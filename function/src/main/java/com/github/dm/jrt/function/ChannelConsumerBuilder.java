@@ -30,153 +30,151 @@ import org.jetbrains.annotations.NotNull;
  */
 public class ChannelConsumerBuilder<OUT> implements ChannelConsumer<OUT> {
 
-    private final ActionDecorator mOnComplete;
+  private final ActionDecorator mOnComplete;
 
-    private final ConsumerDecorator<RoutineException> mOnError;
+  private final ConsumerDecorator<RoutineException> mOnError;
 
-    private final ConsumerDecorator<OUT> mOnOutput;
+  private final ConsumerDecorator<OUT> mOnOutput;
 
-    /**
-     * Constructor.
-     *
-     * @param onOutput   the output consumer.
-     * @param onError    the error consumer.
-     * @param onComplete the complete action.
-     */
-    @SuppressWarnings("unchecked")
-    private ChannelConsumerBuilder(@NotNull final ConsumerDecorator<? super OUT> onOutput,
-            @NotNull final ConsumerDecorator<? super RoutineException> onError,
-            @NotNull final ActionDecorator onComplete) {
-        mOnOutput = (ConsumerDecorator<OUT>) onOutput;
-        mOnError = (ConsumerDecorator<RoutineException>) onError;
-        mOnComplete = onComplete;
-    }
+  /**
+   * Constructor.
+   *
+   * @param onOutput   the output consumer.
+   * @param onError    the error consumer.
+   * @param onComplete the complete action.
+   */
+  @SuppressWarnings("unchecked")
+  private ChannelConsumerBuilder(@NotNull final ConsumerDecorator<? super OUT> onOutput,
+      @NotNull final ConsumerDecorator<? super RoutineException> onError,
+      @NotNull final ActionDecorator onComplete) {
+    mOnOutput = (ConsumerDecorator<OUT>) onOutput;
+    mOnError = (ConsumerDecorator<RoutineException>) onError;
+    mOnComplete = onComplete;
+  }
 
-    /**
-     * Returns a channel consumer builder employing the specified action to handle the invocation
-     * completion.
-     *
-     * @param onComplete the action instance.
-     * @return the builder instance.
-     */
-    @NotNull
-    public static ChannelConsumerBuilder<Object> onComplete(@NotNull final Action onComplete) {
-        return new ChannelConsumerBuilder<Object>(ConsumerDecorator.sink(),
-                ConsumerDecorator.<RoutineException>sink(), ActionDecorator.decorate(onComplete));
-    }
+  /**
+   * Returns a channel consumer builder employing the specified action to handle the invocation
+   * completion.
+   *
+   * @param onComplete the action instance.
+   * @return the builder instance.
+   */
+  @NotNull
+  public static ChannelConsumerBuilder<Object> onComplete(@NotNull final Action onComplete) {
+    return new ChannelConsumerBuilder<Object>(ConsumerDecorator.sink(),
+        ConsumerDecorator.<RoutineException>sink(), ActionDecorator.decorate(onComplete));
+  }
 
-    /**
-     * Returns a channel consumer builder employing the specified consumer function to handle the
-     * invocation errors.
-     *
-     * @param onError the consumer function.
-     * @return the builder instance.
-     */
-    @NotNull
-    public static ChannelConsumerBuilder<Object> onError(
-            @NotNull final Consumer<? super RoutineException> onError) {
-        return new ChannelConsumerBuilder<Object>(ConsumerDecorator.sink(),
-                ConsumerDecorator.decorate(onError), ActionDecorator.noOp());
-    }
+  /**
+   * Returns a channel consumer builder employing the specified consumer function to handle the
+   * invocation errors.
+   *
+   * @param onError the consumer function.
+   * @return the builder instance.
+   */
+  @NotNull
+  public static ChannelConsumerBuilder<Object> onError(
+      @NotNull final Consumer<? super RoutineException> onError) {
+    return new ChannelConsumerBuilder<Object>(ConsumerDecorator.sink(),
+        ConsumerDecorator.decorate(onError), ActionDecorator.noOp());
+  }
 
-    /**
-     * Returns a channel consumer builder employing the specified consumer function to handle the
-     * invocation outputs.
-     *
-     * @param onOutput the consumer function.
-     * @param <OUT>    the output data type.
-     * @return the builder instance.
-     */
-    @NotNull
-    public static <OUT> ChannelConsumerBuilder<OUT> onOutput(
-            @NotNull final Consumer<? super OUT> onOutput) {
-        return new ChannelConsumerBuilder<OUT>(ConsumerDecorator.decorate(onOutput),
-                ConsumerDecorator.<RoutineException>sink(), ActionDecorator.noOp());
-    }
+  /**
+   * Returns a channel consumer builder employing the specified consumer function to handle the
+   * invocation outputs.
+   *
+   * @param onOutput the consumer function.
+   * @param <OUT>    the output data type.
+   * @return the builder instance.
+   */
+  @NotNull
+  public static <OUT> ChannelConsumerBuilder<OUT> onOutput(
+      @NotNull final Consumer<? super OUT> onOutput) {
+    return new ChannelConsumerBuilder<OUT>(ConsumerDecorator.decorate(onOutput),
+        ConsumerDecorator.<RoutineException>sink(), ActionDecorator.noOp());
+  }
 
-    /**
-     * Returns a channel consumer builder employing the specified consumer function to handle the
-     * invocation outputs.
-     *
-     * @param onOutput the consumer function.
-     * @param onError  the consumer function.
-     * @param <OUT>    the output data type.
-     * @return the builder instance.
-     */
-    @NotNull
-    public static <OUT> ChannelConsumerBuilder<OUT> onOutput(
-            @NotNull final Consumer<? super OUT> onOutput,
-            @NotNull final Consumer<? super RoutineException> onError) {
-        return new ChannelConsumerBuilder<OUT>(ConsumerDecorator.decorate(onOutput),
-                ConsumerDecorator.decorate(onError), ActionDecorator.noOp());
-    }
+  /**
+   * Returns a channel consumer builder employing the specified consumer function to handle the
+   * invocation outputs.
+   *
+   * @param onOutput the consumer function.
+   * @param onError  the consumer function.
+   * @param <OUT>    the output data type.
+   * @return the builder instance.
+   */
+  @NotNull
+  public static <OUT> ChannelConsumerBuilder<OUT> onOutput(
+      @NotNull final Consumer<? super OUT> onOutput,
+      @NotNull final Consumer<? super RoutineException> onError) {
+    return new ChannelConsumerBuilder<OUT>(ConsumerDecorator.decorate(onOutput),
+        ConsumerDecorator.decorate(onError), ActionDecorator.noOp());
+  }
 
-    /**
-     * Returns a channel consumer builder employing the specified functions to handle the invocation
-     * outputs, errors adn completion.
-     *
-     * @param onOutput   the consumer function.
-     * @param onError    the consumer function.
-     * @param onComplete the action instance.
-     * @param <OUT>      the output data type.
-     * @return the builder instance.
-     */
-    @NotNull
-    public static <OUT> ChannelConsumerBuilder<OUT> onOutput(
-            @NotNull final Consumer<? super OUT> onOutput,
-            @NotNull final Consumer<? super RoutineException> onError,
-            @NotNull final Action onComplete) {
-        return new ChannelConsumerBuilder<OUT>(ConsumerDecorator.decorate(onOutput),
-                ConsumerDecorator.decorate(onError), ActionDecorator.decorate(onComplete));
-    }
+  /**
+   * Returns a channel consumer builder employing the specified functions to handle the invocation
+   * outputs, errors adn completion.
+   *
+   * @param onOutput   the consumer function.
+   * @param onError    the consumer function.
+   * @param onComplete the action instance.
+   * @param <OUT>      the output data type.
+   * @return the builder instance.
+   */
+  @NotNull
+  public static <OUT> ChannelConsumerBuilder<OUT> onOutput(
+      @NotNull final Consumer<? super OUT> onOutput,
+      @NotNull final Consumer<? super RoutineException> onError, @NotNull final Action onComplete) {
+    return new ChannelConsumerBuilder<OUT>(ConsumerDecorator.decorate(onOutput),
+        ConsumerDecorator.decorate(onError), ActionDecorator.decorate(onComplete));
+  }
 
-    /**
-     * Returns a new channel consumer builder employing also the specified consumer function to
-     * handle the invocation completion.
-     *
-     * @param onComplete the action instance.
-     * @return the builder instance.
-     */
-    @NotNull
-    public ChannelConsumerBuilder<OUT> andOnComplete(@NotNull final Action onComplete) {
-        return new ChannelConsumerBuilder<OUT>(mOnOutput, mOnError,
-                mOnComplete.andThen(onComplete));
-    }
+  /**
+   * Returns a new channel consumer builder employing also the specified consumer function to
+   * handle the invocation completion.
+   *
+   * @param onComplete the action instance.
+   * @return the builder instance.
+   */
+  @NotNull
+  public ChannelConsumerBuilder<OUT> andOnComplete(@NotNull final Action onComplete) {
+    return new ChannelConsumerBuilder<OUT>(mOnOutput, mOnError, mOnComplete.andThen(onComplete));
+  }
 
-    /**
-     * Returns a new channel consumer builder employing also the specified consumer function to
-     * handle the invocation errors.
-     *
-     * @param onError the consumer function.
-     * @return the builder instance.
-     */
-    @NotNull
-    public ChannelConsumerBuilder<OUT> andOnError(
-            @NotNull final Consumer<? super RoutineException> onError) {
-        return new ChannelConsumerBuilder<OUT>(mOnOutput, mOnError.andThen(onError), mOnComplete);
-    }
+  /**
+   * Returns a new channel consumer builder employing also the specified consumer function to
+   * handle the invocation errors.
+   *
+   * @param onError the consumer function.
+   * @return the builder instance.
+   */
+  @NotNull
+  public ChannelConsumerBuilder<OUT> andOnError(
+      @NotNull final Consumer<? super RoutineException> onError) {
+    return new ChannelConsumerBuilder<OUT>(mOnOutput, mOnError.andThen(onError), mOnComplete);
+  }
 
-    /**
-     * Returns a new channel consumer builder employing also the specified consumer function to
-     * handle the invocation outputs.
-     *
-     * @param onOutput the consumer function.
-     * @return the builder instance.
-     */
-    @NotNull
-    public ChannelConsumerBuilder<OUT> andOnOutput(@NotNull final Consumer<? super OUT> onOutput) {
-        return new ChannelConsumerBuilder<OUT>(mOnOutput.andThen(onOutput), mOnError, mOnComplete);
-    }
+  /**
+   * Returns a new channel consumer builder employing also the specified consumer function to
+   * handle the invocation outputs.
+   *
+   * @param onOutput the consumer function.
+   * @return the builder instance.
+   */
+  @NotNull
+  public ChannelConsumerBuilder<OUT> andOnOutput(@NotNull final Consumer<? super OUT> onOutput) {
+    return new ChannelConsumerBuilder<OUT>(mOnOutput.andThen(onOutput), mOnError, mOnComplete);
+  }
 
-    public void onComplete() throws Exception {
-        mOnComplete.perform();
-    }
+  public void onComplete() throws Exception {
+    mOnComplete.perform();
+  }
 
-    public void onError(@NotNull final RoutineException error) throws Exception {
-        mOnError.accept(error);
-    }
+  public void onError(@NotNull final RoutineException error) throws Exception {
+    mOnError.accept(error);
+  }
 
-    public void onOutput(final OUT output) throws Exception {
-        mOnOutput.accept(output);
-    }
+  public void onOutput(final OUT output) throws Exception {
+    mOnOutput.accept(output);
+  }
 }

@@ -34,52 +34,52 @@ import java.util.IdentityHashMap;
  */
 class DistinctIdentityInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
 
-    private static final Object PLACEHOLDER = new Object();
+  private static final Object PLACEHOLDER = new Object();
 
-    private static final InvocationFactory<?, ?> sFactory =
-            new InvocationFactory<Object, Object>(null) {
+  private static final InvocationFactory<?, ?> sFactory =
+      new InvocationFactory<Object, Object>(null) {
 
-                @NotNull
-                @Override
-                public Invocation<Object, Object> newInvocation() {
-                    return new DistinctIdentityInvocation<Object>();
-                }
-            };
-
-    private IdentityHashMap<DATA, Object> mMap;
-
-    /**
-     * Constructor.
-     */
-    private DistinctIdentityInvocation() {
-    }
-
-    /**
-     * Returns a factory of invocations filtering out inputs which are not unique.
-     *
-     * @param <DATA> the data type.
-     * @return the factory instance.
-     */
-    @NotNull
-    @SuppressWarnings("unchecked")
-    static <DATA> InvocationFactory<DATA, DATA> factoryOf() {
-        return (InvocationFactory<DATA, DATA>) sFactory;
-    }
-
-    @Override
-    public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) {
-        if (mMap.put(input, PLACEHOLDER) == null) {
-            result.pass(input);
+        @NotNull
+        @Override
+        public Invocation<Object, Object> newInvocation() {
+          return new DistinctIdentityInvocation<Object>();
         }
-    }
+      };
 
-    @Override
-    public void onRecycle(final boolean isReused) {
-        mMap = null;
-    }
+  private IdentityHashMap<DATA, Object> mMap;
 
-    @Override
-    public void onRestart() {
-        mMap = new IdentityHashMap<DATA, Object>();
+  /**
+   * Constructor.
+   */
+  private DistinctIdentityInvocation() {
+  }
+
+  /**
+   * Returns a factory of invocations filtering out inputs which are not unique.
+   *
+   * @param <DATA> the data type.
+   * @return the factory instance.
+   */
+  @NotNull
+  @SuppressWarnings("unchecked")
+  static <DATA> InvocationFactory<DATA, DATA> factoryOf() {
+    return (InvocationFactory<DATA, DATA>) sFactory;
+  }
+
+  @Override
+  public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) {
+    if (mMap.put(input, PLACEHOLDER) == null) {
+      result.pass(input);
     }
+  }
+
+  @Override
+  public void onRecycle(final boolean isReused) {
+    mMap = null;
+  }
+
+  @Override
+  public void onRestart() {
+    mMap = new IdentityHashMap<DATA, Object>();
+  }
 }

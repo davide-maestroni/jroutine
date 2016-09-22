@@ -37,29 +37,29 @@ import static com.github.dm.jrt.core.util.Reflection.newInstanceOf;
 @SuppressWarnings("unused")
 public class TestApp extends Application implements FactoryContext {
 
-    private final HashMap<InstanceInfo, Object> mInstances = new HashMap<InstanceInfo, Object>();
+  private final HashMap<InstanceInfo, Object> mInstances = new HashMap<InstanceInfo, Object>();
 
-    @Nullable
-    @SuppressWarnings("unchecked")
-    public <TYPE> TYPE geInstance(@NotNull final Class<? extends TYPE> type,
-            @NotNull final Object[] args) {
+  @Nullable
+  @SuppressWarnings("unchecked")
+  public <TYPE> TYPE geInstance(@NotNull final Class<? extends TYPE> type,
+      @NotNull final Object[] args) {
 
-        final HashMap<InstanceInfo, Object> instances = mInstances;
-        final InstanceInfo instanceInfo = new InstanceInfo(type, args);
-        Object instance = instances.get(instanceInfo);
-        if (instance == null) {
-            instance = newInstanceOf(type, args);
-            instances.put(instanceInfo, instance);
-        }
-
-        return (TYPE) instance;
+    final HashMap<InstanceInfo, Object> instances = mInstances;
+    final InstanceInfo instanceInfo = new InstanceInfo(type, args);
+    Object instance = instances.get(instanceInfo);
+    if (instance == null) {
+      instance = newInstanceOf(type, args);
+      instances.put(instanceInfo, instance);
     }
 
-    private static class InstanceInfo extends DeepEqualObject {
+    return (TYPE) instance;
+  }
 
-        private InstanceInfo(@NotNull final Class<?> type, @NotNull final Object[] args) {
+  private static class InstanceInfo extends DeepEqualObject {
 
-            super(asArgs(type, args));
-        }
+    private InstanceInfo(@NotNull final Class<?> type, @NotNull final Object[] args) {
+
+      super(asArgs(type, args));
     }
+  }
 }

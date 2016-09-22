@@ -80,37 +80,37 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface AsyncOutput {
 
-    /**
-     * The output transfer mode.
-     *
-     * @return the mode.
-     */
-    OutputMode value() default OutputMode.VALUE;
+  /**
+   * The output transfer mode.
+   *
+   * @return the mode.
+   */
+  OutputMode value() default OutputMode.VALUE;
+
+  /**
+   * Output transfer mode type.
+   * <br>
+   * The mode indicates in which way the result is passed outside.
+   */
+  enum OutputMode {
 
     /**
-     * Output transfer mode type.
+     * Value mode.
      * <br>
-     * The mode indicates in which way the result is passed outside.
+     * The variable is just passed to the channel.
+     * <p>
+     * The annotated method must return a superclass of
+     * {@link com.github.dm.jrt.core.channel.Channel Channel}.
      */
-    enum OutputMode {
-
-        /**
-         * Value mode.
-         * <br>
-         * The variable is just passed to the channel.
-         * <p>
-         * The annotated method must return a superclass of
-         * {@link com.github.dm.jrt.core.channel.Channel Channel}.
-         */
-        VALUE,
-        /**
-         * Element mode.
-         * <br>
-         * The elements of the result array or iterable are passed one by one to the channel.
-         * <p>
-         * The annotated method must return a superclass of
-         * {@link com.github.dm.jrt.core.channel.Channel Channel}.
-         */
-        ELEMENT
-    }
+    VALUE,
+    /**
+     * Element mode.
+     * <br>
+     * The elements of the result array or iterable are passed one by one to the channel.
+     * <p>
+     * The annotated method must return a superclass of
+     * {@link com.github.dm.jrt.core.channel.Channel Channel}.
+     */
+    ELEMENT
+  }
 }

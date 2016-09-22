@@ -60,10 +60,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ServiceRunner {
 
-    /**
-     * The runner class.
-     *
-     * @return the runner class.
-     */
-    Class<? extends Runner> value();
+  /**
+   * The runner class.
+   *
+   * @return the runner class.
+   */
+  Class<? extends Runner> value();
 }

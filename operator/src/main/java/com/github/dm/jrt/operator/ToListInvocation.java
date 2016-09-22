@@ -34,38 +34,38 @@ import java.util.List;
  */
 class ToListInvocation<DATA> extends CallInvocation<DATA, List<DATA>> {
 
-    private static final InvocationFactory<?, ? extends List<?>> sFactory =
-            new InvocationFactory<Object, List<Object>>(null) {
+  private static final InvocationFactory<?, ? extends List<?>> sFactory =
+      new InvocationFactory<Object, List<Object>>(null) {
 
-                @NotNull
-                @Override
-                public Invocation<Object, List<Object>> newInvocation() {
-                    return new ToListInvocation<Object>();
-                }
-            };
+        @NotNull
+        @Override
+        public Invocation<Object, List<Object>> newInvocation() {
+          return new ToListInvocation<Object>();
+        }
+      };
 
-    /**
-     * Constructor.
-     */
-    private ToListInvocation() {
-    }
+  /**
+   * Constructor.
+   */
+  private ToListInvocation() {
+  }
 
-    /**
-     * Returns the factory of collecting invocations.
-     *
-     * @param <DATA> the data type.
-     * @return the factory instance.
-     */
-    @NotNull
-    @SuppressWarnings("unchecked")
-    static <DATA> InvocationFactory<DATA, List<DATA>> factoryOf() {
-        return (InvocationFactory<DATA, List<DATA>>) sFactory;
-    }
+  /**
+   * Returns the factory of collecting invocations.
+   *
+   * @param <DATA> the data type.
+   * @return the factory instance.
+   */
+  @NotNull
+  @SuppressWarnings("unchecked")
+  static <DATA> InvocationFactory<DATA, List<DATA>> factoryOf() {
+    return (InvocationFactory<DATA, List<DATA>>) sFactory;
+  }
 
-    @Override
-    @SuppressWarnings("unchecked")
-    protected void onCall(@NotNull final List<? extends DATA> inputs,
-            @NotNull final Channel<List<DATA>, ?> result) {
-        result.pass((List<DATA>) inputs);
-    }
+  @Override
+  @SuppressWarnings("unchecked")
+  protected void onCall(@NotNull final List<? extends DATA> inputs,
+      @NotNull final Channel<List<DATA>, ?> result) {
+    result.pass((List<DATA>) inputs);
+  }
 }

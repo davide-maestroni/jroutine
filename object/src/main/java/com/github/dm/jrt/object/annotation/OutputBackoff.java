@@ -61,10 +61,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface OutputBackoff {
 
-    /**
-     * The backoff to apply while waiting for an output channel to have room for additional data.
-     *
-     * @return the backoff type.
-     */
-    Class<? extends Backoff> value();
+  /**
+   * The backoff to apply while waiting for an output channel to have room for additional data.
+   *
+   * @return the backoff type.
+   */
+  Class<? extends Backoff> value();
 }

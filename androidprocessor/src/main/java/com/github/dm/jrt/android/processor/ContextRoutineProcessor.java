@@ -40,260 +40,247 @@ import javax.lang.model.util.Types;
  */
 public class ContextRoutineProcessor extends RoutineProcessor {
 
-    private TypeMirror mCacheAnnotationType;
+  private TypeMirror mCacheAnnotationType;
 
-    private TypeMirror mClashAnnotationType;
+  private TypeMirror mClashAnnotationType;
 
-    private TypeMirror mFactoryIdAnnotationType;
+  private TypeMirror mFactoryIdAnnotationType;
 
-    private String mHeaderService;
+  private String mHeaderService;
 
-    private String mHeaderV11;
+  private String mHeaderV11;
 
-    private String mHeaderV4;
+  private String mHeaderV4;
 
-    private TypeMirror mIdAnnotationType;
+  private TypeMirror mIdAnnotationType;
 
-    private TypeMirror mInputClashAnnotationType;
+  private TypeMirror mInputClashAnnotationType;
 
-    private TypeElement mLoaderProxyCompatElement;
+  private TypeElement mLoaderProxyCompatElement;
 
-    private TypeElement mLoaderProxyElement;
+  private TypeElement mLoaderProxyElement;
 
-    private TypeMirror mLogClassAnnotationType;
+  private TypeMirror mLogClassAnnotationType;
 
-    private String mMethodHeader;
+  private String mMethodHeader;
 
-    private String mMethodHeaderV1;
+  private String mMethodHeaderV1;
 
-    private String mMethodInvocationFooter;
+  private String mMethodInvocationFooter;
 
-    private String mMethodInvocationHeader;
+  private String mMethodInvocationHeader;
 
-    private TypeMirror mRunnerClassAnnotationType;
+  private TypeMirror mRunnerClassAnnotationType;
 
-    private TypeElement mServiceProxyElement;
+  private TypeElement mServiceProxyElement;
 
-    private TypeMirror mStaleTimeAnnotationType;
+  private TypeMirror mStaleTimeAnnotationType;
 
-    @Override
-    public Set<String> getSupportedAnnotationTypes() {
-        final HashSet<String> types = new HashSet<String>();
-        types.add("com.github.dm.jrt.android.proxy.annotation.ServiceProxy");
-        types.add("com.github.dm.jrt.android.proxy.annotation.LoaderProxyCompat");
-        types.add("com.github.dm.jrt.android.proxy.annotation.LoaderProxy");
-        return types;
+  @Override
+  public Set<String> getSupportedAnnotationTypes() {
+    final HashSet<String> types = new HashSet<String>();
+    types.add("com.github.dm.jrt.android.proxy.annotation.ServiceProxy");
+    types.add("com.github.dm.jrt.android.proxy.annotation.LoaderProxyCompat");
+    types.add("com.github.dm.jrt.android.proxy.annotation.LoaderProxy");
+    return types;
+  }
+
+  @Override
+  public synchronized void init(final ProcessingEnvironment processingEnv) {
+    super.init(processingEnv);
+    mIdAnnotationType = getMirrorFromName("com.github.dm.jrt.android.object.annotation.LoaderId");
+    mLogClassAnnotationType =
+        getMirrorFromName("com.github.dm.jrt.android.object.annotation.ServiceLog");
+    mFactoryIdAnnotationType =
+        getMirrorFromName("com.github.dm.jrt.android.object.annotation.FactoryId");
+    mClashAnnotationType =
+        getMirrorFromName("com.github.dm.jrt.android.object.annotation.ClashResolution");
+    mInputClashAnnotationType =
+        getMirrorFromName("com.github.dm.jrt.android.object.annotation.InputClashResolution");
+    mCacheAnnotationType =
+        getMirrorFromName("com.github.dm.jrt.android.object.annotation.CacheStrategy");
+    mStaleTimeAnnotationType =
+        getMirrorFromName("com.github.dm.jrt.android.object.annotation.ResultStaleTime");
+    mRunnerClassAnnotationType =
+        getMirrorFromName("com.github.dm.jrt.android.object.annotation.ServiceRunner");
+    final Types typeUtils = processingEnv.getTypeUtils();
+    mServiceProxyElement = (TypeElement) typeUtils.asElement(
+        getMirrorFromName("com.github.dm.jrt.android.proxy.annotation.ServiceProxy"));
+    mLoaderProxyCompatElement = (TypeElement) typeUtils.asElement(
+        getMirrorFromName("com.github.dm.jrt.android.proxy.annotation.LoaderProxyCompat"));
+    mLoaderProxyElement = (TypeElement) typeUtils.asElement(
+        getMirrorFromName("com.github.dm.jrt.android.proxy.annotation.LoaderProxy"));
+  }
+
+  @NotNull
+  @Override
+  protected String buildRoutineFieldsInit(@NotNull final TypeElement annotationElement,
+      @NotNull final TypeElement element, @NotNull final Element targetElement, final int size) {
+    final TypeElement serviceProxyElement = mServiceProxyElement;
+    final StringBuilder builder = new StringBuilder();
+    for (int i = 1; i <= size; ++i) {
+      builder.append("mRoutine").append(i).append(" = ").append("initRoutine").append(i);
+      if (annotationElement == serviceProxyElement) {
+        builder.append(
+            "(target, invocationConfiguration, objectConfiguration, serviceConfiguration);");
+
+      } else {
+        builder.append(
+            "(target, invocationConfiguration, objectConfiguration, loaderConfiguration);");
+      }
+
+      builder.append(NEW_LINE);
     }
 
-    @Override
-    public synchronized void init(final ProcessingEnvironment processingEnv) {
-        super.init(processingEnv);
-        mIdAnnotationType =
-                getMirrorFromName("com.github.dm.jrt.android.object.annotation.LoaderId");
-        mLogClassAnnotationType =
-                getMirrorFromName("com.github.dm.jrt.android.object.annotation.ServiceLog");
-        mFactoryIdAnnotationType =
-                getMirrorFromName("com.github.dm.jrt.android.object.annotation.FactoryId");
-        mClashAnnotationType =
-                getMirrorFromName("com.github.dm.jrt.android.object.annotation.ClashResolution");
-        mInputClashAnnotationType = getMirrorFromName(
-                "com.github.dm.jrt.android.object.annotation.InputClashResolution");
-        mCacheAnnotationType =
-                getMirrorFromName("com.github.dm.jrt.android.object.annotation.CacheStrategy");
-        mStaleTimeAnnotationType =
-                getMirrorFromName("com.github.dm.jrt.android.object.annotation.ResultStaleTime");
-        mRunnerClassAnnotationType =
-                getMirrorFromName("com.github.dm.jrt.android.object.annotation.ServiceRunner");
-        final Types typeUtils = processingEnv.getTypeUtils();
-        mServiceProxyElement = (TypeElement) typeUtils.asElement(
-                getMirrorFromName("com.github.dm.jrt.android.proxy.annotation.ServiceProxy"));
-        mLoaderProxyCompatElement = (TypeElement) typeUtils.asElement(
-                getMirrorFromName("com.github.dm.jrt.android.proxy.annotation.LoaderProxyCompat"));
-        mLoaderProxyElement = (TypeElement) typeUtils.asElement(
-                getMirrorFromName("com.github.dm.jrt.android.proxy.annotation.LoaderProxy"));
+    return builder.toString();
+  }
+
+  @NotNull
+  @Override
+  protected String getHeaderTemplate(@NotNull final TypeElement annotationElement,
+      @NotNull final TypeElement element, @NotNull final Element targetElement) throws IOException {
+    final TypeElement serviceProxyElement = mServiceProxyElement;
+    final TypeElement loaderProxyCompatElement = mLoaderProxyCompatElement;
+    final TypeElement loaderProxyElement = mLoaderProxyElement;
+    if (annotationElement == serviceProxyElement) {
+      if (mHeaderService == null) {
+        mHeaderService = parseTemplate("/android/templates/header.txt");
+      }
+
+      return mHeaderService;
     }
 
-    @NotNull
-    @Override
-    protected String buildRoutineFieldsInit(@NotNull final TypeElement annotationElement,
-            @NotNull final TypeElement element, @NotNull final Element targetElement,
-            final int size) {
-        final TypeElement serviceProxyElement = mServiceProxyElement;
-        final StringBuilder builder = new StringBuilder();
-        for (int i = 1; i <= size; ++i) {
-            builder.append("mRoutine").append(i).append(" = ").append("initRoutine").append(i);
-            if (annotationElement == serviceProxyElement) {
-                builder.append("(target, invocationConfiguration, objectConfiguration, "
-                        + "serviceConfiguration);");
+    if (annotationElement == loaderProxyCompatElement) {
+      if (mHeaderV4 == null) {
+        mHeaderV4 = parseTemplate("/android/v4/templates/header.txt");
+      }
 
-            } else {
-                builder.append("(target, invocationConfiguration, objectConfiguration, "
-                        + "loaderConfiguration);");
-            }
-
-            builder.append(NEW_LINE);
-        }
-
-        return builder.toString();
+      return mHeaderV4;
     }
 
-    @NotNull
-    @Override
-    protected String getHeaderTemplate(@NotNull final TypeElement annotationElement,
-            @NotNull final TypeElement element, @NotNull final Element targetElement) throws
-            IOException {
-        final TypeElement serviceProxyElement = mServiceProxyElement;
-        final TypeElement loaderProxyCompatElement = mLoaderProxyCompatElement;
-        final TypeElement loaderProxyElement = mLoaderProxyElement;
-        if (annotationElement == serviceProxyElement) {
-            if (mHeaderService == null) {
-                mHeaderService = parseTemplate("/android/templates/header.txt");
-            }
+    if (annotationElement == loaderProxyElement) {
+      if (mHeaderV11 == null) {
+        mHeaderV11 = parseTemplate("/android/v11/templates/header.txt");
+      }
 
-            return mHeaderService;
-        }
-
-        if (annotationElement == loaderProxyCompatElement) {
-            if (mHeaderV4 == null) {
-                mHeaderV4 = parseTemplate("/android/v4/templates/header.txt");
-            }
-
-            return mHeaderV4;
-        }
-
-        if (annotationElement == loaderProxyElement) {
-            if (mHeaderV11 == null) {
-                mHeaderV11 = parseTemplate("/android/v11/templates/header.txt");
-            }
-
-            return mHeaderV11;
-        }
-
-        return super.getHeaderTemplate(annotationElement, element, targetElement);
+      return mHeaderV11;
     }
 
-    @NotNull
-    @Override
-    protected String getMethodHeaderTemplate(@NotNull final TypeElement annotationElement,
-            @NotNull final TypeElement element, @NotNull final Element targetElement,
-            @NotNull final ExecutableElement methodElement, final int count) throws IOException {
-        if (annotationElement != mServiceProxyElement) {
-            if (mMethodHeaderV1 == null) {
-                mMethodHeaderV1 = parseTemplate("/android/v1/templates/method_header.txt");
-            }
+    return super.getHeaderTemplate(annotationElement, element, targetElement);
+  }
 
-            return mMethodHeaderV1.replace("${loaderBuilderOptions}",
-                    buildLoaderOptions(methodElement));
-        }
+  @NotNull
+  @Override
+  protected String getMethodHeaderTemplate(@NotNull final TypeElement annotationElement,
+      @NotNull final TypeElement element, @NotNull final Element targetElement,
+      @NotNull final ExecutableElement methodElement, final int count) throws IOException {
+    if (annotationElement != mServiceProxyElement) {
+      if (mMethodHeaderV1 == null) {
+        mMethodHeaderV1 = parseTemplate("/android/v1/templates/method_header.txt");
+      }
 
-        if (mMethodHeader == null) {
-            mMethodHeader = parseTemplate("/android/templates/method_header.txt");
-        }
-
-        return mMethodHeader.replace("${serviceBuilderOptions}",
-                buildServiceOptions(methodElement));
+      return mMethodHeaderV1.replace("${loaderBuilderOptions}", buildLoaderOptions(methodElement));
     }
 
-    @NotNull
-    @Override
-    protected String getMethodInvocationFooterTemplate(@NotNull final TypeElement annotationElement,
-            @NotNull final TypeElement element, @NotNull final Element targetElement,
-            @NotNull final ExecutableElement methodElement, final int count) throws IOException {
-        if (mMethodInvocationFooter == null) {
-            mMethodInvocationFooter =
-                    parseTemplate("/android/templates/method_invocation_footer.txt");
-        }
-
-        return mMethodInvocationFooter;
+    if (mMethodHeader == null) {
+      mMethodHeader = parseTemplate("/android/templates/method_header.txt");
     }
 
-    @NotNull
-    @Override
-    protected String getMethodInvocationHeaderTemplate(@NotNull final TypeElement annotationElement,
-            @NotNull final TypeElement element, @NotNull final Element targetElement,
-            @NotNull final ExecutableElement methodElement, final int count) throws IOException {
-        if (mMethodInvocationHeader == null) {
-            mMethodInvocationHeader =
-                    parseTemplate("/android/templates/method_invocation_header.txt");
-        }
+    return mMethodHeader.replace("${serviceBuilderOptions}", buildServiceOptions(methodElement));
+  }
 
-        return mMethodInvocationHeader;
+  @NotNull
+  @Override
+  protected String getMethodInvocationFooterTemplate(@NotNull final TypeElement annotationElement,
+      @NotNull final TypeElement element, @NotNull final Element targetElement,
+      @NotNull final ExecutableElement methodElement, final int count) throws IOException {
+    if (mMethodInvocationFooter == null) {
+      mMethodInvocationFooter = parseTemplate("/android/templates/method_invocation_footer.txt");
     }
 
-    @NotNull
-    private String buildLoaderOptions(@NotNull final ExecutableElement methodElement) {
-        // We need to avoid explicit dependency on the android module...
-        final StringBuilder builder = new StringBuilder();
-        final Integer loaderId =
-                (Integer) getAnnotationValue(methodElement, mIdAnnotationType, "value");
-        if (loaderId != null) {
-            builder.append(".withLoaderId(").append(loaderId).append(")");
-        }
+    return mMethodInvocationFooter;
+  }
 
-        final Integer factoryId =
-                (Integer) getAnnotationValue(methodElement, mFactoryIdAnnotationType, "value");
-        if (factoryId != null) {
-            builder.append(".withFactoryId(").append(factoryId).append(")");
-        }
-
-        final Object resolutionType =
-                getAnnotationValue(methodElement, mClashAnnotationType, "value");
-        if (resolutionType != null) {
-            builder.append(
-                    ".withClashResolution(com.github.dm.jrt.android.core.config.LoaderConfiguration"
-                            + ".ClashResolutionType.").append(resolutionType).append(")");
-        }
-
-        final Object inputResolutionType =
-                getAnnotationValue(methodElement, mInputClashAnnotationType, "value");
-        if (inputResolutionType != null) {
-            builder.append(".withInputClashResolution(com.github.dm.jrt.android.core.config"
-                    + ".LoaderConfiguration.ClashResolutionType.")
-                   .append(resolutionType)
-                   .append(")");
-        }
-
-        final Object strategyType =
-                getAnnotationValue(methodElement, mCacheAnnotationType, "value");
-        if (strategyType != null) {
-            builder.append(
-                    ".withCacheStrategy(com.github.dm.jrt.android.core.config.LoaderConfiguration"
-                            + ".CacheStrategyType.").append(strategyType).append(")");
-        }
-
-        final TypeMirror staleTimeAnnotationType = mStaleTimeAnnotationType;
-        final Object staleTime =
-                getAnnotationValue(methodElement, staleTimeAnnotationType, "value");
-        if (staleTime != null) {
-            final Object staleTimeUnit =
-                    getAnnotationValue(methodElement, staleTimeAnnotationType, "unit");
-            builder.append(".withResultStaleTime(")
-                   .append(staleTime)
-                   .append(", ")
-                   .append(TimeUnit.class.getCanonicalName())
-                   .append(".")
-                   .append((staleTimeUnit != null) ? staleTimeUnit : TimeUnit.MILLISECONDS)
-                   .append(")");
-        }
-
-        return builder.toString();
+  @NotNull
+  @Override
+  protected String getMethodInvocationHeaderTemplate(@NotNull final TypeElement annotationElement,
+      @NotNull final TypeElement element, @NotNull final Element targetElement,
+      @NotNull final ExecutableElement methodElement, final int count) throws IOException {
+    if (mMethodInvocationHeader == null) {
+      mMethodInvocationHeader = parseTemplate("/android/templates/method_invocation_header.txt");
     }
 
-    @NotNull
-    private String buildServiceOptions(@NotNull final ExecutableElement methodElement) {
-        // We need to avoid explicit dependency on the android module...
-        final StringBuilder builder = new StringBuilder();
-        final Object logClass = getAnnotationValue(methodElement, mLogClassAnnotationType, "value");
-        if (logClass != null) {
-            builder.append(".withLogClass(").append(logClass).append(")");
-        }
+    return mMethodInvocationHeader;
+  }
 
-        final Object runnerClass =
-                getAnnotationValue(methodElement, mRunnerClassAnnotationType, "value");
-        if (runnerClass != null) {
-            builder.append(".withRunnerClass(").append(runnerClass).append(")");
-        }
-
-        return builder.toString();
+  @NotNull
+  private String buildLoaderOptions(@NotNull final ExecutableElement methodElement) {
+    // We need to avoid explicit dependency on the android module...
+    final StringBuilder builder = new StringBuilder();
+    final Integer loaderId =
+        (Integer) getAnnotationValue(methodElement, mIdAnnotationType, "value");
+    if (loaderId != null) {
+      builder.append(".withLoaderId(").append(loaderId).append(")");
     }
+
+    final Integer factoryId =
+        (Integer) getAnnotationValue(methodElement, mFactoryIdAnnotationType, "value");
+    if (factoryId != null) {
+      builder.append(".withFactoryId(").append(factoryId).append(")");
+    }
+
+    final Object resolutionType = getAnnotationValue(methodElement, mClashAnnotationType, "value");
+    if (resolutionType != null) {
+      builder.append(
+          ".withClashResolution(com.github.dm.jrt.android.core.config.LoaderConfiguration"
+              + ".ClashResolutionType.").append(resolutionType).append(")");
+    }
+
+    final Object inputResolutionType =
+        getAnnotationValue(methodElement, mInputClashAnnotationType, "value");
+    if (inputResolutionType != null) {
+      builder.append(".withInputClashResolution(com.github.dm.jrt.android.core.config"
+          + ".LoaderConfiguration.ClashResolutionType.").append(resolutionType).append(")");
+    }
+
+    final Object strategyType = getAnnotationValue(methodElement, mCacheAnnotationType, "value");
+    if (strategyType != null) {
+      builder.append(".withCacheStrategy(com.github.dm.jrt.android.core.config.LoaderConfiguration"
+          + ".CacheStrategyType.").append(strategyType).append(")");
+    }
+
+    final TypeMirror staleTimeAnnotationType = mStaleTimeAnnotationType;
+    final Object staleTime = getAnnotationValue(methodElement, staleTimeAnnotationType, "value");
+    if (staleTime != null) {
+      final Object staleTimeUnit =
+          getAnnotationValue(methodElement, staleTimeAnnotationType, "unit");
+      builder.append(".withResultStaleTime(")
+             .append(staleTime)
+             .append(", ")
+             .append(TimeUnit.class.getCanonicalName())
+             .append(".")
+             .append((staleTimeUnit != null) ? staleTimeUnit : TimeUnit.MILLISECONDS)
+             .append(")");
+    }
+
+    return builder.toString();
+  }
+
+  @NotNull
+  private String buildServiceOptions(@NotNull final ExecutableElement methodElement) {
+    // We need to avoid explicit dependency on the android module...
+    final StringBuilder builder = new StringBuilder();
+    final Object logClass = getAnnotationValue(methodElement, mLogClassAnnotationType, "value");
+    if (logClass != null) {
+      builder.append(".withLogClass(").append(logClass).append(")");
+    }
+
+    final Object runnerClass =
+        getAnnotationValue(methodElement, mRunnerClassAnnotationType, "value");
+    if (runnerClass != null) {
+      builder.append(".withRunnerClass(").append(runnerClass).append(")");
+    }
+
+    return builder.toString();
+  }
 }

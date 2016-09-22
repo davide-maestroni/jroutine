@@ -44,53 +44,53 @@ import static com.github.dm.jrt.android.v4.core.LoaderContextCompat.loaderFrom;
  */
 public class MainActivity extends AppCompatActivity {
 
-    private ArrayAdapter<Repo> mRepoAdapter;
+  private ArrayAdapter<Repo> mRepoAdapter;
 
-    @Override
-    protected void onCreate(final Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        getWindow().addFlags(LayoutParams.FLAG_DISMISS_KEYGUARD |
-                LayoutParams.FLAG_SHOW_WHEN_LOCKED |
-                LayoutParams.FLAG_TURN_SCREEN_ON | LayoutParams.FLAG_KEEP_SCREEN_ON);
-        setContentView(R.layout.activity_main);
-        mRepoAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
-        final ListView repoList = (ListView) findViewById(R.id.repo_list);
-        if (repoList != null) {
-            repoList.setAdapter(mRepoAdapter);
+  @Override
+  protected void onCreate(final Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    getWindow().addFlags(LayoutParams.FLAG_DISMISS_KEYGUARD |
+        LayoutParams.FLAG_SHOW_WHEN_LOCKED |
+        LayoutParams.FLAG_TURN_SCREEN_ON | LayoutParams.FLAG_KEEP_SCREEN_ON);
+    setContentView(R.layout.activity_main);
+    mRepoAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
+    final ListView repoList = (ListView) findViewById(R.id.repo_list);
+    if (repoList != null) {
+      repoList.setAdapter(mRepoAdapter);
+    }
+  }
+
+  @Override
+  protected void onResume() {
+    super.onResume();
+    final LoaderAdapterFactoryCompat adapterFactory =
+        LoaderAdapterFactoryCompat.on(loaderFrom(this)).buildFactory();
+    final Retrofit retrofit = new Builder().baseUrl("https://api.github.com")
+                                           .addCallAdapterFactory(adapterFactory)
+                                           .addConverterFactory(GsonConverterFactory.create())
+                                           .build();
+    final GitHubService service = retrofit.create(GitHubService.class);
+    service.listRepos("octocat").bind(new TemplateChannelConsumer<List<Repo>>() {
+
+      @Override
+      public void onError(@NotNull final RoutineException error) {
+        final Throwable cause = error.getCause();
+        Toast.makeText(MainActivity.this,
+            (cause != null) ? cause.getMessage() : "Cannot load repository list", Toast.LENGTH_LONG)
+             .show();
+      }
+
+      @Override
+      public void onOutput(final List<Repo> output) {
+        final ArrayAdapter<Repo> adapter = mRepoAdapter;
+        for (final Repo repo : output) {
+          adapter.setNotifyOnChange(false);
+          adapter.add(repo);
         }
-    }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        final LoaderAdapterFactoryCompat adapterFactory =
-                LoaderAdapterFactoryCompat.on(loaderFrom(this)).buildFactory();
-        final Retrofit retrofit = new Builder().baseUrl("https://api.github.com")
-                                               .addCallAdapterFactory(adapterFactory)
-                                               .addConverterFactory(GsonConverterFactory.create())
-                                               .build();
-        final GitHubService service = retrofit.create(GitHubService.class);
-        service.listRepos("octocat").bind(new TemplateChannelConsumer<List<Repo>>() {
-
-            @Override
-            public void onError(@NotNull final RoutineException error) {
-                final Throwable cause = error.getCause();
-                Toast.makeText(MainActivity.this,
-                        (cause != null) ? cause.getMessage() : "Cannot load repository list",
-                        Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onOutput(final List<Repo> output) {
-                final ArrayAdapter<Repo> adapter = mRepoAdapter;
-                for (final Repo repo : output) {
-                    adapter.setNotifyOnChange(false);
-                    adapter.add(repo);
-                }
-
-                adapter.setNotifyOnChange(true);
-                adapter.notifyDataSetChanged();
-            }
-        });
-    }
+        adapter.setNotifyOnChange(true);
+        adapter.notifyDataSetChanged();
+      }
+    });
+  }
 }

@@ -27,34 +27,34 @@ import org.jetbrains.annotations.NotNull;
  */
 public class Logs {
 
-    private static final NullLog sNullLog = new NullLog();
+  private static final NullLog sNullLog = new NullLog();
 
-    private static final SystemLog sSystemLog = new SystemLog();
+  private static final SystemLog sSystemLog = new SystemLog();
 
-    /**
-     * Avoid explicit instantiation.
-     */
-    protected Logs() {
-        ConstantConditions.avoid();
-    }
+  /**
+   * Avoid explicit instantiation.
+   */
+  protected Logs() {
+    ConstantConditions.avoid();
+  }
 
-    /**
-     * Returns the null log shared instance.
-     *
-     * @return the shared instance.
-     */
-    @NotNull
-    public static NullLog nullLog() {
-        return sNullLog;
-    }
+  /**
+   * Returns the null log shared instance.
+   *
+   * @return the shared instance.
+   */
+  @NotNull
+  public static NullLog nullLog() {
+    return sNullLog;
+  }
 
-    /**
-     * Returns the system output log shared instance.
-     *
-     * @return the shared instance.
-     */
-    @NotNull
-    public static SystemLog systemLog() {
-        return sSystemLog;
-    }
+  /**
+   * Returns the system output log shared instance.
+   *
+   * @return the shared instance.
+   */
+  @NotNull
+  public static SystemLog systemLog() {
+    return sSystemLog;
+  }
 }

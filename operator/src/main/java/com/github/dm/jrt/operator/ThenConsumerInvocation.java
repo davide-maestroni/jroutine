@@ -34,32 +34,32 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class ThenConsumerInvocation<IN, OUT> extends GenerateInvocation<IN, OUT> {
 
-    private final long mCount;
+  private final long mCount;
 
-    private final ConsumerDecorator<? super Channel<OUT, ?>> mOutputsConsumer;
+  private final ConsumerDecorator<? super Channel<OUT, ?>> mOutputsConsumer;
 
-    /**
-     * Constructor.
-     *
-     * @param count           the loop count.
-     * @param outputsConsumer the consumer instance.
-     */
-    ThenConsumerInvocation(final long count,
-            @NotNull final ConsumerDecorator<? super Channel<OUT, ?>> outputsConsumer) {
-        super(asArgs(ConstantConditions.positive("count number", count),
-                ConstantConditions.notNull("consumer instance", outputsConsumer)));
-        mCount = count;
-        mOutputsConsumer = outputsConsumer;
+  /**
+   * Constructor.
+   *
+   * @param count           the loop count.
+   * @param outputsConsumer the consumer instance.
+   */
+  ThenConsumerInvocation(final long count,
+      @NotNull final ConsumerDecorator<? super Channel<OUT, ?>> outputsConsumer) {
+    super(asArgs(ConstantConditions.positive("count number", count),
+        ConstantConditions.notNull("consumer instance", outputsConsumer)));
+    mCount = count;
+    mOutputsConsumer = outputsConsumer;
+  }
+
+  public void onComplete(@NotNull final Channel<OUT, ?> result) throws Exception {
+    final long count = mCount;
+    final ConsumerDecorator<? super Channel<OUT, ?>> consumer = mOutputsConsumer;
+    for (long i = 0; i < count; ++i) {
+      consumer.accept(result);
     }
+  }
 
-    public void onComplete(@NotNull final Channel<OUT, ?> result) throws Exception {
-        final long count = mCount;
-        final ConsumerDecorator<? super Channel<OUT, ?>> consumer = mOutputsConsumer;
-        for (long i = 0; i < count; ++i) {
-            consumer.accept(result);
-        }
-    }
-
-    public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) {
-    }
+  public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) {
+  }
 }

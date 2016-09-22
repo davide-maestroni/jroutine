@@ -30,36 +30,36 @@ import java.util.List;
  */
 public class AndroidLog implements com.github.dm.jrt.core.log.Log {
 
-    @Override
-    public void dbg(@NotNull final List<Object> contexts, @Nullable final String message,
-            @Nullable final Throwable throwable) {
-        if (throwable != null) {
-            Log.d(contexts.get(contexts.size() - 1).toString(), message, throwable);
+  @Override
+  public void dbg(@NotNull final List<Object> contexts, @Nullable final String message,
+      @Nullable final Throwable throwable) {
+    if (throwable != null) {
+      Log.d(contexts.get(contexts.size() - 1).toString(), message, throwable);
 
-        } else {
-            Log.d(contexts.get(contexts.size() - 1).toString(), message);
-        }
+    } else {
+      Log.d(contexts.get(contexts.size() - 1).toString(), message);
     }
+  }
 
-    @Override
-    public void err(@NotNull final List<Object> contexts, @Nullable final String message,
-            @Nullable final Throwable throwable) {
-        if (throwable != null) {
-            Log.e(contexts.get(contexts.size() - 1).toString(), message, throwable);
+  @Override
+  public void err(@NotNull final List<Object> contexts, @Nullable final String message,
+      @Nullable final Throwable throwable) {
+    if (throwable != null) {
+      Log.e(contexts.get(contexts.size() - 1).toString(), message, throwable);
 
-        } else {
-            Log.e(contexts.get(contexts.size() - 1).toString(), message);
-        }
+    } else {
+      Log.e(contexts.get(contexts.size() - 1).toString(), message);
     }
+  }
 
-    @Override
-    public void wrn(@NotNull final List<Object> contexts, @Nullable final String message,
-            @Nullable final Throwable throwable) {
-        if (throwable != null) {
-            Log.w(contexts.get(contexts.size() - 1).toString(), message, throwable);
+  @Override
+  public void wrn(@NotNull final List<Object> contexts, @Nullable final String message,
+      @Nullable final Throwable throwable) {
+    if (throwable != null) {
+      Log.w(contexts.get(contexts.size() - 1).toString(), message, throwable);
 
-        } else {
-            Log.w(contexts.get(contexts.size() - 1).toString(), message);
-        }
+    } else {
+      Log.w(contexts.get(contexts.size() - 1).toString(), message);
     }
+  }
 }

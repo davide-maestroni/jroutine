@@ -27,18 +27,18 @@ import org.jetbrains.annotations.NotNull;
  */
 public class ExecutionDecorator implements Execution {
 
-    private final Execution mExecution;
+  private final Execution mExecution;
 
-    /**
-     * Constructor.
-     *
-     * @param wrapped the wrapped instance.
-     */
-    public ExecutionDecorator(@NotNull final Execution wrapped) {
-        mExecution = ConstantConditions.notNull("execution instance", wrapped);
-    }
+  /**
+   * Constructor.
+   *
+   * @param wrapped the wrapped instance.
+   */
+  public ExecutionDecorator(@NotNull final Execution wrapped) {
+    mExecution = ConstantConditions.notNull("execution instance", wrapped);
+  }
 
-    public void run() {
-        mExecution.run();
-    }
+  public void run() {
+    mExecution.run();
+  }
 }

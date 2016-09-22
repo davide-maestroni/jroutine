@@ -31,49 +31,49 @@ import org.jetbrains.annotations.Nullable;
  */
 class ParcelableValue implements Parcelable {
 
-    /**
-     * Creator instance needed by the parcelable protocol.
-     */
-    public static final Creator<ParcelableValue> CREATOR = new Creator<ParcelableValue>() {
+  /**
+   * Creator instance needed by the parcelable protocol.
+   */
+  public static final Creator<ParcelableValue> CREATOR = new Creator<ParcelableValue>() {
 
-        @Override
-        public ParcelableValue createFromParcel(final Parcel source) {
-            return new ParcelableValue(source.readValue(ParcelableValue.class.getClassLoader()));
-        }
-
-        @Override
-        public ParcelableValue[] newArray(final int size) {
-            return new ParcelableValue[size];
-        }
-    };
-
-    private final Object mValue;
-
-    /**
-     * Constructor.
-     *
-     * @param value the wrapped value.
-     */
-    ParcelableValue(@Nullable final Object value) {
-        mValue = value;
+    @Override
+    public ParcelableValue createFromParcel(final Parcel source) {
+      return new ParcelableValue(source.readValue(ParcelableValue.class.getClassLoader()));
     }
 
     @Override
-    public int describeContents() {
-        return 0;
+    public ParcelableValue[] newArray(final int size) {
+      return new ParcelableValue[size];
     }
+  };
 
-    @Override
-    public void writeToParcel(final Parcel dest, final int flags) {
-        dest.writeValue(mValue);
-    }
+  private final Object mValue;
 
-    /**
-     * Returns the wrapped value.
-     *
-     * @return the value.
-     */
-    public Object getValue() {
-        return mValue;
-    }
+  /**
+   * Constructor.
+   *
+   * @param value the wrapped value.
+   */
+  ParcelableValue(@Nullable final Object value) {
+    mValue = value;
+  }
+
+  @Override
+  public int describeContents() {
+    return 0;
+  }
+
+  @Override
+  public void writeToParcel(final Parcel dest, final int flags) {
+    dest.writeValue(mValue);
+  }
+
+  /**
+   * Returns the wrapped value.
+   *
+   * @return the value.
+   */
+  public Object getValue() {
+    return mValue;
+  }
 }

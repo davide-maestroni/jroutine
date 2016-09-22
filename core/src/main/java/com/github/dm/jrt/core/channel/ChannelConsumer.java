@@ -52,26 +52,26 @@ import org.jetbrains.annotations.NotNull;
  */
 public interface ChannelConsumer<OUT> {
 
-    /**
-     * Called when the channel closes after the invocation completes its execution.
-     *
-     * @throws java.lang.Exception if an unexpected error occurs.
-     */
-    void onComplete() throws Exception;
+  /**
+   * Called when the channel closes after the invocation completes its execution.
+   *
+   * @throws java.lang.Exception if an unexpected error occurs.
+   */
+  void onComplete() throws Exception;
 
-    /**
-     * Called when the bounded channel transfer is aborted.
-     *
-     * @param error the reason of the abortion.
-     * @throws java.lang.Exception if an unexpected error occurs.
-     */
-    void onError(@NotNull RoutineException error) throws Exception;
+  /**
+   * Called when the bounded channel transfer is aborted.
+   *
+   * @param error the reason of the abortion.
+   * @throws java.lang.Exception if an unexpected error occurs.
+   */
+  void onError(@NotNull RoutineException error) throws Exception;
 
-    /**
-     * Called when an output is produced by the channel.
-     *
-     * @param output the output.
-     * @throws java.lang.Exception if an unexpected error occurs.
-     */
-    void onOutput(OUT output) throws Exception;
+  /**
+   * Called when an output is produced by the channel.
+   *
+   * @param output the output.
+   * @throws java.lang.Exception if an unexpected error occurs.
+   */
+  void onOutput(OUT output) throws Exception;
 }

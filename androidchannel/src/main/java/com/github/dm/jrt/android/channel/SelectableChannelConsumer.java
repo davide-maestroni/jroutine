@@ -33,35 +33,35 @@ import org.jetbrains.annotations.NotNull;
  */
 class SelectableChannelConsumer<OUT, IN extends OUT> implements ChannelConsumer<IN> {
 
-    private final Channel<? super
-            ParcelableSelectable<OUT>, ?> mChannel;
+  private final Channel<? super
+      ParcelableSelectable<OUT>, ?> mChannel;
 
-    private final int mIndex;
+  private final int mIndex;
 
-    /**
-     * Constructor.
-     *
-     * @param channel the selectable channel.
-     * @param index   the selectable index.
-     */
-    SelectableChannelConsumer(@NotNull final Channel<? super
-            ParcelableSelectable<OUT>, ?> channel, final int index) {
-        mChannel = ConstantConditions.notNull("channel instance", channel);
-        mIndex = index;
-    }
+  /**
+   * Constructor.
+   *
+   * @param channel the selectable channel.
+   * @param index   the selectable index.
+   */
+  SelectableChannelConsumer(@NotNull final Channel<? super
+      ParcelableSelectable<OUT>, ?> channel, final int index) {
+    mChannel = ConstantConditions.notNull("channel instance", channel);
+    mIndex = index;
+  }
 
-    @Override
-    public void onComplete() {
-        mChannel.close();
-    }
+  @Override
+  public void onComplete() {
+    mChannel.close();
+  }
 
-    @Override
-    public void onError(@NotNull final RoutineException error) {
-        mChannel.abort(error);
-    }
+  @Override
+  public void onError(@NotNull final RoutineException error) {
+    mChannel.abort(error);
+  }
 
-    @Override
-    public void onOutput(final IN input) {
-        mChannel.pass(new ParcelableSelectable<OUT>(input, mIndex));
-    }
+  @Override
+  public void onOutput(final IN input) {
+    mChannel.pass(new ParcelableSelectable<OUT>(input, mIndex));
+  }
 }

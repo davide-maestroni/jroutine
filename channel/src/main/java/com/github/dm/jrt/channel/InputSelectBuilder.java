@@ -33,30 +33,28 @@ import org.jetbrains.annotations.NotNull;
  */
 class InputSelectBuilder<DATA, IN extends DATA> extends AbstractBuilder<Channel<IN, ?>> {
 
-    private final Channel<? super Selectable<DATA>, ?> mChannel;
+  private final Channel<? super Selectable<DATA>, ?> mChannel;
 
-    private final int mIndex;
+  private final int mIndex;
 
-    /**
-     * Constructor.
-     *
-     * @param channel the channel.
-     * @param index   the selectable index.
-     */
-    InputSelectBuilder(@NotNull final Channel<? super Selectable<DATA>, ?> channel,
-            final int index) {
-        mChannel = ConstantConditions.notNull("channel instance", channel);
-        mIndex = index;
-    }
+  /**
+   * Constructor.
+   *
+   * @param channel the channel.
+   * @param index   the selectable index.
+   */
+  InputSelectBuilder(@NotNull final Channel<? super Selectable<DATA>, ?> channel, final int index) {
+    mChannel = ConstantConditions.notNull("channel instance", channel);
+    mIndex = index;
+  }
 
-    @NotNull
-    @Override
-    protected Channel<IN, ?> build(@NotNull final ChannelConfiguration configuration) {
-        final Channel<IN, IN> inputChannel = JRoutineCore.io().apply(configuration).buildChannel();
-        final Channel<Selectable<DATA>, Selectable<DATA>> selectableChannel =
-                JRoutineCore.io().buildChannel();
-        selectableChannel.bind(mChannel);
-        return inputChannel.bind(
-                new SelectableChannelConsumer<DATA, IN>(selectableChannel, mIndex));
-    }
+  @NotNull
+  @Override
+  protected Channel<IN, ?> build(@NotNull final ChannelConfiguration configuration) {
+    final Channel<IN, IN> inputChannel = JRoutineCore.io().apply(configuration).buildChannel();
+    final Channel<Selectable<DATA>, Selectable<DATA>> selectableChannel =
+        JRoutineCore.io().buildChannel();
+    selectableChannel.bind(mChannel);
+    return inputChannel.bind(new SelectableChannelConsumer<DATA, IN>(selectableChannel, mIndex));
+  }
 }

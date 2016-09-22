@@ -30,15 +30,15 @@ import org.jetbrains.annotations.NotNull;
  */
 public interface ChannelConfigurable<TYPE> extends Configurable<TYPE> {
 
-    /**
-     * Gets the channel configuration builder related to the instance.
-     * <br>
-     * The configuration options not supported by the specific implementation might be ignored.
-     * <p>
-     * Note that the configuration builder must be initialized with the current configuration.
-     *
-     * @return the channel configuration builder.
-     */
-    @NotNull
-    Builder<? extends TYPE> applyChannelConfiguration();
+  /**
+   * Gets the channel configuration builder related to the instance.
+   * <br>
+   * The configuration options not supported by the specific implementation might be ignored.
+   * <p>
+   * Note that the configuration builder must be initialized with the current configuration.
+   *
+   * @return the channel configuration builder.
+   */
+  @NotNull
+  Builder<? extends TYPE> applyChannelConfiguration();
 }

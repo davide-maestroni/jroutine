@@ -24,6 +24,4 @@ package com.github.dm.jrt.core.runner;
  * <p>
  * Created by davide-maestroni on 09/7/2014.
  */
-public interface Execution extends Runnable {
-
-}
+public interface Execution extends Runnable {}

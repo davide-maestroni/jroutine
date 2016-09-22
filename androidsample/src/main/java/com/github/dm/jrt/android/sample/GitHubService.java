@@ -34,11 +34,11 @@ import retrofit2.http.Path;
  */
 public interface GitHubService {
 
-    @CacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
-    @GET("users/{user}/repos")
-    Channel<Object, List<Repo>> listRepos(@Path("user") String user);
+  @CacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
+  @GET("users/{user}/repos")
+  Channel<Object, List<Repo>> listRepos(@Path("user") String user);
 
-    @MatchResolution(ClashResolutionType.ABORT_OTHER)
-    @GET("users/{user}/repos")
-    Channel<Object, List<Repo>> refreshRepos(@Path("user") String user);
+  @MatchResolution(ClashResolutionType.ABORT_OTHER)
+  @GET("users/{user}/repos")
+  Channel<Object, List<Repo>> refreshRepos(@Path("user") String user);
 }

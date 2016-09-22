@@ -30,7 +30,7 @@ import retrofit2.http.Path;
  */
 public interface GitHubService2 {
 
-    @POST("users/{user}/repos")
-    @Headers({"Accept: application/json", "Content-type: application/json"})
-    Channel<Object, Repo> createRepo(@Path("user") String user, @Body Repo repo);
+  @POST("users/{user}/repos")
+  @Headers({"Accept: application/json", "Content-type: application/json"})
+  Channel<Object, Repo> createRepo(@Path("user") String user, @Body Repo repo);
 }

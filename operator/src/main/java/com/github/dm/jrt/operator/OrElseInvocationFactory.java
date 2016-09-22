@@ -34,60 +34,60 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class OrElseInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
 
+  private final Channel<?, ? extends DATA> mChannel;
+
+  /**
+   * Constructor.
+   *
+   * @param channel the output channel.
+   */
+  OrElseInvocationFactory(@NotNull final Channel<?, ? extends DATA> channel) {
+    super(asArgs(channel));
+    mChannel = channel;
+  }
+
+  @NotNull
+  @Override
+  public Invocation<DATA, DATA> newInvocation() {
+    return new OrElseInvocation<DATA>(mChannel);
+  }
+
+  /**
+   * Invocation generating outputs when no one has been received.
+   *
+   * @param <DATA> the data type.
+   */
+  private static class OrElseInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
+
     private final Channel<?, ? extends DATA> mChannel;
+
+    private boolean mHasOutputs;
 
     /**
      * Constructor.
      *
      * @param channel the output channel.
      */
-    OrElseInvocationFactory(@NotNull final Channel<?, ? extends DATA> channel) {
-        super(asArgs(channel));
-        mChannel = channel;
+    OrElseInvocation(@NotNull final Channel<?, ? extends DATA> channel) {
+      mChannel = channel;
     }
 
-    @NotNull
     @Override
-    public Invocation<DATA, DATA> newInvocation() {
-        return new OrElseInvocation<DATA>(mChannel);
+    public void onComplete(@NotNull final Channel<DATA, ?> result) {
+      if (!mHasOutputs) {
+        result.pass(mChannel);
+      }
     }
 
-    /**
-     * Invocation generating outputs when no one has been received.
-     *
-     * @param <DATA> the data type.
-     */
-    private static class OrElseInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
-
-        private final Channel<?, ? extends DATA> mChannel;
-
-        private boolean mHasOutputs;
-
-        /**
-         * Constructor.
-         *
-         * @param channel the output channel.
-         */
-        OrElseInvocation(@NotNull final Channel<?, ? extends DATA> channel) {
-            mChannel = channel;
-        }
-
-        @Override
-        public void onComplete(@NotNull final Channel<DATA, ?> result) {
-            if (!mHasOutputs) {
-                result.pass(mChannel);
-            }
-        }
-
-        @Override
-        public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) {
-            mHasOutputs = true;
-            result.pass(input);
-        }
-
-        @Override
-        public void onRestart() {
-            mHasOutputs = false;
-        }
+    @Override
+    public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) {
+      mHasOutputs = true;
+      result.pass(input);
     }
+
+    @Override
+    public void onRestart() {
+      mHasOutputs = false;
+    }
+  }
 }

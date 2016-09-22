@@ -41,9 +41,45 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class ToMapInvocationFactory<IN, KEY, VALUE> extends InvocationFactory<IN, Map<KEY, VALUE>> {
 
+  private final FunctionDecorator<? super IN, KEY> mKeyFunction;
+
+  private final FunctionDecorator<? super IN, VALUE> mValueFunction;
+
+  /**
+   * Constructor.
+   *
+   * @param keyFunction   the function extracting the key.
+   * @param valueFunction the function extracting the value.
+   */
+  ToMapInvocationFactory(@NotNull final FunctionDecorator<? super IN, KEY> keyFunction,
+      @NotNull final FunctionDecorator<? super IN, VALUE> valueFunction) {
+    super(asArgs(ConstantConditions.notNull("key function instance", keyFunction),
+        ConstantConditions.notNull("value function instance", valueFunction)));
+    mKeyFunction = keyFunction;
+    mValueFunction = valueFunction;
+  }
+
+  @NotNull
+  @Override
+  public Invocation<IN, Map<KEY, VALUE>> newInvocation() {
+    return new ToMapInvocation<IN, KEY, VALUE>(mKeyFunction, mValueFunction);
+  }
+
+  /**
+   * Invocation collecting inputs into a map.
+   *
+   * @param <IN>    the input data type.
+   * @param <KEY>   the map key type.
+   * @param <VALUE> the map value type.
+   */
+  private static class ToMapInvocation<IN, KEY, VALUE>
+      extends TemplateInvocation<IN, Map<KEY, VALUE>> {
+
     private final FunctionDecorator<? super IN, KEY> mKeyFunction;
 
     private final FunctionDecorator<? super IN, VALUE> mValueFunction;
+
+    private HashMap<KEY, VALUE> mMap;
 
     /**
      * Constructor.
@@ -51,67 +87,31 @@ class ToMapInvocationFactory<IN, KEY, VALUE> extends InvocationFactory<IN, Map<K
      * @param keyFunction   the function extracting the key.
      * @param valueFunction the function extracting the value.
      */
-    ToMapInvocationFactory(@NotNull final FunctionDecorator<? super IN, KEY> keyFunction,
-            @NotNull final FunctionDecorator<? super IN, VALUE> valueFunction) {
-        super(asArgs(ConstantConditions.notNull("key function instance", keyFunction),
-                ConstantConditions.notNull("value function instance", valueFunction)));
-        mKeyFunction = keyFunction;
-        mValueFunction = valueFunction;
+    private ToMapInvocation(@NotNull final FunctionDecorator<? super IN, KEY> keyFunction,
+        @NotNull final FunctionDecorator<? super IN, VALUE> valueFunction) {
+      mKeyFunction = keyFunction;
+      mValueFunction = valueFunction;
     }
 
-    @NotNull
     @Override
-    public Invocation<IN, Map<KEY, VALUE>> newInvocation() {
-        return new ToMapInvocation<IN, KEY, VALUE>(mKeyFunction, mValueFunction);
+    public void onComplete(@NotNull final Channel<Map<KEY, VALUE>, ?> result) {
+      result.pass(mMap);
     }
 
-    /**
-     * Invocation collecting inputs into a map.
-     *
-     * @param <IN>    the input data type.
-     * @param <KEY>   the map key type.
-     * @param <VALUE> the map value type.
-     */
-    private static class ToMapInvocation<IN, KEY, VALUE>
-            extends TemplateInvocation<IN, Map<KEY, VALUE>> {
-
-        private final FunctionDecorator<? super IN, KEY> mKeyFunction;
-
-        private final FunctionDecorator<? super IN, VALUE> mValueFunction;
-
-        private HashMap<KEY, VALUE> mMap;
-
-        /**
-         * Constructor.
-         *
-         * @param keyFunction   the function extracting the key.
-         * @param valueFunction the function extracting the value.
-         */
-        private ToMapInvocation(@NotNull final FunctionDecorator<? super IN, KEY> keyFunction,
-                @NotNull final FunctionDecorator<? super IN, VALUE> valueFunction) {
-            mKeyFunction = keyFunction;
-            mValueFunction = valueFunction;
-        }
-
-        @Override
-        public void onComplete(@NotNull final Channel<Map<KEY, VALUE>, ?> result) {
-            result.pass(mMap);
-        }
-
-        @Override
-        public void onInput(final IN input,
-                @NotNull final Channel<Map<KEY, VALUE>, ?> result) throws Exception {
-            mMap.put(mKeyFunction.apply(input), mValueFunction.apply(input));
-        }
-
-        @Override
-        public void onRecycle(final boolean isReused) {
-            mMap = null;
-        }
-
-        @Override
-        public void onRestart() {
-            mMap = new HashMap<KEY, VALUE>();
-        }
+    @Override
+    public void onInput(final IN input, @NotNull final Channel<Map<KEY, VALUE>, ?> result) throws
+        Exception {
+      mMap.put(mKeyFunction.apply(input), mValueFunction.apply(input));
     }
+
+    @Override
+    public void onRecycle(final boolean isReused) {
+      mMap = null;
+    }
+
+    @Override
+    public void onRestart() {
+      mMap = new HashMap<KEY, VALUE>();
+    }
+  }
 }

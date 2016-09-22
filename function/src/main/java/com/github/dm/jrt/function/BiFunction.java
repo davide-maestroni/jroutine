@@ -27,13 +27,13 @@ package com.github.dm.jrt.function;
  */
 public interface BiFunction<IN1, IN2, OUT> {
 
-    /**
-     * Applies this function to the given arguments.
-     *
-     * @param in1 the first input argument.
-     * @param in2 the second input argument.
-     * @return the function result.
-     * @throws java.lang.Exception if an unexpected error occurs.
-     */
-    OUT apply(IN1 in1, IN2 in2) throws Exception;
+  /**
+   * Applies this function to the given arguments.
+   *
+   * @param in1 the first input argument.
+   * @param in2 the second input argument.
+   * @return the function result.
+   * @throws java.lang.Exception if an unexpected error occurs.
+   */
+  OUT apply(IN1 in1, IN2 in2) throws Exception;
 }

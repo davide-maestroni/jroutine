@@ -34,43 +34,43 @@ import java.util.List;
  */
 public abstract class CallInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> {
 
-    private ArrayList<IN> mInputs;
+  private ArrayList<IN> mInputs;
 
-    /**
-     * Constructor.
-     */
-    public CallInvocation() {
-        mInputs = null;
-    }
+  /**
+   * Constructor.
+   */
+  public CallInvocation() {
+    mInputs = null;
+  }
 
-    @Override
-    public final void onComplete(@NotNull final Channel<OUT, ?> result) throws Exception {
-        onCall(mInputs, result);
-        mInputs = null;
-    }
+  @Override
+  public final void onComplete(@NotNull final Channel<OUT, ?> result) throws Exception {
+    onCall(mInputs, result);
+    mInputs = null;
+  }
 
-    @Override
-    public final void onInput(final IN input, @NotNull final Channel<OUT, ?> result) {
-        mInputs.add(input);
-    }
+  @Override
+  public final void onInput(final IN input, @NotNull final Channel<OUT, ?> result) {
+    mInputs.add(input);
+  }
 
-    @Override
-    public void onRecycle(final boolean isReused) throws Exception {
-        mInputs = null;
-    }
+  @Override
+  public void onRecycle(final boolean isReused) throws Exception {
+    mInputs = null;
+  }
 
-    @Override
-    public final void onRestart() {
-        mInputs = new ArrayList<IN>();
-    }
+  @Override
+  public final void onRestart() {
+    mInputs = new ArrayList<IN>();
+  }
 
-    /**
-     * This method is called when all the inputs are available and ready to be processed.
-     *
-     * @param inputs the input list.
-     * @param result the result channel.
-     * @throws java.lang.Exception if an unexpected error occurs.
-     */
-    protected abstract void onCall(@NotNull List<? extends IN> inputs,
-            @NotNull Channel<OUT, ?> result) throws Exception;
+  /**
+   * This method is called when all the inputs are available and ready to be processed.
+   *
+   * @param inputs the input list.
+   * @param result the result channel.
+   * @throws java.lang.Exception if an unexpected error occurs.
+   */
+  protected abstract void onCall(@NotNull List<? extends IN> inputs,
+      @NotNull Channel<OUT, ?> result) throws Exception;
 }

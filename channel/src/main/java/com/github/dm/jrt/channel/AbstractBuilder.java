@@ -31,30 +31,30 @@ import org.jetbrains.annotations.NotNull;
  */
 public abstract class AbstractBuilder<TYPE> implements ChannelsBuilder<TYPE> {
 
-    private ChannelConfiguration mConfiguration = ChannelConfiguration.defaultConfiguration();
+  private ChannelConfiguration mConfiguration = ChannelConfiguration.defaultConfiguration();
 
-    @NotNull
-    public ChannelsBuilder<TYPE> apply(@NotNull final ChannelConfiguration configuration) {
-        mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
-        return this;
-    }
+  @NotNull
+  public ChannelsBuilder<TYPE> apply(@NotNull final ChannelConfiguration configuration) {
+    mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
+    return this;
+  }
 
-    @NotNull
-    public Builder<ChannelsBuilder<TYPE>> applyChannelConfiguration() {
-        return new Builder<ChannelsBuilder<TYPE>>(this, mConfiguration);
-    }
+  @NotNull
+  public Builder<ChannelsBuilder<TYPE>> applyChannelConfiguration() {
+    return new Builder<ChannelsBuilder<TYPE>>(this, mConfiguration);
+  }
 
-    @NotNull
-    public TYPE buildChannels() {
-        return build(mConfiguration);
-    }
+  @NotNull
+  public TYPE buildChannels() {
+    return build(mConfiguration);
+  }
 
-    /**
-     * Builds and returns an object instance.
-     *
-     * @param configuration the instance configuration.
-     * @return the object instance.
-     */
-    @NotNull
-    protected abstract TYPE build(@NotNull ChannelConfiguration configuration);
+  /**
+   * Builds and returns an object instance.
+   *
+   * @param configuration the instance configuration.
+   * @return the object instance.
+   */
+  @NotNull
+  protected abstract TYPE build(@NotNull ChannelConfiguration configuration);
 }

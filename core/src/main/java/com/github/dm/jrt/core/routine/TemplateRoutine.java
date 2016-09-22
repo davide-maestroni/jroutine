@@ -34,51 +34,51 @@ import org.jetbrains.annotations.Nullable;
  */
 public abstract class TemplateRoutine<IN, OUT> implements Routine<IN, OUT> {
 
-    @NotNull
-    public Channel<IN, OUT> call(@Nullable final IN input) {
-        return call().pass(input).close();
-    }
+  @NotNull
+  public Channel<IN, OUT> call(@Nullable final IN input) {
+    return call().pass(input).close();
+  }
 
-    @NotNull
-    public Channel<IN, OUT> call(@Nullable final IN... inputs) {
-        return call().pass(inputs).close();
-    }
+  @NotNull
+  public Channel<IN, OUT> call(@Nullable final IN... inputs) {
+    return call().pass(inputs).close();
+  }
 
-    @NotNull
-    public Channel<IN, OUT> call(@Nullable final Iterable<? extends IN> inputs) {
-        return call().pass(inputs).close();
-    }
+  @NotNull
+  public Channel<IN, OUT> call(@Nullable final Iterable<? extends IN> inputs) {
+    return call().pass(inputs).close();
+  }
 
-    @NotNull
-    public Channel<IN, OUT> call(@Nullable final Channel<?, ? extends IN> inputs) {
-        return call().pass(inputs).close();
-    }
+  @NotNull
+  public Channel<IN, OUT> call(@Nullable final Channel<?, ? extends IN> inputs) {
+    return call().pass(inputs).close();
+  }
 
-    @NotNull
-    public Channel<IN, OUT> callParallel(@Nullable final IN input) {
-        return callParallel().pass(input).close();
-    }
+  @NotNull
+  public Channel<IN, OUT> callParallel(@Nullable final IN input) {
+    return callParallel().pass(input).close();
+  }
 
-    @NotNull
-    public Channel<IN, OUT> callParallel(@Nullable final IN... inputs) {
-        return callParallel().pass(inputs).close();
-    }
+  @NotNull
+  public Channel<IN, OUT> callParallel(@Nullable final IN... inputs) {
+    return callParallel().pass(inputs).close();
+  }
 
-    @NotNull
-    public Channel<IN, OUT> callParallel(@Nullable final Iterable<? extends IN> inputs) {
-        return callParallel().pass(inputs).close();
-    }
+  @NotNull
+  public Channel<IN, OUT> callParallel(@Nullable final Iterable<? extends IN> inputs) {
+    return callParallel().pass(inputs).close();
+  }
 
-    @NotNull
-    public Channel<IN, OUT> callParallel(@Nullable final Channel<?, ? extends IN> inputs) {
-        return callParallel().pass(inputs).close();
-    }
+  @NotNull
+  public Channel<IN, OUT> callParallel(@Nullable final Channel<?, ? extends IN> inputs) {
+    return callParallel().pass(inputs).close();
+  }
 
-    public void clear() {
-    }
+  public void clear() {
+  }
 
-    @NotNull
-    public Channel<IN, OUT> close() {
-        return call().close();
-    }
+  @NotNull
+  public Channel<IN, OUT> close() {
+    return call().close();
+  }
 }

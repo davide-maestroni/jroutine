@@ -27,62 +27,62 @@ import org.jetbrains.annotations.NotNull;
  * <p>
  * Created by davide-maestroni on 03/07/2015.
  */
-public interface ProxyRoutineBuilder extends InvocationConfigurable<ProxyRoutineBuilder>,
-        ObjectConfigurable<ProxyRoutineBuilder> {
+public interface ProxyRoutineBuilder
+    extends InvocationConfigurable<ProxyRoutineBuilder>, ObjectConfigurable<ProxyRoutineBuilder> {
 
-    /**
-     * Returns a proxy object enabling asynchronous call of the target instance methods.
-     * <p>
-     * The routines used for calling the methods will honor the attributes specified in any optional
-     * <i>{@code com.github.dm.jrt.annotation.*}</i> annotations.
-     * <br>
-     * Note that such annotations will override any configuration set through the builder.
-     * <p>
-     * The proxy object is created through code generation based on the interfaces annotated with
-     * {@link com.github.dm.jrt.proxy.annotation.Proxy Proxy}. The generated class name and package
-     * will be chosen according to the specific annotation attributes.
-     * <br>
-     * It is actually possible to avoid the use of reflection for the proxy object instantiation by
-     * explicitly calling the <code>&lt;generated_class_name&gt;.on()</code> methods.
-     * <br>
-     * Note, however, that, since the class is generated, a generic IDE may highlight an error even
-     * if the compilation is successful.
-     *
-     * @param itf    the interface implemented by the return object.
-     * @param <TYPE> the interface type.
-     * @return the proxy object.
-     * @throws java.lang.IllegalArgumentException if the specified class does not represent an
-     *                                            interface.
-     * @see com.github.dm.jrt.object.annotation Annotations
-     */
-    @NotNull
-    <TYPE> TYPE buildProxy(@NotNull Class<TYPE> itf);
+  /**
+   * Returns a proxy object enabling asynchronous call of the target instance methods.
+   * <p>
+   * The routines used for calling the methods will honor the attributes specified in any optional
+   * <i>{@code com.github.dm.jrt.annotation.*}</i> annotations.
+   * <br>
+   * Note that such annotations will override any configuration set through the builder.
+   * <p>
+   * The proxy object is created through code generation based on the interfaces annotated with
+   * {@link com.github.dm.jrt.proxy.annotation.Proxy Proxy}. The generated class name and package
+   * will be chosen according to the specific annotation attributes.
+   * <br>
+   * It is actually possible to avoid the use of reflection for the proxy object instantiation by
+   * explicitly calling the <code>&lt;generated_class_name&gt;.on()</code> methods.
+   * <br>
+   * Note, however, that, since the class is generated, a generic IDE may highlight an error even
+   * if the compilation is successful.
+   *
+   * @param itf    the interface implemented by the return object.
+   * @param <TYPE> the interface type.
+   * @return the proxy object.
+   * @throws java.lang.IllegalArgumentException if the specified class does not represent an
+   *                                            interface.
+   * @see com.github.dm.jrt.object.annotation Annotations
+   */
+  @NotNull
+  <TYPE> TYPE buildProxy(@NotNull Class<TYPE> itf);
 
-    /**
-     * Returns a proxy object enabling asynchronous call of the target instance methods.
-     * <p>
-     * The routines used for calling the methods will honor the attributes specified in any optional
-     * <i>{@code com.github.dm.jrt.annotation.*}</i> annotations.
-     * <br>
-     * Note that such annotations will override any configuration set through the builder.
-     * <p>
-     * The proxy object is created through code generation based on the interfaces annotated with
-     * {@link com.github.dm.jrt.proxy.annotation.Proxy Proxy}. The generated class name and package
-     * will be chosen according to the specific annotation attributes.
-     * <br>
-     * It is actually possible to avoid the use of reflection for the proxy object instantiation by
-     * explicitly calling the <code>&lt;generated_class_name&gt;.on()</code> methods.
-     * <br>
-     * Note, however, that, since the class is generated, a generic IDE may highlight an error even
-     * if the compilation is successful.
-     *
-     * @param itf    the token of the interface implemented by the return object.
-     * @param <TYPE> the interface type.
-     * @return the proxy object.
-     * @throws java.lang.IllegalArgumentException if the specified class does not represent an
-     *                                            interface.
-     * @see com.github.dm.jrt.object.annotation Annotations
-     */
-    @NotNull
-    <TYPE> TYPE buildProxy(@NotNull ClassToken<TYPE> itf);
+  /**
+   * Returns a proxy object enabling asynchronous call of the target instance methods.
+   * <p>
+   * The routines used for calling the methods will honor the attributes specified in any optional
+   * <i>{@code com.github.dm.jrt.annotation.*}</i> annotations.
+   * <br>
+   * Note that such annotations will override any configuration set through the builder.
+   * <p>
+   * The proxy object is created through code generation based on the interfaces annotated with
+   * {@link com.github.dm.jrt.proxy.annotation.Proxy Proxy}. The generated class name and package
+   * will be chosen according to the specific annotation attributes.
+   * <br>
+   * It is actually possible to avoid the use of reflection for the proxy object instantiation by
+   * explicitly calling the <code>&lt;generated_class_name&gt;.on()</code> methods.
+   * <br>
+   * Note, however, that, since the class is generated, a generic IDE may highlight an error even
+   * if the compilation is successful.
+   *
+   * @param itf    the token of the interface implemented by the return object.
+   * @param <TYPE> the interface type.
+   * @return the proxy object.
+   * @throws java.lang.IllegalArgumentException if the specified class does not represent an
+   *                                            interface.
+   * @see com.github.dm.jrt.object.annotation Annotations
+   */
+  @NotNull
+  <TYPE> TYPE buildProxy(@NotNull ClassToken<TYPE> itf);
 }

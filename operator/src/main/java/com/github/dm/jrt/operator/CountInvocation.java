@@ -30,46 +30,46 @@ import org.jetbrains.annotations.NotNull;
  */
 class CountInvocation extends TemplateInvocation<Object, Long> {
 
-    private static final InvocationFactory<Object, Long> sFactory =
-            new InvocationFactory<Object, Long>(null) {
+  private static final InvocationFactory<Object, Long> sFactory =
+      new InvocationFactory<Object, Long>(null) {
 
-                @NotNull
-                @Override
-                public Invocation<Object, Long> newInvocation() {
-                    return new CountInvocation();
-                }
-            };
+        @NotNull
+        @Override
+        public Invocation<Object, Long> newInvocation() {
+          return new CountInvocation();
+        }
+      };
 
-    private long mCount;
+  private long mCount;
 
-    /**
-     * Constructor.
-     */
-    private CountInvocation() {
-    }
+  /**
+   * Constructor.
+   */
+  private CountInvocation() {
+  }
 
-    /**
-     * Returns the factory of counting invocations.
-     *
-     * @return the factory instance.
-     */
-    @NotNull
-    static InvocationFactory<?, Long> factoryOf() {
-        return sFactory;
-    }
+  /**
+   * Returns the factory of counting invocations.
+   *
+   * @return the factory instance.
+   */
+  @NotNull
+  static InvocationFactory<?, Long> factoryOf() {
+    return sFactory;
+  }
 
-    @Override
-    public void onComplete(@NotNull final Channel<Long, ?> result) {
-        result.pass(mCount);
-    }
+  @Override
+  public void onComplete(@NotNull final Channel<Long, ?> result) {
+    result.pass(mCount);
+  }
 
-    @Override
-    public void onInput(final Object input, @NotNull final Channel<Long, ?> result) {
-        ++mCount;
-    }
+  @Override
+  public void onInput(final Object input, @NotNull final Channel<Long, ?> result) {
+    ++mCount;
+  }
 
-    @Override
-    public void onRestart() {
-        mCount = 0;
-    }
+  @Override
+  public void onRestart() {
+    mCount = 0;
+  }
 }

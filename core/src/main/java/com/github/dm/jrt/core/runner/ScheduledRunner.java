@@ -34,128 +34,128 @@ import java.util.concurrent.TimeUnit;
  */
 class ScheduledRunner extends AsyncRunner {
 
-    private static final WeakHashMap<ScheduledExecutorService, WeakReference<ScheduledRunner>>
-            sRunners = new WeakHashMap<ScheduledExecutorService, WeakReference<ScheduledRunner>>();
+  private static final WeakHashMap<ScheduledExecutorService, WeakReference<ScheduledRunner>>
+      sRunners = new WeakHashMap<ScheduledExecutorService, WeakReference<ScheduledRunner>>();
 
-    private final WeakIdentityHashMap<Execution, WeakHashMap<ScheduledFuture<?>, Void>> mFutures =
-            new WeakIdentityHashMap<Execution, WeakHashMap<ScheduledFuture<?>, Void>>();
+  private final WeakIdentityHashMap<Execution, WeakHashMap<ScheduledFuture<?>, Void>> mFutures =
+      new WeakIdentityHashMap<Execution, WeakHashMap<ScheduledFuture<?>, Void>>();
 
-    private final ScheduledExecutorService mService;
+  private final ScheduledExecutorService mService;
+
+  /**
+   * Constructor.
+   *
+   * @param service the executor service.
+   */
+  private ScheduledRunner(@NotNull final ScheduledExecutorService service) {
+    super(new ScheduledThreadManager());
+    mService = ConstantConditions.notNull("executor service", service);
+  }
+
+  /**
+   * Returns a runner instance employing the specified service.
+   *
+   * @param service the executor service.
+   * @return the runner.
+   */
+  @NotNull
+  static ScheduledRunner getInstance(@NotNull final ScheduledExecutorService service) {
+    ScheduledRunner scheduledRunner;
+    synchronized (sRunners) {
+      final WeakHashMap<ScheduledExecutorService, WeakReference<ScheduledRunner>> runners =
+          sRunners;
+      final WeakReference<ScheduledRunner> runner = runners.get(service);
+      scheduledRunner = (runner != null) ? runner.get() : null;
+      if (scheduledRunner == null) {
+        scheduledRunner = new ScheduledRunner(service);
+        runners.put(service, new WeakReference<ScheduledRunner>(scheduledRunner));
+      }
+    }
+
+    return scheduledRunner;
+  }
+
+  @Override
+  public void cancel(@NotNull final Execution execution) {
+    final WeakHashMap<ScheduledFuture<?>, Void> scheduledFutures;
+    synchronized (mFutures) {
+      scheduledFutures = mFutures.remove(execution);
+    }
+
+    if (scheduledFutures != null) {
+      for (final ScheduledFuture<?> future : scheduledFutures.keySet()) {
+        future.cancel(false);
+      }
+    }
+  }
+
+  @Override
+  public void run(@NotNull final Execution execution, final long delay,
+      @NotNull final TimeUnit timeUnit) {
+    final ScheduledFuture<?> future =
+        mService.schedule(new ExecutionWrapper(execution), delay, timeUnit);
+    synchronized (mFutures) {
+      final WeakIdentityHashMap<Execution, WeakHashMap<ScheduledFuture<?>, Void>> futures =
+          mFutures;
+      WeakHashMap<ScheduledFuture<?>, Void> scheduledFutures = futures.get(execution);
+      if (scheduledFutures == null) {
+        scheduledFutures = new WeakHashMap<ScheduledFuture<?>, Void>();
+        futures.put(execution, scheduledFutures);
+      }
+
+      scheduledFutures.put(future, null);
+    }
+  }
+
+  @NotNull
+  @Override
+  protected ScheduledThreadManager getThreadManager() {
+    return (ScheduledThreadManager) super.getThreadManager();
+  }
+
+  /**
+   * Thread manager implementation.
+   */
+  private static class ScheduledThreadManager implements ThreadManager {
+
+    private final ThreadLocal<Boolean> mIsManaged = new ThreadLocal<Boolean>();
+
+    public boolean isManagedThread() {
+      final Boolean isManaged = mIsManaged.get();
+      return (isManaged != null) && isManaged;
+    }
+
+    private void setManaged() {
+      mIsManaged.set(true);
+    }
+  }
+
+  /**
+   * Class used to keep track of the threads employed by this runner.
+   */
+  private class ExecutionWrapper implements Runnable {
+
+    private final long mCurrentThreadId;
+
+    private final Execution mExecution;
 
     /**
      * Constructor.
      *
-     * @param service the executor service.
+     * @param wrapped the wrapped execution.
      */
-    private ScheduledRunner(@NotNull final ScheduledExecutorService service) {
-        super(new ScheduledThreadManager());
-        mService = ConstantConditions.notNull("executor service", service);
+    private ExecutionWrapper(@NotNull final Execution wrapped) {
+      mExecution = wrapped;
+      mCurrentThreadId = Thread.currentThread().getId();
     }
 
-    /**
-     * Returns a runner instance employing the specified service.
-     *
-     * @param service the executor service.
-     * @return the runner.
-     */
-    @NotNull
-    static ScheduledRunner getInstance(@NotNull final ScheduledExecutorService service) {
-        ScheduledRunner scheduledRunner;
-        synchronized (sRunners) {
-            final WeakHashMap<ScheduledExecutorService, WeakReference<ScheduledRunner>> runners =
-                    sRunners;
-            final WeakReference<ScheduledRunner> runner = runners.get(service);
-            scheduledRunner = (runner != null) ? runner.get() : null;
-            if (scheduledRunner == null) {
-                scheduledRunner = new ScheduledRunner(service);
-                runners.put(service, new WeakReference<ScheduledRunner>(scheduledRunner));
-            }
-        }
+    public void run() {
+      final Thread currentThread = Thread.currentThread();
+      if (currentThread.getId() != mCurrentThreadId) {
+        getThreadManager().setManaged();
+      }
 
-        return scheduledRunner;
+      mExecution.run();
     }
-
-    @Override
-    public void cancel(@NotNull final Execution execution) {
-        final WeakHashMap<ScheduledFuture<?>, Void> scheduledFutures;
-        synchronized (mFutures) {
-            scheduledFutures = mFutures.remove(execution);
-        }
-
-        if (scheduledFutures != null) {
-            for (final ScheduledFuture<?> future : scheduledFutures.keySet()) {
-                future.cancel(false);
-            }
-        }
-    }
-
-    @Override
-    public void run(@NotNull final Execution execution, final long delay,
-            @NotNull final TimeUnit timeUnit) {
-        final ScheduledFuture<?> future =
-                mService.schedule(new ExecutionWrapper(execution), delay, timeUnit);
-        synchronized (mFutures) {
-            final WeakIdentityHashMap<Execution, WeakHashMap<ScheduledFuture<?>, Void>> futures =
-                    mFutures;
-            WeakHashMap<ScheduledFuture<?>, Void> scheduledFutures = futures.get(execution);
-            if (scheduledFutures == null) {
-                scheduledFutures = new WeakHashMap<ScheduledFuture<?>, Void>();
-                futures.put(execution, scheduledFutures);
-            }
-
-            scheduledFutures.put(future, null);
-        }
-    }
-
-    @NotNull
-    @Override
-    protected ScheduledThreadManager getThreadManager() {
-        return (ScheduledThreadManager) super.getThreadManager();
-    }
-
-    /**
-     * Thread manager implementation.
-     */
-    private static class ScheduledThreadManager implements ThreadManager {
-
-        private final ThreadLocal<Boolean> mIsManaged = new ThreadLocal<Boolean>();
-
-        public boolean isManagedThread() {
-            final Boolean isManaged = mIsManaged.get();
-            return (isManaged != null) && isManaged;
-        }
-
-        private void setManaged() {
-            mIsManaged.set(true);
-        }
-    }
-
-    /**
-     * Class used to keep track of the threads employed by this runner.
-     */
-    private class ExecutionWrapper implements Runnable {
-
-        private final long mCurrentThreadId;
-
-        private final Execution mExecution;
-
-        /**
-         * Constructor.
-         *
-         * @param wrapped the wrapped execution.
-         */
-        private ExecutionWrapper(@NotNull final Execution wrapped) {
-            mExecution = wrapped;
-            mCurrentThreadId = Thread.currentThread().getId();
-        }
-
-        public void run() {
-            final Thread currentThread = Thread.currentThread();
-            if (currentThread.getId() != mCurrentThreadId) {
-                getThreadManager().setManaged();
-            }
-
-            mExecution.run();
-        }
-    }
+  }
 }

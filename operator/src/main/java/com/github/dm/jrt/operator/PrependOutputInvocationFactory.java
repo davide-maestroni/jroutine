@@ -35,66 +35,65 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class PrependOutputInvocationFactory<OUT> extends InvocationFactory<OUT, OUT> {
 
+  private final Channel<?, ? extends OUT> mChannel;
+
+  /**
+   * Constructor.
+   *
+   * @param channel the output channel.
+   */
+  PrependOutputInvocationFactory(@Nullable final Channel<?, ? extends OUT> channel) {
+    super(asArgs(channel));
+    mChannel = channel;
+  }
+
+  @NotNull
+  @Override
+  public Invocation<OUT, OUT> newInvocation() throws Exception {
+    return new PrependOutputInvocation<OUT>(mChannel);
+  }
+
+  /**
+   * Invocation prepending outputs.
+   *
+   * @param <OUT> the output data type.
+   */
+  private static class PrependOutputInvocation<OUT> extends TemplateInvocation<OUT, OUT> {
+
     private final Channel<?, ? extends OUT> mChannel;
+
+    private boolean mIsCalled;
 
     /**
      * Constructor.
      *
      * @param channel the output channel.
      */
-    PrependOutputInvocationFactory(@Nullable final Channel<?, ? extends OUT> channel) {
-        super(asArgs(channel));
-        mChannel = channel;
+    private PrependOutputInvocation(@Nullable final Channel<?, ? extends OUT> channel) {
+      mChannel = channel;
     }
 
-    @NotNull
     @Override
-    public Invocation<OUT, OUT> newInvocation() throws Exception {
-        return new PrependOutputInvocation<OUT>(mChannel);
+    public void onComplete(@NotNull final Channel<OUT, ?> result) throws Exception {
+      onResult(result);
     }
 
-    /**
-     * Invocation prepending outputs.
-     *
-     * @param <OUT> the output data type.
-     */
-    private static class PrependOutputInvocation<OUT> extends TemplateInvocation<OUT, OUT> {
-
-        private final Channel<?, ? extends OUT> mChannel;
-
-        private boolean mIsCalled;
-
-        /**
-         * Constructor.
-         *
-         * @param channel the output channel.
-         */
-        private PrependOutputInvocation(@Nullable final Channel<?, ? extends OUT> channel) {
-            mChannel = channel;
-        }
-
-        @Override
-        public void onComplete(@NotNull final Channel<OUT, ?> result) throws Exception {
-            onResult(result);
-        }
-
-        @Override
-        public void onInput(final OUT input, @NotNull final Channel<OUT, ?> result) throws
-                Exception {
-            onResult(result);
-            result.pass(input);
-        }
-
-        @Override
-        public void onRestart() {
-            mIsCalled = false;
-        }
-
-        private void onResult(@NotNull final Channel<OUT, ?> result) throws Exception {
-            if (!mIsCalled) {
-                mIsCalled = true;
-                result.pass(mChannel);
-            }
-        }
+    @Override
+    public void onInput(final OUT input, @NotNull final Channel<OUT, ?> result) throws Exception {
+      onResult(result);
+      result.pass(input);
     }
+
+    @Override
+    public void onRestart() {
+      mIsCalled = false;
+    }
+
+    private void onResult(@NotNull final Channel<OUT, ?> result) throws Exception {
+      if (!mIsCalled) {
+        mIsCalled = true;
+        result.pass(mChannel);
+      }
+    }
+  }
 }

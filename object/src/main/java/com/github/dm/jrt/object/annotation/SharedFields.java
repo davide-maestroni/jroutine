@@ -65,10 +65,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface SharedFields {
 
-    /**
-     * The shared field names associated with the annotated method.
-     *
-     * @return the field names.
-     */
-    String[] value();
+  /**
+   * The shared field names associated with the annotated method.
+   *
+   * @return the field names.
+   */
+  String[] value();
 }

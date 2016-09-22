@@ -38,89 +38,89 @@ import java.util.List;
 @SuppressWarnings("unused")
 public class LifecycleInvocationDecorator<IN, OUT> extends InvocationDecorator<IN, OUT> {
 
-    private static final List<State> TO_ABORT_STATES =
-            Arrays.asList(State.START, State.INPUT, State.COMPLETE);
+  private static final List<State> TO_ABORT_STATES =
+      Arrays.asList(State.START, State.INPUT, State.COMPLETE);
 
-    private static final List<State> TO_INPUT_STATES = Arrays.asList(State.START, State.INPUT);
+  private static final List<State> TO_INPUT_STATES = Arrays.asList(State.START, State.INPUT);
 
-    private static final List<State> TO_RECYCLE_STATES =
-            Arrays.asList(State.START, State.ABORT, State.COMPLETE, State.RECYCLE);
+  private static final List<State> TO_RECYCLE_STATES =
+      Arrays.asList(State.START, State.ABORT, State.COMPLETE, State.RECYCLE);
 
-    private static final List<State> TO_RESULT_STATES = Arrays.asList(State.START, State.INPUT);
+  private static final List<State> TO_RESULT_STATES = Arrays.asList(State.START, State.INPUT);
 
-    private static final List<State> TO_START_STATES =
-            Arrays.asList(State.ABORT, State.RECYCLE, null);
+  private static final List<State> TO_START_STATES =
+      Arrays.asList(State.ABORT, State.RECYCLE, null);
 
-    private State mState;
+  private State mState;
 
-    /**
-     * Constructor.
-     *
-     * @param wrapped the wrapped invocation instance.?
-     */
-    public LifecycleInvocationDecorator(@NotNull final Invocation<IN, OUT> wrapped) {
-        super(wrapped);
+  /**
+   * Constructor.
+   *
+   * @param wrapped the wrapped invocation instance.?
+   */
+  public LifecycleInvocationDecorator(@NotNull final Invocation<IN, OUT> wrapped) {
+    super(wrapped);
+  }
+
+  @Override
+  public void onAbort(@NotNull final RoutineException reason) throws Exception {
+    if (!TO_ABORT_STATES.contains(mState)) {
+      throw new InvocationInterruptedException(null);
     }
 
-    @Override
-    public void onAbort(@NotNull final RoutineException reason) throws Exception {
-        if (!TO_ABORT_STATES.contains(mState)) {
-            throw new InvocationInterruptedException(null);
-        }
+    mState = State.ABORT;
+    super.onAbort(reason);
+  }
 
-        mState = State.ABORT;
-        super.onAbort(reason);
+  @Override
+  public void onComplete(@NotNull final Channel<OUT, ?> result) throws Exception {
+    if (!TO_RESULT_STATES.contains(mState)) {
+      throw new InvocationInterruptedException(null);
     }
 
-    @Override
-    public void onComplete(@NotNull final Channel<OUT, ?> result) throws Exception {
-        if (!TO_RESULT_STATES.contains(mState)) {
-            throw new InvocationInterruptedException(null);
-        }
+    mState = State.COMPLETE;
+    super.onComplete(result);
+  }
 
-        mState = State.COMPLETE;
-        super.onComplete(result);
+  @Override
+  public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) throws Exception {
+    if (!TO_INPUT_STATES.contains(mState)) {
+      throw new InvocationInterruptedException(null);
     }
 
-    @Override
-    public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) throws Exception {
-        if (!TO_INPUT_STATES.contains(mState)) {
-            throw new InvocationInterruptedException(null);
-        }
+    mState = State.INPUT;
+    super.onInput(input, result);
+  }
 
-        mState = State.INPUT;
-        super.onInput(input, result);
+  @Override
+  public void onRecycle(final boolean isReused) throws Exception {
+    if (!TO_RECYCLE_STATES.contains(mState)) {
+      throw new InvocationInterruptedException(null);
     }
 
-    @Override
-    public void onRecycle(final boolean isReused) throws Exception {
-        if (!TO_RECYCLE_STATES.contains(mState)) {
-            throw new InvocationInterruptedException(null);
-        }
-
-        if (isReused && (mState == State.RECYCLE)) {
-            throw new InvocationInterruptedException(null);
-        }
-
-        mState = State.RECYCLE;
-        super.onRecycle(isReused);
+    if (isReused && (mState == State.RECYCLE)) {
+      throw new InvocationInterruptedException(null);
     }
 
-    @Override
-    public void onRestart() throws Exception {
-        if (!TO_START_STATES.contains(mState)) {
-            throw new InvocationInterruptedException(null);
-        }
+    mState = State.RECYCLE;
+    super.onRecycle(isReused);
+  }
 
-        mState = State.START;
-        super.onRestart();
+  @Override
+  public void onRestart() throws Exception {
+    if (!TO_START_STATES.contains(mState)) {
+      throw new InvocationInterruptedException(null);
     }
 
-    private enum State {
-        START,
-        INPUT,
-        COMPLETE,
-        ABORT,
-        RECYCLE,
-    }
+    mState = State.START;
+    super.onRestart();
+  }
+
+  private enum State {
+    START,
+    INPUT,
+    COMPLETE,
+    ABORT,
+    RECYCLE,
+  }
 }

@@ -27,13 +27,13 @@ package com.github.dm.jrt.core.util;
  */
 public interface Backoff {
 
-    int NO_DELAY = -1;
+  int NO_DELAY = -1;
 
-    /**
-     * Gets the delay for the specified count.
-     *
-     * @param count the count (it must be positive).
-     * @return the delay in milliseconds.
-     */
-    long getDelay(int count);
+  /**
+   * Gets the delay for the specified count.
+   *
+   * @param count the count (it must be positive).
+   * @return the delay in milliseconds.
+   */
+  long getDelay(int count);
 }

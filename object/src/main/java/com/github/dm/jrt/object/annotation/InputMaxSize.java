@@ -58,10 +58,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface InputMaxSize {
 
-    /**
-     * The maximum number of data that the input channel can retain.
-     *
-     * @return the maximum number of buffered input data.
-     */
-    int value();
+  /**
+   * The maximum number of data that the input channel can retain.
+   *
+   * @return the maximum number of buffered input data.
+   */
+  int value();
 }

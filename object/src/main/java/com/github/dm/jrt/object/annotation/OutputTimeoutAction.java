@@ -60,10 +60,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface OutputTimeoutAction {
 
-    /**
-     * The type of action to be taken on output channel timeout.
-     *
-     * @return the action type.
-     */
-    TimeoutActionType value();
+  /**
+   * The type of action to be taken on output channel timeout.
+   *
+   * @return the action type.
+   */
+  TimeoutActionType value();
 }

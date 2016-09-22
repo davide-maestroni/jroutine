@@ -46,153 +46,153 @@ import retrofit2.Retrofit;
  */
 public class ProviderAdapterFactory extends CallAdapter.Factory {
 
-    private final Map<String, Factory> mFactories;
+  private final Map<String, Factory> mFactories;
 
-    private final Factory mMissingAnnotationFactory;
+  private final Factory mMissingAnnotationFactory;
 
-    private final Factory mMissingNameFactory;
+  private final Factory mMissingNameFactory;
+
+  /**
+   * Constructor.
+   *
+   * @param missingAnnotationFactory the factory to be used when the annotation is missing.
+   * @param missingNameFactory       the factory to be used when matching name is missing.
+   * @param factories                the registered factories.
+   */
+  private ProviderAdapterFactory(@Nullable final CallAdapter.Factory missingAnnotationFactory,
+      @Nullable final CallAdapter.Factory missingNameFactory,
+      @NotNull final Map<String, Factory> factories) {
+    mMissingAnnotationFactory = missingAnnotationFactory;
+    mMissingNameFactory = missingNameFactory;
+    mFactories = factories;
+  }
+
+  /**
+   * Returns a provider factory builder.
+   *
+   * @return the builder instance.
+   */
+  @NotNull
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  /**
+   * Creates a factory with a single registered instance.
+   *
+   * @param name    the registered factory name.
+   * @param factory the registered factory instance.
+   * @return the filter adapter factory.
+   */
+  @NotNull
+  public static ProviderAdapterFactory withFactory(@NotNull final String name,
+      @NotNull final CallAdapter.Factory factory) {
+    return new ProviderAdapterFactory(null, null,
+        Collections.singletonMap(ConstantConditions.notNull("factory name", name),
+            ConstantConditions.notNull("factory instance", factory)));
+  }
+
+  @Override
+  public CallAdapter<?> get(final Type returnType, final Annotation[] annotations,
+      final Retrofit retrofit) {
+    String factoryName = null;
+    for (final Annotation annotation : annotations) {
+      if (annotation.annotationType() == CallAdapterFactory.class) {
+        factoryName = ((CallAdapterFactory) annotation).value();
+      }
+    }
+
+    final Factory factory = mFactories.get(factoryName);
+    return (factory != null) ? factory.get(returnType, annotations, retrofit)
+        : getDefault(factoryName != null, returnType, annotations, retrofit);
+  }
+
+  @Nullable
+  private CallAdapter<?> getDefault(final boolean hasAnnotation, final Type returnType,
+      final Annotation[] annotations, final Retrofit retrofit) {
+    final Factory factory = (hasAnnotation) ? mMissingNameFactory : mMissingAnnotationFactory;
+    return (factory != null) ? factory.get(returnType, annotations, retrofit) : null;
+  }
+
+  /**
+   * Builder of provider adapter factory instances.
+   */
+  public static class Builder {
+
+    private final HashMap<String, Factory> mFactories = new HashMap<String, Factory>();
+
+    private Factory mMissingAnnotationFactory;
+
+    private Factory mMissingNameFactory;
 
     /**
      * Constructor.
-     *
-     * @param missingAnnotationFactory the factory to be used when the annotation is missing.
-     * @param missingNameFactory       the factory to be used when matching name is missing.
-     * @param factories                the registered factories.
      */
-    private ProviderAdapterFactory(@Nullable final CallAdapter.Factory missingAnnotationFactory,
-            @Nullable final CallAdapter.Factory missingNameFactory,
-            @NotNull final Map<String, Factory> factories) {
-        mMissingAnnotationFactory = missingAnnotationFactory;
-        mMissingNameFactory = missingNameFactory;
-        mFactories = factories;
+    private Builder() {
     }
 
     /**
-     * Returns a provider factory builder.
-     *
-     * @return the builder instance.
-     */
-    @NotNull
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    /**
-     * Creates a factory with a single registered instance.
+     * Registers the specified factory instance with the specified name.
+     * <p>
+     * Note that the very same instance can be registered with different names.
      *
      * @param name    the registered factory name.
      * @param factory the registered factory instance.
-     * @return the filter adapter factory.
+     * @return this builder
      */
     @NotNull
-    public static ProviderAdapterFactory withFactory(@NotNull final String name,
-            @NotNull final CallAdapter.Factory factory) {
-        return new ProviderAdapterFactory(null, null,
-                Collections.singletonMap(ConstantConditions.notNull("factory name", name),
-                        ConstantConditions.notNull("factory instance", factory)));
-    }
-
-    @Override
-    public CallAdapter<?> get(final Type returnType, final Annotation[] annotations,
-            final Retrofit retrofit) {
-        String factoryName = null;
-        for (final Annotation annotation : annotations) {
-            if (annotation.annotationType() == CallAdapterFactory.class) {
-                factoryName = ((CallAdapterFactory) annotation).value();
-            }
-        }
-
-        final Factory factory = mFactories.get(factoryName);
-        return (factory != null) ? factory.get(returnType, annotations, retrofit)
-                : getDefault(factoryName != null, returnType, annotations, retrofit);
-    }
-
-    @Nullable
-    private CallAdapter<?> getDefault(final boolean hasAnnotation, final Type returnType,
-            final Annotation[] annotations, final Retrofit retrofit) {
-        final Factory factory = (hasAnnotation) ? mMissingNameFactory : mMissingAnnotationFactory;
-        return (factory != null) ? factory.get(returnType, annotations, retrofit) : null;
+    public Builder add(@NotNull final String name, @NotNull final CallAdapter.Factory factory) {
+      mFactories.put(ConstantConditions.notNull("factory name", name),
+          ConstantConditions.notNull("factory instance", factory));
+      return this;
     }
 
     /**
-     * Builder of provider adapter factory instances.
+     * Builds and return a new factory instance.
+     *
+     * @return the factory instance.
      */
-    public static class Builder {
-
-        private final HashMap<String, Factory> mFactories = new HashMap<String, Factory>();
-
-        private Factory mMissingAnnotationFactory;
-
-        private Factory mMissingNameFactory;
-
-        /**
-         * Constructor.
-         */
-        private Builder() {
-        }
-
-        /**
-         * Registers the specified factory instance with the specified name.
-         * <p>
-         * Note that the very same instance can be registered with different names.
-         *
-         * @param name    the registered factory name.
-         * @param factory the registered factory instance.
-         * @return this builder
-         */
-        @NotNull
-        public Builder add(@NotNull final String name, @NotNull final CallAdapter.Factory factory) {
-            mFactories.put(ConstantConditions.notNull("factory name", name),
-                    ConstantConditions.notNull("factory instance", factory));
-            return this;
-        }
-
-        /**
-         * Builds and return a new factory instance.
-         *
-         * @return the factory instance.
-         */
-        @NotNull
-        public ProviderAdapterFactory buildFactory() {
-            return new ProviderAdapterFactory(mMissingAnnotationFactory, mMissingNameFactory,
-                    new HashMap<String, CallAdapter.Factory>(mFactories));
-        }
-
-        /**
-         * Sets the factory to be used when the annotation or a matching name is missing.
-         *
-         * @param factory the factory instance.
-         * @return this builder.
-         */
-        @NotNull
-        public Builder whenMissing(@Nullable final CallAdapter.Factory factory) {
-            mMissingAnnotationFactory = factory;
-            mMissingNameFactory = factory;
-            return this;
-        }
-
-        /**
-         * Sets the factory to be used when the annotation is missing.
-         *
-         * @param factory the factory instance.
-         * @return this builder.
-         */
-        @NotNull
-        public Builder whenMissingAnnotation(@Nullable final CallAdapter.Factory factory) {
-            mMissingAnnotationFactory = factory;
-            return this;
-        }
-
-        /**
-         * Sets the factory to be used when matching name is missing.
-         *
-         * @param factory the factory instance.
-         * @return this builder.
-         */
-        @NotNull
-        public Builder whenMissingName(@Nullable final CallAdapter.Factory factory) {
-            mMissingNameFactory = factory;
-            return this;
-        }
+    @NotNull
+    public ProviderAdapterFactory buildFactory() {
+      return new ProviderAdapterFactory(mMissingAnnotationFactory, mMissingNameFactory,
+          new HashMap<String, CallAdapter.Factory>(mFactories));
     }
+
+    /**
+     * Sets the factory to be used when the annotation or a matching name is missing.
+     *
+     * @param factory the factory instance.
+     * @return this builder.
+     */
+    @NotNull
+    public Builder whenMissing(@Nullable final CallAdapter.Factory factory) {
+      mMissingAnnotationFactory = factory;
+      mMissingNameFactory = factory;
+      return this;
+    }
+
+    /**
+     * Sets the factory to be used when the annotation is missing.
+     *
+     * @param factory the factory instance.
+     * @return this builder.
+     */
+    @NotNull
+    public Builder whenMissingAnnotation(@Nullable final CallAdapter.Factory factory) {
+      mMissingAnnotationFactory = factory;
+      return this;
+    }
+
+    /**
+     * Sets the factory to be used when matching name is missing.
+     *
+     * @param factory the factory instance.
+     * @return this builder.
+     */
+    @NotNull
+    public Builder whenMissingName(@Nullable final CallAdapter.Factory factory) {
+      mMissingNameFactory = factory;
+      return this;
+    }
+  }
 }

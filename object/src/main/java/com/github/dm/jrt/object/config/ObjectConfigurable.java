@@ -30,15 +30,15 @@ import org.jetbrains.annotations.NotNull;
  */
 public interface ObjectConfigurable<TYPE> extends Configurable<TYPE> {
 
-    /**
-     * Gets the object configuration builder related to the instance.
-     * <br>
-     * The configuration options not supported by the specific implementation might be ignored.
-     * <p>
-     * Note that the configuration builder must be initialized with the current configuration.
-     *
-     * @return the object configuration builder.
-     */
-    @NotNull
-    Builder<? extends TYPE> applyObjectConfiguration();
+  /**
+   * Gets the object configuration builder related to the instance.
+   * <br>
+   * The configuration options not supported by the specific implementation might be ignored.
+   * <p>
+   * Note that the configuration builder must be initialized with the current configuration.
+   *
+   * @return the object configuration builder.
+   */
+  @NotNull
+  Builder<? extends TYPE> applyObjectConfiguration();
 }

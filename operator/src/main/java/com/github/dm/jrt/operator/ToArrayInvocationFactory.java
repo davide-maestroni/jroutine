@@ -38,48 +38,48 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class ToArrayInvocationFactory<IN> extends InvocationFactory<IN, IN[]> {
 
-    private final Class<? extends IN> mComponentType;
+  private final Class<? extends IN> mComponentType;
+
+  /**
+   * Constructor.
+   *
+   * @param componentType the array component type.
+   */
+  ToArrayInvocationFactory(@NotNull final Class<? extends IN> componentType) {
+    super(asArgs(componentType));
+    mComponentType = ConstantConditions.notNull("element type", componentType);
+  }
+
+  @NotNull
+  @Override
+  public Invocation<IN, IN[]> newInvocation() throws Exception {
+    return new ToArrayInvocation<IN>(mComponentType);
+  }
+
+  /**
+   * Implementation of an invocation collecting inputs into arrays.
+   *
+   * @param <IN> the input data type.
+   */
+  private static class ToArrayInvocation<IN> extends CallInvocation<IN, IN[]> {
+
+    private final Class<? extends IN> mElementType;
 
     /**
      * Constructor.
      *
-     * @param componentType the array component type.
+     * @param elementType the array element type.
      */
-    ToArrayInvocationFactory(@NotNull final Class<? extends IN> componentType) {
-        super(asArgs(componentType));
-        mComponentType = ConstantConditions.notNull("element type", componentType);
+    private ToArrayInvocation(@NotNull final Class<? extends IN> elementType) {
+      mElementType = elementType;
     }
 
-    @NotNull
     @Override
-    public Invocation<IN, IN[]> newInvocation() throws Exception {
-        return new ToArrayInvocation<IN>(mComponentType);
+    protected void onCall(@NotNull final List<? extends IN> inputs,
+        @NotNull final Channel<IN[], ?> result) throws Exception {
+      @SuppressWarnings("unchecked") final IN[] array =
+          (IN[]) Array.newInstance(mElementType, inputs.size());
+      result.pass(inputs.toArray(array));
     }
-
-    /**
-     * Implementation of an invocation collecting inputs into arrays.
-     *
-     * @param <IN> the input data type.
-     */
-    private static class ToArrayInvocation<IN> extends CallInvocation<IN, IN[]> {
-
-        private final Class<? extends IN> mElementType;
-
-        /**
-         * Constructor.
-         *
-         * @param elementType the array element type.
-         */
-        private ToArrayInvocation(@NotNull final Class<? extends IN> elementType) {
-            mElementType = elementType;
-        }
-
-        @Override
-        protected void onCall(@NotNull final List<? extends IN> inputs,
-                @NotNull final Channel<IN[], ?> result) throws Exception {
-            @SuppressWarnings("unchecked") final IN[] array =
-                    (IN[]) Array.newInstance(mElementType, inputs.size());
-            result.pass(inputs.toArray(array));
-        }
-    }
+  }
 }

@@ -31,59 +31,59 @@ import org.jetbrains.annotations.Nullable;
  */
 public interface ChannelBuilder extends ChannelConfigurable<ChannelBuilder> {
 
-    /**
-     * Builds and returns a channel instance.
-     *
-     * @param <DATA> the data type.
-     * @return the newly created channel.
-     */
-    @NotNull
-    <DATA> Channel<DATA, DATA> buildChannel();
+  /**
+   * Builds and returns a channel instance.
+   *
+   * @param <DATA> the data type.
+   * @return the newly created channel.
+   */
+  @NotNull
+  <DATA> Channel<DATA, DATA> buildChannel();
 
-    /**
-     * Builds and returns a channel producing no data.
-     * <p>
-     * Note that the returned channel will be already closed.
-     *
-     * @param <DATA> the data type.
-     * @return the newly created channel.
-     */
-    @NotNull
-    <DATA> Channel<DATA, DATA> of();
+  /**
+   * Builds and returns a channel producing no data.
+   * <p>
+   * Note that the returned channel will be already closed.
+   *
+   * @param <DATA> the data type.
+   * @return the newly created channel.
+   */
+  @NotNull
+  <DATA> Channel<DATA, DATA> of();
 
-    /**
-     * Builds and returns a channel producing the specified input.
-     * <p>
-     * Note that the returned channel will be already closed.
-     *
-     * @param input  the input.
-     * @param <DATA> the data type.
-     * @return the newly created channel.
-     */
-    @NotNull
-    <DATA> Channel<DATA, DATA> of(@Nullable DATA input);
+  /**
+   * Builds and returns a channel producing the specified input.
+   * <p>
+   * Note that the returned channel will be already closed.
+   *
+   * @param input  the input.
+   * @param <DATA> the data type.
+   * @return the newly created channel.
+   */
+  @NotNull
+  <DATA> Channel<DATA, DATA> of(@Nullable DATA input);
 
-    /**
-     * Builds and returns a channel producing the specified inputs.
-     * <p>
-     * Note that the returned channel will be already closed.
-     *
-     * @param inputs the input data.
-     * @param <DATA> the data type.
-     * @return the newly created channel.
-     */
-    @NotNull
-    <DATA> Channel<DATA, DATA> of(@Nullable DATA... inputs);
+  /**
+   * Builds and returns a channel producing the specified inputs.
+   * <p>
+   * Note that the returned channel will be already closed.
+   *
+   * @param inputs the input data.
+   * @param <DATA> the data type.
+   * @return the newly created channel.
+   */
+  @NotNull
+  <DATA> Channel<DATA, DATA> of(@Nullable DATA... inputs);
 
-    /**
-     * Builds and returns a channel producing the specified inputs.
-     * <p>
-     * Note that the returned channel will be already closed.
-     *
-     * @param inputs the iterable returning the input data.
-     * @param <DATA> the data type.
-     * @return the newly created channel.
-     */
-    @NotNull
-    <DATA> Channel<DATA, DATA> of(@Nullable Iterable<DATA> inputs);
+  /**
+   * Builds and returns a channel producing the specified inputs.
+   * <p>
+   * Note that the returned channel will be already closed.
+   *
+   * @param inputs the iterable returning the input data.
+   * @param <DATA> the data type.
+   * @return the newly created channel.
+   */
+  @NotNull
+  <DATA> Channel<DATA, DATA> of(@Nullable Iterable<DATA> inputs);
 }

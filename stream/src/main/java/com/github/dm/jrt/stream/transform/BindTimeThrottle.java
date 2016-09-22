@@ -41,127 +41,126 @@ import java.util.concurrent.TimeUnit;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class BindTimeThrottle<IN, OUT> implements
-        BiFunction<StreamConfiguration, Function<Channel<?, IN>, Channel<?, OUT>>, Function<?
-                super Channel<?, IN>, ? extends Channel<?, OUT>>> {
+class BindTimeThrottle<IN, OUT>
+    implements BiFunction<StreamConfiguration, Function<Channel<?, IN>, Channel<?, OUT>>, Function<?
+    super Channel<?, IN>, ? extends Channel<?, OUT>>> {
 
-    private final int mMaxCount;
+  private final int mMaxCount;
 
-    private final Object mMutex = new Object();
+  private final Object mMutex = new Object();
 
-    private final SimpleQueue<Runnable> mQueue = new SimpleQueue<Runnable>();
+  private final SimpleQueue<Runnable> mQueue = new SimpleQueue<Runnable>();
 
-    private final long mRangeMillis;
+  private final long mRangeMillis;
 
-    private int mCount;
+  private int mCount;
 
-    private long mNextTimeSlot = Long.MIN_VALUE;
+  private long mNextTimeSlot = Long.MIN_VALUE;
+
+  /**
+   * Constructor.
+   *
+   * @param count    the maximum invocation count.
+   * @param range    the time range value.
+   * @param timeUnit the time range unit.
+   */
+  BindTimeThrottle(final int count, final long range, @NotNull final TimeUnit timeUnit) {
+    mMaxCount = ConstantConditions.positive("max count", count);
+    mRangeMillis = timeUnit.toMillis(range);
+  }
+
+  public Function<? super Channel<?, IN>, ? extends Channel<?, OUT>> apply(
+      final StreamConfiguration streamConfiguration,
+      final Function<Channel<?, IN>, Channel<?, OUT>> function) {
+    return new BindingFunction(streamConfiguration.toChannelConfiguration(), function);
+  }
+
+  /**
+   * Binding function implementation.
+   */
+  private class BindingFunction implements Function<Channel<?, IN>, Channel<?, OUT>>, Execution {
+
+    private final Function<? super Channel<?, IN>, ? extends Channel<?, OUT>> mBindingFunction;
+
+    private final ChannelConfiguration mConfiguration;
+
+    private final Runner mRunner;
 
     /**
      * Constructor.
      *
-     * @param count    the maximum invocation count.
-     * @param range    the time range value.
-     * @param timeUnit the time range unit.
+     * @param configuration   the channel configuration.
+     * @param bindingFunction the binding function.
      */
-    BindTimeThrottle(final int count, final long range, @NotNull final TimeUnit timeUnit) {
-        mMaxCount = ConstantConditions.positive("max count", count);
-        mRangeMillis = timeUnit.toMillis(range);
+    BindingFunction(@NotNull final ChannelConfiguration configuration,
+        @NotNull final Function<? super Channel<?, IN>, ? extends Channel<?, OUT>>
+            bindingFunction) {
+      mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
+      mBindingFunction = ConstantConditions.notNull("binding function", bindingFunction);
+      mRunner = configuration.getRunnerOrElse(Runners.sharedRunner());
     }
 
-    public Function<? super Channel<?, IN>, ? extends Channel<?, OUT>> apply(
-            final StreamConfiguration streamConfiguration,
-            final Function<Channel<?, IN>, Channel<?, OUT>> function) {
-        return new BindingFunction(streamConfiguration.toChannelConfiguration(), function);
-    }
-
-    /**
-     * Binding function implementation.
-     */
-    private class BindingFunction implements Function<Channel<?, IN>, Channel<?, OUT>>, Execution {
-
-        private final Function<? super Channel<?, IN>, ? extends Channel<?, OUT>> mBindingFunction;
-
-        private final ChannelConfiguration mConfiguration;
-
-        private final Runner mRunner;
-
-        /**
-         * Constructor.
-         *
-         * @param configuration   the channel configuration.
-         * @param bindingFunction the binding function.
-         */
-        BindingFunction(@NotNull final ChannelConfiguration configuration,
-                @NotNull final Function<? super Channel<?, IN>, ? extends Channel<?, OUT>>
-                        bindingFunction) {
-            mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
-            mBindingFunction = ConstantConditions.notNull("binding function", bindingFunction);
-            mRunner = configuration.getRunnerOrElse(Runners.sharedRunner());
+    public Channel<?, OUT> apply(final Channel<?, IN> channel) throws Exception {
+      final ChannelConfiguration configuration = mConfiguration;
+      final Channel<OUT, OUT> outputChannel = JRoutineCore.io().apply(configuration).buildChannel();
+      final long delay;
+      final boolean isBind;
+      final Runner runner = mRunner;
+      synchronized (mMutex) {
+        final long rangeMillis = mRangeMillis;
+        final long nextTimeSlot = mNextTimeSlot;
+        final long now = System.currentTimeMillis();
+        if ((nextTimeSlot == Long.MIN_VALUE) || (now >= (nextTimeSlot + rangeMillis))) {
+          mNextTimeSlot = now + rangeMillis;
+          mCount = 0;
         }
 
-        public Channel<?, OUT> apply(final Channel<?, IN> channel) throws Exception {
-            final ChannelConfiguration configuration = mConfiguration;
-            final Channel<OUT, OUT> outputChannel =
-                    JRoutineCore.io().apply(configuration).buildChannel();
-            final long delay;
-            final boolean isBind;
-            final Runner runner = mRunner;
-            synchronized (mMutex) {
-                final long rangeMillis = mRangeMillis;
-                final long nextTimeSlot = mNextTimeSlot;
-                final long now = System.currentTimeMillis();
-                if ((nextTimeSlot == Long.MIN_VALUE) || (now >= (nextTimeSlot + rangeMillis))) {
-                    mNextTimeSlot = now + rangeMillis;
-                    mCount = 0;
-                }
+        final int maxCount = mMaxCount;
+        isBind = (++mCount <= maxCount);
+        if (!isBind) {
+          final SimpleQueue<Runnable> queue = mQueue;
+          queue.add(new Runnable() {
 
-                final int maxCount = mMaxCount;
-                isBind = (++mCount <= maxCount);
-                if (!isBind) {
-                    final SimpleQueue<Runnable> queue = mQueue;
-                    queue.add(new Runnable() {
-
-                        public void run() {
-                            try {
-                                mBindingFunction.apply(channel).bind(outputChannel);
-
-                            } catch (final Throwable t) {
-                                outputChannel.abort(t);
-                                InvocationInterruptedException.throwIfInterrupt(t);
-                            }
-                        }
-                    });
-
-                    delay = (((queue.size() - 1) / maxCount) + 1) * rangeMillis;
-
-                } else {
-                    delay = 0;
-                }
-            }
-
-            if (isBind) {
+            public void run() {
+              try {
                 mBindingFunction.apply(channel).bind(outputChannel);
 
-            } else {
-                runner.run(this, delay, TimeUnit.MILLISECONDS);
+              } catch (final Throwable t) {
+                outputChannel.abort(t);
+                InvocationInterruptedException.throwIfInterrupt(t);
+              }
             }
+          });
 
-            return outputChannel;
+          delay = (((queue.size() - 1) / maxCount) + 1) * rangeMillis;
+
+        } else {
+          delay = 0;
         }
+      }
 
-        public void run() {
-            final Runnable runnable;
-            synchronized (mMutex) {
-                final SimpleQueue<Runnable> queue = mQueue;
-                if (queue.isEmpty()) {
-                    return;
-                }
+      if (isBind) {
+        mBindingFunction.apply(channel).bind(outputChannel);
 
-                runnable = queue.removeFirst();
-            }
+      } else {
+        runner.run(this, delay, TimeUnit.MILLISECONDS);
+      }
 
-            runnable.run();
-        }
+      return outputChannel;
     }
+
+    public void run() {
+      final Runnable runnable;
+      synchronized (mMutex) {
+        final SimpleQueue<Runnable> queue = mQueue;
+        if (queue.isEmpty()) {
+          return;
+        }
+
+        runnable = queue.removeFirst();
+      }
+
+      runnable.run();
+    }
+  }
 }

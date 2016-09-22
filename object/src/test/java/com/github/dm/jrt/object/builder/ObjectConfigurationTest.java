@@ -33,81 +33,81 @@ import static org.junit.Assert.fail;
  */
 public class ObjectConfigurationTest {
 
-    @Test
-    public void testBuildFrom() {
+  @Test
+  public void testBuildFrom() {
 
-        final ObjectConfiguration configuration = builder().withSharedFields("test").configured();
-        assertThat(configuration.builderFrom().configured()).isEqualTo(configuration);
-        assertThat(configuration.builderFrom().configured().hashCode()).isEqualTo(
-                configuration.hashCode());
-        assertThat(builderFrom(null).configured()).isEqualTo(
-                ObjectConfiguration.defaultConfiguration());
+    final ObjectConfiguration configuration = builder().withSharedFields("test").configured();
+    assertThat(configuration.builderFrom().configured()).isEqualTo(configuration);
+    assertThat(configuration.builderFrom().configured().hashCode()).isEqualTo(
+        configuration.hashCode());
+    assertThat(builderFrom(null).configured()).isEqualTo(
+        ObjectConfiguration.defaultConfiguration());
+  }
+
+  @Test
+  @SuppressWarnings("ConstantConditions")
+  public void testBuildNullPointerError() {
+
+    try {
+
+      new Builder<Object>(null);
+
+      fail();
+
+    } catch (final NullPointerException ignored) {
+
     }
 
-    @Test
-    @SuppressWarnings("ConstantConditions")
-    public void testBuildNullPointerError() {
+    try {
 
-        try {
+      new Builder<Object>(null, ObjectConfiguration.defaultConfiguration());
 
-            new Builder<Object>(null);
+      fail();
 
-            fail();
+    } catch (final NullPointerException ignored) {
 
-        } catch (final NullPointerException ignored) {
+    }
+  }
 
-        }
+  @Test
+  public void testBuilderFromEquals() {
 
-        try {
+    final ObjectConfiguration configuration = builder().withSharedFields("test").configured();
+    assertThat(builder().with(configuration).configured()).isEqualTo(configuration);
+    assertThat(configuration.builderFrom().configured()).isEqualTo(configuration);
+    assertThat(configuration.builderFrom().with(null).configured()).isEqualTo(
+        ObjectConfiguration.defaultConfiguration());
+  }
 
-            new Builder<Object>(null, ObjectConfiguration.defaultConfiguration());
+  @Test
+  public void testConstructor() {
 
-            fail();
+    boolean failed = false;
+    try {
+      new Builders();
+      failed = true;
 
-        } catch (final NullPointerException ignored) {
+    } catch (final Throwable ignored) {
 
-        }
     }
 
-    @Test
-    public void testBuilderFromEquals() {
+    assertThat(failed).isFalse();
+  }
 
-        final ObjectConfiguration configuration = builder().withSharedFields("test").configured();
-        assertThat(builder().with(configuration).configured()).isEqualTo(configuration);
-        assertThat(configuration.builderFrom().configured()).isEqualTo(configuration);
-        assertThat(configuration.builderFrom().with(null).configured()).isEqualTo(
-                ObjectConfiguration.defaultConfiguration());
-    }
+  @Test
+  public void testSharedFieldsEquals() {
 
-    @Test
-    public void testConstructor() {
+    final ObjectConfiguration configuration = builder().withSharedFields("group").configured();
+    assertThat(configuration).isNotEqualTo(builder().withSharedFields("test").configured());
+    assertThat(configuration.builderFrom().withSharedFields("test").configured()).isEqualTo(
+        builder().withSharedFields("test").configured());
+    assertThat(configuration).isNotEqualTo(builder().withSharedFields("test").configured());
+  }
 
-        boolean failed = false;
-        try {
-            new Builders();
-            failed = true;
+  @Test
+  public void testToString() {
 
-        } catch (final Throwable ignored) {
-
-        }
-
-        assertThat(failed).isFalse();
-    }
-
-    @Test
-    public void testSharedFieldsEquals() {
-
-        final ObjectConfiguration configuration = builder().withSharedFields("group").configured();
-        assertThat(configuration).isNotEqualTo(builder().withSharedFields("test").configured());
-        assertThat(configuration.builderFrom().withSharedFields("test").configured()).isEqualTo(
-                builder().withSharedFields("test").configured());
-        assertThat(configuration).isNotEqualTo(builder().withSharedFields("test").configured());
-    }
-
-    @Test
-    public void testToString() {
-
-        assertThat(builder().withSharedFields("testGroupName123").configured().toString()).contains(
-                "testGroupName123");
-    }
+    assertThat(builder().withSharedFields("testGroupName123").configured().toString()).contains(
+        "testGroupName123");
+  }
 }

@@ -34,13 +34,13 @@ import retrofit2.http.Path;
  */
 public interface GitHubService {
 
-    @GET("users/{user}/repos")
-    @Headers("Accept: application/json")
-    @CacheStrategy(CacheStrategyType.CACHE)
-    Channel<Object, List<Repo>> listRepos(@Path("user") String user);
+  @GET("users/{user}/repos")
+  @Headers("Accept: application/json")
+  @CacheStrategy(CacheStrategyType.CACHE)
+  Channel<Object, List<Repo>> listRepos(@Path("user") String user);
 
-    @GET("users/{user}/repos")
-    @Headers("Accept: application/json")
-    @CacheStrategy(CacheStrategyType.CACHE)
-    StreamBuilder<Object, List<Repo>> streamRepos(@Path("user") String user);
+  @GET("users/{user}/repos")
+  @Headers("Accept: application/json")
+  @CacheStrategy(CacheStrategyType.CACHE)
+  StreamBuilder<Object, List<Repo>> streamRepos(@Path("user") String user);
 }

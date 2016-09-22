@@ -53,62 +53,61 @@ import static org.hamcrest.CoreMatchers.anything;
 @RunWith(AndroidJUnit4.class)
 public class MainActivityTest {
 
-    @Rule
-    public ActivityTestRule<MainActivity> mActivityRule =
-            new ActivityTestRule<>(MainActivity.class);
+  @Rule
+  public ActivityTestRule<MainActivity> mActivityRule = new ActivityTestRule<>(MainActivity.class);
 
-    @Test
-    public void testRepoList() throws InterruptedException {
-        try {
-            // Wait for the network request to complete
-            UnitDuration.seconds(10).sleepAtLeast();
-            IdlingPolicies.setIdlingResourceTimeout(60, TimeUnit.SECONDS);
-            onData(anything()).inAdapterView(withId(R.id.repo_list))
-                              .atPosition(0)
-                              .check(matches(isDisplayed()));
+  @Test
+  public void testRepoList() throws InterruptedException {
+    try {
+      // Wait for the network request to complete
+      UnitDuration.seconds(10).sleepAtLeast();
+      IdlingPolicies.setIdlingResourceTimeout(60, TimeUnit.SECONDS);
+      onData(anything()).inAdapterView(withId(R.id.repo_list))
+                        .atPosition(0)
+                        .check(matches(isDisplayed()));
 
-        } catch (final PerformException ignored) {
-        }
+    } catch (final PerformException ignored) {
+    }
+  }
+
+  @Test
+  public void testRepoListRotation() throws InterruptedException {
+    try {
+      // Wait for the network request to complete
+      UnitDuration.seconds(10).sleepAtLeast();
+      IdlingPolicies.setIdlingResourceTimeout(60, TimeUnit.SECONDS);
+      onData(anything()).inAdapterView(withId(R.id.repo_list))
+                        .atPosition(0)
+                        .check(matches(isDisplayed()));
+      onView(isRoot()).perform(new LandscapeOrientationAction());
+      onData(anything()).inAdapterView(withId(R.id.repo_list))
+                        .atPosition(0)
+                        .check(matches(isDisplayed()));
+
+    } catch (final PerformException ignored) {
+    }
+  }
+
+  private static class LandscapeOrientationAction implements ViewAction {
+
+    @Override
+    public Matcher<View> getConstraints() {
+      return isRoot();
     }
 
-    @Test
-    public void testRepoListRotation() throws InterruptedException {
-        try {
-            // Wait for the network request to complete
-            UnitDuration.seconds(10).sleepAtLeast();
-            IdlingPolicies.setIdlingResourceTimeout(60, TimeUnit.SECONDS);
-            onData(anything()).inAdapterView(withId(R.id.repo_list))
-                              .atPosition(0)
-                              .check(matches(isDisplayed()));
-            onView(isRoot()).perform(new LandscapeOrientationAction());
-            onData(anything()).inAdapterView(withId(R.id.repo_list))
-                              .atPosition(0)
-                              .check(matches(isDisplayed()));
-
-        } catch (final PerformException ignored) {
-        }
+    @Override
+    public String getDescription() {
+      return "change device orientation to landscape";
     }
 
-    private static class LandscapeOrientationAction implements ViewAction {
-
-        @Override
-        public Matcher<View> getConstraints() {
-            return isRoot();
-        }
-
-        @Override
-        public String getDescription() {
-            return "change device orientation to landscape";
-        }
-
-        @Override
-        public void perform(final UiController uiController, final View view) {
-            uiController.loopMainThreadUntilIdle();
-            ((Activity) view.getContext()).setRequestedOrientation(
-                    ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-            if (getInstance().getActivitiesInStage(Stage.RESUMED).isEmpty()) {
-                throw new RuntimeException("orientation change failed");
-            }
-        }
+    @Override
+    public void perform(final UiController uiController, final View view) {
+      uiController.loopMainThreadUntilIdle();
+      ((Activity) view.getContext()).setRequestedOrientation(
+          ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+      if (getInstance().getActivitiesInStage(Stage.RESUMED).isEmpty()) {
+        throw new RuntimeException("orientation change failed");
+      }
     }
+  }
 }

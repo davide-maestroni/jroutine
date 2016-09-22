@@ -48,342 +48,339 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 public final class ServiceConfiguration extends DeepEqualObject {
 
-    private static final DefaultConfigurable sDefaultConfigurable = new DefaultConfigurable();
+  private static final DefaultConfigurable sDefaultConfigurable = new DefaultConfigurable();
 
-    private static final ServiceConfiguration sDefaultConfiguration =
-            builder().buildConfiguration();
+  private static final ServiceConfiguration sDefaultConfiguration = builder().buildConfiguration();
 
-    private final Object[] mLogArgs;
+  private final Object[] mLogArgs;
 
-    private final Class<? extends Log> mLogClass;
+  private final Class<? extends Log> mLogClass;
 
-    private final Looper mLooper;
+  private final Looper mLooper;
 
-    private final Object[] mRunnerArgs;
+  private final Object[] mRunnerArgs;
 
-    private final Class<? extends Runner> mRunnerClass;
+  private final Class<? extends Runner> mRunnerClass;
+
+  /**
+   * Constructor.
+   *
+   * @param looper      the looper instance.
+   * @param runnerClass the runner class.
+   * @param runnerArgs  the runner constructor args.
+   * @param logClass    the log class.
+   * @param logArgs     the log constructor args.
+   */
+  private ServiceConfiguration(@Nullable final Looper looper,
+      @Nullable final Class<? extends Runner> runnerClass, @Nullable final Object[] runnerArgs,
+      @Nullable final Class<? extends Log> logClass, @Nullable final Object[] logArgs) {
+    super(asArgs(looper, runnerClass, runnerArgs, logClass, logArgs));
+    mLooper = looper;
+    mRunnerClass = runnerClass;
+    mRunnerArgs = runnerArgs;
+    mLogClass = logClass;
+    mLogArgs = logArgs;
+  }
+
+  /**
+   * Returns a Service configuration builder.
+   *
+   * @return the builder.
+   */
+  @NotNull
+  public static Builder<ServiceConfiguration> builder() {
+    return new Builder<ServiceConfiguration>(sDefaultConfigurable);
+  }
+
+  /**
+   * Returns a Service configuration builder initialized with the specified configuration.
+   *
+   * @param initialConfiguration the initial configuration.
+   * @return the builder.
+   */
+  @NotNull
+  public static Builder<ServiceConfiguration> builderFrom(
+      @Nullable final ServiceConfiguration initialConfiguration) {
+    return (initialConfiguration == null) ? builder()
+        : new Builder<ServiceConfiguration>(sDefaultConfigurable, initialConfiguration);
+  }
+
+  /**
+   * Returns a configuration with all the options set to their default.
+   *
+   * @return the configuration instance.
+   */
+  @NotNull
+  public static ServiceConfiguration defaultConfiguration() {
+    return sDefaultConfiguration;
+  }
+
+  private static Object[] cloneOrNull(@Nullable final Object[] args) {
+    return (args != null) ? args.clone() : null;
+  }
+
+  /**
+   * Returns a Service configuration builder initialized with this configuration.
+   *
+   * @return the builder.
+   */
+  @NotNull
+  public Builder<ServiceConfiguration> builderFrom() {
+    return builderFrom(this);
+  }
+
+  /**
+   * Returns the arguments to be passed to the log constructor.
+   *
+   * @param valueIfNotSet the default value if none was set.
+   * @return the constructor arguments.
+   */
+  public Object[] getLogArgsOrElse(@Nullable final Object... valueIfNotSet) {
+    final Object[] logArgs = mLogArgs;
+    return (logArgs != null) ? cloneOrNull(logArgs) : valueIfNotSet;
+  }
+
+  /**
+   * Returns the log class (null by default).
+   *
+   * @param valueIfNotSet the default value if none was set.
+   * @return the log class instance.
+   */
+  public Class<? extends Log> getLogClassOrElse(
+      @Nullable final Class<? extends Log> valueIfNotSet) {
+    final Class<? extends Log> logClass = mLogClass;
+    return (logClass != null) ? logClass : valueIfNotSet;
+  }
+
+  /**
+   * Returns the looper used for dispatching the messages from the Service (null by default).
+   *
+   * @param valueIfNotSet the default value if none was set.
+   * @return the looper instance.
+   */
+  public Looper getMessageLooperOrElse(@Nullable final Looper valueIfNotSet) {
+    final Looper looper = mLooper;
+    return (looper != null) ? looper : valueIfNotSet;
+  }
+
+  /**
+   * Returns the arguments to be passed to the runner constructor.
+   *
+   * @param valueIfNotSet the default value if none was set.
+   * @return the constructor arguments.
+   */
+  public Object[] getRunnerArgsOrElse(@Nullable final Object... valueIfNotSet) {
+    final Object[] runnerArgs = mRunnerArgs;
+    return (runnerArgs != null) ? cloneOrNull(runnerArgs) : valueIfNotSet;
+  }
+
+  /**
+   * Returns the runner class (null by default).
+   *
+   * @param valueIfNotSet the default value if none was set.
+   * @return the runner class instance.
+   */
+  public Class<? extends Runner> getRunnerClassOrElse(
+      @Nullable final Class<? extends Runner> valueIfNotSet) {
+    final Class<? extends Runner> runnerClass = mRunnerClass;
+    return (runnerClass != null) ? runnerClass : valueIfNotSet;
+  }
+
+  /**
+   * Interface defining a configurable object.
+   *
+   * @param <TYPE> the configurable object type.
+   */
+  public interface Configurable<TYPE> {
+
+    /**
+     * Sets the specified configuration and returns the configurable instance.
+     *
+     * @param configuration the configuration.
+     * @return the configurable instance.
+     */
+    @NotNull
+    TYPE apply(@NotNull ServiceConfiguration configuration);
+  }
+
+  /**
+   * Builder of Service configurations.
+   *
+   * @param <TYPE> the configurable object type.
+   */
+  public static final class Builder<TYPE> {
+
+    private final Configurable<? extends TYPE> mConfigurable;
+
+    private Object[] mLogArgs;
+
+    private Class<? extends Log> mLogClass;
+
+    private Looper mLooper;
+
+    private Object[] mRunnerArgs;
+
+    private Class<? extends Runner> mRunnerClass;
 
     /**
      * Constructor.
      *
-     * @param looper      the looper instance.
-     * @param runnerClass the runner class.
-     * @param runnerArgs  the runner constructor args.
-     * @param logClass    the log class.
-     * @param logArgs     the log constructor args.
+     * @param configurable the configurable instance.
      */
-    private ServiceConfiguration(@Nullable final Looper looper,
-            @Nullable final Class<? extends Runner> runnerClass,
-            @Nullable final Object[] runnerArgs, @Nullable final Class<? extends Log> logClass,
-            @Nullable final Object[] logArgs) {
-        super(asArgs(looper, runnerClass, runnerArgs, logClass, logArgs));
-        mLooper = looper;
-        mRunnerClass = runnerClass;
-        mRunnerArgs = runnerArgs;
-        mLogClass = logClass;
-        mLogArgs = logArgs;
+    public Builder(@NotNull final Configurable<? extends TYPE> configurable) {
+      mConfigurable = ConstantConditions.notNull("configurable instance", configurable);
     }
 
     /**
-     * Returns a Service configuration builder.
+     * Constructor.
      *
-     * @return the builder.
-     */
-    @NotNull
-    public static Builder<ServiceConfiguration> builder() {
-        return new Builder<ServiceConfiguration>(sDefaultConfigurable);
-    }
-
-    /**
-     * Returns a Service configuration builder initialized with the specified configuration.
-     *
+     * @param configurable         the configurable instance.
      * @param initialConfiguration the initial configuration.
-     * @return the builder.
+     */
+    public Builder(@NotNull final Configurable<? extends TYPE> configurable,
+        @NotNull final ServiceConfiguration initialConfiguration) {
+      mConfigurable = ConstantConditions.notNull("configurable instance", configurable);
+      setConfiguration(initialConfiguration);
+    }
+
+    /**
+     * Applies this configuration and returns the configured object.
+     *
+     * @return the configured object.
      */
     @NotNull
-    public static Builder<ServiceConfiguration> builderFrom(
-            @Nullable final ServiceConfiguration initialConfiguration) {
-        return (initialConfiguration == null) ? builder()
-                : new Builder<ServiceConfiguration>(sDefaultConfigurable, initialConfiguration);
+    public TYPE configured() {
+      return mConfigurable.apply(buildConfiguration());
     }
 
     /**
-     * Returns a configuration with all the options set to their default.
+     * Applies the specified configuration to this builder. A null value means that all the
+     * configuration options will be reset to their default, otherwise only the non-default
+     * options will be applied.
      *
-     * @return the configuration instance.
+     * @param configuration the Service configuration.
+     * @return this builder.
      */
     @NotNull
-    public static ServiceConfiguration defaultConfiguration() {
-        return sDefaultConfiguration;
-    }
+    public Builder<TYPE> with(@Nullable final ServiceConfiguration configuration) {
+      if (configuration == null) {
+        setConfiguration(defaultConfiguration());
+        return this;
+      }
 
-    private static Object[] cloneOrNull(@Nullable final Object[] args) {
-        return (args != null) ? args.clone() : null;
+      final Looper looper = configuration.mLooper;
+      if (looper != null) {
+        withMessageLooper(looper);
+      }
+
+      final Class<? extends Runner> runnerClass = configuration.mRunnerClass;
+      if (runnerClass != null) {
+        withRunnerClass(runnerClass);
+      }
+
+      final Object[] runnerArgs = configuration.mRunnerArgs;
+      if (runnerArgs != null) {
+        withRunnerArgs(runnerArgs);
+      }
+
+      final Class<? extends Log> logClass = configuration.mLogClass;
+      if (logClass != null) {
+        withLogClass(logClass);
+      }
+
+      final Object[] logArgs = configuration.mLogArgs;
+      if (logArgs != null) {
+        withLogArgs(logArgs);
+      }
+
+      return this;
     }
 
     /**
-     * Returns a Service configuration builder initialized with this configuration.
+     * Sets the arguments to be passed to the log constructor.
      *
-     * @return the builder.
+     * @param args the argument objects.
+     * @return this builder.
      */
     @NotNull
-    public Builder<ServiceConfiguration> builderFrom() {
-        return builderFrom(this);
+    public Builder<TYPE> withLogArgs(@Nullable final Object... args) {
+      mLogArgs = cloneOrNull(args);
+      return this;
     }
 
     /**
-     * Returns the arguments to be passed to the log constructor.
+     * Sets the log class. A null value means that it is up to the specific implementation to
+     * choose a default class.
      *
-     * @param valueIfNotSet the default value if none was set.
-     * @return the constructor arguments.
+     * @param logClass the log class.
+     * @return this builder.
      */
-    public Object[] getLogArgsOrElse(@Nullable final Object... valueIfNotSet) {
-        final Object[] logArgs = mLogArgs;
-        return (logArgs != null) ? cloneOrNull(logArgs) : valueIfNotSet;
+    @NotNull
+    public Builder<TYPE> withLogClass(@Nullable final Class<? extends Log> logClass) {
+      mLogClass = logClass;
+      return this;
     }
 
     /**
-     * Returns the log class (null by default).
+     * Sets the looper on which the messages from the Service are dispatched. A null value means
+     * that messages will be dispatched on the main thread (as by default).
      *
-     * @param valueIfNotSet the default value if none was set.
-     * @return the log class instance.
+     * @param looper the looper instance.
+     * @return this builder.
      */
-    public Class<? extends Log> getLogClassOrElse(
-            @Nullable final Class<? extends Log> valueIfNotSet) {
-        final Class<? extends Log> logClass = mLogClass;
-        return (logClass != null) ? logClass : valueIfNotSet;
+    @NotNull
+    public Builder<TYPE> withMessageLooper(@Nullable final Looper looper) {
+      mLooper = looper;
+      return this;
     }
 
     /**
-     * Returns the looper used for dispatching the messages from the Service (null by default).
+     * Sets the arguments to be passed to the runner constructor.
      *
-     * @param valueIfNotSet the default value if none was set.
-     * @return the looper instance.
+     * @param args the argument objects.
+     * @return this builder.
      */
-    public Looper getMessageLooperOrElse(@Nullable final Looper valueIfNotSet) {
-        final Looper looper = mLooper;
-        return (looper != null) ? looper : valueIfNotSet;
+    @NotNull
+    public Builder<TYPE> withRunnerArgs(@Nullable final Object... args) {
+      mRunnerArgs = cloneOrNull(args);
+      return this;
     }
 
     /**
-     * Returns the arguments to be passed to the runner constructor.
+     * Sets the runner class. A null value means that it is up to the specific implementation to
+     * choose a default runner.
      *
-     * @param valueIfNotSet the default value if none was set.
-     * @return the constructor arguments.
+     * @param runnerClass the runner class.
+     * @return this builder.
      */
-    public Object[] getRunnerArgsOrElse(@Nullable final Object... valueIfNotSet) {
-        final Object[] runnerArgs = mRunnerArgs;
-        return (runnerArgs != null) ? cloneOrNull(runnerArgs) : valueIfNotSet;
+    @NotNull
+    public Builder<TYPE> withRunnerClass(@Nullable final Class<? extends Runner> runnerClass) {
+      mRunnerClass = runnerClass;
+      return this;
     }
 
-    /**
-     * Returns the runner class (null by default).
-     *
-     * @param valueIfNotSet the default value if none was set.
-     * @return the runner class instance.
-     */
-    public Class<? extends Runner> getRunnerClassOrElse(
-            @Nullable final Class<? extends Runner> valueIfNotSet) {
-        final Class<? extends Runner> runnerClass = mRunnerClass;
-        return (runnerClass != null) ? runnerClass : valueIfNotSet;
+    @NotNull
+    private ServiceConfiguration buildConfiguration() {
+      return new ServiceConfiguration(mLooper, mRunnerClass, mRunnerArgs, mLogClass, mLogArgs);
     }
 
-    /**
-     * Interface defining a configurable object.
-     *
-     * @param <TYPE> the configurable object type.
-     */
-    public interface Configurable<TYPE> {
-
-        /**
-         * Sets the specified configuration and returns the configurable instance.
-         *
-         * @param configuration the configuration.
-         * @return the configurable instance.
-         */
-        @NotNull
-        TYPE apply(@NotNull ServiceConfiguration configuration);
+    private void setConfiguration(@NotNull final ServiceConfiguration configuration) {
+      mLooper = configuration.mLooper;
+      mRunnerClass = configuration.mRunnerClass;
+      mRunnerArgs = configuration.mRunnerArgs;
+      mLogClass = configuration.mLogClass;
+      mLogArgs = configuration.mLogArgs;
     }
+  }
 
-    /**
-     * Builder of Service configurations.
-     *
-     * @param <TYPE> the configurable object type.
-     */
-    public static final class Builder<TYPE> {
+  /**
+   * Default configurable implementation.
+   */
+  private static class DefaultConfigurable implements Configurable<ServiceConfiguration> {
 
-        private final Configurable<? extends TYPE> mConfigurable;
-
-        private Object[] mLogArgs;
-
-        private Class<? extends Log> mLogClass;
-
-        private Looper mLooper;
-
-        private Object[] mRunnerArgs;
-
-        private Class<? extends Runner> mRunnerClass;
-
-        /**
-         * Constructor.
-         *
-         * @param configurable the configurable instance.
-         */
-        public Builder(@NotNull final Configurable<? extends TYPE> configurable) {
-            mConfigurable = ConstantConditions.notNull("configurable instance", configurable);
-        }
-
-        /**
-         * Constructor.
-         *
-         * @param configurable         the configurable instance.
-         * @param initialConfiguration the initial configuration.
-         */
-        public Builder(@NotNull final Configurable<? extends TYPE> configurable,
-                @NotNull final ServiceConfiguration initialConfiguration) {
-            mConfigurable = ConstantConditions.notNull("configurable instance", configurable);
-            setConfiguration(initialConfiguration);
-        }
-
-        /**
-         * Applies this configuration and returns the configured object.
-         *
-         * @return the configured object.
-         */
-        @NotNull
-        public TYPE configured() {
-            return mConfigurable.apply(buildConfiguration());
-        }
-
-        /**
-         * Applies the specified configuration to this builder. A null value means that all the
-         * configuration options will be reset to their default, otherwise only the non-default
-         * options will be applied.
-         *
-         * @param configuration the Service configuration.
-         * @return this builder.
-         */
-        @NotNull
-        public Builder<TYPE> with(@Nullable final ServiceConfiguration configuration) {
-            if (configuration == null) {
-                setConfiguration(defaultConfiguration());
-                return this;
-            }
-
-            final Looper looper = configuration.mLooper;
-            if (looper != null) {
-                withMessageLooper(looper);
-            }
-
-            final Class<? extends Runner> runnerClass = configuration.mRunnerClass;
-            if (runnerClass != null) {
-                withRunnerClass(runnerClass);
-            }
-
-            final Object[] runnerArgs = configuration.mRunnerArgs;
-            if (runnerArgs != null) {
-                withRunnerArgs(runnerArgs);
-            }
-
-            final Class<? extends Log> logClass = configuration.mLogClass;
-            if (logClass != null) {
-                withLogClass(logClass);
-            }
-
-            final Object[] logArgs = configuration.mLogArgs;
-            if (logArgs != null) {
-                withLogArgs(logArgs);
-            }
-
-            return this;
-        }
-
-        /**
-         * Sets the arguments to be passed to the log constructor.
-         *
-         * @param args the argument objects.
-         * @return this builder.
-         */
-        @NotNull
-        public Builder<TYPE> withLogArgs(@Nullable final Object... args) {
-            mLogArgs = cloneOrNull(args);
-            return this;
-        }
-
-        /**
-         * Sets the log class. A null value means that it is up to the specific implementation to
-         * choose a default class.
-         *
-         * @param logClass the log class.
-         * @return this builder.
-         */
-        @NotNull
-        public Builder<TYPE> withLogClass(@Nullable final Class<? extends Log> logClass) {
-            mLogClass = logClass;
-            return this;
-        }
-
-        /**
-         * Sets the looper on which the messages from the Service are dispatched. A null value means
-         * that messages will be dispatched on the main thread (as by default).
-         *
-         * @param looper the looper instance.
-         * @return this builder.
-         */
-        @NotNull
-        public Builder<TYPE> withMessageLooper(@Nullable final Looper looper) {
-            mLooper = looper;
-            return this;
-        }
-
-        /**
-         * Sets the arguments to be passed to the runner constructor.
-         *
-         * @param args the argument objects.
-         * @return this builder.
-         */
-        @NotNull
-        public Builder<TYPE> withRunnerArgs(@Nullable final Object... args) {
-            mRunnerArgs = cloneOrNull(args);
-            return this;
-        }
-
-        /**
-         * Sets the runner class. A null value means that it is up to the specific implementation to
-         * choose a default runner.
-         *
-         * @param runnerClass the runner class.
-         * @return this builder.
-         */
-        @NotNull
-        public Builder<TYPE> withRunnerClass(@Nullable final Class<? extends Runner> runnerClass) {
-            mRunnerClass = runnerClass;
-            return this;
-        }
-
-        @NotNull
-        private ServiceConfiguration buildConfiguration() {
-            return new ServiceConfiguration(mLooper, mRunnerClass, mRunnerArgs, mLogClass,
-                    mLogArgs);
-        }
-
-        private void setConfiguration(@NotNull final ServiceConfiguration configuration) {
-            mLooper = configuration.mLooper;
-            mRunnerClass = configuration.mRunnerClass;
-            mRunnerArgs = configuration.mRunnerArgs;
-            mLogClass = configuration.mLogClass;
-            mLogArgs = configuration.mLogArgs;
-        }
+    @NotNull
+    public ServiceConfiguration apply(@NotNull final ServiceConfiguration configuration) {
+      return configuration;
     }
-
-    /**
-     * Default configurable implementation.
-     */
-    private static class DefaultConfigurable implements Configurable<ServiceConfiguration> {
-
-        @NotNull
-        public ServiceConfiguration apply(@NotNull final ServiceConfiguration configuration) {
-            return configuration;
-        }
-    }
+  }
 }

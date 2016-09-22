@@ -26,12 +26,12 @@ package com.github.dm.jrt.function;
  */
 public interface BiConsumer<IN1, IN2> {
 
-    /**
-     * Performs this operation on the given arguments.
-     *
-     * @param in1 the first input argument.
-     * @param in2 the second input argument.
-     * @throws java.lang.Exception if an unexpected error occurs.
-     */
-    void accept(IN1 in1, IN2 in2) throws Exception;
+  /**
+   * Performs this operation on the given arguments.
+   *
+   * @param in1 the first input argument.
+   * @param in2 the second input argument.
+   * @throws java.lang.Exception if an unexpected error occurs.
+   */
+  void accept(IN1 in1, IN2 in2) throws Exception;
 }

@@ -25,12 +25,12 @@ import org.jetbrains.annotations.Nullable;
  */
 public class TimeoutException extends RoutineException {
 
-    /**
-     * Constructor.
-     *
-     * @param message the error message.
-     */
-    public TimeoutException(@Nullable final String message) {
-        super(message);
-    }
+  /**
+   * Constructor.
+   *
+   * @param message the error message.
+   */
+  public TimeoutException(@Nullable final String message) {
+    super(message);
+  }
 }

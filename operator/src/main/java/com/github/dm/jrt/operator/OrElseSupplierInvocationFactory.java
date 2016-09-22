@@ -36,9 +36,42 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class OrElseSupplierInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
 
+  private final long mCount;
+
+  private final SupplierDecorator<? extends DATA> mOutputSupplier;
+
+  /**
+   * Constructor.
+   *
+   * @param count          the loop count.
+   * @param outputSupplier the supplier instance.
+   */
+  OrElseSupplierInvocationFactory(final long count,
+      @NotNull final SupplierDecorator<? extends DATA> outputSupplier) {
+    super(asArgs(ConstantConditions.positive("count number", count),
+        ConstantConditions.notNull("supplier instance", outputSupplier)));
+    mCount = count;
+    mOutputSupplier = outputSupplier;
+  }
+
+  @NotNull
+  @Override
+  public Invocation<DATA, DATA> newInvocation() {
+    return new OrElseConsumerInvocation<DATA>(mCount, mOutputSupplier);
+  }
+
+  /**
+   * Invocation employing a supplier to generate outputs when no one has been received.
+   *
+   * @param <DATA> the data type.
+   */
+  private static class OrElseConsumerInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
+
     private final long mCount;
 
     private final SupplierDecorator<? extends DATA> mOutputSupplier;
+
+    private boolean mHasOutputs;
 
     /**
      * Constructor.
@@ -46,64 +79,31 @@ class OrElseSupplierInvocationFactory<DATA> extends InvocationFactory<DATA, DATA
      * @param count          the loop count.
      * @param outputSupplier the supplier instance.
      */
-    OrElseSupplierInvocationFactory(final long count,
-            @NotNull final SupplierDecorator<? extends DATA> outputSupplier) {
-        super(asArgs(ConstantConditions.positive("count number", count),
-                ConstantConditions.notNull("supplier instance", outputSupplier)));
-        mCount = count;
-        mOutputSupplier = outputSupplier;
+    OrElseConsumerInvocation(final long count,
+        @NotNull final SupplierDecorator<? extends DATA> outputSupplier) {
+      mCount = count;
+      mOutputSupplier = outputSupplier;
     }
 
-    @NotNull
+    public void onComplete(@NotNull final Channel<DATA, ?> result) throws Exception {
+      if (!mHasOutputs) {
+        final long count = mCount;
+        final SupplierDecorator<? extends DATA> supplier = mOutputSupplier;
+        for (long i = 0; i < count; ++i) {
+          result.pass(supplier.get());
+        }
+      }
+    }
+
     @Override
-    public Invocation<DATA, DATA> newInvocation() {
-        return new OrElseConsumerInvocation<DATA>(mCount, mOutputSupplier);
+    public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) {
+      mHasOutputs = true;
+      result.pass(input);
     }
 
-    /**
-     * Invocation employing a supplier to generate outputs when no one has been received.
-     *
-     * @param <DATA> the data type.
-     */
-    private static class OrElseConsumerInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
-
-        private final long mCount;
-
-        private final SupplierDecorator<? extends DATA> mOutputSupplier;
-
-        private boolean mHasOutputs;
-
-        /**
-         * Constructor.
-         *
-         * @param count          the loop count.
-         * @param outputSupplier the supplier instance.
-         */
-        OrElseConsumerInvocation(final long count,
-                @NotNull final SupplierDecorator<? extends DATA> outputSupplier) {
-            mCount = count;
-            mOutputSupplier = outputSupplier;
-        }
-
-        public void onComplete(@NotNull final Channel<DATA, ?> result) throws Exception {
-            if (!mHasOutputs) {
-                final long count = mCount;
-                final SupplierDecorator<? extends DATA> supplier = mOutputSupplier;
-                for (long i = 0; i < count; ++i) {
-                    result.pass(supplier.get());
-                }
-            }
-        }
-
-        @Override
-        public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) {
-            mHasOutputs = true;
-            result.pass(input);
-        }
-
-        @Override
-        public void onRestart() {
-            mHasOutputs = false;
-        }
+    @Override
+    public void onRestart() {
+      mHasOutputs = false;
     }
+  }
 }

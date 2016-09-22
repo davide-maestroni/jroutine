@@ -63,10 +63,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Invoke {
 
-    /**
-     * The routine invocation mode.
-     *
-     * @return the invocation mode.
-     */
-    InvocationMode value() default InvocationMode.ASYNC;
+  /**
+   * The routine invocation mode.
+   *
+   * @return the invocation mode.
+   */
+  InvocationMode value() default InvocationMode.ASYNC;
 }

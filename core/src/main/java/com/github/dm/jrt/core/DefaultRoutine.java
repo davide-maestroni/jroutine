@@ -34,28 +34,28 @@ import org.jetbrains.annotations.NotNull;
  */
 class DefaultRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
 
-    private final InvocationFactory<IN, OUT> mFactory;
+  private final InvocationFactory<IN, OUT> mFactory;
 
-    /**
-     * Constructor.
-     *
-     * @param configuration the invocation configuration.
-     * @param factory       the invocation factory.
-     */
-    DefaultRoutine(@NotNull final InvocationConfiguration configuration,
-            @NotNull final InvocationFactory<IN, OUT> factory) {
-        super(configuration);
-        mFactory = ConstantConditions.notNull("invocation factory", factory);
-    }
+  /**
+   * Constructor.
+   *
+   * @param configuration the invocation configuration.
+   * @param factory       the invocation factory.
+   */
+  DefaultRoutine(@NotNull final InvocationConfiguration configuration,
+      @NotNull final InvocationFactory<IN, OUT> factory) {
+    super(configuration);
+    mFactory = ConstantConditions.notNull("invocation factory", factory);
+  }
 
-    @NotNull
-    @Override
-    protected Invocation<IN, OUT> newInvocation() throws Exception {
-        final Logger logger = getLogger();
-        final InvocationFactory<IN, OUT> factory = mFactory;
-        logger.dbg("creating a new invocation instance with factory: %s", factory);
-        final Invocation<IN, OUT> invocation = factory.newInvocation();
-        logger.dbg("created a new instance of class: %s", invocation.getClass());
-        return invocation;
-    }
+  @NotNull
+  @Override
+  protected Invocation<IN, OUT> newInvocation() throws Exception {
+    final Logger logger = getLogger();
+    final InvocationFactory<IN, OUT> factory = mFactory;
+    logger.dbg("creating a new invocation instance with factory: %s", factory);
+    final Invocation<IN, OUT> invocation = factory.newInvocation();
+    logger.dbg("created a new instance of class: %s", invocation.getClass());
+    return invocation;
+  }
 }

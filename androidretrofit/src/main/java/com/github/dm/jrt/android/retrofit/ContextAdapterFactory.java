@@ -47,180 +47,181 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 public abstract class ContextAdapterFactory extends AbstractAdapterFactory {
 
-    private static final TemplateContextInvocation<Call<Object>, Object> sCallInvocation =
-            new TemplateContextInvocation<Call<Object>, Object>() {
+  private static final TemplateContextInvocation<Call<Object>, Object> sCallInvocation =
+      new TemplateContextInvocation<Call<Object>, Object>() {
 
-                public void onInput(final Call<Object> input,
-                        @NotNull final Channel<Object, ?> result) throws IOException {
-                    final Response<Object> response = input.execute();
-                    if (response.isSuccessful()) {
-                        result.pass(response.body());
+        public void onInput(final Call<Object> input,
+            @NotNull final Channel<Object, ?> result) throws IOException {
+          final Response<Object> response = input.execute();
+          if (response.isSuccessful()) {
+            result.pass(response.body());
 
-                    } else {
-                        result.abort(new ErrorResponseException(response));
-                    }
-                }
-            };
+          } else {
+            result.abort(new ErrorResponseException(response));
+          }
+        }
+      };
 
-    private static final ContextInvocationFactory<Call<Object>, Object> sCallInvocationFactory =
-            new ContextInvocationFactory<Call<Object>, Object>(null) {
+  private static final ContextInvocationFactory<Call<Object>, Object> sCallInvocationFactory =
+      new ContextInvocationFactory<Call<Object>, Object>(null) {
 
-                @NotNull
-                @Override
-                public ContextInvocation<Call<Object>, Object> newInvocation() {
-                    return sCallInvocation;
-                }
-            };
+        @NotNull
+        @Override
+        public ContextInvocation<Call<Object>, Object> newInvocation() {
+          return sCallInvocation;
+        }
+      };
 
-    private final CallAdapter.Factory mDelegateFactory;
+  private final CallAdapter.Factory mDelegateFactory;
+
+  /**
+   * Constructor.
+   *
+   * @param delegateFactory the delegate factory.
+   * @param configuration   the invocation configuration.
+   */
+  protected ContextAdapterFactory(@Nullable final Factory delegateFactory,
+      @NotNull final InvocationConfiguration configuration) {
+    super(delegateFactory, configuration);
+    mDelegateFactory = delegateFactory;
+  }
+
+  /**
+   * Gets the Context invocation factory to handle the call execution.
+   *
+   * @param configuration the invocation configuration.
+   * @param responseType  the response type.
+   * @param annotations   the method annotations.
+   * @param retrofit      the Retrofit instance.
+   * @return the invocation factory.
+   */
+  @NotNull
+  @SuppressWarnings("UnusedParameters")
+  protected ContextInvocationFactory<Call<Object>, Object> getFactory(
+      @NotNull final InvocationConfiguration configuration, @NotNull final Type responseType,
+      @NotNull final Annotation[] annotations, @NotNull final Retrofit retrofit) {
+    final CallAdapter.Factory delegateFactory = mDelegateFactory;
+    if (delegateFactory == null) {
+      return sCallInvocationFactory;
+    }
+
+    @SuppressWarnings("unchecked") final CallAdapter<Channel<?, ?>> channelAdapter =
+        (CallAdapter<Channel<?, ?>>) delegateFactory.get(getChannelType(responseType), annotations,
+            retrofit);
+    if (channelAdapter != null) {
+      return new ChannelAdapterInvocationFactory(
+          asArgs(delegateFactory, responseType, annotations, retrofit), channelAdapter);
+    }
+
+    final CallAdapter<?> bodyAdapter = delegateFactory.get(responseType, annotations, retrofit);
+    if (bodyAdapter != null) {
+      return new BodyAdapterInvocationFactory(
+          asArgs(delegateFactory, responseType, annotations, retrofit), bodyAdapter);
+    }
+
+    throw new IllegalArgumentException(
+        "The delegate factory does not support any of the required return types: " + delegateFactory
+            .getClass()
+            .getName());
+  }
+
+  /**
+   * Context invocation employing a call adapter.
+   */
+  private static class BodyAdapterInvocation
+      extends TemplateContextInvocation<Call<Object>, Object> {
+
+    private final CallAdapter<?> mCallAdapter;
 
     /**
      * Constructor.
      *
-     * @param delegateFactory the delegate factory.
-     * @param configuration   the invocation configuration.
+     * @param callAdapter the call adapter instance.
      */
-    protected ContextAdapterFactory(@Nullable final Factory delegateFactory,
-            @NotNull final InvocationConfiguration configuration) {
-        super(delegateFactory, configuration);
-        mDelegateFactory = delegateFactory;
+    private BodyAdapterInvocation(@NotNull final CallAdapter<?> callAdapter) {
+      mCallAdapter = callAdapter;
     }
 
+    @Override
+    public void onInput(final Call<Object> input, @NotNull final Channel<Object, ?> result) {
+      result.pass(mCallAdapter.adapt(input));
+    }
+  }
+
+  /**
+   * Context invocation factory employing a call adapter.
+   */
+  private static class BodyAdapterInvocationFactory
+      extends ContextInvocationFactory<Call<Object>, Object> {
+
+    private final TemplateContextInvocation<Call<Object>, Object> mInvocation;
+
     /**
-     * Gets the Context invocation factory to handle the call execution.
+     * Constructor.
      *
-     * @param configuration the invocation configuration.
-     * @param responseType  the response type.
-     * @param annotations   the method annotations.
-     * @param retrofit      the Retrofit instance.
-     * @return the invocation factory.
+     * @param args        the factory arguments.
+     * @param callAdapter the call adapter instance.
      */
+    private BodyAdapterInvocationFactory(@Nullable final Object[] args,
+        @NotNull final CallAdapter<?> callAdapter) {
+      super(args);
+      mInvocation = new BodyAdapterInvocation(callAdapter);
+    }
+
     @NotNull
-    @SuppressWarnings("UnusedParameters")
-    protected ContextInvocationFactory<Call<Object>, Object> getFactory(
-            @NotNull final InvocationConfiguration configuration, @NotNull final Type responseType,
-            @NotNull final Annotation[] annotations, @NotNull final Retrofit retrofit) {
-        final CallAdapter.Factory delegateFactory = mDelegateFactory;
-        if (delegateFactory == null) {
-            return sCallInvocationFactory;
-        }
-
-        @SuppressWarnings("unchecked") final CallAdapter<Channel<?, ?>> channelAdapter =
-                (CallAdapter<Channel<?, ?>>) delegateFactory.get(getChannelType(responseType),
-                        annotations, retrofit);
-        if (channelAdapter != null) {
-            return new ChannelAdapterInvocationFactory(
-                    asArgs(delegateFactory, responseType, annotations, retrofit), channelAdapter);
-        }
-
-        final CallAdapter<?> bodyAdapter = delegateFactory.get(responseType, annotations, retrofit);
-        if (bodyAdapter != null) {
-            return new BodyAdapterInvocationFactory(
-                    asArgs(delegateFactory, responseType, annotations, retrofit), bodyAdapter);
-        }
-
-        throw new IllegalArgumentException(
-                "The delegate factory does not support any of the required return types: "
-                        + delegateFactory.getClass().getName());
+    @Override
+    public ContextInvocation<Call<Object>, Object> newInvocation() {
+      return mInvocation;
     }
+  }
+
+  /**
+   * Context invocation employing a call adapter.
+   */
+  private static class ChannelAdapterInvocation
+      extends TemplateContextInvocation<Call<Object>, Object> {
+
+    private final CallAdapter<Channel<?, ?>> mCallAdapter;
 
     /**
-     * Context invocation employing a call adapter.
+     * Constructor.
+     *
+     * @param callAdapter the call adapter instance.
      */
-    private static class BodyAdapterInvocation
-            extends TemplateContextInvocation<Call<Object>, Object> {
-
-        private final CallAdapter<?> mCallAdapter;
-
-        /**
-         * Constructor.
-         *
-         * @param callAdapter the call adapter instance.
-         */
-        private BodyAdapterInvocation(@NotNull final CallAdapter<?> callAdapter) {
-            mCallAdapter = callAdapter;
-        }
-
-        @Override
-        public void onInput(final Call<Object> input, @NotNull final Channel<Object, ?> result) {
-            result.pass(mCallAdapter.adapt(input));
-        }
+    private ChannelAdapterInvocation(@NotNull final CallAdapter<Channel<?, ?>> callAdapter) {
+      mCallAdapter = callAdapter;
     }
+
+    @Override
+    public void onInput(final Call<Object> input, @NotNull final Channel<Object, ?> result) {
+      result.pass(mCallAdapter.adapt(input));
+    }
+  }
+
+  /**
+   * Context invocation factory employing a call adapter.
+   */
+  private static class ChannelAdapterInvocationFactory
+      extends ContextInvocationFactory<Call<Object>, Object> {
+
+    private final TemplateContextInvocation<Call<Object>, Object> mInvocation;
 
     /**
-     * Context invocation factory employing a call adapter.
+     * Constructor.
+     *
+     * @param args        the factory arguments.
+     * @param callAdapter the call adapter instance.
      */
-    private static class BodyAdapterInvocationFactory
-            extends ContextInvocationFactory<Call<Object>, Object> {
-
-        private final TemplateContextInvocation<Call<Object>, Object> mInvocation;
-
-        /**
-         * Constructor.
-         *
-         * @param args        the factory arguments.
-         * @param callAdapter the call adapter instance.
-         */
-        private BodyAdapterInvocationFactory(@Nullable final Object[] args,
-                @NotNull final CallAdapter<?> callAdapter) {
-            super(args);
-            mInvocation = new BodyAdapterInvocation(callAdapter);
-        }
-
-        @NotNull
-        @Override
-        public ContextInvocation<Call<Object>, Object> newInvocation() {
-            return mInvocation;
-        }
+    private ChannelAdapterInvocationFactory(@Nullable final Object[] args,
+        @NotNull final CallAdapter<Channel<?, ?>> callAdapter) {
+      super(args);
+      mInvocation = new ChannelAdapterInvocation(callAdapter);
     }
 
-    /**
-     * Context invocation employing a call adapter.
-     */
-    private static class ChannelAdapterInvocation
-            extends TemplateContextInvocation<Call<Object>, Object> {
-
-        private final CallAdapter<Channel<?, ?>> mCallAdapter;
-
-        /**
-         * Constructor.
-         *
-         * @param callAdapter the call adapter instance.
-         */
-        private ChannelAdapterInvocation(@NotNull final CallAdapter<Channel<?, ?>> callAdapter) {
-            mCallAdapter = callAdapter;
-        }
-
-        @Override
-        public void onInput(final Call<Object> input, @NotNull final Channel<Object, ?> result) {
-            result.pass(mCallAdapter.adapt(input));
-        }
+    @NotNull
+    @Override
+    public ContextInvocation<Call<Object>, Object> newInvocation() {
+      return mInvocation;
     }
-
-    /**
-     * Context invocation factory employing a call adapter.
-     */
-    private static class ChannelAdapterInvocationFactory
-            extends ContextInvocationFactory<Call<Object>, Object> {
-
-        private final TemplateContextInvocation<Call<Object>, Object> mInvocation;
-
-        /**
-         * Constructor.
-         *
-         * @param args        the factory arguments.
-         * @param callAdapter the call adapter instance.
-         */
-        private ChannelAdapterInvocationFactory(@Nullable final Object[] args,
-                @NotNull final CallAdapter<Channel<?, ?>> callAdapter) {
-            super(args);
-            mInvocation = new ChannelAdapterInvocation(callAdapter);
-        }
-
-        @NotNull
-        @Override
-        public ContextInvocation<Call<Object>, Object> newInvocation() {
-            return mInvocation;
-        }
-    }
+  }
 }

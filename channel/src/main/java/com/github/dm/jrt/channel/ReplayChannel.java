@@ -49,325 +49,324 @@ import java.util.concurrent.TimeUnit;
  */
 class ReplayChannel<OUT> implements Channel<OUT, OUT>, ChannelConsumer<OUT> {
 
-    private final ArrayList<OUT> mCached = new ArrayList<OUT>();
+  private final ArrayList<OUT> mCached = new ArrayList<OUT>();
 
-    private final Channel<?, OUT> mChannel;
+  private final Channel<?, OUT> mChannel;
 
-    private final IdentityHashMap<Channel<? super OUT, ?>, Void> mChannels =
-            new IdentityHashMap<Channel<? super OUT, ?>, Void>();
+  private final IdentityHashMap<Channel<? super OUT, ?>, Void> mChannels =
+      new IdentityHashMap<Channel<? super OUT, ?>, Void>();
 
-    private final ChannelConfiguration mConfiguration;
+  private final ChannelConfiguration mConfiguration;
 
-    private final IdentityHashMap<ChannelConsumer<? super OUT>, Channel<OUT, OUT>> mConsumers =
-            new IdentityHashMap<ChannelConsumer<? super OUT>, Channel<OUT, OUT>>();
+  private final IdentityHashMap<ChannelConsumer<? super OUT>, Channel<OUT, OUT>> mConsumers =
+      new IdentityHashMap<ChannelConsumer<? super OUT>, Channel<OUT, OUT>>();
 
-    private final Object mMutex = new Object();
+  private final Object mMutex = new Object();
 
-    private RoutineException mAbortException;
+  private RoutineException mAbortException;
 
-    private boolean mIsComplete;
+  private boolean mIsComplete;
 
-    private volatile Channel<OUT, OUT> mOutputChannel;
+  private volatile Channel<OUT, OUT> mOutputChannel;
 
-    /**
-     * Constructor.
-     *
-     * @param configuration the channel configuration.
-     * @param channel       the channel to replay.
-     */
-    ReplayChannel(@Nullable final ChannelConfiguration configuration,
-            @NotNull final Channel<?, OUT> channel) {
-        mConfiguration = (configuration != null) ? configuration
-                : ChannelConfiguration.defaultConfiguration();
-        mOutputChannel = createOutputChannel();
-        mChannel = channel;
-        channel.bind((ChannelConsumer<? super OUT>) this);
+  /**
+   * Constructor.
+   *
+   * @param configuration the channel configuration.
+   * @param channel       the channel to replay.
+   */
+  ReplayChannel(@Nullable final ChannelConfiguration configuration,
+      @NotNull final Channel<?, OUT> channel) {
+    mConfiguration =
+        (configuration != null) ? configuration : ChannelConfiguration.defaultConfiguration();
+    mOutputChannel = createOutputChannel();
+    mChannel = channel;
+    channel.bind((ChannelConsumer<? super OUT>) this);
+  }
+
+  public boolean abort() {
+    return mChannel.abort();
+  }
+
+  public boolean abort(@Nullable final Throwable reason) {
+    return mChannel.abort(reason);
+  }
+
+  @NotNull
+  public Channel<OUT, OUT> after(final long timeout, @NotNull final TimeUnit timeUnit) {
+    mOutputChannel.after(timeout, timeUnit);
+    return this;
+  }
+
+  @NotNull
+  public Channel<OUT, OUT> after(@NotNull final UnitDuration timeout) {
+    mOutputChannel.after(timeout);
+    return this;
+  }
+
+  @NotNull
+  public List<OUT> all() {
+    return mOutputChannel.all();
+  }
+
+  @NotNull
+  public Channel<OUT, OUT> allInto(@NotNull final Collection<? super OUT> results) {
+    mOutputChannel.allInto(results);
+    return this;
+  }
+
+  @NotNull
+  public <AFTER> Channel<? super OUT, AFTER> bind(
+      @NotNull final Channel<? super OUT, AFTER> channel) {
+    synchronized (mMutex) {
+      final IdentityHashMap<Channel<? super OUT, ?>, Void> channels = mChannels;
+      if (channels.containsKey(channel)) {
+        return channel;
+      }
+
+      channels.put(channel, null);
     }
 
-    public boolean abort() {
-        return mChannel.abort();
-    }
+    return channel.pass(this);
+  }
 
-    public boolean abort(@Nullable final Throwable reason) {
-        return mChannel.abort(reason);
-    }
-
-    @NotNull
-    public Channel<OUT, OUT> after(final long timeout, @NotNull final TimeUnit timeUnit) {
-        mOutputChannel.after(timeout, timeUnit);
+  @NotNull
+  public Channel<OUT, OUT> bind(@NotNull final ChannelConsumer<? super OUT> consumer) {
+    final boolean isComplete;
+    final RoutineException abortException;
+    final Channel<OUT, OUT> outputChannel;
+    final Channel<OUT, OUT> inputChannel;
+    final Channel<OUT, OUT> newChannel;
+    final ArrayList<OUT> cachedOutputs;
+    synchronized (mMutex) {
+      final IdentityHashMap<ChannelConsumer<? super OUT>, Channel<OUT, OUT>> consumers = mConsumers;
+      if (consumers.containsKey(consumer)) {
         return this;
+      }
+
+      isComplete = mIsComplete;
+      abortException = mAbortException;
+      outputChannel = mOutputChannel;
+      if ((abortException == null) && !isComplete) {
+        consumers.put(consumer, outputChannel);
+      }
+
+      mOutputChannel = (newChannel = createOutputChannel());
+      inputChannel = JRoutineCore.io().buildChannel();
+      newChannel.pass(inputChannel);
+      cachedOutputs = new ArrayList<OUT>(mCached);
     }
 
-    @NotNull
-    public Channel<OUT, OUT> after(@NotNull final UnitDuration timeout) {
-        mOutputChannel.after(timeout);
-        return this;
+    inputChannel.pass(cachedOutputs).close();
+    if (abortException != null) {
+      newChannel.abort(abortException);
+
+    } else if (isComplete) {
+      newChannel.close();
     }
 
-    @NotNull
-    public List<OUT> all() {
-        return mOutputChannel.all();
+    outputChannel.bind(consumer);
+    return this;
+  }
+
+  @NotNull
+  public Channel<OUT, OUT> close() {
+    return this;
+  }
+
+  @NotNull
+  public Channel<OUT, OUT> eventuallyAbort() {
+    mOutputChannel.eventuallyAbort();
+    return this;
+  }
+
+  @NotNull
+  public Channel<OUT, OUT> eventuallyAbort(@Nullable final Throwable reason) {
+    mOutputChannel.eventuallyAbort(reason);
+    return this;
+  }
+
+  @NotNull
+  public Channel<OUT, OUT> eventuallyContinue() {
+    mOutputChannel.eventuallyContinue();
+    return this;
+  }
+
+  @NotNull
+  public Channel<OUT, OUT> eventuallyFail() {
+    mOutputChannel.eventuallyFail();
+    return this;
+  }
+
+  @NotNull
+  public Iterator<OUT> expiringIterator() {
+    return mOutputChannel.expiringIterator();
+  }
+
+  public boolean getComplete() {
+    return mOutputChannel.getComplete();
+  }
+
+  @Nullable
+  public RoutineException getError() {
+    return mOutputChannel.getError();
+  }
+
+  public boolean hasNext() {
+    return mOutputChannel.hasNext();
+  }
+
+  public OUT next() {
+    return mOutputChannel.next();
+  }
+
+  public int inputCount() {
+    return mChannel.inputCount();
+  }
+
+  public boolean isBound() {
+    return false;
+  }
+
+  public boolean isEmpty() {
+    if (mChannel.isEmpty() && mOutputChannel.isEmpty()) {
+      synchronized (mMutex) {
+        return mCached.isEmpty();
+      }
     }
 
-    @NotNull
-    public Channel<OUT, OUT> allInto(@NotNull final Collection<? super OUT> results) {
-        mOutputChannel.allInto(results);
-        return this;
+    return false;
+  }
+
+  public boolean isOpen() {
+    return false;
+  }
+
+  @NotNull
+  public List<OUT> next(final int count) {
+    return mOutputChannel.next(count);
+  }
+
+  public OUT nextOrElse(final OUT output) {
+    return mOutputChannel.nextOrElse(output);
+  }
+
+  @NotNull
+  public Channel<OUT, OUT> now() {
+    mOutputChannel.now();
+    return this;
+  }
+
+  public int outputCount() {
+    return mOutputChannel.outputCount();
+  }
+
+  @NotNull
+  public Channel<OUT, OUT> pass(@Nullable final Channel<?, ? extends OUT> channel) {
+    throw new IllegalStateException("cannot pass data to a replay channel");
+  }
+
+  @NotNull
+  public Channel<OUT, OUT> pass(@Nullable final Iterable<? extends OUT> inputs) {
+    throw new IllegalStateException("cannot pass data to a replay channel");
+  }
+
+  @NotNull
+  public Channel<OUT, OUT> pass(@Nullable final OUT input) {
+    throw new IllegalStateException("cannot pass data to a replay channel");
+  }
+
+  @NotNull
+  public Channel<OUT, OUT> pass(@Nullable final OUT... inputs) {
+    throw new IllegalStateException("cannot pass data to a replay channel");
+  }
+
+  public int size() {
+    final int outputSize = mOutputChannel.size();
+    final int size = mChannel.size() + outputSize;
+    if (outputSize == 0) {
+      synchronized (mMutex) {
+        return size + mCached.size();
+      }
     }
 
-    @NotNull
-    public <AFTER> Channel<? super OUT, AFTER> bind(
-            @NotNull final Channel<? super OUT, AFTER> channel) {
-        synchronized (mMutex) {
-            final IdentityHashMap<Channel<? super OUT, ?>, Void> channels = mChannels;
-            if (channels.containsKey(channel)) {
-                return channel;
-            }
+    return size;
+  }
 
-            channels.put(channel, null);
-        }
+  @NotNull
+  public Channel<OUT, OUT> skipNext(final int count) {
+    mOutputChannel.skipNext(count);
+    return this;
+  }
 
-        return channel.pass(this);
+  @NotNull
+  public Channel<OUT, OUT> sorted() {
+    return this;
+  }
+
+  public void throwError() {
+    mOutputChannel.throwError();
+  }
+
+  @NotNull
+  public Channel<OUT, OUT> unsorted() {
+    return this;
+  }
+
+  public Iterator<OUT> iterator() {
+    return mOutputChannel.iterator();
+  }
+
+  public void onComplete() {
+    final ArrayList<Channel<OUT, OUT>> channels;
+    synchronized (mMutex) {
+      mIsComplete = true;
+      channels = new ArrayList<Channel<OUT, OUT>>(mConsumers.values());
     }
 
-    @NotNull
-    public Channel<OUT, OUT> bind(@NotNull final ChannelConsumer<? super OUT> consumer) {
-        final boolean isComplete;
-        final RoutineException abortException;
-        final Channel<OUT, OUT> outputChannel;
-        final Channel<OUT, OUT> inputChannel;
-        final Channel<OUT, OUT> newChannel;
-        final ArrayList<OUT> cachedOutputs;
-        synchronized (mMutex) {
-            final IdentityHashMap<ChannelConsumer<? super OUT>, Channel<OUT, OUT>> consumers =
-                    mConsumers;
-            if (consumers.containsKey(consumer)) {
-                return this;
-            }
+    mOutputChannel.close();
+    for (final Channel<OUT, OUT> channel : channels) {
+      channel.close();
+    }
+  }
 
-            isComplete = mIsComplete;
-            abortException = mAbortException;
-            outputChannel = mOutputChannel;
-            if ((abortException == null) && !isComplete) {
-                consumers.put(consumer, outputChannel);
-            }
-
-            mOutputChannel = (newChannel = createOutputChannel());
-            inputChannel = JRoutineCore.io().buildChannel();
-            newChannel.pass(inputChannel);
-            cachedOutputs = new ArrayList<OUT>(mCached);
-        }
-
-        inputChannel.pass(cachedOutputs).close();
-        if (abortException != null) {
-            newChannel.abort(abortException);
-
-        } else if (isComplete) {
-            newChannel.close();
-        }
-
-        outputChannel.bind(consumer);
-        return this;
+  public void onError(@NotNull final RoutineException error) {
+    final ArrayList<Channel<OUT, OUT>> channels;
+    synchronized (mMutex) {
+      mAbortException = error;
+      channels = new ArrayList<Channel<OUT, OUT>>(mConsumers.values());
     }
 
-    @NotNull
-    public Channel<OUT, OUT> close() {
-        return this;
+    mOutputChannel.abort(error);
+    for (final Channel<OUT, OUT> channel : channels) {
+      channel.abort(error);
+    }
+  }
+
+  public void onOutput(final OUT output) {
+    final ArrayList<Channel<OUT, OUT>> channels;
+    synchronized (mMutex) {
+      mCached.add(output);
+      channels = new ArrayList<Channel<OUT, OUT>>(mConsumers.values());
     }
 
-    @NotNull
-    public Channel<OUT, OUT> eventuallyAbort() {
-        mOutputChannel.eventuallyAbort();
-        return this;
+    mOutputChannel.pass(output);
+    for (final Channel<OUT, OUT> channel : channels) {
+      channel.pass(output);
     }
+  }
 
-    @NotNull
-    public Channel<OUT, OUT> eventuallyAbort(@Nullable final Throwable reason) {
-        mOutputChannel.eventuallyAbort(reason);
-        return this;
-    }
+  public void remove() {
+    mOutputChannel.remove();
+  }
 
-    @NotNull
-    public Channel<OUT, OUT> eventuallyContinue() {
-        mOutputChannel.eventuallyContinue();
-        return this;
-    }
-
-    @NotNull
-    public Channel<OUT, OUT> eventuallyFail() {
-        mOutputChannel.eventuallyFail();
-        return this;
-    }
-
-    @NotNull
-    public Iterator<OUT> expiringIterator() {
-        return mOutputChannel.expiringIterator();
-    }
-
-    public boolean getComplete() {
-        return mOutputChannel.getComplete();
-    }
-
-    @Nullable
-    public RoutineException getError() {
-        return mOutputChannel.getError();
-    }
-
-    public boolean hasNext() {
-        return mOutputChannel.hasNext();
-    }
-
-    public OUT next() {
-        return mOutputChannel.next();
-    }
-
-    public int inputCount() {
-        return mChannel.inputCount();
-    }
-
-    public boolean isBound() {
-        return false;
-    }
-
-    public boolean isEmpty() {
-        if (mChannel.isEmpty() && mOutputChannel.isEmpty()) {
-            synchronized (mMutex) {
-                return mCached.isEmpty();
-            }
-        }
-
-        return false;
-    }
-
-    public boolean isOpen() {
-        return false;
-    }
-
-    @NotNull
-    public List<OUT> next(final int count) {
-        return mOutputChannel.next(count);
-    }
-
-    public OUT nextOrElse(final OUT output) {
-        return mOutputChannel.nextOrElse(output);
-    }
-
-    @NotNull
-    public Channel<OUT, OUT> now() {
-        mOutputChannel.now();
-        return this;
-    }
-
-    public int outputCount() {
-        return mOutputChannel.outputCount();
-    }
-
-    @NotNull
-    public Channel<OUT, OUT> pass(@Nullable final Channel<?, ? extends OUT> channel) {
-        throw new IllegalStateException("cannot pass data to a replay channel");
-    }
-
-    @NotNull
-    public Channel<OUT, OUT> pass(@Nullable final Iterable<? extends OUT> inputs) {
-        throw new IllegalStateException("cannot pass data to a replay channel");
-    }
-
-    @NotNull
-    public Channel<OUT, OUT> pass(@Nullable final OUT input) {
-        throw new IllegalStateException("cannot pass data to a replay channel");
-    }
-
-    @NotNull
-    public Channel<OUT, OUT> pass(@Nullable final OUT... inputs) {
-        throw new IllegalStateException("cannot pass data to a replay channel");
-    }
-
-    public int size() {
-        final int outputSize = mOutputChannel.size();
-        final int size = mChannel.size() + outputSize;
-        if (outputSize == 0) {
-            synchronized (mMutex) {
-                return size + mCached.size();
-            }
-        }
-
-        return size;
-    }
-
-    @NotNull
-    public Channel<OUT, OUT> skipNext(final int count) {
-        mOutputChannel.skipNext(count);
-        return this;
-    }
-
-    @NotNull
-    public Channel<OUT, OUT> sorted() {
-        return this;
-    }
-
-    public void throwError() {
-        mOutputChannel.throwError();
-    }
-
-    @NotNull
-    public Channel<OUT, OUT> unsorted() {
-        return this;
-    }
-
-    public Iterator<OUT> iterator() {
-        return mOutputChannel.iterator();
-    }
-
-    public void onComplete() {
-        final ArrayList<Channel<OUT, OUT>> channels;
-        synchronized (mMutex) {
-            mIsComplete = true;
-            channels = new ArrayList<Channel<OUT, OUT>>(mConsumers.values());
-        }
-
-        mOutputChannel.close();
-        for (final Channel<OUT, OUT> channel : channels) {
-            channel.close();
-        }
-    }
-
-    public void onError(@NotNull final RoutineException error) {
-        final ArrayList<Channel<OUT, OUT>> channels;
-        synchronized (mMutex) {
-            mAbortException = error;
-            channels = new ArrayList<Channel<OUT, OUT>>(mConsumers.values());
-        }
-
-        mOutputChannel.abort(error);
-        for (final Channel<OUT, OUT> channel : channels) {
-            channel.abort(error);
-        }
-    }
-
-    public void onOutput(final OUT output) {
-        final ArrayList<Channel<OUT, OUT>> channels;
-        synchronized (mMutex) {
-            mCached.add(output);
-            channels = new ArrayList<Channel<OUT, OUT>>(mConsumers.values());
-        }
-
-        mOutputChannel.pass(output);
-        for (final Channel<OUT, OUT> channel : channels) {
-            channel.pass(output);
-        }
-    }
-
-    public void remove() {
-        mOutputChannel.remove();
-    }
-
-    @NotNull
-    private Channel<OUT, OUT> createOutputChannel() {
-        return JRoutineCore.io()
-                           .applyChannelConfiguration()
-                           .with(mConfiguration)
-                           .withOrder(OrderType.SORTED)
-                           .configured()
-                           .buildChannel();
-    }
+  @NotNull
+  private Channel<OUT, OUT> createOutputChannel() {
+    return JRoutineCore.io()
+                       .applyChannelConfiguration()
+                       .with(mConfiguration)
+                       .withOrder(OrderType.SORTED)
+                       .configured()
+                       .buildChannel();
+  }
 }

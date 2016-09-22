@@ -46,218 +46,218 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 public final class ObjectConfiguration extends DeepEqualObject {
 
-    private static final DefaultConfigurable sDefaultConfigurable = new DefaultConfigurable();
+  private static final DefaultConfigurable sDefaultConfigurable = new DefaultConfigurable();
 
-    private static final ObjectConfiguration sDefaultConfiguration = builder().buildConfiguration();
+  private static final ObjectConfiguration sDefaultConfiguration = builder().buildConfiguration();
 
-    private final Set<String> mFieldNames;
+  private final Set<String> mFieldNames;
+
+  /**
+   * Constructor.
+   *
+   * @param fieldNames the shared field names.
+   */
+  private ObjectConfiguration(@Nullable final Set<String> fieldNames) {
+    super(asArgs(fieldNames));
+    mFieldNames = (fieldNames != null) ? Collections.unmodifiableSet(fieldNames) : null;
+  }
+
+  /**
+   * Returns an object configuration builder.
+   *
+   * @return the builder.
+   */
+  @NotNull
+  public static Builder<ObjectConfiguration> builder() {
+    return new Builder<ObjectConfiguration>(sDefaultConfigurable);
+  }
+
+  /**
+   * Returns an object configuration builder initialized with the specified configuration.
+   *
+   * @param initialConfiguration the initial object configuration.
+   * @return the builder.
+   */
+  @NotNull
+  public static Builder<ObjectConfiguration> builderFrom(
+      @Nullable final ObjectConfiguration initialConfiguration) {
+    return (initialConfiguration == null) ? builder()
+        : new Builder<ObjectConfiguration>(sDefaultConfigurable, initialConfiguration);
+  }
+
+  /**
+   * Returns a configuration with all the options set to their default.
+   *
+   * @return the configuration instance.
+   */
+  @NotNull
+  public static ObjectConfiguration defaultConfiguration() {
+    return sDefaultConfiguration;
+  }
+
+  /**
+   * Returns an object configuration builder initialized with this configuration.
+   *
+   * @return the builder.
+   */
+  @NotNull
+  public Builder<ObjectConfiguration> builderFrom() {
+    return builderFrom(this);
+  }
+
+  /**
+   * Returns the shared field names (null by default).
+   *
+   * @param valueIfNotSet the default value if none was set.
+   * @return the field names.
+   */
+  public Set<String> getSharedFieldsOrElse(@Nullable final Set<String> valueIfNotSet) {
+    final Set<String> fieldNames = mFieldNames;
+    return (fieldNames != null) ? fieldNames : valueIfNotSet;
+  }
+
+  /**
+   * Interface defining a configurable object.
+   *
+   * @param <TYPE> the configurable object type.
+   */
+  public interface Configurable<TYPE> {
+
+    /**
+     * Sets the specified configuration and returns the configurable instance.
+     *
+     * @param configuration the configuration.
+     * @return the configurable instance.
+     */
+    @NotNull
+    TYPE apply(@NotNull ObjectConfiguration configuration);
+  }
+
+  /**
+   * Builder of object configurations.
+   *
+   * @param <TYPE> the configurable object type.
+   */
+  public static final class Builder<TYPE> {
+
+    private final Configurable<? extends TYPE> mConfigurable;
+
+    private Set<String> mFieldNames;
 
     /**
      * Constructor.
      *
-     * @param fieldNames the shared field names.
+     * @param configurable the configurable instance.
      */
-    private ObjectConfiguration(@Nullable final Set<String> fieldNames) {
-        super(asArgs(fieldNames));
-        mFieldNames = (fieldNames != null) ? Collections.unmodifiableSet(fieldNames) : null;
+    public Builder(@NotNull final Configurable<? extends TYPE> configurable) {
+      mConfigurable = ConstantConditions.notNull("configurable instance", configurable);
     }
 
     /**
-     * Returns an object configuration builder.
+     * Constructor.
      *
-     * @return the builder.
-     */
-    @NotNull
-    public static Builder<ObjectConfiguration> builder() {
-        return new Builder<ObjectConfiguration>(sDefaultConfigurable);
-    }
-
-    /**
-     * Returns an object configuration builder initialized with the specified configuration.
-     *
+     * @param configurable         the configurable instance.
      * @param initialConfiguration the initial object configuration.
-     * @return the builder.
+     */
+    public Builder(@NotNull final Configurable<? extends TYPE> configurable,
+        @NotNull final ObjectConfiguration initialConfiguration) {
+      mConfigurable = ConstantConditions.notNull("configurable instance", configurable);
+      setConfiguration(initialConfiguration);
+    }
+
+    @NotNull
+    private static Set<String> toSet(@NotNull final String[] values) {
+      final HashSet<String> set = new HashSet<String>();
+      Collections.addAll(set, values);
+      return set;
+    }
+
+    /**
+     * Applies this configuration and returns the configured object.
+     *
+     * @return the configured object.
      */
     @NotNull
-    public static Builder<ObjectConfiguration> builderFrom(
-            @Nullable final ObjectConfiguration initialConfiguration) {
-        return (initialConfiguration == null) ? builder()
-                : new Builder<ObjectConfiguration>(sDefaultConfigurable, initialConfiguration);
+    public TYPE configured() {
+      return mConfigurable.apply(buildConfiguration());
     }
 
     /**
-     * Returns a configuration with all the options set to their default.
+     * Applies the specified configuration to this builder. A null value means that all the
+     * configuration options will be reset to their default, otherwise only the non-default
+     * options will be applied.
      *
-     * @return the configuration instance.
+     * @param configuration the object configuration.
+     * @return this builder.
      */
     @NotNull
-    public static ObjectConfiguration defaultConfiguration() {
-        return sDefaultConfiguration;
+    public Builder<TYPE> with(@Nullable final ObjectConfiguration configuration) {
+      if (configuration == null) {
+        setConfiguration(defaultConfiguration());
+        return this;
+      }
+
+      final Set<String> fieldNames = configuration.mFieldNames;
+      if (fieldNames != null) {
+        withSharedFields(fieldNames);
+      }
+
+      return this;
     }
 
     /**
-     * Returns an object configuration builder initialized with this configuration.
+     * Sets the shared field names to empty, that is, no field is shared.
      *
-     * @return the builder.
+     * @return this builder.
      */
     @NotNull
-    public Builder<ObjectConfiguration> builderFrom() {
-        return builderFrom(this);
+    public Builder<TYPE> withSharedFields() {
+      mFieldNames = Collections.emptySet();
+      return this;
     }
 
     /**
-     * Returns the shared field names (null by default).
+     * Sets the shared field names. A null value means that all fields are shared.
      *
-     * @param valueIfNotSet the default value if none was set.
-     * @return the field names.
+     * @param fieldNames the field names.
+     * @return this builder.
      */
-    public Set<String> getSharedFieldsOrElse(@Nullable final Set<String> valueIfNotSet) {
-        final Set<String> fieldNames = mFieldNames;
-        return (fieldNames != null) ? fieldNames : valueIfNotSet;
+    @NotNull
+    public Builder<TYPE> withSharedFields(@Nullable final String... fieldNames) {
+      mFieldNames = (fieldNames != null) ? toSet(fieldNames) : null;
+      return this;
     }
 
     /**
-     * Interface defining a configurable object.
+     * Sets the shared field names. A null value means that all fields are shared.
      *
-     * @param <TYPE> the configurable object type.
+     * @param fieldNames the field names.
+     * @return this builder.
      */
-    public interface Configurable<TYPE> {
-
-        /**
-         * Sets the specified configuration and returns the configurable instance.
-         *
-         * @param configuration the configuration.
-         * @return the configurable instance.
-         */
-        @NotNull
-        TYPE apply(@NotNull ObjectConfiguration configuration);
+    @NotNull
+    public Builder<TYPE> withSharedFields(@Nullable final Collection<String> fieldNames) {
+      mFieldNames = (fieldNames != null) ? new HashSet<String>(fieldNames) : null;
+      return this;
     }
 
-    /**
-     * Builder of object configurations.
-     *
-     * @param <TYPE> the configurable object type.
-     */
-    public static final class Builder<TYPE> {
-
-        private final Configurable<? extends TYPE> mConfigurable;
-
-        private Set<String> mFieldNames;
-
-        /**
-         * Constructor.
-         *
-         * @param configurable the configurable instance.
-         */
-        public Builder(@NotNull final Configurable<? extends TYPE> configurable) {
-            mConfigurable = ConstantConditions.notNull("configurable instance", configurable);
-        }
-
-        /**
-         * Constructor.
-         *
-         * @param configurable         the configurable instance.
-         * @param initialConfiguration the initial object configuration.
-         */
-        public Builder(@NotNull final Configurable<? extends TYPE> configurable,
-                @NotNull final ObjectConfiguration initialConfiguration) {
-            mConfigurable = ConstantConditions.notNull("configurable instance", configurable);
-            setConfiguration(initialConfiguration);
-        }
-
-        @NotNull
-        private static Set<String> toSet(@NotNull final String[] values) {
-            final HashSet<String> set = new HashSet<String>();
-            Collections.addAll(set, values);
-            return set;
-        }
-
-        /**
-         * Applies this configuration and returns the configured object.
-         *
-         * @return the configured object.
-         */
-        @NotNull
-        public TYPE configured() {
-            return mConfigurable.apply(buildConfiguration());
-        }
-
-        /**
-         * Applies the specified configuration to this builder. A null value means that all the
-         * configuration options will be reset to their default, otherwise only the non-default
-         * options will be applied.
-         *
-         * @param configuration the object configuration.
-         * @return this builder.
-         */
-        @NotNull
-        public Builder<TYPE> with(@Nullable final ObjectConfiguration configuration) {
-            if (configuration == null) {
-                setConfiguration(defaultConfiguration());
-                return this;
-            }
-
-            final Set<String> fieldNames = configuration.mFieldNames;
-            if (fieldNames != null) {
-                withSharedFields(fieldNames);
-            }
-
-            return this;
-        }
-
-        /**
-         * Sets the shared field names to empty, that is, no field is shared.
-         *
-         * @return this builder.
-         */
-        @NotNull
-        public Builder<TYPE> withSharedFields() {
-            mFieldNames = Collections.emptySet();
-            return this;
-        }
-
-        /**
-         * Sets the shared field names. A null value means that all fields are shared.
-         *
-         * @param fieldNames the field names.
-         * @return this builder.
-         */
-        @NotNull
-        public Builder<TYPE> withSharedFields(@Nullable final String... fieldNames) {
-            mFieldNames = (fieldNames != null) ? toSet(fieldNames) : null;
-            return this;
-        }
-
-        /**
-         * Sets the shared field names. A null value means that all fields are shared.
-         *
-         * @param fieldNames the field names.
-         * @return this builder.
-         */
-        @NotNull
-        public Builder<TYPE> withSharedFields(@Nullable final Collection<String> fieldNames) {
-            mFieldNames = (fieldNames != null) ? new HashSet<String>(fieldNames) : null;
-            return this;
-        }
-
-        @NotNull
-        private ObjectConfiguration buildConfiguration() {
-            return new ObjectConfiguration(mFieldNames);
-        }
-
-        private void setConfiguration(@NotNull final ObjectConfiguration configuration) {
-            mFieldNames = configuration.mFieldNames;
-        }
+    @NotNull
+    private ObjectConfiguration buildConfiguration() {
+      return new ObjectConfiguration(mFieldNames);
     }
 
-    /**
-     * Default configurable implementation.
-     */
-    private static class DefaultConfigurable implements Configurable<ObjectConfiguration> {
-
-        @NotNull
-        public ObjectConfiguration apply(@NotNull final ObjectConfiguration configuration) {
-            return configuration;
-        }
+    private void setConfiguration(@NotNull final ObjectConfiguration configuration) {
+      mFieldNames = configuration.mFieldNames;
     }
+  }
+
+  /**
+   * Default configurable implementation.
+   */
+  private static class DefaultConfigurable implements Configurable<ObjectConfiguration> {
+
+    @NotNull
+    public ObjectConfiguration apply(@NotNull final ObjectConfiguration configuration) {
+      return configuration;
+    }
+  }
 }

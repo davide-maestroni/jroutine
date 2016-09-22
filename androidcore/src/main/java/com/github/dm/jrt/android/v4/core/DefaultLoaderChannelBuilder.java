@@ -43,132 +43,130 @@ import static com.github.dm.jrt.core.config.InvocationConfiguration.builderFromO
  */
 class DefaultLoaderChannelBuilder implements LoaderChannelBuilder {
 
-    private final LoaderContextCompat mContext;
+  private final LoaderContextCompat mContext;
 
-    private ChannelConfiguration mChannelConfiguration =
-            ChannelConfiguration.defaultConfiguration();
+  private ChannelConfiguration mChannelConfiguration = ChannelConfiguration.defaultConfiguration();
 
-    private LoaderConfiguration mLoaderConfiguration = LoaderConfiguration.defaultConfiguration();
+  private LoaderConfiguration mLoaderConfiguration = LoaderConfiguration.defaultConfiguration();
 
-    /**
-     * Constructor.
-     *
-     * @param context the context instance.
-     */
-    DefaultLoaderChannelBuilder(@NotNull final LoaderContextCompat context) {
-        mContext = ConstantConditions.notNull("Loader context", context);
+  /**
+   * Constructor.
+   *
+   * @param context the context instance.
+   */
+  DefaultLoaderChannelBuilder(@NotNull final LoaderContextCompat context) {
+    mContext = ConstantConditions.notNull("Loader context", context);
+  }
+
+  @NotNull
+  @Override
+  public LoaderChannelBuilder apply(@NotNull final LoaderConfiguration configuration) {
+    mLoaderConfiguration = ConstantConditions.notNull("Loader configuration", configuration);
+    return this;
+  }
+
+  @NotNull
+  @Override
+  public LoaderConfiguration.Builder<? extends LoaderChannelBuilder> applyLoaderConfiguration() {
+    final LoaderConfiguration config = mLoaderConfiguration;
+    return new LoaderConfiguration.Builder<LoaderChannelBuilder>(this, config);
+  }
+
+  @NotNull
+  @Override
+  public <OUT> Channel<?, OUT> buildChannel() {
+    final LoaderConfiguration loaderConfiguration = mLoaderConfiguration;
+    final int loaderId = loaderConfiguration.getLoaderIdOrElse(LoaderConfiguration.AUTO);
+    if (loaderId == LoaderConfiguration.AUTO) {
+      throw new IllegalArgumentException("the Loader ID must not be generated");
     }
 
-    @NotNull
-    @Override
-    public LoaderChannelBuilder apply(@NotNull final LoaderConfiguration configuration) {
-        mLoaderConfiguration = ConstantConditions.notNull("Loader configuration", configuration);
-        return this;
+    final LoaderContextCompat context = mContext;
+    final Object component = context.getComponent();
+    if (component == null) {
+      final Channel<OUT, OUT> channel = JRoutineCore.io().buildChannel();
+      channel.abort(new MissingLoaderException(loaderId));
+      return channel.close();
     }
 
-    @NotNull
-    @Override
-    public LoaderConfiguration.Builder<? extends LoaderChannelBuilder> applyLoaderConfiguration() {
-        final LoaderConfiguration config = mLoaderConfiguration;
-        return new LoaderConfiguration.Builder<LoaderChannelBuilder>(this, config);
-    }
+    final MissingLoaderInvocationFactory<OUT> factory =
+        new MissingLoaderInvocationFactory<OUT>(loaderId);
+    final DefaultLoaderRoutineBuilder<Void, OUT> builder =
+        new DefaultLoaderRoutineBuilder<Void, OUT>(context, factory);
+    return builder.apply(builderFromOutput(mChannelConfiguration).configured())
+                  .applyLoaderConfiguration()
+                  .withClashResolution(ClashResolutionType.JOIN)
+                  .withMatchResolution(ClashResolutionType.JOIN)
+                  .with(loaderConfiguration)
+                  .configured()
+                  .close();
+  }
 
-    @NotNull
-    @Override
-    public <OUT> Channel<?, OUT> buildChannel() {
-        final LoaderConfiguration loaderConfiguration = mLoaderConfiguration;
-        final int loaderId = loaderConfiguration.getLoaderIdOrElse(LoaderConfiguration.AUTO);
-        if (loaderId == LoaderConfiguration.AUTO) {
-            throw new IllegalArgumentException("the Loader ID must not be generated");
+  @Override
+  public void clear(@Nullable final Object... inputs) {
+    final LoaderContextCompat context = mContext;
+    if (context.getComponent() != null) {
+      final List<Object> inputList;
+      if (inputs == null) {
+        inputList = Collections.emptyList();
+
+      } else {
+        inputList = Arrays.asList(inputs);
+      }
+
+      clearLoader(context, mLoaderConfiguration.getLoaderIdOrElse(LoaderConfiguration.AUTO),
+          inputList);
+    }
+  }
+
+  @Override
+  public void clear(@Nullable final Iterable<?> inputs) {
+    final LoaderContextCompat context = mContext;
+    if (context.getComponent() != null) {
+      final List<Object> inputList;
+      if (inputs == null) {
+        inputList = Collections.emptyList();
+
+      } else {
+        inputList = new ArrayList<Object>();
+        for (final Object input : inputs) {
+          inputList.add(input);
         }
+      }
 
-        final LoaderContextCompat context = mContext;
-        final Object component = context.getComponent();
-        if (component == null) {
-            final Channel<OUT, OUT> channel = JRoutineCore.io().buildChannel();
-            channel.abort(new MissingLoaderException(loaderId));
-            return channel.close();
-        }
-
-        final MissingLoaderInvocationFactory<OUT> factory =
-                new MissingLoaderInvocationFactory<OUT>(loaderId);
-        final DefaultLoaderRoutineBuilder<Void, OUT> builder =
-                new DefaultLoaderRoutineBuilder<Void, OUT>(context, factory);
-        return builder.apply(builderFromOutput(mChannelConfiguration).configured())
-                      .applyLoaderConfiguration()
-                      .withClashResolution(ClashResolutionType.JOIN)
-                      .withMatchResolution(ClashResolutionType.JOIN)
-                      .with(loaderConfiguration)
-                      .configured()
-                      .close();
+      clearLoader(context, mLoaderConfiguration.getLoaderIdOrElse(LoaderConfiguration.AUTO),
+          inputList);
     }
+  }
 
-    @Override
-    public void clear(@Nullable final Object... inputs) {
-        final LoaderContextCompat context = mContext;
-        if (context.getComponent() != null) {
-            final List<Object> inputList;
-            if (inputs == null) {
-                inputList = Collections.emptyList();
-
-            } else {
-                inputList = Arrays.asList(inputs);
-            }
-
-            clearLoader(context, mLoaderConfiguration.getLoaderIdOrElse(LoaderConfiguration.AUTO),
-                    inputList);
-        }
+  @Override
+  public void clear() {
+    final LoaderContextCompat context = mContext;
+    if (context.getComponent() != null) {
+      clearLoader(context, mLoaderConfiguration.getLoaderIdOrElse(LoaderConfiguration.AUTO));
     }
+  }
 
-    @Override
-    public void clear(@Nullable final Iterable<?> inputs) {
-        final LoaderContextCompat context = mContext;
-        if (context.getComponent() != null) {
-            final List<Object> inputList;
-            if (inputs == null) {
-                inputList = Collections.emptyList();
-
-            } else {
-                inputList = new ArrayList<Object>();
-                for (final Object input : inputs) {
-                    inputList.add(input);
-                }
-            }
-
-            clearLoader(context, mLoaderConfiguration.getLoaderIdOrElse(LoaderConfiguration.AUTO),
-                    inputList);
-        }
+  @Override
+  public void clear(@Nullable final Object input) {
+    final LoaderContextCompat context = mContext;
+    if (context.getComponent() != null) {
+      clearLoader(context, mLoaderConfiguration.getLoaderIdOrElse(LoaderConfiguration.AUTO),
+          Collections.singletonList(input));
     }
+  }
 
-    @Override
-    public void clear() {
-        final LoaderContextCompat context = mContext;
-        if (context.getComponent() != null) {
-            clearLoader(context, mLoaderConfiguration.getLoaderIdOrElse(LoaderConfiguration.AUTO));
-        }
-    }
+  @NotNull
+  @Override
+  public LoaderChannelBuilder apply(@NotNull final ChannelConfiguration configuration) {
+    mChannelConfiguration = ConstantConditions.notNull("channel configuration", configuration);
+    return this;
+  }
 
-    @Override
-    public void clear(@Nullable final Object input) {
-        final LoaderContextCompat context = mContext;
-        if (context.getComponent() != null) {
-            clearLoader(context, mLoaderConfiguration.getLoaderIdOrElse(LoaderConfiguration.AUTO),
-                    Collections.singletonList(input));
-        }
-    }
-
-    @NotNull
-    @Override
-    public LoaderChannelBuilder apply(@NotNull final ChannelConfiguration configuration) {
-        mChannelConfiguration = ConstantConditions.notNull("channel configuration", configuration);
-        return this;
-    }
-
-    @NotNull
-    @Override
-    public ChannelConfiguration.Builder<? extends LoaderChannelBuilder> applyChannelConfiguration
-            () {
-        final ChannelConfiguration config = mChannelConfiguration;
-        return new ChannelConfiguration.Builder<LoaderChannelBuilder>(this, config);
-    }
+  @NotNull
+  @Override
+  public ChannelConfiguration.Builder<? extends LoaderChannelBuilder> applyChannelConfiguration() {
+    final ChannelConfiguration config = mChannelConfiguration;
+    return new ChannelConfiguration.Builder<LoaderChannelBuilder>(this, config);
+  }
 }

@@ -60,278 +60,273 @@ import static com.github.dm.jrt.object.builder.Builders.withAnnotations;
  */
 class DefaultObjectRoutineBuilder implements ObjectRoutineBuilder {
 
-    private static final WeakIdentityHashMap<Object, HashMap<RoutineInfo, Routine<?, ?>>>
-            sRoutines = new WeakIdentityHashMap<Object, HashMap<RoutineInfo, Routine<?, ?>>>();
+  private static final WeakIdentityHashMap<Object, HashMap<RoutineInfo, Routine<?, ?>>> sRoutines =
+      new WeakIdentityHashMap<Object, HashMap<RoutineInfo, Routine<?, ?>>>();
+
+  private final InvocationTarget<?> mTarget;
+
+  private InvocationConfiguration mInvocationConfiguration =
+      InvocationConfiguration.defaultConfiguration();
+
+  private ObjectConfiguration mObjectConfiguration = ObjectConfiguration.defaultConfiguration();
+
+  /**
+   * Constructor.
+   *
+   * @param target the invocation target.
+   * @throws java.lang.IllegalArgumentException if the class of specified target represents an
+   *                                            interface.
+   */
+  DefaultObjectRoutineBuilder(@NotNull final InvocationTarget<?> target) {
+    final Class<?> targetClass = target.getTargetClass();
+    if (targetClass.isInterface()) {
+      throw new IllegalArgumentException(
+          "the target class must not be an interface: " + targetClass.getName());
+    }
+
+    mTarget = target;
+  }
+
+  @NotNull
+  public ObjectRoutineBuilder apply(@NotNull final InvocationConfiguration configuration) {
+    mInvocationConfiguration =
+        ConstantConditions.notNull("invocation configuration", configuration);
+    return this;
+  }
+
+  @NotNull
+  public ObjectRoutineBuilder apply(@NotNull final ObjectConfiguration configuration) {
+    mObjectConfiguration = ConstantConditions.notNull("object configuration", configuration);
+    return this;
+  }
+
+  @NotNull
+  public InvocationConfiguration.Builder<? extends ObjectRoutineBuilder>
+  applyInvocationConfiguration() {
+    final InvocationConfiguration config = mInvocationConfiguration;
+    return new InvocationConfiguration.Builder<ObjectRoutineBuilder>(this, config);
+  }
+
+  @NotNull
+  public ObjectConfiguration.Builder<? extends ObjectRoutineBuilder> applyObjectConfiguration() {
+    final ObjectConfiguration config = mObjectConfiguration;
+    return new ObjectConfiguration.Builder<ObjectRoutineBuilder>(this, config);
+  }
+
+  @NotNull
+  public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
+    if (!itf.isInterface()) {
+      throw new IllegalArgumentException(
+          "the specified class is not an interface: " + itf.getName());
+    }
+
+    final Object proxy = Proxy.newProxyInstance(itf.getClassLoader(), new Class[]{itf},
+        new ProxyInvocationHandler());
+    return itf.cast(proxy);
+  }
+
+  @NotNull
+  public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
+    return itf.cast(buildProxy(itf.getRawClass()));
+  }
+
+  @NotNull
+  public <IN, OUT> Routine<IN, OUT> method(@NotNull final String name) {
+    final Method method = getAnnotatedMethod(mTarget.getTargetClass(), name);
+    if (method == null) {
+      return method(name, Reflection.NO_PARAMS);
+    }
+
+    return method(method);
+  }
+
+  @NotNull
+  public <IN, OUT> Routine<IN, OUT> method(@NotNull final String name,
+      @NotNull final Class<?>... parameterTypes) {
+    return method(Reflection.findMethod(mTarget.getTargetClass(), name, parameterTypes));
+  }
+
+  @NotNull
+  public <IN, OUT> Routine<IN, OUT> method(@NotNull final Method method) {
+    return getRoutine(withAnnotations(mInvocationConfiguration, method),
+        withAnnotations(mObjectConfiguration, method), method, null, null);
+  }
+
+  @NotNull
+  @SuppressWarnings("unchecked")
+  private <IN, OUT> Routine<IN, OUT> getRoutine(
+      @NotNull final InvocationConfiguration invocationConfiguration,
+      @NotNull final ObjectConfiguration objectConfiguration, @NotNull final Method method,
+      @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
+    final InvocationTarget<?> target = mTarget;
+    final Object targetInstance = target.getTarget();
+    if (targetInstance == null) {
+      throw new IllegalStateException("the target object has been destroyed");
+    }
+
+    synchronized (sRoutines) {
+      final WeakIdentityHashMap<Object, HashMap<RoutineInfo, Routine<?, ?>>> routines = sRoutines;
+      HashMap<RoutineInfo, Routine<?, ?>> routineMap = routines.get(targetInstance);
+      if (routineMap == null) {
+        routineMap = new HashMap<RoutineInfo, Routine<?, ?>>();
+        routines.put(targetInstance, routineMap);
+      }
+
+      final RoutineInfo routineInfo =
+          new RoutineInfo(invocationConfiguration, objectConfiguration, method, inputMode,
+              outputMode);
+      Routine<?, ?> routine = routineMap.get(routineInfo);
+      if (routine == null) {
+        final MethodInvocationFactory factory =
+            new MethodInvocationFactory(objectConfiguration, target, method, inputMode, outputMode);
+        routine = JRoutineCore.with(factory).apply(invocationConfiguration).buildRoutine();
+        routineMap.put(routineInfo, routine);
+      }
+
+      return (Routine<IN, OUT>) routine;
+    }
+  }
+
+  /**
+   * Implementation of a simple invocation wrapping the target method.
+   */
+  private static class MethodCallInvocation extends CallInvocation<Object, Object> {
+
+    private final InputMode mInputMode;
+
+    private final Method mMethod;
+
+    private final Mutex mMutex;
+
+    private final OutputMode mOutputMode;
 
     private final InvocationTarget<?> mTarget;
-
-    private InvocationConfiguration mInvocationConfiguration =
-            InvocationConfiguration.defaultConfiguration();
-
-    private ObjectConfiguration mObjectConfiguration = ObjectConfiguration.defaultConfiguration();
 
     /**
      * Constructor.
      *
-     * @param target the invocation target.
-     * @throws java.lang.IllegalArgumentException if the class of specified target represents an
-     *                                            interface.
+     * @param objectConfiguration the object configuration.
+     * @param target              the invocation target.
+     * @param method              the method to wrap.
+     * @param inputMode           the input transfer mode.
+     * @param outputMode          the output transfer mode.
      */
-    DefaultObjectRoutineBuilder(@NotNull final InvocationTarget<?> target) {
-        final Class<?> targetClass = target.getTargetClass();
-        if (targetClass.isInterface()) {
-            throw new IllegalArgumentException(
-                    "the target class must not be an interface: " + targetClass.getName());
-        }
-
-        mTarget = target;
+    private MethodCallInvocation(@NotNull final ObjectConfiguration objectConfiguration,
+        @NotNull final InvocationTarget<?> target, @NotNull final Method method,
+        @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
+      final Object mutexTarget =
+          (Modifier.isStatic(method.getModifiers())) ? target.getTargetClass() : target.getTarget();
+      mMutex = getSharedMutex(mutexTarget, objectConfiguration.getSharedFieldsOrElse(null));
+      mTarget = target;
+      mMethod = method;
+      mInputMode = inputMode;
+      mOutputMode = outputMode;
     }
 
-    @NotNull
-    public ObjectRoutineBuilder apply(@NotNull final InvocationConfiguration configuration) {
-        mInvocationConfiguration =
-                ConstantConditions.notNull("invocation configuration", configuration);
-        return this;
+    @Override
+    protected void onCall(@NotNull final List<?> objects,
+        @NotNull final Channel<Object, ?> result) throws Exception {
+      final Object target = mTarget.getTarget();
+      if (target == null) {
+        throw new IllegalStateException("the target object has been destroyed");
+      }
+
+      callFromInvocation(mMutex, target, mMethod, objects, result, mInputMode, mOutputMode);
     }
+  }
 
-    @NotNull
-    public ObjectRoutineBuilder apply(@NotNull final ObjectConfiguration configuration) {
-        mObjectConfiguration = ConstantConditions.notNull("object configuration", configuration);
-        return this;
-    }
+  /**
+   * Factory creating method invocations.
+   */
+  private static class MethodInvocationFactory extends InvocationFactory<Object, Object> {
 
-    @NotNull
-    public InvocationConfiguration.Builder<? extends ObjectRoutineBuilder>
-    applyInvocationConfiguration() {
-        final InvocationConfiguration config = mInvocationConfiguration;
-        return new InvocationConfiguration.Builder<ObjectRoutineBuilder>(this, config);
-    }
+    private final InputMode mInputMode;
 
-    @NotNull
-    public ObjectConfiguration.Builder<? extends ObjectRoutineBuilder> applyObjectConfiguration() {
-        final ObjectConfiguration config = mObjectConfiguration;
-        return new ObjectConfiguration.Builder<ObjectRoutineBuilder>(this, config);
-    }
+    private final Method mMethod;
 
-    @NotNull
-    public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
-        if (!itf.isInterface()) {
-            throw new IllegalArgumentException(
-                    "the specified class is not an interface: " + itf.getName());
-        }
+    private final ObjectConfiguration mObjectConfiguration;
 
-        final Object proxy = Proxy.newProxyInstance(itf.getClassLoader(), new Class[]{itf},
-                new ProxyInvocationHandler());
-        return itf.cast(proxy);
-    }
+    private final OutputMode mOutputMode;
 
-    @NotNull
-    public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
-        return itf.cast(buildProxy(itf.getRawClass()));
-    }
-
-    @NotNull
-    public <IN, OUT> Routine<IN, OUT> method(@NotNull final String name) {
-        final Method method = getAnnotatedMethod(mTarget.getTargetClass(), name);
-        if (method == null) {
-            return method(name, Reflection.NO_PARAMS);
-        }
-
-        return method(method);
-    }
-
-    @NotNull
-    public <IN, OUT> Routine<IN, OUT> method(@NotNull final String name,
-            @NotNull final Class<?>... parameterTypes) {
-        return method(Reflection.findMethod(mTarget.getTargetClass(), name, parameterTypes));
-    }
-
-    @NotNull
-    public <IN, OUT> Routine<IN, OUT> method(@NotNull final Method method) {
-        return getRoutine(withAnnotations(mInvocationConfiguration, method),
-                withAnnotations(mObjectConfiguration, method), method, null, null);
-    }
-
-    @NotNull
-    @SuppressWarnings("unchecked")
-    private <IN, OUT> Routine<IN, OUT> getRoutine(
-            @NotNull final InvocationConfiguration invocationConfiguration,
-            @NotNull final ObjectConfiguration objectConfiguration, @NotNull final Method method,
-            @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
-        final InvocationTarget<?> target = mTarget;
-        final Object targetInstance = target.getTarget();
-        if (targetInstance == null) {
-            throw new IllegalStateException("the target object has been destroyed");
-        }
-
-        synchronized (sRoutines) {
-            final WeakIdentityHashMap<Object, HashMap<RoutineInfo, Routine<?, ?>>> routines =
-                    sRoutines;
-            HashMap<RoutineInfo, Routine<?, ?>> routineMap = routines.get(targetInstance);
-            if (routineMap == null) {
-                routineMap = new HashMap<RoutineInfo, Routine<?, ?>>();
-                routines.put(targetInstance, routineMap);
-            }
-
-            final RoutineInfo routineInfo =
-                    new RoutineInfo(invocationConfiguration, objectConfiguration, method, inputMode,
-                            outputMode);
-            Routine<?, ?> routine = routineMap.get(routineInfo);
-            if (routine == null) {
-                final MethodInvocationFactory factory =
-                        new MethodInvocationFactory(objectConfiguration, target, method, inputMode,
-                                outputMode);
-                routine = JRoutineCore.with(factory).apply(invocationConfiguration).buildRoutine();
-                routineMap.put(routineInfo, routine);
-            }
-
-            return (Routine<IN, OUT>) routine;
-        }
-    }
+    private final InvocationTarget<?> mTarget;
 
     /**
-     * Implementation of a simple invocation wrapping the target method.
+     * Constructor.
+     *
+     * @param objectConfiguration the object configuration.
+     * @param target              the invocation target.
+     * @param method              the method to wrap.
+     * @param inputMode           the input transfer mode.
+     * @param outputMode          the output transfer mode.
      */
-    private static class MethodCallInvocation extends CallInvocation<Object, Object> {
-
-        private final InputMode mInputMode;
-
-        private final Method mMethod;
-
-        private final Mutex mMutex;
-
-        private final OutputMode mOutputMode;
-
-        private final InvocationTarget<?> mTarget;
-
-        /**
-         * Constructor.
-         *
-         * @param objectConfiguration the object configuration.
-         * @param target              the invocation target.
-         * @param method              the method to wrap.
-         * @param inputMode           the input transfer mode.
-         * @param outputMode          the output transfer mode.
-         */
-        private MethodCallInvocation(@NotNull final ObjectConfiguration objectConfiguration,
-                @NotNull final InvocationTarget<?> target, @NotNull final Method method,
-                @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
-            final Object mutexTarget =
-                    (Modifier.isStatic(method.getModifiers())) ? target.getTargetClass()
-                            : target.getTarget();
-            mMutex = getSharedMutex(mutexTarget, objectConfiguration.getSharedFieldsOrElse(null));
-            mTarget = target;
-            mMethod = method;
-            mInputMode = inputMode;
-            mOutputMode = outputMode;
-        }
-
-        @Override
-        protected void onCall(@NotNull final List<?> objects,
-                @NotNull final Channel<Object, ?> result) throws Exception {
-            final Object target = mTarget.getTarget();
-            if (target == null) {
-                throw new IllegalStateException("the target object has been destroyed");
-            }
-
-            callFromInvocation(mMutex, target, mMethod, objects, result, mInputMode, mOutputMode);
-        }
+    private MethodInvocationFactory(@NotNull final ObjectConfiguration objectConfiguration,
+        @NotNull final InvocationTarget<?> target, @NotNull final Method method,
+        @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
+      super(asArgs(objectConfiguration, target, method, inputMode, outputMode));
+      mObjectConfiguration = objectConfiguration;
+      mTarget = target;
+      mMethod = method;
+      mInputMode = inputMode;
+      mOutputMode = outputMode;
     }
+
+    @NotNull
+    @Override
+    public Invocation<Object, Object> newInvocation() {
+      return new MethodCallInvocation(mObjectConfiguration, mTarget, mMethod, mInputMode,
+          mOutputMode);
+    }
+  }
+
+  /**
+   * Class used as key to identify a specific routine instance.
+   */
+  private static final class RoutineInfo extends DeepEqualObject {
 
     /**
-     * Factory creating method invocations.
+     * Constructor.
+     *
+     * @param invocationConfiguration the invocation configuration.
+     * @param objectConfiguration     the object configuration.
+     * @param method                  the method to wrap.
+     * @param inputMode               the input transfer mode.
+     * @param outputMode              the output transfer mode.
      */
-    private static class MethodInvocationFactory extends InvocationFactory<Object, Object> {
-
-        private final InputMode mInputMode;
-
-        private final Method mMethod;
-
-        private final ObjectConfiguration mObjectConfiguration;
-
-        private final OutputMode mOutputMode;
-
-        private final InvocationTarget<?> mTarget;
-
-        /**
-         * Constructor.
-         *
-         * @param objectConfiguration the object configuration.
-         * @param target              the invocation target.
-         * @param method              the method to wrap.
-         * @param inputMode           the input transfer mode.
-         * @param outputMode          the output transfer mode.
-         */
-        private MethodInvocationFactory(@NotNull final ObjectConfiguration objectConfiguration,
-                @NotNull final InvocationTarget<?> target, @NotNull final Method method,
-                @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
-            super(asArgs(objectConfiguration, target, method, inputMode, outputMode));
-            mObjectConfiguration = objectConfiguration;
-            mTarget = target;
-            mMethod = method;
-            mInputMode = inputMode;
-            mOutputMode = outputMode;
-        }
-
-        @NotNull
-        @Override
-        public Invocation<Object, Object> newInvocation() {
-            return new MethodCallInvocation(mObjectConfiguration, mTarget, mMethod, mInputMode,
-                    mOutputMode);
-        }
+    private RoutineInfo(@NotNull final InvocationConfiguration invocationConfiguration,
+        @NotNull final ObjectConfiguration objectConfiguration, @NotNull final Method method,
+        @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
+      super(asArgs(invocationConfiguration, objectConfiguration, method, inputMode, outputMode));
     }
+  }
+
+  /**
+   * Invocation handler adapting a different interface to the target object instance.
+   */
+  private class ProxyInvocationHandler implements InvocationHandler {
+
+    private final InvocationConfiguration mInvocationConfiguration;
+
+    private final ObjectConfiguration mObjectConfiguration;
 
     /**
-     * Class used as key to identify a specific routine instance.
+     * Constructor.
      */
-    private static final class RoutineInfo extends DeepEqualObject {
-
-        /**
-         * Constructor.
-         *
-         * @param invocationConfiguration the invocation configuration.
-         * @param objectConfiguration     the object configuration.
-         * @param method                  the method to wrap.
-         * @param inputMode               the input transfer mode.
-         * @param outputMode              the output transfer mode.
-         */
-        private RoutineInfo(@NotNull final InvocationConfiguration invocationConfiguration,
-                @NotNull final ObjectConfiguration objectConfiguration,
-                @NotNull final Method method, @Nullable final InputMode inputMode,
-                @Nullable final OutputMode outputMode) {
-            super(asArgs(invocationConfiguration, objectConfiguration, method, inputMode,
-                    outputMode));
-        }
+    private ProxyInvocationHandler() {
+      mInvocationConfiguration = DefaultObjectRoutineBuilder.this.mInvocationConfiguration;
+      mObjectConfiguration = DefaultObjectRoutineBuilder.this.mObjectConfiguration;
     }
 
-    /**
-     * Invocation handler adapting a different interface to the target object instance.
-     */
-    private class ProxyInvocationHandler implements InvocationHandler {
-
-        private final InvocationConfiguration mInvocationConfiguration;
-
-        private final ObjectConfiguration mObjectConfiguration;
-
-        /**
-         * Constructor.
-         */
-        private ProxyInvocationHandler() {
-            mInvocationConfiguration = DefaultObjectRoutineBuilder.this.mInvocationConfiguration;
-            mObjectConfiguration = DefaultObjectRoutineBuilder.this.mObjectConfiguration;
-        }
-
-        public Object invoke(final Object proxy, final Method method, final Object[] args) throws
-                Throwable {
-            final MethodInfo methodInfo = getTargetMethodInfo(mTarget.getTargetClass(), method);
-            final InputMode inputMode = methodInfo.inputMode;
-            final OutputMode outputMode = methodInfo.outputMode;
-            final Routine<Object, Object> routine =
-                    getRoutine(withAnnotations(mInvocationConfiguration, method),
-                            withAnnotations(mObjectConfiguration, method), methodInfo.method,
-                            inputMode, outputMode);
-            return invokeRoutine(routine, method, asArgs(args), methodInfo.invocationMode,
-                    inputMode, outputMode);
-        }
+    public Object invoke(final Object proxy, final Method method, final Object[] args) throws
+        Throwable {
+      final MethodInfo methodInfo = getTargetMethodInfo(mTarget.getTargetClass(), method);
+      final InputMode inputMode = methodInfo.inputMode;
+      final OutputMode outputMode = methodInfo.outputMode;
+      final Routine<Object, Object> routine =
+          getRoutine(withAnnotations(mInvocationConfiguration, method),
+              withAnnotations(mObjectConfiguration, method), methodInfo.method, inputMode,
+              outputMode);
+      return invokeRoutine(routine, method, asArgs(args), methodInfo.invocationMode, inputMode,
+          outputMode);
     }
+  }
 }

@@ -54,806 +54,798 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TargetApi(VERSION_CODES.FROYO)
 public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestActivity> {
 
-    public SparseChannelsTest() {
+  public SparseChannelsTest() {
 
-        super(TestActivity.class);
+    super(TestActivity.class);
+  }
+
+  @NotNull
+  private static <T> Map<Integer, Channel<?, T>> toMap(
+      @NotNull final SparseArray<Channel<?, T>> sparseArray) {
+
+    final int size = sparseArray.size();
+    final HashMap<Integer, Channel<?, T>> map = new HashMap<Integer, Channel<?, T>>(size);
+    for (int i = 0; i < size; ++i) {
+      map.put(sparseArray.keyAt(i), sparseArray.valueAt(i));
     }
 
-    @NotNull
-    private static <T> Map<Integer, Channel<?, T>> toMap(
-            @NotNull final SparseArray<Channel<?, T>> sparseArray) {
+    return map;
+  }
 
-        final int size = sparseArray.size();
-        final HashMap<Integer, Channel<?, T>> map = new HashMap<Integer, Channel<?, T>>(size);
-        for (int i = 0; i < size; ++i) {
-            map.put(sparseArray.keyAt(i), sparseArray.valueAt(i));
-        }
+  public void testCombine() {
 
-        return map;
+    if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+      return;
     }
 
-    public void testCombine() {
+    final Channel<String, String> channel1 = JRoutineLoader.on(loaderFrom(getActivity()))
+                                                           .with(factoryOf(PassingString.class))
+                                                           .call()
+                                                           .sorted();
+    final Channel<Integer, Integer> channel2 = JRoutineLoader.on(loaderFrom(getActivity()))
+                                                             .with(factoryOf(PassingInteger.class))
+                                                             .call()
+                                                             .sorted();
+    SparseChannels.combine(channel1, channel2)
+                  .buildChannels()
+                  .pass(new ParcelableSelectable<String>("test1", 0))
+                  .pass(new ParcelableSelectable<Integer>(1, 1))
+                  .close();
+    SparseChannels.combine(3, channel1, channel2)
+                  .buildChannels()
+                  .pass(new ParcelableSelectable<String>("test2", 3))
+                  .pass(new ParcelableSelectable<Integer>(2, 4))
+                  .close();
+    SparseChannels.combine(Arrays.<Channel<?, ?>>asList(channel1, channel2))
+                  .buildChannels()
+                  .pass(new ParcelableSelectable<String>("test3", 0))
+                  .pass(new ParcelableSelectable<Integer>(3, 1))
+                  .close();
+    SparseChannels.combine(-5, Arrays.<Channel<?, ?>>asList(channel1, channel2))
+                  .buildChannels()
+                  .pass(new ParcelableSelectable<String>("test4", -5))
+                  .pass(new ParcelableSelectable<Integer>(4, -4))
+                  .close();
+    final SparseArray<Channel<?, ?>> map = new SparseArray<Channel<?, ?>>(2);
+    map.put(31, channel1);
+    map.put(17, channel2);
+    SparseChannels.combine(map)
+                  .buildChannels()
+                  .pass(new ParcelableSelectable<String>("test5", 31))
+                  .pass(new ParcelableSelectable<Integer>(5, 17))
+                  .close();
+    assertThat(channel1.close().after(seconds(10)).all()).containsExactly("test1", "test2", "test3",
+        "test4", "test5");
+    assertThat(channel2.close().after(seconds(10)).all()).containsExactly(1, 2, 3, 4, 5);
+  }
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+  public void testCombineAbort() {
 
-            return;
-        }
+    if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
 
-        final Channel<String, String> channel1 = JRoutineLoader.on(loaderFrom(getActivity()))
-                                                               .with(factoryOf(PassingString.class))
-                                                               .call()
-                                                               .sorted();
-        final Channel<Integer, Integer> channel2 = JRoutineLoader.on(loaderFrom(getActivity()))
-                                                                 .with(factoryOf(
-                                                                         PassingInteger.class))
-                                                                 .call()
-                                                                 .sorted();
-        SparseChannels.combine(channel1, channel2)
-                      .buildChannels()
-                      .pass(new ParcelableSelectable<String>("test1", 0))
-                      .pass(new ParcelableSelectable<Integer>(1, 1))
-                      .close();
-        SparseChannels.combine(3, channel1, channel2)
-                      .buildChannels()
-                      .pass(new ParcelableSelectable<String>("test2", 3))
-                      .pass(new ParcelableSelectable<Integer>(2, 4))
-                      .close();
-        SparseChannels.combine(Arrays.<Channel<?, ?>>asList(channel1, channel2))
-                      .buildChannels()
-                      .pass(new ParcelableSelectable<String>("test3", 0))
-                      .pass(new ParcelableSelectable<Integer>(3, 1))
-                      .close();
-        SparseChannels.combine(-5, Arrays.<Channel<?, ?>>asList(channel1, channel2))
-                      .buildChannels()
-                      .pass(new ParcelableSelectable<String>("test4", -5))
-                      .pass(new ParcelableSelectable<Integer>(4, -4))
-                      .close();
-        final SparseArray<Channel<?, ?>> map = new SparseArray<Channel<?, ?>>(2);
-        map.put(31, channel1);
-        map.put(17, channel2);
-        SparseChannels.combine(map)
-                      .buildChannels()
-                      .pass(new ParcelableSelectable<String>("test5", 31))
-                      .pass(new ParcelableSelectable<Integer>(5, 17))
-                      .close();
-        assertThat(channel1.close().after(seconds(10)).all()).containsExactly("test1", "test2",
-                "test3", "test4", "test5");
-        assertThat(channel2.close().after(seconds(10)).all()).containsExactly(1, 2, 3, 4, 5);
+      return;
     }
 
-    public void testCombineAbort() {
+    Channel<String, String> channel1;
+    Channel<Integer, Integer> channel2;
+    channel1 = JRoutineLoader.on(loaderFrom(getActivity()))
+                             .with(factoryOf(PassingString.class))
+                             .call()
+                             .sorted();
+    channel2 = JRoutineLoader.on(loaderFrom(getActivity()))
+                             .with(factoryOf(PassingInteger.class))
+                             .call()
+                             .sorted();
+    SparseChannels.combine(channel1, channel2).buildChannels().abort();
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+    try {
 
-            return;
-        }
+      channel1.close().after(seconds(10)).next();
 
-        Channel<String, String> channel1;
-        Channel<Integer, Integer> channel2;
-        channel1 = JRoutineLoader.on(loaderFrom(getActivity()))
-                                 .with(factoryOf(PassingString.class))
-                                 .call()
-                                 .sorted();
-        channel2 = JRoutineLoader.on(loaderFrom(getActivity()))
-                                 .with(factoryOf(PassingInteger.class))
-                                 .call()
-                                 .sorted();
-        SparseChannels.combine(channel1, channel2).buildChannels().abort();
+      fail();
 
-        try {
+    } catch (final AbortException ignored) {
 
-            channel1.close().after(seconds(10)).next();
-
-            fail();
-
-        } catch (final AbortException ignored) {
-
-        }
-
-        try {
-
-            channel2.close().after(seconds(10)).next();
-
-            fail();
-
-        } catch (final AbortException ignored) {
-
-        }
-
-        channel1 = JRoutineLoader.on(loaderFrom(getActivity()))
-                                 .with(factoryOf(PassingString.class))
-                                 .call()
-                                 .sorted();
-        channel2 = JRoutineLoader.on(loaderFrom(getActivity()))
-                                 .with(factoryOf(PassingInteger.class))
-                                 .call()
-                                 .sorted();
-        SparseChannels.combine(3, channel1, channel2).buildChannels().abort();
-
-        try {
-
-            channel1.close().after(seconds(10)).next();
-
-            fail();
-
-        } catch (final AbortException ignored) {
-
-        }
-
-        try {
-
-            channel2.close().after(seconds(10)).next();
-
-            fail();
-
-        } catch (final AbortException ignored) {
-
-        }
-
-        channel1 = JRoutineLoader.on(loaderFrom(getActivity()))
-                                 .with(factoryOf(PassingString.class))
-                                 .call()
-                                 .sorted();
-        channel2 = JRoutineLoader.on(loaderFrom(getActivity()))
-                                 .with(factoryOf(PassingInteger.class))
-                                 .call()
-                                 .sorted();
-        SparseChannels.combine(Arrays.<Channel<?, ?>>asList(channel1, channel2))
-                      .buildChannels()
-                      .abort();
-
-        try {
-
-            channel1.close().after(seconds(10)).next();
-
-            fail();
-
-        } catch (final AbortException ignored) {
-
-        }
-
-        try {
-
-            channel2.close().after(seconds(10)).next();
-
-            fail();
-
-        } catch (final AbortException ignored) {
-
-        }
-
-        channel1 = JRoutineLoader.on(loaderFrom(getActivity()))
-                                 .with(factoryOf(PassingString.class))
-                                 .call()
-                                 .sorted();
-        channel2 = JRoutineLoader.on(loaderFrom(getActivity()))
-                                 .with(factoryOf(PassingInteger.class))
-                                 .call()
-                                 .sorted();
-        SparseChannels.combine(-5, Arrays.<Channel<?, ?>>asList(channel1, channel2))
-                      .buildChannels()
-                      .abort();
-
-        try {
-
-            channel1.close().after(seconds(10)).next();
-
-            fail();
-
-        } catch (final AbortException ignored) {
-
-        }
-
-        try {
-
-            channel2.close().after(seconds(10)).next();
-
-            fail();
-
-        } catch (final AbortException ignored) {
-
-        }
-
-        channel1 = JRoutineLoader.on(loaderFrom(getActivity()))
-                                 .with(factoryOf(PassingString.class))
-                                 .call()
-                                 .sorted();
-        channel2 = JRoutineLoader.on(loaderFrom(getActivity()))
-                                 .with(factoryOf(PassingInteger.class))
-                                 .call()
-                                 .sorted();
-        final SparseArray<Channel<?, ?>> map = new SparseArray<Channel<?, ?>>(2);
-        map.put(31, channel1);
-        map.put(17, channel2);
-        SparseChannels.combine(map).buildChannels().abort();
-
-        try {
-
-            channel1.close().after(seconds(10)).next();
-
-            fail();
-
-        } catch (final AbortException ignored) {
-
-        }
-
-        try {
-
-            channel2.close().after(seconds(10)).next();
-
-            fail();
-
-        } catch (final AbortException ignored) {
-
-        }
     }
 
-    public void testCombineError() {
+    try {
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+      channel2.close().after(seconds(10)).next();
 
-            return;
-        }
+      fail();
 
-        try {
+    } catch (final AbortException ignored) {
 
-            SparseChannels.combine();
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            SparseChannels.combine(0);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            SparseChannels.combine(Collections.<Channel<?, ?>>emptyList());
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            SparseChannels.combine(0, Collections.<Channel<?, ?>>emptyList());
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            SparseChannels.combine(new SparseArray<Channel<?, ?>>(0));
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
     }
 
-    public void testConstructor() {
+    channel1 = JRoutineLoader.on(loaderFrom(getActivity()))
+                             .with(factoryOf(PassingString.class))
+                             .call()
+                             .sorted();
+    channel2 = JRoutineLoader.on(loaderFrom(getActivity()))
+                             .with(factoryOf(PassingInteger.class))
+                             .call()
+                             .sorted();
+    SparseChannels.combine(3, channel1, channel2).buildChannels().abort();
 
-        boolean failed = false;
-        try {
-            new SparseChannels();
-            failed = true;
+    try {
 
-        } catch (final Throwable ignored) {
+      channel1.close().after(seconds(10)).next();
 
-        }
+      fail();
 
-        assertThat(failed).isFalse();
+    } catch (final AbortException ignored) {
+
     }
 
-    public void testInputMap() {
+    try {
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+      channel2.close().after(seconds(10)).next();
 
-            return;
-        }
+      fail();
 
-        final ArrayList<ParcelableSelectable<Object>> outputs =
-                new ArrayList<ParcelableSelectable<Object>>();
-        outputs.add(new ParcelableSelectable<Object>("test21", Sort.STRING));
-        outputs.add(new ParcelableSelectable<Object>(-11, Sort.INTEGER));
-        final Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> routine =
-                JRoutineLoader.on(loaderFrom(getActivity()))
-                              .with(factoryOf(Sort.class))
-                              .buildRoutine();
-        SparseArray<Channel<Object, ?>> channelMap;
-        Channel<ParcelableSelectable<Object>, ParcelableSelectable<Object>> channel;
-        channel = routine.call();
-        channelMap = SparseChannels.selectInputParcelable(channel,
-                Arrays.asList(Sort.INTEGER, Sort.STRING)).buildChannels();
-        channelMap.get(Sort.INTEGER).pass(-11).close();
-        channelMap.get(Sort.STRING).pass("test21").close();
-        assertThat(channel.close().after(seconds(10)).all()).containsOnlyElementsOf(outputs);
-        channel = routine.call();
-        channelMap = SparseChannels.selectInputParcelable(channel, Sort.INTEGER, Sort.STRING)
-                                   .buildChannels();
-        channelMap.get(Sort.INTEGER).pass(-11).close();
-        channelMap.get(Sort.STRING).pass("test21").close();
-        assertThat(channel.close().after(seconds(10)).all()).containsOnlyElementsOf(outputs);
-        channel = routine.call();
-        channelMap = SparseChannels.selectInputParcelable(Math.min(Sort.INTEGER, Sort.STRING), 2,
-                channel).buildChannels();
-        channelMap.get(Sort.INTEGER).pass(-11).close();
-        channelMap.get(Sort.STRING).pass("test21").close();
-        assertThat(channel.close().after(seconds(10)).all()).containsOnlyElementsOf(outputs);
+    } catch (final AbortException ignored) {
+
     }
 
-    public void testInputMapAbort() {
+    channel1 = JRoutineLoader.on(loaderFrom(getActivity()))
+                             .with(factoryOf(PassingString.class))
+                             .call()
+                             .sorted();
+    channel2 = JRoutineLoader.on(loaderFrom(getActivity()))
+                             .with(factoryOf(PassingInteger.class))
+                             .call()
+                             .sorted();
+    SparseChannels.combine(Arrays.<Channel<?, ?>>asList(channel1, channel2))
+                  .buildChannels()
+                  .abort();
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+    try {
 
-            return;
-        }
+      channel1.close().after(seconds(10)).next();
 
-        final Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> routine =
-                JRoutineLoader.on(loaderFrom(getActivity()))
-                              .with(factoryOf(Sort.class))
-                              .buildRoutine();
-        SparseArray<Channel<Object, ?>> channelMap;
-        Channel<ParcelableSelectable<Object>, ParcelableSelectable<Object>> channel;
-        channel = routine.call();
-        channelMap = SparseChannels.selectInputParcelable(channel,
-                Arrays.asList(Sort.INTEGER, Sort.STRING)).buildChannels();
-        channelMap.get(Sort.INTEGER).pass(-11).close();
-        channelMap.get(Sort.STRING).abort();
+      fail();
 
-        try {
+    } catch (final AbortException ignored) {
 
-            channel.close().after(seconds(10)).all();
-
-            fail();
-
-        } catch (final AbortException ignored) {
-
-        }
-
-        channel = routine.call();
-        channelMap = SparseChannels.selectInputParcelable(channel, Sort.INTEGER, Sort.STRING)
-                                   .buildChannels();
-        channelMap.get(Sort.INTEGER).abort();
-        channelMap.get(Sort.STRING).pass("test21").close();
-
-        try {
-
-            channel.close().after(seconds(10)).all();
-
-            fail();
-
-        } catch (final AbortException ignored) {
-
-        }
-
-        channel = routine.call();
-        channelMap = SparseChannels.selectInputParcelable(Math.min(Sort.INTEGER, Sort.STRING), 2,
-                channel).buildChannels();
-        channelMap.get(Sort.INTEGER).abort();
-        channelMap.get(Sort.STRING).abort();
-
-        try {
-
-            channel.close().after(seconds(10)).all();
-
-            fail();
-
-        } catch (final AbortException ignored) {
-
-        }
     }
 
-    public void testInputMapError() {
+    try {
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+      channel2.close().after(seconds(10)).next();
 
-            return;
-        }
+      fail();
 
-        try {
+    } catch (final AbortException ignored) {
 
-            SparseChannels.selectInputParcelable(0, 0, JRoutineLoader.on(loaderFrom(getActivity()))
-                                                                     .with(factoryOf(Sort.class))
-                                                                     .call());
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
     }
 
-    public void testMap() {
+    channel1 = JRoutineLoader.on(loaderFrom(getActivity()))
+                             .with(factoryOf(PassingString.class))
+                             .call()
+                             .sorted();
+    channel2 = JRoutineLoader.on(loaderFrom(getActivity()))
+                             .with(factoryOf(PassingInteger.class))
+                             .call()
+                             .sorted();
+    SparseChannels.combine(-5, Arrays.<Channel<?, ?>>asList(channel1, channel2))
+                  .buildChannels()
+                  .abort();
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+    try {
 
-            return;
-        }
+      channel1.close().after(seconds(10)).next();
 
-        final ChannelBuilder builder = JRoutineCore.io()
-                                                   .applyChannelConfiguration()
-                                                   .withOrder(OrderType.SORTED)
-                                                   .configured();
-        final Channel<String, String> channel1 = builder.buildChannel();
-        final Channel<Integer, Integer> channel2 = builder.buildChannel();
+      fail();
 
-        final Channel<?, ? extends ParcelableSelectable<Object>> channel =
-                SparseChannels.mergeParcelable(Arrays.<Channel<?, ?>>asList(channel1, channel2))
-                              .buildChannels();
-        final Channel<?, ParcelableSelectable<Object>> output =
-                JRoutineLoader.on(loaderFrom(getActivity()))
-                              .with(factoryOf(Sort.class))
-                              .applyInvocationConfiguration()
-                              .withInputOrder(OrderType.SORTED)
-                              .configured()
-                              .call(channel);
-        final SparseArray<Channel<?, Object>> channelMap =
-                SparseChannels.selectOutputParcelable(output, Sort.INTEGER, Sort.STRING)
-                              .buildChannels();
+    } catch (final AbortException ignored) {
 
-        for (int i = 0; i < 4; i++) {
-
-            final String input = Integer.toString(i);
-            channel1.after(millis(20)).pass(input);
-            channel2.after(millis(20)).pass(i);
-        }
-
-        channel1.close();
-        channel2.close();
-
-        assertThat(channelMap.get(Sort.STRING).after(seconds(10)).all()).containsExactly("0", "1",
-                "2", "3");
-        assertThat(channelMap.get(Sort.INTEGER).after(seconds(10)).all()).containsExactly(0, 1, 2,
-                3);
     }
 
-    @SuppressWarnings("unchecked")
-    public void testMerge() {
+    try {
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+      channel2.close().after(seconds(10)).next();
 
-            return;
-        }
+      fail();
 
-        final ChannelBuilder builder = JRoutineCore.io()
-                                                   .applyChannelConfiguration()
-                                                   .withOrder(OrderType.SORTED)
-                                                   .configured();
-        final Channel<String, String> channel1 = builder.buildChannel();
-        final Channel<Integer, Integer> channel2 = builder.buildChannel();
-        final SparseArray<Channel<?, ?>> channelMap = new SparseArray<Channel<?, ?>>(2);
-        channelMap.put(7, channel1);
-        channelMap.put(-3, channel2);
-        final Channel<?, ? extends ParcelableSelectable<?>> outputChannel =
-                SparseChannels.mergeParcelable(channelMap).buildChannels();
-        channel1.pass("test3").close();
-        channel2.pass(111).close();
-        assertThat(outputChannel.after(seconds(10)).all()).containsOnly(
-                new ParcelableSelectable<String>("test3", 7),
-                new ParcelableSelectable<Integer>(111, -3));
+    } catch (final AbortException ignored) {
+
     }
 
-    @SuppressWarnings("unchecked")
-    public void testMergeAbort() {
+    channel1 = JRoutineLoader.on(loaderFrom(getActivity()))
+                             .with(factoryOf(PassingString.class))
+                             .call()
+                             .sorted();
+    channel2 = JRoutineLoader.on(loaderFrom(getActivity()))
+                             .with(factoryOf(PassingInteger.class))
+                             .call()
+                             .sorted();
+    final SparseArray<Channel<?, ?>> map = new SparseArray<Channel<?, ?>>(2);
+    map.put(31, channel1);
+    map.put(17, channel2);
+    SparseChannels.combine(map).buildChannels().abort();
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+    try {
 
-            return;
-        }
+      channel1.close().after(seconds(10)).next();
 
-        final ChannelBuilder builder = JRoutineCore.io()
-                                                   .applyChannelConfiguration()
-                                                   .withOrder(OrderType.SORTED)
-                                                   .configured();
-        final Channel<String, String> channel1 = builder.buildChannel();
-        final Channel<Integer, Integer> channel2 = builder.buildChannel();
-        final SparseArray<Channel<?, ?>> channelMap = new SparseArray<Channel<?, ?>>(2);
-        channelMap.put(7, channel1);
-        channelMap.put(-3, channel2);
-        final Channel<?, ? extends ParcelableSelectable<?>> outputChannel =
-                SparseChannels.mergeParcelable(channelMap).buildChannels();
-        channel1.abort();
-        channel2.pass(111).close();
+      fail();
 
-        try {
+    } catch (final AbortException ignored) {
 
-            outputChannel.after(seconds(10)).all();
-
-            fail();
-
-        } catch (final AbortException ignored) {
-
-        }
     }
 
-    public void testMergeError() {
+    try {
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+      channel2.close().after(seconds(10)).next();
 
-            return;
-        }
+      fail();
 
-        try {
+    } catch (final AbortException ignored) {
 
-            SparseChannels.mergeParcelable(new SparseArray<Channel<?, ?>>(0));
+    }
+  }
 
-            fail();
+  public void testCombineError() {
 
-        } catch (final IllegalArgumentException ignored) {
+    if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
 
-        }
+      return;
     }
 
-    @SuppressWarnings("unchecked")
-    public void testOutputMap() {
+    try {
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+      SparseChannels.combine();
 
-            return;
-        }
+      fail();
 
-        final Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> routine =
-                JRoutineLoader.on(loaderFrom(getActivity()))
-                              .with(factoryOf(Sort.class))
-                              .buildRoutine();
-        SparseArray<Channel<?, Object>> channelMap;
-        Channel<?, ParcelableSelectable<Object>> channel;
-        channel = routine.call(new ParcelableSelectable<Object>("test21", Sort.STRING),
-                new ParcelableSelectable<Object>(-11, Sort.INTEGER));
-        channelMap = SparseChannels.selectOutputParcelable(channel,
-                Arrays.asList(Sort.INTEGER, Sort.STRING)).buildChannels();
-        assertThat(channelMap.get(Sort.INTEGER).after(seconds(10)).all()).containsOnly(-11);
-        assertThat(channelMap.get(Sort.STRING).after(seconds(10)).all()).containsOnly("test21");
-        channel = routine.call(new ParcelableSelectable<Object>(-11, Sort.INTEGER),
-                new ParcelableSelectable<Object>("test21", Sort.STRING));
-        channelMap = SparseChannels.selectOutputParcelable(channel, Sort.INTEGER, Sort.STRING)
-                                   .buildChannels();
-        assertThat(channelMap.get(Sort.INTEGER).after(seconds(10)).all()).containsOnly(-11);
-        assertThat(channelMap.get(Sort.STRING).after(seconds(10)).all()).containsOnly("test21");
-        channel = routine.call(new ParcelableSelectable<Object>("test21", Sort.STRING),
-                new ParcelableSelectable<Object>(-11, Sort.INTEGER));
-        channelMap = SparseChannels.selectOutputParcelable(Math.min(Sort.INTEGER, Sort.STRING), 2,
-                channel).buildChannels();
-        assertThat(channelMap.get(Sort.INTEGER).after(seconds(10)).all()).containsOnly(-11);
-        assertThat(channelMap.get(Sort.STRING).after(seconds(10)).all()).containsOnly("test21");
+    } catch (final IllegalArgumentException ignored) {
+
     }
 
-    @SuppressWarnings("unchecked")
-    public void testOutputMapAbort() {
+    try {
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+      SparseChannels.combine(0);
 
-            return;
-        }
+      fail();
 
-        final Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> routine =
-                JRoutineLoader.on(loaderFrom(getActivity()))
-                              .with(factoryOf(Sort.class))
-                              .buildRoutine();
-        SparseArray<Channel<?, Object>> channelMap;
-        Channel<?, ParcelableSelectable<Object>> channel;
-        channel = routine.call()
-                         .after(millis(100))
-                         .pass(new ParcelableSelectable<Object>("test21", Sort.STRING),
-                                 new ParcelableSelectable<Object>(-11, Sort.INTEGER));
-        channelMap = SparseChannels.selectOutputParcelable(channel,
-                Arrays.asList(Sort.INTEGER, Sort.STRING)).buildChannels();
-        channel.abort();
+    } catch (final IllegalArgumentException ignored) {
 
-        try {
-
-            channelMap.get(Sort.STRING).after(seconds(10)).all();
-
-            fail();
-
-        } catch (final AbortException ignored) {
-
-        }
-
-        try {
-
-            channelMap.get(Sort.INTEGER).after(seconds(10)).all();
-
-            fail();
-
-        } catch (final AbortException ignored) {
-
-        }
-
-        channel = routine.call()
-                         .after(millis(100))
-                         .pass(new ParcelableSelectable<Object>(-11, Sort.INTEGER),
-                                 new ParcelableSelectable<Object>("test21", Sort.STRING));
-        channelMap = SparseChannels.selectOutputParcelable(channel, Sort.INTEGER, Sort.STRING)
-                                   .buildChannels();
-        channel.abort();
-
-        try {
-
-            channelMap.get(Sort.STRING).after(seconds(10)).all();
-
-            fail();
-
-        } catch (final AbortException ignored) {
-
-        }
-
-        try {
-
-            channelMap.get(Sort.INTEGER).after(seconds(10)).all();
-
-            fail();
-
-        } catch (final AbortException ignored) {
-
-        }
-
-        channel = routine.call()
-                         .after(millis(100))
-                         .pass(new ParcelableSelectable<Object>("test21", Sort.STRING),
-                                 new ParcelableSelectable<Object>(-11, Sort.INTEGER));
-        channelMap = SparseChannels.selectOutputParcelable(Math.min(Sort.INTEGER, Sort.STRING), 2,
-                channel).buildChannels();
-        channel.abort();
-
-        try {
-
-            channelMap.get(Sort.STRING).after(seconds(10)).all();
-
-            fail();
-
-        } catch (final AbortException ignored) {
-
-        }
-
-        try {
-
-            channelMap.get(Sort.INTEGER).after(seconds(10)).all();
-
-            fail();
-
-        } catch (final AbortException ignored) {
-
-        }
     }
 
-    public void testOutputMapCache() {
+    try {
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-            return;
-        }
+      SparseChannels.combine(Collections.<Channel<?, ?>>emptyList());
 
-        final Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> routine =
-                JRoutineLoader.on(loaderFrom(getActivity()))
-                              .with(factoryOf(Sort.class))
-                              .buildRoutine();
-        final Channel<?, ParcelableSelectable<Object>> channel = routine.call();
-        final SparseArray<Channel<?, Object>> channelMap =
-                SparseChannels.selectOutputParcelable(channel,
-                        Arrays.asList(Sort.INTEGER, Sort.STRING)).buildChannels();
-        assertThat(toMap(channelMap)).isEqualTo(
-                toMap(SparseChannels.selectOutputParcelable(channel, Sort.INTEGER, Sort.STRING)
-                                    .buildChannels()));
+      fail();
+
+    } catch (final IllegalArgumentException ignored) {
+
     }
 
-    public void testOutputMapError() {
+    try {
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+      SparseChannels.combine(0, Collections.<Channel<?, ?>>emptyList());
 
-            return;
-        }
+      fail();
 
-        try {
+    } catch (final IllegalArgumentException ignored) {
 
-            SparseChannels.selectOutputParcelable(0, 0, JRoutineLoader.on(loaderFrom(getActivity()))
-                                                                      .with(factoryOf(Sort.class))
-                                                                      .call());
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
     }
 
-    @SuppressWarnings("unchecked")
-    public void testOutputSelect() {
+    try {
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+      SparseChannels.combine(new SparseArray<Channel<?, ?>>(0));
 
-            return;
-        }
+      fail();
 
-        final Channel<ParcelableSelectable<String>, ParcelableSelectable<String>> channel =
-                JRoutineCore.io().buildChannel();
-        final Channel<?, String> outputChannel =
-                SparseChannels.selectOutputParcelable(channel, 33).buildChannels().get(33);
-        channel.pass(new ParcelableSelectable<String>("test1", 33),
-                new ParcelableSelectable<String>("test2", -33),
-                new ParcelableSelectable<String>("test3", 33),
-                new ParcelableSelectable<String>("test4", 333));
-        channel.close();
-        assertThat(outputChannel.after(seconds(10)).all()).containsExactly("test1", "test3");
+    } catch (final IllegalArgumentException ignored) {
+
+    }
+  }
+
+  public void testConstructor() {
+
+    boolean failed = false;
+    try {
+      new SparseChannels();
+      failed = true;
+
+    } catch (final Throwable ignored) {
+
     }
 
-    public void testOutputSelectAbort() {
+    assertThat(failed).isFalse();
+  }
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+  public void testInputMap() {
 
-            return;
-        }
+    if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
 
-        final Channel<ParcelableSelectable<String>, ParcelableSelectable<String>> channel =
-                JRoutineCore.io().buildChannel();
-        final Channel<?, String> outputChannel =
-                SparseChannels.selectOutputParcelable(channel, 33).buildChannels().get(33);
-        channel.abort();
-
-        try {
-
-            outputChannel.after(seconds(10)).all();
-
-            fail();
-
-        } catch (final AbortException ignored) {
-
-        }
+      return;
     }
 
-    private static class PassingInteger extends TemplateContextInvocation<Integer, Integer> {
+    final ArrayList<ParcelableSelectable<Object>> outputs =
+        new ArrayList<ParcelableSelectable<Object>>();
+    outputs.add(new ParcelableSelectable<Object>("test21", Sort.STRING));
+    outputs.add(new ParcelableSelectable<Object>(-11, Sort.INTEGER));
+    final Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> routine =
+        JRoutineLoader.on(loaderFrom(getActivity())).with(factoryOf(Sort.class)).buildRoutine();
+    SparseArray<Channel<Object, ?>> channelMap;
+    Channel<ParcelableSelectable<Object>, ParcelableSelectable<Object>> channel;
+    channel = routine.call();
+    channelMap =
+        SparseChannels.selectInputParcelable(channel, Arrays.asList(Sort.INTEGER, Sort.STRING))
+                      .buildChannels();
+    channelMap.get(Sort.INTEGER).pass(-11).close();
+    channelMap.get(Sort.STRING).pass("test21").close();
+    assertThat(channel.close().after(seconds(10)).all()).containsOnlyElementsOf(outputs);
+    channel = routine.call();
+    channelMap =
+        SparseChannels.selectInputParcelable(channel, Sort.INTEGER, Sort.STRING).buildChannels();
+    channelMap.get(Sort.INTEGER).pass(-11).close();
+    channelMap.get(Sort.STRING).pass("test21").close();
+    assertThat(channel.close().after(seconds(10)).all()).containsOnlyElementsOf(outputs);
+    channel = routine.call();
+    channelMap =
+        SparseChannels.selectInputParcelable(Math.min(Sort.INTEGER, Sort.STRING), 2, channel)
+                      .buildChannels();
+    channelMap.get(Sort.INTEGER).pass(-11).close();
+    channelMap.get(Sort.STRING).pass("test21").close();
+    assertThat(channel.close().after(seconds(10)).all()).containsOnlyElementsOf(outputs);
+  }
 
-        public void onInput(final Integer i, @NotNull final Channel<Integer, ?> result) {
+  public void testInputMapAbort() {
 
-            result.pass(i);
-        }
+    if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+      return;
     }
 
-    private static class PassingString extends TemplateContextInvocation<String, String> {
+    final Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> routine =
+        JRoutineLoader.on(loaderFrom(getActivity())).with(factoryOf(Sort.class)).buildRoutine();
+    SparseArray<Channel<Object, ?>> channelMap;
+    Channel<ParcelableSelectable<Object>, ParcelableSelectable<Object>> channel;
+    channel = routine.call();
+    channelMap =
+        SparseChannels.selectInputParcelable(channel, Arrays.asList(Sort.INTEGER, Sort.STRING))
+                      .buildChannels();
+    channelMap.get(Sort.INTEGER).pass(-11).close();
+    channelMap.get(Sort.STRING).abort();
 
-        public void onInput(final String s, @NotNull final Channel<String, ?> result) {
+    try {
 
-            result.pass(s);
-        }
+      channel.close().after(seconds(10)).all();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
     }
 
-    private static class Sort extends
-            TemplateContextInvocation<ParcelableSelectable<Object>, ParcelableSelectable<Object>> {
+    channel = routine.call();
+    channelMap =
+        SparseChannels.selectInputParcelable(channel, Sort.INTEGER, Sort.STRING).buildChannels();
+    channelMap.get(Sort.INTEGER).abort();
+    channelMap.get(Sort.STRING).pass("test21").close();
 
-        private static final int INTEGER = 1;
+    try {
 
-        private static final int STRING = 0;
+      channel.close().after(seconds(10)).all();
 
-        public void onInput(final ParcelableSelectable<Object> selectable,
-                @NotNull final Channel<ParcelableSelectable<Object>, ?> result) {
+      fail();
 
-            switch (selectable.index) {
+    } catch (final AbortException ignored) {
 
-                case INTEGER:
-                    SparseChannels.<Object, Integer>selectInputParcelable(result,
-                            INTEGER).buildChannels().pass((Integer) selectable.data).close();
-                    break;
-
-                case STRING:
-                    SparseChannels.<Object, String>selectInputParcelable(result,
-                            STRING).buildChannels().pass((String) selectable.data).close();
-                    break;
-            }
-        }
     }
+
+    channel = routine.call();
+    channelMap =
+        SparseChannels.selectInputParcelable(Math.min(Sort.INTEGER, Sort.STRING), 2, channel)
+                      .buildChannels();
+    channelMap.get(Sort.INTEGER).abort();
+    channelMap.get(Sort.STRING).abort();
+
+    try {
+
+      channel.close().after(seconds(10)).all();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+  }
+
+  public void testInputMapError() {
+
+    if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+      return;
+    }
+
+    try {
+
+      SparseChannels.selectInputParcelable(0, 0,
+          JRoutineLoader.on(loaderFrom(getActivity())).with(factoryOf(Sort.class)).call());
+
+      fail();
+
+    } catch (final IllegalArgumentException ignored) {
+
+    }
+  }
+
+  public void testMap() {
+
+    if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+      return;
+    }
+
+    final ChannelBuilder builder =
+        JRoutineCore.io().applyChannelConfiguration().withOrder(OrderType.SORTED).configured();
+    final Channel<String, String> channel1 = builder.buildChannel();
+    final Channel<Integer, Integer> channel2 = builder.buildChannel();
+
+    final Channel<?, ? extends ParcelableSelectable<Object>> channel =
+        SparseChannels.mergeParcelable(Arrays.<Channel<?, ?>>asList(channel1, channel2))
+                      .buildChannels();
+    final Channel<?, ParcelableSelectable<Object>> output =
+        JRoutineLoader.on(loaderFrom(getActivity()))
+                      .with(factoryOf(Sort.class))
+                      .applyInvocationConfiguration()
+                      .withInputOrder(OrderType.SORTED)
+                      .configured()
+                      .call(channel);
+    final SparseArray<Channel<?, Object>> channelMap =
+        SparseChannels.selectOutputParcelable(output, Sort.INTEGER, Sort.STRING).buildChannels();
+
+    for (int i = 0; i < 4; i++) {
+
+      final String input = Integer.toString(i);
+      channel1.after(millis(20)).pass(input);
+      channel2.after(millis(20)).pass(i);
+    }
+
+    channel1.close();
+    channel2.close();
+
+    assertThat(channelMap.get(Sort.STRING).after(seconds(10)).all()).containsExactly("0", "1", "2",
+        "3");
+    assertThat(channelMap.get(Sort.INTEGER).after(seconds(10)).all()).containsExactly(0, 1, 2, 3);
+  }
+
+  @SuppressWarnings("unchecked")
+  public void testMerge() {
+
+    if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+      return;
+    }
+
+    final ChannelBuilder builder =
+        JRoutineCore.io().applyChannelConfiguration().withOrder(OrderType.SORTED).configured();
+    final Channel<String, String> channel1 = builder.buildChannel();
+    final Channel<Integer, Integer> channel2 = builder.buildChannel();
+    final SparseArray<Channel<?, ?>> channelMap = new SparseArray<Channel<?, ?>>(2);
+    channelMap.put(7, channel1);
+    channelMap.put(-3, channel2);
+    final Channel<?, ? extends ParcelableSelectable<?>> outputChannel =
+        SparseChannels.mergeParcelable(channelMap).buildChannels();
+    channel1.pass("test3").close();
+    channel2.pass(111).close();
+    assertThat(outputChannel.after(seconds(10)).all()).containsOnly(
+        new ParcelableSelectable<String>("test3", 7), new ParcelableSelectable<Integer>(111, -3));
+  }
+
+  @SuppressWarnings("unchecked")
+  public void testMergeAbort() {
+
+    if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+      return;
+    }
+
+    final ChannelBuilder builder =
+        JRoutineCore.io().applyChannelConfiguration().withOrder(OrderType.SORTED).configured();
+    final Channel<String, String> channel1 = builder.buildChannel();
+    final Channel<Integer, Integer> channel2 = builder.buildChannel();
+    final SparseArray<Channel<?, ?>> channelMap = new SparseArray<Channel<?, ?>>(2);
+    channelMap.put(7, channel1);
+    channelMap.put(-3, channel2);
+    final Channel<?, ? extends ParcelableSelectable<?>> outputChannel =
+        SparseChannels.mergeParcelable(channelMap).buildChannels();
+    channel1.abort();
+    channel2.pass(111).close();
+
+    try {
+
+      outputChannel.after(seconds(10)).all();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+  }
+
+  public void testMergeError() {
+
+    if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+      return;
+    }
+
+    try {
+
+      SparseChannels.mergeParcelable(new SparseArray<Channel<?, ?>>(0));
+
+      fail();
+
+    } catch (final IllegalArgumentException ignored) {
+
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public void testOutputMap() {
+
+    if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+      return;
+    }
+
+    final Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> routine =
+        JRoutineLoader.on(loaderFrom(getActivity())).with(factoryOf(Sort.class)).buildRoutine();
+    SparseArray<Channel<?, Object>> channelMap;
+    Channel<?, ParcelableSelectable<Object>> channel;
+    channel = routine.call(new ParcelableSelectable<Object>("test21", Sort.STRING),
+        new ParcelableSelectable<Object>(-11, Sort.INTEGER));
+    channelMap =
+        SparseChannels.selectOutputParcelable(channel, Arrays.asList(Sort.INTEGER, Sort.STRING))
+                      .buildChannels();
+    assertThat(channelMap.get(Sort.INTEGER).after(seconds(10)).all()).containsOnly(-11);
+    assertThat(channelMap.get(Sort.STRING).after(seconds(10)).all()).containsOnly("test21");
+    channel = routine.call(new ParcelableSelectable<Object>(-11, Sort.INTEGER),
+        new ParcelableSelectable<Object>("test21", Sort.STRING));
+    channelMap =
+        SparseChannels.selectOutputParcelable(channel, Sort.INTEGER, Sort.STRING).buildChannels();
+    assertThat(channelMap.get(Sort.INTEGER).after(seconds(10)).all()).containsOnly(-11);
+    assertThat(channelMap.get(Sort.STRING).after(seconds(10)).all()).containsOnly("test21");
+    channel = routine.call(new ParcelableSelectable<Object>("test21", Sort.STRING),
+        new ParcelableSelectable<Object>(-11, Sort.INTEGER));
+    channelMap =
+        SparseChannels.selectOutputParcelable(Math.min(Sort.INTEGER, Sort.STRING), 2, channel)
+                      .buildChannels();
+    assertThat(channelMap.get(Sort.INTEGER).after(seconds(10)).all()).containsOnly(-11);
+    assertThat(channelMap.get(Sort.STRING).after(seconds(10)).all()).containsOnly("test21");
+  }
+
+  @SuppressWarnings("unchecked")
+  public void testOutputMapAbort() {
+
+    if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+      return;
+    }
+
+    final Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> routine =
+        JRoutineLoader.on(loaderFrom(getActivity())).with(factoryOf(Sort.class)).buildRoutine();
+    SparseArray<Channel<?, Object>> channelMap;
+    Channel<?, ParcelableSelectable<Object>> channel;
+    channel = routine.call()
+                     .after(millis(100))
+                     .pass(new ParcelableSelectable<Object>("test21", Sort.STRING),
+                         new ParcelableSelectable<Object>(-11, Sort.INTEGER));
+    channelMap =
+        SparseChannels.selectOutputParcelable(channel, Arrays.asList(Sort.INTEGER, Sort.STRING))
+                      .buildChannels();
+    channel.abort();
+
+    try {
+
+      channelMap.get(Sort.STRING).after(seconds(10)).all();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+
+    try {
+
+      channelMap.get(Sort.INTEGER).after(seconds(10)).all();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+
+    channel = routine.call()
+                     .after(millis(100))
+                     .pass(new ParcelableSelectable<Object>(-11, Sort.INTEGER),
+                         new ParcelableSelectable<Object>("test21", Sort.STRING));
+    channelMap =
+        SparseChannels.selectOutputParcelable(channel, Sort.INTEGER, Sort.STRING).buildChannels();
+    channel.abort();
+
+    try {
+
+      channelMap.get(Sort.STRING).after(seconds(10)).all();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+
+    try {
+
+      channelMap.get(Sort.INTEGER).after(seconds(10)).all();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+
+    channel = routine.call()
+                     .after(millis(100))
+                     .pass(new ParcelableSelectable<Object>("test21", Sort.STRING),
+                         new ParcelableSelectable<Object>(-11, Sort.INTEGER));
+    channelMap =
+        SparseChannels.selectOutputParcelable(Math.min(Sort.INTEGER, Sort.STRING), 2, channel)
+                      .buildChannels();
+    channel.abort();
+
+    try {
+
+      channelMap.get(Sort.STRING).after(seconds(10)).all();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+
+    try {
+
+      channelMap.get(Sort.INTEGER).after(seconds(10)).all();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+  }
+
+  public void testOutputMapCache() {
+
+    if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+      return;
+    }
+
+    final Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> routine =
+        JRoutineLoader.on(loaderFrom(getActivity())).with(factoryOf(Sort.class)).buildRoutine();
+    final Channel<?, ParcelableSelectable<Object>> channel = routine.call();
+    final SparseArray<Channel<?, Object>> channelMap =
+        SparseChannels.selectOutputParcelable(channel, Arrays.asList(Sort.INTEGER, Sort.STRING))
+                      .buildChannels();
+    assertThat(toMap(channelMap)).isEqualTo(toMap(
+        SparseChannels.selectOutputParcelable(channel, Sort.INTEGER, Sort.STRING).buildChannels()));
+  }
+
+  public void testOutputMapError() {
+
+    if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+      return;
+    }
+
+    try {
+
+      SparseChannels.selectOutputParcelable(0, 0,
+          JRoutineLoader.on(loaderFrom(getActivity())).with(factoryOf(Sort.class)).call());
+
+      fail();
+
+    } catch (final IllegalArgumentException ignored) {
+
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public void testOutputSelect() {
+
+    if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+      return;
+    }
+
+    final Channel<ParcelableSelectable<String>, ParcelableSelectable<String>> channel =
+        JRoutineCore.io().buildChannel();
+    final Channel<?, String> outputChannel =
+        SparseChannels.selectOutputParcelable(channel, 33).buildChannels().get(33);
+    channel.pass(new ParcelableSelectable<String>("test1", 33),
+        new ParcelableSelectable<String>("test2", -33),
+        new ParcelableSelectable<String>("test3", 33),
+        new ParcelableSelectable<String>("test4", 333));
+    channel.close();
+    assertThat(outputChannel.after(seconds(10)).all()).containsExactly("test1", "test3");
+  }
+
+  public void testOutputSelectAbort() {
+
+    if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+      return;
+    }
+
+    final Channel<ParcelableSelectable<String>, ParcelableSelectable<String>> channel =
+        JRoutineCore.io().buildChannel();
+    final Channel<?, String> outputChannel =
+        SparseChannels.selectOutputParcelable(channel, 33).buildChannels().get(33);
+    channel.abort();
+
+    try {
+
+      outputChannel.after(seconds(10)).all();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+  }
+
+  private static class PassingInteger extends TemplateContextInvocation<Integer, Integer> {
+
+    public void onInput(final Integer i, @NotNull final Channel<Integer, ?> result) {
+
+      result.pass(i);
+    }
+  }
+
+  private static class PassingString extends TemplateContextInvocation<String, String> {
+
+    public void onInput(final String s, @NotNull final Channel<String, ?> result) {
+
+      result.pass(s);
+    }
+  }
+
+  private static class Sort extends
+      TemplateContextInvocation<ParcelableSelectable<Object>, ParcelableSelectable<Object>> {
+
+    private static final int INTEGER = 1;
+
+    private static final int STRING = 0;
+
+    public void onInput(final ParcelableSelectable<Object> selectable,
+        @NotNull final Channel<ParcelableSelectable<Object>, ?> result) {
+
+      switch (selectable.index) {
+
+        case INTEGER:
+          SparseChannels.<Object, Integer>selectInputParcelable(result, INTEGER).buildChannels()
+                                                                                .pass(
+                                                                                    (Integer)
+                                                                                        selectable.data)
+                                                                                .close();
+          break;
+
+        case STRING:
+          SparseChannels.<Object, String>selectInputParcelable(result, STRING).buildChannels()
+                                                                              .pass(
+                                                                                  (String)
+                                                                                      selectable
+                                                                                          .data)
+                                                                              .close();
+          break;
+      }
+    }
+  }
 }

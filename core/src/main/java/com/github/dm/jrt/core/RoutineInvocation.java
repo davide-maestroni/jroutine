@@ -37,6 +37,57 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 public class RoutineInvocation<IN, OUT> extends ChannelInvocation<IN, OUT> {
 
+  private final InvocationMode mInvocationMode;
+
+  private final Routine<IN, OUT> mRoutine;
+
+  /**
+   * Constructor.
+   *
+   * @param routine        the routine used to execute this invocation.
+   * @param invocationMode the type of routine invocation.
+   */
+  private RoutineInvocation(@NotNull final Routine<IN, OUT> routine,
+      @NotNull final InvocationMode invocationMode) {
+    mRoutine = routine;
+    mInvocationMode = invocationMode;
+  }
+
+  /**
+   * Returns a factory of delegating invocations.
+   *
+   * @param routine        the routine used to execute this invocation.
+   * @param invocationMode the type of routine invocation.
+   * @param <IN>           the input data type.
+   * @param <OUT>          the output data type.
+   * @return the factory.
+   */
+  @NotNull
+  public static <IN, OUT> InvocationFactory<IN, OUT> factoryFrom(
+      @NotNull final Routine<IN, OUT> routine, @NotNull final InvocationMode invocationMode) {
+    return new RoutineInvocationFactory<IN, OUT>(routine, invocationMode);
+  }
+
+  @Override
+  public void onRecycle(final boolean isReused) throws Exception {
+    super.onRecycle(isReused);
+    mRoutine.clear();
+  }
+
+  @NotNull
+  @Override
+  protected Channel<?, OUT> onChannel(@NotNull final Channel<?, IN> channel) {
+    return mInvocationMode.invoke(mRoutine).pass(channel).close();
+  }
+
+  /**
+   * Factory creating delegating invocation instances.
+   *
+   * @param <IN>  the input data type.
+   * @param <OUT> the output data type.
+   */
+  private static class RoutineInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
+
     private final InvocationMode mInvocationMode;
 
     private final Routine<IN, OUT> mRoutine;
@@ -44,72 +95,21 @@ public class RoutineInvocation<IN, OUT> extends ChannelInvocation<IN, OUT> {
     /**
      * Constructor.
      *
-     * @param routine        the routine used to execute this invocation.
+     * @param routine        the delegated routine.
      * @param invocationMode the type of routine invocation.
      */
-    private RoutineInvocation(@NotNull final Routine<IN, OUT> routine,
-            @NotNull final InvocationMode invocationMode) {
-        mRoutine = routine;
-        mInvocationMode = invocationMode;
-    }
-
-    /**
-     * Returns a factory of delegating invocations.
-     *
-     * @param routine        the routine used to execute this invocation.
-     * @param invocationMode the type of routine invocation.
-     * @param <IN>           the input data type.
-     * @param <OUT>          the output data type.
-     * @return the factory.
-     */
-    @NotNull
-    public static <IN, OUT> InvocationFactory<IN, OUT> factoryFrom(
-            @NotNull final Routine<IN, OUT> routine, @NotNull final InvocationMode invocationMode) {
-        return new RoutineInvocationFactory<IN, OUT>(routine, invocationMode);
-    }
-
-    @Override
-    public void onRecycle(final boolean isReused) throws Exception {
-        super.onRecycle(isReused);
-        mRoutine.clear();
+    private RoutineInvocationFactory(@NotNull final Routine<IN, OUT> routine,
+        @NotNull final InvocationMode invocationMode) {
+      super(asArgs(ConstantConditions.notNull("routine instance", routine),
+          ConstantConditions.notNull("invocation mode", invocationMode)));
+      mRoutine = routine;
+      mInvocationMode = invocationMode;
     }
 
     @NotNull
     @Override
-    protected Channel<?, OUT> onChannel(@NotNull final Channel<?, IN> channel) {
-        return mInvocationMode.invoke(mRoutine).pass(channel).close();
+    public Invocation<IN, OUT> newInvocation() {
+      return new RoutineInvocation<IN, OUT>(mRoutine, mInvocationMode);
     }
-
-    /**
-     * Factory creating delegating invocation instances.
-     *
-     * @param <IN>  the input data type.
-     * @param <OUT> the output data type.
-     */
-    private static class RoutineInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
-
-        private final InvocationMode mInvocationMode;
-
-        private final Routine<IN, OUT> mRoutine;
-
-        /**
-         * Constructor.
-         *
-         * @param routine        the delegated routine.
-         * @param invocationMode the type of routine invocation.
-         */
-        private RoutineInvocationFactory(@NotNull final Routine<IN, OUT> routine,
-                @NotNull final InvocationMode invocationMode) {
-            super(asArgs(ConstantConditions.notNull("routine instance", routine),
-                    ConstantConditions.notNull("invocation mode", invocationMode)));
-            mRoutine = routine;
-            mInvocationMode = invocationMode;
-        }
-
-        @NotNull
-        @Override
-        public Invocation<IN, OUT> newInvocation() {
-            return new RoutineInvocation<IN, OUT>(mRoutine, mInvocationMode);
-        }
-    }
+  }
 }

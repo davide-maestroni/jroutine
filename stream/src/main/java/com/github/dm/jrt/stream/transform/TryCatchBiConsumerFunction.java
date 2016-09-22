@@ -33,20 +33,19 @@ import org.jetbrains.annotations.NotNull;
  */
 class TryCatchBiConsumerFunction<OUT> implements BiConsumer<RoutineException, Channel<OUT, ?>> {
 
-    private final Function<? super RoutineException, ? extends OUT> mCatchFunction;
+  private final Function<? super RoutineException, ? extends OUT> mCatchFunction;
 
-    /**
-     * Constructor.
-     *
-     * @param catchFunction the function instance.
-     */
-    TryCatchBiConsumerFunction(
-            @NotNull final Function<? super RoutineException, ? extends OUT> catchFunction) {
-        mCatchFunction = ConstantConditions.notNull("function instance", catchFunction);
-    }
+  /**
+   * Constructor.
+   *
+   * @param catchFunction the function instance.
+   */
+  TryCatchBiConsumerFunction(
+      @NotNull final Function<? super RoutineException, ? extends OUT> catchFunction) {
+    mCatchFunction = ConstantConditions.notNull("function instance", catchFunction);
+  }
 
-    public void accept(final RoutineException error, final Channel<OUT, ?> channel) throws
-            Exception {
-        channel.pass(mCatchFunction.apply(error));
-    }
+  public void accept(final RoutineException error, final Channel<OUT, ?> channel) throws Exception {
+    channel.pass(mCatchFunction.apply(error));
+  }
 }

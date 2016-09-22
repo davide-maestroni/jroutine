@@ -35,307 +35,306 @@ import java.util.NoSuchElementException;
  */
 public class SimpleQueue<E> implements Iterable<E> {
 
-    private static final int DEFAULT_SIZE = 1 << 3; // 8
+  private static final int DEFAULT_SIZE = 1 << 3; // 8
 
-    private int mFirst;
+  private int mFirst;
 
-    private int mLast;
+  private int mLast;
 
-    private int mMask;
+  private int mMask;
 
-    private Object[] mQueue;
+  private Object[] mQueue;
 
-    private volatile long mReplaceCount = Long.MIN_VALUE;
+  private volatile long mReplaceCount = Long.MIN_VALUE;
 
-    private int mSize;
+  private int mSize;
+
+  /**
+   * Constructor.
+   */
+  public SimpleQueue() {
+    mQueue = new Object[DEFAULT_SIZE];
+    mMask = DEFAULT_SIZE - 1;
+  }
+
+  /**
+   * Constructor.
+   *
+   * @param minCapacity the minimum capacity.
+   * @throws java.lang.IllegalArgumentException if the specified capacity is less than 1.
+   */
+  public SimpleQueue(final int minCapacity) {
+    final int msb =
+        Integer.highestOneBit(ConstantConditions.positive("minimum capacity", minCapacity));
+    final int initialCapacity = (minCapacity == msb) ? msb : msb << 1;
+    mQueue = new Object[initialCapacity];
+    mMask = initialCapacity - 1;
+  }
+
+  private static void resizeArray(@NotNull final Object[] src, @NotNull final Object[] dst,
+      final int first) {
+    final int remainder = src.length - first;
+    System.arraycopy(src, 0, dst, 0, first);
+    System.arraycopy(src, first, dst, dst.length - remainder, remainder);
+  }
+
+  /**
+   * Adds the specified element to the queue.
+   * <p>
+   * Note that the element can be null.
+   *
+   * @param element the element to add.
+   */
+  public void add(@Nullable final E element) {
+    final int last = mLast;
+    final int newLast = (last + 1) & mMask;
+    mQueue[last] = element;
+    if (mFirst == newLast) {
+      doubleCapacity();
+    }
+
+    mLast = newLast;
+    ++mSize;
+  }
+
+  /**
+   * Adds all the elements returned by the specified iterable.
+   * <p>
+   * Note that any of the returned element can be null.
+   *
+   * @param elements the element iterable.
+   */
+  public void addAll(@NotNull final Iterable<? extends E> elements) {
+    for (final E element : elements) {
+      add(element);
+    }
+  }
+
+  /**
+   * Adds the specified element as the first element of the queue.
+   * <p>
+   * Note that the element can be null.
+   *
+   * @param element the element to add.
+   */
+  public void addFirst(@Nullable final E element) {
+    int mask = mMask;
+    int newFirst = (mFirst + mask) & mask;
+    if (newFirst == mLast) {
+      doubleCapacity();
+      mask = mMask;
+      newFirst = (mFirst + mask) & mask;
+    }
+
+    mQueue[newFirst] = element;
+    mFirst = newFirst;
+    ++mSize;
+  }
+
+  /**
+   * Clears the queue.
+   */
+  public void clear() {
+    mFirst = 0;
+    mLast = 0;
+    mSize = 0;
+    Arrays.fill(mQueue, null);
+  }
+
+  /**
+   * Check if the queue does not contain any element.
+   *
+   * @return whether the queue is empty.
+   */
+  public boolean isEmpty() {
+    return mSize == 0;
+  }
+
+  public SimpleQueueIterator<E> iterator() {
+    return new SimpleQueueIterator<E>(this);
+  }
+
+  /**
+   * Peeks the first element added into the queue.
+   *
+   * @return the element.
+   * @throws java.util.NoSuchElementException if the queue is empty.
+   */
+  @SuppressWarnings("unchecked")
+  public E peekFirst() {
+    if (isEmpty()) {
+      throw new NoSuchElementException();
+    }
+
+    return (E) mQueue[mFirst];
+  }
+
+  /**
+   * Removes the first element added into the queue.
+   *
+   * @return the element.
+   * @throws java.util.NoSuchElementException if the queue is empty.
+   */
+  @SuppressWarnings("unchecked")
+  public E removeFirst() {
+    if (isEmpty()) {
+      throw new NoSuchElementException();
+    }
+
+    final Object[] queue = mQueue;
+    final int first = mFirst;
+    mFirst = (first + 1) & mMask;
+    final Object output = queue[first];
+    queue[first] = null;
+    --mSize;
+    return (E) output;
+  }
+
+  /**
+   * Returns the size of the queue (that is, the number of elements).
+   *
+   * @return the size.
+   */
+  public int size() {
+    return mSize;
+  }
+
+  /**
+   * Removes all the elements from this queue and add them to the specified collection.
+   *
+   * @param collection the collection to fill.
+   */
+  @SuppressWarnings("unchecked")
+  public void transferTo(@NotNull final Collection<? super E> collection) {
+    final Object[] queue = mQueue;
+    final int mask = mMask;
+    final int last = mLast;
+    int i = mFirst;
+    while (i != last) {
+      collection.add((E) queue[i]);
+      queue[i] = null;
+      i = (i + 1) & mask;
+    }
+
+    mFirst = 0;
+    mLast = 0;
+    mSize = 0;
+  }
+
+  /**
+   * Removes all the elements from this queue and add them to the specified one.
+   *
+   * @param other the queue to fill.
+   */
+  @SuppressWarnings("unchecked")
+  public void transferTo(@NotNull final SimpleQueue<? super E> other) {
+    final Object[] queue = mQueue;
+    final int mask = mMask;
+    final int last = mLast;
+    int i = mFirst;
+    while (i != last) {
+      other.add((E) queue[i]);
+      queue[i] = null;
+      i = (i + 1) & mask;
+    }
+
+    mFirst = 0;
+    mLast = 0;
+    mSize = 0;
+  }
+
+  private void doubleCapacity() {
+    final Object[] queue = mQueue;
+    final int size = queue.length;
+    final int newSize = size << 1;
+    if (newSize < size) {
+      throw new OutOfMemoryError();
+    }
+
+    final int first = mFirst;
+    final Object[] newQueue = new Object[newSize];
+    resizeArray(queue, newQueue, first);
+    mQueue = newQueue;
+    final int shift = newSize - size;
+    mFirst = first + shift;
+    if (mLast >= first) {
+      mLast += shift;
+    }
+
+    mMask = newSize - 1;
+  }
+
+  /**
+   * Queue iterator implementation.
+   */
+  public static class SimpleQueueIterator<E> implements Iterator<E> {
+
+    private final int mOriginalFirst;
+
+    private final int mOriginalLast;
+
+    private final SimpleQueue<E> mQueue;
+
+    private int mPointer;
+
+    private long mReplaceCount;
 
     /**
      * Constructor.
      */
-    public SimpleQueue() {
-        mQueue = new Object[DEFAULT_SIZE];
-        mMask = DEFAULT_SIZE - 1;
+    private SimpleQueueIterator(@NotNull final SimpleQueue<E> queue) {
+      mQueue = queue;
+      mPointer = (mOriginalFirst = queue.mFirst);
+      mOriginalLast = queue.mLast;
+      mReplaceCount = queue.mReplaceCount;
     }
 
-    /**
-     * Constructor.
-     *
-     * @param minCapacity the minimum capacity.
-     * @throws java.lang.IllegalArgumentException if the specified capacity is less than 1.
-     */
-    public SimpleQueue(final int minCapacity) {
-        final int msb =
-                Integer.highestOneBit(ConstantConditions.positive("minimum capacity", minCapacity));
-        final int initialCapacity = (minCapacity == msb) ? msb : msb << 1;
-        mQueue = new Object[initialCapacity];
-        mMask = initialCapacity - 1;
+    public boolean hasNext() {
+      return (mPointer != mOriginalLast);
     }
 
-    private static void resizeArray(@NotNull final Object[] src, @NotNull final Object[] dst,
-            final int first) {
-        final int remainder = src.length - first;
-        System.arraycopy(src, 0, dst, 0, first);
-        System.arraycopy(src, first, dst, dst.length - remainder, remainder);
-    }
-
-    /**
-     * Adds the specified element to the queue.
-     * <p>
-     * Note that the element can be null.
-     *
-     * @param element the element to add.
-     */
-    public void add(@Nullable final E element) {
-        final int last = mLast;
-        final int newLast = (last + 1) & mMask;
-        mQueue[last] = element;
-        if (mFirst == newLast) {
-            doubleCapacity();
-        }
-
-        mLast = newLast;
-        ++mSize;
-    }
-
-    /**
-     * Adds all the elements returned by the specified iterable.
-     * <p>
-     * Note that any of the returned element can be null.
-     *
-     * @param elements the element iterable.
-     */
-    public void addAll(@NotNull final Iterable<? extends E> elements) {
-        for (final E element : elements) {
-            add(element);
-        }
-    }
-
-    /**
-     * Adds the specified element as the first element of the queue.
-     * <p>
-     * Note that the element can be null.
-     *
-     * @param element the element to add.
-     */
-    public void addFirst(@Nullable final E element) {
-        int mask = mMask;
-        int newFirst = (mFirst + mask) & mask;
-        if (newFirst == mLast) {
-            doubleCapacity();
-            mask = mMask;
-            newFirst = (mFirst + mask) & mask;
-        }
-
-        mQueue[newFirst] = element;
-        mFirst = newFirst;
-        ++mSize;
-    }
-
-    /**
-     * Clears the queue.
-     */
-    public void clear() {
-        mFirst = 0;
-        mLast = 0;
-        mSize = 0;
-        Arrays.fill(mQueue, null);
-    }
-
-    /**
-     * Check if the queue does not contain any element.
-     *
-     * @return whether the queue is empty.
-     */
-    public boolean isEmpty() {
-        return mSize == 0;
-    }
-
-    public SimpleQueueIterator<E> iterator() {
-        return new SimpleQueueIterator<E>(this);
-    }
-
-    /**
-     * Peeks the first element added into the queue.
-     *
-     * @return the element.
-     * @throws java.util.NoSuchElementException if the queue is empty.
-     */
     @SuppressWarnings("unchecked")
-    public E peekFirst() {
-        if (isEmpty()) {
-            throw new NoSuchElementException();
-        }
+    public E next() {
+      final SimpleQueue<E> queue = mQueue;
+      final int originalLast = mOriginalLast;
+      if (queue.mLast != originalLast) {
+        throw new ConcurrentModificationException();
+      }
 
-        return (E) mQueue[mFirst];
+      final int pointer = mPointer;
+      if (pointer == originalLast) {
+        throw new NoSuchElementException();
+      }
+
+      mPointer = (pointer + 1) & queue.mMask;
+      return (E) queue.mQueue[pointer];
+    }
+
+    public void remove() {
+      throw new UnsupportedOperationException();
     }
 
     /**
-     * Removes the first element added into the queue.
+     * Replaces the last element returned by {@code next()} with the specified one.
+     * <br>
+     * This method can be called several times to replace the same element.
      *
-     * @return the element.
-     * @throws java.util.NoSuchElementException if the queue is empty.
+     * @param element the replacement element.
+     * @throws java.lang.IllegalStateException if the {@code next()} method has not yet been called.
      */
-    @SuppressWarnings("unchecked")
-    public E removeFirst() {
-        if (isEmpty()) {
-            throw new NoSuchElementException();
-        }
+    public void replace(final E element) {
+      final int pointer = mPointer;
+      if (pointer == mOriginalFirst) {
+        throw new IllegalStateException();
+      }
 
-        final Object[] queue = mQueue;
-        final int first = mFirst;
-        mFirst = (first + 1) & mMask;
-        final Object output = queue[first];
-        queue[first] = null;
-        --mSize;
-        return (E) output;
+      final SimpleQueue<E> queue = mQueue;
+      if ((queue.mLast != mOriginalLast) || (++mReplaceCount != ++queue.mReplaceCount)) {
+        throw new ConcurrentModificationException();
+      }
+
+      final int mask = queue.mMask;
+      queue.mQueue[(pointer + mask) & mask] = element;
     }
-
-    /**
-     * Returns the size of the queue (that is, the number of elements).
-     *
-     * @return the size.
-     */
-    public int size() {
-        return mSize;
-    }
-
-    /**
-     * Removes all the elements from this queue and add them to the specified collection.
-     *
-     * @param collection the collection to fill.
-     */
-    @SuppressWarnings("unchecked")
-    public void transferTo(@NotNull final Collection<? super E> collection) {
-        final Object[] queue = mQueue;
-        final int mask = mMask;
-        final int last = mLast;
-        int i = mFirst;
-        while (i != last) {
-            collection.add((E) queue[i]);
-            queue[i] = null;
-            i = (i + 1) & mask;
-        }
-
-        mFirst = 0;
-        mLast = 0;
-        mSize = 0;
-    }
-
-    /**
-     * Removes all the elements from this queue and add them to the specified one.
-     *
-     * @param other the queue to fill.
-     */
-    @SuppressWarnings("unchecked")
-    public void transferTo(@NotNull final SimpleQueue<? super E> other) {
-        final Object[] queue = mQueue;
-        final int mask = mMask;
-        final int last = mLast;
-        int i = mFirst;
-        while (i != last) {
-            other.add((E) queue[i]);
-            queue[i] = null;
-            i = (i + 1) & mask;
-        }
-
-        mFirst = 0;
-        mLast = 0;
-        mSize = 0;
-    }
-
-    private void doubleCapacity() {
-        final Object[] queue = mQueue;
-        final int size = queue.length;
-        final int newSize = size << 1;
-        if (newSize < size) {
-            throw new OutOfMemoryError();
-        }
-
-        final int first = mFirst;
-        final Object[] newQueue = new Object[newSize];
-        resizeArray(queue, newQueue, first);
-        mQueue = newQueue;
-        final int shift = newSize - size;
-        mFirst = first + shift;
-        if (mLast >= first) {
-            mLast += shift;
-        }
-
-        mMask = newSize - 1;
-    }
-
-    /**
-     * Queue iterator implementation.
-     */
-    public static class SimpleQueueIterator<E> implements Iterator<E> {
-
-        private final int mOriginalFirst;
-
-        private final int mOriginalLast;
-
-        private final SimpleQueue<E> mQueue;
-
-        private int mPointer;
-
-        private long mReplaceCount;
-
-        /**
-         * Constructor.
-         */
-        private SimpleQueueIterator(@NotNull final SimpleQueue<E> queue) {
-            mQueue = queue;
-            mPointer = (mOriginalFirst = queue.mFirst);
-            mOriginalLast = queue.mLast;
-            mReplaceCount = queue.mReplaceCount;
-        }
-
-        public boolean hasNext() {
-            return (mPointer != mOriginalLast);
-        }
-
-        @SuppressWarnings("unchecked")
-        public E next() {
-            final SimpleQueue<E> queue = mQueue;
-            final int originalLast = mOriginalLast;
-            if (queue.mLast != originalLast) {
-                throw new ConcurrentModificationException();
-            }
-
-            final int pointer = mPointer;
-            if (pointer == originalLast) {
-                throw new NoSuchElementException();
-            }
-
-            mPointer = (pointer + 1) & queue.mMask;
-            return (E) queue.mQueue[pointer];
-        }
-
-        public void remove() {
-            throw new UnsupportedOperationException();
-        }
-
-        /**
-         * Replaces the last element returned by {@code next()} with the specified one.
-         * <br>
-         * This method can be called several times to replace the same element.
-         *
-         * @param element the replacement element.
-         * @throws java.lang.IllegalStateException if the {@code next()} method has not yet been
-         *                                         called.
-         */
-        public void replace(final E element) {
-            final int pointer = mPointer;
-            if (pointer == mOriginalFirst) {
-                throw new IllegalStateException();
-            }
-
-            final SimpleQueue<E> queue = mQueue;
-            if ((queue.mLast != mOriginalLast) || (++mReplaceCount != ++queue.mReplaceCount)) {
-                throw new ConcurrentModificationException();
-            }
-
-            final int mask = queue.mMask;
-            queue.mQueue[(pointer + mask) & mask] = element;
-        }
-    }
+  }
 }

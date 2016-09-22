@@ -36,110 +36,107 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TargetApi(VERSION_CODES.HONEYCOMB)
 public class LoaderContextTest extends ActivityInstrumentationTestCase2<TestActivity> {
 
-    public LoaderContextTest() {
+  public LoaderContextTest() {
 
-        super(TestActivity.class);
+    super(TestActivity.class);
+  }
+
+  public void testActivityEquals() {
+
+    final ContextWrapper contextWrapper = new ContextWrapper(getActivity());
+    LoaderContextCompat loaderContext = loaderFrom(getActivity());
+    assertThat(loaderContext).isEqualTo(loaderContext);
+    assertThat(loaderContext).isNotEqualTo(null);
+    assertThat(loaderContext).isNotEqualTo("test");
+    assertThat(loaderContext).isNotEqualTo(loaderFrom(getActivity(), contextWrapper));
+    assertThat(loaderContext).isEqualTo(loaderFrom(getActivity()));
+    assertThat(loaderContext.hashCode()).isEqualTo(loaderFrom(getActivity()).hashCode());
+    loaderContext = loaderFrom(getActivity(), contextWrapper);
+    assertThat(loaderContext).isEqualTo(loaderContext);
+    assertThat(loaderContext).isNotEqualTo(null);
+    assertThat(loaderContext).isNotEqualTo("test");
+    assertThat(loaderContext).isNotEqualTo(loaderFrom(getActivity(), getActivity()));
+    assertThat(loaderContext).isEqualTo(loaderFrom(getActivity(), contextWrapper));
+    assertThat(loaderContext.hashCode()).isEqualTo(
+        loaderFrom(getActivity(), contextWrapper).hashCode());
+  }
+
+  @SuppressWarnings("ConstantConditions")
+  public void testActivityError() {
+
+    try {
+      loaderFrom((FragmentActivity) null);
+      fail();
+
+    } catch (final NullPointerException ignored) {
+
     }
 
-    public void testActivityEquals() {
+    try {
+      loaderFrom(getActivity(), null);
+      fail();
 
-        final ContextWrapper contextWrapper = new ContextWrapper(getActivity());
-        LoaderContextCompat loaderContext = loaderFrom(getActivity());
-        assertThat(loaderContext).isEqualTo(loaderContext);
-        assertThat(loaderContext).isNotEqualTo(null);
-        assertThat(loaderContext).isNotEqualTo("test");
-        assertThat(loaderContext).isNotEqualTo(loaderFrom(getActivity(), contextWrapper));
-        assertThat(loaderContext).isEqualTo(loaderFrom(getActivity()));
-        assertThat(loaderContext.hashCode()).isEqualTo(loaderFrom(getActivity()).hashCode());
-        loaderContext = loaderFrom(getActivity(), contextWrapper);
-        assertThat(loaderContext).isEqualTo(loaderContext);
-        assertThat(loaderContext).isNotEqualTo(null);
-        assertThat(loaderContext).isNotEqualTo("test");
-        assertThat(loaderContext).isNotEqualTo(loaderFrom(getActivity(), getActivity()));
-        assertThat(loaderContext).isEqualTo(loaderFrom(getActivity(), contextWrapper));
-        assertThat(loaderContext.hashCode()).isEqualTo(
-                loaderFrom(getActivity(), contextWrapper).hashCode());
+    } catch (final NullPointerException ignored) {
+
     }
 
-    @SuppressWarnings("ConstantConditions")
-    public void testActivityError() {
+    try {
+      loaderFrom(getActivity(), new ContextWrapper(getActivity()) {});
+      fail();
 
-        try {
-            loaderFrom((FragmentActivity) null);
-            fail();
+    } catch (final IllegalArgumentException ignored) {
 
-        } catch (final NullPointerException ignored) {
+    }
+  }
 
-        }
+  public void testFragmentEquals() {
 
-        try {
-            loaderFrom(getActivity(), null);
-            fail();
+    final ContextWrapper contextWrapper = new ContextWrapper(getActivity());
+    final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+                                                              .findFragmentById(R.id.test_fragment);
+    LoaderContextCompat loaderContext = loaderFrom(fragment);
+    assertThat(loaderContext).isEqualTo(loaderContext);
+    assertThat(loaderContext).isNotEqualTo(null);
+    assertThat(loaderContext).isNotEqualTo("test");
+    assertThat(loaderContext).isNotEqualTo(loaderFrom(fragment, contextWrapper));
+    assertThat(loaderContext).isEqualTo(loaderFrom(fragment));
+    assertThat(loaderContext.hashCode()).isEqualTo(loaderFrom(fragment).hashCode());
+    loaderContext = loaderFrom(fragment, contextWrapper);
+    assertThat(loaderContext).isEqualTo(loaderContext);
+    assertThat(loaderContext).isNotEqualTo(null);
+    assertThat(loaderContext).isNotEqualTo("test");
+    assertThat(loaderContext).isNotEqualTo(loaderFrom(fragment, getActivity()));
+    assertThat(loaderContext).isEqualTo(loaderFrom(fragment, contextWrapper));
+    assertThat(loaderContext.hashCode()).isEqualTo(loaderFrom(fragment, contextWrapper).hashCode());
+  }
 
-        } catch (final NullPointerException ignored) {
+  @SuppressWarnings("ConstantConditions")
+  public void testFragmentError() {
 
-        }
+    final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+                                                              .findFragmentById(R.id.test_fragment);
+    try {
+      loaderFrom((Fragment) null);
+      fail();
 
-        try {
-            loaderFrom(getActivity(), new ContextWrapper(getActivity()) {});
-            fail();
+    } catch (final NullPointerException ignored) {
 
-        } catch (final IllegalArgumentException ignored) {
-
-        }
     }
 
-    public void testFragmentEquals() {
+    try {
+      loaderFrom(fragment, null);
+      fail();
 
-        final ContextWrapper contextWrapper = new ContextWrapper(getActivity());
-        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
-                                                                  .findFragmentById(
-                                                                          R.id.test_fragment);
-        LoaderContextCompat loaderContext = loaderFrom(fragment);
-        assertThat(loaderContext).isEqualTo(loaderContext);
-        assertThat(loaderContext).isNotEqualTo(null);
-        assertThat(loaderContext).isNotEqualTo("test");
-        assertThat(loaderContext).isNotEqualTo(loaderFrom(fragment, contextWrapper));
-        assertThat(loaderContext).isEqualTo(loaderFrom(fragment));
-        assertThat(loaderContext.hashCode()).isEqualTo(loaderFrom(fragment).hashCode());
-        loaderContext = loaderFrom(fragment, contextWrapper);
-        assertThat(loaderContext).isEqualTo(loaderContext);
-        assertThat(loaderContext).isNotEqualTo(null);
-        assertThat(loaderContext).isNotEqualTo("test");
-        assertThat(loaderContext).isNotEqualTo(loaderFrom(fragment, getActivity()));
-        assertThat(loaderContext).isEqualTo(loaderFrom(fragment, contextWrapper));
-        assertThat(loaderContext.hashCode()).isEqualTo(
-                loaderFrom(fragment, contextWrapper).hashCode());
+    } catch (final NullPointerException ignored) {
+
     }
 
-    @SuppressWarnings("ConstantConditions")
-    public void testFragmentError() {
+    try {
+      loaderFrom(fragment, new ContextWrapper(getActivity()) {});
+      fail();
 
-        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
-                                                                  .findFragmentById(
-                                                                          R.id.test_fragment);
-        try {
-            loaderFrom((Fragment) null);
-            fail();
+    } catch (final IllegalArgumentException ignored) {
 
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-            loaderFrom(fragment, null);
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-            loaderFrom(fragment, new ContextWrapper(getActivity()) {});
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
     }
+  }
 }

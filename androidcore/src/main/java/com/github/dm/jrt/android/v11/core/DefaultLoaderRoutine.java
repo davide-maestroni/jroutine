@@ -46,127 +46,127 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * @param <OUT> the output data type.
  */
 class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
-        implements LoaderRoutine<IN, OUT> {
+    implements LoaderRoutine<IN, OUT> {
 
-    private final LoaderConfiguration mConfiguration;
+  private final LoaderConfiguration mConfiguration;
 
-    private final LoaderContext mContext;
+  private final LoaderContext mContext;
+
+  private final ContextInvocationFactory<IN, OUT> mFactory;
+
+  private final int mLoaderId;
+
+  private final OrderType mOrderType;
+
+  /**
+   * Constructor.
+   *
+   * @param context                 the routine context.
+   * @param factory                 the invocation factory.
+   * @param invocationConfiguration the invocation configuration.
+   * @param loaderConfiguration     the Loader configuration.
+   */
+  DefaultLoaderRoutine(@NotNull final LoaderContext context,
+      @NotNull final ContextInvocationFactory<IN, OUT> factory,
+      @NotNull final InvocationConfiguration invocationConfiguration,
+      @NotNull final LoaderConfiguration loaderConfiguration) {
+    super(invocationConfiguration);
+    final int factoryId = loaderConfiguration.getFactoryIdOrElse(LoaderConfiguration.AUTO);
+    mContext = ConstantConditions.notNull("Loader context", context);
+    ConstantConditions.notNull("Context invocation factory", factory);
+    mFactory = (factoryId == LoaderConfiguration.AUTO) ? factory
+        : new FactoryWrapper<IN, OUT>(factory, factoryId);
+    mConfiguration = loaderConfiguration;
+    mLoaderId = loaderConfiguration.getLoaderIdOrElse(LoaderConfiguration.AUTO);
+    mOrderType = invocationConfiguration.getOutputOrderTypeOrElse(null);
+    getLogger().dbg("building Context routine with configuration: %s", loaderConfiguration);
+  }
+
+  @Override
+  public void clear() {
+    super.clear();
+    final LoaderContext context = mContext;
+    if (context.getComponent() != null) {
+      clearLoaders(context, mLoaderId, mFactory);
+    }
+  }
+
+  @NotNull
+  @Override
+  protected Invocation<IN, OUT> newInvocation() {
+    return new LoaderInvocation<IN, OUT>(mContext, mFactory, mConfiguration, mOrderType,
+        getLogger());
+  }
+
+  @Override
+  public void clear(@Nullable final IN input) {
+    final LoaderContext context = mContext;
+    if (context.getComponent() != null) {
+      clearLoaders(context, mLoaderId, mFactory, Collections.singletonList(input));
+    }
+  }
+
+  public void clear(@Nullable final IN... inputs) {
+    final LoaderContext context = mContext;
+    if (context.getComponent() != null) {
+      final List<IN> inputList;
+      if (inputs == null) {
+        inputList = Collections.emptyList();
+
+      } else {
+        inputList = Arrays.asList(inputs);
+      }
+
+      clearLoaders(context, mLoaderId, mFactory, inputList);
+    }
+  }
+
+  @Override
+  public void clear(@Nullable final Iterable<? extends IN> inputs) {
+    final LoaderContext context = mContext;
+    if (context.getComponent() != null) {
+      final List<IN> inputList;
+      if (inputs == null) {
+        inputList = Collections.emptyList();
+
+      } else {
+        inputList = new ArrayList<IN>();
+        for (final IN input : inputs) {
+          inputList.add(input);
+        }
+      }
+
+      clearLoaders(context, mLoaderId, mFactory, inputList);
+    }
+  }
+
+  /**
+   * Wrapper of call Context invocation factories overriding {@code equals()} and
+   * {@code hashCode()}.
+   *
+   * @param <IN>  the input data type.
+   * @param <OUT> the output data type.
+   */
+  private static class FactoryWrapper<IN, OUT> extends ContextInvocationFactory<IN, OUT> {
 
     private final ContextInvocationFactory<IN, OUT> mFactory;
-
-    private final int mLoaderId;
-
-    private final OrderType mOrderType;
 
     /**
      * Constructor.
      *
-     * @param context                 the routine context.
-     * @param factory                 the invocation factory.
-     * @param invocationConfiguration the invocation configuration.
-     * @param loaderConfiguration     the Loader configuration.
+     * @param factory   the wrapped factory.
+     * @param factoryId the factory ID.
      */
-    DefaultLoaderRoutine(@NotNull final LoaderContext context,
-            @NotNull final ContextInvocationFactory<IN, OUT> factory,
-            @NotNull final InvocationConfiguration invocationConfiguration,
-            @NotNull final LoaderConfiguration loaderConfiguration) {
-        super(invocationConfiguration);
-        final int factoryId = loaderConfiguration.getFactoryIdOrElse(LoaderConfiguration.AUTO);
-        mContext = ConstantConditions.notNull("Loader context", context);
-        ConstantConditions.notNull("Context invocation factory", factory);
-        mFactory = (factoryId == LoaderConfiguration.AUTO) ? factory
-                : new FactoryWrapper<IN, OUT>(factory, factoryId);
-        mConfiguration = loaderConfiguration;
-        mLoaderId = loaderConfiguration.getLoaderIdOrElse(LoaderConfiguration.AUTO);
-        mOrderType = invocationConfiguration.getOutputOrderTypeOrElse(null);
-        getLogger().dbg("building Context routine with configuration: %s", loaderConfiguration);
-    }
-
-    @Override
-    public void clear() {
-        super.clear();
-        final LoaderContext context = mContext;
-        if (context.getComponent() != null) {
-            clearLoaders(context, mLoaderId, mFactory);
-        }
+    private FactoryWrapper(@NotNull final ContextInvocationFactory<IN, OUT> factory,
+        final int factoryId) {
+      super(asArgs(factoryId));
+      mFactory = factory;
     }
 
     @NotNull
     @Override
-    protected Invocation<IN, OUT> newInvocation() {
-        return new LoaderInvocation<IN, OUT>(mContext, mFactory, mConfiguration, mOrderType,
-                getLogger());
+    public ContextInvocation<IN, OUT> newInvocation() throws Exception {
+      return mFactory.newInvocation();
     }
-
-    @Override
-    public void clear(@Nullable final IN input) {
-        final LoaderContext context = mContext;
-        if (context.getComponent() != null) {
-            clearLoaders(context, mLoaderId, mFactory, Collections.singletonList(input));
-        }
-    }
-
-    public void clear(@Nullable final IN... inputs) {
-        final LoaderContext context = mContext;
-        if (context.getComponent() != null) {
-            final List<IN> inputList;
-            if (inputs == null) {
-                inputList = Collections.emptyList();
-
-            } else {
-                inputList = Arrays.asList(inputs);
-            }
-
-            clearLoaders(context, mLoaderId, mFactory, inputList);
-        }
-    }
-
-    @Override
-    public void clear(@Nullable final Iterable<? extends IN> inputs) {
-        final LoaderContext context = mContext;
-        if (context.getComponent() != null) {
-            final List<IN> inputList;
-            if (inputs == null) {
-                inputList = Collections.emptyList();
-
-            } else {
-                inputList = new ArrayList<IN>();
-                for (final IN input : inputs) {
-                    inputList.add(input);
-                }
-            }
-
-            clearLoaders(context, mLoaderId, mFactory, inputList);
-        }
-    }
-
-    /**
-     * Wrapper of call Context invocation factories overriding {@code equals()} and
-     * {@code hashCode()}.
-     *
-     * @param <IN>  the input data type.
-     * @param <OUT> the output data type.
-     */
-    private static class FactoryWrapper<IN, OUT> extends ContextInvocationFactory<IN, OUT> {
-
-        private final ContextInvocationFactory<IN, OUT> mFactory;
-
-        /**
-         * Constructor.
-         *
-         * @param factory   the wrapped factory.
-         * @param factoryId the factory ID.
-         */
-        protected FactoryWrapper(@NotNull final ContextInvocationFactory<IN, OUT> factory,
-                final int factoryId) {
-            super(asArgs(factoryId));
-            mFactory = factory;
-        }
-
-        @NotNull
-        @Override
-        public ContextInvocation<IN, OUT> newInvocation() throws Exception {
-            return mFactory.newInvocation();
-        }
-    }
+  }
 }

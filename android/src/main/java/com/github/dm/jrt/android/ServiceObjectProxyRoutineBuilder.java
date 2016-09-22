@@ -38,57 +38,57 @@ import org.jetbrains.annotations.Nullable;
  * Created by davide-maestroni on 03/06/2016.
  */
 public interface ServiceObjectProxyRoutineBuilder
-        extends ObjectProxyRoutineBuilder, ServiceObjectRoutineBuilder {
+    extends ObjectProxyRoutineBuilder, ServiceObjectRoutineBuilder {
 
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    ServiceObjectProxyRoutineBuilder apply(@NotNull InvocationConfiguration configuration);
+  /**
+   * {@inheritDoc}
+   */
+  @NotNull
+  @Override
+  ServiceObjectProxyRoutineBuilder apply(@NotNull InvocationConfiguration configuration);
 
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    ServiceObjectProxyRoutineBuilder apply(@NotNull ObjectConfiguration configuration);
+  /**
+   * {@inheritDoc}
+   */
+  @NotNull
+  @Override
+  ServiceObjectProxyRoutineBuilder apply(@NotNull ObjectConfiguration configuration);
 
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    InvocationConfiguration.Builder<? extends ServiceObjectProxyRoutineBuilder>
-    applyInvocationConfiguration();
+  /**
+   * {@inheritDoc}
+   */
+  @NotNull
+  @Override
+  InvocationConfiguration.Builder<? extends ServiceObjectProxyRoutineBuilder>
+  applyInvocationConfiguration();
 
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    ObjectConfiguration.Builder<? extends ServiceObjectProxyRoutineBuilder>
-    applyObjectConfiguration();
+  /**
+   * {@inheritDoc}
+   */
+  @NotNull
+  @Override
+  ObjectConfiguration.Builder<? extends ServiceObjectProxyRoutineBuilder>
+  applyObjectConfiguration();
 
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    ServiceObjectProxyRoutineBuilder withType(@Nullable BuilderType builderType);
+  /**
+   * {@inheritDoc}
+   */
+  @NotNull
+  @Override
+  ServiceObjectProxyRoutineBuilder withType(@Nullable BuilderType builderType);
 
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    ServiceObjectProxyRoutineBuilder apply(@NotNull ServiceConfiguration configuration);
+  /**
+   * {@inheritDoc}
+   */
+  @NotNull
+  @Override
+  ServiceObjectProxyRoutineBuilder apply(@NotNull ServiceConfiguration configuration);
 
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    ServiceConfiguration.Builder<? extends ServiceObjectProxyRoutineBuilder>
-    applyServiceConfiguration();
+  /**
+   * {@inheritDoc}
+   */
+  @NotNull
+  @Override
+  ServiceConfiguration.Builder<? extends ServiceObjectProxyRoutineBuilder>
+  applyServiceConfiguration();
 }

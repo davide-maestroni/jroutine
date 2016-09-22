@@ -28,25 +28,25 @@ import org.jetbrains.annotations.Nullable;
  */
 public class AbortException extends RoutineException {
 
-    /**
-     * Constructor.
-     *
-     * @param cause the wrapped exception.
-     */
-    public AbortException(@Nullable final Throwable cause) {
-        super(cause);
-    }
+  /**
+   * Constructor.
+   *
+   * @param cause the wrapped exception.
+   */
+  public AbortException(@Nullable final Throwable cause) {
+    super(cause);
+  }
 
-    /**
-     * Wraps the specified throwable only if it is not an instance of
-     * {@link com.github.dm.jrt.core.error.RoutineException RoutineException}.
-     *
-     * @param cause the throwable to wrap.
-     * @return the throwable or an abort exception wrapping it.
-     */
-    @NotNull
-    public static RoutineException wrapIfNeeded(@Nullable final Throwable cause) {
-        return (cause instanceof RoutineException) ? (RoutineException) cause
-                : new AbortException(cause);
-    }
+  /**
+   * Wraps the specified throwable only if it is not an instance of
+   * {@link com.github.dm.jrt.core.error.RoutineException RoutineException}.
+   *
+   * @param cause the throwable to wrap.
+   * @return the throwable or an abort exception wrapping it.
+   */
+  @NotNull
+  public static RoutineException wrapIfNeeded(@Nullable final Throwable cause) {
+    return (cause instanceof RoutineException) ? (RoutineException) cause
+        : new AbortException(cause);
+  }
 }

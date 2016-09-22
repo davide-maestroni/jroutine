@@ -35,23 +35,23 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class MapInvocation<IN, OUT> extends MappingInvocation<IN, OUT> {
 
-    private final FunctionDecorator<? super IN, ? extends Channel<?, ? extends OUT>> mFunction;
+  private final FunctionDecorator<? super IN, ? extends Channel<?, ? extends OUT>> mFunction;
 
-    /**
-     * Constructor.
-     *
-     * @param function the mapping function.
-     */
-    MapInvocation(@NotNull final FunctionDecorator<? super IN, ? extends Channel<?, ? extends
-            OUT>> function) {
-        super(asArgs(ConstantConditions.notNull("function instance", function)));
-        mFunction = function;
-    }
+  /**
+   * Constructor.
+   *
+   * @param function the mapping function.
+   */
+  MapInvocation(@NotNull final FunctionDecorator<? super IN, ? extends Channel<?, ? extends
+      OUT>> function) {
+    super(asArgs(ConstantConditions.notNull("function instance", function)));
+    mFunction = function;
+  }
 
-    public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) throws Exception {
-        final Channel<?, ? extends OUT> channel = mFunction.apply(input);
-        if (channel != null) {
-            channel.bind(result);
-        }
+  public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) throws Exception {
+    final Channel<?, ? extends OUT> channel = mFunction.apply(input);
+    if (channel != null) {
+      channel.bind(result);
     }
+  }
 }

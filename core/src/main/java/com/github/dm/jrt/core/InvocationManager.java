@@ -30,25 +30,25 @@ import org.jetbrains.annotations.NotNull;
  */
 interface InvocationManager<IN, OUT> {
 
-    /**
-     * Creates a new invocation instance.
-     *
-     * @param observer the invocation observer.
-     * @return whether the invocation is immediately created (false if delayed).
-     */
-    boolean create(@NotNull InvocationObserver<IN, OUT> observer);
+  /**
+   * Creates a new invocation instance.
+   *
+   * @param observer the invocation observer.
+   * @return whether the invocation is immediately created (false if delayed).
+   */
+  boolean create(@NotNull InvocationObserver<IN, OUT> observer);
 
-    /**
-     * Discards the specified invocation.
-     *
-     * @param invocation the invocation instance.
-     */
-    void discard(@NotNull Invocation<IN, OUT> invocation);
+  /**
+   * Discards the specified invocation.
+   *
+   * @param invocation the invocation instance.
+   */
+  void discard(@NotNull Invocation<IN, OUT> invocation);
 
-    /**
-     * Recycles the specified invocation.
-     *
-     * @param invocation the invocation instance.
-     */
-    void recycle(@NotNull Invocation<IN, OUT> invocation);
+  /**
+   * Recycles the specified invocation.
+   *
+   * @param invocation the invocation instance.
+   */
+  void recycle(@NotNull Invocation<IN, OUT> invocation);
 }

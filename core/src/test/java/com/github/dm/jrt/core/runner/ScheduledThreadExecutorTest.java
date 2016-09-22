@@ -33,63 +33,62 @@ import static org.junit.Assert.fail;
  */
 public class ScheduledThreadExecutorTest {
 
-    @Test
-    public void testEquals() {
+  @Test
+  public void testEquals() {
 
-        final ExecutorService pool = Executors.newCachedThreadPool();
-        final ScheduledThreadExecutor executor = new ScheduledThreadExecutor(pool);
-        assertThat(executor).isEqualTo(executor);
-        assertThat(executor).isNotEqualTo(null);
-        assertThat(executor).isNotEqualTo("test");
-        assertThat(executor).isNotEqualTo(
-                new ScheduledThreadExecutor(Executors.newCachedThreadPool()));
-        assertThat(executor).isEqualTo(new ScheduledThreadExecutor(pool));
-        assertThat(executor.hashCode()).isEqualTo(new ScheduledThreadExecutor(pool).hashCode());
+    final ExecutorService pool = Executors.newCachedThreadPool();
+    final ScheduledThreadExecutor executor = new ScheduledThreadExecutor(pool);
+    assertThat(executor).isEqualTo(executor);
+    assertThat(executor).isNotEqualTo(null);
+    assertThat(executor).isNotEqualTo("test");
+    assertThat(executor).isNotEqualTo(new ScheduledThreadExecutor(Executors.newCachedThreadPool()));
+    assertThat(executor).isEqualTo(new ScheduledThreadExecutor(pool));
+    assertThat(executor.hashCode()).isEqualTo(new ScheduledThreadExecutor(pool).hashCode());
+  }
+
+  @Test
+  public void testUnsupportedMethods() {
+
+    final ScheduledThreadExecutor executor =
+        new ScheduledThreadExecutor(Executors.newCachedThreadPool());
+    try {
+      executor.schedule(new Callable<Object>() {
+
+        public Object call() throws Exception {
+
+          return null;
+        }
+      }, 0, TimeUnit.MILLISECONDS);
+      fail();
+
+    } catch (final UnsupportedOperationException ignored) {
+
     }
 
-    @Test
-    public void testUnsupportedMethods() {
+    try {
+      executor.scheduleAtFixedRate(new Runnable() {
 
-        final ScheduledThreadExecutor executor =
-                new ScheduledThreadExecutor(Executors.newCachedThreadPool());
-        try {
-            executor.schedule(new Callable<Object>() {
-
-                public Object call() throws Exception {
-
-                    return null;
-                }
-            }, 0, TimeUnit.MILLISECONDS);
-            fail();
-
-        } catch (final UnsupportedOperationException ignored) {
+        public void run() {
 
         }
+      }, 0, 1, TimeUnit.SECONDS);
+      fail();
 
-        try {
-            executor.scheduleAtFixedRate(new Runnable() {
+    } catch (final UnsupportedOperationException ignored) {
 
-                public void run() {
-
-                }
-            }, 0, 1, TimeUnit.SECONDS);
-            fail();
-
-        } catch (final UnsupportedOperationException ignored) {
-
-        }
-
-        try {
-            executor.scheduleWithFixedDelay(new Runnable() {
-
-                public void run() {
-
-                }
-            }, 0, 1, TimeUnit.SECONDS);
-            fail();
-
-        } catch (final UnsupportedOperationException ignored) {
-
-        }
     }
+
+    try {
+      executor.scheduleWithFixedDelay(new Runnable() {
+
+        public void run() {
+
+        }
+      }, 0, 1, TimeUnit.SECONDS);
+      fail();
+
+    } catch (final UnsupportedOperationException ignored) {
+
+    }
+  }
 }

@@ -47,191 +47,191 @@ import java.util.concurrent.TimeUnit;
 @TargetApi(VERSION_CODES.HONEYCOMB)
 class InvocationChannelConsumer<OUT> implements ChannelConsumer<OUT> {
 
-    private static final Runner sMainRunner = AndroidRunners.mainRunner();
+  private static final Runner sMainRunner = AndroidRunners.mainRunner();
 
-    private final ArrayList<OUT> mCachedResults = new ArrayList<OUT>();
+  private final ArrayList<OUT> mCachedResults = new ArrayList<OUT>();
 
-    private final Execution mDeliverResult;
+  private final Execution mDeliverResult;
 
-    private final ArrayList<OUT> mLastResults = new ArrayList<OUT>();
+  private final ArrayList<OUT> mLastResults = new ArrayList<OUT>();
 
-    private final Logger mLogger;
+  private final Logger mLogger;
 
-    private final Object mMutex = new Object();
+  private final Object mMutex = new Object();
 
-    private RoutineException mAbortException;
+  private RoutineException mAbortException;
 
-    private boolean mIsComplete;
+  private boolean mIsComplete;
 
-    private long mResultTimestamp = Long.MAX_VALUE;
+  private long mResultTimestamp = Long.MAX_VALUE;
 
-    /**
-     * Constructor.
-     *
-     * @param loader the Loader instance.
-     * @param logger the logger instance.
-     */
-    InvocationChannelConsumer(@NotNull final Loader<InvocationResult<OUT>> loader,
-            @NotNull final Logger logger) {
-        ConstantConditions.notNull("Loader instance", loader);
-        mDeliverResult = new Execution() {
+  /**
+   * Constructor.
+   *
+   * @param loader the Loader instance.
+   * @param logger the logger instance.
+   */
+  InvocationChannelConsumer(@NotNull final Loader<InvocationResult<OUT>> loader,
+      @NotNull final Logger logger) {
+    ConstantConditions.notNull("Loader instance", loader);
+    mDeliverResult = new Execution() {
 
-            public void run() {
-                loader.deliverResult(createResult());
-            }
-        };
-        mLogger = logger.subContextLogger(this);
+      public void run() {
+        loader.deliverResult(createResult());
+      }
+    };
+    mLogger = logger.subContextLogger(this);
+  }
+
+  @Override
+  public void onComplete() {
+    final boolean deliverResult;
+    synchronized (mMutex) {
+      mIsComplete = true;
+      if (mAbortException != null) {
+        mLogger.dbg("aborting channel");
+        throw mAbortException;
+      }
+
+      mResultTimestamp = System.currentTimeMillis();
+      deliverResult = mLastResults.isEmpty();
+    }
+
+    if (deliverResult) {
+      mLogger.dbg("delivering final result");
+      deliverResult();
+    }
+  }
+
+  @Override
+  public void onError(@NotNull final RoutineException error) {
+    final boolean deliverResult;
+    synchronized (mMutex) {
+      mIsComplete = true;
+      mAbortException = error;
+      deliverResult = mLastResults.isEmpty();
+    }
+
+    if (deliverResult) {
+      mLogger.dbg(error, "delivering error");
+      deliverResult();
+    }
+  }
+
+  @Override
+  public void onOutput(final OUT output) {
+    final boolean deliverResult;
+    synchronized (mMutex) {
+      if (mAbortException != null) {
+        mLogger.dbg("aborting channel");
+        throw mAbortException;
+      }
+
+      deliverResult = mLastResults.isEmpty();
+      mLastResults.add(output);
+    }
+
+    if (deliverResult) {
+      mLogger.dbg("delivering result: %s", output);
+      deliverResult();
+    }
+  }
+
+  /**
+   * Creates and returns a new invocation result object.
+   *
+   * @return the result object.
+   */
+  @NotNull
+  InvocationResult<OUT> createResult() {
+    // Need to create a new instance each time to trick the Loader manager into thinking that a
+    // brand new result is available
+    return new Result();
+  }
+
+  private void deliverResult() {
+    sMainRunner.run(mDeliverResult, 0, TimeUnit.MILLISECONDS);
+  }
+
+  /**
+   * Implementation of an invocation result.
+   */
+  private class Result implements InvocationResult<OUT> {
+
+    @Override
+    public void abort() {
+      synchronized (mMutex) {
+        mIsComplete = true;
+        mAbortException = new AbortException(null);
+      }
+    }
+
+    @Nullable
+    @Override
+    public RoutineException getAbortException() {
+      synchronized (mMutex) {
+        return mAbortException;
+      }
     }
 
     @Override
-    public void onComplete() {
-        final boolean deliverResult;
-        synchronized (mMutex) {
-            mIsComplete = true;
-            if (mAbortException != null) {
-                mLogger.dbg("aborting channel");
-                throw mAbortException;
-            }
-
-            mResultTimestamp = System.currentTimeMillis();
-            deliverResult = mLastResults.isEmpty();
-        }
-
-        if (deliverResult) {
-            mLogger.dbg("delivering final result");
-            deliverResult();
-        }
+    public long getResultTimestamp() {
+      synchronized (mMutex) {
+        return mResultTimestamp;
+      }
     }
 
     @Override
-    public void onError(@NotNull final RoutineException error) {
-        final boolean deliverResult;
-        synchronized (mMutex) {
-            mIsComplete = true;
-            mAbortException = error;
-            deliverResult = mLastResults.isEmpty();
-        }
-
-        if (deliverResult) {
-            mLogger.dbg(error, "delivering error");
-            deliverResult();
-        }
+    public boolean isError() {
+      synchronized (mMutex) {
+        return (mAbortException != null);
+      }
     }
 
     @Override
-    public void onOutput(final OUT output) {
-        final boolean deliverResult;
-        synchronized (mMutex) {
-            if (mAbortException != null) {
-                mLogger.dbg("aborting channel");
-                throw mAbortException;
+    public boolean passTo(@NotNull final Collection<Channel<OUT, ?>> newChannels,
+        @NotNull final Collection<Channel<OUT, ?>> oldChannels,
+        @NotNull final Collection<Channel<OUT, ?>> abortedChannels) {
+      synchronized (mMutex) {
+        final Logger logger = mLogger;
+        final ArrayList<OUT> lastResults = mLastResults;
+        final ArrayList<OUT> cachedResults = mCachedResults;
+        if (mAbortException != null) {
+          logger.dbg("avoiding passing results since invocation is aborted");
+          lastResults.clear();
+          cachedResults.clear();
+          return true;
+
+        } else {
+          logger.dbg("passing result: %s + %s", cachedResults, lastResults);
+          for (final Channel<OUT, ?> newChannel : newChannels) {
+            try {
+              newChannel.pass(cachedResults).pass(lastResults);
+
+            } catch (final Throwable t) {
+              logger.wrn(t, "aborted channel");
+              abortedChannels.add(newChannel);
             }
+          }
 
-            deliverResult = mLastResults.isEmpty();
-            mLastResults.add(output);
+          for (final Channel<OUT, ?> channel : oldChannels) {
+            try {
+              channel.pass(lastResults);
+
+            } catch (final Throwable t) {
+              logger.wrn(t, "aborted channel");
+              abortedChannels.add(channel);
+            }
+          }
+
+          cachedResults.addAll(lastResults);
+          lastResults.clear();
         }
 
-        if (deliverResult) {
-            mLogger.dbg("delivering result: %s", output);
-            deliverResult();
-        }
+        final boolean isComplete = mIsComplete;
+        logger.dbg("invocation is complete: %s", isComplete);
+        return isComplete;
+      }
     }
-
-    /**
-     * Creates and returns a new invocation result object.
-     *
-     * @return the result object.
-     */
-    @NotNull
-    InvocationResult<OUT> createResult() {
-        // Need to create a new instance each time to trick the Loader manager into thinking that a
-        // brand new result is available
-        return new Result();
-    }
-
-    private void deliverResult() {
-        sMainRunner.run(mDeliverResult, 0, TimeUnit.MILLISECONDS);
-    }
-
-    /**
-     * Implementation of an invocation result.
-     */
-    private class Result implements InvocationResult<OUT> {
-
-        @Override
-        public void abort() {
-            synchronized (mMutex) {
-                mIsComplete = true;
-                mAbortException = new AbortException(null);
-            }
-        }
-
-        @Nullable
-        @Override
-        public RoutineException getAbortException() {
-            synchronized (mMutex) {
-                return mAbortException;
-            }
-        }
-
-        @Override
-        public long getResultTimestamp() {
-            synchronized (mMutex) {
-                return mResultTimestamp;
-            }
-        }
-
-        @Override
-        public boolean isError() {
-            synchronized (mMutex) {
-                return (mAbortException != null);
-            }
-        }
-
-        @Override
-        public boolean passTo(@NotNull final Collection<Channel<OUT, ?>> newChannels,
-                @NotNull final Collection<Channel<OUT, ?>> oldChannels,
-                @NotNull final Collection<Channel<OUT, ?>> abortedChannels) {
-            synchronized (mMutex) {
-                final Logger logger = mLogger;
-                final ArrayList<OUT> lastResults = mLastResults;
-                final ArrayList<OUT> cachedResults = mCachedResults;
-                if (mAbortException != null) {
-                    logger.dbg("avoiding passing results since invocation is aborted");
-                    lastResults.clear();
-                    cachedResults.clear();
-                    return true;
-
-                } else {
-                    logger.dbg("passing result: %s + %s", cachedResults, lastResults);
-                    for (final Channel<OUT, ?> newChannel : newChannels) {
-                        try {
-                            newChannel.pass(cachedResults).pass(lastResults);
-
-                        } catch (final Throwable t) {
-                            logger.wrn(t, "aborted channel");
-                            abortedChannels.add(newChannel);
-                        }
-                    }
-
-                    for (final Channel<OUT, ?> channel : oldChannels) {
-                        try {
-                            channel.pass(lastResults);
-
-                        } catch (final Throwable t) {
-                            logger.wrn(t, "aborted channel");
-                            abortedChannels.add(channel);
-                        }
-                    }
-
-                    cachedResults.addAll(lastResults);
-                    lastResults.clear();
-                }
-
-                final boolean isComplete = mIsComplete;
-                logger.dbg("invocation is complete: %s", isComplete);
-                return isComplete;
-            }
-        }
-    }
+  }
 }

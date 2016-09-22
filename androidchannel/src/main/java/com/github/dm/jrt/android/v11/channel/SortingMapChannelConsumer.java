@@ -34,47 +34,46 @@ import org.jetbrains.annotations.NotNull;
  */
 class SortingMapChannelConsumer<OUT> implements ChannelConsumer<Selectable<? extends OUT>> {
 
-    private final SparseArray<Channel<OUT, ?>> mChannels;
+  private final SparseArray<Channel<OUT, ?>> mChannels;
 
-    /**
-     * Constructor.
-     *
-     * @param channels the map of indexes and channels.
-     * @throws java.lang.NullPointerException if the specified map is null or contains a null
-     *                                        object.
-     */
-    SortingMapChannelConsumer(@NotNull final SparseArray<Channel<OUT, ?>> channels) {
-        final SparseArray<Channel<OUT, ?>> channelMap = channels.clone();
-        if (channelMap.indexOfValue(null) >= 0) {
-            throw new NullPointerException("the map of channels must not contain null objects");
-        }
-
-        mChannels = channelMap;
+  /**
+   * Constructor.
+   *
+   * @param channels the map of indexes and channels.
+   * @throws java.lang.NullPointerException if the specified map is null or contains a null object.
+   */
+  SortingMapChannelConsumer(@NotNull final SparseArray<Channel<OUT, ?>> channels) {
+    final SparseArray<Channel<OUT, ?>> channelMap = channels.clone();
+    if (channelMap.indexOfValue(null) >= 0) {
+      throw new NullPointerException("the map of channels must not contain null objects");
     }
 
-    @Override
-    public void onComplete() {
-        final SparseArray<Channel<OUT, ?>> channels = mChannels;
-        final int size = channels.size();
-        for (int i = 0; i < size; ++i) {
-            channels.valueAt(i).close();
-        }
-    }
+    mChannels = channelMap;
+  }
 
-    @Override
-    public void onError(@NotNull final RoutineException error) {
-        final SparseArray<Channel<OUT, ?>> channels = mChannels;
-        final int size = channels.size();
-        for (int i = 0; i < size; ++i) {
-            channels.valueAt(i).abort(error);
-        }
+  @Override
+  public void onComplete() {
+    final SparseArray<Channel<OUT, ?>> channels = mChannels;
+    final int size = channels.size();
+    for (int i = 0; i < size; ++i) {
+      channels.valueAt(i).close();
     }
+  }
 
-    @Override
-    public void onOutput(final Selectable<? extends OUT> selectable) {
-        final Channel<OUT, ?> channel = mChannels.get(selectable.index);
-        if (channel != null) {
-            channel.pass(selectable.data);
-        }
+  @Override
+  public void onError(@NotNull final RoutineException error) {
+    final SparseArray<Channel<OUT, ?>> channels = mChannels;
+    final int size = channels.size();
+    for (int i = 0; i < size; ++i) {
+      channels.valueAt(i).abort(error);
     }
+  }
+
+  @Override
+  public void onOutput(final Selectable<? extends OUT> selectable) {
+    final Channel<OUT, ?> channel = mChannels.get(selectable.index);
+    if (channel != null) {
+      channel.pass(selectable.data);
+    }
+  }
 }

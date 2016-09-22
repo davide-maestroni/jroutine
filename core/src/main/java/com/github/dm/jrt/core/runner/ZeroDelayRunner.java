@@ -31,84 +31,84 @@ import java.util.concurrent.TimeUnit;
  */
 class ZeroDelayRunner extends RunnerDecorator {
 
-    private static final WeakIdentityHashMap<Runner, WeakReference<ZeroDelayRunner>> sRunners =
-            new WeakIdentityHashMap<Runner, WeakReference<ZeroDelayRunner>>();
+  private static final WeakIdentityHashMap<Runner, WeakReference<ZeroDelayRunner>> sRunners =
+      new WeakIdentityHashMap<Runner, WeakReference<ZeroDelayRunner>>();
 
-    private static final QueuedRunner sSyncRunner = new QueuedRunner();
+  private static final QueuedRunner sSyncRunner = new QueuedRunner();
 
-    private final WeakIdentityHashMap<Execution, WeakReference<ExecutionDecorator>> mExecutions =
-            new WeakIdentityHashMap<Execution, WeakReference<ExecutionDecorator>>();
+  private final WeakIdentityHashMap<Execution, WeakReference<ExecutionDecorator>> mExecutions =
+      new WeakIdentityHashMap<Execution, WeakReference<ExecutionDecorator>>();
 
-    /**
-     * Constructor.
-     *
-     * @param wrapped the wrapped instance.
-     */
-    private ZeroDelayRunner(@NotNull final Runner wrapped) {
-        super(wrapped);
+  /**
+   * Constructor.
+   *
+   * @param wrapped the wrapped instance.
+   */
+  private ZeroDelayRunner(@NotNull final Runner wrapped) {
+    super(wrapped);
+  }
+
+  /**
+   * Returns an instance wrapping the specified runner.
+   *
+   * @param wrapped the wrapped instance.
+   * @return the zero delay runner.
+   */
+  @NotNull
+  static ZeroDelayRunner getInstance(@NotNull final Runner wrapped) {
+    if (wrapped instanceof ZeroDelayRunner) {
+      return (ZeroDelayRunner) wrapped;
     }
 
-    /**
-     * Returns an instance wrapping the specified runner.
-     *
-     * @param wrapped the wrapped instance.
-     * @return the zero delay runner.
-     */
-    @NotNull
-    static ZeroDelayRunner getInstance(@NotNull final Runner wrapped) {
-        if (wrapped instanceof ZeroDelayRunner) {
-            return (ZeroDelayRunner) wrapped;
-        }
-
-        ZeroDelayRunner zeroDelayRunner;
-        synchronized (sRunners) {
-            final WeakIdentityHashMap<Runner, WeakReference<ZeroDelayRunner>> runners = sRunners;
-            final WeakReference<ZeroDelayRunner> runner = runners.get(wrapped);
-            zeroDelayRunner = (runner != null) ? runner.get() : null;
-            if (zeroDelayRunner == null) {
-                zeroDelayRunner = new ZeroDelayRunner(wrapped);
-                runners.put(wrapped, new WeakReference<ZeroDelayRunner>(zeroDelayRunner));
-            }
-        }
-
-        return zeroDelayRunner;
+    ZeroDelayRunner zeroDelayRunner;
+    synchronized (sRunners) {
+      final WeakIdentityHashMap<Runner, WeakReference<ZeroDelayRunner>> runners = sRunners;
+      final WeakReference<ZeroDelayRunner> runner = runners.get(wrapped);
+      zeroDelayRunner = (runner != null) ? runner.get() : null;
+      if (zeroDelayRunner == null) {
+        zeroDelayRunner = new ZeroDelayRunner(wrapped);
+        runners.put(wrapped, new WeakReference<ZeroDelayRunner>(zeroDelayRunner));
+      }
     }
 
-    @Override
-    public void cancel(@NotNull final Execution execution) {
-        final ExecutionDecorator decorator;
-        synchronized (mExecutions) {
-            final WeakReference<ExecutionDecorator> reference = mExecutions.remove(execution);
-            decorator = (reference != null) ? reference.get() : null;
-        }
+    return zeroDelayRunner;
+  }
 
-        if (decorator != null) {
-            sSyncRunner.cancel(decorator);
-        }
-
-        super.cancel(execution);
+  @Override
+  public void cancel(@NotNull final Execution execution) {
+    final ExecutionDecorator decorator;
+    synchronized (mExecutions) {
+      final WeakReference<ExecutionDecorator> reference = mExecutions.remove(execution);
+      decorator = (reference != null) ? reference.get() : null;
     }
 
-    @Override
-    public void run(@NotNull final Execution execution, final long delay,
-            @NotNull final TimeUnit timeUnit) {
-        if ((delay == 0) && getThreadManager().isManagedThread()) {
-            ExecutionDecorator decorator;
-            synchronized (mExecutions) {
-                final WeakIdentityHashMap<Execution, WeakReference<ExecutionDecorator>> executions =
-                        mExecutions;
-                final WeakReference<ExecutionDecorator> reference = mExecutions.get(execution);
-                decorator = (reference != null) ? reference.get() : null;
-                if (decorator == null) {
-                    decorator = new ExecutionDecorator(execution);
-                    executions.put(execution, new WeakReference<ExecutionDecorator>(decorator));
-                }
-            }
-
-            sSyncRunner.run(decorator, delay, timeUnit);
-
-        } else {
-            super.run(execution, delay, timeUnit);
-        }
+    if (decorator != null) {
+      sSyncRunner.cancel(decorator);
     }
+
+    super.cancel(execution);
+  }
+
+  @Override
+  public void run(@NotNull final Execution execution, final long delay,
+      @NotNull final TimeUnit timeUnit) {
+    if ((delay == 0) && getThreadManager().isManagedThread()) {
+      ExecutionDecorator decorator;
+      synchronized (mExecutions) {
+        final WeakIdentityHashMap<Execution, WeakReference<ExecutionDecorator>> executions =
+            mExecutions;
+        final WeakReference<ExecutionDecorator> reference = mExecutions.get(execution);
+        decorator = (reference != null) ? reference.get() : null;
+        if (decorator == null) {
+          decorator = new ExecutionDecorator(execution);
+          executions.put(execution, new WeakReference<ExecutionDecorator>(decorator));
+        }
+      }
+
+      sSyncRunner.run(decorator, delay, timeUnit);
+
+    } else {
+      super.run(execution, delay, timeUnit);
+    }
+  }
 }

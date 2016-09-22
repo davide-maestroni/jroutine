@@ -33,19 +33,19 @@ import org.jetbrains.annotations.NotNull;
  */
 class DefaultRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OUT> {
 
-    private final InvocationFactory<IN, OUT> mFactory;
+  private final InvocationFactory<IN, OUT> mFactory;
 
-    /**
-     * Constructor.
-     *
-     * @param factory the invocation factory.
-     */
-    DefaultRoutineBuilder(@NotNull final InvocationFactory<IN, OUT> factory) {
-        mFactory = ConstantConditions.notNull("invocation factory", factory);
-    }
+  /**
+   * Constructor.
+   *
+   * @param factory the invocation factory.
+   */
+  DefaultRoutineBuilder(@NotNull final InvocationFactory<IN, OUT> factory) {
+    mFactory = ConstantConditions.notNull("invocation factory", factory);
+  }
 
-    @NotNull
-    public Routine<IN, OUT> buildRoutine() {
-        return new DefaultRoutine<IN, OUT>(getConfiguration(), mFactory);
-    }
+  @NotNull
+  public Routine<IN, OUT> buildRoutine() {
+    return new DefaultRoutine<IN, OUT>(getConfiguration(), mFactory);
+  }
 }

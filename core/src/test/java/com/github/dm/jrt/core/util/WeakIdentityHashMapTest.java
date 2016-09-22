@@ -34,392 +34,391 @@ import static org.junit.Assert.fail;
  */
 public class WeakIdentityHashMapTest {
 
-    @Test
-    public void testClear() {
+  @Test
+  public void testClear() {
 
-        final WeakIdentityHashMap<Object, String> map =
-                new WeakIdentityHashMap<Object, String>(4, 0.75f);
+    final WeakIdentityHashMap<Object, String> map =
+        new WeakIdentityHashMap<Object, String>(4, 0.75f);
 
-        final HashMap<Object, String> entries = new HashMap<Object, String>();
+    final HashMap<Object, String> entries = new HashMap<Object, String>();
 
-        final Object key0 = new Object();
-        final Object key1 = new Object();
-        final Object key2 = new Object();
-        final Object key3 = new Object();
+    final Object key0 = new Object();
+    final Object key1 = new Object();
+    final Object key2 = new Object();
+    final Object key3 = new Object();
 
-        entries.put(key0, "test0");
-        entries.put(key1, "test1");
-        entries.put(key2, "test2");
-        entries.put(key3, "test3");
+    entries.put(key0, "test0");
+    entries.put(key1, "test1");
+    entries.put(key2, "test2");
+    entries.put(key3, "test3");
 
-        map.putAll(entries);
+    map.putAll(entries);
 
-        assertThat(map).hasSize(4);
-        assertThat(map).contains(MapEntry.entry(key0, "test0"), MapEntry.entry(key1, "test1"),
-                MapEntry.entry(key2, "test2"), MapEntry.entry(key3, "test3"));
+    assertThat(map).hasSize(4);
+    assertThat(map).contains(MapEntry.entry(key0, "test0"), MapEntry.entry(key1, "test1"),
+        MapEntry.entry(key2, "test2"), MapEntry.entry(key3, "test3"));
 
-        map.clear();
+    map.clear();
 
-        assertThat(map).isEmpty();
+    assertThat(map).isEmpty();
+  }
+
+  @Test
+  public void testEntryIteratorRemove() {
+
+    final WeakIdentityHashMap<Object, String> map =
+        new WeakIdentityHashMap<Object, String>(4, 0.75f);
+
+    final Object key0 = new Object();
+
+    map.put(key0, "test0");
+
+    final Iterator<Entry<Object, String>> entryIterator = map.entrySet().iterator();
+    final Entry<Object, String> nextEntry = entryIterator.next();
+
+    assertThat(map.get(nextEntry.getKey())).isEqualTo(nextEntry.getValue());
+
+    entryIterator.remove();
+
+    try {
+
+      entryIterator.remove();
+
+      fail();
+
+    } catch (final Exception ignored) {
+
     }
 
-    @Test
-    public void testEntryIteratorRemove() {
+    assertThat(map).doesNotContainKey(nextEntry.getKey());
+    assertThat(map).doesNotContainValue(nextEntry.getValue());
+    assertThat(map).isEmpty();
 
-        final WeakIdentityHashMap<Object, String> map =
-                new WeakIdentityHashMap<Object, String>(4, 0.75f);
+    while (entryIterator.hasNext()) {
 
-        final Object key0 = new Object();
-
-        map.put(key0, "test0");
-
-        final Iterator<Entry<Object, String>> entryIterator = map.entrySet().iterator();
-        final Entry<Object, String> nextEntry = entryIterator.next();
-
-        assertThat(map.get(nextEntry.getKey())).isEqualTo(nextEntry.getValue());
-
-        entryIterator.remove();
-
-        try {
-
-            entryIterator.remove();
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        assertThat(map).doesNotContainKey(nextEntry.getKey());
-        assertThat(map).doesNotContainValue(nextEntry.getValue());
-        assertThat(map).isEmpty();
-
-        while (entryIterator.hasNext()) {
-
-            entryIterator.next();
-        }
-
-        try {
-
-            entryIterator.next();
-
-            fail();
-
-        } catch (final NoSuchElementException ignored) {
-
-        }
+      entryIterator.next();
     }
 
-    @Test
-    public void testEquals() {
+    try {
 
-        final HashMap<Object, String> entries = new HashMap<Object, String>();
+      entryIterator.next();
 
-        final Object key0 = new Object();
-        final Object key1 = new Object();
-        final Object key2 = new Object();
-        final Object key3 = new Object();
+      fail();
 
-        entries.put(key0, "test0");
-        entries.put(key1, "test1");
-        entries.put(key2, "test2");
-        entries.put(key3, "test3");
+    } catch (final NoSuchElementException ignored) {
 
-        final WeakIdentityHashMap<Object, String> map =
-                new WeakIdentityHashMap<Object, String>(entries);
+    }
+  }
 
-        assertThat(map).hasSize(4);
-        assertThat(map).contains(MapEntry.entry(key0, "test0"), MapEntry.entry(key1, "test1"),
-                MapEntry.entry(key2, "test2"), MapEntry.entry(key3, "test3"));
+  @Test
+  public void testEquals() {
 
-        assertThat(map).isEqualTo(entries);
-        assertThat(map.keySet()).isEqualTo(entries.keySet());
-        assertThat(map.values()).containsOnly(entries.values().toArray(new String[entries.size()]));
-        assertThat(map.entrySet()).isEqualTo(entries.entrySet());
+    final HashMap<Object, String> entries = new HashMap<Object, String>();
+
+    final Object key0 = new Object();
+    final Object key1 = new Object();
+    final Object key2 = new Object();
+    final Object key3 = new Object();
+
+    entries.put(key0, "test0");
+    entries.put(key1, "test1");
+    entries.put(key2, "test2");
+    entries.put(key3, "test3");
+
+    final WeakIdentityHashMap<Object, String> map =
+        new WeakIdentityHashMap<Object, String>(entries);
+
+    assertThat(map).hasSize(4);
+    assertThat(map).contains(MapEntry.entry(key0, "test0"), MapEntry.entry(key1, "test1"),
+        MapEntry.entry(key2, "test2"), MapEntry.entry(key3, "test3"));
+
+    assertThat(map).isEqualTo(entries);
+    assertThat(map.keySet()).isEqualTo(entries.keySet());
+    assertThat(map.values()).containsOnly(entries.values().toArray(new String[entries.size()]));
+    assertThat(map.entrySet()).isEqualTo(entries.entrySet());
+  }
+
+  @Test
+  public void testIdentity() {
+
+    final MyInteger key0 = new MyInteger(3);
+    final MyInteger key1 = new MyInteger(3);
+
+    assertThat(key0).isEqualTo(key1);
+
+    final WeakIdentityHashMap<MyInteger, String> map = new WeakIdentityHashMap<MyInteger, String>();
+
+    map.put(key0, "test0");
+    map.put(key1, "test1");
+
+    assertThat(map).contains(MapEntry.entry(key0, "test0"), MapEntry.entry(key1, "test1"));
+    map.remove(key0);
+    assertThat(map).contains(MapEntry.entry(key1, "test1"));
+  }
+
+  @Test
+  public void testKeyIteratorRemove() {
+
+    final WeakIdentityHashMap<Object, String> map =
+        new WeakIdentityHashMap<Object, String>(4, 0.75f);
+
+    final Object key0 = new Object();
+    final Object key1 = new Object();
+    final Object key3 = new Object();
+
+    map.put(key0, "test0");
+    map.put(key1, "test1");
+    map.put(key3, "test3");
+
+    final Iterator<Object> keyIterator = map.keySet().iterator();
+    final Object nextKey = keyIterator.next();
+
+    assertThat(map).containsKey(nextKey);
+
+    keyIterator.remove();
+
+    try {
+
+      keyIterator.remove();
+
+      fail();
+
+    } catch (final Exception ignored) {
+
     }
 
-    @Test
-    public void testIdentity() {
+    assertThat(map).doesNotContainKey(nextKey);
+    assertThat(map).hasSize(2);
 
-        final MyInteger key0 = new MyInteger(3);
-        final MyInteger key1 = new MyInteger(3);
+    while (keyIterator.hasNext()) {
 
-        assertThat(key0).isEqualTo(key1);
-
-        final WeakIdentityHashMap<MyInteger, String> map =
-                new WeakIdentityHashMap<MyInteger, String>();
-
-        map.put(key0, "test0");
-        map.put(key1, "test1");
-
-        assertThat(map).contains(MapEntry.entry(key0, "test0"), MapEntry.entry(key1, "test1"));
-        map.remove(key0);
-        assertThat(map).contains(MapEntry.entry(key1, "test1"));
+      keyIterator.next();
     }
 
-    @Test
-    public void testKeyIteratorRemove() {
+    try {
 
-        final WeakIdentityHashMap<Object, String> map =
-                new WeakIdentityHashMap<Object, String>(4, 0.75f);
+      keyIterator.next();
 
-        final Object key0 = new Object();
-        final Object key1 = new Object();
-        final Object key3 = new Object();
+      fail();
 
-        map.put(key0, "test0");
-        map.put(key1, "test1");
-        map.put(key3, "test3");
+    } catch (final NoSuchElementException ignored) {
 
-        final Iterator<Object> keyIterator = map.keySet().iterator();
-        final Object nextKey = keyIterator.next();
+    }
+  }
 
-        assertThat(map).containsKey(nextKey);
+  @Test
+  public void testPut() {
 
-        keyIterator.remove();
+    final WeakIdentityHashMap<Object, String> map = new WeakIdentityHashMap<Object, String>(13);
 
-        try {
+    assertThat(map).isEmpty();
 
-            keyIterator.remove();
+    final Object key0 = new Object();
+    map.put(key0, "test0");
 
-            fail();
+    assertThat(map).hasSize(1);
+    assertThat(map).contains(MapEntry.entry(key0, "test0"));
+    assertThat(map).containsKey(key0);
+    assertThat(map).containsValue("test0");
+    assertThat(map).doesNotContainKey("test0");
+    assertThat(map).doesNotContainValue("test1");
+  }
 
-        } catch (final Exception ignored) {
+  @Test
+  public void testPutAll() {
 
-        }
+    final WeakIdentityHashMap<Object, String> map = new WeakIdentityHashMap<Object, String>(13);
 
-        assertThat(map).doesNotContainKey(nextKey);
-        assertThat(map).hasSize(2);
+    assertThat(map).isEmpty();
 
-        while (keyIterator.hasNext()) {
+    final Object key0 = new Object();
+    map.put(key0, "test0");
 
-            keyIterator.next();
-        }
+    final HashMap<Object, String> entries = new HashMap<Object, String>();
 
-        try {
+    final Object key1 = new Object();
+    final Object key2 = new Object();
+    final Object key3 = new Object();
 
-            keyIterator.next();
+    entries.put(key1, "test1");
+    entries.put(key2, "test2");
+    entries.put(key3, "test3");
 
-            fail();
+    map.putAll(entries);
 
-        } catch (final NoSuchElementException ignored) {
+    assertThat(map).hasSize(4);
+    assertThat(map).contains(MapEntry.entry(key0, "test0"), MapEntry.entry(key1, "test1"),
+        MapEntry.entry(key2, "test2"), MapEntry.entry(key3, "test3"));
+  }
 
-        }
+  @Test
+  public void testRemove() {
+
+    final WeakIdentityHashMap<Object, String> map =
+        new WeakIdentityHashMap<Object, String>(4, 0.75f);
+
+    final Object key0 = new Object();
+    final Object key1 = new Object();
+    final Object key2 = new Object();
+    final Object key3 = new Object();
+
+    map.put(key0, "test0");
+    map.put(key1, "test1");
+    map.put(key2, "test2");
+    map.put(key3, "test3");
+
+    assertThat(map).hasSize(4);
+    assertThat(map).contains(MapEntry.entry(key0, "test0"), MapEntry.entry(key1, "test1"),
+        MapEntry.entry(key2, "test2"), MapEntry.entry(key3, "test3"));
+
+    assertThat(map.get(key2)).isEqualTo("test2");
+
+    map.remove(key2);
+
+    assertThat(map).hasSize(3);
+    assertThat(map).contains(MapEntry.entry(key0, "test0"), MapEntry.entry(key1, "test1"),
+        MapEntry.entry(key3, "test3"));
+  }
+
+  @Test
+  public void testSetEntry() {
+
+    final WeakIdentityHashMap<Object, String> map = new WeakIdentityHashMap<Object, String>(13);
+
+    final Object key0 = new Object();
+    map.put(key0, "test0");
+
+    final HashMap<Object, String> entries = new HashMap<Object, String>();
+
+    final Object key1 = new Object();
+    final Object key2 = new Object();
+    final Object key3 = new Object();
+
+    entries.put(key1, "test1");
+    entries.put(key2, "test2");
+    entries.put(key3, "test3");
+
+    map.putAll(entries);
+
+    final Entry<Object, String> entry = map.entrySet().iterator().next();
+
+    entry.setValue("test");
+
+    assertThat(entry.getValue()).isEqualTo("test");
+    assertThat(map.get(entry.getKey())).isEqualTo("test");
+  }
+
+  @Test
+  public void testValueIteratorRemove() {
+
+    final WeakIdentityHashMap<Object, String> map =
+        new WeakIdentityHashMap<Object, String>(4, 0.75f);
+
+    final Object key0 = new Object();
+    final Object key1 = new Object();
+
+    map.put(key0, "test0");
+    map.put(key1, "test1");
+
+    final Iterator<String> valueIterator = map.values().iterator();
+    final String nextValue = valueIterator.next();
+
+    assertThat(map).containsValue(nextValue);
+
+    valueIterator.remove();
+
+    try {
+
+      valueIterator.remove();
+
+      fail();
+
+    } catch (final Exception ignored) {
+
     }
 
-    @Test
-    public void testPut() {
+    assertThat(map).doesNotContainValue(nextValue);
+    assertThat(map).hasSize(1);
 
-        final WeakIdentityHashMap<Object, String> map = new WeakIdentityHashMap<Object, String>(13);
+    while (valueIterator.hasNext()) {
 
-        assertThat(map).isEmpty();
-
-        final Object key0 = new Object();
-        map.put(key0, "test0");
-
-        assertThat(map).hasSize(1);
-        assertThat(map).contains(MapEntry.entry(key0, "test0"));
-        assertThat(map).containsKey(key0);
-        assertThat(map).containsValue("test0");
-        assertThat(map).doesNotContainKey("test0");
-        assertThat(map).doesNotContainValue("test1");
+      valueIterator.next();
     }
 
-    @Test
-    public void testPutAll() {
+    try {
 
-        final WeakIdentityHashMap<Object, String> map = new WeakIdentityHashMap<Object, String>(13);
+      valueIterator.next();
 
-        assertThat(map).isEmpty();
+      fail();
 
-        final Object key0 = new Object();
-        map.put(key0, "test0");
+    } catch (final NoSuchElementException ignored) {
 
-        final HashMap<Object, String> entries = new HashMap<Object, String>();
+    }
+  }
 
-        final Object key1 = new Object();
-        final Object key2 = new Object();
-        final Object key3 = new Object();
+  @Test
+  @SuppressWarnings("UnusedAssignment")
+  public void testWeakReference() throws InterruptedException {
 
-        entries.put(key1, "test1");
-        entries.put(key2, "test2");
-        entries.put(key3, "test3");
+    final WeakIdentityHashMap<Object, String> map = new WeakIdentityHashMap<Object, String>(4);
 
-        map.putAll(entries);
+    final Object key0 = new Object();
+    final Object key1 = new Object();
+    Object key2 = new Object();
+    final Object key3 = new Object();
 
-        assertThat(map).hasSize(4);
-        assertThat(map).contains(MapEntry.entry(key0, "test0"), MapEntry.entry(key1, "test1"),
-                MapEntry.entry(key2, "test2"), MapEntry.entry(key3, "test3"));
+    map.put(key0, "test0");
+    map.put(key1, "test1");
+    map.put(key2, "test2");
+    map.put(key3, "test3");
+
+    key2 = null;
+
+    // This is not guaranteed to work, so let's try a few times...
+    for (int i = 0; i < 5; i++) {
+
+      System.gc();
+      Thread.sleep(100);
+
+      if (!map.prune().containsValue("test2")) {
+
+        return;
+      }
     }
 
-    @Test
-    public void testRemove() {
+    fail();
+  }
 
-        final WeakIdentityHashMap<Object, String> map =
-                new WeakIdentityHashMap<Object, String>(4, 0.75f);
+  private static class MyInteger {
 
-        final Object key0 = new Object();
-        final Object key1 = new Object();
-        final Object key2 = new Object();
-        final Object key3 = new Object();
+    private final int mInt;
 
-        map.put(key0, "test0");
-        map.put(key1, "test1");
-        map.put(key2, "test2");
-        map.put(key3, "test3");
+    private MyInteger(final int i) {
 
-        assertThat(map).hasSize(4);
-        assertThat(map).contains(MapEntry.entry(key0, "test0"), MapEntry.entry(key1, "test1"),
-                MapEntry.entry(key2, "test2"), MapEntry.entry(key3, "test3"));
-
-        assertThat(map.get(key2)).isEqualTo("test2");
-
-        map.remove(key2);
-
-        assertThat(map).hasSize(3);
-        assertThat(map).contains(MapEntry.entry(key0, "test0"), MapEntry.entry(key1, "test1"),
-                MapEntry.entry(key3, "test3"));
+      mInt = i;
     }
 
-    @Test
-    public void testSetEntry() {
+    @Override
+    public int hashCode() {
 
-        final WeakIdentityHashMap<Object, String> map = new WeakIdentityHashMap<Object, String>(13);
-
-        final Object key0 = new Object();
-        map.put(key0, "test0");
-
-        final HashMap<Object, String> entries = new HashMap<Object, String>();
-
-        final Object key1 = new Object();
-        final Object key2 = new Object();
-        final Object key3 = new Object();
-
-        entries.put(key1, "test1");
-        entries.put(key2, "test2");
-        entries.put(key3, "test3");
-
-        map.putAll(entries);
-
-        final Entry<Object, String> entry = map.entrySet().iterator().next();
-
-        entry.setValue("test");
-
-        assertThat(entry.getValue()).isEqualTo("test");
-        assertThat(map.get(entry.getKey())).isEqualTo("test");
+      return mInt;
     }
 
-    @Test
-    public void testValueIteratorRemove() {
+    @Override
+    public boolean equals(final Object o) {
 
-        final WeakIdentityHashMap<Object, String> map =
-                new WeakIdentityHashMap<Object, String>(4, 0.75f);
+      if (this == o) {
 
-        final Object key0 = new Object();
-        final Object key1 = new Object();
+        return true;
+      }
 
-        map.put(key0, "test0");
-        map.put(key1, "test1");
+      if (!(o instanceof MyInteger)) {
 
-        final Iterator<String> valueIterator = map.values().iterator();
-        final String nextValue = valueIterator.next();
+        return false;
+      }
 
-        assertThat(map).containsValue(nextValue);
-
-        valueIterator.remove();
-
-        try {
-
-            valueIterator.remove();
-
-            fail();
-
-        } catch (final Exception ignored) {
-
-        }
-
-        assertThat(map).doesNotContainValue(nextValue);
-        assertThat(map).hasSize(1);
-
-        while (valueIterator.hasNext()) {
-
-            valueIterator.next();
-        }
-
-        try {
-
-            valueIterator.next();
-
-            fail();
-
-        } catch (final NoSuchElementException ignored) {
-
-        }
+      final MyInteger myInteger = (MyInteger) o;
+      return mInt == myInteger.mInt;
     }
-
-    @Test
-    @SuppressWarnings("UnusedAssignment")
-    public void testWeakReference() throws InterruptedException {
-
-        final WeakIdentityHashMap<Object, String> map = new WeakIdentityHashMap<Object, String>(4);
-
-        final Object key0 = new Object();
-        final Object key1 = new Object();
-        Object key2 = new Object();
-        final Object key3 = new Object();
-
-        map.put(key0, "test0");
-        map.put(key1, "test1");
-        map.put(key2, "test2");
-        map.put(key3, "test3");
-
-        key2 = null;
-
-        // This is not guaranteed to work, so let's try a few times...
-        for (int i = 0; i < 5; i++) {
-
-            System.gc();
-            Thread.sleep(100);
-
-            if (!map.prune().containsValue("test2")) {
-
-                return;
-            }
-        }
-
-        fail();
-    }
-
-    private static class MyInteger {
-
-        private final int mInt;
-
-        private MyInteger(final int i) {
-
-            mInt = i;
-        }
-
-        @Override
-        public int hashCode() {
-
-            return mInt;
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            if (this == o) {
-
-                return true;
-            }
-
-            if (!(o instanceof MyInteger)) {
-
-                return false;
-            }
-
-            final MyInteger myInteger = (MyInteger) o;
-            return mInt == myInteger.mInt;
-        }
-    }
+  }
 }

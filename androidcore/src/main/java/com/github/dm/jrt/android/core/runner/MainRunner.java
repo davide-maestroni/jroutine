@@ -26,10 +26,10 @@ import android.os.Looper;
  */
 public class MainRunner extends HandlerRunner {
 
-    /**
-     * Constructor.
-     */
-    public MainRunner() {
-        super(new Handler(Looper.getMainLooper()));
-    }
+  /**
+   * Constructor.
+   */
+  public MainRunner() {
+    super(new Handler(Looper.getMainLooper()));
+  }
 }

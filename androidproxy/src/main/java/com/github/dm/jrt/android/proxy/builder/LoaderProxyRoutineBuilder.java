@@ -31,102 +31,102 @@ import org.jetbrains.annotations.NotNull;
  * Created by davide-maestroni on 05/06/2015.
  */
 public interface LoaderProxyRoutineBuilder
-        extends ProxyRoutineBuilder, LoaderConfigurable<LoaderProxyRoutineBuilder> {
+    extends ProxyRoutineBuilder, LoaderConfigurable<LoaderProxyRoutineBuilder> {
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * The configured asynchronous runner will be ignored.
-     */
-    @NotNull
-    @Override
-    LoaderProxyRoutineBuilder apply(@NotNull InvocationConfiguration configuration);
+  /**
+   * {@inheritDoc}
+   * <p>
+   * The configured asynchronous runner will be ignored.
+   */
+  @NotNull
+  @Override
+  LoaderProxyRoutineBuilder apply(@NotNull InvocationConfiguration configuration);
 
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    LoaderProxyRoutineBuilder apply(@NotNull ObjectConfiguration configuration);
+  /**
+   * {@inheritDoc}
+   */
+  @NotNull
+  @Override
+  LoaderProxyRoutineBuilder apply(@NotNull ObjectConfiguration configuration);
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * The configured asynchronous runner will be ignored.
-     */
-    @NotNull
-    @Override
-    InvocationConfiguration.Builder<? extends LoaderProxyRoutineBuilder>
-    applyInvocationConfiguration();
+  /**
+   * {@inheritDoc}
+   * <p>
+   * The configured asynchronous runner will be ignored.
+   */
+  @NotNull
+  @Override
+  InvocationConfiguration.Builder<? extends LoaderProxyRoutineBuilder>
+  applyInvocationConfiguration();
 
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    ObjectConfiguration.Builder<? extends LoaderProxyRoutineBuilder> applyObjectConfiguration();
+  /**
+   * {@inheritDoc}
+   */
+  @NotNull
+  @Override
+  ObjectConfiguration.Builder<? extends LoaderProxyRoutineBuilder> applyObjectConfiguration();
 
-    /**
-     * Returns a proxy object enabling asynchronous call of the target instance methods.
-     * <p>
-     * The routines used for calling the methods will honor the attributes specified in any optional
-     * <i>{@code com.github.dm.jrt.object.annotation.*}</i> as well as
-     * <i>{@code com.github.dm.jrt.android.object.annotation.*}</i> annotations.
-     * <br>
-     * Note that such annotations will override any configuration set through the builder.
-     * <p>
-     * The proxy object is created through code generation based on the interfaces annotated with
-     * {@link com.github.dm.jrt.android.proxy.annotation.LoaderProxyCompat LoaderProxyCompat} or
-     * {@link com.github.dm.jrt.android.proxy.annotation.LoaderProxy LoaderProxy}. The generated
-     * class name and package will be chosen according to the specific annotation attributes.
-     * <br>
-     * It is actually possible to avoid the use of reflection for the proxy object instantiation by
-     * explicitly calling the <code>&lt;generated_class_name&gt;.with()</code> method.
-     * <br>
-     * Note, however, that, since the class is generated, a generic IDE may highlight an error even
-     * if the compilation is successful.
-     *
-     * @param itf    the interface implemented by the return object.
-     * @param <TYPE> the interface type.
-     * @return the proxy object.
-     * @throws java.lang.IllegalArgumentException if the specified class does not represent an
-     *                                            interface.
-     * @see com.github.dm.jrt.android.object.annotation Android Annotations
-     * @see com.github.dm.jrt.object.annotation Annotations
-     */
-    @NotNull
-    @Override
-    <TYPE> TYPE buildProxy(@NotNull Class<TYPE> itf);
+  /**
+   * Returns a proxy object enabling asynchronous call of the target instance methods.
+   * <p>
+   * The routines used for calling the methods will honor the attributes specified in any optional
+   * <i>{@code com.github.dm.jrt.object.annotation.*}</i> as well as
+   * <i>{@code com.github.dm.jrt.android.object.annotation.*}</i> annotations.
+   * <br>
+   * Note that such annotations will override any configuration set through the builder.
+   * <p>
+   * The proxy object is created through code generation based on the interfaces annotated with
+   * {@link com.github.dm.jrt.android.proxy.annotation.LoaderProxyCompat LoaderProxyCompat} or
+   * {@link com.github.dm.jrt.android.proxy.annotation.LoaderProxy LoaderProxy}. The generated
+   * class name and package will be chosen according to the specific annotation attributes.
+   * <br>
+   * It is actually possible to avoid the use of reflection for the proxy object instantiation by
+   * explicitly calling the <code>&lt;generated_class_name&gt;.with()</code> method.
+   * <br>
+   * Note, however, that, since the class is generated, a generic IDE may highlight an error even
+   * if the compilation is successful.
+   *
+   * @param itf    the interface implemented by the return object.
+   * @param <TYPE> the interface type.
+   * @return the proxy object.
+   * @throws java.lang.IllegalArgumentException if the specified class does not represent an
+   *                                            interface.
+   * @see com.github.dm.jrt.android.object.annotation Android Annotations
+   * @see com.github.dm.jrt.object.annotation Annotations
+   */
+  @NotNull
+  @Override
+  <TYPE> TYPE buildProxy(@NotNull Class<TYPE> itf);
 
-    /**
-     * Returns a proxy object enabling asynchronous call of the target instance methods.
-     * <p>
-     * The routines used for calling the methods will honor the attributes specified in any optional
-     * <i>{@code com.github.dm.jrt.object.annotation.*}</i> as well as
-     * <i>{@code com.github.dm.jrt.android.object.annotation.*}</i> annotations.
-     * <br>
-     * Note that such annotations will override any configuration set through the builder.
-     * <p>
-     * The proxy object is created through code generation based on the interfaces annotated with
-     * {@link com.github.dm.jrt.android.proxy.annotation.LoaderProxyCompat LoaderProxyCompat} or
-     * {@link com.github.dm.jrt.android.proxy.annotation.LoaderProxy LoaderProxy}. The generated
-     * class name and package will be chosen according to the specific annotation attributes.
-     * <br>
-     * It is actually possible to avoid the use of reflection for the proxy object instantiation by
-     * explicitly calling the <code>&lt;generated_class_name&gt;.with()</code> method.
-     * <br>
-     * Note, however, that, since the class is generated, a generic IDE may highlight an error even
-     * if the compilation is successful.
-     *
-     * @param itf    the token of the interface implemented by the return object.
-     * @param <TYPE> the interface type.
-     * @return the proxy object.
-     * @throws java.lang.IllegalArgumentException if the specified class does not represent an
-     *                                            interface.
-     * @see com.github.dm.jrt.android.object.annotation Android Annotations
-     * @see com.github.dm.jrt.object.annotation Annotations
-     */
-    @NotNull
-    @Override
-    <TYPE> TYPE buildProxy(@NotNull ClassToken<TYPE> itf);
+  /**
+   * Returns a proxy object enabling asynchronous call of the target instance methods.
+   * <p>
+   * The routines used for calling the methods will honor the attributes specified in any optional
+   * <i>{@code com.github.dm.jrt.object.annotation.*}</i> as well as
+   * <i>{@code com.github.dm.jrt.android.object.annotation.*}</i> annotations.
+   * <br>
+   * Note that such annotations will override any configuration set through the builder.
+   * <p>
+   * The proxy object is created through code generation based on the interfaces annotated with
+   * {@link com.github.dm.jrt.android.proxy.annotation.LoaderProxyCompat LoaderProxyCompat} or
+   * {@link com.github.dm.jrt.android.proxy.annotation.LoaderProxy LoaderProxy}. The generated
+   * class name and package will be chosen according to the specific annotation attributes.
+   * <br>
+   * It is actually possible to avoid the use of reflection for the proxy object instantiation by
+   * explicitly calling the <code>&lt;generated_class_name&gt;.with()</code> method.
+   * <br>
+   * Note, however, that, since the class is generated, a generic IDE may highlight an error even
+   * if the compilation is successful.
+   *
+   * @param itf    the token of the interface implemented by the return object.
+   * @param <TYPE> the interface type.
+   * @return the proxy object.
+   * @throws java.lang.IllegalArgumentException if the specified class does not represent an
+   *                                            interface.
+   * @see com.github.dm.jrt.android.object.annotation Android Annotations
+   * @see com.github.dm.jrt.object.annotation Annotations
+   */
+  @NotNull
+  @Override
+  <TYPE> TYPE buildProxy(@NotNull ClassToken<TYPE> itf);
 }

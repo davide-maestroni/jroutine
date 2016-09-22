@@ -58,10 +58,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface OutputMaxSize {
 
-    /**
-     * The maximum number of data that the output channel can retain.
-     *
-     * @return the maximum number of buffered output data.
-     */
-    int value();
+  /**
+   * The maximum number of data that the output channel can retain.
+   *
+   * @return the maximum number of buffered output data.
+   */
+  int value();
 }

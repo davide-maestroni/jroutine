@@ -47,31 +47,31 @@ import org.jetbrains.annotations.NotNull;
  * @param <OUT> the output data type.
  */
 public interface LoaderRoutineBuilder<IN, OUT>
-        extends RoutineBuilder<IN, OUT>, LoaderConfigurable<LoaderRoutineBuilder<IN, OUT>>,
-        LoaderRoutine<IN, OUT> {
+    extends RoutineBuilder<IN, OUT>, LoaderConfigurable<LoaderRoutineBuilder<IN, OUT>>,
+    LoaderRoutine<IN, OUT> {
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * The configured asynchronous runner will be ignored.
-     */
-    @NotNull
-    @Override
-    LoaderRoutineBuilder<IN, OUT> apply(@NotNull InvocationConfiguration configuration);
+  /**
+   * {@inheritDoc}
+   * <p>
+   * The configured asynchronous runner will be ignored.
+   */
+  @NotNull
+  @Override
+  LoaderRoutineBuilder<IN, OUT> apply(@NotNull InvocationConfiguration configuration);
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * The configured asynchronous runner will be ignored.
-     */
-    @NotNull
-    @Override
-    Builder<? extends LoaderRoutineBuilder<IN, OUT>> applyInvocationConfiguration();
+  /**
+   * {@inheritDoc}
+   * <p>
+   * The configured asynchronous runner will be ignored.
+   */
+  @NotNull
+  @Override
+  Builder<? extends LoaderRoutineBuilder<IN, OUT>> applyInvocationConfiguration();
 
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    LoaderRoutine<IN, OUT> buildRoutine();
+  /**
+   * {@inheritDoc}
+   */
+  @NotNull
+  @Override
+  LoaderRoutine<IN, OUT> buildRoutine();
 }

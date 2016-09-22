@@ -32,13 +32,13 @@ import com.github.dm.jrt.android.core.R;
 @TargetApi(VERSION_CODES.ECLAIR)
 public class TestActivity extends FragmentActivity {
 
-    @Override
-    protected void onCreate(final Bundle savedInstanceState) {
+  @Override
+  protected void onCreate(final Bundle savedInstanceState) {
 
-        super.onCreate(savedInstanceState);
-        getWindow().addFlags(LayoutParams.FLAG_DISMISS_KEYGUARD |
-                LayoutParams.FLAG_SHOW_WHEN_LOCKED |
-                LayoutParams.FLAG_TURN_SCREEN_ON | LayoutParams.FLAG_KEEP_SCREEN_ON);
-        setContentView(R.layout.test_v4_layout);
-    }
+    super.onCreate(savedInstanceState);
+    getWindow().addFlags(LayoutParams.FLAG_DISMISS_KEYGUARD |
+        LayoutParams.FLAG_SHOW_WHEN_LOCKED |
+        LayoutParams.FLAG_TURN_SCREEN_ON | LayoutParams.FLAG_KEEP_SCREEN_ON);
+    setContentView(R.layout.test_v4_layout);
+  }
 }

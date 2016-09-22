@@ -33,49 +33,49 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class ThrottlingTest {
 
-    @Test
-    public void testThrottling() throws InterruptedException {
-        final Semaphore semaphore = new Semaphore(0);
-        final TestExecution execution = new TestExecution(semaphore);
-        final Runner runner = Runners.throttlingRunner(Runners.sharedRunner(), 1);
-        for (int i = 0; i < 100; i++) {
-            runner.run(execution, 0, TimeUnit.MILLISECONDS);
-        }
-
-        assertThat(semaphore.tryAcquire(100, 20, TimeUnit.SECONDS)).isTrue();
-        assertThat(TestExecution.sFailed.get()).isFalse();
+  @Test
+  public void testThrottling() throws InterruptedException {
+    final Semaphore semaphore = new Semaphore(0);
+    final TestExecution execution = new TestExecution(semaphore);
+    final Runner runner = Runners.throttlingRunner(Runners.sharedRunner(), 1);
+    for (int i = 0; i < 100; i++) {
+      runner.run(execution, 0, TimeUnit.MILLISECONDS);
     }
 
-    private static class TestExecution implements Execution {
+    assertThat(semaphore.tryAcquire(100, 20, TimeUnit.SECONDS)).isTrue();
+    assertThat(TestExecution.sFailed.get()).isFalse();
+  }
 
-        private static AtomicInteger sCount = new AtomicInteger();
+  private static class TestExecution implements Execution {
 
-        private static AtomicBoolean sFailed = new AtomicBoolean();
+    private static AtomicInteger sCount = new AtomicInteger();
 
-        private final Semaphore mSemaphore;
+    private static AtomicBoolean sFailed = new AtomicBoolean();
 
-        TestExecution(final Semaphore semaphore) {
-            mSemaphore = semaphore;
-        }
+    private final Semaphore mSemaphore;
 
-        public void run() {
-            final int before = sCount.incrementAndGet();
-            if (before > 1) {
-                sFailed.set(true);
-            }
-
-            try {
-                millis(100).sleepAtLeast();
-
-            } catch (Throwable ignored) {
-            }
-
-            final int after = sCount.decrementAndGet();
-            if (after > 0) {
-                sFailed.set(true);
-            }
-
-            mSemaphore.release();
-        }
+    TestExecution(final Semaphore semaphore) {
+      mSemaphore = semaphore;
     }
+
+    public void run() {
+      final int before = sCount.incrementAndGet();
+      if (before > 1) {
+        sFailed.set(true);
+      }
+
+      try {
+        millis(100).sleepAtLeast();
+
+      } catch (Throwable ignored) {
+      }
+
+      final int after = sCount.decrementAndGet();
+      if (after > 0) {
+        sFailed.set(true);
+      }
+
+      mSemaphore.release();
+    }
+  }
 }

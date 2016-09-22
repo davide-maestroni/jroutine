@@ -59,10 +59,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface LogLevel {
 
-    /**
-     * The routine log level.
-     *
-     * @return the log level.
-     */
-    Level value();
+  /**
+   * The routine log level.
+   *
+   * @return the log level.
+   */
+  Level value();
 }

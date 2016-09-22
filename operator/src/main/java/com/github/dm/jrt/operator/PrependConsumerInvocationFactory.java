@@ -36,9 +36,42 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class PrependConsumerInvocationFactory<OUT> extends InvocationFactory<OUT, OUT> {
 
+  private final long mCount;
+
+  private final ConsumerDecorator<? super Channel<OUT, ?>> mOutputsConsumer;
+
+  /**
+   * Constructor.
+   *
+   * @param count           the loop count.
+   * @param outputsConsumer the consumer instance.
+   */
+  PrependConsumerInvocationFactory(final long count,
+      @NotNull final ConsumerDecorator<? super Channel<OUT, ?>> outputsConsumer) {
+    super(asArgs(ConstantConditions.positive("count number", count),
+        ConstantConditions.notNull("consumer instance", outputsConsumer)));
+    mCount = count;
+    mOutputsConsumer = outputsConsumer;
+  }
+
+  @NotNull
+  @Override
+  public Invocation<OUT, OUT> newInvocation() throws Exception {
+    return new PrependConsumerInvocation<OUT>(mCount, mOutputsConsumer);
+  }
+
+  /**
+   * Prepending invocations used to call a consumer a specific number of times.
+   *
+   * @param <OUT> the output data type.
+   */
+  private static class PrependConsumerInvocation<OUT> extends TemplateInvocation<OUT, OUT> {
+
     private final long mCount;
 
     private final ConsumerDecorator<? super Channel<OUT, ?>> mOutputsConsumer;
+
+    private boolean mIsCalled;
 
     /**
      * Constructor.
@@ -46,71 +79,37 @@ class PrependConsumerInvocationFactory<OUT> extends InvocationFactory<OUT, OUT> 
      * @param count           the loop count.
      * @param outputsConsumer the consumer instance.
      */
-    PrependConsumerInvocationFactory(final long count,
-            @NotNull final ConsumerDecorator<? super Channel<OUT, ?>> outputsConsumer) {
-        super(asArgs(ConstantConditions.positive("count number", count),
-                ConstantConditions.notNull("consumer instance", outputsConsumer)));
-        mCount = count;
-        mOutputsConsumer = outputsConsumer;
+    private PrependConsumerInvocation(final long count,
+        @NotNull final ConsumerDecorator<? super Channel<OUT, ?>> outputsConsumer) {
+      mCount = count;
+      mOutputsConsumer = outputsConsumer;
     }
 
-    @NotNull
     @Override
-    public Invocation<OUT, OUT> newInvocation() throws Exception {
-        return new PrependConsumerInvocation<OUT>(mCount, mOutputsConsumer);
+    public void onComplete(@NotNull final Channel<OUT, ?> result) throws Exception {
+      onResult(result);
     }
 
-    /**
-     * Prepending invocations used to call a consumer a specific number of times.
-     *
-     * @param <OUT> the output data type.
-     */
-    private static class PrependConsumerInvocation<OUT> extends TemplateInvocation<OUT, OUT> {
-
-        private final long mCount;
-
-        private final ConsumerDecorator<? super Channel<OUT, ?>> mOutputsConsumer;
-
-        private boolean mIsCalled;
-
-        /**
-         * Constructor.
-         *
-         * @param count           the loop count.
-         * @param outputsConsumer the consumer instance.
-         */
-        private PrependConsumerInvocation(final long count,
-                @NotNull final ConsumerDecorator<? super Channel<OUT, ?>> outputsConsumer) {
-            mCount = count;
-            mOutputsConsumer = outputsConsumer;
-        }
-
-        @Override
-        public void onComplete(@NotNull final Channel<OUT, ?> result) throws Exception {
-            onResult(result);
-        }
-
-        @Override
-        public void onInput(final OUT input, @NotNull final Channel<OUT, ?> result) throws
-                Exception {
-            onResult(result);
-            result.pass(input);
-        }
-
-        @Override
-        public void onRestart() {
-            mIsCalled = false;
-        }
-
-        private void onResult(@NotNull final Channel<OUT, ?> result) throws Exception {
-            if (!mIsCalled) {
-                mIsCalled = true;
-                final long count = mCount;
-                final ConsumerDecorator<? super Channel<OUT, ?>> consumer = mOutputsConsumer;
-                for (long i = 0; i < count; ++i) {
-                    consumer.accept(result);
-                }
-            }
-        }
+    @Override
+    public void onInput(final OUT input, @NotNull final Channel<OUT, ?> result) throws Exception {
+      onResult(result);
+      result.pass(input);
     }
+
+    @Override
+    public void onRestart() {
+      mIsCalled = false;
+    }
+
+    private void onResult(@NotNull final Channel<OUT, ?> result) throws Exception {
+      if (!mIsCalled) {
+        mIsCalled = true;
+        final long count = mCount;
+        final ConsumerDecorator<? super Channel<OUT, ?>> consumer = mOutputsConsumer;
+        for (long i = 0; i < count; ++i) {
+          consumer.accept(result);
+        }
+      }
+    }
+  }
 }

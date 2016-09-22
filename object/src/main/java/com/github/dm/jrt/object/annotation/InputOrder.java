@@ -60,10 +60,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface InputOrder {
 
-    /**
-     * The order in which input data are collected from the input channel.
-     *
-     * @return the input data oder.
-     */
-    OrderType value();
+  /**
+   * The order in which input data are collected from the input channel.
+   *
+   * @return the input data oder.
+   */
+  OrderType value();
 }

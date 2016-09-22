@@ -42,19 +42,19 @@ import org.jetbrains.annotations.NotNull;
  * @param <OUT> the output data type.
  */
 public interface ServiceRoutineBuilder<IN, OUT>
-        extends RoutineBuilder<IN, OUT>, ServiceConfigurable<ServiceRoutineBuilder<IN, OUT>> {
+    extends RoutineBuilder<IN, OUT>, ServiceConfigurable<ServiceRoutineBuilder<IN, OUT>> {
 
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    ServiceRoutineBuilder<IN, OUT> apply(@NotNull InvocationConfiguration configuration);
+  /**
+   * {@inheritDoc}
+   */
+  @NotNull
+  @Override
+  ServiceRoutineBuilder<IN, OUT> apply(@NotNull InvocationConfiguration configuration);
 
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    Builder<? extends ServiceRoutineBuilder<IN, OUT>> applyInvocationConfiguration();
+  /**
+   * {@inheritDoc}
+   */
+  @NotNull
+  @Override
+  Builder<? extends ServiceRoutineBuilder<IN, OUT>> applyInvocationConfiguration();
 }

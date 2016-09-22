@@ -43,169 +43,168 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TargetApi(VERSION_CODES.FROYO)
 public class ContextInvocationTargetTest extends ActivityInstrumentationTestCase2<TestActivity> {
 
-    public ContextInvocationTargetTest() {
+  public ContextInvocationTargetTest() {
 
-        super(TestActivity.class);
+    super(TestActivity.class);
+  }
+
+  public void testClass() throws Exception {
+
+    final ContextInvocationTarget<TestClass> target = classOfType(TestClass.class);
+    assertThat(target.getTargetClass()).isEqualTo(TestClass.class);
+    assertThat(target.isAssignableTo(TestClass.class)).isTrue();
+    assertThat(target.isAssignableTo(Object.class)).isTrue();
+    assertThat(target.isOfType(TestClass.class)).isTrue();
+    assertThat(target.isOfType(Object.class)).isFalse();
+    final InvocationTarget<TestClass> invocationTarget = target.getInvocationTarget(getActivity());
+    assertThat(invocationTarget.getTargetClass()).isEqualTo(TestClass.class);
+    assertThat(invocationTarget.getTarget()).isEqualTo(TestClass.class);
+  }
+
+  public void testClassEquals() {
+
+    final ContextInvocationTarget<TestClass> target = classOfType(TestClass.class);
+    assertThat(target).isEqualTo(target);
+    assertThat(target).isNotEqualTo(null);
+    assertThat(target).isNotEqualTo("test");
+    assertThat(target).isNotEqualTo(classOfType(Object.class));
+    assertThat(target).isEqualTo(classOfType(TestClass.class));
+    assertThat(target.hashCode()).isEqualTo(classOfType(TestClass.class).hashCode());
+  }
+
+  @SuppressWarnings("ConstantConditions")
+  public void testClassError() {
+
+    try {
+      classOfType(null);
+      fail();
+
+    } catch (final NullPointerException ignored) {
+
     }
+  }
 
-    public void testClass() throws Exception {
+  public void testClassParcelable() {
 
-        final ContextInvocationTarget<TestClass> target = classOfType(TestClass.class);
-        assertThat(target.getTargetClass()).isEqualTo(TestClass.class);
-        assertThat(target.isAssignableTo(TestClass.class)).isTrue();
-        assertThat(target.isAssignableTo(Object.class)).isTrue();
-        assertThat(target.isOfType(TestClass.class)).isTrue();
-        assertThat(target.isOfType(Object.class)).isFalse();
-        final InvocationTarget<TestClass> invocationTarget =
-                target.getInvocationTarget(getActivity());
-        assertThat(invocationTarget.getTargetClass()).isEqualTo(TestClass.class);
-        assertThat(invocationTarget.getTarget()).isEqualTo(TestClass.class);
-    }
+    final Parcel parcel = Parcel.obtain();
+    final ContextInvocationTarget<TestClass> target = classOfType(TestClass.class);
+    parcel.writeParcelable(target, 0);
+    parcel.setDataPosition(0);
+    final Parcelable parcelable =
+        parcel.readParcelable(ContextInvocationTarget.class.getClassLoader());
+    assertThat(parcelable).isEqualTo(target);
+    parcel.recycle();
+  }
 
-    public void testClassEquals() {
+  public void testInstance() throws Exception {
 
-        final ContextInvocationTarget<TestClass> target = classOfType(TestClass.class);
-        assertThat(target).isEqualTo(target);
-        assertThat(target).isNotEqualTo(null);
-        assertThat(target).isNotEqualTo("test");
-        assertThat(target).isNotEqualTo(classOfType(Object.class));
-        assertThat(target).isEqualTo(classOfType(TestClass.class));
-        assertThat(target.hashCode()).isEqualTo(classOfType(TestClass.class).hashCode());
-    }
+    final ContextInvocationTarget<TestClass> target = instanceOf(TestClass.class);
+    assertThat(target.getTargetClass()).isEqualTo(TestClass.class);
+    assertThat(target.isAssignableTo(TestClass.class)).isTrue();
+    assertThat(target.isAssignableTo(Object.class)).isTrue();
+    assertThat(target.isOfType(TestClass.class)).isTrue();
+    assertThat(target.isOfType(Object.class)).isTrue();
+    InvocationTarget<TestClass> invocationTarget = target.getInvocationTarget(getActivity());
+    assertThat(invocationTarget.getTargetClass()).isEqualTo(TestClass.class);
+    assertThat(invocationTarget.getTarget()).isExactlyInstanceOf(TestClass.class);
+    invocationTarget = target.getInvocationTarget(new NullContext(getActivity()));
+    assertThat(invocationTarget.getTargetClass()).isEqualTo(TestClass.class);
+    assertThat(invocationTarget.getTarget()).isExactlyInstanceOf(TestClass.class);
+  }
 
-    @SuppressWarnings("ConstantConditions")
-    public void testClassError() {
+  public void testInstanceEquals() {
 
-        try {
-            classOfType(null);
-            fail();
+    final ContextInvocationTarget<TestClass> target = instanceOf(TestClass.class);
+    assertThat(target).isEqualTo(target);
+    assertThat(target).isNotEqualTo(null);
+    assertThat(target).isNotEqualTo("test");
+    assertThat(target).isNotEqualTo(classOfType(Object.class));
+    assertThat(target).isEqualTo(instanceOf(TestClass.class));
+    assertThat(target.hashCode()).isEqualTo(instanceOf(TestClass.class).hashCode());
+  }
 
-        } catch (final NullPointerException ignored) {
+  @SuppressWarnings("ConstantConditions")
+  public void testInstanceError() throws Exception {
 
-        }
-    }
+    try {
+      instanceOf(null);
+      fail();
 
-    public void testClassParcelable() {
-
-        final Parcel parcel = Parcel.obtain();
-        final ContextInvocationTarget<TestClass> target = classOfType(TestClass.class);
-        parcel.writeParcelable(target, 0);
-        parcel.setDataPosition(0);
-        final Parcelable parcelable =
-                parcel.readParcelable(ContextInvocationTarget.class.getClassLoader());
-        assertThat(parcelable).isEqualTo(target);
-        parcel.recycle();
-    }
-
-    public void testInstance() throws Exception {
-
-        final ContextInvocationTarget<TestClass> target = instanceOf(TestClass.class);
-        assertThat(target.getTargetClass()).isEqualTo(TestClass.class);
-        assertThat(target.isAssignableTo(TestClass.class)).isTrue();
-        assertThat(target.isAssignableTo(Object.class)).isTrue();
-        assertThat(target.isOfType(TestClass.class)).isTrue();
-        assertThat(target.isOfType(Object.class)).isTrue();
-        InvocationTarget<TestClass> invocationTarget = target.getInvocationTarget(getActivity());
-        assertThat(invocationTarget.getTargetClass()).isEqualTo(TestClass.class);
-        assertThat(invocationTarget.getTarget()).isExactlyInstanceOf(TestClass.class);
-        invocationTarget = target.getInvocationTarget(new NullContext(getActivity()));
-        assertThat(invocationTarget.getTargetClass()).isEqualTo(TestClass.class);
-        assertThat(invocationTarget.getTarget()).isExactlyInstanceOf(TestClass.class);
-    }
-
-    public void testInstanceEquals() {
-
-        final ContextInvocationTarget<TestClass> target = instanceOf(TestClass.class);
-        assertThat(target).isEqualTo(target);
-        assertThat(target).isNotEqualTo(null);
-        assertThat(target).isNotEqualTo("test");
-        assertThat(target).isNotEqualTo(classOfType(Object.class));
-        assertThat(target).isEqualTo(instanceOf(TestClass.class));
-        assertThat(target.hashCode()).isEqualTo(instanceOf(TestClass.class).hashCode());
-    }
-
-    @SuppressWarnings("ConstantConditions")
-    public void testInstanceError() throws Exception {
-
-        try {
-            instanceOf(null);
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-            instanceOf(null, "test");
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        final ContextInvocationTarget<TestClass> target = instanceOf(TestClass.class);
-        try {
-            target.getInvocationTarget(new ObjectContext(getActivity()));
-            fail();
-
-        } catch (final RoutineException ignored) {
-
-        }
-    }
-
-    public void testInstanceParcelable() {
-
-        final Parcel parcel = Parcel.obtain();
-        final ContextInvocationTarget<TestClass> target = instanceOf(TestClass.class);
-        parcel.writeParcelable(target, 0);
-        parcel.setDataPosition(0);
-        final Parcelable parcelable =
-                parcel.readParcelable(ContextInvocationTarget.class.getClassLoader());
-        assertThat(parcelable).isEqualTo(target);
-        parcel.recycle();
-    }
-
-    public void testPrimitiveClass() {
-        try {
-            classOfType(int.class);
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-        }
-    }
-
-    public static class TestClass {
+    } catch (final NullPointerException ignored) {
 
     }
 
-    private static class NullContext extends ContextWrapper implements FactoryContext {
+    try {
+      instanceOf(null, "test");
+      fail();
 
-        public NullContext(final Context base) {
+    } catch (final NullPointerException ignored) {
 
-            super(base);
-        }
-
-        @Nullable
-        public <TYPE> TYPE geInstance(@NotNull final Class<? extends TYPE> type,
-                @NotNull final Object... args) {
-
-            return null;
-        }
     }
 
-    private static class ObjectContext extends ContextWrapper implements FactoryContext {
+    final ContextInvocationTarget<TestClass> target = instanceOf(TestClass.class);
+    try {
+      target.getInvocationTarget(new ObjectContext(getActivity()));
+      fail();
 
-        public ObjectContext(final Context base) {
+    } catch (final RoutineException ignored) {
 
-            super(base);
-        }
-
-        @Nullable
-        @SuppressWarnings("unchecked")
-        public <TYPE> TYPE geInstance(@NotNull final Class<? extends TYPE> type,
-                @NotNull final Object... args) {
-
-            return (TYPE) new Object();
-        }
     }
+  }
+
+  public void testInstanceParcelable() {
+
+    final Parcel parcel = Parcel.obtain();
+    final ContextInvocationTarget<TestClass> target = instanceOf(TestClass.class);
+    parcel.writeParcelable(target, 0);
+    parcel.setDataPosition(0);
+    final Parcelable parcelable =
+        parcel.readParcelable(ContextInvocationTarget.class.getClassLoader());
+    assertThat(parcelable).isEqualTo(target);
+    parcel.recycle();
+  }
+
+  public void testPrimitiveClass() {
+    try {
+      classOfType(int.class);
+      fail();
+
+    } catch (final IllegalArgumentException ignored) {
+    }
+  }
+
+  public static class TestClass {
+
+  }
+
+  private static class NullContext extends ContextWrapper implements FactoryContext {
+
+    public NullContext(final Context base) {
+
+      super(base);
+    }
+
+    @Nullable
+    public <TYPE> TYPE geInstance(@NotNull final Class<? extends TYPE> type,
+        @NotNull final Object... args) {
+
+      return null;
+    }
+  }
+
+  private static class ObjectContext extends ContextWrapper implements FactoryContext {
+
+    public ObjectContext(final Context base) {
+
+      super(base);
+    }
+
+    @Nullable
+    @SuppressWarnings("unchecked")
+    public <TYPE> TYPE geInstance(@NotNull final Class<? extends TYPE> type,
+        @NotNull final Object... args) {
+
+      return (TYPE) new Object();
+    }
+  }
 }

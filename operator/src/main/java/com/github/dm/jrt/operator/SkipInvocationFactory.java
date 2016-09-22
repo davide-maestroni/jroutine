@@ -35,58 +35,58 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class SkipInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
 
+  private final int mCount;
+
+  /**
+   * Constructor.
+   *
+   * @param count the number of data to skip.
+   * @throws java.lang.IllegalArgumentException if the count is negative.
+   */
+  SkipInvocationFactory(final int count) {
+    super(asArgs(ConstantConditions.notNegative("count", count)));
+    mCount = count;
+  }
+
+  @NotNull
+  @Override
+  public Invocation<DATA, DATA> newInvocation() {
+    return new SkipInvocation<DATA>(mCount);
+  }
+
+  /**
+   * Routine invocation skipping input data.
+   *
+   * @param <DATA> the data type.
+   */
+  private static class SkipInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
+
     private final int mCount;
+
+    private int mCurrent;
 
     /**
      * Constructor.
      *
      * @param count the number of data to skip.
-     * @throws java.lang.IllegalArgumentException if the count is negative.
      */
-    SkipInvocationFactory(final int count) {
-        super(asArgs(ConstantConditions.notNegative("count", count)));
-        mCount = count;
+    private SkipInvocation(final int count) {
+      mCount = count;
     }
 
-    @NotNull
     @Override
-    public Invocation<DATA, DATA> newInvocation() {
-        return new SkipInvocation<DATA>(mCount);
+    public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) {
+      if (mCurrent < mCount) {
+        ++mCurrent;
+
+      } else {
+        result.pass(input);
+      }
     }
 
-    /**
-     * Routine invocation skipping input data.
-     *
-     * @param <DATA> the data type.
-     */
-    private static class SkipInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
-
-        private final int mCount;
-
-        private int mCurrent;
-
-        /**
-         * Constructor.
-         *
-         * @param count the number of data to skip.
-         */
-        private SkipInvocation(final int count) {
-            mCount = count;
-        }
-
-        @Override
-        public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) {
-            if (mCurrent < mCount) {
-                ++mCurrent;
-
-            } else {
-                result.pass(input);
-            }
-        }
-
-        @Override
-        public void onRestart() {
-            mCurrent = 0;
-        }
+    @Override
+    public void onRestart() {
+      mCurrent = 0;
     }
+  }
 }

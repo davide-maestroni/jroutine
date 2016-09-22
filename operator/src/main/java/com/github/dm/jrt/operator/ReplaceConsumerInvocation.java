@@ -36,31 +36,30 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class ReplaceConsumerInvocation<DATA> extends MappingInvocation<DATA, DATA> {
 
-    private final PredicateDecorator<? super DATA> mPredicate;
+  private final PredicateDecorator<? super DATA> mPredicate;
 
-    private final BiConsumerDecorator<DATA, ? super Channel<DATA, ?>> mReplacementConsumer;
+  private final BiConsumerDecorator<DATA, ? super Channel<DATA, ?>> mReplacementConsumer;
 
-    /**
-     * Constructor.
-     *
-     * @param predicate           the predicate instance.
-     * @param replacementConsumer the consumer instance.
-     */
-    ReplaceConsumerInvocation(@NotNull final PredicateDecorator<? super DATA> predicate,
-            @NotNull final BiConsumerDecorator<DATA, ? super Channel<DATA, ?>>
-                    replacementConsumer) {
-        super(asArgs(ConstantConditions.notNull("predicate instance", predicate),
-                ConstantConditions.notNull("consumer instance", replacementConsumer)));
-        mPredicate = predicate;
-        mReplacementConsumer = replacementConsumer;
+  /**
+   * Constructor.
+   *
+   * @param predicate           the predicate instance.
+   * @param replacementConsumer the consumer instance.
+   */
+  ReplaceConsumerInvocation(@NotNull final PredicateDecorator<? super DATA> predicate,
+      @NotNull final BiConsumerDecorator<DATA, ? super Channel<DATA, ?>> replacementConsumer) {
+    super(asArgs(ConstantConditions.notNull("predicate instance", predicate),
+        ConstantConditions.notNull("consumer instance", replacementConsumer)));
+    mPredicate = predicate;
+    mReplacementConsumer = replacementConsumer;
+  }
+
+  public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) throws Exception {
+    if (mPredicate.test(input)) {
+      mReplacementConsumer.accept(input, result);
+
+    } else {
+      result.pass(input);
     }
-
-    public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) throws Exception {
-        if (mPredicate.test(input)) {
-            mReplacementConsumer.accept(input, result);
-
-        } else {
-            result.pass(input);
-        }
-    }
+  }
 }

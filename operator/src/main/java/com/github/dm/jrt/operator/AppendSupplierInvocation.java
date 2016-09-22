@@ -33,33 +33,33 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class AppendSupplierInvocation<OUT> extends GenerateInvocation<OUT, OUT> {
 
-    private final long mCount;
+  private final long mCount;
 
-    private final SupplierDecorator<? extends OUT> mOutputSupplier;
+  private final SupplierDecorator<? extends OUT> mOutputSupplier;
 
-    /**
-     * Constructor.
-     *
-     * @param count          the loop count.
-     * @param outputSupplier the supplier instance.
-     */
-    AppendSupplierInvocation(final long count,
-            @NotNull final SupplierDecorator<? extends OUT> outputSupplier) {
-        super(asArgs(ConstantConditions.positive("count number", count),
-                ConstantConditions.notNull("supplier instance", outputSupplier)));
-        mCount = count;
-        mOutputSupplier = outputSupplier;
+  /**
+   * Constructor.
+   *
+   * @param count          the loop count.
+   * @param outputSupplier the supplier instance.
+   */
+  AppendSupplierInvocation(final long count,
+      @NotNull final SupplierDecorator<? extends OUT> outputSupplier) {
+    super(asArgs(ConstantConditions.positive("count number", count),
+        ConstantConditions.notNull("supplier instance", outputSupplier)));
+    mCount = count;
+    mOutputSupplier = outputSupplier;
+  }
+
+  public void onComplete(@NotNull final Channel<OUT, ?> result) throws Exception {
+    final long count = mCount;
+    final SupplierDecorator<? extends OUT> supplier = mOutputSupplier;
+    for (long i = 0; i < count; ++i) {
+      result.pass(supplier.get());
     }
+  }
 
-    public void onComplete(@NotNull final Channel<OUT, ?> result) throws Exception {
-        final long count = mCount;
-        final SupplierDecorator<? extends OUT> supplier = mOutputSupplier;
-        for (long i = 0; i < count; ++i) {
-            result.pass(supplier.get());
-        }
-    }
-
-    public void onInput(final OUT input, @NotNull final Channel<OUT, ?> result) {
-        result.pass(input);
-    }
+  public void onInput(final OUT input, @NotNull final Channel<OUT, ?> result) {
+    result.pass(input);
+  }
 }

@@ -36,38 +36,38 @@ import org.jetbrains.annotations.NotNull;
  * @param <OUT> the output data type.
  */
 public abstract class TemplateRoutineBuilder<IN, OUT> extends TemplateRoutine<IN, OUT>
-        implements RoutineBuilder<IN, OUT> {
+    implements RoutineBuilder<IN, OUT> {
 
-    private InvocationConfiguration mConfiguration = InvocationConfiguration.defaultConfiguration();
+  private InvocationConfiguration mConfiguration = InvocationConfiguration.defaultConfiguration();
 
-    @NotNull
-    public RoutineBuilder<IN, OUT> apply(@NotNull final InvocationConfiguration configuration) {
-        mConfiguration = ConstantConditions.notNull("invocation configuration", configuration);
-        return this;
-    }
+  @NotNull
+  public RoutineBuilder<IN, OUT> apply(@NotNull final InvocationConfiguration configuration) {
+    mConfiguration = ConstantConditions.notNull("invocation configuration", configuration);
+    return this;
+  }
 
-    @NotNull
-    public Builder<? extends RoutineBuilder<IN, OUT>> applyInvocationConfiguration() {
-        return new Builder<RoutineBuilder<IN, OUT>>(this, mConfiguration);
-    }
+  @NotNull
+  public Builder<? extends RoutineBuilder<IN, OUT>> applyInvocationConfiguration() {
+    return new Builder<RoutineBuilder<IN, OUT>>(this, mConfiguration);
+  }
 
-    @NotNull
-    public Channel<IN, OUT> call() {
-        return buildRoutine().call();
-    }
+  @NotNull
+  public Channel<IN, OUT> call() {
+    return buildRoutine().call();
+  }
 
-    @NotNull
-    public Channel<IN, OUT> callParallel() {
-        return buildRoutine().callParallel();
-    }
+  @NotNull
+  public Channel<IN, OUT> callParallel() {
+    return buildRoutine().callParallel();
+  }
 
-    /**
-     * Returns the builder invocation configuration.
-     *
-     * @return the invocation configuration.
-     */
-    @NotNull
-    protected InvocationConfiguration getConfiguration() {
-        return mConfiguration;
-    }
+  /**
+   * Returns the builder invocation configuration.
+   *
+   * @return the invocation configuration.
+   */
+  @NotNull
+  protected InvocationConfiguration getConfiguration() {
+    return mConfiguration;
+  }
 }

@@ -30,65 +30,65 @@ import static org.junit.Assert.fail;
  */
 public class LruHashMapTest {
 
-    @Test
-    public void testCapacity() {
-        final LruHashMap<String, String> map = new LruHashMap<String, String>(1);
-        map.put("test1", "test1");
-        map.put("test2", "test2");
-        assertThat(map).containsOnlyKeys("test2");
-        map.put("test3", "test3");
-        assertThat(map).containsOnlyKeys("test3");
+  @Test
+  public void testCapacity() {
+    final LruHashMap<String, String> map = new LruHashMap<String, String>(1);
+    map.put("test1", "test1");
+    map.put("test2", "test2");
+    assertThat(map).containsOnlyKeys("test2");
+    map.put("test3", "test3");
+    assertThat(map).containsOnlyKeys("test3");
+  }
+
+  @Test
+  public void testCopy() {
+    final LruHashMap<String, String> map1 = new LruHashMap<String, String>(3);
+    map1.put("test1", "test1");
+    map1.put("test2", "test2");
+    map1.put("test3", "test3");
+    final LruHashMap<String, String> map2 = new LruHashMap<String, String>(1, map1);
+    assertThat(map2).containsOnlyKeys("test3");
+  }
+
+  @Test
+  @SuppressWarnings("ConstantConditions")
+  public void testErrors() {
+    try {
+      new LruHashMap<String, String>(0);
+      fail();
+
+    } catch (final IllegalArgumentException ignored) {
     }
 
-    @Test
-    public void testCopy() {
-        final LruHashMap<String, String> map1 = new LruHashMap<String, String>(3);
-        map1.put("test1", "test1");
-        map1.put("test2", "test2");
-        map1.put("test3", "test3");
-        final LruHashMap<String, String> map2 = new LruHashMap<String, String>(1, map1);
-        assertThat(map2).containsOnlyKeys("test3");
+    try {
+      new LruHashMap<String, String>(-1);
+      fail();
+
+    } catch (final IllegalArgumentException ignored) {
     }
 
-    @Test
-    @SuppressWarnings("ConstantConditions")
-    public void testErrors() {
-        try {
-            new LruHashMap<String, String>(0);
-            fail();
+    try {
+      new LruHashMap<String, String>(1, null);
+      fail();
 
-        } catch (final IllegalArgumentException ignored) {
-        }
-
-        try {
-            new LruHashMap<String, String>(-1);
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-        }
-
-        try {
-            new LruHashMap<String, String>(1, null);
-            fail();
-
-        } catch (final NullPointerException ignored) {
-        }
+    } catch (final NullPointerException ignored) {
     }
+  }
 
-    @Test
-    public void testLRU() {
-        final LruHashMap<String, String> map = new LruHashMap<String, String>(3);
-        map.put("test1", "test1");
-        map.put("test2", "test2");
-        map.put("test3", "test3");
-        assertThat(map).containsOnlyKeys("test1", "test2", "test3");
-        map.get("test1");
-        map.get("test3");
-        map.get("test2");
-        final Iterator<String> iterator = map.keySet().iterator();
-        assertThat(iterator.next()).isEqualTo("test1");
-        assertThat(iterator.next()).isEqualTo("test3");
-        assertThat(iterator.next()).isEqualTo("test2");
-        assertThat(iterator.hasNext()).isFalse();
-    }
+  @Test
+  public void testLRU() {
+    final LruHashMap<String, String> map = new LruHashMap<String, String>(3);
+    map.put("test1", "test1");
+    map.put("test2", "test2");
+    map.put("test3", "test3");
+    assertThat(map).containsOnlyKeys("test1", "test2", "test3");
+    map.get("test1");
+    map.get("test3");
+    map.get("test2");
+    final Iterator<String> iterator = map.keySet().iterator();
+    assertThat(iterator.next()).isEqualTo("test1");
+    assertThat(iterator.next()).isEqualTo("test3");
+    assertThat(iterator.next()).isEqualTo("test2");
+    assertThat(iterator.hasNext()).isFalse();
+  }
 }

@@ -27,19 +27,19 @@ import org.jetbrains.annotations.Nullable;
  */
 public class LocalValue<T> extends ThreadLocal<T> {
 
-    private final T mInitialValue;
+  private final T mInitialValue;
 
-    /**
-     * Constructor.
-     *
-     * @param initialValue the initial value.
-     */
-    public LocalValue(@Nullable final T initialValue) {
-        mInitialValue = initialValue;
-    }
+  /**
+   * Constructor.
+   *
+   * @param initialValue the initial value.
+   */
+  public LocalValue(@Nullable final T initialValue) {
+    mInitialValue = initialValue;
+  }
 
-    @Override
-    protected T initialValue() {
-        return mInitialValue;
-    }
+  @Override
+  protected T initialValue() {
+    return mInitialValue;
+  }
 }

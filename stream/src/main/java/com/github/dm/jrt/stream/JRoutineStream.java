@@ -56,305 +56,286 @@ import static com.github.dm.jrt.function.FunctionDecorator.decorate;
  */
 public class JRoutineStream {
 
-    /**
-     * Avoid explicit instantiation.
-     */
-    protected JRoutineStream() {
-        ConstantConditions.avoid();
-    }
+  /**
+   * Avoid explicit instantiation.
+   */
+  protected JRoutineStream() {
+    ConstantConditions.avoid();
+  }
 
-    /**
-     * Returns a stream routine builder.
-     *
-     * @param <IN> the input data type.
-     * @return the routine builder instance.
-     */
-    @NotNull
-    public static <IN> StreamBuilder<IN, IN> withStream() {
-        return new DefaultStreamBuilder<IN, IN>();
-    }
+  /**
+   * Returns a stream routine builder.
+   *
+   * @param <IN> the input data type.
+   * @return the routine builder instance.
+   */
+  @NotNull
+  public static <IN> StreamBuilder<IN, IN> withStream() {
+    return new DefaultStreamBuilder<IN, IN>();
+  }
 
-    /**
-     * Returns a stream routine builder producing only the inputs passed by the specified consumer.
-     * <br>
-     * The data will be produced only when the invocation completes.
-     * <br>
-     * If any other input is passed to the built routine, the invocation will be aborted with an
-     * {@link java.lang.IllegalStateException}.
-     *
-     * @param consumer the consumer instance.
-     * @param <IN>     the input data type.
-     * @return the routine builder instance.
-     */
-    @NotNull
-    public static <IN> StreamBuilder<IN, IN> withStreamAccept(
-            @NotNull final Consumer<Channel<IN, ?>> consumer) {
-        return withStreamAccept(1, consumer);
-    }
+  /**
+   * Returns a stream routine builder producing only the inputs passed by the specified consumer.
+   * <br>
+   * The data will be produced only when the invocation completes.
+   * <br>
+   * If any other input is passed to the built routine, the invocation will be aborted with an
+   * {@link java.lang.IllegalStateException}.
+   *
+   * @param consumer the consumer instance.
+   * @param <IN>     the input data type.
+   * @return the routine builder instance.
+   */
+  @NotNull
+  public static <IN> StreamBuilder<IN, IN> withStreamAccept(
+      @NotNull final Consumer<Channel<IN, ?>> consumer) {
+    return withStreamAccept(1, consumer);
+  }
 
-    /**
-     * Returns a stream routine builder producing only the inputs passed by the specified consumer.
-     * <br>
-     * The data will be produced by calling the consumer {@code count} number of times only when the
-     * invocation completes.
-     * <br>
-     * If any other input is passed to the built routine, the invocation will be aborted with an
-     * {@link java.lang.IllegalStateException}.
-     *
-     * @param count    the number of times the consumer is called.
-     * @param consumer the consumer instance.
-     * @param <IN>     the input data type.
-     * @return the routine builder instance.
-     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
-     */
-    @NotNull
-    public static <IN> StreamBuilder<IN, IN> withStreamAccept(final int count,
-            @NotNull final Consumer<Channel<IN, ?>> consumer) {
-        ConstantConditions.notNull("consumer instance", consumer);
-        ConstantConditions.positive("count", count);
-        return JRoutineStream.<IN>withStream().lift(
-                new Function<Function<? super Channel<?, IN>, ? extends Channel<?, IN>>,
-                        Function<? super Channel<?, IN>, ? extends Channel<?, IN>>>() {
+  /**
+   * Returns a stream routine builder producing only the inputs passed by the specified consumer.
+   * <br>
+   * The data will be produced by calling the consumer {@code count} number of times only when the
+   * invocation completes.
+   * <br>
+   * If any other input is passed to the built routine, the invocation will be aborted with an
+   * {@link java.lang.IllegalStateException}.
+   *
+   * @param count    the number of times the consumer is called.
+   * @param consumer the consumer instance.
+   * @param <IN>     the input data type.
+   * @return the routine builder instance.
+   * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
+   */
+  @NotNull
+  public static <IN> StreamBuilder<IN, IN> withStreamAccept(final int count,
+      @NotNull final Consumer<Channel<IN, ?>> consumer) {
+    ConstantConditions.notNull("consumer instance", consumer);
+    ConstantConditions.positive("count", count);
+    return JRoutineStream.<IN>withStream().lift(
+        new Function<Function<? super Channel<?, IN>, ? extends Channel<?, IN>>, Function<? super
+            Channel<?, IN>, ? extends Channel<?, IN>>>() {
 
-                    public Function<? super Channel<?, IN>, ? extends Channel<?, IN>> apply(
-                            final Function<? super Channel<?, IN>, ? extends Channel<?, IN>>
-                                    function) {
-                        return decorate(function).andThen(
-                                new Function<Channel<?, IN>, Channel<?, IN>>() {
+          public Function<? super Channel<?, IN>, ? extends Channel<?, IN>> apply(
+              final Function<? super Channel<?, IN>, ? extends Channel<?, IN>> function) {
+            return decorate(function).andThen(new Function<Channel<?, IN>, Channel<?, IN>>() {
 
-                                    public Channel<?, IN> apply(final Channel<?, IN> inputs) {
-                                        final Channel<IN, IN> outputChannel =
-                                                JRoutineCore.io().buildChannel();
-                                        inputs.bind(new ChannelConsumer<IN>() {
+              public Channel<?, IN> apply(final Channel<?, IN> inputs) {
+                final Channel<IN, IN> outputChannel = JRoutineCore.io().buildChannel();
+                inputs.bind(new ChannelConsumer<IN>() {
 
-                                            public void onComplete() {
-                                                try {
-                                                    for (int i = 0; i < count; ++i) {
-                                                        consumer.accept(outputChannel);
-                                                    }
+                  public void onComplete() {
+                    try {
+                      for (int i = 0; i < count; ++i) {
+                        consumer.accept(outputChannel);
+                      }
 
-                                                    outputChannel.close();
+                      outputChannel.close();
 
-                                                } catch (final Throwable t) {
-                                                    outputChannel.abort(t);
-                                                    InvocationInterruptedException.throwIfInterrupt(
-                                                            t);
-                                                }
-                                            }
-
-                                            public void onError(
-                                                    @NotNull final RoutineException error) {
-                                                outputChannel.abort(error);
-                                            }
-
-                                            public void onOutput(final IN output) {
-                                                throw new IllegalStateException();
-                                            }
-                                        });
-                                        return outputChannel;
-                                    }
-                                });
+                    } catch (final Throwable t) {
+                      outputChannel.abort(t);
+                      InvocationInterruptedException.throwIfInterrupt(t);
                     }
+                  }
+
+                  public void onError(@NotNull final RoutineException error) {
+                    outputChannel.abort(error);
+                  }
+
+                  public void onOutput(final IN output) {
+                    throw new IllegalStateException();
+                  }
                 });
-    }
+                return outputChannel;
+              }
+            });
+          }
+        });
+  }
 
-    /**
-     * Returns a stream routine builder producing only the inputs returned by the specified
-     * supplier.
-     * <br>
-     * The data will be produced only when the invocation completes.
-     * <br>
-     * If any other input is passed to the built routine, the invocation will be aborted with an
-     * {@link java.lang.IllegalStateException}.
-     *
-     * @param supplier the supplier instance.
-     * @param <IN>     the input data type.
-     * @return the routine builder instance.
-     */
-    @NotNull
-    public static <IN> StreamBuilder<IN, IN> withStreamGet(@NotNull final Supplier<IN> supplier) {
-        return withStreamGet(1, supplier);
-    }
+  /**
+   * Returns a stream routine builder producing only the inputs returned by the specified supplier.
+   * <br>
+   * The data will be produced only when the invocation completes.
+   * <br>
+   * If any other input is passed to the built routine, the invocation will be aborted with an
+   * {@link java.lang.IllegalStateException}.
+   *
+   * @param supplier the supplier instance.
+   * @param <IN>     the input data type.
+   * @return the routine builder instance.
+   */
+  @NotNull
+  public static <IN> StreamBuilder<IN, IN> withStreamGet(@NotNull final Supplier<IN> supplier) {
+    return withStreamGet(1, supplier);
+  }
 
-    /**
-     * Returns a stream routine builder producing only the inputs returned by the specified
-     * supplier.
-     * <br>
-     * The data will be produced by calling the supplier {@code count} number of times only when the
-     * invocation completes.
-     * <br>
-     * If any other input is passed to the built routine, the invocation will be aborted with an
-     * {@link java.lang.IllegalStateException}.
-     *
-     * @param count    the number of times the supplier is called.
-     * @param supplier the supplier instance.
-     * @param <IN>     the input data type.
-     * @return the routine builder instance.
-     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
-     */
-    @NotNull
-    public static <IN> StreamBuilder<IN, IN> withStreamGet(final int count,
-            @NotNull final Supplier<IN> supplier) {
-        ConstantConditions.notNull("supplier instance", supplier);
-        ConstantConditions.positive("count", count);
-        return JRoutineStream.<IN>withStream().lift(
-                new Function<Function<? super Channel<?, IN>, ? extends Channel<?, IN>>,
-                        Function<? super Channel<?, IN>, ? extends Channel<?, IN>>>() {
+  /**
+   * Returns a stream routine builder producing only the inputs returned by the specified supplier.
+   * <br>
+   * The data will be produced by calling the supplier {@code count} number of times only when the
+   * invocation completes.
+   * <br>
+   * If any other input is passed to the built routine, the invocation will be aborted with an
+   * {@link java.lang.IllegalStateException}.
+   *
+   * @param count    the number of times the supplier is called.
+   * @param supplier the supplier instance.
+   * @param <IN>     the input data type.
+   * @return the routine builder instance.
+   * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
+   */
+  @NotNull
+  public static <IN> StreamBuilder<IN, IN> withStreamGet(final int count,
+      @NotNull final Supplier<IN> supplier) {
+    ConstantConditions.notNull("supplier instance", supplier);
+    ConstantConditions.positive("count", count);
+    return JRoutineStream.<IN>withStream().lift(
+        new Function<Function<? super Channel<?, IN>, ? extends Channel<?, IN>>, Function<? super
+            Channel<?, IN>, ? extends Channel<?, IN>>>() {
 
-                    public Function<? super Channel<?, IN>, ? extends Channel<?, IN>> apply(
-                            final Function<? super Channel<?, IN>, ? extends Channel<?, IN>>
-                                    function) {
-                        return decorate(function).andThen(
-                                new Function<Channel<?, IN>, Channel<?, IN>>() {
+          public Function<? super Channel<?, IN>, ? extends Channel<?, IN>> apply(
+              final Function<? super Channel<?, IN>, ? extends Channel<?, IN>> function) {
+            return decorate(function).andThen(new Function<Channel<?, IN>, Channel<?, IN>>() {
 
-                                    public Channel<?, IN> apply(final Channel<?, IN> inputs) {
-                                        final Channel<IN, IN> outputChannel =
-                                                JRoutineCore.io().buildChannel();
-                                        inputs.bind(new ChannelConsumer<IN>() {
+              public Channel<?, IN> apply(final Channel<?, IN> inputs) {
+                final Channel<IN, IN> outputChannel = JRoutineCore.io().buildChannel();
+                inputs.bind(new ChannelConsumer<IN>() {
 
-                                            public void onComplete() {
-                                                try {
-                                                    for (int i = 0; i < count; ++i) {
-                                                        outputChannel.pass(supplier.get());
-                                                    }
+                  public void onComplete() {
+                    try {
+                      for (int i = 0; i < count; ++i) {
+                        outputChannel.pass(supplier.get());
+                      }
 
-                                                    outputChannel.close();
+                      outputChannel.close();
 
-                                                } catch (final Throwable t) {
-                                                    outputChannel.abort(t);
-                                                    InvocationInterruptedException.throwIfInterrupt(
-                                                            t);
-                                                }
-                                            }
-
-                                            public void onError(
-                                                    @NotNull final RoutineException error) {
-                                                outputChannel.abort(error);
-                                            }
-
-                                            public void onOutput(final IN output) {
-                                                throw new IllegalStateException();
-                                            }
-                                        });
-                                        return outputChannel;
-                                    }
-                                });
+                    } catch (final Throwable t) {
+                      outputChannel.abort(t);
+                      InvocationInterruptedException.throwIfInterrupt(t);
                     }
+                  }
+
+                  public void onError(@NotNull final RoutineException error) {
+                    outputChannel.abort(error);
+                  }
+
+                  public void onOutput(final IN output) {
+                    throw new IllegalStateException();
+                  }
                 });
-    }
+                return outputChannel;
+              }
+            });
+          }
+        });
+  }
 
-    /**
-     * Returns a stream routine builder producing only the specified input.
-     * <br>
-     * The data will be produced only when the invocation completes.
-     * <br>
-     * If any other input is passed to the built routine, the invocation will be aborted with an
-     * {@link java.lang.IllegalStateException}.
-     *
-     * @param input the input.
-     * @param <IN>  the input data type.
-     * @return the routine builder instance.
-     */
-    @NotNull
-    public static <IN> StreamBuilder<IN, IN> withStreamOf(@Nullable final IN input) {
-        return withStreamOf(Channels.replay(JRoutineCore.io().of(input)).buildChannels());
-    }
+  /**
+   * Returns a stream routine builder producing only the specified input.
+   * <br>
+   * The data will be produced only when the invocation completes.
+   * <br>
+   * If any other input is passed to the built routine, the invocation will be aborted with an
+   * {@link java.lang.IllegalStateException}.
+   *
+   * @param input the input.
+   * @param <IN>  the input data type.
+   * @return the routine builder instance.
+   */
+  @NotNull
+  public static <IN> StreamBuilder<IN, IN> withStreamOf(@Nullable final IN input) {
+    return withStreamOf(Channels.replay(JRoutineCore.io().of(input)).buildChannels());
+  }
 
-    /**
-     * Returns a stream routine builder producing only the specified inputs.
-     * <br>
-     * The data will be produced only when the invocation completes.
-     * <br>
-     * If any other input is passed to the built routine, the invocation will be aborted with an
-     * {@link java.lang.IllegalStateException}.
-     *
-     * @param inputs the input data.
-     * @param <IN>   the input data type.
-     * @return the routine builder instance.
-     */
-    @NotNull
-    public static <IN> StreamBuilder<IN, IN> withStreamOf(@Nullable final IN... inputs) {
-        return withStreamOf(Channels.replay(JRoutineCore.io().of(inputs)).buildChannels());
-    }
+  /**
+   * Returns a stream routine builder producing only the specified inputs.
+   * <br>
+   * The data will be produced only when the invocation completes.
+   * <br>
+   * If any other input is passed to the built routine, the invocation will be aborted with an
+   * {@link java.lang.IllegalStateException}.
+   *
+   * @param inputs the input data.
+   * @param <IN>   the input data type.
+   * @return the routine builder instance.
+   */
+  @NotNull
+  public static <IN> StreamBuilder<IN, IN> withStreamOf(@Nullable final IN... inputs) {
+    return withStreamOf(Channels.replay(JRoutineCore.io().of(inputs)).buildChannels());
+  }
 
-    /**
-     * Returns a stream routine builder producing only the inputs returned by the specified
-     * iterable.
-     * <br>
-     * The data will be produced only when the invocation completes.
-     * <br>
-     * If any other input is passed to the built routine, the invocation will be aborted with an
-     * {@link java.lang.IllegalStateException}.
-     *
-     * @param inputs the inputs iterable.
-     * @param <IN>   the input data type.
-     * @return the routine builder instance.
-     */
-    @NotNull
-    public static <IN> StreamBuilder<IN, IN> withStreamOf(
-            @Nullable final Iterable<? extends IN> inputs) {
-        return withStreamOf(Channels.replay(JRoutineCore.io().of(inputs)).buildChannels());
-    }
+  /**
+   * Returns a stream routine builder producing only the inputs returned by the specified iterable.
+   * <br>
+   * The data will be produced only when the invocation completes.
+   * <br>
+   * If any other input is passed to the built routine, the invocation will be aborted with an
+   * {@link java.lang.IllegalStateException}.
+   *
+   * @param inputs the inputs iterable.
+   * @param <IN>   the input data type.
+   * @return the routine builder instance.
+   */
+  @NotNull
+  public static <IN> StreamBuilder<IN, IN> withStreamOf(
+      @Nullable final Iterable<? extends IN> inputs) {
+    return withStreamOf(Channels.replay(JRoutineCore.io().of(inputs)).buildChannels());
+  }
 
-    /**
-     * Returns a stream routine builder producing only the inputs returned by the specified
-     * channel.
-     * <br>
-     * The data will be produced only when the invocation completes.
-     * <br>
-     * If any other input is passed to the built routine, the invocation will be aborted with an
-     * {@link java.lang.IllegalStateException}.
-     * <p>
-     * Note that the passed channel will be bound as a result of the call, so, in order to support
-     * multiple invocations, consider wrapping the channel in a replayable one, by calling the
-     * {@link Channels#replay(Channel)} utility method.
-     *
-     * @param channel the input channel.
-     * @param <IN>    the input data type.
-     * @return the routine builder instance.
-     */
-    @NotNull
-    public static <IN> StreamBuilder<IN, IN> withStreamOf(
-            @Nullable final Channel<?, ? extends IN> channel) {
-        return JRoutineStream.<IN>withStream().lift(
-                new Function<Function<? super Channel<?, IN>, ? extends Channel<?, IN>>,
-                        Function<? super Channel<?, IN>, ? extends Channel<?, IN>>>() {
+  /**
+   * Returns a stream routine builder producing only the inputs returned by the specified channel.
+   * <br>
+   * The data will be produced only when the invocation completes.
+   * <br>
+   * If any other input is passed to the built routine, the invocation will be aborted with an
+   * {@link java.lang.IllegalStateException}.
+   * <p>
+   * Note that the passed channel will be bound as a result of the call, so, in order to support
+   * multiple invocations, consider wrapping the channel in a replayable one, by calling the
+   * {@link Channels#replay(Channel)} utility method.
+   *
+   * @param channel the input channel.
+   * @param <IN>    the input data type.
+   * @return the routine builder instance.
+   */
+  @NotNull
+  public static <IN> StreamBuilder<IN, IN> withStreamOf(
+      @Nullable final Channel<?, ? extends IN> channel) {
+    return JRoutineStream.<IN>withStream().lift(
+        new Function<Function<? super Channel<?, IN>, ? extends Channel<?, IN>>, Function<? super
+            Channel<?, IN>, ? extends Channel<?, IN>>>() {
 
-                    public Function<? super Channel<?, IN>, ? extends Channel<?, IN>> apply(
-                            final Function<? super Channel<?, IN>, ? extends Channel<?, IN>>
-                                    function) {
-                        return decorate(function).andThen(
-                                new Function<Channel<?, IN>, Channel<?, IN>>() {
+          public Function<? super Channel<?, IN>, ? extends Channel<?, IN>> apply(
+              final Function<? super Channel<?, IN>, ? extends Channel<?, IN>> function) {
+            return decorate(function).andThen(new Function<Channel<?, IN>, Channel<?, IN>>() {
 
-                                    public Channel<?, IN> apply(final Channel<?, IN> inputs) {
-                                        final Channel<IN, IN> outputChannel =
-                                                JRoutineCore.io().buildChannel();
-                                        inputs.bind(new ChannelConsumer<IN>() {
+              public Channel<?, IN> apply(final Channel<?, IN> inputs) {
+                final Channel<IN, IN> outputChannel = JRoutineCore.io().buildChannel();
+                inputs.bind(new ChannelConsumer<IN>() {
 
-                                            public void onComplete() {
-                                                try {
-                                                    outputChannel.pass(channel).close();
+                  public void onComplete() {
+                    try {
+                      outputChannel.pass(channel).close();
 
-                                                } catch (final Throwable t) {
-                                                    outputChannel.abort(t);
-                                                    InvocationInterruptedException.throwIfInterrupt(
-                                                            t);
-                                                }
-                                            }
-
-                                            public void onError(
-                                                    @NotNull final RoutineException error) {
-                                                outputChannel.abort(error);
-                                            }
-
-                                            public void onOutput(final IN output) {
-                                                throw new IllegalStateException();
-                                            }
-                                        });
-                                        return outputChannel;
-                                    }
-                                });
+                    } catch (final Throwable t) {
+                      outputChannel.abort(t);
+                      InvocationInterruptedException.throwIfInterrupt(t);
                     }
+                  }
+
+                  public void onError(@NotNull final RoutineException error) {
+                    outputChannel.abort(error);
+                  }
+
+                  public void onOutput(final IN output) {
+                    throw new IllegalStateException();
+                  }
                 });
-    }
+                return outputChannel;
+              }
+            });
+          }
+        });
+  }
 }

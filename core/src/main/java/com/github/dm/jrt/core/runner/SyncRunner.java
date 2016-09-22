@@ -27,31 +27,31 @@ import org.jetbrains.annotations.NotNull;
  */
 public abstract class SyncRunner extends Runner {
 
-    private static final ThreadManager sManager = new ThreadManager() {
+  private static final ThreadManager sManager = new ThreadManager() {
 
-        public boolean isManagedThread() {
-            return false;
-        }
-    };
-
-    /**
-     * Constructor.
-     */
-    protected SyncRunner() {
-        super(sManager);
+    public boolean isManagedThread() {
+      return false;
     }
+  };
 
-    @Override
-    public void cancel(@NotNull final Execution execution) {
-    }
+  /**
+   * Constructor.
+   */
+  protected SyncRunner() {
+    super(sManager);
+  }
 
-    @Override
-    public boolean isExecutionThread() {
-        return true;
-    }
+  @Override
+  public void cancel(@NotNull final Execution execution) {
+  }
 
-    @Override
-    public boolean isSynchronous() {
-        return true;
-    }
+  @Override
+  public boolean isExecutionThread() {
+    return true;
+  }
+
+  @Override
+  public boolean isSynchronous() {
+    return true;
+  }
 }

@@ -27,36 +27,36 @@ import java.util.concurrent.TimeUnit;
  */
 public class RunnerDecorator extends Runner {
 
-    private final Runner mRunner;
+  private final Runner mRunner;
 
-    /**
-     * Constructor.
-     *
-     * @param wrapped the wrapped instance.
-     */
-    public RunnerDecorator(@NotNull final Runner wrapped) {
-        super(wrapped.getThreadManager());
-        mRunner = wrapped;
-    }
+  /**
+   * Constructor.
+   *
+   * @param wrapped the wrapped instance.
+   */
+  public RunnerDecorator(@NotNull final Runner wrapped) {
+    super(wrapped.getThreadManager());
+    mRunner = wrapped;
+  }
 
-    @Override
-    public void cancel(@NotNull final Execution execution) {
-        mRunner.cancel(execution);
-    }
+  @Override
+  public void cancel(@NotNull final Execution execution) {
+    mRunner.cancel(execution);
+  }
 
-    @Override
-    public boolean isExecutionThread() {
-        return mRunner.isExecutionThread();
-    }
+  @Override
+  public boolean isExecutionThread() {
+    return mRunner.isExecutionThread();
+  }
 
-    @Override
-    public boolean isSynchronous() {
-        return mRunner.isSynchronous();
-    }
+  @Override
+  public boolean isSynchronous() {
+    return mRunner.isSynchronous();
+  }
 
-    @Override
-    public void run(@NotNull final Execution execution, final long delay,
-            @NotNull final TimeUnit timeUnit) {
-        mRunner.run(execution, delay, timeUnit);
-    }
+  @Override
+  public void run(@NotNull final Execution execution, final long delay,
+      @NotNull final TimeUnit timeUnit) {
+    mRunner.run(execution, delay, timeUnit);
+  }
 }

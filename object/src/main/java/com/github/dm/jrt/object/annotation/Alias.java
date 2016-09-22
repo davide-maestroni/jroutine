@@ -83,10 +83,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Alias {
 
-    /**
-     * The name used to identify the method independently from its original signature.
-     *
-     * @return the name.
-     */
-    String value();
+  /**
+   * The name used to identify the method independently from its original signature.
+   *
+   * @return the name.
+   */
+  String value();
 }

@@ -28,128 +28,128 @@ import static org.junit.Assert.fail;
  */
 public class ConstantConditionsTest {
 
-    @Test
-    public void testConstructor() {
+  @Test
+  public void testConstructor() {
 
-        boolean failed = false;
-        try {
-            new ConstantConditions();
-            failed = true;
+    boolean failed = false;
+    try {
+      new ConstantConditions();
+      failed = true;
 
-        } catch (final Throwable ignored) {
+    } catch (final Throwable ignored) {
 
-        }
-
-        assertThat(failed).isFalse();
     }
 
-    @Test
-    public void testNotNegative() {
+    assertThat(failed).isFalse();
+  }
 
-        assertThat(ConstantConditions.notNegative("test", 0)).isEqualTo(0);
-        assertThat(ConstantConditions.notNegative(17)).isEqualTo(17);
-        try {
-            ConstantConditions.notNegative("test", -1);
-            fail();
+  @Test
+  public void testNotNegative() {
 
-        } catch (final IllegalArgumentException e) {
-            assertThat(e.getMessage()).contains("test");
-        }
+    assertThat(ConstantConditions.notNegative("test", 0)).isEqualTo(0);
+    assertThat(ConstantConditions.notNegative(17)).isEqualTo(17);
+    try {
+      ConstantConditions.notNegative("test", -1);
+      fail();
 
-        try {
-            ConstantConditions.notNegative(-71);
-            fail();
-
-        } catch (final IllegalArgumentException e) {
-            assertThat(e.getMessage()).contains("number");
-        }
+    } catch (final IllegalArgumentException e) {
+      assertThat(e.getMessage()).contains("test");
     }
 
-    @Test
-    public void testNotNegativeLong() {
+    try {
+      ConstantConditions.notNegative(-71);
+      fail();
 
-        assertThat(ConstantConditions.notNegative("test", 0L)).isEqualTo(0L);
-        assertThat(ConstantConditions.notNegative(17L)).isEqualTo(17L);
-        try {
-            ConstantConditions.notNegative("test", -1L);
-            fail();
+    } catch (final IllegalArgumentException e) {
+      assertThat(e.getMessage()).contains("number");
+    }
+  }
 
-        } catch (final IllegalArgumentException e) {
-            assertThat(e.getMessage()).contains("test");
-        }
+  @Test
+  public void testNotNegativeLong() {
 
-        try {
-            ConstantConditions.notNegative(-71L);
-            fail();
+    assertThat(ConstantConditions.notNegative("test", 0L)).isEqualTo(0L);
+    assertThat(ConstantConditions.notNegative(17L)).isEqualTo(17L);
+    try {
+      ConstantConditions.notNegative("test", -1L);
+      fail();
 
-        } catch (final IllegalArgumentException e) {
-            assertThat(e.getMessage()).contains("number");
-        }
+    } catch (final IllegalArgumentException e) {
+      assertThat(e.getMessage()).contains("test");
     }
 
-    @Test
-    public void testNullity() {
+    try {
+      ConstantConditions.notNegative(-71L);
+      fail();
 
-        assertThat(ConstantConditions.notNull("test", this)).isEqualTo(this);
-        assertThat(ConstantConditions.notNull(this)).isEqualTo(this);
-        try {
-            ConstantConditions.notNull("test", null);
-            fail();
+    } catch (final IllegalArgumentException e) {
+      assertThat(e.getMessage()).contains("number");
+    }
+  }
 
-        } catch (final NullPointerException e) {
-            assertThat(e.getMessage()).contains("test");
-        }
+  @Test
+  public void testNullity() {
 
-        try {
-            ConstantConditions.notNull(null);
-            fail();
+    assertThat(ConstantConditions.notNull("test", this)).isEqualTo(this);
+    assertThat(ConstantConditions.notNull(this)).isEqualTo(this);
+    try {
+      ConstantConditions.notNull("test", null);
+      fail();
 
-        } catch (final NullPointerException e) {
-            assertThat(e.getMessage()).contains("object");
-        }
+    } catch (final NullPointerException e) {
+      assertThat(e.getMessage()).contains("test");
     }
 
-    @Test
-    public void testPositive() {
+    try {
+      ConstantConditions.notNull(null);
+      fail();
 
-        assertThat(ConstantConditions.positive("test", 11)).isEqualTo(11);
-        assertThat(ConstantConditions.positive(17)).isEqualTo(17);
-        try {
-            ConstantConditions.positive("test", -13);
-            fail();
+    } catch (final NullPointerException e) {
+      assertThat(e.getMessage()).contains("object");
+    }
+  }
 
-        } catch (final IllegalArgumentException e) {
-            assertThat(e.getMessage()).contains("test");
-        }
+  @Test
+  public void testPositive() {
 
-        try {
-            ConstantConditions.positive(-71);
-            fail();
+    assertThat(ConstantConditions.positive("test", 11)).isEqualTo(11);
+    assertThat(ConstantConditions.positive(17)).isEqualTo(17);
+    try {
+      ConstantConditions.positive("test", -13);
+      fail();
 
-        } catch (final IllegalArgumentException e) {
-            assertThat(e.getMessage()).contains("number");
-        }
+    } catch (final IllegalArgumentException e) {
+      assertThat(e.getMessage()).contains("test");
     }
 
-    @Test
-    public void testPositiveLong() {
+    try {
+      ConstantConditions.positive(-71);
+      fail();
 
-        assertThat(ConstantConditions.positive("test", 11L)).isEqualTo(11L);
-        assertThat(ConstantConditions.positive(17L)).isEqualTo(17L);
-        try {
-            ConstantConditions.positive("test", -13L);
-            fail();
-
-        } catch (final IllegalArgumentException e) {
-            assertThat(e.getMessage()).contains("test");
-        }
-
-        try {
-            ConstantConditions.positive(-71L);
-            fail();
-
-        } catch (final IllegalArgumentException e) {
-            assertThat(e.getMessage()).contains("number");
-        }
+    } catch (final IllegalArgumentException e) {
+      assertThat(e.getMessage()).contains("number");
     }
+  }
+
+  @Test
+  public void testPositiveLong() {
+
+    assertThat(ConstantConditions.positive("test", 11L)).isEqualTo(11L);
+    assertThat(ConstantConditions.positive(17L)).isEqualTo(17L);
+    try {
+      ConstantConditions.positive("test", -13L);
+      fail();
+
+    } catch (final IllegalArgumentException e) {
+      assertThat(e.getMessage()).contains("test");
+    }
+
+    try {
+      ConstantConditions.positive(-71L);
+      fail();
+
+    } catch (final IllegalArgumentException e) {
+      assertThat(e.getMessage()).contains("number");
+    }
+  }
 }

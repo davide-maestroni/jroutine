@@ -36,34 +36,34 @@ import java.net.URLConnection;
  */
 public class ReadConnection extends MappingInvocation<URI, ByteBuffer> {
 
-    private static final int MAX_CHUNK_SIZE = 2048;
+  private static final int MAX_CHUNK_SIZE = 2048;
 
-    /**
-     * Constructor.
-     */
-    protected ReadConnection() {
-        super(null);
+  /**
+   * Constructor.
+   */
+  public ReadConnection() {
+    super(null);
+  }
+
+  public void onInput(final URI uri, @NotNull final Channel<ByteBuffer, ?> result) throws
+      IOException {
+    final URLConnection connection = uri.toURL().openConnection();
+    connection.setConnectTimeout(3000);
+    if (connection instanceof HttpURLConnection) {
+      final int code = ((HttpURLConnection) connection).getResponseCode();
+      if ((code < 200) || (code >= 300)) {
+        throw new IOException();
+      }
     }
 
-    public void onInput(final URI uri, @NotNull final Channel<ByteBuffer, ?> result) throws
-            IOException {
-        final URLConnection connection = uri.toURL().openConnection();
-        connection.setConnectTimeout(3000);
-        if (connection instanceof HttpURLConnection) {
-            final int code = ((HttpURLConnection) connection).getResponseCode();
-            if ((code < 200) || (code >= 300)) {
-                throw new IOException();
-            }
-        }
+    // We employ the utility class dedicated to the optimized transfer of bytes through a routine
+    // channel
+    final BufferOutputStream outputStream = Channels.byteChannel(MAX_CHUNK_SIZE).bind(result);
+    try {
+      outputStream.transferFrom(connection.getInputStream());
 
-        // We employ the utility class dedicated to the optimized transfer of bytes through a
-        // routine channel
-        final BufferOutputStream outputStream = Channels.byteChannel(MAX_CHUNK_SIZE).bind(result);
-        try {
-            outputStream.transferFrom(connection.getInputStream());
-
-        } finally {
-            outputStream.close();
-        }
+    } finally {
+      outputStream.close();
     }
+  }
 }

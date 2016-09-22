@@ -29,45 +29,63 @@ import org.jetbrains.annotations.NotNull;
  */
 public enum InvocationMode {
 
-    /**
-     * Asynchronous mode.
-     *
-     * @see com.github.dm.jrt.core.routine.Routine Routine
-     */
-    ASYNC(new Invoker() {
+  /**
+   * Asynchronous mode.
+   *
+   * @see com.github.dm.jrt.core.routine.Routine Routine
+   */
+  ASYNC(new Invoker() {
 
-        @NotNull
-        public <IN, OUT> Channel<IN, OUT> invoke(@NotNull final Routine<IN, OUT> routine) {
-            return routine.call();
-        }
-    }),
-
-    /**
-     * Parallel mode.
-     *
-     * @see com.github.dm.jrt.core.routine.Routine Routine
-     */
-    PARALLEL(new Invoker() {
-
-        @NotNull
-        public <IN, OUT> Channel<IN, OUT> invoke(@NotNull final Routine<IN, OUT> routine) {
-            return routine.callParallel();
-        }
-    });
-
-    private final Invoker mInvoker;
-
-    /**
-     * Constructor.
-     *
-     * @param invoker the invoker.
-     */
-    InvocationMode(@NotNull final Invoker invoker) {
-        mInvoker = invoker;
+    @NotNull
+    public <IN, OUT> Channel<IN, OUT> invoke(@NotNull final Routine<IN, OUT> routine) {
+      return routine.call();
     }
+  }),
+
+  /**
+   * Parallel mode.
+   *
+   * @see com.github.dm.jrt.core.routine.Routine Routine
+   */
+  PARALLEL(new Invoker() {
+
+    @NotNull
+    public <IN, OUT> Channel<IN, OUT> invoke(@NotNull final Routine<IN, OUT> routine) {
+      return routine.callParallel();
+    }
+  });
+
+  private final Invoker mInvoker;
+
+  /**
+   * Constructor.
+   *
+   * @param invoker the invoker.
+   */
+  InvocationMode(@NotNull final Invoker invoker) {
+    mInvoker = invoker;
+  }
+
+  /**
+   * Invokes the specified routine with this mode.
+   *
+   * @param routine the routine to invoke.
+   * @param <IN>    the input data type.
+   * @param <OUT>   the output data type.
+   * @return the invocation channel.
+   */
+  @NotNull
+  public <IN, OUT> Channel<IN, OUT> invoke(@NotNull final Routine<IN, OUT> routine) {
+    return mInvoker.invoke(routine);
+  }
+
+  /**
+   * Invoker interface.
+   */
+  private interface Invoker {
 
     /**
-     * Invokes the specified routine with this mode.
+     * Invokes the specified routine.
      *
      * @param routine the routine to invoke.
      * @param <IN>    the input data type.
@@ -75,24 +93,6 @@ public enum InvocationMode {
      * @return the invocation channel.
      */
     @NotNull
-    public <IN, OUT> Channel<IN, OUT> invoke(@NotNull final Routine<IN, OUT> routine) {
-        return mInvoker.invoke(routine);
-    }
-
-    /**
-     * Invoker interface.
-     */
-    private interface Invoker {
-
-        /**
-         * Invokes the specified routine.
-         *
-         * @param routine the routine to invoke.
-         * @param <IN>    the input data type.
-         * @param <OUT>   the output data type.
-         * @return the invocation channel.
-         */
-        @NotNull
-        <IN, OUT> Channel<IN, OUT> invoke(@NotNull Routine<IN, OUT> routine);
-    }
+    <IN, OUT> Channel<IN, OUT> invoke(@NotNull Routine<IN, OUT> routine);
+  }
 }

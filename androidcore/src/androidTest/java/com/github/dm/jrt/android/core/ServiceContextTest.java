@@ -37,108 +37,103 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TargetApi(VERSION_CODES.HONEYCOMB)
 public class ServiceContextTest extends ActivityInstrumentationTestCase2<TestActivity> {
 
-    public ServiceContextTest() {
+  public ServiceContextTest() {
 
-        super(TestActivity.class);
+    super(TestActivity.class);
+  }
+
+  public void testEquals() {
+
+    ServiceContext serviceContext = serviceFrom(getActivity());
+    assertThat(serviceContext).isEqualTo(serviceContext);
+    assertThat(serviceContext).isNotEqualTo(null);
+    assertThat(serviceContext).isNotEqualTo("test");
+    assertThat(serviceContext).isNotEqualTo(serviceFrom(getActivity().getApplicationContext()));
+    assertThat(serviceContext).isEqualTo(serviceFrom(getActivity()));
+    assertThat(serviceContext.hashCode()).isEqualTo(serviceFrom(getActivity()).hashCode());
+    serviceContext = serviceFrom(getActivity(), TestService.class);
+    assertThat(serviceContext).isEqualTo(serviceContext);
+    assertThat(serviceContext).isNotEqualTo(null);
+    assertThat(serviceContext).isNotEqualTo("test");
+    assertThat(serviceContext).isNotEqualTo(serviceFrom(getActivity(), InvocationService.class));
+    assertThat(serviceContext).isEqualTo(serviceFrom(getActivity(), TestService.class));
+    assertThat(serviceContext.hashCode()).isEqualTo(
+        serviceFrom(getActivity(), TestService.class).hashCode());
+    final Intent intent = new Intent(getActivity(), TestService.class);
+    serviceContext = serviceFrom(getActivity(), intent);
+    assertThat(serviceContext).isEqualTo(serviceContext);
+    assertThat(serviceContext).isNotEqualTo(null);
+    assertThat(serviceContext).isNotEqualTo("test");
+    assertThat(serviceContext).isNotEqualTo(serviceFrom(getActivity(), InvocationService.class));
+    assertThat(serviceContext).isEqualTo(serviceFrom(getActivity(), intent));
+    assertThat(serviceContext.hashCode()).isEqualTo(serviceFrom(getActivity(), intent).hashCode());
+    final Intent intentExtra = new Intent(getActivity(), TestService.class);
+    intentExtra.putExtra("test", true);
+    serviceContext = serviceFrom(getActivity(), intentExtra);
+    assertThat(serviceContext).isNotEqualTo(serviceFrom(getActivity(), InvocationService.class));
+    final Intent intentExtra2 = new Intent(getActivity(), TestService.class);
+    intentExtra2.putExtra("test", false);
+    assertThat(serviceContext).isNotEqualTo(serviceFrom(getActivity(), intentExtra2));
+    intentExtra2.putExtra("test", true);
+    assertThat(serviceContext).isEqualTo(serviceFrom(getActivity(), intentExtra2));
+    assertThat(serviceContext.hashCode()).isEqualTo(
+        serviceFrom(getActivity(), intentExtra2).hashCode());
+    intentExtra2.putExtra("testString", "test");
+    assertThat(serviceContext).isNotEqualTo(serviceFrom(getActivity(), intentExtra2));
+    intentExtra2.putExtra("testString", (String) null);
+    assertThat(serviceContext).isNotEqualTo(serviceFrom(getActivity(), intentExtra2));
+    intentExtra.putExtra("testString", (String) null);
+    assertThat(serviceContext).isEqualTo(serviceFrom(getActivity(), intentExtra2));
+    intentExtra.putExtra("testString", "test");
+    assertThat(serviceContext).isNotEqualTo(serviceFrom(getActivity(), intentExtra2));
+    intentExtra2.putExtra("testString", "test");
+    intentExtra2.putExtra("testBundle", new Bundle());
+    assertThat(serviceContext).isNotEqualTo(serviceFrom(getActivity(), intentExtra2));
+    intentExtra.putExtra("testBundle", new Bundle());
+    assertThat(serviceContext).isNotEqualTo(serviceFrom(getActivity(), intentExtra2));
+  }
+
+  @SuppressWarnings("ConstantConditions")
+  public void testError() {
+
+    try {
+      serviceFrom(null);
+      fail();
+
+    } catch (final NullPointerException ignored) {
+
     }
 
-    public void testEquals() {
+    try {
+      serviceFrom(getActivity(), (Class<InvocationService>) null);
+      fail();
 
-        ServiceContext serviceContext = serviceFrom(getActivity());
-        assertThat(serviceContext).isEqualTo(serviceContext);
-        assertThat(serviceContext).isNotEqualTo(null);
-        assertThat(serviceContext).isNotEqualTo("test");
-        assertThat(serviceContext).isNotEqualTo(serviceFrom(getActivity().getApplicationContext()));
-        assertThat(serviceContext).isEqualTo(serviceFrom(getActivity()));
-        assertThat(serviceContext.hashCode()).isEqualTo(serviceFrom(getActivity()).hashCode());
-        serviceContext = serviceFrom(getActivity(), TestService.class);
-        assertThat(serviceContext).isEqualTo(serviceContext);
-        assertThat(serviceContext).isNotEqualTo(null);
-        assertThat(serviceContext).isNotEqualTo("test");
-        assertThat(serviceContext).isNotEqualTo(
-                serviceFrom(getActivity(), InvocationService.class));
-        assertThat(serviceContext).isEqualTo(serviceFrom(getActivity(), TestService.class));
-        assertThat(serviceContext.hashCode()).isEqualTo(
-                serviceFrom(getActivity(), TestService.class).hashCode());
-        final Intent intent = new Intent(getActivity(), TestService.class);
-        serviceContext = serviceFrom(getActivity(), intent);
-        assertThat(serviceContext).isEqualTo(serviceContext);
-        assertThat(serviceContext).isNotEqualTo(null);
-        assertThat(serviceContext).isNotEqualTo("test");
-        assertThat(serviceContext).isNotEqualTo(
-                serviceFrom(getActivity(), InvocationService.class));
-        assertThat(serviceContext).isEqualTo(serviceFrom(getActivity(), intent));
-        assertThat(serviceContext.hashCode()).isEqualTo(
-                serviceFrom(getActivity(), intent).hashCode());
-        final Intent intentExtra = new Intent(getActivity(), TestService.class);
-        intentExtra.putExtra("test", true);
-        serviceContext = serviceFrom(getActivity(), intentExtra);
-        assertThat(serviceContext).isNotEqualTo(
-                serviceFrom(getActivity(), InvocationService.class));
-        final Intent intentExtra2 = new Intent(getActivity(), TestService.class);
-        intentExtra2.putExtra("test", false);
-        assertThat(serviceContext).isNotEqualTo(serviceFrom(getActivity(), intentExtra2));
-        intentExtra2.putExtra("test", true);
-        assertThat(serviceContext).isEqualTo(serviceFrom(getActivity(), intentExtra2));
-        assertThat(serviceContext.hashCode()).isEqualTo(
-                serviceFrom(getActivity(), intentExtra2).hashCode());
-        intentExtra2.putExtra("testString", "test");
-        assertThat(serviceContext).isNotEqualTo(serviceFrom(getActivity(), intentExtra2));
-        intentExtra2.putExtra("testString", (String) null);
-        assertThat(serviceContext).isNotEqualTo(serviceFrom(getActivity(), intentExtra2));
-        intentExtra.putExtra("testString", (String) null);
-        assertThat(serviceContext).isEqualTo(serviceFrom(getActivity(), intentExtra2));
-        intentExtra.putExtra("testString", "test");
-        assertThat(serviceContext).isNotEqualTo(serviceFrom(getActivity(), intentExtra2));
-        intentExtra2.putExtra("testString", "test");
-        intentExtra2.putExtra("testBundle", new Bundle());
-        assertThat(serviceContext).isNotEqualTo(serviceFrom(getActivity(), intentExtra2));
-        intentExtra.putExtra("testBundle", new Bundle());
-        assertThat(serviceContext).isNotEqualTo(serviceFrom(getActivity(), intentExtra2));
+    } catch (final NullPointerException ignored) {
+
     }
 
-    @SuppressWarnings("ConstantConditions")
-    public void testError() {
+    try {
+      serviceFrom(getActivity(), (Intent) null);
+      fail();
 
-        try {
-            serviceFrom(null);
-            fail();
+    } catch (final NullPointerException ignored) {
 
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-            serviceFrom(getActivity(), (Class<InvocationService>) null);
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-            serviceFrom(getActivity(), (Intent) null);
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-            serviceFrom(getActivity(), new Intent(getActivity(), Service.class));
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-            serviceFrom(getActivity(),
-                    new Intent().setClassName(getActivity(), "not.existing.Class"));
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
     }
+
+    try {
+      serviceFrom(getActivity(), new Intent(getActivity(), Service.class));
+      fail();
+
+    } catch (final IllegalArgumentException ignored) {
+
+    }
+
+    try {
+      serviceFrom(getActivity(), new Intent().setClassName(getActivity(), "not.existing.Class"));
+      fail();
+
+    } catch (final IllegalArgumentException ignored) {
+
+    }
+  }
 }

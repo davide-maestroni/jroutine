@@ -31,63 +31,62 @@ import org.jetbrains.annotations.NotNull;
  * @param <TYPE> the interface type.
  */
 public interface LoaderProxyObjectBuilder<TYPE>
-        extends ProxyObjectBuilder<TYPE>, LoaderConfigurable<LoaderProxyObjectBuilder<TYPE>> {
+    extends ProxyObjectBuilder<TYPE>, LoaderConfigurable<LoaderProxyObjectBuilder<TYPE>> {
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * The configured asynchronous runner will be ignored.
-     */
-    @NotNull
-    @Override
-    LoaderProxyObjectBuilder<TYPE> apply(@NotNull InvocationConfiguration configuration);
+  /**
+   * {@inheritDoc}
+   * <p>
+   * The configured asynchronous runner will be ignored.
+   */
+  @NotNull
+  @Override
+  LoaderProxyObjectBuilder<TYPE> apply(@NotNull InvocationConfiguration configuration);
 
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    LoaderProxyObjectBuilder<TYPE> apply(@NotNull ObjectConfiguration configuration);
+  /**
+   * {@inheritDoc}
+   */
+  @NotNull
+  @Override
+  LoaderProxyObjectBuilder<TYPE> apply(@NotNull ObjectConfiguration configuration);
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * The configured asynchronous runner will be ignored.
-     */
-    @NotNull
-    @Override
-    InvocationConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>>
-    applyInvocationConfiguration();
+  /**
+   * {@inheritDoc}
+   * <p>
+   * The configured asynchronous runner will be ignored.
+   */
+  @NotNull
+  @Override
+  InvocationConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>>
+  applyInvocationConfiguration();
 
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    ObjectConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>>
-    applyObjectConfiguration();
+  /**
+   * {@inheritDoc}
+   */
+  @NotNull
+  @Override
+  ObjectConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>> applyObjectConfiguration();
 
-    /**
-     * Returns a proxy object enabling asynchronous call of the target instance methods.
-     * <p>
-     * The routines used for calling the methods will honor the attributes specified in any optional
-     * <i>{@code com.github.dm.jrt.object.annotation.*}</i> as well as
-     * <i>{@code com.github.dm.jrt.android.object.annotation.*}</i> annotations.
-     * <br>
-     * Note that such annotations will override any configuration set through the builder.
-     * <p>
-     * The proxy object is created through code generation based on the interfaces annotated with
-     * {@link com.github.dm.jrt.android.proxy.annotation.LoaderProxyCompat LoaderProxyCompat} or
-     * {@link com.github.dm.jrt.android.proxy.annotation.LoaderProxy LoaderProxy}.
-     * <br>
-     * Note that, you'll need to enable annotation pre-processing by adding the processor artifact
-     * to the specific project dependencies.
-     *
-     * @return the proxy object.
-     * @see com.github.dm.jrt.android.object.annotation Android Annotations
-     * @see com.github.dm.jrt.object.annotation Annotations
-     */
-    @NotNull
-    @Override
-    TYPE buildProxy();
+  /**
+   * Returns a proxy object enabling asynchronous call of the target instance methods.
+   * <p>
+   * The routines used for calling the methods will honor the attributes specified in any optional
+   * <i>{@code com.github.dm.jrt.object.annotation.*}</i> as well as
+   * <i>{@code com.github.dm.jrt.android.object.annotation.*}</i> annotations.
+   * <br>
+   * Note that such annotations will override any configuration set through the builder.
+   * <p>
+   * The proxy object is created through code generation based on the interfaces annotated with
+   * {@link com.github.dm.jrt.android.proxy.annotation.LoaderProxyCompat LoaderProxyCompat} or
+   * {@link com.github.dm.jrt.android.proxy.annotation.LoaderProxy LoaderProxy}.
+   * <br>
+   * Note that, you'll need to enable annotation pre-processing by adding the processor artifact
+   * to the specific project dependencies.
+   *
+   * @return the proxy object.
+   * @see com.github.dm.jrt.android.object.annotation Android Annotations
+   * @see com.github.dm.jrt.object.annotation Annotations
+   */
+  @NotNull
+  @Override
+  TYPE buildProxy();
 }

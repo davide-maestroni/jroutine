@@ -30,47 +30,44 @@ import static org.junit.Assert.fail;
  */
 public class ExceptionTest {
 
-    @Test
-    public void tesInvocationDeadlockException() {
+  @Test
+  public void tesInvocationDeadlockException() {
 
-        assertThat(new InvocationDeadlockException("")).hasNoCause();
+    assertThat(new InvocationDeadlockException("")).hasNoCause();
+  }
+
+  @Test
+  public void testInvocationException() {
+
+    assertThat(new InvocationException(new NullPointerException()).getCause()).isExactlyInstanceOf(
+        NullPointerException.class);
+    assertThat(new InvocationException(null)).hasNoCause();
+    assertThat(InvocationException.wrapIfNeeded(new NullPointerException())).isExactlyInstanceOf(
+        InvocationException.class);
+    assertThat(InvocationException.wrapIfNeeded(new RoutineException())).isExactlyInstanceOf(
+        RoutineException.class);
+  }
+
+  @Test
+  public void testInvocationInterruptedException() {
+
+    assertThat(new InvocationInterruptedException(
+        new InterruptedException()).getCause()).isExactlyInstanceOf(InterruptedException.class);
+    assertThat(new InvocationInterruptedException(null)).hasNoCause();
+    InvocationInterruptedException.throwIfInterrupt(new NullPointerException());
+    try {
+      InvocationInterruptedException.throwIfInterrupt(new InterruptedException());
+      fail();
+
+    } catch (final InvocationInterruptedException ignored) {
     }
 
-    @Test
-    public void testInvocationException() {
+    try {
+      InvocationInterruptedException.throwIfInterrupt(
+          new InvocationInterruptedException(new InterruptedException()));
+      fail();
 
-        assertThat(
-                new InvocationException(new NullPointerException()).getCause()).isExactlyInstanceOf(
-                NullPointerException.class);
-        assertThat(new InvocationException(null)).hasNoCause();
-        assertThat(
-                InvocationException.wrapIfNeeded(new NullPointerException())).isExactlyInstanceOf(
-                InvocationException.class);
-        assertThat(InvocationException.wrapIfNeeded(new RoutineException())).isExactlyInstanceOf(
-                RoutineException.class);
+    } catch (final InvocationInterruptedException ignored) {
     }
-
-    @Test
-    public void testInvocationInterruptedException() {
-
-        assertThat(new InvocationInterruptedException(
-                new InterruptedException()).getCause()).isExactlyInstanceOf(
-                InterruptedException.class);
-        assertThat(new InvocationInterruptedException(null)).hasNoCause();
-        InvocationInterruptedException.throwIfInterrupt(new NullPointerException());
-        try {
-            InvocationInterruptedException.throwIfInterrupt(new InterruptedException());
-            fail();
-
-        } catch (final InvocationInterruptedException ignored) {
-        }
-
-        try {
-            InvocationInterruptedException.throwIfInterrupt(
-                    new InvocationInterruptedException(new InterruptedException()));
-            fail();
-
-        } catch (final InvocationInterruptedException ignored) {
-        }
-    }
+  }
 }

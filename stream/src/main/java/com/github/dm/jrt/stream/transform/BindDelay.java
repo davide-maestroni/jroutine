@@ -35,30 +35,29 @@ import java.util.concurrent.TimeUnit;
  */
 class BindDelay<OUT> implements Function<Channel<?, OUT>, Channel<?, OUT>> {
 
-    private final ChannelConfiguration mConfiguration;
+  private final ChannelConfiguration mConfiguration;
 
-    private final long mDelay;
+  private final long mDelay;
 
-    private final TimeUnit mDelayUnit;
+  private final TimeUnit mDelayUnit;
 
-    /**
-     * Constructor.
-     *
-     * @param configuration the channel configuration.
-     * @param delay         the delay value.
-     * @param timeUnit      the delay time unit.
-     */
-    BindDelay(@NotNull final ChannelConfiguration configuration, final long delay,
-            @NotNull final TimeUnit timeUnit) {
-        mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
-        mDelay = ConstantConditions.notNegative("delay value", delay);
-        mDelayUnit = ConstantConditions.notNull("delay unit", timeUnit);
-    }
+  /**
+   * Constructor.
+   *
+   * @param configuration the channel configuration.
+   * @param delay         the delay value.
+   * @param timeUnit      the delay time unit.
+   */
+  BindDelay(@NotNull final ChannelConfiguration configuration, final long delay,
+      @NotNull final TimeUnit timeUnit) {
+    mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
+    mDelay = ConstantConditions.notNegative("delay value", delay);
+    mDelayUnit = ConstantConditions.notNull("delay unit", timeUnit);
+  }
 
-    public Channel<?, OUT> apply(final Channel<?, OUT> channel) throws Exception {
-        final ChannelConfiguration configuration = mConfiguration;
-        final Channel<OUT, OUT> outputChannel =
-                JRoutineCore.io().apply(configuration).buildChannel();
-        return outputChannel.after(mDelay, mDelayUnit).pass(channel).now().close();
-    }
+  public Channel<?, OUT> apply(final Channel<?, OUT> channel) throws Exception {
+    final ChannelConfiguration configuration = mConfiguration;
+    final Channel<OUT, OUT> outputChannel = JRoutineCore.io().apply(configuration).buildChannel();
+    return outputChannel.after(mDelay, mDelayUnit).pass(channel).now().close();
+  }
 }

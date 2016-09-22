@@ -35,163 +35,163 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 public class ActionDecorator extends DeepEqualObject implements Action, Decorator {
 
-    private static final ActionDecorator sNoOp = new ActionDecorator(new Action() {
+  private static final ActionDecorator sNoOp = new ActionDecorator(new Action() {
 
-        public void perform() {
-        }
-    });
+    public void perform() {
+    }
+  });
 
-    private final List<Action> mActions;
+  private final List<Action> mActions;
+
+  /**
+   * Constructor.
+   *
+   * @param action the wrapped action.
+   */
+  private ActionDecorator(@NotNull final Action action) {
+    this(Collections.singletonList(ConstantConditions.notNull("action instance", action)));
+  }
+
+  /**
+   * Constructor.
+   *
+   * @param actions the list of wrapped actions.
+   */
+  private ActionDecorator(@NotNull final List<Action> actions) {
+    super(asArgs(actions));
+    mActions = actions;
+  }
+
+  /**
+   * Decorates the specified action instance so to provide additional features.
+   * <br>
+   * The returned object will support concatenation and comparison.
+   * <p>
+   * Note that the passed object is expected to have a functional behavior, that is, it must not
+   * retain a mutable internal state.
+   * <br>
+   * Note also that any external object used inside the function must be synchronized in order to
+   * avoid concurrency issues.
+   *
+   * @param action the action instance.
+   * @return the decorated action.
+   */
+  @NotNull
+  public static ActionDecorator decorate(@NotNull final Action action) {
+    if (action instanceof ActionDecorator) {
+      return (ActionDecorator) action;
+    }
+
+    return new ActionDecorator(action);
+  }
+
+  /**
+   * Decorates the specified runnable instance so to provide additional features.
+   * <br>
+   * The returned object will support concatenation and comparison.
+   * <p>
+   * Note that the passed object is expected to have a functional behavior, that is, it must not
+   * retain a mutable internal state.
+   * <br>
+   * Note also that any external object used inside the function must be synchronized in order to
+   * avoid concurrency issues.
+   *
+   * @param action the runnable instance.
+   * @return the decorated action.
+   */
+  @NotNull
+  public static ActionDecorator decorate(@NotNull final Runnable action) {
+    return new ActionDecorator(new ActionRunnable(action));
+  }
+
+  /**
+   * Returns an action decorator doing nothing.
+   * <br>
+   * The returned object will support concatenation and comparison.
+   *
+   * @return the action decorator.
+   */
+  @NotNull
+  public static ActionDecorator noOp() {
+    return sNoOp;
+  }
+
+  /**
+   * Returns a composed action decorator that performs, in sequence, this operation followed by
+   * the after operation.
+   *
+   * @param after the operation to perform after this operation.
+   * @return the composed action.
+   */
+  @NotNull
+  public ActionDecorator andThen(@NotNull final Action after) {
+    ConstantConditions.notNull("action instance", after);
+    final List<Action> actions = mActions;
+    final ArrayList<Action> newActions = new ArrayList<Action>(actions.size() + 1);
+    newActions.addAll(actions);
+    if (after instanceof ActionDecorator) {
+      newActions.addAll(((ActionDecorator) after).mActions);
+
+    } else {
+      newActions.add(after);
+    }
+
+    return new ActionDecorator(newActions);
+  }
+
+  /**
+   * Returns a composed action decorator that performs, in sequence, this operation followed by
+   * the after operation.
+   *
+   * @param after the operation to perform after this operation.
+   * @return the composed action.
+   */
+  @NotNull
+  public ActionDecorator andThen(@NotNull final Runnable after) {
+    ConstantConditions.notNull("runnable instance", after);
+    final List<Action> actions = mActions;
+    final ArrayList<Action> newActions = new ArrayList<Action>(actions.size() + 1);
+    newActions.addAll(actions);
+    newActions.add(new ActionRunnable(after));
+    return new ActionDecorator(newActions);
+  }
+
+  public boolean hasStaticScope() {
+    for (final Action action : mActions) {
+      if (!Reflection.hasStaticScope(action) || ((action instanceof ActionRunnable)
+          && !Reflection.hasStaticScope(((ActionRunnable) action).mRunnable))) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  /**
+   * Implementation of an action executing a runnable.
+   */
+  private static class ActionRunnable extends DeepEqualObject implements Action {
+
+    private final Runnable mRunnable;
 
     /**
      * Constructor.
      *
-     * @param action the wrapped action.
+     * @param runnable the runnable instance.
      */
-    private ActionDecorator(@NotNull final Action action) {
-        this(Collections.singletonList(ConstantConditions.notNull("action instance", action)));
+    private ActionRunnable(@NotNull final Runnable runnable) {
+      super(asArgs(ConstantConditions.notNull("runnable instance", runnable)));
+      mRunnable = runnable;
     }
 
-    /**
-     * Constructor.
-     *
-     * @param actions the list of wrapped actions.
-     */
-    private ActionDecorator(@NotNull final List<Action> actions) {
-        super(asArgs(actions));
-        mActions = actions;
+    public void perform() {
+      mRunnable.run();
     }
+  }
 
-    /**
-     * Decorates the specified action instance so to provide additional features.
-     * <br>
-     * The returned object will support concatenation and comparison.
-     * <p>
-     * Note that the passed object is expected to have a functional behavior, that is, it must not
-     * retain a mutable internal state.
-     * <br>
-     * Note also that any external object used inside the function must be synchronized in order to
-     * avoid concurrency issues.
-     *
-     * @param action the action instance.
-     * @return the decorated action.
-     */
-    @NotNull
-    public static ActionDecorator decorate(@NotNull final Action action) {
-        if (action instanceof ActionDecorator) {
-            return (ActionDecorator) action;
-        }
-
-        return new ActionDecorator(action);
+  public void perform() throws Exception {
+    for (final Action action : mActions) {
+      action.perform();
     }
-
-    /**
-     * Decorates the specified runnable instance so to provide additional features.
-     * <br>
-     * The returned object will support concatenation and comparison.
-     * <p>
-     * Note that the passed object is expected to have a functional behavior, that is, it must not
-     * retain a mutable internal state.
-     * <br>
-     * Note also that any external object used inside the function must be synchronized in order to
-     * avoid concurrency issues.
-     *
-     * @param action the runnable instance.
-     * @return the decorated action.
-     */
-    @NotNull
-    public static ActionDecorator decorate(@NotNull final Runnable action) {
-        return new ActionDecorator(new ActionRunnable(action));
-    }
-
-    /**
-     * Returns an action decorator doing nothing.
-     * <br>
-     * The returned object will support concatenation and comparison.
-     *
-     * @return the action decorator.
-     */
-    @NotNull
-    public static ActionDecorator noOp() {
-        return sNoOp;
-    }
-
-    /**
-     * Returns a composed action decorator that performs, in sequence, this operation followed by
-     * the after operation.
-     *
-     * @param after the operation to perform after this operation.
-     * @return the composed action.
-     */
-    @NotNull
-    public ActionDecorator andThen(@NotNull final Action after) {
-        ConstantConditions.notNull("action instance", after);
-        final List<Action> actions = mActions;
-        final ArrayList<Action> newActions = new ArrayList<Action>(actions.size() + 1);
-        newActions.addAll(actions);
-        if (after instanceof ActionDecorator) {
-            newActions.addAll(((ActionDecorator) after).mActions);
-
-        } else {
-            newActions.add(after);
-        }
-
-        return new ActionDecorator(newActions);
-    }
-
-    /**
-     * Returns a composed action decorator that performs, in sequence, this operation followed by
-     * the after operation.
-     *
-     * @param after the operation to perform after this operation.
-     * @return the composed action.
-     */
-    @NotNull
-    public ActionDecorator andThen(@NotNull final Runnable after) {
-        ConstantConditions.notNull("runnable instance", after);
-        final List<Action> actions = mActions;
-        final ArrayList<Action> newActions = new ArrayList<Action>(actions.size() + 1);
-        newActions.addAll(actions);
-        newActions.add(new ActionRunnable(after));
-        return new ActionDecorator(newActions);
-    }
-
-    public boolean hasStaticScope() {
-        for (final Action action : mActions) {
-            if (!Reflection.hasStaticScope(action) || ((action instanceof ActionRunnable)
-                    && !Reflection.hasStaticScope(((ActionRunnable) action).mRunnable))) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Implementation of an action executing a runnable.
-     */
-    private static class ActionRunnable extends DeepEqualObject implements Action {
-
-        private final Runnable mRunnable;
-
-        /**
-         * Constructor.
-         *
-         * @param runnable the runnable instance.
-         */
-        private ActionRunnable(@NotNull final Runnable runnable) {
-            super(asArgs(ConstantConditions.notNull("runnable instance", runnable)));
-            mRunnable = runnable;
-        }
-
-        public void perform() {
-            mRunnable.run();
-        }
-    }
-
-    public void perform() throws Exception {
-        for (final Action action : mActions) {
-            action.perform();
-        }
-    }
+  }
 }

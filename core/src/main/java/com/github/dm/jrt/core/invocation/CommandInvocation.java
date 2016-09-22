@@ -33,32 +33,32 @@ import org.jetbrains.annotations.Nullable;
  * @param <OUT> the output data type.
  */
 public abstract class CommandInvocation<OUT> extends InvocationFactory<Void, OUT>
-        implements Invocation<Void, OUT> {
+    implements Invocation<Void, OUT> {
 
-    /**
-     * Constructor.
-     *
-     * @param args the constructor arguments.
-     */
-    protected CommandInvocation(@Nullable final Object[] args) {
-        super(args);
-    }
+  /**
+   * Constructor.
+   *
+   * @param args the constructor arguments.
+   */
+  protected CommandInvocation(@Nullable final Object[] args) {
+    super(args);
+  }
 
-    @NotNull
-    @Override
-    public final Invocation<Void, OUT> newInvocation() {
-        return this;
-    }
+  @NotNull
+  @Override
+  public final Invocation<Void, OUT> newInvocation() {
+    return this;
+  }
 
-    public final void onAbort(@NotNull final RoutineException reason) {
-    }
+  public final void onAbort(@NotNull final RoutineException reason) {
+  }
 
-    public final void onInput(final Void input, @NotNull final Channel<OUT, ?> result) {
-    }
+  public final void onInput(final Void input, @NotNull final Channel<OUT, ?> result) {
+  }
 
-    public final void onRecycle(final boolean isReused) {
-    }
+  public final void onRecycle(final boolean isReused) {
+  }
 
-    public final void onRestart() {
-    }
+  public final void onRestart() {
+  }
 }

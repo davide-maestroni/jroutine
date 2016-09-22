@@ -34,41 +34,41 @@ import java.util.Map;
  */
 class SortingMapChannelConsumer<OUT> implements ChannelConsumer<Selectable<? extends OUT>> {
 
-    private final HashMap<Integer, Channel<OUT, ?>> mChannels;
+  private final HashMap<Integer, Channel<OUT, ?>> mChannels;
 
-    /**
-     * Constructor.
-     *
-     * @param channels the map of indexes and channels.
-     * @throws java.lang.NullPointerException if the specified map is null or contains a null
-     *                                        object.
-     */
-    SortingMapChannelConsumer(@NotNull final Map<Integer, Channel<OUT, ?>> channels) {
-        final HashMap<Integer, Channel<OUT, ?>> channelMap =
-                new HashMap<Integer, Channel<OUT, ?>>(channels);
-        if (channelMap.containsValue(null)) {
-            throw new NullPointerException("the map of channels must not contain null objects");
-        }
-
-        mChannels = channelMap;
+  /**
+   * Constructor.
+   *
+   * @param channels the map of indexes and channels.
+   * @throws java.lang.NullPointerException if the specified map is null or contains a null
+   *                                        object.
+   */
+  SortingMapChannelConsumer(@NotNull final Map<Integer, Channel<OUT, ?>> channels) {
+    final HashMap<Integer, Channel<OUT, ?>> channelMap =
+        new HashMap<Integer, Channel<OUT, ?>>(channels);
+    if (channelMap.containsValue(null)) {
+      throw new NullPointerException("the map of channels must not contain null objects");
     }
 
-    public void onComplete() {
-        for (final Channel<OUT, ?> channel : mChannels.values()) {
-            channel.close();
-        }
-    }
+    mChannels = channelMap;
+  }
 
-    public void onError(@NotNull final RoutineException error) {
-        for (final Channel<OUT, ?> channel : mChannels.values()) {
-            channel.abort(error);
-        }
+  public void onComplete() {
+    for (final Channel<OUT, ?> channel : mChannels.values()) {
+      channel.close();
     }
+  }
 
-    public void onOutput(final Selectable<? extends OUT> selectable) {
-        final Channel<OUT, ?> channel = mChannels.get(selectable.index);
-        if (channel != null) {
-            channel.pass(selectable.data);
-        }
+  public void onError(@NotNull final RoutineException error) {
+    for (final Channel<OUT, ?> channel : mChannels.values()) {
+      channel.abort(error);
     }
+  }
+
+  public void onOutput(final Selectable<? extends OUT> selectable) {
+    final Channel<OUT, ?> channel = mChannels.get(selectable.index);
+    if (channel != null) {
+      channel.pass(selectable.data);
+    }
+  }
 }

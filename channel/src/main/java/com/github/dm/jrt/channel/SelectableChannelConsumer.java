@@ -33,31 +33,31 @@ import org.jetbrains.annotations.NotNull;
  */
 class SelectableChannelConsumer<OUT, IN extends OUT> implements ChannelConsumer<IN> {
 
-    private final Channel<? super Selectable<OUT>, ?> mChannel;
+  private final Channel<? super Selectable<OUT>, ?> mChannel;
 
-    private final int mIndex;
+  private final int mIndex;
 
-    /**
-     * Constructor.
-     *
-     * @param channel the selectable channel.
-     * @param index   the selectable index.
-     */
-    SelectableChannelConsumer(@NotNull final Channel<? super Selectable<OUT>, ?> channel,
-            final int index) {
-        mChannel = ConstantConditions.notNull("channel instance", channel);
-        mIndex = index;
-    }
+  /**
+   * Constructor.
+   *
+   * @param channel the selectable channel.
+   * @param index   the selectable index.
+   */
+  SelectableChannelConsumer(@NotNull final Channel<? super Selectable<OUT>, ?> channel,
+      final int index) {
+    mChannel = ConstantConditions.notNull("channel instance", channel);
+    mIndex = index;
+  }
 
-    public void onComplete() {
-        mChannel.close();
-    }
+  public void onComplete() {
+    mChannel.close();
+  }
 
-    public void onError(@NotNull final RoutineException error) {
-        mChannel.abort(error);
-    }
+  public void onError(@NotNull final RoutineException error) {
+    mChannel.abort(error);
+  }
 
-    public void onOutput(final IN input) {
-        mChannel.pass(new Selectable<OUT>(input, mIndex));
-    }
+  public void onOutput(final IN input) {
+    mChannel.pass(new Selectable<OUT>(input, mIndex));
+  }
 }

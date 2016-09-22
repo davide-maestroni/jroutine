@@ -35,59 +35,59 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class RequestDataTest extends AndroidTestCase {
 
-    public void testParcelable() {
+  public void testParcelable() {
 
-        final Parcel parcel = Parcel.obtain();
-        final Request request = new Request.Builder().url("http://www.google.com").get().build();
-        parcel.writeParcelable(RequestData.of(request), 0);
-        parcel.setDataPosition(0);
-        final RequestData parcelable = parcel.readParcelable(RequestData.class.getClassLoader());
-        assertThat(ComparableCall.of(new CallWrapper(parcelable.requestWithBody(null)))).isEqualTo(
-                ComparableCall.of(new CallWrapper(request)));
-        parcel.recycle();
+    final Parcel parcel = Parcel.obtain();
+    final Request request = new Request.Builder().url("http://www.google.com").get().build();
+    parcel.writeParcelable(RequestData.of(request), 0);
+    parcel.setDataPosition(0);
+    final RequestData parcelable = parcel.readParcelable(RequestData.class.getClassLoader());
+    assertThat(ComparableCall.of(new CallWrapper(parcelable.requestWithBody(null)))).isEqualTo(
+        ComparableCall.of(new CallWrapper(request)));
+    parcel.recycle();
+  }
+
+  private static class CallWrapper implements Call<Object> {
+
+    private final Request mRequest;
+
+    private CallWrapper(final Request request) {
+
+      mRequest = request;
     }
 
-    private static class CallWrapper implements Call<Object> {
+    @SuppressWarnings("CloneDoesntCallSuperClone")
+    public Call<Object> clone() {
 
-        private final Request mRequest;
-
-        private CallWrapper(final Request request) {
-
-            mRequest = request;
-        }
-
-        @SuppressWarnings("CloneDoesntCallSuperClone")
-        public Call<Object> clone() {
-
-            return new CallWrapper(mRequest);
-        }
-
-        public Response<Object> execute() throws IOException {
-
-            throw new IOException();
-        }
-
-        public void enqueue(final Callback<Object> callback) {
-
-        }
-
-        public boolean isExecuted() {
-
-            return false;
-        }
-
-        public void cancel() {
-
-        }
-
-        public boolean isCanceled() {
-
-            return false;
-        }
-
-        public Request request() {
-
-            return mRequest;
-        }
+      return new CallWrapper(mRequest);
     }
+
+    public Response<Object> execute() throws IOException {
+
+      throw new IOException();
+    }
+
+    public void enqueue(final Callback<Object> callback) {
+
+    }
+
+    public boolean isExecuted() {
+
+      return false;
+    }
+
+    public void cancel() {
+
+    }
+
+    public boolean isCanceled() {
+
+      return false;
+    }
+
+    public Request request() {
+
+      return mRequest;
+    }
+  }
 }

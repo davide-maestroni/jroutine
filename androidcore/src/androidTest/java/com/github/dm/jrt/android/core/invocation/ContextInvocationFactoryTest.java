@@ -47,211 +47,209 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TargetApi(VERSION_CODES.FROYO)
 public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCase2<TestActivity> {
 
-    public ContextInvocationFactoryTest() {
+  public ContextInvocationFactoryTest() {
 
-        super(TestActivity.class);
+    super(TestActivity.class);
+  }
+
+  public void testClass() {
+    final InvocationConfiguration configuration =
+        InvocationConfiguration.builder().withRunner(Runners.syncRunner()).configured();
+    assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(Case.class)))
+                           .apply(configuration)
+                           .call("TEST")
+                           .all()).containsExactly("test");
+    assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(Case.class, true)))
+                           .apply(configuration)
+                           .call("test")
+                           .all()).containsExactly("TEST");
+  }
+
+  @SuppressWarnings("ConstantConditions")
+  public void testClassError() {
+
+    try {
+      factoryOf((Class<Case>) null);
+      fail();
+
+    } catch (final NullPointerException ignored) {
+
     }
 
-    public void testClass() {
-        final InvocationConfiguration configuration =
-                InvocationConfiguration.builder().withRunner(Runners.syncRunner()).configured();
-        assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(Case.class)))
-                               .apply(configuration)
-                               .call("TEST")
-                               .all()).containsExactly("test");
-        assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(Case.class, true)))
-                               .apply(configuration)
-                               .call("test")
-                               .all()).containsExactly("TEST");
+    try {
+      factoryOf((Class<Case>) null, true);
+      fail();
+
+    } catch (final NullPointerException ignored) {
+
     }
+  }
 
-    @SuppressWarnings("ConstantConditions")
-    public void testClassError() {
+  public void testFromFactory() {
 
-        try {
-            factoryOf((Class<Case>) null);
-            fail();
+    final InvocationFactory<String, String> factory =
+        fromFactory(getActivity(), factoryOf(tokenOf(Case.class)));
+    assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryFrom(factory)))
+                           .applyInvocationConfiguration()
+                           .withRunner(Runners.syncRunner())
+                           .configured()
+                           .call("TEST")
+                           .all()).containsExactly("test");
+  }
 
-        } catch (final NullPointerException ignored) {
+  @SuppressWarnings("ConstantConditions")
+  public void testFromFactoryError() {
 
-        }
+    try {
+      factoryFrom(null);
+      fail();
 
-        try {
-            factoryOf((Class<Case>) null, true);
-            fail();
+    } catch (final NullPointerException ignored) {
 
-        } catch (final NullPointerException ignored) {
-
-        }
     }
+  }
 
-    public void testFromFactory() {
-
-        final InvocationFactory<String, String> factory =
-                fromFactory(getActivity(), factoryOf(tokenOf(Case.class)));
-        assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryFrom(factory)))
-                               .applyInvocationConfiguration()
-                               .withRunner(Runners.syncRunner())
-                               .configured()
-                               .call("TEST")
-                               .all()).containsExactly("test");
-    }
-
-    @SuppressWarnings("ConstantConditions")
-    public void testFromFactoryError() {
-
-        try {
-            factoryFrom(null);
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-    }
-
-    public void testScopeError() {
-        try {
-            factoryFrom(new InvocationFactory<Object, Object>(null) {
-
-                @NotNull
-                @Override
-                public Invocation<Object, Object> newInvocation() throws Exception {
-                    return new TemplateInvocation<Object, Object>() {};
-                }
-            });
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-        }
-
-        try {
-            factoryOf(new TemplateInvocation<Object, Object>() {}.getClass());
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-        }
-
-        try {
-            factoryOf(new TemplateContextInvocation<Object, Object>() {}.getClass());
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-        }
-    }
-
-    public void testTemplateInvocation() {
-        final InvocationConfiguration configuration =
-                InvocationConfiguration.builder().withRunner(Runners.syncRunner()).configured();
-        assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(ContextTest.class)))
-                               .apply(configuration)
-                               .close()
-                               .getError()).isNull();
-        assertThat(
-                JRoutineCore.with(fromFactory(getActivity(), factoryOf(ChannelContextTest.class)))
-                            .apply(configuration)
-                            .close()
-                            .getError()).isNull();
-    }
-
-    public void testToken() {
-        final InvocationConfiguration configuration =
-                InvocationConfiguration.builder().withRunner(Runners.syncRunner()).configured();
-        assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(tokenOf(Case.class))))
-                               .apply(configuration)
-                               .call("TEST")
-                               .all()).containsExactly("test");
-        assertThat(
-                JRoutineCore.with(fromFactory(getActivity(), factoryOf(tokenOf(Case.class), true)))
-                            .apply(configuration)
-                            .call("test")
-                            .all()).containsExactly("TEST");
-    }
-
-    @SuppressWarnings("ConstantConditions")
-    public void testTokenError() {
-
-        try {
-            factoryOf((ClassToken<Case>) null);
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-            factoryOf((ClassToken<Case>) null, true);
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-    }
-
-    public void testWrapper() {
-        final InvocationConfiguration configuration =
-                InvocationConfiguration.builder().withRunner(Runners.syncRunner()).configured();
-        assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(CaseWrapper.class)))
-                               .apply(configuration)
-                               .call("TEST")
-                               .all()).containsExactly("test");
-        assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(CaseWrapper.class, true)))
-                               .apply(configuration)
-                               .call("test")
-                               .all()).containsExactly("TEST");
-    }
-
-    @SuppressWarnings("unused")
-    public static class Case extends TemplateContextInvocation<String, String> {
-
-        private final boolean mIsUpper;
-
-        public Case() {
-
-            this(false);
-        }
-
-        public Case(final boolean isUpper) {
-
-            mIsUpper = isUpper;
-        }
-
-        @Override
-        public void onInput(final String input, @NotNull final Channel<String, ?> result) throws
-                Exception {
-
-            result.pass(mIsUpper ? input.toUpperCase() : input.toLowerCase());
-        }
-    }
-
-    @SuppressWarnings("unused")
-    public static class CaseWrapper extends ContextInvocationWrapper<String, String> {
-
-        public CaseWrapper() {
-
-            super(new Case());
-        }
-
-        public CaseWrapper(final boolean isUpper) {
-
-            super(new Case(isUpper));
-        }
-    }
-
-    public static class ChannelContextTest extends ChannelContextInvocation<Object, Object> {
+  public void testScopeError() {
+    try {
+      factoryFrom(new InvocationFactory<Object, Object>(null) {
 
         @NotNull
         @Override
-        protected Channel<?, Object> onChannel(@NotNull final Channel<?, Object> channel) {
-            assertThat(getContext()).isExactlyInstanceOf(TestActivity.class);
-            return channel;
+        public Invocation<Object, Object> newInvocation() throws Exception {
+          return new TemplateInvocation<Object, Object>() {};
         }
+      });
+      fail();
+
+    } catch (final IllegalArgumentException ignored) {
     }
 
-    public static class ContextTest extends TemplateContextInvocation<Object, Object> {
+    try {
+      factoryOf(new TemplateInvocation<Object, Object>() {}.getClass());
+      fail();
 
-        @Override
-        public void onComplete(@NotNull final Channel<Object, ?> result) {
-            assertThat(getContext()).isExactlyInstanceOf(TestActivity.class);
-        }
+    } catch (final IllegalArgumentException ignored) {
     }
+
+    try {
+      factoryOf(new TemplateContextInvocation<Object, Object>() {}.getClass());
+      fail();
+
+    } catch (final IllegalArgumentException ignored) {
+    }
+  }
+
+  public void testTemplateInvocation() {
+    final InvocationConfiguration configuration =
+        InvocationConfiguration.builder().withRunner(Runners.syncRunner()).configured();
+    assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(ContextTest.class)))
+                           .apply(configuration)
+                           .close()
+                           .getError()).isNull();
+    assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(ChannelContextTest.class)))
+                           .apply(configuration)
+                           .close()
+                           .getError()).isNull();
+  }
+
+  public void testToken() {
+    final InvocationConfiguration configuration =
+        InvocationConfiguration.builder().withRunner(Runners.syncRunner()).configured();
+    assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(tokenOf(Case.class))))
+                           .apply(configuration)
+                           .call("TEST")
+                           .all()).containsExactly("test");
+    assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(tokenOf(Case.class), true)))
+                           .apply(configuration)
+                           .call("test")
+                           .all()).containsExactly("TEST");
+  }
+
+  @SuppressWarnings("ConstantConditions")
+  public void testTokenError() {
+
+    try {
+      factoryOf((ClassToken<Case>) null);
+      fail();
+
+    } catch (final NullPointerException ignored) {
+
+    }
+
+    try {
+      factoryOf((ClassToken<Case>) null, true);
+      fail();
+
+    } catch (final NullPointerException ignored) {
+
+    }
+  }
+
+  public void testWrapper() {
+    final InvocationConfiguration configuration =
+        InvocationConfiguration.builder().withRunner(Runners.syncRunner()).configured();
+    assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(CaseWrapper.class)))
+                           .apply(configuration)
+                           .call("TEST")
+                           .all()).containsExactly("test");
+    assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(CaseWrapper.class, true)))
+                           .apply(configuration)
+                           .call("test")
+                           .all()).containsExactly("TEST");
+  }
+
+  @SuppressWarnings("unused")
+  public static class Case extends TemplateContextInvocation<String, String> {
+
+    private final boolean mIsUpper;
+
+    public Case() {
+
+      this(false);
+    }
+
+    public Case(final boolean isUpper) {
+
+      mIsUpper = isUpper;
+    }
+
+    @Override
+    public void onInput(final String input, @NotNull final Channel<String, ?> result) throws
+        Exception {
+
+      result.pass(mIsUpper ? input.toUpperCase() : input.toLowerCase());
+    }
+  }
+
+  @SuppressWarnings("unused")
+  public static class CaseWrapper extends ContextInvocationWrapper<String, String> {
+
+    public CaseWrapper() {
+
+      super(new Case());
+    }
+
+    public CaseWrapper(final boolean isUpper) {
+
+      super(new Case(isUpper));
+    }
+  }
+
+  public static class ChannelContextTest extends ChannelContextInvocation<Object, Object> {
+
+    @NotNull
+    @Override
+    protected Channel<?, Object> onChannel(@NotNull final Channel<?, Object> channel) {
+      assertThat(getContext()).isExactlyInstanceOf(TestActivity.class);
+      return channel;
+    }
+  }
+
+  public static class ContextTest extends TemplateContextInvocation<Object, Object> {
+
+    @Override
+    public void onComplete(@NotNull final Channel<Object, ?> result) {
+      assertThat(getContext()).isExactlyInstanceOf(TestActivity.class);
+    }
+  }
 }

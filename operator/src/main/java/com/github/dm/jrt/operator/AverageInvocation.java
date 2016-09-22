@@ -38,85 +38,85 @@ import static com.github.dm.jrt.operator.math.Numbers.addOptimistic;
  */
 class AverageInvocation extends TemplateInvocation<Number, Number> {
 
-    private static final InvocationFactory<Number, Number> sFactory =
-            new InvocationFactory<Number, Number>(null) {
+  private static final InvocationFactory<Number, Number> sFactory =
+      new InvocationFactory<Number, Number>(null) {
 
-                @NotNull
-                @Override
-                public Invocation<Number, Number> newInvocation() {
-                    return new AverageInvocation();
-                }
-            };
-
-    private int mCount;
-
-    private Number mSum;
-
-    /**
-     * Constructor.
-     */
-    private AverageInvocation() {
-    }
-
-    /**
-     * Returns a factory of invocations computing the average of the input numbers.
-     *
-     * @return the factory instance.
-     */
-    @NotNull
-    static InvocationFactory<Number, Number> factoryOf() {
-        return sFactory;
-    }
-
-    @Override
-    public void onComplete(@NotNull final Channel<Number, ?> result) {
-        if (mCount == 0) {
-            result.pass(0);
-
-        } else {
-            final Number mean;
-            final Number sum = mSum;
-            if (sum instanceof BigDecimal) {
-                mean = ((BigDecimal) sum).divide(new BigDecimal(mCount), 15, RoundingMode.HALF_UP);
-
-            } else if (sum instanceof BigInteger) {
-                mean = ((BigInteger) sum).divide(BigInteger.valueOf(mCount));
-
-            } else if (sum instanceof Double) {
-                mean = sum.doubleValue() / mCount;
-
-            } else if (sum instanceof Float) {
-                mean = sum.floatValue() / mCount;
-
-            } else if (sum instanceof Long) {
-                mean = sum.longValue() / mCount;
-
-            } else if (sum instanceof Integer) {
-                mean = sum.intValue() / mCount;
-
-            } else if (sum instanceof Short) {
-                mean = (short) (sum.shortValue() / mCount);
-
-            } else if (sum instanceof Byte) {
-                mean = (byte) (sum.byteValue() / mCount);
-
-            } else {
-                mean = sum.doubleValue() / mCount;
-            }
-
-            result.pass(mean);
+        @NotNull
+        @Override
+        public Invocation<Number, Number> newInvocation() {
+          return new AverageInvocation();
         }
-    }
+      };
 
-    @Override
-    public void onInput(final Number input, @NotNull final Channel<Number, ?> result) {
-        mSum = addOptimistic(mSum, input);
-        ++mCount;
-    }
+  private int mCount;
 
-    @Override
-    public void onRestart() {
-        mSum = (byte) 0;
-        mCount = 0;
+  private Number mSum;
+
+  /**
+   * Constructor.
+   */
+  private AverageInvocation() {
+  }
+
+  /**
+   * Returns a factory of invocations computing the average of the input numbers.
+   *
+   * @return the factory instance.
+   */
+  @NotNull
+  static InvocationFactory<Number, Number> factoryOf() {
+    return sFactory;
+  }
+
+  @Override
+  public void onComplete(@NotNull final Channel<Number, ?> result) {
+    if (mCount == 0) {
+      result.pass(0);
+
+    } else {
+      final Number mean;
+      final Number sum = mSum;
+      if (sum instanceof BigDecimal) {
+        mean = ((BigDecimal) sum).divide(new BigDecimal(mCount), 15, RoundingMode.HALF_UP);
+
+      } else if (sum instanceof BigInteger) {
+        mean = ((BigInteger) sum).divide(BigInteger.valueOf(mCount));
+
+      } else if (sum instanceof Double) {
+        mean = sum.doubleValue() / mCount;
+
+      } else if (sum instanceof Float) {
+        mean = sum.floatValue() / mCount;
+
+      } else if (sum instanceof Long) {
+        mean = sum.longValue() / mCount;
+
+      } else if (sum instanceof Integer) {
+        mean = sum.intValue() / mCount;
+
+      } else if (sum instanceof Short) {
+        mean = (short) (sum.shortValue() / mCount);
+
+      } else if (sum instanceof Byte) {
+        mean = (byte) (sum.byteValue() / mCount);
+
+      } else {
+        mean = sum.doubleValue() / mCount;
+      }
+
+      result.pass(mean);
     }
+  }
+
+  @Override
+  public void onInput(final Number input, @NotNull final Channel<Number, ?> result) {
+    mSum = addOptimistic(mSum, input);
+    ++mCount;
+  }
+
+  @Override
+  public void onRestart() {
+    mSum = (byte) 0;
+    mCount = 0;
+  }
 }

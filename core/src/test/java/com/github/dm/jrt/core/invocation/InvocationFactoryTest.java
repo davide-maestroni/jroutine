@@ -35,84 +35,83 @@ import static org.junit.Assert.fail;
  */
 public class InvocationFactoryTest {
 
-    @Test
-    public void testDecoratingInvocationFactory() throws Exception {
-        final InvocationFactory<String, String> factory = IdentityInvocation.factoryOf();
-        assertThat(factory.newInvocation()).isExactlyInstanceOf(IdentityInvocation.class);
-        final TestInvocationFactory decoratedFactory = new TestInvocationFactory(factory);
-        assertThat(decoratedFactory.newInvocation()).isExactlyInstanceOf(
-                TestInvocationDecorator.class);
+  @Test
+  public void testDecoratingInvocationFactory() throws Exception {
+    final InvocationFactory<String, String> factory = IdentityInvocation.factoryOf();
+    assertThat(factory.newInvocation()).isExactlyInstanceOf(IdentityInvocation.class);
+    final TestInvocationFactory decoratedFactory = new TestInvocationFactory(factory);
+    assertThat(decoratedFactory.newInvocation()).isExactlyInstanceOf(TestInvocationDecorator.class);
+  }
+
+  @Test
+  public void testDecoratingInvocationFactoryEquals() {
+    final InvocationFactory<String, String> factory = IdentityInvocation.factoryOf();
+    final TestInvocationFactory decoratedFactory = new TestInvocationFactory(factory);
+    assertThat(decoratedFactory).isEqualTo(decoratedFactory);
+    assertThat(decoratedFactory).isNotEqualTo(null);
+    assertThat(decoratedFactory).isNotEqualTo("test");
+    assertThat(decoratedFactory).isNotEqualTo(new TestInvocationFactory(
+        factoryOf(TestInvocationDecorator.class, (Invocation<?, ?>) null)));
+    assertThat(decoratedFactory).isEqualTo(new TestInvocationFactory(factory));
+    assertThat(decoratedFactory.hashCode()).isEqualTo(
+        new TestInvocationFactory(factory).hashCode());
+  }
+
+  @Test
+  @SuppressWarnings("ConstantConditions")
+  public void testDecoratingInvocationFactoryError() {
+    try {
+      new TestInvocationFactory(null);
+      fail();
+
+    } catch (final NullPointerException ignored) {
+    }
+  }
+
+  @Test
+  public void testInvocationDecoratorAbort() {
+    final InvocationFactory<String, String> factory = IdentityInvocation.factoryOf();
+    final TestInvocationFactory decoratedFactory = new TestInvocationFactory(factory);
+    final Routine<String, String> routine = JRoutineCore.with(decoratedFactory).buildRoutine();
+    assertThat(routine.call().after(millis(100)).pass("test").now().abort()).isTrue();
+  }
+
+  @Test
+  public void testInvocationDecoratorLifecycle() {
+    final InvocationFactory<String, String> factory = IdentityInvocation.factoryOf();
+    final TestInvocationFactory decoratedFactory = new TestInvocationFactory(factory);
+    final Routine<String, String> routine = JRoutineCore.with(decoratedFactory).buildRoutine();
+    assertThat(routine.call("test").after(seconds(1)).all()).containsExactly("test");
+  }
+
+  private static class TestInvocationDecorator extends InvocationDecorator<String, String> {
+
+    /**
+     * Constructor.
+     *
+     * @param wrapped the wrapped invocation instance.
+     */
+    public TestInvocationDecorator(@NotNull final Invocation<String, String> wrapped) {
+      super(wrapped);
+    }
+  }
+
+  private static class TestInvocationFactory extends DecoratingInvocationFactory<String, String> {
+
+    /**
+     * Constructor.
+     *
+     * @param wrapped the wrapped factory instance.
+     */
+    public TestInvocationFactory(@NotNull final InvocationFactory<String, String> wrapped) {
+      super(wrapped);
     }
 
-    @Test
-    public void testDecoratingInvocationFactoryEquals() {
-        final InvocationFactory<String, String> factory = IdentityInvocation.factoryOf();
-        final TestInvocationFactory decoratedFactory = new TestInvocationFactory(factory);
-        assertThat(decoratedFactory).isEqualTo(decoratedFactory);
-        assertThat(decoratedFactory).isNotEqualTo(null);
-        assertThat(decoratedFactory).isNotEqualTo("test");
-        assertThat(decoratedFactory).isNotEqualTo(new TestInvocationFactory(
-                factoryOf(TestInvocationDecorator.class, (Invocation<?, ?>) null)));
-        assertThat(decoratedFactory).isEqualTo(new TestInvocationFactory(factory));
-        assertThat(decoratedFactory.hashCode()).isEqualTo(
-                new TestInvocationFactory(factory).hashCode());
+    @NotNull
+    @Override
+    protected Invocation<String, String> decorate(
+        @NotNull final Invocation<String, String> invocation) {
+      return new TestInvocationDecorator(invocation);
     }
-
-    @Test
-    @SuppressWarnings("ConstantConditions")
-    public void testDecoratingInvocationFactoryError() {
-        try {
-            new TestInvocationFactory(null);
-            fail();
-
-        } catch (final NullPointerException ignored) {
-        }
-    }
-
-    @Test
-    public void testInvocationDecoratorAbort() {
-        final InvocationFactory<String, String> factory = IdentityInvocation.factoryOf();
-        final TestInvocationFactory decoratedFactory = new TestInvocationFactory(factory);
-        final Routine<String, String> routine = JRoutineCore.with(decoratedFactory).buildRoutine();
-        assertThat(routine.call().after(millis(100)).pass("test").now().abort()).isTrue();
-    }
-
-    @Test
-    public void testInvocationDecoratorLifecycle() {
-        final InvocationFactory<String, String> factory = IdentityInvocation.factoryOf();
-        final TestInvocationFactory decoratedFactory = new TestInvocationFactory(factory);
-        final Routine<String, String> routine = JRoutineCore.with(decoratedFactory).buildRoutine();
-        assertThat(routine.call("test").after(seconds(1)).all()).containsExactly("test");
-    }
-
-    private static class TestInvocationDecorator extends InvocationDecorator<String, String> {
-
-        /**
-         * Constructor.
-         *
-         * @param wrapped the wrapped invocation instance.
-         */
-        public TestInvocationDecorator(@NotNull final Invocation<String, String> wrapped) {
-            super(wrapped);
-        }
-    }
-
-    private static class TestInvocationFactory extends DecoratingInvocationFactory<String, String> {
-
-        /**
-         * Constructor.
-         *
-         * @param wrapped the wrapped factory instance.
-         */
-        public TestInvocationFactory(@NotNull final InvocationFactory<String, String> wrapped) {
-            super(wrapped);
-        }
-
-        @NotNull
-        @Override
-        protected Invocation<String, String> decorate(
-                @NotNull final Invocation<String, String> invocation) {
-            return new TestInvocationDecorator(invocation);
-        }
-    }
+  }
 }

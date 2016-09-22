@@ -50,64 +50,61 @@ import java.util.List;
  */
 public interface Log {
 
-    /**
-     * Logs a debug message.
-     *
-     * @param contexts  the list of contexts.
-     * @param message   the message.
-     * @param throwable the optional throwable or null.
-     */
-    void dbg(@NotNull List<Object> contexts, @Nullable String message,
-            @Nullable Throwable throwable);
+  /**
+   * Logs a debug message.
+   *
+   * @param contexts  the list of contexts.
+   * @param message   the message.
+   * @param throwable the optional throwable or null.
+   */
+  void dbg(@NotNull List<Object> contexts, @Nullable String message, @Nullable Throwable throwable);
+
+  /**
+   * Logs an error message.
+   *
+   * @param contexts  the list of contexts.
+   * @param message   the message.
+   * @param throwable the optional throwable or null.
+   */
+  void err(@NotNull List<Object> contexts, @Nullable String message, @Nullable Throwable throwable);
+
+  /**
+   * Logs a warning message.
+   *
+   * @param contexts  the list of contexts.
+   * @param message   the message.
+   * @param throwable the optional throwable or null.
+   */
+  void wrn(@NotNull List<Object> contexts, @Nullable String message, @Nullable Throwable throwable);
+
+  /**
+   * Log levels enumeration from more to less verbose.
+   */
+  enum Level {
 
     /**
-     * Logs an error message.
-     *
-     * @param contexts  the list of contexts.
-     * @param message   the message.
-     * @param throwable the optional throwable or null.
+     * The most verbose log level.
+     * <br>
+     * Debug logs are meant to describe in detail what's happening inside the routine.
      */
-    void err(@NotNull List<Object> contexts, @Nullable String message,
-            @Nullable Throwable throwable);
-
+    DEBUG,
     /**
-     * Logs a warning message.
-     *
-     * @param contexts  the list of contexts.
-     * @param message   the message.
-     * @param throwable the optional throwable or null.
+     * The medium log level.
+     * <br>
+     * Warning logs are meant to notify events that are not completely unexpected, but might be a
+     * clue that something wrong is happening.
      */
-    void wrn(@NotNull List<Object> contexts, @Nullable String message,
-            @Nullable Throwable throwable);
-
+    WARNING,
     /**
-     * Log levels enumeration from more to less verbose.
+     * The least verbose level.
+     * <br>
+     * Error logs notify unexpected events that are clearly an exception in the normal code
+     * execution.
      */
-    enum Level {
-
-        /**
-         * The most verbose log level.
-         * <br>
-         * Debug logs are meant to describe in detail what's happening inside the routine.
-         */
-        DEBUG,
-        /**
-         * The medium log level.
-         * <br>
-         * Warning logs are meant to notify events that are not completely unexpected,
-         * but might be a clue that something wrong is happening.
-         */
-        WARNING,
-        /**
-         * The least verbose level.
-         * <br>
-         * Error logs notify unexpected events that are clearly an exception in the normal code
-         * execution.
-         */
-        ERROR,
-        /**
-         * Silences all the logs.
-         */
-        SILENT
-    }
+    ERROR,
+    /**
+     * Silences all the logs.
+     */
+    SILENT
+  }
 }

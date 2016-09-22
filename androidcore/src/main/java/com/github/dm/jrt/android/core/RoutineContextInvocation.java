@@ -39,64 +39,64 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 public class RoutineContextInvocation<IN, OUT> extends ContextInvocationWrapper<IN, OUT> {
 
+  /**
+   * Constructor.
+   *
+   * @param invocation the wrapped invocation.
+   */
+  private RoutineContextInvocation(@NotNull final Invocation<IN, OUT> invocation) {
+    super(invocation);
+  }
+
+  /**
+   * Returns a factory of delegating invocations.
+   * <p>
+   * Note that the specified identifier will be used to detect clashing of invocations (see
+   * {@link com.github.dm.jrt.android.v11.core.JRoutineLoader} and
+   * {@link com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat}).
+   *
+   * @param routine        the routine used to execute this invocation.
+   * @param routineId      the routine identifier.
+   * @param invocationMode the type of routine invocation.
+   * @param <IN>           the input data type.
+   * @param <OUT>          the output data type.
+   * @return the factory.
+   */
+  @NotNull
+  public static <IN, OUT> ContextInvocationFactory<IN, OUT> factoryFrom(
+      @NotNull final Routine<IN, OUT> routine, final int routineId,
+      @NotNull final InvocationMode invocationMode) {
+    return new DelegatingContextInvocationFactory<IN, OUT>(routine, routineId, invocationMode);
+  }
+
+  /**
+   * Factory creating delegating Context invocation instances.
+   *
+   * @param <IN>  the input data type.
+   * @param <OUT> the output data type.
+   */
+  private static class DelegatingContextInvocationFactory<IN, OUT>
+      extends ContextInvocationFactory<IN, OUT> {
+
+    private final InvocationFactory<IN, OUT> mFactory;
+
     /**
      * Constructor.
      *
-     * @param invocation the wrapped invocation.
-     */
-    private RoutineContextInvocation(@NotNull final Invocation<IN, OUT> invocation) {
-        super(invocation);
-    }
-
-    /**
-     * Returns a factory of delegating invocations.
-     * <p>
-     * Note that the specified identifier will be used to detect clashing of invocations (see
-     * {@link com.github.dm.jrt.android.v11.core.JRoutineLoader} and
-     * {@link com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat}).
-     *
-     * @param routine        the routine used to execute this invocation.
+     * @param routine        the delegated routine.
      * @param routineId      the routine identifier.
      * @param invocationMode the type of routine invocation.
-     * @param <IN>           the input data type.
-     * @param <OUT>          the output data type.
-     * @return the factory.
      */
+    private DelegatingContextInvocationFactory(@NotNull final Routine<IN, OUT> routine,
+        final int routineId, @NotNull final InvocationMode invocationMode) {
+      super(asArgs(routineId, invocationMode));
+      mFactory = RoutineInvocation.factoryFrom(routine, invocationMode);
+    }
+
     @NotNull
-    public static <IN, OUT> ContextInvocationFactory<IN, OUT> factoryFrom(
-            @NotNull final Routine<IN, OUT> routine, final int routineId,
-            @NotNull final InvocationMode invocationMode) {
-        return new DelegatingContextInvocationFactory<IN, OUT>(routine, routineId, invocationMode);
+    @Override
+    public ContextInvocation<IN, OUT> newInvocation() throws Exception {
+      return new RoutineContextInvocation<IN, OUT>(mFactory.newInvocation());
     }
-
-    /**
-     * Factory creating delegating Context invocation instances.
-     *
-     * @param <IN>  the input data type.
-     * @param <OUT> the output data type.
-     */
-    private static class DelegatingContextInvocationFactory<IN, OUT>
-            extends ContextInvocationFactory<IN, OUT> {
-
-        private final InvocationFactory<IN, OUT> mFactory;
-
-        /**
-         * Constructor.
-         *
-         * @param routine        the delegated routine.
-         * @param routineId      the routine identifier.
-         * @param invocationMode the type of routine invocation.
-         */
-        private DelegatingContextInvocationFactory(@NotNull final Routine<IN, OUT> routine,
-                final int routineId, @NotNull final InvocationMode invocationMode) {
-            super(asArgs(routineId, invocationMode));
-            mFactory = RoutineInvocation.factoryFrom(routine, invocationMode);
-        }
-
-        @NotNull
-        @Override
-        public ContextInvocation<IN, OUT> newInvocation() throws Exception {
-            return new RoutineContextInvocation<IN, OUT>(mFactory.newInvocation());
-        }
-    }
+  }
 }

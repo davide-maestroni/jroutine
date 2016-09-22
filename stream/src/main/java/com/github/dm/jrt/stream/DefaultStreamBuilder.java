@@ -36,116 +36,115 @@ import org.jetbrains.annotations.NotNull;
  */
 class DefaultStreamBuilder<IN, OUT> extends AbstractStreamBuilder<IN, OUT> {
 
-    /**
-     * Constructor.
-     */
-    DefaultStreamBuilder() {
-        this(new DefaultStreamConfiguration(InvocationConfiguration.defaultConfiguration(),
-                InvocationConfiguration.defaultConfiguration(), InvocationMode.ASYNC));
-    }
+  /**
+   * Constructor.
+   */
+  DefaultStreamBuilder() {
+    this(new DefaultStreamConfiguration(InvocationConfiguration.defaultConfiguration(),
+        InvocationConfiguration.defaultConfiguration(), InvocationMode.ASYNC));
+  }
+
+  /**
+   * Constructor.
+   *
+   * @param streamConfiguration the stream configuration.
+   */
+  private DefaultStreamBuilder(@NotNull final StreamConfiguration streamConfiguration) {
+    super(streamConfiguration);
+  }
+
+  @NotNull
+  @Override
+  protected StreamConfiguration newConfiguration(
+      @NotNull final InvocationConfiguration streamConfiguration,
+      @NotNull final InvocationConfiguration currentConfiguration,
+      @NotNull final InvocationMode invocationMode) {
+    return new DefaultStreamConfiguration(streamConfiguration, currentConfiguration,
+        invocationMode);
+  }
+
+  @NotNull
+  @Override
+  protected <BEFORE, AFTER> Routine<? super BEFORE, ? extends AFTER> newRoutine(
+      @NotNull final StreamConfiguration streamConfiguration,
+      @NotNull final InvocationFactory<? super BEFORE, ? extends AFTER> factory) {
+    return newRoutine(streamConfiguration, JRoutineCore.with(factory));
+  }
+
+  @NotNull
+  @Override
+  protected StreamConfiguration resetConfiguration(
+      @NotNull final InvocationConfiguration streamConfiguration,
+      @NotNull final InvocationMode invocationMode) {
+    return new DefaultStreamConfiguration(streamConfiguration,
+        InvocationConfiguration.defaultConfiguration(), invocationMode);
+  }
+
+  /**
+   * Default implementation of a stream configuration.
+   */
+  private static class DefaultStreamConfiguration implements StreamConfiguration {
+
+    private final InvocationConfiguration mConfiguration;
+
+    private final InvocationMode mInvocationMode;
+
+    private final InvocationConfiguration mStreamConfiguration;
+
+    private volatile ChannelConfiguration mChannelConfiguration;
+
+    private volatile InvocationConfiguration mInvocationConfiguration;
 
     /**
      * Constructor.
      *
-     * @param streamConfiguration the stream configuration.
+     * @param streamConfiguration  the stream invocation configuration.
+     * @param currentConfiguration the current invocation configuration.
+     * @param invocationMode       the invocation mode.
      */
-    DefaultStreamBuilder(@NotNull final StreamConfiguration streamConfiguration) {
-        super(streamConfiguration);
+    private DefaultStreamConfiguration(@NotNull final InvocationConfiguration streamConfiguration,
+        @NotNull final InvocationConfiguration currentConfiguration,
+        @NotNull final InvocationMode invocationMode) {
+      mStreamConfiguration =
+          ConstantConditions.notNull("stream invocation configuration", streamConfiguration);
+      mConfiguration =
+          ConstantConditions.notNull("current invocation configuration", currentConfiguration);
+      mInvocationMode = ConstantConditions.notNull("invocation mode", invocationMode);
     }
 
     @NotNull
-    @Override
-    protected StreamConfiguration newConfiguration(
-            @NotNull final InvocationConfiguration streamConfiguration,
-            @NotNull final InvocationConfiguration currentConfiguration,
-            @NotNull final InvocationMode invocationMode) {
-        return new DefaultStreamConfiguration(streamConfiguration, currentConfiguration,
-                invocationMode);
+    public InvocationConfiguration getCurrentInvocationConfiguration() {
+      return mConfiguration;
     }
 
     @NotNull
-    @Override
-    protected <BEFORE, AFTER> Routine<? super BEFORE, ? extends AFTER> newRoutine(
-            @NotNull final StreamConfiguration streamConfiguration,
-            @NotNull final InvocationFactory<? super BEFORE, ? extends AFTER> factory) {
-        return newRoutine(streamConfiguration, JRoutineCore.with(factory));
+    public InvocationMode getInvocationMode() {
+      return mInvocationMode;
     }
 
     @NotNull
-    @Override
-    protected StreamConfiguration resetConfiguration(
-            @NotNull final InvocationConfiguration streamConfiguration,
-            @NotNull final InvocationMode invocationMode) {
-        return new DefaultStreamConfiguration(streamConfiguration,
-                InvocationConfiguration.defaultConfiguration(), invocationMode);
+    public InvocationConfiguration getStreamInvocationConfiguration() {
+      return mStreamConfiguration;
     }
 
-    /**
-     * Default implementation of a stream configuration.
-     */
-    private static class DefaultStreamConfiguration implements StreamConfiguration {
+    @NotNull
+    public ChannelConfiguration toChannelConfiguration() {
+      if (mChannelConfiguration == null) {
+        mChannelConfiguration =
+            toInvocationConfiguration().outputConfigurationBuilder().configured();
+      }
 
-        private final InvocationConfiguration mConfiguration;
-
-        private final InvocationMode mInvocationMode;
-
-        private final InvocationConfiguration mStreamConfiguration;
-
-        private volatile ChannelConfiguration mChannelConfiguration;
-
-        private volatile InvocationConfiguration mInvocationConfiguration;
-
-        /**
-         * Constructor.
-         *
-         * @param streamConfiguration  the stream invocation configuration.
-         * @param currentConfiguration the current invocation configuration.
-         * @param invocationMode       the invocation mode.
-         */
-        private DefaultStreamConfiguration(
-                @NotNull final InvocationConfiguration streamConfiguration,
-                @NotNull final InvocationConfiguration currentConfiguration,
-                @NotNull final InvocationMode invocationMode) {
-            mStreamConfiguration = ConstantConditions.notNull("stream invocation configuration",
-                    streamConfiguration);
-            mConfiguration = ConstantConditions.notNull("current invocation configuration",
-                    currentConfiguration);
-            mInvocationMode = ConstantConditions.notNull("invocation mode", invocationMode);
-        }
-
-        @NotNull
-        public InvocationConfiguration getCurrentInvocationConfiguration() {
-            return mConfiguration;
-        }
-
-        @NotNull
-        public InvocationMode getInvocationMode() {
-            return mInvocationMode;
-        }
-
-        @NotNull
-        public InvocationConfiguration getStreamInvocationConfiguration() {
-            return mStreamConfiguration;
-        }
-
-        @NotNull
-        public ChannelConfiguration toChannelConfiguration() {
-            if (mChannelConfiguration == null) {
-                mChannelConfiguration =
-                        toInvocationConfiguration().outputConfigurationBuilder().configured();
-            }
-
-            return mChannelConfiguration;
-        }
-
-        @NotNull
-        public InvocationConfiguration toInvocationConfiguration() {
-            if (mInvocationConfiguration == null) {
-                mInvocationConfiguration =
-                        mStreamConfiguration.builderFrom().with(mConfiguration).configured();
-            }
-
-            return mInvocationConfiguration;
-        }
+      return mChannelConfiguration;
     }
+
+    @NotNull
+    public InvocationConfiguration toInvocationConfiguration() {
+      if (mInvocationConfiguration == null) {
+        mInvocationConfiguration =
+            mStreamConfiguration.builderFrom().with(mConfiguration).configured();
+      }
+
+      return mInvocationConfiguration;
+    }
+  }
 }

@@ -32,46 +32,46 @@ import static com.github.dm.jrt.operator.math.Numbers.addOptimistic;
  */
 class SumFloatInvocation extends TemplateInvocation<Number, Float> {
 
-    private static final InvocationFactory<Number, Float> sFactory =
-            new InvocationFactory<Number, Float>(null) {
+  private static final InvocationFactory<Number, Float> sFactory =
+      new InvocationFactory<Number, Float>(null) {
 
-                @NotNull
-                @Override
-                public Invocation<Number, Float> newInvocation() {
-                    return new SumFloatInvocation();
-                }
-            };
+        @NotNull
+        @Override
+        public Invocation<Number, Float> newInvocation() {
+          return new SumFloatInvocation();
+        }
+      };
 
-    private float mSum;
+  private float mSum;
 
-    /**
-     * Constructor.
-     */
-    private SumFloatInvocation() {
-    }
+  /**
+   * Constructor.
+   */
+  private SumFloatInvocation() {
+  }
 
-    /**
-     * Returns a factory of invocations computing the sum of the input numbers.
-     *
-     * @return the factory instance.
-     */
-    @NotNull
-    static InvocationFactory<Number, Float> factoryOf() {
-        return sFactory;
-    }
+  /**
+   * Returns a factory of invocations computing the sum of the input numbers.
+   *
+   * @return the factory instance.
+   */
+  @NotNull
+  static InvocationFactory<Number, Float> factoryOf() {
+    return sFactory;
+  }
 
-    @Override
-    public void onComplete(@NotNull final Channel<Float, ?> result) {
-        result.pass(mSum);
-    }
+  @Override
+  public void onComplete(@NotNull final Channel<Float, ?> result) {
+    result.pass(mSum);
+  }
 
-    @Override
-    public void onInput(final Number input, @NotNull final Channel<Float, ?> result) {
-        mSum = addOptimistic(mSum, input).floatValue();
-    }
+  @Override
+  public void onInput(final Number input, @NotNull final Channel<Float, ?> result) {
+    mSum = addOptimistic(mSum, input).floatValue();
+  }
 
-    @Override
-    public void onRestart() {
-        mSum = 0;
-    }
+  @Override
+  public void onRestart() {
+    mSum = 0;
+  }
 }

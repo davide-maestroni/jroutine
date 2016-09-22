@@ -74,46 +74,46 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface AsyncInput {
 
-    /**
-     * The input transfer mode.
-     *
-     * @return the mode.
-     */
-    InputMode mode() default InputMode.VALUE;
+  /**
+   * The input transfer mode.
+   *
+   * @return the mode.
+   */
+  InputMode mode() default InputMode.VALUE;
+
+  /**
+   * The parameter class.
+   *
+   * @return the class.
+   */
+  Class<?> value();
+
+  /**
+   * Input transfer mode type.
+   * <br>
+   * The mode indicates in which way a parameter is passed to the wrapped method.
+   */
+  enum InputMode {
 
     /**
-     * The parameter class.
-     *
-     * @return the class.
-     */
-    Class<?> value();
-
-    /**
-     * Input transfer mode type.
+     * Value mode.
      * <br>
-     * The mode indicates in which way a parameter is passed to the wrapped method.
+     * The variable is just read from a channel.
+     * <p>
+     * The annotated parameters must extend a
+     * {@link com.github.dm.jrt.core.channel.Channel Channel}.
      */
-    enum InputMode {
-
-        /**
-         * Value mode.
-         * <br>
-         * The variable is just read from a channel.
-         * <p>
-         * The annotated parameters must extend a
-         * {@link com.github.dm.jrt.core.channel.Channel Channel}.
-         */
-        VALUE,
-        /**
-         * Collection mode.
-         * <br>
-         * The inputs are collected from the channel and passed as an array or collection to the
-         * wrapped method.
-         * <p>
-         * The annotated parameter must extend a
-         * {@link com.github.dm.jrt.core.channel.Channel Channel} and must be the only parameter
-         * accepted by the method.
-         */
-        COLLECTION
-    }
+    VALUE,
+    /**
+     * Collection mode.
+     * <br>
+     * The inputs are collected from the channel and passed as an array or collection to the
+     * wrapped method.
+     * <p>
+     * The annotated parameter must extend a
+     * {@link com.github.dm.jrt.core.channel.Channel Channel} and must be the only parameter
+     * accepted by the method.
+     */
+    COLLECTION
+  }
 }

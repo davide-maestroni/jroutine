@@ -32,56 +32,56 @@ import static com.github.dm.jrt.operator.math.Numbers.addOptimistic;
  */
 class AverageByteInvocation extends TemplateInvocation<Number, Byte> {
 
-    private static final InvocationFactory<Number, Byte> sFactory =
-            new InvocationFactory<Number, Byte>(null) {
+  private static final InvocationFactory<Number, Byte> sFactory =
+      new InvocationFactory<Number, Byte>(null) {
 
-                @NotNull
-                @Override
-                public Invocation<Number, Byte> newInvocation() {
-                    return new AverageByteInvocation();
-                }
-            };
-
-    private int mCount;
-
-    private Number mSum;
-
-    /**
-     * Constructor.
-     */
-    private AverageByteInvocation() {
-    }
-
-    /**
-     * Returns a factory of invocations computing the average of the input numbers in byte
-     * precision.
-     *
-     * @return the factory instance.
-     */
-    @NotNull
-    static InvocationFactory<Number, Byte> factoryOf() {
-        return sFactory;
-    }
-
-    @Override
-    public void onComplete(@NotNull final Channel<Byte, ?> result) {
-        if (mCount == 0) {
-            result.pass((byte) 0);
-
-        } else {
-            result.pass((byte) (mSum.byteValue() / mCount));
+        @NotNull
+        @Override
+        public Invocation<Number, Byte> newInvocation() {
+          return new AverageByteInvocation();
         }
-    }
+      };
 
-    @Override
-    public void onInput(final Number input, @NotNull final Channel<Byte, ?> result) {
-        mSum = addOptimistic(mSum, input).byteValue();
-        ++mCount;
-    }
+  private int mCount;
 
-    @Override
-    public void onRestart() {
-        mSum = (byte) 0;
-        mCount = 0;
+  private Number mSum;
+
+  /**
+   * Constructor.
+   */
+  private AverageByteInvocation() {
+  }
+
+  /**
+   * Returns a factory of invocations computing the average of the input numbers in byte
+   * precision.
+   *
+   * @return the factory instance.
+   */
+  @NotNull
+  static InvocationFactory<Number, Byte> factoryOf() {
+    return sFactory;
+  }
+
+  @Override
+  public void onComplete(@NotNull final Channel<Byte, ?> result) {
+    if (mCount == 0) {
+      result.pass((byte) 0);
+
+    } else {
+      result.pass((byte) (mSum.byteValue() / mCount));
     }
+  }
+
+  @Override
+  public void onInput(final Number input, @NotNull final Channel<Byte, ?> result) {
+    mSum = addOptimistic(mSum, input).byteValue();
+    ++mCount;
+  }
+
+  @Override
+  public void onRestart() {
+    mSum = (byte) 0;
+    mCount = 0;
+  }
 }

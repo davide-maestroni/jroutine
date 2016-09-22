@@ -26,12 +26,12 @@ package com.github.dm.jrt.function;
  */
 public interface Function<IN, OUT> {
 
-    /**
-     * Applies this function to the given argument.
-     *
-     * @param in the input argument.
-     * @return the function result.
-     * @throws java.lang.Exception if an unexpected error occurs.
-     */
-    OUT apply(IN in) throws Exception;
+  /**
+   * Applies this function to the given argument.
+   *
+   * @param in the input argument.
+   * @return the function result.
+   * @throws java.lang.Exception if an unexpected error occurs.
+   */
+  OUT apply(IN in) throws Exception;
 }

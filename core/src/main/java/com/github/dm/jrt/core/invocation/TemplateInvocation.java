@@ -33,18 +33,18 @@ import org.jetbrains.annotations.NotNull;
  */
 public abstract class TemplateInvocation<IN, OUT> implements Invocation<IN, OUT> {
 
-    public void onAbort(@NotNull final RoutineException reason) throws Exception {
-    }
+  public void onAbort(@NotNull final RoutineException reason) throws Exception {
+  }
 
-    public void onComplete(@NotNull final Channel<OUT, ?> result) throws Exception {
-    }
+  public void onComplete(@NotNull final Channel<OUT, ?> result) throws Exception {
+  }
 
-    public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) throws Exception {
-    }
+  public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) throws Exception {
+  }
 
-    public void onRecycle(final boolean isReused) throws Exception {
-    }
+  public void onRecycle(final boolean isReused) throws Exception {
+  }
 
-    public void onRestart() throws Exception {
-    }
+  public void onRestart() throws Exception {
+  }
 }

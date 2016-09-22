@@ -35,55 +35,55 @@ import java.util.Collections;
  */
 class SortInvocation<DATA extends Comparable<? super DATA>> extends TemplateInvocation<DATA, DATA> {
 
-    private static final InvocationFactory<? extends Comparable<?>, ? extends Comparable<?>>
-            sFactory = new InvocationFactory<Comparable<Object>, Comparable<Object>>(null) {
+  private static final InvocationFactory<? extends Comparable<?>, ? extends Comparable<?>>
+      sFactory = new InvocationFactory<Comparable<Object>, Comparable<Object>>(null) {
 
-        @NotNull
-        @Override
-        public Invocation<Comparable<Object>, Comparable<Object>> newInvocation() {
-            return new SortInvocation<Comparable<Object>>();
-        }
-    };
-
-    private ArrayList<DATA> mList;
-
-    /**
-     * Constructor.
-     */
-    private SortInvocation() {
-    }
-
-    /**
-     * Returns the factory of sorting invocations.
-     *
-     * @param <DATA> the data type.
-     * @return the factory instance.
-     */
     @NotNull
-    @SuppressWarnings("unchecked")
-    static <DATA extends Comparable<? super DATA>> InvocationFactory<DATA, DATA> factoryOf() {
-        return (InvocationFactory<DATA, DATA>) sFactory;
-    }
-
     @Override
-    public void onComplete(@NotNull final Channel<DATA, ?> result) {
-        final ArrayList<DATA> list = mList;
-        Collections.sort(list);
-        result.pass(list);
+    public Invocation<Comparable<Object>, Comparable<Object>> newInvocation() {
+      return new SortInvocation<Comparable<Object>>();
     }
+  };
 
-    @Override
-    public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) {
-        mList.add(input);
-    }
+  private ArrayList<DATA> mList;
 
-    @Override
-    public void onRecycle(final boolean isReused) {
-        mList = null;
-    }
+  /**
+   * Constructor.
+   */
+  private SortInvocation() {
+  }
 
-    @Override
-    public void onRestart() {
-        mList = new ArrayList<DATA>();
-    }
+  /**
+   * Returns the factory of sorting invocations.
+   *
+   * @param <DATA> the data type.
+   * @return the factory instance.
+   */
+  @NotNull
+  @SuppressWarnings("unchecked")
+  static <DATA extends Comparable<? super DATA>> InvocationFactory<DATA, DATA> factoryOf() {
+    return (InvocationFactory<DATA, DATA>) sFactory;
+  }
+
+  @Override
+  public void onComplete(@NotNull final Channel<DATA, ?> result) {
+    final ArrayList<DATA> list = mList;
+    Collections.sort(list);
+    result.pass(list);
+  }
+
+  @Override
+  public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) {
+    mList.add(input);
+  }
+
+  @Override
+  public void onRecycle(final boolean isReused) {
+    mList = null;
+  }
+
+  @Override
+  public void onRestart() {
+    mList = new ArrayList<DATA>();
+  }
 }

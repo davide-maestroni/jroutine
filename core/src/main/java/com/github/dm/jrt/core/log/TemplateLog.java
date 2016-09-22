@@ -38,57 +38,57 @@ import java.util.Locale;
  */
 public abstract class TemplateLog implements Log {
 
-    private static final String DATE_FORMAT = "MM/dd HH:mm:ss.SSS z";
+  private static final String DATE_FORMAT = "MM/dd HH:mm:ss.SSS z";
 
-    private static final String EXCEPTION_FORMAT = " caused by:%n%s";
+  private static final String EXCEPTION_FORMAT = " caused by:%n%s";
 
-    private static final String LOG_FORMAT = "%s\t%s\t%s\t%s<%s>";
+  private static final String LOG_FORMAT = "%s\t%s\t%s\t%s<%s>";
 
-    private static String format(@NotNull final Level level, @NotNull final List<Object> contexts,
-            @Nullable final String message) {
-        return String.format(LOG_FORMAT,
-                new SimpleDateFormat(DATE_FORMAT, Locale.getDefault()).format(new Date()),
-                Thread.currentThread().getName(), contexts.toString(), level, message);
+  private static String format(@NotNull final Level level, @NotNull final List<Object> contexts,
+      @Nullable final String message) {
+    return String.format(LOG_FORMAT,
+        new SimpleDateFormat(DATE_FORMAT, Locale.getDefault()).format(new Date()),
+        Thread.currentThread().getName(), contexts.toString(), level, message);
+  }
+
+  public void dbg(@NotNull final List<Object> contexts, @Nullable final String message,
+      @Nullable final Throwable throwable) {
+    log(Level.DEBUG, contexts, message, throwable);
+  }
+
+  public void err(@NotNull final List<Object> contexts, @Nullable final String message,
+      @Nullable final Throwable throwable) {
+    log(Level.ERROR, contexts, message, throwable);
+  }
+
+  public void wrn(@NotNull final List<Object> contexts, @Nullable final String message,
+      @Nullable final Throwable throwable) {
+    log(Level.WARNING, contexts, message, throwable);
+  }
+
+  /**
+   * Formats and then write the specified log message.
+   *
+   * @param level     the log level.
+   * @param contexts  the log context array.
+   * @param message   the log message.
+   * @param throwable the related exception.
+   */
+  protected void log(@NotNull final Level level, @NotNull final List<Object> contexts,
+      @Nullable final String message, @Nullable final Throwable throwable) {
+    String formatted = format(level, contexts, message);
+    if (throwable != null) {
+      formatted += String.format(EXCEPTION_FORMAT, Logger.printStackTrace(throwable));
     }
 
-    public void dbg(@NotNull final List<Object> contexts, @Nullable final String message,
-            @Nullable final Throwable throwable) {
-        log(Level.DEBUG, contexts, message, throwable);
-    }
+    log(formatted);
+  }
 
-    public void err(@NotNull final List<Object> contexts, @Nullable final String message,
-            @Nullable final Throwable throwable) {
-        log(Level.ERROR, contexts, message, throwable);
-    }
-
-    public void wrn(@NotNull final List<Object> contexts, @Nullable final String message,
-            @Nullable final Throwable throwable) {
-        log(Level.WARNING, contexts, message, throwable);
-    }
-
-    /**
-     * Formats and then write the specified log message.
-     *
-     * @param level     the log level.
-     * @param contexts  the log context array.
-     * @param message   the log message.
-     * @param throwable the related exception.
-     */
-    protected void log(@NotNull final Level level, @NotNull final List<Object> contexts,
-            @Nullable final String message, @Nullable final Throwable throwable) {
-        String formatted = format(level, contexts, message);
-        if (throwable != null) {
-            formatted += String.format(EXCEPTION_FORMAT, Logger.printStackTrace(throwable));
-        }
-
-        log(formatted);
-    }
-
-    /**
-     * Writes the specified message after it's been formatted.
-     *
-     * @param message the message.
-     */
-    protected void log(@NotNull final String message) {
-    }
+  /**
+   * Writes the specified message after it's been formatted.
+   *
+   * @param message the message.
+   */
+  protected void log(@NotNull final String message) {
+  }
 }

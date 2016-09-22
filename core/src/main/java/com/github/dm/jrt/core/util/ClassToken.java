@@ -46,154 +46,150 @@ import java.lang.reflect.Type;
  */
 public abstract class ClassToken<TYPE> {
 
-    private Type mGenericType;
+  private Type mGenericType;
 
-    private Class<TYPE> mRawClass;
+  private Class<TYPE> mRawClass;
 
-    /**
-     * Creates a new token from the specified raw class.
-     *
-     * @param rawClass the raw class.
-     * @param <TYPE>   the class type.
-     * @return the newly created token.
-     */
-    @NotNull
-    public static <TYPE> ClassToken<TYPE> tokenOf(@NotNull final Class<TYPE> rawClass) {
-        ConstantConditions.notNull("token raw type", rawClass);
-        final ClassToken<TYPE> classToken = new DefaultClassToken<TYPE>();
-        classToken.mGenericType = rawClass;
-        classToken.mRawClass = rawClass;
-        return classToken;
+  /**
+   * Creates a new token from the specified raw class.
+   *
+   * @param rawClass the raw class.
+   * @param <TYPE>   the class type.
+   * @return the newly created token.
+   */
+  @NotNull
+  public static <TYPE> ClassToken<TYPE> tokenOf(@NotNull final Class<TYPE> rawClass) {
+    ConstantConditions.notNull("token raw type", rawClass);
+    final ClassToken<TYPE> classToken = new DefaultClassToken<TYPE>();
+    classToken.mGenericType = rawClass;
+    classToken.mRawClass = rawClass;
+    return classToken;
+  }
+
+  /**
+   * Creates a new token from the class of the specified object.
+   *
+   * @param object the object.
+   * @param <TYPE> the class type.
+   * @return the newly created token.
+   */
+  @NotNull
+  @SuppressWarnings("unchecked")
+  public static <TYPE> ClassToken<TYPE> tokenOf(@NotNull final TYPE object) {
+    return tokenOf((Class<TYPE>) object.getClass());
+  }
+
+  /**
+   * Casts the specified object to this token type.
+   * <p>
+   * Note that the cast is unsafe and may raise an exception.
+   *
+   * @param object the object to cast.
+   * @return the casted object.
+   */
+  @SuppressWarnings("unchecked")
+  public final TYPE cast(final Object object) {
+    return (TYPE) object;
+  }
+
+  /**
+   * Gets the generic type of this token.
+   *
+   * @return the generic type.
+   */
+  @NotNull
+  public final Type getGenericType() {
+    if (mGenericType == null) {
+      Class<?> subClass = getClass();
+      Class<?> superClass = subClass.getSuperclass();
+      while (!ClassToken.class.equals(superClass)) {
+        subClass = superClass;
+        superClass = subClass.getSuperclass();
+      }
+
+      final Type type = subClass.getGenericSuperclass();
+      if (type instanceof ParameterizedType) {
+        final ParameterizedType paramType = (ParameterizedType) type;
+        mGenericType = paramType.getActualTypeArguments()[0];
+
+      } else {
+        mGenericType = Object.class;
+      }
     }
 
-    /**
-     * Creates a new token from the class of the specified object.
-     *
-     * @param object the object.
-     * @param <TYPE> the class type.
-     * @return the newly created token.
-     */
-    @NotNull
-    @SuppressWarnings("unchecked")
-    public static <TYPE> ClassToken<TYPE> tokenOf(@NotNull final TYPE object) {
-        return tokenOf((Class<TYPE>) object.getClass());
+    return mGenericType;
+  }
+
+  /**
+   * Gets the raw class of this token.
+   *
+   * @return the raw class.
+   * @throws java.lang.IllegalStateException if this class does not correctly extend a class token.
+   */
+  @NotNull
+  @SuppressWarnings("unchecked")
+  public final Class<TYPE> getRawClass() {
+    if (mRawClass == null) {
+      final Type type = getGenericType();
+      if (type instanceof Class) {
+        mRawClass = (Class<TYPE>) type;
+
+      } else if (type instanceof ParameterizedType) {
+        mRawClass = (Class<TYPE>) ((ParameterizedType) type).getRawType();
+
+      } else {
+        throw new IllegalStateException(
+            "the class does not correctly extend a class token: " + getClass().getName());
+      }
     }
 
-    /**
-     * Casts the specified object to this token type.
-     * <p>
-     * Note that the cast is unsafe and may raise an exception.
-     *
-     * @param object the object to cast.
-     * @return the casted object.
-     */
-    @SuppressWarnings("unchecked")
-    public final TYPE cast(final Object object) {
-        return (TYPE) object;
+    return mRawClass;
+  }
+
+  @Override
+  public int hashCode() {
+    return getRawClass().hashCode();
+  }
+
+  @Override
+  public boolean equals(final Object o) {
+    if (this == o) {
+      return true;
     }
 
-    /**
-     * Gets the generic type of this token.
-     *
-     * @return the generic type.
-     */
-    @NotNull
-    public final Type getGenericType() {
-        if (mGenericType == null) {
-            Class<?> subClass = getClass();
-            Class<?> superClass = subClass.getSuperclass();
-            while (!ClassToken.class.equals(superClass)) {
-                subClass = superClass;
-                superClass = subClass.getSuperclass();
-            }
-
-            final Type type = subClass.getGenericSuperclass();
-            if (type instanceof ParameterizedType) {
-                final ParameterizedType paramType = (ParameterizedType) type;
-                mGenericType = paramType.getActualTypeArguments()[0];
-
-            } else {
-                mGenericType = Object.class;
-            }
-        }
-
-        return mGenericType;
+    if (!(o instanceof ClassToken)) {
+      return false;
     }
 
-    /**
-     * Gets the raw class of this token.
-     *
-     * @return the raw class.
-     * @throws java.lang.IllegalStateException if this class does not correctly extend a class
-     *                                         token.
-     */
-    @NotNull
-    @SuppressWarnings("unchecked")
-    public final Class<TYPE> getRawClass() {
-        if (mRawClass == null) {
-            final Type type = getGenericType();
-            if (type instanceof Class) {
-                mRawClass = (Class<TYPE>) type;
+    final ClassToken<?> that = (ClassToken) o;
+    return getRawClass().equals(that.getRawClass());
+  }
 
-            } else if (type instanceof ParameterizedType) {
-                mRawClass = (Class<TYPE>) ((ParameterizedType) type).getRawType();
+  /**
+   * Checks if this token raw class is equal to or is a superclass of the specified one.
+   *
+   * @param other the class token to compare.
+   * @return whether this token raw class is equal to or is a superclass.
+   * @throws java.lang.IllegalStateException if this class does not correctly extend a class token.
+   */
+  public final boolean isAssignableFrom(@NotNull final ClassToken<?> other) {
+    return getRawClass().isAssignableFrom(other.getRawClass());
+  }
 
-            } else {
-                throw new IllegalStateException(
-                        "the class does not correctly extend a class token: "
-                                + getClass().getName());
-            }
-        }
+  /**
+   * Checks if this token raw class represents an interface.
+   *
+   * @return whether this token raw class is an interface.
+   * @throws java.lang.IllegalStateException if this class does not correctly extend a class token.
+   */
+  public final boolean isInterface() {
+    return getRawClass().isInterface();
+  }
 
-        return mRawClass;
-    }
-
-    @Override
-    public int hashCode() {
-        return getRawClass().hashCode();
-    }
-
-    @Override
-    public boolean equals(final Object o) {
-        if (this == o) {
-            return true;
-        }
-
-        if (!(o instanceof ClassToken)) {
-            return false;
-        }
-
-        final ClassToken<?> that = (ClassToken) o;
-        return getRawClass().equals(that.getRawClass());
-    }
-
-    /**
-     * Checks if this token raw class is equal to or is a superclass of the specified one.
-     *
-     * @param other the class token to compare.
-     * @return whether this token raw class is equal to or is a superclass.
-     * @throws java.lang.IllegalStateException if this class does not correctly extend a class
-     *                                         token.
-     */
-    public final boolean isAssignableFrom(@NotNull final ClassToken<?> other) {
-        return getRawClass().isAssignableFrom(other.getRawClass());
-    }
-
-    /**
-     * Checks if this token raw class represents an interface.
-     *
-     * @return whether this token raw class is an interface.
-     * @throws java.lang.IllegalStateException if this class does not correctly extend a class
-     *                                         token.
-     */
-    public final boolean isInterface() {
-        return getRawClass().isInterface();
-    }
-
-    /**
-     * Default class token implementation.
-     *
-     * @param <TYPE> the class type.
-     */
-    private static class DefaultClassToken<TYPE> extends ClassToken<TYPE> {}
+  /**
+   * Default class token implementation.
+   *
+   * @param <TYPE> the class type.
+   */
+  private static class DefaultClassToken<TYPE> extends ClassToken<TYPE> {}
 }

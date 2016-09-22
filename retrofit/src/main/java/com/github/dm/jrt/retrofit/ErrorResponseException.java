@@ -38,79 +38,78 @@ import retrofit2.Response;
  */
 public class ErrorResponseException extends RoutineException {
 
-    private final int mCode;
+  private final int mCode;
 
-    private final byte[] mErrorBody;
+  private final byte[] mErrorBody;
 
-    private final Map<String, List<String>> mHeaders;
+  private final Map<String, List<String>> mHeaders;
 
-    private final String mMediaType;
+  private final String mMediaType;
 
-    private final String mMessage;
+  private final String mMessage;
 
-    /**
-     * Constructor.
-     *
-     * @param response the unsuccessful response.
-     * @throws java.io.IOException if an I/O error occurred.
-     */
-    public ErrorResponseException(@NotNull final Response<?> response) throws IOException {
-        if (response.isSuccessful()) {
-            throw new IllegalArgumentException("the response is successful");
-        }
-
-        mCode = response.code();
-        mMessage = response.message();
-        mHeaders = response.headers().toMultimap();
-        final ResponseBody errorBody = response.errorBody();
-        final MediaType contentType = errorBody.contentType();
-        mMediaType = (contentType != null) ? contentType.toString() : null;
-        mErrorBody = errorBody.bytes();
+  /**
+   * Constructor.
+   *
+   * @param response the unsuccessful response.
+   * @throws java.io.IOException if an I/O error occurred.
+   */
+  public ErrorResponseException(@NotNull final Response<?> response) throws IOException {
+    if (response.isSuccessful()) {
+      throw new IllegalArgumentException("the response is successful");
     }
 
-    /**
-     * Returns the response HTTP status code.
-     *
-     * @return the status code.
-     */
-    public int code() {
-        return mCode;
+    mCode = response.code();
+    mMessage = response.message();
+    mHeaders = response.headers().toMultimap();
+    final ResponseBody errorBody = response.errorBody();
+    final MediaType contentType = errorBody.contentType();
+    mMediaType = (contentType != null) ? contentType.toString() : null;
+    mErrorBody = errorBody.bytes();
+  }
+
+  /**
+   * Returns the response HTTP status code.
+   *
+   * @return the status code.
+   */
+  public int code() {
+    return mCode;
+  }
+
+  /**
+   * Returns the raw response body.
+   *
+   * @return the response body.
+   */
+  public ResponseBody errorBody() {
+    final String mediaType = mMediaType;
+    return ResponseBody.create((mediaType != null) ? MediaType.parse(mediaType) : null, mErrorBody);
+  }
+
+  /**
+   * Returns the response HTTP headers.
+   *
+   * @return the HTTP headers.
+   */
+  public Headers headers() {
+    final Builder builder = new Builder();
+    for (final Entry<String, List<String>> entry : mHeaders.entrySet()) {
+      final String name = entry.getKey();
+      for (final String value : entry.getValue()) {
+        builder.add(name, value);
+      }
     }
 
-    /**
-     * Returns the raw response body.
-     *
-     * @return the response body.
-     */
-    public ResponseBody errorBody() {
-        final String mediaType = mMediaType;
-        return ResponseBody.create((mediaType != null) ? MediaType.parse(mediaType) : null,
-                mErrorBody);
-    }
+    return builder.build();
+  }
 
-    /**
-     * Returns the response HTTP headers.
-     *
-     * @return the HTTP headers.
-     */
-    public Headers headers() {
-        final Builder builder = new Builder();
-        for (final Entry<String, List<String>> entry : mHeaders.entrySet()) {
-            final String name = entry.getKey();
-            for (final String value : entry.getValue()) {
-                builder.add(name, value);
-            }
-        }
-
-        return builder.build();
-    }
-
-    /**
-     * Returns the response HTTP status message (or null if unknown).
-     *
-     * @return the status message.
-     */
-    public String message() {
-        return mMessage;
-    }
+  /**
+   * Returns the response HTTP status message (or null if unknown).
+   *
+   * @return the status message.
+   */
+  public String message() {
+    return mMessage;
+  }
 }

@@ -36,9 +36,42 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class OrElseConsumerInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
 
+  private final long mCount;
+
+  private final ConsumerDecorator<? super Channel<DATA, ?>> mOutputsConsumer;
+
+  /**
+   * Constructor.
+   *
+   * @param count           the loop count.
+   * @param outputsConsumer the consumer instance.
+   */
+  OrElseConsumerInvocationFactory(final long count,
+      @NotNull final ConsumerDecorator<? super Channel<DATA, ?>> outputsConsumer) {
+    super(asArgs(ConstantConditions.positive("count number", count),
+        ConstantConditions.notNull("consumer instance", outputsConsumer)));
+    mCount = count;
+    mOutputsConsumer = outputsConsumer;
+  }
+
+  @NotNull
+  @Override
+  public Invocation<DATA, DATA> newInvocation() {
+    return new OrElseConsumerInvocation<DATA>(mCount, mOutputsConsumer);
+  }
+
+  /**
+   * Invocation employing a consumer to generate outputs when no one has been received.
+   *
+   * @param <DATA> the data type.
+   */
+  private static class OrElseConsumerInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
+
     private final long mCount;
 
     private final ConsumerDecorator<? super Channel<DATA, ?>> mOutputsConsumer;
+
+    private boolean mHasOutputs;
 
     /**
      * Constructor.
@@ -46,64 +79,31 @@ class OrElseConsumerInvocationFactory<DATA> extends InvocationFactory<DATA, DATA
      * @param count           the loop count.
      * @param outputsConsumer the consumer instance.
      */
-    OrElseConsumerInvocationFactory(final long count,
-            @NotNull final ConsumerDecorator<? super Channel<DATA, ?>> outputsConsumer) {
-        super(asArgs(ConstantConditions.positive("count number", count),
-                ConstantConditions.notNull("consumer instance", outputsConsumer)));
-        mCount = count;
-        mOutputsConsumer = outputsConsumer;
+    OrElseConsumerInvocation(final long count,
+        @NotNull final ConsumerDecorator<? super Channel<DATA, ?>> outputsConsumer) {
+      mCount = count;
+      mOutputsConsumer = outputsConsumer;
     }
 
-    @NotNull
+    public void onComplete(@NotNull final Channel<DATA, ?> result) throws Exception {
+      if (!mHasOutputs) {
+        final long count = mCount;
+        final ConsumerDecorator<? super Channel<DATA, ?>> consumer = mOutputsConsumer;
+        for (long i = 0; i < count; ++i) {
+          consumer.accept(result);
+        }
+      }
+    }
+
     @Override
-    public Invocation<DATA, DATA> newInvocation() {
-        return new OrElseConsumerInvocation<DATA>(mCount, mOutputsConsumer);
+    public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) {
+      mHasOutputs = true;
+      result.pass(input);
     }
 
-    /**
-     * Invocation employing a consumer to generate outputs when no one has been received.
-     *
-     * @param <DATA> the data type.
-     */
-    private static class OrElseConsumerInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
-
-        private final long mCount;
-
-        private final ConsumerDecorator<? super Channel<DATA, ?>> mOutputsConsumer;
-
-        private boolean mHasOutputs;
-
-        /**
-         * Constructor.
-         *
-         * @param count           the loop count.
-         * @param outputsConsumer the consumer instance.
-         */
-        OrElseConsumerInvocation(final long count,
-                @NotNull final ConsumerDecorator<? super Channel<DATA, ?>> outputsConsumer) {
-            mCount = count;
-            mOutputsConsumer = outputsConsumer;
-        }
-
-        public void onComplete(@NotNull final Channel<DATA, ?> result) throws Exception {
-            if (!mHasOutputs) {
-                final long count = mCount;
-                final ConsumerDecorator<? super Channel<DATA, ?>> consumer = mOutputsConsumer;
-                for (long i = 0; i < count; ++i) {
-                    consumer.accept(result);
-                }
-            }
-        }
-
-        @Override
-        public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) {
-            mHasOutputs = true;
-            result.pass(input);
-        }
-
-        @Override
-        public void onRestart() {
-            mHasOutputs = false;
-        }
+    @Override
+    public void onRestart() {
+      mHasOutputs = false;
     }
+  }
 }

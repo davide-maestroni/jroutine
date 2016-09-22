@@ -59,312 +59,309 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class RunnerTest extends AndroidTestCase {
 
-    private static void testRunner(final Runner runner) throws InterruptedException {
+  private static void testRunner(final Runner runner) throws InterruptedException {
 
-        final Random random = new Random(System.currentTimeMillis());
-        final ArrayList<TestRunExecution> executions = new ArrayList<TestRunExecution>();
+    final Random random = new Random(System.currentTimeMillis());
+    final ArrayList<TestRunExecution> executions = new ArrayList<TestRunExecution>();
 
-        for (int i = 0; i < 13; i++) {
+    for (int i = 0; i < 13; i++) {
 
-            final UnitDuration delay;
-            final int unit = random.nextInt(4);
+      final UnitDuration delay;
+      final int unit = random.nextInt(4);
 
-            switch (unit) {
+      switch (unit) {
 
-                case 0:
-                    delay = millis((long) Math.floor(random.nextFloat() * 500));
-                    break;
+        case 0:
+          delay = millis((long) Math.floor(random.nextFloat() * 500));
+          break;
 
-                case 1:
-                    delay = micros((long) Math.floor(random.nextFloat() * millis(500).toMicros()));
-                    break;
+        case 1:
+          delay = micros((long) Math.floor(random.nextFloat() * millis(500).toMicros()));
+          break;
 
-                case 2:
-                    delay = nanos((long) Math.floor(random.nextFloat() * millis(500).toNanos()));
-                    break;
+        case 2:
+          delay = nanos((long) Math.floor(random.nextFloat() * millis(500).toNanos()));
+          break;
 
-                default:
-                    delay = zero();
-                    break;
-            }
+        default:
+          delay = zero();
+          break;
+      }
 
-            final TestRunExecution execution = new TestRunExecution(delay);
-            executions.add(execution);
+      final TestRunExecution execution = new TestRunExecution(delay);
+      executions.add(execution);
 
-            runner.run(execution, delay.value, delay.unit);
-        }
-
-        for (final TestRunExecution execution : executions) {
-
-            execution.await();
-            assertThat(execution.isPassed()).isTrue();
-        }
-
-        executions.clear();
-
-        final ArrayList<UnitDuration> delays = new ArrayList<UnitDuration>();
-
-        for (int i = 0; i < 13; i++) {
-
-            final UnitDuration delay;
-            final int unit = random.nextInt(4);
-
-            switch (unit) {
-
-                case 0:
-                    delay = millis((long) Math.floor(random.nextFloat() * 500));
-                    break;
-
-                case 1:
-                    delay = micros((long) Math.floor(random.nextFloat() * millis(500).toMicros()));
-                    break;
-
-                case 2:
-                    delay = nanos((long) Math.floor(random.nextFloat() * millis(500).toNanos()));
-                    break;
-
-                default:
-                    delay = zero();
-                    break;
-            }
-
-            delays.add(delay);
-
-            final TestRunExecution execution = new TestRunExecution(delay);
-            executions.add(execution);
-        }
-
-        final TestRecursiveExecution recursiveExecution =
-                new TestRecursiveExecution(runner, executions, delays, zero());
-
-        runner.run(recursiveExecution, 0, TimeUnit.MILLISECONDS);
-
-        for (final TestRunExecution execution : executions) {
-
-            execution.await();
-            assertThat(execution.isPassed()).isTrue();
-        }
+      runner.run(execution, delay.value, delay.unit);
     }
 
-    public void testConstructor() {
+    for (final TestRunExecution execution : executions) {
 
-        boolean failed = false;
-        try {
-            new AndroidRunners();
-            failed = true;
-
-        } catch (final Throwable ignored) {
-
-        }
-
-        assertThat(failed).isFalse();
+      execution.await();
+      assertThat(execution.isPassed()).isTrue();
     }
 
-    @SuppressWarnings("ConstantConditions")
-    public void testError() {
+    executions.clear();
 
-        try {
+    final ArrayList<UnitDuration> delays = new ArrayList<UnitDuration>();
 
-            AndroidRunners.looperRunner(null);
+    for (int i = 0; i < 13; i++) {
 
-            fail();
+      final UnitDuration delay;
+      final int unit = random.nextInt(4);
 
-        } catch (final NullPointerException ignored) {
+      switch (unit) {
 
-        }
+        case 0:
+          delay = millis((long) Math.floor(random.nextFloat() * 500));
+          break;
+
+        case 1:
+          delay = micros((long) Math.floor(random.nextFloat() * millis(500).toMicros()));
+          break;
+
+        case 2:
+          delay = nanos((long) Math.floor(random.nextFloat() * millis(500).toNanos()));
+          break;
+
+        default:
+          delay = zero();
+          break;
+      }
+
+      delays.add(delay);
+
+      final TestRunExecution execution = new TestRunExecution(delay);
+      executions.add(execution);
     }
 
-    public void testHandlerRunner() {
+    final TestRecursiveExecution recursiveExecution =
+        new TestRecursiveExecution(runner, executions, delays, zero());
 
-        final CommandInvocation<Handler> invocation = new CommandInvocation<Handler>(null) {
+    runner.run(recursiveExecution, 0, TimeUnit.MILLISECONDS);
 
-            @Override
-            public void onComplete(@NotNull final Channel<Handler, ?> result) {
+    for (final TestRunExecution execution : executions) {
 
-                result.pass(new Handler());
-            }
-        };
-        final Channel<?, Handler> channel = JRoutineCore.with(factoryOf(invocation, this, null))
-                                                        .applyInvocationConfiguration()
-                                                        .withRunner(AndroidRunners.handlerRunner(
-                                                                new HandlerThread("test")))
-                                                        .configured()
-                                                        .close();
-        assertThat(JRoutineCore.with(new HandlerInvocationFactory())
-                               .call(channel)
-                               .after(seconds(30))
-                               .next()).isEqualTo(true);
+      execution.await();
+      assertThat(execution.isPassed()).isTrue();
+    }
+  }
+
+  public void testConstructor() {
+
+    boolean failed = false;
+    try {
+      new AndroidRunners();
+      failed = true;
+
+    } catch (final Throwable ignored) {
+
     }
 
-    public void testLooperRunner() {
+    assertThat(failed).isFalse();
+  }
 
-        final TemplateInvocation<Object, Object> invocation =
-                new TemplateInvocation<Object, Object>() {
+  @SuppressWarnings("ConstantConditions")
+  public void testError() {
 
-                    @Override
-                    public void onComplete(@NotNull final Channel<Object, ?> result) {
+    try {
 
-                        result.pass(Looper.myLooper()).pass(AndroidRunners.myRunner());
-                    }
-                };
-        final Channel<?, Object> channel = JRoutineCore.with(factoryOf(invocation, this))
-                                                       .applyInvocationConfiguration()
-                                                       .withRunner(AndroidRunners.handlerRunner(
-                                                               new HandlerThread("test")))
-                                                       .configured()
-                                                       .close();
-        assertThat(JRoutineCore.with(new LooperInvocationFactory())
-                               .call(channel)
-                               .after(seconds(30))
-                               .next()).isEqualTo(true);
+      AndroidRunners.looperRunner(null);
+
+      fail();
+
+    } catch (final NullPointerException ignored) {
+
+    }
+  }
+
+  public void testHandlerRunner() {
+
+    final CommandInvocation<Handler> invocation = new CommandInvocation<Handler>(null) {
+
+      @Override
+      public void onComplete(@NotNull final Channel<Handler, ?> result) {
+
+        result.pass(new Handler());
+      }
+    };
+    final Channel<?, Handler> channel = JRoutineCore.with(factoryOf(invocation, this, null))
+                                                    .applyInvocationConfiguration()
+                                                    .withRunner(AndroidRunners.handlerRunner(
+                                                        new HandlerThread("test")))
+                                                    .configured()
+                                                    .close();
+    assertThat(JRoutineCore.with(new HandlerInvocationFactory())
+                           .call(channel)
+                           .after(seconds(30))
+                           .next()).isEqualTo(true);
+  }
+
+  public void testLooperRunner() {
+
+    final TemplateInvocation<Object, Object> invocation = new TemplateInvocation<Object, Object>() {
+
+      @Override
+      public void onComplete(@NotNull final Channel<Object, ?> result) {
+
+        result.pass(Looper.myLooper()).pass(AndroidRunners.myRunner());
+      }
+    };
+    final Channel<?, Object> channel = JRoutineCore.with(factoryOf(invocation, this))
+                                                   .applyInvocationConfiguration()
+                                                   .withRunner(AndroidRunners.handlerRunner(
+                                                       new HandlerThread("test")))
+                                                   .configured()
+                                                   .close();
+    assertThat(JRoutineCore.with(new LooperInvocationFactory())
+                           .call(channel)
+                           .after(seconds(30))
+                           .next()).isEqualTo(true);
+  }
+
+  public void testMainRunner() throws InterruptedException {
+
+    testRunner(AndroidRunners.mainRunner());
+    testRunner(new MainRunner());
+    testRunner(AndroidRunners.looperRunner(Looper.getMainLooper()));
+    testRunner(new RunnerDecorator(AndroidRunners.looperRunner(Looper.getMainLooper())));
+  }
+
+  public void testTaskRunner() throws InterruptedException {
+
+    testRunner(new AsyncTaskRunner(null));
+    testRunner(AndroidRunners.taskRunner());
+    testRunner(AndroidRunners.taskRunner(Executors.newCachedThreadPool()));
+    testRunner(new RunnerDecorator(AndroidRunners.taskRunner(Executors.newSingleThreadExecutor())));
+  }
+
+  public void testThreadRunner() throws InterruptedException {
+
+    testRunner(AndroidRunners.handlerRunner(new HandlerThread("test")));
+  }
+
+  private static class HandlerInvocationFactory extends MappingInvocation<Handler, Object> {
+
+    /**
+     * Constructor.
+     */
+    protected HandlerInvocationFactory() {
+
+      super(null);
     }
 
-    public void testMainRunner() throws InterruptedException {
+    public void onInput(final Handler input, @NotNull final Channel<Object, ?> result) throws
+        Exception {
 
-        testRunner(AndroidRunners.mainRunner());
-        testRunner(new MainRunner());
-        testRunner(AndroidRunners.looperRunner(Looper.getMainLooper()));
-        testRunner(new RunnerDecorator(AndroidRunners.looperRunner(Looper.getMainLooper())));
+      testRunner(new HandlerRunner(input));
+      testRunner(AndroidRunners.handlerRunner(input));
+      result.pass(true);
+    }
+  }
+
+  private static class LooperInvocationFactory extends InvocationFactory<Object, Object> {
+
+    /**
+     * Constructor.
+     */
+    protected LooperInvocationFactory() {
+
+      super(null);
     }
 
-    public void testTaskRunner() throws InterruptedException {
+    @NotNull
+    @Override
+    public Invocation<Object, Object> newInvocation() {
 
-        testRunner(new AsyncTaskRunner(null));
-        testRunner(AndroidRunners.taskRunner());
-        testRunner(AndroidRunners.taskRunner(Executors.newCachedThreadPool()));
-        testRunner(new RunnerDecorator(
-                AndroidRunners.taskRunner(Executors.newSingleThreadExecutor())));
-    }
+      return new CallInvocation<Object, Object>() {
 
-    public void testThreadRunner() throws InterruptedException {
+        @Override
+        protected void onCall(@NotNull final List<?> objects,
+            @NotNull final Channel<Object, ?> result) {
 
-        testRunner(AndroidRunners.handlerRunner(new HandlerThread("test")));
-    }
+          try {
 
-    private static class HandlerInvocationFactory extends MappingInvocation<Handler, Object> {
+            testRunner(AndroidRunners.looperRunner((Looper) objects.get(0)));
+            testRunner((Runner) objects.get(1));
 
-        /**
-         * Constructor.
-         */
-        protected HandlerInvocationFactory() {
-
-            super(null);
-        }
-
-        public void onInput(final Handler input, @NotNull final Channel<Object, ?> result) throws
-                Exception {
-
-            testRunner(new HandlerRunner(input));
-            testRunner(AndroidRunners.handlerRunner(input));
             result.pass(true);
+
+          } catch (final InterruptedException e) {
+
+            throw new InvocationInterruptedException(e);
+          }
         }
+      };
+    }
+  }
+
+  private static class TestRecursiveExecution extends TestRunExecution {
+
+    private final ArrayList<UnitDuration> mDelays;
+
+    private final ArrayList<TestRunExecution> mExecutions;
+
+    private final Runner mRunner;
+
+    public TestRecursiveExecution(final Runner runner, final ArrayList<TestRunExecution> executions,
+        final ArrayList<UnitDuration> delays, final UnitDuration delay) {
+
+      super(delay);
+
+      mRunner = runner;
+      mExecutions = executions;
+      mDelays = delays;
     }
 
-    private static class LooperInvocationFactory extends InvocationFactory<Object, Object> {
+    @Override
+    public void run() {
 
-        /**
-         * Constructor.
-         */
-        protected LooperInvocationFactory() {
+      final ArrayList<TestRunExecution> executions = mExecutions;
+      final ArrayList<UnitDuration> delays = mDelays;
+      final Runner runner = mRunner;
+      final int size = executions.size();
 
-            super(null);
-        }
+      for (int i = 0; i < size; i++) {
 
-        @NotNull
-        @Override
-        public Invocation<Object, Object> newInvocation() {
+        final UnitDuration delay = delays.get(i);
+        runner.run(executions.get(i), delay.value, delay.unit);
+      }
 
-            return new CallInvocation<Object, Object>() {
+      super.run();
+    }
+  }
 
-                @Override
-                protected void onCall(@NotNull final List<?> objects,
-                        @NotNull final Channel<Object, ?> result) {
+  private static class TestRunExecution implements Execution {
 
-                    try {
+    private final UnitDuration mDelay;
 
-                        testRunner(AndroidRunners.looperRunner((Looper) objects.get(0)));
-                        testRunner((Runner) objects.get(1));
+    private final Semaphore mSemaphore = new Semaphore(0);
 
-                        result.pass(true);
+    private final long mStartTime;
 
-                    } catch (final InterruptedException e) {
+    private boolean mIsPassed;
 
-                        throw new InvocationInterruptedException(e);
-                    }
-                }
-            };
-        }
+    public TestRunExecution(final UnitDuration delay) {
+
+      mStartTime = System.currentTimeMillis();
+      mDelay = delay;
     }
 
-    private static class TestRecursiveExecution extends TestRunExecution {
+    public void await() throws InterruptedException {
 
-        private final ArrayList<UnitDuration> mDelays;
-
-        private final ArrayList<TestRunExecution> mExecutions;
-
-        private final Runner mRunner;
-
-        public TestRecursiveExecution(final Runner runner,
-                final ArrayList<TestRunExecution> executions, final ArrayList<UnitDuration> delays,
-                final UnitDuration delay) {
-
-            super(delay);
-
-            mRunner = runner;
-            mExecutions = executions;
-            mDelays = delays;
-        }
-
-        @Override
-        public void run() {
-
-            final ArrayList<TestRunExecution> executions = mExecutions;
-            final ArrayList<UnitDuration> delays = mDelays;
-            final Runner runner = mRunner;
-            final int size = executions.size();
-
-            for (int i = 0; i < size; i++) {
-
-                final UnitDuration delay = delays.get(i);
-                runner.run(executions.get(i), delay.value, delay.unit);
-            }
-
-            super.run();
-        }
+      mSemaphore.acquire();
     }
 
-    private static class TestRunExecution implements Execution {
+    public boolean isPassed() {
 
-        private final UnitDuration mDelay;
-
-        private final Semaphore mSemaphore = new Semaphore(0);
-
-        private final long mStartTime;
-
-        private boolean mIsPassed;
-
-        public TestRunExecution(final UnitDuration delay) {
-
-            mStartTime = System.currentTimeMillis();
-            mDelay = delay;
-        }
-
-        public void await() throws InterruptedException {
-
-            mSemaphore.acquire();
-        }
-
-        public boolean isPassed() {
-
-            return mIsPassed;
-        }
-
-        public void run() {
-
-            // It looks like that handlers and the kind are not so accurate after all...
-            // Let's have a 10 millisecond error tolerance
-            mIsPassed = (System.currentTimeMillis() - mStartTime + 10 >= mDelay.toMillis());
-            mSemaphore.release();
-        }
+      return mIsPassed;
     }
+
+    public void run() {
+
+      // It looks like that handlers and the kind are not so accurate after all...
+      // Let's have a 10 millisecond error tolerance
+      mIsPassed = (System.currentTimeMillis() - mStartTime + 10 >= mDelay.toMillis());
+      mSemaphore.release();
+    }
+  }
 }

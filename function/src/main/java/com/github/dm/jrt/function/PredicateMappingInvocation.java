@@ -33,21 +33,21 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class PredicateMappingInvocation<IN> extends MappingInvocation<IN, IN> {
 
-    private final PredicateDecorator<? super IN> mPredicate;
+  private final PredicateDecorator<? super IN> mPredicate;
 
-    /**
-     * Constructor.
-     *
-     * @param predicate the predicate instance.
-     */
-    PredicateMappingInvocation(@NotNull final PredicateDecorator<? super IN> predicate) {
-        super(asArgs(ConstantConditions.notNull("predicate wrapper", predicate)));
-        mPredicate = predicate;
-    }
+  /**
+   * Constructor.
+   *
+   * @param predicate the predicate instance.
+   */
+  PredicateMappingInvocation(@NotNull final PredicateDecorator<? super IN> predicate) {
+    super(asArgs(ConstantConditions.notNull("predicate wrapper", predicate)));
+    mPredicate = predicate;
+  }
 
-    public void onInput(final IN input, @NotNull final Channel<IN, ?> result) throws Exception {
-        if (mPredicate.test(input)) {
-            result.pass(input);
-        }
+  public void onInput(final IN input, @NotNull final Channel<IN, ?> result) throws Exception {
+    if (mPredicate.test(input)) {
+      result.pass(input);
     }
+  }
 }

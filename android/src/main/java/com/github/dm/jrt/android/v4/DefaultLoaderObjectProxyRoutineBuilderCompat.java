@@ -44,170 +44,167 @@ import java.lang.reflect.Method;
  */
 class DefaultLoaderObjectProxyRoutineBuilderCompat implements LoaderObjectProxyRoutineBuilder {
 
-    private final LoaderContextCompat mContext;
+  private final LoaderContextCompat mContext;
 
-    private final ContextInvocationTarget<?> mTarget;
+  private final ContextInvocationTarget<?> mTarget;
 
-    private BuilderType mBuilderType;
+  private BuilderType mBuilderType;
 
-    private InvocationConfiguration mInvocationConfiguration =
-            InvocationConfiguration.defaultConfiguration();
+  private InvocationConfiguration mInvocationConfiguration =
+      InvocationConfiguration.defaultConfiguration();
 
-    private LoaderConfiguration mLoaderConfiguration = LoaderConfiguration.defaultConfiguration();
+  private LoaderConfiguration mLoaderConfiguration = LoaderConfiguration.defaultConfiguration();
 
-    private ObjectConfiguration mObjectConfiguration = ObjectConfiguration.defaultConfiguration();
+  private ObjectConfiguration mObjectConfiguration = ObjectConfiguration.defaultConfiguration();
 
-    /**
-     * Constructor.
-     *
-     * @param context the Loader context.
-     * @param target  the invocation target.
-     */
-    DefaultLoaderObjectProxyRoutineBuilderCompat(@NotNull final LoaderContextCompat context,
-            @NotNull final ContextInvocationTarget<?> target) {
-        mContext = ConstantConditions.notNull("Loader context", context);
-        mTarget = ConstantConditions.notNull("invocation target", target);
+  /**
+   * Constructor.
+   *
+   * @param context the Loader context.
+   * @param target  the invocation target.
+   */
+  DefaultLoaderObjectProxyRoutineBuilderCompat(@NotNull final LoaderContextCompat context,
+      @NotNull final ContextInvocationTarget<?> target) {
+    mContext = ConstantConditions.notNull("Loader context", context);
+    mTarget = ConstantConditions.notNull("invocation target", target);
+  }
+
+  @NotNull
+  @Override
+  public LoaderObjectProxyRoutineBuilder apply(
+      @NotNull final InvocationConfiguration configuration) {
+    mInvocationConfiguration =
+        ConstantConditions.notNull("invocation configuration", configuration);
+    return this;
+  }
+
+  @NotNull
+  @Override
+  public LoaderObjectProxyRoutineBuilder apply(@NotNull final ObjectConfiguration configuration) {
+    mObjectConfiguration = ConstantConditions.notNull("object configuration", configuration);
+    return this;
+  }
+
+  @NotNull
+  @Override
+  public Builder<? extends LoaderObjectProxyRoutineBuilder> applyInvocationConfiguration() {
+    return new InvocationConfiguration.Builder<LoaderObjectProxyRoutineBuilder>(
+        new InvocationConfiguration.Configurable<LoaderObjectProxyRoutineBuilder>() {
+
+          @NotNull
+          @Override
+          public LoaderObjectProxyRoutineBuilder apply(
+              @NotNull final InvocationConfiguration configuration) {
+            return DefaultLoaderObjectProxyRoutineBuilderCompat.this.apply(configuration);
+          }
+        }, mInvocationConfiguration);
+  }
+
+  @NotNull
+  @Override
+  public ObjectConfiguration.Builder<? extends LoaderObjectProxyRoutineBuilder>
+  applyObjectConfiguration() {
+    return new ObjectConfiguration.Builder<LoaderObjectProxyRoutineBuilder>(
+        new ObjectConfiguration.Configurable<LoaderObjectProxyRoutineBuilder>() {
+
+          @NotNull
+          @Override
+          public LoaderObjectProxyRoutineBuilder apply(
+              @NotNull final ObjectConfiguration configuration) {
+            return DefaultLoaderObjectProxyRoutineBuilderCompat.this.apply(configuration);
+          }
+        }, mObjectConfiguration);
+  }
+
+  @NotNull
+  @Override
+  public LoaderObjectProxyRoutineBuilder withType(@Nullable final BuilderType builderType) {
+    mBuilderType = builderType;
+    return this;
+  }
+
+  @NotNull
+  @Override
+  public LoaderObjectProxyRoutineBuilder apply(@NotNull final LoaderConfiguration configuration) {
+    mLoaderConfiguration = ConstantConditions.notNull("Loader configuration", configuration);
+    return this;
+  }
+
+  @NotNull
+  @Override
+  public LoaderConfiguration.Builder<? extends LoaderObjectProxyRoutineBuilder>
+  applyLoaderConfiguration() {
+    return new LoaderConfiguration.Builder<LoaderObjectProxyRoutineBuilder>(
+        new LoaderConfiguration.Configurable<LoaderObjectProxyRoutineBuilder>() {
+
+          @NotNull
+          @Override
+          public LoaderObjectProxyRoutineBuilder apply(
+              @NotNull final LoaderConfiguration configuration) {
+            return DefaultLoaderObjectProxyRoutineBuilderCompat.this.apply(configuration);
+          }
+        }, mLoaderConfiguration);
+  }
+
+  @NotNull
+  @Override
+  public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
+    final BuilderType builderType = mBuilderType;
+    if (builderType == null) {
+      final LoaderProxyCompat proxyAnnotation = itf.getAnnotation(LoaderProxyCompat.class);
+      if ((proxyAnnotation != null) && mTarget.isAssignableTo(proxyAnnotation.value())) {
+        return newProxyBuilder().buildProxy(itf);
+      }
+
+      return newObjectBuilder().buildProxy(itf);
+
+    } else if (builderType == BuilderType.PROXY) {
+      return newProxyBuilder().buildProxy(itf);
     }
 
-    @NotNull
-    @Override
-    public LoaderObjectProxyRoutineBuilder apply(
-            @NotNull final InvocationConfiguration configuration) {
-        mInvocationConfiguration =
-                ConstantConditions.notNull("invocation configuration", configuration);
-        return this;
-    }
+    return newObjectBuilder().buildProxy(itf);
+  }
 
-    @NotNull
-    @Override
-    public LoaderObjectProxyRoutineBuilder apply(@NotNull final ObjectConfiguration configuration) {
-        mObjectConfiguration = ConstantConditions.notNull("object configuration", configuration);
-        return this;
-    }
+  @NotNull
+  @Override
+  public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
+    return buildProxy(itf.getRawClass());
+  }
 
-    @NotNull
-    @Override
-    public Builder<? extends LoaderObjectProxyRoutineBuilder> applyInvocationConfiguration() {
-        return new InvocationConfiguration.Builder<LoaderObjectProxyRoutineBuilder>(
-                new InvocationConfiguration.Configurable<LoaderObjectProxyRoutineBuilder>() {
+  @NotNull
+  @Override
+  public <IN, OUT> LoaderRoutine<IN, OUT> method(@NotNull final String name) {
+    return newObjectBuilder().method(name);
+  }
 
-                    @NotNull
-                    @Override
-                    public LoaderObjectProxyRoutineBuilder apply(
-                            @NotNull final InvocationConfiguration configuration) {
-                        return DefaultLoaderObjectProxyRoutineBuilderCompat.this.apply(
-                                configuration);
-                    }
-                }, mInvocationConfiguration);
-    }
+  @NotNull
+  @Override
+  public <IN, OUT> LoaderRoutine<IN, OUT> method(@NotNull final String name,
+      @NotNull final Class<?>... parameterTypes) {
+    return newObjectBuilder().method(name, parameterTypes);
+  }
 
-    @NotNull
-    @Override
-    public ObjectConfiguration.Builder<? extends LoaderObjectProxyRoutineBuilder>
-    applyObjectConfiguration() {
-        return new ObjectConfiguration.Builder<LoaderObjectProxyRoutineBuilder>(
-                new ObjectConfiguration.Configurable<LoaderObjectProxyRoutineBuilder>() {
+  @NotNull
+  @Override
+  public <IN, OUT> LoaderRoutine<IN, OUT> method(@NotNull final Method method) {
+    return newObjectBuilder().method(method);
+  }
 
-                    @NotNull
-                    @Override
-                    public LoaderObjectProxyRoutineBuilder apply(
-                            @NotNull final ObjectConfiguration configuration) {
-                        return DefaultLoaderObjectProxyRoutineBuilderCompat.this.apply(
-                                configuration);
-                    }
-                }, mObjectConfiguration);
-    }
+  @NotNull
+  private LoaderObjectRoutineBuilder newObjectBuilder() {
+    return JRoutineLoaderObjectCompat.on(mContext)
+                                     .with(mTarget)
+                                     .apply(mInvocationConfiguration)
+                                     .apply(mObjectConfiguration)
+                                     .apply(mLoaderConfiguration);
+  }
 
-    @NotNull
-    @Override
-    public LoaderObjectProxyRoutineBuilder withType(@Nullable final BuilderType builderType) {
-        mBuilderType = builderType;
-        return this;
-    }
-
-    @NotNull
-    @Override
-    public LoaderObjectProxyRoutineBuilder apply(@NotNull final LoaderConfiguration configuration) {
-        mLoaderConfiguration = ConstantConditions.notNull("Loader configuration", configuration);
-        return this;
-    }
-
-    @NotNull
-    @Override
-    public LoaderConfiguration.Builder<? extends LoaderObjectProxyRoutineBuilder>
-    applyLoaderConfiguration() {
-        return new LoaderConfiguration.Builder<LoaderObjectProxyRoutineBuilder>(
-                new LoaderConfiguration.Configurable<LoaderObjectProxyRoutineBuilder>() {
-
-                    @NotNull
-                    @Override
-                    public LoaderObjectProxyRoutineBuilder apply(
-                            @NotNull final LoaderConfiguration configuration) {
-                        return DefaultLoaderObjectProxyRoutineBuilderCompat.this.apply(
-                                configuration);
-                    }
-                }, mLoaderConfiguration);
-    }
-
-    @NotNull
-    @Override
-    public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
-        final BuilderType builderType = mBuilderType;
-        if (builderType == null) {
-            final LoaderProxyCompat proxyAnnotation = itf.getAnnotation(LoaderProxyCompat.class);
-            if ((proxyAnnotation != null) && mTarget.isAssignableTo(proxyAnnotation.value())) {
-                return newProxyBuilder().buildProxy(itf);
-            }
-
-            return newObjectBuilder().buildProxy(itf);
-
-        } else if (builderType == BuilderType.PROXY) {
-            return newProxyBuilder().buildProxy(itf);
-        }
-
-        return newObjectBuilder().buildProxy(itf);
-    }
-
-    @NotNull
-    @Override
-    public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
-        return buildProxy(itf.getRawClass());
-    }
-
-    @NotNull
-    @Override
-    public <IN, OUT> LoaderRoutine<IN, OUT> method(@NotNull final String name) {
-        return newObjectBuilder().method(name);
-    }
-
-    @NotNull
-    @Override
-    public <IN, OUT> LoaderRoutine<IN, OUT> method(@NotNull final String name,
-            @NotNull final Class<?>... parameterTypes) {
-        return newObjectBuilder().method(name, parameterTypes);
-    }
-
-    @NotNull
-    @Override
-    public <IN, OUT> LoaderRoutine<IN, OUT> method(@NotNull final Method method) {
-        return newObjectBuilder().method(method);
-    }
-
-    @NotNull
-    private LoaderObjectRoutineBuilder newObjectBuilder() {
-        return JRoutineLoaderObjectCompat.on(mContext)
-                                         .with(mTarget)
-                                         .apply(mInvocationConfiguration)
-                                         .apply(mObjectConfiguration)
-                                         .apply(mLoaderConfiguration);
-    }
-
-    @NotNull
-    private LoaderProxyRoutineBuilder newProxyBuilder() {
-        return JRoutineLoaderProxyCompat.on(mContext)
-                                        .with(mTarget)
-                                        .apply(mInvocationConfiguration)
-                                        .apply(mObjectConfiguration)
-                                        .apply(mLoaderConfiguration);
-    }
+  @NotNull
+  private LoaderProxyRoutineBuilder newProxyBuilder() {
+    return JRoutineLoaderProxyCompat.on(mContext)
+                                    .with(mTarget)
+                                    .apply(mInvocationConfiguration)
+                                    .apply(mObjectConfiguration)
+                                    .apply(mLoaderConfiguration);
+  }
 }

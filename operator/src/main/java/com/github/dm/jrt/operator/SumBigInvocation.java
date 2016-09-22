@@ -34,47 +34,47 @@ import static com.github.dm.jrt.operator.math.Numbers.toBigDecimalOptimistic;
  */
 class SumBigInvocation extends TemplateInvocation<Number, BigDecimal> {
 
-    private static final InvocationFactory<Number, BigDecimal> sFactory =
-            new InvocationFactory<Number, BigDecimal>(null) {
+  private static final InvocationFactory<Number, BigDecimal> sFactory =
+      new InvocationFactory<Number, BigDecimal>(null) {
 
-                @NotNull
-                @Override
-                public Invocation<Number, BigDecimal> newInvocation() {
-                    return new SumBigInvocation();
-                }
-            };
+        @NotNull
+        @Override
+        public Invocation<Number, BigDecimal> newInvocation() {
+          return new SumBigInvocation();
+        }
+      };
 
-    private BigDecimal mSum;
+  private BigDecimal mSum;
 
-    /**
-     * Constructor.
-     */
-    private SumBigInvocation() {
-    }
+  /**
+   * Constructor.
+   */
+  private SumBigInvocation() {
+  }
 
-    /**
-     * Returns a factory of invocations computing the sum of the input numbers by employing a
-     * {@code BigDecimal}.
-     *
-     * @return the factory instance.
-     */
-    @NotNull
-    static InvocationFactory<Number, BigDecimal> factoryOf() {
-        return sFactory;
-    }
+  /**
+   * Returns a factory of invocations computing the sum of the input numbers by employing a
+   * {@code BigDecimal}.
+   *
+   * @return the factory instance.
+   */
+  @NotNull
+  static InvocationFactory<Number, BigDecimal> factoryOf() {
+    return sFactory;
+  }
 
-    @Override
-    public void onComplete(@NotNull final Channel<BigDecimal, ?> result) {
-        result.pass(mSum);
-    }
+  @Override
+  public void onComplete(@NotNull final Channel<BigDecimal, ?> result) {
+    result.pass(mSum);
+  }
 
-    @Override
-    public void onInput(final Number input, @NotNull final Channel<BigDecimal, ?> result) {
-        mSum = mSum.add(toBigDecimalOptimistic(input));
-    }
+  @Override
+  public void onInput(final Number input, @NotNull final Channel<BigDecimal, ?> result) {
+    mSum = mSum.add(toBigDecimalOptimistic(input));
+  }
 
-    @Override
-    public void onRestart() {
-        mSum = BigDecimal.ZERO;
-    }
+  @Override
+  public void onRestart() {
+    mSum = BigDecimal.ZERO;
+  }
 }

@@ -36,63 +36,63 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class AnyMatchInvocationFactory<IN> extends InvocationFactory<IN, Boolean> {
 
+  private final PredicateDecorator<? super IN> mFilterPredicate;
+
+  /**
+   * Constructor.
+   *
+   * @param filterPredicate the predicate defining the condition.
+   */
+  AnyMatchInvocationFactory(@NotNull final PredicateDecorator<? super IN> filterPredicate) {
+    super(asArgs(ConstantConditions.notNull("predicate instance", filterPredicate)));
+    mFilterPredicate = filterPredicate;
+  }
+
+  @NotNull
+  @Override
+  public Invocation<IN, Boolean> newInvocation() {
+    return new AnyMatchInvocation<IN>(mFilterPredicate);
+  }
+
+  /**
+   * Invocation verifying that any of the inputs satisfies a specific conditions.
+   *
+   * @param <IN> the input data type.
+   */
+  private static class AnyMatchInvocation<IN> extends TemplateInvocation<IN, Boolean> {
+
     private final PredicateDecorator<? super IN> mFilterPredicate;
+
+    private boolean mIsMatch;
 
     /**
      * Constructor.
      *
      * @param filterPredicate the predicate defining the condition.
      */
-    AnyMatchInvocationFactory(@NotNull final PredicateDecorator<? super IN> filterPredicate) {
-        super(asArgs(ConstantConditions.notNull("predicate instance", filterPredicate)));
-        mFilterPredicate = filterPredicate;
+    private AnyMatchInvocation(@NotNull final PredicateDecorator<? super IN> filterPredicate) {
+      mFilterPredicate = filterPredicate;
     }
 
-    @NotNull
     @Override
-    public Invocation<IN, Boolean> newInvocation() {
-        return new AnyMatchInvocation<IN>(mFilterPredicate);
+    public void onComplete(@NotNull final Channel<Boolean, ?> result) {
+      if (!mIsMatch) {
+        result.pass(false);
+      }
     }
 
-    /**
-     * Invocation verifying that any of the inputs satisfies a specific conditions.
-     *
-     * @param <IN> the input data type.
-     */
-    private static class AnyMatchInvocation<IN> extends TemplateInvocation<IN, Boolean> {
-
-        private final PredicateDecorator<? super IN> mFilterPredicate;
-
-        private boolean mIsMatch;
-
-        /**
-         * Constructor.
-         *
-         * @param filterPredicate the predicate defining the condition.
-         */
-        private AnyMatchInvocation(@NotNull final PredicateDecorator<? super IN> filterPredicate) {
-            mFilterPredicate = filterPredicate;
-        }
-
-        @Override
-        public void onComplete(@NotNull final Channel<Boolean, ?> result) {
-            if (!mIsMatch) {
-                result.pass(false);
-            }
-        }
-
-        @Override
-        public void onInput(final IN input, @NotNull final Channel<Boolean, ?> result) throws
-                Exception {
-            if (!mIsMatch && mFilterPredicate.test(input)) {
-                mIsMatch = true;
-                result.pass(true);
-            }
-        }
-
-        @Override
-        public void onRestart() {
-            mIsMatch = false;
-        }
+    @Override
+    public void onInput(final IN input, @NotNull final Channel<Boolean, ?> result) throws
+        Exception {
+      if (!mIsMatch && mFilterPredicate.test(input)) {
+        mIsMatch = true;
+        result.pass(true);
+      }
     }
+
+    @Override
+    public void onRestart() {
+      mIsMatch = false;
+    }
+  }
 }

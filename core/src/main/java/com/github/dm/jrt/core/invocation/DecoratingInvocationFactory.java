@@ -32,32 +32,32 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 public abstract class DecoratingInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
 
-    private final InvocationFactory<IN, OUT> mFactory;
+  private final InvocationFactory<IN, OUT> mFactory;
 
-    /**
-     * Constructor.
-     *
-     * @param wrapped the wrapped factory instance.
-     */
-    public DecoratingInvocationFactory(@NotNull final InvocationFactory<IN, OUT> wrapped) {
-        super(asArgs(ConstantConditions.notNull("wrapped factory", wrapped)));
-        mFactory = wrapped;
-    }
+  /**
+   * Constructor.
+   *
+   * @param wrapped the wrapped factory instance.
+   */
+  public DecoratingInvocationFactory(@NotNull final InvocationFactory<IN, OUT> wrapped) {
+    super(asArgs(ConstantConditions.notNull("wrapped factory", wrapped)));
+    mFactory = wrapped;
+  }
 
-    @NotNull
-    @Override
-    public final Invocation<IN, OUT> newInvocation() throws Exception {
-        return decorate(mFactory.newInvocation());
-    }
+  @NotNull
+  @Override
+  public final Invocation<IN, OUT> newInvocation() throws Exception {
+    return decorate(mFactory.newInvocation());
+  }
 
-    /**
-     * Decorates the specified invocation.
-     *
-     * @param invocation the invocation instance to decorate.
-     * @return the decorated invocation.
-     * @throws java.lang.Exception if an unexpected error occurs.
-     */
-    @NotNull
-    protected abstract Invocation<IN, OUT> decorate(@NotNull Invocation<IN, OUT> invocation) throws
-            Exception;
+  /**
+   * Decorates the specified invocation.
+   *
+   * @param invocation the invocation instance to decorate.
+   * @return the decorated invocation.
+   * @throws java.lang.Exception if an unexpected error occurs.
+   */
+  @NotNull
+  protected abstract Invocation<IN, OUT> decorate(@NotNull Invocation<IN, OUT> invocation) throws
+      Exception;
 }

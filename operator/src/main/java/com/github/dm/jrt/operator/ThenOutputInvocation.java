@@ -33,22 +33,22 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class ThenOutputInvocation<IN, OUT> extends GenerateInvocation<IN, OUT> {
 
-    private final Channel<?, ? extends OUT> mChannel;
+  private final Channel<?, ? extends OUT> mChannel;
 
-    /**
-     * Constructor.
-     *
-     * @param channel the output channel.
-     */
-    ThenOutputInvocation(@Nullable final Channel<?, ? extends OUT> channel) {
-        super(asArgs(channel));
-        mChannel = channel;
-    }
+  /**
+   * Constructor.
+   *
+   * @param channel the output channel.
+   */
+  ThenOutputInvocation(@Nullable final Channel<?, ? extends OUT> channel) {
+    super(asArgs(channel));
+    mChannel = channel;
+  }
 
-    public void onComplete(@NotNull final Channel<OUT, ?> result) {
-        result.pass(mChannel);
-    }
+  public void onComplete(@NotNull final Channel<OUT, ?> result) {
+    result.pass(mChannel);
+  }
 
-    public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) {
-    }
+  public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) {
+  }
 }

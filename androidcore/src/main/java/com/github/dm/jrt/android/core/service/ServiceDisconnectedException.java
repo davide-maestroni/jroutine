@@ -29,44 +29,44 @@ import org.jetbrains.annotations.Nullable;
  */
 public class ServiceDisconnectedException extends RoutineException {
 
-    private final String mClassName;
+  private final String mClassName;
 
-    private final String mPackageName;
+  private final String mPackageName;
 
-    /**
-     * Constructor.
-     */
-    public ServiceDisconnectedException() {
-        this(null);
+  /**
+   * Constructor.
+   */
+  public ServiceDisconnectedException() {
+    this(null);
+  }
+
+  /**
+   * Constructor.
+   *
+   * @param name the Service component name.
+   */
+  public ServiceDisconnectedException(@Nullable final ComponentName name) {
+    if (name != null) {
+      mPackageName = name.getPackageName();
+      mClassName = name.getClassName();
+
+    } else {
+      mPackageName = null;
+      mClassName = null;
+    }
+  }
+
+  /**
+   * Gets the Service component name.
+   *
+   * @return the component name.
+   */
+  @Nullable
+  public ComponentName getComponentName() {
+    if ((mPackageName != null) && (mClassName != null)) {
+      return new ComponentName(mPackageName, mClassName);
     }
 
-    /**
-     * Constructor.
-     *
-     * @param name the Service component name.
-     */
-    public ServiceDisconnectedException(@Nullable final ComponentName name) {
-        if (name != null) {
-            mPackageName = name.getPackageName();
-            mClassName = name.getClassName();
-
-        } else {
-            mPackageName = null;
-            mClassName = null;
-        }
-    }
-
-    /**
-     * Gets the Service component name.
-     *
-     * @return the component name.
-     */
-    @Nullable
-    public ComponentName getComponentName() {
-        if ((mPackageName != null) && (mClassName != null)) {
-            return new ComponentName(mPackageName, mClassName);
-        }
-
-        return null;
-    }
+    return null;
+  }
 }

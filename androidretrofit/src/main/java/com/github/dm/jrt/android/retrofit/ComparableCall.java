@@ -49,231 +49,231 @@ import retrofit2.Response;
  */
 public class ComparableCall<T> implements Call<T> {
 
-    private final Call<T> mCall;
+  private final Call<T> mCall;
+
+  /**
+   * Constructor.
+   *
+   * @param wrapped the wrapped instance.
+   */
+  @SuppressWarnings("unchecked")
+  private ComparableCall(@NotNull final Call<?> wrapped) {
+    mCall = (Call<T>) ConstantConditions.notNull("call instance", wrapped);
+  }
+
+  /**
+   * Returns a call instance wrapping the specified one.
+   *
+   * @param wrapped the wrapped instance.
+   * @param <T>     the response type.
+   * @return the comparable call.
+   */
+  @NotNull
+  public static <T> ComparableCall<T> of(@NotNull final Call<?> wrapped) {
+    return new ComparableCall<T>(wrapped);
+  }
+
+  /**
+   * Wraps the specified adapter so to make the passed call comparable.
+   *
+   * @param callAdapter the adapter to wrap.
+   * @param <T>         the response type.
+   * @return the wrapped adapter.
+   */
+  @NotNull
+  public static <T> CallAdapter<T> wrap(@NotNull final CallAdapter<T> callAdapter) {
+    return new CallAdapterDecorator<T>(callAdapter);
+  }
+
+  private static boolean equals(@Nullable final RequestBody b1, @Nullable final RequestBody b2) {
+    if (b1 == b2) {
+      return true;
+    }
+
+    if ((b1 == null) || (b2 == null)) {
+      return false;
+    }
+
+    if (!equals(b1.contentType(), b2.contentType())) {
+      return false;
+    }
+
+    try {
+      if (b1.contentLength() != b2.contentLength()) {
+        return false;
+      }
+
+      final Buffer buffer1 = new Buffer();
+      b1.writeTo(buffer1);
+      final Buffer buffer2 = new Buffer();
+      b2.writeTo(buffer2);
+      return buffer1.equals(buffer2);
+
+    } catch (final IOException e) {
+      throw new IllegalStateException(e);
+    }
+  }
+
+  private static boolean equals(@Nullable final Headers h1, @Nullable final Headers h2) {
+    if (h1 == h2) {
+      return true;
+    }
+
+    if ((h1 == null) || (h2 == null)) {
+      return false;
+    }
+
+    final int size = h1.size();
+    if (size != h2.size()) {
+      return false;
+    }
+
+    final Locale locale = Locale.getDefault();
+    final HashMap<String, List<String>> map1 = new HashMap<String, List<String>>();
+    final HashMap<String, List<String>> map2 = new HashMap<String, List<String>>();
+    for (int i = 0; i < size; ++i) {
+      final String name1 = h1.name(i);
+      map1.put(name1.toLowerCase(locale), h1.values(name1));
+      final String name2 = h2.name(i);
+      map2.put(name2.toLowerCase(locale), h2.values(name2));
+    }
+
+    return map1.equals(map2);
+  }
+
+  private static boolean equals(@Nullable final Object o1, @Nullable final Object o2) {
+    return (o1 == o2) || !((o1 == null) || (o2 == null)) && o1.equals(o2);
+  }
+
+  @Override
+  @SuppressWarnings("CloneDoesntCallSuperClone")
+  public Call<T> clone() {
+    return new ComparableCall<T>(mCall.clone());
+  }
+
+  @Override
+  public boolean equals(final Object o) {
+    if (this == o) {
+      return true;
+    }
+
+    if ((o == null) || (getClass() != o.getClass())) {
+      return false;
+    }
+
+    final ComparableCall<?> that = (ComparableCall<?>) o;
+    final Request thisRequest = request();
+    final Request thatRequest = that.request();
+    return equals(thisRequest.url(), thatRequest.url()) && equals(thisRequest.method(),
+        thatRequest.method()) && equals(thisRequest.body(), thatRequest.body()) && equals(
+        thisRequest.tag(), thisRequest.tag()) && equals(thisRequest.headers(),
+        thatRequest.headers());
+  }
+
+  @Override
+  public int hashCode() {
+    final Request request = mCall.request();
+    int result = 0;
+    final HttpUrl url = request.url();
+    result += result * 31 + ((url != null) ? url.hashCode() : 0);
+    final String method = request.method();
+    result += result * 31 + ((method != null) ? method.hashCode() : 0);
+    final RequestBody body = request.body();
+    if (body == null) {
+      result += result * 31;
+
+    } else {
+      final MediaType mediaType = body.contentType();
+      result += result * 31 + ((mediaType != null) ? mediaType.hashCode() : 0);
+      final Buffer buffer = new Buffer();
+      try {
+        body.writeTo(buffer);
+      } catch (final IOException e) {
+        throw new IllegalStateException(e);
+      }
+
+      result = 31 * result + buffer.hashCode();
+    }
+
+    final Object tag = request.tag();
+    if (tag != request) {
+      result += result * 31 + ((tag != null) ? tag.hashCode() : 0);
+    }
+
+    final Headers headers = request.headers();
+    if (headers.size() > 0) {
+      final Locale locale = Locale.getDefault();
+      final TreeSet<String> names = new TreeSet<String>();
+      for (final String name : headers.names()) {
+        names.add((name != null) ? name.toLowerCase(locale) : null);
+      }
+
+      for (final String name : names) {
+        result += result * 31 + ((name != null) ? name.hashCode() : 0);
+        final List<String> values = headers.values(name);
+        result += result * 31 + ((values != null) ? values.hashCode() : 0);
+      }
+    }
+
+    return result;
+  }
+
+  @Override
+  public Response<T> execute() throws IOException {
+    return mCall.execute();
+  }
+
+  @Override
+  public void enqueue(final Callback<T> callback) {
+    mCall.enqueue(callback);
+  }
+
+  @Override
+  public boolean isExecuted() {
+    return mCall.isExecuted();
+  }
+
+  @Override
+  public void cancel() {
+    mCall.cancel();
+  }
+
+  @Override
+  public boolean isCanceled() {
+    return mCall.isCanceled();
+  }
+
+  @Override
+  public Request request() {
+    return mCall.request();
+  }
+
+  /**
+   * Call adapter decorator making the adapted instance comparable.
+   *
+   * @param <T> the adapted type.
+   */
+  private static class CallAdapterDecorator<T> implements CallAdapter<T> {
+
+    private final CallAdapter<T> mAdapter;
 
     /**
      * Constructor.
      *
-     * @param wrapped the wrapped instance.
+     * @param wrapped the wrapped adapter instance.
      */
-    @SuppressWarnings("unchecked")
-    private ComparableCall(@NotNull final Call<?> wrapped) {
-        mCall = (Call<T>) ConstantConditions.notNull("call instance", wrapped);
-    }
-
-    /**
-     * Returns a call instance wrapping the specified one.
-     *
-     * @param wrapped the wrapped instance.
-     * @param <T>     the response type.
-     * @return the comparable call.
-     */
-    @NotNull
-    public static <T> ComparableCall<T> of(@NotNull final Call<?> wrapped) {
-        return new ComparableCall<T>(wrapped);
-    }
-
-    /**
-     * Wraps the specified adapter so to make the passed call comparable.
-     *
-     * @param callAdapter the adapter to wrap.
-     * @param <T>         the response type.
-     * @return the wrapped adapter.
-     */
-    @NotNull
-    public static <T> CallAdapter<T> wrap(@NotNull final CallAdapter<T> callAdapter) {
-        return new CallAdapterDecorator<T>(callAdapter);
-    }
-
-    private static boolean equals(@Nullable final RequestBody b1, @Nullable final RequestBody b2) {
-        if (b1 == b2) {
-            return true;
-        }
-
-        if ((b1 == null) || (b2 == null)) {
-            return false;
-        }
-
-        if (!equals(b1.contentType(), b2.contentType())) {
-            return false;
-        }
-
-        try {
-            if (b1.contentLength() != b2.contentLength()) {
-                return false;
-            }
-
-            final Buffer buffer1 = new Buffer();
-            b1.writeTo(buffer1);
-            final Buffer buffer2 = new Buffer();
-            b2.writeTo(buffer2);
-            return buffer1.equals(buffer2);
-
-        } catch (final IOException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
-    private static boolean equals(@Nullable final Headers h1, @Nullable final Headers h2) {
-        if (h1 == h2) {
-            return true;
-        }
-
-        if ((h1 == null) || (h2 == null)) {
-            return false;
-        }
-
-        final int size = h1.size();
-        if (size != h2.size()) {
-            return false;
-        }
-
-        final Locale locale = Locale.getDefault();
-        final HashMap<String, List<String>> map1 = new HashMap<String, List<String>>();
-        final HashMap<String, List<String>> map2 = new HashMap<String, List<String>>();
-        for (int i = 0; i < size; ++i) {
-            final String name1 = h1.name(i);
-            map1.put(name1.toLowerCase(locale), h1.values(name1));
-            final String name2 = h2.name(i);
-            map2.put(name2.toLowerCase(locale), h2.values(name2));
-        }
-
-        return map1.equals(map2);
-    }
-
-    private static boolean equals(@Nullable final Object o1, @Nullable final Object o2) {
-        return (o1 == o2) || !((o1 == null) || (o2 == null)) && o1.equals(o2);
+    private CallAdapterDecorator(@NotNull final CallAdapter<T> wrapped) {
+      mAdapter = ConstantConditions.notNull("call adapter instance", wrapped);
     }
 
     @Override
-    @SuppressWarnings("CloneDoesntCallSuperClone")
-    public Call<T> clone() {
-        return new ComparableCall<T>(mCall.clone());
+    public Type responseType() {
+      return mAdapter.responseType();
     }
 
     @Override
-    public boolean equals(final Object o) {
-        if (this == o) {
-            return true;
-        }
-
-        if ((o == null) || (getClass() != o.getClass())) {
-            return false;
-        }
-
-        final ComparableCall<?> that = (ComparableCall<?>) o;
-        final Request thisRequest = request();
-        final Request thatRequest = that.request();
-        return equals(thisRequest.url(), thatRequest.url()) && equals(thisRequest.method(),
-                thatRequest.method()) && equals(thisRequest.body(), thatRequest.body()) && equals(
-                thisRequest.tag(), thisRequest.tag()) && equals(thisRequest.headers(),
-                thatRequest.headers());
+    public <OUT> T adapt(final Call<OUT> call) {
+      return mAdapter.adapt(ComparableCall.of(call));
     }
-
-    @Override
-    public int hashCode() {
-        final Request request = mCall.request();
-        int result = 0;
-        final HttpUrl url = request.url();
-        result += result * 31 + ((url != null) ? url.hashCode() : 0);
-        final String method = request.method();
-        result += result * 31 + ((method != null) ? method.hashCode() : 0);
-        final RequestBody body = request.body();
-        if (body == null) {
-            result += result * 31;
-
-        } else {
-            final MediaType mediaType = body.contentType();
-            result += result * 31 + ((mediaType != null) ? mediaType.hashCode() : 0);
-            final Buffer buffer = new Buffer();
-            try {
-                body.writeTo(buffer);
-            } catch (final IOException e) {
-                throw new IllegalStateException(e);
-            }
-
-            result = 31 * result + buffer.hashCode();
-        }
-
-        final Object tag = request.tag();
-        if (tag != request) {
-            result += result * 31 + ((tag != null) ? tag.hashCode() : 0);
-        }
-
-        final Headers headers = request.headers();
-        if (headers.size() > 0) {
-            final Locale locale = Locale.getDefault();
-            final TreeSet<String> names = new TreeSet<String>();
-            for (final String name : headers.names()) {
-                names.add((name != null) ? name.toLowerCase(locale) : null);
-            }
-
-            for (final String name : names) {
-                result += result * 31 + ((name != null) ? name.hashCode() : 0);
-                final List<String> values = headers.values(name);
-                result += result * 31 + ((values != null) ? values.hashCode() : 0);
-            }
-        }
-
-        return result;
-    }
-
-    @Override
-    public Response<T> execute() throws IOException {
-        return mCall.execute();
-    }
-
-    @Override
-    public void enqueue(final Callback<T> callback) {
-        mCall.enqueue(callback);
-    }
-
-    @Override
-    public boolean isExecuted() {
-        return mCall.isExecuted();
-    }
-
-    @Override
-    public void cancel() {
-        mCall.cancel();
-    }
-
-    @Override
-    public boolean isCanceled() {
-        return mCall.isCanceled();
-    }
-
-    @Override
-    public Request request() {
-        return mCall.request();
-    }
-
-    /**
-     * Call adapter decorator making the adapted instance comparable.
-     *
-     * @param <T> the adapted type.
-     */
-    private static class CallAdapterDecorator<T> implements CallAdapter<T> {
-
-        private final CallAdapter<T> mAdapter;
-
-        /**
-         * Constructor.
-         *
-         * @param wrapped the wrapped adapter instance.
-         */
-        private CallAdapterDecorator(@NotNull final CallAdapter<T> wrapped) {
-            mAdapter = ConstantConditions.notNull("call adapter instance", wrapped);
-        }
-
-        @Override
-        public Type responseType() {
-            return mAdapter.responseType();
-        }
-
-        @Override
-        public <OUT> T adapt(final Call<OUT> call) {
-            return mAdapter.adapt(ComparableCall.of(call));
-        }
-    }
+  }
 }

@@ -31,20 +31,20 @@ import org.jetbrains.annotations.NotNull;
  */
 class ReplayChannelBuilder<OUT> extends AbstractBuilder<Channel<?, OUT>> {
 
-    private final Channel<?, OUT> mChannel;
+  private final Channel<?, OUT> mChannel;
 
-    /**
-     * Constructor.
-     *
-     * @param channel the channel.
-     */
-    ReplayChannelBuilder(@NotNull final Channel<?, OUT> channel) {
-        mChannel = ConstantConditions.notNull("channel instance", channel);
-    }
+  /**
+   * Constructor.
+   *
+   * @param channel the channel.
+   */
+  ReplayChannelBuilder(@NotNull final Channel<?, OUT> channel) {
+    mChannel = ConstantConditions.notNull("channel instance", channel);
+  }
 
-    @NotNull
-    @Override
-    protected Channel<?, OUT> build(@NotNull final ChannelConfiguration configuration) {
-        return new ReplayChannel<OUT>(configuration, mChannel);
-    }
+  @NotNull
+  @Override
+  protected Channel<?, OUT> build(@NotNull final ChannelConfiguration configuration) {
+    return new ReplayChannel<OUT>(configuration, mChannel);
+  }
 }

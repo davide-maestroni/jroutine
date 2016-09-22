@@ -29,22 +29,22 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class ExceptionTest {
 
-    @Test
-    @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
-    public void testStreamException() {
+  @Test
+  @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
+  public void testStreamException() {
 
-        assertThat(StreamBuildingException.wrapIfNeeded(new NullPointerException())
-                                          .getCause()).isExactlyInstanceOf(
-                NullPointerException.class);
-        assertThat(StreamBuildingException.wrapIfNeeded(null)).hasNoCause();
-        assertThat(StreamBuildingException.wrapIfNeeded(
-                new NullPointerException())).isExactlyInstanceOf(StreamBuildingException.class);
-        assertThat(
-                StreamBuildingException.wrapIfNeeded(new RoutineException())).isExactlyInstanceOf(
-                StreamBuildingException.class);
-        assertThat(StreamBuildingException.wrapIfNeeded(StreamBuildingException.wrapIfNeeded(null)))
-                .isExactlyInstanceOf(StreamBuildingException.class);
-        assertThat(StreamBuildingException.wrapIfNeeded(StreamBuildingException.wrapIfNeeded(null)))
-                .hasNoCause();
-    }
+    assertThat(StreamBuildingException.wrapIfNeeded(new NullPointerException())
+                                      .getCause()).isExactlyInstanceOf(NullPointerException.class);
+    assertThat(StreamBuildingException.wrapIfNeeded(null)).hasNoCause();
+    assertThat(
+        StreamBuildingException.wrapIfNeeded(new NullPointerException())).isExactlyInstanceOf(
+        StreamBuildingException.class);
+    assertThat(StreamBuildingException.wrapIfNeeded(new RoutineException())).isExactlyInstanceOf(
+        StreamBuildingException.class);
+    assertThat(StreamBuildingException.wrapIfNeeded(
+        StreamBuildingException.wrapIfNeeded(null))).isExactlyInstanceOf(
+        StreamBuildingException.class);
+    assertThat(StreamBuildingException.wrapIfNeeded(
+        StreamBuildingException.wrapIfNeeded(null))).hasNoCause();
+  }
 }

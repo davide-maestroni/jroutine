@@ -35,54 +35,54 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class AccumulateFunctionInvocationTest {
 
-    private static BiFunction<String, String, String> createFunction() {
+  private static BiFunction<String, String, String> createFunction() {
 
-        return new BiFunction<String, String, String>() {
+    return new BiFunction<String, String, String>() {
 
-            public String apply(final String s1, final String s2) {
+      public String apply(final String s1, final String s2) {
 
-                return s1 + s2;
-            }
-        };
-    }
+        return s1 + s2;
+      }
+    };
+  }
 
-    @Test
-    public void testFactory() {
+  @Test
+  public void testFactory() {
 
-        final BiFunction<String, String, String> function = createFunction();
-        assertThat(JRoutineCore.with(functionFactory(function))
-                               .applyInvocationConfiguration()
-                               .withRunner(Runners.syncRunner())
-                               .configured()
-                               .call("test1", "test2", "test3")
-                               .next()).isEqualTo("test1test2test3");
-        assertThat(JRoutineCore.with(functionFactory(new Supplier<String>() {
+    final BiFunction<String, String, String> function = createFunction();
+    assertThat(JRoutineCore.with(functionFactory(function))
+                           .applyInvocationConfiguration()
+                           .withRunner(Runners.syncRunner())
+                           .configured()
+                           .call("test1", "test2", "test3")
+                           .next()).isEqualTo("test1test2test3");
+    assertThat(JRoutineCore.with(functionFactory(new Supplier<String>() {
 
-            public String get() {
+      public String get() {
 
-                return "test0";
-            }
-        }, function))
-                               .applyInvocationConfiguration()
-                               .withRunner(Runners.syncRunner())
-                               .configured()
-                               .call("test1", "test2", "test3")
-                               .next()).isEqualTo("test0test1test2test3");
-    }
+        return "test0";
+      }
+    }, function))
+                           .applyInvocationConfiguration()
+                           .withRunner(Runners.syncRunner())
+                           .configured()
+                           .call("test1", "test2", "test3")
+                           .next()).isEqualTo("test0test1test2test3");
+  }
 
-    @Test
-    public void testFactoryEquals() {
+  @Test
+  public void testFactoryEquals() {
 
-        final BiFunction<String, String, String> function = createFunction();
-        final InvocationFactory<String, String> factory = functionFactory(function);
-        final BiFunction<String, String, String> first = first();
-        assertThat(factory).isEqualTo(factory);
-        assertThat(factory).isEqualTo(functionFactory(function));
-        assertThat(functionFactory(function)).isEqualTo(functionFactory(function));
-        assertThat(functionFactory(first)).isEqualTo(functionFactory(first));
-        assertThat(factory).isNotEqualTo(functionFactory(first));
-        assertThat(factory).isNotEqualTo("");
-        assertThat(factory.hashCode()).isEqualTo(functionFactory(function).hashCode());
-        assertThat(factory.hashCode()).isNotEqualTo(functionFactory(first).hashCode());
-    }
+    final BiFunction<String, String, String> function = createFunction();
+    final InvocationFactory<String, String> factory = functionFactory(function);
+    final BiFunction<String, String, String> first = first();
+    assertThat(factory).isEqualTo(factory);
+    assertThat(factory).isEqualTo(functionFactory(function));
+    assertThat(functionFactory(function)).isEqualTo(functionFactory(function));
+    assertThat(functionFactory(first)).isEqualTo(functionFactory(first));
+    assertThat(factory).isNotEqualTo(functionFactory(first));
+    assertThat(factory).isNotEqualTo("");
+    assertThat(factory.hashCode()).isEqualTo(functionFactory(function).hashCode());
+    assertThat(factory.hashCode()).isNotEqualTo(functionFactory(first).hashCode());
+  }
 }

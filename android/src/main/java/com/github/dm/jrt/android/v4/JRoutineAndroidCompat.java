@@ -45,137 +45,137 @@ import static com.github.dm.jrt.android.v4.core.LoaderContextCompat.loaderFrom;
  */
 public class JRoutineAndroidCompat extends SparseChannelsCompat {
 
-    /**
-     * Avoid explicit instantiation.
-     */
-    protected JRoutineAndroidCompat() {
-        ConstantConditions.avoid();
-    }
+  /**
+   * Avoid explicit instantiation.
+   */
+  protected JRoutineAndroidCompat() {
+    ConstantConditions.avoid();
+  }
 
-    /**
-     * Returns a channel builder.
-     *
-     * @return the channel builder instance.
-     */
-    @NotNull
-    public static ChannelBuilder io() {
-        return JRoutine.io();
-    }
+  /**
+   * Returns a channel builder.
+   *
+   * @return the channel builder instance.
+   */
+  @NotNull
+  public static ChannelBuilder io() {
+    return JRoutine.io();
+  }
 
-    /**
-     * Returns a Context based builder of Service routine builders.
-     *
-     * @param context the Service Context.
-     * @return the Context based builder.
-     */
-    @NotNull
-    public static ServiceBuilder on(@NotNull final Context context) {
-        return on(serviceFrom(context));
-    }
+  /**
+   * Returns a Context based builder of Service routine builders.
+   *
+   * @param context the Service Context.
+   * @return the Context based builder.
+   */
+  @NotNull
+  public static ServiceBuilder on(@NotNull final Context context) {
+    return on(serviceFrom(context));
+  }
 
-    /**
-     * Returns a Context based builder of Service routine builders.
-     *
-     * @param context      the Service Context.
-     * @param serviceClass the Service class.
-     * @return the Context based builder.
-     */
-    @NotNull
-    public static ServiceBuilder on(@NotNull final Context context,
-            @NotNull final Class<? extends InvocationService> serviceClass) {
-        return on(serviceFrom(context, serviceClass));
-    }
+  /**
+   * Returns a Context based builder of Service routine builders.
+   *
+   * @param context      the Service Context.
+   * @param serviceClass the Service class.
+   * @return the Context based builder.
+   */
+  @NotNull
+  public static ServiceBuilder on(@NotNull final Context context,
+      @NotNull final Class<? extends InvocationService> serviceClass) {
+    return on(serviceFrom(context, serviceClass));
+  }
 
-    /**
-     * Returns a Context based builder of Service routine builders.
-     *
-     * @param context the Service Context.
-     * @param service the Service Intent.
-     * @return the Context based builder.
-     */
-    @NotNull
-    public static ServiceBuilder on(@NotNull final Context context, @NotNull final Intent service) {
-        return on(serviceFrom(context, service));
-    }
+  /**
+   * Returns a Context based builder of Service routine builders.
+   *
+   * @param context the Service Context.
+   * @param service the Service Intent.
+   * @return the Context based builder.
+   */
+  @NotNull
+  public static ServiceBuilder on(@NotNull final Context context, @NotNull final Intent service) {
+    return on(serviceFrom(context, service));
+  }
 
-    /**
-     * Returns a Context based builder of Loader routine builders.
-     *
-     * @param fragment the Loader Fragment.
-     * @return the Context based builder.
-     */
-    @NotNull
-    public static LoaderBuilderCompat on(@NotNull final Fragment fragment) {
-        return on(loaderFrom(fragment));
-    }
+  /**
+   * Returns a Context based builder of Loader routine builders.
+   *
+   * @param fragment the Loader Fragment.
+   * @return the Context based builder.
+   */
+  @NotNull
+  public static LoaderBuilderCompat on(@NotNull final Fragment fragment) {
+    return on(loaderFrom(fragment));
+  }
 
-    /**
-     * Returns a Context based builder of Loader routine builders.
-     *
-     * @param fragment the Loader Fragment.
-     * @param context  the Context used to get the application one.
-     * @return the Context based builder.
-     */
-    @NotNull
-    public static LoaderBuilderCompat on(@NotNull final Fragment fragment,
-            @NotNull final Context context) {
-        return on(loaderFrom(fragment, context));
-    }
+  /**
+   * Returns a Context based builder of Loader routine builders.
+   *
+   * @param fragment the Loader Fragment.
+   * @param context  the Context used to get the application one.
+   * @return the Context based builder.
+   */
+  @NotNull
+  public static LoaderBuilderCompat on(@NotNull final Fragment fragment,
+      @NotNull final Context context) {
+    return on(loaderFrom(fragment, context));
+  }
 
-    /**
-     * Returns a Context based builder of Loader routine builders.
-     *
-     * @param activity the Loader Activity.
-     * @return the Context based builder.
-     */
-    @NotNull
-    public static LoaderBuilderCompat on(@NotNull final FragmentActivity activity) {
-        return on(loaderFrom(activity));
-    }
+  /**
+   * Returns a Context based builder of Loader routine builders.
+   *
+   * @param activity the Loader Activity.
+   * @return the Context based builder.
+   */
+  @NotNull
+  public static LoaderBuilderCompat on(@NotNull final FragmentActivity activity) {
+    return on(loaderFrom(activity));
+  }
 
-    /**
-     * Returns a Context based builder of Loader routine builders.
-     *
-     * @param activity the Loader Activity.
-     * @param context  the Context used to get the application one.
-     * @return the Context based builder.
-     */
-    @NotNull
-    public static LoaderBuilderCompat on(@NotNull final FragmentActivity activity,
-            @NotNull final Context context) {
-        return on(loaderFrom(activity, context));
-    }
+  /**
+   * Returns a Context based builder of Loader routine builders.
+   *
+   * @param activity the Loader Activity.
+   * @param context  the Context used to get the application one.
+   * @return the Context based builder.
+   */
+  @NotNull
+  public static LoaderBuilderCompat on(@NotNull final FragmentActivity activity,
+      @NotNull final Context context) {
+    return on(loaderFrom(activity, context));
+  }
 
-    /**
-     * Returns a Context based builder of Loader routine builders.
-     *
-     * @param context the Loader context.
-     * @return the Context based builder.
-     */
-    @NotNull
-    public static LoaderBuilderCompat on(@NotNull final LoaderContextCompat context) {
-        return new LoaderBuilderCompat(context);
-    }
+  /**
+   * Returns a Context based builder of Loader routine builders.
+   *
+   * @param context the Loader context.
+   * @return the Context based builder.
+   */
+  @NotNull
+  public static LoaderBuilderCompat on(@NotNull final LoaderContextCompat context) {
+    return new LoaderBuilderCompat(context);
+  }
 
-    /**
-     * Returns a Context based builder of Service routine builders.
-     *
-     * @param context the Service context.
-     * @return the Context based builder.
-     */
-    @NotNull
-    public static ServiceBuilder on(@NotNull final ServiceContext context) {
-        return new ServiceBuilder(context) {};
-    }
+  /**
+   * Returns a Context based builder of Service routine builders.
+   *
+   * @param context the Service context.
+   * @return the Context based builder.
+   */
+  @NotNull
+  public static ServiceBuilder on(@NotNull final ServiceContext context) {
+    return new ServiceBuilder(context) {};
+  }
 
-    /**
-     * Returns a stream routine builder.
-     *
-     * @param <IN> the input data type.
-     * @return the routine builder instance.
-     */
-    @NotNull
-    public static <IN> LoaderStreamBuilderCompat<IN, IN> withStream() {
-        return JRoutineLoaderStreamCompat.withStream();
-    }
+  /**
+   * Returns a stream routine builder.
+   *
+   * @param <IN> the input data type.
+   * @return the routine builder instance.
+   */
+  @NotNull
+  public static <IN> LoaderStreamBuilderCompat<IN, IN> withStream() {
+    return JRoutineLoaderStreamCompat.withStream();
+  }
 }

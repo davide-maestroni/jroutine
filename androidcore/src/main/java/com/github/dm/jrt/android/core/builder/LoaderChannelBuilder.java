@@ -35,60 +35,60 @@ import org.jetbrains.annotations.Nullable;
  *
  * @see com.github.dm.jrt.android.core.builder.LoaderRoutineBuilder LoaderRoutineBuilder
  */
-public interface LoaderChannelBuilder extends ChannelConfigurable<LoaderChannelBuilder>,
-        LoaderConfigurable<LoaderChannelBuilder> {
+public interface LoaderChannelBuilder
+    extends ChannelConfigurable<LoaderChannelBuilder>, LoaderConfigurable<LoaderChannelBuilder> {
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * The clash resolution types will be ignored.
-     */
-    @NotNull
-    @Override
-    LoaderChannelBuilder apply(@NotNull LoaderConfiguration configuration);
+  /**
+   * {@inheritDoc}
+   * <p>
+   * The clash resolution types will be ignored.
+   */
+  @NotNull
+  @Override
+  LoaderChannelBuilder apply(@NotNull LoaderConfiguration configuration);
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * The clash resolution types will be ignored.
-     */
-    @NotNull
-    @Override
-    Builder<? extends LoaderChannelBuilder> applyLoaderConfiguration();
+  /**
+   * {@inheritDoc}
+   * <p>
+   * The clash resolution types will be ignored.
+   */
+  @NotNull
+  @Override
+  Builder<? extends LoaderChannelBuilder> applyLoaderConfiguration();
 
-    /**
-     * Builds and returns a channel bound to the routine invocation.
-     *
-     * @param <OUT> the output data type.
-     * @return the newly created channel.
-     * @throws java.lang.IllegalArgumentException if the configured Loader ID is equal to AUTO.
-     */
-    @NotNull
-    <OUT> Channel<?, OUT> buildChannel();
+  /**
+   * Builds and returns a channel bound to the routine invocation.
+   *
+   * @param <OUT> the output data type.
+   * @return the newly created channel.
+   * @throws java.lang.IllegalArgumentException if the configured Loader ID is equal to AUTO.
+   */
+  @NotNull
+  <OUT> Channel<?, OUT> buildChannel();
 
-    /**
-     * Makes the builder discard the cached invocation instances with the specified inputs.
-     *
-     * @param inputs the inputs.
-     */
-    void clear(@Nullable Object... inputs);
+  /**
+   * Makes the builder discard the cached invocation instances with the specified inputs.
+   *
+   * @param inputs the inputs.
+   */
+  void clear(@Nullable Object... inputs);
 
-    /**
-     * Makes the builder discard the cached invocation instances with the specified inputs.
-     *
-     * @param inputs the inputs.
-     */
-    void clear(@Nullable Iterable<?> inputs);
+  /**
+   * Makes the builder discard the cached invocation instances with the specified inputs.
+   *
+   * @param inputs the inputs.
+   */
+  void clear(@Nullable Iterable<?> inputs);
 
-    /**
-     * Makes the builder discard all the cached invocation instances.
-     */
-    void clear();
+  /**
+   * Makes the builder discard all the cached invocation instances.
+   */
+  void clear();
 
-    /**
-     * Makes the builder discard the cached invocation instances with the specified input.
-     *
-     * @param input the input.
-     */
-    void clear(@Nullable Object input);
+  /**
+   * Makes the builder discard the cached invocation instances with the specified input.
+   *
+   * @param input the input.
+   */
+  void clear(@Nullable Object input);
 }

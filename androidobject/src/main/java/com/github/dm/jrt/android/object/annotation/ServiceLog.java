@@ -60,10 +60,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ServiceLog {
 
-    /**
-     * The log class.
-     *
-     * @return the log class.
-     */
-    Class<? extends Log> value();
+  /**
+   * The log class.
+   *
+   * @return the log class.
+   */
+  Class<? extends Log> value();
 }

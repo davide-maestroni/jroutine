@@ -44,99 +44,93 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class OutputMapBuilder<OUT> extends AbstractBuilder<SparseArray<Channel<?, OUT>>> {
 
-    private static final WeakIdentityHashMap<Channel<?, ?>, HashMap<SelectInfo,
-            SparseArray<Channel<?, ?>>>>
-            sOutputChannels =
-            new WeakIdentityHashMap<Channel<?, ?>, HashMap<SelectInfo, SparseArray<Channel<?,
-                    ?>>>>();
+  private static final WeakIdentityHashMap<Channel<?, ?>, HashMap<SelectInfo,
+      SparseArray<Channel<?, ?>>>>
+      sOutputChannels =
+      new WeakIdentityHashMap<Channel<?, ?>, HashMap<SelectInfo, SparseArray<Channel<?, ?>>>>();
 
-    private final Channel<?, ? extends ParcelableSelectable<? extends OUT>> mChannel;
+  private final Channel<?, ? extends ParcelableSelectable<? extends OUT>> mChannel;
 
-    private final HashSet<Integer> mIndexes;
+  private final HashSet<Integer> mIndexes;
+
+  /**
+   * Constructor.
+   *
+   * @param channel the selectable channel.
+   * @param indexes the set of indexes.
+   * @throws java.lang.NullPointerException if the specified set of indexes is null or contains a
+   *                                        null object.
+   */
+  OutputMapBuilder(@NotNull final Channel<?, ? extends ParcelableSelectable<? extends OUT>> channel,
+      @NotNull final Set<Integer> indexes) {
+    mChannel = ConstantConditions.notNull("channel instance", channel);
+    final HashSet<Integer> indexSet =
+        new HashSet<Integer>(ConstantConditions.notNull("set of indexes", indexes));
+    if (indexSet.contains(null)) {
+      throw new NullPointerException("the set of indexes must not contain null objects");
+    }
+
+    mIndexes = indexSet;
+  }
+
+  @NotNull
+  @Override
+  @SuppressWarnings("unchecked")
+  protected SparseArray<Channel<?, OUT>> build(@NotNull final ChannelConfiguration configuration) {
+    final HashSet<Integer> indexes = mIndexes;
+    final Channel<?, ? extends ParcelableSelectable<? extends OUT>> channel = mChannel;
+    synchronized (sOutputChannels) {
+      final WeakIdentityHashMap<Channel<?, ?>, HashMap<SelectInfo, SparseArray<Channel<?, ?>>>>
+          outputChannels = sOutputChannels;
+      HashMap<SelectInfo, SparseArray<Channel<?, ?>>> channelMaps = outputChannels.get(channel);
+      if (channelMaps == null) {
+        channelMaps = new HashMap<SelectInfo, SparseArray<Channel<?, ?>>>();
+        outputChannels.put(channel, channelMaps);
+      }
+
+      final int size = indexes.size();
+      final SelectInfo selectInfo = new SelectInfo(configuration, indexes);
+      final SparseArray<Channel<?, OUT>> channelMap = new SparseArray<Channel<?, OUT>>(size);
+      SparseArray<Channel<?, ?>> channels = channelMaps.get(selectInfo);
+      if (channels != null) {
+        final int channelSize = channels.size();
+        for (int i = 0; i < channelSize; ++i) {
+          channelMap.append(channels.keyAt(i), (Channel<?, OUT>) channels.valueAt(i));
+        }
+
+      } else {
+        final SparseArray<Channel<OUT, ?>> inputMap = new SparseArray<Channel<OUT, ?>>(size);
+        channels = new SparseArray<Channel<?, ?>>(size);
+        for (final Integer index : indexes) {
+          final Channel<OUT, OUT> outputChannel =
+              JRoutineCore.io().apply(configuration).buildChannel();
+          inputMap.append(index, outputChannel);
+          channelMap.append(index, outputChannel);
+          channels.append(index, outputChannel);
+        }
+
+        channel.bind(new SortingMapChannelConsumer<OUT>(inputMap));
+        channelMaps.put(selectInfo, channels);
+      }
+
+      return channelMap;
+    }
+  }
+
+  /**
+   * Class used as key to identify a specific map of output channels.
+   */
+  private static class SelectInfo extends DeepEqualObject {
 
     /**
      * Constructor.
      *
-     * @param channel the selectable channel.
-     * @param indexes the set of indexes.
-     * @throws java.lang.NullPointerException if the specified set of indexes is null or contains a
-     *                                        null object.
+     * @param configuration the channel configuration.
+     * @param indexes       the set of indexes,
      */
-    OutputMapBuilder(
-            @NotNull final Channel<?, ? extends ParcelableSelectable<? extends OUT>> channel,
-            @NotNull final Set<Integer> indexes) {
-        mChannel = ConstantConditions.notNull("channel instance", channel);
-        final HashSet<Integer> indexSet =
-                new HashSet<Integer>(ConstantConditions.notNull("set of indexes", indexes));
-        if (indexSet.contains(null)) {
-            throw new NullPointerException("the set of indexes must not contain null objects");
-        }
-
-        mIndexes = indexSet;
+    private SelectInfo(@NotNull final ChannelConfiguration configuration,
+        @NotNull final HashSet<Integer> indexes) {
+      super(asArgs(configuration, indexes));
     }
-
-    @NotNull
-    @Override
-    @SuppressWarnings("unchecked")
-    protected SparseArray<Channel<?, OUT>> build(
-            @NotNull final ChannelConfiguration configuration) {
-        final HashSet<Integer> indexes = mIndexes;
-        final Channel<?, ? extends ParcelableSelectable<? extends OUT>> channel = mChannel;
-        synchronized (sOutputChannels) {
-            final WeakIdentityHashMap<Channel<?, ?>, HashMap<SelectInfo, SparseArray<Channel<?,
-                    ?>>>>
-                    outputChannels = sOutputChannels;
-            HashMap<SelectInfo, SparseArray<Channel<?, ?>>> channelMaps =
-                    outputChannels.get(channel);
-            if (channelMaps == null) {
-                channelMaps = new HashMap<SelectInfo, SparseArray<Channel<?, ?>>>();
-                outputChannels.put(channel, channelMaps);
-            }
-
-            final int size = indexes.size();
-            final SelectInfo selectInfo = new SelectInfo(configuration, indexes);
-            final SparseArray<Channel<?, OUT>> channelMap = new SparseArray<Channel<?, OUT>>(size);
-            SparseArray<Channel<?, ?>> channels = channelMaps.get(selectInfo);
-            if (channels != null) {
-                final int channelSize = channels.size();
-                for (int i = 0; i < channelSize; ++i) {
-                    channelMap.append(channels.keyAt(i), (Channel<?, OUT>) channels.valueAt(i));
-                }
-
-            } else {
-                final SparseArray<Channel<OUT, ?>> inputMap =
-                        new SparseArray<Channel<OUT, ?>>(size);
-                channels = new SparseArray<Channel<?, ?>>(size);
-                for (final Integer index : indexes) {
-                    final Channel<OUT, OUT> outputChannel =
-                            JRoutineCore.io().apply(configuration).buildChannel();
-                    inputMap.append(index, outputChannel);
-                    channelMap.append(index, outputChannel);
-                    channels.append(index, outputChannel);
-                }
-
-                channel.bind(new SortingMapChannelConsumer<OUT>(inputMap));
-                channelMaps.put(selectInfo, channels);
-            }
-
-            return channelMap;
-        }
-    }
-
-    /**
-     * Class used as key to identify a specific map of output channels.
-     */
-    private static class SelectInfo extends DeepEqualObject {
-
-        /**
-         * Constructor.
-         *
-         * @param configuration the channel configuration.
-         * @param indexes       the set of indexes,
-         */
-        private SelectInfo(@NotNull final ChannelConfiguration configuration,
-                @NotNull final HashSet<Integer> indexes) {
-            super(asArgs(configuration, indexes));
-        }
-    }
+  }
 }

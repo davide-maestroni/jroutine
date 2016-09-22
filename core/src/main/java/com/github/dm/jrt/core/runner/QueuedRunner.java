@@ -30,14 +30,14 @@ import java.util.concurrent.TimeUnit;
  */
 class QueuedRunner extends SyncRunner {
 
-    @Override
-    public void cancel(@NotNull final Execution execution) {
-        LocalRunner.cancel(execution);
-    }
+  @Override
+  public void cancel(@NotNull final Execution execution) {
+    LocalRunner.cancel(execution);
+  }
 
-    @Override
-    public void run(@NotNull final Execution execution, final long delay,
-            @NotNull final TimeUnit timeUnit) {
-        LocalRunner.run(execution, delay, timeUnit);
-    }
+  @Override
+  public void run(@NotNull final Execution execution, final long delay,
+      @NotNull final TimeUnit timeUnit) {
+    LocalRunner.run(execution, delay, timeUnit);
+  }
 }

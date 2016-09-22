@@ -36,237 +36,234 @@ import static org.junit.Assert.fail;
  */
 public class InvocationTest {
 
-    @Test
-    @SuppressWarnings("ConstantConditions")
-    public void testCommandInvocation() throws Exception {
-        final CommandInvocation<Object> invocation = new CommandInvocation<Object>(null) {
+  @Test
+  @SuppressWarnings("ConstantConditions")
+  public void testCommandInvocation() throws Exception {
+    final CommandInvocation<Object> invocation = new CommandInvocation<Object>(null) {
 
-            public void onComplete(@NotNull final Channel<Object, ?> result) throws Exception {
-            }
-        };
-        invocation.onRestart();
-        invocation.onInput(null, null);
-        invocation.onComplete(null);
-        invocation.onAbort(null);
+      public void onComplete(@NotNull final Channel<Object, ?> result) throws Exception {
+      }
+    };
+    invocation.onRestart();
+    invocation.onInput(null, null);
+    invocation.onComplete(null);
+    invocation.onAbort(null);
+  }
+
+  @Test
+  public void testComparableCommandInvocation() {
+    final TestComparableCommandInvocation factory = new TestComparableCommandInvocation(asArgs(1));
+    assertThat(factory).isEqualTo(factory);
+    assertThat(factory).isNotEqualTo(null);
+    assertThat(factory).isNotEqualTo(new InvocationFactory<Object, Object>(null) {
+
+      @NotNull
+      @Override
+      public Invocation<Object, Object> newInvocation() {
+        return new TemplateInvocation<Object, Object>() {};
+      }
+    });
+    assertThat(factory).isNotEqualTo(new TestComparableCommandInvocation(asArgs(2)));
+    assertThat(factory.hashCode()).isEqualTo(
+        new TestComparableCommandInvocation(asArgs(1)).hashCode());
+    assertThat(factory).isEqualTo(new TestComparableCommandInvocation(asArgs(1)));
+  }
+
+  @Test
+  public void testComparableInvocationFactory() {
+    final TestComparableInvocationFactory factory = new TestComparableInvocationFactory(asArgs(1));
+    assertThat(factory).isEqualTo(factory);
+    assertThat(factory).isNotEqualTo(null);
+    assertThat(factory).isNotEqualTo(new InvocationFactory<Object, Object>(null) {
+
+      @NotNull
+      @Override
+      public Invocation<Object, Object> newInvocation() {
+        return new TemplateInvocation<Object, Object>() {};
+      }
+    });
+    assertThat(factory).isNotEqualTo(new TestComparableInvocationFactory(asArgs(2)));
+    assertThat(factory.hashCode()).isEqualTo(
+        new TestComparableInvocationFactory(asArgs(1)).hashCode());
+    assertThat(factory).isEqualTo(new TestComparableInvocationFactory(asArgs(1)));
+  }
+
+  @Test
+  public void testComparableMappingInvocation() {
+    final TestComparableMappingInvocation factory = new TestComparableMappingInvocation(asArgs(1));
+    assertThat(factory).isEqualTo(factory);
+    assertThat(factory).isNotEqualTo(null);
+    assertThat(factory).isNotEqualTo(new InvocationFactory<Object, Object>(null) {
+
+      @NotNull
+      @Override
+      public Invocation<Object, Object> newInvocation() {
+        return new TemplateInvocation<Object, Object>() {};
+      }
+    });
+    assertThat(factory).isNotEqualTo(new TestComparableMappingInvocation(asArgs(2)));
+    assertThat(factory.hashCode()).isEqualTo(
+        new TestComparableMappingInvocation(asArgs(1)).hashCode());
+    assertThat(factory).isEqualTo(new TestComparableMappingInvocation(asArgs(1)));
+  }
+
+  @Test
+  @SuppressWarnings("NullArgumentToVariableArgMethod")
+  public void testInvocationFactory() throws Exception {
+    assertThat(factoryOf(TestInvocation.class).newInvocation()).isExactlyInstanceOf(
+        TestInvocation.class);
+    assertThat(
+        factoryOf(ClassToken.tokenOf(TestInvocation.class)).newInvocation()).isExactlyInstanceOf(
+        TestInvocation.class);
+    assertThat(factoryOf(new TestInvocation()).newInvocation()).isExactlyInstanceOf(
+        TestInvocation.class);
+  }
+
+  @Test
+  public void testInvocationFactoryEquals() {
+    final InvocationFactory<Object, Object> factory = factoryOf(TestInvocation.class);
+    assertThat(factory).isEqualTo(factory);
+    assertThat(factory).isNotEqualTo(new InvocationFactory<Object, Object>(null) {
+
+      @NotNull
+      @Override
+      public Invocation<Object, Object> newInvocation() {
+        return new TemplateInvocation<Object, Object>() {};
+      }
+    });
+    assertThat(factoryOf(TestInvocation.class).hashCode()).isEqualTo(
+        factoryOf(TestInvocation.class).hashCode());
+    assertThat(factoryOf(TestInvocation.class)).isEqualTo(factoryOf(TestInvocation.class));
+    assertThat(factoryOf(ClassToken.tokenOf(TestInvocation.class)).hashCode()).isEqualTo(
+        factoryOf(TestInvocation.class).hashCode());
+    assertThat(factoryOf(ClassToken.tokenOf(TestInvocation.class))).isEqualTo(
+        factoryOf(TestInvocation.class));
+    assertThat(factoryOf(ClassToken.tokenOf(TestInvocation.class)).hashCode()).isEqualTo(
+        factoryOf(ClassToken.tokenOf(TestInvocation.class)).hashCode());
+    assertThat(factoryOf(ClassToken.tokenOf(TestInvocation.class))).isEqualTo(
+        factoryOf(ClassToken.tokenOf(TestInvocation.class)));
+    assertThat(factoryOf(TestInvocation.class).hashCode()).isNotEqualTo(
+        factoryOf(new TemplateInvocation<Object, Object>() {}, this).hashCode());
+    assertThat(factoryOf(TestInvocation.class)).isNotEqualTo(
+        factoryOf(new TemplateInvocation<Object, Object>() {}, this));
+    assertThat(factoryOf(ClassToken.tokenOf(TestInvocation.class)).hashCode()).isNotEqualTo(
+        factoryOf(new TemplateInvocation<Object, Object>() {}, this).hashCode());
+    assertThat(factoryOf(ClassToken.tokenOf(TestInvocation.class))).isNotEqualTo(
+        factoryOf(new TemplateInvocation<Object, Object>() {}, this));
+  }
+
+  @Test
+  @SuppressWarnings("ConstantConditions")
+  public void testNullClassError() {
+    try {
+      factoryOf((Class<TestInvocation>) null);
+      fail();
+
+    } catch (final NullPointerException ignored) {
     }
 
-    @Test
-    public void testComparableCommandInvocation() {
-        final TestComparableCommandInvocation factory =
-                new TestComparableCommandInvocation(asArgs(1));
-        assertThat(factory).isEqualTo(factory);
-        assertThat(factory).isNotEqualTo(null);
-        assertThat(factory).isNotEqualTo(new InvocationFactory<Object, Object>(null) {
+    try {
+      factoryOf((Class<TestInvocation>) null, Reflection.NO_ARGS);
+      fail();
 
-            @NotNull
-            @Override
-            public Invocation<Object, Object> newInvocation() {
-                return new TemplateInvocation<Object, Object>() {};
-            }
-        });
-        assertThat(factory).isNotEqualTo(new TestComparableCommandInvocation(asArgs(2)));
-        assertThat(factory.hashCode()).isEqualTo(
-                new TestComparableCommandInvocation(asArgs(1)).hashCode());
-        assertThat(factory).isEqualTo(new TestComparableCommandInvocation(asArgs(1)));
+    } catch (final NullPointerException ignored) {
+    }
+  }
+
+  @Test
+  @SuppressWarnings("ConstantConditions")
+  public void testNullInvocationError() {
+    try {
+      factoryOf((TestInvocation) null);
+      fail();
+
+    } catch (final NullPointerException ignored) {
     }
 
-    @Test
-    public void testComparableInvocationFactory() {
-        final TestComparableInvocationFactory factory =
-                new TestComparableInvocationFactory(asArgs(1));
-        assertThat(factory).isEqualTo(factory);
-        assertThat(factory).isNotEqualTo(null);
-        assertThat(factory).isNotEqualTo(new InvocationFactory<Object, Object>(null) {
+    try {
+      factoryOf((TestInvocation) null, Reflection.NO_ARGS);
+      fail();
 
-            @NotNull
-            @Override
-            public Invocation<Object, Object> newInvocation() {
-                return new TemplateInvocation<Object, Object>() {};
-            }
-        });
-        assertThat(factory).isNotEqualTo(new TestComparableInvocationFactory(asArgs(2)));
-        assertThat(factory.hashCode()).isEqualTo(
-                new TestComparableInvocationFactory(asArgs(1)).hashCode());
-        assertThat(factory).isEqualTo(new TestComparableInvocationFactory(asArgs(1)));
+    } catch (final NullPointerException ignored) {
+    }
+  }
+
+  @Test
+  @SuppressWarnings("ConstantConditions")
+  public void testNullTokenError() {
+    try {
+      factoryOf((ClassToken<TestInvocation>) null);
+      fail();
+
+    } catch (final NullPointerException ignored) {
     }
 
-    @Test
-    public void testComparableMappingInvocation() {
-        final TestComparableMappingInvocation factory =
-                new TestComparableMappingInvocation(asArgs(1));
-        assertThat(factory).isEqualTo(factory);
-        assertThat(factory).isNotEqualTo(null);
-        assertThat(factory).isNotEqualTo(new InvocationFactory<Object, Object>(null) {
+    try {
+      factoryOf((ClassToken<TestInvocation>) null, Reflection.NO_ARGS);
+      fail();
 
-            @NotNull
-            @Override
-            public Invocation<Object, Object> newInvocation() {
-                return new TemplateInvocation<Object, Object>() {};
-            }
-        });
-        assertThat(factory).isNotEqualTo(new TestComparableMappingInvocation(asArgs(2)));
-        assertThat(factory.hashCode()).isEqualTo(
-                new TestComparableMappingInvocation(asArgs(1)).hashCode());
-        assertThat(factory).isEqualTo(new TestComparableMappingInvocation(asArgs(1)));
+    } catch (final NullPointerException ignored) {
+    }
+  }
+
+  private static class TestComparableCommandInvocation extends CommandInvocation<Object> {
+
+    /**
+     * Constructor.
+     *
+     * @param args the constructor arguments.
+     */
+    protected TestComparableCommandInvocation(@Nullable final Object[] args) {
+      super(args);
     }
 
-    @Test
-    @SuppressWarnings("NullArgumentToVariableArgMethod")
-    public void testInvocationFactory() throws Exception {
-        assertThat(factoryOf(TestInvocation.class).newInvocation()).isExactlyInstanceOf(
-                TestInvocation.class);
-        assertThat(factoryOf(
-                ClassToken.tokenOf(TestInvocation.class)).newInvocation()).isExactlyInstanceOf(
-                TestInvocation.class);
-        assertThat(factoryOf(new TestInvocation()).newInvocation()).isExactlyInstanceOf(
-                TestInvocation.class);
+    public void onComplete(@NotNull final Channel<Object, ?> result) {
+    }
+  }
+
+  private static class TestComparableInvocationFactory extends InvocationFactory<Object, Object> {
+
+    /**
+     * Constructor.
+     *
+     * @param args the constructor arguments.
+     */
+    protected TestComparableInvocationFactory(@Nullable final Object[] args) {
+      super(args);
     }
 
-    @Test
-    public void testInvocationFactoryEquals() {
-        final InvocationFactory<Object, Object> factory = factoryOf(TestInvocation.class);
-        assertThat(factory).isEqualTo(factory);
-        assertThat(factory).isNotEqualTo(new InvocationFactory<Object, Object>(null) {
+    @NotNull
+    @Override
+    public Invocation<Object, Object> newInvocation() {
+      return new TemplateInvocation<Object, Object>() {};
+    }
+  }
 
-            @NotNull
-            @Override
-            public Invocation<Object, Object> newInvocation() {
-                return new TemplateInvocation<Object, Object>() {};
-            }
-        });
-        assertThat(factoryOf(TestInvocation.class).hashCode()).isEqualTo(
-                factoryOf(TestInvocation.class).hashCode());
-        assertThat(factoryOf(TestInvocation.class)).isEqualTo(factoryOf(TestInvocation.class));
-        assertThat(factoryOf(ClassToken.tokenOf(TestInvocation.class)).hashCode()).isEqualTo(
-                factoryOf(TestInvocation.class).hashCode());
-        assertThat(factoryOf(ClassToken.tokenOf(TestInvocation.class))).isEqualTo(
-                factoryOf(TestInvocation.class));
-        assertThat(factoryOf(ClassToken.tokenOf(TestInvocation.class)).hashCode()).isEqualTo(
-                factoryOf(ClassToken.tokenOf(TestInvocation.class)).hashCode());
-        assertThat(factoryOf(ClassToken.tokenOf(TestInvocation.class))).isEqualTo(
-                factoryOf(ClassToken.tokenOf(TestInvocation.class)));
-        assertThat(factoryOf(TestInvocation.class).hashCode()).isNotEqualTo(
-                factoryOf(new TemplateInvocation<Object, Object>() {}, this).hashCode());
-        assertThat(factoryOf(TestInvocation.class)).isNotEqualTo(
-                factoryOf(new TemplateInvocation<Object, Object>() {}, this));
-        assertThat(factoryOf(ClassToken.tokenOf(TestInvocation.class)).hashCode()).isNotEqualTo(
-                factoryOf(new TemplateInvocation<Object, Object>() {}, this).hashCode());
-        assertThat(factoryOf(ClassToken.tokenOf(TestInvocation.class))).isNotEqualTo(
-                factoryOf(new TemplateInvocation<Object, Object>() {}, this));
+  private static class TestComparableMappingInvocation extends MappingInvocation<Object, Object> {
+
+    /**
+     * Constructor.
+     *
+     * @param args the constructor arguments.
+     */
+    protected TestComparableMappingInvocation(@Nullable final Object[] args) {
+      super(args);
     }
 
-    @Test
-    @SuppressWarnings("ConstantConditions")
-    public void testNullClassError() {
-        try {
-            factoryOf((Class<TestInvocation>) null);
-            fail();
+    public void onInput(final Object input, @NotNull final Channel<Object, ?> result) {
+    }
+  }
 
-        } catch (final NullPointerException ignored) {
-        }
+  private static class TestInvocation extends MappingInvocation<Object, Object> {
 
-        try {
-            factoryOf((Class<TestInvocation>) null, Reflection.NO_ARGS);
-            fail();
-
-        } catch (final NullPointerException ignored) {
-        }
+    /**
+     * Constructor.
+     */
+    protected TestInvocation() {
+      super(null);
     }
 
-    @Test
-    @SuppressWarnings("ConstantConditions")
-    public void testNullInvocationError() {
-        try {
-            factoryOf((TestInvocation) null);
-            fail();
-
-        } catch (final NullPointerException ignored) {
-        }
-
-        try {
-            factoryOf((TestInvocation) null, Reflection.NO_ARGS);
-            fail();
-
-        } catch (final NullPointerException ignored) {
-        }
+    public void onInput(final Object o, @NotNull final Channel<Object, ?> result) {
     }
-
-    @Test
-    @SuppressWarnings("ConstantConditions")
-    public void testNullTokenError() {
-        try {
-            factoryOf((ClassToken<TestInvocation>) null);
-            fail();
-
-        } catch (final NullPointerException ignored) {
-        }
-
-        try {
-            factoryOf((ClassToken<TestInvocation>) null, Reflection.NO_ARGS);
-            fail();
-
-        } catch (final NullPointerException ignored) {
-        }
-    }
-
-    private static class TestComparableCommandInvocation extends CommandInvocation<Object> {
-
-        /**
-         * Constructor.
-         *
-         * @param args the constructor arguments.
-         */
-        protected TestComparableCommandInvocation(@Nullable final Object[] args) {
-            super(args);
-        }
-
-        public void onComplete(@NotNull final Channel<Object, ?> result) {
-        }
-    }
-
-    private static class TestComparableInvocationFactory extends InvocationFactory<Object, Object> {
-
-        /**
-         * Constructor.
-         *
-         * @param args the constructor arguments.
-         */
-        protected TestComparableInvocationFactory(@Nullable final Object[] args) {
-            super(args);
-        }
-
-        @NotNull
-        @Override
-        public Invocation<Object, Object> newInvocation() {
-            return new TemplateInvocation<Object, Object>() {};
-        }
-    }
-
-    private static class TestComparableMappingInvocation extends MappingInvocation<Object, Object> {
-
-        /**
-         * Constructor.
-         *
-         * @param args the constructor arguments.
-         */
-        protected TestComparableMappingInvocation(@Nullable final Object[] args) {
-            super(args);
-        }
-
-        public void onInput(final Object input, @NotNull final Channel<Object, ?> result) {
-        }
-    }
-
-    private static class TestInvocation extends MappingInvocation<Object, Object> {
-
-        /**
-         * Constructor.
-         */
-        protected TestInvocation() {
-            super(null);
-        }
-
-        public void onInput(final Object o, @NotNull final Channel<Object, ?> result) {
-        }
-    }
+  }
 }

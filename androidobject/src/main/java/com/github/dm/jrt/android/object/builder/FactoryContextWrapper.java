@@ -30,17 +30,17 @@ import org.jetbrains.annotations.NotNull;
  */
 public abstract class FactoryContextWrapper extends ContextWrapper implements FactoryContext {
 
-    /**
-     * Constructor.
-     *
-     * @param base the base Context.
-     */
-    public FactoryContextWrapper(@NotNull final Context base) {
-        super(base.getApplicationContext());
-    }
+  /**
+   * Constructor.
+   *
+   * @param base the base Context.
+   */
+  public FactoryContextWrapper(@NotNull final Context base) {
+    super(base.getApplicationContext());
+  }
 
-    @Override
-    public Context getApplicationContext() {
-        return this;
-    }
+  @Override
+  public Context getApplicationContext() {
+    return this;
+  }
 }

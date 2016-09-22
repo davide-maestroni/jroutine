@@ -30,15 +30,15 @@ import org.jetbrains.annotations.NotNull;
  */
 public interface LoaderConfigurable<TYPE> extends Configurable<TYPE> {
 
-    /**
-     * Gets the Loader configuration builder related to the instance.
-     * <br>
-     * The configuration options not supported by the specific implementation might be ignored.
-     * <p>
-     * Note that the configuration builder must be initialized with the current configuration.
-     *
-     * @return the Loader configuration builder.
-     */
-    @NotNull
-    Builder<? extends TYPE> applyLoaderConfiguration();
+  /**
+   * Gets the Loader configuration builder related to the instance.
+   * <br>
+   * The configuration options not supported by the specific implementation might be ignored.
+   * <p>
+   * Note that the configuration builder must be initialized with the current configuration.
+   *
+   * @return the Loader configuration builder.
+   */
+  @NotNull
+  Builder<? extends TYPE> applyLoaderConfiguration();
 }

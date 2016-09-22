@@ -39,93 +39,92 @@ import retrofit2.CallAdapter;
  */
 public class RoutineAdapterFactory extends AbstractAdapterFactory {
 
-    private static final RoutineAdapterFactory sFactory =
-            new RoutineAdapterFactory(null, InvocationConfiguration.defaultConfiguration());
+  private static final RoutineAdapterFactory sFactory =
+      new RoutineAdapterFactory(null, InvocationConfiguration.defaultConfiguration());
+
+  /**
+   * Constructor.
+   *
+   * @param delegateFactory the delegate factory.
+   * @param configuration   the invocation configuration.
+   */
+  private RoutineAdapterFactory(@Nullable final CallAdapter.Factory delegateFactory,
+      @NotNull final InvocationConfiguration configuration) {
+    super(delegateFactory, configuration);
+  }
+
+  /**
+   * Returns the default factory instance.
+   *
+   * @return the factory instance.
+   */
+  @NotNull
+  public static RoutineAdapterFactory buildFactory() {
+    return sFactory;
+  }
+
+  /**
+   * Returns an adapter factory builder.
+   *
+   * @return the builder instance.
+   */
+  @NotNull
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  /**
+   * Builder of routine adapter factory instances.
+   * <p>
+   * The options set through the builder configuration will be applied to all the routine handling
+   * the Retrofit calls, unless they are overwritten by specific annotations.
+   *
+   * @see Builders#getInvocationMode(Method)
+   * @see Builders#withAnnotations(InvocationConfiguration, Annotation...)
+   */
+  public static class Builder implements InvocationConfigurable<Builder> {
+
+    private InvocationConfiguration mConfiguration = InvocationConfiguration.defaultConfiguration();
+
+    private CallAdapter.Factory mDelegateFactory;
 
     /**
      * Constructor.
-     *
-     * @param delegateFactory the delegate factory.
-     * @param configuration   the invocation configuration.
      */
-    private RoutineAdapterFactory(@Nullable final CallAdapter.Factory delegateFactory,
-            @NotNull final InvocationConfiguration configuration) {
-        super(delegateFactory, configuration);
+    private Builder() {
+    }
+
+    @NotNull
+    public Builder apply(@NotNull final InvocationConfiguration configuration) {
+      mConfiguration = ConstantConditions.notNull("invocation configuration", configuration);
+      return this;
+    }
+
+    @NotNull
+    public InvocationConfiguration.Builder<? extends Builder> applyInvocationConfiguration() {
+      return new InvocationConfiguration.Builder<Builder>(this, mConfiguration);
     }
 
     /**
-     * Returns the default factory instance.
+     * Builds and return a new factory instance.
      *
      * @return the factory instance.
      */
     @NotNull
-    public static RoutineAdapterFactory buildFactory() {
-        return sFactory;
+    public RoutineAdapterFactory buildFactory() {
+      return new RoutineAdapterFactory(mDelegateFactory, mConfiguration);
     }
 
     /**
-     * Returns an adapter factory builder.
+     * Sets the delegate factory to be used to execute the calls.
      *
-     * @return the builder instance.
+     * @param factory the factory instance.
+     * @return this builder.
      */
     @NotNull
-    public static Builder builder() {
-        return new Builder();
+    public Builder delegateFactory(@Nullable final CallAdapter.Factory factory) {
+      mDelegateFactory = factory;
+      return this;
     }
-
-    /**
-     * Builder of routine adapter factory instances.
-     * <p>
-     * The options set through the builder configuration will be applied to all the routine handling
-     * the Retrofit calls, unless they are overwritten by specific annotations.
-     *
-     * @see Builders#getInvocationMode(Method)
-     * @see Builders#withAnnotations(InvocationConfiguration, Annotation...)
-     */
-    public static class Builder implements InvocationConfigurable<Builder> {
-
-        private InvocationConfiguration mConfiguration =
-                InvocationConfiguration.defaultConfiguration();
-
-        private CallAdapter.Factory mDelegateFactory;
-
-        /**
-         * Constructor.
-         */
-        private Builder() {
-        }
-
-        @NotNull
-        public Builder apply(@NotNull final InvocationConfiguration configuration) {
-            mConfiguration = ConstantConditions.notNull("invocation configuration", configuration);
-            return this;
-        }
-
-        @NotNull
-        public InvocationConfiguration.Builder<? extends Builder> applyInvocationConfiguration() {
-            return new InvocationConfiguration.Builder<Builder>(this, mConfiguration);
-        }
-
-        /**
-         * Builds and return a new factory instance.
-         *
-         * @return the factory instance.
-         */
-        @NotNull
-        public RoutineAdapterFactory buildFactory() {
-            return new RoutineAdapterFactory(mDelegateFactory, mConfiguration);
-        }
-
-        /**
-         * Sets the delegate factory to be used to execute the calls.
-         *
-         * @param factory the factory instance.
-         * @return this builder.
-         */
-        @NotNull
-        public Builder delegateFactory(@Nullable final CallAdapter.Factory factory) {
-            mDelegateFactory = factory;
-            return this;
-        }
-    }
+  }
 }

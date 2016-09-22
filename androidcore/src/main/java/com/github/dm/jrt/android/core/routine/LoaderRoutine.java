@@ -31,24 +31,24 @@ import org.jetbrains.annotations.Nullable;
  */
 public interface LoaderRoutine<IN, OUT> extends Routine<IN, OUT> {
 
-    /**
-     * Makes the builder discard the cached invocation instances with the specified input.
-     *
-     * @param input the input.
-     */
-    void clear(@Nullable IN input);
+  /**
+   * Makes the builder discard the cached invocation instances with the specified input.
+   *
+   * @param input the input.
+   */
+  void clear(@Nullable IN input);
 
-    /**
-     * Makes the builder discard the cached invocation instances with the specified inputs.
-     *
-     * @param inputs the inputs.
-     */
-    void clear(@Nullable IN... inputs);
+  /**
+   * Makes the builder discard the cached invocation instances with the specified inputs.
+   *
+   * @param inputs the inputs.
+   */
+  void clear(@Nullable IN... inputs);
 
-    /**
-     * Makes the builder discard the cached invocation instances with the specified inputs.
-     *
-     * @param inputs the inputs.
-     */
-    void clear(@Nullable Iterable<? extends IN> inputs);
+  /**
+   * Makes the builder discard the cached invocation instances with the specified inputs.
+   *
+   * @param inputs the inputs.
+   */
+  void clear(@Nullable Iterable<? extends IN> inputs);
 }

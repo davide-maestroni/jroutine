@@ -27,21 +27,21 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class ExceptionTest {
 
-    @Test
-    public void testDeadlockException() {
+  @Test
+  public void testDeadlockException() {
 
-        assertThat(new DeadlockException("")).hasNoCause();
-    }
+    assertThat(new DeadlockException("")).hasNoCause();
+  }
 
-    @Test
-    public void testRoutineException() {
+  @Test
+  public void testRoutineException() {
 
-        assertThat(new RoutineException()).hasNoCause();
-    }
+    assertThat(new RoutineException()).hasNoCause();
+  }
 
-    @Test
-    public void testTimeoutException() {
+  @Test
+  public void testTimeoutException() {
 
-        assertThat(new TimeoutException("")).hasNoCause();
-    }
+    assertThat(new TimeoutException("")).hasNoCause();
+  }
 }

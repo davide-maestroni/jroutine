@@ -23,10 +23,10 @@ package com.github.dm.jrt.function;
  */
 public interface Action {
 
-    /**
-     * Performs the action.
-     *
-     * @throws java.lang.Exception if an unexpected error occurs.
-     */
-    void perform() throws Exception;
+  /**
+   * Performs the action.
+   *
+   * @throws java.lang.Exception if an unexpected error occurs.
+   */
+  void perform() throws Exception;
 }

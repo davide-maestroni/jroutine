@@ -30,15 +30,15 @@ import org.jetbrains.annotations.NotNull;
  */
 public interface ServiceConfigurable<TYPE> extends Configurable<TYPE> {
 
-    /**
-     * Gets the Service configuration builder related to the instance.
-     * <br>
-     * The configuration options not supported by the specific implementation might be ignored.
-     * <p>
-     * Note that the configuration builder must be initialized with the current configuration.
-     *
-     * @return the Service configuration builder.
-     */
-    @NotNull
-    Builder<? extends TYPE> applyServiceConfiguration();
+  /**
+   * Gets the Service configuration builder related to the instance.
+   * <br>
+   * The configuration options not supported by the specific implementation might be ignored.
+   * <p>
+   * Note that the configuration builder must be initialized with the current configuration.
+   *
+   * @return the Service configuration builder.
+   */
+  @NotNull
+  Builder<? extends TYPE> applyServiceConfiguration();
 }

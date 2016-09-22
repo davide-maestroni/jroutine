@@ -28,12 +28,12 @@ import org.jetbrains.annotations.Nullable;
  */
 public class InvocationDeadlockException extends DeadlockException {
 
-    /**
-     * Constructor.
-     *
-     * @param message the error message.
-     */
-    public InvocationDeadlockException(@Nullable final String message) {
-        super(message);
-    }
+  /**
+   * Constructor.
+   *
+   * @param message the error message.
+   */
+  public InvocationDeadlockException(@Nullable final String message) {
+    super(message);
+  }
 }

@@ -27,12 +27,12 @@ import org.jetbrains.annotations.Nullable;
  */
 public class OutputTimeoutException extends TimeoutException {
 
-    /**
-     * Constructor.
-     *
-     * @param message the error message.
-     */
-    public OutputTimeoutException(@Nullable final String message) {
-        super(message);
-    }
+  /**
+   * Constructor.
+   *
+   * @param message the error message.
+   */
+  public OutputTimeoutException(@Nullable final String message) {
+    super(message);
+  }
 }

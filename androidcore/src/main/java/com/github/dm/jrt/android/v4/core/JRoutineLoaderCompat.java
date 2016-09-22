@@ -131,87 +131,87 @@ import org.jetbrains.annotations.NotNull;
  */
 public class JRoutineLoaderCompat {
 
-    /**
-     * Avoid explicit instantiation.
-     */
-    protected JRoutineLoaderCompat() {
-        ConstantConditions.avoid();
-    }
+  /**
+   * Avoid explicit instantiation.
+   */
+  protected JRoutineLoaderCompat() {
+    ConstantConditions.avoid();
+  }
+
+  /**
+   * Returns a Context based builder of Loader routine builders.
+   *
+   * @param context the Loader context.
+   * @return the Context based builder.
+   */
+  @NotNull
+  public static LoaderBuilderCompat on(@NotNull final LoaderContextCompat context) {
+    return new LoaderBuilderCompat(context);
+  }
+
+  /**
+   * Context based builder of Loader routine builders.
+   */
+  public static class LoaderBuilderCompat {
+
+    private final LoaderContextCompat mContext;
 
     /**
-     * Returns a Context based builder of Loader routine builders.
+     * Constructor.
      *
      * @param context the Loader context.
-     * @return the Context based builder.
      */
-    @NotNull
-    public static LoaderBuilderCompat on(@NotNull final LoaderContextCompat context) {
-        return new LoaderBuilderCompat(context);
+    private LoaderBuilderCompat(@NotNull final LoaderContextCompat context) {
+      mContext = ConstantConditions.notNull("Loader context", context);
     }
 
     /**
-     * Context based builder of Loader routine builders.
+     * Returns a builder of routines bound to the builder context.
+     * <br>
+     * In order to prevent undesired leaks, the class of the specified factory must have a static
+     * scope.
+     * <p>
+     * Note that the built routine results will be always dispatched on the configured looper
+     * thread, thus waiting for the outputs immediately after its invocation may result in a
+     * deadlock.
+     * <br>
+     * Note also that the input data passed to the invocation channel will be cached, and the
+     * results will be produced only after the invocation channel is closed, so be sure to avoid
+     * streaming inputs in order to prevent starvation or out of memory errors.
+     *
+     * @param factory the invocation factory.
+     * @param <IN>    the input data type.
+     * @param <OUT>   the output data type.
+     * @return the routine builder instance.
+     * @throws java.lang.IllegalArgumentException if the class of the specified factory has not
+     *                                            a static scope.
      */
-    public static class LoaderBuilderCompat {
-
-        private final LoaderContextCompat mContext;
-
-        /**
-         * Constructor.
-         *
-         * @param context the Loader context.
-         */
-        private LoaderBuilderCompat(@NotNull final LoaderContextCompat context) {
-            mContext = ConstantConditions.notNull("Loader context", context);
-        }
-
-        /**
-         * Returns a builder of routines bound to the builder context.
-         * <br>
-         * In order to prevent undesired leaks, the class of the specified factory must have a
-         * static scope.
-         * <p>
-         * Note that the built routine results will be always dispatched on the configured looper
-         * thread, thus waiting for the outputs immediately after its invocation may result in a
-         * deadlock.
-         * <br>
-         * Note also that the input data passed to the invocation channel will be cached, and the
-         * results will be produced only after the invocation channel is closed, so be sure to avoid
-         * streaming inputs in order to prevent starvation or out of memory errors.
-         *
-         * @param factory the invocation factory.
-         * @param <IN>    the input data type.
-         * @param <OUT>   the output data type.
-         * @return the routine builder instance.
-         * @throws java.lang.IllegalArgumentException if the class of the specified factory has not
-         *                                            a static scope.
-         */
-        @NotNull
-        public <IN, OUT> LoaderRoutineBuilder<IN, OUT> with(
-                @NotNull final ContextInvocationFactory<IN, OUT> factory) {
-            return new DefaultLoaderRoutineBuilder<IN, OUT>(mContext, factory);
-        }
-
-        /**
-         * Returns a builder of channels bound to the Loader identified by the specified ID.
-         * <br>
-         * If no Loader with the specified ID is running at the time of the channel creation, the
-         * output will be aborted with a
-         * {@link com.github.dm.jrt.android.core.invocation.MissingLoaderException
-         * MissingLoaderException}.
-         * <p>
-         * Note that the built routine results will be always dispatched on the configured looper
-         * thread, thus waiting for the outputs immediately after its invocation may result in a
-         * deadlock.
-         *
-         * @param loaderId the Loader ID.
-         * @return the channel builder instance.
-         */
-        @NotNull
-        public LoaderChannelBuilder withId(final int loaderId) {
-            return new DefaultLoaderChannelBuilder(mContext).applyLoaderConfiguration()
-                                                            .withLoaderId(loaderId)
-                                                            .configured();
-        }
+    @NotNull
+    public <IN, OUT> LoaderRoutineBuilder<IN, OUT> with(
+        @NotNull final ContextInvocationFactory<IN, OUT> factory) {
+      return new DefaultLoaderRoutineBuilder<IN, OUT>(mContext, factory);
     }
+
+    /**
+     * Returns a builder of channels bound to the Loader identified by the specified ID.
+     * <br>
+     * If no Loader with the specified ID is running at the time of the channel creation, the
+     * output will be aborted with a
+     * {@link com.github.dm.jrt.android.core.invocation.MissingLoaderException
+     * MissingLoaderException}.
+     * <p>
+     * Note that the built routine results will be always dispatched on the configured looper
+     * thread, thus waiting for the outputs immediately after its invocation may result in a
+     * deadlock.
+     *
+     * @param loaderId the Loader ID.
+     * @return the channel builder instance.
+     */
+    @NotNull
+    public LoaderChannelBuilder withId(final int loaderId) {
+      return new DefaultLoaderChannelBuilder(mContext).applyLoaderConfiguration()
+                                                      .withLoaderId(loaderId)
+                                                      .configured();
+    }
+  }
 }

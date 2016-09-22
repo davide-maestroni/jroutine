@@ -29,36 +29,36 @@ import org.jetbrains.annotations.NotNull;
  */
 public class IdentityContextInvocation<DATA> extends TemplateContextInvocation<DATA, DATA> {
 
-    private static final ContextInvocationFactory<Object, Object> sFactory =
-            new ContextInvocationFactory<Object, Object>(null) {
+  private static final ContextInvocationFactory<Object, Object> sFactory =
+      new ContextInvocationFactory<Object, Object>(null) {
 
-                @NotNull
-                @Override
-                public ContextInvocation<Object, Object> newInvocation() {
-                    return new IdentityContextInvocation<Object>();
-                }
-            };
+        @NotNull
+        @Override
+        public ContextInvocation<Object, Object> newInvocation() {
+          return new IdentityContextInvocation<Object>();
+        }
+      };
 
-    /**
-     * Avoid instantiation.
-     */
-    private IdentityContextInvocation() {
-    }
+  /**
+   * Avoid instantiation.
+   */
+  private IdentityContextInvocation() {
+  }
 
-    /**
-     * Returns a factory of identity invocations.
-     *
-     * @param <DATA> the data type.
-     * @return the factory.
-     */
-    @NotNull
-    @SuppressWarnings("unchecked")
-    public static <DATA> ContextInvocationFactory<DATA, DATA> factoryOf() {
-        return (ContextInvocationFactory<DATA, DATA>) sFactory;
-    }
+  /**
+   * Returns a factory of identity invocations.
+   *
+   * @param <DATA> the data type.
+   * @return the factory.
+   */
+  @NotNull
+  @SuppressWarnings("unchecked")
+  public static <DATA> ContextInvocationFactory<DATA, DATA> factoryOf() {
+    return (ContextInvocationFactory<DATA, DATA>) sFactory;
+  }
 
-    @Override
-    public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) {
-        result.pass(input);
-    }
+  @Override
+  public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) {
+    result.pass(input);
+  }
 }

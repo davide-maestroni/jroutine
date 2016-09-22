@@ -32,45 +32,45 @@ import java.util.concurrent.TimeUnit;
  */
 class DynamicScheduledThreadExecutor extends ScheduledThreadExecutor {
 
-    /**
-     * Constructor.
-     *
-     * @param corePoolSize    the number of threads to keep in the pool, even if they are idle.
-     * @param maximumPoolSize the maximum number of threads to allow in the pool.
-     * @param keepAliveTime   when the number of threads is greater than the core, this is the
-     *                        maximum time that excess idle threads will wait for new tasks before
-     *                        terminating.
-     * @param keepAliveUnit   the time unit for the keep alive time.
-     * @throws java.lang.IllegalArgumentException if one of the following holds:<ul>
-     *                                            <li>{@code corePoolSize < 0}</li>
-     *                                            <li>{@code maximumPoolSize <= 0}</li>
-     *                                            <li>{@code keepAliveTime < 0}</li></ul>
-     */
-    DynamicScheduledThreadExecutor(final int corePoolSize, final int maximumPoolSize,
-            final long keepAliveTime, @NotNull final TimeUnit keepAliveUnit) {
-        super(new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, keepAliveUnit,
-                new NonRejectingQueue()));
+  /**
+   * Constructor.
+   *
+   * @param corePoolSize    the number of threads to keep in the pool, even if they are idle.
+   * @param maximumPoolSize the maximum number of threads to allow in the pool.
+   * @param keepAliveTime   when the number of threads is greater than the core, this is the
+   *                        maximum time that excess idle threads will wait for new tasks before
+   *                        terminating.
+   * @param keepAliveUnit   the time unit for the keep alive time.
+   * @throws java.lang.IllegalArgumentException if one of the following holds:<ul>
+   *                                            <li>{@code corePoolSize < 0}</li>
+   *                                            <li>{@code maximumPoolSize <= 0}</li>
+   *                                            <li>{@code keepAliveTime < 0}</li></ul>
+   */
+  DynamicScheduledThreadExecutor(final int corePoolSize, final int maximumPoolSize,
+      final long keepAliveTime, @NotNull final TimeUnit keepAliveUnit) {
+    super(new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, keepAliveUnit,
+        new NonRejectingQueue()));
+  }
+
+  /**
+   * Implementation of a synchronous queue, which avoids rejection of tasks by forcedly waiting
+   * for available threads.
+   */
+  private static class NonRejectingQueue extends SynchronousQueue<Runnable> {
+
+    // Just don't care...
+    private static final long serialVersionUID = -1;
+
+    @Override
+    public boolean offer(@NotNull final Runnable runnable) {
+      try {
+        put(runnable);
+
+      } catch (final InterruptedException ignored) {
+        return false;
+      }
+
+      return true;
     }
-
-    /**
-     * Implementation of a synchronous queue, which avoids rejection of tasks by forcedly waiting
-     * for available threads.
-     */
-    private static class NonRejectingQueue extends SynchronousQueue<Runnable> {
-
-        // Just don't care...
-        private static final long serialVersionUID = -1;
-
-        @Override
-        public boolean offer(final Runnable runnable) {
-            try {
-                put(runnable);
-
-            } catch (final InterruptedException ignored) {
-                return false;
-            }
-
-            return true;
-        }
-    }
+  }
 }

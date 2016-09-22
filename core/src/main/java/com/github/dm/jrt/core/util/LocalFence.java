@@ -26,59 +26,59 @@ package com.github.dm.jrt.core.util;
  */
 public class LocalFence {
 
-    private final LocalCount mCount = new LocalCount();
+  private final LocalCount mCount = new LocalCount();
 
-    /**
-     * Enters the fence on the current thread.
-     */
-    public void enter() {
-        mCount.get().incValue();
+  /**
+   * Enters the fence on the current thread.
+   */
+  public void enter() {
+    mCount.get().incValue();
+  }
+
+  /**
+   * Exits the fence on the current thread.
+   */
+  public void exit() {
+    mCount.get().decValue();
+  }
+
+  /**
+   * Checks if the current thread is inside the fence.
+   *
+   * @return whether the thread is in the fence.
+   */
+  public boolean isInside() {
+    return mCount.get().getValue() > 0;
+  }
+
+  /**
+   * Count implementation.
+   */
+  private static class Count {
+
+    private int mCount;
+
+    private void decValue() {
+      mCount = ConstantConditions.notNegative("count", mCount - 1);
     }
 
-    /**
-     * Exits the fence on the current thread.
-     */
-    public void exit() {
-        mCount.get().decValue();
+    private int getValue() {
+      return mCount;
     }
 
-    /**
-     * Checks if the current thread is inside the fence.
-     *
-     * @return whether the thread is in the fence.
-     */
-    public boolean isInside() {
-        return mCount.get().getValue() > 0;
+    private void incValue() {
+      ++mCount;
     }
+  }
 
-    /**
-     * Count implementation.
-     */
-    private static class Count {
+  /**
+   * Local count implementation.
+   */
+  private static class LocalCount extends ThreadLocal<Count> {
 
-        private int mCount;
-
-        private void decValue() {
-            mCount = ConstantConditions.notNegative("count", mCount - 1);
-        }
-
-        private int getValue() {
-            return mCount;
-        }
-
-        private void incValue() {
-            ++mCount;
-        }
+    @Override
+    protected Count initialValue() {
+      return new Count();
     }
-
-    /**
-     * Local count implementation.
-     */
-    private static class LocalCount extends ThreadLocal<Count> {
-
-        @Override
-        protected Count initialValue() {
-            return new Count();
-        }
-    }
+  }
 }

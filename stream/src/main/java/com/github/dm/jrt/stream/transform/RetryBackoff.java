@@ -30,27 +30,27 @@ import org.jetbrains.annotations.NotNull;
  */
 class RetryBackoff implements BiFunction<Integer, RoutineException, Long> {
 
-    private final Backoff mBackoff;
+  private final Backoff mBackoff;
 
-    private final int mCount;
+  private final int mCount;
 
-    /**
-     * Constructor.
-     *
-     * @param count   the retry count.
-     * @param backoff the backoff policy
-     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
-     */
-    RetryBackoff(final int count, @NotNull final Backoff backoff) {
-        mCount = ConstantConditions.positive("max retries", count);
-        mBackoff = ConstantConditions.notNull("backoff policy", backoff);
+  /**
+   * Constructor.
+   *
+   * @param count   the retry count.
+   * @param backoff the backoff policy
+   * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
+   */
+  RetryBackoff(final int count, @NotNull final Backoff backoff) {
+    mCount = ConstantConditions.positive("max retries", count);
+    mBackoff = ConstantConditions.notNull("backoff policy", backoff);
+  }
+
+  public Long apply(final Integer count, final RoutineException error) {
+    if (count <= mCount) {
+      return mBackoff.getDelay(count);
     }
 
-    public Long apply(final Integer count, final RoutineException error) {
-        if (count <= mCount) {
-            return mBackoff.getDelay(count);
-        }
-
-        return null;
-    }
+    return null;
+  }
 }

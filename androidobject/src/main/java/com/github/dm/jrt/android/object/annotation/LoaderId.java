@@ -58,10 +58,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface LoaderId {
 
-    /**
-     * The Loader ID.
-     *
-     * @return the ID.
-     */
-    int value();
+  /**
+   * The Loader ID.
+   *
+   * @return the ID.
+   */
+  int value();
 }

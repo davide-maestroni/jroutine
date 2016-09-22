@@ -27,78 +27,78 @@ import org.junit.Test;
  */
 public class SystemLogTest {
 
-    private static final String[] ARGS = new String[]{"test1", "test2", "test3", "test4", "test5"};
+  private static final String[] ARGS = new String[]{"test1", "test2", "test3", "test4", "test5"};
 
-    private static final String FORMAT0 = "0: %s";
+  private static final String FORMAT0 = "0: %s";
 
-    private static final String FORMAT1 = "0: %s - 1: %s";
+  private static final String FORMAT1 = "0: %s - 1: %s";
 
-    private static final String FORMAT2 = "0: %s - 1: %s - 2: %s";
+  private static final String FORMAT2 = "0: %s - 1: %s - 2: %s";
 
-    private static final String FORMAT3 = "0: %s - 1: %s - 2: %s - 3: %s";
+  private static final String FORMAT3 = "0: %s - 1: %s - 2: %s - 3: %s";
 
-    private static final String FORMAT4 = "0: %s - 1: %s - 2: %s - 3: %s - 4: %s";
+  private static final String FORMAT4 = "0: %s - 1: %s - 2: %s - 3: %s - 4: %s";
 
-    @Test
-    public void testLogDbg() {
+  @Test
+  public void testLogDbg() {
 
-        final NullPointerException ex = new NullPointerException();
-        final Logger logger = Logger.newLogger(new SystemLog(), Level.DEBUG, this);
+    final NullPointerException ex = new NullPointerException();
+    final Logger logger = Logger.newLogger(new SystemLog(), Level.DEBUG, this);
 
-        logger.dbg(ARGS[0]);
-        logger.dbg(FORMAT0, ARGS[0]);
-        logger.dbg(FORMAT1, ARGS[0], ARGS[1]);
-        logger.dbg(FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
-        logger.dbg(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
-        logger.dbg(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
-        logger.dbg(ex);
-        logger.dbg(ex, ARGS[0]);
-        logger.dbg(ex, FORMAT0, ARGS[0]);
-        logger.dbg(ex, FORMAT1, ARGS[0], ARGS[1]);
-        logger.dbg(ex, FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
-        logger.dbg(ex, FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
-        logger.dbg(ex, FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
-    }
+    logger.dbg(ARGS[0]);
+    logger.dbg(FORMAT0, ARGS[0]);
+    logger.dbg(FORMAT1, ARGS[0], ARGS[1]);
+    logger.dbg(FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
+    logger.dbg(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
+    logger.dbg(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
+    logger.dbg(ex);
+    logger.dbg(ex, ARGS[0]);
+    logger.dbg(ex, FORMAT0, ARGS[0]);
+    logger.dbg(ex, FORMAT1, ARGS[0], ARGS[1]);
+    logger.dbg(ex, FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
+    logger.dbg(ex, FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
+    logger.dbg(ex, FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
+  }
 
-    @Test
-    public void testLogErr() {
+  @Test
+  public void testLogErr() {
 
-        final NullPointerException ex = new NullPointerException();
-        final Logger logger = Logger.newLogger(new SystemLog(), Level.DEBUG, this);
+    final NullPointerException ex = new NullPointerException();
+    final Logger logger = Logger.newLogger(new SystemLog(), Level.DEBUG, this);
 
-        logger.err(ARGS[0]);
-        logger.err(FORMAT0, ARGS[0]);
-        logger.err(FORMAT1, ARGS[0], ARGS[1]);
-        logger.err(FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
-        logger.err(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
-        logger.err(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
-        logger.err(ex);
-        logger.err(ex, ARGS[0]);
-        logger.err(ex, FORMAT0, ARGS[0]);
-        logger.err(ex, FORMAT1, ARGS[0], ARGS[1]);
-        logger.err(ex, FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
-        logger.err(ex, FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
-        logger.err(ex, FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
-    }
+    logger.err(ARGS[0]);
+    logger.err(FORMAT0, ARGS[0]);
+    logger.err(FORMAT1, ARGS[0], ARGS[1]);
+    logger.err(FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
+    logger.err(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
+    logger.err(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
+    logger.err(ex);
+    logger.err(ex, ARGS[0]);
+    logger.err(ex, FORMAT0, ARGS[0]);
+    logger.err(ex, FORMAT1, ARGS[0], ARGS[1]);
+    logger.err(ex, FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
+    logger.err(ex, FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
+    logger.err(ex, FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
+  }
 
-    @Test
-    public void testLogWrn() {
+  @Test
+  public void testLogWrn() {
 
-        final NullPointerException ex = new NullPointerException();
-        final Logger logger = Logger.newLogger(new SystemLog(), Level.DEBUG, this);
+    final NullPointerException ex = new NullPointerException();
+    final Logger logger = Logger.newLogger(new SystemLog(), Level.DEBUG, this);
 
-        logger.wrn(ARGS[0]);
-        logger.wrn(FORMAT0, ARGS[0]);
-        logger.wrn(FORMAT1, ARGS[0], ARGS[1]);
-        logger.wrn(FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
-        logger.wrn(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
-        logger.wrn(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
-        logger.wrn(ex);
-        logger.wrn(ex, ARGS[0]);
-        logger.wrn(ex, FORMAT0, ARGS[0]);
-        logger.wrn(ex, FORMAT1, ARGS[0], ARGS[1]);
-        logger.wrn(ex, FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
-        logger.wrn(ex, FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
-        logger.wrn(ex, FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
-    }
+    logger.wrn(ARGS[0]);
+    logger.wrn(FORMAT0, ARGS[0]);
+    logger.wrn(FORMAT1, ARGS[0], ARGS[1]);
+    logger.wrn(FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
+    logger.wrn(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
+    logger.wrn(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
+    logger.wrn(ex);
+    logger.wrn(ex, ARGS[0]);
+    logger.wrn(ex, FORMAT0, ARGS[0]);
+    logger.wrn(ex, FORMAT1, ARGS[0], ARGS[1]);
+    logger.wrn(ex, FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
+    logger.wrn(ex, FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
+    logger.wrn(ex, FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
+  }
 }

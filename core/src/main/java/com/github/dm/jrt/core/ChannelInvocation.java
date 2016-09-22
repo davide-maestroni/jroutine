@@ -33,56 +33,56 @@ import org.jetbrains.annotations.NotNull;
  */
 public abstract class ChannelInvocation<IN, OUT> implements Invocation<IN, OUT> {
 
-    private Channel<IN, IN> mInputChannel;
+  private Channel<IN, IN> mInputChannel;
 
-    private Channel<?, OUT> mOutputChannel;
+  private Channel<?, OUT> mOutputChannel;
 
-    /**
-     * Constructor.
-     */
-    public ChannelInvocation() {
-        mInputChannel = null;
-        mOutputChannel = null;
+  /**
+   * Constructor.
+   */
+  public ChannelInvocation() {
+    mInputChannel = null;
+    mOutputChannel = null;
+  }
+
+  public final void onAbort(@NotNull final RoutineException reason) {
+    mInputChannel.abort(reason);
+  }
+
+  public final void onComplete(@NotNull final Channel<OUT, ?> result) {
+    bind(result);
+    mInputChannel.close();
+  }
+
+  public final void onInput(final IN input, @NotNull final Channel<OUT, ?> result) {
+    bind(result);
+    mInputChannel.pass(input);
+  }
+
+  public void onRecycle(final boolean isReused) throws Exception {
+    mInputChannel = null;
+    mOutputChannel = null;
+  }
+
+  public final void onRestart() throws Exception {
+    final Channel<IN, IN> inputChannel = (mInputChannel = JRoutineCore.io().buildChannel());
+    mOutputChannel = ConstantConditions.notNull("stream channel", onChannel(inputChannel));
+  }
+
+  /**
+   * Transforms the channel providing the input data into the output one.
+   *
+   * @param channel the input channel.
+   * @return the output channel.
+   * @throws java.lang.Exception if an unexpected error occurs.
+   */
+  @NotNull
+  protected abstract Channel<?, OUT> onChannel(@NotNull Channel<?, IN> channel) throws Exception;
+
+  private void bind(@NotNull final Channel<OUT, ?> result) {
+    final Channel<?, OUT> outputChannel = mOutputChannel;
+    if (!outputChannel.isBound()) {
+      outputChannel.bind(result);
     }
-
-    public final void onAbort(@NotNull final RoutineException reason) {
-        mInputChannel.abort(reason);
-    }
-
-    public final void onComplete(@NotNull final Channel<OUT, ?> result) {
-        bind(result);
-        mInputChannel.close();
-    }
-
-    public final void onInput(final IN input, @NotNull final Channel<OUT, ?> result) {
-        bind(result);
-        mInputChannel.pass(input);
-    }
-
-    public void onRecycle(final boolean isReused) throws Exception {
-        mInputChannel = null;
-        mOutputChannel = null;
-    }
-
-    public final void onRestart() throws Exception {
-        final Channel<IN, IN> inputChannel = (mInputChannel = JRoutineCore.io().buildChannel());
-        mOutputChannel = ConstantConditions.notNull("stream channel", onChannel(inputChannel));
-    }
-
-    /**
-     * Transforms the channel providing the input data into the output one.
-     *
-     * @param channel the input channel.
-     * @return the output channel.
-     * @throws java.lang.Exception if an unexpected error occurs.
-     */
-    @NotNull
-    protected abstract Channel<?, OUT> onChannel(@NotNull Channel<?, IN> channel) throws Exception;
-
-    private void bind(@NotNull final Channel<OUT, ?> result) {
-        final Channel<?, OUT> outputChannel = mOutputChannel;
-        if (!outputChannel.isBound()) {
-            outputChannel.bind(result);
-        }
-    }
+  }
 }

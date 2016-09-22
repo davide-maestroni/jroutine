@@ -24,18 +24,18 @@ package com.github.dm.jrt.android.core.invocation;
  */
 public class MissingLoaderException extends LoaderInvocationException {
 
-    /**
-     * Constructor.
-     */
-    public MissingLoaderException() {
-    }
+  /**
+   * Constructor.
+   */
+  public MissingLoaderException() {
+  }
 
-    /**
-     * Constructor.
-     *
-     * @param id the Loader ID.
-     */
-    public MissingLoaderException(final int id) {
-        super(id);
-    }
+  /**
+   * Constructor.
+   *
+   * @param id the Loader ID.
+   */
+  public MissingLoaderException(final int id) {
+    super(id);
+  }
 }

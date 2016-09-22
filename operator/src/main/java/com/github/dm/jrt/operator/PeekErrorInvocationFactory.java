@@ -37,6 +37,32 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class PeekErrorInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
 
+  private final ConsumerDecorator<? super RoutineException> mErrorConsumer;
+
+  /**
+   * Constructor.
+   *
+   * @param errorConsumer the consumer instance.
+   */
+  PeekErrorInvocationFactory(
+      @NotNull final ConsumerDecorator<? super RoutineException> errorConsumer) {
+    super(asArgs(ConstantConditions.notNull("consumer instance", errorConsumer)));
+    mErrorConsumer = errorConsumer;
+  }
+
+  @NotNull
+  @Override
+  public Invocation<DATA, DATA> newInvocation() throws Exception {
+    return new PeekErrorInvocation<DATA>(mErrorConsumer);
+  }
+
+  /**
+   * Invocation peeking errors as they are passed along.
+   *
+   * @param <DATA> the data type.
+   */
+  private static class PeekErrorInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
+
     private final ConsumerDecorator<? super RoutineException> mErrorConsumer;
 
     /**
@@ -44,45 +70,19 @@ class PeekErrorInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
      *
      * @param errorConsumer the consumer instance.
      */
-    PeekErrorInvocationFactory(
-            @NotNull final ConsumerDecorator<? super RoutineException> errorConsumer) {
-        super(asArgs(ConstantConditions.notNull("consumer instance", errorConsumer)));
-        mErrorConsumer = errorConsumer;
+    private PeekErrorInvocation(
+        @NotNull final ConsumerDecorator<? super RoutineException> errorConsumer) {
+      mErrorConsumer = errorConsumer;
     }
 
-    @NotNull
     @Override
-    public Invocation<DATA, DATA> newInvocation() throws Exception {
-        return new PeekErrorInvocation<DATA>(mErrorConsumer);
+    public void onAbort(@NotNull final RoutineException reason) throws Exception {
+      mErrorConsumer.accept(reason);
     }
 
-    /**
-     * Invocation peeking errors as they are passed along.
-     *
-     * @param <DATA> the data type.
-     */
-    private static class PeekErrorInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
-
-        private final ConsumerDecorator<? super RoutineException> mErrorConsumer;
-
-        /**
-         * Constructor.
-         *
-         * @param errorConsumer the consumer instance.
-         */
-        private PeekErrorInvocation(
-                @NotNull final ConsumerDecorator<? super RoutineException> errorConsumer) {
-            mErrorConsumer = errorConsumer;
-        }
-
-        @Override
-        public void onAbort(@NotNull final RoutineException reason) throws Exception {
-            mErrorConsumer.accept(reason);
-        }
-
-        @Override
-        public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) {
-            result.pass(input);
-        }
+    @Override
+    public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) {
+      result.pass(input);
     }
+  }
 }

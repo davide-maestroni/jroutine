@@ -37,88 +37,87 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class BinaryOperatorInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
 
-    private final BiFunction<DATA, DATA, DATA> mBinaryFunction;
+  private final BiFunction<DATA, DATA, DATA> mBinaryFunction;
 
-    private boolean mIsFirst;
+  private boolean mIsFirst;
 
-    private DATA mResult;
+  private DATA mResult;
+
+  /**
+   * Constructor.
+   *
+   * @param binaryFunction the operator bi-function instance.
+   */
+  private BinaryOperatorInvocation(@NotNull final BiFunction<DATA, DATA, DATA> binaryFunction) {
+    mBinaryFunction = binaryFunction;
+  }
+
+  /**
+   * Builds and returns a new binary operator invocation factory backed by the specified
+   * bi-function instance.
+   *
+   * @param binaryFunction the operator bi-function instance.
+   * @param <DATA>         the data type.
+   * @return the invocation factory.
+   */
+  @NotNull
+  static <DATA> InvocationFactory<DATA, DATA> functionFactory(
+      @NotNull final BiFunction<DATA, DATA, DATA> binaryFunction) {
+    return new BinaryOperatorInvocationFactory<DATA>(Functions.decorate(binaryFunction));
+  }
+
+  @Override
+  public void onComplete(@NotNull final Channel<DATA, ?> result) {
+    if (!mIsFirst) {
+      result.pass(mResult);
+    }
+  }
+
+  @Override
+  public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) throws Exception {
+    if (mIsFirst) {
+      mIsFirst = false;
+      mResult = input;
+
+    } else {
+      mResult = mBinaryFunction.apply(mResult, input);
+    }
+  }
+
+  @Override
+  public void onRecycle(final boolean isReused) {
+    mResult = null;
+  }
+
+  @Override
+  public void onRestart() {
+    mIsFirst = true;
+  }
+
+  /**
+   * Class implementing a binary operator invocation factory.
+   *
+   * @param <DATA> the data type.
+   */
+  private static class BinaryOperatorInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
+
+    private final BiFunctionDecorator<DATA, DATA, DATA> mBinaryFunction;
 
     /**
      * Constructor.
      *
      * @param binaryFunction the operator bi-function instance.
      */
-    private BinaryOperatorInvocation(@NotNull final BiFunction<DATA, DATA, DATA> binaryFunction) {
-        mBinaryFunction = binaryFunction;
+    private BinaryOperatorInvocationFactory(
+        @NotNull final BiFunctionDecorator<DATA, DATA, DATA> binaryFunction) {
+      super(asArgs(binaryFunction));
+      mBinaryFunction = binaryFunction;
     }
 
-    /**
-     * Builds and returns a new binary operator invocation factory backed by the specified
-     * bi-function instance.
-     *
-     * @param binaryFunction the operator bi-function instance.
-     * @param <DATA>         the data type.
-     * @return the invocation factory.
-     */
     @NotNull
-    static <DATA> InvocationFactory<DATA, DATA> functionFactory(
-            @NotNull final BiFunction<DATA, DATA, DATA> binaryFunction) {
-        return new BinaryOperatorInvocationFactory<DATA>(Functions.decorate(binaryFunction));
-    }
-
     @Override
-    public void onComplete(@NotNull final Channel<DATA, ?> result) {
-        if (!mIsFirst) {
-            result.pass(mResult);
-        }
+    public Invocation<DATA, DATA> newInvocation() {
+      return new BinaryOperatorInvocation<DATA>(mBinaryFunction);
     }
-
-    @Override
-    public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) throws Exception {
-        if (mIsFirst) {
-            mIsFirst = false;
-            mResult = input;
-
-        } else {
-            mResult = mBinaryFunction.apply(mResult, input);
-        }
-    }
-
-    @Override
-    public void onRecycle(final boolean isReused) {
-        mResult = null;
-    }
-
-    @Override
-    public void onRestart() {
-        mIsFirst = true;
-    }
-
-    /**
-     * Class implementing a binary operator invocation factory.
-     *
-     * @param <DATA> the data type.
-     */
-    private static class BinaryOperatorInvocationFactory<DATA>
-            extends InvocationFactory<DATA, DATA> {
-
-        private final BiFunctionDecorator<DATA, DATA, DATA> mBinaryFunction;
-
-        /**
-         * Constructor.
-         *
-         * @param binaryFunction the operator bi-function instance.
-         */
-        private BinaryOperatorInvocationFactory(
-                @NotNull final BiFunctionDecorator<DATA, DATA, DATA> binaryFunction) {
-            super(asArgs(binaryFunction));
-            mBinaryFunction = binaryFunction;
-        }
-
-        @NotNull
-        @Override
-        public Invocation<DATA, DATA> newInvocation() {
-            return new BinaryOperatorInvocation<DATA>(mBinaryFunction);
-        }
-    }
+  }
 }

@@ -108,58 +108,58 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Proxy {
 
-    /**
-     * Constant indicating a default class name or package.
-     */
-    String DEFAULT = "*";
+  /**
+   * Constant indicating a default class name or package.
+   */
+  String DEFAULT = "*";
 
-    /**
-     * Constant indicating the default generated class name prefix.
-     */
-    String DEFAULT_CLASS_PREFIX = "Proxy_";
+  /**
+   * Constant indicating the default generated class name prefix.
+   */
+  String DEFAULT_CLASS_PREFIX = "Proxy_";
 
-    /**
-     * Constant indicating the default generated class name suffix.
-     */
-    String DEFAULT_CLASS_SUFFIX = "";
+  /**
+   * Constant indicating the default generated class name suffix.
+   */
+  String DEFAULT_CLASS_SUFFIX = "";
 
-    /**
-     * The generated class name. By default the name is obtained by the interface simple name,
-     * prepending all the outer class names in case it is not a top level class.
-     * <p>
-     * For instance, an interface named <code>MyItf</code> defined inside a class named
-     * <code>MyClass</code>, will result in the generation of a class named
-     * <code>Proxy_MyClass_MyItf</code>.
-     *
-     * @return the class name.
-     */
-    String className() default DEFAULT;
+  /**
+   * The generated class name. By default the name is obtained by the interface simple name,
+   * prepending all the outer class names in case it is not a top level class.
+   * <p>
+   * For instance, an interface named <code>MyItf</code> defined inside a class named
+   * <code>MyClass</code>, will result in the generation of a class named
+   * <code>Proxy_MyClass_MyItf</code>.
+   *
+   * @return the class name.
+   */
+  String className() default DEFAULT;
 
-    /**
-     * The generated class package. By default it is the same as the interface one.
-     *
-     * @return the package.
-     */
-    String classPackage() default DEFAULT;
+  /**
+   * The generated class package. By default it is the same as the interface one.
+   *
+   * @return the package.
+   */
+  String classPackage() default DEFAULT;
 
-    /**
-     * The generated class name prefix.
-     *
-     * @return the name prefix.
-     */
-    String classPrefix() default DEFAULT_CLASS_PREFIX;
+  /**
+   * The generated class name prefix.
+   *
+   * @return the name prefix.
+   */
+  String classPrefix() default DEFAULT_CLASS_PREFIX;
 
-    /**
-     * The generated class name suffix.
-     *
-     * @return the name suffix.
-     */
-    String classSuffix() default DEFAULT_CLASS_SUFFIX;
+  /**
+   * The generated class name suffix.
+   *
+   * @return the name suffix.
+   */
+  String classSuffix() default DEFAULT_CLASS_SUFFIX;
 
-    /**
-     * The wrapped class.
-     *
-     * @return the class.
-     */
-    Class<?> value();
+  /**
+   * The wrapped class.
+   *
+   * @return the class.
+   */
+  Class<?> value();
 }

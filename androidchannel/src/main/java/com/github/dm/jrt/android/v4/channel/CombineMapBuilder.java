@@ -35,48 +35,47 @@ import org.jetbrains.annotations.NotNull;
  */
 class CombineMapBuilder<IN> extends AbstractBuilder<Channel<Selectable<? extends IN>, ?>> {
 
-    private final SparseArrayCompat<? extends Channel<? extends IN, ?>> mChannelMap;
+  private final SparseArrayCompat<? extends Channel<? extends IN, ?>> mChannelMap;
 
-    /**
-     * Constructor.
-     *
-     * @param channels the map of channels to combine.
-     * @throws java.lang.IllegalArgumentException if the specified map is empty.
-     * @throws java.lang.NullPointerException     if the specified map is null or contains a null
-     *                                            object.
-     */
-    CombineMapBuilder(
-            @NotNull final SparseArrayCompat<? extends Channel<? extends IN, ?>> channels) {
-        if (channels.size() == 0) {
-            throw new IllegalArgumentException("the map of channels must not be empty");
-        }
-
-        final SparseArrayCompat<? extends Channel<? extends IN, ?>> channelMap = channels.clone();
-        if (channelMap.indexOfValue(null) >= 0) {
-            throw new NullPointerException("the map of channels must not contain null objects");
-        }
-
-        mChannelMap = channelMap;
+  /**
+   * Constructor.
+   *
+   * @param channels the map of channels to combine.
+   * @throws java.lang.IllegalArgumentException if the specified map is empty.
+   * @throws java.lang.NullPointerException     if the specified map is null or contains a null
+   *                                            object.
+   */
+  CombineMapBuilder(@NotNull final SparseArrayCompat<? extends Channel<? extends IN, ?>> channels) {
+    if (channels.size() == 0) {
+      throw new IllegalArgumentException("the map of channels must not be empty");
     }
 
-    @NotNull
-    @Override
-    @SuppressWarnings("unchecked")
-    protected Channel<Selectable<? extends IN>, ?> build(
-            @NotNull final ChannelConfiguration configuration) {
-        final SparseArrayCompat<? extends Channel<? extends IN, ?>> channelMap = mChannelMap;
-        final int size = channelMap.size();
-        final SparseArrayCompat<Channel<IN, ?>> inputChannelMap =
-                new SparseArrayCompat<Channel<IN, ?>>(size);
-        for (int i = 0; i < size; ++i) {
-            final Channel<IN, IN> outputChannel = JRoutineCore.io().buildChannel();
-            outputChannel.bind((Channel<IN, ?>) channelMap.valueAt(i));
-            inputChannelMap.put(channelMap.keyAt(i), outputChannel);
-        }
-
-        final Channel<Selectable<? extends IN>, Selectable<? extends IN>> inputChannel =
-                JRoutineCore.io().apply(configuration).buildChannel();
-        inputChannel.bind(new SortingMapChannelConsumer<IN>(inputChannelMap));
-        return inputChannel;
+    final SparseArrayCompat<? extends Channel<? extends IN, ?>> channelMap = channels.clone();
+    if (channelMap.indexOfValue(null) >= 0) {
+      throw new NullPointerException("the map of channels must not contain null objects");
     }
+
+    mChannelMap = channelMap;
+  }
+
+  @NotNull
+  @Override
+  @SuppressWarnings("unchecked")
+  protected Channel<Selectable<? extends IN>, ?> build(
+      @NotNull final ChannelConfiguration configuration) {
+    final SparseArrayCompat<? extends Channel<? extends IN, ?>> channelMap = mChannelMap;
+    final int size = channelMap.size();
+    final SparseArrayCompat<Channel<IN, ?>> inputChannelMap =
+        new SparseArrayCompat<Channel<IN, ?>>(size);
+    for (int i = 0; i < size; ++i) {
+      final Channel<IN, IN> outputChannel = JRoutineCore.io().buildChannel();
+      outputChannel.bind((Channel<IN, ?>) channelMap.valueAt(i));
+      inputChannelMap.put(channelMap.keyAt(i), outputChannel);
+    }
+
+    final Channel<Selectable<? extends IN>, Selectable<? extends IN>> inputChannel =
+        JRoutineCore.io().apply(configuration).buildChannel();
+    inputChannel.bind(new SortingMapChannelConsumer<IN>(inputChannelMap));
+    return inputChannel;
+  }
 }

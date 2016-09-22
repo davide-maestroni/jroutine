@@ -39,80 +39,80 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TargetApi(VERSION_CODES.FROYO)
 public class ExceptionTest extends ActivityInstrumentationTestCase2<TestActivity> {
 
-    public ExceptionTest() {
+  public ExceptionTest() {
 
-        super(TestActivity.class);
-    }
+    super(TestActivity.class);
+  }
 
-    public void testLoaderException() {
+  public void testLoaderException() {
 
-        assertThat(new LoaderInvocationException().getId()).isEqualTo(-1);
-        assertThat(new LoaderInvocationException(13).getId()).isEqualTo(13);
-        assertThat(new LoaderClashException(13).getId()).isEqualTo(13);
-        assertThat(new InvocationClashException(13).getId()).isEqualTo(13);
-        assertThat(new TypeClashException(13).getId()).isEqualTo(13);
-        assertThat(new MissingLoaderException().getId()).isEqualTo(-1);
-        assertThat(new MissingLoaderException(13).getId()).isEqualTo(13);
-        assertThat(new StaleResultException(13).getId()).isEqualTo(13);
-    }
+    assertThat(new LoaderInvocationException().getId()).isEqualTo(-1);
+    assertThat(new LoaderInvocationException(13).getId()).isEqualTo(13);
+    assertThat(new LoaderClashException(13).getId()).isEqualTo(13);
+    assertThat(new InvocationClashException(13).getId()).isEqualTo(13);
+    assertThat(new TypeClashException(13).getId()).isEqualTo(13);
+    assertThat(new MissingLoaderException().getId()).isEqualTo(-1);
+    assertThat(new MissingLoaderException(13).getId()).isEqualTo(13);
+    assertThat(new StaleResultException(13).getId()).isEqualTo(13);
+  }
 
-    public void testLoaderExceptionSerialization() throws IOException, ClassNotFoundException {
+  public void testLoaderExceptionSerialization() throws IOException, ClassNotFoundException {
 
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        new ObjectOutputStream(outputStream).writeObject(new LoaderInvocationException(17));
-        Object object = new ObjectInputStream(
-                new ByteArrayInputStream(outputStream.toByteArray())).readObject();
-        assertThat(object).isExactlyInstanceOf(LoaderInvocationException.class);
-        assertThat(((LoaderInvocationException) object).getId()).isEqualTo(17);
-        outputStream = new ByteArrayOutputStream();
-        new ObjectOutputStream(outputStream).writeObject(new LoaderClashException(17));
-        object = new ObjectInputStream(
-                new ByteArrayInputStream(outputStream.toByteArray())).readObject();
-        assertThat(object).isExactlyInstanceOf(LoaderClashException.class);
-        assertThat(((LoaderClashException) object).getId()).isEqualTo(17);
-        outputStream = new ByteArrayOutputStream();
-        new ObjectOutputStream(outputStream).writeObject(new InvocationClashException(17));
-        object = new ObjectInputStream(
-                new ByteArrayInputStream(outputStream.toByteArray())).readObject();
-        assertThat(object).isExactlyInstanceOf(InvocationClashException.class);
-        assertThat(((InvocationClashException) object).getId()).isEqualTo(17);
-        outputStream = new ByteArrayOutputStream();
-        new ObjectOutputStream(outputStream).writeObject(new TypeClashException(17));
-        object = new ObjectInputStream(
-                new ByteArrayInputStream(outputStream.toByteArray())).readObject();
-        assertThat(object).isExactlyInstanceOf(TypeClashException.class);
-        assertThat(((TypeClashException) object).getId()).isEqualTo(17);
-        outputStream = new ByteArrayOutputStream();
-        new ObjectOutputStream(outputStream).writeObject(new MissingLoaderException(17));
-        object = new ObjectInputStream(
-                new ByteArrayInputStream(outputStream.toByteArray())).readObject();
-        assertThat(object).isExactlyInstanceOf(MissingLoaderException.class);
-        assertThat(((MissingLoaderException) object).getId()).isEqualTo(17);
-        outputStream = new ByteArrayOutputStream();
-        new ObjectOutputStream(outputStream).writeObject(new StaleResultException(17));
-        object = new ObjectInputStream(
-                new ByteArrayInputStream(outputStream.toByteArray())).readObject();
-        assertThat(object).isExactlyInstanceOf(StaleResultException.class);
-        assertThat(((StaleResultException) object).getId()).isEqualTo(17);
-    }
+    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    new ObjectOutputStream(outputStream).writeObject(new LoaderInvocationException(17));
+    Object object =
+        new ObjectInputStream(new ByteArrayInputStream(outputStream.toByteArray())).readObject();
+    assertThat(object).isExactlyInstanceOf(LoaderInvocationException.class);
+    assertThat(((LoaderInvocationException) object).getId()).isEqualTo(17);
+    outputStream = new ByteArrayOutputStream();
+    new ObjectOutputStream(outputStream).writeObject(new LoaderClashException(17));
+    object =
+        new ObjectInputStream(new ByteArrayInputStream(outputStream.toByteArray())).readObject();
+    assertThat(object).isExactlyInstanceOf(LoaderClashException.class);
+    assertThat(((LoaderClashException) object).getId()).isEqualTo(17);
+    outputStream = new ByteArrayOutputStream();
+    new ObjectOutputStream(outputStream).writeObject(new InvocationClashException(17));
+    object =
+        new ObjectInputStream(new ByteArrayInputStream(outputStream.toByteArray())).readObject();
+    assertThat(object).isExactlyInstanceOf(InvocationClashException.class);
+    assertThat(((InvocationClashException) object).getId()).isEqualTo(17);
+    outputStream = new ByteArrayOutputStream();
+    new ObjectOutputStream(outputStream).writeObject(new TypeClashException(17));
+    object =
+        new ObjectInputStream(new ByteArrayInputStream(outputStream.toByteArray())).readObject();
+    assertThat(object).isExactlyInstanceOf(TypeClashException.class);
+    assertThat(((TypeClashException) object).getId()).isEqualTo(17);
+    outputStream = new ByteArrayOutputStream();
+    new ObjectOutputStream(outputStream).writeObject(new MissingLoaderException(17));
+    object =
+        new ObjectInputStream(new ByteArrayInputStream(outputStream.toByteArray())).readObject();
+    assertThat(object).isExactlyInstanceOf(MissingLoaderException.class);
+    assertThat(((MissingLoaderException) object).getId()).isEqualTo(17);
+    outputStream = new ByteArrayOutputStream();
+    new ObjectOutputStream(outputStream).writeObject(new StaleResultException(17));
+    object =
+        new ObjectInputStream(new ByteArrayInputStream(outputStream.toByteArray())).readObject();
+    assertThat(object).isExactlyInstanceOf(StaleResultException.class);
+    assertThat(((StaleResultException) object).getId()).isEqualTo(17);
+  }
 
-    public void testServiceException() {
+  public void testServiceException() {
 
-        assertThat(new ServiceDisconnectedException().getComponentName()).isNull();
-        assertThat(new ServiceDisconnectedException(
-                getActivity().getComponentName()).getComponentName()).isEqualTo(
-                getActivity().getComponentName());
-    }
+    assertThat(new ServiceDisconnectedException().getComponentName()).isNull();
+    assertThat(new ServiceDisconnectedException(
+        getActivity().getComponentName()).getComponentName()).isEqualTo(
+        getActivity().getComponentName());
+  }
 
-    public void testServiceExceptionSerialization() throws IOException, ClassNotFoundException {
+  public void testServiceExceptionSerialization() throws IOException, ClassNotFoundException {
 
-        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        new ObjectOutputStream(outputStream).writeObject(
-                new ServiceDisconnectedException(getActivity().getComponentName()));
-        final Object object = new ObjectInputStream(
-                new ByteArrayInputStream(outputStream.toByteArray())).readObject();
-        assertThat(object).isExactlyInstanceOf(ServiceDisconnectedException.class);
-        assertThat(((ServiceDisconnectedException) object).getComponentName()).isEqualTo(
-                getActivity().getComponentName());
-    }
+    final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    new ObjectOutputStream(outputStream).writeObject(
+        new ServiceDisconnectedException(getActivity().getComponentName()));
+    final Object object =
+        new ObjectInputStream(new ByteArrayInputStream(outputStream.toByteArray())).readObject();
+    assertThat(object).isExactlyInstanceOf(ServiceDisconnectedException.class);
+    assertThat(((ServiceDisconnectedException) object).getComponentName()).isEqualTo(
+        getActivity().getComponentName());
+  }
 }

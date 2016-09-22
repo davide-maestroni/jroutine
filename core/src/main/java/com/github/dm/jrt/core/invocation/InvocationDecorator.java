@@ -32,34 +32,34 @@ import org.jetbrains.annotations.NotNull;
  */
 public class InvocationDecorator<IN, OUT> implements Invocation<IN, OUT> {
 
-    private final Invocation<IN, OUT> mInvocation;
+  private final Invocation<IN, OUT> mInvocation;
 
-    /**
-     * Constructor.
-     *
-     * @param wrapped the wrapped invocation instance.
-     */
-    public InvocationDecorator(@NotNull final Invocation<IN, OUT> wrapped) {
-        mInvocation = ConstantConditions.notNull("wrapped invocation", wrapped);
-    }
+  /**
+   * Constructor.
+   *
+   * @param wrapped the wrapped invocation instance.
+   */
+  public InvocationDecorator(@NotNull final Invocation<IN, OUT> wrapped) {
+    mInvocation = ConstantConditions.notNull("wrapped invocation", wrapped);
+  }
 
-    public void onAbort(@NotNull final RoutineException reason) throws Exception {
-        mInvocation.onAbort(reason);
-    }
+  public void onAbort(@NotNull final RoutineException reason) throws Exception {
+    mInvocation.onAbort(reason);
+  }
 
-    public void onComplete(@NotNull final Channel<OUT, ?> result) throws Exception {
-        mInvocation.onComplete(result);
-    }
+  public void onComplete(@NotNull final Channel<OUT, ?> result) throws Exception {
+    mInvocation.onComplete(result);
+  }
 
-    public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) throws Exception {
-        mInvocation.onInput(input, result);
-    }
+  public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) throws Exception {
+    mInvocation.onInput(input, result);
+  }
 
-    public void onRecycle(final boolean isReused) throws Exception {
-        mInvocation.onRecycle(isReused);
-    }
+  public void onRecycle(final boolean isReused) throws Exception {
+    mInvocation.onRecycle(isReused);
+  }
 
-    public void onRestart() throws Exception {
-        mInvocation.onRestart();
-    }
+  public void onRestart() throws Exception {
+    mInvocation.onRestart();
+  }
 }

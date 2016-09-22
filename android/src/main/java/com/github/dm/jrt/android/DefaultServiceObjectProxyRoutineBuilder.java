@@ -42,171 +42,168 @@ import java.lang.reflect.Method;
  */
 class DefaultServiceObjectProxyRoutineBuilder implements ServiceObjectProxyRoutineBuilder {
 
-    private final ServiceContext mContext;
+  private final ServiceContext mContext;
 
-    private final ContextInvocationTarget<?> mTarget;
+  private final ContextInvocationTarget<?> mTarget;
 
-    private BuilderType mBuilderType;
+  private BuilderType mBuilderType;
 
-    private InvocationConfiguration mInvocationConfiguration =
-            InvocationConfiguration.defaultConfiguration();
+  private InvocationConfiguration mInvocationConfiguration =
+      InvocationConfiguration.defaultConfiguration();
 
-    private ObjectConfiguration mObjectConfiguration = ObjectConfiguration.defaultConfiguration();
+  private ObjectConfiguration mObjectConfiguration = ObjectConfiguration.defaultConfiguration();
 
-    private ServiceConfiguration mServiceConfiguration =
-            ServiceConfiguration.defaultConfiguration();
+  private ServiceConfiguration mServiceConfiguration = ServiceConfiguration.defaultConfiguration();
 
-    /**
-     * Constructor.
-     *
-     * @param context the Service context.
-     * @param target  the invocation target.
-     */
-    DefaultServiceObjectProxyRoutineBuilder(@NotNull final ServiceContext context,
-            @NotNull final ContextInvocationTarget<?> target) {
-        mContext = ConstantConditions.notNull("Service context", context);
-        mTarget = ConstantConditions.notNull("invocation target", target);
+  /**
+   * Constructor.
+   *
+   * @param context the Service context.
+   * @param target  the invocation target.
+   */
+  DefaultServiceObjectProxyRoutineBuilder(@NotNull final ServiceContext context,
+      @NotNull final ContextInvocationTarget<?> target) {
+    mContext = ConstantConditions.notNull("Service context", context);
+    mTarget = ConstantConditions.notNull("invocation target", target);
+  }
+
+  @NotNull
+  @Override
+  public ServiceObjectProxyRoutineBuilder apply(
+      @NotNull final InvocationConfiguration configuration) {
+    mInvocationConfiguration =
+        ConstantConditions.notNull("invocation configuration", configuration);
+    return this;
+  }
+
+  @NotNull
+  @Override
+  public ServiceObjectProxyRoutineBuilder apply(@NotNull final ObjectConfiguration configuration) {
+    mObjectConfiguration = ConstantConditions.notNull("object configuration", configuration);
+    return this;
+  }
+
+  @NotNull
+  @Override
+  public InvocationConfiguration.Builder<? extends ServiceObjectProxyRoutineBuilder>
+  applyInvocationConfiguration() {
+    return new InvocationConfiguration.Builder<ServiceObjectProxyRoutineBuilder>(
+        new InvocationConfiguration.Configurable<ServiceObjectProxyRoutineBuilder>() {
+
+          @NotNull
+          @Override
+          public ServiceObjectProxyRoutineBuilder apply(
+              @NotNull final InvocationConfiguration configuration) {
+            return DefaultServiceObjectProxyRoutineBuilder.this.apply(configuration);
+          }
+        }, mInvocationConfiguration);
+  }
+
+  @NotNull
+  @Override
+  public ObjectConfiguration.Builder<? extends ServiceObjectProxyRoutineBuilder>
+  applyObjectConfiguration() {
+    return new ObjectConfiguration.Builder<ServiceObjectProxyRoutineBuilder>(
+        new ObjectConfiguration.Configurable<ServiceObjectProxyRoutineBuilder>() {
+
+          @NotNull
+          @Override
+          public ServiceObjectProxyRoutineBuilder apply(
+              @NotNull final ObjectConfiguration configuration) {
+            return DefaultServiceObjectProxyRoutineBuilder.this.apply(configuration);
+          }
+        }, mObjectConfiguration);
+  }
+
+  @NotNull
+  @Override
+  public ServiceObjectProxyRoutineBuilder withType(@Nullable final BuilderType builderType) {
+    mBuilderType = builderType;
+    return this;
+  }
+
+  @NotNull
+  @Override
+  public ServiceObjectProxyRoutineBuilder apply(@NotNull final ServiceConfiguration configuration) {
+    mServiceConfiguration = ConstantConditions.notNull("Service configuration", configuration);
+    return this;
+  }
+
+  @NotNull
+  @Override
+  public ServiceConfiguration.Builder<? extends ServiceObjectProxyRoutineBuilder>
+  applyServiceConfiguration() {
+    return new ServiceConfiguration.Builder<ServiceObjectProxyRoutineBuilder>(
+        new ServiceConfiguration.Configurable<ServiceObjectProxyRoutineBuilder>() {
+
+          @NotNull
+          @Override
+          public ServiceObjectProxyRoutineBuilder apply(
+              @NotNull final ServiceConfiguration configuration) {
+            return DefaultServiceObjectProxyRoutineBuilder.this.apply(configuration);
+          }
+        }, mServiceConfiguration);
+  }
+
+  @NotNull
+  @Override
+  public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
+    final BuilderType builderType = mBuilderType;
+    if (builderType == null) {
+      final ServiceProxy proxyAnnotation = itf.getAnnotation(ServiceProxy.class);
+      if ((proxyAnnotation != null) && mTarget.isAssignableTo(proxyAnnotation.value())) {
+        return newProxyBuilder().buildProxy(itf);
+      }
+
+      return newObjectBuilder().buildProxy(itf);
+
+    } else if (builderType == BuilderType.PROXY) {
+      return newProxyBuilder().buildProxy(itf);
     }
 
-    @NotNull
-    @Override
-    public ServiceObjectProxyRoutineBuilder apply(
-            @NotNull final InvocationConfiguration configuration) {
-        mInvocationConfiguration =
-                ConstantConditions.notNull("invocation configuration", configuration);
-        return this;
-    }
+    return newObjectBuilder().buildProxy(itf);
+  }
 
-    @NotNull
-    @Override
-    public ServiceObjectProxyRoutineBuilder apply(
-            @NotNull final ObjectConfiguration configuration) {
-        mObjectConfiguration = ConstantConditions.notNull("object configuration", configuration);
-        return this;
-    }
+  @NotNull
+  @Override
+  public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
+    return buildProxy(itf.getRawClass());
+  }
 
-    @NotNull
-    @Override
-    public InvocationConfiguration.Builder<? extends ServiceObjectProxyRoutineBuilder>
-    applyInvocationConfiguration() {
-        return new InvocationConfiguration.Builder<ServiceObjectProxyRoutineBuilder>(
-                new InvocationConfiguration.Configurable<ServiceObjectProxyRoutineBuilder>() {
+  @NotNull
+  @Override
+  public <IN, OUT> Routine<IN, OUT> method(@NotNull final String name) {
+    return newObjectBuilder().method(name);
+  }
 
-                    @NotNull
-                    @Override
-                    public ServiceObjectProxyRoutineBuilder apply(
-                            @NotNull final InvocationConfiguration configuration) {
-                        return DefaultServiceObjectProxyRoutineBuilder.this.apply(configuration);
-                    }
-                }, mInvocationConfiguration);
-    }
+  @NotNull
+  @Override
+  public <IN, OUT> Routine<IN, OUT> method(@NotNull final String name,
+      @NotNull final Class<?>... parameterTypes) {
+    return newObjectBuilder().method(name, parameterTypes);
+  }
 
-    @NotNull
-    @Override
-    public ObjectConfiguration.Builder<? extends ServiceObjectProxyRoutineBuilder>
-    applyObjectConfiguration() {
-        return new ObjectConfiguration.Builder<ServiceObjectProxyRoutineBuilder>(
-                new ObjectConfiguration.Configurable<ServiceObjectProxyRoutineBuilder>() {
+  @NotNull
+  @Override
+  public <IN, OUT> Routine<IN, OUT> method(@NotNull final Method method) {
+    return newObjectBuilder().method(method);
+  }
 
-                    @NotNull
-                    @Override
-                    public ServiceObjectProxyRoutineBuilder apply(
-                            @NotNull final ObjectConfiguration configuration) {
-                        return DefaultServiceObjectProxyRoutineBuilder.this.apply(configuration);
-                    }
-                }, mObjectConfiguration);
-    }
+  @NotNull
+  private ServiceObjectRoutineBuilder newObjectBuilder() {
+    return JRoutineServiceObject.on(mContext)
+                                .with(mTarget)
+                                .apply(mInvocationConfiguration)
+                                .apply(mObjectConfiguration)
+                                .apply(mServiceConfiguration);
+  }
 
-    @NotNull
-    @Override
-    public ServiceObjectProxyRoutineBuilder withType(@Nullable final BuilderType builderType) {
-        mBuilderType = builderType;
-        return this;
-    }
-
-    @NotNull
-    @Override
-    public ServiceObjectProxyRoutineBuilder apply(
-            @NotNull final ServiceConfiguration configuration) {
-        mServiceConfiguration = ConstantConditions.notNull("Service configuration", configuration);
-        return this;
-    }
-
-    @NotNull
-    @Override
-    public ServiceConfiguration.Builder<? extends ServiceObjectProxyRoutineBuilder>
-    applyServiceConfiguration() {
-        return new ServiceConfiguration.Builder<ServiceObjectProxyRoutineBuilder>(
-                new ServiceConfiguration.Configurable<ServiceObjectProxyRoutineBuilder>() {
-
-                    @NotNull
-                    @Override
-                    public ServiceObjectProxyRoutineBuilder apply(
-                            @NotNull final ServiceConfiguration configuration) {
-                        return DefaultServiceObjectProxyRoutineBuilder.this.apply(configuration);
-                    }
-                }, mServiceConfiguration);
-    }
-
-    @NotNull
-    @Override
-    public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
-        final BuilderType builderType = mBuilderType;
-        if (builderType == null) {
-            final ServiceProxy proxyAnnotation = itf.getAnnotation(ServiceProxy.class);
-            if ((proxyAnnotation != null) && mTarget.isAssignableTo(proxyAnnotation.value())) {
-                return newProxyBuilder().buildProxy(itf);
-            }
-
-            return newObjectBuilder().buildProxy(itf);
-
-        } else if (builderType == BuilderType.PROXY) {
-            return newProxyBuilder().buildProxy(itf);
-        }
-
-        return newObjectBuilder().buildProxy(itf);
-    }
-
-    @NotNull
-    @Override
-    public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
-        return buildProxy(itf.getRawClass());
-    }
-
-    @NotNull
-    @Override
-    public <IN, OUT> Routine<IN, OUT> method(@NotNull final String name) {
-        return newObjectBuilder().method(name);
-    }
-
-    @NotNull
-    @Override
-    public <IN, OUT> Routine<IN, OUT> method(@NotNull final String name,
-            @NotNull final Class<?>... parameterTypes) {
-        return newObjectBuilder().method(name, parameterTypes);
-    }
-
-    @NotNull
-    @Override
-    public <IN, OUT> Routine<IN, OUT> method(@NotNull final Method method) {
-        return newObjectBuilder().method(method);
-    }
-
-    @NotNull
-    private ServiceObjectRoutineBuilder newObjectBuilder() {
-        return JRoutineServiceObject.on(mContext)
-                                    .with(mTarget)
-                                    .apply(mInvocationConfiguration)
-                                    .apply(mObjectConfiguration)
-                                    .apply(mServiceConfiguration);
-    }
-
-    @NotNull
-    private ServiceProxyRoutineBuilder newProxyBuilder() {
-        return JRoutineServiceProxy.on(mContext)
-                                   .with(mTarget)
-                                   .apply(mInvocationConfiguration)
-                                   .apply(mObjectConfiguration)
-                                   .apply(mServiceConfiguration);
-    }
+  @NotNull
+  private ServiceProxyRoutineBuilder newProxyBuilder() {
+    return JRoutineServiceProxy.on(mContext)
+                               .with(mTarget)
+                               .apply(mInvocationConfiguration)
+                               .apply(mObjectConfiguration)
+                               .apply(mServiceConfiguration);
+  }
 }

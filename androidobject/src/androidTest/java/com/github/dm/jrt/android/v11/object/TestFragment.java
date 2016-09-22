@@ -35,11 +35,11 @@ import org.jetbrains.annotations.NotNull;
 @TargetApi(VERSION_CODES.HONEYCOMB)
 public class TestFragment extends Fragment {
 
-    @Nullable
-    @Override
-    public View onCreateView(@NotNull final LayoutInflater inflater, final ViewGroup container,
-            final Bundle savedInstanceState) {
+  @Nullable
+  @Override
+  public View onCreateView(@NotNull final LayoutInflater inflater, final ViewGroup container,
+      final Bundle savedInstanceState) {
 
-        return new View(getActivity());
-    }
+    return new View(getActivity());
+  }
 }

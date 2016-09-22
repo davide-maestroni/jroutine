@@ -60,10 +60,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface MatchResolution {
 
-    /**
-     * The input clash resolution type.
-     *
-     * @return the resolution type.
-     */
-    ClashResolutionType value();
+  /**
+   * The input clash resolution type.
+   *
+   * @return the resolution type.
+   */
+  ClashResolutionType value();
 }

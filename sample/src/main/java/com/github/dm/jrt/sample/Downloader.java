@@ -44,173 +44,173 @@ import static com.github.dm.jrt.core.util.UnitDuration.zero;
  */
 public class Downloader {
 
-    private static final Runner sReadRunner = Runners.poolRunner();
+  private static final Runner sReadRunner = Runners.poolRunner();
 
-    private static final Runner sWriteRunner = Runners.poolRunner(1);
+  private static final Runner sWriteRunner = Runners.poolRunner(1);
 
-    private final HashSet<URI> mDownloaded = new HashSet<URI>();
+  private final HashSet<URI> mDownloaded = new HashSet<URI>();
 
-    private final HashMap<URI, Channel<?, Boolean>> mDownloads =
-            new HashMap<URI, Channel<?, Boolean>>();
+  private final HashMap<URI, Channel<?, Boolean>> mDownloads =
+      new HashMap<URI, Channel<?, Boolean>>();
 
-    private final Routine<URI, ByteBuffer> mReadConnection;
+  private final Routine<URI, ByteBuffer> mReadConnection;
 
-    /**
-     * Constructor.
-     *
-     * @param maxParallelDownloads the max number of parallel downloads running at the same time.
-     */
-    public Downloader(final int maxParallelDownloads) {
-        // The read connection invocation is stateless so we can just use a single instance of it
-        mReadConnection = JRoutineCore.with(new ReadConnection())
-                                      .applyInvocationConfiguration()
-                                      // Since each download may take a long time to complete, we
-                                      // use a dedicated runner
-                                      .withRunner(sReadRunner)
-                                      // By setting the maximum number of parallel invocations we
-                                      // effectively limit the number of parallel downloads
-                                      .withMaxInstances(maxParallelDownloads)
-                                      .configured()
-                                      .buildRoutine();
+  /**
+   * Constructor.
+   *
+   * @param maxParallelDownloads the max number of parallel downloads running at the same time.
+   */
+  public Downloader(final int maxParallelDownloads) {
+    // The read connection invocation is stateless so we can just use a single instance of it
+    mReadConnection = JRoutineCore.with(new ReadConnection())
+                                  .applyInvocationConfiguration()
+                                  // Since each download may take a long time to complete, we use a
+                                  // dedicated runner
+                                  .withRunner(sReadRunner)
+                                  // By setting the maximum number of parallel invocations we
+                                  // effectively limit the number of parallel downloads
+                                  .withMaxInstances(maxParallelDownloads)
+                                  .configured()
+                                  .buildRoutine();
+  }
+
+  /**
+   * Utility method to get the name of the downloaded file from its URI.
+   *
+   * @param uri the URI of the resource to download.
+   * @return the file name.
+   */
+  public static String getFileName(final URI uri) {
+    final String path = uri.getPath();
+    final String fileName = path.substring(path.lastIndexOf('/') + 1);
+    if (fileName.equals("")) {
+      return Long.toString(path.hashCode()) + ".tmp";
     }
 
-    /**
-     * Utility method to get the name of the downloaded file from its URI.
-     *
-     * @param uri the URI of the resource to download.
-     * @return the file name.
-     */
-    public static String getFileName(final URI uri) {
-        final String path = uri.getPath();
-        final String fileName = path.substring(path.lastIndexOf('/') + 1);
-        if (fileName.equals("")) {
-            return Long.toString(path.hashCode()) + ".tmp";
-        }
+    return fileName;
+  }
 
-        return fileName;
+  /**
+   * Main.
+   * <br>
+   * The first argument is the path to the download directory, the second one is the maximum
+   * number of parallel downloads, and all the further ones are the URIs of the resources to
+   * download.
+   *
+   * @param args the arguments.
+   * @throws java.io.IOException         if an I/O error occurred.
+   * @throws java.net.URISyntaxException if one of the specified URIs is not correctly formatted.
+   */
+  public static void main(final String args[]) throws IOException, URISyntaxException {
+    final File downloadDir = new File(args[0]);
+    final Downloader downloader = new Downloader(Integer.parseInt(args[1]));
+    for (int i = 2; i < args.length; ++i) {
+      final URI uri = new URI(args[i]);
+      downloader.download(uri, new File(downloadDir, getFileName(uri)));
+    }
+  }
+
+  /**
+   * Aborts the download of the specified URI.
+   *
+   * @param uri the URI.
+   * @return whether the download was running and has been successfully aborted.
+   */
+  public boolean abort(final URI uri) {
+    final Channel<?, Boolean> channel = mDownloads.remove(uri);
+    return (channel != null) && channel.abort();
+  }
+
+  /**
+   * Aborts the download of the specified URI by waiting for the specified timeout for completion.
+   *
+   * @param uri     the URI.
+   * @param timeout the time to wait for the abortion to complete.
+   * @return whether the download was running and has been successfully aborted before the timeout
+   * elapsed.
+   */
+  public boolean abortAndWait(final URI uri, final UnitDuration timeout) {
+    final Channel<?, Boolean> channel = mDownloads.remove(uri);
+    return (channel != null) && channel.abort() && channel.after(timeout).getComplete();
+  }
+
+  /**
+   * Downloads the specified resources to the destination file.
+   *
+   * @param uri     the URI of the resource to download.
+   * @param dstFile the destination file.
+   */
+  public void download(final URI uri, final File dstFile) {
+    final HashMap<URI, Channel<?, Boolean>> downloads = mDownloads;
+    // Check if we are already downloading the same resource
+    if (!downloads.containsKey(uri)) {
+      // Remove it from the downloaded set
+      mDownloaded.remove(uri);
+      // In order to be able to abort the download at any time, we need to split the processing
+      // between the routine responsible for reading the data from the socket, and the one writing
+      // the next chunk of bytes to the local file
+      // In such way we can abort the download between two chunks, while they are passed to the
+      // specific routine
+      // That's why we store the routine channel in an internal map
+      final Routine<ByteBuffer, Boolean> writeFile =
+          JRoutineCore.with(factoryOf(WriteFile.class, dstFile))
+                      .applyInvocationConfiguration()
+                      // Since we want to limit the number of allocated chunks, we have to make the
+                      // writing happen in a dedicated runner, so that waiting for available space
+                      // becomes allowed
+                      .withRunner(sWriteRunner)
+                      .withInputBackoff(afterCount(32).linearDelay(seconds(3)))
+                      .configured()
+                      .buildRoutine();
+      downloads.put(uri, writeFile.call(mReadConnection.call(uri)));
+    }
+  }
+
+  /**
+   * Checks if the specified resource was successfully downloaded.
+   *
+   * @param uri the URI of the resource.
+   * @return whether the resource was downloaded.
+   */
+  public boolean isDownloaded(final URI uri) {
+    return waitDone(uri, zero());
+  }
+
+  /**
+   * Checks if the specified resource is currently downloading.
+   *
+   * @param uri the URI of the resource.
+   * @return whether the resource is downloading.
+   */
+  public boolean isDownloading(final URI uri) {
+    return mDownloads.containsKey(uri);
+  }
+
+  /**
+   * Waits at maximum the specified time for the resource to complete the downloading.
+   *
+   * @param uri     the URI of the resource.
+   * @param timeout the time to wait for the download to complete.
+   * @return whether the resource was successfully downloaded.
+   */
+  public boolean waitDone(final URI uri, final UnitDuration timeout) {
+    final HashMap<URI, Channel<?, Boolean>> downloads = mDownloads;
+    final Channel<?, Boolean> channel = downloads.get(uri);
+    // Check if the output channel is in the map, that is, the resource is currently downloading,
+    // wait for the routine to complete
+    if ((channel != null) && channel.after(timeout).getComplete()) {
+      // If complete, remove the resource from the download map
+      downloads.remove(uri);
+      // Read the result and, if successful, add the resource to the downloaded set
+      try {
+        return channel.next() && mDownloaded.add(uri);
+
+      } catch (final InvocationException ignored) {
+        // Something went wrong or the routine has been aborted
+      }
     }
 
-    /**
-     * Main.
-     * <br>
-     * The first argument is the path to the download directory, the second one is the maximum
-     * number of parallel downloads, and all the further ones are the URIs of the resources to
-     * download.
-     *
-     * @param args the arguments.
-     * @throws java.io.IOException         if an I/O error occurred.
-     * @throws java.net.URISyntaxException if one of the specified URIs is not correctly formatted.
-     */
-    public static void main(final String args[]) throws IOException, URISyntaxException {
-        final File downloadDir = new File(args[0]);
-        final Downloader downloader = new Downloader(Integer.parseInt(args[1]));
-        for (int i = 2; i < args.length; ++i) {
-            final URI uri = new URI(args[i]);
-            downloader.download(uri, new File(downloadDir, getFileName(uri)));
-        }
-    }
-
-    /**
-     * Aborts the download of the specified URI.
-     *
-     * @param uri the URI.
-     * @return whether the download was running and has been successfully aborted.
-     */
-    public boolean abort(final URI uri) {
-        final Channel<?, Boolean> channel = mDownloads.remove(uri);
-        return (channel != null) && channel.abort();
-    }
-
-    /**
-     * Aborts the download of the specified URI by waiting for the specified timeout for completion.
-     *
-     * @param uri     the URI.
-     * @param timeout the time to wait for the abortion to complete.
-     * @return whether the download was running and has been successfully aborted before the timeout
-     * elapsed.
-     */
-    public boolean abortAndWait(final URI uri, final UnitDuration timeout) {
-        final Channel<?, Boolean> channel = mDownloads.remove(uri);
-        return (channel != null) && channel.abort() && channel.after(timeout).getComplete();
-    }
-
-    /**
-     * Downloads the specified resources to the destination file.
-     *
-     * @param uri     the URI of the resource to download.
-     * @param dstFile the destination file.
-     */
-    public void download(final URI uri, final File dstFile) {
-        final HashMap<URI, Channel<?, Boolean>> downloads = mDownloads;
-        // Check if we are already downloading the same resource
-        if (!downloads.containsKey(uri)) {
-            // Remove it from the downloaded set
-            mDownloaded.remove(uri);
-            // In order to be able to abort the download at any time, we need to split the
-            // processing between the routine responsible for reading the data from the socket, and
-            // the one writing the next chunk of bytes to the local file
-            // In such way we can abort the download between two chunks, while they are passed to
-            // the specific routine
-            // That's why we store the routine channel in an internal map
-            final Routine<ByteBuffer, Boolean> writeFile =
-                    JRoutineCore.with(factoryOf(WriteFile.class, dstFile))
-                                .applyInvocationConfiguration()
-                                // Since we want to limit the number of allocated chunks, we have to
-                                // make the writing happen in a dedicated runner, so that waiting
-                                // for available space becomes allowed
-                                .withRunner(sWriteRunner)
-                                .withInputBackoff(afterCount(32).linearDelay(seconds(3)))
-                                .configured()
-                                .buildRoutine();
-            downloads.put(uri, writeFile.call(mReadConnection.call(uri)));
-        }
-    }
-
-    /**
-     * Checks if the specified resource was successfully downloaded.
-     *
-     * @param uri the URI of the resource.
-     * @return whether the resource was downloaded.
-     */
-    public boolean isDownloaded(final URI uri) {
-        return waitDone(uri, zero());
-    }
-
-    /**
-     * Checks if the specified resource is currently downloading.
-     *
-     * @param uri the URI of the resource.
-     * @return whether the resource is downloading.
-     */
-    public boolean isDownloading(final URI uri) {
-        return mDownloads.containsKey(uri);
-    }
-
-    /**
-     * Waits at maximum the specified time for the resource to complete the downloading.
-     *
-     * @param uri     the URI of the resource.
-     * @param timeout the time to wait for the download to complete.
-     * @return whether the resource was successfully downloaded.
-     */
-    public boolean waitDone(final URI uri, final UnitDuration timeout) {
-        final HashMap<URI, Channel<?, Boolean>> downloads = mDownloads;
-        final Channel<?, Boolean> channel = downloads.get(uri);
-        // Check if the output channel is in the map, that is, the resource is currently
-        // downloading, wait for the routine to complete
-        if ((channel != null) && channel.after(timeout).getComplete()) {
-            // If complete, remove the resource from the download map
-            downloads.remove(uri);
-            // Read the result and, if successful, add the resource to the downloaded set
-            try {
-                return channel.next() && mDownloaded.add(uri);
-
-            } catch (final InvocationException ignored) {
-                // Something went wrong or the routine has been aborted
-            }
-        }
-
-        // Check if the resource is in the downloaded set
-        return mDownloaded.contains(uri);
-    }
+    // Check if the resource is in the downloaded set
+    return mDownloaded.contains(uri);
+  }
 }

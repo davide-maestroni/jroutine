@@ -29,39 +29,39 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class ExceptionTest {
 
-    @Test
-    public void testAbortException() {
+  @Test
+  public void testAbortException() {
 
-        assertThat(new AbortException(new NullPointerException()).getCause()).isExactlyInstanceOf(
-                NullPointerException.class);
-        assertThat(new AbortException(null)).hasNoCause();
-        assertThat(AbortException.wrapIfNeeded(new NullPointerException())).isExactlyInstanceOf(
-                AbortException.class);
-        assertThat(AbortException.wrapIfNeeded(new RoutineException())).isExactlyInstanceOf(
-                RoutineException.class);
-    }
+    assertThat(new AbortException(new NullPointerException()).getCause()).isExactlyInstanceOf(
+        NullPointerException.class);
+    assertThat(new AbortException(null)).hasNoCause();
+    assertThat(AbortException.wrapIfNeeded(new NullPointerException())).isExactlyInstanceOf(
+        AbortException.class);
+    assertThat(AbortException.wrapIfNeeded(new RoutineException())).isExactlyInstanceOf(
+        RoutineException.class);
+  }
 
-    @Test
-    public void testExecutionDeadlockException() {
+  @Test
+  public void testExecutionDeadlockException() {
 
-        assertThat(new ExecutionDeadlockException("")).hasNoCause();
-    }
+    assertThat(new ExecutionDeadlockException("")).hasNoCause();
+  }
 
-    @Test
-    public void testInputDeadlockException() {
+  @Test
+  public void testInputDeadlockException() {
 
-        assertThat(new InputDeadlockException("")).hasNoCause();
-    }
+    assertThat(new InputDeadlockException("")).hasNoCause();
+  }
 
-    @Test
-    public void testOutputDeadlockException() {
+  @Test
+  public void testOutputDeadlockException() {
 
-        assertThat(new OutputDeadlockException("")).hasNoCause();
-    }
+    assertThat(new OutputDeadlockException("")).hasNoCause();
+  }
 
-    @Test
-    public void testOutputTimeoutException() {
+  @Test
+  public void testOutputTimeoutException() {
 
-        assertThat(new OutputTimeoutException("")).hasNoCause();
-    }
+    assertThat(new OutputTimeoutException("")).hasNoCause();
+  }
 }

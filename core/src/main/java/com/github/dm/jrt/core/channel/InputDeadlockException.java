@@ -27,12 +27,12 @@ import org.jetbrains.annotations.Nullable;
  */
 public class InputDeadlockException extends DeadlockException {
 
-    /**
-     * Constructor.
-     *
-     * @param message the error message.
-     */
-    public InputDeadlockException(@Nullable final String message) {
-        super(message);
-    }
+  /**
+   * Constructor.
+   *
+   * @param message the error message.
+   */
+  public InputDeadlockException(@Nullable final String message) {
+    super(message);
+  }
 }

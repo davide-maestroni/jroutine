@@ -36,9 +36,42 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class PrependSupplierInvocationFactory<OUT> extends InvocationFactory<OUT, OUT> {
 
+  private final long mCount;
+
+  private final SupplierDecorator<? extends OUT> mOutputSupplier;
+
+  /**
+   * Constructor.
+   *
+   * @param count          the loop count.
+   * @param outputSupplier the supplier instance.
+   */
+  PrependSupplierInvocationFactory(final long count,
+      @NotNull final SupplierDecorator<? extends OUT> outputSupplier) {
+    super(asArgs(ConstantConditions.positive("count number", count),
+        ConstantConditions.notNull("supplier instance", outputSupplier)));
+    mCount = count;
+    mOutputSupplier = outputSupplier;
+  }
+
+  @NotNull
+  @Override
+  public Invocation<OUT, OUT> newInvocation() throws Exception {
+    return new PrependSupplierInvocation<OUT>(mCount, mOutputSupplier);
+  }
+
+  /**
+   * Prepending invocation used to call a supplier a specific number of times.
+   *
+   * @param <OUT> the output data type.
+   */
+  private static class PrependSupplierInvocation<OUT> extends TemplateInvocation<OUT, OUT> {
+
     private final long mCount;
 
     private final SupplierDecorator<? extends OUT> mOutputSupplier;
+
+    private boolean mIsCalled;
 
     /**
      * Constructor.
@@ -46,71 +79,37 @@ class PrependSupplierInvocationFactory<OUT> extends InvocationFactory<OUT, OUT> 
      * @param count          the loop count.
      * @param outputSupplier the supplier instance.
      */
-    PrependSupplierInvocationFactory(final long count,
-            @NotNull final SupplierDecorator<? extends OUT> outputSupplier) {
-        super(asArgs(ConstantConditions.positive("count number", count),
-                ConstantConditions.notNull("supplier instance", outputSupplier)));
-        mCount = count;
-        mOutputSupplier = outputSupplier;
+    private PrependSupplierInvocation(final long count,
+        @NotNull final SupplierDecorator<? extends OUT> outputSupplier) {
+      mCount = count;
+      mOutputSupplier = outputSupplier;
     }
 
-    @NotNull
     @Override
-    public Invocation<OUT, OUT> newInvocation() throws Exception {
-        return new PrependSupplierInvocation<OUT>(mCount, mOutputSupplier);
+    public void onComplete(@NotNull final Channel<OUT, ?> result) throws Exception {
+      onResult(result);
     }
 
-    /**
-     * Prepending invocation used to call a supplier a specific number of times.
-     *
-     * @param <OUT> the output data type.
-     */
-    private static class PrependSupplierInvocation<OUT> extends TemplateInvocation<OUT, OUT> {
-
-        private final long mCount;
-
-        private final SupplierDecorator<? extends OUT> mOutputSupplier;
-
-        private boolean mIsCalled;
-
-        /**
-         * Constructor.
-         *
-         * @param count          the loop count.
-         * @param outputSupplier the supplier instance.
-         */
-        private PrependSupplierInvocation(final long count,
-                @NotNull final SupplierDecorator<? extends OUT> outputSupplier) {
-            mCount = count;
-            mOutputSupplier = outputSupplier;
-        }
-
-        @Override
-        public void onComplete(@NotNull final Channel<OUT, ?> result) throws Exception {
-            onResult(result);
-        }
-
-        @Override
-        public void onInput(final OUT input, @NotNull final Channel<OUT, ?> result) throws
-                Exception {
-            onResult(result);
-            result.pass(input);
-        }
-
-        @Override
-        public void onRestart() {
-            mIsCalled = false;
-        }
-
-        private void onResult(@NotNull final Channel<OUT, ?> result) throws Exception {
-            if (!mIsCalled) {
-                mIsCalled = true;
-                final long count = mCount;
-                final SupplierDecorator<? extends OUT> supplier = mOutputSupplier;
-                for (long i = 0; i < count; ++i) {
-                    result.pass(supplier.get());
-                }
-            }
-        }
+    @Override
+    public void onInput(final OUT input, @NotNull final Channel<OUT, ?> result) throws Exception {
+      onResult(result);
+      result.pass(input);
     }
+
+    @Override
+    public void onRestart() {
+      mIsCalled = false;
+    }
+
+    private void onResult(@NotNull final Channel<OUT, ?> result) throws Exception {
+      if (!mIsCalled) {
+        mIsCalled = true;
+        final long count = mCount;
+        final SupplierDecorator<? extends OUT> supplier = mOutputSupplier;
+        for (long i = 0; i < count; ++i) {
+          result.pass(supplier.get());
+        }
+      }
+    }
+  }
 }

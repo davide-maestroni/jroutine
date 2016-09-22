@@ -44,132 +44,132 @@ import java.util.concurrent.TimeUnit;
  */
 class RetryChannelConsumer<IN, OUT> implements Execution, ChannelConsumer<OUT> {
 
-    private final BiFunction<? super Integer, ? super RoutineException, ? extends Long>
-            mBackoffFunction;
+  private final BiFunction<? super Integer, ? super RoutineException, ? extends Long>
+      mBackoffFunction;
 
-    private final Function<Channel<?, IN>, Channel<?, OUT>> mBindingFunction;
+  private final Function<Channel<?, IN>, Channel<?, OUT>> mBindingFunction;
 
-    private final Channel<?, IN> mInputChannel;
+  private final Channel<?, IN> mInputChannel;
 
-    private final Channel<OUT, ?> mOutputChannel;
+  private final Channel<OUT, ?> mOutputChannel;
 
-    private final ArrayList<OUT> mOutputs = new ArrayList<OUT>();
+  private final ArrayList<OUT> mOutputs = new ArrayList<OUT>();
 
-    private final Runner mRunner;
+  private final Runner mRunner;
 
-    private int mCount;
+  private int mCount;
+
+  /**
+   * Constructor.
+   *
+   * @param inputChannel    the input channel.
+   * @param outputChannel   the output channel.
+   * @param runner          the runner instance.
+   * @param bindingFunction the binding function.
+   * @param backoffFunction the backoff function.
+   */
+  RetryChannelConsumer(@NotNull final Channel<?, IN> inputChannel,
+      @NotNull final Channel<OUT, ?> outputChannel, @NotNull final Runner runner,
+      @NotNull final Function<Channel<?, IN>, Channel<?, OUT>> bindingFunction,
+      @NotNull final BiFunction<? super Integer, ? super RoutineException, ? extends Long>
+          backoffFunction) {
+    mInputChannel = ConstantConditions.notNull("input channel instance", inputChannel);
+    mOutputChannel = ConstantConditions.notNull("output channel instance", outputChannel);
+    mRunner = ConstantConditions.notNull("runner instance", runner);
+    mBindingFunction = ConstantConditions.notNull("binding function", bindingFunction);
+    mBackoffFunction = ConstantConditions.notNull("backoff function", backoffFunction);
+  }
+
+  public void onComplete() {
+    final Channel<OUT, ?> outputChannel = mOutputChannel;
+    try {
+      outputChannel.pass(mOutputs).close();
+
+    } catch (final Throwable t) {
+      outputChannel.abort(t);
+      InvocationInterruptedException.throwIfInterrupt(t);
+    }
+  }
+
+  public void run() {
+    final Channel<IN, IN> channel = JRoutineCore.io().buildChannel();
+    mInputChannel.bind(new SafeChannelConsumer<IN>(channel));
+    try {
+      mBindingFunction.apply(channel).bind(this);
+
+    } catch (final Throwable t) {
+      abort(t);
+      InvocationInterruptedException.throwIfInterrupt(t);
+    }
+  }
+
+  private void abort(@NotNull final Throwable error) {
+    final RoutineException ex = InvocationException.wrapIfNeeded(error);
+    mOutputChannel.abort(ex);
+    mInputChannel.abort(ex);
+  }
+
+  /**
+   * Channel consumer implementation avoiding the upstream propagation of errors.
+   *
+   * @param <IN> the input data type.
+   */
+  private static class SafeChannelConsumer<IN> implements ChannelConsumer<IN> {
+
+    private final Channel<IN, ?> mChannel;
 
     /**
      * Constructor.
      *
-     * @param inputChannel    the input channel.
-     * @param outputChannel   the output channel.
-     * @param runner          the runner instance.
-     * @param bindingFunction the binding function.
-     * @param backoffFunction the backoff function.
+     * @param channel the channel.
      */
-    RetryChannelConsumer(@NotNull final Channel<?, IN> inputChannel,
-            @NotNull final Channel<OUT, ?> outputChannel, @NotNull final Runner runner,
-            @NotNull final Function<Channel<?, IN>, Channel<?, OUT>> bindingFunction,
-            @NotNull final BiFunction<? super Integer, ? super RoutineException, ? extends Long>
-                    backoffFunction) {
-        mInputChannel = ConstantConditions.notNull("input channel instance", inputChannel);
-        mOutputChannel = ConstantConditions.notNull("output channel instance", outputChannel);
-        mRunner = ConstantConditions.notNull("runner instance", runner);
-        mBindingFunction = ConstantConditions.notNull("binding function", bindingFunction);
-        mBackoffFunction = ConstantConditions.notNull("backoff function", backoffFunction);
+    private SafeChannelConsumer(@NotNull final Channel<IN, ?> channel) {
+      mChannel = channel;
     }
 
     public void onComplete() {
-        final Channel<OUT, ?> outputChannel = mOutputChannel;
-        try {
-            outputChannel.pass(mOutputs).close();
-
-        } catch (final Throwable t) {
-            outputChannel.abort(t);
-            InvocationInterruptedException.throwIfInterrupt(t);
-        }
-    }
-
-    public void run() {
-        final Channel<IN, IN> channel = JRoutineCore.io().buildChannel();
-        mInputChannel.bind(new SafeChannelConsumer<IN>(channel));
-        try {
-            mBindingFunction.apply(channel).bind(this);
-
-        } catch (final Throwable t) {
-            abort(t);
-            InvocationInterruptedException.throwIfInterrupt(t);
-        }
-    }
-
-    private void abort(@NotNull final Throwable error) {
-        final RoutineException ex = InvocationException.wrapIfNeeded(error);
-        mOutputChannel.abort(ex);
-        mInputChannel.abort(ex);
-    }
-
-    /**
-     * Channel consumer implementation avoiding the upstream propagation of errors.
-     *
-     * @param <IN> the input data type.
-     */
-    private static class SafeChannelConsumer<IN> implements ChannelConsumer<IN> {
-
-        private final Channel<IN, ?> mChannel;
-
-        /**
-         * Constructor.
-         *
-         * @param channel the channel.
-         */
-        private SafeChannelConsumer(@NotNull final Channel<IN, ?> channel) {
-            mChannel = channel;
-        }
-
-        public void onComplete() {
-            mChannel.close();
-        }
-
-        public void onError(@NotNull final RoutineException error) {
-            mChannel.abort(error);
-        }
-
-        public void onOutput(final IN output) {
-            try {
-                mChannel.pass(output);
-
-            } catch (final InvocationInterruptedException e) {
-                throw e;
-
-            } catch (final Throwable ignored) {
-            }
-        }
+      mChannel.close();
     }
 
     public void onError(@NotNull final RoutineException error) {
-        Long delay = null;
-        if (!(error instanceof AbortException)) {
-            try {
-                delay = mBackoffFunction.apply(++mCount, error);
-
-            } catch (final Throwable t) {
-                abort(t);
-                InvocationInterruptedException.throwIfInterrupt(t);
-            }
-        }
-
-        if (delay != null) {
-            mOutputs.clear();
-            mRunner.run(this, delay, TimeUnit.MILLISECONDS);
-
-        } else {
-            mOutputChannel.abort(error);
-            mInputChannel.abort(error);
-        }
+      mChannel.abort(error);
     }
 
-    public void onOutput(final OUT output) {
-        mOutputs.add(output);
+    public void onOutput(final IN output) {
+      try {
+        mChannel.pass(output);
+
+      } catch (final InvocationInterruptedException e) {
+        throw e;
+
+      } catch (final Throwable ignored) {
+      }
     }
+  }
+
+  public void onError(@NotNull final RoutineException error) {
+    Long delay = null;
+    if (!(error instanceof AbortException)) {
+      try {
+        delay = mBackoffFunction.apply(++mCount, error);
+
+      } catch (final Throwable t) {
+        abort(t);
+        InvocationInterruptedException.throwIfInterrupt(t);
+      }
+    }
+
+    if (delay != null) {
+      mOutputs.clear();
+      mRunner.run(this, delay, TimeUnit.MILLISECONDS);
+
+    } else {
+      mOutputChannel.abort(error);
+      mInputChannel.abort(error);
+    }
+  }
+
+  public void onOutput(final OUT output) {
+    mOutputs.add(output);
+  }
 }

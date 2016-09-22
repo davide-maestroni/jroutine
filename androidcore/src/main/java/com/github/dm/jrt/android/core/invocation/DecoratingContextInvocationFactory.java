@@ -31,35 +31,35 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * @param <OUT> the output data type.
  */
 public abstract class DecoratingContextInvocationFactory<IN, OUT>
-        extends ContextInvocationFactory<IN, OUT> {
+    extends ContextInvocationFactory<IN, OUT> {
 
-    private final ContextInvocationFactory<IN, OUT> mFactory;
+  private final ContextInvocationFactory<IN, OUT> mFactory;
 
-    /**
-     * Constructor.
-     *
-     * @param wrapped the wrapped factory instance.
-     */
-    public DecoratingContextInvocationFactory(
-            @NotNull final ContextInvocationFactory<IN, OUT> wrapped) {
-        super(asArgs(ConstantConditions.notNull("wrapped invocation factory", wrapped)));
-        mFactory = wrapped;
-    }
+  /**
+   * Constructor.
+   *
+   * @param wrapped the wrapped factory instance.
+   */
+  public DecoratingContextInvocationFactory(
+      @NotNull final ContextInvocationFactory<IN, OUT> wrapped) {
+    super(asArgs(ConstantConditions.notNull("wrapped invocation factory", wrapped)));
+    mFactory = wrapped;
+  }
 
-    @NotNull
-    @Override
-    public final ContextInvocation<IN, OUT> newInvocation() throws Exception {
-        return decorate(mFactory.newInvocation());
-    }
+  @NotNull
+  @Override
+  public final ContextInvocation<IN, OUT> newInvocation() throws Exception {
+    return decorate(mFactory.newInvocation());
+  }
 
-    /**
-     * Decorates the specified Context invocation.
-     *
-     * @param invocation the Context invocation instance to decorate.
-     * @return the decorated Context invocation.
-     * @throws java.lang.Exception if an unexpected error occurs.
-     */
-    @NotNull
-    protected abstract ContextInvocation<IN, OUT> decorate(
-            @NotNull ContextInvocation<IN, OUT> invocation) throws Exception;
+  /**
+   * Decorates the specified Context invocation.
+   *
+   * @param invocation the Context invocation instance to decorate.
+   * @return the decorated Context invocation.
+   * @throws java.lang.Exception if an unexpected error occurs.
+   */
+  @NotNull
+  protected abstract ContextInvocation<IN, OUT> decorate(
+      @NotNull ContextInvocation<IN, OUT> invocation) throws Exception;
 }

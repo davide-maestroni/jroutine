@@ -27,19 +27,19 @@ import org.jetbrains.annotations.Nullable;
  */
 public interface FactoryContext {
 
-    /**
-     * Returns an instance of the object described by the specified parameters.
-     * <br>
-     * If a null instance is returned, the constructor matching the specified arguments will be
-     * called by default.
-     *
-     * @param type   the type of the returned instance.
-     * @param args   the custom arguments.
-     * @param <TYPE> the target object type.
-     * @return the object instance.
-     * @throws java.lang.Exception if an unexpected error occurs.
-     */
-    @Nullable
-    <TYPE> TYPE geInstance(@NotNull Class<? extends TYPE> type, @NotNull Object... args) throws
-            Exception;
+  /**
+   * Returns an instance of the object described by the specified parameters.
+   * <br>
+   * If a null instance is returned, the constructor matching the specified arguments will be
+   * called by default.
+   *
+   * @param type   the type of the returned instance.
+   * @param args   the custom arguments.
+   * @param <TYPE> the target object type.
+   * @return the object instance.
+   * @throws java.lang.Exception if an unexpected error occurs.
+   */
+  @Nullable
+  <TYPE> TYPE geInstance(@NotNull Class<? extends TYPE> type, @NotNull Object... args) throws
+      Exception;
 }

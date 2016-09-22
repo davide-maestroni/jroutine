@@ -38,212 +38,212 @@ import java.util.concurrent.TimeUnit;
  */
 class ThrottlingRunner extends RunnerDecorator {
 
-    private final WeakIdentityHashMap<Execution, WeakReference<ThrottlingExecution>> mExecutions =
-            new WeakIdentityHashMap<Execution, WeakReference<ThrottlingExecution>>();
+  private final WeakIdentityHashMap<Execution, WeakReference<ThrottlingExecution>> mExecutions =
+      new WeakIdentityHashMap<Execution, WeakReference<ThrottlingExecution>>();
 
-    private final int mMaxRunning;
+  private final int mMaxRunning;
 
-    private final Object mMutex = new Object();
+  private final Object mMutex = new Object();
 
-    private final SimpleQueue<PendingExecution> mQueue = new SimpleQueue<PendingExecution>();
+  private final SimpleQueue<PendingExecution> mQueue = new SimpleQueue<PendingExecution>();
 
-    private final VoidPendingExecution mVoidExecution = new VoidPendingExecution();
+  private final VoidPendingExecution mVoidExecution = new VoidPendingExecution();
 
-    private int mRunningCount;
+  private int mRunningCount;
+
+  /**
+   * Constructor.
+   *
+   * @param wrapped       the wrapped instance.
+   * @param maxExecutions the maximum number of running executions.
+   * @throws java.lang.IllegalArgumentException if the specified max number is less than 1.
+   */
+  ThrottlingRunner(@NotNull final Runner wrapped, final int maxExecutions) {
+    super(wrapped);
+    mMaxRunning =
+        ConstantConditions.positive("maximum number of running executions", maxExecutions);
+  }
+
+  @Override
+  public void cancel(@NotNull final Execution execution) {
+    ThrottlingExecution throttlingExecution = null;
+    synchronized (mMutex) {
+      final SimpleQueueIterator<PendingExecution> iterator = mQueue.iterator();
+      while (iterator.hasNext()) {
+        final PendingExecution pendingExecution = iterator.next();
+        if (pendingExecution.mExecution == execution) {
+          iterator.replace(mVoidExecution);
+        }
+      }
+
+      final WeakReference<ThrottlingExecution> executionReference = mExecutions.get(execution);
+      if (executionReference != null) {
+        throttlingExecution = executionReference.get();
+      }
+    }
+
+    if (throttlingExecution != null) {
+      super.cancel(throttlingExecution);
+    }
+  }
+
+  @Override
+  public void run(@NotNull final Execution execution, final long delay,
+      @NotNull final TimeUnit timeUnit) {
+    final ThrottlingExecution throttlingExecution;
+    synchronized (mMutex) {
+      final SimpleQueue<PendingExecution> queue = mQueue;
+      if ((mRunningCount + queue.size()) >= mMaxRunning) {
+        queue.add(new PendingExecution(execution, delay, timeUnit));
+        return;
+      }
+
+      throttlingExecution = getThrottlingExecution(execution);
+    }
+
+    super.run(throttlingExecution, delay, timeUnit);
+  }
+
+  @NotNull
+  private ThrottlingExecution getThrottlingExecution(@NotNull final Execution execution) {
+    final WeakIdentityHashMap<Execution, WeakReference<ThrottlingExecution>> executions =
+        mExecutions;
+    final WeakReference<ThrottlingExecution> executionReference = executions.get(execution);
+    ThrottlingExecution throttlingExecution =
+        (executionReference != null) ? executionReference.get() : null;
+    if (throttlingExecution == null) {
+      throttlingExecution = new ThrottlingExecution(execution);
+      executions.put(execution, new WeakReference<ThrottlingExecution>(throttlingExecution));
+    }
+
+    return throttlingExecution;
+  }
+
+  /**
+   * Void execution implementation.
+   */
+  private static class VoidExecution implements Execution {
+
+    public void run() {
+    }
+  }
+
+  /**
+   * Pending execution implementation.
+   */
+  private class PendingExecution implements Execution {
+
+    private final long mDelay;
+
+    private final Execution mExecution;
+
+    private final long mStartTimeMillis;
+
+    private final TimeUnit mTimeUnit;
 
     /**
      * Constructor.
      *
-     * @param wrapped       the wrapped instance.
-     * @param maxExecutions the maximum number of running executions.
-     * @throws java.lang.IllegalArgumentException if the specified max number is less than 1.
+     * @param execution the execution.
+     * @param delay     the execution delay.
+     * @param timeUnit  the delay time unit.
      */
-    ThrottlingRunner(@NotNull final Runner wrapped, final int maxExecutions) {
-        super(wrapped);
-        mMaxRunning =
-                ConstantConditions.positive("maximum number of running executions", maxExecutions);
+    private PendingExecution(@NotNull final Execution execution, final long delay,
+        @NotNull final TimeUnit timeUnit) {
+      mExecution = execution;
+      mDelay = delay;
+      mTimeUnit = timeUnit;
+      mStartTimeMillis = System.currentTimeMillis();
+    }
+
+    public void run() {
+      final ThrottlingExecution throttlingExecution;
+      synchronized (mMutex) {
+        throttlingExecution = getThrottlingExecution(mExecution);
+      }
+
+      final long delay = mDelay;
+      ThrottlingRunner.super.run(throttlingExecution, (delay == 0) ? 0
+              : Math.max(mTimeUnit.toMillis(delay) + mStartTimeMillis - System.currentTimeMillis
+                  (), 0),
+          TimeUnit.MILLISECONDS);
+    }
+  }
+
+  /**
+   * Execution used to dequeue and run pending executions, when the maximum running count allows
+   * it.
+   */
+  private class ThrottlingExecution implements Execution {
+
+    private final Execution mExecution;
+
+    /**
+     * Constructor.
+     *
+     * @param execution the execution.
+     */
+    private ThrottlingExecution(@NotNull final Execution execution) {
+      mExecution = execution;
+    }
+
+    public void run() {
+      final int maxRunning = mMaxRunning;
+      final Execution execution = mExecution;
+      final SimpleQueue<PendingExecution> queue = mQueue;
+      synchronized (mMutex) {
+        if (mRunningCount >= maxRunning) {
+          queue.addFirst(new PendingExecution(execution, 0, TimeUnit.MILLISECONDS));
+          return;
+        }
+
+        ++mRunningCount;
+      }
+
+      try {
+        execution.run();
+
+      } finally {
+        PendingExecution pendingExecution = null;
+        synchronized (mMutex) {
+          --mRunningCount;
+          if (!queue.isEmpty()) {
+            pendingExecution = queue.removeFirst();
+          }
+        }
+
+        if (pendingExecution != null) {
+          pendingExecution.run();
+        }
+      }
+    }
+  }
+
+  /**
+   * Void pending execution implementation.
+   */
+  private class VoidPendingExecution extends PendingExecution {
+
+    /**
+     * Constructor.
+     */
+    private VoidPendingExecution() {
+      super(new VoidExecution(), 0, TimeUnit.MILLISECONDS);
     }
 
     @Override
-    public void cancel(@NotNull final Execution execution) {
-        ThrottlingExecution throttlingExecution = null;
-        synchronized (mMutex) {
-            final SimpleQueueIterator<PendingExecution> iterator = mQueue.iterator();
-            while (iterator.hasNext()) {
-                final PendingExecution pendingExecution = iterator.next();
-                if (pendingExecution.mExecution == execution) {
-                    iterator.replace(mVoidExecution);
-                }
-            }
-
-            final WeakReference<ThrottlingExecution> executionReference =
-                    mExecutions.get(execution);
-            if (executionReference != null) {
-                throttlingExecution = executionReference.get();
-            }
+    public void run() {
+      final SimpleQueue<PendingExecution> queue = mQueue;
+      PendingExecution pendingExecution = null;
+      synchronized (mMutex) {
+        if (!queue.isEmpty()) {
+          pendingExecution = queue.removeFirst();
         }
+      }
 
-        if (throttlingExecution != null) {
-            super.cancel(throttlingExecution);
-        }
+      if (pendingExecution != null) {
+        pendingExecution.run();
+      }
     }
-
-    @Override
-    public void run(@NotNull final Execution execution, final long delay,
-            @NotNull final TimeUnit timeUnit) {
-        final ThrottlingExecution throttlingExecution;
-        synchronized (mMutex) {
-            final SimpleQueue<PendingExecution> queue = mQueue;
-            if ((mRunningCount + queue.size()) >= mMaxRunning) {
-                queue.add(new PendingExecution(execution, delay, timeUnit));
-                return;
-            }
-
-            throttlingExecution = getThrottlingExecution(execution);
-        }
-
-        super.run(throttlingExecution, delay, timeUnit);
-    }
-
-    @NotNull
-    private ThrottlingExecution getThrottlingExecution(@NotNull final Execution execution) {
-        final WeakIdentityHashMap<Execution, WeakReference<ThrottlingExecution>> executions =
-                mExecutions;
-        final WeakReference<ThrottlingExecution> executionReference = executions.get(execution);
-        ThrottlingExecution throttlingExecution =
-                (executionReference != null) ? executionReference.get() : null;
-        if (throttlingExecution == null) {
-            throttlingExecution = new ThrottlingExecution(execution);
-            executions.put(execution, new WeakReference<ThrottlingExecution>(throttlingExecution));
-        }
-
-        return throttlingExecution;
-    }
-
-    /**
-     * Void execution implementation.
-     */
-    private static class VoidExecution implements Execution {
-
-        public void run() {
-        }
-    }
-
-    /**
-     * Pending execution implementation.
-     */
-    private class PendingExecution implements Execution {
-
-        private final long mDelay;
-
-        private final Execution mExecution;
-
-        private final long mStartTimeMillis;
-
-        private final TimeUnit mTimeUnit;
-
-        /**
-         * Constructor.
-         *
-         * @param execution the execution.
-         * @param delay     the execution delay.
-         * @param timeUnit  the delay time unit.
-         */
-        private PendingExecution(@NotNull final Execution execution, final long delay,
-                @NotNull final TimeUnit timeUnit) {
-            mExecution = execution;
-            mDelay = delay;
-            mTimeUnit = timeUnit;
-            mStartTimeMillis = System.currentTimeMillis();
-        }
-
-        public void run() {
-            final ThrottlingExecution throttlingExecution;
-            synchronized (mMutex) {
-                throttlingExecution = getThrottlingExecution(mExecution);
-            }
-
-            final long delay = mDelay;
-            ThrottlingRunner.super.run(throttlingExecution, (delay == 0) ? 0 : Math.max(
-                    mTimeUnit.toMillis(delay) + mStartTimeMillis - System.currentTimeMillis(), 0),
-                    TimeUnit.MILLISECONDS);
-        }
-    }
-
-    /**
-     * Execution used to dequeue and run pending executions, when the maximum running count allows
-     * it.
-     */
-    private class ThrottlingExecution implements Execution {
-
-        private final Execution mExecution;
-
-        /**
-         * Constructor.
-         *
-         * @param execution the execution.
-         */
-        private ThrottlingExecution(@NotNull final Execution execution) {
-            mExecution = execution;
-        }
-
-        public void run() {
-            final int maxRunning = mMaxRunning;
-            final Execution execution = mExecution;
-            final SimpleQueue<PendingExecution> queue = mQueue;
-            synchronized (mMutex) {
-                if (mRunningCount >= maxRunning) {
-                    queue.addFirst(new PendingExecution(execution, 0, TimeUnit.MILLISECONDS));
-                    return;
-                }
-
-                ++mRunningCount;
-            }
-
-            try {
-                execution.run();
-
-            } finally {
-                PendingExecution pendingExecution = null;
-                synchronized (mMutex) {
-                    --mRunningCount;
-                    if (!queue.isEmpty()) {
-                        pendingExecution = queue.removeFirst();
-                    }
-                }
-
-                if (pendingExecution != null) {
-                    pendingExecution.run();
-                }
-            }
-        }
-    }
-
-    /**
-     * Void pending execution implementation.
-     */
-    private class VoidPendingExecution extends PendingExecution {
-
-        /**
-         * Constructor.
-         */
-        private VoidPendingExecution() {
-            super(new VoidExecution(), 0, TimeUnit.MILLISECONDS);
-        }
-
-        @Override
-        public void run() {
-            final SimpleQueue<PendingExecution> queue = mQueue;
-            PendingExecution pendingExecution = null;
-            synchronized (mMutex) {
-                if (!queue.isEmpty()) {
-                    pendingExecution = queue.removeFirst();
-                }
-            }
-
-            if (pendingExecution != null) {
-                pendingExecution.run();
-            }
-        }
-    }
+  }
 }

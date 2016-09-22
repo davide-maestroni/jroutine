@@ -32,46 +32,46 @@ import static com.github.dm.jrt.operator.math.Numbers.addOptimistic;
  */
 class SumLongInvocation extends TemplateInvocation<Number, Long> {
 
-    private static final InvocationFactory<Number, Long> sFactory =
-            new InvocationFactory<Number, Long>(null) {
+  private static final InvocationFactory<Number, Long> sFactory =
+      new InvocationFactory<Number, Long>(null) {
 
-                @NotNull
-                @Override
-                public Invocation<Number, Long> newInvocation() {
-                    return new SumLongInvocation();
-                }
-            };
+        @NotNull
+        @Override
+        public Invocation<Number, Long> newInvocation() {
+          return new SumLongInvocation();
+        }
+      };
 
-    private long mSum;
+  private long mSum;
 
-    /**
-     * Constructor.
-     */
-    private SumLongInvocation() {
-    }
+  /**
+   * Constructor.
+   */
+  private SumLongInvocation() {
+  }
 
-    /**
-     * Returns a factory of invocations computing the sum of the input numbers.
-     *
-     * @return the factory instance.
-     */
-    @NotNull
-    static InvocationFactory<Number, Long> factoryOf() {
-        return sFactory;
-    }
+  /**
+   * Returns a factory of invocations computing the sum of the input numbers.
+   *
+   * @return the factory instance.
+   */
+  @NotNull
+  static InvocationFactory<Number, Long> factoryOf() {
+    return sFactory;
+  }
 
-    @Override
-    public void onComplete(@NotNull final Channel<Long, ?> result) {
-        result.pass(mSum);
-    }
+  @Override
+  public void onComplete(@NotNull final Channel<Long, ?> result) {
+    result.pass(mSum);
+  }
 
-    @Override
-    public void onInput(final Number input, @NotNull final Channel<Long, ?> result) {
-        mSum = addOptimistic(mSum, input).longValue();
-    }
+  @Override
+  public void onInput(final Number input, @NotNull final Channel<Long, ?> result) {
+    mSum = addOptimistic(mSum, input).longValue();
+  }
 
-    @Override
-    public void onRestart() {
-        mSum = 0;
-    }
+  @Override
+  public void onRestart() {
+    mSum = 0;
+  }
 }

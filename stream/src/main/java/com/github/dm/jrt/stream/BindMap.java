@@ -34,24 +34,24 @@ import org.jetbrains.annotations.NotNull;
  */
 class BindMap<IN, OUT> implements Function<Channel<?, IN>, Channel<?, OUT>> {
 
-    private final InvocationMode mInvocationMode;
+  private final InvocationMode mInvocationMode;
 
-    private final Routine<IN, OUT> mRoutine;
+  private final Routine<IN, OUT> mRoutine;
 
-    /**
-     * Constructor.
-     *
-     * @param routine        the routine to bind.
-     * @param invocationMode the invocation mode.
-     */
-    @SuppressWarnings("unchecked")
-    BindMap(@NotNull final Routine<? super IN, ? extends OUT> routine,
-            @NotNull final InvocationMode invocationMode) {
-        mRoutine = (Routine<IN, OUT>) ConstantConditions.notNull("routine instance", routine);
-        mInvocationMode = ConstantConditions.notNull("invocation mode", invocationMode);
-    }
+  /**
+   * Constructor.
+   *
+   * @param routine        the routine to bind.
+   * @param invocationMode the invocation mode.
+   */
+  @SuppressWarnings("unchecked")
+  BindMap(@NotNull final Routine<? super IN, ? extends OUT> routine,
+      @NotNull final InvocationMode invocationMode) {
+    mRoutine = (Routine<IN, OUT>) ConstantConditions.notNull("routine instance", routine);
+    mInvocationMode = ConstantConditions.notNull("invocation mode", invocationMode);
+  }
 
-    public Channel<?, OUT> apply(final Channel<?, IN> channel) {
-        return mInvocationMode.invoke(mRoutine).pass(channel).close();
-    }
+  public Channel<?, OUT> apply(final Channel<?, IN> channel) {
+    return mInvocationMode.invoke(mRoutine).pass(channel).close();
+  }
 }

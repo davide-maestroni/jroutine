@@ -37,41 +37,40 @@ import java.util.HashMap;
  */
 class BindParallelCount<IN, OUT> extends BindMap<IN, OUT> {
 
-    private final ChannelConfiguration mConfiguration;
+  private final ChannelConfiguration mConfiguration;
 
-    private final int mCount;
+  private final int mCount;
 
-    /**
-     * Constructor.
-     *
-     * @param configuration  the channel configuration.
-     * @param count          the channel count.
-     * @param routine        the routine instance.
-     * @param invocationMode the invocation mode.
-     * @throws java.lang.IllegalArgumentException if the channel count is not positive.
-     */
-    BindParallelCount(@NotNull final ChannelConfiguration configuration, final int count,
-            @NotNull final Routine<? super IN, ? extends OUT> routine,
-            @NotNull final InvocationMode invocationMode) {
-        super(routine, invocationMode);
-        mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
-        mCount = ConstantConditions.positive("channel count", count);
+  /**
+   * Constructor.
+   *
+   * @param configuration  the channel configuration.
+   * @param count          the channel count.
+   * @param routine        the routine instance.
+   * @param invocationMode the invocation mode.
+   * @throws java.lang.IllegalArgumentException if the channel count is not positive.
+   */
+  BindParallelCount(@NotNull final ChannelConfiguration configuration, final int count,
+      @NotNull final Routine<? super IN, ? extends OUT> routine,
+      @NotNull final InvocationMode invocationMode) {
+    super(routine, invocationMode);
+    mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
+    mCount = ConstantConditions.positive("channel count", count);
+  }
+
+  public Channel<?, OUT> apply(final Channel<?, IN> channel) {
+    final int count = mCount;
+    final Channel<OUT, OUT> outputChannel = JRoutineCore.io().apply(mConfiguration).buildChannel();
+    final HashMap<Channel<IN, IN>, Channel<?, OUT>> channels =
+        new HashMap<Channel<IN, IN>, Channel<?, OUT>>(count);
+    for (int i = 0; i < count; ++i) {
+      final Channel<IN, IN> inputChannel = JRoutineCore.io().buildChannel();
+      final Channel<?, OUT> invocationChannel = super.apply(inputChannel);
+      outputChannel.pass(invocationChannel);
+      channels.put(inputChannel, invocationChannel);
     }
 
-    public Channel<?, OUT> apply(final Channel<?, IN> channel) {
-        final int count = mCount;
-        final Channel<OUT, OUT> outputChannel =
-                JRoutineCore.io().apply(mConfiguration).buildChannel();
-        final HashMap<Channel<IN, IN>, Channel<?, OUT>> channels =
-                new HashMap<Channel<IN, IN>, Channel<?, OUT>>(count);
-        for (int i = 0; i < count; ++i) {
-            final Channel<IN, IN> inputChannel = JRoutineCore.io().buildChannel();
-            final Channel<?, OUT> invocationChannel = super.apply(inputChannel);
-            outputChannel.pass(invocationChannel);
-            channels.put(inputChannel, invocationChannel);
-        }
-
-        channel.bind(new ParallelCountChannelConsumer<IN>(channels));
-        return outputChannel.close();
-    }
+    channel.bind(new ParallelCountChannelConsumer<IN>(channels));
+    return outputChannel.close();
+  }
 }

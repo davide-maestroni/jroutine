@@ -23,12 +23,12 @@ package com.github.dm.jrt.android.core.invocation;
  */
 public class StaleResultException extends InvocationClashException {
 
-    /**
-     * Constructor.
-     *
-     * @param id the Loader ID.
-     */
-    public StaleResultException(final int id) {
-        super(id);
-    }
+  /**
+   * Constructor.
+   *
+   * @param id the Loader ID.
+   */
+  public StaleResultException(final int id) {
+    super(id);
+  }
 }

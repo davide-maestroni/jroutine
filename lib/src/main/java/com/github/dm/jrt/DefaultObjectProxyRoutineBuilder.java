@@ -40,131 +40,126 @@ import java.lang.reflect.Method;
  */
 class DefaultObjectProxyRoutineBuilder implements ObjectProxyRoutineBuilder {
 
-    private final InvocationTarget<?> mTarget;
+  private final InvocationTarget<?> mTarget;
 
-    private BuilderType mBuilderType;
+  private BuilderType mBuilderType;
 
-    private InvocationConfiguration mInvocationConfiguration =
-            InvocationConfiguration.defaultConfiguration();
+  private InvocationConfiguration mInvocationConfiguration =
+      InvocationConfiguration.defaultConfiguration();
 
-    private ObjectConfiguration mObjectConfiguration = ObjectConfiguration.defaultConfiguration();
+  private ObjectConfiguration mObjectConfiguration = ObjectConfiguration.defaultConfiguration();
 
-    /**
-     * Constructor.
-     *
-     * @param target the invocation target.
-     * @throws java.lang.IllegalArgumentException if the class of specified target represents an
-     *                                            interface.
-     */
-    DefaultObjectProxyRoutineBuilder(@NotNull final InvocationTarget<?> target) {
-        final Class<?> targetClass = target.getTargetClass();
-        if (targetClass.isInterface()) {
-            throw new IllegalArgumentException(
-                    "the target class must not be an interface: " + targetClass.getName());
-        }
-
-        mTarget = target;
+  /**
+   * Constructor.
+   *
+   * @param target the invocation target.
+   * @throws java.lang.IllegalArgumentException if the class of specified target represents an
+   *                                            interface.
+   */
+  DefaultObjectProxyRoutineBuilder(@NotNull final InvocationTarget<?> target) {
+    final Class<?> targetClass = target.getTargetClass();
+    if (targetClass.isInterface()) {
+      throw new IllegalArgumentException(
+          "the target class must not be an interface: " + targetClass.getName());
     }
 
-    @NotNull
-    public ObjectProxyRoutineBuilder apply(@NotNull final InvocationConfiguration configuration) {
-        mInvocationConfiguration =
-                ConstantConditions.notNull("invocation configuration", configuration);
-        return this;
+    mTarget = target;
+  }
+
+  @NotNull
+  public ObjectProxyRoutineBuilder apply(@NotNull final InvocationConfiguration configuration) {
+    mInvocationConfiguration =
+        ConstantConditions.notNull("invocation configuration", configuration);
+    return this;
+  }
+
+  @NotNull
+  public ObjectProxyRoutineBuilder apply(@NotNull final ObjectConfiguration configuration) {
+    mObjectConfiguration = ConstantConditions.notNull("object configuration", configuration);
+    return this;
+  }
+
+  @NotNull
+  public InvocationConfiguration.Builder<? extends ObjectProxyRoutineBuilder>
+  applyInvocationConfiguration() {
+    final InvocationConfiguration config = mInvocationConfiguration;
+    return new InvocationConfiguration.Builder<ObjectProxyRoutineBuilder>(
+        new InvocationConfiguration.Configurable<ObjectProxyRoutineBuilder>() {
+
+          @NotNull
+          public ObjectProxyRoutineBuilder apply(
+              @NotNull final InvocationConfiguration configuration) {
+            return DefaultObjectProxyRoutineBuilder.this.apply(configuration);
+          }
+        }, config);
+  }
+
+  @NotNull
+  public ObjectConfiguration.Builder<? extends ObjectProxyRoutineBuilder>
+  applyObjectConfiguration() {
+    final ObjectConfiguration config = mObjectConfiguration;
+    return new ObjectConfiguration.Builder<ObjectProxyRoutineBuilder>(
+        new ObjectConfiguration.Configurable<ObjectProxyRoutineBuilder>() {
+
+          @NotNull
+          public ObjectProxyRoutineBuilder apply(@NotNull final ObjectConfiguration configuration) {
+            return DefaultObjectProxyRoutineBuilder.this.apply(configuration);
+          }
+        }, config);
+  }
+
+  @NotNull
+  public ObjectProxyRoutineBuilder withType(@Nullable final BuilderType builderType) {
+    mBuilderType = builderType;
+    return this;
+  }
+
+  @NotNull
+  public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
+    final BuilderType builderType = mBuilderType;
+    if (builderType == null) {
+      final Proxy proxyAnnotation = itf.getAnnotation(Proxy.class);
+      if ((proxyAnnotation != null) && mTarget.isAssignableTo(proxyAnnotation.value())) {
+        return newProxyBuilder().buildProxy(itf);
+      }
+
+      return newObjectBuilder().buildProxy(itf);
+
+    } else if (builderType == BuilderType.PROXY) {
+      return newProxyBuilder().buildProxy(itf);
     }
 
-    @NotNull
-    public ObjectProxyRoutineBuilder apply(@NotNull final ObjectConfiguration configuration) {
-        mObjectConfiguration = ConstantConditions.notNull("object configuration", configuration);
-        return this;
-    }
+    return newObjectBuilder().buildProxy(itf);
+  }
 
-    @NotNull
-    public InvocationConfiguration.Builder<? extends ObjectProxyRoutineBuilder>
-    applyInvocationConfiguration() {
-        final InvocationConfiguration config = mInvocationConfiguration;
-        return new InvocationConfiguration.Builder<ObjectProxyRoutineBuilder>(
-                new InvocationConfiguration.Configurable<ObjectProxyRoutineBuilder>() {
+  @NotNull
+  public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
+    return buildProxy(itf.getRawClass());
+  }
 
-                    @NotNull
-                    public ObjectProxyRoutineBuilder apply(
-                            @NotNull final InvocationConfiguration configuration) {
-                        return DefaultObjectProxyRoutineBuilder.this.apply(configuration);
-                    }
-                }, config);
-    }
+  @NotNull
+  public <IN, OUT> Routine<IN, OUT> method(@NotNull final String name) {
+    return newObjectBuilder().method(name);
+  }
 
-    @NotNull
-    public ObjectConfiguration.Builder<? extends ObjectProxyRoutineBuilder>
-    applyObjectConfiguration() {
-        final ObjectConfiguration config = mObjectConfiguration;
-        return new ObjectConfiguration.Builder<ObjectProxyRoutineBuilder>(
-                new ObjectConfiguration.Configurable<ObjectProxyRoutineBuilder>() {
+  @NotNull
+  public <IN, OUT> Routine<IN, OUT> method(@NotNull final String name,
+      @NotNull final Class<?>... parameterTypes) {
+    return newObjectBuilder().method(name, parameterTypes);
+  }
 
-                    @NotNull
-                    public ObjectProxyRoutineBuilder apply(
-                            @NotNull final ObjectConfiguration configuration) {
-                        return DefaultObjectProxyRoutineBuilder.this.apply(configuration);
-                    }
-                }, config);
-    }
+  @NotNull
+  public <IN, OUT> Routine<IN, OUT> method(@NotNull final Method method) {
+    return newObjectBuilder().method(method);
+  }
 
-    @NotNull
-    public ObjectProxyRoutineBuilder withType(@Nullable final BuilderType builderType) {
-        mBuilderType = builderType;
-        return this;
-    }
+  @NotNull
+  private ObjectRoutineBuilder newObjectBuilder() {
+    return JRoutineObject.with(mTarget).apply(mInvocationConfiguration).apply(mObjectConfiguration);
+  }
 
-    @NotNull
-    public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
-        final BuilderType builderType = mBuilderType;
-        if (builderType == null) {
-            final Proxy proxyAnnotation = itf.getAnnotation(Proxy.class);
-            if ((proxyAnnotation != null) && mTarget.isAssignableTo(proxyAnnotation.value())) {
-                return newProxyBuilder().buildProxy(itf);
-            }
-
-            return newObjectBuilder().buildProxy(itf);
-
-        } else if (builderType == BuilderType.PROXY) {
-            return newProxyBuilder().buildProxy(itf);
-        }
-
-        return newObjectBuilder().buildProxy(itf);
-    }
-
-    @NotNull
-    public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
-        return buildProxy(itf.getRawClass());
-    }
-
-    @NotNull
-    public <IN, OUT> Routine<IN, OUT> method(@NotNull final String name) {
-        return newObjectBuilder().method(name);
-    }
-
-    @NotNull
-    public <IN, OUT> Routine<IN, OUT> method(@NotNull final String name,
-            @NotNull final Class<?>... parameterTypes) {
-        return newObjectBuilder().method(name, parameterTypes);
-    }
-
-    @NotNull
-    public <IN, OUT> Routine<IN, OUT> method(@NotNull final Method method) {
-        return newObjectBuilder().method(method);
-    }
-
-    @NotNull
-    private ObjectRoutineBuilder newObjectBuilder() {
-        return JRoutineObject.with(mTarget)
-                             .apply(mInvocationConfiguration)
-                             .apply(mObjectConfiguration);
-    }
-
-    @NotNull
-    private ProxyRoutineBuilder newProxyBuilder() {
-        return JRoutineProxy.with(mTarget)
-                            .apply(mInvocationConfiguration)
-                            .apply(mObjectConfiguration);
-    }
+  @NotNull
+  private ProxyRoutineBuilder newProxyBuilder() {
+    return JRoutineProxy.with(mTarget).apply(mInvocationConfiguration).apply(mObjectConfiguration);
+  }
 }

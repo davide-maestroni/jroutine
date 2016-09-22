@@ -116,37 +116,37 @@ import org.jetbrains.annotations.NotNull;
  */
 public class JRoutineCore {
 
-    /**
-     * Avoid explicit instantiation.
-     */
-    protected JRoutineCore() {
-        ConstantConditions.avoid();
-    }
+  /**
+   * Avoid explicit instantiation.
+   */
+  protected JRoutineCore() {
+    ConstantConditions.avoid();
+  }
 
-    /**
-     * Returns a channel builder.
-     *
-     * @return the channel builder instance.
-     */
-    @NotNull
-    public static ChannelBuilder io() {
-        return new DefaultChannelBuilder();
-    }
+  /**
+   * Returns a channel builder.
+   *
+   * @return the channel builder instance.
+   */
+  @NotNull
+  public static ChannelBuilder io() {
+    return new DefaultChannelBuilder();
+  }
 
-    /**
-     * Returns a routine builder based on the specified invocation factory.
-     * <br>
-     * In order to prevent undesired leaks, the class of the specified factory should have a static
-     * scope.
-     *
-     * @param factory the invocation factory.
-     * @param <IN>    the input data type.
-     * @param <OUT>   the output data type.
-     * @return the routine builder instance.
-     */
-    @NotNull
-    public static <IN, OUT> RoutineBuilder<IN, OUT> with(
-            @NotNull final InvocationFactory<IN, OUT> factory) {
-        return new DefaultRoutineBuilder<IN, OUT>(factory);
-    }
+  /**
+   * Returns a routine builder based on the specified invocation factory.
+   * <br>
+   * In order to prevent undesired leaks, the class of the specified factory should have a static
+   * scope.
+   *
+   * @param factory the invocation factory.
+   * @param <IN>    the input data type.
+   * @param <OUT>   the output data type.
+   * @return the routine builder instance.
+   */
+  @NotNull
+  public static <IN, OUT> RoutineBuilder<IN, OUT> with(
+      @NotNull final InvocationFactory<IN, OUT> factory) {
+    return new DefaultRoutineBuilder<IN, OUT>(factory);
+  }
 }

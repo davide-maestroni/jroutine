@@ -32,18 +32,18 @@ import org.jetbrains.annotations.NotNull;
  * @param <OUT> the output data type.
  */
 public class ContextInvocationWrapper<IN, OUT> extends InvocationDecorator<IN, OUT>
-        implements ContextInvocation<IN, OUT> {
+    implements ContextInvocation<IN, OUT> {
 
-    /**
-     * Constructor.
-     *
-     * @param invocation the wrapped invocation.
-     */
-    public ContextInvocationWrapper(@NotNull final Invocation<IN, OUT> invocation) {
-        super(invocation);
-    }
+  /**
+   * Constructor.
+   *
+   * @param invocation the wrapped invocation.
+   */
+  public ContextInvocationWrapper(@NotNull final Invocation<IN, OUT> invocation) {
+    super(invocation);
+  }
 
-    @Override
-    public void onContext(@NotNull final Context context) {
-    }
+  @Override
+  public void onContext(@NotNull final Context context) {
+  }
 }

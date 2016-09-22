@@ -34,77 +34,74 @@ import java.util.concurrent.TimeUnit;
  */
 class SynchronizedRunner extends RunnerDecorator {
 
-    private final Object mExecutionMutex = new Object();
+  private final Object mExecutionMutex = new Object();
 
-    private final WeakIdentityHashMap<Execution, WeakReference<SynchronizedExecution>> mExecutions =
-            new WeakIdentityHashMap<Execution, WeakReference<SynchronizedExecution>>();
+  private final WeakIdentityHashMap<Execution, WeakReference<SynchronizedExecution>> mExecutions =
+      new WeakIdentityHashMap<Execution, WeakReference<SynchronizedExecution>>();
 
-    private final Object mMutex = new Object();
+  private final Object mMutex = new Object();
+
+  /**
+   * Constructor.
+   *
+   * @param wrapped the wrapped instance.
+   */
+  SynchronizedRunner(@NotNull final Runner wrapped) {
+    super(wrapped);
+  }
+
+  @Override
+  public void cancel(@NotNull final Execution execution) {
+    SynchronizedExecution synchronizedExecution = null;
+    synchronized (mMutex) {
+      final WeakReference<SynchronizedExecution> executionReference = mExecutions.get(execution);
+      if (executionReference != null) {
+        synchronizedExecution = executionReference.get();
+      }
+    }
+
+    if (synchronizedExecution != null) {
+      super.cancel(synchronizedExecution);
+    }
+  }
+
+  @Override
+  public void run(@NotNull final Execution execution, final long delay,
+      @NotNull final TimeUnit timeUnit) {
+    SynchronizedExecution synchronizedExecution;
+    synchronized (mMutex) {
+      final WeakIdentityHashMap<Execution, WeakReference<SynchronizedExecution>> executions =
+          mExecutions;
+      final WeakReference<SynchronizedExecution> executionReference = executions.get(execution);
+      synchronizedExecution = (executionReference != null) ? executionReference.get() : null;
+      if (synchronizedExecution == null) {
+        synchronizedExecution = new SynchronizedExecution(execution);
+        executions.put(execution, new WeakReference<SynchronizedExecution>(synchronizedExecution));
+      }
+    }
+
+    super.run(synchronizedExecution, delay, timeUnit);
+  }
+
+  /**
+   * Synchronized execution decorator.
+   */
+  private class SynchronizedExecution extends ExecutionDecorator {
 
     /**
      * Constructor.
      *
      * @param wrapped the wrapped instance.
      */
-    SynchronizedRunner(@NotNull final Runner wrapped) {
-        super(wrapped);
+    private SynchronizedExecution(@NotNull final Execution wrapped) {
+      super(wrapped);
     }
 
     @Override
-    public void cancel(@NotNull final Execution execution) {
-        SynchronizedExecution synchronizedExecution = null;
-        synchronized (mMutex) {
-            final WeakReference<SynchronizedExecution> executionReference =
-                    mExecutions.get(execution);
-            if (executionReference != null) {
-                synchronizedExecution = executionReference.get();
-            }
-        }
-
-        if (synchronizedExecution != null) {
-            super.cancel(synchronizedExecution);
-        }
+    public void run() {
+      synchronized (mExecutionMutex) {
+        super.run();
+      }
     }
-
-    @Override
-    public void run(@NotNull final Execution execution, final long delay,
-            @NotNull final TimeUnit timeUnit) {
-        SynchronizedExecution synchronizedExecution;
-        synchronized (mMutex) {
-            final WeakIdentityHashMap<Execution, WeakReference<SynchronizedExecution>> executions =
-                    mExecutions;
-            final WeakReference<SynchronizedExecution> executionReference =
-                    executions.get(execution);
-            synchronizedExecution = (executionReference != null) ? executionReference.get() : null;
-            if (synchronizedExecution == null) {
-                synchronizedExecution = new SynchronizedExecution(execution);
-                executions.put(execution,
-                        new WeakReference<SynchronizedExecution>(synchronizedExecution));
-            }
-        }
-
-        super.run(synchronizedExecution, delay, timeUnit);
-    }
-
-    /**
-     * Synchronized execution decorator.
-     */
-    private class SynchronizedExecution extends ExecutionDecorator {
-
-        /**
-         * Constructor.
-         *
-         * @param wrapped the wrapped instance.
-         */
-        public SynchronizedExecution(@NotNull final Execution wrapped) {
-            super(wrapped);
-        }
-
-        @Override
-        public void run() {
-            synchronized (mExecutionMutex) {
-                super.run();
-            }
-        }
-    }
+  }
 }

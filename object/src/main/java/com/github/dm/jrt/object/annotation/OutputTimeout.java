@@ -59,17 +59,17 @@ import java.util.concurrent.TimeUnit;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface OutputTimeout {
 
-    /**
-     * The time unit of the timeout for an invocation instance to produce a result.
-     *
-     * @return the time unit.
-     */
-    TimeUnit unit() default TimeUnit.MILLISECONDS;
+  /**
+   * The time unit of the timeout for an invocation instance to produce a result.
+   *
+   * @return the time unit.
+   */
+  TimeUnit unit() default TimeUnit.MILLISECONDS;
 
-    /**
-     * The timeout for an invocation instance to produce a result.
-     *
-     * @return the timeout.
-     */
-    long value();
+  /**
+   * The timeout for an invocation instance to produce a result.
+   *
+   * @return the timeout.
+   */
+  long value();
 }

@@ -68,30 +68,30 @@ import org.jetbrains.annotations.NotNull;
  */
 public class JRoutineObject {
 
-    /**
-     * Avoid explicit instantiation.
-     */
-    protected JRoutineObject() {
-        ConstantConditions.avoid();
-    }
+  /**
+   * Avoid explicit instantiation.
+   */
+  protected JRoutineObject() {
+    ConstantConditions.avoid();
+  }
 
-    /**
-     * Returns a routine builder wrapping the specified target object.
-     * <p>
-     * Note that it is responsibility of the caller to retain a strong reference to the target
-     * instance to prevent it from being garbage collected.
-     * <br>
-     * Note also that the invocation input data will be cached, and the results will be produced
-     * only after the invocation channel is closed, so be sure to avoid streaming inputs in
-     * order to prevent starvation or out of memory errors.
-     *
-     * @param target the invocation target.
-     * @return the routine builder instance.
-     * @throws java.lang.IllegalArgumentException if the specified object class represents an
-     *                                            interface.
-     */
-    @NotNull
-    public static ObjectRoutineBuilder with(@NotNull final InvocationTarget<?> target) {
-        return new DefaultObjectRoutineBuilder(target);
-    }
+  /**
+   * Returns a routine builder wrapping the specified target object.
+   * <p>
+   * Note that it is responsibility of the caller to retain a strong reference to the target
+   * instance to prevent it from being garbage collected.
+   * <br>
+   * Note also that the invocation input data will be cached, and the results will be produced
+   * only after the invocation channel is closed, so be sure to avoid streaming inputs in order to
+   * prevent starvation or out of memory errors.
+   *
+   * @param target the invocation target.
+   * @return the routine builder instance.
+   * @throws java.lang.IllegalArgumentException if the specified object class represents an
+   *                                            interface.
+   */
+  @NotNull
+  public static ObjectRoutineBuilder with(@NotNull final InvocationTarget<?> target) {
+    return new DefaultObjectRoutineBuilder(target);
+  }
 }

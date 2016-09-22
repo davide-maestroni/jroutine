@@ -33,855 +33,855 @@ import static org.junit.Assert.fail;
  */
 public class LoggerTest {
 
-    private static final String[] ARGS = new String[]{"test1", "test2", "test3", "test4", "test5"};
+  private static final String[] ARGS = new String[]{"test1", "test2", "test3", "test4", "test5"};
 
-    private static final String FORMAT0 = "0: %s";
+  private static final String FORMAT0 = "0: %s";
 
-    private static final String FORMAT1 = "0: %s - 1: %s";
+  private static final String FORMAT1 = "0: %s - 1: %s";
 
-    private static final String FORMAT2 = "0: %s - 1: %s - 2: %s";
+  private static final String FORMAT2 = "0: %s - 1: %s - 2: %s";
 
-    private static final String FORMAT3 = "0: %s - 1: %s - 2: %s - 3: %s";
+  private static final String FORMAT3 = "0: %s - 1: %s - 2: %s - 3: %s";
 
-    private static final String FORMAT4 = "0: %s - 1: %s - 2: %s - 3: %s - 4: %s";
+  private static final String FORMAT4 = "0: %s - 1: %s - 2: %s - 3: %s - 4: %s";
 
-    @Test
-    public void testConstructor() {
+  @Test
+  public void testConstructor() {
 
-        boolean failed = false;
-        try {
-            new Logs();
-            failed = true;
+    boolean failed = false;
+    try {
+      new Logs();
+      failed = true;
 
-        } catch (final Throwable ignored) {
+    } catch (final Throwable ignored) {
 
-        }
-
-        assertThat(failed).isFalse();
     }
 
-    @Test
-    public void testDefaultLog() {
+    assertThat(failed).isFalse();
+  }
 
-        final NullLog log = Logs.nullLog();
-        Logger.setDefaultLog(log);
-        assertThat(Logger.getDefaultLog()).isEqualTo(log);
+  @Test
+  public void testDefaultLog() {
 
-        final Logger logger = Logger.newLogger(null, Level.DEBUG, this);
-        assertThat(logger.getLog()).isEqualTo(log);
-        assertThat(logger.getLogLevel()).isEqualTo(Level.DEBUG);
+    final NullLog log = Logs.nullLog();
+    Logger.setDefaultLog(log);
+    assertThat(Logger.getDefaultLog()).isEqualTo(log);
+
+    final Logger logger = Logger.newLogger(null, Level.DEBUG, this);
+    assertThat(logger.getLog()).isEqualTo(log);
+    assertThat(logger.getLogLevel()).isEqualTo(Level.DEBUG);
+  }
+
+  @Test
+  public void testDefaultLogLevel() {
+
+    final Level logLevel = Level.SILENT;
+    Logger.setDefaultLevel(logLevel);
+    assertThat(Logger.getDefaultLevel()).isEqualTo(logLevel);
+
+    final NullLog log = Logs.nullLog();
+    final Logger logger = Logger.newLogger(log, null, this);
+    assertThat(logger.getLog()).isEqualTo(log);
+    assertThat(logger.getLogLevel()).isEqualTo(logLevel);
+  }
+
+  @Test
+  @SuppressWarnings("ConstantConditions")
+  public void testError() {
+
+    try {
+
+      Logger.setDefaultLog(null);
+
+      fail();
+
+    } catch (final NullPointerException ignored) {
+
     }
 
-    @Test
-    public void testDefaultLogLevel() {
+    assertThat(Logger.getDefaultLog()).isNotNull();
 
-        final Level logLevel = Level.SILENT;
-        Logger.setDefaultLevel(logLevel);
-        assertThat(Logger.getDefaultLevel()).isEqualTo(logLevel);
+    try {
 
-        final NullLog log = Logs.nullLog();
-        final Logger logger = Logger.newLogger(log, null, this);
-        assertThat(logger.getLog()).isEqualTo(log);
-        assertThat(logger.getLogLevel()).isEqualTo(logLevel);
+      Logger.newLogger(new NullLog(), Level.DEBUG, this).subContextLogger(null);
+
+      fail();
+
+    } catch (final NullPointerException ignored) {
+
     }
 
-    @Test
-    @SuppressWarnings("ConstantConditions")
-    public void testError() {
+    try {
 
-        try {
+      Logger.setDefaultLevel(null);
 
-            Logger.setDefaultLog(null);
+      fail();
 
-            fail();
+    } catch (final NullPointerException ignored) {
 
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        assertThat(Logger.getDefaultLog()).isNotNull();
-
-        try {
-
-            Logger.newLogger(new NullLog(), Level.DEBUG, this).subContextLogger(null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            Logger.setDefaultLevel(null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        assertThat(Logger.getDefaultLevel()).isNotNull();
-
-        Logger.newLogger(new NullLog(), Level.DEBUG, this).err((Throwable) null);
     }
 
-    @Test
-    public void testLoggerDebug() {
+    assertThat(Logger.getDefaultLevel()).isNotNull();
 
-        final NullPointerException ex = new NullPointerException();
-        final TestLog log = new TestLog();
-        final Logger logger = Logger.newLogger(log, Level.DEBUG, this);
+    Logger.newLogger(new NullLog(), Level.DEBUG, this).err((Throwable) null);
+  }
 
-        assertThat(logger.getLog()).isEqualTo(log);
-        assertThat(logger.getLogLevel()).isEqualTo(Level.DEBUG);
+  @Test
+  public void testLoggerDebug() {
 
-        // - DBG
-        logger.dbg(ARGS[0]);
-        assertThat(log.getLevel()).isEqualTo(Level.DEBUG);
-        assertThat(log.getMessage()).contains(ARGS[0]);
+    final NullPointerException ex = new NullPointerException();
+    final TestLog log = new TestLog();
+    final Logger logger = Logger.newLogger(log, Level.DEBUG, this);
 
-        logger.dbg(FORMAT0, ARGS[0]);
-        assertThat(log.getLevel()).isEqualTo(Level.DEBUG);
-        assertThat(log.getMessage()).contains(String.format(FORMAT0, ARGS[0]));
+    assertThat(logger.getLog()).isEqualTo(log);
+    assertThat(logger.getLogLevel()).isEqualTo(Level.DEBUG);
 
-        logger.dbg(FORMAT1, ARGS[0], ARGS[1]);
-        assertThat(log.getLevel()).isEqualTo(Level.DEBUG);
-        assertThat(log.getMessage()).contains(String.format(FORMAT1, ARGS[0], ARGS[1]));
+    // - DBG
+    logger.dbg(ARGS[0]);
+    assertThat(log.getLevel()).isEqualTo(Level.DEBUG);
+    assertThat(log.getMessage()).contains(ARGS[0]);
 
-        logger.dbg(FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
-        assertThat(log.getLevel()).isEqualTo(Level.DEBUG);
-        assertThat(log.getMessage()).contains(String.format(FORMAT2, ARGS[0], ARGS[1], ARGS[2]));
+    logger.dbg(FORMAT0, ARGS[0]);
+    assertThat(log.getLevel()).isEqualTo(Level.DEBUG);
+    assertThat(log.getMessage()).contains(String.format(FORMAT0, ARGS[0]));
 
-        logger.dbg(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
-        assertThat(log.getLevel()).isEqualTo(Level.DEBUG);
-        assertThat(log.getMessage()).contains(
-                String.format(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]));
+    logger.dbg(FORMAT1, ARGS[0], ARGS[1]);
+    assertThat(log.getLevel()).isEqualTo(Level.DEBUG);
+    assertThat(log.getMessage()).contains(String.format(FORMAT1, ARGS[0], ARGS[1]));
 
-        logger.dbg(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
-        assertThat(log.getLevel()).isEqualTo(Level.DEBUG);
-        assertThat(log.getMessage()).contains(
-                String.format(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]));
+    logger.dbg(FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
+    assertThat(log.getLevel()).isEqualTo(Level.DEBUG);
+    assertThat(log.getMessage()).contains(String.format(FORMAT2, ARGS[0], ARGS[1], ARGS[2]));
 
-        logger.dbg(ex);
-        assertThat(log.getLevel()).isEqualTo(Level.DEBUG);
-        assertThat(log.getMessage()).isNotEmpty();
+    logger.dbg(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
+    assertThat(log.getLevel()).isEqualTo(Level.DEBUG);
+    assertThat(log.getMessage()).contains(
+        String.format(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]));
 
-        logger.dbg(ex, ARGS[0]);
-        assertThat(log.getLevel()).isEqualTo(Level.DEBUG);
-        assertThat(log.getMessage()).contains(ARGS[0]);
+    logger.dbg(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
+    assertThat(log.getLevel()).isEqualTo(Level.DEBUG);
+    assertThat(log.getMessage()).contains(
+        String.format(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]));
 
-        logger.dbg(ex, FORMAT0, ARGS[0]);
-        assertThat(log.getLevel()).isEqualTo(Level.DEBUG);
-        assertThat(log.getMessage()).contains(String.format(FORMAT0, ARGS[0]));
+    logger.dbg(ex);
+    assertThat(log.getLevel()).isEqualTo(Level.DEBUG);
+    assertThat(log.getMessage()).isNotEmpty();
 
-        logger.dbg(ex, FORMAT1, ARGS[0], ARGS[1]);
-        assertThat(log.getLevel()).isEqualTo(Level.DEBUG);
-        assertThat(log.getMessage()).contains(String.format(FORMAT1, ARGS[0], ARGS[1]));
+    logger.dbg(ex, ARGS[0]);
+    assertThat(log.getLevel()).isEqualTo(Level.DEBUG);
+    assertThat(log.getMessage()).contains(ARGS[0]);
 
-        logger.dbg(ex, FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
-        assertThat(log.getLevel()).isEqualTo(Level.DEBUG);
-        assertThat(log.getMessage()).contains(String.format(FORMAT2, ARGS[0], ARGS[1], ARGS[2]));
+    logger.dbg(ex, FORMAT0, ARGS[0]);
+    assertThat(log.getLevel()).isEqualTo(Level.DEBUG);
+    assertThat(log.getMessage()).contains(String.format(FORMAT0, ARGS[0]));
 
-        logger.dbg(ex, FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
-        assertThat(log.getLevel()).isEqualTo(Level.DEBUG);
-        assertThat(log.getMessage()).contains(
-                String.format(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]));
+    logger.dbg(ex, FORMAT1, ARGS[0], ARGS[1]);
+    assertThat(log.getLevel()).isEqualTo(Level.DEBUG);
+    assertThat(log.getMessage()).contains(String.format(FORMAT1, ARGS[0], ARGS[1]));
 
-        logger.dbg(ex, FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
-        assertThat(log.getLevel()).isEqualTo(Level.DEBUG);
-        assertThat(log.getMessage()).contains(
-                String.format(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]));
+    logger.dbg(ex, FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
+    assertThat(log.getLevel()).isEqualTo(Level.DEBUG);
+    assertThat(log.getMessage()).contains(String.format(FORMAT2, ARGS[0], ARGS[1], ARGS[2]));
 
-        // - WRN
-        logger.wrn(ARGS[0]);
-        assertThat(log.getLevel()).isEqualTo(Level.WARNING);
-        assertThat(log.getMessage()).contains(ARGS[0]);
+    logger.dbg(ex, FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
+    assertThat(log.getLevel()).isEqualTo(Level.DEBUG);
+    assertThat(log.getMessage()).contains(
+        String.format(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]));
 
-        logger.wrn(FORMAT0, ARGS[0]);
-        assertThat(log.getLevel()).isEqualTo(Level.WARNING);
-        assertThat(log.getMessage()).contains(String.format(FORMAT0, ARGS[0]));
+    logger.dbg(ex, FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
+    assertThat(log.getLevel()).isEqualTo(Level.DEBUG);
+    assertThat(log.getMessage()).contains(
+        String.format(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]));
 
-        logger.wrn(FORMAT1, ARGS[0], ARGS[1]);
-        assertThat(log.getLevel()).isEqualTo(Level.WARNING);
-        assertThat(log.getMessage()).contains(String.format(FORMAT1, ARGS[0], ARGS[1]));
+    // - WRN
+    logger.wrn(ARGS[0]);
+    assertThat(log.getLevel()).isEqualTo(Level.WARNING);
+    assertThat(log.getMessage()).contains(ARGS[0]);
 
-        logger.wrn(FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
-        assertThat(log.getLevel()).isEqualTo(Level.WARNING);
-        assertThat(log.getMessage()).contains(String.format(FORMAT2, ARGS[0], ARGS[1], ARGS[2]));
+    logger.wrn(FORMAT0, ARGS[0]);
+    assertThat(log.getLevel()).isEqualTo(Level.WARNING);
+    assertThat(log.getMessage()).contains(String.format(FORMAT0, ARGS[0]));
 
-        logger.wrn(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
-        assertThat(log.getLevel()).isEqualTo(Level.WARNING);
-        assertThat(log.getMessage()).contains(
-                String.format(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]));
+    logger.wrn(FORMAT1, ARGS[0], ARGS[1]);
+    assertThat(log.getLevel()).isEqualTo(Level.WARNING);
+    assertThat(log.getMessage()).contains(String.format(FORMAT1, ARGS[0], ARGS[1]));
 
-        logger.wrn(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
-        assertThat(log.getLevel()).isEqualTo(Level.WARNING);
-        assertThat(log.getMessage()).contains(
-                String.format(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]));
+    logger.wrn(FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
+    assertThat(log.getLevel()).isEqualTo(Level.WARNING);
+    assertThat(log.getMessage()).contains(String.format(FORMAT2, ARGS[0], ARGS[1], ARGS[2]));
 
-        logger.wrn(ex);
-        assertThat(log.getLevel()).isEqualTo(Level.WARNING);
-        assertThat(log.getMessage()).isNotEmpty();
+    logger.wrn(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
+    assertThat(log.getLevel()).isEqualTo(Level.WARNING);
+    assertThat(log.getMessage()).contains(
+        String.format(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]));
 
-        logger.wrn(ex, ARGS[0]);
-        assertThat(log.getLevel()).isEqualTo(Level.WARNING);
-        assertThat(log.getMessage()).contains(ARGS[0]);
+    logger.wrn(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
+    assertThat(log.getLevel()).isEqualTo(Level.WARNING);
+    assertThat(log.getMessage()).contains(
+        String.format(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]));
 
-        logger.wrn(ex, FORMAT0, ARGS[0]);
-        assertThat(log.getLevel()).isEqualTo(Level.WARNING);
-        assertThat(log.getMessage()).contains(String.format(FORMAT0, ARGS[0]));
+    logger.wrn(ex);
+    assertThat(log.getLevel()).isEqualTo(Level.WARNING);
+    assertThat(log.getMessage()).isNotEmpty();
 
-        logger.wrn(ex, FORMAT1, ARGS[0], ARGS[1]);
-        assertThat(log.getLevel()).isEqualTo(Level.WARNING);
-        assertThat(log.getMessage()).contains(String.format(FORMAT1, ARGS[0], ARGS[1]));
+    logger.wrn(ex, ARGS[0]);
+    assertThat(log.getLevel()).isEqualTo(Level.WARNING);
+    assertThat(log.getMessage()).contains(ARGS[0]);
 
-        logger.wrn(ex, FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
-        assertThat(log.getLevel()).isEqualTo(Level.WARNING);
-        assertThat(log.getMessage()).contains(String.format(FORMAT2, ARGS[0], ARGS[1], ARGS[2]));
+    logger.wrn(ex, FORMAT0, ARGS[0]);
+    assertThat(log.getLevel()).isEqualTo(Level.WARNING);
+    assertThat(log.getMessage()).contains(String.format(FORMAT0, ARGS[0]));
 
-        logger.wrn(ex, FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
-        assertThat(log.getLevel()).isEqualTo(Level.WARNING);
-        assertThat(log.getMessage()).contains(
-                String.format(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]));
+    logger.wrn(ex, FORMAT1, ARGS[0], ARGS[1]);
+    assertThat(log.getLevel()).isEqualTo(Level.WARNING);
+    assertThat(log.getMessage()).contains(String.format(FORMAT1, ARGS[0], ARGS[1]));
 
-        logger.wrn(ex, FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
-        assertThat(log.getLevel()).isEqualTo(Level.WARNING);
-        assertThat(log.getMessage()).contains(
-                String.format(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]));
+    logger.wrn(ex, FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
+    assertThat(log.getLevel()).isEqualTo(Level.WARNING);
+    assertThat(log.getMessage()).contains(String.format(FORMAT2, ARGS[0], ARGS[1], ARGS[2]));
 
-        // - ERR
-        logger.err(ARGS[0]);
-        assertThat(log.getLevel()).isEqualTo(Level.ERROR);
-        assertThat(log.getMessage()).contains(ARGS[0]);
+    logger.wrn(ex, FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
+    assertThat(log.getLevel()).isEqualTo(Level.WARNING);
+    assertThat(log.getMessage()).contains(
+        String.format(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]));
 
-        logger.err(FORMAT0, ARGS[0]);
-        assertThat(log.getLevel()).isEqualTo(Level.ERROR);
-        assertThat(log.getMessage()).contains(String.format(FORMAT0, ARGS[0]));
+    logger.wrn(ex, FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
+    assertThat(log.getLevel()).isEqualTo(Level.WARNING);
+    assertThat(log.getMessage()).contains(
+        String.format(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]));
 
-        logger.err(FORMAT1, ARGS[0], ARGS[1]);
-        assertThat(log.getLevel()).isEqualTo(Level.ERROR);
-        assertThat(log.getMessage()).contains(String.format(FORMAT1, ARGS[0], ARGS[1]));
+    // - ERR
+    logger.err(ARGS[0]);
+    assertThat(log.getLevel()).isEqualTo(Level.ERROR);
+    assertThat(log.getMessage()).contains(ARGS[0]);
 
-        logger.err(FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
-        assertThat(log.getLevel()).isEqualTo(Level.ERROR);
-        assertThat(log.getMessage()).contains(String.format(FORMAT2, ARGS[0], ARGS[1], ARGS[2]));
+    logger.err(FORMAT0, ARGS[0]);
+    assertThat(log.getLevel()).isEqualTo(Level.ERROR);
+    assertThat(log.getMessage()).contains(String.format(FORMAT0, ARGS[0]));
 
-        logger.err(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
-        assertThat(log.getLevel()).isEqualTo(Level.ERROR);
-        assertThat(log.getMessage()).contains(
-                String.format(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]));
+    logger.err(FORMAT1, ARGS[0], ARGS[1]);
+    assertThat(log.getLevel()).isEqualTo(Level.ERROR);
+    assertThat(log.getMessage()).contains(String.format(FORMAT1, ARGS[0], ARGS[1]));
 
-        logger.err(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
-        assertThat(log.getLevel()).isEqualTo(Level.ERROR);
-        assertThat(log.getMessage()).contains(
-                String.format(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]));
+    logger.err(FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
+    assertThat(log.getLevel()).isEqualTo(Level.ERROR);
+    assertThat(log.getMessage()).contains(String.format(FORMAT2, ARGS[0], ARGS[1], ARGS[2]));
 
-        logger.err(ex);
-        assertThat(log.getLevel()).isEqualTo(Level.ERROR);
-        assertThat(log.getMessage()).isNotEmpty();
+    logger.err(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
+    assertThat(log.getLevel()).isEqualTo(Level.ERROR);
+    assertThat(log.getMessage()).contains(
+        String.format(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]));
 
-        logger.err(ex, ARGS[0]);
-        assertThat(log.getLevel()).isEqualTo(Level.ERROR);
-        assertThat(log.getMessage()).contains(ARGS[0]);
+    logger.err(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
+    assertThat(log.getLevel()).isEqualTo(Level.ERROR);
+    assertThat(log.getMessage()).contains(
+        String.format(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]));
 
-        logger.err(ex, FORMAT0, ARGS[0]);
-        assertThat(log.getLevel()).isEqualTo(Level.ERROR);
-        assertThat(log.getMessage()).contains(String.format(FORMAT0, ARGS[0]));
+    logger.err(ex);
+    assertThat(log.getLevel()).isEqualTo(Level.ERROR);
+    assertThat(log.getMessage()).isNotEmpty();
 
-        logger.err(ex, FORMAT1, ARGS[0], ARGS[1]);
-        assertThat(log.getLevel()).isEqualTo(Level.ERROR);
-        assertThat(log.getMessage()).contains(String.format(FORMAT1, ARGS[0], ARGS[1]));
+    logger.err(ex, ARGS[0]);
+    assertThat(log.getLevel()).isEqualTo(Level.ERROR);
+    assertThat(log.getMessage()).contains(ARGS[0]);
 
-        logger.err(ex, FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
-        assertThat(log.getLevel()).isEqualTo(Level.ERROR);
-        assertThat(log.getMessage()).contains(String.format(FORMAT2, ARGS[0], ARGS[1], ARGS[2]));
+    logger.err(ex, FORMAT0, ARGS[0]);
+    assertThat(log.getLevel()).isEqualTo(Level.ERROR);
+    assertThat(log.getMessage()).contains(String.format(FORMAT0, ARGS[0]));
 
-        logger.err(ex, FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
-        assertThat(log.getLevel()).isEqualTo(Level.ERROR);
-        assertThat(log.getMessage()).contains(
-                String.format(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]));
+    logger.err(ex, FORMAT1, ARGS[0], ARGS[1]);
+    assertThat(log.getLevel()).isEqualTo(Level.ERROR);
+    assertThat(log.getMessage()).contains(String.format(FORMAT1, ARGS[0], ARGS[1]));
 
-        logger.err(ex, FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
-        assertThat(log.getLevel()).isEqualTo(Level.ERROR);
-        assertThat(log.getMessage()).contains(
-                String.format(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]));
+    logger.err(ex, FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
+    assertThat(log.getLevel()).isEqualTo(Level.ERROR);
+    assertThat(log.getMessage()).contains(String.format(FORMAT2, ARGS[0], ARGS[1], ARGS[2]));
+
+    logger.err(ex, FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
+    assertThat(log.getLevel()).isEqualTo(Level.ERROR);
+    assertThat(log.getMessage()).contains(
+        String.format(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]));
+
+    logger.err(ex, FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
+    assertThat(log.getLevel()).isEqualTo(Level.ERROR);
+    assertThat(log.getMessage()).contains(
+        String.format(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]));
+  }
+
+  @Test
+  public void testLoggerError() {
+
+    final NullPointerException ex = new NullPointerException();
+    final TestLog log = new TestLog();
+    final Logger logger = Logger.newLogger(log, Level.ERROR, this);
+
+    assertThat(logger.getLog()).isEqualTo(log);
+    assertThat(logger.getLogLevel()).isEqualTo(Level.ERROR);
+
+    // - DBG
+    logger.dbg(ARGS[0]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.dbg(FORMAT0, ARGS[0]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.dbg(FORMAT1, ARGS[0], ARGS[1]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.dbg(FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.dbg(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.dbg(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.dbg(ex);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.dbg(ex, ARGS[0]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.dbg(ex, FORMAT0, ARGS[0]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.dbg(ex, FORMAT1, ARGS[0], ARGS[1]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.dbg(ex, FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.dbg(ex, FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.dbg(ex, FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    // - WRN
+    logger.wrn(ARGS[0]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.wrn(FORMAT0, ARGS[0]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.wrn(FORMAT1, ARGS[0], ARGS[1]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.wrn(FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.wrn(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.wrn(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.wrn(ex);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.wrn(ex, ARGS[0]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.wrn(ex, FORMAT0, ARGS[0]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.wrn(ex, FORMAT1, ARGS[0], ARGS[1]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.wrn(ex, FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.wrn(ex, FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.wrn(ex, FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    // - ERR
+    logger.err(ARGS[0]);
+    assertThat(log.getLevel()).isEqualTo(Level.ERROR);
+    assertThat(log.getMessage()).contains(ARGS[0]);
+
+    logger.err(FORMAT0, ARGS[0]);
+    assertThat(log.getLevel()).isEqualTo(Level.ERROR);
+    assertThat(log.getMessage()).contains(String.format(FORMAT0, ARGS[0]));
+
+    logger.err(FORMAT1, ARGS[0], ARGS[1]);
+    assertThat(log.getLevel()).isEqualTo(Level.ERROR);
+    assertThat(log.getMessage()).contains(String.format(FORMAT1, ARGS[0], ARGS[1]));
+
+    logger.err(FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
+    assertThat(log.getLevel()).isEqualTo(Level.ERROR);
+    assertThat(log.getMessage()).contains(String.format(FORMAT2, ARGS[0], ARGS[1], ARGS[2]));
+
+    logger.err(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
+    assertThat(log.getLevel()).isEqualTo(Level.ERROR);
+    assertThat(log.getMessage()).contains(
+        String.format(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]));
+
+    logger.err(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
+    assertThat(log.getLevel()).isEqualTo(Level.ERROR);
+    assertThat(log.getMessage()).contains(
+        String.format(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]));
+
+    logger.err(ex);
+    assertThat(log.getLevel()).isEqualTo(Level.ERROR);
+    assertThat(log.getMessage()).isNotEmpty();
+
+    logger.err(ex, ARGS[0]);
+    assertThat(log.getLevel()).isEqualTo(Level.ERROR);
+    assertThat(log.getMessage()).contains(ARGS[0]);
+
+    logger.err(ex, FORMAT0, ARGS[0]);
+    assertThat(log.getLevel()).isEqualTo(Level.ERROR);
+    assertThat(log.getMessage()).contains(String.format(FORMAT0, ARGS[0]));
+
+    logger.err(ex, FORMAT1, ARGS[0], ARGS[1]);
+    assertThat(log.getLevel()).isEqualTo(Level.ERROR);
+    assertThat(log.getMessage()).contains(String.format(FORMAT1, ARGS[0], ARGS[1]));
+
+    logger.err(ex, FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
+    assertThat(log.getLevel()).isEqualTo(Level.ERROR);
+    assertThat(log.getMessage()).contains(String.format(FORMAT2, ARGS[0], ARGS[1], ARGS[2]));
+
+    logger.err(ex, FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
+    assertThat(log.getLevel()).isEqualTo(Level.ERROR);
+    assertThat(log.getMessage()).contains(
+        String.format(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]));
+
+    logger.err(ex, FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
+    assertThat(log.getLevel()).isEqualTo(Level.ERROR);
+    assertThat(log.getMessage()).contains(
+        String.format(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]));
+  }
+
+  @Test
+  public void testLoggerSilent() {
+
+    final NullPointerException ex = new NullPointerException();
+    final TestLog log = new TestLog();
+    final Logger logger = Logger.newLogger(log, Level.SILENT, this);
+
+    assertThat(logger.getLog()).isEqualTo(log);
+    assertThat(logger.getLogLevel()).isEqualTo(Level.SILENT);
+
+    // - DBG
+    logger.dbg(ARGS[0]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.dbg(FORMAT0, ARGS[0]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.dbg(FORMAT1, ARGS[0], ARGS[1]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.dbg(FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.dbg(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.dbg(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.dbg(ex);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.dbg(ex, ARGS[0]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.dbg(ex, FORMAT0, ARGS[0]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.dbg(ex, FORMAT1, ARGS[0], ARGS[1]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.dbg(ex, FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.dbg(ex, FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.dbg(ex, FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    // - WRN
+    logger.wrn(ARGS[0]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.wrn(FORMAT0, ARGS[0]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.wrn(FORMAT1, ARGS[0], ARGS[1]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.wrn(FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.wrn(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.wrn(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.wrn(ex);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.wrn(ex, ARGS[0]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.wrn(ex, FORMAT0, ARGS[0]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.wrn(ex, FORMAT1, ARGS[0], ARGS[1]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.wrn(ex, FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.wrn(ex, FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.wrn(ex, FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    // - ERR
+    logger.err(ARGS[0]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.err(FORMAT0, ARGS[0]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.err(FORMAT1, ARGS[0], ARGS[1]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.err(FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.err(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.err(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.err(ex);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.err(ex, ARGS[0]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.err(ex, FORMAT0, ARGS[0]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.err(ex, FORMAT1, ARGS[0], ARGS[1]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.err(ex, FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.err(ex, FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.err(ex, FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+  }
+
+  @Test
+  public void testLoggerWarning() {
+
+    final NullPointerException ex = new NullPointerException();
+    final TestLog log = new TestLog();
+    final Logger logger = Logger.newLogger(log, Level.WARNING, this);
+
+    assertThat(logger.getLog()).isEqualTo(log);
+    assertThat(logger.getLogLevel()).isEqualTo(Level.WARNING);
+
+    // - DBG
+    logger.dbg(ARGS[0]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.dbg(FORMAT0, ARGS[0]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.dbg(FORMAT1, ARGS[0], ARGS[1]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.dbg(FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.dbg(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.dbg(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.dbg(ex);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.dbg(ex, ARGS[0]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.dbg(ex, FORMAT0, ARGS[0]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.dbg(ex, FORMAT1, ARGS[0], ARGS[1]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.dbg(ex, FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.dbg(ex, FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    logger.dbg(ex, FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
+    assertThat(log.getLevel()).isNull();
+    assertThat(log.getMessage()).isNull();
+
+    // - WRN
+    logger.wrn(ARGS[0]);
+    assertThat(log.getLevel()).isEqualTo(Level.WARNING);
+    assertThat(log.getMessage()).contains(ARGS[0]);
+
+    logger.wrn(FORMAT0, ARGS[0]);
+    assertThat(log.getLevel()).isEqualTo(Level.WARNING);
+    assertThat(log.getMessage()).contains(String.format(FORMAT0, ARGS[0]));
+
+    logger.wrn(FORMAT1, ARGS[0], ARGS[1]);
+    assertThat(log.getLevel()).isEqualTo(Level.WARNING);
+    assertThat(log.getMessage()).contains(String.format(FORMAT1, ARGS[0], ARGS[1]));
+
+    logger.wrn(FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
+    assertThat(log.getLevel()).isEqualTo(Level.WARNING);
+    assertThat(log.getMessage()).contains(String.format(FORMAT2, ARGS[0], ARGS[1], ARGS[2]));
+
+    logger.wrn(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
+    assertThat(log.getLevel()).isEqualTo(Level.WARNING);
+    assertThat(log.getMessage()).contains(
+        String.format(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]));
+
+    logger.wrn(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
+    assertThat(log.getLevel()).isEqualTo(Level.WARNING);
+    assertThat(log.getMessage()).contains(
+        String.format(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]));
+
+    logger.wrn(ex);
+    assertThat(log.getLevel()).isEqualTo(Level.WARNING);
+    assertThat(log.getMessage()).isNotEmpty();
+
+    logger.wrn(ex, ARGS[0]);
+    assertThat(log.getLevel()).isEqualTo(Level.WARNING);
+    assertThat(log.getMessage()).contains(ARGS[0]);
+
+    logger.wrn(ex, FORMAT0, ARGS[0]);
+    assertThat(log.getLevel()).isEqualTo(Level.WARNING);
+    assertThat(log.getMessage()).contains(String.format(FORMAT0, ARGS[0]));
+
+    logger.wrn(ex, FORMAT1, ARGS[0], ARGS[1]);
+    assertThat(log.getLevel()).isEqualTo(Level.WARNING);
+    assertThat(log.getMessage()).contains(String.format(FORMAT1, ARGS[0], ARGS[1]));
+
+    logger.wrn(ex, FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
+    assertThat(log.getLevel()).isEqualTo(Level.WARNING);
+    assertThat(log.getMessage()).contains(String.format(FORMAT2, ARGS[0], ARGS[1], ARGS[2]));
+
+    logger.wrn(ex, FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
+    assertThat(log.getLevel()).isEqualTo(Level.WARNING);
+    assertThat(log.getMessage()).contains(
+        String.format(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]));
+
+    logger.wrn(ex, FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
+    assertThat(log.getLevel()).isEqualTo(Level.WARNING);
+    assertThat(log.getMessage()).contains(
+        String.format(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]));
+
+    // - ERR
+    logger.err(ARGS[0]);
+    assertThat(log.getLevel()).isEqualTo(Level.ERROR);
+    assertThat(log.getMessage()).contains(ARGS[0]);
+
+    logger.err(FORMAT0, ARGS[0]);
+    assertThat(log.getLevel()).isEqualTo(Level.ERROR);
+    assertThat(log.getMessage()).contains(String.format(FORMAT0, ARGS[0]));
+
+    logger.err(FORMAT1, ARGS[0], ARGS[1]);
+    assertThat(log.getLevel()).isEqualTo(Level.ERROR);
+    assertThat(log.getMessage()).contains(String.format(FORMAT1, ARGS[0], ARGS[1]));
+
+    logger.err(FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
+    assertThat(log.getLevel()).isEqualTo(Level.ERROR);
+    assertThat(log.getMessage()).contains(String.format(FORMAT2, ARGS[0], ARGS[1], ARGS[2]));
+
+    logger.err(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
+    assertThat(log.getLevel()).isEqualTo(Level.ERROR);
+    assertThat(log.getMessage()).contains(
+        String.format(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]));
+
+    logger.err(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
+    assertThat(log.getLevel()).isEqualTo(Level.ERROR);
+    assertThat(log.getMessage()).contains(
+        String.format(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]));
+
+    logger.err(ex);
+    assertThat(log.getLevel()).isEqualTo(Level.ERROR);
+    assertThat(log.getMessage()).isNotEmpty();
+
+    logger.err(ex, ARGS[0]);
+    assertThat(log.getLevel()).isEqualTo(Level.ERROR);
+    assertThat(log.getMessage()).contains(ARGS[0]);
+
+    logger.err(ex, FORMAT0, ARGS[0]);
+    assertThat(log.getLevel()).isEqualTo(Level.ERROR);
+    assertThat(log.getMessage()).contains(String.format(FORMAT0, ARGS[0]));
+
+    logger.err(ex, FORMAT1, ARGS[0], ARGS[1]);
+    assertThat(log.getLevel()).isEqualTo(Level.ERROR);
+    assertThat(log.getMessage()).contains(String.format(FORMAT1, ARGS[0], ARGS[1]));
+
+    logger.err(ex, FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
+    assertThat(log.getLevel()).isEqualTo(Level.ERROR);
+    assertThat(log.getMessage()).contains(String.format(FORMAT2, ARGS[0], ARGS[1], ARGS[2]));
+
+    logger.err(ex, FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
+    assertThat(log.getLevel()).isEqualTo(Level.ERROR);
+    assertThat(log.getMessage()).contains(
+        String.format(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]));
+
+    logger.err(ex, FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
+    assertThat(log.getLevel()).isEqualTo(Level.ERROR);
+    assertThat(log.getMessage()).contains(
+        String.format(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]));
+  }
+
+  @Test
+  public void testSubContext() {
+
+    final TestLog log = new TestLog();
+    final Logger logger = Logger.newLogger(log, Level.WARNING, "ctx1");
+    final Logger subLogger = logger.subContextLogger("ctx2");
+
+    assertThat(logger.getContextList()).containsExactly("ctx1");
+    assertThat(subLogger.getContextList()).containsExactly("ctx1", "ctx2");
+
+    logger.wrn("test1");
+    assertThat(log.getMessage()).contains("ctx1");
+    assertThat(log.getMessage()).contains("test1");
+    assertThat(log.getMessage()).doesNotContain("test2");
+    assertThat(log.getMessage()).doesNotContain("ctx2");
+
+    subLogger.wrn("test2");
+    assertThat(log.getMessage()).contains("ctx1");
+    assertThat(log.getMessage()).doesNotContain("test1");
+    assertThat(log.getMessage()).contains("test2");
+    assertThat(log.getMessage()).contains("ctx2");
+  }
+
+  private static class TestLog extends TemplateLog {
+
+    private Level mLevel;
+
+    private String mMessage;
+
+    public Level getLevel() {
+
+      return mLevel;
     }
 
-    @Test
-    public void testLoggerError() {
+    public String getMessage() {
 
-        final NullPointerException ex = new NullPointerException();
-        final TestLog log = new TestLog();
-        final Logger logger = Logger.newLogger(log, Level.ERROR, this);
-
-        assertThat(logger.getLog()).isEqualTo(log);
-        assertThat(logger.getLogLevel()).isEqualTo(Level.ERROR);
-
-        // - DBG
-        logger.dbg(ARGS[0]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.dbg(FORMAT0, ARGS[0]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.dbg(FORMAT1, ARGS[0], ARGS[1]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.dbg(FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.dbg(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.dbg(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.dbg(ex);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.dbg(ex, ARGS[0]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.dbg(ex, FORMAT0, ARGS[0]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.dbg(ex, FORMAT1, ARGS[0], ARGS[1]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.dbg(ex, FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.dbg(ex, FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.dbg(ex, FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        // - WRN
-        logger.wrn(ARGS[0]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.wrn(FORMAT0, ARGS[0]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.wrn(FORMAT1, ARGS[0], ARGS[1]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.wrn(FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.wrn(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.wrn(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.wrn(ex);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.wrn(ex, ARGS[0]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.wrn(ex, FORMAT0, ARGS[0]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.wrn(ex, FORMAT1, ARGS[0], ARGS[1]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.wrn(ex, FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.wrn(ex, FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.wrn(ex, FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        // - ERR
-        logger.err(ARGS[0]);
-        assertThat(log.getLevel()).isEqualTo(Level.ERROR);
-        assertThat(log.getMessage()).contains(ARGS[0]);
-
-        logger.err(FORMAT0, ARGS[0]);
-        assertThat(log.getLevel()).isEqualTo(Level.ERROR);
-        assertThat(log.getMessage()).contains(String.format(FORMAT0, ARGS[0]));
-
-        logger.err(FORMAT1, ARGS[0], ARGS[1]);
-        assertThat(log.getLevel()).isEqualTo(Level.ERROR);
-        assertThat(log.getMessage()).contains(String.format(FORMAT1, ARGS[0], ARGS[1]));
-
-        logger.err(FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
-        assertThat(log.getLevel()).isEqualTo(Level.ERROR);
-        assertThat(log.getMessage()).contains(String.format(FORMAT2, ARGS[0], ARGS[1], ARGS[2]));
-
-        logger.err(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
-        assertThat(log.getLevel()).isEqualTo(Level.ERROR);
-        assertThat(log.getMessage()).contains(
-                String.format(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]));
-
-        logger.err(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
-        assertThat(log.getLevel()).isEqualTo(Level.ERROR);
-        assertThat(log.getMessage()).contains(
-                String.format(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]));
-
-        logger.err(ex);
-        assertThat(log.getLevel()).isEqualTo(Level.ERROR);
-        assertThat(log.getMessage()).isNotEmpty();
-
-        logger.err(ex, ARGS[0]);
-        assertThat(log.getLevel()).isEqualTo(Level.ERROR);
-        assertThat(log.getMessage()).contains(ARGS[0]);
-
-        logger.err(ex, FORMAT0, ARGS[0]);
-        assertThat(log.getLevel()).isEqualTo(Level.ERROR);
-        assertThat(log.getMessage()).contains(String.format(FORMAT0, ARGS[0]));
-
-        logger.err(ex, FORMAT1, ARGS[0], ARGS[1]);
-        assertThat(log.getLevel()).isEqualTo(Level.ERROR);
-        assertThat(log.getMessage()).contains(String.format(FORMAT1, ARGS[0], ARGS[1]));
-
-        logger.err(ex, FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
-        assertThat(log.getLevel()).isEqualTo(Level.ERROR);
-        assertThat(log.getMessage()).contains(String.format(FORMAT2, ARGS[0], ARGS[1], ARGS[2]));
-
-        logger.err(ex, FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
-        assertThat(log.getLevel()).isEqualTo(Level.ERROR);
-        assertThat(log.getMessage()).contains(
-                String.format(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]));
-
-        logger.err(ex, FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
-        assertThat(log.getLevel()).isEqualTo(Level.ERROR);
-        assertThat(log.getMessage()).contains(
-                String.format(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]));
+      return mMessage;
     }
 
-    @Test
-    public void testLoggerSilent() {
+    @Override
+    protected void log(@NotNull final Level level, @NotNull final List<Object> contexts,
+        final String message, final Throwable throwable) {
 
-        final NullPointerException ex = new NullPointerException();
-        final TestLog log = new TestLog();
-        final Logger logger = Logger.newLogger(log, Level.SILENT, this);
+      mLevel = level;
 
-        assertThat(logger.getLog()).isEqualTo(log);
-        assertThat(logger.getLogLevel()).isEqualTo(Level.SILENT);
-
-        // - DBG
-        logger.dbg(ARGS[0]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.dbg(FORMAT0, ARGS[0]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.dbg(FORMAT1, ARGS[0], ARGS[1]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.dbg(FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.dbg(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.dbg(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.dbg(ex);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.dbg(ex, ARGS[0]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.dbg(ex, FORMAT0, ARGS[0]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.dbg(ex, FORMAT1, ARGS[0], ARGS[1]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.dbg(ex, FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.dbg(ex, FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.dbg(ex, FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        // - WRN
-        logger.wrn(ARGS[0]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.wrn(FORMAT0, ARGS[0]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.wrn(FORMAT1, ARGS[0], ARGS[1]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.wrn(FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.wrn(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.wrn(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.wrn(ex);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.wrn(ex, ARGS[0]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.wrn(ex, FORMAT0, ARGS[0]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.wrn(ex, FORMAT1, ARGS[0], ARGS[1]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.wrn(ex, FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.wrn(ex, FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.wrn(ex, FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        // - ERR
-        logger.err(ARGS[0]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.err(FORMAT0, ARGS[0]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.err(FORMAT1, ARGS[0], ARGS[1]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.err(FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.err(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.err(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.err(ex);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.err(ex, ARGS[0]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.err(ex, FORMAT0, ARGS[0]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.err(ex, FORMAT1, ARGS[0], ARGS[1]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.err(ex, FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.err(ex, FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.err(ex, FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
+      super.log(level, contexts, message, throwable);
     }
 
-    @Test
-    public void testLoggerWarning() {
+    @Override
+    protected void log(@NotNull final String message) {
 
-        final NullPointerException ex = new NullPointerException();
-        final TestLog log = new TestLog();
-        final Logger logger = Logger.newLogger(log, Level.WARNING, this);
-
-        assertThat(logger.getLog()).isEqualTo(log);
-        assertThat(logger.getLogLevel()).isEqualTo(Level.WARNING);
-
-        // - DBG
-        logger.dbg(ARGS[0]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.dbg(FORMAT0, ARGS[0]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.dbg(FORMAT1, ARGS[0], ARGS[1]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.dbg(FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.dbg(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.dbg(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.dbg(ex);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.dbg(ex, ARGS[0]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.dbg(ex, FORMAT0, ARGS[0]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.dbg(ex, FORMAT1, ARGS[0], ARGS[1]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.dbg(ex, FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.dbg(ex, FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        logger.dbg(ex, FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
-        assertThat(log.getLevel()).isNull();
-        assertThat(log.getMessage()).isNull();
-
-        // - WRN
-        logger.wrn(ARGS[0]);
-        assertThat(log.getLevel()).isEqualTo(Level.WARNING);
-        assertThat(log.getMessage()).contains(ARGS[0]);
-
-        logger.wrn(FORMAT0, ARGS[0]);
-        assertThat(log.getLevel()).isEqualTo(Level.WARNING);
-        assertThat(log.getMessage()).contains(String.format(FORMAT0, ARGS[0]));
-
-        logger.wrn(FORMAT1, ARGS[0], ARGS[1]);
-        assertThat(log.getLevel()).isEqualTo(Level.WARNING);
-        assertThat(log.getMessage()).contains(String.format(FORMAT1, ARGS[0], ARGS[1]));
-
-        logger.wrn(FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
-        assertThat(log.getLevel()).isEqualTo(Level.WARNING);
-        assertThat(log.getMessage()).contains(String.format(FORMAT2, ARGS[0], ARGS[1], ARGS[2]));
-
-        logger.wrn(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
-        assertThat(log.getLevel()).isEqualTo(Level.WARNING);
-        assertThat(log.getMessage()).contains(
-                String.format(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]));
-
-        logger.wrn(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
-        assertThat(log.getLevel()).isEqualTo(Level.WARNING);
-        assertThat(log.getMessage()).contains(
-                String.format(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]));
-
-        logger.wrn(ex);
-        assertThat(log.getLevel()).isEqualTo(Level.WARNING);
-        assertThat(log.getMessage()).isNotEmpty();
-
-        logger.wrn(ex, ARGS[0]);
-        assertThat(log.getLevel()).isEqualTo(Level.WARNING);
-        assertThat(log.getMessage()).contains(ARGS[0]);
-
-        logger.wrn(ex, FORMAT0, ARGS[0]);
-        assertThat(log.getLevel()).isEqualTo(Level.WARNING);
-        assertThat(log.getMessage()).contains(String.format(FORMAT0, ARGS[0]));
-
-        logger.wrn(ex, FORMAT1, ARGS[0], ARGS[1]);
-        assertThat(log.getLevel()).isEqualTo(Level.WARNING);
-        assertThat(log.getMessage()).contains(String.format(FORMAT1, ARGS[0], ARGS[1]));
-
-        logger.wrn(ex, FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
-        assertThat(log.getLevel()).isEqualTo(Level.WARNING);
-        assertThat(log.getMessage()).contains(String.format(FORMAT2, ARGS[0], ARGS[1], ARGS[2]));
-
-        logger.wrn(ex, FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
-        assertThat(log.getLevel()).isEqualTo(Level.WARNING);
-        assertThat(log.getMessage()).contains(
-                String.format(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]));
-
-        logger.wrn(ex, FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
-        assertThat(log.getLevel()).isEqualTo(Level.WARNING);
-        assertThat(log.getMessage()).contains(
-                String.format(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]));
-
-        // - ERR
-        logger.err(ARGS[0]);
-        assertThat(log.getLevel()).isEqualTo(Level.ERROR);
-        assertThat(log.getMessage()).contains(ARGS[0]);
-
-        logger.err(FORMAT0, ARGS[0]);
-        assertThat(log.getLevel()).isEqualTo(Level.ERROR);
-        assertThat(log.getMessage()).contains(String.format(FORMAT0, ARGS[0]));
-
-        logger.err(FORMAT1, ARGS[0], ARGS[1]);
-        assertThat(log.getLevel()).isEqualTo(Level.ERROR);
-        assertThat(log.getMessage()).contains(String.format(FORMAT1, ARGS[0], ARGS[1]));
-
-        logger.err(FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
-        assertThat(log.getLevel()).isEqualTo(Level.ERROR);
-        assertThat(log.getMessage()).contains(String.format(FORMAT2, ARGS[0], ARGS[1], ARGS[2]));
-
-        logger.err(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
-        assertThat(log.getLevel()).isEqualTo(Level.ERROR);
-        assertThat(log.getMessage()).contains(
-                String.format(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]));
-
-        logger.err(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
-        assertThat(log.getLevel()).isEqualTo(Level.ERROR);
-        assertThat(log.getMessage()).contains(
-                String.format(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]));
-
-        logger.err(ex);
-        assertThat(log.getLevel()).isEqualTo(Level.ERROR);
-        assertThat(log.getMessage()).isNotEmpty();
-
-        logger.err(ex, ARGS[0]);
-        assertThat(log.getLevel()).isEqualTo(Level.ERROR);
-        assertThat(log.getMessage()).contains(ARGS[0]);
-
-        logger.err(ex, FORMAT0, ARGS[0]);
-        assertThat(log.getLevel()).isEqualTo(Level.ERROR);
-        assertThat(log.getMessage()).contains(String.format(FORMAT0, ARGS[0]));
-
-        logger.err(ex, FORMAT1, ARGS[0], ARGS[1]);
-        assertThat(log.getLevel()).isEqualTo(Level.ERROR);
-        assertThat(log.getMessage()).contains(String.format(FORMAT1, ARGS[0], ARGS[1]));
-
-        logger.err(ex, FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
-        assertThat(log.getLevel()).isEqualTo(Level.ERROR);
-        assertThat(log.getMessage()).contains(String.format(FORMAT2, ARGS[0], ARGS[1], ARGS[2]));
-
-        logger.err(ex, FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
-        assertThat(log.getLevel()).isEqualTo(Level.ERROR);
-        assertThat(log.getMessage()).contains(
-                String.format(FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]));
-
-        logger.err(ex, FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
-        assertThat(log.getLevel()).isEqualTo(Level.ERROR);
-        assertThat(log.getMessage()).contains(
-                String.format(FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]));
+      mMessage = message;
     }
-
-    @Test
-    public void testSubContext() {
-
-        final TestLog log = new TestLog();
-        final Logger logger = Logger.newLogger(log, Level.WARNING, "ctx1");
-        final Logger subLogger = logger.subContextLogger("ctx2");
-
-        assertThat(logger.getContextList()).containsExactly("ctx1");
-        assertThat(subLogger.getContextList()).containsExactly("ctx1", "ctx2");
-
-        logger.wrn("test1");
-        assertThat(log.getMessage()).contains("ctx1");
-        assertThat(log.getMessage()).contains("test1");
-        assertThat(log.getMessage()).doesNotContain("test2");
-        assertThat(log.getMessage()).doesNotContain("ctx2");
-
-        subLogger.wrn("test2");
-        assertThat(log.getMessage()).contains("ctx1");
-        assertThat(log.getMessage()).doesNotContain("test1");
-        assertThat(log.getMessage()).contains("test2");
-        assertThat(log.getMessage()).contains("ctx2");
-    }
-
-    private static class TestLog extends TemplateLog {
-
-        private Level mLevel;
-
-        private String mMessage;
-
-        public Level getLevel() {
-
-            return mLevel;
-        }
-
-        public String getMessage() {
-
-            return mMessage;
-        }
-
-        @Override
-        protected void log(@NotNull final Level level, @NotNull final List<Object> contexts,
-                final String message, final Throwable throwable) {
-
-            mLevel = level;
-
-            super.log(level, contexts, message, throwable);
-        }
-
-        @Override
-        protected void log(@NotNull final String message) {
-
-            mMessage = message;
-        }
-    }
+  }
 }

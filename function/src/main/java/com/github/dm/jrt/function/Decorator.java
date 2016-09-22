@@ -23,10 +23,10 @@ package com.github.dm.jrt.function;
  */
 public interface Decorator {
 
-    /**
-     * Checks if the class of the wrapped functions are static or top level.
-     *
-     * @return whether this decorator has a static scope.
-     */
-    boolean hasStaticScope();
+  /**
+   * Checks if the class of the wrapped functions are static or top level.
+   *
+   * @return whether this decorator has a static scope.
+   */
+  boolean hasStaticScope();
 }

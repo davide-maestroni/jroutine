@@ -54,47 +54,47 @@ import java.util.HashSet;
  * @param <IN>   the input data type.
  */
 class InputMapBuilder<DATA, IN extends DATA>
-        extends AbstractBuilder<SparseArrayCompat<Channel<IN, ?>>> {
+    extends AbstractBuilder<SparseArrayCompat<Channel<IN, ?>>> {
 
-    private final Channel<? super ParcelableSelectable<DATA>, ?> mChannel;
+  private final Channel<? super ParcelableSelectable<DATA>, ?> mChannel;
 
-    private final HashSet<Integer> mIndexes;
+  private final HashSet<Integer> mIndexes;
 
-    /**
-     * Constructor.
-     *
-     * @param channel the selectable channel.
-     * @param indexes the set of indexes.
-     * @throws NullPointerException if the specified set of indexes is null or
-     *                              contains a null object.
-     */
-    InputMapBuilder(@NotNull final Channel<? super ParcelableSelectable<DATA>, ?> channel,
-            @NotNull final HashSet<Integer> indexes) {
-        mChannel = ConstantConditions.notNull("channel instance", channel);
-        final HashSet<Integer> indexSet =
-                new HashSet<Integer>(ConstantConditions.notNull("set of indexes", indexes));
-        if (indexSet.contains(null)) {
-            throw new NullPointerException("the set of indexes must not contain null objects");
-        }
-
-        mIndexes = indexSet;
+  /**
+   * Constructor.
+   *
+   * @param channel the selectable channel.
+   * @param indexes the set of indexes.
+   * @throws java.lang.NullPointerException if the specified set of indexes is null or contains a
+   *                                        null object.
+   */
+  InputMapBuilder(@NotNull final Channel<? super ParcelableSelectable<DATA>, ?> channel,
+      @NotNull final HashSet<Integer> indexes) {
+    mChannel = ConstantConditions.notNull("channel instance", channel);
+    final HashSet<Integer> indexSet =
+        new HashSet<Integer>(ConstantConditions.notNull("set of indexes", indexes));
+    if (indexSet.contains(null)) {
+      throw new NullPointerException("the set of indexes must not contain null objects");
     }
 
-    @NotNull
-    @Override
-    protected SparseArrayCompat<Channel<IN, ?>> build(
-            @NotNull final ChannelConfiguration configuration) {
-        final HashSet<Integer> indexes = mIndexes;
-        final Channel<? super ParcelableSelectable<DATA>, ?> channel = mChannel;
-        final SparseArrayCompat<Channel<IN, ?>> channelMap =
-                new SparseArrayCompat<Channel<IN, ?>>(indexes.size());
-        for (final Integer index : indexes) {
-            final Channel<IN, ?> inputChannel =
-                    AndroidChannels.<DATA, IN>selectInputParcelable(channel, index).apply(
-                            configuration).buildChannels();
-            channelMap.put(index, inputChannel);
-        }
+    mIndexes = indexSet;
+  }
 
-        return channelMap;
+  @NotNull
+  @Override
+  protected SparseArrayCompat<Channel<IN, ?>> build(
+      @NotNull final ChannelConfiguration configuration) {
+    final HashSet<Integer> indexes = mIndexes;
+    final Channel<? super ParcelableSelectable<DATA>, ?> channel = mChannel;
+    final SparseArrayCompat<Channel<IN, ?>> channelMap =
+        new SparseArrayCompat<Channel<IN, ?>>(indexes.size());
+    for (final Integer index : indexes) {
+      final Channel<IN, ?> inputChannel =
+          AndroidChannels.<DATA, IN>selectInputParcelable(channel, index).apply(configuration)
+                                                                         .buildChannels();
+      channelMap.put(index, inputChannel);
     }
+
+    return channelMap;
+  }
 }

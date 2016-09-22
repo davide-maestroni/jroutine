@@ -28,33 +28,33 @@ import org.jetbrains.annotations.Nullable;
  */
 public class StreamBuildingException extends RoutineException {
 
-    /**
-     * Constructor.
-     *
-     * @param cause the wrapped exception.
-     */
-    private StreamBuildingException(@Nullable final Throwable cause) {
-        super(cause);
+  /**
+   * Constructor.
+   *
+   * @param cause the wrapped exception.
+   */
+  private StreamBuildingException(@Nullable final Throwable cause) {
+    super(cause);
+  }
+
+  /**
+   * Wraps the specified throwable.
+   * <br>
+   * If the cause is an instance of
+   * {@link com.github.dm.jrt.core.error.RoutineException RoutineException}, its cause will be
+   * wrapped instead.
+   *
+   * @param cause the throwable to wrap.
+   * @return the throwable or a stream exception wrapping it.
+   */
+  @NotNull
+  public static StreamBuildingException wrapIfNeeded(@Nullable final Throwable cause) {
+    if (cause instanceof StreamBuildingException) {
+      return (StreamBuildingException) cause;
     }
 
-    /**
-     * Wraps the specified throwable.
-     * <br>
-     * If the cause is an instance of
-     * {@link com.github.dm.jrt.core.error.RoutineException RoutineException}, its cause will be
-     * wrapped instead.
-     *
-     * @param cause the throwable to wrap.
-     * @return the throwable or a stream exception wrapping it.
-     */
-    @NotNull
-    public static StreamBuildingException wrapIfNeeded(@Nullable final Throwable cause) {
-        if (cause instanceof StreamBuildingException) {
-            return (StreamBuildingException) cause;
-        }
-
-        // Unwrap routine exception to get the original cause
-        return new StreamBuildingException(
-                (cause instanceof RoutineException) ? cause.getCause() : cause);
-    }
+    // Unwrap routine exception to get the original cause
+    return new StreamBuildingException(
+        (cause instanceof RoutineException) ? cause.getCause() : cause);
+  }
 }

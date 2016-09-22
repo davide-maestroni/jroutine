@@ -35,47 +35,46 @@ import java.util.Map.Entry;
  */
 class CombineMapBuilder<IN> extends AbstractBuilder<Channel<Selectable<? extends IN>, ?>> {
 
-    private final HashMap<Integer, Channel<? extends IN, ?>> mChannelMap;
+  private final HashMap<Integer, Channel<? extends IN, ?>> mChannelMap;
 
-    /**
-     * Constructor.
-     *
-     * @param channels the map of channels to combine.
-     * @throws java.lang.IllegalArgumentException if the specified map is empty.
-     * @throws java.lang.NullPointerException     if the specified map is null or contains a null
-     *                                            object.
-     */
-    CombineMapBuilder(@NotNull final Map<Integer, ? extends Channel<? extends IN, ?>> channels) {
-        if (channels.isEmpty()) {
-            throw new IllegalArgumentException("the map of channels must not be empty");
-        }
-
-        final HashMap<Integer, Channel<? extends IN, ?>> channelMap =
-                new HashMap<Integer, Channel<? extends IN, ?>>(channels);
-        if (channelMap.containsValue(null)) {
-            throw new NullPointerException("the map of channels must not contain null objects");
-        }
-
-        mChannelMap = channelMap;
+  /**
+   * Constructor.
+   *
+   * @param channels the map of channels to combine.
+   * @throws java.lang.IllegalArgumentException if the specified map is empty.
+   * @throws java.lang.NullPointerException     if the specified map is null or contains a null
+   *                                            object.
+   */
+  CombineMapBuilder(@NotNull final Map<Integer, ? extends Channel<? extends IN, ?>> channels) {
+    if (channels.isEmpty()) {
+      throw new IllegalArgumentException("the map of channels must not be empty");
     }
 
-    @NotNull
-    @Override
-    @SuppressWarnings("unchecked")
-    protected Channel<Selectable<? extends IN>, ?> build(
-            @NotNull final ChannelConfiguration configuration) {
-        final HashMap<Integer, Channel<? extends IN, ?>> channelMap = mChannelMap;
-        final HashMap<Integer, Channel<IN, ?>> inputChannelMap =
-                new HashMap<Integer, Channel<IN, ?>>(channelMap.size());
-        for (final Entry<Integer, Channel<? extends IN, ?>> entry : channelMap.entrySet()) {
-            final Channel<IN, IN> outputChannel =
-                    JRoutineCore.io().apply(configuration).buildChannel();
-            outputChannel.bind((Channel<IN, ?>) entry.getValue());
-            inputChannelMap.put(entry.getKey(), outputChannel);
-        }
-
-        final Channel<Selectable<? extends IN>, Selectable<? extends IN>> inputChannel =
-                JRoutineCore.io().apply(configuration).buildChannel();
-        return inputChannel.bind(new SortingMapChannelConsumer<IN>(inputChannelMap));
+    final HashMap<Integer, Channel<? extends IN, ?>> channelMap =
+        new HashMap<Integer, Channel<? extends IN, ?>>(channels);
+    if (channelMap.containsValue(null)) {
+      throw new NullPointerException("the map of channels must not contain null objects");
     }
+
+    mChannelMap = channelMap;
+  }
+
+  @NotNull
+  @Override
+  @SuppressWarnings("unchecked")
+  protected Channel<Selectable<? extends IN>, ?> build(
+      @NotNull final ChannelConfiguration configuration) {
+    final HashMap<Integer, Channel<? extends IN, ?>> channelMap = mChannelMap;
+    final HashMap<Integer, Channel<IN, ?>> inputChannelMap =
+        new HashMap<Integer, Channel<IN, ?>>(channelMap.size());
+    for (final Entry<Integer, Channel<? extends IN, ?>> entry : channelMap.entrySet()) {
+      final Channel<IN, IN> outputChannel = JRoutineCore.io().apply(configuration).buildChannel();
+      outputChannel.bind((Channel<IN, ?>) entry.getValue());
+      inputChannelMap.put(entry.getKey(), outputChannel);
+    }
+
+    final Channel<Selectable<? extends IN>, Selectable<? extends IN>> inputChannel =
+        JRoutineCore.io().apply(configuration).buildChannel();
+    return inputChannel.bind(new SortingMapChannelConsumer<IN>(inputChannelMap));
+  }
 }

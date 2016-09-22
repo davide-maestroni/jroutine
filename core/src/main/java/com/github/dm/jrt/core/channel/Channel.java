@@ -40,655 +40,652 @@ import java.util.concurrent.TimeUnit;
  */
 public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
 
-    /**
-     * Closes the channel and abort the transfer of data, thus aborting the routine invocation.
-     * <br>
-     * An instance of {@link com.github.dm.jrt.core.channel.AbortException AbortException} will be
-     * passed as the abortion reason.
-     * <br>
-     * If a delay has been set through the dedicated methods, the abortion will be accordingly
-     * postponed.
-     * <p>
-     * Note that, in case the channel is already closed, the method invocation will have no effect.
-     *
-     * @return whether the channel status changed as a result of the call.
-     * @see #after(UnitDuration)
-     * @see #after(long, TimeUnit)
-     * @see #now()
-     */
-    boolean abort();
+  /**
+   * Closes the channel and abort the transfer of data, thus aborting the routine invocation.
+   * <br>
+   * An instance of {@link com.github.dm.jrt.core.channel.AbortException AbortException} will be
+   * passed as the abortion reason.
+   * <br>
+   * If a delay has been set through the dedicated methods, the abortion will be accordingly
+   * postponed.
+   * <p>
+   * Note that, in case the channel is already closed, the method invocation will have no effect.
+   *
+   * @return whether the channel status changed as a result of the call.
+   * @see #after(UnitDuration)
+   * @see #after(long, TimeUnit)
+   * @see #now()
+   */
+  boolean abort();
 
-    /**
-     * Closes the channel and abort the transfer of data, thus aborting the routine invocation and
-     * causing the specified throwable to be passed as the abortion reason.
-     * <br>
-     * The throwable, unless it extends the base
-     * {@link com.github.dm.jrt.core.error.RoutineException RoutineException}, will be wrapped as
-     * the cause of an {@link com.github.dm.jrt.core.channel.AbortException AbortException}
-     * instance.
-     * <br>
-     * If a delay has been set through the dedicated methods, the abortion will be accordingly
-     * postponed.
-     * <p>
-     * Note that, in case the channel is already closed, the method invocation will have no effect.
-     *
-     * @param reason the throwable object identifying the reason of the invocation abortion.
-     * @return whether the channel status changed as a result of the call.
-     * @see #after(UnitDuration)
-     * @see #after(long, TimeUnit)
-     * @see #now()
-     */
-    boolean abort(@Nullable Throwable reason);
+  /**
+   * Closes the channel and abort the transfer of data, thus aborting the routine invocation and
+   * causing the specified throwable to be passed as the abortion reason.
+   * <br>
+   * The throwable, unless it extends the base
+   * {@link com.github.dm.jrt.core.error.RoutineException RoutineException}, will be wrapped as
+   * the cause of an {@link com.github.dm.jrt.core.channel.AbortException AbortException}
+   * instance.
+   * <br>
+   * If a delay has been set through the dedicated methods, the abortion will be accordingly
+   * postponed.
+   * <p>
+   * Note that, in case the channel is already closed, the method invocation will have no effect.
+   *
+   * @param reason the throwable object identifying the reason of the invocation abortion.
+   * @return whether the channel status changed as a result of the call.
+   * @see #after(UnitDuration)
+   * @see #after(long, TimeUnit)
+   * @see #now()
+   */
+  boolean abort(@Nullable Throwable reason);
 
-    /**
-     * Tells the channel to delay the following operations of the specified time duration.
-     * <br>
-     * In case of read operations the value will represent the maximum allowed time before the
-     * operation completes.
-     * <p>
-     * Note that closing and abortion commands will be delayed as well. Note, however, that a
-     * delayed abortion will not prevent the invocation from completing, as pending input data do.
-     * <p>
-     * Note that the implementing class should ensure that calls of this method from different
-     * threads will not interfere with each others.
-     *
-     * @param delay    the delay value.
-     * @param timeUnit the delay time unit.
-     * @return this channel.
-     * @throws com.github.dm.jrt.core.error.RoutineException if the execution has been aborted.
-     * @throws java.lang.IllegalArgumentException            if the specified delay is negative.
-     */
-    @NotNull
-    Channel<IN, OUT> after(long delay, @NotNull TimeUnit timeUnit);
+  /**
+   * Tells the channel to delay the following operations of the specified time duration.
+   * <br>
+   * In case of read operations the value will represent the maximum allowed time before the
+   * operation completes.
+   * <p>
+   * Note that closing and abortion commands will be delayed as well. Note, however, that a
+   * delayed abortion will not prevent the invocation from completing, as pending input data do.
+   * <p>
+   * Note that the implementing class should ensure that calls of this method from different
+   * threads will not interfere with each others.
+   *
+   * @param delay    the delay value.
+   * @param timeUnit the delay time unit.
+   * @return this channel.
+   * @throws com.github.dm.jrt.core.error.RoutineException if the execution has been aborted.
+   * @throws java.lang.IllegalArgumentException            if the specified delay is negative.
+   */
+  @NotNull
+  Channel<IN, OUT> after(long delay, @NotNull TimeUnit timeUnit);
 
-    /**
-     * Tells the channel to delay the following operations of the specified time duration.
-     * <br>
-     * In case of read operations the value will represent the maximum allowed time before the
-     * operation completes.
-     * <p>
-     * Note that closing and abortion commands will be delayed as well. Note, however, that a
-     * delayed abortion will not prevent the invocation from completing, as pending input data do.
-     * <p>
-     * Note that the implementing class should ensure that calls of this method from different
-     * threads will not interfere with each others.
-     *
-     * @param delay the delay.
-     * @return this channel.
-     * @throws com.github.dm.jrt.core.error.RoutineException if the execution has been aborted.
-     */
-    @NotNull
-    Channel<IN, OUT> after(@NotNull UnitDuration delay);
+  /**
+   * Tells the channel to delay the following operations of the specified time duration.
+   * <br>
+   * In case of read operations the value will represent the maximum allowed time before the
+   * operation completes.
+   * <p>
+   * Note that closing and abortion commands will be delayed as well. Note, however, that a
+   * delayed abortion will not prevent the invocation from completing, as pending input data do.
+   * <p>
+   * Note that the implementing class should ensure that calls of this method from different
+   * threads will not interfere with each others.
+   *
+   * @param delay the delay.
+   * @return this channel.
+   * @throws com.github.dm.jrt.core.error.RoutineException if the execution has been aborted.
+   */
+  @NotNull
+  Channel<IN, OUT> after(@NotNull UnitDuration delay);
 
-    /**
-     * Consumes all the results by waiting for the routine to complete at the maximum for the set
-     * delay.
-     * <p>
-     * Note that this method invocation will block the calling thread until the routine invocation
-     * completes or is aborted, or the timeout elapses.
-     *
-     * @return the list of results.
-     * @throws com.github.dm.jrt.core.channel.OutputTimeoutException if the channel is set to throw
-     *                                                               an exception when the timeout
-     *                                                               elapses.
-     * @throws com.github.dm.jrt.core.error.RoutineException         if the execution has been
-     *                                                               aborted.
-     * @throws java.lang.IllegalStateException                       if this channel is already
-     *                                                               bound to a consumer or another
-     *                                                               channel.
-     * @see #after(UnitDuration)
-     * @see #after(long, TimeUnit)
-     * @see #now()
-     * @see #eventuallyAbort()
-     * @see #eventuallyAbort(Throwable)
-     * @see #eventuallyContinue()
-     * @see #eventuallyFail()
-     */
-    @NotNull
-    List<OUT> all();
+  /**
+   * Consumes all the results by waiting for the routine to complete at the maximum for the set
+   * delay.
+   * <p>
+   * Note that this method invocation will block the calling thread until the routine invocation
+   * completes or is aborted, or the timeout elapses.
+   *
+   * @return the list of results.
+   * @throws com.github.dm.jrt.core.channel.OutputTimeoutException if the channel is set to throw
+   *                                                               an exception when the timeout
+   *                                                               elapses.
+   * @throws com.github.dm.jrt.core.error.RoutineException         if the execution has been
+   *                                                               aborted.
+   * @throws java.lang.IllegalStateException                       if this channel is already
+   *                                                               bound to a consumer or another
+   *                                                               channel.
+   * @see #after(UnitDuration)
+   * @see #after(long, TimeUnit)
+   * @see #now()
+   * @see #eventuallyAbort()
+   * @see #eventuallyAbort(Throwable)
+   * @see #eventuallyContinue()
+   * @see #eventuallyFail()
+   */
+  @NotNull
+  List<OUT> all();
 
-    /**
-     * Consumes all the results by waiting for the routine to complete at the maximum for the set
-     * delay, and put them into the specified collection.
-     * <p>
-     * Note that this method invocation will block the calling thread until the routine invocation
-     * completes or is aborted, or the timeout elapses.
-     *
-     * @param results the collection to fill.
-     * @return this channel.
-     * @throws com.github.dm.jrt.core.channel.OutputTimeoutException if the channel is set to throw
-     *                                                               an exception when the timeout
-     *                                                               elapses.
-     * @throws com.github.dm.jrt.core.error.RoutineException         if the execution has been
-     *                                                               aborted.
-     * @throws java.lang.IllegalStateException                       if this channel is already
-     *                                                               bound to a consumer or another
-     *                                                               channel.
-     * @see #after(UnitDuration)
-     * @see #after(long, TimeUnit)
-     * @see #now()
-     * @see #eventuallyAbort()
-     * @see #eventuallyAbort(Throwable)
-     * @see #eventuallyContinue()
-     * @see #eventuallyFail()
-     */
-    @NotNull
-    Channel<IN, OUT> allInto(@NotNull Collection<? super OUT> results);
+  /**
+   * Consumes all the results by waiting for the routine to complete at the maximum for the set
+   * delay, and put them into the specified collection.
+   * <p>
+   * Note that this method invocation will block the calling thread until the routine invocation
+   * completes or is aborted, or the timeout elapses.
+   *
+   * @param results the collection to fill.
+   * @return this channel.
+   * @throws com.github.dm.jrt.core.channel.OutputTimeoutException if the channel is set to throw
+   *                                                               an exception when the timeout
+   *                                                               elapses.
+   * @throws com.github.dm.jrt.core.error.RoutineException         if the execution has been
+   *                                                               aborted.
+   * @throws java.lang.IllegalStateException                       if this channel is already
+   *                                                               bound to a consumer or another
+   *                                                               channel.
+   * @see #after(UnitDuration)
+   * @see #after(long, TimeUnit)
+   * @see #now()
+   * @see #eventuallyAbort()
+   * @see #eventuallyAbort(Throwable)
+   * @see #eventuallyContinue()
+   * @see #eventuallyFail()
+   */
+  @NotNull
+  Channel<IN, OUT> allInto(@NotNull Collection<? super OUT> results);
 
-    /**
-     * Binds this channel to the specified one.
-     * <br>
-     * After method exits, all the output will be passed only to the specified input channel.
-     * Attempting to read through the dedicated methods will cause an
-     * {@link java.lang.IllegalStateException} to be thrown.
-     * <br>
-     * If a delay has been set through the dedicated methods, the transfer of data will be
-     * accordingly postponed.
-     *
-     * @param channel the input channel
-     * @param <AFTER> the channel output type.
-     * @return the passed channel.
-     * @throws java.lang.IllegalStateException if this channel is already bound.
-     * @see #after(UnitDuration)
-     * @see #after(long, TimeUnit)
-     * @see #now()
-     */
-    @NotNull
-    <AFTER> Channel<? super OUT, AFTER> bind(@NotNull Channel<? super OUT, AFTER> channel);
+  /**
+   * Binds this channel to the specified one.
+   * <br>
+   * After method exits, all the output will be passed only to the specified input channel.
+   * Attempting to read through the dedicated methods will cause an
+   * {@link java.lang.IllegalStateException} to be thrown.
+   * <br>
+   * If a delay has been set through the dedicated methods, the transfer of data will be
+   * accordingly postponed.
+   *
+   * @param channel the input channel
+   * @param <AFTER> the channel output type.
+   * @return the passed channel.
+   * @throws java.lang.IllegalStateException if this channel is already bound.
+   * @see #after(UnitDuration)
+   * @see #after(long, TimeUnit)
+   * @see #now()
+   */
+  @NotNull
+  <AFTER> Channel<? super OUT, AFTER> bind(@NotNull Channel<? super OUT, AFTER> channel);
 
-    /**
-     * Binds this channel to the specified consumer.
-     * <br>
-     * After method exits, all the output will be passed only to the consumer. Attempting to read
-     * through the dedicated methods will cause an {@link java.lang.IllegalStateException} to be
-     * thrown.
-     * <br>
-     * If a delay has been set through the dedicated methods, the transfer of data will be
-     * accordingly postponed.
-     * <p>
-     * Note that the consumer methods may be called on the runner thread.
-     *
-     * @param consumer the consumer instance.
-     * @return this channel.
-     * @throws java.lang.IllegalStateException if this channel is already bound.
-     * @see #after(UnitDuration)
-     * @see #after(long, TimeUnit)
-     * @see #now()
-     */
-    @NotNull
-    Channel<IN, OUT> bind(@NotNull ChannelConsumer<? super OUT> consumer);
+  /**
+   * Binds this channel to the specified consumer.
+   * <br>
+   * After method exits, all the output will be passed only to the consumer. Attempting to read
+   * through the dedicated methods will cause an {@link java.lang.IllegalStateException} to be
+   * thrown.
+   * <br>
+   * If a delay has been set through the dedicated methods, the transfer of data will be
+   * accordingly postponed.
+   * <p>
+   * Note that the consumer methods may be called on the runner thread.
+   *
+   * @param consumer the consumer instance.
+   * @return this channel.
+   * @throws java.lang.IllegalStateException if this channel is already bound.
+   * @see #after(UnitDuration)
+   * @see #after(long, TimeUnit)
+   * @see #now()
+   */
+  @NotNull
+  Channel<IN, OUT> bind(@NotNull ChannelConsumer<? super OUT> consumer);
 
-    /**
-     * Closes this channel and completes the invocation.
-     * <br>
-     * After channel is closed, attempting to pass additional input data through the dedicated
-     * methods will cause an {@link java.lang.IllegalStateException} to be thrown.
-     * <br>
-     * If a delay has been set through the dedicated methods, the closing command will be
-     * accordingly postponed.
-     * <p>
-     * Note that, even if calling this method is not strictly mandatory, some invocation
-     * implementations may rely on the completion notification to produce their results. So, it's
-     * always advisable to close the channel as soon as all the input data has been passed.
-     *
-     * @return this channel.
-     * @see #after(UnitDuration)
-     * @see #after(long, TimeUnit)
-     * @see #now()
-     */
-    @NotNull
-    Channel<IN, OUT> close();
+  /**
+   * Closes this channel and completes the invocation.
+   * <br>
+   * After channel is closed, attempting to pass additional input data through the dedicated
+   * methods will cause an {@link java.lang.IllegalStateException} to be thrown.
+   * <br>
+   * If a delay has been set through the dedicated methods, the closing command will be
+   * accordingly postponed.
+   * <p>
+   * Note that, even if calling this method is not strictly mandatory, some invocation
+   * implementations may rely on the completion notification to produce their results. So, it's
+   * always advisable to close the channel as soon as all the input data has been passed.
+   *
+   * @return this channel.
+   * @see #after(UnitDuration)
+   * @see #after(long, TimeUnit)
+   * @see #now()
+   */
+  @NotNull
+  Channel<IN, OUT> close();
 
-    /**
-     * Tells the channel to abort the invocation execution in case, after a read method is invoked,
-     * no result is available before the timeout has elapsed.
-     * <p>
-     * By default an
-     * {@link com.github.dm.jrt.core.channel.OutputTimeoutException OutputTimeoutException}
-     * exception will be thrown.
-     * <p>
-     * Note that the implementing class should ensure that calls of this method from different
-     * threads will not interfere with each others.
-     *
-     * @return this channel.
-     * @see #after(UnitDuration)
-     * @see #after(long, TimeUnit)
-     * @see #now()
-     * @see #eventuallyAbort(Throwable)
-     * @see #eventuallyContinue()
-     * @see #eventuallyFail()
-     */
-    @NotNull
-    Channel<IN, OUT> eventuallyAbort();
+  /**
+   * Tells the channel to abort the invocation execution in case, after a read method is invoked,
+   * no result is available before the timeout has elapsed.
+   * <p>
+   * By default an
+   * {@link com.github.dm.jrt.core.channel.OutputTimeoutException OutputTimeoutException}
+   * exception will be thrown.
+   * <p>
+   * Note that the implementing class should ensure that calls of this method from different
+   * threads will not interfere with each others.
+   *
+   * @return this channel.
+   * @see #after(UnitDuration)
+   * @see #after(long, TimeUnit)
+   * @see #now()
+   * @see #eventuallyAbort(Throwable)
+   * @see #eventuallyContinue()
+   * @see #eventuallyFail()
+   */
+  @NotNull
+  Channel<IN, OUT> eventuallyAbort();
 
-    /**
-     * Tells the channel to abort the invocation execution in case, after a read method is invoked,
-     * no result is available before the timeout has elapsed.
-     * <p>
-     * By default an
-     * {@link com.github.dm.jrt.core.channel.OutputTimeoutException OutputTimeoutException}
-     * exception will be thrown.
-     * <p>
-     * Note that the implementing class should ensure that calls of this method from different
-     * threads will not interfere with each others.
-     *
-     * @param reason the throwable object identifying the reason of the invocation abortion.
-     * @return this channel.
-     * @see #after(UnitDuration)
-     * @see #after(long, TimeUnit)
-     * @see #now()
-     * @see #eventuallyAbort()
-     * @see #eventuallyContinue()
-     * @see #eventuallyFail()
-     */
-    @NotNull
-    Channel<IN, OUT> eventuallyAbort(@Nullable Throwable reason);
+  /**
+   * Tells the channel to abort the invocation execution in case, after a read method is invoked,
+   * no result is available before the timeout has elapsed.
+   * <p>
+   * By default an
+   * {@link com.github.dm.jrt.core.channel.OutputTimeoutException OutputTimeoutException}
+   * exception will be thrown.
+   * <p>
+   * Note that the implementing class should ensure that calls of this method from different
+   * threads will not interfere with each others.
+   *
+   * @param reason the throwable object identifying the reason of the invocation abortion.
+   * @return this channel.
+   * @see #after(UnitDuration)
+   * @see #after(long, TimeUnit)
+   * @see #now()
+   * @see #eventuallyAbort()
+   * @see #eventuallyContinue()
+   * @see #eventuallyFail()
+   */
+  @NotNull
+  Channel<IN, OUT> eventuallyAbort(@Nullable Throwable reason);
 
-    /**
-     * Tells the channel to break the invocation execution in case, after a read method is
-     * invoked, no result is available before the timeout has elapsed.
-     * <p>
-     * By default an
-     * {@link com.github.dm.jrt.core.channel.OutputTimeoutException OutputTimeoutException}
-     * exception will be thrown.
-     * <p>
-     * Note that the implementing class should ensure that calls of this method from different
-     * threads will not interfere with each others.
-     *
-     * @return this channel.
-     * @see #after(UnitDuration)
-     * @see #after(long, TimeUnit)
-     * @see #now()
-     * @see #eventuallyAbort()
-     * @see #eventuallyAbort(Throwable)
-     * @see #eventuallyFail()
-     */
-    @NotNull
-    Channel<IN, OUT> eventuallyContinue();
+  /**
+   * Tells the channel to break the invocation execution in case, after a read method is
+   * invoked, no result is available before the timeout has elapsed.
+   * <p>
+   * By default an
+   * {@link com.github.dm.jrt.core.channel.OutputTimeoutException OutputTimeoutException}
+   * exception will be thrown.
+   * <p>
+   * Note that the implementing class should ensure that calls of this method from different
+   * threads will not interfere with each others.
+   *
+   * @return this channel.
+   * @see #after(UnitDuration)
+   * @see #after(long, TimeUnit)
+   * @see #now()
+   * @see #eventuallyAbort()
+   * @see #eventuallyAbort(Throwable)
+   * @see #eventuallyFail()
+   */
+  @NotNull
+  Channel<IN, OUT> eventuallyContinue();
 
-    /**
-     * Tells the channel to throw an
-     * {@link com.github.dm.jrt.core.channel.OutputTimeoutException OutputTimeoutException} in case,
-     * after a read method is invoked, no result is available before the timeout has elapsed.
-     * <p>
-     * This is the default behavior.
-     * <p>
-     * Note that the implementing class should ensure that calls of this method from different
-     * threads will not interfere with each others.
-     *
-     * @return this channel.
-     * @see #after(UnitDuration)
-     * @see #after(long, TimeUnit)
-     * @see #now()
-     * @see #eventuallyAbort()
-     * @see #eventuallyAbort(Throwable)
-     * @see #eventuallyContinue()
-     */
-    @NotNull
-    Channel<IN, OUT> eventuallyFail();
+  /**
+   * Tells the channel to throw an
+   * {@link com.github.dm.jrt.core.channel.OutputTimeoutException OutputTimeoutException} in case,
+   * after a read method is invoked, no result is available before the timeout has elapsed.
+   * <p>
+   * This is the default behavior.
+   * <p>
+   * Note that the implementing class should ensure that calls of this method from different
+   * threads will not interfere with each others.
+   *
+   * @return this channel.
+   * @see #after(UnitDuration)
+   * @see #after(long, TimeUnit)
+   * @see #now()
+   * @see #eventuallyAbort()
+   * @see #eventuallyAbort(Throwable)
+   * @see #eventuallyContinue()
+   */
+  @NotNull
+  Channel<IN, OUT> eventuallyFail();
 
-    /**
-     * Returns an iterator whose lifetime cannot exceed the set delay.
-     *
-     * @return the iterator instance.
-     * @see #after(UnitDuration)
-     * @see #after(long, TimeUnit)
-     * @see #now()
-     * @see #eventuallyAbort(Throwable)
-     * @see #eventuallyContinue()
-     * @see #eventuallyFail()
-     */
-    @NotNull
-    Iterator<OUT> expiringIterator();
+  /**
+   * Returns an iterator whose lifetime cannot exceed the set delay.
+   *
+   * @return the iterator instance.
+   * @see #after(UnitDuration)
+   * @see #after(long, TimeUnit)
+   * @see #now()
+   * @see #eventuallyAbort(Throwable)
+   * @see #eventuallyContinue()
+   * @see #eventuallyFail()
+   */
+  @NotNull
+  Iterator<OUT> expiringIterator();
 
-    /**
-     * Checks if the invocation has completed, waiting at the maximum for the set delay.
-     * <p>
-     * Note that this method invocation will block the calling thread until the routine invocation
-     * completes or is aborted, or the timeout elapses.
-     *
-     * @return whether the routine execution has completed.
-     * @see #after(UnitDuration)
-     * @see #after(long, TimeUnit)
-     * @see #now()
-     */
-    boolean getComplete();
+  /**
+   * Checks if the invocation has completed, waiting at the maximum for the set delay.
+   * <p>
+   * Note that this method invocation will block the calling thread until the routine invocation
+   * completes or is aborted, or the timeout elapses.
+   *
+   * @return whether the routine execution has completed.
+   * @see #after(UnitDuration)
+   * @see #after(long, TimeUnit)
+   * @see #now()
+   */
+  boolean getComplete();
 
-    /**
-     * Gets the invocation error or abort exception, if the invocation is aborted, waiting at the
-     * maximum for the set delay.
-     * <p>
-     * Note that this method invocation will block the calling thread until the routine invocation
-     * completes or is aborted, or the timeout elapses.
-     *
-     * @return the invocation error or null.
-     * @see #after(UnitDuration)
-     * @see #after(long, TimeUnit)
-     * @see #now()
-     */
-    @Nullable
-    RoutineException getError();
+  /**
+   * Gets the invocation error or abort exception, if the invocation is aborted, waiting at the
+   * maximum for the set delay.
+   * <p>
+   * Note that this method invocation will block the calling thread until the routine invocation
+   * completes or is aborted, or the timeout elapses.
+   *
+   * @return the invocation error or null.
+   * @see #after(UnitDuration)
+   * @see #after(long, TimeUnit)
+   * @see #now()
+   */
+  @Nullable
+  RoutineException getError();
 
-    /**
-     * Checks if more results are available by waiting at the maximum for the set timeout.
-     * <p>
-     * Note that this method invocation will block the calling thread until a new output is
-     * available, the routine invocation completes or is aborted, or the timeout elapses.
-     *
-     * @return whether at least one result is available.
-     * @throws com.github.dm.jrt.core.channel.OutputTimeoutException if the channel is set to throw
-     *                                                               an exception when the timeout
-     *                                                               elapses.
-     * @throws com.github.dm.jrt.core.error.RoutineException         if the execution has been
-     *                                                               aborted.
-     * @throws java.lang.IllegalStateException                       if this channel is already
-     *                                                               bound to a consumer or another
-     *                                                               channel.
-     * @see #after(UnitDuration)
-     * @see #after(long, TimeUnit)
-     * @see #now()
-     * @see #eventuallyAbort()
-     * @see #eventuallyAbort(Throwable)
-     * @see #eventuallyContinue()
-     * @see #eventuallyFail()
-     */
-    boolean hasNext();
+  /**
+   * Checks if more results are available by waiting at the maximum for the set timeout.
+   * <p>
+   * Note that this method invocation will block the calling thread until a new output is
+   * available, the routine invocation completes or is aborted, or the timeout elapses.
+   *
+   * @return whether at least one result is available.
+   * @throws com.github.dm.jrt.core.channel.OutputTimeoutException if the channel is set to throw
+   *                                                               an exception when the timeout
+   *                                                               elapses.
+   * @throws com.github.dm.jrt.core.error.RoutineException         if the execution has been
+   *                                                               aborted.
+   * @throws java.lang.IllegalStateException                       if this channel is already
+   *                                                               bound to a consumer or another
+   *                                                               channel.
+   * @see #after(UnitDuration)
+   * @see #after(long, TimeUnit)
+   * @see #now()
+   * @see #eventuallyAbort()
+   * @see #eventuallyAbort(Throwable)
+   * @see #eventuallyContinue()
+   * @see #eventuallyFail()
+   */
+  boolean hasNext();
 
-    /**
-     * Consumes the first available result by waiting at the maximum for the set timeout.
-     * <p>
-     * Note that this method invocation will block the calling thread until a new output is
-     * available, the routine invocation completes or is aborted, or the timeout elapses.
-     *
-     * @return the first available result.
-     * @throws com.github.dm.jrt.core.channel.OutputTimeoutException if the channel is set to throw
-     *                                                               an exception when the timeout
-     *                                                               elapses.
-     * @throws com.github.dm.jrt.core.error.RoutineException         if the execution has been
-     *                                                               aborted.
-     * @throws java.lang.IllegalStateException                       if this channel is already
-     *                                                               bound to a consumer or another
-     *                                                               channel.
-     * @throws java.util.NoSuchElementException                      if no output is available (it
-     *                                                               might be thrown also in case
-     *                                                               the read timeout elapses and no
-     *                                                               timeout exception is set to be
-     *                                                               thrown).
-     * @see #after(UnitDuration)
-     * @see #after(long, TimeUnit)
-     * @see #now()
-     * @see #eventuallyAbort()
-     * @see #eventuallyAbort(Throwable)
-     * @see #eventuallyContinue()
-     * @see #eventuallyFail()
-     */
-    OUT next();
+  /**
+   * Consumes the first available result by waiting at the maximum for the set timeout.
+   * <p>
+   * Note that this method invocation will block the calling thread until a new output is
+   * available, the routine invocation completes or is aborted, or the timeout elapses.
+   *
+   * @return the first available result.
+   * @throws com.github.dm.jrt.core.channel.OutputTimeoutException if the channel is set to throw
+   *                                                               an exception when the timeout
+   *                                                               elapses.
+   * @throws com.github.dm.jrt.core.error.RoutineException         if the execution has been
+   *                                                               aborted.
+   * @throws java.lang.IllegalStateException                       if this channel is already
+   *                                                               bound to a consumer or another
+   *                                                               channel.
+   * @throws java.util.NoSuchElementException                      if no output is available (it
+   *                                                               might be thrown also in case
+   *                                                               the read timeout elapses and no
+   *                                                               timeout exception is set to be
+   *                                                               thrown).
+   * @see #after(UnitDuration)
+   * @see #after(long, TimeUnit)
+   * @see #now()
+   * @see #eventuallyAbort()
+   * @see #eventuallyAbort(Throwable)
+   * @see #eventuallyContinue()
+   * @see #eventuallyFail()
+   */
+  OUT next();
 
-    /**
-     * Returns the number of input data stored in the channel.
-     *
-     * @return the input data size.
-     */
-    int inputCount();
+  /**
+   * Returns the number of input data stored in the channel.
+   *
+   * @return the input data size.
+   */
+  int inputCount();
 
-    /**
-     * Checks if this channel is bound to a consumer or another channel.
-     *
-     * @return whether the channel is bound.
-     * @see #bind bind(Channel)
-     * @see #bind(ChannelConsumer)
-     */
-    boolean isBound();
+  /**
+   * Checks if this channel is bound to a consumer or another channel.
+   *
+   * @return whether the channel is bound.
+   * @see #bind bind(Channel)
+   * @see #bind(ChannelConsumer)
+   */
+  boolean isBound();
 
-    /**
-     * Checks if the channel is empty, that is, no data are stored in it.
-     *
-     * @return whether the channel is empty.
-     */
-    boolean isEmpty();
+  /**
+   * Checks if the channel is empty, that is, no data are stored in it.
+   *
+   * @return whether the channel is empty.
+   */
+  boolean isEmpty();
 
-    /**
-     * Checks if the channel is open, that is, more data are expected to be passed to it.
-     *
-     * @return whether the channel is open.
-     */
-    boolean isOpen();
+  /**
+   * Checks if the channel is open, that is, more data are expected to be passed to it.
+   *
+   * @return whether the channel is open.
+   */
+  boolean isOpen();
 
-    /**
-     * Consumes the first {@code count} available results by waiting at the maximum for the set
-     * delay.
-     * <p>
-     * Note that this method invocation will block the calling thread until {@code count} new
-     * outputs are available, the routine invocation completes or is aborted, or the timeout
-     * elapses.
-     *
-     * @param count the number of outputs to read.
-     * @return the first {@code count} available results.
-     * @throws com.github.dm.jrt.core.channel.OutputTimeoutException if the channel is set to throw
-     *                                                               an exception when the timeout
-     *                                                               elapses.
-     * @throws com.github.dm.jrt.core.error.RoutineException         if the execution has been
-     *                                                               aborted.
-     * @throws java.lang.IllegalStateException                       if this channel is already
-     *                                                               bound to a consumer or another
-     *                                                               channel.
-     * @see #after(UnitDuration)
-     * @see #after(long, TimeUnit)
-     * @see #now()
-     * @see #eventuallyAbort()
-     * @see #eventuallyAbort(Throwable)
-     * @see #eventuallyContinue()
-     * @see #eventuallyFail()
-     */
-    @NotNull
-    List<OUT> next(int count);
+  /**
+   * Consumes the first {@code count} available results by waiting at the maximum for the set delay.
+   * <p>
+   * Note that this method invocation will block the calling thread until {@code count} new
+   * outputs are available, the routine invocation completes or is aborted, or the timeout elapses.
+   *
+   * @param count the number of outputs to read.
+   * @return the first {@code count} available results.
+   * @throws com.github.dm.jrt.core.channel.OutputTimeoutException if the channel is set to throw
+   *                                                               an exception when the timeout
+   *                                                               elapses.
+   * @throws com.github.dm.jrt.core.error.RoutineException         if the execution has been
+   *                                                               aborted.
+   * @throws java.lang.IllegalStateException                       if this channel is already
+   *                                                               bound to a consumer or another
+   *                                                               channel.
+   * @see #after(UnitDuration)
+   * @see #after(long, TimeUnit)
+   * @see #now()
+   * @see #eventuallyAbort()
+   * @see #eventuallyAbort(Throwable)
+   * @see #eventuallyContinue()
+   * @see #eventuallyFail()
+   */
+  @NotNull
+  List<OUT> next(int count);
 
-    /**
-     * Consumes the first available result by waiting at the maximum for the set delay.
-     * <br>
-     * If the timeout elapses and the channel is not configured to throw an exception or abort the
-     * invocation, the specified alternative output is returned.
-     * <p>
-     * Note that this method invocation will block the calling thread until a new output is
-     * available, the routine invocation completes or is aborted, or the timeout elapses.
-     *
-     * @param output the default output to return.
-     * @return the first available result.
-     * @throws com.github.dm.jrt.core.channel.OutputTimeoutException if the channel is set to throw
-     *                                                               an exception when the timeout
-     *                                                               elapses.
-     * @throws com.github.dm.jrt.core.error.RoutineException         if the execution has been
-     *                                                               aborted.
-     * @throws java.lang.IllegalStateException                       if this channel is already
-     *                                                               bound to a consumer or another
-     *                                                               channel.
-     * @throws java.util.NoSuchElementException                      if no output is available (it
-     *                                                               might be thrown also in case
-     *                                                               the read timeout elapses and no
-     *                                                               timeout exception is set to be
-     *                                                               thrown).
-     * @see #after(UnitDuration)
-     * @see #after(long, TimeUnit)
-     * @see #now()
-     * @see #eventuallyAbort()
-     * @see #eventuallyAbort(Throwable)
-     * @see #eventuallyContinue()
-     * @see #eventuallyFail()
-     */
-    OUT nextOrElse(OUT output);
+  /**
+   * Consumes the first available result by waiting at the maximum for the set delay.
+   * <br>
+   * If the timeout elapses and the channel is not configured to throw an exception or abort the
+   * invocation, the specified alternative output is returned.
+   * <p>
+   * Note that this method invocation will block the calling thread until a new output is
+   * available, the routine invocation completes or is aborted, or the timeout elapses.
+   *
+   * @param output the default output to return.
+   * @return the first available result.
+   * @throws com.github.dm.jrt.core.channel.OutputTimeoutException if the channel is set to throw
+   *                                                               an exception when the timeout
+   *                                                               elapses.
+   * @throws com.github.dm.jrt.core.error.RoutineException         if the execution has been
+   *                                                               aborted.
+   * @throws java.lang.IllegalStateException                       if this channel is already
+   *                                                               bound to a consumer or another
+   *                                                               channel.
+   * @throws java.util.NoSuchElementException                      if no output is available (it
+   *                                                               might be thrown also in case
+   *                                                               the read timeout elapses and no
+   *                                                               timeout exception is set to be
+   *                                                               thrown).
+   * @see #after(UnitDuration)
+   * @see #after(long, TimeUnit)
+   * @see #now()
+   * @see #eventuallyAbort()
+   * @see #eventuallyAbort(Throwable)
+   * @see #eventuallyContinue()
+   * @see #eventuallyFail()
+   */
+  OUT nextOrElse(OUT output);
 
-    /**
-     * Tells the channel to not wait for results to be available.
-     * <p>
-     * By default the timeout is set to 0 to avoid unexpected deadlocks.
-     * <p>
-     * Note that the implementing class should ensure that calls of this method from different
-     * threads will not interfere with each others.
-     *
-     * @return this channel.
-     */
-    @NotNull
-    Channel<IN, OUT> now();
+  /**
+   * Tells the channel to not wait for results to be available.
+   * <p>
+   * By default the timeout is set to 0 to avoid unexpected deadlocks.
+   * <p>
+   * Note that the implementing class should ensure that calls of this method from different
+   * threads will not interfere with each others.
+   *
+   * @return this channel.
+   */
+  @NotNull
+  Channel<IN, OUT> now();
 
-    /**
-     * Returns the number of output data stored in the channel.
-     *
-     * @return the output data size.
-     */
-    int outputCount();
+  /**
+   * Returns the number of output data stored in the channel.
+   *
+   * @return the output data size.
+   */
+  int outputCount();
 
-    /**
-     * Passes the data returned by the specified channel to this one.
-     * <br>
-     * If a delay has been set through the dedicated methods, the transfer of data will be
-     * accordingly postponed.
-     * <p>
-     * Note that the passed channel will be bound as a result of the call, thus effectively
-     * preventing any other consumer from getting data from it.
-     *
-     * @param channel the channel.
-     * @return this channel.
-     * @throws com.github.dm.jrt.core.error.RoutineException if the execution has been aborted.
-     * @throws java.lang.IllegalStateException               if this channel is already closed.
-     * @see #after(UnitDuration)
-     * @see #after(long, TimeUnit)
-     * @see #now()
-     */
-    @NotNull
-    Channel<IN, OUT> pass(@Nullable Channel<?, ? extends IN> channel);
+  /**
+   * Passes the data returned by the specified channel to this one.
+   * <br>
+   * If a delay has been set through the dedicated methods, the transfer of data will be
+   * accordingly postponed.
+   * <p>
+   * Note that the passed channel will be bound as a result of the call, thus effectively
+   * preventing any other consumer from getting data from it.
+   *
+   * @param channel the channel.
+   * @return this channel.
+   * @throws com.github.dm.jrt.core.error.RoutineException if the execution has been aborted.
+   * @throws java.lang.IllegalStateException               if this channel is already closed.
+   * @see #after(UnitDuration)
+   * @see #after(long, TimeUnit)
+   * @see #now()
+   */
+  @NotNull
+  Channel<IN, OUT> pass(@Nullable Channel<?, ? extends IN> channel);
 
-    /**
-     * Passes the data returned by the specified iterable to this channel.
-     * <br>
-     * If a delay has been set through the dedicated methods, the transfer of data will be
-     * accordingly postponed.
-     *
-     * @param inputs the iterable returning the input data.
-     * @return this channel.
-     * @throws com.github.dm.jrt.core.error.RoutineException if the execution has been aborted.
-     * @throws java.lang.IllegalStateException               if this channel is already closed.
-     * @see #after(UnitDuration)
-     * @see #after(long, TimeUnit)
-     * @see #now()
-     */
-    @NotNull
-    Channel<IN, OUT> pass(@Nullable Iterable<? extends IN> inputs);
+  /**
+   * Passes the data returned by the specified iterable to this channel.
+   * <br>
+   * If a delay has been set through the dedicated methods, the transfer of data will be
+   * accordingly postponed.
+   *
+   * @param inputs the iterable returning the input data.
+   * @return this channel.
+   * @throws com.github.dm.jrt.core.error.RoutineException if the execution has been aborted.
+   * @throws java.lang.IllegalStateException               if this channel is already closed.
+   * @see #after(UnitDuration)
+   * @see #after(long, TimeUnit)
+   * @see #now()
+   */
+  @NotNull
+  Channel<IN, OUT> pass(@Nullable Iterable<? extends IN> inputs);
 
-    /**
-     * Passes the specified input to this channel.
-     * <br>
-     * If a delay has been set through the dedicated methods, the transfer of data will be
-     * accordingly postponed.
-     *
-     * @param input the input.
-     * @return this channel.
-     * @throws com.github.dm.jrt.core.error.RoutineException if the execution has been aborted.
-     * @throws java.lang.IllegalStateException               if this channel is already closed.
-     * @see #after(UnitDuration)
-     * @see #after(long, TimeUnit)
-     * @see #now()
-     */
-    @NotNull
-    Channel<IN, OUT> pass(@Nullable IN input);
+  /**
+   * Passes the specified input to this channel.
+   * <br>
+   * If a delay has been set through the dedicated methods, the transfer of data will be
+   * accordingly postponed.
+   *
+   * @param input the input.
+   * @return this channel.
+   * @throws com.github.dm.jrt.core.error.RoutineException if the execution has been aborted.
+   * @throws java.lang.IllegalStateException               if this channel is already closed.
+   * @see #after(UnitDuration)
+   * @see #after(long, TimeUnit)
+   * @see #now()
+   */
+  @NotNull
+  Channel<IN, OUT> pass(@Nullable IN input);
 
-    /**
-     * Passes the specified input data to this channel.
-     * <br>
-     * If a delay has been set through the dedicated methods, the transfer of data will be
-     * accordingly postponed.
-     *
-     * @param inputs the input data.
-     * @return this channel.
-     * @throws com.github.dm.jrt.core.error.RoutineException if the execution has been aborted.
-     * @throws java.lang.IllegalStateException               if this channel is already closed.
-     * @see #after(UnitDuration)
-     * @see #after(long, TimeUnit)
-     * @see #now()
-     */
-    @NotNull
-    Channel<IN, OUT> pass(@Nullable IN... inputs);
+  /**
+   * Passes the specified input data to this channel.
+   * <br>
+   * If a delay has been set through the dedicated methods, the transfer of data will be
+   * accordingly postponed.
+   *
+   * @param inputs the input data.
+   * @return this channel.
+   * @throws com.github.dm.jrt.core.error.RoutineException if the execution has been aborted.
+   * @throws java.lang.IllegalStateException               if this channel is already closed.
+   * @see #after(UnitDuration)
+   * @see #after(long, TimeUnit)
+   * @see #now()
+   */
+  @NotNull
+  Channel<IN, OUT> pass(@Nullable IN... inputs);
 
-    /**
-     * Returns the total number of data stored in the channel.
-     *
-     * @return the data size.
-     */
-    int size();
+  /**
+   * Returns the total number of data stored in the channel.
+   *
+   * @return the data size.
+   */
+  int size();
 
-    /**
-     * Skips the first {@code count} available results by waiting at the maximum for the set delay.
-     * <p>
-     * Note that this method invocation will block the calling thread until {@code count} new
-     * outputs are available, the routine invocation completes or is aborted, or the timeout
-     * elapses.
-     *
-     * @param count the number of outputs to skip.
-     * @return this channel.
-     * @throws com.github.dm.jrt.core.channel.OutputTimeoutException if the channel is set to throw
-     *                                                               an exception when the timeout
-     *                                                               elapses.
-     * @throws com.github.dm.jrt.core.error.RoutineException         if the execution has been
-     *                                                               aborted.
-     * @throws java.lang.IllegalStateException                       if this channel is already
-     *                                                               bound to a consumer or another
-     *                                                               channel.
-     * @see #after(UnitDuration)
-     * @see #after(long, TimeUnit)
-     * @see #now()
-     * @see #eventuallyAbort()
-     * @see #eventuallyAbort(Throwable)
-     * @see #eventuallyContinue()
-     * @see #eventuallyFail()
-     */
-    @NotNull
-    Channel<IN, OUT> skipNext(int count);
+  /**
+   * Skips the first {@code count} available results by waiting at the maximum for the set delay.
+   * <p>
+   * Note that this method invocation will block the calling thread until {@code count} new
+   * outputs are available, the routine invocation completes or is aborted, or the timeout elapses.
+   *
+   * @param count the number of outputs to skip.
+   * @return this channel.
+   * @throws com.github.dm.jrt.core.channel.OutputTimeoutException if the channel is set to throw
+   *                                                               an exception when the timeout
+   *                                                               elapses.
+   * @throws com.github.dm.jrt.core.error.RoutineException         if the execution has been
+   *                                                               aborted.
+   * @throws java.lang.IllegalStateException                       if this channel is already
+   *                                                               bound to a consumer or another
+   *                                                               channel.
+   * @see #after(UnitDuration)
+   * @see #after(long, TimeUnit)
+   * @see #now()
+   * @see #eventuallyAbort()
+   * @see #eventuallyAbort(Throwable)
+   * @see #eventuallyContinue()
+   * @see #eventuallyFail()
+   */
+  @NotNull
+  Channel<IN, OUT> skipNext(int count);
 
-    /**
-     * Tells the channel to sort the passed input data based in the same order as they are passed
-     * to the channel.
-     * <p>
-     * By default no particular order is applied.
-     * <p>
-     * Note that the implementing class should ensure that calls of this method from different
-     * threads will not interfere with each others.
-     *
-     * @return this channel.
-     * @throws com.github.dm.jrt.core.error.RoutineException if the execution has been aborted.
-     * @see #unsorted()
-     */
-    @NotNull
-    Channel<IN, OUT> sorted();
+  /**
+   * Tells the channel to sort the passed input data based in the same order as they are passed
+   * to the channel.
+   * <p>
+   * By default no particular order is applied.
+   * <p>
+   * Note that the implementing class should ensure that calls of this method from different
+   * threads will not interfere with each others.
+   *
+   * @return this channel.
+   * @throws com.github.dm.jrt.core.error.RoutineException if the execution has been aborted.
+   * @see #unsorted()
+   */
+  @NotNull
+  Channel<IN, OUT> sorted();
 
-    /**
-     * Throws the invocation error or abort exception, if the invocation is aborted, waiting at the
-     * maximum for the set delay.
-     * <p>
-     * Note that this method invocation will block the calling thread until the routine invocation
-     * completes or is aborted, or the timeout elapses.
-     *
-     * @throws com.github.dm.jrt.core.error.RoutineException if the execution has been aborted.
-     * @see #after(UnitDuration)
-     * @see #after(long, TimeUnit)
-     * @see #now()
-     */
-    void throwError();
+  /**
+   * Throws the invocation error or abort exception, if the invocation is aborted, waiting at the
+   * maximum for the set delay.
+   * <p>
+   * Note that this method invocation will block the calling thread until the routine invocation
+   * completes or is aborted, or the timeout elapses.
+   *
+   * @throws com.github.dm.jrt.core.error.RoutineException if the execution has been aborted.
+   * @see #after(UnitDuration)
+   * @see #after(long, TimeUnit)
+   * @see #now()
+   */
+  void throwError();
 
-    /**
-     * Tells the channel to not sort the passed input data.
-     * <p>
-     * Note that only the inputs passed with a 0 delay will be delivered in the same order as they
-     * are passed to the channel, while the others will be delivered as soon as the dedicated runner
-     * handles the specific execution.
-     * <p>
-     * This is the default behavior.
-     * <p>
-     * Note that the implementing class should ensure that calls of this method from different
-     * threads will not interfere with each others.
-     *
-     * @return this channel.
-     * @throws com.github.dm.jrt.core.error.RoutineException if the execution has been aborted.
-     * @see #sorted()
-     */
-    @NotNull
-    Channel<IN, OUT> unsorted();
+  /**
+   * Tells the channel to not sort the passed input data.
+   * <p>
+   * Note that only the inputs passed with a 0 delay will be delivered in the same order as they
+   * are passed to the channel, while the others will be delivered as soon as the dedicated runner
+   * handles the specific execution.
+   * <p>
+   * This is the default behavior.
+   * <p>
+   * Note that the implementing class should ensure that calls of this method from different
+   * threads will not interfere with each others.
+   *
+   * @return this channel.
+   * @throws com.github.dm.jrt.core.error.RoutineException if the execution has been aborted.
+   * @see #sorted()
+   */
+  @NotNull
+  Channel<IN, OUT> unsorted();
 }

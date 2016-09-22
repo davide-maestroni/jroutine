@@ -38,57 +38,57 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class IntervalInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
 
+  private final Backoff mBackoff;
+
+  /**
+   * Constructor.
+   *
+   * @param backoff the interval backoff.
+   */
+  IntervalInvocationFactory(@NotNull final Backoff backoff) {
+    super(asArgs(ConstantConditions.notNull("backoff instance", backoff)));
+    mBackoff = backoff;
+  }
+
+  @NotNull
+  @Override
+  public Invocation<DATA, DATA> newInvocation() throws Exception {
+    return new IntervalInvocation<DATA>(mBackoff);
+  }
+
+  /**
+   * Routine invocation passing on data after an interval specified by a backoff policy.
+   *
+   * @param <DATA> the data type.
+   */
+  private static class IntervalInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
+
     private final Backoff mBackoff;
+
+    private int mCount;
+
+    private long mStartTime;
 
     /**
      * Constructor.
      *
      * @param backoff the interval backoff.
      */
-    IntervalInvocationFactory(@NotNull final Backoff backoff) {
-        super(asArgs(ConstantConditions.notNull("backoff instance", backoff)));
-        mBackoff = backoff;
+    private IntervalInvocation(@NotNull final Backoff backoff) {
+      mBackoff = backoff;
     }
 
-    @NotNull
     @Override
-    public Invocation<DATA, DATA> newInvocation() throws Exception {
-        return new IntervalInvocation<DATA>(mBackoff);
+    public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) {
+      result.after(
+          Math.max(0, mStartTime + mBackoff.getDelay(++mCount) - System.currentTimeMillis()),
+          TimeUnit.MILLISECONDS).pass(input);
     }
 
-    /**
-     * Routine invocation passing on data after an interval specified by a backoff policy.
-     *
-     * @param <DATA> the data type.
-     */
-    private static class IntervalInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
-
-        private final Backoff mBackoff;
-
-        private int mCount;
-
-        private long mStartTime;
-
-        /**
-         * Constructor.
-         *
-         * @param backoff the interval backoff.
-         */
-        private IntervalInvocation(@NotNull final Backoff backoff) {
-            mBackoff = backoff;
-        }
-
-        @Override
-        public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) {
-            result.after(Math.max(0,
-                    mStartTime + mBackoff.getDelay(++mCount) - System.currentTimeMillis()),
-                    TimeUnit.MILLISECONDS).pass(input);
-        }
-
-        @Override
-        public void onRestart() {
-            mStartTime = System.currentTimeMillis();
-            mCount = 0;
-        }
+    @Override
+    public void onRestart() {
+      mStartTime = System.currentTimeMillis();
+      mCount = 0;
     }
+  }
 }

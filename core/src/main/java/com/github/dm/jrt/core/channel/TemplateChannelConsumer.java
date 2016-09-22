@@ -31,12 +31,12 @@ import org.jetbrains.annotations.NotNull;
  */
 public abstract class TemplateChannelConsumer<OUT> implements ChannelConsumer<OUT> {
 
-    public void onComplete() throws Exception {
-    }
+  public void onComplete() throws Exception {
+  }
 
-    public void onError(@NotNull final RoutineException error) throws Exception {
-    }
+  public void onError(@NotNull final RoutineException error) throws Exception {
+  }
 
-    public void onOutput(final OUT output) throws Exception {
-    }
+  public void onOutput(final OUT output) throws Exception {
+  }
 }

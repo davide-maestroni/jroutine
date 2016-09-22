@@ -69,324 +69,318 @@ import static com.github.dm.jrt.function.Functions.decorate;
  */
 public class ServiceAdapterFactory extends CallAdapter.Factory {
 
-    private static final CallMappingInvocation sInvocation = new CallMappingInvocation();
+  private static final CallMappingInvocation sInvocation = new CallMappingInvocation();
 
-    private final InvocationConfiguration mInvocationConfiguration;
+  private final InvocationConfiguration mInvocationConfiguration;
 
-    private final ServiceConfiguration mServiceConfiguration;
+  private final ServiceConfiguration mServiceConfiguration;
+
+  private final ServiceContext mServiceContext;
+
+  /**
+   * Constructor.
+   *
+   * @param context                 the Service context.
+   * @param invocationConfiguration the invocation configuration.
+   * @param serviceConfiguration    the Service configuration.
+   */
+  private ServiceAdapterFactory(@NotNull final ServiceContext context,
+      @NotNull final InvocationConfiguration invocationConfiguration,
+      @NotNull final ServiceConfiguration serviceConfiguration) {
+    mServiceContext = context;
+    mInvocationConfiguration = invocationConfiguration;
+    mServiceConfiguration = serviceConfiguration;
+  }
+
+  /**
+   * Returns an adapter factory builder.
+   *
+   * @param context the Service context.
+   * @return the builder instance.
+   */
+  @NotNull
+  public static Builder on(@NotNull final ServiceContext context) {
+    return new Builder(context);
+  }
+
+  @Override
+  public CallAdapter<?> get(final Type returnType, final Annotation[] annotations,
+      final Retrofit retrofit) {
+    Type rawType = null;
+    Type responseType = Object.class;
+    if (returnType instanceof ParameterizedType) {
+      final ParameterizedType parameterizedType = (ParameterizedType) returnType;
+      rawType = parameterizedType.getRawType();
+      if ((Channel.class == rawType) || (StreamBuilder.class == rawType)) {
+        responseType = parameterizedType.getActualTypeArguments()[1];
+      }
+
+    } else if (returnType instanceof Class) {
+      rawType = returnType;
+    }
+
+    if (rawType != null) {
+      // Use annotations to configure the routine
+      final InvocationConfiguration invocationConfiguration =
+          Builders.withAnnotations(mInvocationConfiguration, annotations);
+      final ServiceConfiguration serviceConfiguration =
+          AndroidBuilders.withAnnotations(mServiceConfiguration, annotations);
+      if (Channel.class == rawType) {
+        return new OutputChannelAdapter(invocationConfiguration,
+            retrofit.responseBodyConverter(responseType, annotations),
+            buildRoutine(invocationConfiguration, serviceConfiguration), responseType);
+
+      } else if (StreamBuilder.class == rawType) {
+        return new StreamBuilderAdapter(invocationConfiguration,
+            retrofit.responseBodyConverter(responseType, annotations),
+            buildRoutine(invocationConfiguration, serviceConfiguration), responseType);
+      }
+    }
+
+    return null;
+  }
+
+  @NotNull
+  private Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> buildRoutine(
+      @NotNull final InvocationConfiguration invocationConfiguration,
+      @NotNull final ServiceConfiguration serviceConfiguration) {
+    return JRoutineService.on(ConstantConditions.notNull("Service context", mServiceContext))
+                          .with(factoryOf(ServiceCallInvocation.class))
+                          .apply(invocationConfiguration)
+                          .apply(serviceConfiguration)
+                          .buildRoutine();
+  }
+
+  /**
+   * Builder of Service routine adapter factory instances.
+   * <p>
+   * The options set through the builder configuration will be applied to all the routine handling
+   * the Retrofit calls, unless they are overwritten by specific annotations.
+   *
+   * @see Builders#withAnnotations(InvocationConfiguration, Annotation...)
+   * @see AndroidBuilders#withAnnotations(ServiceConfiguration, Annotation...)
+   */
+  public static class Builder
+      implements ServiceConfigurable<Builder>, InvocationConfigurable<Builder> {
 
     private final ServiceContext mServiceContext;
+
+    private InvocationConfiguration mInvocationConfiguration =
+        InvocationConfiguration.defaultConfiguration();
+
+    private ServiceConfiguration mServiceConfiguration =
+        ServiceConfiguration.defaultConfiguration();
 
     /**
      * Constructor.
      *
-     * @param context                 the Service context.
-     * @param invocationConfiguration the invocation configuration.
-     * @param serviceConfiguration    the Service configuration.
+     * @param context the Service context.
      */
-    private ServiceAdapterFactory(@NotNull final ServiceContext context,
-            @NotNull final InvocationConfiguration invocationConfiguration,
-            @NotNull final ServiceConfiguration serviceConfiguration) {
-        mServiceContext = context;
-        mInvocationConfiguration = invocationConfiguration;
-        mServiceConfiguration = serviceConfiguration;
+    private Builder(@NotNull final ServiceContext context) {
+      mServiceContext = ConstantConditions.notNull("Service context", context);
+    }
+
+    @NotNull
+    @Override
+    public Builder apply(@NotNull final InvocationConfiguration configuration) {
+      mInvocationConfiguration =
+          ConstantConditions.notNull("invocation configuration", configuration);
+      return this;
+    }
+
+    @NotNull
+    @Override
+    public Builder apply(@NotNull final ServiceConfiguration configuration) {
+      mServiceConfiguration = ConstantConditions.notNull("Service configuration", configuration);
+      return this;
+    }
+
+    @NotNull
+    @Override
+    public InvocationConfiguration.Builder<? extends Builder> applyInvocationConfiguration() {
+      return new InvocationConfiguration.Builder<Builder>(this, mInvocationConfiguration);
+    }
+
+    @NotNull
+    @Override
+    public ServiceConfiguration.Builder<? extends Builder> applyServiceConfiguration() {
+      return new ServiceConfiguration.Builder<Builder>(this, mServiceConfiguration);
     }
 
     /**
-     * Returns an adapter factory builder.
+     * Builds and return a new factory instance.
      *
-     * @param context the Service context.
-     * @return the builder instance.
+     * @return the factory instance.
      */
     @NotNull
-    public static Builder on(@NotNull final ServiceContext context) {
-        return new Builder(context);
+    public ServiceAdapterFactory buildFactory() {
+      return new ServiceAdapterFactory(mServiceContext, mInvocationConfiguration,
+          mServiceConfiguration);
+    }
+  }
+
+  /**
+   * Base adapter implementation.
+   */
+  private static abstract class BaseAdapter<T> implements CallAdapter<T> {
+
+    private final Type mResponseType;
+
+    private final Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> mRoutine;
+
+    /**
+     * Constructor.
+     *
+     * @param routine      the routine instance.
+     * @param responseType the response type.
+     */
+    private BaseAdapter(
+        @NotNull final Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> routine,
+        @NotNull final Type responseType) {
+      mResponseType = responseType;
+      mRoutine = routine;
     }
 
     @Override
-    public CallAdapter<?> get(final Type returnType, final Annotation[] annotations,
-            final Retrofit retrofit) {
-        Type rawType = null;
-        Type responseType = Object.class;
-        if (returnType instanceof ParameterizedType) {
-            final ParameterizedType parameterizedType = (ParameterizedType) returnType;
-            rawType = parameterizedType.getRawType();
-            if ((Channel.class == rawType) || (StreamBuilder.class == rawType)) {
-                responseType = parameterizedType.getActualTypeArguments()[1];
-            }
+    public Type responseType() {
+      return mResponseType;
+    }
 
-        } else if (returnType instanceof Class) {
-            rawType = returnType;
-        }
+    /**
+     * Gets the adapter routine.
+     *
+     * @return the routine instance.
+     */
+    @NotNull
+    protected Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> getRoutine() {
+      return mRoutine;
+    }
+  }
 
-        if (rawType != null) {
-            // Use annotations to configure the routine
-            final InvocationConfiguration invocationConfiguration =
-                    Builders.withAnnotations(mInvocationConfiguration, annotations);
-            final ServiceConfiguration serviceConfiguration =
-                    AndroidBuilders.withAnnotations(mServiceConfiguration, annotations);
-            if (Channel.class == rawType) {
-                return new OutputChannelAdapter(invocationConfiguration,
-                        retrofit.responseBodyConverter(responseType, annotations),
-                        buildRoutine(invocationConfiguration, serviceConfiguration), responseType);
+  /**
+   * Bind function used to create the stream channel instances.
+   */
+  private static class BindService
+      implements Function<Channel<?, ParcelableSelectable<Object>>, Channel<?, Object>> {
 
-            } else if (StreamBuilder.class == rawType) {
-                return new StreamBuilderAdapter(invocationConfiguration,
-                        retrofit.responseBodyConverter(responseType, annotations),
-                        buildRoutine(invocationConfiguration, serviceConfiguration), responseType);
-            }
-        }
+    private final ChannelConfiguration mConfiguration;
 
-        return null;
+    private final Converter<ResponseBody, ?> mConverter;
+
+    private final Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> mRoutine;
+
+    /**
+     * Constructor.
+     *
+     * @param configuration the channel configuration.
+     * @param converter     the body converter.
+     * @param routine       the routine instance.
+     */
+    private BindService(@NotNull final ChannelConfiguration configuration,
+        @NotNull final Converter<ResponseBody, ?> converter,
+        @NotNull final Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>>
+            routine) {
+      mConfiguration = configuration;
+      mConverter = converter;
+      mRoutine = routine;
+    }
+
+    @Override
+    public Channel<?, Object> apply(final Channel<?, ParcelableSelectable<Object>> channel) {
+      final Channel<Object, Object> outputChannel =
+          JRoutineCore.io().apply(mConfiguration).buildChannel();
+      mRoutine.call(channel).bind(new ConverterChannelConsumer(mConverter, outputChannel));
+      return outputChannel;
+    }
+  }
+
+  /**
+   * Output channel adapter implementation.
+   */
+  private static class OutputChannelAdapter extends BaseAdapter<Channel> {
+
+    private final ChannelConfiguration mChannelConfiguration;
+
+    private final Converter<ResponseBody, ?> mConverter;
+
+    private final InvocationConfiguration mInvocationConfiguration;
+
+    /**
+     * Constructor.
+     *
+     * @param configuration the invocation configuration.
+     * @param converter     the body converter.
+     * @param routine       the routine instance.
+     * @param responseType  the response type.
+     */
+    private OutputChannelAdapter(@NotNull final InvocationConfiguration configuration,
+        @NotNull final Converter<ResponseBody, ?> converter,
+        @NotNull final Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> routine,
+        @NotNull final Type responseType) {
+      super(routine, responseType);
+      mInvocationConfiguration = configuration;
+      mChannelConfiguration = configuration.outputConfigurationBuilder().configured();
+      mConverter = converter;
     }
 
     @NotNull
-    private Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> buildRoutine(
-            @NotNull final InvocationConfiguration invocationConfiguration,
-            @NotNull final ServiceConfiguration serviceConfiguration) {
-        return JRoutineService.on(ConstantConditions.notNull("Service context", mServiceContext))
-                              .with(factoryOf(ServiceCallInvocation.class))
-                              .apply(invocationConfiguration)
-                              .apply(serviceConfiguration)
-                              .buildRoutine();
+    private Channel<?, ParcelableSelectable<Object>> invokeCall(final Call<?> call) {
+      return JRoutineCore.with(sInvocation).apply(mInvocationConfiguration).call(call);
     }
 
+    @Override
+    public <OUT> Channel adapt(final Call<OUT> call) {
+      final Channel<Object, Object> outputChannel =
+          JRoutineCore.io().apply(mChannelConfiguration).buildChannel();
+      getRoutine().call(invokeCall(call))
+                  .bind(new ConverterChannelConsumer(mConverter, outputChannel));
+      return outputChannel;
+    }
+  }
+
+  /**
+   * Stream routine builder adapter implementation.
+   */
+  private static class StreamBuilderAdapter extends BaseAdapter<StreamBuilder> implements
+      BiFunction<StreamConfiguration, Function<Channel<?, Call<?>>, Channel<?,
+          ParcelableSelectable<Object>>>, Function<Channel<?, Call<?>>, Channel<?, Object>>> {
+
+    private final Converter<ResponseBody, ?> mConverter;
+
+    private final InvocationConfiguration mInvocationConfiguration;
+
     /**
-     * Builder of Service routine adapter factory instances.
-     * <p>
-     * The options set through the builder configuration will be applied to all the routine handling
-     * the Retrofit calls, unless they are overwritten by specific annotations.
+     * Constructor.
      *
-     * @see Builders#withAnnotations(InvocationConfiguration, Annotation...)
-     * @see AndroidBuilders#withAnnotations(ServiceConfiguration, Annotation...)
+     * @param configuration the invocation configuration.
+     * @param converter     the body converter.
+     * @param routine       the routine instance.
+     * @param responseType  the response type.
      */
-    public static class Builder
-            implements ServiceConfigurable<Builder>, InvocationConfigurable<Builder> {
-
-        private final ServiceContext mServiceContext;
-
-        private InvocationConfiguration mInvocationConfiguration =
-                InvocationConfiguration.defaultConfiguration();
-
-        private ServiceConfiguration mServiceConfiguration =
-                ServiceConfiguration.defaultConfiguration();
-
-        /**
-         * Constructor.
-         *
-         * @param context the Service context.
-         */
-        private Builder(@NotNull final ServiceContext context) {
-            mServiceContext = ConstantConditions.notNull("Service context", context);
-        }
-
-        @NotNull
-        @Override
-        public Builder apply(@NotNull final InvocationConfiguration configuration) {
-            mInvocationConfiguration =
-                    ConstantConditions.notNull("invocation configuration", configuration);
-            return this;
-        }
-
-        @NotNull
-        @Override
-        public Builder apply(@NotNull final ServiceConfiguration configuration) {
-            mServiceConfiguration =
-                    ConstantConditions.notNull("Service configuration", configuration);
-            return this;
-        }
-
-        @NotNull
-        @Override
-        public InvocationConfiguration.Builder<? extends Builder> applyInvocationConfiguration() {
-            return new InvocationConfiguration.Builder<Builder>(this, mInvocationConfiguration);
-        }
-
-        @NotNull
-        @Override
-        public ServiceConfiguration.Builder<? extends Builder> applyServiceConfiguration() {
-            return new ServiceConfiguration.Builder<Builder>(this, mServiceConfiguration);
-        }
-
-        /**
-         * Builds and return a new factory instance.
-         *
-         * @return the factory instance.
-         */
-        @NotNull
-        public ServiceAdapterFactory buildFactory() {
-            return new ServiceAdapterFactory(mServiceContext, mInvocationConfiguration,
-                    mServiceConfiguration);
-        }
+    private StreamBuilderAdapter(@NotNull final InvocationConfiguration configuration,
+        @NotNull final Converter<ResponseBody, ?> converter,
+        @NotNull final Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> routine,
+        @NotNull final Type responseType) {
+      super(routine, responseType);
+      mInvocationConfiguration = configuration;
+      mConverter = converter;
     }
 
-    /**
-     * Base adapter implementation.
-     */
-    private static abstract class BaseAdapter<T> implements CallAdapter<T> {
-
-        private final Type mResponseType;
-
-        private final Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> mRoutine;
-
-        /**
-         * Constructor.
-         *
-         * @param routine      the routine instance.
-         * @param responseType the response type.
-         */
-        private BaseAdapter(
-                @NotNull final Routine<ParcelableSelectable<Object>,
-                        ParcelableSelectable<Object>> routine,
-                @NotNull final Type responseType) {
-            mResponseType = responseType;
-            mRoutine = routine;
-        }
-
-        @Override
-        public Type responseType() {
-            return mResponseType;
-        }
-
-        /**
-         * Gets the adapter routine.
-         *
-         * @return the routine instance.
-         */
-        @NotNull
-        protected Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> getRoutine() {
-            return mRoutine;
-        }
+    @Override
+    public Function<Channel<?, Call<?>>, Channel<?, Object>> apply(
+        final StreamConfiguration streamConfiguration,
+        final Function<Channel<?, Call<?>>, Channel<?, ParcelableSelectable<Object>>> function)
+        throws
+        Exception {
+      return decorate(function).andThen(
+          new BindService(streamConfiguration.toChannelConfiguration(), mConverter, getRoutine()));
     }
 
-    /**
-     * Bind function used to create the stream channel instances.
-     */
-    private static class BindService
-            implements Function<Channel<?, ParcelableSelectable<Object>>, Channel<?, Object>> {
-
-        private final ChannelConfiguration mConfiguration;
-
-        private final Converter<ResponseBody, ?> mConverter;
-
-        private final Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> mRoutine;
-
-        /**
-         * Constructor.
-         *
-         * @param configuration the channel configuration.
-         * @param converter     the body converter.
-         * @param routine       the routine instance.
-         */
-        private BindService(@NotNull final ChannelConfiguration configuration,
-                @NotNull final Converter<ResponseBody, ?> converter,
-                @NotNull final Routine<ParcelableSelectable<Object>,
-                        ParcelableSelectable<Object>> routine) {
-            mConfiguration = configuration;
-            mConverter = converter;
-            mRoutine = routine;
-        }
-
-        @Override
-        public Channel<?, Object> apply(final Channel<?, ParcelableSelectable<Object>> channel) {
-            final Channel<Object, Object> outputChannel =
-                    JRoutineCore.io().apply(mConfiguration).buildChannel();
-            mRoutine.call(channel).bind(new ConverterChannelConsumer(mConverter, outputChannel));
-            return outputChannel;
-        }
+    @Override
+    public <OUT> StreamBuilder adapt(final Call<OUT> call) {
+      return JRoutineStream.<Call<?>>withStreamOf(call).apply(mInvocationConfiguration)
+                                                       .map(sInvocation)
+                                                       .liftWithConfig(this);
     }
-
-    /**
-     * Output channel adapter implementation.
-     */
-    private static class OutputChannelAdapter extends BaseAdapter<Channel> {
-
-        private final ChannelConfiguration mChannelConfiguration;
-
-        private final Converter<ResponseBody, ?> mConverter;
-
-        private final InvocationConfiguration mInvocationConfiguration;
-
-        /**
-         * Constructor.
-         *
-         * @param configuration the invocation configuration.
-         * @param converter     the body converter.
-         * @param routine       the routine instance.
-         * @param responseType  the response type.
-         */
-        private OutputChannelAdapter(@NotNull final InvocationConfiguration configuration,
-                @NotNull final Converter<ResponseBody, ?> converter,
-                @NotNull final Routine<ParcelableSelectable<Object>,
-                        ParcelableSelectable<Object>> routine,
-                @NotNull final Type responseType) {
-            super(routine, responseType);
-            mInvocationConfiguration = configuration;
-            mChannelConfiguration = configuration.outputConfigurationBuilder().configured();
-            mConverter = converter;
-        }
-
-        @NotNull
-        private Channel<?, ParcelableSelectable<Object>> invokeCall(final Call<?> call) {
-            return JRoutineCore.with(sInvocation).apply(mInvocationConfiguration).call(call);
-        }
-
-        @Override
-        public <OUT> Channel adapt(final Call<OUT> call) {
-            final Channel<Object, Object> outputChannel =
-                    JRoutineCore.io().apply(mChannelConfiguration).buildChannel();
-            getRoutine().call(invokeCall(call))
-                        .bind(new ConverterChannelConsumer(mConverter, outputChannel));
-            return outputChannel;
-        }
-    }
-
-    /**
-     * Stream routine builder adapter implementation.
-     */
-    private static class StreamBuilderAdapter extends BaseAdapter<StreamBuilder> implements
-            BiFunction<StreamConfiguration, Function<Channel<?, Call<?>>, Channel<?,
-                    ParcelableSelectable<Object>>>, Function<Channel<?, Call<?>>, Channel<?,
-                    Object>>> {
-
-        private final Converter<ResponseBody, ?> mConverter;
-
-        private final InvocationConfiguration mInvocationConfiguration;
-
-        /**
-         * Constructor.
-         *
-         * @param configuration the invocation configuration.
-         * @param converter     the body converter.
-         * @param routine       the routine instance.
-         * @param responseType  the response type.
-         */
-        private StreamBuilderAdapter(@NotNull final InvocationConfiguration configuration,
-                @NotNull final Converter<ResponseBody, ?> converter,
-                @NotNull final Routine<ParcelableSelectable<Object>,
-                        ParcelableSelectable<Object>> routine,
-                @NotNull final Type responseType) {
-            super(routine, responseType);
-            mInvocationConfiguration = configuration;
-            mConverter = converter;
-        }
-
-        @Override
-        public Function<Channel<?, Call<?>>, Channel<?, Object>> apply(
-                final StreamConfiguration streamConfiguration,
-                final Function<Channel<?, Call<?>>, Channel<?, ParcelableSelectable<Object>>>
-                        function) throws
-                Exception {
-            return decorate(function).andThen(
-                    new BindService(streamConfiguration.toChannelConfiguration(), mConverter,
-                            getRoutine()));
-        }
-
-        @Override
-        public <OUT> StreamBuilder adapt(final Call<OUT> call) {
-            return JRoutineStream.<Call<?>>withStreamOf(call).apply(mInvocationConfiguration)
-                                                             .map(sInvocation)
-                                                             .liftWithConfig(this);
-        }
-    }
+  }
 }

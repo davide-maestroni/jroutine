@@ -45,176 +45,174 @@ import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory
  */
 class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
 
-    private final ContextInvocationFactory<IN, OUT> mFactory;
+  private final ContextInvocationFactory<IN, OUT> mFactory;
 
-    private final List<? extends IN> mInputs;
+  private final List<? extends IN> mInputs;
+
+  private final ContextInvocation<IN, OUT> mInvocation;
+
+  private final Logger mLogger;
+
+  private final OrderType mOrderType;
+
+  private int mInvocationCount;
+
+  private InvocationResult<OUT> mResult;
+
+  /**
+   * Constructor.
+   *
+   * @param context    used to retrieve the application Context.
+   * @param invocation the invocation instance.
+   * @param factory    the invocation factory.
+   * @param inputs     the input data.
+   * @param order      the data order.
+   * @param logger     the logger instance.
+   */
+  InvocationLoader(@NotNull final Context context,
+      @NotNull final ContextInvocation<IN, OUT> invocation,
+      @NotNull final ContextInvocationFactory<IN, OUT> factory,
+      @NotNull final List<? extends IN> inputs, @Nullable final OrderType order,
+      @NotNull final Logger logger) {
+    super(context);
+    mInvocation = ConstantConditions.notNull("invocation instance", invocation);
+    mFactory = ConstantConditions.notNull("Context invocation factory", factory);
+    mInputs = ConstantConditions.notNull("list of input data", inputs);
+    mOrderType = order;
+    mLogger = logger.subContextLogger(this);
+  }
+
+  /**
+   * Checks if the Loader inputs are equal to the specified ones.
+   *
+   * @param inputs the input data.
+   * @return whether the inputs are equal.
+   */
+  public boolean areSameInputs(@Nullable final List<? extends IN> inputs) {
+    return mInputs.equals(inputs);
+  }
+
+  @Override
+  public void deliverResult(final InvocationResult<OUT> data) {
+    mLogger.dbg("delivering result: %s", data);
+    mResult = data;
+    super.deliverResult(data);
+  }
+
+  @Override
+  protected void onStartLoading() {
+    super.onStartLoading();
+    final Logger logger = mLogger;
+    logger.dbg("start background invocation");
+    final InvocationResult<OUT> result = mResult;
+    if (takeContentChanged() || (result == null)) {
+      forceLoad();
+
+    } else {
+      logger.dbg("re-delivering result: %s", result);
+      super.deliverResult(result);
+    }
+  }
+
+  @Override
+  protected void onReset() {
+    try {
+      mInvocation.onRecycle(false);
+
+    } catch (final Throwable t) {
+      InvocationInterruptedException.throwIfInterrupt(t);
+      mLogger.wrn(t, "ignoring exception while discarding invocation instance");
+    }
+
+    mLogger.dbg("resetting result");
+    mResult = null;
+    super.onReset();
+  }
+
+  @Override
+  public InvocationResult<OUT> loadInBackground() {
+    final Logger logger = mLogger;
+    final InvocationChannelConsumer<OUT> consumer =
+        new InvocationChannelConsumer<OUT>(this, logger);
+    final LoaderContextInvocationFactory<IN, OUT> factory =
+        new LoaderContextInvocationFactory<IN, OUT>(mInvocation);
+    JRoutineCore.with(fromFactory(getContext(), factory))
+                .applyInvocationConfiguration()
+                .withRunner(Runners.syncRunner())
+                .withOutputOrder(mOrderType)
+                .withLog(logger.getLog())
+                .withLogLevel(logger.getLogLevel())
+                .configured()
+                .call(mInputs)
+                .bind(consumer);
+    return consumer.createResult();
+  }
+
+  /**
+   * Gets this Loader invocation count.
+   *
+   * @return the invocation count.
+   */
+  int getInvocationCount() {
+    return mInvocationCount;
+  }
+
+  /**
+   * Sets the invocation count.
+   *
+   * @param count the invocation count.
+   */
+  void setInvocationCount(final int count) {
+    mInvocationCount = count;
+  }
+
+  /**
+   * Returns the invocation factory.
+   *
+   * @return the factory.
+   */
+  @NotNull
+  ContextInvocationFactory<IN, OUT> getInvocationFactory() {
+    return mFactory;
+  }
+
+  /**
+   * Checks if the last result has been delivered more than the specified milliseconds in the past.
+   *
+   * @param staleTimeMillis the stale time in milliseconds.
+   * @return whether the result is stale.
+   */
+  boolean isStaleResult(final long staleTimeMillis) {
+    final InvocationResult<OUT> result = mResult;
+    return (result != null) && ((System.currentTimeMillis() - result.getResultTimestamp())
+        > staleTimeMillis);
+  }
+
+  /**
+   * Context invocation factory implementation.
+   *
+   * @param <IN>  the input data type.
+   * @param <OUT> the output data type.
+   */
+  private static class LoaderContextInvocationFactory<IN, OUT>
+      extends ContextInvocationFactory<IN, OUT> {
 
     private final ContextInvocation<IN, OUT> mInvocation;
-
-    private final Logger mLogger;
-
-    private final OrderType mOrderType;
-
-    private int mInvocationCount;
-
-    private InvocationResult<OUT> mResult;
 
     /**
      * Constructor.
      *
-     * @param context    used to retrieve the application Context.
-     * @param invocation the invocation instance.
-     * @param factory    the invocation factory.
-     * @param inputs     the input data.
-     * @param order      the data order.
-     * @param logger     the logger instance.
+     * @param invocation the Loader invocation instance.
      */
-    InvocationLoader(@NotNull final Context context,
-            @NotNull final ContextInvocation<IN, OUT> invocation,
-            @NotNull final ContextInvocationFactory<IN, OUT> factory,
-            @NotNull final List<? extends IN> inputs, @Nullable final OrderType order,
-            @NotNull final Logger logger) {
-        super(context);
-        mInvocation = ConstantConditions.notNull("invocation instance", invocation);
-        mFactory = ConstantConditions.notNull("Context invocation factory", factory);
-        mInputs = ConstantConditions.notNull("list of input data", inputs);
-        mOrderType = order;
-        mLogger = logger.subContextLogger(this);
+    private LoaderContextInvocationFactory(@NotNull final ContextInvocation<IN, OUT> invocation) {
+      super(null);
+      mInvocation = invocation;
     }
 
-    /**
-     * Checks if the Loader inputs are equal to the specified ones.
-     *
-     * @param inputs the input data.
-     * @return whether the inputs are equal.
-     */
-    public boolean areSameInputs(@Nullable final List<? extends IN> inputs) {
-        return mInputs.equals(inputs);
-    }
-
-    @Override
-    public void deliverResult(final InvocationResult<OUT> data) {
-        mLogger.dbg("delivering result: %s", data);
-        mResult = data;
-        super.deliverResult(data);
-    }
-
-    @Override
-    protected void onStartLoading() {
-        super.onStartLoading();
-        final Logger logger = mLogger;
-        logger.dbg("start background invocation");
-        final InvocationResult<OUT> result = mResult;
-        if (takeContentChanged() || (result == null)) {
-            forceLoad();
-
-        } else {
-            logger.dbg("re-delivering result: %s", result);
-            super.deliverResult(result);
-        }
-    }
-
-    @Override
-    protected void onReset() {
-        try {
-            mInvocation.onRecycle(false);
-
-        } catch (final Throwable t) {
-            InvocationInterruptedException.throwIfInterrupt(t);
-            mLogger.wrn(t, "ignoring exception while discarding invocation instance");
-        }
-
-        mLogger.dbg("resetting result");
-        mResult = null;
-        super.onReset();
-    }
-
-    @Override
-    public InvocationResult<OUT> loadInBackground() {
-        final Logger logger = mLogger;
-        final InvocationChannelConsumer<OUT> consumer =
-                new InvocationChannelConsumer<OUT>(this, logger);
-        final LoaderContextInvocationFactory<IN, OUT> factory =
-                new LoaderContextInvocationFactory<IN, OUT>(mInvocation);
-        JRoutineCore.with(fromFactory(getContext(), factory))
-                    .applyInvocationConfiguration()
-                    .withRunner(Runners.syncRunner())
-                    .withOutputOrder(mOrderType)
-                    .withLog(logger.getLog())
-                    .withLogLevel(logger.getLogLevel())
-                    .configured()
-                    .call(mInputs)
-                    .bind(consumer);
-        return consumer.createResult();
-    }
-
-    /**
-     * Gets this Loader invocation count.
-     *
-     * @return the invocation count.
-     */
-    int getInvocationCount() {
-        return mInvocationCount;
-    }
-
-    /**
-     * Sets the invocation count.
-     *
-     * @param count the invocation count.
-     */
-    void setInvocationCount(final int count) {
-        mInvocationCount = count;
-    }
-
-    /**
-     * Returns the invocation factory.
-     *
-     * @return the factory.
-     */
     @NotNull
-    ContextInvocationFactory<IN, OUT> getInvocationFactory() {
-        return mFactory;
+    @Override
+    public ContextInvocation<IN, OUT> newInvocation() {
+      return mInvocation;
     }
-
-    /**
-     * Checks if the last result has been delivered more than the specified milliseconds in the
-     * past.
-     *
-     * @param staleTimeMillis the stale time in milliseconds.
-     * @return whether the result is stale.
-     */
-    boolean isStaleResult(final long staleTimeMillis) {
-        final InvocationResult<OUT> result = mResult;
-        return (result != null) && ((System.currentTimeMillis() - result.getResultTimestamp())
-                > staleTimeMillis);
-    }
-
-    /**
-     * Context invocation factory implementation.
-     *
-     * @param <IN>  the input data type.
-     * @param <OUT> the output data type.
-     */
-    private static class LoaderContextInvocationFactory<IN, OUT>
-            extends ContextInvocationFactory<IN, OUT> {
-
-        private final ContextInvocation<IN, OUT> mInvocation;
-
-        /**
-         * Constructor.
-         *
-         * @param invocation the Loader invocation instance.
-         */
-        private LoaderContextInvocationFactory(
-                @NotNull final ContextInvocation<IN, OUT> invocation) {
-            super(null);
-            mInvocation = invocation;
-        }
-
-        @NotNull
-        @Override
-        public ContextInvocation<IN, OUT> newInvocation() {
-            return mInvocation;
-        }
-    }
+  }
 }

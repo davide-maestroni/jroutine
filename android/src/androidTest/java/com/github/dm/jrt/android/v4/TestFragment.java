@@ -30,11 +30,11 @@ import android.view.ViewGroup;
  */
 public class TestFragment extends Fragment {
 
-    @Nullable
-    @Override
-    public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
-            final Bundle savedInstanceState) {
+  @Nullable
+  @Override
+  public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
+      final Bundle savedInstanceState) {
 
-        return new View(getActivity());
-    }
+    return new View(getActivity());
+  }
 }

@@ -33,28 +33,28 @@ import org.jetbrains.annotations.NotNull;
  */
 class SelectableOutputBuilder<OUT> extends AbstractBuilder<Channel<?, ParcelableSelectable<OUT>>> {
 
-    private final Channel<?, ? extends OUT> mChannel;
+  private final Channel<?, ? extends OUT> mChannel;
 
-    private final int mIndex;
+  private final int mIndex;
 
-    /**
-     * Constructor.
-     *
-     * @param channel the output channel.
-     * @param index   the selectable index.
-     */
-    SelectableOutputBuilder(@NotNull final Channel<?, ? extends OUT> channel, final int index) {
-        mChannel = ConstantConditions.notNull("channel instance", channel);
-        mIndex = index;
-    }
+  /**
+   * Constructor.
+   *
+   * @param channel the output channel.
+   * @param index   the selectable index.
+   */
+  SelectableOutputBuilder(@NotNull final Channel<?, ? extends OUT> channel, final int index) {
+    mChannel = ConstantConditions.notNull("channel instance", channel);
+    mIndex = index;
+  }
 
-    @NotNull
-    @Override
-    protected Channel<?, ParcelableSelectable<OUT>> build(
-            @NotNull final ChannelConfiguration configuration) {
-        final Channel<ParcelableSelectable<OUT>, ParcelableSelectable<OUT>> outputChannel =
-                JRoutineCore.io().apply(configuration).buildChannel();
-        mChannel.bind(new SelectableChannelConsumer<OUT, OUT>(outputChannel, mIndex));
-        return outputChannel;
-    }
+  @NotNull
+  @Override
+  protected Channel<?, ParcelableSelectable<OUT>> build(
+      @NotNull final ChannelConfiguration configuration) {
+    final Channel<ParcelableSelectable<OUT>, ParcelableSelectable<OUT>> outputChannel =
+        JRoutineCore.io().apply(configuration).buildChannel();
+    mChannel.bind(new SelectableChannelConsumer<OUT, OUT>(outputChannel, mIndex));
+    return outputChannel;
+  }
 }

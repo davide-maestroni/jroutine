@@ -39,49 +39,49 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class ConsumerInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
 
-    private final CallInvocation<IN, OUT> mInvocation;
+  private final CallInvocation<IN, OUT> mInvocation;
+
+  /**
+   * Constructor.
+   *
+   * @param consumer the consumer instance.
+   */
+  ConsumerInvocationFactory(@NotNull final BiConsumerDecorator<? super List<IN>, ? super
+      Channel<OUT, ?>> consumer) {
+    super(asArgs(ConstantConditions.notNull("bi-consumer wrapper", consumer)));
+    mInvocation = new ConsumerInvocation<IN, OUT>(consumer);
+  }
+
+  @NotNull
+  @Override
+  public Invocation<IN, OUT> newInvocation() {
+    return mInvocation;
+  }
+
+  /**
+   * Invocation implementation.
+   *
+   * @param <IN>  the input data type.
+   * @param <OUT> the output data type.
+   */
+  private static class ConsumerInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
+
+    private final BiConsumerDecorator<? super List<IN>, ? super Channel<OUT, ?>> mConsumer;
 
     /**
      * Constructor.
      *
      * @param consumer the consumer instance.
      */
-    ConsumerInvocationFactory(@NotNull final BiConsumerDecorator<? super List<IN>, ? super
-            Channel<OUT, ?>> consumer) {
-        super(asArgs(ConstantConditions.notNull("bi-consumer wrapper", consumer)));
-        mInvocation = new ConsumerInvocation<IN, OUT>(consumer);
+    private ConsumerInvocation(@NotNull final BiConsumerDecorator<? super List<IN>, ? super
+        Channel<OUT, ?>> consumer) {
+      mConsumer = consumer;
     }
 
-    @NotNull
     @Override
-    public Invocation<IN, OUT> newInvocation() {
-        return mInvocation;
+    protected void onCall(@NotNull final List<? extends IN> inputs,
+        @NotNull final Channel<OUT, ?> result) throws Exception {
+      mConsumer.accept(new ArrayList<IN>(inputs), result);
     }
-
-    /**
-     * Invocation implementation.
-     *
-     * @param <IN>  the input data type.
-     * @param <OUT> the output data type.
-     */
-    private static class ConsumerInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
-
-        private final BiConsumerDecorator<? super List<IN>, ? super Channel<OUT, ?>> mConsumer;
-
-        /**
-         * Constructor.
-         *
-         * @param consumer the consumer instance.
-         */
-        private ConsumerInvocation(@NotNull final BiConsumerDecorator<? super List<IN>, ? super
-                Channel<OUT, ?>> consumer) {
-            mConsumer = consumer;
-        }
-
-        @Override
-        protected void onCall(@NotNull final List<? extends IN> inputs,
-                @NotNull final Channel<OUT, ?> result) throws Exception {
-            mConsumer.accept(new ArrayList<IN>(inputs), result);
-        }
-    }
+  }
 }

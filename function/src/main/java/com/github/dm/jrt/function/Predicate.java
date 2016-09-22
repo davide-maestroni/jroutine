@@ -25,12 +25,12 @@ package com.github.dm.jrt.function;
  */
 public interface Predicate<IN> {
 
-    /**
-     * Evaluates this predicate on the given argument.
-     *
-     * @param in the input argument.
-     * @return true if the input argument matches the predicate, otherwise false.
-     * @throws java.lang.Exception if an unexpected error occurs.
-     */
-    boolean test(IN in) throws Exception;
+  /**
+   * Evaluates this predicate on the given argument.
+   *
+   * @param in the input argument.
+   * @return true if the input argument matches the predicate, otherwise false.
+   * @throws java.lang.Exception if an unexpected error occurs.
+   */
+  boolean test(IN in) throws Exception;
 }

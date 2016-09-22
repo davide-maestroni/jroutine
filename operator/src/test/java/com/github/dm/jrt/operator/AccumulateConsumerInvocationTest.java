@@ -39,70 +39,69 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class AccumulateConsumerInvocationTest {
 
-    private static BiConsumer<List<String>, List<String>> createConsumer() {
+  private static BiConsumer<List<String>, List<String>> createConsumer() {
 
-        return new BiConsumer<List<String>, List<String>>() {
+    return new BiConsumer<List<String>, List<String>>() {
 
-            public void accept(final List<String> strings1, final List<String> strings2) {
+      public void accept(final List<String> strings1, final List<String> strings2) {
 
-                strings1.addAll(strings2);
-            }
-        };
-    }
+        strings1.addAll(strings2);
+      }
+    };
+  }
 
-    @Test
-    @SuppressWarnings("unchecked")
-    public void testFactory() {
+  @Test
+  @SuppressWarnings("unchecked")
+  public void testFactory() {
 
-        final BiConsumer<List<String>, List<String>> consumer = createConsumer();
-        assertThat(JRoutineCore.with(consumerFactory(consumer))
-                               .applyInvocationConfiguration()
-                               .withRunner(Runners.syncRunner())
-                               .configured()
-                               .call(new ArrayList<String>() {{
-                                   add("test1");
-                               }}, new ArrayList<String>() {{
-                                   add("test2");
-                               }}, new ArrayList<String>() {{
-                                   add("test3");
-                               }})
-                               .next()).isEqualTo(Arrays.asList("test1", "test2", "test3"));
-        assertThat(JRoutineCore.with(consumerFactory(new Supplier<List<String>>() {
+    final BiConsumer<List<String>, List<String>> consumer = createConsumer();
+    assertThat(JRoutineCore.with(consumerFactory(consumer))
+                           .applyInvocationConfiguration()
+                           .withRunner(Runners.syncRunner())
+                           .configured()
+                           .call(new ArrayList<String>() {{
+                             add("test1");
+                           }}, new ArrayList<String>() {{
+                             add("test2");
+                           }}, new ArrayList<String>() {{
+                             add("test3");
+                           }})
+                           .next()).isEqualTo(Arrays.asList("test1", "test2", "test3"));
+    assertThat(JRoutineCore.with(consumerFactory(new Supplier<List<String>>() {
 
-            public List<String> get() {
+      public List<String> get() {
 
-                return new ArrayList<String>() {{
-                    add("test0");
-                }};
-            }
-        }, consumer))
-                               .applyInvocationConfiguration()
-                               .withRunner(Runners.syncRunner())
-                               .configured()
-                               .call(new ArrayList<String>() {{
-                                   add("test1");
-                               }}, new ArrayList<String>() {{
-                                   add("test2");
-                               }}, new ArrayList<String>() {{
-                                   add("test3");
-                               }})
-                               .next()).isEqualTo(
-                Arrays.asList("test0", "test1", "test2", "test3"));
-    }
+        return new ArrayList<String>() {{
+          add("test0");
+        }};
+      }
+    }, consumer))
+                           .applyInvocationConfiguration()
+                           .withRunner(Runners.syncRunner())
+                           .configured()
+                           .call(new ArrayList<String>() {{
+                             add("test1");
+                           }}, new ArrayList<String>() {{
+                             add("test2");
+                           }}, new ArrayList<String>() {{
+                             add("test3");
+                           }})
+                           .next()).isEqualTo(Arrays.asList("test0", "test1", "test2", "test3"));
+  }
 
-    @Test
-    public void testFactoryEquals() {
+  @Test
+  public void testFactoryEquals() {
 
-        final BiConsumer<List<String>, List<String>> consumer = createConsumer();
-        final InvocationFactory<List<String>, List<String>> factory = consumerFactory(consumer);
-        final BiConsumer<List<String>, List<String>> biSink = biSink();
-        assertThat(factory).isEqualTo(factory);
-        assertThat(factory).isEqualTo(consumerFactory(consumer));
-        assertThat(consumerFactory(consumer)).isEqualTo(consumerFactory(consumer));
-        assertThat(consumerFactory(biSink)).isEqualTo(consumerFactory(biSink));
-        assertThat(factory).isNotEqualTo(consumerFactory(biSink));
-        assertThat(factory).isNotEqualTo("");
-        assertThat(factory.hashCode()).isEqualTo(consumerFactory(consumer).hashCode());
-        assertThat(factory.hashCode()).isNotEqualTo(consumerFactory(biSink).hashCode());
-    }
+    final BiConsumer<List<String>, List<String>> consumer = createConsumer();
+    final InvocationFactory<List<String>, List<String>> factory = consumerFactory(consumer);
+    final BiConsumer<List<String>, List<String>> biSink = biSink();
+    assertThat(factory).isEqualTo(factory);
+    assertThat(factory).isEqualTo(consumerFactory(consumer));
+    assertThat(consumerFactory(consumer)).isEqualTo(consumerFactory(consumer));
+    assertThat(consumerFactory(biSink)).isEqualTo(consumerFactory(biSink));
+    assertThat(factory).isNotEqualTo(consumerFactory(biSink));
+    assertThat(factory).isNotEqualTo("");
+    assertThat(factory.hashCode()).isEqualTo(consumerFactory(consumer).hashCode());
+    assertThat(factory.hashCode()).isNotEqualTo(consumerFactory(biSink).hashCode());
+  }
 }

@@ -32,56 +32,55 @@ import static com.github.dm.jrt.operator.math.Numbers.addOptimistic;
  */
 class AverageLongInvocation extends TemplateInvocation<Number, Long> {
 
-    private static final InvocationFactory<Number, Long> sFactory =
-            new InvocationFactory<Number, Long>(null) {
+  private static final InvocationFactory<Number, Long> sFactory =
+      new InvocationFactory<Number, Long>(null) {
 
-                @NotNull
-                @Override
-                public Invocation<Number, Long> newInvocation() {
-                    return new AverageLongInvocation();
-                }
-            };
-
-    private int mCount;
-
-    private Number mSum;
-
-    /**
-     * Constructor.
-     */
-    private AverageLongInvocation() {
-    }
-
-    /**
-     * Returns a factory of invocations computing the average of the input numbers in long
-     * precision.
-     *
-     * @return the factory instance.
-     */
-    @NotNull
-    static InvocationFactory<Number, Long> factoryOf() {
-        return sFactory;
-    }
-
-    @Override
-    public void onComplete(@NotNull final Channel<Long, ?> result) {
-        if (mCount == 0) {
-            result.pass(0L);
-
-        } else {
-            result.pass(mSum.longValue() / mCount);
+        @NotNull
+        @Override
+        public Invocation<Number, Long> newInvocation() {
+          return new AverageLongInvocation();
         }
-    }
+      };
 
-    @Override
-    public void onInput(final Number input, @NotNull final Channel<Long, ?> result) {
-        mSum = addOptimistic(mSum, input).longValue();
-        ++mCount;
-    }
+  private int mCount;
 
-    @Override
-    public void onRestart() {
-        mSum = (byte) 0;
-        mCount = 0;
+  private Number mSum;
+
+  /**
+   * Constructor.
+   */
+  private AverageLongInvocation() {
+  }
+
+  /**
+   * Returns a factory of invocations computing the average of the input numbers in long precision.
+   *
+   * @return the factory instance.
+   */
+  @NotNull
+  static InvocationFactory<Number, Long> factoryOf() {
+    return sFactory;
+  }
+
+  @Override
+  public void onComplete(@NotNull final Channel<Long, ?> result) {
+    if (mCount == 0) {
+      result.pass(0L);
+
+    } else {
+      result.pass(mSum.longValue() / mCount);
     }
+  }
+
+  @Override
+  public void onInput(final Number input, @NotNull final Channel<Long, ?> result) {
+    mSum = addOptimistic(mSum, input).longValue();
+    ++mCount;
+  }
+
+  @Override
+  public void onRestart() {
+    mSum = (byte) 0;
+    mCount = 0;
+  }
 }

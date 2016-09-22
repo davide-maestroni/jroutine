@@ -44,69 +44,67 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class ComparableCallTest extends AndroidTestCase {
 
-    public void testCall() throws IOException, InterruptedException {
-        final Retrofit retrofit = new Builder().baseUrl("https://api.github.com")
-                                               .addConverterFactory(GsonConverterFactory.create())
-                                               .build();
-        final GitHubService service = retrofit.create(GitHubService.class);
-        ComparableCall<List<Repo>> call = ComparableCall.of(service.listRepos("octocat"));
-        final Response<List<Repo>> response = call.execute();
-        if (response.isSuccessful()) {
-            assertThat(response.body()).isNotEmpty();
+  public void testCall() throws IOException, InterruptedException {
+    final Retrofit retrofit = new Builder().baseUrl("https://api.github.com")
+                                           .addConverterFactory(GsonConverterFactory.create())
+                                           .build();
+    final GitHubService service = retrofit.create(GitHubService.class);
+    ComparableCall<List<Repo>> call = ComparableCall.of(service.listRepos("octocat"));
+    final Response<List<Repo>> response = call.execute();
+    if (response.isSuccessful()) {
+      assertThat(response.body()).isNotEmpty();
 
-        } else {
-            assertThat(response.errorBody()).isNotNull();
-        }
-
-        call = ComparableCall.of(service.listRepos("octocat"));
-        final Semaphore semaphore = new Semaphore(0);
-        call.enqueue(new Callback<List<Repo>>() {
-
-            @Override
-            public void onResponse(final Call<List<Repo>> call,
-                    final Response<List<Repo>> response) {
-                semaphore.release();
-            }
-
-            @Override
-            public void onFailure(final Call<List<Repo>> call, final Throwable t) {
-                semaphore.release();
-            }
-        });
-        assertThat(semaphore.tryAcquire(10, TimeUnit.SECONDS)).isTrue();
-        assertThat(call.isCanceled()).isFalse();
-        assertThat(call.isExecuted()).isTrue();
-        call.cancel();
-        assertThat(call.isCanceled()).isTrue();
-        assertThat(call.isExecuted()).isTrue();
+    } else {
+      assertThat(response.errorBody()).isNotNull();
     }
 
-    public void testEquals() {
-        final Retrofit retrofit = new Builder().baseUrl("https://api.github.com")
-                                               .addConverterFactory(GsonConverterFactory.create())
-                                               .build();
-        final GitHubService service = retrofit.create(GitHubService.class);
-        final ComparableCall<List<Repo>> call =
-                ComparableCall.of(service.listRepos("octocat", "test"));
-        assertThat(call).isEqualTo(call);
-        assertThat(call).isEqualTo(call.clone());
-        assertThat(call).isNotEqualTo(null);
-        assertThat(call).isNotEqualTo("test");
-        assertThat(call).isNotEqualTo(ComparableCall.of(service.listRepos("octocat")));
-        assertThat(call).isNotEqualTo(ComparableCall.of(service.listRepos("octocat", "")));
-        assertThat(call).isEqualTo(ComparableCall.of(service.listRepos("octocat", "test")));
-        assertThat(call.hashCode()).isEqualTo(
-                ComparableCall.of(service.listRepos("octocat", "test")).hashCode());
-    }
+    call = ComparableCall.of(service.listRepos("octocat"));
+    final Semaphore semaphore = new Semaphore(0);
+    call.enqueue(new Callback<List<Repo>>() {
 
-    public interface GitHubService {
+      @Override
+      public void onResponse(final Call<List<Repo>> call, final Response<List<Repo>> response) {
+        semaphore.release();
+      }
 
-        @POST("users/{user}/repos")
-        @Headers({"Cache-Control: max-age=640000", "Content-type: application/json"})
-        Call<List<Repo>> listRepos(@Path("user") String user, @Body String body);
+      @Override
+      public void onFailure(final Call<List<Repo>> call, final Throwable t) {
+        semaphore.release();
+      }
+    });
+    assertThat(semaphore.tryAcquire(10, TimeUnit.SECONDS)).isTrue();
+    assertThat(call.isCanceled()).isFalse();
+    assertThat(call.isExecuted()).isTrue();
+    call.cancel();
+    assertThat(call.isCanceled()).isTrue();
+    assertThat(call.isExecuted()).isTrue();
+  }
 
-        @GET("users/{user}/repos")
-        @Headers("Cache-Control: max-age=640000")
-        Call<List<Repo>> listRepos(@Path("user") String user);
-    }
+  public void testEquals() {
+    final Retrofit retrofit = new Builder().baseUrl("https://api.github.com")
+                                           .addConverterFactory(GsonConverterFactory.create())
+                                           .build();
+    final GitHubService service = retrofit.create(GitHubService.class);
+    final ComparableCall<List<Repo>> call = ComparableCall.of(service.listRepos("octocat", "test"));
+    assertThat(call).isEqualTo(call);
+    assertThat(call).isEqualTo(call.clone());
+    assertThat(call).isNotEqualTo(null);
+    assertThat(call).isNotEqualTo("test");
+    assertThat(call).isNotEqualTo(ComparableCall.of(service.listRepos("octocat")));
+    assertThat(call).isNotEqualTo(ComparableCall.of(service.listRepos("octocat", "")));
+    assertThat(call).isEqualTo(ComparableCall.of(service.listRepos("octocat", "test")));
+    assertThat(call.hashCode()).isEqualTo(
+        ComparableCall.of(service.listRepos("octocat", "test")).hashCode());
+  }
+
+  public interface GitHubService {
+
+    @POST("users/{user}/repos")
+    @Headers({"Cache-Control: max-age=640000", "Content-type: application/json"})
+    Call<List<Repo>> listRepos(@Path("user") String user, @Body String body);
+
+    @GET("users/{user}/repos")
+    @Headers("Cache-Control: max-age=640000")
+    Call<List<Repo>> listRepos(@Path("user") String user);
+  }
 }

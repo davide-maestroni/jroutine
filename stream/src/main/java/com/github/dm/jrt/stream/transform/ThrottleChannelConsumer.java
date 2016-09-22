@@ -32,44 +32,44 @@ import org.jetbrains.annotations.NotNull;
  */
 class ThrottleChannelConsumer<OUT> implements ChannelConsumer<OUT> {
 
-    private final CompletionHandler mHandler;
+  private final CompletionHandler mHandler;
 
-    private final Channel<OUT, ?> mOutputChannel;
+  private final Channel<OUT, ?> mOutputChannel;
+
+  /**
+   * Constructor.
+   *
+   * @param handler       the completion handler.
+   * @param outputChannel the output channel.
+   */
+  ThrottleChannelConsumer(@NotNull final CompletionHandler handler,
+      @NotNull final Channel<OUT, ?> outputChannel) {
+    mHandler = ConstantConditions.notNull("completion handler", handler);
+    mOutputChannel = ConstantConditions.notNull("output channel", outputChannel);
+  }
+
+  public void onComplete() {
+    mOutputChannel.close();
+    mHandler.onComplete();
+  }
+
+  public void onError(@NotNull final RoutineException error) {
+    mOutputChannel.abort(error);
+    mHandler.onComplete();
+  }
+
+  public void onOutput(final OUT output) {
+    mOutputChannel.pass(output);
+  }
+
+  /**
+   * Interface defining an invocation completion handler.
+   */
+  interface CompletionHandler {
 
     /**
-     * Constructor.
-     *
-     * @param handler       the completion handler.
-     * @param outputChannel the output channel.
+     * Notifies the handler that the invocation has completed.
      */
-    ThrottleChannelConsumer(@NotNull final CompletionHandler handler,
-            @NotNull final Channel<OUT, ?> outputChannel) {
-        mHandler = ConstantConditions.notNull("completion handler", handler);
-        mOutputChannel = ConstantConditions.notNull("output channel", outputChannel);
-    }
-
-    public void onComplete() {
-        mOutputChannel.close();
-        mHandler.onComplete();
-    }
-
-    public void onError(@NotNull final RoutineException error) {
-        mOutputChannel.abort(error);
-        mHandler.onComplete();
-    }
-
-    public void onOutput(final OUT output) {
-        mOutputChannel.pass(output);
-    }
-
-    /**
-     * Interface defining an invocation completion handler.
-     */
-    interface CompletionHandler {
-
-        /**
-         * Notifies the handler that the invocation has completed.
-         */
-        void onComplete();
-    }
+    void onComplete();
+  }
 }

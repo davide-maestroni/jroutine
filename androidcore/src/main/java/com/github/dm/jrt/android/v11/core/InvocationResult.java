@@ -33,44 +33,44 @@ import java.util.Collection;
  */
 interface InvocationResult<OUT> {
 
-    /**
-     * Aborts the Loader invocation.
-     */
-    void abort();
+  /**
+   * Aborts the Loader invocation.
+   */
+  void abort();
 
-    /**
-     * Returns the abort exception.
-     *
-     * @return the exception.
-     */
-    @Nullable
-    RoutineException getAbortException();
+  /**
+   * Returns the abort exception.
+   *
+   * @return the exception.
+   */
+  @Nullable
+  RoutineException getAbortException();
 
-    /**
-     * Returns the timestamp of the latest delivered result or {@link Long#MAX_VALUE} if no result
-     * has been produced yet.
-     *
-     * @return the timestamp.
-     */
-    long getResultTimestamp();
+  /**
+   * Returns the timestamp of the latest delivered result or {@link Long#MAX_VALUE} if no result
+   * has been produced yet.
+   *
+   * @return the timestamp.
+   */
+  long getResultTimestamp();
 
-    /**
-     * Checks if this result represents an error.
-     *
-     * @return whether the result is an error.
-     */
-    boolean isError();
+  /**
+   * Checks if this result represents an error.
+   *
+   * @return whether the result is an error.
+   */
+  boolean isError();
 
-    /**
-     * Passes the cached results to the specified channels.
-     *
-     * @param newChannels     new channels freshly created.
-     * @param oldChannels     old channels already fed with previous results.
-     * @param abortedChannels list to be filled with the channels, from the other lists, that are
-     *                        aborted while passing the results.
-     * @return whether the invocation is complete.
-     */
-    boolean passTo(@NotNull Collection<Channel<OUT, ?>> newChannels,
-            @NotNull Collection<Channel<OUT, ?>> oldChannels,
-            @NotNull Collection<Channel<OUT, ?>> abortedChannels);
+  /**
+   * Passes the cached results to the specified channels.
+   *
+   * @param newChannels     new channels freshly created.
+   * @param oldChannels     old channels already fed with previous results.
+   * @param abortedChannels list to be filled with the channels, from the other lists, that are
+   *                        aborted while passing the results.
+   * @return whether the invocation is complete.
+   */
+  boolean passTo(@NotNull Collection<Channel<OUT, ?>> newChannels,
+      @NotNull Collection<Channel<OUT, ?>> oldChannels,
+      @NotNull Collection<Channel<OUT, ?>> abortedChannels);
 }

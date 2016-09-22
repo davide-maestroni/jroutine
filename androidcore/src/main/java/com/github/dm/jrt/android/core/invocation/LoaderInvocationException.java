@@ -26,30 +26,30 @@ import com.github.dm.jrt.core.error.RoutineException;
  */
 public class LoaderInvocationException extends RoutineException {
 
-    private final int mId;
+  private final int mId;
 
-    /**
-     * Constructor.
-     */
-    public LoaderInvocationException() {
-        this(-1);
-    }
+  /**
+   * Constructor.
+   */
+  public LoaderInvocationException() {
+    this(-1);
+  }
 
-    /**
-     * Constructor.
-     *
-     * @param id the Loader ID.
-     */
-    public LoaderInvocationException(final int id) {
-        mId = id;
-    }
+  /**
+   * Constructor.
+   *
+   * @param id the Loader ID.
+   */
+  public LoaderInvocationException(final int id) {
+    mId = id;
+  }
 
-    /**
-     * Returns the Loader ID.
-     *
-     * @return the Loader ID.
-     */
-    public int getId() {
-        return mId;
-    }
+  /**
+   * Returns the Loader ID.
+   *
+   * @return the Loader ID.
+   */
+  public int getId() {
+    return mId;
+  }
 }

@@ -117,52 +117,52 @@ import org.jetbrains.annotations.NotNull;
  */
 public interface Invocation<IN, OUT> {
 
-    /**
-     * Called when the invocation execution is aborted.
-     * <br>
-     * This method may be called at any time after the invocation initialization.
-     *
-     * @param reason the reason of the abortion.
-     * @throws java.lang.Exception if an unexpected error occurs.
-     */
-    void onAbort(@NotNull RoutineException reason) throws Exception;
+  /**
+   * Called when the invocation execution is aborted.
+   * <br>
+   * This method may be called at any time after the invocation initialization.
+   *
+   * @param reason the reason of the abortion.
+   * @throws java.lang.Exception if an unexpected error occurs.
+   */
+  void onAbort(@NotNull RoutineException reason) throws Exception;
 
-    /**
-     * Called when all the inputs has been passed to the invocation.
-     * <br>
-     * This method is called once in the invocation lifecycle to indicate that the final invocation
-     * results should be passed to the result channel.
-     *
-     * @param result the result channel.
-     * @throws java.lang.Exception if an unexpected error occurs.
-     */
-    void onComplete(@NotNull Channel<OUT, ?> result) throws Exception;
+  /**
+   * Called when all the inputs has been passed to the invocation.
+   * <br>
+   * This method is called once in the invocation lifecycle to indicate that the final invocation
+   * results should be passed to the result channel.
+   *
+   * @param result the result channel.
+   * @throws java.lang.Exception if an unexpected error occurs.
+   */
+  void onComplete(@NotNull Channel<OUT, ?> result) throws Exception;
 
-    /**
-     * Called when an input is passed to the routine.
-     * <br>
-     * This method is called once for each input object.
-     *
-     * @param input  the input.
-     * @param result the result channel.
-     * @throws java.lang.Exception if an unexpected error occurs.
-     */
-    void onInput(IN input, @NotNull Channel<OUT, ?> result) throws Exception;
+  /**
+   * Called when an input is passed to the routine.
+   * <br>
+   * This method is called once for each input object.
+   *
+   * @param input  the input.
+   * @param result the result channel.
+   * @throws java.lang.Exception if an unexpected error occurs.
+   */
+  void onInput(IN input, @NotNull Channel<OUT, ?> result) throws Exception;
 
-    /**
-     * Called when the routine invocation is recycled.
-     *
-     * @param isReused whether the invocation is going to be reused.
-     * @throws java.lang.Exception if an unexpected error occurs.
-     */
-    void onRecycle(boolean isReused) throws Exception;
+  /**
+   * Called when the routine invocation is recycled.
+   *
+   * @param isReused whether the invocation is going to be reused.
+   * @throws java.lang.Exception if an unexpected error occurs.
+   */
+  void onRecycle(boolean isReused) throws Exception;
 
-    /**
-     * Called when the routine invocation is initialized.
-     * <br>
-     * This is always the first method in the invocation lifecycle.
-     *
-     * @throws java.lang.Exception if an unexpected error occurs.
-     */
-    void onRestart() throws Exception;
+  /**
+   * Called when the routine invocation is initialized.
+   * <br>
+   * This is always the first method in the invocation lifecycle.
+   *
+   * @throws java.lang.Exception if an unexpected error occurs.
+   */
+  void onRestart() throws Exception;
 }

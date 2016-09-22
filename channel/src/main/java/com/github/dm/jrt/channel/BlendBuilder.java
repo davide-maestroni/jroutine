@@ -33,44 +33,42 @@ import java.util.ArrayList;
  */
 class BlendBuilder<OUT> extends AbstractBuilder<Channel<?, OUT>> {
 
-    private final ArrayList<Channel<?, ? extends OUT>> mChannels;
+  private final ArrayList<Channel<?, ? extends OUT>> mChannels;
 
-    /**
-     * Constructor.
-     *
-     * @param channels the channels to blend.
-     * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
-     * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
-     *                                            null object.
-     */
-    BlendBuilder(@NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
-        final ArrayList<Channel<?, ? extends OUT>> channelList =
-                new ArrayList<Channel<?, ? extends OUT>>();
-        for (final Channel<?, ? extends OUT> channel : channels) {
-            if (channel == null) {
-                throw new NullPointerException(
-                        "the collection of channels must not contain null objects");
-            }
+  /**
+   * Constructor.
+   *
+   * @param channels the channels to blend.
+   * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
+   * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
+   *                                            null object.
+   */
+  BlendBuilder(@NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
+    final ArrayList<Channel<?, ? extends OUT>> channelList =
+        new ArrayList<Channel<?, ? extends OUT>>();
+    for (final Channel<?, ? extends OUT> channel : channels) {
+      if (channel == null) {
+        throw new NullPointerException("the collection of channels must not contain null objects");
+      }
 
-            channelList.add(channel);
-        }
-
-        if (channelList.isEmpty()) {
-            throw new IllegalArgumentException("the collection of channels must not be empty");
-        }
-
-        mChannels = channelList;
+      channelList.add(channel);
     }
 
-    @NotNull
-    @Override
-    protected Channel<?, OUT> build(@NotNull final ChannelConfiguration configuration) {
-        final Channel<OUT, OUT> outputChannel =
-                JRoutineCore.io().apply(configuration).buildChannel();
-        for (final Channel<?, ? extends OUT> channel : mChannels) {
-            channel.bind(outputChannel);
-        }
-
-        return outputChannel.close();
+    if (channelList.isEmpty()) {
+      throw new IllegalArgumentException("the collection of channels must not be empty");
     }
+
+    mChannels = channelList;
+  }
+
+  @NotNull
+  @Override
+  protected Channel<?, OUT> build(@NotNull final ChannelConfiguration configuration) {
+    final Channel<OUT, OUT> outputChannel = JRoutineCore.io().apply(configuration).buildChannel();
+    for (final Channel<?, ? extends OUT> channel : mChannels) {
+      channel.bind(outputChannel);
+    }
+
+    return outputChannel.close();
+  }
 }

@@ -44,37 +44,38 @@ import static com.github.dm.jrt.android.retrofit.ServiceCallInvocation.REQUEST_D
  */
 class CallMappingInvocation extends MappingInvocation<Call<?>, ParcelableSelectable<Object>> {
 
-    /**
-     * Constructor.
-     */
-    CallMappingInvocation() {
-        super(null);
-    }
+  /**
+   * Constructor.
+   */
+  CallMappingInvocation() {
+    super(null);
+  }
 
-    @Override
-    public void onInput(final Call<?> input,
-            @NotNull final Channel<ParcelableSelectable<Object>, ?> result) throws IOException {
-        final Request request = input.request();
-        result.pass(new ParcelableSelectable<Object>(RequestData.of(request), REQUEST_DATA_INDEX));
-        final RequestBody body = request.body();
-        if (body != null) {
-            final MediaType mediaType = body.contentType();
-            result.pass(new ParcelableSelectable<Object>(
-                    (mediaType != null) ? mediaType.toString() : null, MEDIA_TYPE_INDEX));
-            final Buffer buffer = new Buffer();
-            body.writeTo(buffer);
-            if (buffer.size() > 0) {
-                final Channel<Object, ?> channel =
-                        AndroidChannels.selectInputParcelable(result, BYTES_INDEX).buildChannels();
-                final BufferOutputStream outputStream =
-                        AndroidChannels.parcelableByteChannel().bindDeep(channel);
-                try {
-                    outputStream.transferFrom(buffer.inputStream());
+  @Override
+  public void onInput(final Call<?> input,
+      @NotNull final Channel<ParcelableSelectable<Object>, ?> result) throws IOException {
+    final Request request = input.request();
+    result.pass(new ParcelableSelectable<Object>(RequestData.of(request), REQUEST_DATA_INDEX));
+    final RequestBody body = request.body();
+    if (body != null) {
+      final MediaType mediaType = body.contentType();
+      result.pass(
+          new ParcelableSelectable<Object>((mediaType != null) ? mediaType.toString() : null,
+              MEDIA_TYPE_INDEX));
+      final Buffer buffer = new Buffer();
+      body.writeTo(buffer);
+      if (buffer.size() > 0) {
+        final Channel<Object, ?> channel =
+            AndroidChannels.selectInputParcelable(result, BYTES_INDEX).buildChannels();
+        final BufferOutputStream outputStream =
+            AndroidChannels.parcelableByteChannel().bindDeep(channel);
+        try {
+          outputStream.transferFrom(buffer.inputStream());
 
-                } finally {
-                    outputStream.close();
-                }
-            }
+        } finally {
+          outputStream.close();
         }
+      }
     }
+  }
 }

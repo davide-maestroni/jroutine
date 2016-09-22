@@ -32,56 +32,55 @@ import static com.github.dm.jrt.operator.math.Numbers.addOptimistic;
  */
 class AverageShortInvocation extends TemplateInvocation<Number, Short> {
 
-    private static final InvocationFactory<Number, Short> sFactory =
-            new InvocationFactory<Number, Short>(null) {
+  private static final InvocationFactory<Number, Short> sFactory =
+      new InvocationFactory<Number, Short>(null) {
 
-                @NotNull
-                @Override
-                public Invocation<Number, Short> newInvocation() {
-                    return new AverageShortInvocation();
-                }
-            };
-
-    private int mCount;
-
-    private Number mSum;
-
-    /**
-     * Constructor.
-     */
-    private AverageShortInvocation() {
-    }
-
-    /**
-     * Returns a factory of invocations computing the average of the input numbers in short
-     * precision.
-     *
-     * @return the factory instance.
-     */
-    @NotNull
-    static InvocationFactory<Number, Short> factoryOf() {
-        return sFactory;
-    }
-
-    @Override
-    public void onComplete(@NotNull final Channel<Short, ?> result) {
-        if (mCount == 0) {
-            result.pass((short) 0);
-
-        } else {
-            result.pass((short) (mSum.shortValue() / mCount));
+        @NotNull
+        @Override
+        public Invocation<Number, Short> newInvocation() {
+          return new AverageShortInvocation();
         }
-    }
+      };
 
-    @Override
-    public void onInput(final Number input, @NotNull final Channel<Short, ?> result) {
-        mSum = addOptimistic(mSum, input).shortValue();
-        ++mCount;
-    }
+  private int mCount;
 
-    @Override
-    public void onRestart() {
-        mSum = (byte) 0;
-        mCount = 0;
+  private Number mSum;
+
+  /**
+   * Constructor.
+   */
+  private AverageShortInvocation() {
+  }
+
+  /**
+   * Returns a factory of invocations computing the average of the input numbers in short precision.
+   *
+   * @return the factory instance.
+   */
+  @NotNull
+  static InvocationFactory<Number, Short> factoryOf() {
+    return sFactory;
+  }
+
+  @Override
+  public void onComplete(@NotNull final Channel<Short, ?> result) {
+    if (mCount == 0) {
+      result.pass((short) 0);
+
+    } else {
+      result.pass((short) (mSum.shortValue() / mCount));
     }
+  }
+
+  @Override
+  public void onInput(final Number input, @NotNull final Channel<Short, ?> result) {
+    mSum = addOptimistic(mSum, input).shortValue();
+    ++mCount;
+  }
+
+  @Override
+  public void onRestart() {
+    mSum = (byte) 0;
+    mCount = 0;
+  }
 }

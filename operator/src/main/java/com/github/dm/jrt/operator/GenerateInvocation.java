@@ -32,29 +32,29 @@ import org.jetbrains.annotations.Nullable;
  * @param <OUT> the output data type.
  */
 abstract class GenerateInvocation<IN, OUT> extends InvocationFactory<IN, OUT>
-        implements Invocation<IN, OUT> {
+    implements Invocation<IN, OUT> {
 
-    /**
-     * Constructor.
-     *
-     * @param args the constructor arguments.
-     */
-    GenerateInvocation(@Nullable final Object[] args) {
-        super(args);
-    }
+  /**
+   * Constructor.
+   *
+   * @param args the constructor arguments.
+   */
+  GenerateInvocation(@Nullable final Object[] args) {
+    super(args);
+  }
 
-    @NotNull
-    @Override
-    public final Invocation<IN, OUT> newInvocation() {
-        return this;
-    }
+  @NotNull
+  @Override
+  public final Invocation<IN, OUT> newInvocation() {
+    return this;
+  }
 
-    public final void onAbort(@NotNull final RoutineException reason) {
-    }
+  public final void onAbort(@NotNull final RoutineException reason) {
+  }
 
-    public final void onRecycle(final boolean isReused) {
-    }
+  public final void onRecycle(final boolean isReused) {
+  }
 
-    public final void onRestart() {
-    }
+  public final void onRestart() {
+  }
 }

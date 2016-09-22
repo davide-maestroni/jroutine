@@ -35,53 +35,53 @@ import java.util.Set;
  */
 class ToSetInvocation<DATA> extends TemplateInvocation<DATA, Set<DATA>> {
 
-    private static final InvocationFactory<?, ? extends Set<?>> sFactory =
-            new InvocationFactory<Object, Set<Object>>(null) {
+  private static final InvocationFactory<?, ? extends Set<?>> sFactory =
+      new InvocationFactory<Object, Set<Object>>(null) {
 
-                @NotNull
-                @Override
-                public Invocation<Object, Set<Object>> newInvocation() {
-                    return new ToSetInvocation<Object>();
-                }
-            };
+        @NotNull
+        @Override
+        public Invocation<Object, Set<Object>> newInvocation() {
+          return new ToSetInvocation<Object>();
+        }
+      };
 
-    private HashSet<DATA> mSet;
+  private HashSet<DATA> mSet;
 
-    /**
-     * Constructor.
-     */
-    private ToSetInvocation() {
-    }
+  /**
+   * Constructor.
+   */
+  private ToSetInvocation() {
+  }
 
-    /**
-     * Returns the factory of collecting invocations.
-     *
-     * @param <DATA> the data type.
-     * @return the factory instance.
-     */
-    @NotNull
-    @SuppressWarnings("unchecked")
-    static <DATA> InvocationFactory<DATA, Set<DATA>> factoryOf() {
-        return (InvocationFactory<DATA, Set<DATA>>) sFactory;
-    }
+  /**
+   * Returns the factory of collecting invocations.
+   *
+   * @param <DATA> the data type.
+   * @return the factory instance.
+   */
+  @NotNull
+  @SuppressWarnings("unchecked")
+  static <DATA> InvocationFactory<DATA, Set<DATA>> factoryOf() {
+    return (InvocationFactory<DATA, Set<DATA>>) sFactory;
+  }
 
-    @Override
-    public void onComplete(@NotNull final Channel<Set<DATA>, ?> result) {
-        result.pass(mSet);
-    }
+  @Override
+  public void onComplete(@NotNull final Channel<Set<DATA>, ?> result) {
+    result.pass(mSet);
+  }
 
-    @Override
-    public void onInput(final DATA input, @NotNull final Channel<Set<DATA>, ?> result) {
-        mSet.add(input);
-    }
+  @Override
+  public void onInput(final DATA input, @NotNull final Channel<Set<DATA>, ?> result) {
+    mSet.add(input);
+  }
 
-    @Override
-    public void onRecycle(final boolean isReused) {
-        mSet = null;
-    }
+  @Override
+  public void onRecycle(final boolean isReused) {
+    mSet = null;
+  }
 
-    @Override
-    public void onRestart() {
-        mSet = new HashSet<DATA>();
-    }
+  @Override
+  public void onRestart() {
+    mSet = new HashSet<DATA>();
+  }
 }

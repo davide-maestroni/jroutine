@@ -32,11 +32,11 @@ import org.jetbrains.annotations.NotNull;
  */
 public interface ContextInvocation<IN, OUT> extends Invocation<IN, OUT> {
 
-    /**
-     * Called right after the instantiation to specify the invocation Context.
-     *
-     * @param context the Context of the invocation.
-     * @throws java.lang.Exception if an unexpected error occurs.
-     */
-    void onContext(@NotNull Context context) throws Exception;
+  /**
+   * Called right after the instantiation to specify the invocation Context.
+   *
+   * @param context the Context of the invocation.
+   * @throws java.lang.Exception if an unexpected error occurs.
+   */
+  void onContext(@NotNull Context context) throws Exception;
 }

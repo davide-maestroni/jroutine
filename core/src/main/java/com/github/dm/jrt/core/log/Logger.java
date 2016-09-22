@@ -37,693 +37,692 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 public class Logger {
 
-    private static final int DEBUG_LEVEL = Level.DEBUG.ordinal();
+  private static final int DEBUG_LEVEL = Level.DEBUG.ordinal();
 
-    private static final int ERROR_LEVEL = Level.ERROR.ordinal();
+  private static final int ERROR_LEVEL = Level.ERROR.ordinal();
 
-    private static final int WARNING_LEVEL = Level.WARNING.ordinal();
+  private static final int WARNING_LEVEL = Level.WARNING.ordinal();
 
-    private static final AtomicReference<Log> sLog = new AtomicReference<Log>(Logs.systemLog());
+  private static final AtomicReference<Log> sLog = new AtomicReference<Log>(Logs.systemLog());
 
-    private static final AtomicReference<Level> sLogLevel = new AtomicReference<Level>(Level.ERROR);
+  private static final AtomicReference<Level> sLogLevel = new AtomicReference<Level>(Level.ERROR);
 
-    private final List<Object> mContextList;
+  private final List<Object> mContextList;
 
-    private final Object[] mContexts;
+  private final Object[] mContexts;
 
-    private final int mLevel;
+  private final int mLevel;
 
-    private final Log mLog;
+  private final Log mLog;
 
-    private final Level mLogLevel;
+  private final Level mLogLevel;
 
-    /**
-     * Constructor.
-     *
-     * @param contexts the array of contexts.
-     * @param log      the log instance.
-     * @param level    the log level.
-     */
-    private Logger(@NotNull final Object[] contexts, @Nullable final Log log,
-            @Nullable final Level level) {
-        mContexts = contexts.clone();
-        mLog = (log == null) ? sLog.get() : log;
-        mLogLevel = (level == null) ? sLogLevel.get() : level;
-        mLevel = mLogLevel.ordinal();
-        mContextList = Arrays.asList(mContexts);
+  /**
+   * Constructor.
+   *
+   * @param contexts the array of contexts.
+   * @param log      the log instance.
+   * @param level    the log level.
+   */
+  private Logger(@NotNull final Object[] contexts, @Nullable final Log log,
+      @Nullable final Level level) {
+    mContexts = contexts.clone();
+    mLog = (log == null) ? sLog.get() : log;
+    mLogLevel = (level == null) ? sLogLevel.get() : level;
+    mLevel = mLogLevel.ordinal();
+    mContextList = Arrays.asList(mContexts);
+  }
+
+  /**
+   * Gets the default log level.
+   *
+   * @return the log level.
+   */
+  @NotNull
+  public static Level getDefaultLevel() {
+    return sLogLevel.get();
+  }
+
+  /**
+   * Sets the default log level.
+   *
+   * @param level the log level.
+   */
+  public static void setDefaultLevel(@NotNull final Level level) {
+    sLogLevel.set(ConstantConditions.notNull("default log level", level));
+  }
+
+  /**
+   * Gets the default log instance.
+   *
+   * @return the log instance.
+   */
+  @NotNull
+  public static Log getDefaultLog() {
+    return sLog.get();
+  }
+
+  /**
+   * Sets the default log instance.
+   *
+   * @param log the log instance.
+   */
+  public static void setDefaultLog(@NotNull final Log log) {
+    sLog.set(ConstantConditions.notNull("default log instance", log));
+  }
+
+  /**
+   * Creates a new logger.
+   *
+   * @param log     the log instance.
+   * @param level   the log level.
+   * @param context the context.
+   * @return the new logger.
+   */
+  @NotNull
+  public static Logger newLogger(@Nullable final Log log, @Nullable final Level level,
+      @NotNull final Object context) {
+    return new Logger(asArgs(ConstantConditions.notNull("logger context", context)), log, level);
+  }
+
+  /**
+   * Prints the stack trace of the specified throwable into a string.
+   *
+   * @param throwable the throwable instance.
+   * @return the printed stack trace.
+   */
+  @NotNull
+  public static String printStackTrace(@NotNull final Throwable throwable) {
+    final StringWriter writer = new StringWriter();
+    throwable.printStackTrace(new PrintWriter(writer));
+    return writer.toString();
+  }
+
+  /**
+   * Logs a debug message.
+   *
+   * @param message the message.
+   */
+  public void dbg(@Nullable final String message) {
+    if (mLevel <= DEBUG_LEVEL) {
+      mLog.dbg(mContextList, message, null);
     }
+  }
 
-    /**
-     * Gets the default log level.
-     *
-     * @return the log level.
-     */
-    @NotNull
-    public static Level getDefaultLevel() {
-        return sLogLevel.get();
+  /**
+   * Logs a debug message.
+   *
+   * @param format the message format.
+   * @param arg1   the first format argument.
+   */
+  public void dbg(@NotNull final String format, @Nullable final Object arg1) {
+    if (mLevel <= DEBUG_LEVEL) {
+      mLog.dbg(mContextList, String.format(format, arg1), null);
     }
+  }
 
-    /**
-     * Sets the default log level.
-     *
-     * @param level the log level.
-     */
-    public static void setDefaultLevel(@NotNull final Level level) {
-        sLogLevel.set(ConstantConditions.notNull("default log level", level));
+  /**
+   * Logs a debug message.
+   *
+   * @param format the message format.
+   * @param arg1   the first format argument.
+   * @param arg2   the second format argument.
+   */
+  public void dbg(@NotNull final String format, @Nullable final Object arg1,
+      @Nullable final Object arg2) {
+    if (mLevel <= DEBUG_LEVEL) {
+      mLog.dbg(mContextList, String.format(format, arg1, arg2), null);
     }
+  }
 
-    /**
-     * Gets the default log instance.
-     *
-     * @return the log instance.
-     */
-    @NotNull
-    public static Log getDefaultLog() {
-        return sLog.get();
+  /**
+   * Logs a debug message.
+   *
+   * @param format the message format.
+   * @param arg1   the first format argument.
+   * @param arg2   the second format argument.
+   * @param arg3   the third format argument.
+   */
+  public void dbg(@NotNull final String format, @Nullable final Object arg1,
+      @Nullable final Object arg2, @Nullable final Object arg3) {
+    if (mLevel <= DEBUG_LEVEL) {
+      mLog.dbg(mContextList, String.format(format, arg1, arg2, arg3), null);
     }
+  }
 
-    /**
-     * Sets the default log instance.
-     *
-     * @param log the log instance.
-     */
-    public static void setDefaultLog(@NotNull final Log log) {
-        sLog.set(ConstantConditions.notNull("default log instance", log));
+  /**
+   * Logs a debug message.
+   *
+   * @param format the message format.
+   * @param arg1   the first format argument.
+   * @param arg2   the second format argument.
+   * @param arg3   the third format argument.
+   * @param arg4   the fourth format argument.
+   */
+  public void dbg(@NotNull final String format, @Nullable final Object arg1,
+      @Nullable final Object arg2, @Nullable final Object arg3, @Nullable final Object arg4) {
+    if (mLevel <= DEBUG_LEVEL) {
+      mLog.dbg(mContextList, String.format(format, arg1, arg2, arg3, arg4), null);
     }
+  }
 
-    /**
-     * Creates a new logger.
-     *
-     * @param log     the log instance.
-     * @param level   the log level.
-     * @param context the context.
-     * @return the new logger.
-     */
-    @NotNull
-    public static Logger newLogger(@Nullable final Log log, @Nullable final Level level,
-            @NotNull final Object context) {
-        return new Logger(asArgs(ConstantConditions.notNull("logger context", context)), log,
-                level);
+  /**
+   * Logs a debug message.
+   *
+   * @param format the message format.
+   * @param args   the format arguments.
+   */
+  public void dbg(@NotNull final String format, @Nullable final Object... args) {
+    if (mLevel <= DEBUG_LEVEL) {
+      mLog.dbg(mContextList, String.format(format, args), null);
     }
+  }
 
-    /**
-     * Prints the stack trace of the specified throwable into a string.
-     *
-     * @param throwable the throwable instance.
-     * @return the printed stack trace.
-     */
-    @NotNull
-    public static String printStackTrace(@NotNull final Throwable throwable) {
-        final StringWriter writer = new StringWriter();
-        throwable.printStackTrace(new PrintWriter(writer));
-        return writer.toString();
+  /**
+   * Logs a debug exception.
+   *
+   * @param throwable the related throwable.
+   */
+  public void dbg(@Nullable final Throwable throwable) {
+    if (mLevel <= DEBUG_LEVEL) {
+      mLog.dbg(mContextList, "", throwable);
     }
+  }
 
-    /**
-     * Logs a debug message.
-     *
-     * @param message the message.
-     */
-    public void dbg(@Nullable final String message) {
-        if (mLevel <= DEBUG_LEVEL) {
-            mLog.dbg(mContextList, message, null);
-        }
+  /**
+   * Logs a debug message.
+   *
+   * @param throwable the related throwable.
+   * @param message   the message.
+   */
+  public void dbg(@Nullable final Throwable throwable, @Nullable final String message) {
+    if (mLevel <= DEBUG_LEVEL) {
+      mLog.dbg(mContextList, message, throwable);
     }
+  }
 
-    /**
-     * Logs a debug message.
-     *
-     * @param format the message format.
-     * @param arg1   the first format argument.
-     */
-    public void dbg(@NotNull final String format, @Nullable final Object arg1) {
-        if (mLevel <= DEBUG_LEVEL) {
-            mLog.dbg(mContextList, String.format(format, arg1), null);
-        }
+  /**
+   * Logs a debug message.
+   *
+   * @param throwable the related throwable.
+   * @param format    the message format.
+   * @param arg1      the first format argument.
+   */
+  public void dbg(@NotNull final Throwable throwable, @NotNull final String format,
+      @Nullable final Object arg1) {
+    if (mLevel <= DEBUG_LEVEL) {
+      mLog.dbg(mContextList, String.format(format, arg1), throwable);
     }
+  }
 
-    /**
-     * Logs a debug message.
-     *
-     * @param format the message format.
-     * @param arg1   the first format argument.
-     * @param arg2   the second format argument.
-     */
-    public void dbg(@NotNull final String format, @Nullable final Object arg1,
-            @Nullable final Object arg2) {
-        if (mLevel <= DEBUG_LEVEL) {
-            mLog.dbg(mContextList, String.format(format, arg1, arg2), null);
-        }
+  /**
+   * Logs a debug message.
+   *
+   * @param throwable the related throwable.
+   * @param format    the message format.
+   * @param arg1      the first format argument.
+   * @param arg2      the second format argument.
+   */
+  public void dbg(@NotNull final Throwable throwable, @NotNull final String format,
+      @Nullable final Object arg1, @Nullable final Object arg2) {
+    if (mLevel <= DEBUG_LEVEL) {
+      mLog.dbg(mContextList, String.format(format, arg1, arg2), throwable);
     }
+  }
 
-    /**
-     * Logs a debug message.
-     *
-     * @param format the message format.
-     * @param arg1   the first format argument.
-     * @param arg2   the second format argument.
-     * @param arg3   the third format argument.
-     */
-    public void dbg(@NotNull final String format, @Nullable final Object arg1,
-            @Nullable final Object arg2, @Nullable final Object arg3) {
-        if (mLevel <= DEBUG_LEVEL) {
-            mLog.dbg(mContextList, String.format(format, arg1, arg2, arg3), null);
-        }
+  /**
+   * Logs a debug message.
+   *
+   * @param throwable the related throwable.
+   * @param format    the message format.
+   * @param arg1      the first format argument.
+   * @param arg2      the second format argument.
+   * @param arg3      the third format argument.
+   */
+  public void dbg(@NotNull final Throwable throwable, @NotNull final String format,
+      @Nullable final Object arg1, @Nullable final Object arg2, @Nullable final Object arg3) {
+    if (mLevel <= DEBUG_LEVEL) {
+      mLog.dbg(mContextList, String.format(format, arg1, arg2, arg3), throwable);
     }
+  }
 
-    /**
-     * Logs a debug message.
-     *
-     * @param format the message format.
-     * @param arg1   the first format argument.
-     * @param arg2   the second format argument.
-     * @param arg3   the third format argument.
-     * @param arg4   the fourth format argument.
-     */
-    public void dbg(@NotNull final String format, @Nullable final Object arg1,
-            @Nullable final Object arg2, @Nullable final Object arg3, @Nullable final Object arg4) {
-        if (mLevel <= DEBUG_LEVEL) {
-            mLog.dbg(mContextList, String.format(format, arg1, arg2, arg3, arg4), null);
-        }
+  /**
+   * Logs a debug message.
+   *
+   * @param throwable the related throwable.
+   * @param format    the message format.
+   * @param arg1      the first format argument.
+   * @param arg2      the second format argument.
+   * @param arg3      the third format argument.
+   * @param arg4      the fourth format argument.
+   */
+  public void dbg(@NotNull final Throwable throwable, @NotNull final String format,
+      @Nullable final Object arg1, @Nullable final Object arg2, @Nullable final Object arg3,
+      @Nullable final Object arg4) {
+    if (mLevel <= DEBUG_LEVEL) {
+      mLog.dbg(mContextList, String.format(format, arg1, arg2, arg3, arg4), throwable);
     }
+  }
 
-    /**
-     * Logs a debug message.
-     *
-     * @param format the message format.
-     * @param args   the format arguments.
-     */
-    public void dbg(@NotNull final String format, @Nullable final Object... args) {
-        if (mLevel <= DEBUG_LEVEL) {
-            mLog.dbg(mContextList, String.format(format, args), null);
-        }
+  /**
+   * Logs a debug message.
+   *
+   * @param throwable the related throwable.
+   * @param format    the message format.
+   * @param args      the format arguments.
+   */
+  public void dbg(@NotNull final Throwable throwable, @NotNull final String format,
+      @Nullable final Object... args) {
+    if (mLevel <= DEBUG_LEVEL) {
+      mLog.dbg(mContextList, String.format(format, args), throwable);
     }
+  }
 
-    /**
-     * Logs a debug exception.
-     *
-     * @param throwable the related throwable.
-     */
-    public void dbg(@Nullable final Throwable throwable) {
-        if (mLevel <= DEBUG_LEVEL) {
-            mLog.dbg(mContextList, "", throwable);
-        }
+  /**
+   * Logs an error message.
+   *
+   * @param message the message.
+   */
+  public void err(@Nullable final String message) {
+    if (mLevel <= ERROR_LEVEL) {
+      mLog.err(mContextList, message, null);
     }
+  }
 
-    /**
-     * Logs a debug message.
-     *
-     * @param throwable the related throwable.
-     * @param message   the message.
-     */
-    public void dbg(@Nullable final Throwable throwable, @Nullable final String message) {
-        if (mLevel <= DEBUG_LEVEL) {
-            mLog.dbg(mContextList, message, throwable);
-        }
+  /**
+   * Logs an error message.
+   *
+   * @param format the message format.
+   * @param arg1   the first format argument.
+   */
+  public void err(@NotNull final String format, @Nullable final Object arg1) {
+    if (mLevel <= ERROR_LEVEL) {
+      mLog.err(mContextList, String.format(format, arg1), null);
     }
+  }
 
-    /**
-     * Logs a debug message.
-     *
-     * @param throwable the related throwable.
-     * @param format    the message format.
-     * @param arg1      the first format argument.
-     */
-    public void dbg(@NotNull final Throwable throwable, @NotNull final String format,
-            @Nullable final Object arg1) {
-        if (mLevel <= DEBUG_LEVEL) {
-            mLog.dbg(mContextList, String.format(format, arg1), throwable);
-        }
+  /**
+   * Logs an error message.
+   *
+   * @param format the message format.
+   * @param arg1   the first format argument.
+   * @param arg2   the second format argument.
+   */
+  public void err(@NotNull final String format, @Nullable final Object arg1,
+      @Nullable final Object arg2) {
+    if (mLevel <= ERROR_LEVEL) {
+      mLog.err(mContextList, String.format(format, arg1, arg2), null);
     }
+  }
 
-    /**
-     * Logs a debug message.
-     *
-     * @param throwable the related throwable.
-     * @param format    the message format.
-     * @param arg1      the first format argument.
-     * @param arg2      the second format argument.
-     */
-    public void dbg(@NotNull final Throwable throwable, @NotNull final String format,
-            @Nullable final Object arg1, @Nullable final Object arg2) {
-        if (mLevel <= DEBUG_LEVEL) {
-            mLog.dbg(mContextList, String.format(format, arg1, arg2), throwable);
-        }
+  /**
+   * Logs an error message.
+   *
+   * @param format the message format.
+   * @param arg1   the first format argument.
+   * @param arg2   the second format argument.
+   * @param arg3   the third format argument.
+   */
+  public void err(@NotNull final String format, @Nullable final Object arg1,
+      @Nullable final Object arg2, @Nullable final Object arg3) {
+    if (mLevel <= ERROR_LEVEL) {
+      mLog.err(mContextList, String.format(format, arg1, arg2, arg3), null);
     }
+  }
 
-    /**
-     * Logs a debug message.
-     *
-     * @param throwable the related throwable.
-     * @param format    the message format.
-     * @param arg1      the first format argument.
-     * @param arg2      the second format argument.
-     * @param arg3      the third format argument.
-     */
-    public void dbg(@NotNull final Throwable throwable, @NotNull final String format,
-            @Nullable final Object arg1, @Nullable final Object arg2, @Nullable final Object arg3) {
-        if (mLevel <= DEBUG_LEVEL) {
-            mLog.dbg(mContextList, String.format(format, arg1, arg2, arg3), throwable);
-        }
+  /**
+   * Logs an error message.
+   *
+   * @param format the message format.
+   * @param arg1   the first format argument.
+   * @param arg2   the second format argument.
+   * @param arg3   the third format argument.
+   * @param arg4   the fourth format argument.
+   */
+  public void err(@NotNull final String format, @Nullable final Object arg1,
+      @Nullable final Object arg2, @Nullable final Object arg3, @Nullable final Object arg4) {
+    if (mLevel <= ERROR_LEVEL) {
+      mLog.err(mContextList, String.format(format, arg1, arg2, arg3, arg4), null);
     }
+  }
 
-    /**
-     * Logs a debug message.
-     *
-     * @param throwable the related throwable.
-     * @param format    the message format.
-     * @param arg1      the first format argument.
-     * @param arg2      the second format argument.
-     * @param arg3      the third format argument.
-     * @param arg4      the fourth format argument.
-     */
-    public void dbg(@NotNull final Throwable throwable, @NotNull final String format,
-            @Nullable final Object arg1, @Nullable final Object arg2, @Nullable final Object arg3,
-            @Nullable final Object arg4) {
-        if (mLevel <= DEBUG_LEVEL) {
-            mLog.dbg(mContextList, String.format(format, arg1, arg2, arg3, arg4), throwable);
-        }
+  /**
+   * Logs an error message.
+   *
+   * @param format the message format.
+   * @param args   the format arguments.
+   */
+  public void err(@NotNull final String format, @Nullable final Object... args) {
+    if (mLevel <= ERROR_LEVEL) {
+      mLog.err(mContextList, String.format(format, args), null);
     }
+  }
 
-    /**
-     * Logs a debug message.
-     *
-     * @param throwable the related throwable.
-     * @param format    the message format.
-     * @param args      the format arguments.
-     */
-    public void dbg(@NotNull final Throwable throwable, @NotNull final String format,
-            @Nullable final Object... args) {
-        if (mLevel <= DEBUG_LEVEL) {
-            mLog.dbg(mContextList, String.format(format, args), throwable);
-        }
+  /**
+   * Logs an error exception.
+   *
+   * @param throwable the related throwable.
+   */
+  public void err(@NotNull final Throwable throwable) {
+    if (mLevel <= ERROR_LEVEL) {
+      mLog.err(mContextList, "", throwable);
     }
+  }
 
-    /**
-     * Logs an error message.
-     *
-     * @param message the message.
-     */
-    public void err(@Nullable final String message) {
-        if (mLevel <= ERROR_LEVEL) {
-            mLog.err(mContextList, message, null);
-        }
+  /**
+   * Logs an error message.
+   *
+   * @param throwable the related throwable.
+   * @param message   the message.
+   */
+  public void err(@NotNull final Throwable throwable, @Nullable final String message) {
+    if (mLevel <= ERROR_LEVEL) {
+      mLog.err(mContextList, message, throwable);
     }
+  }
 
-    /**
-     * Logs an error message.
-     *
-     * @param format the message format.
-     * @param arg1   the first format argument.
-     */
-    public void err(@NotNull final String format, @Nullable final Object arg1) {
-        if (mLevel <= ERROR_LEVEL) {
-            mLog.err(mContextList, String.format(format, arg1), null);
-        }
+  /**
+   * Logs an error message.
+   *
+   * @param throwable the related throwable.
+   * @param format    the message format.
+   * @param arg1      the first format argument.
+   */
+  public void err(@NotNull final Throwable throwable, @NotNull final String format,
+      @Nullable final Object arg1) {
+    if (mLevel <= ERROR_LEVEL) {
+      mLog.err(mContextList, String.format(format, arg1), throwable);
     }
+  }
 
-    /**
-     * Logs an error message.
-     *
-     * @param format the message format.
-     * @param arg1   the first format argument.
-     * @param arg2   the second format argument.
-     */
-    public void err(@NotNull final String format, @Nullable final Object arg1,
-            @Nullable final Object arg2) {
-        if (mLevel <= ERROR_LEVEL) {
-            mLog.err(mContextList, String.format(format, arg1, arg2), null);
-        }
+  /**
+   * Logs an error message.
+   *
+   * @param throwable the related throwable.
+   * @param format    the message format.
+   * @param arg1      the first format argument.
+   * @param arg2      the second format argument.
+   */
+  public void err(@NotNull final Throwable throwable, @NotNull final String format,
+      @Nullable final Object arg1, @Nullable final Object arg2) {
+    if (mLevel <= ERROR_LEVEL) {
+      mLog.err(mContextList, String.format(format, arg1, arg2), throwable);
     }
+  }
 
-    /**
-     * Logs an error message.
-     *
-     * @param format the message format.
-     * @param arg1   the first format argument.
-     * @param arg2   the second format argument.
-     * @param arg3   the third format argument.
-     */
-    public void err(@NotNull final String format, @Nullable final Object arg1,
-            @Nullable final Object arg2, @Nullable final Object arg3) {
-        if (mLevel <= ERROR_LEVEL) {
-            mLog.err(mContextList, String.format(format, arg1, arg2, arg3), null);
-        }
+  /**
+   * Logs an error message.
+   *
+   * @param throwable the related throwable.
+   * @param format    the message format.
+   * @param arg1      the first format argument.
+   * @param arg2      the second format argument.
+   * @param arg3      the third format argument.
+   */
+  public void err(@NotNull final Throwable throwable, @NotNull final String format,
+      @Nullable final Object arg1, @Nullable final Object arg2, @Nullable final Object arg3) {
+    if (mLevel <= ERROR_LEVEL) {
+      mLog.err(mContextList, String.format(format, arg1, arg2, arg3), throwable);
     }
+  }
 
-    /**
-     * Logs an error message.
-     *
-     * @param format the message format.
-     * @param arg1   the first format argument.
-     * @param arg2   the second format argument.
-     * @param arg3   the third format argument.
-     * @param arg4   the fourth format argument.
-     */
-    public void err(@NotNull final String format, @Nullable final Object arg1,
-            @Nullable final Object arg2, @Nullable final Object arg3, @Nullable final Object arg4) {
-        if (mLevel <= ERROR_LEVEL) {
-            mLog.err(mContextList, String.format(format, arg1, arg2, arg3, arg4), null);
-        }
+  /**
+   * Logs an error message.
+   *
+   * @param throwable the related throwable.
+   * @param format    the message format.
+   * @param arg1      the first format argument.
+   * @param arg2      the second format argument.
+   * @param arg3      the third format argument.
+   * @param arg4      the fourth format argument.
+   */
+  public void err(@NotNull final Throwable throwable, @NotNull final String format,
+      @Nullable final Object arg1, @Nullable final Object arg2, @Nullable final Object arg3,
+      @Nullable final Object arg4) {
+    if (mLevel <= ERROR_LEVEL) {
+      mLog.err(mContextList, String.format(format, arg1, arg2, arg3, arg4), throwable);
     }
+  }
 
-    /**
-     * Logs an error message.
-     *
-     * @param format the message format.
-     * @param args   the format arguments.
-     */
-    public void err(@NotNull final String format, @Nullable final Object... args) {
-        if (mLevel <= ERROR_LEVEL) {
-            mLog.err(mContextList, String.format(format, args), null);
-        }
+  /**
+   * Logs an error message.
+   *
+   * @param throwable the related throwable.
+   * @param format    the message format.
+   * @param args      the format arguments.
+   */
+  public void err(@NotNull final Throwable throwable, @NotNull final String format,
+      @Nullable final Object... args) {
+    if (mLevel <= ERROR_LEVEL) {
+      mLog.err(mContextList, String.format(format, args), throwable);
     }
+  }
 
-    /**
-     * Logs an error exception.
-     *
-     * @param throwable the related throwable.
-     */
-    public void err(@NotNull final Throwable throwable) {
-        if (mLevel <= ERROR_LEVEL) {
-            mLog.err(mContextList, "", throwable);
-        }
-    }
+  /**
+   * Returns the list of contexts.
+   *
+   * @return the list of contexts.
+   */
+  @NotNull
+  public List<Object> getContextList() {
+    return mContextList;
+  }
 
-    /**
-     * Logs an error message.
-     *
-     * @param throwable the related throwable.
-     * @param message   the message.
-     */
-    public void err(@NotNull final Throwable throwable, @Nullable final String message) {
-        if (mLevel <= ERROR_LEVEL) {
-            mLog.err(mContextList, message, throwable);
-        }
-    }
+  /**
+   * Returns the log instance of this logger.
+   *
+   * @return the log instance.
+   */
+  @NotNull
+  public Log getLog() {
+    return mLog;
+  }
 
-    /**
-     * Logs an error message.
-     *
-     * @param throwable the related throwable.
-     * @param format    the message format.
-     * @param arg1      the first format argument.
-     */
-    public void err(@NotNull final Throwable throwable, @NotNull final String format,
-            @Nullable final Object arg1) {
-        if (mLevel <= ERROR_LEVEL) {
-            mLog.err(mContextList, String.format(format, arg1), throwable);
-        }
-    }
+  /**
+   * Returns the log level of this logger.
+   *
+   * @return the log level.
+   */
+  @NotNull
+  public Level getLogLevel() {
+    return mLogLevel;
+  }
 
-    /**
-     * Logs an error message.
-     *
-     * @param throwable the related throwable.
-     * @param format    the message format.
-     * @param arg1      the first format argument.
-     * @param arg2      the second format argument.
-     */
-    public void err(@NotNull final Throwable throwable, @NotNull final String format,
-            @Nullable final Object arg1, @Nullable final Object arg2) {
-        if (mLevel <= ERROR_LEVEL) {
-            mLog.err(mContextList, String.format(format, arg1, arg2), throwable);
-        }
-    }
+  /**
+   * Creates a new logger with the same log instance and log level, but adding the specified
+   * context to the list of contexts.
+   *
+   * @param context the context.
+   * @return the new logger.
+   */
+  @NotNull
+  public Logger subContextLogger(@NotNull final Object context) {
+    ConstantConditions.notNull("logger context", context);
+    final Object[] thisContexts = mContexts;
+    final int thisLength = thisContexts.length;
+    final Object[] newContexts = new Object[thisLength + 1];
+    System.arraycopy(thisContexts, 0, newContexts, 0, thisLength);
+    newContexts[thisLength] = context;
+    return new Logger(newContexts, mLog, mLogLevel);
+  }
 
-    /**
-     * Logs an error message.
-     *
-     * @param throwable the related throwable.
-     * @param format    the message format.
-     * @param arg1      the first format argument.
-     * @param arg2      the second format argument.
-     * @param arg3      the third format argument.
-     */
-    public void err(@NotNull final Throwable throwable, @NotNull final String format,
-            @Nullable final Object arg1, @Nullable final Object arg2, @Nullable final Object arg3) {
-        if (mLevel <= ERROR_LEVEL) {
-            mLog.err(mContextList, String.format(format, arg1, arg2, arg3), throwable);
-        }
+  /**
+   * Logs a warning message.
+   *
+   * @param message the message.
+   */
+  public void wrn(@Nullable final String message) {
+    if (mLevel <= WARNING_LEVEL) {
+      mLog.wrn(mContextList, message, null);
     }
+  }
 
-    /**
-     * Logs an error message.
-     *
-     * @param throwable the related throwable.
-     * @param format    the message format.
-     * @param arg1      the first format argument.
-     * @param arg2      the second format argument.
-     * @param arg3      the third format argument.
-     * @param arg4      the fourth format argument.
-     */
-    public void err(@NotNull final Throwable throwable, @NotNull final String format,
-            @Nullable final Object arg1, @Nullable final Object arg2, @Nullable final Object arg3,
-            @Nullable final Object arg4) {
-        if (mLevel <= ERROR_LEVEL) {
-            mLog.err(mContextList, String.format(format, arg1, arg2, arg3, arg4), throwable);
-        }
+  /**
+   * Logs a warning message.
+   *
+   * @param format the message format.
+   * @param arg1   the first format argument.
+   */
+  public void wrn(@NotNull final String format, @Nullable final Object arg1) {
+    if (mLevel <= WARNING_LEVEL) {
+      mLog.wrn(mContextList, String.format(format, arg1), null);
     }
+  }
 
-    /**
-     * Logs an error message.
-     *
-     * @param throwable the related throwable.
-     * @param format    the message format.
-     * @param args      the format arguments.
-     */
-    public void err(@NotNull final Throwable throwable, @NotNull final String format,
-            @Nullable final Object... args) {
-        if (mLevel <= ERROR_LEVEL) {
-            mLog.err(mContextList, String.format(format, args), throwable);
-        }
+  /**
+   * Logs a warning message.
+   *
+   * @param format the message format.
+   * @param arg1   the first format argument.
+   * @param arg2   the second format argument.
+   */
+  public void wrn(@NotNull final String format, @Nullable final Object arg1,
+      @Nullable final Object arg2) {
+    if (mLevel <= WARNING_LEVEL) {
+      mLog.wrn(mContextList, String.format(format, arg1, arg2), null);
     }
+  }
 
-    /**
-     * Returns the list of contexts.
-     *
-     * @return the list of contexts.
-     */
-    @NotNull
-    public List<Object> getContextList() {
-        return mContextList;
+  /**
+   * Logs a warning message.
+   *
+   * @param format the message format.
+   * @param arg1   the first format argument.
+   * @param arg2   the second format argument.
+   * @param arg3   the third format argument.
+   */
+  public void wrn(@NotNull final String format, @Nullable final Object arg1,
+      @Nullable final Object arg2, @Nullable final Object arg3) {
+    if (mLevel <= WARNING_LEVEL) {
+      mLog.wrn(mContextList, String.format(format, arg1, arg2, arg3), null);
     }
+  }
 
-    /**
-     * Returns the log instance of this logger.
-     *
-     * @return the log instance.
-     */
-    @NotNull
-    public Log getLog() {
-        return mLog;
+  /**
+   * Logs a warning message.
+   *
+   * @param format the message format.
+   * @param arg1   the first format argument.
+   * @param arg2   the second format argument.
+   * @param arg3   the third format argument.
+   * @param arg4   the fourth format argument.
+   */
+  public void wrn(@NotNull final String format, @Nullable final Object arg1,
+      @Nullable final Object arg2, @Nullable final Object arg3, @Nullable final Object arg4) {
+    if (mLevel <= WARNING_LEVEL) {
+      mLog.wrn(mContextList, String.format(format, arg1, arg2, arg3, arg4), null);
     }
+  }
 
-    /**
-     * Returns the log level of this logger.
-     *
-     * @return the log level.
-     */
-    @NotNull
-    public Level getLogLevel() {
-        return mLogLevel;
+  /**
+   * Logs a warning message.
+   *
+   * @param format the message format.
+   * @param args   the format arguments.
+   */
+  public void wrn(@NotNull final String format, @Nullable final Object... args) {
+    if (mLevel <= WARNING_LEVEL) {
+      mLog.wrn(mContextList, String.format(format, args), null);
     }
+  }
 
-    /**
-     * Creates a new logger with the same log instance and log level, but adding the specified
-     * context to the list of contexts.
-     *
-     * @param context the context.
-     * @return the new logger.
-     */
-    @NotNull
-    public Logger subContextLogger(@NotNull final Object context) {
-        ConstantConditions.notNull("logger context", context);
-        final Object[] thisContexts = mContexts;
-        final int thisLength = thisContexts.length;
-        final Object[] newContexts = new Object[thisLength + 1];
-        System.arraycopy(thisContexts, 0, newContexts, 0, thisLength);
-        newContexts[thisLength] = context;
-        return new Logger(newContexts, mLog, mLogLevel);
+  /**
+   * Logs a warning exception.
+   *
+   * @param throwable the related throwable.
+   */
+  public void wrn(@NotNull final Throwable throwable) {
+    if (mLevel <= WARNING_LEVEL) {
+      mLog.wrn(mContextList, "", throwable);
     }
+  }
 
-    /**
-     * Logs a warning message.
-     *
-     * @param message the message.
-     */
-    public void wrn(@Nullable final String message) {
-        if (mLevel <= WARNING_LEVEL) {
-            mLog.wrn(mContextList, message, null);
-        }
+  /**
+   * Logs a warning message.
+   *
+   * @param throwable the related throwable.
+   * @param message   the message.
+   */
+  public void wrn(@NotNull final Throwable throwable, @Nullable final String message) {
+    if (mLevel <= WARNING_LEVEL) {
+      mLog.wrn(mContextList, message, throwable);
     }
+  }
 
-    /**
-     * Logs a warning message.
-     *
-     * @param format the message format.
-     * @param arg1   the first format argument.
-     */
-    public void wrn(@NotNull final String format, @Nullable final Object arg1) {
-        if (mLevel <= WARNING_LEVEL) {
-            mLog.wrn(mContextList, String.format(format, arg1), null);
-        }
+  /**
+   * Logs a warning message.
+   *
+   * @param throwable the related throwable.
+   * @param format    the message format.
+   * @param arg1      the first format argument.
+   */
+  public void wrn(@NotNull final Throwable throwable, @NotNull final String format,
+      @Nullable final Object arg1) {
+    if (mLevel <= WARNING_LEVEL) {
+      mLog.wrn(mContextList, String.format(format, arg1), throwable);
     }
+  }
 
-    /**
-     * Logs a warning message.
-     *
-     * @param format the message format.
-     * @param arg1   the first format argument.
-     * @param arg2   the second format argument.
-     */
-    public void wrn(@NotNull final String format, @Nullable final Object arg1,
-            @Nullable final Object arg2) {
-        if (mLevel <= WARNING_LEVEL) {
-            mLog.wrn(mContextList, String.format(format, arg1, arg2), null);
-        }
+  /**
+   * Logs a warning message.
+   *
+   * @param throwable the related throwable.
+   * @param format    the message format.
+   * @param arg1      the first format argument.
+   * @param arg2      the second format argument.
+   */
+  public void wrn(@NotNull final Throwable throwable, @NotNull final String format,
+      @Nullable final Object arg1, @Nullable final Object arg2) {
+    if (mLevel <= WARNING_LEVEL) {
+      mLog.wrn(mContextList, String.format(format, arg1, arg2), throwable);
     }
+  }
 
-    /**
-     * Logs a warning message.
-     *
-     * @param format the message format.
-     * @param arg1   the first format argument.
-     * @param arg2   the second format argument.
-     * @param arg3   the third format argument.
-     */
-    public void wrn(@NotNull final String format, @Nullable final Object arg1,
-            @Nullable final Object arg2, @Nullable final Object arg3) {
-        if (mLevel <= WARNING_LEVEL) {
-            mLog.wrn(mContextList, String.format(format, arg1, arg2, arg3), null);
-        }
+  /**
+   * Logs a warning message.
+   *
+   * @param throwable the related throwable.
+   * @param format    the message format.
+   * @param arg1      the first format argument.
+   * @param arg2      the second format argument.
+   * @param arg3      the third format argument.
+   */
+  public void wrn(@NotNull final Throwable throwable, @NotNull final String format,
+      @Nullable final Object arg1, @Nullable final Object arg2, @Nullable final Object arg3) {
+    if (mLevel <= WARNING_LEVEL) {
+      mLog.wrn(mContextList, String.format(format, arg1, arg2, arg3), throwable);
     }
+  }
 
-    /**
-     * Logs a warning message.
-     *
-     * @param format the message format.
-     * @param arg1   the first format argument.
-     * @param arg2   the second format argument.
-     * @param arg3   the third format argument.
-     * @param arg4   the fourth format argument.
-     */
-    public void wrn(@NotNull final String format, @Nullable final Object arg1,
-            @Nullable final Object arg2, @Nullable final Object arg3, @Nullable final Object arg4) {
-        if (mLevel <= WARNING_LEVEL) {
-            mLog.wrn(mContextList, String.format(format, arg1, arg2, arg3, arg4), null);
-        }
+  /**
+   * Logs a warning message.
+   *
+   * @param throwable the related throwable.
+   * @param format    the message format.
+   * @param arg1      the first format argument.
+   * @param arg2      the second format argument.
+   * @param arg3      the third format argument.
+   * @param arg4      the fourth format argument.
+   */
+  public void wrn(@NotNull final Throwable throwable, @NotNull final String format,
+      @Nullable final Object arg1, @Nullable final Object arg2, @Nullable final Object arg3,
+      @Nullable final Object arg4) {
+    if (mLevel <= WARNING_LEVEL) {
+      mLog.wrn(mContextList, String.format(format, arg1, arg2, arg3, arg4), throwable);
     }
+  }
 
-    /**
-     * Logs a warning message.
-     *
-     * @param format the message format.
-     * @param args   the format arguments.
-     */
-    public void wrn(@NotNull final String format, @Nullable final Object... args) {
-        if (mLevel <= WARNING_LEVEL) {
-            mLog.wrn(mContextList, String.format(format, args), null);
-        }
+  /**
+   * Logs a warning message.
+   *
+   * @param throwable the related throwable.
+   * @param format    the message format.
+   * @param args      the format arguments.
+   */
+  public void wrn(@NotNull final Throwable throwable, @NotNull final String format,
+      @Nullable final Object... args) {
+    if (mLevel <= WARNING_LEVEL) {
+      mLog.wrn(mContextList, String.format(format, args), throwable);
     }
-
-    /**
-     * Logs a warning exception.
-     *
-     * @param throwable the related throwable.
-     */
-    public void wrn(@NotNull final Throwable throwable) {
-        if (mLevel <= WARNING_LEVEL) {
-            mLog.wrn(mContextList, "", throwable);
-        }
-    }
-
-    /**
-     * Logs a warning message.
-     *
-     * @param throwable the related throwable.
-     * @param message   the message.
-     */
-    public void wrn(@NotNull final Throwable throwable, @Nullable final String message) {
-        if (mLevel <= WARNING_LEVEL) {
-            mLog.wrn(mContextList, message, throwable);
-        }
-    }
-
-    /**
-     * Logs a warning message.
-     *
-     * @param throwable the related throwable.
-     * @param format    the message format.
-     * @param arg1      the first format argument.
-     */
-    public void wrn(@NotNull final Throwable throwable, @NotNull final String format,
-            @Nullable final Object arg1) {
-        if (mLevel <= WARNING_LEVEL) {
-            mLog.wrn(mContextList, String.format(format, arg1), throwable);
-        }
-    }
-
-    /**
-     * Logs a warning message.
-     *
-     * @param throwable the related throwable.
-     * @param format    the message format.
-     * @param arg1      the first format argument.
-     * @param arg2      the second format argument.
-     */
-    public void wrn(@NotNull final Throwable throwable, @NotNull final String format,
-            @Nullable final Object arg1, @Nullable final Object arg2) {
-        if (mLevel <= WARNING_LEVEL) {
-            mLog.wrn(mContextList, String.format(format, arg1, arg2), throwable);
-        }
-    }
-
-    /**
-     * Logs a warning message.
-     *
-     * @param throwable the related throwable.
-     * @param format    the message format.
-     * @param arg1      the first format argument.
-     * @param arg2      the second format argument.
-     * @param arg3      the third format argument.
-     */
-    public void wrn(@NotNull final Throwable throwable, @NotNull final String format,
-            @Nullable final Object arg1, @Nullable final Object arg2, @Nullable final Object arg3) {
-        if (mLevel <= WARNING_LEVEL) {
-            mLog.wrn(mContextList, String.format(format, arg1, arg2, arg3), throwable);
-        }
-    }
-
-    /**
-     * Logs a warning message.
-     *
-     * @param throwable the related throwable.
-     * @param format    the message format.
-     * @param arg1      the first format argument.
-     * @param arg2      the second format argument.
-     * @param arg3      the third format argument.
-     * @param arg4      the fourth format argument.
-     */
-    public void wrn(@NotNull final Throwable throwable, @NotNull final String format,
-            @Nullable final Object arg1, @Nullable final Object arg2, @Nullable final Object arg3,
-            @Nullable final Object arg4) {
-        if (mLevel <= WARNING_LEVEL) {
-            mLog.wrn(mContextList, String.format(format, arg1, arg2, arg3, arg4), throwable);
-        }
-    }
-
-    /**
-     * Logs a warning message.
-     *
-     * @param throwable the related throwable.
-     * @param format    the message format.
-     * @param args      the format arguments.
-     */
-    public void wrn(@NotNull final Throwable throwable, @NotNull final String format,
-            @Nullable final Object... args) {
-        if (mLevel <= WARNING_LEVEL) {
-            mLog.wrn(mContextList, String.format(format, args), throwable);
-        }
-    }
+  }
 }

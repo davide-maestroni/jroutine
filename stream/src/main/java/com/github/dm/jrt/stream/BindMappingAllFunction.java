@@ -41,123 +41,120 @@ import java.util.List;
  */
 class BindMappingAllFunction<IN, OUT> implements Function<Channel<?, IN>, Channel<?, OUT>> {
 
-    private final ChannelConfiguration mConfiguration;
+  private final ChannelConfiguration mConfiguration;
 
-    private final InvocationMode mInvocationMode;
+  private final InvocationMode mInvocationMode;
+
+  private final Function<? super List<IN>, ? extends OUT> mMappingFunction;
+
+  /**
+   * Constructor.
+   *
+   * @param configuration   the channel configuration.
+   * @param invocationMode  the invocation mode.
+   * @param mappingFunction the mapping function.
+   */
+  BindMappingAllFunction(@NotNull final ChannelConfiguration configuration,
+      @NotNull final InvocationMode invocationMode,
+      @NotNull final Function<? super List<IN>, ? extends OUT> mappingFunction) {
+    mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
+    mInvocationMode = ConstantConditions.notNull("invocation mode", invocationMode);
+    mMappingFunction = ConstantConditions.notNull("function instance", mappingFunction);
+  }
+
+  public Channel<?, OUT> apply(final Channel<?, IN> channel) {
+    final Channel<OUT, OUT> outputChannel = JRoutineCore.io().apply(mConfiguration).buildChannel();
+    channel.bind((mInvocationMode == InvocationMode.ASYNC) ? new MappingFunctionConsumer<IN, OUT>(
+        mMappingFunction, outputChannel)
+        : new MappingFunctionConsumerParallel<IN, OUT>(mMappingFunction, outputChannel));
+    return outputChannel;
+  }
+
+  /**
+   * Channel consumer implementation.
+   *
+   * @param <IN>  the input data type.
+   * @param <OUT> the output data type.
+   */
+  private static class MappingFunctionConsumer<IN, OUT> implements ChannelConsumer<IN> {
 
     private final Function<? super List<IN>, ? extends OUT> mMappingFunction;
+
+    private final Channel<OUT, ?> mOutputChannel;
+
+    private final ArrayList<IN> mOutputs = new ArrayList<IN>();
 
     /**
      * Constructor.
      *
-     * @param configuration   the channel configuration.
-     * @param invocationMode  the invocation mode.
      * @param mappingFunction the mapping function.
+     * @param outputChannel   the output channel.
      */
-    BindMappingAllFunction(@NotNull final ChannelConfiguration configuration,
-            @NotNull final InvocationMode invocationMode,
-            @NotNull final Function<? super List<IN>, ? extends OUT> mappingFunction) {
-        mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
-        mInvocationMode = ConstantConditions.notNull("invocation mode", invocationMode);
-        mMappingFunction = ConstantConditions.notNull("function instance", mappingFunction);
+    private MappingFunctionConsumer(
+        @NotNull final Function<? super List<IN>, ? extends OUT> mappingFunction,
+        @NotNull final Channel<OUT, ?> outputChannel) {
+      mMappingFunction = mappingFunction;
+      mOutputChannel = outputChannel;
     }
 
-    public Channel<?, OUT> apply(final Channel<?, IN> channel) {
-        final Channel<OUT, OUT> outputChannel =
-                JRoutineCore.io().apply(mConfiguration).buildChannel();
-        channel.bind(
-                (mInvocationMode == InvocationMode.ASYNC) ? new MappingFunctionConsumer<IN, OUT>(
-                        mMappingFunction, outputChannel)
-                        : new MappingFunctionConsumerParallel<IN, OUT>(mMappingFunction,
-                                outputChannel));
-        return outputChannel;
+    public void onComplete() {
+      final Channel<OUT, ?> outputChannel = mOutputChannel;
+      try {
+        outputChannel.pass(mMappingFunction.apply(mOutputs));
+        outputChannel.close();
+
+      } catch (final Throwable t) {
+        outputChannel.abort(t);
+        InvocationInterruptedException.throwIfInterrupt(t);
+      }
     }
+
+    public void onError(@NotNull final RoutineException error) {
+      mOutputChannel.abort(error);
+    }
+
+    public void onOutput(final IN output) {
+      mOutputs.add(output);
+    }
+  }
+
+  /**
+   * Channel consumer implementation handling parallel mode.
+   *
+   * @param <IN>  the input data type.
+   * @param <OUT> the output data type.
+   */
+  private static class MappingFunctionConsumerParallel<IN, OUT> implements ChannelConsumer<IN> {
+
+    private final Function<? super List<IN>, ? extends OUT> mMappingFunction;
+
+    private final Channel<OUT, ?> mOutputChannel;
 
     /**
-     * Channel consumer implementation.
+     * Constructor.
      *
-     * @param <IN>  the input data type.
-     * @param <OUT> the output data type.
+     * @param mappingFunction the mapping function.
+     * @param outputChannel   the output channel.
      */
-    private static class MappingFunctionConsumer<IN, OUT> implements ChannelConsumer<IN> {
-
-        private final Function<? super List<IN>, ? extends OUT> mMappingFunction;
-
-        private final Channel<OUT, ?> mOutputChannel;
-
-        private final ArrayList<IN> mOutputs = new ArrayList<IN>();
-
-        /**
-         * Constructor.
-         *
-         * @param mappingFunction the mapping function.
-         * @param outputChannel   the output channel.
-         */
-        private MappingFunctionConsumer(
-                @NotNull final Function<? super List<IN>, ? extends OUT> mappingFunction,
-                @NotNull final Channel<OUT, ?> outputChannel) {
-            mMappingFunction = mappingFunction;
-            mOutputChannel = outputChannel;
-        }
-
-        public void onComplete() {
-            final Channel<OUT, ?> outputChannel = mOutputChannel;
-            try {
-                outputChannel.pass(mMappingFunction.apply(mOutputs));
-                outputChannel.close();
-
-            } catch (final Throwable t) {
-                outputChannel.abort(t);
-                InvocationInterruptedException.throwIfInterrupt(t);
-            }
-        }
-
-        public void onError(@NotNull final RoutineException error) {
-            mOutputChannel.abort(error);
-        }
-
-        public void onOutput(final IN output) {
-            mOutputs.add(output);
-        }
+    private MappingFunctionConsumerParallel(
+        @NotNull final Function<? super List<IN>, ? extends OUT> mappingFunction,
+        @NotNull final Channel<OUT, ?> outputChannel) {
+      mMappingFunction = mappingFunction;
+      mOutputChannel = outputChannel;
     }
 
-    /**
-     * Channel consumer implementation handling parallel mode.
-     *
-     * @param <IN>  the input data type.
-     * @param <OUT> the output data type.
-     */
-    private static class MappingFunctionConsumerParallel<IN, OUT> implements ChannelConsumer<IN> {
-
-        private final Function<? super List<IN>, ? extends OUT> mMappingFunction;
-
-        private final Channel<OUT, ?> mOutputChannel;
-
-        /**
-         * Constructor.
-         *
-         * @param mappingFunction the mapping function.
-         * @param outputChannel   the output channel.
-         */
-        private MappingFunctionConsumerParallel(
-                @NotNull final Function<? super List<IN>, ? extends OUT> mappingFunction,
-                @NotNull final Channel<OUT, ?> outputChannel) {
-            mMappingFunction = mappingFunction;
-            mOutputChannel = outputChannel;
-        }
-
-        public void onComplete() {
-            mOutputChannel.close();
-        }
-
-        public void onError(@NotNull final RoutineException error) {
-            mOutputChannel.abort(error);
-        }
-
-        public void onOutput(final IN output) throws Exception {
-            final ArrayList<IN> outputs = new ArrayList<IN>(1);
-            outputs.add(output);
-            mOutputChannel.pass(mMappingFunction.apply(outputs));
-        }
+    public void onComplete() {
+      mOutputChannel.close();
     }
+
+    public void onError(@NotNull final RoutineException error) {
+      mOutputChannel.abort(error);
+    }
+
+    public void onOutput(final IN output) throws Exception {
+      final ArrayList<IN> outputs = new ArrayList<IN>(1);
+      outputs.add(output);
+      mOutputChannel.pass(mMappingFunction.apply(outputs));
+    }
+  }
 }

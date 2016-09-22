@@ -36,30 +36,30 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class ReplaceFunctionInvocation<DATA> extends MappingInvocation<DATA, DATA> {
 
-    private final PredicateDecorator<? super DATA> mPredicate;
+  private final PredicateDecorator<? super DATA> mPredicate;
 
-    private final FunctionDecorator<DATA, ? extends DATA> mReplacementFunction;
+  private final FunctionDecorator<DATA, ? extends DATA> mReplacementFunction;
 
-    /**
-     * Constructor.
-     *
-     * @param predicate           the predicate instance.
-     * @param replacementFunction the function instance.
-     */
-    ReplaceFunctionInvocation(@NotNull final PredicateDecorator<? super DATA> predicate,
-            @NotNull final FunctionDecorator<DATA, ? extends DATA> replacementFunction) {
-        super(asArgs(ConstantConditions.notNull("predicate instance", predicate),
-                ConstantConditions.notNull("supplier instance", replacementFunction)));
-        mPredicate = predicate;
-        mReplacementFunction = replacementFunction;
+  /**
+   * Constructor.
+   *
+   * @param predicate           the predicate instance.
+   * @param replacementFunction the function instance.
+   */
+  ReplaceFunctionInvocation(@NotNull final PredicateDecorator<? super DATA> predicate,
+      @NotNull final FunctionDecorator<DATA, ? extends DATA> replacementFunction) {
+    super(asArgs(ConstantConditions.notNull("predicate instance", predicate),
+        ConstantConditions.notNull("supplier instance", replacementFunction)));
+    mPredicate = predicate;
+    mReplacementFunction = replacementFunction;
+  }
+
+  public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) throws Exception {
+    if (mPredicate.test(input)) {
+      result.pass(mReplacementFunction.apply(input));
+
+    } else {
+      result.pass(input);
     }
-
-    public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) throws Exception {
-        if (mPredicate.test(input)) {
-            result.pass(mReplacementFunction.apply(input));
-
-        } else {
-            result.pass(input);
-        }
-    }
+  }
 }

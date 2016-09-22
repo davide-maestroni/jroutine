@@ -41,125 +41,124 @@ import java.util.concurrent.TimeUnit;
  */
 class AsyncTaskRunner extends AsyncRunner {
 
-    private static final Void[] NO_PARAMS = new Void[0];
+  private static final Void[] NO_PARAMS = new Void[0];
 
-    private static final MainRunner sMainRunner = new MainRunner();
+  private static final MainRunner sMainRunner = new MainRunner();
+
+  private final Executor mExecutor;
+
+  private final WeakIdentityHashMap<Execution, WeakHashMap<ExecutionTask, Void>> mTasks =
+      new WeakIdentityHashMap<Execution, WeakHashMap<ExecutionTask, Void>>();
+
+  /**
+   * Constructor.
+   * <p>
+   * Note that, in case a null executor is passed as parameter, the default one will be used.
+   *
+   * @param executor the executor.
+   */
+  AsyncTaskRunner(@Nullable final Executor executor) {
+    super(new AsyncTaskThreadManager());
+    mExecutor = executor;
+  }
+
+  @Override
+  public void cancel(@NotNull final Execution execution) {
+    synchronized (mTasks) {
+      final WeakHashMap<ExecutionTask, Void> executionTasks = mTasks.remove(execution);
+      if (executionTasks != null) {
+        for (final ExecutionTask task : executionTasks.keySet()) {
+          sMainRunner.cancel(task);
+          task.cancel(false);
+        }
+      }
+    }
+  }
+
+  @Override
+  public void run(@NotNull final Execution execution, final long delay,
+      @NotNull final TimeUnit timeUnit) {
+    final ExecutionTask task = new ExecutionTask(execution, mExecutor);
+    synchronized (mTasks) {
+      final WeakIdentityHashMap<Execution, WeakHashMap<ExecutionTask, Void>> tasks = mTasks;
+      WeakHashMap<ExecutionTask, Void> executionTasks = tasks.get(execution);
+      if (executionTasks == null) {
+        executionTasks = new WeakHashMap<ExecutionTask, Void>();
+        tasks.put(execution, executionTasks);
+      }
+
+      executionTasks.put(task, null);
+    }
+
+    // We need to ensure that a task is always started from the main thread
+    sMainRunner.run(task, delay, timeUnit);
+  }
+
+  @NotNull
+  @Override
+  protected AsyncTaskThreadManager getThreadManager() {
+    return (AsyncTaskThreadManager) super.getThreadManager();
+  }
+
+  /**
+   * Thread manager implementation.
+   */
+  private static class AsyncTaskThreadManager implements ThreadManager {
+
+    private final ThreadLocal<Boolean> mIsManaged = new ThreadLocal<Boolean>();
+
+    @Override
+    public boolean isManagedThread() {
+      final Boolean isManaged = mIsManaged.get();
+      return (isManaged != null) && isManaged;
+    }
+
+    private void setManaged() {
+      mIsManaged.set(true);
+    }
+  }
+
+  /**
+   * Implementation of an async task whose execution starts in a runnable.
+   */
+  private class ExecutionTask extends AsyncTask<Void, Void, Void> implements Execution {
+
+    private final Execution mExecution;
 
     private final Executor mExecutor;
 
-    private final WeakIdentityHashMap<Execution, WeakHashMap<ExecutionTask, Void>> mTasks =
-            new WeakIdentityHashMap<Execution, WeakHashMap<ExecutionTask, Void>>();
-
     /**
      * Constructor.
-     * <p>
-     * Note that, in case a null executor is passed as parameter, the default one will be used.
      *
-     * @param executor the executor.
+     * @param execution the execution instance.
+     * @param executor  the executor.
      */
-    AsyncTaskRunner(@Nullable final Executor executor) {
-        super(new AsyncTaskThreadManager());
-        mExecutor = executor;
+    private ExecutionTask(@NotNull final Execution execution, @Nullable final Executor executor) {
+      mExecution = execution;
+      mExecutor = executor;
+    }
+
+    @TargetApi(VERSION_CODES.HONEYCOMB)
+    @Override
+    public void run() {
+      final Executor executor = mExecutor;
+      if ((executor != null) && (VERSION.SDK_INT >= VERSION_CODES.HONEYCOMB)) {
+        executeOnExecutor(executor, NO_PARAMS);
+
+      } else {
+        execute(NO_PARAMS);
+      }
     }
 
     @Override
-    public void cancel(@NotNull final Execution execution) {
-        synchronized (mTasks) {
-            final WeakHashMap<ExecutionTask, Void> executionTasks = mTasks.remove(execution);
-            if (executionTasks != null) {
-                for (final ExecutionTask task : executionTasks.keySet()) {
-                    sMainRunner.cancel(task);
-                    task.cancel(false);
-                }
-            }
-        }
+    protected Void doInBackground(@NotNull final Void... voids) {
+      final Looper looper = Looper.myLooper();
+      if (looper != Looper.getMainLooper()) {
+        getThreadManager().setManaged();
+      }
+
+      mExecution.run();
+      return null;
     }
-
-    @Override
-    public void run(@NotNull final Execution execution, final long delay,
-            @NotNull final TimeUnit timeUnit) {
-        final ExecutionTask task = new ExecutionTask(execution, mExecutor);
-        synchronized (mTasks) {
-            final WeakIdentityHashMap<Execution, WeakHashMap<ExecutionTask, Void>> tasks = mTasks;
-            WeakHashMap<ExecutionTask, Void> executionTasks = tasks.get(execution);
-            if (executionTasks == null) {
-                executionTasks = new WeakHashMap<ExecutionTask, Void>();
-                tasks.put(execution, executionTasks);
-            }
-
-            executionTasks.put(task, null);
-        }
-
-        // We need to ensure that a task is always started from the main thread
-        sMainRunner.run(task, delay, timeUnit);
-    }
-
-    @NotNull
-    @Override
-    protected AsyncTaskThreadManager getThreadManager() {
-        return (AsyncTaskThreadManager) super.getThreadManager();
-    }
-
-    /**
-     * Thread manager implementation.
-     */
-    private static class AsyncTaskThreadManager implements ThreadManager {
-
-        private final ThreadLocal<Boolean> mIsManaged = new ThreadLocal<Boolean>();
-
-        @Override
-        public boolean isManagedThread() {
-            final Boolean isManaged = mIsManaged.get();
-            return (isManaged != null) && isManaged;
-        }
-
-        private void setManaged() {
-            mIsManaged.set(true);
-        }
-    }
-
-    /**
-     * Implementation of an async task whose execution starts in a runnable.
-     */
-    private class ExecutionTask extends AsyncTask<Void, Void, Void> implements Execution {
-
-        private final Execution mExecution;
-
-        private final Executor mExecutor;
-
-        /**
-         * Constructor.
-         *
-         * @param execution the execution instance.
-         * @param executor  the executor.
-         */
-        private ExecutionTask(@NotNull final Execution execution,
-                @Nullable final Executor executor) {
-            mExecution = execution;
-            mExecutor = executor;
-        }
-
-        @TargetApi(VERSION_CODES.HONEYCOMB)
-        @Override
-        public void run() {
-            final Executor executor = mExecutor;
-            if ((executor != null) && (VERSION.SDK_INT >= VERSION_CODES.HONEYCOMB)) {
-                executeOnExecutor(executor, NO_PARAMS);
-
-            } else {
-                execute(NO_PARAMS);
-            }
-        }
-
-        @Override
-        protected Void doInBackground(@NotNull final Void... voids) {
-            final Looper looper = Looper.myLooper();
-            if (looper != Looper.getMainLooper()) {
-                getThreadManager().setManaged();
-            }
-
-            mExecution.run();
-            return null;
-        }
-    }
+  }
 }

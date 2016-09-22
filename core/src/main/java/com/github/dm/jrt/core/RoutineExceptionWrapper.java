@@ -30,35 +30,35 @@ import org.jetbrains.annotations.Nullable;
  */
 class RoutineExceptionWrapper {
 
-    private final Throwable mCause;
+  private final Throwable mCause;
 
-    /**
-     * Constructor.
-     *
-     * @param cause the cause exception.
-     */
-    private RoutineExceptionWrapper(@Nullable final Throwable cause) {
-        mCause = cause;
-    }
+  /**
+   * Constructor.
+   *
+   * @param cause the cause exception.
+   */
+  private RoutineExceptionWrapper(@Nullable final Throwable cause) {
+    mCause = cause;
+  }
 
-    /**
-     * Creates an instance wrapping the specified exception.
-     *
-     * @param t the throwable to wrap.
-     * @return the new wrapper instance.
-     */
-    @NotNull
-    static RoutineExceptionWrapper wrap(@Nullable final Throwable t) {
-        return new RoutineExceptionWrapper(t);
-    }
+  /**
+   * Creates an instance wrapping the specified exception.
+   *
+   * @param t the throwable to wrap.
+   * @return the new wrapper instance.
+   */
+  @NotNull
+  static RoutineExceptionWrapper wrap(@Nullable final Throwable t) {
+    return new RoutineExceptionWrapper(t);
+  }
 
-    /**
-     * Returns a routine exception wrapping the cause one.
-     *
-     * @return the routine exception.
-     */
-    @NotNull
-    RoutineException raise() {
-        return InvocationException.wrapIfNeeded(mCause);
-    }
+  /**
+   * Returns a routine exception wrapping the cause one.
+   *
+   * @return the routine exception.
+   */
+  @NotNull
+  RoutineException raise() {
+    return InvocationException.wrapIfNeeded(mCause);
+  }
 }

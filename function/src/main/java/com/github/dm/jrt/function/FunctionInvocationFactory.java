@@ -39,49 +39,49 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class FunctionInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
 
-    private final CallInvocation<IN, OUT> mInvocation;
+  private final CallInvocation<IN, OUT> mInvocation;
+
+  /**
+   * Constructor.
+   *
+   * @param function the function instance.
+   */
+  FunctionInvocationFactory(
+      @NotNull final FunctionDecorator<? super List<IN>, ? extends OUT> function) {
+    super(asArgs(ConstantConditions.notNull("function wrapper", function)));
+    mInvocation = new FunctionInvocation<IN, OUT>(function);
+  }
+
+  @NotNull
+  @Override
+  public Invocation<IN, OUT> newInvocation() {
+    return mInvocation;
+  }
+
+  /**
+   * Invocation implementation.
+   *
+   * @param <IN>  the input data type.
+   * @param <OUT> the output data type.
+   */
+  private static class FunctionInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
+
+    private final FunctionDecorator<? super List<IN>, ? extends OUT> mFunction;
 
     /**
      * Constructor.
      *
      * @param function the function instance.
      */
-    FunctionInvocationFactory(
-            @NotNull final FunctionDecorator<? super List<IN>, ? extends OUT> function) {
-        super(asArgs(ConstantConditions.notNull("function wrapper", function)));
-        mInvocation = new FunctionInvocation<IN, OUT>(function);
+    private FunctionInvocation(
+        @NotNull FunctionDecorator<? super List<IN>, ? extends OUT> function) {
+      mFunction = function;
     }
 
-    @NotNull
     @Override
-    public Invocation<IN, OUT> newInvocation() {
-        return mInvocation;
+    protected void onCall(@NotNull final List<? extends IN> inputs,
+        @NotNull final Channel<OUT, ?> result) throws Exception {
+      result.pass(mFunction.apply(new ArrayList<IN>(inputs)));
     }
-
-    /**
-     * Invocation implementation.
-     *
-     * @param <IN>  the input data type.
-     * @param <OUT> the output data type.
-     */
-    private static class FunctionInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
-
-        private final FunctionDecorator<? super List<IN>, ? extends OUT> mFunction;
-
-        /**
-         * Constructor.
-         *
-         * @param function the function instance.
-         */
-        private FunctionInvocation(
-                @NotNull FunctionDecorator<? super List<IN>, ? extends OUT> function) {
-            mFunction = function;
-        }
-
-        @Override
-        protected void onCall(@NotNull final List<? extends IN> inputs,
-                @NotNull final Channel<OUT, ?> result) throws Exception {
-            result.pass(mFunction.apply(new ArrayList<IN>(inputs)));
-        }
-    }
+  }
 }

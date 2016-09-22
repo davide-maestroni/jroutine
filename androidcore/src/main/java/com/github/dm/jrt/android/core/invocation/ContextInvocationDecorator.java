@@ -34,44 +34,44 @@ import org.jetbrains.annotations.NotNull;
  */
 public class ContextInvocationDecorator<IN, OUT> implements ContextInvocation<IN, OUT> {
 
-    private final ContextInvocation<IN, OUT> mInvocation;
+  private final ContextInvocation<IN, OUT> mInvocation;
 
-    /**
-     * Constructor.
-     *
-     * @param wrapped the wrapped invocation instance.
-     */
-    public ContextInvocationDecorator(@NotNull final ContextInvocation<IN, OUT> wrapped) {
-        mInvocation = ConstantConditions.notNull("wrapped invocation instance", wrapped);
-    }
+  /**
+   * Constructor.
+   *
+   * @param wrapped the wrapped invocation instance.
+   */
+  public ContextInvocationDecorator(@NotNull final ContextInvocation<IN, OUT> wrapped) {
+    mInvocation = ConstantConditions.notNull("wrapped invocation instance", wrapped);
+  }
 
-    @Override
-    public void onAbort(@NotNull final RoutineException reason) throws Exception {
-        mInvocation.onAbort(reason);
-    }
+  @Override
+  public void onAbort(@NotNull final RoutineException reason) throws Exception {
+    mInvocation.onAbort(reason);
+  }
 
-    @Override
-    public void onComplete(@NotNull final Channel<OUT, ?> result) throws Exception {
-        mInvocation.onComplete(result);
-    }
+  @Override
+  public void onComplete(@NotNull final Channel<OUT, ?> result) throws Exception {
+    mInvocation.onComplete(result);
+  }
 
-    @Override
-    public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) throws Exception {
-        mInvocation.onInput(input, result);
-    }
+  @Override
+  public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) throws Exception {
+    mInvocation.onInput(input, result);
+  }
 
-    @Override
-    public void onRecycle(final boolean isReused) throws Exception {
-        mInvocation.onRecycle(isReused);
-    }
+  @Override
+  public void onRecycle(final boolean isReused) throws Exception {
+    mInvocation.onRecycle(isReused);
+  }
 
-    @Override
-    public void onRestart() throws Exception {
-        mInvocation.onRestart();
-    }
+  @Override
+  public void onRestart() throws Exception {
+    mInvocation.onRestart();
+  }
 
-    @Override
-    public void onContext(@NotNull final Context context) throws Exception {
-        mInvocation.onContext(context);
-    }
+  @Override
+  public void onContext(@NotNull final Context context) throws Exception {
+    mInvocation.onContext(context);
+  }
 }

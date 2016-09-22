@@ -86,17 +86,17 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface AsyncMethod {
 
-    /**
-     * The output transfer mode.
-     *
-     * @return the mode.
-     */
-    OutputMode mode() default OutputMode.VALUE;
+  /**
+   * The output transfer mode.
+   *
+   * @return the mode.
+   */
+  OutputMode mode() default OutputMode.VALUE;
 
-    /**
-     * The array of parameter types.
-     *
-     * @return the parameter types.
-     */
-    Class<?>[] value();
+  /**
+   * The array of parameter types.
+   *
+   * @return the parameter types.
+   */
+  Class<?>[] value();
 }

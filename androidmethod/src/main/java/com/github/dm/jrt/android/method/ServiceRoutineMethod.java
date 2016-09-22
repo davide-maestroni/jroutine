@@ -98,634 +98,618 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * Created by davide-maestroni on 08/18/2016.
  */
 public class ServiceRoutineMethod extends RoutineMethod
-        implements ServiceConfigurable<ServiceRoutineMethod> {
+    implements ServiceConfigurable<ServiceRoutineMethod> {
 
-    private final Object[] mArgs;
+  private final Object[] mArgs;
+
+  private final ServiceContext mContext;
+
+  private final ThreadLocal<InputChannel<?>> mLocalChannel = new ThreadLocal<InputChannel<?>>();
+
+  private final ThreadLocal<Context> mLocalContext = new ThreadLocal<Context>();
+
+  private final ThreadLocal<Boolean> mLocalIgnore = new ThreadLocal<Boolean>();
+
+  private ServiceConfiguration mConfiguration = ServiceConfiguration.defaultConfiguration();
+
+  private Class<?> mReturnType;
+
+  /**
+   * Constructor.
+   *
+   * @param context the Service context.
+   */
+  public ServiceRoutineMethod(@NotNull final ServiceContext context) {
+    this(context, (Object[]) null);
+  }
+
+  /**
+   * Constructor.
+   *
+   * @param context the Service context.
+   * @param args    the constructor arguments.
+   */
+  public ServiceRoutineMethod(@NotNull final ServiceContext context,
+      @Nullable final Object... args) {
+    mContext = ConstantConditions.notNull("Service context", context);
+    final Class<? extends RoutineMethod> type = getClass();
+    if (!Reflection.hasStaticScope(type)) {
+      throw new IllegalStateException(
+          "the method class must have a static scope: " + type.getName());
+    }
+
+    final Object[] additionalArgs;
+    final Object[] safeArgs = Reflection.asArgs(args);
+    if (type.isAnonymousClass()) {
+      if (safeArgs.length > 0) {
+        additionalArgs = new Object[safeArgs.length + 1];
+        System.arraycopy(safeArgs, 0, additionalArgs, 1, safeArgs.length);
+        additionalArgs[0] = safeArgs;
+
+      } else {
+        additionalArgs = safeArgs;
+      }
+
+    } else {
+      additionalArgs = cloneArgs(safeArgs);
+    }
+
+    final Object[] constructorArgs = new Object[additionalArgs.length + 1];
+    System.arraycopy(additionalArgs, 0, constructorArgs, 1, additionalArgs.length);
+    constructorArgs[0] = context;
+    Reflection.findBestMatchingConstructor(type, constructorArgs);
+    mArgs = additionalArgs;
+  }
+
+  /**
+   * Builds a Service object routine method by wrapping the specified static method.
+   *
+   * @param context the Service context.
+   * @param method  the method.
+   * @return the routine method instance.
+   * @throws java.lang.IllegalArgumentException if the specified method is not static.
+   */
+  @NotNull
+  public static ObjectServiceRoutineMethod from(@NotNull final ServiceContext context,
+      @NotNull final Method method) {
+    if (!Modifier.isStatic(method.getModifiers())) {
+      throw new IllegalArgumentException("the method is not static: " + method);
+    }
+
+    return from(context, ContextInvocationTarget.classOfType(method.getDeclaringClass()), method);
+  }
+
+  /**
+   * Builds a Service object routine method by wrapping a method of the specified target.
+   *
+   * @param context the Service context.
+   * @param target  the invocation target.
+   * @param method  the method.
+   * @return the routine method instance.
+   * @throws java.lang.IllegalArgumentException if the specified method is not implemented by the
+   *                                            target instance.
+   */
+  @NotNull
+  public static ObjectServiceRoutineMethod from(@NotNull final ServiceContext context,
+      @NotNull final ContextInvocationTarget<?> target, @NotNull final Method method) {
+    if (!method.getDeclaringClass().isAssignableFrom(target.getTargetClass())) {
+      throw new IllegalArgumentException(
+          "the method is not applicable to the specified target class: " + target.getTargetClass());
+    }
+
+    return new ObjectServiceRoutineMethod(context, target, method);
+  }
+
+  /**
+   * Builds a Service object routine method by wrapping a method of the specified target.
+   *
+   * @param context        the Service context.
+   * @param target         the invocation target.
+   * @param name           the method name.
+   * @param parameterTypes the method parameter types.
+   * @return the routine method instance.
+   * @throws java.lang.NoSuchMethodException if no method with the specified signature is found.
+   */
+  @NotNull
+  public static ObjectServiceRoutineMethod from(@NotNull final ServiceContext context,
+      @NotNull final ContextInvocationTarget<?> target, @NotNull final String name,
+      @Nullable final Class<?>... parameterTypes) throws NoSuchMethodException {
+    return from(context, target, target.getTargetClass().getMethod(name, parameterTypes));
+  }
+
+  @NotNull
+  @Override
+  public ServiceRoutineMethod apply(@NotNull final InvocationConfiguration configuration) {
+    return (ServiceRoutineMethod) super.apply(configuration);
+  }
+
+  @NotNull
+  @Override
+  @SuppressWarnings("unchecked")
+  public InvocationConfiguration.Builder<? extends ServiceRoutineMethod>
+  applyInvocationConfiguration() {
+    return (InvocationConfiguration.Builder<? extends ServiceRoutineMethod>) super
+        .applyInvocationConfiguration();
+  }
+
+  /**
+   * Calls the routine.
+   * <br>
+   * The output channel will produced the data returned by the method. In case the method does not
+   * return any output, the channel will be anyway notified of invocation abortion and completion.
+   * <p>
+   * Note that the specific method will be selected based on the specified parameters. If no
+   * matching method is found, the call will fail with an exception.
+   *
+   * @param params the parameters.
+   * @param <OUT>  the output data type.
+   * @return the output channel instance.
+   */
+  @NotNull
+  @Override
+  public <OUT> OutputChannel<OUT> call(@Nullable final Object... params) {
+    final Object[] safeParams = asArgs(params);
+    findBestMatchingMethod(getClass(), safeParams);
+    return call(InvocationMode.ASYNC, safeParams);
+  }
+
+  /**
+   * Calls the routine in parallel mode.
+   * <br>
+   * The output channel will produced the data returned by the method. In case the method does not
+   * return any output, the channel will be anyway notified of invocation abortion and completion.
+   * <p>
+   * Note that the specific method will be selected based on the specified parameters. If no
+   * matching method is found, the call will fail with an exception.
+   *
+   * @param params the parameters.
+   * @param <OUT>  the output data type.
+   * @return the output channel instance.
+   * @see com.github.dm.jrt.core.routine.Routine Routine
+   */
+  @NotNull
+  @Override
+  public <OUT> OutputChannel<OUT> callParallel(@Nullable final Object... params) {
+    final Object[] safeParams = asArgs(params);
+    findBestMatchingMethod(getClass(), safeParams);
+    return call(InvocationMode.PARALLEL, safeParams);
+  }
+
+  /**
+   * Tells the routine to ignore the method return value, that is, it will not be passed to the
+   * output channel.
+   *
+   * @param <OUT> the output data type.
+   * @return the return value.
+   */
+  @SuppressWarnings("unchecked")
+  protected <OUT> OUT ignoreReturnValue() {
+    mLocalIgnore.set(true);
+    return (OUT) boxingDefault(mReturnType);
+  }
+
+  /**
+   * Returns the input channel which is ready to produce data. If the method takes no input channel
+   * as parameter, null will be returned.
+   * <p>
+   * Note this method will return null if called outside the routine method invocation or from a
+   * different thread.
+   *
+   * @param <IN> the input data type.
+   * @return the input channel producing data or null.
+   */
+  @Override
+  @SuppressWarnings("unchecked")
+  protected <IN> InputChannel<IN> switchInput() {
+    return (InputChannel<IN>) mLocalChannel.get();
+  }
+
+  @NotNull
+  @Override
+  public ServiceRoutineMethod apply(@NotNull final ServiceConfiguration configuration) {
+    mConfiguration = ConstantConditions.notNull("Service configuration", configuration);
+    return this;
+  }
+
+  @NotNull
+  @Override
+  public Builder<? extends ServiceRoutineMethod> applyServiceConfiguration() {
+    return new Builder<ServiceRoutineMethod>(this, mConfiguration);
+  }
+
+  /**
+   * Returns the Android Context (that is, the Service instance).
+   * <p>
+   * Note this method will return null if called outside the routine method invocation or from a
+   * different thread.
+   *
+   * @return the Context.
+   */
+  protected Context getContext() {
+    return mLocalContext.get();
+  }
+
+  /**
+   * Returns the Service configuration.
+   *
+   * @return the Service configuration.
+   */
+  @NotNull
+  protected ServiceConfiguration getServiceConfiguration() {
+    return mConfiguration;
+  }
+
+  @NotNull
+  @SuppressWarnings("unchecked")
+  private <OUT> OutputChannel<OUT> call(@NotNull final InvocationMode mode,
+      @NotNull final Object[] params) {
+    final ArrayList<InputChannel<?>> inputChannels = new ArrayList<InputChannel<?>>();
+    final ArrayList<OutputChannel<?>> outputChannels = new ArrayList<OutputChannel<?>>();
+    for (int i = 0; i < params.length; ++i) {
+      final Object param = params[i];
+      if (param instanceof InputChannel) {
+        params[i] = InputChannelPlaceHolder.class;
+        inputChannels.add((InputChannel<?>) param);
+
+      } else if (param instanceof OutputChannel) {
+        params[i] = OutputChannelPlaceHolder.class;
+        outputChannels.add((OutputChannel<?>) param);
+      }
+    }
+
+    final OutputChannel<OUT> resultChannel = outputChannel();
+    outputChannels.add(resultChannel);
+    final Channel<?, ? extends ParcelableSelectable<Object>> inputChannel =
+        (!inputChannels.isEmpty()) ? AndroidChannels.mergeParcelable(inputChannels).buildChannels()
+            : JRoutineCore.io().<ParcelableSelectable<Object>>of();
+    final Channel<ParcelableSelectable<Object>, ParcelableSelectable<Object>> outputChannel =
+        mode.invoke(JRoutineService.on(mContext)
+                                   .with(factoryOf(ServiceInvocation.class, getClass(), mArgs,
+                                       params))
+                                   .apply(getConfiguration())
+                                   .apply(getServiceConfiguration())).pass(inputChannel).close();
+    final Map<Integer, Channel<?, Object>> channelMap =
+        AndroidChannels.selectOutput(0, outputChannels.size(), outputChannel).buildChannels();
+    for (final Entry<Integer, Channel<?, Object>> entry : channelMap.entrySet()) {
+      entry.getValue().bind((OutputChannel<Object>) outputChannels.get(entry.getKey())).close();
+    }
+
+    return resultChannel;
+  }
+
+  private boolean isIgnoreReturnValue() {
+    return (mLocalIgnore.get() != null);
+  }
+
+  private void resetIgnoreReturnValue() {
+    mLocalIgnore.set(null);
+  }
+
+  private void setLocalContext(@Nullable final Context context) {
+    mLocalContext.set(context);
+  }
+
+  private void setLocalInput(@Nullable final InputChannel<?> inputChannel) {
+    mLocalChannel.set(inputChannel);
+  }
+
+  private void setReturnType(@NotNull final Class<?> returnType) {
+    mReturnType = returnType;
+  }
+
+  /**
+   * Implementation of a Service routine method wrapping an object method.
+   */
+  public static class ObjectServiceRoutineMethod extends ServiceRoutineMethod
+      implements ObjectConfigurable<ObjectServiceRoutineMethod> {
 
     private final ServiceContext mContext;
 
-    private final ThreadLocal<InputChannel<?>> mLocalChannel = new ThreadLocal<InputChannel<?>>();
+    private final Method mMethod;
 
-    private final ThreadLocal<Context> mLocalContext = new ThreadLocal<Context>();
+    private final ContextInvocationTarget<?> mTarget;
 
-    private final ThreadLocal<Boolean> mLocalIgnore = new ThreadLocal<Boolean>();
-
-    private ServiceConfiguration mConfiguration = ServiceConfiguration.defaultConfiguration();
-
-    private Class<?> mReturnType;
+    private ObjectConfiguration mConfiguration = ObjectConfiguration.defaultConfiguration();
 
     /**
      * Constructor.
-     *
-     * @param context the Service context.
-     */
-    public ServiceRoutineMethod(@NotNull final ServiceContext context) {
-        this(context, (Object[]) null);
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param context the Service context.
-     * @param args    the constructor arguments.
-     */
-    public ServiceRoutineMethod(@NotNull final ServiceContext context,
-            @Nullable final Object... args) {
-        mContext = ConstantConditions.notNull("Service context", context);
-        final Class<? extends RoutineMethod> type = getClass();
-        if (!Reflection.hasStaticScope(type)) {
-            throw new IllegalStateException(
-                    "the method class must have a static scope: " + type.getName());
-        }
-
-        final Object[] additionalArgs;
-        final Object[] safeArgs = Reflection.asArgs(args);
-        if (type.isAnonymousClass()) {
-            if (safeArgs.length > 0) {
-                additionalArgs = new Object[safeArgs.length + 1];
-                System.arraycopy(safeArgs, 0, additionalArgs, 1, safeArgs.length);
-                additionalArgs[0] = safeArgs;
-
-            } else {
-                additionalArgs = safeArgs;
-            }
-
-        } else {
-            additionalArgs = cloneArgs(safeArgs);
-        }
-
-        final Object[] constructorArgs = new Object[additionalArgs.length + 1];
-        System.arraycopy(additionalArgs, 0, constructorArgs, 1, additionalArgs.length);
-        constructorArgs[0] = context;
-        Reflection.findBestMatchingConstructor(type, constructorArgs);
-        mArgs = additionalArgs;
-    }
-
-    /**
-     * Builds a Service object routine method by wrapping the specified static method.
-     *
-     * @param context the Service context.
-     * @param method  the method.
-     * @return the routine method instance.
-     * @throws java.lang.IllegalArgumentException if the specified method is not static.
-     */
-    @NotNull
-    public static ObjectServiceRoutineMethod from(@NotNull final ServiceContext context,
-            @NotNull final Method method) {
-        if (!Modifier.isStatic(method.getModifiers())) {
-            throw new IllegalArgumentException("the method is not static: " + method);
-        }
-
-        return from(context, ContextInvocationTarget.classOfType(method.getDeclaringClass()),
-                method);
-    }
-
-    /**
-     * Builds a Service object routine method by wrapping a method of the specified target.
      *
      * @param context the Service context.
      * @param target  the invocation target.
-     * @param method  the method.
-     * @return the routine method instance.
-     * @throws java.lang.IllegalArgumentException if the specified method is not implemented by the
-     *                                            target instance.
+     * @param method  the method instance.
      */
-    @NotNull
-    public static ObjectServiceRoutineMethod from(@NotNull final ServiceContext context,
-            @NotNull final ContextInvocationTarget<?> target, @NotNull final Method method) {
-        if (!method.getDeclaringClass().isAssignableFrom(target.getTargetClass())) {
-            throw new IllegalArgumentException(
-                    "the method is not applicable to the specified target class: "
-                            + target.getTargetClass());
-        }
-
-        return new ObjectServiceRoutineMethod(context, target, method);
-    }
-
-    /**
-     * Builds a Service object routine method by wrapping a method of the specified target.
-     *
-     * @param context        the Service context.
-     * @param target         the invocation target.
-     * @param name           the method name.
-     * @param parameterTypes the method parameter types.
-     * @return the routine method instance.
-     * @throws java.lang.NoSuchMethodException if no method with the specified signature is found.
-     */
-    @NotNull
-    public static ObjectServiceRoutineMethod from(@NotNull final ServiceContext context,
-            @NotNull final ContextInvocationTarget<?> target, @NotNull final String name,
-            @Nullable final Class<?>... parameterTypes) throws NoSuchMethodException {
-        return from(context, target, target.getTargetClass().getMethod(name, parameterTypes));
+    private ObjectServiceRoutineMethod(@NotNull final ServiceContext context,
+        @NotNull final ContextInvocationTarget<?> target, @NotNull final Method method) {
+      super(context, target, method);
+      mContext = context;
+      mTarget = target;
+      mMethod = method;
     }
 
     @NotNull
     @Override
-    public ServiceRoutineMethod apply(@NotNull final InvocationConfiguration configuration) {
-        return (ServiceRoutineMethod) super.apply(configuration);
+    public ObjectServiceRoutineMethod apply(@NotNull final InvocationConfiguration configuration) {
+      return (ObjectServiceRoutineMethod) super.apply(configuration);
     }
 
     @NotNull
     @Override
     @SuppressWarnings("unchecked")
-    public InvocationConfiguration.Builder<? extends ServiceRoutineMethod>
+    public InvocationConfiguration.Builder<? extends ObjectServiceRoutineMethod>
     applyInvocationConfiguration() {
-        return (InvocationConfiguration.Builder<? extends ServiceRoutineMethod>) super
-                .applyInvocationConfiguration();
+      return (InvocationConfiguration.Builder<? extends ObjectServiceRoutineMethod>) super
+          .applyInvocationConfiguration();
     }
 
-    /**
-     * Calls the routine.
-     * <br>
-     * The output channel will produced the data returned by the method. In case the method does not
-     * return any output, the channel will be anyway notified of invocation abortion and completion.
-     * <p>
-     * Note that the specific method will be selected based on the specified parameters. If no
-     * matching method is found, the call will fail with an exception.
-     *
-     * @param params the parameters.
-     * @param <OUT>  the output data type.
-     * @return the output channel instance.
-     */
     @NotNull
     @Override
     public <OUT> OutputChannel<OUT> call(@Nullable final Object... params) {
-        final Object[] safeParams = asArgs(params);
-        findBestMatchingMethod(getClass(), safeParams);
-        return call(InvocationMode.ASYNC, safeParams);
+      return call(InvocationMode.ASYNC, params);
     }
 
-    /**
-     * Calls the routine in parallel mode.
-     * <br>
-     * The output channel will produced the data returned by the method. In case the method does not
-     * return any output, the channel will be anyway notified of invocation abortion and completion.
-     * <p>
-     * Note that the specific method will be selected based on the specified parameters. If no
-     * matching method is found, the call will fail with an exception.
-     *
-     * @param params the parameters.
-     * @param <OUT>  the output data type.
-     * @return the output channel instance.
-     * @see com.github.dm.jrt.core.routine.Routine Routine
-     */
     @NotNull
     @Override
     public <OUT> OutputChannel<OUT> callParallel(@Nullable final Object... params) {
-        final Object[] safeParams = asArgs(params);
-        findBestMatchingMethod(getClass(), safeParams);
-        return call(InvocationMode.PARALLEL, safeParams);
+      return call(InvocationMode.PARALLEL, params);
     }
 
-    /**
-     * Tells the routine to ignore the method return value, that is, it will not be passed to the
-     * output channel.
-     *
-     * @param <OUT> the output data type.
-     * @return the return value.
-     */
-    @SuppressWarnings("unchecked")
-    protected <OUT> OUT ignoreReturnValue() {
-        mLocalIgnore.set(true);
-        return (OUT) boxingDefault(mReturnType);
+    @NotNull
+    @Override
+    public ObjectServiceRoutineMethod apply(@NotNull final ServiceConfiguration configuration) {
+      return (ObjectServiceRoutineMethod) super.apply(configuration);
     }
 
-    /**
-     * Returns the input channel which is ready to produce data. If the method takes no input
-     * channel as parameter, null will be returned.
-     * <p>
-     * Note this method will return null if called outside the routine method invocation or from
-     * a different thread.
-     *
-     * @param <IN> the input data type.
-     * @return the input channel producing data or null.
-     */
+    @NotNull
     @Override
     @SuppressWarnings("unchecked")
-    protected <IN> InputChannel<IN> switchInput() {
-        return (InputChannel<IN>) mLocalChannel.get();
+    public Builder<? extends ObjectServiceRoutineMethod> applyServiceConfiguration() {
+      return (Builder<? extends ObjectServiceRoutineMethod>) super.applyServiceConfiguration();
     }
 
     @NotNull
     @Override
-    public ServiceRoutineMethod apply(@NotNull final ServiceConfiguration configuration) {
-        mConfiguration = ConstantConditions.notNull("Service configuration", configuration);
-        return this;
+    public ObjectServiceRoutineMethod apply(@NotNull final ObjectConfiguration configuration) {
+      mConfiguration = ConstantConditions.notNull("object configuration", configuration);
+      return this;
     }
 
     @NotNull
     @Override
-    public Builder<? extends ServiceRoutineMethod> applyServiceConfiguration() {
-        return new Builder<ServiceRoutineMethod>(this, mConfiguration);
-    }
-
-    /**
-     * Returns the Android Context (that is, the Service instance).
-     * <p>
-     * Note this method will return null if called outside the routine method invocation or from
-     * a different thread.
-     *
-     * @return the Context.
-     */
-    protected Context getContext() {
-        return mLocalContext.get();
-    }
-
-    /**
-     * Returns the Service configuration.
-     *
-     * @return the Service configuration.
-     */
-    @NotNull
-    protected ServiceConfiguration getServiceConfiguration() {
-        return mConfiguration;
+    public ObjectConfiguration.Builder<? extends ObjectServiceRoutineMethod>
+    applyObjectConfiguration() {
+      return new ObjectConfiguration.Builder<ObjectServiceRoutineMethod>(this, mConfiguration);
     }
 
     @NotNull
     @SuppressWarnings("unchecked")
     private <OUT> OutputChannel<OUT> call(@NotNull final InvocationMode mode,
-            @NotNull final Object[] params) {
-        final ArrayList<InputChannel<?>> inputChannels = new ArrayList<InputChannel<?>>();
-        final ArrayList<OutputChannel<?>> outputChannels = new ArrayList<OutputChannel<?>>();
-        for (int i = 0; i < params.length; ++i) {
-            final Object param = params[i];
-            if (param instanceof InputChannel) {
-                params[i] = InputChannelPlaceHolder.class;
-                inputChannels.add((InputChannel<?>) param);
+        @Nullable final Object[] params) {
+      final Object[] safeParams = asArgs(params);
+      final Method method = mMethod;
+      if (method.getParameterTypes().length != safeParams.length) {
+        throw new IllegalArgumentException("wrong number of parameters: expected <" +
+            method.getParameterTypes().length + "> but was <" + safeParams.length + ">");
+      }
 
-            } else if (param instanceof OutputChannel) {
-                params[i] = OutputChannelPlaceHolder.class;
-                outputChannels.add((OutputChannel<?>) param);
-            }
+      final Routine<Object, Object> routine = JRoutineServiceObject.on(mContext)
+                                                                   .with(mTarget)
+                                                                   .apply(getConfiguration())
+                                                                   .apply(getServiceConfiguration())
+                                                                   .apply(mConfiguration)
+                                                                   .method(method);
+      final Channel<Object, Object> channel = mode.invoke(routine).sorted();
+      for (final Object param : safeParams) {
+        if (param instanceof InputChannel) {
+          channel.pass((InputChannel<?>) param);
+
+        } else {
+          channel.pass(param);
         }
+      }
 
-        final OutputChannel<OUT> resultChannel = outputChannel();
-        outputChannels.add(resultChannel);
-        final Channel<?, ? extends ParcelableSelectable<Object>> inputChannel =
-                (!inputChannels.isEmpty()) ? AndroidChannels.mergeParcelable(inputChannels)
-                                                            .buildChannels()
-                        : JRoutineCore.io().<ParcelableSelectable<Object>>of();
-        final Channel<ParcelableSelectable<Object>, ParcelableSelectable<Object>> outputChannel =
-                mode.invoke(JRoutineService.on(mContext)
-                                           .with(factoryOf(ServiceInvocation.class, getClass(),
-                                                   mArgs, params))
-                                           .apply(getConfiguration())
-                                           .apply(getServiceConfiguration()))
-                    .pass(inputChannel)
-                    .close();
-        final Map<Integer, Channel<?, Object>> channelMap =
-                AndroidChannels.selectOutput(0, outputChannels.size(), outputChannel)
-                               .buildChannels();
-        for (final Entry<Integer, Channel<?, Object>> entry : channelMap.entrySet()) {
-            entry.getValue()
-                 .bind((OutputChannel<Object>) outputChannels.get(entry.getKey()))
-                 .close();
-        }
-
-        return resultChannel;
+      return (OutputChannel<OUT>) toOutput(channel.close());
     }
+  }
 
-    private boolean isIgnoreReturnValue() {
-        return (mLocalIgnore.get() != null);
-    }
+  /**
+   * Input channel placeholder class used to make the method parameters parcelable.
+   */
+  private static class InputChannelPlaceHolder {}
 
-    private void resetIgnoreReturnValue() {
-        mLocalIgnore.set(null);
-    }
+  /**
+   * Output channel placeholder class used to make the method parameters parcelable.
+   */
+  private static class OutputChannelPlaceHolder {}
 
-    private void setLocalContext(@Nullable final Context context) {
-        mLocalContext.set(context);
-    }
+  /**
+   * Context invocation implementation.
+   */
+  private static class ServiceInvocation
+      implements ContextInvocation<ParcelableSelectable<Object>, ParcelableSelectable<Object>> {
 
-    private void setLocalInput(@Nullable final InputChannel<?> inputChannel) {
-        mLocalChannel.set(inputChannel);
-    }
+    private final Object[] mArgs;
 
-    private void setReturnType(@NotNull final Class<?> returnType) {
-        mReturnType = returnType;
-    }
+    private final ArrayList<InputChannel<?>> mInputChannels = new ArrayList<InputChannel<?>>();
+
+    private final Method mMethod;
+
+    private final Object[] mOrigParams;
+
+    private final ArrayList<OutputChannel<?>> mOutputChannels = new ArrayList<OutputChannel<?>>();
+
+    private final boolean mReturnResults;
+
+    private final Class<? extends ServiceRoutineMethod> mType;
+
+    private Constructor<? extends ServiceRoutineMethod> mConstructor;
+
+    private Object[] mConstructorArgs;
+
+    private Context mContext;
+
+    private ServiceRoutineMethod mInstance;
+
+    private boolean mIsAborted;
+
+    private boolean mIsBound;
+
+    private boolean mIsComplete;
+
+    private Object[] mParams;
 
     /**
-     * Implementation of a Service routine method wrapping an object method.
+     * Constructor.
+     *
+     * @param type   the Service routine method type.
+     * @param args   the constructor arguments.
+     * @param params the method parameters.
      */
-    public static class ObjectServiceRoutineMethod extends ServiceRoutineMethod
-            implements ObjectConfigurable<ObjectServiceRoutineMethod> {
+    private ServiceInvocation(@NotNull final Class<? extends ServiceRoutineMethod> type,
+        @NotNull final Object[] args, @NotNull final Object[] params) {
+      for (int i = 0; i < params.length; ++i) {
+        final Object param = params[i];
+        if (param == InputChannelPlaceHolder.class) {
+          params[i] = ServiceRoutineMethod.inputChannel();
 
-        private final ServiceContext mContext;
-
-        private final Method mMethod;
-
-        private final ContextInvocationTarget<?> mTarget;
-
-        private ObjectConfiguration mConfiguration = ObjectConfiguration.defaultConfiguration();
-
-        /**
-         * Constructor.
-         *
-         * @param context the Service context.
-         * @param target  the invocation target.
-         * @param method  the method instance.
-         */
-        private ObjectServiceRoutineMethod(@NotNull final ServiceContext context,
-                @NotNull final ContextInvocationTarget<?> target, @NotNull final Method method) {
-            super(context, target, method);
-            mContext = context;
-            mTarget = target;
-            mMethod = method;
+        } else if (param == OutputChannelPlaceHolder.class) {
+          params[i] = ServiceRoutineMethod.outputChannel();
         }
+      }
 
-        @NotNull
-        @Override
-        public ObjectServiceRoutineMethod apply(
-                @NotNull final InvocationConfiguration configuration) {
-            return (ObjectServiceRoutineMethod) super.apply(configuration);
-        }
-
-        @NotNull
-        @Override
-        @SuppressWarnings("unchecked")
-        public InvocationConfiguration.Builder<? extends ObjectServiceRoutineMethod>
-        applyInvocationConfiguration() {
-            return (InvocationConfiguration.Builder<? extends ObjectServiceRoutineMethod>) super
-                    .applyInvocationConfiguration();
-        }
-
-        @NotNull
-        @Override
-        public <OUT> OutputChannel<OUT> call(@Nullable final Object... params) {
-            return call(InvocationMode.ASYNC, params);
-        }
-
-        @NotNull
-        @Override
-        public <OUT> OutputChannel<OUT> callParallel(@Nullable final Object... params) {
-            return call(InvocationMode.PARALLEL, params);
-        }
-
-        @NotNull
-        @Override
-        public ObjectServiceRoutineMethod apply(@NotNull final ServiceConfiguration configuration) {
-            return (ObjectServiceRoutineMethod) super.apply(configuration);
-        }
-
-        @NotNull
-        @Override
-        @SuppressWarnings("unchecked")
-        public Builder<? extends ObjectServiceRoutineMethod> applyServiceConfiguration() {
-            return (Builder<? extends ObjectServiceRoutineMethod>) super
-                    .applyServiceConfiguration();
-        }
-
-        @NotNull
-        @Override
-        public ObjectServiceRoutineMethod apply(@NotNull final ObjectConfiguration configuration) {
-            mConfiguration = ConstantConditions.notNull("object configuration", configuration);
-            return this;
-        }
-
-        @NotNull
-        @Override
-        public ObjectConfiguration.Builder<? extends ObjectServiceRoutineMethod>
-        applyObjectConfiguration() {
-            return new ObjectConfiguration.Builder<ObjectServiceRoutineMethod>(this,
-                    mConfiguration);
-        }
-
-        @NotNull
-        @SuppressWarnings("unchecked")
-        private <OUT> OutputChannel<OUT> call(@NotNull final InvocationMode mode,
-                @Nullable final Object[] params) {
-            final Object[] safeParams = asArgs(params);
-            final Method method = mMethod;
-            if (method.getParameterTypes().length != safeParams.length) {
-                throw new IllegalArgumentException("wrong number of parameters: expected <" +
-                        method.getParameterTypes().length + "> but was <" + safeParams.length
-                        + ">");
-            }
-
-            final Routine<Object, Object> routine = JRoutineServiceObject.on(mContext)
-                                                                         .with(mTarget)
-                                                                         .apply(getConfiguration())
-                                                                         .apply(getServiceConfiguration())
-                                                                         .apply(mConfiguration)
-                                                                         .method(method);
-            final Channel<Object, Object> channel = mode.invoke(routine).sorted();
-            for (final Object param : safeParams) {
-                if (param instanceof InputChannel) {
-                    channel.pass((InputChannel<?>) param);
-
-                } else {
-                    channel.pass(param);
-                }
-            }
-
-            return (OutputChannel<OUT>) toOutput(channel.close());
-        }
+      mType = type;
+      mArgs = args;
+      mMethod = findBestMatchingMethod(type, params);
+      mOrigParams = params;
+      mReturnResults = (boxingClass(mMethod.getReturnType()) != Void.class);
     }
 
-    /**
-     * Input channel placeholder class used to make the method parameters parcelable.
-     */
-    private static class InputChannelPlaceHolder {}
+    @Override
+    public void onAbort(@NotNull final RoutineException reason) throws Exception {
+      mIsAborted = true;
+      final List<InputChannel<?>> inputChannels = mInputChannels;
+      for (final InputChannel<?> inputChannel : inputChannels) {
+        inputChannel.abort(reason);
+      }
 
-    /**
-     * Output channel placeholder class used to make the method parameters parcelable.
-     */
-    private static class OutputChannelPlaceHolder {}
-
-    /**
-     * Context invocation implementation.
-     */
-    private static class ServiceInvocation implements
-            ContextInvocation<ParcelableSelectable<Object>, ParcelableSelectable<Object>> {
-
-        private final Object[] mArgs;
-
-        private final ArrayList<InputChannel<?>> mInputChannels = new ArrayList<InputChannel<?>>();
-
-        private final Method mMethod;
-
-        private final Object[] mOrigParams;
-
-        private final ArrayList<OutputChannel<?>> mOutputChannels =
-                new ArrayList<OutputChannel<?>>();
-
-        private final boolean mReturnResults;
-
-        private final Class<? extends ServiceRoutineMethod> mType;
-
-        private Constructor<? extends ServiceRoutineMethod> mConstructor;
-
-        private Object[] mConstructorArgs;
-
-        private Context mContext;
-
-        private ServiceRoutineMethod mInstance;
-
-        private boolean mIsAborted;
-
-        private boolean mIsBound;
-
-        private boolean mIsComplete;
-
-        private Object[] mParams;
-
-        /**
-         * Constructor.
-         *
-         * @param type   the Service routine method type.
-         * @param args   the constructor arguments.
-         * @param params the method parameters.
-         */
-        private ServiceInvocation(@NotNull final Class<? extends ServiceRoutineMethod> type,
-                @NotNull final Object[] args, @NotNull final Object[] params) {
-            for (int i = 0; i < params.length; ++i) {
-                final Object param = params[i];
-                if (param == InputChannelPlaceHolder.class) {
-                    params[i] = ServiceRoutineMethod.inputChannel();
-
-                } else if (param == OutputChannelPlaceHolder.class) {
-                    params[i] = ServiceRoutineMethod.outputChannel();
-                }
-            }
-
-            mType = type;
-            mArgs = args;
-            mMethod = findBestMatchingMethod(type, params);
-            mOrigParams = params;
-            mReturnResults = (boxingClass(mMethod.getReturnType()) != Void.class);
+      final ServiceRoutineMethod instance = mInstance;
+      instance.setLocalInput((!inputChannels.isEmpty()) ? inputChannels.get(0) : null);
+      try {
+        if (!mIsComplete) {
+          invokeMethod();
         }
 
-        @Override
-        public void onAbort(@NotNull final RoutineException reason) throws Exception {
-            mIsAborted = true;
-            final List<InputChannel<?>> inputChannels = mInputChannels;
-            for (final InputChannel<?> inputChannel : inputChannels) {
-                inputChannel.abort(reason);
-            }
-
-            final ServiceRoutineMethod instance = mInstance;
-            instance.setLocalInput((!inputChannels.isEmpty()) ? inputChannels.get(0) : null);
-            try {
-                if (!mIsComplete) {
-                    invokeMethod();
-                }
-
-            } finally {
-                instance.resetIgnoreReturnValue();
-                instance.setLocalInput(null);
-                for (final OutputChannel<?> outputChannel : mOutputChannels) {
-                    outputChannel.abort(reason);
-                }
-            }
+      } finally {
+        instance.resetIgnoreReturnValue();
+        instance.setLocalInput(null);
+        for (final OutputChannel<?> outputChannel : mOutputChannels) {
+          outputChannel.abort(reason);
         }
-
-        @Override
-        public void onComplete(
-                @NotNull final Channel<ParcelableSelectable<Object>, ?> result) throws Exception {
-            bind(result);
-            mIsComplete = true;
-            if (!mIsAborted) {
-                final List<InputChannel<?>> inputChannels = mInputChannels;
-                for (final InputChannel<?> inputChannel : inputChannels) {
-                    inputChannel.close();
-                }
-
-                final ServiceRoutineMethod instance = mInstance;
-                instance.setLocalInput((!inputChannels.isEmpty()) ? inputChannels.get(0) : null);
-                instance.resetIgnoreReturnValue();
-                final List<OutputChannel<?>> outputChannels = mOutputChannels;
-                try {
-                    final Object methodResult = invokeMethod();
-                    if (mReturnResults && !instance.isIgnoreReturnValue()) {
-                        result.pass(new ParcelableSelectable<Object>(methodResult,
-                                outputChannels.size()));
-                    }
-
-                } finally {
-                    instance.resetIgnoreReturnValue();
-                    instance.setLocalInput(null);
-                }
-
-                for (final OutputChannel<?> outputChannel : outputChannels) {
-                    outputChannel.close();
-                }
-            }
-        }
-
-        @Override
-        public void onInput(final ParcelableSelectable<Object> input,
-                @NotNull final Channel<ParcelableSelectable<Object>, ?> result) throws Exception {
-            bind(result);
-            @SuppressWarnings("unchecked") final InputChannel<Object> inputChannel =
-                    (InputChannel<Object>) mInputChannels.get(input.index);
-            inputChannel.pass(input.data);
-            final ServiceRoutineMethod instance = mInstance;
-            instance.setLocalInput(inputChannel);
-            try {
-                final Object methodResult = invokeMethod();
-                if (mReturnResults && !instance.isIgnoreReturnValue()) {
-                    result.pass(
-                            new ParcelableSelectable<Object>(methodResult, mOutputChannels.size()));
-                }
-
-            } finally {
-                instance.resetIgnoreReturnValue();
-                instance.setLocalInput(null);
-            }
-        }
-
-        @Override
-        public void onRecycle(final boolean isReused) {
-            mInputChannels.clear();
-            mOutputChannels.clear();
-        }
-
-        @Override
-        public void onRestart() throws Exception {
-            mIsBound = false;
-            mIsAborted = false;
-            mIsComplete = false;
-            final ServiceRoutineMethod instance =
-                    (mInstance = mConstructor.newInstance(mConstructorArgs));
-            instance.setReturnType(mMethod.getReturnType());
-            mParams = replaceChannels(mOrigParams, mInputChannels, mOutputChannels);
-        }
-
-        @Override
-        public void onContext(@NotNull final Context context) throws Exception {
-            mContext = context;
-            final Object[] additionalArgs = mArgs;
-            final Object[] constructorArgs =
-                    (mConstructorArgs = new Object[additionalArgs.length + 1]);
-            System.arraycopy(additionalArgs, 0, constructorArgs, 1, additionalArgs.length);
-            constructorArgs[0] = ServiceContext.serviceFrom(context);
-            mConstructor = Reflection.findBestMatchingConstructor(mType, constructorArgs);
-        }
-
-        private void bind(@NotNull final Channel<ParcelableSelectable<Object>, ?> result) {
-            if (!mIsBound) {
-                mIsBound = true;
-                final List<OutputChannel<?>> outputChannels = mOutputChannels;
-                if (!outputChannels.isEmpty()) {
-                    result.pass(AndroidChannels.mergeParcelable(outputChannels).buildChannels());
-                }
-            }
-        }
-
-        @Nullable
-        private Object invokeMethod() throws Exception {
-            final ServiceRoutineMethod instance = mInstance;
-            instance.setLocalContext(mContext);
-            try {
-                return mMethod.invoke(instance, mParams);
-
-            } catch (final InvocationTargetException e) {
-                throw InvocationException.wrapIfNeeded(e.getTargetException());
-
-            } finally {
-                instance.setLocalContext(null);
-            }
-        }
+      }
     }
+
+    @Override
+    public void onComplete(@NotNull final Channel<ParcelableSelectable<Object>, ?> result) throws
+        Exception {
+      bind(result);
+      mIsComplete = true;
+      if (!mIsAborted) {
+        final List<InputChannel<?>> inputChannels = mInputChannels;
+        for (final InputChannel<?> inputChannel : inputChannels) {
+          inputChannel.close();
+        }
+
+        final ServiceRoutineMethod instance = mInstance;
+        instance.setLocalInput((!inputChannels.isEmpty()) ? inputChannels.get(0) : null);
+        instance.resetIgnoreReturnValue();
+        final List<OutputChannel<?>> outputChannels = mOutputChannels;
+        try {
+          final Object methodResult = invokeMethod();
+          if (mReturnResults && !instance.isIgnoreReturnValue()) {
+            result.pass(new ParcelableSelectable<Object>(methodResult, outputChannels.size()));
+          }
+
+        } finally {
+          instance.resetIgnoreReturnValue();
+          instance.setLocalInput(null);
+        }
+
+        for (final OutputChannel<?> outputChannel : outputChannels) {
+          outputChannel.close();
+        }
+      }
+    }
+
+    @Override
+    public void onInput(final ParcelableSelectable<Object> input,
+        @NotNull final Channel<ParcelableSelectable<Object>, ?> result) throws Exception {
+      bind(result);
+      @SuppressWarnings("unchecked") final InputChannel<Object> inputChannel =
+          (InputChannel<Object>) mInputChannels.get(input.index);
+      inputChannel.pass(input.data);
+      final ServiceRoutineMethod instance = mInstance;
+      instance.setLocalInput(inputChannel);
+      try {
+        final Object methodResult = invokeMethod();
+        if (mReturnResults && !instance.isIgnoreReturnValue()) {
+          result.pass(new ParcelableSelectable<Object>(methodResult, mOutputChannels.size()));
+        }
+
+      } finally {
+        instance.resetIgnoreReturnValue();
+        instance.setLocalInput(null);
+      }
+    }
+
+    @Override
+    public void onRecycle(final boolean isReused) {
+      mInputChannels.clear();
+      mOutputChannels.clear();
+    }
+
+    @Override
+    public void onRestart() throws Exception {
+      mIsBound = false;
+      mIsAborted = false;
+      mIsComplete = false;
+      final ServiceRoutineMethod instance =
+          (mInstance = mConstructor.newInstance(mConstructorArgs));
+      instance.setReturnType(mMethod.getReturnType());
+      mParams = replaceChannels(mOrigParams, mInputChannels, mOutputChannels);
+    }
+
+    @Override
+    public void onContext(@NotNull final Context context) throws Exception {
+      mContext = context;
+      final Object[] additionalArgs = mArgs;
+      final Object[] constructorArgs = (mConstructorArgs = new Object[additionalArgs.length + 1]);
+      System.arraycopy(additionalArgs, 0, constructorArgs, 1, additionalArgs.length);
+      constructorArgs[0] = ServiceContext.serviceFrom(context);
+      mConstructor = Reflection.findBestMatchingConstructor(mType, constructorArgs);
+    }
+
+    private void bind(@NotNull final Channel<ParcelableSelectable<Object>, ?> result) {
+      if (!mIsBound) {
+        mIsBound = true;
+        final List<OutputChannel<?>> outputChannels = mOutputChannels;
+        if (!outputChannels.isEmpty()) {
+          result.pass(AndroidChannels.mergeParcelable(outputChannels).buildChannels());
+        }
+      }
+    }
+
+    @Nullable
+    private Object invokeMethod() throws Exception {
+      final ServiceRoutineMethod instance = mInstance;
+      instance.setLocalContext(mContext);
+      try {
+        return mMethod.invoke(instance, mParams);
+
+      } catch (final InvocationTargetException e) {
+        throw InvocationException.wrapIfNeeded(e.getTargetException());
+
+      } finally {
+        instance.setLocalContext(null);
+      }
+    }
+  }
 }

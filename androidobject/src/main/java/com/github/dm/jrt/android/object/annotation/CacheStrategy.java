@@ -60,10 +60,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface CacheStrategy {
 
-    /**
-     * The cache strategy type.
-     *
-     * @return the cache strategy.
-     */
-    CacheStrategyType value();
+  /**
+   * The cache strategy type.
+   *
+   * @return the cache strategy.
+   */
+  CacheStrategyType value();
 }

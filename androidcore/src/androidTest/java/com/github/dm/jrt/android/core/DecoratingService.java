@@ -32,60 +32,57 @@ import org.jetbrains.annotations.Nullable;
  */
 public class DecoratingService extends InvocationService {
 
+  @NotNull
+  @Override
+  @SuppressWarnings("unchecked")
+  public ContextInvocationFactory<?, ?> getInvocationFactory(
+      @NotNull final Class<? extends ContextInvocation<?, ?>> targetClass,
+      @Nullable final Object... args) throws Exception {
+
+    final ContextInvocationFactory<?, ?> factory = super.getInvocationFactory(targetClass, args);
+    if (StringInvocation.class.isAssignableFrom(targetClass)) {
+      return new TestInvocationFactory((ContextInvocationFactory<String, String>) factory);
+    }
+
+    return factory;
+  }
+
+  public interface StringInvocation extends ContextInvocation<String, String> {
+
+  }
+
+  private static class TestInvocationDecorator extends ContextInvocationDecorator<String, String> {
+
+    /**
+     * Constructor.
+     *
+     * @param wrapped the wrapped invocation instance.
+     */
+    public TestInvocationDecorator(@NotNull final ContextInvocation<String, String> wrapped) {
+
+      super(wrapped);
+    }
+  }
+
+  private static class TestInvocationFactory
+      extends DecoratingContextInvocationFactory<String, String> {
+
+    /**
+     * Constructor.
+     *
+     * @param wrapped the wrapped factory instance.
+     */
+    public TestInvocationFactory(@NotNull final ContextInvocationFactory<String, String> wrapped) {
+
+      super(wrapped);
+    }
+
     @NotNull
     @Override
-    @SuppressWarnings("unchecked")
-    public ContextInvocationFactory<?, ?> getInvocationFactory(
-            @NotNull final Class<? extends ContextInvocation<?, ?>> targetClass,
-            @Nullable final Object... args) throws Exception {
+    protected ContextInvocation<String, String> decorate(
+        @NotNull final ContextInvocation<String, String> invocation) throws Exception {
 
-        final ContextInvocationFactory<?, ?> factory =
-                super.getInvocationFactory(targetClass, args);
-        if (StringInvocation.class.isAssignableFrom(targetClass)) {
-            return new TestInvocationFactory((ContextInvocationFactory<String, String>) factory);
-        }
-
-        return factory;
+      return new TestInvocationDecorator(invocation);
     }
-
-    public interface StringInvocation extends ContextInvocation<String, String> {
-
-    }
-
-    private static class TestInvocationDecorator
-            extends ContextInvocationDecorator<String, String> {
-
-        /**
-         * Constructor.
-         *
-         * @param wrapped the wrapped invocation instance.
-         */
-        public TestInvocationDecorator(@NotNull final ContextInvocation<String, String> wrapped) {
-
-            super(wrapped);
-        }
-    }
-
-    private static class TestInvocationFactory
-            extends DecoratingContextInvocationFactory<String, String> {
-
-        /**
-         * Constructor.
-         *
-         * @param wrapped the wrapped factory instance.
-         */
-        public TestInvocationFactory(
-                @NotNull final ContextInvocationFactory<String, String> wrapped) {
-
-            super(wrapped);
-        }
-
-        @NotNull
-        @Override
-        protected ContextInvocation<String, String> decorate(
-                @NotNull final ContextInvocation<String, String> invocation) throws Exception {
-
-            return new TestInvocationDecorator(invocation);
-        }
-    }
+  }
 }

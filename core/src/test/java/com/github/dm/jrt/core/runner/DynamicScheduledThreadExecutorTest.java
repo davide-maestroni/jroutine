@@ -30,49 +30,49 @@ import static org.junit.Assert.fail;
  */
 public class DynamicScheduledThreadExecutorTest {
 
-    @Test
-    public void testUnsupportedMethods() {
+  @Test
+  public void testUnsupportedMethods() {
 
-        final DynamicScheduledThreadExecutor executor =
-                new DynamicScheduledThreadExecutor(1, 1, 1, TimeUnit.SECONDS);
-        try {
-            executor.schedule(new Callable<Object>() {
+    final DynamicScheduledThreadExecutor executor =
+        new DynamicScheduledThreadExecutor(1, 1, 1, TimeUnit.SECONDS);
+    try {
+      executor.schedule(new Callable<Object>() {
 
-                public Object call() throws Exception {
+        public Object call() throws Exception {
 
-                    return null;
-                }
-            }, 0, TimeUnit.MILLISECONDS);
-            fail();
-
-        } catch (final UnsupportedOperationException ignored) {
-
+          return null;
         }
+      }, 0, TimeUnit.MILLISECONDS);
+      fail();
 
-        try {
-            executor.scheduleAtFixedRate(new Runnable() {
+    } catch (final UnsupportedOperationException ignored) {
 
-                public void run() {
-
-                }
-            }, 0, 1, TimeUnit.SECONDS);
-            fail();
-
-        } catch (final UnsupportedOperationException ignored) {
-
-        }
-
-        try {
-            executor.scheduleWithFixedDelay(new Runnable() {
-
-                public void run() {
-
-                }
-            }, 0, 1, TimeUnit.SECONDS);
-            fail();
-
-        } catch (final UnsupportedOperationException ignored) {
-
-        }
     }
+
+    try {
+      executor.scheduleAtFixedRate(new Runnable() {
+
+        public void run() {
+
+        }
+      }, 0, 1, TimeUnit.SECONDS);
+      fail();
+
+    } catch (final UnsupportedOperationException ignored) {
+
+    }
+
+    try {
+      executor.scheduleWithFixedDelay(new Runnable() {
+
+        public void run() {
+
+        }
+      }, 0, 1, TimeUnit.SECONDS);
+      fail();
+
+    } catch (final UnsupportedOperationException ignored) {
+
+    }
+  }
 }

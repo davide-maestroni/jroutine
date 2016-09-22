@@ -30,17 +30,17 @@ import org.jetbrains.annotations.NotNull;
  */
 interface InvocationObserver<IN, OUT> {
 
-    /**
-     * Called when a new invocation instances is available.
-     *
-     * @param invocation the invocation.
-     */
-    void onCreate(@NotNull Invocation<IN, OUT> invocation);
+  /**
+   * Called when a new invocation instances is available.
+   *
+   * @param invocation the invocation.
+   */
+  void onCreate(@NotNull Invocation<IN, OUT> invocation);
 
-    /**
-     * Called when an error occurs during the invocation instantiation.
-     *
-     * @param error the error.
-     */
-    void onError(@NotNull Throwable error);
+  /**
+   * Called when an error occurs during the invocation instantiation.
+   *
+   * @param error the error.
+   */
+  void onError(@NotNull Throwable error);
 }

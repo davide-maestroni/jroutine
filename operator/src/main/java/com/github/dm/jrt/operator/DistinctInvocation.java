@@ -35,50 +35,50 @@ import java.util.HashSet;
  */
 class DistinctInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
 
-    private static final InvocationFactory<?, ?> sFactory =
-            new InvocationFactory<Object, Object>(null) {
+  private static final InvocationFactory<?, ?> sFactory =
+      new InvocationFactory<Object, Object>(null) {
 
-                @NotNull
-                @Override
-                public Invocation<Object, Object> newInvocation() {
-                    return new DistinctInvocation<Object>();
-                }
-            };
-
-    private HashSet<DATA> mSet;
-
-    /**
-     * Constructor.
-     */
-    private DistinctInvocation() {
-    }
-
-    /**
-     * Returns a factory of invocations filtering out inputs which are not unique.
-     *
-     * @param <DATA> the data type.
-     * @return the factory instance.
-     */
-    @NotNull
-    @SuppressWarnings("unchecked")
-    static <DATA> InvocationFactory<DATA, DATA> factoryOf() {
-        return (InvocationFactory<DATA, DATA>) sFactory;
-    }
-
-    @Override
-    public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) {
-        if (mSet.add(input)) {
-            result.pass(input);
+        @NotNull
+        @Override
+        public Invocation<Object, Object> newInvocation() {
+          return new DistinctInvocation<Object>();
         }
-    }
+      };
 
-    @Override
-    public void onRecycle(final boolean isReused) {
-        mSet = null;
-    }
+  private HashSet<DATA> mSet;
 
-    @Override
-    public void onRestart() {
-        mSet = new HashSet<DATA>();
+  /**
+   * Constructor.
+   */
+  private DistinctInvocation() {
+  }
+
+  /**
+   * Returns a factory of invocations filtering out inputs which are not unique.
+   *
+   * @param <DATA> the data type.
+   * @return the factory instance.
+   */
+  @NotNull
+  @SuppressWarnings("unchecked")
+  static <DATA> InvocationFactory<DATA, DATA> factoryOf() {
+    return (InvocationFactory<DATA, DATA>) sFactory;
+  }
+
+  @Override
+  public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) {
+    if (mSet.add(input)) {
+      result.pass(input);
     }
+  }
+
+  @Override
+  public void onRecycle(final boolean isReused) {
+    mSet = null;
+  }
+
+  @Override
+  public void onRestart() {
+    mSet = new HashSet<DATA>();
+  }
 }

@@ -38,57 +38,55 @@ import org.jetbrains.annotations.Nullable;
  * Created by davide-maestroni on 03/06/2016.
  */
 public interface LoaderObjectProxyRoutineBuilder
-        extends ObjectProxyRoutineBuilder, LoaderObjectRoutineBuilder {
+    extends ObjectProxyRoutineBuilder, LoaderObjectRoutineBuilder {
 
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    LoaderObjectProxyRoutineBuilder apply(@NotNull InvocationConfiguration configuration);
+  /**
+   * {@inheritDoc}
+   */
+  @NotNull
+  @Override
+  LoaderObjectProxyRoutineBuilder apply(@NotNull InvocationConfiguration configuration);
 
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    LoaderObjectProxyRoutineBuilder apply(@NotNull ObjectConfiguration configuration);
+  /**
+   * {@inheritDoc}
+   */
+  @NotNull
+  @Override
+  LoaderObjectProxyRoutineBuilder apply(@NotNull ObjectConfiguration configuration);
 
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    InvocationConfiguration.Builder<? extends LoaderObjectProxyRoutineBuilder>
-    applyInvocationConfiguration();
+  /**
+   * {@inheritDoc}
+   */
+  @NotNull
+  @Override
+  InvocationConfiguration.Builder<? extends LoaderObjectProxyRoutineBuilder>
+  applyInvocationConfiguration();
 
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    ObjectConfiguration.Builder<? extends LoaderObjectProxyRoutineBuilder>
-    applyObjectConfiguration();
+  /**
+   * {@inheritDoc}
+   */
+  @NotNull
+  @Override
+  ObjectConfiguration.Builder<? extends LoaderObjectProxyRoutineBuilder> applyObjectConfiguration();
 
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    LoaderObjectProxyRoutineBuilder withType(@Nullable BuilderType builderType);
+  /**
+   * {@inheritDoc}
+   */
+  @NotNull
+  @Override
+  LoaderObjectProxyRoutineBuilder withType(@Nullable BuilderType builderType);
 
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    LoaderObjectProxyRoutineBuilder apply(@NotNull LoaderConfiguration configuration);
+  /**
+   * {@inheritDoc}
+   */
+  @NotNull
+  @Override
+  LoaderObjectProxyRoutineBuilder apply(@NotNull LoaderConfiguration configuration);
 
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    LoaderConfiguration.Builder<? extends LoaderObjectProxyRoutineBuilder>
-    applyLoaderConfiguration();
+  /**
+   * {@inheritDoc}
+   */
+  @NotNull
+  @Override
+  LoaderConfiguration.Builder<? extends LoaderObjectProxyRoutineBuilder> applyLoaderConfiguration();
 }

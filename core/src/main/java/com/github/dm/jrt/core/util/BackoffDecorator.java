@@ -27,19 +27,19 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 public class BackoffDecorator extends DeepEqualObject implements Backoff {
 
-    private final Backoff mBackoff;
+  private final Backoff mBackoff;
 
-    /**
-     * Constructor.
-     *
-     * @param wrapped the wrapped instance.
-     */
-    public BackoffDecorator(@NotNull final Backoff wrapped) {
-        super(asArgs(ConstantConditions.notNull("backoff instance", wrapped)));
-        mBackoff = wrapped;
-    }
+  /**
+   * Constructor.
+   *
+   * @param wrapped the wrapped instance.
+   */
+  public BackoffDecorator(@NotNull final Backoff wrapped) {
+    super(asArgs(ConstantConditions.notNull("backoff instance", wrapped)));
+    mBackoff = wrapped;
+  }
 
-    public long getDelay(final int count) {
-        return mBackoff.getDelay(count);
-    }
+  public long getDelay(final int count) {
+    return mBackoff.getDelay(count);
+  }
 }

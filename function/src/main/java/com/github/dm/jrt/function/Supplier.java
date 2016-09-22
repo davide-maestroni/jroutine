@@ -25,11 +25,11 @@ package com.github.dm.jrt.function;
  */
 public interface Supplier<OUT> {
 
-    /**
-     * Gets a result.
-     *
-     * @return a result.
-     * @throws java.lang.Exception if an unexpected error occurs.
-     */
-    OUT get() throws Exception;
+  /**
+   * Gets a result.
+   *
+   * @return a result.
+   * @throws java.lang.Exception if an unexpected error occurs.
+   */
+  OUT get() throws Exception;
 }

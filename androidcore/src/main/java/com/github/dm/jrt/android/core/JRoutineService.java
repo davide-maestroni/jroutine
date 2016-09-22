@@ -78,65 +78,65 @@ import org.jetbrains.annotations.NotNull;
  */
 public class JRoutineService {
 
-    /**
-     * Avoid explicit instantiation.
-     */
-    protected JRoutineService() {
-        ConstantConditions.avoid();
-    }
+  /**
+   * Avoid explicit instantiation.
+   */
+  protected JRoutineService() {
+    ConstantConditions.avoid();
+  }
+
+  /**
+   * Returns a Context based builder of Service routine builders.
+   *
+   * @param context the Service context.
+   * @return the Context based builder.
+   */
+  @NotNull
+  public static ServiceBuilder on(@NotNull final ServiceContext context) {
+    return new ServiceBuilder(context);
+  }
+
+  /**
+   * Context based builder of Service proxy routine builders.
+   */
+  public static class ServiceBuilder {
+
+    private final ServiceContext mContext;
 
     /**
-     * Returns a Context based builder of Service routine builders.
+     * Constructor.
      *
      * @param context the Service context.
-     * @return the Context based builder.
      */
-    @NotNull
-    public static ServiceBuilder on(@NotNull final ServiceContext context) {
-        return new ServiceBuilder(context);
+    private ServiceBuilder(@NotNull final ServiceContext context) {
+      mContext = ConstantConditions.notNull("Service context", context);
     }
 
     /**
-     * Context based builder of Service proxy routine builders.
+     * Returns a builder of routines running in a Service based on the builder context.
+     * <br>
+     * In order to customize the invocation creation, the caller must override the method
+     * {@link com.github.dm.jrt.android.core.service.InvocationService#getInvocationFactory(
+     *Class, Object...) getInvocationFactory(Class, Object...)} of the routine Service.
+     * <p>
+     * Note that the built routine results will be dispatched into the configured looper, thus,
+     * waiting for the outputs on the very same looper thread, immediately after its invocation,
+     * will result in a deadlock. By default output results are dispatched in the main looper.
+     *
+     * @param target the invocation target.
+     * @param <IN>   the input data type.
+     * @param <OUT>  the output data type.
+     * @return the routine builder instance.
      */
-    public static class ServiceBuilder {
-
-        private final ServiceContext mContext;
-
-        /**
-         * Constructor.
-         *
-         * @param context the Service context.
-         */
-        private ServiceBuilder(@NotNull final ServiceContext context) {
-            mContext = ConstantConditions.notNull("Service context", context);
-        }
-
-        /**
-         * Returns a builder of routines running in a Service based on the builder context.
-         * <br>
-         * In order to customize the invocation creation, the caller must override the method
-         * {@link com.github.dm.jrt.android.core.service.InvocationService#getInvocationFactory(
-         *Class, Object...) getInvocationFactory(Class, Object...)} of the routine Service.
-         * <p>
-         * Note that the built routine results will be dispatched into the configured looper, thus,
-         * waiting for the outputs on the very same looper thread, immediately after its invocation,
-         * will result in a deadlock. By default output results are dispatched in the main looper.
-         *
-         * @param target the invocation target.
-         * @param <IN>   the input data type.
-         * @param <OUT>  the output data type.
-         * @return the routine builder instance.
-         */
-        @NotNull
-        public <IN, OUT> ServiceRoutineBuilder<IN, OUT> with(
-                @NotNull final TargetInvocationFactory<IN, OUT> target) {
-            return new DefaultServiceRoutineBuilder<IN, OUT>(mContext, target);
-        }
+    @NotNull
+    public <IN, OUT> ServiceRoutineBuilder<IN, OUT> with(
+        @NotNull final TargetInvocationFactory<IN, OUT> target) {
+      return new DefaultServiceRoutineBuilder<IN, OUT>(mContext, target);
     }
+  }
 
-    static {
-        // Sets the Android log as default
-        Logger.setDefaultLog(AndroidLogs.androidLog());
-    }
+  static {
+    // Sets the Android log as default
+    Logger.setDefaultLog(AndroidLogs.androidLog());
+  }
 }

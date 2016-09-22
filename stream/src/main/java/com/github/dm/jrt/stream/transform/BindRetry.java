@@ -38,37 +38,36 @@ import org.jetbrains.annotations.NotNull;
  */
 class BindRetry<IN, OUT> implements Function<Channel<?, IN>, Channel<?, OUT>> {
 
-    private final BiFunction<? super Integer, ? super RoutineException, ? extends Long>
-            mBackoffFunction;
+  private final BiFunction<? super Integer, ? super RoutineException, ? extends Long>
+      mBackoffFunction;
 
-    private final Function<Channel<?, IN>, Channel<?, OUT>> mBindingFunction;
+  private final Function<Channel<?, IN>, Channel<?, OUT>> mBindingFunction;
 
-    private final ChannelConfiguration mConfiguration;
+  private final ChannelConfiguration mConfiguration;
 
-    /**
-     * Constructor.
-     *
-     * @param configuration   the channel configuration.
-     * @param bindingFunction the binding function.
-     * @param backoffFunction the backoff function.
-     */
-    BindRetry(@NotNull final ChannelConfiguration configuration,
-            @NotNull final Function<Channel<?, IN>, Channel<?, OUT>> bindingFunction,
-            @NotNull final BiFunction<? super Integer, ? super RoutineException, ? extends Long>
-                    backoffFunction) {
-        mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
-        mBindingFunction = ConstantConditions.notNull("binding function", bindingFunction);
-        mBackoffFunction = ConstantConditions.notNull("backoff function", backoffFunction);
-    }
+  /**
+   * Constructor.
+   *
+   * @param configuration   the channel configuration.
+   * @param bindingFunction the binding function.
+   * @param backoffFunction the backoff function.
+   */
+  BindRetry(@NotNull final ChannelConfiguration configuration,
+      @NotNull final Function<Channel<?, IN>, Channel<?, OUT>> bindingFunction,
+      @NotNull final BiFunction<? super Integer, ? super RoutineException, ? extends Long>
+          backoffFunction) {
+    mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
+    mBindingFunction = ConstantConditions.notNull("binding function", bindingFunction);
+    mBackoffFunction = ConstantConditions.notNull("backoff function", backoffFunction);
+  }
 
-    public Channel<?, OUT> apply(final Channel<?, IN> channel) {
-        final ChannelConfiguration configuration = mConfiguration;
-        final Channel<?, IN> inputChannel = Channels.replay(channel).buildChannels();
-        final Channel<OUT, OUT> outputChannel =
-                JRoutineCore.io().apply(configuration).buildChannel();
-        new RetryChannelConsumer<IN, OUT>(inputChannel, outputChannel,
-                configuration.getRunnerOrElse(Runners.sharedRunner()), mBindingFunction,
-                mBackoffFunction).run();
-        return outputChannel;
-    }
+  public Channel<?, OUT> apply(final Channel<?, IN> channel) {
+    final ChannelConfiguration configuration = mConfiguration;
+    final Channel<?, IN> inputChannel = Channels.replay(channel).buildChannels();
+    final Channel<OUT, OUT> outputChannel = JRoutineCore.io().apply(configuration).buildChannel();
+    new RetryChannelConsumer<IN, OUT>(inputChannel, outputChannel,
+        configuration.getRunnerOrElse(Runners.sharedRunner()), mBindingFunction,
+        mBackoffFunction).run();
+    return outputChannel;
+  }
 }

@@ -58,10 +58,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface CoreInstances {
 
-    /**
-     * The number of invocation instances which represents the core pool of reusable invocations.
-     *
-     * @return the instance number.
-     */
-    int value();
+  /**
+   * The number of invocation instances which represents the core pool of reusable invocations.
+   *
+   * @return the instance number.
+   */
+  int value();
 }

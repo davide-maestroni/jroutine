@@ -46,60 +46,59 @@ import static com.github.dm.jrt.android.retrofit.ServiceCallInvocation.MEDIA_TYP
  */
 class ConverterChannelConsumer implements ChannelConsumer<ParcelableSelectable<Object>> {
 
-    private final Converter<ResponseBody, ?> mConverter;
+  private final Converter<ResponseBody, ?> mConverter;
 
-    private final Channel<Object, ?> mOutputChannel;
+  private final Channel<Object, ?> mOutputChannel;
 
-    private final ByteArrayOutputStream mOutputStream = new ByteArrayOutputStream();
+  private final ByteArrayOutputStream mOutputStream = new ByteArrayOutputStream();
 
-    private MediaType mMediaType;
+  private MediaType mMediaType;
 
-    /**
-     * Constructor.
-     *
-     * @param converter the body converter.
-     * @param channel   the output channel.
-     */
-    ConverterChannelConsumer(@NotNull final Converter<ResponseBody, ?> converter,
-            @NotNull final Channel<Object, ?> channel) {
-        mConverter = ConstantConditions.notNull("converter instance", converter);
-        mOutputChannel = ConstantConditions.notNull("channel instance", channel);
+  /**
+   * Constructor.
+   *
+   * @param converter the body converter.
+   * @param channel   the output channel.
+   */
+  ConverterChannelConsumer(@NotNull final Converter<ResponseBody, ?> converter,
+      @NotNull final Channel<Object, ?> channel) {
+    mConverter = ConstantConditions.notNull("converter instance", converter);
+    mOutputChannel = ConstantConditions.notNull("channel instance", channel);
+  }
+
+  @Override
+  public void onComplete() {
+    final ResponseBody responseBody = ResponseBody.create(mMediaType, mOutputStream.toByteArray());
+    final Channel<Object, ?> outputChannel = mOutputChannel;
+    try {
+      outputChannel.pass(mConverter.convert(responseBody)).close();
+
+    } catch (final Throwable t) {
+      outputChannel.abort(InvocationException.wrapIfNeeded(t));
+      InvocationInterruptedException.throwIfInterrupt(t);
     }
+  }
 
-    @Override
-    public void onComplete() {
-        final ResponseBody responseBody =
-                ResponseBody.create(mMediaType, mOutputStream.toByteArray());
-        final Channel<Object, ?> outputChannel = mOutputChannel;
-        try {
-            outputChannel.pass(mConverter.convert(responseBody)).close();
+  @Override
+  public void onError(@NotNull final RoutineException error) {
+    mOutputChannel.abort(error);
+  }
 
-        } catch (final Throwable t) {
-            outputChannel.abort(InvocationException.wrapIfNeeded(t));
-            InvocationInterruptedException.throwIfInterrupt(t);
-        }
+  @Override
+  public void onOutput(final ParcelableSelectable<Object> output) throws IOException {
+    switch (output.index) {
+      case MEDIA_TYPE_INDEX:
+        final String mediaType = output.data();
+        mMediaType = MediaType.parse(mediaType);
+        break;
+
+      case BYTES_INDEX:
+        final ParcelableByteBuffer buffer = output.data();
+        ParcelableByteChannel.inputStream(buffer).transferTo(mOutputStream);
+        break;
+
+      default:
+        throw new IllegalArgumentException("unknown selectable index: " + output.index);
     }
-
-    @Override
-    public void onError(@NotNull final RoutineException error) {
-        mOutputChannel.abort(error);
-    }
-
-    @Override
-    public void onOutput(final ParcelableSelectable<Object> output) throws IOException {
-        switch (output.index) {
-            case MEDIA_TYPE_INDEX:
-                final String mediaType = output.data();
-                mMediaType = MediaType.parse(mediaType);
-                break;
-
-            case BYTES_INDEX:
-                final ParcelableByteBuffer buffer = output.data();
-                ParcelableByteChannel.inputStream(buffer).transferTo(mOutputStream);
-                break;
-
-            default:
-                throw new IllegalArgumentException("unknown selectable index: " + output.index);
-        }
-    }
+  }
 }

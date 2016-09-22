@@ -36,37 +36,36 @@ import org.jetbrains.annotations.NotNull;
  */
 class BindParallelKey<IN, OUT> implements Function<Channel<?, IN>, Channel<?, OUT>> {
 
-    private final ChannelConfiguration mConfiguration;
+  private final ChannelConfiguration mConfiguration;
 
-    private final InvocationMode mInvocationMode;
+  private final InvocationMode mInvocationMode;
 
-    private final Function<? super IN, ?> mKeyFunction;
+  private final Function<? super IN, ?> mKeyFunction;
 
-    private final Routine<? super IN, ? extends OUT> mRoutine;
+  private final Routine<? super IN, ? extends OUT> mRoutine;
 
-    /**
-     * Constructor.
-     *
-     * @param configuration  the channel configuration.
-     * @param keyFunction    the key function.
-     * @param routine        the routine instance.
-     * @param invocationMode the invocation mode.
-     */
-    BindParallelKey(@NotNull final ChannelConfiguration configuration,
-            @NotNull final Function<? super IN, ?> keyFunction,
-            @NotNull final Routine<? super IN, ? extends OUT> routine,
-            @NotNull final InvocationMode invocationMode) {
-        mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
-        mKeyFunction = ConstantConditions.notNull("key function", keyFunction);
-        mRoutine = ConstantConditions.notNull("routine instance", routine);
-        mInvocationMode = ConstantConditions.notNull("invocation mode", invocationMode);
-    }
+  /**
+   * Constructor.
+   *
+   * @param configuration  the channel configuration.
+   * @param keyFunction    the key function.
+   * @param routine        the routine instance.
+   * @param invocationMode the invocation mode.
+   */
+  BindParallelKey(@NotNull final ChannelConfiguration configuration,
+      @NotNull final Function<? super IN, ?> keyFunction,
+      @NotNull final Routine<? super IN, ? extends OUT> routine,
+      @NotNull final InvocationMode invocationMode) {
+    mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
+    mKeyFunction = ConstantConditions.notNull("key function", keyFunction);
+    mRoutine = ConstantConditions.notNull("routine instance", routine);
+    mInvocationMode = ConstantConditions.notNull("invocation mode", invocationMode);
+  }
 
-    public Channel<?, OUT> apply(final Channel<?, IN> channel) {
-        final Channel<OUT, OUT> outputChannel =
-                JRoutineCore.io().apply(mConfiguration).buildChannel();
-        channel.bind(new ParallelKeyChannelConsumer<IN, OUT>(outputChannel, mKeyFunction, mRoutine,
-                mInvocationMode));
-        return outputChannel;
-    }
+  public Channel<?, OUT> apply(final Channel<?, IN> channel) {
+    final Channel<OUT, OUT> outputChannel = JRoutineCore.io().apply(mConfiguration).buildChannel();
+    channel.bind(new ParallelKeyChannelConsumer<IN, OUT>(outputChannel, mKeyFunction, mRoutine,
+        mInvocationMode));
+    return outputChannel;
+  }
 }

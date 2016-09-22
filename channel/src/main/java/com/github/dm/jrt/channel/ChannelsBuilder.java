@@ -29,11 +29,11 @@ import org.jetbrains.annotations.NotNull;
  */
 public interface ChannelsBuilder<TYPE> extends ChannelConfigurable<ChannelsBuilder<TYPE>> {
 
-    /**
-     * Builds and returns an object instance.
-     *
-     * @return the object instance.
-     */
-    @NotNull
-    TYPE buildChannels();
+  /**
+   * Builds and returns an object instance.
+   *
+   * @return the object instance.
+   */
+  @NotNull
+  TYPE buildChannels();
 }

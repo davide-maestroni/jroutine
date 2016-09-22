@@ -39,118 +39,118 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBuilder<TYPE> {
 
-    private static final WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>> sProxies =
-            new WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>>();
+  private static final WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>> sProxies =
+      new WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>>();
 
-    private InvocationConfiguration mInvocationConfiguration =
-            InvocationConfiguration.defaultConfiguration();
+  private InvocationConfiguration mInvocationConfiguration =
+      InvocationConfiguration.defaultConfiguration();
 
-    private ObjectConfiguration mObjectConfiguration = ObjectConfiguration.defaultConfiguration();
+  private ObjectConfiguration mObjectConfiguration = ObjectConfiguration.defaultConfiguration();
 
-    @NotNull
-    public ProxyObjectBuilder<TYPE> apply(@NotNull final InvocationConfiguration configuration) {
-        mInvocationConfiguration =
-                ConstantConditions.notNull("invocation configuration", configuration);
-        return this;
+  @NotNull
+  public ProxyObjectBuilder<TYPE> apply(@NotNull final InvocationConfiguration configuration) {
+    mInvocationConfiguration =
+        ConstantConditions.notNull("invocation configuration", configuration);
+    return this;
+  }
+
+  @NotNull
+  public ProxyObjectBuilder<TYPE> apply(@NotNull final ObjectConfiguration configuration) {
+    mObjectConfiguration = ConstantConditions.notNull("object configuration", configuration);
+    return this;
+  }
+
+  @NotNull
+  public InvocationConfiguration.Builder<? extends ProxyObjectBuilder<TYPE>>
+  applyInvocationConfiguration() {
+    final InvocationConfiguration config = mInvocationConfiguration;
+    return new InvocationConfiguration.Builder<ProxyObjectBuilder<TYPE>>(this, config);
+  }
+
+  @NotNull
+  public ObjectConfiguration.Builder<? extends ProxyObjectBuilder<TYPE>> applyObjectConfiguration
+      () {
+    final ObjectConfiguration config = mObjectConfiguration;
+    return new ObjectConfiguration.Builder<ProxyObjectBuilder<TYPE>>(this, config);
+  }
+
+  @NotNull
+  @SuppressWarnings("unchecked")
+  public TYPE buildProxy() {
+    final Object target = getTarget();
+    synchronized (sProxies) {
+      final WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>> proxies = sProxies;
+      HashMap<ClassInfo, Object> proxyMap = proxies.get(target);
+      if (proxyMap == null) {
+        proxyMap = new HashMap<ClassInfo, Object>();
+        proxies.put(target, proxyMap);
+      }
+
+      final InvocationConfiguration invocationConfiguration = mInvocationConfiguration;
+      final ObjectConfiguration objectConfiguration = mObjectConfiguration;
+      final ClassInfo classInfo =
+          new ClassInfo(getInterfaceClass(), invocationConfiguration, objectConfiguration);
+      final Object instance = proxyMap.get(classInfo);
+      if (instance != null) {
+        return (TYPE) instance;
+      }
+
+      try {
+        final TYPE newInstance = newProxy(invocationConfiguration, objectConfiguration);
+        proxyMap.put(classInfo, newInstance);
+        return newInstance;
+
+      } catch (final Throwable t) {
+        InvocationInterruptedException.throwIfInterrupt(t);
+        throw new IllegalArgumentException(t);
+      }
     }
+  }
 
-    @NotNull
-    public ProxyObjectBuilder<TYPE> apply(@NotNull final ObjectConfiguration configuration) {
-        mObjectConfiguration = ConstantConditions.notNull("object configuration", configuration);
-        return this;
-    }
+  /**
+   * Returns the builder proxy class.
+   *
+   * @return the proxy class.
+   */
+  @NotNull
+  protected abstract Class<? super TYPE> getInterfaceClass();
 
-    @NotNull
-    public InvocationConfiguration.Builder<? extends ProxyObjectBuilder<TYPE>>
-    applyInvocationConfiguration() {
-        final InvocationConfiguration config = mInvocationConfiguration;
-        return new InvocationConfiguration.Builder<ProxyObjectBuilder<TYPE>>(this, config);
-    }
+  /**
+   * Returns the builder target object.
+   *
+   * @return the target object.
+   */
+  @Nullable
+  protected abstract Object getTarget();
 
-    @NotNull
-    public ObjectConfiguration.Builder<? extends ProxyObjectBuilder<TYPE>>
-    applyObjectConfiguration() {
-        final ObjectConfiguration config = mObjectConfiguration;
-        return new ObjectConfiguration.Builder<ProxyObjectBuilder<TYPE>>(this, config);
-    }
+  /**
+   * Creates and return a new proxy instance.
+   *
+   * @param invocationConfiguration the invocation configuration.
+   * @param objectConfiguration     the object configuration.
+   * @return the proxy instance.
+   * @throws java.lang.Exception if an unexpected error occurs.
+   */
+  @NotNull
+  protected abstract TYPE newProxy(@NotNull InvocationConfiguration invocationConfiguration,
+      @NotNull ObjectConfiguration objectConfiguration) throws Exception;
 
-    @NotNull
-    @SuppressWarnings("unchecked")
-    public TYPE buildProxy() {
-        final Object target = getTarget();
-        synchronized (sProxies) {
-            final WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>> proxies = sProxies;
-            HashMap<ClassInfo, Object> proxyMap = proxies.get(target);
-            if (proxyMap == null) {
-                proxyMap = new HashMap<ClassInfo, Object>();
-                proxies.put(target, proxyMap);
-            }
-
-            final InvocationConfiguration invocationConfiguration = mInvocationConfiguration;
-            final ObjectConfiguration objectConfiguration = mObjectConfiguration;
-            final ClassInfo classInfo = new ClassInfo(getInterfaceClass(), invocationConfiguration,
-                    objectConfiguration);
-            final Object instance = proxyMap.get(classInfo);
-            if (instance != null) {
-                return (TYPE) instance;
-            }
-
-            try {
-                final TYPE newInstance = newProxy(invocationConfiguration, objectConfiguration);
-                proxyMap.put(classInfo, newInstance);
-                return newInstance;
-
-            } catch (final Throwable t) {
-                InvocationInterruptedException.throwIfInterrupt(t);
-                throw new IllegalArgumentException(t);
-            }
-        }
-    }
+  /**
+   * Class used as key to identify a specific proxy instance.
+   */
+  private static class ClassInfo extends DeepEqualObject {
 
     /**
-     * Returns the builder proxy class.
+     * Constructor.
      *
-     * @return the proxy class.
-     */
-    @NotNull
-    protected abstract Class<? super TYPE> getInterfaceClass();
-
-    /**
-     * Returns the builder target object.
-     *
-     * @return the target object.
-     */
-    @Nullable
-    protected abstract Object getTarget();
-
-    /**
-     * Creates and return a new proxy instance.
-     *
+     * @param itf                     the proxy interface class.
      * @param invocationConfiguration the invocation configuration.
      * @param objectConfiguration     the object configuration.
-     * @return the proxy instance.
-     * @throws java.lang.Exception if an unexpected error occurs.
      */
-    @NotNull
-    protected abstract TYPE newProxy(@NotNull InvocationConfiguration invocationConfiguration,
-            @NotNull ObjectConfiguration objectConfiguration) throws Exception;
-
-    /**
-     * Class used as key to identify a specific proxy instance.
-     */
-    private static class ClassInfo extends DeepEqualObject {
-
-        /**
-         * Constructor.
-         *
-         * @param itf                     the proxy interface class.
-         * @param invocationConfiguration the invocation configuration.
-         * @param objectConfiguration     the object configuration.
-         */
-        private ClassInfo(@NotNull final Class<?> itf,
-                @NotNull final InvocationConfiguration invocationConfiguration,
-                @NotNull final ObjectConfiguration objectConfiguration) {
-            super(asArgs(itf, invocationConfiguration, objectConfiguration));
-        }
+    private ClassInfo(@NotNull final Class<?> itf,
+        @NotNull final InvocationConfiguration invocationConfiguration,
+        @NotNull final ObjectConfiguration objectConfiguration) {
+      super(asArgs(itf, invocationConfiguration, objectConfiguration));
     }
+  }
 }

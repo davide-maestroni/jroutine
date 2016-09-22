@@ -39,202 +39,202 @@ import java.util.concurrent.TimeUnit;
  */
 public final class OutputChannel<OUT> implements Channel<OUT, OUT> {
 
-    private final Channel<OUT, OUT> mChannel;
+  private final Channel<OUT, OUT> mChannel;
 
-    /**
-     * Constructor.
-     *
-     * @param wrapped the wrapped channel.
-     */
-    OutputChannel(@NotNull final Channel<OUT, OUT> wrapped) {
-        mChannel = ConstantConditions.notNull("wrapped channel", wrapped);
-    }
+  /**
+   * Constructor.
+   *
+   * @param wrapped the wrapped channel.
+   */
+  OutputChannel(@NotNull final Channel<OUT, OUT> wrapped) {
+    mChannel = ConstantConditions.notNull("wrapped channel", wrapped);
+  }
 
-    public boolean abort() {
-        return mChannel.abort();
-    }
+  public boolean abort() {
+    return mChannel.abort();
+  }
 
-    public boolean abort(@Nullable final Throwable reason) {
-        return mChannel.abort(reason);
-    }
+  public boolean abort(@Nullable final Throwable reason) {
+    return mChannel.abort(reason);
+  }
 
-    @NotNull
-    public OutputChannel<OUT> after(final long delay, @NotNull final TimeUnit timeUnit) {
-        mChannel.after(delay, timeUnit);
-        return this;
-    }
+  @NotNull
+  public OutputChannel<OUT> after(final long delay, @NotNull final TimeUnit timeUnit) {
+    mChannel.after(delay, timeUnit);
+    return this;
+  }
 
-    @NotNull
-    public OutputChannel<OUT> after(@NotNull final UnitDuration delay) {
-        mChannel.after(delay);
-        return this;
-    }
+  @NotNull
+  public OutputChannel<OUT> after(@NotNull final UnitDuration delay) {
+    mChannel.after(delay);
+    return this;
+  }
 
-    @NotNull
-    public List<OUT> all() {
-        return mChannel.all();
-    }
+  @NotNull
+  public List<OUT> all() {
+    return mChannel.all();
+  }
 
-    @NotNull
-    public OutputChannel<OUT> allInto(@NotNull final Collection<? super OUT> results) {
-        mChannel.allInto(results);
-        return this;
-    }
+  @NotNull
+  public OutputChannel<OUT> allInto(@NotNull final Collection<? super OUT> results) {
+    mChannel.allInto(results);
+    return this;
+  }
 
-    @NotNull
-    public <AFTER> Channel<? super OUT, AFTER> bind(
-            @NotNull final Channel<? super OUT, AFTER> channel) {
-        return mChannel.bind(channel);
-    }
+  @NotNull
+  public <AFTER> Channel<? super OUT, AFTER> bind(
+      @NotNull final Channel<? super OUT, AFTER> channel) {
+    return mChannel.bind(channel);
+  }
 
-    @NotNull
-    public OutputChannel<OUT> bind(@NotNull final ChannelConsumer<? super OUT> consumer) {
-        mChannel.bind(consumer);
-        return this;
-    }
+  @NotNull
+  public OutputChannel<OUT> bind(@NotNull final ChannelConsumer<? super OUT> consumer) {
+    mChannel.bind(consumer);
+    return this;
+  }
 
-    @NotNull
-    public OutputChannel<OUT> close() {
-        mChannel.close();
-        return this;
-    }
+  @NotNull
+  public OutputChannel<OUT> close() {
+    mChannel.close();
+    return this;
+  }
 
-    @NotNull
-    public OutputChannel<OUT> eventuallyAbort() {
-        mChannel.eventuallyAbort();
-        return this;
-    }
+  @NotNull
+  public OutputChannel<OUT> eventuallyAbort() {
+    mChannel.eventuallyAbort();
+    return this;
+  }
 
-    @NotNull
-    public OutputChannel<OUT> eventuallyAbort(@Nullable final Throwable reason) {
-        mChannel.eventuallyAbort(reason);
-        return this;
-    }
+  @NotNull
+  public OutputChannel<OUT> eventuallyAbort(@Nullable final Throwable reason) {
+    mChannel.eventuallyAbort(reason);
+    return this;
+  }
 
-    @NotNull
-    public OutputChannel<OUT> eventuallyContinue() {
-        mChannel.eventuallyContinue();
-        return this;
-    }
+  @NotNull
+  public OutputChannel<OUT> eventuallyContinue() {
+    mChannel.eventuallyContinue();
+    return this;
+  }
 
-    @NotNull
-    public OutputChannel<OUT> eventuallyFail() {
-        mChannel.eventuallyFail();
-        return this;
-    }
+  @NotNull
+  public OutputChannel<OUT> eventuallyFail() {
+    mChannel.eventuallyFail();
+    return this;
+  }
 
-    @NotNull
-    public Iterator<OUT> expiringIterator() {
-        return mChannel.expiringIterator();
-    }
+  @NotNull
+  public Iterator<OUT> expiringIterator() {
+    return mChannel.expiringIterator();
+  }
 
-    public boolean getComplete() {
-        return mChannel.getComplete();
-    }
+  public boolean getComplete() {
+    return mChannel.getComplete();
+  }
 
-    @Nullable
-    public RoutineException getError() {
-        return mChannel.getError();
-    }
+  @Nullable
+  public RoutineException getError() {
+    return mChannel.getError();
+  }
 
-    public boolean hasNext() {
-        return mChannel.hasNext();
-    }
+  public boolean hasNext() {
+    return mChannel.hasNext();
+  }
 
-    public OUT next() {
-        return mChannel.next();
-    }
+  public OUT next() {
+    return mChannel.next();
+  }
 
-    public int inputCount() {
-        return mChannel.inputCount();
-    }
+  public int inputCount() {
+    return mChannel.inputCount();
+  }
 
-    public boolean isBound() {
-        return mChannel.isBound();
-    }
+  public boolean isBound() {
+    return mChannel.isBound();
+  }
 
-    public boolean isEmpty() {
-        return mChannel.isEmpty();
-    }
+  public boolean isEmpty() {
+    return mChannel.isEmpty();
+  }
 
-    public boolean isOpen() {
-        return mChannel.isOpen();
-    }
+  public boolean isOpen() {
+    return mChannel.isOpen();
+  }
 
-    @NotNull
-    public List<OUT> next(final int count) {
-        return mChannel.next(count);
-    }
+  @NotNull
+  public List<OUT> next(final int count) {
+    return mChannel.next(count);
+  }
 
-    public OUT nextOrElse(final OUT output) {
-        return mChannel.nextOrElse(output);
-    }
+  public OUT nextOrElse(final OUT output) {
+    return mChannel.nextOrElse(output);
+  }
 
-    @NotNull
-    public OutputChannel<OUT> now() {
-        mChannel.now();
-        return this;
-    }
+  @NotNull
+  public OutputChannel<OUT> now() {
+    mChannel.now();
+    return this;
+  }
 
-    public int outputCount() {
-        return mChannel.outputCount();
-    }
+  public int outputCount() {
+    return mChannel.outputCount();
+  }
 
-    @NotNull
-    public OutputChannel<OUT> pass(@Nullable final Channel<?, ? extends OUT> channel) {
-        mChannel.pass(channel);
-        return this;
-    }
+  @NotNull
+  public OutputChannel<OUT> pass(@Nullable final Channel<?, ? extends OUT> channel) {
+    mChannel.pass(channel);
+    return this;
+  }
 
-    @NotNull
-    public OutputChannel<OUT> pass(@Nullable final Iterable<? extends OUT> inputs) {
-        mChannel.pass(inputs);
-        return this;
-    }
+  @NotNull
+  public OutputChannel<OUT> pass(@Nullable final Iterable<? extends OUT> inputs) {
+    mChannel.pass(inputs);
+    return this;
+  }
 
-    @NotNull
-    public OutputChannel<OUT> pass(@Nullable final OUT input) {
-        mChannel.pass(input);
-        return this;
-    }
+  @NotNull
+  public OutputChannel<OUT> pass(@Nullable final OUT input) {
+    mChannel.pass(input);
+    return this;
+  }
 
-    @NotNull
-    public OutputChannel<OUT> pass(@Nullable final OUT... inputs) {
-        mChannel.pass(inputs);
-        return this;
-    }
+  @NotNull
+  public OutputChannel<OUT> pass(@Nullable final OUT... inputs) {
+    mChannel.pass(inputs);
+    return this;
+  }
 
-    public int size() {
-        return mChannel.size();
-    }
+  public int size() {
+    return mChannel.size();
+  }
 
-    @NotNull
-    public OutputChannel<OUT> skipNext(final int count) {
-        mChannel.skipNext(count);
-        return this;
-    }
+  @NotNull
+  public OutputChannel<OUT> skipNext(final int count) {
+    mChannel.skipNext(count);
+    return this;
+  }
 
-    @NotNull
-    public OutputChannel<OUT> sorted() {
-        mChannel.sorted();
-        return this;
-    }
+  @NotNull
+  public OutputChannel<OUT> sorted() {
+    mChannel.sorted();
+    return this;
+  }
 
-    public void throwError() {
-        mChannel.throwError();
-    }
+  public void throwError() {
+    mChannel.throwError();
+  }
 
-    @NotNull
-    public OutputChannel<OUT> unsorted() {
-        mChannel.unsorted();
-        return this;
-    }
+  @NotNull
+  public OutputChannel<OUT> unsorted() {
+    mChannel.unsorted();
+    return this;
+  }
 
-    public Iterator<OUT> iterator() {
-        return mChannel.iterator();
-    }
+  public Iterator<OUT> iterator() {
+    return mChannel.iterator();
+  }
 
-    public void remove() {
-        mChannel.remove();
-    }
+  public void remove() {
+    mChannel.remove();
+  }
 }

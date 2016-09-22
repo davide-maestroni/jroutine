@@ -41,13 +41,112 @@ import static com.github.dm.jrt.function.Functions.decorate;
  */
 class AccumulateConsumerInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> {
 
+  private final BiConsumerDecorator<? super OUT, ? super IN> mAccumulateConsumer;
+
+  private final SupplierDecorator<? extends OUT> mSeedSupplier;
+
+  private OUT mAccumulated;
+
+  private boolean mIsFirst;
+
+  /**
+   * Constructor.
+   *
+   * @param seedSupplier       the supplier of initial accumulation values.
+   * @param accumulateConsumer the accumulating bi-consumer instance.
+   */
+  private AccumulateConsumerInvocation(
+      @Nullable final SupplierDecorator<? extends OUT> seedSupplier,
+      @NotNull final BiConsumerDecorator<? super OUT, ? super IN> accumulateConsumer) {
+    mSeedSupplier = seedSupplier;
+    mAccumulateConsumer = accumulateConsumer;
+  }
+
+  /**
+   * Builds and returns a new accumulating invocation factory backed by the specified bi-consumer
+   * instance.
+   *
+   * @param accumulateConsumer the accumulating bi-consumer instance.
+   * @param <IN>               the input data type.
+   * @return the invocation factory.
+   */
+  @NotNull
+  static <IN> InvocationFactory<IN, IN> consumerFactory(
+      @NotNull final BiConsumer<? super IN, ? super IN> accumulateConsumer) {
+    return new AccumulateInvocationFactory<IN, IN>(null, decorate(accumulateConsumer));
+  }
+
+  /**
+   * Builds and returns a new accumulating invocation factory backed by the specified bi-consumer
+   * instance.
+   *
+   * @param seedSupplier       the supplier of initial accumulation values.
+   * @param accumulateConsumer the accumulating bi-consumer instance.
+   * @param <IN>               the input data type.
+   * @param <OUT>              the output data type.
+   * @return the invocation factory.
+   */
+  @NotNull
+  static <IN, OUT> InvocationFactory<IN, OUT> consumerFactory(
+      @NotNull final Supplier<? extends OUT> seedSupplier,
+      @NotNull final BiConsumer<? super OUT, ? super IN> accumulateConsumer) {
+    return new AccumulateInvocationFactory<IN, OUT>(decorate(seedSupplier),
+        decorate(accumulateConsumer));
+  }
+
+  @Override
+  public void onComplete(@NotNull final Channel<OUT, ?> result) throws Exception {
+    if (!mIsFirst) {
+      result.pass(mAccumulated);
+
+    } else {
+      final SupplierDecorator<? extends OUT> supplier = mSeedSupplier;
+      if (supplier != null) {
+        result.pass(supplier.get());
+      }
+    }
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) throws Exception {
+    if (mIsFirst) {
+      mIsFirst = false;
+      final SupplierDecorator<? extends OUT> supplier = mSeedSupplier;
+      if (supplier != null) {
+        mAccumulated = supplier.get();
+        mAccumulateConsumer.accept(mAccumulated, input);
+
+      } else {
+        mAccumulated = (OUT) input;
+      }
+
+    } else {
+      mAccumulateConsumer.accept(mAccumulated, input);
+    }
+  }
+
+  @Override
+  public void onRecycle(final boolean isReused) {
+    mAccumulated = null;
+  }
+
+  @Override
+  public void onRestart() {
+    mIsFirst = true;
+  }
+
+  /**
+   * Class implementing an accumulating invocation factory.
+   *
+   * @param <IN>  the input data type.
+   * @param <OUT> the output data type.
+   */
+  private static class AccumulateInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
+
     private final BiConsumerDecorator<? super OUT, ? super IN> mAccumulateConsumer;
 
     private final SupplierDecorator<? extends OUT> mSeedSupplier;
-
-    private OUT mAccumulated;
-
-    private boolean mIsFirst;
 
     /**
      * Constructor.
@@ -55,117 +154,18 @@ class AccumulateConsumerInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> 
      * @param seedSupplier       the supplier of initial accumulation values.
      * @param accumulateConsumer the accumulating bi-consumer instance.
      */
-    private AccumulateConsumerInvocation(
-            @Nullable final SupplierDecorator<? extends OUT> seedSupplier,
-            @NotNull final BiConsumerDecorator<? super OUT, ? super IN> accumulateConsumer) {
-        mSeedSupplier = seedSupplier;
-        mAccumulateConsumer = accumulateConsumer;
+    private AccumulateInvocationFactory(
+        @Nullable final SupplierDecorator<? extends OUT> seedSupplier,
+        @NotNull final BiConsumerDecorator<? super OUT, ? super IN> accumulateConsumer) {
+      super(asArgs(seedSupplier, accumulateConsumer));
+      mSeedSupplier = seedSupplier;
+      mAccumulateConsumer = accumulateConsumer;
     }
 
-    /**
-     * Builds and returns a new accumulating invocation factory backed by the specified bi-consumer
-     * instance.
-     *
-     * @param accumulateConsumer the accumulating bi-consumer instance.
-     * @param <IN>               the input data type.
-     * @return the invocation factory.
-     */
     @NotNull
-    static <IN> InvocationFactory<IN, IN> consumerFactory(
-            @NotNull final BiConsumer<? super IN, ? super IN> accumulateConsumer) {
-        return new AccumulateInvocationFactory<IN, IN>(null, decorate(accumulateConsumer));
-    }
-
-    /**
-     * Builds and returns a new accumulating invocation factory backed by the specified bi-consumer
-     * instance.
-     *
-     * @param seedSupplier       the supplier of initial accumulation values.
-     * @param accumulateConsumer the accumulating bi-consumer instance.
-     * @param <IN>               the input data type.
-     * @param <OUT>              the output data type.
-     * @return the invocation factory.
-     */
-    @NotNull
-    static <IN, OUT> InvocationFactory<IN, OUT> consumerFactory(
-            @NotNull final Supplier<? extends OUT> seedSupplier,
-            @NotNull final BiConsumer<? super OUT, ? super IN> accumulateConsumer) {
-        return new AccumulateInvocationFactory<IN, OUT>(decorate(seedSupplier),
-                decorate(accumulateConsumer));
-    }
-
     @Override
-    public void onComplete(@NotNull final Channel<OUT, ?> result) throws Exception {
-        if (!mIsFirst) {
-            result.pass(mAccumulated);
-
-        } else {
-            final SupplierDecorator<? extends OUT> supplier = mSeedSupplier;
-            if (supplier != null) {
-                result.pass(supplier.get());
-            }
-        }
+    public Invocation<IN, OUT> newInvocation() {
+      return new AccumulateConsumerInvocation<IN, OUT>(mSeedSupplier, mAccumulateConsumer);
     }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) throws Exception {
-        if (mIsFirst) {
-            mIsFirst = false;
-            final SupplierDecorator<? extends OUT> supplier = mSeedSupplier;
-            if (supplier != null) {
-                mAccumulated = supplier.get();
-                mAccumulateConsumer.accept(mAccumulated, input);
-
-            } else {
-                mAccumulated = (OUT) input;
-            }
-
-        } else {
-            mAccumulateConsumer.accept(mAccumulated, input);
-        }
-    }
-
-    @Override
-    public void onRecycle(final boolean isReused) {
-        mAccumulated = null;
-    }
-
-    @Override
-    public void onRestart() {
-        mIsFirst = true;
-    }
-
-    /**
-     * Class implementing an accumulating invocation factory.
-     *
-     * @param <IN>  the input data type.
-     * @param <OUT> the output data type.
-     */
-    private static class AccumulateInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
-
-        private final BiConsumerDecorator<? super OUT, ? super IN> mAccumulateConsumer;
-
-        private final SupplierDecorator<? extends OUT> mSeedSupplier;
-
-        /**
-         * Constructor.
-         *
-         * @param seedSupplier       the supplier of initial accumulation values.
-         * @param accumulateConsumer the accumulating bi-consumer instance.
-         */
-        private AccumulateInvocationFactory(
-                @Nullable final SupplierDecorator<? extends OUT> seedSupplier,
-                @NotNull final BiConsumerDecorator<? super OUT, ? super IN> accumulateConsumer) {
-            super(asArgs(seedSupplier, accumulateConsumer));
-            mSeedSupplier = seedSupplier;
-            mAccumulateConsumer = accumulateConsumer;
-        }
-
-        @NotNull
-        @Override
-        public Invocation<IN, OUT> newInvocation() {
-            return new AccumulateConsumerInvocation<IN, OUT>(mSeedSupplier, mAccumulateConsumer);
-        }
-    }
+  }
 }

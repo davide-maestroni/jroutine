@@ -32,38 +32,38 @@ import static com.github.dm.jrt.core.util.Reflection.cloneArgs;
  */
 public abstract class DeepEqualObject {
 
-    private final Object[] mArgs;
+  private final Object[] mArgs;
 
-    /**
-     * Constructor.
-     *
-     * @param args the constructor arguments.
-     */
-    protected DeepEqualObject(@Nullable final Object[] args) {
-        mArgs = cloneArgs(args);
+  /**
+   * Constructor.
+   *
+   * @param args the constructor arguments.
+   */
+  protected DeepEqualObject(@Nullable final Object[] args) {
+    mArgs = cloneArgs(args);
+  }
+
+  @Override
+  public int hashCode() {
+    return 31 * getClass().hashCode() + Arrays.deepHashCode(mArgs);
+  }
+
+  @Override
+  public boolean equals(final Object o) {
+    if (this == o) {
+      return true;
     }
 
-    @Override
-    public int hashCode() {
-        return 31 * getClass().hashCode() + Arrays.deepHashCode(mArgs);
+    if ((o == null) || (getClass() != o.getClass())) {
+      return false;
     }
 
-    @Override
-    public boolean equals(final Object o) {
-        if (this == o) {
-            return true;
-        }
+    final DeepEqualObject that = (DeepEqualObject) o;
+    return Arrays.deepEquals(mArgs, that.mArgs);
+  }
 
-        if ((o == null) || (getClass() != o.getClass())) {
-            return false;
-        }
-
-        final DeepEqualObject that = (DeepEqualObject) o;
-        return Arrays.deepEquals(mArgs, that.mArgs);
-    }
-
-    @Override
-    public String toString() {
-        return super.toString() + "{" + Arrays.deepToString(mArgs) + "}";
-    }
+  @Override
+  public String toString() {
+    return super.toString() + "{" + Arrays.deepToString(mArgs) + "}";
+  }
 }

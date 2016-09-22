@@ -32,34 +32,34 @@ import org.jetbrains.annotations.NotNull;
  * Created by davide-maestroni on 03/29/2015.
  */
 public interface ServiceObjectRoutineBuilder
-        extends ObjectRoutineBuilder, ServiceConfigurable<ServiceObjectRoutineBuilder> {
+    extends ObjectRoutineBuilder, ServiceConfigurable<ServiceObjectRoutineBuilder> {
 
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    ServiceObjectRoutineBuilder apply(@NotNull InvocationConfiguration configuration);
+  /**
+   * {@inheritDoc}
+   */
+  @NotNull
+  @Override
+  ServiceObjectRoutineBuilder apply(@NotNull InvocationConfiguration configuration);
 
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    ServiceObjectRoutineBuilder apply(@NotNull ObjectConfiguration configuration);
+  /**
+   * {@inheritDoc}
+   */
+  @NotNull
+  @Override
+  ServiceObjectRoutineBuilder apply(@NotNull ObjectConfiguration configuration);
 
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    InvocationConfiguration.Builder<? extends ServiceObjectRoutineBuilder>
-    applyInvocationConfiguration();
+  /**
+   * {@inheritDoc}
+   */
+  @NotNull
+  @Override
+  InvocationConfiguration.Builder<? extends ServiceObjectRoutineBuilder>
+  applyInvocationConfiguration();
 
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    ObjectConfiguration.Builder<? extends ServiceObjectRoutineBuilder> applyObjectConfiguration();
+  /**
+   * {@inheritDoc}
+   */
+  @NotNull
+  @Override
+  ObjectConfiguration.Builder<? extends ServiceObjectRoutineBuilder> applyObjectConfiguration();
 }

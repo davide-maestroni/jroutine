@@ -23,12 +23,12 @@ package com.github.dm.jrt.android.core.invocation;
  */
 public class LoaderClashException extends LoaderInvocationException {
 
-    /**
-     * Constructor.
-     *
-     * @param id the Loader ID.
-     */
-    public LoaderClashException(final int id) {
-        super(id);
-    }
+  /**
+   * Constructor.
+   *
+   * @param id the Loader ID.
+   */
+  public LoaderClashException(final int id) {
+    super(id);
+  }
 }

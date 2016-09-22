@@ -35,56 +35,56 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class LimitInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
 
+  private final int mCount;
+
+  /**
+   * Constructor.
+   *
+   * @param count the number of data to pass.
+   * @throws java.lang.IllegalArgumentException if the count is negative.
+   */
+  LimitInvocationFactory(final int count) {
+    super(asArgs(ConstantConditions.notNegative("count", count)));
+    mCount = count;
+  }
+
+  @NotNull
+  @Override
+  public Invocation<DATA, DATA> newInvocation() {
+    return new LimitInvocation<DATA>(mCount);
+  }
+
+  /**
+   * Routine invocation passing only the first {@code count} input data.
+   *
+   * @param <DATA> the data type.
+   */
+  private static class LimitInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
+
     private final int mCount;
+
+    private int mCurrent;
 
     /**
      * Constructor.
      *
      * @param count the number of data to pass.
-     * @throws java.lang.IllegalArgumentException if the count is negative.
      */
-    LimitInvocationFactory(final int count) {
-        super(asArgs(ConstantConditions.notNegative("count", count)));
-        mCount = count;
+    private LimitInvocation(final int count) {
+      mCount = count;
     }
 
-    @NotNull
     @Override
-    public Invocation<DATA, DATA> newInvocation() {
-        return new LimitInvocation<DATA>(mCount);
+    public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) {
+      if (mCurrent < mCount) {
+        ++mCurrent;
+        result.pass(input);
+      }
     }
 
-    /**
-     * Routine invocation passing only the first {@code count} input data.
-     *
-     * @param <DATA> the data type.
-     */
-    private static class LimitInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
-
-        private final int mCount;
-
-        private int mCurrent;
-
-        /**
-         * Constructor.
-         *
-         * @param count the number of data to pass.
-         */
-        private LimitInvocation(final int count) {
-            mCount = count;
-        }
-
-        @Override
-        public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) {
-            if (mCurrent < mCount) {
-                ++mCurrent;
-                result.pass(input);
-            }
-        }
-
-        @Override
-        public void onRestart() {
-            mCurrent = 0;
-        }
+    @Override
+    public void onRestart() {
+      mCurrent = 0;
     }
+  }
 }

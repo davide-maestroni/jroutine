@@ -63,295 +63,293 @@ import static com.github.dm.jrt.core.util.Reflection.newInstanceOf;
  * @param <OUT> the output data type.
  */
 public abstract class TargetInvocationFactory<IN, OUT> extends DeepEqualObject
-        implements Parcelable {
+    implements Parcelable {
+
+  /**
+   * Constructor.
+   *
+   * @param args the constructor arguments.
+   */
+  private TargetInvocationFactory(@Nullable final Object[] args) {
+    super(args);
+  }
+
+  /**
+   * Returns a target based on the specified invocation class.
+   * <br>
+   * The method accepts also classes implementing {@link ContextInvocation}.
+   * <p>
+   * Note that, in case a class not representing a {@link ContextInvocation} is passed to the
+   * factory, the specified invocation class will be passed as the first argument to a special
+   * Context invocation in order to be automatically instantiated via reflection.
+   *
+   * @param targetClass the target invocation class.
+   * @param <IN>        the input data type.
+   * @param <OUT>       the output data type.
+   * @return the invocation factory target.
+   * @throws java.lang.IllegalArgumentException if the class of the specified invocation has
+   *                                            not a static scope.
+   */
+  @NotNull
+  public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryOf(
+      @NotNull final Class<? extends Invocation<IN, OUT>> targetClass) {
+    return factoryOf(targetClass, (Object[]) null);
+  }
+
+  /**
+   * Returns a target based on the specified invocation class.
+   * <br>
+   * The method accepts also classes implementing {@link ContextInvocation}.
+   * <p>
+   * Note that, in case a class not representing a {@link ContextInvocation} is passed to the
+   * factory, the specified invocation class will be passed as the first argument to a special
+   * Context invocation in order to be automatically instantiated via reflection.
+   *
+   * @param targetClass the target invocation class.
+   * @param factoryArgs the invocation factory arguments.
+   * @param <IN>        the input data type.
+   * @param <OUT>       the output data type.
+   * @return the invocation factory target.
+   * @throws java.lang.IllegalArgumentException if the class of the specified invocation has
+   *                                            not a static scope.
+   */
+  @NotNull
+  @SuppressWarnings("unchecked")
+  public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryOf(
+      @NotNull final Class<? extends Invocation<IN, OUT>> targetClass,
+      @Nullable final Object... factoryArgs) {
+    if (!Reflection.hasStaticScope(targetClass)) {
+      throw new IllegalArgumentException(
+          "the invocation class must have a static scope: " + targetClass.getName());
+    }
+
+    if (ContextInvocation.class.isAssignableFrom(targetClass)) {
+      return new DefaultTargetInvocationFactory<IN, OUT>(
+          (Class<? extends ContextInvocation<IN, OUT>>) targetClass, factoryArgs);
+    }
+
+    final Class<? extends TargetInvocationWrapper<IN, OUT>> targetWrapper =
+        new ClassToken<TargetInvocationWrapper<IN, OUT>>() {}.getRawClass();
+    return new DefaultTargetInvocationFactory<IN, OUT>(targetWrapper,
+        asArgs(targetClass, factoryArgs));
+  }
+
+  /**
+   * Returns a target based on the specified invocation token.
+   * <br>
+   * The method accepts also classes implementing {@link ContextInvocation}.
+   * <p>
+   * Note that, in case a class not representing a {@link ContextInvocation} is passed to the
+   * factory, the specified invocation class will be passed as the first argument to a special
+   * Context invocation in order to be automatically instantiated via reflection.
+   *
+   * @param targetToken the target invocation token.
+   * @param <IN>        the input data type.
+   * @param <OUT>       the output data type.
+   * @return the invocation factory target.
+   * @throws java.lang.IllegalArgumentException if the class of the specified invocation has
+   *                                            not a static scope.
+   */
+  @NotNull
+  public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryOf(
+      @NotNull final ClassToken<? extends Invocation<IN, OUT>> targetToken) {
+    return factoryOf(targetToken.getRawClass());
+  }
+
+  /**
+   * Returns a target based on the specified invocation token.
+   * <br>
+   * The method accepts also classes implementing {@link ContextInvocation}.
+   * <p>
+   * Note that, in case a class not representing a {@link ContextInvocation} is passed to the
+   * factory, the specified invocation class will be passed as the first argument to a special
+   * Context invocation in order to be automatically instantiated via reflection.
+   *
+   * @param targetToken the target invocation token.
+   * @param factoryArgs the invocation factory arguments.
+   * @param <IN>        the input data type.
+   * @param <OUT>       the output data type.
+   * @return the invocation factory target.
+   * @throws java.lang.IllegalArgumentException if the class of the specified invocation has
+   *                                            not a static scope.
+   */
+  @NotNull
+  public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryOf(
+      @NotNull final ClassToken<? extends Invocation<IN, OUT>> targetToken,
+      @Nullable final Object... factoryArgs) {
+    return factoryOf(targetToken.getRawClass(), factoryArgs);
+  }
+
+  /**
+   * Returns a target based on the specified invocation.
+   * <br>
+   * The method accepts also instances implementing {@link ContextInvocation}.
+   * <p>
+   * Note that, in case a class not representing a {@link ContextInvocation} is passed to the
+   * factory, the specified invocation class will be passed as the first argument to a special
+   * Context invocation in order to be automatically instantiated via reflection.
+   *
+   * @param targetInvocation the target invocation.
+   * @param <IN>             the input data type.
+   * @param <OUT>            the output data type.
+   * @return the invocation factory target.
+   * @throws java.lang.IllegalArgumentException if the class of the specified invocation has
+   *                                            not a static scope.
+   */
+  @NotNull
+  public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryOf(
+      @NotNull final Invocation<IN, OUT> targetInvocation) {
+    return factoryOf(tokenOf(targetInvocation));
+  }
+
+  /**
+   * Returns a target based on the specified invocation.
+   * <br>
+   * The method accepts also instances implementing {@link ContextInvocation}.
+   * <p>
+   * Note that, in case a class not representing a {@link ContextInvocation} is passed to the
+   * factory, the specified invocation class will be passed as the first argument to a special
+   * Context invocation in order to be automatically instantiated via reflection.
+   *
+   * @param targetInvocation the target invocation.
+   * @param factoryArgs      the invocation factory arguments.
+   * @param <IN>             the input data type.
+   * @param <OUT>            the output data type.
+   * @return the invocation factory target.
+   * @throws java.lang.IllegalArgumentException if the class of the specified invocation has
+   *                                            not a static scope.
+   */
+  @NotNull
+  public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryOf(
+      @NotNull final Invocation<IN, OUT> targetInvocation, @Nullable final Object... factoryArgs) {
+    return factoryOf(tokenOf(targetInvocation), factoryArgs);
+  }
+
+  /**
+   * Returns the factory arguments.
+   *
+   * @return the factory arguments.
+   */
+  @NotNull
+  public abstract Object[] getFactoryArgs();
+
+  /**
+   * Returns the target class.
+   *
+   * @return the target class.
+   */
+  @NotNull
+  public abstract Class<? extends ContextInvocation<IN, OUT>> getInvocationClass();
+
+  /**
+   * Invocation factory target implementation.
+   *
+   * @param <IN>  the input data type.
+   * @param <OUT> the output data type.
+   */
+  private static class DefaultTargetInvocationFactory<IN, OUT>
+      extends TargetInvocationFactory<IN, OUT> {
+
+    /**
+     * Creator instance needed by the parcelable protocol.
+     */
+    public static final Creator<DefaultTargetInvocationFactory> CREATOR =
+        new Creator<DefaultTargetInvocationFactory>() {
+
+          @Override
+          public DefaultTargetInvocationFactory createFromParcel(final Parcel source) {
+            return new DefaultTargetInvocationFactory(source);
+          }
+
+          @Override
+          public DefaultTargetInvocationFactory[] newArray(final int size) {
+            return new DefaultTargetInvocationFactory[size];
+          }
+        };
+
+    private final Object[] mFactoryArgs;
+
+    private final Class<? extends ContextInvocation<IN, OUT>> mTargetClass;
 
     /**
      * Constructor.
      *
-     * @param args the constructor arguments.
+     * @param source the source parcel.
      */
-    private TargetInvocationFactory(@Nullable final Object[] args) {
-        super(args);
-    }
-
-    /**
-     * Returns a target based on the specified invocation class.
-     * <br>
-     * The method accepts also classes implementing {@link ContextInvocation}.
-     * <p>
-     * Note that, in case a class not representing a {@link ContextInvocation} is passed to the
-     * factory, the specified invocation class will be passed as the first argument to a special
-     * Context invocation in order to be automatically instantiated via reflection.
-     *
-     * @param targetClass the target invocation class.
-     * @param <IN>        the input data type.
-     * @param <OUT>       the output data type.
-     * @return the invocation factory target.
-     * @throws java.lang.IllegalArgumentException if the class of the specified invocation has
-     *                                            not a static scope.
-     */
-    @NotNull
-    public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryOf(
-            @NotNull final Class<? extends Invocation<IN, OUT>> targetClass) {
-        return factoryOf(targetClass, (Object[]) null);
-    }
-
-    /**
-     * Returns a target based on the specified invocation class.
-     * <br>
-     * The method accepts also classes implementing {@link ContextInvocation}.
-     * <p>
-     * Note that, in case a class not representing a {@link ContextInvocation} is passed to the
-     * factory, the specified invocation class will be passed as the first argument to a special
-     * Context invocation in order to be automatically instantiated via reflection.
-     *
-     * @param targetClass the target invocation class.
-     * @param factoryArgs the invocation factory arguments.
-     * @param <IN>        the input data type.
-     * @param <OUT>       the output data type.
-     * @return the invocation factory target.
-     * @throws java.lang.IllegalArgumentException if the class of the specified invocation has
-     *                                            not a static scope.
-     */
-    @NotNull
     @SuppressWarnings("unchecked")
-    public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryOf(
-            @NotNull final Class<? extends Invocation<IN, OUT>> targetClass,
-            @Nullable final Object... factoryArgs) {
-        if (!Reflection.hasStaticScope(targetClass)) {
-            throw new IllegalArgumentException(
-                    "the invocation class must have a static scope: " + targetClass.getName());
-        }
-
-        if (ContextInvocation.class.isAssignableFrom(targetClass)) {
-            return new DefaultTargetInvocationFactory<IN, OUT>(
-                    (Class<? extends ContextInvocation<IN, OUT>>) targetClass, factoryArgs);
-        }
-
-        final Class<? extends TargetInvocationWrapper<IN, OUT>> targetWrapper =
-                new ClassToken<TargetInvocationWrapper<IN, OUT>>() {}.getRawClass();
-        return new DefaultTargetInvocationFactory<IN, OUT>(targetWrapper,
-                asArgs(targetClass, factoryArgs));
+    private DefaultTargetInvocationFactory(@NotNull final Parcel source) {
+      this((Class<? extends ContextInvocation<IN, OUT>>) source.readSerializable(),
+          source.readArray(TargetInvocationFactory.class.getClassLoader()));
     }
 
     /**
-     * Returns a target based on the specified invocation token.
-     * <br>
-     * The method accepts also classes implementing {@link ContextInvocation}.
-     * <p>
-     * Note that, in case a class not representing a {@link ContextInvocation} is passed to the
-     * factory, the specified invocation class will be passed as the first argument to a special
-     * Context invocation in order to be automatically instantiated via reflection.
+     * Constructor.
      *
-     * @param targetToken the target invocation token.
-     * @param <IN>        the input data type.
-     * @param <OUT>       the output data type.
-     * @return the invocation factory target.
-     * @throws java.lang.IllegalArgumentException if the class of the specified invocation has
-     *                                            not a static scope.
-     */
-    @NotNull
-    public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryOf(
-            @NotNull final ClassToken<? extends Invocation<IN, OUT>> targetToken) {
-        return factoryOf(targetToken.getRawClass());
-    }
-
-    /**
-     * Returns a target based on the specified invocation token.
-     * <br>
-     * The method accepts also classes implementing {@link ContextInvocation}.
-     * <p>
-     * Note that, in case a class not representing a {@link ContextInvocation} is passed to the
-     * factory, the specified invocation class will be passed as the first argument to a special
-     * Context invocation in order to be automatically instantiated via reflection.
-     *
-     * @param targetToken the target invocation token.
+     * @param targetClass the target invocation class.
      * @param factoryArgs the invocation factory arguments.
-     * @param <IN>        the input data type.
-     * @param <OUT>       the output data type.
-     * @return the invocation factory target.
-     * @throws java.lang.IllegalArgumentException if the class of the specified invocation has
-     *                                            not a static scope.
      */
+    private DefaultTargetInvocationFactory(
+        @NotNull final Class<? extends ContextInvocation<IN, OUT>> targetClass,
+        @Nullable final Object[] factoryArgs) {
+      super(asArgs(ConstantConditions.notNull("target invocation class", targetClass),
+          cloneArgs(factoryArgs)));
+      mTargetClass = targetClass;
+      mFactoryArgs = cloneArgs(factoryArgs);
+    }
+
+    @Override
+    public int describeContents() {
+      return 0;
+    }
+
+    @Override
+    public void writeToParcel(final Parcel dest, final int flags) {
+      dest.writeSerializable(mTargetClass);
+      dest.writeArray(mFactoryArgs);
+    }
+
     @NotNull
-    public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryOf(
-            @NotNull final ClassToken<? extends Invocation<IN, OUT>> targetToken,
-            @Nullable final Object... factoryArgs) {
-        return factoryOf(targetToken.getRawClass(), factoryArgs);
+    @Override
+    public Object[] getFactoryArgs() {
+      return mFactoryArgs;
+    }
+
+    @NotNull
+    @Override
+    public Class<? extends ContextInvocation<IN, OUT>> getInvocationClass() {
+      return mTargetClass;
+    }
+  }
+
+  /**
+   * Context invocation wrapping a base one.
+   *
+   * @param <IN>  the input data type.
+   * @param <OUT> the output data type.
+   */
+  @SuppressWarnings("unused")
+  private static class TargetInvocationWrapper<IN, OUT> extends ContextInvocationWrapper<IN, OUT> {
+
+    /**
+     * Constructor.
+     *
+     * @param invocationClass the wrapped invocation class.
+     */
+    public TargetInvocationWrapper(
+        @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass) {
+      this(invocationClass, (Object[]) null);
     }
 
     /**
-     * Returns a target based on the specified invocation.
-     * <br>
-     * The method accepts also instances implementing {@link ContextInvocation}.
-     * <p>
-     * Note that, in case a class not representing a {@link ContextInvocation} is passed to the
-     * factory, the specified invocation class will be passed as the first argument to a special
-     * Context invocation in order to be automatically instantiated via reflection.
+     * Constructor.
      *
-     * @param targetInvocation the target invocation.
-     * @param <IN>             the input data type.
-     * @param <OUT>            the output data type.
-     * @return the invocation factory target.
-     * @throws java.lang.IllegalArgumentException if the class of the specified invocation has
-     *                                            not a static scope.
+     * @param invocationClass the wrapped invocation class.
+     * @param invocationArgs  the invocation constructor arguments
      */
-    @NotNull
-    public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryOf(
-            @NotNull final Invocation<IN, OUT> targetInvocation) {
-        return factoryOf(tokenOf(targetInvocation));
+    public TargetInvocationWrapper(
+        @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass,
+        @Nullable final Object... invocationArgs) {
+      super(newInstanceOf(invocationClass, asArgs(invocationArgs)));
     }
-
-    /**
-     * Returns a target based on the specified invocation.
-     * <br>
-     * The method accepts also instances implementing {@link ContextInvocation}.
-     * <p>
-     * Note that, in case a class not representing a {@link ContextInvocation} is passed to the
-     * factory, the specified invocation class will be passed as the first argument to a special
-     * Context invocation in order to be automatically instantiated via reflection.
-     *
-     * @param targetInvocation the target invocation.
-     * @param factoryArgs      the invocation factory arguments.
-     * @param <IN>             the input data type.
-     * @param <OUT>            the output data type.
-     * @return the invocation factory target.
-     * @throws java.lang.IllegalArgumentException if the class of the specified invocation has
-     *                                            not a static scope.
-     */
-    @NotNull
-    public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryOf(
-            @NotNull final Invocation<IN, OUT> targetInvocation,
-            @Nullable final Object... factoryArgs) {
-        return factoryOf(tokenOf(targetInvocation), factoryArgs);
-    }
-
-    /**
-     * Returns the factory arguments.
-     *
-     * @return the factory arguments.
-     */
-    @NotNull
-    public abstract Object[] getFactoryArgs();
-
-    /**
-     * Returns the target class.
-     *
-     * @return the target class.
-     */
-    @NotNull
-    public abstract Class<? extends ContextInvocation<IN, OUT>> getInvocationClass();
-
-    /**
-     * Invocation factory target implementation.
-     *
-     * @param <IN>  the input data type.
-     * @param <OUT> the output data type.
-     */
-    private static class DefaultTargetInvocationFactory<IN, OUT>
-            extends TargetInvocationFactory<IN, OUT> {
-
-        /**
-         * Creator instance needed by the parcelable protocol.
-         */
-        public static final Creator<DefaultTargetInvocationFactory> CREATOR =
-                new Creator<DefaultTargetInvocationFactory>() {
-
-                    @Override
-                    public DefaultTargetInvocationFactory createFromParcel(final Parcel source) {
-                        return new DefaultTargetInvocationFactory(source);
-                    }
-
-                    @Override
-                    public DefaultTargetInvocationFactory[] newArray(final int size) {
-                        return new DefaultTargetInvocationFactory[size];
-                    }
-                };
-
-        private final Object[] mFactoryArgs;
-
-        private final Class<? extends ContextInvocation<IN, OUT>> mTargetClass;
-
-        /**
-         * Constructor.
-         *
-         * @param source the source parcel.
-         */
-        @SuppressWarnings("unchecked")
-        private DefaultTargetInvocationFactory(@NotNull final Parcel source) {
-            this((Class<? extends ContextInvocation<IN, OUT>>) source.readSerializable(),
-                    source.readArray(TargetInvocationFactory.class.getClassLoader()));
-        }
-
-        /**
-         * Constructor.
-         *
-         * @param targetClass the target invocation class.
-         * @param factoryArgs the invocation factory arguments.
-         */
-        private DefaultTargetInvocationFactory(
-                @NotNull final Class<? extends ContextInvocation<IN, OUT>> targetClass,
-                @Nullable final Object[] factoryArgs) {
-            super(asArgs(ConstantConditions.notNull("target invocation class", targetClass),
-                    cloneArgs(factoryArgs)));
-            mTargetClass = targetClass;
-            mFactoryArgs = cloneArgs(factoryArgs);
-        }
-
-        @Override
-        public int describeContents() {
-            return 0;
-        }
-
-        @Override
-        public void writeToParcel(final Parcel dest, final int flags) {
-            dest.writeSerializable(mTargetClass);
-            dest.writeArray(mFactoryArgs);
-        }
-
-        @NotNull
-        @Override
-        public Object[] getFactoryArgs() {
-            return mFactoryArgs;
-        }
-
-        @NotNull
-        @Override
-        public Class<? extends ContextInvocation<IN, OUT>> getInvocationClass() {
-            return mTargetClass;
-        }
-    }
-
-    /**
-     * Context invocation wrapping a base one.
-     *
-     * @param <IN>  the input data type.
-     * @param <OUT> the output data type.
-     */
-    @SuppressWarnings("unused")
-    private static class TargetInvocationWrapper<IN, OUT>
-            extends ContextInvocationWrapper<IN, OUT> {
-
-        /**
-         * Constructor.
-         *
-         * @param invocationClass the wrapped invocation class.
-         */
-        public TargetInvocationWrapper(
-                @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass) {
-            this(invocationClass, (Object[]) null);
-        }
-
-        /**
-         * Constructor.
-         *
-         * @param invocationClass the wrapped invocation class.
-         * @param invocationArgs  the invocation constructor arguments
-         */
-        public TargetInvocationWrapper(
-                @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass,
-                @Nullable final Object... invocationArgs) {
-            super(newInstanceOf(invocationClass, asArgs(invocationArgs)));
-        }
-    }
+  }
 }

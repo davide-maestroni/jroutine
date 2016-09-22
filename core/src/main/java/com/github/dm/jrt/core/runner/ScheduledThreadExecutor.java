@@ -33,88 +33,88 @@ import java.util.concurrent.TimeUnit;
  */
 class ScheduledThreadExecutor extends ScheduledThreadPoolExecutor {
 
-    private final ExecutorService mExecutor;
+  private final ExecutorService mExecutor;
+
+  /**
+   * Constructor.
+   *
+   * @param service the executor service.
+   */
+  ScheduledThreadExecutor(@NotNull final ExecutorService service) {
+    super(1);
+    mExecutor = ConstantConditions.notNull("executor service", service);
+  }
+
+  @Override
+  public int hashCode() {
+    return mExecutor.hashCode();
+  }
+
+  @Override
+  public boolean equals(final Object o) {
+    if (this == o) {
+      return true;
+    }
+
+    if ((o == null) || (getClass() != o.getClass())) {
+      return false;
+    }
+
+    final ScheduledThreadExecutor that = (ScheduledThreadExecutor) o;
+    return mExecutor.equals(that.mExecutor);
+  }
+
+  @NotNull
+  @Override
+  public ScheduledFuture<?> schedule(final Runnable command, final long delay,
+      final TimeUnit unit) {
+    return super.schedule(new CommandRunnable(mExecutor, command), delay, unit);
+  }
+
+  @NotNull
+  @Override
+  public <V> ScheduledFuture<V> schedule(final Callable<V> callable, final long delay,
+      final TimeUnit unit) {
+    return ConstantConditions.unsupported();
+  }
+
+  @NotNull
+  @Override
+  public ScheduledFuture<?> scheduleAtFixedRate(final Runnable command, final long initialDelay,
+      final long period, final TimeUnit unit) {
+    return ConstantConditions.unsupported();
+  }
+
+  @NotNull
+  @Override
+  public ScheduledFuture<?> scheduleWithFixedDelay(final Runnable command, final long initialDelay,
+      final long delay, final TimeUnit unit) {
+    return ConstantConditions.unsupported();
+  }
+
+  /**
+   * Runnable executing another runnable.
+   */
+  private static class CommandRunnable implements Runnable {
+
+    private final Runnable mCommand;
+
+    private final ExecutorService mService;
 
     /**
      * Constructor.
      *
      * @param service the executor service.
+     * @param command the command to execute.
      */
-    ScheduledThreadExecutor(@NotNull final ExecutorService service) {
-        super(1);
-        mExecutor = ConstantConditions.notNull("executor service", service);
+    private CommandRunnable(@NotNull final ExecutorService service,
+        @NotNull final Runnable command) {
+      mService = service;
+      mCommand = command;
     }
 
-    @Override
-    public int hashCode() {
-        return mExecutor.hashCode();
+    public void run() {
+      mService.execute(mCommand);
     }
-
-    @Override
-    public boolean equals(final Object o) {
-        if (this == o) {
-            return true;
-        }
-
-        if ((o == null) || (getClass() != o.getClass())) {
-            return false;
-        }
-
-        final ScheduledThreadExecutor that = (ScheduledThreadExecutor) o;
-        return mExecutor.equals(that.mExecutor);
-    }
-
-    @NotNull
-    @Override
-    public ScheduledFuture<?> schedule(final Runnable command, final long delay,
-            final TimeUnit unit) {
-        return super.schedule(new CommandRunnable(mExecutor, command), delay, unit);
-    }
-
-    @NotNull
-    @Override
-    public <V> ScheduledFuture<V> schedule(final Callable<V> callable, final long delay,
-            final TimeUnit unit) {
-        return ConstantConditions.unsupported();
-    }
-
-    @NotNull
-    @Override
-    public ScheduledFuture<?> scheduleAtFixedRate(final Runnable command, final long initialDelay,
-            final long period, final TimeUnit unit) {
-        return ConstantConditions.unsupported();
-    }
-
-    @NotNull
-    @Override
-    public ScheduledFuture<?> scheduleWithFixedDelay(final Runnable command,
-            final long initialDelay, final long delay, final TimeUnit unit) {
-        return ConstantConditions.unsupported();
-    }
-
-    /**
-     * Runnable executing another runnable.
-     */
-    private static class CommandRunnable implements Runnable {
-
-        private final Runnable mCommand;
-
-        private final ExecutorService mService;
-
-        /**
-         * Constructor.
-         *
-         * @param service the executor service.
-         * @param command the command to execute.
-         */
-        private CommandRunnable(@NotNull final ExecutorService service,
-                @NotNull final Runnable command) {
-            mService = service;
-            mCommand = command;
-        }
-
-        public void run() {
-            mService.execute(mCommand);
-        }
-    }
+  }
 }

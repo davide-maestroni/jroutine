@@ -34,24 +34,23 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class SupplierInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
 
-    private final SupplierDecorator<? extends Invocation<? super IN, ? extends OUT>> mSupplier;
+  private final SupplierDecorator<? extends Invocation<? super IN, ? extends OUT>> mSupplier;
 
-    /**
-     * Constructor.
-     *
-     * @param supplier the supplier function.
-     */
-    SupplierInvocationFactory(
-            @NotNull final SupplierDecorator<? extends Invocation<? super IN, ? extends OUT>>
-                    supplier) {
-        super(asArgs(ConstantConditions.notNull("supplier wrapper", supplier)));
-        mSupplier = supplier;
-    }
+  /**
+   * Constructor.
+   *
+   * @param supplier the supplier function.
+   */
+  SupplierInvocationFactory(
+      @NotNull final SupplierDecorator<? extends Invocation<? super IN, ? extends OUT>> supplier) {
+    super(asArgs(ConstantConditions.notNull("supplier wrapper", supplier)));
+    mSupplier = supplier;
+  }
 
-    @NotNull
-    @Override
-    @SuppressWarnings("unchecked")
-    public Invocation<IN, OUT> newInvocation() throws Exception {
-        return (Invocation<IN, OUT>) mSupplier.get();
-    }
+  @NotNull
+  @Override
+  @SuppressWarnings("unchecked")
+  public Invocation<IN, OUT> newInvocation() throws Exception {
+    return (Invocation<IN, OUT>) mSupplier.get();
+  }
 }

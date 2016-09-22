@@ -32,56 +32,56 @@ import static com.github.dm.jrt.operator.math.Numbers.addOptimistic;
  */
 class AverageFloatInvocation extends TemplateInvocation<Number, Float> {
 
-    private static final InvocationFactory<Number, Float> sFactory =
-            new InvocationFactory<Number, Float>(null) {
+  private static final InvocationFactory<Number, Float> sFactory =
+      new InvocationFactory<Number, Float>(null) {
 
-                @NotNull
-                @Override
-                public Invocation<Number, Float> newInvocation() {
-                    return new AverageFloatInvocation();
-                }
-            };
-
-    private int mCount;
-
-    private Number mSum;
-
-    /**
-     * Constructor.
-     */
-    private AverageFloatInvocation() {
-    }
-
-    /**
-     * Returns a factory of invocations computing the average of the input numbers in floating
-     * precision.
-     *
-     * @return the factory instance.
-     */
-    @NotNull
-    static InvocationFactory<Number, Float> factoryOf() {
-        return sFactory;
-    }
-
-    @Override
-    public void onComplete(@NotNull final Channel<Float, ?> result) {
-        if (mCount == 0) {
-            result.pass(0f);
-
-        } else {
-            result.pass(mSum.floatValue() / mCount);
+        @NotNull
+        @Override
+        public Invocation<Number, Float> newInvocation() {
+          return new AverageFloatInvocation();
         }
-    }
+      };
 
-    @Override
-    public void onInput(final Number input, @NotNull final Channel<Float, ?> result) {
-        mSum = addOptimistic(mSum, input).floatValue();
-        ++mCount;
-    }
+  private int mCount;
 
-    @Override
-    public void onRestart() {
-        mSum = (byte) 0;
-        mCount = 0;
+  private Number mSum;
+
+  /**
+   * Constructor.
+   */
+  private AverageFloatInvocation() {
+  }
+
+  /**
+   * Returns a factory of invocations computing the average of the input numbers in floating
+   * precision.
+   *
+   * @return the factory instance.
+   */
+  @NotNull
+  static InvocationFactory<Number, Float> factoryOf() {
+    return sFactory;
+  }
+
+  @Override
+  public void onComplete(@NotNull final Channel<Float, ?> result) {
+    if (mCount == 0) {
+      result.pass(0f);
+
+    } else {
+      result.pass(mSum.floatValue() / mCount);
     }
+  }
+
+  @Override
+  public void onInput(final Number input, @NotNull final Channel<Float, ?> result) {
+    mSum = addOptimistic(mSum, input).floatValue();
+    ++mCount;
+  }
+
+  @Override
+  public void onRestart() {
+    mSum = (byte) 0;
+    mCount = 0;
+  }
 }

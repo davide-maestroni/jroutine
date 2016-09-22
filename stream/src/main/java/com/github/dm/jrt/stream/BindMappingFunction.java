@@ -36,64 +36,63 @@ import org.jetbrains.annotations.NotNull;
  */
 class BindMappingFunction<IN, OUT> implements Function<Channel<?, IN>, Channel<?, OUT>> {
 
-    private final ChannelConfiguration mConfiguration;
+  private final ChannelConfiguration mConfiguration;
+
+  private final Function<? super IN, ? extends OUT> mMappingFunction;
+
+  /**
+   * Constructor.
+   *
+   * @param configuration   the channel configuration.
+   * @param mappingFunction the mapping function.
+   */
+  BindMappingFunction(@NotNull final ChannelConfiguration configuration,
+      @NotNull final Function<? super IN, ? extends OUT> mappingFunction) {
+    mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
+    mMappingFunction = ConstantConditions.notNull("function instance", mappingFunction);
+  }
+
+  public Channel<?, OUT> apply(final Channel<?, IN> channel) {
+    final Channel<OUT, OUT> outputChannel = JRoutineCore.io().apply(mConfiguration).buildChannel();
+    channel.bind(new MappingFunctionConsumer<IN, OUT>(mMappingFunction, outputChannel));
+    return outputChannel;
+  }
+
+  /**
+   * Channel consumer implementation.
+   *
+   * @param <IN>  the input data type.
+   * @param <OUT> the output data type.
+   */
+  private static class MappingFunctionConsumer<IN, OUT> implements ChannelConsumer<IN> {
 
     private final Function<? super IN, ? extends OUT> mMappingFunction;
+
+    private final Channel<OUT, ?> mOutputChannel;
 
     /**
      * Constructor.
      *
-     * @param configuration   the channel configuration.
      * @param mappingFunction the mapping function.
+     * @param outputChannel   the output channel.
      */
-    BindMappingFunction(@NotNull final ChannelConfiguration configuration,
-            @NotNull final Function<? super IN, ? extends OUT> mappingFunction) {
-        mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
-        mMappingFunction = ConstantConditions.notNull("function instance", mappingFunction);
+    private MappingFunctionConsumer(
+        @NotNull final Function<? super IN, ? extends OUT> mappingFunction,
+        @NotNull final Channel<OUT, ?> outputChannel) {
+      mMappingFunction = mappingFunction;
+      mOutputChannel = outputChannel;
     }
 
-    public Channel<?, OUT> apply(final Channel<?, IN> channel) {
-        final Channel<OUT, OUT> outputChannel =
-                JRoutineCore.io().apply(mConfiguration).buildChannel();
-        channel.bind(new MappingFunctionConsumer<IN, OUT>(mMappingFunction, outputChannel));
-        return outputChannel;
+    public void onComplete() {
+      mOutputChannel.close();
     }
 
-    /**
-     * Channel consumer implementation.
-     *
-     * @param <IN>  the input data type.
-     * @param <OUT> the output data type.
-     */
-    private static class MappingFunctionConsumer<IN, OUT> implements ChannelConsumer<IN> {
-
-        private final Function<? super IN, ? extends OUT> mMappingFunction;
-
-        private final Channel<OUT, ?> mOutputChannel;
-
-        /**
-         * Constructor.
-         *
-         * @param mappingFunction the mapping function.
-         * @param outputChannel   the output channel.
-         */
-        private MappingFunctionConsumer(
-                @NotNull final Function<? super IN, ? extends OUT> mappingFunction,
-                @NotNull final Channel<OUT, ?> outputChannel) {
-            mMappingFunction = mappingFunction;
-            mOutputChannel = outputChannel;
-        }
-
-        public void onComplete() {
-            mOutputChannel.close();
-        }
-
-        public void onError(@NotNull final RoutineException error) {
-            mOutputChannel.abort(error);
-        }
-
-        public void onOutput(final IN output) throws Exception {
-            mOutputChannel.pass(mMappingFunction.apply(output));
-        }
+    public void onError(@NotNull final RoutineException error) {
+      mOutputChannel.abort(error);
     }
+
+    public void onOutput(final IN output) throws Exception {
+      mOutputChannel.pass(mMappingFunction.apply(output));
+    }
+  }
 }

@@ -37,59 +37,59 @@ import org.jetbrains.annotations.Nullable;
  */
 public interface ObjectProxyRoutineBuilder extends ObjectRoutineBuilder {
 
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    ObjectProxyRoutineBuilder apply(@NotNull InvocationConfiguration configuration);
+  /**
+   * {@inheritDoc}
+   */
+  @NotNull
+  ObjectProxyRoutineBuilder apply(@NotNull InvocationConfiguration configuration);
+
+  /**
+   * {@inheritDoc}
+   */
+  @NotNull
+  ObjectProxyRoutineBuilder apply(@NotNull ObjectConfiguration configuration);
+
+  /**
+   * {@inheritDoc}
+   */
+  @NotNull
+  InvocationConfiguration.Builder<? extends ObjectProxyRoutineBuilder>
+  applyInvocationConfiguration();
+
+  /**
+   * {@inheritDoc}
+   */
+  @NotNull
+  ObjectConfiguration.Builder<? extends ObjectProxyRoutineBuilder> applyObjectConfiguration();
+
+  /**
+   * Force the type of builder to be employed to create the proxy instance.
+   * <br>
+   * A null value means default algorithm will be applied, that is, the builder type will be
+   * automatically chosen based on the proxy interface definition.
+   *
+   * @param builderType the builder type.
+   * @return this builder.
+   */
+  @NotNull
+  ObjectProxyRoutineBuilder withType(@Nullable BuilderType builderType);
+
+  /**
+   * Builder type enumeration.
+   */
+  enum BuilderType {
 
     /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    ObjectProxyRoutineBuilder apply(@NotNull ObjectConfiguration configuration);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    InvocationConfiguration.Builder<? extends ObjectProxyRoutineBuilder>
-    applyInvocationConfiguration();
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    ObjectConfiguration.Builder<? extends ObjectProxyRoutineBuilder> applyObjectConfiguration();
-
-    /**
-     * Force the type of builder to be employed to create the proxy instance.
+     * Object routine builder.
      * <br>
-     * A null value means default algorithm will be applied, that is, the builder type will be
-     * automatically chosen based on the proxy interface definition.
-     *
-     * @param builderType the builder type.
-     * @return this builder.
+     * The proxy instance will be created through reflection.
      */
-    @NotNull
-    ObjectProxyRoutineBuilder withType(@Nullable BuilderType builderType);
-
+    OBJECT,
     /**
-     * Builder type enumeration.
+     * Proxy routine builder.
+     * <br>
+     * The proxy instance will be created through code generation.
      */
-    enum BuilderType {
-
-        /**
-         * Object routine builder.
-         * <br>
-         * The proxy instance will be created through reflection.
-         */
-        OBJECT,
-        /**
-         * Proxy routine builder.
-         * <br>
-         * The proxy instance will be created through code generation.
-         */
-        PROXY
-    }
+    PROXY
+  }
 }

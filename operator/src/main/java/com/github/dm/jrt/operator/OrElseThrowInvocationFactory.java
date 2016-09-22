@@ -35,59 +35,59 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class OrElseThrowInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
 
+  private final Throwable mError;
+
+  /**
+   * Constructor.
+   *
+   * @param error the error.
+   */
+  OrElseThrowInvocationFactory(@Nullable final Throwable error) {
+    super(asArgs(error));
+    mError = error;
+  }
+
+  @NotNull
+  @Override
+  public Invocation<DATA, DATA> newInvocation() {
+    return new OrElseThrowInvocation<DATA>(mError);
+  }
+
+  /**
+   * Invocation aborting the execution when no output has been received.
+   *
+   * @param <DATA> the data type.
+   */
+  private static class OrElseThrowInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
+
     private final Throwable mError;
+
+    private boolean mHasOutputs;
 
     /**
      * Constructor.
      *
      * @param error the error.
      */
-    protected OrElseThrowInvocationFactory(@Nullable final Throwable error) {
-        super(asArgs(error));
-        mError = error;
+    OrElseThrowInvocation(@Nullable final Throwable error) {
+      mError = error;
     }
 
-    @NotNull
+    public void onComplete(@NotNull final Channel<DATA, ?> result) throws Exception {
+      if (!mHasOutputs) {
+        result.abort(mError);
+      }
+    }
+
     @Override
-    public Invocation<DATA, DATA> newInvocation() {
-        return new OrElseThrowInvocation<DATA>(mError);
+    public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) {
+      mHasOutputs = true;
+      result.pass(input);
     }
 
-    /**
-     * Invocation aborting the execution when no output has been received.
-     *
-     * @param <DATA> the data type.
-     */
-    private static class OrElseThrowInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
-
-        private final Throwable mError;
-
-        private boolean mHasOutputs;
-
-        /**
-         * Constructor.
-         *
-         * @param error the error.
-         */
-        OrElseThrowInvocation(@Nullable final Throwable error) {
-            mError = error;
-        }
-
-        public void onComplete(@NotNull final Channel<DATA, ?> result) throws Exception {
-            if (!mHasOutputs) {
-                result.abort(mError);
-            }
-        }
-
-        @Override
-        public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) {
-            mHasOutputs = true;
-            result.pass(input);
-        }
-
-        @Override
-        public void onRestart() {
-            mHasOutputs = false;
-        }
+    @Override
+    public void onRestart() {
+      mHasOutputs = false;
     }
+  }
 }

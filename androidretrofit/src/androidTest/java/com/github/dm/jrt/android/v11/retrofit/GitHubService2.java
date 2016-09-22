@@ -34,8 +34,8 @@ import retrofit2.http.Path;
  */
 public interface GitHubService2 {
 
-    @GET("users/{user}/repos")
-    @Headers("Accept: application/json")
-    @CacheStrategy(CacheStrategyType.CACHE)
-    LoaderStreamBuilder<Object, List<Repo>> streamLoaderRepos(@Path("user") String user);
+  @GET("users/{user}/repos")
+  @Headers("Accept: application/json")
+  @CacheStrategy(CacheStrategyType.CACHE)
+  LoaderStreamBuilder<Object, List<Repo>> streamLoaderRepos(@Path("user") String user);
 }

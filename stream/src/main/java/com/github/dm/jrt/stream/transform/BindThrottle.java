@@ -37,103 +37,101 @@ import org.jetbrains.annotations.NotNull;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class BindThrottle<IN, OUT> implements
-        BiFunction<StreamConfiguration, Function<Channel<?, IN>, Channel<?, OUT>>, Function<?
-                super Channel<?, IN>, ? extends Channel<?, OUT>>> {
+class BindThrottle<IN, OUT>
+    implements BiFunction<StreamConfiguration, Function<Channel<?, IN>, Channel<?, OUT>>, Function<?
+    super Channel<?, IN>, ? extends Channel<?, OUT>>> {
 
-    private final int mMaxCount;
+  private final int mMaxCount;
 
-    private final Object mMutex = new Object();
+  private final Object mMutex = new Object();
 
-    private final SimpleQueue<Runnable> mQueue = new SimpleQueue<Runnable>();
+  private final SimpleQueue<Runnable> mQueue = new SimpleQueue<Runnable>();
 
-    private int mCount;
+  private int mCount;
+
+  /**
+   * Constructor.
+   *
+   * @param count the maximum invocation count.
+   */
+  BindThrottle(final int count) {
+    mMaxCount = ConstantConditions.positive("max count", count);
+  }
+
+  public Function<? super Channel<?, IN>, ? extends Channel<?, OUT>> apply(
+      final StreamConfiguration streamConfiguration,
+      final Function<Channel<?, IN>, Channel<?, OUT>> function) {
+    return new BindingFunction(streamConfiguration.toChannelConfiguration(), function);
+  }
+
+  /**
+   * Binding function implementation.
+   */
+  private class BindingFunction
+      implements Function<Channel<?, IN>, Channel<?, OUT>>, CompletionHandler {
+
+    private final Function<? super Channel<?, IN>, ? extends Channel<?, OUT>> mBindingFunction;
+
+    private final ChannelConfiguration mConfiguration;
 
     /**
      * Constructor.
      *
-     * @param count the maximum invocation count.
+     * @param configuration   the channel configuration.
+     * @param bindingFunction the binding function.
      */
-    BindThrottle(final int count) {
-        mMaxCount = ConstantConditions.positive("max count", count);
+    private BindingFunction(@NotNull final ChannelConfiguration configuration,
+        @NotNull final Function<? super Channel<?, IN>, ? extends Channel<?, OUT>>
+            bindingFunction) {
+      mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
+      mBindingFunction = ConstantConditions.notNull("binding function", bindingFunction);
     }
 
-    public Function<? super Channel<?, IN>, ? extends Channel<?, OUT>> apply(
-            final StreamConfiguration streamConfiguration,
-            final Function<Channel<?, IN>, Channel<?, OUT>> function) {
-        return new BindingFunction(streamConfiguration.toChannelConfiguration(), function);
-    }
+    public Channel<?, OUT> apply(final Channel<?, IN> channel) throws Exception {
+      final ChannelConfiguration configuration = mConfiguration;
+      final Channel<OUT, OUT> outputChannel = JRoutineCore.io().apply(configuration).buildChannel();
+      final boolean isBind;
+      synchronized (mMutex) {
+        isBind = (++mCount <= mMaxCount);
+        if (!isBind) {
+          mQueue.add(new Runnable() {
 
-    /**
-     * Binding function implementation.
-     */
-    private class BindingFunction
-            implements Function<Channel<?, IN>, Channel<?, OUT>>, CompletionHandler {
-
-        private final Function<? super Channel<?, IN>, ? extends Channel<?, OUT>> mBindingFunction;
-
-        private final ChannelConfiguration mConfiguration;
-
-        /**
-         * Constructor.
-         *
-         * @param configuration   the channel configuration.
-         * @param bindingFunction the binding function.
-         */
-        private BindingFunction(@NotNull final ChannelConfiguration configuration,
-                @NotNull final Function<? super Channel<?, IN>, ? extends Channel<?, OUT>>
-                        bindingFunction) {
-            mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
-            mBindingFunction = ConstantConditions.notNull("binding function", bindingFunction);
-        }
-
-        public Channel<?, OUT> apply(final Channel<?, IN> channel) throws Exception {
-            final ChannelConfiguration configuration = mConfiguration;
-            final Channel<OUT, OUT> outputChannel =
-                    JRoutineCore.io().apply(configuration).buildChannel();
-            final boolean isBind;
-            synchronized (mMutex) {
-                isBind = (++mCount <= mMaxCount);
-                if (!isBind) {
-                    mQueue.add(new Runnable() {
-
-                        public void run() {
-                            try {
-                                mBindingFunction.apply(channel)
-                                                .bind(new ThrottleChannelConsumer<OUT>(
-                                                        BindingFunction.this, outputChannel));
-
-                            } catch (final Throwable t) {
-                                outputChannel.abort(t);
-                                onComplete();
-                                InvocationInterruptedException.throwIfInterrupt(t);
-                            }
-                        }
-                    });
-                }
-            }
-
-            if (isBind) {
+            public void run() {
+              try {
                 mBindingFunction.apply(channel)
-                                .bind(new ThrottleChannelConsumer<OUT>(this, outputChannel));
+                                .bind(new ThrottleChannelConsumer<OUT>(BindingFunction.this,
+                                    outputChannel));
+
+              } catch (final Throwable t) {
+                outputChannel.abort(t);
+                onComplete();
+                InvocationInterruptedException.throwIfInterrupt(t);
+              }
             }
-
-            return outputChannel;
+          });
         }
+      }
 
-        public void onComplete() {
-            final Runnable runnable;
-            synchronized (mMutex) {
-                --mCount;
-                final SimpleQueue<Runnable> queue = mQueue;
-                if (queue.isEmpty()) {
-                    return;
-                }
+      if (isBind) {
+        mBindingFunction.apply(channel).bind(new ThrottleChannelConsumer<OUT>(this, outputChannel));
+      }
 
-                runnable = queue.removeFirst();
-            }
-
-            runnable.run();
-        }
+      return outputChannel;
     }
+
+    public void onComplete() {
+      final Runnable runnable;
+      synchronized (mMutex) {
+        --mCount;
+        final SimpleQueue<Runnable> queue = mQueue;
+        if (queue.isEmpty()) {
+          return;
+        }
+
+        runnable = queue.removeFirst();
+      }
+
+      runnable.run();
+    }
+  }
 }

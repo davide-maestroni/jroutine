@@ -35,29 +35,29 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class ReplaceInvocation<DATA> extends MappingInvocation<DATA, DATA> {
 
-    private final PredicateDecorator<? super DATA> mPredicate;
+  private final PredicateDecorator<? super DATA> mPredicate;
 
-    private final DATA mReplacement;
+  private final DATA mReplacement;
 
-    /**
-     * Constructor.
-     *
-     * @param predicate   the predicate instance.
-     * @param replacement the replacement instance.
-     */
-    ReplaceInvocation(@NotNull final PredicateDecorator<? super DATA> predicate,
-            @Nullable final DATA replacement) {
-        super(asArgs(ConstantConditions.notNull("predicate instance", predicate), replacement));
-        mPredicate = predicate;
-        mReplacement = replacement;
+  /**
+   * Constructor.
+   *
+   * @param predicate   the predicate instance.
+   * @param replacement the replacement instance.
+   */
+  ReplaceInvocation(@NotNull final PredicateDecorator<? super DATA> predicate,
+      @Nullable final DATA replacement) {
+    super(asArgs(ConstantConditions.notNull("predicate instance", predicate), replacement));
+    mPredicate = predicate;
+    mReplacement = replacement;
+  }
+
+  public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) throws Exception {
+    if (mPredicate.test(input)) {
+      result.pass(mReplacement);
+
+    } else {
+      result.pass(input);
     }
-
-    public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) throws Exception {
-        if (mPredicate.test(input)) {
-            result.pass(mReplacement);
-
-        } else {
-            result.pass(input);
-        }
-    }
+  }
 }

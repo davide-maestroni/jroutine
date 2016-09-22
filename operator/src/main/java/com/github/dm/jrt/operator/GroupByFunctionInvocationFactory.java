@@ -40,75 +40,74 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class GroupByFunctionInvocationFactory<DATA> extends InvocationFactory<DATA, List<DATA>> {
 
+  private final FunctionDecorator<DATA, Object> mKeyFunction;
+
+  /**
+   * Constructor.
+   *
+   * @param keyFunction the function returning the group key.
+   */
+  GroupByFunctionInvocationFactory(@NotNull final FunctionDecorator<DATA, Object> keyFunction) {
+    super(asArgs(ConstantConditions.notNull("function instance", keyFunction)));
+    mKeyFunction = keyFunction;
+  }
+
+  @NotNull
+  @Override
+  public Invocation<DATA, List<DATA>> newInvocation() throws Exception {
+    return new GroupByFunctionInvocation<DATA>(mKeyFunction);
+  }
+
+  /**
+   * Routine invocation grouping data into collections based on the same key.
+   *
+   * @param <DATA> the data type.
+   */
+  private static class GroupByFunctionInvocation<DATA>
+      extends TemplateInvocation<DATA, List<DATA>> {
+
     private final FunctionDecorator<DATA, Object> mKeyFunction;
+
+    private HashMap<Object, ArrayList<DATA>> mGroups;
 
     /**
      * Constructor.
      *
      * @param keyFunction the function returning the group key.
      */
-    GroupByFunctionInvocationFactory(@NotNull final FunctionDecorator<DATA, Object> keyFunction) {
-        super(asArgs(ConstantConditions.notNull("function instance", keyFunction)));
-        mKeyFunction = keyFunction;
+    private GroupByFunctionInvocation(@NotNull final FunctionDecorator<DATA, Object> keyFunction) {
+      mKeyFunction = keyFunction;
     }
 
-    @NotNull
     @Override
-    public Invocation<DATA, List<DATA>> newInvocation() throws Exception {
-        return new GroupByFunctionInvocation<DATA>(mKeyFunction);
+    public void onComplete(@NotNull final Channel<List<DATA>, ?> result) {
+      for (final ArrayList<DATA> inputs : mGroups.values()) {
+        result.pass(inputs);
+      }
     }
 
-    /**
-     * Routine invocation grouping data into collections based on the same key.
-     *
-     * @param <DATA> the data type.
-     */
-    private static class GroupByFunctionInvocation<DATA>
-            extends TemplateInvocation<DATA, List<DATA>> {
+    @Override
+    public void onInput(final DATA input, @NotNull final Channel<List<DATA>, ?> result) throws
+        Exception {
+      final Object key = mKeyFunction.apply(input);
+      final HashMap<Object, ArrayList<DATA>> groups = mGroups;
+      ArrayList<DATA> inputs = groups.get(key);
+      if (inputs == null) {
+        inputs = new ArrayList<DATA>();
+        groups.put(key, inputs);
+      }
 
-        private final FunctionDecorator<DATA, Object> mKeyFunction;
-
-        private HashMap<Object, ArrayList<DATA>> mGroups;
-
-        /**
-         * Constructor.
-         *
-         * @param keyFunction the function returning the group key.
-         */
-        private GroupByFunctionInvocation(
-                @NotNull final FunctionDecorator<DATA, Object> keyFunction) {
-            mKeyFunction = keyFunction;
-        }
-
-        @Override
-        public void onComplete(@NotNull final Channel<List<DATA>, ?> result) {
-            for (final ArrayList<DATA> inputs : mGroups.values()) {
-                result.pass(inputs);
-            }
-        }
-
-        @Override
-        public void onInput(final DATA input, @NotNull final Channel<List<DATA>, ?> result) throws
-                Exception {
-            final Object key = mKeyFunction.apply(input);
-            final HashMap<Object, ArrayList<DATA>> groups = mGroups;
-            ArrayList<DATA> inputs = groups.get(key);
-            if (inputs == null) {
-                inputs = new ArrayList<DATA>();
-                groups.put(key, inputs);
-            }
-
-            inputs.add(input);
-        }
-
-        @Override
-        public void onRecycle(final boolean isReused) {
-            mGroups = null;
-        }
-
-        @Override
-        public void onRestart() {
-            mGroups = new HashMap<Object, ArrayList<DATA>>();
-        }
+      inputs.add(input);
     }
+
+    @Override
+    public void onRecycle(final boolean isReused) {
+      mGroups = null;
+    }
+
+    @Override
+    public void onRestart() {
+      mGroups = new HashMap<Object, ArrayList<DATA>>();
+    }
+  }
 }

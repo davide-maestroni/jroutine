@@ -34,20 +34,20 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class ConsumerMappingInvocation<IN, OUT> extends MappingInvocation<IN, OUT> {
 
-    private final BiConsumerDecorator<? super IN, ? super Channel<OUT, ?>> mConsumer;
+  private final BiConsumerDecorator<? super IN, ? super Channel<OUT, ?>> mConsumer;
 
-    /**
-     * Constructor.
-     *
-     * @param consumer the consumer instance.
-     */
-    ConsumerMappingInvocation(
-            @NotNull final BiConsumerDecorator<? super IN, ? super Channel<OUT, ?>> consumer) {
-        super(asArgs(ConstantConditions.notNull("bi-consumer wrapper", consumer)));
-        mConsumer = consumer;
-    }
+  /**
+   * Constructor.
+   *
+   * @param consumer the consumer instance.
+   */
+  ConsumerMappingInvocation(
+      @NotNull final BiConsumerDecorator<? super IN, ? super Channel<OUT, ?>> consumer) {
+    super(asArgs(ConstantConditions.notNull("bi-consumer wrapper", consumer)));
+    mConsumer = consumer;
+  }
 
-    public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) throws Exception {
-        mConsumer.accept(input, result);
-    }
+  public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) throws Exception {
+    mConsumer.accept(input, result);
+  }
 }

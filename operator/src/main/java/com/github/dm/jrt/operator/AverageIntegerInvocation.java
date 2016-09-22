@@ -32,56 +32,56 @@ import static com.github.dm.jrt.operator.math.Numbers.addOptimistic;
  */
 class AverageIntegerInvocation extends TemplateInvocation<Number, Integer> {
 
-    private static final InvocationFactory<Number, Integer> sFactory =
-            new InvocationFactory<Number, Integer>(null) {
+  private static final InvocationFactory<Number, Integer> sFactory =
+      new InvocationFactory<Number, Integer>(null) {
 
-                @NotNull
-                @Override
-                public Invocation<Number, Integer> newInvocation() {
-                    return new AverageIntegerInvocation();
-                }
-            };
-
-    private int mCount;
-
-    private Number mSum;
-
-    /**
-     * Constructor.
-     */
-    private AverageIntegerInvocation() {
-    }
-
-    /**
-     * Returns a factory of invocations computing the average of the input numbers in integer
-     * precision.
-     *
-     * @return the factory instance.
-     */
-    @NotNull
-    static InvocationFactory<Number, Integer> factoryOf() {
-        return sFactory;
-    }
-
-    @Override
-    public void onComplete(@NotNull final Channel<Integer, ?> result) {
-        if (mCount == 0) {
-            result.pass(0);
-
-        } else {
-            result.pass(mSum.intValue() / mCount);
+        @NotNull
+        @Override
+        public Invocation<Number, Integer> newInvocation() {
+          return new AverageIntegerInvocation();
         }
-    }
+      };
 
-    @Override
-    public void onInput(final Number input, @NotNull final Channel<Integer, ?> result) {
-        mSum = addOptimistic(mSum, input).intValue();
-        ++mCount;
-    }
+  private int mCount;
 
-    @Override
-    public void onRestart() {
-        mSum = (byte) 0;
-        mCount = 0;
+  private Number mSum;
+
+  /**
+   * Constructor.
+   */
+  private AverageIntegerInvocation() {
+  }
+
+  /**
+   * Returns a factory of invocations computing the average of the input numbers in integer
+   * precision.
+   *
+   * @return the factory instance.
+   */
+  @NotNull
+  static InvocationFactory<Number, Integer> factoryOf() {
+    return sFactory;
+  }
+
+  @Override
+  public void onComplete(@NotNull final Channel<Integer, ?> result) {
+    if (mCount == 0) {
+      result.pass(0);
+
+    } else {
+      result.pass(mSum.intValue() / mCount);
     }
+  }
+
+  @Override
+  public void onInput(final Number input, @NotNull final Channel<Integer, ?> result) {
+    mSum = addOptimistic(mSum, input).intValue();
+    ++mCount;
+  }
+
+  @Override
+  public void onRestart() {
+    mSum = (byte) 0;
+    mCount = 0;
+  }
 }

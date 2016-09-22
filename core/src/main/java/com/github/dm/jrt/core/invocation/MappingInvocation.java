@@ -33,32 +33,32 @@ import org.jetbrains.annotations.Nullable;
  * @param <OUT> the output data type.
  */
 public abstract class MappingInvocation<IN, OUT> extends InvocationFactory<IN, OUT>
-        implements Invocation<IN, OUT> {
+    implements Invocation<IN, OUT> {
 
-    /**
-     * Constructor.
-     *
-     * @param args the constructor arguments.
-     */
-    protected MappingInvocation(@Nullable final Object[] args) {
-        super(args);
-    }
+  /**
+   * Constructor.
+   *
+   * @param args the constructor arguments.
+   */
+  protected MappingInvocation(@Nullable final Object[] args) {
+    super(args);
+  }
 
-    @NotNull
-    @Override
-    public final Invocation<IN, OUT> newInvocation() {
-        return this;
-    }
+  @NotNull
+  @Override
+  public final Invocation<IN, OUT> newInvocation() {
+    return this;
+  }
 
-    public final void onAbort(@NotNull final RoutineException reason) {
-    }
+  public final void onAbort(@NotNull final RoutineException reason) {
+  }
 
-    public final void onComplete(@NotNull final Channel<OUT, ?> result) {
-    }
+  public final void onComplete(@NotNull final Channel<OUT, ?> result) {
+  }
 
-    public final void onRecycle(final boolean isReused) {
-    }
+  public final void onRecycle(final boolean isReused) {
+  }
 
-    public final void onRestart() {
-    }
+  public final void onRestart() {
+  }
 }

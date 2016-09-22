@@ -58,10 +58,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface MaxInstances {
 
-    /**
-     * The max number of concurrently running invocation instances.
-     *
-     * @return the instance number.
-     */
-    int value();
+  /**
+   * The max number of concurrently running invocation instances.
+   *
+   * @return the instance number.
+   */
+  int value();
 }

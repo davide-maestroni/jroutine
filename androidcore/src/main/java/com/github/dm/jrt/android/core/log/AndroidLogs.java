@@ -27,22 +27,22 @@ import org.jetbrains.annotations.NotNull;
  */
 public class AndroidLogs {
 
-    private static final AndroidLog sAndroidLog = new AndroidLog();
+  private static final AndroidLog sAndroidLog = new AndroidLog();
 
-    /**
-     * Avoid explicit instantiation.
-     */
-    protected AndroidLogs() {
-        ConstantConditions.avoid();
-    }
+  /**
+   * Avoid explicit instantiation.
+   */
+  protected AndroidLogs() {
+    ConstantConditions.avoid();
+  }
 
-    /**
-     * Returns the Android log shared instance.
-     *
-     * @return the shared instance.
-     */
-    @NotNull
-    public static AndroidLog androidLog() {
-        return sAndroidLog;
-    }
+  /**
+   * Returns the Android log shared instance.
+   *
+   * @return the shared instance.
+   */
+  @NotNull
+  public static AndroidLog androidLog() {
+    return sAndroidLog;
+  }
 }

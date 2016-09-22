@@ -58,10 +58,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface FactoryId {
 
-    /**
-     * The routine ID.
-     *
-     * @return the ID.
-     */
-    int value();
+  /**
+   * The routine ID.
+   *
+   * @return the ID.
+   */
+  int value();
 }

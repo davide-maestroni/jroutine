@@ -46,433 +46,431 @@ import static org.junit.Assert.fail;
  */
 public class ReplayChannelTest {
 
-    @Test
-    public void testChannel() {
+  @Test
+  public void testChannel() {
 
-        Channel<?, String> channel = Channels.replay(JRoutineCore.io().of("test")).buildChannels();
-        assertThat(channel.isOpen()).isFalse();
-        assertThat(channel.abort()).isFalse();
-        assertThat(channel.abort(null)).isFalse();
-        assertThat(channel.close().isOpen()).isFalse();
-        assertThat(channel.isEmpty()).isFalse();
-        assertThat(channel.getComplete()).isTrue();
-        assertThat(channel.isBound()).isFalse();
-        final ArrayList<String> results = new ArrayList<String>();
-        assertThat(channel.after(1, TimeUnit.SECONDS).hasNext()).isTrue();
-        channel.now().allInto(results);
-        assertThat(results).containsExactly("test");
-        channel = Channels.replay(JRoutineCore.io().of("test1", "test2", "test3")).buildChannels();
+    Channel<?, String> channel = Channels.replay(JRoutineCore.io().of("test")).buildChannels();
+    assertThat(channel.isOpen()).isFalse();
+    assertThat(channel.abort()).isFalse();
+    assertThat(channel.abort(null)).isFalse();
+    assertThat(channel.close().isOpen()).isFalse();
+    assertThat(channel.isEmpty()).isFalse();
+    assertThat(channel.getComplete()).isTrue();
+    assertThat(channel.isBound()).isFalse();
+    final ArrayList<String> results = new ArrayList<String>();
+    assertThat(channel.after(1, TimeUnit.SECONDS).hasNext()).isTrue();
+    channel.now().allInto(results);
+    assertThat(results).containsExactly("test");
+    channel = Channels.replay(JRoutineCore.io().of("test1", "test2", "test3")).buildChannels();
 
-        try {
-            channel.remove();
-            fail();
+    try {
+      channel.remove();
+      fail();
 
-        } catch (final UnsupportedOperationException ignored) {
+    } catch (final UnsupportedOperationException ignored) {
 
-        }
-
-        assertThat(channel.skipNext(1).next(1)).containsExactly("test2");
-        assertThat(channel.eventuallyContinue().next(4)).containsExactly("test3");
-        assertThat(channel.eventuallyContinue().nextOrElse("test4")).isEqualTo("test4");
-
-        Iterator<String> iterator = Channels.replay(JRoutineCore.io().of("test1", "test2", "test3"))
-                                            .buildChannels()
-                                            .iterator();
-        assertThat(iterator.hasNext()).isTrue();
-        assertThat(iterator.next()).isEqualTo("test1");
-
-        try {
-            iterator.remove();
-            fail();
-
-        } catch (final UnsupportedOperationException ignored) {
-
-        }
-
-        iterator = Channels.replay(JRoutineCore.io().of("test1", "test2", "test3"))
-                           .buildChannels()
-                           .expiringIterator();
-        assertThat(iterator.hasNext()).isTrue();
-        assertThat(iterator.next()).isEqualTo("test1");
-
-        try {
-            iterator.remove();
-            fail();
-
-        } catch (final UnsupportedOperationException ignored) {
-
-        }
-
-        channel = Channels.replay(
-                JRoutineCore.io().<String>buildChannel().after(days(1)).pass("test"))
-                          .buildChannels();
-
-        try {
-            channel.eventuallyFail().next();
-            fail();
-
-        } catch (final TimeoutException ignored) {
-
-        }
-
-        try {
-            channel.eventuallyContinue().next();
-            fail();
-
-        } catch (final NoSuchElementException ignored) {
-
-        }
-
-        try {
-            channel.eventuallyAbort().next();
-            fail();
-
-        } catch (final AbortException ignored) {
-
-        }
-
-        try {
-            channel.eventuallyAbort(new IllegalArgumentException()).next();
-            fail();
-
-        } catch (final AbortException e) {
-            assertThat(e.getCause()).isNull();
-        }
-
-        channel = Channels.replay(
-                JRoutineCore.io().<String>buildChannel().after(seconds(1)).pass("test"))
-                          .buildChannels();
-
-        try {
-            channel.eventuallyAbort(new IllegalArgumentException()).next();
-            fail();
-
-        } catch (final AbortException e) {
-            assertThat(e.getCause()).isExactlyInstanceOf(IllegalArgumentException.class);
-        }
     }
 
-    @Test
-    @SuppressWarnings("unchecked")
-    public void testInvalidCalls() {
-        final Channel<String, String> inputChannel = JRoutineCore.io().buildChannel();
-        final Channel<Object, String> channel =
-                (Channel<Object, String>) Channels.replay(inputChannel).buildChannels();
-        try {
-            channel.sorted().pass("test");
-            fail();
+    assertThat(channel.skipNext(1).next(1)).containsExactly("test2");
+    assertThat(channel.eventuallyContinue().next(4)).containsExactly("test3");
+    assertThat(channel.eventuallyContinue().nextOrElse("test4")).isEqualTo("test4");
 
-        } catch (final IllegalStateException ignored) {
-        }
+    Iterator<String> iterator =
+        Channels.replay(JRoutineCore.io().of("test1", "test2", "test3")).buildChannels().iterator();
+    assertThat(iterator.hasNext()).isTrue();
+    assertThat(iterator.next()).isEqualTo("test1");
 
-        try {
-            channel.unsorted().pass("test", "test");
-            fail();
+    try {
+      iterator.remove();
+      fail();
 
-        } catch (final IllegalStateException ignored) {
-        }
+    } catch (final UnsupportedOperationException ignored) {
 
-        try {
-            channel.pass(Collections.singleton("test"));
-            fail();
-
-        } catch (final IllegalStateException ignored) {
-        }
-
-        try {
-            channel.pass(JRoutineCore.io().buildChannel());
-            fail();
-
-        } catch (final IllegalStateException ignored) {
-        }
     }
 
-    @Test
-    public void testReplay() {
+    iterator = Channels.replay(JRoutineCore.io().of("test1", "test2", "test3"))
+                       .buildChannels()
+                       .expiringIterator();
+    assertThat(iterator.hasNext()).isTrue();
+    assertThat(iterator.next()).isEqualTo("test1");
 
-        final Channel<Object, Object> inputChannel = JRoutineCore.io().buildChannel();
-        final Channel<?, Object> channel = Channels.replay(inputChannel).buildChannels();
-        assertThat(channel.isBound()).isFalse();
-        assertThat(channel.isEmpty()).isTrue();
-        inputChannel.pass("test1", "test2");
-        final Channel<Object, Object> output1 = JRoutineCore.io().buildChannel();
-        channel.bind(output1).close();
-        assertThat(output1.next()).isEqualTo("test1");
-        final Channel<Object, Object> output2 = JRoutineCore.io().buildChannel();
-        channel.bind(output2).close();
-        assertThat(channel.isOpen()).isFalse();
-        channel.close();
-        assertThat(channel.isOpen()).isFalse();
-        inputChannel.pass("test3").close();
-        assertThat(channel.isOpen()).isFalse();
-        assertThat(channel.getComplete()).isTrue();
-        channel.bind(output1);
-        assertThat(output2.all()).containsExactly("test1", "test2", "test3");
-        assertThat(output1.all()).containsExactly("test2", "test3");
-        assertThat(channel.isEmpty()).isFalse();
+    try {
+      iterator.remove();
+      fail();
+
+    } catch (final UnsupportedOperationException ignored) {
+
     }
 
-    @Test
-    @SuppressWarnings({"ConstantConditions", "ThrowableResultOfMethodCallIgnored"})
-    public void testReplayAbort() {
+    channel = Channels.replay(JRoutineCore.io().<String>buildChannel().after(days(1)).pass("test"))
+                      .buildChannels();
 
-        Channel<Object, Object> inputChannel = JRoutineCore.io().buildChannel();
-        Channel<?, Object> channel = Channels.replay(inputChannel).buildChannels();
-        inputChannel.pass("test1", "test2");
-        final Channel<Object, Object> output1 = JRoutineCore.io().buildChannel();
-        channel.bind(output1).close();
-        assertThat(output1.next()).isEqualTo("test1");
-        final Channel<Object, Object> output2 = JRoutineCore.io().buildChannel();
-        channel.bind(output2).close();
-        inputChannel.abort();
+    try {
+      channel.eventuallyFail().next();
+      fail();
 
-        try {
-            output1.all();
-            fail();
+    } catch (final TimeoutException ignored) {
 
-        } catch (final AbortException ignored) {
-
-        }
-
-        try {
-            output2.all();
-            fail();
-
-        } catch (final AbortException ignored) {
-
-        }
-
-        inputChannel = JRoutineCore.io().buildChannel();
-        channel = Channels.replay(inputChannel).buildChannels();
-        inputChannel.pass("test").close();
-        channel.bind(new TemplateChannelConsumer<Object>() {
-
-            @Override
-            public void onOutput(final Object output) throws Exception {
-
-                throw new IllegalAccessError();
-            }
-        });
-        assertThat(channel.getError()).isNull();
     }
 
-    @Test
-    @SuppressWarnings({"ConstantConditions", "ThrowableResultOfMethodCallIgnored"})
-    public void testReplayAbortException() {
+    try {
+      channel.eventuallyContinue().next();
+      fail();
 
-        Channel<Object, Object> inputChannel = JRoutineCore.io().buildChannel();
-        Channel<?, Object> channel = Channels.replay(inputChannel).buildChannels();
-        channel.bind(new TemplateChannelConsumer<Object>() {
+    } catch (final NoSuchElementException ignored) {
 
-            @Override
-            public void onError(@NotNull final RoutineException error) throws Exception {
-
-                throw new UnsupportedOperationException();
-            }
-        });
-        inputChannel.abort();
-        assertThat(channel.getError().getCause()).isNull();
-        inputChannel = JRoutineCore.io().buildChannel();
-        channel = Channels.replay(inputChannel).buildChannels();
-        channel.bind(new TemplateChannelConsumer<Object>() {
-
-            @Override
-            public void onError(@NotNull final RoutineException error) throws Exception {
-
-                throw new RoutineException();
-            }
-        });
-        inputChannel.abort();
-        assertThat(channel.getError().getCause()).isNull();
-
-        inputChannel = JRoutineCore.io().buildChannel();
-        channel = Channels.replay(inputChannel).buildChannels();
-        inputChannel.abort();
-        channel.bind(new TemplateChannelConsumer<Object>() {
-
-            @Override
-            public void onError(@NotNull final RoutineException error) throws Exception {
-
-                throw new UnsupportedOperationException();
-            }
-        });
-        assertThat(channel.getError().getCause()).isNull();
-        inputChannel = JRoutineCore.io().buildChannel();
-        channel = Channels.replay(inputChannel).buildChannels();
-        inputChannel.abort();
-        channel.bind(new TemplateChannelConsumer<Object>() {
-
-            @Override
-            public void onError(@NotNull final RoutineException error) throws Exception {
-
-                throw new RoutineException();
-            }
-        });
-        assertThat(channel.getError().getCause()).isNull();
     }
 
-    @Test
-    public void testReplayConsumer() {
+    try {
+      channel.eventuallyAbort().next();
+      fail();
 
-        final Channel<Object, Object> inputChannel = JRoutineCore.io().buildChannel();
-        final Channel<?, Object> channel = Channels.replay(inputChannel).buildChannels();
-        assertThat(channel.isBound()).isFalse();
-        assertThat(channel.isEmpty()).isTrue();
-        inputChannel.pass("test1", "test2");
-        final ArrayList<Object> outputs = new ArrayList<Object>();
-        final TemplateChannelConsumer<Object> consumer = new TemplateChannelConsumer<Object>() {
+    } catch (final AbortException ignored) {
 
-            @Override
-            public void onOutput(final Object output) throws Exception {
-
-                outputs.add(output);
-            }
-        };
-        channel.bind(consumer);
-        assertThat(channel.isOpen()).isFalse();
-        inputChannel.pass("test3").close();
-        assertThat(channel.isOpen()).isFalse();
-        assertThat(channel.getComplete()).isTrue();
-        channel.bind(consumer);
-        assertThat(outputs).containsExactly("test1", "test2", "test3");
-        assertThat(channel.isEmpty()).isFalse();
     }
 
-    @Test
-    public void testReplayError() {
+    try {
+      channel.eventuallyAbort(new IllegalArgumentException()).next();
+      fail();
 
-        final Channel<Object, Object> inputChannel = JRoutineCore.io().buildChannel();
-        final Channel<?, Object> channel = Channels.replay(inputChannel).buildChannels();
-        channel.eventuallyContinue();
-        try {
-            channel.remove();
-            fail();
-
-        } catch (final UnsupportedOperationException ignored) {
-
-        }
-
-        channel.eventuallyAbort();
-        try {
-            channel.remove();
-            fail();
-
-        } catch (final UnsupportedOperationException ignored) {
-
-        }
-
-        channel.eventuallyAbort(new NullPointerException());
-        try {
-            channel.remove();
-            fail();
-
-        } catch (final UnsupportedOperationException ignored) {
-
-        }
-
-        channel.eventuallyFail();
-        try {
-            channel.remove();
-            fail();
-
-        } catch (final UnsupportedOperationException ignored) {
-
-        }
-
-        channel.now();
-        try {
-            channel.remove();
-            fail();
-
-        } catch (final UnsupportedOperationException ignored) {
-
-        }
-
-        channel.after(seconds(3));
-        try {
-            channel.remove();
-            fail();
-
-        } catch (final UnsupportedOperationException ignored) {
-
-        }
-
-        channel.after(3, TimeUnit.SECONDS);
-        try {
-            channel.remove();
-            fail();
-
-        } catch (final UnsupportedOperationException ignored) {
-
-        }
+    } catch (final AbortException e) {
+      assertThat(e.getCause()).isNull();
     }
 
-    @Test
-    public void testReplayException() {
+    channel =
+        Channels.replay(JRoutineCore.io().<String>buildChannel().after(seconds(1)).pass("test"))
+                .buildChannels();
 
-        Channel<Object, Object> inputChannel = JRoutineCore.io().buildChannel();
-        Channel<?, Object> channel = Channels.replay(inputChannel).buildChannels();
-        channel.bind(new TemplateChannelConsumer<Object>() {
+    try {
+      channel.eventuallyAbort(new IllegalArgumentException()).next();
+      fail();
 
-            @Override
-            public void onComplete() throws Exception {
+    } catch (final AbortException e) {
+      assertThat(e.getCause()).isExactlyInstanceOf(IllegalArgumentException.class);
+    }
+  }
 
-                throw new UnsupportedOperationException();
-            }
-        });
-        inputChannel.pass("test").close().throwError();
-        inputChannel = JRoutineCore.io().buildChannel();
-        channel = Channels.replay(inputChannel).buildChannels();
-        channel.bind(new TemplateChannelConsumer<Object>() {
+  @Test
+  @SuppressWarnings("unchecked")
+  public void testInvalidCalls() {
+    final Channel<String, String> inputChannel = JRoutineCore.io().buildChannel();
+    final Channel<Object, String> channel =
+        (Channel<Object, String>) Channels.replay(inputChannel).buildChannels();
+    try {
+      channel.sorted().pass("test");
+      fail();
 
-            @Override
-            public void onComplete() throws Exception {
-
-                throw new RoutineException();
-            }
-        });
-        inputChannel.pass("test").close().throwError();
-
-        inputChannel = JRoutineCore.io().buildChannel();
-        channel = Channels.replay(inputChannel).buildChannels();
-        inputChannel.pass("test").close();
-        channel.bind(new TemplateChannelConsumer<Object>() {
-
-            @Override
-            public void onComplete() throws Exception {
-
-                throw new UnsupportedOperationException();
-            }
-        });
-        channel.throwError();
-        inputChannel = JRoutineCore.io().buildChannel();
-        channel = Channels.replay(inputChannel).buildChannels();
-        inputChannel.pass("test").close();
-        channel.bind(new TemplateChannelConsumer<Object>() {
-
-            @Override
-            public void onComplete() throws Exception {
-
-                throw new RoutineException();
-            }
-        });
-        channel.throwError();
+    } catch (final IllegalStateException ignored) {
     }
 
-    @Test
-    public void testSize() {
+    try {
+      channel.unsorted().pass("test", "test");
+      fail();
 
-        final Channel<Object, Object> channel =
-                JRoutineCore.with(IdentityInvocation.factoryOf()).call();
-        assertThat(channel.inputCount()).isEqualTo(0);
-        channel.after(millis(500)).pass("test");
-        assertThat(channel.inputCount()).isEqualTo(1);
-        assertThat(channel.outputCount()).isEqualTo(0);
-        final Channel<?, Object> result = Channels.replay(channel.now().close()).buildChannels();
-        assertThat(result.after(seconds(1)).getComplete()).isTrue();
-        assertThat(result.inputCount()).isEqualTo(0);
-        assertThat(result.outputCount()).isEqualTo(1);
-        assertThat(result.size()).isEqualTo(1);
-        assertThat(result.skipNext(1).outputCount()).isEqualTo(0);
+    } catch (final IllegalStateException ignored) {
     }
+
+    try {
+      channel.pass(Collections.singleton("test"));
+      fail();
+
+    } catch (final IllegalStateException ignored) {
+    }
+
+    try {
+      channel.pass(JRoutineCore.io().buildChannel());
+      fail();
+
+    } catch (final IllegalStateException ignored) {
+    }
+  }
+
+  @Test
+  public void testReplay() {
+
+    final Channel<Object, Object> inputChannel = JRoutineCore.io().buildChannel();
+    final Channel<?, Object> channel = Channels.replay(inputChannel).buildChannels();
+    assertThat(channel.isBound()).isFalse();
+    assertThat(channel.isEmpty()).isTrue();
+    inputChannel.pass("test1", "test2");
+    final Channel<Object, Object> output1 = JRoutineCore.io().buildChannel();
+    channel.bind(output1).close();
+    assertThat(output1.next()).isEqualTo("test1");
+    final Channel<Object, Object> output2 = JRoutineCore.io().buildChannel();
+    channel.bind(output2).close();
+    assertThat(channel.isOpen()).isFalse();
+    channel.close();
+    assertThat(channel.isOpen()).isFalse();
+    inputChannel.pass("test3").close();
+    assertThat(channel.isOpen()).isFalse();
+    assertThat(channel.getComplete()).isTrue();
+    channel.bind(output1);
+    assertThat(output2.all()).containsExactly("test1", "test2", "test3");
+    assertThat(output1.all()).containsExactly("test2", "test3");
+    assertThat(channel.isEmpty()).isFalse();
+  }
+
+  @Test
+  @SuppressWarnings({"ConstantConditions", "ThrowableResultOfMethodCallIgnored"})
+  public void testReplayAbort() {
+
+    Channel<Object, Object> inputChannel = JRoutineCore.io().buildChannel();
+    Channel<?, Object> channel = Channels.replay(inputChannel).buildChannels();
+    inputChannel.pass("test1", "test2");
+    final Channel<Object, Object> output1 = JRoutineCore.io().buildChannel();
+    channel.bind(output1).close();
+    assertThat(output1.next()).isEqualTo("test1");
+    final Channel<Object, Object> output2 = JRoutineCore.io().buildChannel();
+    channel.bind(output2).close();
+    inputChannel.abort();
+
+    try {
+      output1.all();
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+
+    try {
+      output2.all();
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+
+    inputChannel = JRoutineCore.io().buildChannel();
+    channel = Channels.replay(inputChannel).buildChannels();
+    inputChannel.pass("test").close();
+    channel.bind(new TemplateChannelConsumer<Object>() {
+
+      @Override
+      public void onOutput(final Object output) throws Exception {
+
+        throw new IllegalAccessError();
+      }
+    });
+    assertThat(channel.getError()).isNull();
+  }
+
+  @Test
+  @SuppressWarnings({"ConstantConditions", "ThrowableResultOfMethodCallIgnored"})
+  public void testReplayAbortException() {
+
+    Channel<Object, Object> inputChannel = JRoutineCore.io().buildChannel();
+    Channel<?, Object> channel = Channels.replay(inputChannel).buildChannels();
+    channel.bind(new TemplateChannelConsumer<Object>() {
+
+      @Override
+      public void onError(@NotNull final RoutineException error) throws Exception {
+
+        throw new UnsupportedOperationException();
+      }
+    });
+    inputChannel.abort();
+    assertThat(channel.getError().getCause()).isNull();
+    inputChannel = JRoutineCore.io().buildChannel();
+    channel = Channels.replay(inputChannel).buildChannels();
+    channel.bind(new TemplateChannelConsumer<Object>() {
+
+      @Override
+      public void onError(@NotNull final RoutineException error) throws Exception {
+
+        throw new RoutineException();
+      }
+    });
+    inputChannel.abort();
+    assertThat(channel.getError().getCause()).isNull();
+
+    inputChannel = JRoutineCore.io().buildChannel();
+    channel = Channels.replay(inputChannel).buildChannels();
+    inputChannel.abort();
+    channel.bind(new TemplateChannelConsumer<Object>() {
+
+      @Override
+      public void onError(@NotNull final RoutineException error) throws Exception {
+
+        throw new UnsupportedOperationException();
+      }
+    });
+    assertThat(channel.getError().getCause()).isNull();
+    inputChannel = JRoutineCore.io().buildChannel();
+    channel = Channels.replay(inputChannel).buildChannels();
+    inputChannel.abort();
+    channel.bind(new TemplateChannelConsumer<Object>() {
+
+      @Override
+      public void onError(@NotNull final RoutineException error) throws Exception {
+
+        throw new RoutineException();
+      }
+    });
+    assertThat(channel.getError().getCause()).isNull();
+  }
+
+  @Test
+  public void testReplayConsumer() {
+
+    final Channel<Object, Object> inputChannel = JRoutineCore.io().buildChannel();
+    final Channel<?, Object> channel = Channels.replay(inputChannel).buildChannels();
+    assertThat(channel.isBound()).isFalse();
+    assertThat(channel.isEmpty()).isTrue();
+    inputChannel.pass("test1", "test2");
+    final ArrayList<Object> outputs = new ArrayList<Object>();
+    final TemplateChannelConsumer<Object> consumer = new TemplateChannelConsumer<Object>() {
+
+      @Override
+      public void onOutput(final Object output) throws Exception {
+
+        outputs.add(output);
+      }
+    };
+    channel.bind(consumer);
+    assertThat(channel.isOpen()).isFalse();
+    inputChannel.pass("test3").close();
+    assertThat(channel.isOpen()).isFalse();
+    assertThat(channel.getComplete()).isTrue();
+    channel.bind(consumer);
+    assertThat(outputs).containsExactly("test1", "test2", "test3");
+    assertThat(channel.isEmpty()).isFalse();
+  }
+
+  @Test
+  public void testReplayError() {
+
+    final Channel<Object, Object> inputChannel = JRoutineCore.io().buildChannel();
+    final Channel<?, Object> channel = Channels.replay(inputChannel).buildChannels();
+    channel.eventuallyContinue();
+    try {
+      channel.remove();
+      fail();
+
+    } catch (final UnsupportedOperationException ignored) {
+
+    }
+
+    channel.eventuallyAbort();
+    try {
+      channel.remove();
+      fail();
+
+    } catch (final UnsupportedOperationException ignored) {
+
+    }
+
+    channel.eventuallyAbort(new NullPointerException());
+    try {
+      channel.remove();
+      fail();
+
+    } catch (final UnsupportedOperationException ignored) {
+
+    }
+
+    channel.eventuallyFail();
+    try {
+      channel.remove();
+      fail();
+
+    } catch (final UnsupportedOperationException ignored) {
+
+    }
+
+    channel.now();
+    try {
+      channel.remove();
+      fail();
+
+    } catch (final UnsupportedOperationException ignored) {
+
+    }
+
+    channel.after(seconds(3));
+    try {
+      channel.remove();
+      fail();
+
+    } catch (final UnsupportedOperationException ignored) {
+
+    }
+
+    channel.after(3, TimeUnit.SECONDS);
+    try {
+      channel.remove();
+      fail();
+
+    } catch (final UnsupportedOperationException ignored) {
+
+    }
+  }
+
+  @Test
+  public void testReplayException() {
+
+    Channel<Object, Object> inputChannel = JRoutineCore.io().buildChannel();
+    Channel<?, Object> channel = Channels.replay(inputChannel).buildChannels();
+    channel.bind(new TemplateChannelConsumer<Object>() {
+
+      @Override
+      public void onComplete() throws Exception {
+
+        throw new UnsupportedOperationException();
+      }
+    });
+    inputChannel.pass("test").close().throwError();
+    inputChannel = JRoutineCore.io().buildChannel();
+    channel = Channels.replay(inputChannel).buildChannels();
+    channel.bind(new TemplateChannelConsumer<Object>() {
+
+      @Override
+      public void onComplete() throws Exception {
+
+        throw new RoutineException();
+      }
+    });
+    inputChannel.pass("test").close().throwError();
+
+    inputChannel = JRoutineCore.io().buildChannel();
+    channel = Channels.replay(inputChannel).buildChannels();
+    inputChannel.pass("test").close();
+    channel.bind(new TemplateChannelConsumer<Object>() {
+
+      @Override
+      public void onComplete() throws Exception {
+
+        throw new UnsupportedOperationException();
+      }
+    });
+    channel.throwError();
+    inputChannel = JRoutineCore.io().buildChannel();
+    channel = Channels.replay(inputChannel).buildChannels();
+    inputChannel.pass("test").close();
+    channel.bind(new TemplateChannelConsumer<Object>() {
+
+      @Override
+      public void onComplete() throws Exception {
+
+        throw new RoutineException();
+      }
+    });
+    channel.throwError();
+  }
+
+  @Test
+  public void testSize() {
+
+    final Channel<Object, Object> channel =
+        JRoutineCore.with(IdentityInvocation.factoryOf()).call();
+    assertThat(channel.inputCount()).isEqualTo(0);
+    channel.after(millis(500)).pass("test");
+    assertThat(channel.inputCount()).isEqualTo(1);
+    assertThat(channel.outputCount()).isEqualTo(0);
+    final Channel<?, Object> result = Channels.replay(channel.now().close()).buildChannels();
+    assertThat(result.after(seconds(1)).getComplete()).isTrue();
+    assertThat(result.inputCount()).isEqualTo(0);
+    assertThat(result.outputCount()).isEqualTo(1);
+    assertThat(result.size()).isEqualTo(1);
+    assertThat(result.skipNext(1).outputCount()).isEqualTo(0);
+  }
 }

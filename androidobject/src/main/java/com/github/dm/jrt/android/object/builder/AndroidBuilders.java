@@ -44,131 +44,130 @@ import java.lang.reflect.Method;
  */
 public class AndroidBuilders {
 
-    /**
-     * Avoid explicit instantiation.
-     */
-    protected AndroidBuilders() {
-        ConstantConditions.avoid();
+  /**
+   * Avoid explicit instantiation.
+   */
+  protected AndroidBuilders() {
+    ConstantConditions.avoid();
+  }
+
+  /**
+   * Returns a Loader configuration properly modified by taking into account the annotations added
+   * to the specified method.
+   *
+   * @param configuration the initial configuration.
+   * @param annotations   the annotations.
+   * @return the modified configuration.
+   * @see com.github.dm.jrt.android.object.annotation.CacheStrategy CacheStrategy
+   * @see com.github.dm.jrt.android.object.annotation.ClashResolution ClashResolution
+   * @see com.github.dm.jrt.android.object.annotation.FactoryId FactoryId
+   * @see com.github.dm.jrt.android.object.annotation.MatchResolution MatchResolution
+   * @see com.github.dm.jrt.android.object.annotation.LoaderId LoaderId
+   * @see com.github.dm.jrt.android.object.annotation.ResultStaleTime ResultStaleTime
+   */
+  @NotNull
+  public static LoaderConfiguration withAnnotations(
+      @Nullable final LoaderConfiguration configuration,
+      @Nullable final Annotation... annotations) {
+    final LoaderConfiguration.Builder<LoaderConfiguration> builder =
+        LoaderConfiguration.builderFrom(configuration);
+    if (annotations == null) {
+      return builder.configured();
     }
 
-    /**
-     * Returns a Loader configuration properly modified by taking into account the annotations added
-     * to the specified method.
-     *
-     * @param configuration the initial configuration.
-     * @param annotations   the annotations.
-     * @return the modified configuration.
-     * @see com.github.dm.jrt.android.object.annotation.CacheStrategy CacheStrategy
-     * @see com.github.dm.jrt.android.object.annotation.ClashResolution ClashResolution
-     * @see com.github.dm.jrt.android.object.annotation.FactoryId FactoryId
-     * @see com.github.dm.jrt.android.object.annotation.MatchResolution MatchResolution
-     * @see com.github.dm.jrt.android.object.annotation.LoaderId LoaderId
-     * @see com.github.dm.jrt.android.object.annotation.ResultStaleTime ResultStaleTime
-     */
-    @NotNull
-    public static LoaderConfiguration withAnnotations(
-            @Nullable final LoaderConfiguration configuration,
-            @Nullable final Annotation... annotations) {
-        final LoaderConfiguration.Builder<LoaderConfiguration> builder =
-                LoaderConfiguration.builderFrom(configuration);
-        if (annotations == null) {
-            return builder.configured();
-        }
+    for (final Annotation annotation : annotations) {
+      final Class<? extends Annotation> annotationType = annotation.annotationType();
+      if (annotationType == LoaderId.class) {
+        builder.withLoaderId(((LoaderId) annotation).value());
 
-        for (final Annotation annotation : annotations) {
-            final Class<? extends Annotation> annotationType = annotation.annotationType();
-            if (annotationType == LoaderId.class) {
-                builder.withLoaderId(((LoaderId) annotation).value());
+      } else if (annotationType == FactoryId.class) {
+        builder.withFactoryId(((FactoryId) annotation).value());
 
-            } else if (annotationType == FactoryId.class) {
-                builder.withFactoryId(((FactoryId) annotation).value());
+      } else if (annotationType == ClashResolution.class) {
+        builder.withClashResolution(((ClashResolution) annotation).value());
 
-            } else if (annotationType == ClashResolution.class) {
-                builder.withClashResolution(((ClashResolution) annotation).value());
+      } else if (annotationType == MatchResolution.class) {
+        builder.withMatchResolution(((MatchResolution) annotation).value());
 
-            } else if (annotationType == MatchResolution.class) {
-                builder.withMatchResolution(((MatchResolution) annotation).value());
+      } else if (annotationType == CacheStrategy.class) {
+        builder.withCacheStrategy(((CacheStrategy) annotation).value());
 
-            } else if (annotationType == CacheStrategy.class) {
-                builder.withCacheStrategy(((CacheStrategy) annotation).value());
-
-            } else if (annotationType == ResultStaleTime.class) {
-                final ResultStaleTime timeAnnotation = (ResultStaleTime) annotation;
-                builder.withResultStaleTime(timeAnnotation.value(), timeAnnotation.unit());
-            }
-        }
-
-        return builder.configured();
+      } else if (annotationType == ResultStaleTime.class) {
+        final ResultStaleTime timeAnnotation = (ResultStaleTime) annotation;
+        builder.withResultStaleTime(timeAnnotation.value(), timeAnnotation.unit());
+      }
     }
 
-    /**
-     * Returns a Loader configuration properly modified by taking into account the annotations added
-     * to the specified method.
-     *
-     * @param configuration the initial configuration.
-     * @param method        the target method.
-     * @return the modified configuration.
-     * @see com.github.dm.jrt.android.object.annotation.CacheStrategy CacheStrategy
-     * @see com.github.dm.jrt.android.object.annotation.ClashResolution ClashResolution
-     * @see com.github.dm.jrt.android.object.annotation.FactoryId FactoryId
-     * @see com.github.dm.jrt.android.object.annotation.MatchResolution MatchResolution
-     * @see com.github.dm.jrt.android.object.annotation.LoaderId LoaderId
-     * @see com.github.dm.jrt.android.object.annotation.ResultStaleTime ResultStaleTime
-     */
-    @NotNull
-    public static LoaderConfiguration withAnnotations(
-            @Nullable final LoaderConfiguration configuration, @NotNull final Method method) {
-        return withAnnotations(configuration, method.getDeclaredAnnotations());
+    return builder.configured();
+  }
+
+  /**
+   * Returns a Loader configuration properly modified by taking into account the annotations added
+   * to the specified method.
+   *
+   * @param configuration the initial configuration.
+   * @param method        the target method.
+   * @return the modified configuration.
+   * @see com.github.dm.jrt.android.object.annotation.CacheStrategy CacheStrategy
+   * @see com.github.dm.jrt.android.object.annotation.ClashResolution ClashResolution
+   * @see com.github.dm.jrt.android.object.annotation.FactoryId FactoryId
+   * @see com.github.dm.jrt.android.object.annotation.MatchResolution MatchResolution
+   * @see com.github.dm.jrt.android.object.annotation.LoaderId LoaderId
+   * @see com.github.dm.jrt.android.object.annotation.ResultStaleTime ResultStaleTime
+   */
+  @NotNull
+  public static LoaderConfiguration withAnnotations(
+      @Nullable final LoaderConfiguration configuration, @NotNull final Method method) {
+    return withAnnotations(configuration, method.getDeclaredAnnotations());
+  }
+
+  /**
+   * Returns a Service configuration properly modified by taking into account the annotations added
+   * to the specified method.
+   *
+   * @param configuration the initial configuration.
+   * @param annotations   the annotations.
+   * @return the modified configuration.
+   * @see com.github.dm.jrt.android.object.annotation.ServiceLog ServiceLog
+   * @see com.github.dm.jrt.android.object.annotation.ServiceRunner ServiceRunner
+   */
+  @NotNull
+  public static ServiceConfiguration withAnnotations(
+      @Nullable final ServiceConfiguration configuration,
+      @Nullable final Annotation... annotations) {
+    final ServiceConfiguration.Builder<ServiceConfiguration> builder =
+        ServiceConfiguration.builderFrom(configuration);
+    if (annotations == null) {
+      return builder.configured();
     }
 
-    /**
-     * Returns a Service configuration properly modified by taking into account the annotations
-     * added to the specified method.
-     *
-     * @param configuration the initial configuration.
-     * @param annotations   the annotations.
-     * @return the modified configuration.
-     * @see com.github.dm.jrt.android.object.annotation.ServiceLog ServiceLog
-     * @see com.github.dm.jrt.android.object.annotation.ServiceRunner ServiceRunner
-     */
-    @NotNull
-    public static ServiceConfiguration withAnnotations(
-            @Nullable final ServiceConfiguration configuration,
-            @Nullable final Annotation... annotations) {
-        final ServiceConfiguration.Builder<ServiceConfiguration> builder =
-                ServiceConfiguration.builderFrom(configuration);
-        if (annotations == null) {
-            return builder.configured();
-        }
+    for (final Annotation annotation : annotations) {
+      final Class<? extends Annotation> annotationType = annotation.annotationType();
+      if (annotationType == ServiceLog.class) {
+        builder.withLogClass(((ServiceLog) annotation).value()).withLogArgs((Object[]) null);
 
-        for (final Annotation annotation : annotations) {
-            final Class<? extends Annotation> annotationType = annotation.annotationType();
-            if (annotationType == ServiceLog.class) {
-                builder.withLogClass(((ServiceLog) annotation).value())
-                       .withLogArgs((Object[]) null);
-
-            } else if (annotationType == ServiceRunner.class) {
-                builder.withRunnerClass(((ServiceRunner) annotation).value())
-                       .withRunnerArgs((Object[]) null);
-            }
-        }
-
-        return builder.configured();
+      } else if (annotationType == ServiceRunner.class) {
+        builder.withRunnerClass(((ServiceRunner) annotation).value())
+               .withRunnerArgs((Object[]) null);
+      }
     }
 
-    /**
-     * Returns a Service configuration properly modified by taking into account the annotations
-     * added to the specified method.
-     *
-     * @param configuration the initial configuration.
-     * @param method        the target method.
-     * @return the modified configuration.
-     * @see com.github.dm.jrt.android.object.annotation.ServiceLog ServiceLog
-     * @see com.github.dm.jrt.android.object.annotation.ServiceRunner ServiceRunner
-     */
-    @NotNull
-    public static ServiceConfiguration withAnnotations(
-            @Nullable final ServiceConfiguration configuration, @NotNull final Method method) {
-        return withAnnotations(configuration, method.getDeclaredAnnotations());
-    }
+    return builder.configured();
+  }
+
+  /**
+   * Returns a Service configuration properly modified by taking into account the annotations added
+   * to the specified method.
+   *
+   * @param configuration the initial configuration.
+   * @param method        the target method.
+   * @return the modified configuration.
+   * @see com.github.dm.jrt.android.object.annotation.ServiceLog ServiceLog
+   * @see com.github.dm.jrt.android.object.annotation.ServiceRunner ServiceRunner
+   */
+  @NotNull
+  public static ServiceConfiguration withAnnotations(
+      @Nullable final ServiceConfiguration configuration, @NotNull final Method method) {
+    return withAnnotations(configuration, method.getDeclaredAnnotations());
+  }
 }

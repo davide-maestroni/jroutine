@@ -39,64 +39,64 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class SortByInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
 
+  private final Comparator<? super DATA> mComparator;
+
+  /**
+   * Constructor.
+   *
+   * @param comparator the comparator instance.
+   */
+  SortByInvocationFactory(@NotNull final Comparator<? super DATA> comparator) {
+    super(asArgs(ConstantConditions.notNull("comparator instance", comparator)));
+    mComparator = comparator;
+  }
+
+  @NotNull
+  @Override
+  public Invocation<DATA, DATA> newInvocation() {
+    return new SortByInvocation<DATA>(mComparator);
+  }
+
+  /**
+   * Invocation sorting the input using a specific comparator.
+   *
+   * @param <DATA> the data type.
+   */
+  private static class SortByInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
+
     private final Comparator<? super DATA> mComparator;
+
+    private ArrayList<DATA> mList;
 
     /**
      * Constructor.
      *
      * @param comparator the comparator instance.
      */
-    SortByInvocationFactory(@NotNull final Comparator<? super DATA> comparator) {
-        super(asArgs(ConstantConditions.notNull("comparator instance", comparator)));
-        mComparator = comparator;
+    private SortByInvocation(@NotNull final Comparator<? super DATA> comparator) {
+      mComparator = comparator;
     }
 
-    @NotNull
     @Override
-    public Invocation<DATA, DATA> newInvocation() {
-        return new SortByInvocation<DATA>(mComparator);
+    public void onComplete(@NotNull final Channel<DATA, ?> result) {
+      final ArrayList<DATA> list = mList;
+      Collections.sort(list, mComparator);
+      result.pass(list);
     }
 
-    /**
-     * Invocation sorting the input using a specific comparator.
-     *
-     * @param <DATA> the data type.
-     */
-    private static class SortByInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
-
-        private final Comparator<? super DATA> mComparator;
-
-        private ArrayList<DATA> mList;
-
-        /**
-         * Constructor.
-         *
-         * @param comparator the comparator instance.
-         */
-        private SortByInvocation(@NotNull final Comparator<? super DATA> comparator) {
-            mComparator = comparator;
-        }
-
-        @Override
-        public void onComplete(@NotNull final Channel<DATA, ?> result) {
-            final ArrayList<DATA> list = mList;
-            Collections.sort(list, mComparator);
-            result.pass(list);
-        }
-
-        @Override
-        public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) {
-            mList.add(input);
-        }
-
-        @Override
-        public void onRecycle(final boolean isReused) {
-            mList = null;
-        }
-
-        @Override
-        public void onRestart() {
-            mList = new ArrayList<DATA>();
-        }
+    @Override
+    public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) {
+      mList.add(input);
     }
+
+    @Override
+    public void onRecycle(final boolean isReused) {
+      mList = null;
+    }
+
+    @Override
+    public void onRestart() {
+      mList = new ArrayList<DATA>();
+    }
+  }
 }

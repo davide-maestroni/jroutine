@@ -36,57 +36,57 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class SkipLastInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
 
+  private final int mCount;
+
+  /**
+   * Constructor.
+   *
+   * @param count the number of data to skip.
+   * @throws java.lang.IllegalArgumentException if the count is negative.
+   */
+  SkipLastInvocationFactory(final int count) {
+    super(asArgs(ConstantConditions.notNegative("count", count)));
+    mCount = count;
+  }
+
+  @NotNull
+  @Override
+  public Invocation<DATA, DATA> newInvocation() {
+    return new SkipLastInvocation<DATA>(mCount);
+  }
+
+  /**
+   * Routine invocation skipping the last input data.
+   *
+   * @param <DATA> the data type.
+   */
+  private static class SkipLastInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
+
     private final int mCount;
+
+    private SimpleQueue<DATA> mData = new SimpleQueue<DATA>();
 
     /**
      * Constructor.
      *
      * @param count the number of data to skip.
-     * @throws java.lang.IllegalArgumentException if the count is negative.
      */
-    SkipLastInvocationFactory(final int count) {
-        super(asArgs(ConstantConditions.notNegative("count", count)));
-        mCount = count;
+    private SkipLastInvocation(final int count) {
+      mCount = count;
     }
 
-    @NotNull
     @Override
-    public Invocation<DATA, DATA> newInvocation() {
-        return new SkipLastInvocation<DATA>(mCount);
+    public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) {
+      final SimpleQueue<DATA> data = mData;
+      data.add(input);
+      if (data.size() > mCount) {
+        result.pass(data.removeFirst());
+      }
     }
 
-    /**
-     * Routine invocation skipping the last input data.
-     *
-     * @param <DATA> the data type.
-     */
-    private static class SkipLastInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
-
-        private final int mCount;
-
-        private SimpleQueue<DATA> mData = new SimpleQueue<DATA>();
-
-        /**
-         * Constructor.
-         *
-         * @param count the number of data to skip.
-         */
-        private SkipLastInvocation(final int count) {
-            mCount = count;
-        }
-
-        @Override
-        public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) {
-            final SimpleQueue<DATA> data = mData;
-            data.add(input);
-            if (data.size() > mCount) {
-                result.pass(data.removeFirst());
-            }
-        }
-
-        @Override
-        public void onRecycle(final boolean isReused) throws Exception {
-            mData.clear();
-        }
+    @Override
+    public void onRecycle(final boolean isReused) throws Exception {
+      mData.clear();
     }
+  }
 }

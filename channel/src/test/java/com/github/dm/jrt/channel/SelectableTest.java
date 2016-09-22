@@ -27,17 +27,17 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class SelectableTest {
 
-    @Test
-    public void testEquals() {
+  @Test
+  public void testEquals() {
 
-        final Selectable<Object> selectable = new Selectable<Object>("test", 0);
-        assertThat(selectable).isEqualTo(selectable);
-        assertThat(selectable).isNotEqualTo(null);
-        assertThat(selectable).isNotEqualTo("test");
-        assertThat(selectable).isNotEqualTo(new Selectable<Object>("test1", 0));
-        assertThat(selectable).isNotEqualTo(new Selectable<Object>("test", 1));
-        assertThat(selectable).isEqualTo(new Selectable<Object>("test", 0));
-        assertThat(selectable.hashCode()).isEqualTo(new Selectable<Object>("test", 0).hashCode());
-        assertThat(selectable.toString()).isEqualTo(new Selectable<Object>("test", 0).toString());
-    }
+    final Selectable<Object> selectable = new Selectable<Object>("test", 0);
+    assertThat(selectable).isEqualTo(selectable);
+    assertThat(selectable).isNotEqualTo(null);
+    assertThat(selectable).isNotEqualTo("test");
+    assertThat(selectable).isNotEqualTo(new Selectable<Object>("test1", 0));
+    assertThat(selectable).isNotEqualTo(new Selectable<Object>("test", 1));
+    assertThat(selectable).isEqualTo(new Selectable<Object>("test", 0));
+    assertThat(selectable.hashCode()).isEqualTo(new Selectable<Object>("test", 0).hashCode());
+    assertThat(selectable.toString()).isEqualTo(new Selectable<Object>("test", 0).toString());
+  }
 }

@@ -34,41 +34,40 @@ import org.jetbrains.annotations.NotNull;
  */
 class TryCatchChannelConsumer<OUT> implements ChannelConsumer<OUT> {
 
-    private final BiConsumer<? super RoutineException, ? super Channel<OUT, ?>> mCatchConsumer;
+  private final BiConsumer<? super RoutineException, ? super Channel<OUT, ?>> mCatchConsumer;
 
-    private final Channel<OUT, ?> mOutputChannel;
+  private final Channel<OUT, ?> mOutputChannel;
 
-    /**
-     * Constructor.
-     *
-     * @param catchConsumer the consumer instance.
-     * @param outputChannel the output channel.
-     */
-    TryCatchChannelConsumer(
-            @NotNull final BiConsumer<? super RoutineException, ? super Channel<OUT, ?>>
-                    catchConsumer,
-            @NotNull final Channel<OUT, ?> outputChannel) {
-        mCatchConsumer = ConstantConditions.notNull("bi-consumer instance", catchConsumer);
-        mOutputChannel = ConstantConditions.notNull("channel instance", outputChannel);
+  /**
+   * Constructor.
+   *
+   * @param catchConsumer the consumer instance.
+   * @param outputChannel the output channel.
+   */
+  TryCatchChannelConsumer(
+      @NotNull final BiConsumer<? super RoutineException, ? super Channel<OUT, ?>> catchConsumer,
+      @NotNull final Channel<OUT, ?> outputChannel) {
+    mCatchConsumer = ConstantConditions.notNull("bi-consumer instance", catchConsumer);
+    mOutputChannel = ConstantConditions.notNull("channel instance", outputChannel);
+  }
+
+  public void onComplete() {
+    mOutputChannel.close();
+  }
+
+  public void onError(@NotNull final RoutineException error) {
+    final Channel<OUT, ?> channel = mOutputChannel;
+    try {
+      mCatchConsumer.accept(error, channel);
+      channel.close();
+
+    } catch (final Throwable t) {
+      channel.abort(t);
+      InvocationInterruptedException.throwIfInterrupt(t);
     }
+  }
 
-    public void onComplete() {
-        mOutputChannel.close();
-    }
-
-    public void onError(@NotNull final RoutineException error) {
-        final Channel<OUT, ?> channel = mOutputChannel;
-        try {
-            mCatchConsumer.accept(error, channel);
-            channel.close();
-
-        } catch (final Throwable t) {
-            channel.abort(t);
-            InvocationInterruptedException.throwIfInterrupt(t);
-        }
-    }
-
-    public void onOutput(final OUT output) {
-        mOutputChannel.pass(output);
-    }
+  public void onOutput(final OUT output) {
+    mOutputChannel.pass(output);
+  }
 }

@@ -33,19 +33,19 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class ConsumerCommandInvocation<OUT> extends CommandInvocation<OUT> {
 
-    private final ConsumerDecorator<? super Channel<OUT, ?>> mConsumer;
+  private final ConsumerDecorator<? super Channel<OUT, ?>> mConsumer;
 
-    /**
-     * Constructor.
-     *
-     * @param consumer the consumer instance.
-     */
-    ConsumerCommandInvocation(@NotNull final ConsumerDecorator<? super Channel<OUT, ?>> consumer) {
-        super(asArgs(ConstantConditions.notNull("consumer wrapper", consumer)));
-        mConsumer = consumer;
-    }
+  /**
+   * Constructor.
+   *
+   * @param consumer the consumer instance.
+   */
+  ConsumerCommandInvocation(@NotNull final ConsumerDecorator<? super Channel<OUT, ?>> consumer) {
+    super(asArgs(ConstantConditions.notNull("consumer wrapper", consumer)));
+    mConsumer = consumer;
+  }
 
-    public void onComplete(@NotNull final Channel<OUT, ?> result) throws Exception {
-        mConsumer.accept(result);
-    }
+  public void onComplete(@NotNull final Channel<OUT, ?> result) throws Exception {
+    mConsumer.accept(result);
+  }
 }

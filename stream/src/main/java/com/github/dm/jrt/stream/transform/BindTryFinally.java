@@ -34,26 +34,25 @@ import org.jetbrains.annotations.NotNull;
  */
 class BindTryFinally<OUT> implements Function<Channel<?, OUT>, Channel<?, OUT>> {
 
-    private final ChannelConfiguration mConfiguration;
+  private final ChannelConfiguration mConfiguration;
 
-    private final Action mFinally;
+  private final Action mFinally;
 
-    /**
-     * Constructor.
-     *
-     * @param configuration the channel configuration.
-     * @param finallyAction the finally action.
-     */
-    BindTryFinally(@NotNull final ChannelConfiguration configuration,
-            @NotNull final Action finallyAction) {
-        mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
-        mFinally = ConstantConditions.notNull("action instance", finallyAction);
-    }
+  /**
+   * Constructor.
+   *
+   * @param configuration the channel configuration.
+   * @param finallyAction the finally action.
+   */
+  BindTryFinally(@NotNull final ChannelConfiguration configuration,
+      @NotNull final Action finallyAction) {
+    mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
+    mFinally = ConstantConditions.notNull("action instance", finallyAction);
+  }
 
-    public Channel<?, OUT> apply(final Channel<?, OUT> channel) {
-        final Channel<OUT, OUT> outputChannel =
-                JRoutineCore.io().apply(mConfiguration).buildChannel();
-        channel.bind(new TryFinallyChannelConsumer<OUT>(mFinally, outputChannel));
-        return outputChannel;
-    }
+  public Channel<?, OUT> apply(final Channel<?, OUT> channel) {
+    final Channel<OUT, OUT> outputChannel = JRoutineCore.io().apply(mConfiguration).buildChannel();
+    channel.bind(new TryFinallyChannelConsumer<OUT>(mFinally, outputChannel));
+    return outputChannel;
+  }
 }

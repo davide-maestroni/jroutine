@@ -31,21 +31,21 @@ import android.view.WindowManager.LayoutParams;
 @TargetApi(VERSION_CODES.ECLAIR)
 public class TestActivity extends Activity {
 
-    @Override
-    protected void onCreate(final Bundle savedInstanceState) {
+  @Override
+  protected void onCreate(final Bundle savedInstanceState) {
 
-        super.onCreate(savedInstanceState);
-        getWindow().addFlags(LayoutParams.FLAG_DISMISS_KEYGUARD |
-                LayoutParams.FLAG_SHOW_WHEN_LOCKED |
-                LayoutParams.FLAG_TURN_SCREEN_ON | LayoutParams.FLAG_KEEP_SCREEN_ON);
-        setContentView(R.layout.test_layout);
-        startService(new Intent(this, TestService.class));
-    }
+    super.onCreate(savedInstanceState);
+    getWindow().addFlags(LayoutParams.FLAG_DISMISS_KEYGUARD |
+        LayoutParams.FLAG_SHOW_WHEN_LOCKED |
+        LayoutParams.FLAG_TURN_SCREEN_ON | LayoutParams.FLAG_KEEP_SCREEN_ON);
+    setContentView(R.layout.test_layout);
+    startService(new Intent(this, TestService.class));
+  }
 
-    @Override
-    protected void onDestroy() {
+  @Override
+  protected void onDestroy() {
 
-        stopService(new Intent(this, TestService.class));
-        super.onDestroy();
-    }
+    stopService(new Intent(this, TestService.class));
+    super.onDestroy();
+  }
 }

@@ -42,10 +42,10 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface CallAdapterFactory {
 
-    /**
-     * The name of the registered adapter factory to employ for the method.
-     *
-     * @return the factory name.
-     */
-    String value();
+  /**
+   * The name of the registered adapter factory to employ for the method.
+   *
+   * @return the factory name.
+   */
+  String value();
 }

@@ -45,58 +45,58 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class AndroidBuildersTest extends AndroidTestCase {
 
-    public void testBuilderConfigurationThroughAnnotations() throws NoSuchMethodException {
+  public void testBuilderConfigurationThroughAnnotations() throws NoSuchMethodException {
 
-        assertThat(withAnnotations(LoaderConfiguration.defaultConfiguration(),
-                AnnotationItf.class.getMethod("toString"))).isEqualTo( //
-                LoaderConfiguration.builder()
-                                   .withCacheStrategy(CacheStrategyType.CACHE_IF_ERROR)
-                                   .withClashResolution(ClashResolutionType.ABORT_BOTH)
-                                   .withFactoryId(13)
-                                   .withMatchResolution(ClashResolutionType.ABORT_THIS)
-                                   .withLoaderId(-77)
-                                   .withResultStaleTime(UnitDuration.millis(333))
-                                   .configured());
-        assertThat(withAnnotations(
-                ServiceConfiguration.builder().withRunnerArgs(1).withLogArgs(1).configured(),
-                AnnotationItf.class.getMethod("toString"))).isEqualTo( //
-                ServiceConfiguration.builder()
-                                    .withLogClass(NullLog.class)
-                                    .withRunnerClass(MyRunner.class)
-                                    .configured());
+    assertThat(withAnnotations(LoaderConfiguration.defaultConfiguration(),
+        AnnotationItf.class.getMethod("toString"))).isEqualTo( //
+        LoaderConfiguration.builder()
+                           .withCacheStrategy(CacheStrategyType.CACHE_IF_ERROR)
+                           .withClashResolution(ClashResolutionType.ABORT_BOTH)
+                           .withFactoryId(13)
+                           .withMatchResolution(ClashResolutionType.ABORT_THIS)
+                           .withLoaderId(-77)
+                           .withResultStaleTime(UnitDuration.millis(333))
+                           .configured());
+    assertThat(withAnnotations(
+        ServiceConfiguration.builder().withRunnerArgs(1).withLogArgs(1).configured(),
+        AnnotationItf.class.getMethod("toString"))).isEqualTo( //
+        ServiceConfiguration.builder()
+                            .withLogClass(NullLog.class)
+                            .withRunnerClass(MyRunner.class)
+                            .configured());
+  }
+
+  public void testConstructor() {
+
+    boolean failed = false;
+    try {
+      new AndroidBuilders();
+      failed = true;
+
+    } catch (final Throwable ignored) {
+
     }
 
-    public void testConstructor() {
+    assertThat(failed).isFalse();
+  }
 
-        boolean failed = false;
-        try {
-            new AndroidBuilders();
-            failed = true;
+  public interface AnnotationItf {
 
-        } catch (final Throwable ignored) {
+    @CacheStrategy(CacheStrategyType.CACHE_IF_ERROR)
+    @ClashResolution(ClashResolutionType.ABORT_BOTH)
+    @FactoryId(13)
+    @MatchResolution(ClashResolutionType.ABORT_THIS)
+    @LoaderId(-77)
+    @ResultStaleTime(333)
+    @ServiceLog(NullLog.class)
+    @ServiceRunner(MyRunner.class)
+    String toString();
+  }
 
-        }
+  public static class MyRunner extends RunnerDecorator {
 
-        assertThat(failed).isFalse();
+    public MyRunner() {
+      super(Runners.sharedRunner());
     }
-
-    public interface AnnotationItf {
-
-        @CacheStrategy(CacheStrategyType.CACHE_IF_ERROR)
-        @ClashResolution(ClashResolutionType.ABORT_BOTH)
-        @FactoryId(13)
-        @MatchResolution(ClashResolutionType.ABORT_THIS)
-        @LoaderId(-77)
-        @ResultStaleTime(333)
-        @ServiceLog(NullLog.class)
-        @ServiceRunner(MyRunner.class)
-        String toString();
-    }
-
-    public static class MyRunner extends RunnerDecorator {
-
-        public MyRunner() {
-            super(Runners.sharedRunner());
-        }
-    }
+  }
 }

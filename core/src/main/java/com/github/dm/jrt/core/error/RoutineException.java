@@ -25,27 +25,27 @@ import org.jetbrains.annotations.Nullable;
  */
 public class RoutineException extends RuntimeException {
 
-    /**
-     * Constructor.
-     */
-    public RoutineException() {
-    }
+  /**
+   * Constructor.
+   */
+  public RoutineException() {
+  }
 
-    /**
-     * Constructor.
-     *
-     * @param message the error message.
-     */
-    public RoutineException(@Nullable final String message) {
-        super(message);
-    }
+  /**
+   * Constructor.
+   *
+   * @param message the error message.
+   */
+  public RoutineException(@Nullable final String message) {
+    super(message);
+  }
 
-    /**
-     * Constructor.
-     *
-     * @param cause the error cause.
-     */
-    public RoutineException(@Nullable final Throwable cause) {
-        super(cause);
-    }
+  /**
+   * Constructor.
+   *
+   * @param cause the error cause.
+   */
+  public RoutineException(@Nullable final Throwable cause) {
+    super(cause);
+  }
 }

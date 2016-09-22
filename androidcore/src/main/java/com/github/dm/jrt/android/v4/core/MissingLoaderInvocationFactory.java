@@ -35,6 +35,31 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 final class MissingLoaderInvocationFactory<OUT> extends ContextInvocationFactory<Void, OUT> {
 
+  private final int mId;
+
+  /**
+   * Constructor.
+   *
+   * @param id the Loader ID.
+   */
+  MissingLoaderInvocationFactory(final int id) {
+    super(asArgs(id));
+    mId = id;
+  }
+
+  @NotNull
+  @Override
+  public ContextInvocation<Void, OUT> newInvocation() {
+    return new MissingLoaderInvocation<OUT>(mId);
+  }
+
+  /**
+   * Call Context invocation implementation.
+   *
+   * @param <OUT> the output data type.
+   */
+  private static class MissingLoaderInvocation<OUT> extends TemplateContextInvocation<Void, OUT> {
+
     private final int mId;
 
     /**
@@ -42,38 +67,13 @@ final class MissingLoaderInvocationFactory<OUT> extends ContextInvocationFactory
      *
      * @param id the Loader ID.
      */
-    MissingLoaderInvocationFactory(final int id) {
-        super(asArgs(id));
-        mId = id;
+    private MissingLoaderInvocation(final int id) {
+      mId = id;
     }
 
-    @NotNull
     @Override
-    public ContextInvocation<Void, OUT> newInvocation() {
-        return new MissingLoaderInvocation<OUT>(mId);
+    public void onComplete(@NotNull final Channel<OUT, ?> result) {
+      result.abort(new MissingLoaderException(mId));
     }
-
-    /**
-     * Call Context invocation implementation.
-     *
-     * @param <OUT> the output data type.
-     */
-    private static class MissingLoaderInvocation<OUT> extends TemplateContextInvocation<Void, OUT> {
-
-        private final int mId;
-
-        /**
-         * Constructor.
-         *
-         * @param id the Loader ID.
-         */
-        private MissingLoaderInvocation(final int id) {
-            mId = id;
-        }
-
-        @Override
-        public void onComplete(@NotNull final Channel<OUT, ?> result) {
-            result.abort(new MissingLoaderException(mId));
-        }
-    }
+  }
 }

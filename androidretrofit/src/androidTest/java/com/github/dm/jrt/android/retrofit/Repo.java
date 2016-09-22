@@ -26,48 +26,48 @@ import com.google.gson.annotations.SerializedName;
 @SuppressWarnings("unused")
 public class Repo {
 
-    @SerializedName("id")
-    private String mId;
+  @SerializedName("id")
+  private String mId;
 
-    @SerializedName("isPrivate")
-    private boolean mIsPrivate;
+  @SerializedName("isPrivate")
+  private boolean mIsPrivate;
 
-    @SerializedName("name")
-    private String mName;
+  @SerializedName("name")
+  private String mName;
 
-    public String getId() {
+  public String getId() {
 
-        return mId;
-    }
+    return mId;
+  }
 
-    public void setId(final String id) {
+  public void setId(final String id) {
 
-        mId = id;
-    }
+    mId = id;
+  }
 
-    public String getName() {
+  public String getName() {
 
-        return mName;
-    }
+    return mName;
+  }
 
-    public void setName(final String name) {
+  public void setName(final String name) {
 
-        mName = name;
-    }
+    mName = name;
+  }
 
-    public boolean isPrivate() {
+  public boolean isPrivate() {
 
-        return mIsPrivate;
-    }
+    return mIsPrivate;
+  }
 
-    public void setPrivate(final boolean isPrivate) {
+  public void setPrivate(final boolean isPrivate) {
 
-        mIsPrivate = isPrivate;
-    }
+    mIsPrivate = isPrivate;
+  }
 
-    @Override
-    public String toString() {
+  @Override
+  public String toString() {
 
-        return mName;
-    }
+    return mName;
+  }
 }

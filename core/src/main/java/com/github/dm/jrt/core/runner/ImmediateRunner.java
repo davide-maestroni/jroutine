@@ -36,18 +36,18 @@ import java.util.concurrent.TimeUnit;
  */
 class ImmediateRunner extends SyncRunner {
 
-    @Override
-    public void run(@NotNull final Execution execution, final long delay,
-            @NotNull final TimeUnit timeUnit) {
-        if (delay > 0) {
-            try {
-                UnitDuration.sleepAtLeast(delay, timeUnit);
+  @Override
+  public void run(@NotNull final Execution execution, final long delay,
+      @NotNull final TimeUnit timeUnit) {
+    if (delay > 0) {
+      try {
+        UnitDuration.sleepAtLeast(delay, timeUnit);
 
-            } catch (final InterruptedException e) {
-                throw new InvocationInterruptedException(e);
-            }
-        }
-
-        execution.run();
+      } catch (final InterruptedException e) {
+        throw new InvocationInterruptedException(e);
+      }
     }
+
+    execution.run();
+  }
 }

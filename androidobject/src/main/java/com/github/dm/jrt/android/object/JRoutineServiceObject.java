@@ -67,58 +67,58 @@ import org.jetbrains.annotations.NotNull;
  */
 public class JRoutineServiceObject {
 
-    /**
-     * Avoid explicit instantiation.
-     */
-    protected JRoutineServiceObject() {
-        ConstantConditions.avoid();
-    }
+  /**
+   * Avoid explicit instantiation.
+   */
+  protected JRoutineServiceObject() {
+    ConstantConditions.avoid();
+  }
+
+  /**
+   * Returns a Context based builder of Service routine builders.
+   *
+   * @param context the Service context.
+   * @return the Context based builder.
+   */
+  @NotNull
+  public static ServiceObjectBuilder on(@NotNull final ServiceContext context) {
+    return new ServiceObjectBuilder(context);
+  }
+
+  /**
+   * Context based builder of Service routine builders.
+   */
+  public static class ServiceObjectBuilder {
+
+    private final ServiceContext mContext;
 
     /**
-     * Returns a Context based builder of Service routine builders.
+     * Constructor.
      *
      * @param context the Service context.
-     * @return the Context based builder.
      */
-    @NotNull
-    public static ServiceObjectBuilder on(@NotNull final ServiceContext context) {
-        return new ServiceObjectBuilder(context);
+    private ServiceObjectBuilder(@NotNull final ServiceContext context) {
+      mContext = ConstantConditions.notNull("Service context", context);
     }
 
     /**
-     * Context based builder of Service routine builders.
+     * Returns a builder of routines running in a Service based on the builder context, wrapping
+     * the specified target object.
+     * <br>
+     * In order to customize the object creation, the caller must employ an implementation of a
+     * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
+     * invocation Service.
+     * <p>
+     * Note that the built routine results will be dispatched into the configured looper, thus,
+     * waiting for the outputs on the very same looper thread, immediately after its invocation,
+     * will result in a deadlock. By default output results are dispatched in the main looper.
+     *
+     * @param target the invocation target.
+     * @return the routine builder instance.
      */
-    public static class ServiceObjectBuilder {
-
-        private final ServiceContext mContext;
-
-        /**
-         * Constructor.
-         *
-         * @param context the Service context.
-         */
-        private ServiceObjectBuilder(@NotNull final ServiceContext context) {
-            mContext = ConstantConditions.notNull("Service context", context);
-        }
-
-        /**
-         * Returns a builder of routines running in a Service based on the builder context, wrapping
-         * the specified target object.
-         * <br>
-         * In order to customize the object creation, the caller must employ an implementation of a
-         * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
-         * invocation Service.
-         * <p>
-         * Note that the built routine results will be dispatched into the configured looper, thus,
-         * waiting for the outputs on the very same looper thread, immediately after its invocation,
-         * will result in a deadlock. By default output results are dispatched in the main looper.
-         *
-         * @param target the invocation target.
-         * @return the routine builder instance.
-         */
-        @NotNull
-        public ServiceObjectRoutineBuilder with(@NotNull final ContextInvocationTarget<?> target) {
-            return new DefaultServiceObjectRoutineBuilder(mContext, target);
-        }
+    @NotNull
+    public ServiceObjectRoutineBuilder with(@NotNull final ContextInvocationTarget<?> target) {
+      return new DefaultServiceObjectRoutineBuilder(mContext, target);
     }
+  }
 }

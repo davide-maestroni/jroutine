@@ -25,12 +25,12 @@ import org.jetbrains.annotations.Nullable;
  */
 public class DeadlockException extends RoutineException {
 
-    /**
-     * Constructor.
-     *
-     * @param message the error message.
-     */
-    public DeadlockException(@Nullable final String message) {
-        super(message);
-    }
+  /**
+   * Constructor.
+   *
+   * @param message the error message.
+   */
+  public DeadlockException(@Nullable final String message) {
+    super(message);
+  }
 }

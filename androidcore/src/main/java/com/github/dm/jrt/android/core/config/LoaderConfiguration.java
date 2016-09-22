@@ -53,465 +53,460 @@ import static com.github.dm.jrt.core.util.UnitDuration.fromUnit;
  */
 public final class LoaderConfiguration extends DeepEqualObject {
 
+  /**
+   * Constant identifying a Loader ID computed from the factory class and the input parameters.
+   */
+  public static final int AUTO = Integer.MIN_VALUE;
+
+  private static final DefaultConfigurable sDefaultConfigurable = new DefaultConfigurable();
+
+  private static final LoaderConfiguration sDefaultConfiguration = builder().buildConfiguration();
+
+  private final ClashResolutionType mClashResolutionType;
+
+  private final int mFactoryId;
+
+  private final int mLoaderId;
+
+  private final ClashResolutionType mMatchResolutionType;
+
+  private final UnitDuration mStaleTime;
+
+  private final CacheStrategyType mStrategyType;
+
+  /**
+   * Constructor.
+   *
+   * @param loaderId            the Loader ID.
+   * @param factoryId           the factory ID.
+   * @param clashResolutionType the type of clash resolution.
+   * @param matchResolutionType the type of match resolution.
+   * @param strategyType        the cache strategy type.
+   * @param staleTime           the stale time.
+   */
+  private LoaderConfiguration(final int loaderId, final int factoryId,
+      @Nullable final ClashResolutionType clashResolutionType,
+      @Nullable final ClashResolutionType matchResolutionType,
+      @Nullable final CacheStrategyType strategyType, @Nullable final UnitDuration staleTime) {
+    super(asArgs(loaderId, factoryId, clashResolutionType, matchResolutionType, strategyType,
+        staleTime));
+    mLoaderId = loaderId;
+    mFactoryId = factoryId;
+    mClashResolutionType = clashResolutionType;
+    mMatchResolutionType = matchResolutionType;
+    mStrategyType = strategyType;
+    mStaleTime = staleTime;
+  }
+
+  /**
+   * Returns a Loader configuration builder.
+   *
+   * @return the builder.
+   */
+  @NotNull
+  public static Builder<LoaderConfiguration> builder() {
+    return new Builder<LoaderConfiguration>(sDefaultConfigurable);
+  }
+
+  /**
+   * Returns a Loader configuration builder initialized with the specified configuration.
+   *
+   * @param initialConfiguration the initial Loader configuration.
+   * @return the builder.
+   */
+  @NotNull
+  public static Builder<LoaderConfiguration> builderFrom(
+      @Nullable final LoaderConfiguration initialConfiguration) {
+    return (initialConfiguration == null) ? builder()
+        : new Builder<LoaderConfiguration>(sDefaultConfigurable, initialConfiguration);
+  }
+
+  /**
+   * Returns a configuration with all the options set to their default.
+   *
+   * @return the configuration instance.
+   */
+  @NotNull
+  public static LoaderConfiguration defaultConfiguration() {
+    return sDefaultConfiguration;
+  }
+
+  /**
+   * Returns a Loader configuration builder initialized with this configuration.
+   *
+   * @return the builder.
+   */
+  @NotNull
+  public Builder<LoaderConfiguration> builderFrom() {
+    return builderFrom(this);
+  }
+
+  /**
+   * Returns the type of cache strategy (null by default).
+   *
+   * @param valueIfNotSet the default value if none was set.
+   * @return the cache strategy type.
+   */
+  public CacheStrategyType getCacheStrategyTypeOrElse(
+      @Nullable final CacheStrategyType valueIfNotSet) {
+    final CacheStrategyType strategyType = mStrategyType;
+    return (strategyType != null) ? strategyType : valueIfNotSet;
+  }
+
+  /**
+   * Returns the type of clash resolution (null by default).
+   *
+   * @param valueIfNotSet the default value if none was set.
+   * @return the clash resolution type.
+   */
+  public ClashResolutionType getClashResolutionTypeOrElse(
+      @Nullable final ClashResolutionType valueIfNotSet) {
+    final ClashResolutionType resolutionType = mClashResolutionType;
+    return (resolutionType != null) ? resolutionType : valueIfNotSet;
+  }
+
+  /**
+   * Returns the factory ID (AUTO by default).
+   *
+   * @param valueIfNotSet the default value if none was set.
+   * @return the factory ID.
+   */
+  public int getFactoryIdOrElse(final int valueIfNotSet) {
+    final int factoryId = mFactoryId;
+    return (factoryId != AUTO) ? factoryId : valueIfNotSet;
+  }
+
+  /**
+   * Returns the Loader ID (AUTO by default).
+   *
+   * @param valueIfNotSet the default value if none was set.
+   * @return the Loader ID.
+   */
+  public int getLoaderIdOrElse(final int valueIfNotSet) {
+    final int loaderId = mLoaderId;
+    return (loaderId != AUTO) ? loaderId : valueIfNotSet;
+  }
+
+  /**
+   * Returns the type of resolution when invocation types and inputs match (null by default).
+   *
+   * @param valueIfNotSet the default value if none was set.
+   * @return the clash resolution type.
+   */
+  public ClashResolutionType getMatchResolutionTypeOrElse(
+      @Nullable final ClashResolutionType valueIfNotSet) {
+    final ClashResolutionType resolutionType = mMatchResolutionType;
+    return (resolutionType != null) ? resolutionType : valueIfNotSet;
+  }
+
+  /**
+   * Returns the time after which results are considered to be stale (null by default).
+   *
+   * @param valueIfNotSet the default value if none was set.
+   * @return the results stale time.
+   */
+  public UnitDuration getResultStaleTimeOrElse(@Nullable final UnitDuration valueIfNotSet) {
+    final UnitDuration staleTime = mStaleTime;
+    return (staleTime != null) ? staleTime : valueIfNotSet;
+  }
+
+  /**
+   * Result cache type enumeration.
+   * <br>
+   * The cache strategy type indicates what will happen to the result of an invocation after its
+   * completion.
+   */
+  public enum CacheStrategyType {
+
     /**
-     * Constant identifying a Loader ID computed from the factory class and the input parameters.
+     * On completion the invocation results are cleared.
      */
-    public static final int AUTO = Integer.MIN_VALUE;
+    CLEAR,
+    /**
+     * Only in case of error the results are cleared, otherwise they are retained.
+     */
+    CACHE_IF_SUCCESS,
+    /**
+     * Only in case of successful completion the results are cleared, otherwise they are retained.
+     */
+    CACHE_IF_ERROR,
+    /**
+     * On completion the invocation results are retained.
+     */
+    CACHE
+  }
 
-    private static final DefaultConfigurable sDefaultConfigurable = new DefaultConfigurable();
+  /**
+   * Invocation clash resolution enumeration.
+   * <br>
+   * The clash of two invocations happens when the same Loader ID is already in use at the time of
+   * the routine execution. The possible outcomes are:
+   * <ul>
+   * <li>the running invocation is retained and the current one joins it</li>
+   * <li>the running invocation is aborted</li>
+   * <li>the current invocation is aborted</li>
+   * <li>both running and current invocations are aborted</li>
+   * </ul>
+   * Two different types of resolution can be set based on whether the input data are different or
+   * not.
+   */
+  public enum ClashResolutionType {
 
-    private static final LoaderConfiguration sDefaultConfiguration = builder().buildConfiguration();
+    /**
+     * The clash is resolved by joining the two invocations.
+     */
+    JOIN,
+    /**
+     * The clash is resolved by aborting the running invocation.
+     */
+    ABORT_OTHER,
+    /**
+     * The clash is resolved by aborting the invocation with an
+     * {@link com.github.dm.jrt.android.core.invocation.InvocationClashException
+     * InvocationClashException}.
+     */
+    ABORT_THIS,
+    /**
+     * The clash is resolved by aborting both the invocations.
+     */
+    ABORT_BOTH
+  }
 
-    private final ClashResolutionType mClashResolutionType;
+  /**
+   * Interface defining a configurable object.
+   *
+   * @param <TYPE> the configurable object type.
+   */
+  public interface Configurable<TYPE> {
 
-    private final int mFactoryId;
+    /**
+     * Sets the specified configuration and returns the configurable instance.
+     *
+     * @param configuration the configuration.
+     * @return the configurable instance.
+     */
+    @NotNull
+    TYPE apply(@NotNull LoaderConfiguration configuration);
+  }
 
-    private final int mLoaderId;
+  /**
+   * Builder of Loader configurations.
+   *
+   * @param <TYPE> the configurable object type.
+   */
+  public static final class Builder<TYPE> {
 
-    private final ClashResolutionType mMatchResolutionType;
+    private final Configurable<? extends TYPE> mConfigurable;
 
-    private final UnitDuration mStaleTime;
+    private ClashResolutionType mClashResolutionType;
 
-    private final CacheStrategyType mStrategyType;
+    private int mFactoryId;
+
+    private int mLoaderId;
+
+    private ClashResolutionType mMatchResolutionType;
+
+    private UnitDuration mStaleTime;
+
+    private CacheStrategyType mStrategyType;
 
     /**
      * Constructor.
      *
-     * @param loaderId            the Loader ID.
-     * @param factoryId           the factory ID.
-     * @param clashResolutionType the type of clash resolution.
-     * @param matchResolutionType the type of match resolution.
-     * @param strategyType        the cache strategy type.
-     * @param staleTime           the stale time.
+     * @param configurable the configurable instance.
      */
-    private LoaderConfiguration(final int loaderId, final int factoryId,
-            @Nullable final ClashResolutionType clashResolutionType,
-            @Nullable final ClashResolutionType matchResolutionType,
-            @Nullable final CacheStrategyType strategyType,
-            @Nullable final UnitDuration staleTime) {
-        super(asArgs(loaderId, factoryId, clashResolutionType, matchResolutionType, strategyType,
-                staleTime));
-        mLoaderId = loaderId;
-        mFactoryId = factoryId;
-        mClashResolutionType = clashResolutionType;
-        mMatchResolutionType = matchResolutionType;
-        mStrategyType = strategyType;
-        mStaleTime = staleTime;
+    public Builder(@NotNull final Configurable<? extends TYPE> configurable) {
+      mConfigurable = ConstantConditions.notNull("configurable instance", configurable);
+      mLoaderId = AUTO;
+      mFactoryId = AUTO;
     }
 
     /**
-     * Returns a Loader configuration builder.
+     * Constructor.
      *
-     * @return the builder.
-     */
-    @NotNull
-    public static Builder<LoaderConfiguration> builder() {
-        return new Builder<LoaderConfiguration>(sDefaultConfigurable);
-    }
-
-    /**
-     * Returns a Loader configuration builder initialized with the specified configuration.
-     *
+     * @param configurable         the configurable instance.
      * @param initialConfiguration the initial Loader configuration.
-     * @return the builder.
+     */
+    public Builder(@NotNull final Configurable<? extends TYPE> configurable,
+        @NotNull final LoaderConfiguration initialConfiguration) {
+      mConfigurable = ConstantConditions.notNull("configurable instance", configurable);
+      setConfiguration(initialConfiguration);
+    }
+
+    /**
+     * Applies this configuration and returns the configured object.
+     *
+     * @return the configured object.
      */
     @NotNull
-    public static Builder<LoaderConfiguration> builderFrom(
-            @Nullable final LoaderConfiguration initialConfiguration) {
-        return (initialConfiguration == null) ? builder()
-                : new Builder<LoaderConfiguration>(sDefaultConfigurable, initialConfiguration);
+    public TYPE configured() {
+      return mConfigurable.apply(buildConfiguration());
     }
 
     /**
-     * Returns a configuration with all the options set to their default.
+     * Applies the specified configuration to this builder. A null value means that all the
+     * configuration options will be reset to their default, otherwise only the non-default
+     * options will be applied.
      *
-     * @return the configuration instance.
+     * @param configuration the Loader configuration.
+     * @return this builder.
      */
     @NotNull
-    public static LoaderConfiguration defaultConfiguration() {
-        return sDefaultConfiguration;
+    public Builder<TYPE> with(@Nullable final LoaderConfiguration configuration) {
+      if (configuration == null) {
+        setConfiguration(defaultConfiguration());
+        return this;
+      }
+
+      final int loaderId = configuration.mLoaderId;
+      if (loaderId != AUTO) {
+        withLoaderId(loaderId);
+      }
+
+      final int factoryId = configuration.mFactoryId;
+      if (factoryId != AUTO) {
+        withFactoryId(factoryId);
+      }
+
+      final ClashResolutionType clashResolutionType = configuration.mClashResolutionType;
+      if (clashResolutionType != null) {
+        withClashResolution(clashResolutionType);
+      }
+
+      final ClashResolutionType matchResolutionType = configuration.mMatchResolutionType;
+      if (matchResolutionType != null) {
+        withMatchResolution(matchResolutionType);
+      }
+
+      final CacheStrategyType strategyType = configuration.mStrategyType;
+      if (strategyType != null) {
+        withCacheStrategy(strategyType);
+      }
+
+      final UnitDuration staleTime = configuration.mStaleTime;
+      if (staleTime != null) {
+        withResultStaleTime(staleTime);
+      }
+
+      return this;
     }
 
     /**
-     * Returns a Loader configuration builder initialized with this configuration.
+     * Tells the builder how to cache the invocation result after its completion. A null value
+     * means that it is up to the specific implementation to choose a default strategy.
      *
-     * @return the builder.
+     * @param strategyType the cache strategy type.
+     * @return this builder.
      */
     @NotNull
-    public Builder<LoaderConfiguration> builderFrom() {
-        return builderFrom(this);
+    public Builder<TYPE> withCacheStrategy(@Nullable final CacheStrategyType strategyType) {
+      mStrategyType = strategyType;
+      return this;
     }
 
     /**
-     * Returns the type of cache strategy (null by default).
+     * Tells the builder how to resolve clashes of invocations with different inputs. A clash
+     * happens when a Loader with the same ID is still running. A null value means that it is up
+     * to the specific implementation to choose a default resolution type.
      *
-     * @param valueIfNotSet the default value if none was set.
-     * @return the cache strategy type.
+     * @param resolutionType the type of resolution.
+     * @return this builder.
      */
-    public CacheStrategyType getCacheStrategyTypeOrElse(
-            @Nullable final CacheStrategyType valueIfNotSet) {
-        final CacheStrategyType strategyType = mStrategyType;
-        return (strategyType != null) ? strategyType : valueIfNotSet;
+    @NotNull
+    public Builder<TYPE> withClashResolution(@Nullable final ClashResolutionType resolutionType) {
+      mClashResolutionType = resolutionType;
+      return this;
     }
 
     /**
-     * Returns the type of clash resolution (null by default).
+     * Tells the builder to identify the backing invocation factory with the specified ID.
      *
-     * @param valueIfNotSet the default value if none was set.
-     * @return the clash resolution type.
+     * @param factoryId the factory ID.
+     * @return this builder.
      */
-    public ClashResolutionType getClashResolutionTypeOrElse(
-            @Nullable final ClashResolutionType valueIfNotSet) {
-        final ClashResolutionType resolutionType = mClashResolutionType;
-        return (resolutionType != null) ? resolutionType : valueIfNotSet;
+    @NotNull
+    public Builder<TYPE> withFactoryId(final int factoryId) {
+      mFactoryId = factoryId;
+      return this;
     }
 
     /**
-     * Returns the factory ID (AUTO by default).
+     * Tells the builder to identify the Loader with the specified ID.
      *
-     * @param valueIfNotSet the default value if none was set.
-     * @return the factory ID.
+     * @param loaderId the Loader ID.
+     * @return this builder.
      */
-    public int getFactoryIdOrElse(final int valueIfNotSet) {
-        final int factoryId = mFactoryId;
-        return (factoryId != AUTO) ? factoryId : valueIfNotSet;
+    @NotNull
+    public Builder<TYPE> withLoaderId(final int loaderId) {
+      mLoaderId = loaderId;
+      return this;
     }
 
     /**
-     * Returns the Loader ID (AUTO by default).
+     * Tells the builder how to resolve clashes of invocations with same invocation type and
+     * inputs. A clash happens when a Loader with the same ID is still running. A null value
+     * means that it is up to the specific implementation to choose a default resolution type.
      *
-     * @param valueIfNotSet the default value if none was set.
-     * @return the Loader ID.
+     * @param resolutionType the type of resolution.
+     * @return this builder.
      */
-    public int getLoaderIdOrElse(final int valueIfNotSet) {
-        final int loaderId = mLoaderId;
-        return (loaderId != AUTO) ? loaderId : valueIfNotSet;
+    @NotNull
+    public Builder<TYPE> withMatchResolution(@Nullable final ClashResolutionType resolutionType) {
+      mMatchResolutionType = resolutionType;
+      return this;
     }
 
     /**
-     * Returns the type of resolution when invocation types and inputs match (null by default).
+     * Sets the time after which results are considered to be stale. In case a clash is resolved
+     * by joining the two invocations, and the results of the running one are stale, the invocation
+     * execution is repeated. A null value means that the results are always valid.
      *
-     * @param valueIfNotSet the default value if none was set.
-     * @return the clash resolution type.
+     * @param staleTime the stale time.
+     * @return this builder.
      */
-    public ClashResolutionType getMatchResolutionTypeOrElse(
-            @Nullable final ClashResolutionType valueIfNotSet) {
-        final ClashResolutionType resolutionType = mMatchResolutionType;
-        return (resolutionType != null) ? resolutionType : valueIfNotSet;
+    @NotNull
+    public Builder<TYPE> withResultStaleTime(@Nullable final UnitDuration staleTime) {
+      mStaleTime = staleTime;
+      return this;
     }
 
     /**
-     * Returns the time after which results are considered to be stale (null by default).
+     * Sets the time after which results are considered to be stale.
      *
-     * @param valueIfNotSet the default value if none was set.
-     * @return the results stale time.
+     * @param time     the time.
+     * @param timeUnit the time unit.
+     * @return this builder.
+     * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
      */
-    public UnitDuration getResultStaleTimeOrElse(@Nullable final UnitDuration valueIfNotSet) {
-        final UnitDuration staleTime = mStaleTime;
-        return (staleTime != null) ? staleTime : valueIfNotSet;
+    @NotNull
+    public Builder<TYPE> withResultStaleTime(final long time, @NotNull final TimeUnit timeUnit) {
+      return withResultStaleTime(fromUnit(time, timeUnit));
     }
 
-    /**
-     * Result cache type enumeration.
-     * <br>
-     * The cache strategy type indicates what will happen to the result of an invocation after its
-     * completion.
-     */
-    public enum CacheStrategyType {
-
-        /**
-         * On completion the invocation results are cleared.
-         */
-        CLEAR,
-        /**
-         * Only in case of error the results are cleared, otherwise they are retained.
-         */
-        CACHE_IF_SUCCESS,
-        /**
-         * Only in case of successful completion the results are cleared, otherwise they are
-         * retained.
-         */
-        CACHE_IF_ERROR,
-        /**
-         * On completion the invocation results are retained.
-         */
-        CACHE
+    @NotNull
+    private LoaderConfiguration buildConfiguration() {
+      return new LoaderConfiguration(mLoaderId, mFactoryId, mClashResolutionType,
+          mMatchResolutionType, mStrategyType, mStaleTime);
     }
 
-    /**
-     * Invocation clash resolution enumeration.
-     * <br>
-     * The clash of two invocations happens when the same Loader ID is already in use at the time of
-     * the routine execution. The possible outcomes are:
-     * <ul>
-     * <li>the running invocation is retained and the current one joins it</li>
-     * <li>the running invocation is aborted</li>
-     * <li>the current invocation is aborted</li>
-     * <li>both running and current invocations are aborted</li>
-     * </ul>
-     * Two different types of resolution can be set based on whether the input data are different or
-     * not.
-     */
-    public enum ClashResolutionType {
-
-        /**
-         * The clash is resolved by joining the two invocations.
-         */
-        JOIN,
-        /**
-         * The clash is resolved by aborting the running invocation.
-         */
-        ABORT_OTHER,
-        /**
-         * The clash is resolved by aborting the invocation with an
-         * {@link com.github.dm.jrt.android.core.invocation.InvocationClashException
-         * InvocationClashException}.
-         */
-        ABORT_THIS,
-        /**
-         * The clash is resolved by aborting both the invocations.
-         */
-        ABORT_BOTH
+    private void setConfiguration(@NotNull final LoaderConfiguration configuration) {
+      mLoaderId = configuration.mLoaderId;
+      mFactoryId = configuration.mFactoryId;
+      mClashResolutionType = configuration.mClashResolutionType;
+      mMatchResolutionType = configuration.mMatchResolutionType;
+      mStrategyType = configuration.mStrategyType;
+      mStaleTime = configuration.mStaleTime;
     }
+  }
 
-    /**
-     * Interface defining a configurable object.
-     *
-     * @param <TYPE> the configurable object type.
-     */
-    public interface Configurable<TYPE> {
+  /**
+   * Default configurable implementation.
+   */
+  private static class DefaultConfigurable implements Configurable<LoaderConfiguration> {
 
-        /**
-         * Sets the specified configuration and returns the configurable instance.
-         *
-         * @param configuration the configuration.
-         * @return the configurable instance.
-         */
-        @NotNull
-        TYPE apply(@NotNull LoaderConfiguration configuration);
+    @NotNull
+    public LoaderConfiguration apply(@NotNull final LoaderConfiguration configuration) {
+      return configuration;
     }
-
-    /**
-     * Builder of Loader configurations.
-     *
-     * @param <TYPE> the configurable object type.
-     */
-    public static final class Builder<TYPE> {
-
-        private final Configurable<? extends TYPE> mConfigurable;
-
-        private ClashResolutionType mClashResolutionType;
-
-        private int mFactoryId;
-
-        private int mLoaderId;
-
-        private ClashResolutionType mMatchResolutionType;
-
-        private UnitDuration mStaleTime;
-
-        private CacheStrategyType mStrategyType;
-
-        /**
-         * Constructor.
-         *
-         * @param configurable the configurable instance.
-         */
-        public Builder(@NotNull final Configurable<? extends TYPE> configurable) {
-            mConfigurable = ConstantConditions.notNull("configurable instance", configurable);
-            mLoaderId = AUTO;
-            mFactoryId = AUTO;
-        }
-
-        /**
-         * Constructor.
-         *
-         * @param configurable         the configurable instance.
-         * @param initialConfiguration the initial Loader configuration.
-         */
-        public Builder(@NotNull final Configurable<? extends TYPE> configurable,
-                @NotNull final LoaderConfiguration initialConfiguration) {
-            mConfigurable = ConstantConditions.notNull("configurable instance", configurable);
-            setConfiguration(initialConfiguration);
-        }
-
-        /**
-         * Applies this configuration and returns the configured object.
-         *
-         * @return the configured object.
-         */
-        @NotNull
-        public TYPE configured() {
-            return mConfigurable.apply(buildConfiguration());
-        }
-
-        /**
-         * Applies the specified configuration to this builder. A null value means that all the
-         * configuration options will be reset to their default, otherwise only the non-default
-         * options will be applied.
-         *
-         * @param configuration the Loader configuration.
-         * @return this builder.
-         */
-        @NotNull
-        public Builder<TYPE> with(@Nullable final LoaderConfiguration configuration) {
-            if (configuration == null) {
-                setConfiguration(defaultConfiguration());
-                return this;
-            }
-
-            final int loaderId = configuration.mLoaderId;
-            if (loaderId != AUTO) {
-                withLoaderId(loaderId);
-            }
-
-            final int factoryId = configuration.mFactoryId;
-            if (factoryId != AUTO) {
-                withFactoryId(factoryId);
-            }
-
-            final ClashResolutionType clashResolutionType = configuration.mClashResolutionType;
-            if (clashResolutionType != null) {
-                withClashResolution(clashResolutionType);
-            }
-
-            final ClashResolutionType matchResolutionType = configuration.mMatchResolutionType;
-            if (matchResolutionType != null) {
-                withMatchResolution(matchResolutionType);
-            }
-
-            final CacheStrategyType strategyType = configuration.mStrategyType;
-            if (strategyType != null) {
-                withCacheStrategy(strategyType);
-            }
-
-            final UnitDuration staleTime = configuration.mStaleTime;
-            if (staleTime != null) {
-                withResultStaleTime(staleTime);
-            }
-
-            return this;
-        }
-
-        /**
-         * Tells the builder how to cache the invocation result after its completion. A null value
-         * means that it is up to the specific implementation to choose a default strategy.
-         *
-         * @param strategyType the cache strategy type.
-         * @return this builder.
-         */
-        @NotNull
-        public Builder<TYPE> withCacheStrategy(@Nullable final CacheStrategyType strategyType) {
-            mStrategyType = strategyType;
-            return this;
-        }
-
-        /**
-         * Tells the builder how to resolve clashes of invocations with different inputs. A clash
-         * happens when a Loader with the same ID is still running. A null value means that it is up
-         * to the specific implementation to choose a default resolution type.
-         *
-         * @param resolutionType the type of resolution.
-         * @return this builder.
-         */
-        @NotNull
-        public Builder<TYPE> withClashResolution(
-                @Nullable final ClashResolutionType resolutionType) {
-            mClashResolutionType = resolutionType;
-            return this;
-        }
-
-        /**
-         * Tells the builder to identify the backing invocation factory with the specified ID.
-         *
-         * @param factoryId the factory ID.
-         * @return this builder.
-         */
-        @NotNull
-        public Builder<TYPE> withFactoryId(final int factoryId) {
-            mFactoryId = factoryId;
-            return this;
-        }
-
-        /**
-         * Tells the builder to identify the Loader with the specified ID.
-         *
-         * @param loaderId the Loader ID.
-         * @return this builder.
-         */
-        @NotNull
-        public Builder<TYPE> withLoaderId(final int loaderId) {
-            mLoaderId = loaderId;
-            return this;
-        }
-
-        /**
-         * Tells the builder how to resolve clashes of invocations with same invocation type and
-         * inputs. A clash happens when a Loader with the same ID is still running. A null value
-         * means that it is up to the specific implementation to choose a default resolution type.
-         *
-         * @param resolutionType the type of resolution.
-         * @return this builder.
-         */
-        @NotNull
-        public Builder<TYPE> withMatchResolution(
-                @Nullable final ClashResolutionType resolutionType) {
-            mMatchResolutionType = resolutionType;
-            return this;
-        }
-
-        /**
-         * Sets the time after which results are considered to be stale. In case a clash is resolved
-         * by joining the two invocations, and the results of the running one are stale, the
-         * invocation execution is repeated. A null value means that the results are always valid.
-         *
-         * @param staleTime the stale time.
-         * @return this builder.
-         */
-        @NotNull
-        public Builder<TYPE> withResultStaleTime(@Nullable final UnitDuration staleTime) {
-            mStaleTime = staleTime;
-            return this;
-        }
-
-        /**
-         * Sets the time after which results are considered to be stale.
-         *
-         * @param time     the time.
-         * @param timeUnit the time unit.
-         * @return this builder.
-         * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
-         */
-        @NotNull
-        public Builder<TYPE> withResultStaleTime(final long time,
-                @NotNull final TimeUnit timeUnit) {
-            return withResultStaleTime(fromUnit(time, timeUnit));
-        }
-
-        @NotNull
-        private LoaderConfiguration buildConfiguration() {
-            return new LoaderConfiguration(mLoaderId, mFactoryId, mClashResolutionType,
-                    mMatchResolutionType, mStrategyType, mStaleTime);
-        }
-
-        private void setConfiguration(@NotNull final LoaderConfiguration configuration) {
-            mLoaderId = configuration.mLoaderId;
-            mFactoryId = configuration.mFactoryId;
-            mClashResolutionType = configuration.mClashResolutionType;
-            mMatchResolutionType = configuration.mMatchResolutionType;
-            mStrategyType = configuration.mStrategyType;
-            mStaleTime = configuration.mStaleTime;
-        }
-    }
-
-    /**
-     * Default configurable implementation.
-     */
-    private static class DefaultConfigurable implements Configurable<LoaderConfiguration> {
-
-        @NotNull
-        public LoaderConfiguration apply(@NotNull final LoaderConfiguration configuration) {
-            return configuration;
-        }
-    }
+  }
 }

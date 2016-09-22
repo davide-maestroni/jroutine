@@ -35,7 +35,67 @@ import java.util.ArrayList;
  */
 class CombineBuilder<IN> extends AbstractBuilder<Channel<Selectable<? extends IN>, ?>> {
 
-    private final ArrayList<Channel<? extends IN, ?>> mChannels;
+  private final ArrayList<Channel<? extends IN, ?>> mChannels;
+
+  private final int mStartIndex;
+
+  /**
+   * Constructor.
+   *
+   * @param startIndex the selectable start index.
+   * @param channels   the channels to combine.
+   * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
+   * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
+   *                                            null object.
+   */
+  CombineBuilder(final int startIndex,
+      @NotNull final Iterable<? extends Channel<? extends IN, ?>> channels) {
+    final ArrayList<Channel<? extends IN, ?>> channelList =
+        new ArrayList<Channel<? extends IN, ?>>();
+    for (final Channel<? extends IN, ?> channel : channels) {
+      if (channel == null) {
+        throw new NullPointerException("the collection of channels must not contain null objects");
+      }
+
+      channelList.add(channel);
+    }
+
+    if (channelList.isEmpty()) {
+      throw new IllegalArgumentException("the collection of channels must not be empty");
+    }
+
+    mStartIndex = startIndex;
+    mChannels = channelList;
+  }
+
+  @NotNull
+  @Override
+  @SuppressWarnings("unchecked")
+  protected Channel<Selectable<? extends IN>, ?> build(
+      @NotNull final ChannelConfiguration configuration) {
+    final ArrayList<Channel<? extends IN, ?>> channels = mChannels;
+    final ArrayList<Channel<? extends IN, ?>> channelList =
+        new ArrayList<Channel<? extends IN, ?>>(channels.size());
+    for (final Channel<? extends IN, ?> channel : channels) {
+      final Channel<IN, IN> outputChannel = JRoutineCore.io().apply(configuration).buildChannel();
+      outputChannel.bind((Channel<IN, ?>) channel);
+      channelList.add(outputChannel);
+    }
+
+    final Channel<Selectable<? extends IN>, ?> inputChannel =
+        JRoutineCore.io().apply(configuration).buildChannel();
+    return inputChannel.bind(new SortingArrayChannelConsumer(mStartIndex, channelList));
+  }
+
+  /**
+   * Channel consumer sorting selectable inputs among a list of channels.
+   */
+  private static class SortingArrayChannelConsumer<IN>
+      implements ChannelConsumer<Selectable<? extends IN>> {
+
+    private final ArrayList<Channel<? extends IN, ?>> mChannelList;
+
+    private final int mSize;
 
     private final int mStartIndex;
 
@@ -43,100 +103,38 @@ class CombineBuilder<IN> extends AbstractBuilder<Channel<Selectable<? extends IN
      * Constructor.
      *
      * @param startIndex the selectable start index.
-     * @param channels   the channels to combine.
-     * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
-     * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
-     *                                            null object.
+     * @param channels   the list of channels.
      */
-    CombineBuilder(final int startIndex,
-            @NotNull final Iterable<? extends Channel<? extends IN, ?>> channels) {
-        final ArrayList<Channel<? extends IN, ?>> channelList =
-                new ArrayList<Channel<? extends IN, ?>>();
-        for (final Channel<? extends IN, ?> channel : channels) {
-            if (channel == null) {
-                throw new NullPointerException(
-                        "the collection of channels must not contain null objects");
-            }
-
-            channelList.add(channel);
-        }
-
-        if (channelList.isEmpty()) {
-            throw new IllegalArgumentException("the collection of channels must not be empty");
-        }
-
-        mStartIndex = startIndex;
-        mChannels = channelList;
+    private SortingArrayChannelConsumer(final int startIndex,
+        @NotNull final ArrayList<Channel<? extends IN, ?>> channels) {
+      mStartIndex = startIndex;
+      mChannelList = channels;
+      mSize = channels.size();
     }
 
-    @NotNull
-    @Override
-    @SuppressWarnings("unchecked")
-    protected Channel<Selectable<? extends IN>, ?> build(
-            @NotNull final ChannelConfiguration configuration) {
-        final ArrayList<Channel<? extends IN, ?>> channels = mChannels;
-        final ArrayList<Channel<? extends IN, ?>> channelList =
-                new ArrayList<Channel<? extends IN, ?>>(channels.size());
-        for (final Channel<? extends IN, ?> channel : channels) {
-            final Channel<IN, IN> outputChannel =
-                    JRoutineCore.io().apply(configuration).buildChannel();
-            outputChannel.bind((Channel<IN, ?>) channel);
-            channelList.add(outputChannel);
-        }
-
-        final Channel<Selectable<? extends IN>, ?> inputChannel =
-                JRoutineCore.io().apply(configuration).buildChannel();
-        return inputChannel.bind(new SortingArrayChannelConsumer(mStartIndex, channelList));
+    public void onComplete() {
+      for (final Channel<? extends IN, ?> channel : mChannelList) {
+        channel.close();
+      }
     }
 
-    /**
-     * Channel consumer sorting selectable inputs among a list of channels.
-     */
-    private static class SortingArrayChannelConsumer<IN>
-            implements ChannelConsumer<Selectable<? extends IN>> {
-
-        private final ArrayList<Channel<? extends IN, ?>> mChannelList;
-
-        private final int mSize;
-
-        private final int mStartIndex;
-
-        /**
-         * Constructor.
-         *
-         * @param startIndex the selectable start index.
-         * @param channels   the list of channels.
-         */
-        private SortingArrayChannelConsumer(final int startIndex,
-                @NotNull final ArrayList<Channel<? extends IN, ?>> channels) {
-            mStartIndex = startIndex;
-            mChannelList = channels;
-            mSize = channels.size();
-        }
-
-        public void onComplete() {
-            for (final Channel<? extends IN, ?> channel : mChannelList) {
-                channel.close();
-            }
-        }
-
-        public void onError(@NotNull final RoutineException error) {
-            for (final Channel<? extends IN, ?> channel : mChannelList) {
-                channel.abort(error);
-            }
-        }
-
-        public void onOutput(final Selectable<? extends IN> selectable) {
-            final int index = selectable.index - mStartIndex;
-            if ((index < 0) || (index >= mSize)) {
-                return;
-            }
-
-            @SuppressWarnings("unchecked") final Channel<IN, ?> channel =
-                    (Channel<IN, ?>) mChannelList.get(index);
-            if (channel != null) {
-                channel.pass(selectable.data);
-            }
-        }
+    public void onError(@NotNull final RoutineException error) {
+      for (final Channel<? extends IN, ?> channel : mChannelList) {
+        channel.abort(error);
+      }
     }
+
+    public void onOutput(final Selectable<? extends IN> selectable) {
+      final int index = selectable.index - mStartIndex;
+      if ((index < 0) || (index >= mSize)) {
+        return;
+      }
+
+      @SuppressWarnings("unchecked") final Channel<IN, ?> channel =
+          (Channel<IN, ?>) mChannelList.get(index);
+      if (channel != null) {
+        channel.pass(selectable.data);
+      }
+    }
+  }
 }

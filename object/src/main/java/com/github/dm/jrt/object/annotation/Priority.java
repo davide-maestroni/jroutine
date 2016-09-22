@@ -56,10 +56,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Priority {
 
-    /**
-     * The priority value.
-     *
-     * @return the priority.
-     */
-    int value();
+  /**
+   * The priority value.
+   *
+   * @return the priority.
+   */
+  int value();
 }

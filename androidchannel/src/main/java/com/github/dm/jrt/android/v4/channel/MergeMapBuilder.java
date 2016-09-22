@@ -36,43 +36,43 @@ import org.jetbrains.annotations.NotNull;
  */
 class MergeMapBuilder<OUT> extends AbstractBuilder<Channel<?, ParcelableSelectable<OUT>>> {
 
-    private final SparseArrayCompat<? extends Channel<?, ? extends OUT>> mChannelMap;
+  private final SparseArrayCompat<? extends Channel<?, ? extends OUT>> mChannelMap;
 
-    /**
-     * Constructor.
-     *
-     * @param channels the map of channels to merge.
-     * @throws java.lang.IllegalArgumentException if the specified map is empty.
-     * @throws java.lang.NullPointerException     if the specified map is null or contains a null
-     *                                            object.
-     */
-    MergeMapBuilder(
-            @NotNull final SparseArrayCompat<? extends Channel<?, ? extends OUT>> channels) {
-        if (channels.size() == 0) {
-            throw new IllegalArgumentException("the map of channels must not be empty");
-        }
-
-        final SparseArrayCompat<? extends Channel<?, ? extends OUT>> channelMap = channels.clone();
-        if (channelMap.indexOfValue(null) >= 0) {
-            throw new NullPointerException("the map of channels must not contain null objects");
-        }
-
-        mChannelMap = channelMap;
+  /**
+   * Constructor.
+   *
+   * @param channels the map of channels to merge.
+   * @throws java.lang.IllegalArgumentException if the specified map is empty.
+   * @throws java.lang.NullPointerException     if the specified map is null or contains a null
+   *                                            object.
+   */
+  MergeMapBuilder(@NotNull final SparseArrayCompat<? extends Channel<?, ? extends OUT>> channels) {
+    if (channels.size() == 0) {
+      throw new IllegalArgumentException("the map of channels must not be empty");
     }
 
-    @NotNull
-    @Override
-    protected Channel<?, ParcelableSelectable<OUT>> build(
-            @NotNull final ChannelConfiguration configuration) {
-        final SparseArrayCompat<? extends Channel<?, ? extends OUT>> channelMap = mChannelMap;
-        final Channel<ParcelableSelectable<OUT>, ParcelableSelectable<OUT>> outputChannel =
-                JRoutineCore.io().apply(configuration).buildChannel();
-        final int size = channelMap.size();
-        for (int i = 0; i < size; ++i) {
-            outputChannel.pass(AndroidChannels.selectableOutputParcelable(channelMap.valueAt(i),
-                    channelMap.keyAt(i)).buildChannels());
-        }
-
-        return outputChannel.close();
+    final SparseArrayCompat<? extends Channel<?, ? extends OUT>> channelMap = channels.clone();
+    if (channelMap.indexOfValue(null) >= 0) {
+      throw new NullPointerException("the map of channels must not contain null objects");
     }
+
+    mChannelMap = channelMap;
+  }
+
+  @NotNull
+  @Override
+  protected Channel<?, ParcelableSelectable<OUT>> build(
+      @NotNull final ChannelConfiguration configuration) {
+    final SparseArrayCompat<? extends Channel<?, ? extends OUT>> channelMap = mChannelMap;
+    final Channel<ParcelableSelectable<OUT>, ParcelableSelectable<OUT>> outputChannel =
+        JRoutineCore.io().apply(configuration).buildChannel();
+    final int size = channelMap.size();
+    for (int i = 0; i < size; ++i) {
+      outputChannel.pass(
+          AndroidChannels.selectableOutputParcelable(channelMap.valueAt(i), channelMap.keyAt(i))
+                         .buildChannels());
+    }
+
+    return outputChannel.close();
+  }
 }

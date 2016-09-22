@@ -33,21 +33,21 @@ import org.jetbrains.annotations.NotNull;
  * @param <OUT> the output data type.
  */
 public abstract class TemplateContextInvocation<IN, OUT> extends TemplateInvocation<IN, OUT>
-        implements ContextInvocation<IN, OUT> {
+    implements ContextInvocation<IN, OUT> {
 
-    private Context mContext;
+  private Context mContext;
 
-    @Override
-    public void onContext(@NotNull final Context context) throws Exception {
-        mContext = context;
-    }
+  @Override
+  public void onContext(@NotNull final Context context) throws Exception {
+    mContext = context;
+  }
 
-    /**
-     * Returns this invocation Context.
-     *
-     * @return the Context of this invocation.
-     */
-    protected Context getContext() {
-        return mContext;
-    }
+  /**
+   * Returns this invocation Context.
+   *
+   * @return the Context of this invocation.
+   */
+  protected Context getContext() {
+    return mContext;
+  }
 }

@@ -70,49 +70,49 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface LoaderProxy {
 
-    /**
-     * Constant indicating the default generated class name prefix.
-     */
-    String DEFAULT_CLASS_PREFIX = "LoaderProxy_";
+  /**
+   * Constant indicating the default generated class name prefix.
+   */
+  String DEFAULT_CLASS_PREFIX = "LoaderProxy_";
 
-    /**
-     * Constant indicating the default generated class name suffix.
-     */
-    String DEFAULT_CLASS_SUFFIX = "";
+  /**
+   * Constant indicating the default generated class name suffix.
+   */
+  String DEFAULT_CLASS_SUFFIX = "";
 
-    /**
-     * The generated class name. By default the name is obtained by the interface simple name,
-     * prepending all the outer class names in case it is not a top level class.
-     *
-     * @return the class name.
-     */
-    String className() default Proxy.DEFAULT;
+  /**
+   * The generated class name. By default the name is obtained by the interface simple name,
+   * prepending all the outer class names in case it is not a top level class.
+   *
+   * @return the class name.
+   */
+  String className() default Proxy.DEFAULT;
 
-    /**
-     * The generated class package. By default it is the same as the interface one.
-     *
-     * @return the package.
-     */
-    String classPackage() default Proxy.DEFAULT;
+  /**
+   * The generated class package. By default it is the same as the interface one.
+   *
+   * @return the package.
+   */
+  String classPackage() default Proxy.DEFAULT;
 
-    /**
-     * The generated class name prefix.
-     *
-     * @return the name prefix.
-     */
-    String classPrefix() default DEFAULT_CLASS_PREFIX;
+  /**
+   * The generated class name prefix.
+   *
+   * @return the name prefix.
+   */
+  String classPrefix() default DEFAULT_CLASS_PREFIX;
 
-    /**
-     * The generated class name suffix.
-     *
-     * @return the name suffix.
-     */
-    String classSuffix() default DEFAULT_CLASS_SUFFIX;
+  /**
+   * The generated class name suffix.
+   *
+   * @return the name suffix.
+   */
+  String classSuffix() default DEFAULT_CLASS_SUFFIX;
 
-    /**
-     * The wrapped class.
-     *
-     * @return the class.
-     */
-    Class<?> value();
+  /**
+   * The wrapped class.
+   *
+   * @return the class.
+   */
+  Class<?> value();
 }

@@ -25,8 +25,8 @@ import org.jetbrains.annotations.NotNull;
  */
 public class SystemLog extends TemplateLog {
 
-    @Override
-    public void log(@NotNull final String message) {
-        System.out.println(message);
-    }
+  @Override
+  public void log(@NotNull final String message) {
+    System.out.println(message);
+  }
 }

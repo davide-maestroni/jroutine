@@ -60,389 +60,386 @@ import static com.github.dm.jrt.object.InvocationTarget.instance;
  */
 public class JRoutine extends Channels {
 
-    /**
-     * Avoid explicit instantiation.
-     */
-    protected JRoutine() {
-        ConstantConditions.avoid();
-    }
+  /**
+   * Avoid explicit instantiation.
+   */
+  protected JRoutine() {
+    ConstantConditions.avoid();
+  }
 
-    /**
-     * Returns a channel builder.
-     *
-     * @return the channel builder instance.
-     */
-    @NotNull
-    public static ChannelBuilder io() {
-        return JRoutineCore.io();
-    }
+  /**
+   * Returns a channel builder.
+   *
+   * @return the channel builder instance.
+   */
+  @NotNull
+  public static ChannelBuilder io() {
+    return JRoutineCore.io();
+  }
 
-    /**
-     * Returns a routine builder based on an invocation factory creating instances of the
-     * specified class.
-     *
-     * @param invocationClass the invocation class.
-     * @param <IN>            the input data type.
-     * @param <OUT>           the output data type.
-     * @return the routine builder instance.
-     * @throws java.lang.IllegalArgumentException if no default constructor was found.
-     */
-    @NotNull
-    public static <IN, OUT> RoutineBuilder<IN, OUT> with(
-            @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass) {
-        return with(factoryOf(invocationClass));
-    }
+  /**
+   * Returns a routine builder based on an invocation factory creating instances of the specified
+   * class.
+   *
+   * @param invocationClass the invocation class.
+   * @param <IN>            the input data type.
+   * @param <OUT>           the output data type.
+   * @return the routine builder instance.
+   * @throws java.lang.IllegalArgumentException if no default constructor was found.
+   */
+  @NotNull
+  public static <IN, OUT> RoutineBuilder<IN, OUT> with(
+      @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass) {
+    return with(factoryOf(invocationClass));
+  }
 
-    /**
-     * Returns a routine builder based on an invocation factory creating instances of the specified
-     * class by passing the specified arguments to the class constructor.
-     * <p>
-     * Note that inner and anonymous classes can be passed as well. Remember however that Java
-     * creates synthetic constructors for such classes, so be sure to specify the correct arguments
-     * to guarantee proper instantiation. In fact, inner classes always have the outer instance as
-     * first constructor parameter, and anonymous classes have both the outer instance and all the
-     * variables captured in the closure.
-     *
-     * @param invocationClass the invocation class.
-     * @param args            the invocation constructor arguments.
-     * @param <IN>            the input data type.
-     * @param <OUT>           the output data type.
-     * @return the routine builder instance.
-     * @throws java.lang.IllegalArgumentException if no constructor taking the specified objects as
-     *                                            parameters was found.
-     */
-    @NotNull
-    public static <IN, OUT> RoutineBuilder<IN, OUT> with(
-            @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass,
-            @Nullable final Object... args) {
-        return with(factoryOf(invocationClass, args));
-    }
+  /**
+   * Returns a routine builder based on an invocation factory creating instances of the specified
+   * class by passing the specified arguments to the class constructor.
+   * <p>
+   * Note that inner and anonymous classes can be passed as well. Remember however that Java
+   * creates synthetic constructors for such classes, so be sure to specify the correct arguments
+   * to guarantee proper instantiation. In fact, inner classes always have the outer instance as
+   * first constructor parameter, and anonymous classes have both the outer instance and all the
+   * variables captured in the closure.
+   *
+   * @param invocationClass the invocation class.
+   * @param args            the invocation constructor arguments.
+   * @param <IN>            the input data type.
+   * @param <OUT>           the output data type.
+   * @return the routine builder instance.
+   * @throws java.lang.IllegalArgumentException if no constructor taking the specified objects as
+   *                                            parameters was found.
+   */
+  @NotNull
+  public static <IN, OUT> RoutineBuilder<IN, OUT> with(
+      @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass,
+      @Nullable final Object... args) {
+    return with(factoryOf(invocationClass, args));
+  }
 
-    /**
-     * Returns a routine builder based on an invocation factory creating instances of the specified
-     * class token.
-     *
-     * @param invocationToken the invocation class token.
-     * @param <IN>            the input data type.
-     * @param <OUT>           the output data type.
-     * @return the routine builder instance.
-     * @throws java.lang.IllegalArgumentException if no default constructor was found.
-     */
-    @NotNull
-    public static <IN, OUT> RoutineBuilder<IN, OUT> with(
-            @NotNull final ClassToken<? extends Invocation<IN, OUT>> invocationToken) {
-        return with(factoryOf(invocationToken));
-    }
+  /**
+   * Returns a routine builder based on an invocation factory creating instances of the specified
+   * class token.
+   *
+   * @param invocationToken the invocation class token.
+   * @param <IN>            the input data type.
+   * @param <OUT>           the output data type.
+   * @return the routine builder instance.
+   * @throws java.lang.IllegalArgumentException if no default constructor was found.
+   */
+  @NotNull
+  public static <IN, OUT> RoutineBuilder<IN, OUT> with(
+      @NotNull final ClassToken<? extends Invocation<IN, OUT>> invocationToken) {
+    return with(factoryOf(invocationToken));
+  }
 
-    /**
-     * Returns a routine builder based on an invocation factory creating instances of the specified
-     * class token by passing the specified arguments to the class constructor.
-     * <p>
-     * Note that class tokens of inner and anonymous classes can be passed as well. Remember however
-     * that Java creates synthetic constructors for such classes, so be sure to specify the correct
-     * arguments to guarantee proper instantiation. In fact, inner classes always have the outer
-     * instance as first constructor parameter, and anonymous classes have both the outer instance
-     * and all the variables captured in the closure.
-     *
-     * @param invocationToken the invocation class token.
-     * @param args            the invocation constructor arguments.
-     * @param <IN>            the input data type.
-     * @param <OUT>           the output data type.
-     * @return the routine builder instance.
-     * @throws java.lang.IllegalArgumentException if no constructor taking the specified objects as
-     *                                            parameters was found.
-     */
-    @NotNull
-    public static <IN, OUT> RoutineBuilder<IN, OUT> with(
-            @NotNull final ClassToken<? extends Invocation<IN, OUT>> invocationToken,
-            @Nullable final Object... args) {
-        return with(factoryOf(invocationToken, args));
-    }
+  /**
+   * Returns a routine builder based on an invocation factory creating instances of the specified
+   * class token by passing the specified arguments to the class constructor.
+   * <p>
+   * Note that class tokens of inner and anonymous classes can be passed as well. Remember however
+   * that Java creates synthetic constructors for such classes, so be sure to specify the correct
+   * arguments to guarantee proper instantiation. In fact, inner classes always have the outer
+   * instance as first constructor parameter, and anonymous classes have both the outer instance
+   * and all the variables captured in the closure.
+   *
+   * @param invocationToken the invocation class token.
+   * @param args            the invocation constructor arguments.
+   * @param <IN>            the input data type.
+   * @param <OUT>           the output data type.
+   * @return the routine builder instance.
+   * @throws java.lang.IllegalArgumentException if no constructor taking the specified objects as
+   *                                            parameters was found.
+   */
+  @NotNull
+  public static <IN, OUT> RoutineBuilder<IN, OUT> with(
+      @NotNull final ClassToken<? extends Invocation<IN, OUT>> invocationToken,
+      @Nullable final Object... args) {
+    return with(factoryOf(invocationToken, args));
+  }
 
-    /**
-     * Returns a routine builder based on the specified command invocation.
-     *
-     * @param invocation the command invocation instance.
-     * @param <OUT>      the output data type.
-     * @return the routine builder instance.
-     */
-    @NotNull
-    public static <OUT> RoutineBuilder<Void, OUT> with(
-            @NotNull final CommandInvocation<OUT> invocation) {
-        return with((InvocationFactory<Void, OUT>) invocation);
-    }
+  /**
+   * Returns a routine builder based on the specified command invocation.
+   *
+   * @param invocation the command invocation instance.
+   * @param <OUT>      the output data type.
+   * @return the routine builder instance.
+   */
+  @NotNull
+  public static <OUT> RoutineBuilder<Void, OUT> with(
+      @NotNull final CommandInvocation<OUT> invocation) {
+    return with((InvocationFactory<Void, OUT>) invocation);
+  }
 
-    /**
-     * Returns a routine builder based on an invocation factory creating instances of the specified
-     * object.
-     *
-     * @param invocation the invocation instance.
-     * @param <IN>       the input data type.
-     * @param <OUT>      the output data type.
-     * @return the routine builder instance.
-     * @throws java.lang.IllegalArgumentException if no default constructor was found.
-     */
-    @NotNull
-    public static <IN, OUT> RoutineBuilder<IN, OUT> with(
-            @NotNull final Invocation<IN, OUT> invocation) {
-        return with(factoryOf(invocation));
-    }
+  /**
+   * Returns a routine builder based on an invocation factory creating instances of the specified
+   * object.
+   *
+   * @param invocation the invocation instance.
+   * @param <IN>       the input data type.
+   * @param <OUT>      the output data type.
+   * @return the routine builder instance.
+   * @throws java.lang.IllegalArgumentException if no default constructor was found.
+   */
+  @NotNull
+  public static <IN, OUT> RoutineBuilder<IN, OUT> with(
+      @NotNull final Invocation<IN, OUT> invocation) {
+    return with(factoryOf(invocation));
+  }
 
-    /**
-     * Returns a routine builder based on an invocation factory creating instances of the specified
-     * object by passing the specified arguments to the class constructor.
-     * <p>
-     * Note that inner and anonymous objects can be passed as well. Remember however that Java
-     * creates synthetic constructors for such classes, so be sure to specify the correct arguments
-     * to guarantee proper instantiation. In fact, inner classes always have the outer instance as
-     * first constructor parameter, and anonymous classes have both the outer instance and all the
-     * variables captured in the closure.
-     *
-     * @param invocation the invocation instance.
-     * @param args       the invocation constructor arguments.
-     * @param <IN>       the input data type.
-     * @param <OUT>      the output data type.
-     * @return the routine builder instance.
-     * @throws java.lang.IllegalArgumentException if no constructor taking the specified objects as
-     *                                            parameters was found.
-     */
-    @NotNull
-    public static <IN, OUT> RoutineBuilder<IN, OUT> with(
-            @NotNull final Invocation<IN, OUT> invocation, @Nullable final Object... args) {
-        return with(factoryOf(invocation, args));
-    }
+  /**
+   * Returns a routine builder based on an invocation factory creating instances of the specified
+   * object by passing the specified arguments to the class constructor.
+   * <p>
+   * Note that inner and anonymous objects can be passed as well. Remember however that Java
+   * creates synthetic constructors for such classes, so be sure to specify the correct arguments
+   * to guarantee proper instantiation. In fact, inner classes always have the outer instance as
+   * first constructor parameter, and anonymous classes have both the outer instance and all the
+   * variables captured in the closure.
+   *
+   * @param invocation the invocation instance.
+   * @param args       the invocation constructor arguments.
+   * @param <IN>       the input data type.
+   * @param <OUT>      the output data type.
+   * @return the routine builder instance.
+   * @throws java.lang.IllegalArgumentException if no constructor taking the specified objects as
+   *                                            parameters was found.
+   */
+  @NotNull
+  public static <IN, OUT> RoutineBuilder<IN, OUT> with(
+      @NotNull final Invocation<IN, OUT> invocation, @Nullable final Object... args) {
+    return with(factoryOf(invocation, args));
+  }
 
-    /**
-     * Returns a routine builder based on the specified invocation factory.
-     * <br>
-     * In order to prevent undesired leaks, the class of the specified factory should have a static
-     * scope.
-     *
-     * @param factory the invocation factory.
-     * @param <IN>    the input data type.
-     * @param <OUT>   the output data type.
-     * @return the routine builder instance.
-     */
-    @NotNull
-    public static <IN, OUT> RoutineBuilder<IN, OUT> with(
-            @NotNull final InvocationFactory<IN, OUT> factory) {
-        return JRoutineCore.with(factory);
-    }
+  /**
+   * Returns a routine builder based on the specified invocation factory.
+   * <br>
+   * In order to prevent undesired leaks, the class of the specified factory should have a static
+   * scope.
+   *
+   * @param factory the invocation factory.
+   * @param <IN>    the input data type.
+   * @param <OUT>   the output data type.
+   * @return the routine builder instance.
+   */
+  @NotNull
+  public static <IN, OUT> RoutineBuilder<IN, OUT> with(
+      @NotNull final InvocationFactory<IN, OUT> factory) {
+    return JRoutineCore.with(factory);
+  }
 
-    /**
-     * Returns a routine builder wrapping the specified target.
-     * <p>
-     * Note that it is responsibility of the caller to retain a strong reference to the target
-     * instance to prevent it from being garbage collected.
-     * <br>
-     * Note also that the invocation input data will be cached, and the results will be produced
-     * only after the invocation channel is closed, so be sure to avoid streaming inputs in
-     * order to prevent starvation or out of memory errors.
-     *
-     * @param target the invocation target.
-     * @return the routine builder instance.
-     * @throws java.lang.IllegalArgumentException if the specified object class represents an
-     *                                            interface.
-     */
-    @NotNull
-    public static ObjectProxyRoutineBuilder with(@NotNull final InvocationTarget<?> target) {
-        return new DefaultObjectProxyRoutineBuilder(target);
-    }
+  /**
+   * Returns a routine builder wrapping the specified target.
+   * <p>
+   * Note that it is responsibility of the caller to retain a strong reference to the target
+   * instance to prevent it from being garbage collected.
+   * <br>
+   * Note also that the invocation input data will be cached, and the results will be produced
+   * only after the invocation channel is closed, so be sure to avoid streaming inputs in order to
+   * prevent starvation or out of memory errors.
+   *
+   * @param target the invocation target.
+   * @return the routine builder instance.
+   * @throws java.lang.IllegalArgumentException if the specified object class represents an
+   *                                            interface.
+   */
+  @NotNull
+  public static ObjectProxyRoutineBuilder with(@NotNull final InvocationTarget<?> target) {
+    return new DefaultObjectProxyRoutineBuilder(target);
+  }
 
-    /**
-     * Returns a routine builder based on the specified mapping invocation.
-     *
-     * @param invocation the mapping invocation instance.
-     * @param <IN>       the input data type.
-     * @param <OUT>      the output data type.
-     * @return the routine builder instance.
-     */
-    @NotNull
-    public static <IN, OUT> RoutineBuilder<IN, OUT> with(
-            @NotNull final MappingInvocation<IN, OUT> invocation) {
-        return with((InvocationFactory<IN, OUT>) invocation);
-    }
+  /**
+   * Returns a routine builder based on the specified mapping invocation.
+   *
+   * @param invocation the mapping invocation instance.
+   * @param <IN>       the input data type.
+   * @param <OUT>      the output data type.
+   * @return the routine builder instance.
+   */
+  @NotNull
+  public static <IN, OUT> RoutineBuilder<IN, OUT> with(
+      @NotNull final MappingInvocation<IN, OUT> invocation) {
+    return with((InvocationFactory<IN, OUT>) invocation);
+  }
 
-    /**
-     * Returns a routine builder wrapping the specified object.
-     * <br>
-     * The invocation target will be automatically chosen based on whether the specified object is
-     * a class or an instance.
-     * <p>
-     * Note that it is responsibility of the caller to retain a strong reference to the target
-     * instance to prevent it from being garbage collected.
-     * <br>
-     * Note also that the invocation input data will be cached, and the results will be produced
-     * only after the invocation channel is closed, so be sure to avoid streaming inputs in
-     * order to prevent starvation or out of memory errors.
-     *
-     * @param object the target object.
-     * @return the routine builder instance.
-     * @throws java.lang.IllegalArgumentException if the specified object class represents an
-     *                                            interface.
-     */
-    @NotNull
-    public static ObjectProxyRoutineBuilder with(@NotNull final Object object) {
-        return (object instanceof Class) ? withClassOfType((Class<?>) object)
-                : withInstance(object);
-    }
+  /**
+   * Returns a routine builder wrapping the specified object.
+   * <br>
+   * The invocation target will be automatically chosen based on whether the specified object is
+   * a class or an instance.
+   * <p>
+   * Note that it is responsibility of the caller to retain a strong reference to the target
+   * instance to prevent it from being garbage collected.
+   * <br>
+   * Note also that the invocation input data will be cached, and the results will be produced
+   * only after the invocation channel is closed, so be sure to avoid streaming inputs in order to
+   * prevent starvation or out of memory errors.
+   *
+   * @param object the target object.
+   * @return the routine builder instance.
+   * @throws java.lang.IllegalArgumentException if the specified object class represents an
+   *                                            interface.
+   */
+  @NotNull
+  public static ObjectProxyRoutineBuilder with(@NotNull final Object object) {
+    return (object instanceof Class) ? withClassOfType((Class<?>) object) : withInstance(object);
+  }
 
-    /**
-     * Returns a routine builder based on a call invocation factory backed by the specified
-     * function.
-     *
-     * @param function the function instance.
-     * @param <IN>     the input data type.
-     * @param <OUT>    the output data type.
-     * @return the routine builder instance.
-     */
-    @NotNull
-    public static <IN, OUT> RoutineBuilder<IN, OUT> withCall(
-            @NotNull final Function<? super List<IN>, ? extends OUT> function) {
-        return JRoutineCore.with(functionCall(function));
-    }
+  /**
+   * Returns a routine builder based on a call invocation factory backed by the specified function.
+   *
+   * @param function the function instance.
+   * @param <IN>     the input data type.
+   * @param <OUT>    the output data type.
+   * @return the routine builder instance.
+   */
+  @NotNull
+  public static <IN, OUT> RoutineBuilder<IN, OUT> withCall(
+      @NotNull final Function<? super List<IN>, ? extends OUT> function) {
+    return JRoutineCore.with(functionCall(function));
+  }
 
-    /**
-     * Returns a routine builder based on a call invocation factory backed by the specified
-     * consumer.
-     *
-     * @param consumer the consumer instance.
-     * @param <IN>     the input data type.
-     * @param <OUT>    the output data type.
-     * @return the routine builder instance.
-     */
-    @NotNull
-    public static <IN, OUT> RoutineBuilder<IN, OUT> withCallConsumer(
-            @NotNull final BiConsumer<? super List<IN>, ? super Channel<OUT, ?>> consumer) {
-        return JRoutineCore.with(consumerCall(consumer));
-    }
+  /**
+   * Returns a routine builder based on a call invocation factory backed by the specified consumer.
+   *
+   * @param consumer the consumer instance.
+   * @param <IN>     the input data type.
+   * @param <OUT>    the output data type.
+   * @return the routine builder instance.
+   */
+  @NotNull
+  public static <IN, OUT> RoutineBuilder<IN, OUT> withCallConsumer(
+      @NotNull final BiConsumer<? super List<IN>, ? super Channel<OUT, ?>> consumer) {
+    return JRoutineCore.with(consumerCall(consumer));
+  }
 
-    /**
-     * Returns a routine builder wrapping the specified class.
-     * <p>
-     * Note that it is responsibility of the caller to retain a strong reference to the target
-     * instance to prevent it from being garbage collected.
-     * <br>
-     * Note also that the invocation input data will be cached, and the results will be produced
-     * only after the invocation channel is closed, so be sure to avoid streaming inputs in
-     * order to prevent starvation or out of memory errors.
-     *
-     * @param targetClass the target class.
-     * @return the routine builder instance.
-     * @throws java.lang.IllegalArgumentException if the specified class represents an interface.
-     */
-    @NotNull
-    public static ObjectProxyRoutineBuilder withClassOfType(@NotNull final Class<?> targetClass) {
-        return new DefaultObjectProxyRoutineBuilder(classOfType(targetClass));
-    }
+  /**
+   * Returns a routine builder wrapping the specified class.
+   * <p>
+   * Note that it is responsibility of the caller to retain a strong reference to the target
+   * instance to prevent it from being garbage collected.
+   * <br>
+   * Note also that the invocation input data will be cached, and the results will be produced
+   * only after the invocation channel is closed, so be sure to avoid streaming inputs in order to
+   * prevent starvation or out of memory errors.
+   *
+   * @param targetClass the target class.
+   * @return the routine builder instance.
+   * @throws java.lang.IllegalArgumentException if the specified class represents an interface.
+   */
+  @NotNull
+  public static ObjectProxyRoutineBuilder withClassOfType(@NotNull final Class<?> targetClass) {
+    return new DefaultObjectProxyRoutineBuilder(classOfType(targetClass));
+  }
 
-    /**
-     * Returns a routine builder based on a command invocation backed by the specified supplier.
-     *
-     * @param supplier the supplier instance.
-     * @param <OUT>    the output data type.
-     * @return the routine builder instance.
-     */
-    @NotNull
-    public static <OUT> RoutineBuilder<Void, OUT> withCommand(
-            @NotNull final Supplier<? extends OUT> supplier) {
-        return JRoutineCore.with(supplierCommand(supplier));
-    }
+  /**
+   * Returns a routine builder based on a command invocation backed by the specified supplier.
+   *
+   * @param supplier the supplier instance.
+   * @param <OUT>    the output data type.
+   * @return the routine builder instance.
+   */
+  @NotNull
+  public static <OUT> RoutineBuilder<Void, OUT> withCommand(
+      @NotNull final Supplier<? extends OUT> supplier) {
+    return JRoutineCore.with(supplierCommand(supplier));
+  }
 
-    /**
-     * Returns a routine builder based on a command invocation backed by the specified consumer.
-     *
-     * @param consumer the consumer instance.
-     * @param <OUT>    the output data type.
-     * @return the routine builder instance.
-     */
-    @NotNull
-    public static <OUT> RoutineBuilder<Void, OUT> withCommandConsumer(
-            @NotNull final Consumer<? super Channel<OUT, ?>> consumer) {
-        return JRoutineCore.with(consumerCommand(consumer));
-    }
+  /**
+   * Returns a routine builder based on a command invocation backed by the specified consumer.
+   *
+   * @param consumer the consumer instance.
+   * @param <OUT>    the output data type.
+   * @return the routine builder instance.
+   */
+  @NotNull
+  public static <OUT> RoutineBuilder<Void, OUT> withCommandConsumer(
+      @NotNull final Consumer<? super Channel<OUT, ?>> consumer) {
+    return JRoutineCore.with(consumerCommand(consumer));
+  }
 
-    /**
-     * Returns a routine builder based on an invocation factory backed by the specified supplier.
-     *
-     * @param supplier the supplier instance.
-     * @param <IN>     the input data type.
-     * @param <OUT>    the output data type.
-     * @return the routine builder instance.
-     */
-    @NotNull
-    public static <IN, OUT> RoutineBuilder<IN, OUT> withFactory(
-            @NotNull final Supplier<? extends Invocation<? super IN, ? extends OUT>> supplier) {
-        return JRoutineCore.with(supplierFactory(supplier));
-    }
+  /**
+   * Returns a routine builder based on an invocation factory backed by the specified supplier.
+   *
+   * @param supplier the supplier instance.
+   * @param <IN>     the input data type.
+   * @param <OUT>    the output data type.
+   * @return the routine builder instance.
+   */
+  @NotNull
+  public static <IN, OUT> RoutineBuilder<IN, OUT> withFactory(
+      @NotNull final Supplier<? extends Invocation<? super IN, ? extends OUT>> supplier) {
+    return JRoutineCore.with(supplierFactory(supplier));
+  }
 
-    /**
-     * Returns a routine builder based on a operation invocation backed by the specified predicate.
-     *
-     * @param predicate the predicate instance.
-     * @param <IN>      the input data type.
-     * @return the routine builder instance.
-     */
-    @NotNull
-    public static <IN> RoutineBuilder<IN, IN> withFilter(
-            @NotNull final Predicate<? super IN> predicate) {
-        return JRoutineCore.with(predicateFilter(predicate));
-    }
+  /**
+   * Returns a routine builder based on a operation invocation backed by the specified predicate.
+   *
+   * @param predicate the predicate instance.
+   * @param <IN>      the input data type.
+   * @return the routine builder instance.
+   */
+  @NotNull
+  public static <IN> RoutineBuilder<IN, IN> withFilter(
+      @NotNull final Predicate<? super IN> predicate) {
+    return JRoutineCore.with(predicateFilter(predicate));
+  }
 
-    /**
-     * Returns a routine builder wrapping the specified object.
-     * <p>
-     * Note that it is responsibility of the caller to retain a strong reference to the target
-     * instance to prevent it from being garbage collected.
-     * <br>
-     * Note also that the invocation input data will be cached, and the results will be produced
-     * only after the invocation channel is closed, so be sure to avoid streaming inputs in
-     * order to prevent starvation or out of memory errors.
-     *
-     * @param object the target object.
-     * @return the routine builder instance.
-     */
-    @NotNull
-    public static ObjectProxyRoutineBuilder withInstance(@NotNull final Object object) {
-        return new DefaultObjectProxyRoutineBuilder(instance(object));
-    }
+  /**
+   * Returns a routine builder wrapping the specified object.
+   * <p>
+   * Note that it is responsibility of the caller to retain a strong reference to the target
+   * instance to prevent it from being garbage collected.
+   * <br>
+   * Note also that the invocation input data will be cached, and the results will be produced
+   * only after the invocation channel is closed, so be sure to avoid streaming inputs in order to
+   * prevent starvation or out of memory errors.
+   *
+   * @param object the target object.
+   * @return the routine builder instance.
+   */
+  @NotNull
+  public static ObjectProxyRoutineBuilder withInstance(@NotNull final Object object) {
+    return new DefaultObjectProxyRoutineBuilder(instance(object));
+  }
 
-    /**
-     * Returns a routine builder based on a mapping invocation backed by the specified function.
-     *
-     * @param function the function instance.
-     * @param <IN>     the input data type.
-     * @param <OUT>    the output data type.
-     * @return the routine builder instance.
-     */
-    @NotNull
-    public static <IN, OUT> RoutineBuilder<IN, OUT> withMapping(
-            @NotNull final Function<? super IN, ? extends OUT> function) {
-        return JRoutineCore.with(functionMapping(function));
-    }
+  /**
+   * Returns a routine builder based on a mapping invocation backed by the specified function.
+   *
+   * @param function the function instance.
+   * @param <IN>     the input data type.
+   * @param <OUT>    the output data type.
+   * @return the routine builder instance.
+   */
+  @NotNull
+  public static <IN, OUT> RoutineBuilder<IN, OUT> withMapping(
+      @NotNull final Function<? super IN, ? extends OUT> function) {
+    return JRoutineCore.with(functionMapping(function));
+  }
 
-    /**
-     * Returns a routine builder based on a mapping invocation backed by the specified consumer.
-     *
-     * @param consumer the consumer instance.
-     * @param <IN>     the input data type.
-     * @param <OUT>    the output data type.
-     * @return the routine builder instance.
-     */
-    @NotNull
-    public static <IN, OUT> RoutineBuilder<IN, OUT> withMappingConsumer(
-            @NotNull final BiConsumer<? super IN, ? super Channel<OUT, ?>> consumer) {
-        return JRoutineCore.with(consumerMapping(consumer));
-    }
+  /**
+   * Returns a routine builder based on a mapping invocation backed by the specified consumer.
+   *
+   * @param consumer the consumer instance.
+   * @param <IN>     the input data type.
+   * @param <OUT>    the output data type.
+   * @return the routine builder instance.
+   */
+  @NotNull
+  public static <IN, OUT> RoutineBuilder<IN, OUT> withMappingConsumer(
+      @NotNull final BiConsumer<? super IN, ? super Channel<OUT, ?>> consumer) {
+    return JRoutineCore.with(consumerMapping(consumer));
+  }
 
-    /**
-     * Returns a stream routine builder.
-     *
-     * @param <IN> the input data type.
-     * @return the routine builder instance.
-     */
-    @NotNull
-    public static <IN> StreamBuilder<IN, IN> withStream() {
-        return JRoutineStream.withStream();
-    }
+  /**
+   * Returns a stream routine builder.
+   *
+   * @param <IN> the input data type.
+   * @return the routine builder instance.
+   */
+  @NotNull
+  public static <IN> StreamBuilder<IN, IN> withStream() {
+    return JRoutineStream.withStream();
+  }
 }

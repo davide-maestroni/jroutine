@@ -36,32 +36,31 @@ import java.util.concurrent.TimeUnit;
  */
 class BindTimeout<OUT> implements Function<Channel<?, OUT>, Channel<?, OUT>> {
 
-    private final ChannelConfiguration mConfiguration;
+  private final ChannelConfiguration mConfiguration;
 
-    private final long mTimeout;
+  private final long mTimeout;
 
-    private final TimeUnit mTimeoutUnit;
+  private final TimeUnit mTimeoutUnit;
 
-    /**
-     * Constructor.
-     *
-     * @param configuration the channel configuration.
-     * @param timeout       the timeout value.
-     * @param timeUnit      the timeout unit.
-     */
-    BindTimeout(@NotNull final ChannelConfiguration configuration, final long timeout,
-            @NotNull final TimeUnit timeUnit) {
-        mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
-        mTimeout = ConstantConditions.notNegative("timeout value", timeout);
-        mTimeoutUnit = ConstantConditions.notNull("timeout unit", timeUnit);
-    }
+  /**
+   * Constructor.
+   *
+   * @param configuration the channel configuration.
+   * @param timeout       the timeout value.
+   * @param timeUnit      the timeout unit.
+   */
+  BindTimeout(@NotNull final ChannelConfiguration configuration, final long timeout,
+      @NotNull final TimeUnit timeUnit) {
+    mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
+    mTimeout = ConstantConditions.notNegative("timeout value", timeout);
+    mTimeoutUnit = ConstantConditions.notNull("timeout unit", timeUnit);
+  }
 
-    public Channel<?, OUT> apply(final Channel<?, OUT> channel) throws Exception {
-        final ChannelConfiguration configuration = mConfiguration;
-        final Channel<OUT, OUT> outputChannel =
-                JRoutineCore.io().apply(configuration).buildChannel();
-        channel.bind(new TimeoutChannelConsumer<OUT>(mTimeout, mTimeoutUnit,
-                configuration.getRunnerOrElse(Runners.sharedRunner()), outputChannel));
-        return outputChannel;
-    }
+  public Channel<?, OUT> apply(final Channel<?, OUT> channel) throws Exception {
+    final ChannelConfiguration configuration = mConfiguration;
+    final Channel<OUT, OUT> outputChannel = JRoutineCore.io().apply(configuration).buildChannel();
+    channel.bind(new TimeoutChannelConsumer<OUT>(mTimeout, mTimeoutUnit,
+        configuration.getRunnerOrElse(Runners.sharedRunner()), outputChannel));
+    return outputChannel;
+  }
 }

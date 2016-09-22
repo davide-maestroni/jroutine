@@ -27,21 +27,21 @@ import org.jetbrains.annotations.NotNull;
  */
 public abstract class AsyncRunner extends Runner {
 
-    /**
-     * Constructor.
-     *
-     * @param manager the manager of threads.
-     */
-    protected AsyncRunner(@NotNull final ThreadManager manager) {
-        super(manager);
-    }
+  /**
+   * Constructor.
+   *
+   * @param manager the manager of threads.
+   */
+  protected AsyncRunner(@NotNull final ThreadManager manager) {
+    super(manager);
+  }
 
-    @Override
-    public void cancel(@NotNull final Execution execution) {
-    }
+  @Override
+  public void cancel(@NotNull final Execution execution) {
+  }
 
-    @Override
-    public boolean isExecutionThread() {
-        return getThreadManager().isManagedThread();
-    }
+  @Override
+  public boolean isExecutionThread() {
+    return getThreadManager().isManagedThread();
+  }
 }

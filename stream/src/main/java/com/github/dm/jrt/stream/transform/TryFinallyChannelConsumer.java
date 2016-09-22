@@ -33,41 +33,41 @@ import org.jetbrains.annotations.NotNull;
  */
 class TryFinallyChannelConsumer<OUT> implements ChannelConsumer<OUT> {
 
-    private final Action mFinallyAction;
+  private final Action mFinallyAction;
 
-    private final Channel<OUT, ?> mOutputChannel;
+  private final Channel<OUT, ?> mOutputChannel;
 
-    /**
-     * Constructor.
-     *
-     * @param finallyAction the action instance.
-     * @param outputChannel the output channel.
-     */
-    TryFinallyChannelConsumer(@NotNull final Action finallyAction,
-            @NotNull final Channel<OUT, ?> outputChannel) {
-        mFinallyAction = ConstantConditions.notNull("action instance", finallyAction);
-        mOutputChannel = ConstantConditions.notNull("channel instance", outputChannel);
+  /**
+   * Constructor.
+   *
+   * @param finallyAction the action instance.
+   * @param outputChannel the output channel.
+   */
+  TryFinallyChannelConsumer(@NotNull final Action finallyAction,
+      @NotNull final Channel<OUT, ?> outputChannel) {
+    mFinallyAction = ConstantConditions.notNull("action instance", finallyAction);
+    mOutputChannel = ConstantConditions.notNull("channel instance", outputChannel);
+  }
+
+  public void onComplete() throws Exception {
+    try {
+      mFinallyAction.perform();
+
+    } finally {
+      mOutputChannel.close();
     }
+  }
 
-    public void onComplete() throws Exception {
-        try {
-            mFinallyAction.perform();
+  public void onError(@NotNull final RoutineException error) throws Exception {
+    try {
+      mFinallyAction.perform();
 
-        } finally {
-            mOutputChannel.close();
-        }
+    } finally {
+      mOutputChannel.abort(error);
     }
+  }
 
-    public void onError(@NotNull final RoutineException error) throws Exception {
-        try {
-            mFinallyAction.perform();
-
-        } finally {
-            mOutputChannel.abort(error);
-        }
-    }
-
-    public void onOutput(final OUT output) {
-        mOutputChannel.pass(output);
-    }
+  public void onOutput(final OUT output) {
+    mOutputChannel.pass(output);
+  }
 }

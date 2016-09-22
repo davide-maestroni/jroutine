@@ -400,952 +400,941 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  */
 public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
 
+  private final Object[] mArgs;
+
+  private final Constructor<? extends RoutineMethod> mConstructor;
+
+  private final AtomicBoolean mIsFirstCall = new AtomicBoolean(true);
+
+  private final ThreadLocal<InputChannel<?>> mLocalChannel = new ThreadLocal<InputChannel<?>>();
+
+  private final ThreadLocal<Boolean> mLocalIgnore = new ThreadLocal<Boolean>();
+
+  private InvocationConfiguration mConfiguration = InvocationConfiguration.defaultConfiguration();
+
+  private Class<?> mReturnType;
+
+  /**
+   * Constructor.
+   */
+  public RoutineMethod() {
+    this((Object[]) null);
+  }
+
+  /**
+   * Constructor.
+   *
+   * @param args the constructor arguments.
+   */
+  public RoutineMethod(@Nullable final Object... args) {
+    final Class<? extends RoutineMethod> type = getClass();
+    final Object[] constructorArgs;
+    if (type.isAnonymousClass()) {
+      final Object[] safeArgs = asArgs(args);
+      if (safeArgs.length > 0) {
+        constructorArgs = new Object[safeArgs.length + 1];
+        System.arraycopy(safeArgs, 0, constructorArgs, 1, safeArgs.length);
+        if (Reflection.hasStaticScope(type)) {
+          constructorArgs[0] = safeArgs;
+
+        } else {
+          constructorArgs[0] = safeArgs[0];
+          constructorArgs[1] = safeArgs;
+        }
+
+      } else {
+        constructorArgs = safeArgs;
+      }
+
+    } else {
+      constructorArgs = cloneArgs(args);
+    }
+
+    Constructor<? extends RoutineMethod> constructor = null;
+    try {
+      constructor = Reflection.findBestMatchingConstructor(type, constructorArgs);
+
+    } catch (final IllegalArgumentException ignored) {
+    }
+
+    mArgs = constructorArgs;
+    mConstructor = constructor;
+  }
+
+  /**
+   * Builds an object routine method by wrapping the specified static method.
+   *
+   * @param method the method.
+   * @return the routine method instance.
+   * @throws java.lang.IllegalArgumentException if the specified method is not static.
+   */
+  @NotNull
+  public static ObjectRoutineMethod from(@NotNull final Method method) {
+    if (!Modifier.isStatic(method.getModifiers())) {
+      throw new IllegalArgumentException("the method is not static: " + method);
+    }
+
+    return from(InvocationTarget.classOfType(method.getDeclaringClass()), method);
+  }
+
+  /**
+   * Builds an object routine method by wrapping a method of the specified target.
+   *
+   * @param target the invocation target.
+   * @param method the method.
+   * @return the routine method instance.
+   * @throws java.lang.IllegalArgumentException if the specified method is not implemented by the
+   *                                            target instance.
+   */
+  @NotNull
+  public static ObjectRoutineMethod from(@NotNull final InvocationTarget<?> target,
+      @NotNull final Method method) {
+    if (!method.getDeclaringClass().isAssignableFrom(target.getTargetClass())) {
+      throw new IllegalArgumentException(
+          "the method is not applicable to the specified target class: " + target.getTargetClass());
+    }
+
+    return new ObjectRoutineMethod(target, method);
+  }
+
+  /**
+   * Builds an object routine method by wrapping a method of the specified target.
+   *
+   * @param target         the invocation target.
+   * @param name           the method name.
+   * @param parameterTypes the method parameter types.
+   * @return the routine method instance.
+   * @throws java.lang.NoSuchMethodException if no method with the specified signature is found.
+   */
+  @NotNull
+  public static ObjectRoutineMethod from(@NotNull final InvocationTarget<?> target,
+      @NotNull final String name, @Nullable final Class<?>... parameterTypes) throws
+      NoSuchMethodException {
+    return from(target, target.getTargetClass().getMethod(name, parameterTypes));
+  }
+
+  /**
+   * Builds a new input channel.
+   *
+   * @param <IN> the input data type.
+   * @return the input channel instance.
+   */
+  @NotNull
+  public static <IN> InputChannel<IN> inputChannel() {
+    return toInput(JRoutineCore.io().<IN>buildChannel());
+  }
+
+  /**
+   * Builds a new input channel and binds the specified one to it.
+   *
+   * @param channel the channel to bind.
+   * @param <IN>    the input data type.
+   * @return the input channel instance.
+   */
+  @NotNull
+  @SuppressWarnings("unchecked")
+  public static <IN> InputChannel<IN> inputFrom(@NotNull final Channel<?, IN> channel) {
+    final InputChannel<IN> inputChannel = inputChannel();
+    channel.bind(inputChannel).close();
+    return inputChannel;
+  }
+
+  /**
+   * Builds a new input channel producing no data.
+   * <p>
+   * Note that the channel will be already closed.
+   *
+   * @param <IN> the input data type.
+   * @return the input channel instance.
+   */
+  @NotNull
+  public static <IN> InputChannel<IN> inputOf() {
+    return toInput(JRoutineCore.io().<IN>of());
+  }
+
+  /**
+   * Builds a new input channel producing the specified input.
+   * <p>
+   * Note that the channel will be already closed.
+   *
+   * @param input the input.
+   * @param <IN>  the input data type.
+   * @return the input channel instance.
+   */
+  @NotNull
+  public static <IN> InputChannel<IN> inputOf(@Nullable final IN input) {
+    return toInput(JRoutineCore.io().of(input));
+  }
+
+  /**
+   * Builds a new input channel producing the specified inputs.
+   * <p>
+   * Note that the channel will be already closed.
+   *
+   * @param inputs the inputs.
+   * @param <IN>   the input data type.
+   * @return the input channel instance.
+   */
+  @NotNull
+  public static <IN> InputChannel<IN> inputOf(@Nullable final IN... inputs) {
+    return toInput(JRoutineCore.io().of(inputs));
+  }
+
+  /**
+   * Builds a new input channel producing the inputs returned by the specified iterable.
+   * <p>
+   * Note that the channel will be already closed.
+   *
+   * @param inputs the iterable returning the input data.
+   * @param <IN>   the input data type.
+   * @return the input channel instance.
+   */
+  @NotNull
+  public static <IN> InputChannel<IN> inputOf(@Nullable final Iterable<IN> inputs) {
+    return toInput(JRoutineCore.io().of(inputs));
+  }
+
+  /**
+   * Builds a new output channel.
+   *
+   * @param <OUT> the output data type.
+   * @return the output channel instance.
+   */
+  @NotNull
+  public static <OUT> OutputChannel<OUT> outputChannel() {
+    return toOutput(JRoutineCore.io().<OUT>buildChannel());
+  }
+
+  /**
+   * Builds a new output channel and binds it to the specified one.
+   *
+   * @param channel the channel to bind to.
+   * @param <OUT>   the output data type.
+   * @return the output channel instance.
+   */
+  @NotNull
+  @SuppressWarnings("unchecked")
+  public static <OUT> OutputChannel<OUT> outputFrom(@NotNull final Channel<OUT, ?> channel) {
+    final OutputChannel<OUT> outOutputChannel = outputChannel();
+    outOutputChannel.bind(channel).close();
+    return outOutputChannel;
+  }
+
+  /**
+   * Builds a new input channel wrapping the specified one.
+   *
+   * @param channel the channel to wrap.
+   * @param <IN>    the input data type.
+   * @return the input channel instance.
+   */
+  @NotNull
+  public static <IN> InputChannel<IN> toInput(@NotNull final Channel<IN, IN> channel) {
+    return new InputChannel<IN>(channel);
+  }
+
+  /**
+   * Builds a new output channel wrapping the specified one.
+   *
+   * @param channel the channel to wrap.
+   * @param <OUT>   the output data type.
+   * @return the output channel instance.
+   */
+  @NotNull
+  public static <OUT> OutputChannel<OUT> toOutput(@NotNull final Channel<OUT, OUT> channel) {
+    return new OutputChannel<OUT>(channel);
+  }
+
+  /**
+   * Replaces all the input and output channels in the specified parameters with newly created
+   * instances.
+   *
+   * @param params         the original method parameters.
+   * @param inputChannels  the list to fill with the newly created input channels.
+   * @param outputChannels the list to fill with the newly created output channels.
+   * @return the replaced parameters.
+   */
+  @NotNull
+  protected static Object[] replaceChannels(@NotNull final Object[] params,
+      @NotNull final ArrayList<InputChannel<?>> inputChannels,
+      @NotNull final ArrayList<OutputChannel<?>> outputChannels) {
+    final ArrayList<Object> parameters = new ArrayList<Object>(params.length);
+    for (final Object param : params) {
+      if (param instanceof InputChannel) {
+        final InputChannel<Object> inputChannel = toInput(JRoutineCore.io().buildChannel());
+        inputChannels.add(inputChannel);
+        parameters.add(inputChannel);
+
+      } else if (param instanceof OutputChannel) {
+        final OutputChannel<Object> outputChannel = toOutput(JRoutineCore.io().buildChannel());
+        outputChannels.add(outputChannel);
+        parameters.add(outputChannel);
+
+      } else {
+        parameters.add(param);
+      }
+    }
+
+    return parameters.toArray();
+  }
+
+  @NotNull
+  public RoutineMethod apply(@NotNull final InvocationConfiguration configuration) {
+    mConfiguration = ConstantConditions.notNull("invocation configuration", configuration);
+    return this;
+  }
+
+  @NotNull
+  public InvocationConfiguration.Builder<? extends RoutineMethod> applyInvocationConfiguration() {
+    return new Builder<RoutineMethod>(this, mConfiguration);
+  }
+
+  /**
+   * Calls the routine.
+   * <br>
+   * The output channel will produced the data returned by the method. In case the method does not
+   * return any output, the channel will be anyway notified of invocation abortion and completion.
+   * <p>
+   * Note that the specific method will be selected based on the specified parameters. If no
+   * matching method is found, the call will fail with an exception.
+   * <br>
+   * Note also that, in case no proper arguments are passed to the constructor, it will be possible
+   * to invoke this method only once.
+   *
+   * @param params the parameters.
+   * @param <OUT>  the output data type.
+   * @return the output channel instance.
+   */
+  @NotNull
+  public <OUT> OutputChannel<OUT> call(@Nullable final Object... params) {
+    final Object[] safeParams = asArgs(params);
+    final Class<? extends RoutineMethod> type = getClass();
+    final Method method = findBestMatchingMethod(type, safeParams);
+    final InvocationFactory<Selectable<Object>, Selectable<Object>> factory;
+    final Constructor<? extends RoutineMethod> constructor = mConstructor;
+    if (constructor != null) {
+      factory = new MultiInvocationFactory(type, constructor, mArgs, method, safeParams);
+
+    } else {
+      if (!mIsFirstCall.getAndSet(false)) {
+        throw new IllegalStateException(
+            "cannot invoke the routine in more than once: please provide proper "
+                + "constructor arguments");
+      }
+
+      setReturnType(method.getReturnType());
+      factory = new SingleInvocationFactory(this, method, safeParams);
+    }
+
+    return call(factory, InvocationMode.ASYNC, safeParams);
+  }
+
+  /**
+   * Calls the routine in parallel mode.
+   * <br>
+   * The output channel will produced the data returned by the method. In case the method does not
+   * return any output, the channel will be anyway notified of invocation abortion and completion.
+   * <p>
+   * Note that the specific method will be selected based on the specified parameters. If no
+   * matching method is found, the call will fail with an exception.
+   * <br>
+   * Note also that, in case no proper arguments are passed to the constructor, it will be possible
+   * to invoke this method only once.
+   *
+   * @param params the parameters.
+   * @param <OUT>  the output data type.
+   * @return the output channel instance.
+   * @see com.github.dm.jrt.core.routine.Routine Routine
+   */
+  @NotNull
+  public <OUT> OutputChannel<OUT> callParallel(@Nullable final Object... params) {
+    final Constructor<? extends RoutineMethod> constructor = mConstructor;
+    if (constructor == null) {
+      throw new IllegalStateException(
+          "cannot invoke the routine in parallel mode: please provide proper "
+              + "constructor arguments");
+    }
+
+    final Object[] safeParams = asArgs(params);
+    final Class<? extends RoutineMethod> type = getClass();
+    final Method method = findBestMatchingMethod(type, safeParams);
+    return call(new MultiInvocationFactory(type, constructor, mArgs, method, safeParams),
+        InvocationMode.PARALLEL, safeParams);
+  }
+
+  /**
+   * Returns the invocation configuration.
+   *
+   * @return the invocation configuration.
+   */
+  @NotNull
+  protected InvocationConfiguration getConfiguration() {
+    return mConfiguration;
+  }
+
+  /**
+   * Tells the routine to ignore the method return value, that is, it will not be passed to the
+   * output channel.
+   *
+   * @param <OUT> the output data type.
+   * @return the return value.
+   */
+  @SuppressWarnings("unchecked")
+  protected <OUT> OUT ignoreReturnValue() {
+    mLocalIgnore.set(true);
+    return (OUT) boxingDefault(mReturnType);
+  }
+
+  /**
+   * Returns the input channel which is ready to produce data. If the method takes no input
+   * channel as parameter, null will be returned.
+   * <p>
+   * Note this method will return null if called outside the routine method invocation or from a
+   * different thread.
+   *
+   * @param <IN> the input data type.
+   * @return the input channel producing data or null.
+   */
+  @SuppressWarnings("unchecked")
+  protected <IN> InputChannel<IN> switchInput() {
+    return (InputChannel<IN>) mLocalChannel.get();
+  }
+
+  @NotNull
+  @SuppressWarnings("unchecked")
+  private <OUT> OutputChannel<OUT> call(
+      @NotNull final InvocationFactory<Selectable<Object>, Selectable<Object>> factory,
+      @NotNull final InvocationMode mode, @NotNull final Object[] params) {
+    final ArrayList<InputChannel<?>> inputChannels = new ArrayList<InputChannel<?>>();
+    final ArrayList<OutputChannel<?>> outputChannels = new ArrayList<OutputChannel<?>>();
+    for (final Object param : params) {
+      if (param instanceof InputChannel) {
+        inputChannels.add((InputChannel<?>) param);
+
+      } else if (param instanceof OutputChannel) {
+        outputChannels.add((OutputChannel<?>) param);
+      }
+    }
+
+    final OutputChannel<OUT> resultChannel = outputChannel();
+    outputChannels.add(resultChannel);
+    final Channel<?, ? extends Selectable<Object>> inputChannel =
+        (!inputChannels.isEmpty()) ? Channels.merge(inputChannels).buildChannels()
+            : JRoutineCore.io().<Selectable<Object>>of();
+    final Channel<Selectable<Object>, Selectable<Object>> outputChannel =
+        mode.invoke(JRoutineCore.with(factory).apply(getConfiguration()))
+            .pass(inputChannel)
+            .close();
+    final Map<Integer, Channel<?, Object>> channelMap =
+        Channels.selectOutput(0, outputChannels.size(), outputChannel).buildChannels();
+    for (final Entry<Integer, Channel<?, Object>> entry : channelMap.entrySet()) {
+      entry.getValue().bind((OutputChannel<Object>) outputChannels.get(entry.getKey())).close();
+    }
+
+    return resultChannel;
+  }
+
+  private boolean isIgnoreReturnValue() {
+    return (mLocalIgnore.get() != null);
+  }
+
+  private void resetIgnoreReturnValue() {
+    mLocalIgnore.set(null);
+  }
+
+  private void setLocalInput(@Nullable final InputChannel<?> inputChannel) {
+    mLocalChannel.set(inputChannel);
+  }
+
+  private void setReturnType(@NotNull final Class<?> returnType) {
+    mReturnType = returnType;
+  }
+
+  /**
+   * Implementation of a routine method wrapping an object method.
+   */
+  public static class ObjectRoutineMethod extends RoutineMethod
+      implements ObjectConfigurable<ObjectRoutineMethod> {
+
+    private final Method mMethod;
+
+    private final InvocationTarget<?> mTarget;
+
+    private ObjectConfiguration mConfiguration = ObjectConfiguration.defaultConfiguration();
+
+    /**
+     * Constructor.
+     *
+     * @param target the invocation target.
+     * @param method the method instance.
+     */
+    private ObjectRoutineMethod(@NotNull final InvocationTarget<?> target,
+        @NotNull final Method method) {
+      mTarget = target;
+      mMethod = method;
+    }
+
+    @NotNull
+    public ObjectRoutineMethod apply(@NotNull final ObjectConfiguration configuration) {
+      mConfiguration = ConstantConditions.notNull("object configuration", configuration);
+      return this;
+    }
+
+    @NotNull
+    @Override
+    public ObjectRoutineMethod apply(@NotNull final InvocationConfiguration configuration) {
+      return (ObjectRoutineMethod) super.apply(configuration);
+    }
+
+    @NotNull
+    @Override
+    @SuppressWarnings("unchecked")
+    public Builder<? extends ObjectRoutineMethod> applyInvocationConfiguration() {
+      return (Builder<? extends ObjectRoutineMethod>) super.applyInvocationConfiguration();
+    }
+
+    @NotNull
+    @Override
+    public <OUT> OutputChannel<OUT> call(@Nullable final Object... params) {
+      return call(InvocationMode.ASYNC, params);
+    }
+
+    @NotNull
+    @Override
+    public <OUT> OutputChannel<OUT> callParallel(@Nullable final Object... params) {
+      return call(InvocationMode.PARALLEL, params);
+    }
+
+    @NotNull
+    public ObjectConfiguration.Builder<? extends ObjectRoutineMethod> applyObjectConfiguration() {
+      return new ObjectConfiguration.Builder<ObjectRoutineMethod>(this, mConfiguration);
+    }
+
+    @NotNull
+    @SuppressWarnings("unchecked")
+    private <OUT> OutputChannel<OUT> call(@NotNull final InvocationMode mode,
+        @Nullable final Object[] params) {
+      final Object[] safeParams = asArgs(params);
+      final Method method = mMethod;
+      if (method.getParameterTypes().length != safeParams.length) {
+        throw new IllegalArgumentException("wrong number of parameters: expected <" +
+            method.getParameterTypes().length + "> but was <" + safeParams.length + ">");
+      }
+
+      final Routine<Object, Object> routine = JRoutineObject.with(mTarget)
+                                                            .apply(getConfiguration())
+                                                            .apply(mConfiguration)
+                                                            .method(method);
+      final Channel<Object, Object> channel = mode.invoke(routine).sorted();
+      for (final Object param : safeParams) {
+        if (param instanceof InputChannel) {
+          channel.pass((InputChannel<?>) param);
+
+        } else {
+          channel.pass(param);
+        }
+      }
+
+      return (OutputChannel<OUT>) toOutput(channel.close());
+    }
+  }
+
+  /**
+   * Base invocation implementation.
+   */
+  private static abstract class AbstractInvocation
+      implements Invocation<Selectable<Object>, Selectable<Object>> {
+
+    private final boolean mReturnResults;
+
+    private boolean mIsAborted;
+
+    private boolean mIsBound;
+
+    private boolean mIsComplete;
+
+    /**
+     * Constructor.
+     *
+     * @param method the method instance.
+     */
+    private AbstractInvocation(@NotNull final Method method) {
+      mReturnResults = (boxingClass(method.getReturnType()) != Void.class);
+    }
+
+    public void onAbort(@NotNull final RoutineException reason) throws Exception {
+      mIsAborted = true;
+      final List<InputChannel<?>> inputChannels = getInputChannels();
+      for (final InputChannel<?> inputChannel : inputChannels) {
+        inputChannel.abort(reason);
+      }
+
+      try {
+        if (!mIsComplete) {
+          internalInvoke((!inputChannels.isEmpty()) ? inputChannels.get(0) : null);
+        }
+
+      } finally {
+        resetIgnoreReturnValue();
+        for (final OutputChannel<?> outputChannel : getOutputChannels()) {
+          outputChannel.abort(reason);
+        }
+      }
+    }
+
+    public void onComplete(@NotNull final Channel<Selectable<Object>, ?> result) throws Exception {
+      bind(result);
+      mIsComplete = true;
+      if (!mIsAborted) {
+        final List<InputChannel<?>> inputChannels = getInputChannels();
+        for (final InputChannel<?> inputChannel : inputChannels) {
+          inputChannel.close();
+        }
+
+        final List<OutputChannel<?>> outputChannels = getOutputChannels();
+        try {
+          resetIgnoreReturnValue();
+          final Object methodResult =
+              internalInvoke((!inputChannels.isEmpty()) ? inputChannels.get(0) : null);
+          if (mReturnResults && !isIgnoreReturnValue()) {
+            result.pass(new Selectable<Object>(methodResult, outputChannels.size()));
+          }
+
+        } finally {
+          resetIgnoreReturnValue();
+        }
+
+        for (final OutputChannel<?> outputChannel : outputChannels) {
+          outputChannel.close();
+        }
+      }
+    }
+
+    public void onInput(final Selectable<Object> input,
+        @NotNull final Channel<Selectable<Object>, ?> result) throws Exception {
+      bind(result);
+      @SuppressWarnings("unchecked") final InputChannel<Object> inputChannel =
+          (InputChannel<Object>) getInputChannels().get(input.index);
+      inputChannel.pass(input.data);
+      try {
+        resetIgnoreReturnValue();
+        final Object methodResult = internalInvoke(inputChannel);
+        if (mReturnResults && !isIgnoreReturnValue()) {
+          result.pass(new Selectable<Object>(methodResult, getOutputChannels().size()));
+        }
+
+      } finally {
+        resetIgnoreReturnValue();
+      }
+    }
+
+    /**
+     * Returns the list of input channels representing the input of the method.
+     *
+     * @return the list of input channels.
+     */
+    @NotNull
+    protected abstract List<InputChannel<?>> getInputChannels();
+
+    /**
+     * Returns the list of output channels representing the output of the method.
+     *
+     * @return the list of output channels.
+     */
+    @NotNull
+    protected abstract List<OutputChannel<?>> getOutputChannels();
+
+    /**
+     * Invokes the method.
+     *
+     * @param inputChannel the ready input channel.
+     * @return the method result.
+     * @throws java.lang.Exception if an error occurred during the invocation.
+     */
+    @Nullable
+    protected abstract Object invokeMethod(@Nullable InputChannel<?> inputChannel) throws Exception;
+
+    /**
+     * Checks if the method return value must be ignored.
+     *
+     * @return whether the return value must be ignored.
+     */
+    protected abstract boolean isIgnoreReturnValue();
+
+    /**
+     * Resets the method return value ignore flag.
+     */
+    protected abstract void resetIgnoreReturnValue();
+
+    private void bind(@NotNull final Channel<Selectable<Object>, ?> result) {
+      if (!mIsBound) {
+        mIsBound = true;
+        final List<OutputChannel<?>> outputChannels = getOutputChannels();
+        if (!outputChannels.isEmpty()) {
+          result.pass(Channels.merge(outputChannels).buildChannels());
+        }
+      }
+    }
+
+    @Nullable
+    private Object internalInvoke(@Nullable final InputChannel<?> inputChannel) throws Exception {
+      try {
+        return invokeMethod(inputChannel);
+
+      } catch (final InvocationTargetException e) {
+        throw InvocationException.wrapIfNeeded(e.getTargetException());
+      }
+    }
+
+    public void onRestart() throws Exception {
+      mIsBound = false;
+      mIsAborted = false;
+      mIsComplete = false;
+    }
+  }
+
+  /**
+   * Invocation implementation supporting multiple invocation of the routine method.
+   */
+  private static class MultiInvocation extends AbstractInvocation {
+
     private final Object[] mArgs;
 
     private final Constructor<? extends RoutineMethod> mConstructor;
 
-    private final AtomicBoolean mIsFirstCall = new AtomicBoolean(true);
+    private final ArrayList<InputChannel<?>> mInputChannels = new ArrayList<InputChannel<?>>();
 
-    private final ThreadLocal<InputChannel<?>> mLocalChannel = new ThreadLocal<InputChannel<?>>();
+    private final Method mMethod;
 
-    private final ThreadLocal<Boolean> mLocalIgnore = new ThreadLocal<Boolean>();
+    private final Object[] mOrigParams;
 
-    private InvocationConfiguration mConfiguration = InvocationConfiguration.defaultConfiguration();
+    private final ArrayList<OutputChannel<?>> mOutputChannels = new ArrayList<OutputChannel<?>>();
 
-    private Class<?> mReturnType;
+    private RoutineMethod mInstance;
 
-    /**
-     * Constructor.
-     */
-    public RoutineMethod() {
-        this((Object[]) null);
-    }
+    private Object[] mParams;
 
     /**
      * Constructor.
      *
-     * @param args the constructor arguments.
+     * @param constructor the routine method constructor.
+     * @param args        the constructor arguments.
+     * @param method      the method instance.
+     * @param params      the method parameters.
      */
-    public RoutineMethod(@Nullable final Object... args) {
-        final Class<? extends RoutineMethod> type = getClass();
-        final Object[] constructorArgs;
-        if (type.isAnonymousClass()) {
-            final Object[] safeArgs = asArgs(args);
-            if (safeArgs.length > 0) {
-                constructorArgs = new Object[safeArgs.length + 1];
-                System.arraycopy(safeArgs, 0, constructorArgs, 1, safeArgs.length);
-                if (Reflection.hasStaticScope(type)) {
-                    constructorArgs[0] = safeArgs;
-
-                } else {
-                    constructorArgs[0] = safeArgs[0];
-                    constructorArgs[1] = safeArgs;
-                }
-
-            } else {
-                constructorArgs = safeArgs;
-            }
-
-        } else {
-            constructorArgs = cloneArgs(args);
-        }
-
-        Constructor<? extends RoutineMethod> constructor = null;
-        try {
-            constructor = Reflection.findBestMatchingConstructor(type, constructorArgs);
-
-        } catch (final IllegalArgumentException ignored) {
-        }
-
-        mArgs = constructorArgs;
-        mConstructor = constructor;
+    private MultiInvocation(@NotNull final Constructor<? extends RoutineMethod> constructor,
+        @NotNull final Object[] args, @NotNull final Method method,
+        @NotNull final Object[] params) {
+      super(method);
+      mConstructor = constructor;
+      mArgs = args;
+      mMethod = method;
+      mOrigParams = params;
     }
 
+    @NotNull
+    @Override
+    protected List<InputChannel<?>> getInputChannels() {
+      return mInputChannels;
+    }
+
+    @Override
+    public void onRestart() throws Exception {
+      super.onRestart();
+      final RoutineMethod instance = (mInstance = mConstructor.newInstance(mArgs));
+      instance.setReturnType(mMethod.getReturnType());
+      mParams = replaceChannels(mOrigParams, mInputChannels, mOutputChannels);
+    }
+
+    public void onRecycle(final boolean isReused) throws Exception {
+      mInputChannels.clear();
+      mOutputChannels.clear();
+    }
+
+    @NotNull
+    @Override
+    protected List<OutputChannel<?>> getOutputChannels() {
+      return mOutputChannels;
+    }
+
+    @Override
+    protected Object invokeMethod(@Nullable final InputChannel<?> inputChannel) throws
+        InvocationTargetException, IllegalAccessException {
+      final RoutineMethod instance = mInstance;
+      instance.setLocalInput(inputChannel);
+      try {
+        return mMethod.invoke(instance, mParams);
+
+      } finally {
+        instance.setLocalInput(null);
+      }
+    }
+
+    @Override
+    protected boolean isIgnoreReturnValue() {
+      return mInstance.isIgnoreReturnValue();
+    }
+
+    @Override
+    protected void resetIgnoreReturnValue() {
+      mInstance.resetIgnoreReturnValue();
+    }
+  }
+
+  /**
+   * Invocation factory supporting multiple invocation of the routine method.
+   */
+  private static class MultiInvocationFactory
+      extends InvocationFactory<Selectable<Object>, Selectable<Object>> {
+
+    private final Object[] mArgs;
+
+    private final Constructor<? extends RoutineMethod> mConstructor;
+
+    private final Method mMethod;
+
+    private final Object[] mParams;
+
     /**
-     * Builds an object routine method by wrapping the specified static method.
+     * Constructor.
      *
-     * @param method the method.
-     * @return the routine method instance.
-     * @throws java.lang.IllegalArgumentException if the specified method is not static.
+     * @param type        the routine method type.
+     * @param constructor the routine method constructor.
+     * @param args        the constructor arguments.
+     * @param method      the method instance.
+     * @param params      the method parameters.
      */
-    @NotNull
-    public static ObjectRoutineMethod from(@NotNull final Method method) {
-        if (!Modifier.isStatic(method.getModifiers())) {
-            throw new IllegalArgumentException("the method is not static: " + method);
-        }
-
-        return from(InvocationTarget.classOfType(method.getDeclaringClass()), method);
+    private MultiInvocationFactory(@NotNull final Class<? extends RoutineMethod> type,
+        @NotNull final Constructor<? extends RoutineMethod> constructor,
+        @NotNull final Object[] args, @NotNull final Method method,
+        @NotNull final Object[] params) {
+      super(asArgs(type, args, method, cloneArgs(params)));
+      mConstructor = constructor;
+      mArgs = args;
+      mMethod = method;
+      mParams = cloneArgs(params);
     }
 
+    @NotNull
+    @Override
+    public Invocation<Selectable<Object>, Selectable<Object>> newInvocation() {
+      return new MultiInvocation(mConstructor, mArgs, mMethod, mParams);
+    }
+  }
+
+  /**
+   * Invocation implementation supporting single invocation of the routine method.
+   */
+  private static class SingleInvocation extends AbstractInvocation {
+
+    private final ArrayList<InputChannel<?>> mInputChannels;
+
+    private final RoutineMethod mInstance;
+
+    private final Method mMethod;
+
+    private final ArrayList<OutputChannel<?>> mOutputChannels;
+
+    private final Object[] mParams;
+
     /**
-     * Builds an object routine method by wrapping a method of the specified target.
+     * Constructor.
      *
-     * @param target the invocation target.
-     * @param method the method.
-     * @return the routine method instance.
-     * @throws java.lang.IllegalArgumentException if the specified method is not implemented by the
-     *                                            target instance.
+     * @param inputChannels  the list of input channels.
+     * @param outputChannels the list of output channels.
+     * @param instance       the target instance.
+     * @param method         the method instance.
+     * @param params         the method parameters.
      */
-    @NotNull
-    public static ObjectRoutineMethod from(@NotNull final InvocationTarget<?> target,
-            @NotNull final Method method) {
-        if (!method.getDeclaringClass().isAssignableFrom(target.getTargetClass())) {
-            throw new IllegalArgumentException(
-                    "the method is not applicable to the specified target class: "
-                            + target.getTargetClass());
-        }
-
-        return new ObjectRoutineMethod(target, method);
+    private SingleInvocation(@NotNull final ArrayList<InputChannel<?>> inputChannels,
+        @NotNull final ArrayList<OutputChannel<?>> outputChannels,
+        @NotNull final RoutineMethod instance, @NotNull final Method method,
+        @NotNull final Object[] params) {
+      super(method);
+      mInputChannels = inputChannels;
+      mOutputChannels = outputChannels;
+      mInstance = instance;
+      mMethod = method;
+      mParams = params;
     }
 
+    @Override
+    protected Object invokeMethod(@Nullable final InputChannel<?> inputChannel) throws
+        InvocationTargetException, IllegalAccessException {
+      final RoutineMethod instance = mInstance;
+      instance.setLocalInput(inputChannel);
+      try {
+        return mMethod.invoke(instance, mParams);
+
+      } finally {
+        instance.setLocalInput(null);
+      }
+    }
+
+    public void onRecycle(final boolean isReused) {
+    }
+
+    @NotNull
+    @Override
+    protected List<InputChannel<?>> getInputChannels() {
+      return mInputChannels;
+    }
+
+    @NotNull
+    @Override
+    protected List<OutputChannel<?>> getOutputChannels() {
+      return mOutputChannels;
+    }
+
+    @Override
+    protected boolean isIgnoreReturnValue() {
+      return mInstance.isIgnoreReturnValue();
+    }
+
+    @Override
+    protected void resetIgnoreReturnValue() {
+      mInstance.resetIgnoreReturnValue();
+    }
+  }
+
+  /**
+   * Invocation factory supporting single invocation of the routine method.
+   */
+  private static class SingleInvocationFactory
+      extends InvocationFactory<Selectable<Object>, Selectable<Object>> {
+
+    private final ArrayList<InputChannel<?>> mInputChannels;
+
+    private final RoutineMethod mInstance;
+
+    private final Method mMethod;
+
+    private final ArrayList<OutputChannel<?>> mOutputChannels;
+
+    private final Object[] mParams;
+
     /**
-     * Builds an object routine method by wrapping a method of the specified target.
+     * Constructor.
      *
-     * @param target         the invocation target.
-     * @param name           the method name.
-     * @param parameterTypes the method parameter types.
-     * @return the routine method instance.
-     * @throws java.lang.NoSuchMethodException if no method with the specified signature is found.
+     * @param instance the routine method instance.
+     * @param method   the method instance.
+     * @param params   the method parameters.
      */
-    @NotNull
-    public static ObjectRoutineMethod from(@NotNull final InvocationTarget<?> target,
-            @NotNull final String name, @Nullable final Class<?>... parameterTypes) throws
-            NoSuchMethodException {
-        return from(target, target.getTargetClass().getMethod(name, parameterTypes));
-    }
-
-    /**
-     * Builds a new input channel.
-     *
-     * @param <IN> the input data type.
-     * @return the input channel instance.
-     */
-    @NotNull
-    public static <IN> InputChannel<IN> inputChannel() {
-        return toInput(JRoutineCore.io().<IN>buildChannel());
-    }
-
-    /**
-     * Builds a new input channel and binds the specified one to it.
-     *
-     * @param channel the channel to bind.
-     * @param <IN>    the input data type.
-     * @return the input channel instance.
-     */
-    @NotNull
-    @SuppressWarnings("unchecked")
-    public static <IN> InputChannel<IN> inputFrom(@NotNull final Channel<?, IN> channel) {
-        final InputChannel<IN> inputChannel = inputChannel();
-        channel.bind(inputChannel).close();
-        return inputChannel;
-    }
-
-    /**
-     * Builds a new input channel producing no data.
-     * <p>
-     * Note that the channel will be already closed.
-     *
-     * @param <IN> the input data type.
-     * @return the input channel instance.
-     */
-    @NotNull
-    public static <IN> InputChannel<IN> inputOf() {
-        return toInput(JRoutineCore.io().<IN>of());
-    }
-
-    /**
-     * Builds a new input channel producing the specified input.
-     * <p>
-     * Note that the channel will be already closed.
-     *
-     * @param input the input.
-     * @param <IN>  the input data type.
-     * @return the input channel instance.
-     */
-    @NotNull
-    public static <IN> InputChannel<IN> inputOf(@Nullable final IN input) {
-        return toInput(JRoutineCore.io().of(input));
-    }
-
-    /**
-     * Builds a new input channel producing the specified inputs.
-     * <p>
-     * Note that the channel will be already closed.
-     *
-     * @param inputs the inputs.
-     * @param <IN>   the input data type.
-     * @return the input channel instance.
-     */
-    @NotNull
-    public static <IN> InputChannel<IN> inputOf(@Nullable final IN... inputs) {
-        return toInput(JRoutineCore.io().of(inputs));
-    }
-
-    /**
-     * Builds a new input channel producing the inputs returned by the specified iterable.
-     * <p>
-     * Note that the channel will be already closed.
-     *
-     * @param inputs the iterable returning the input data.
-     * @param <IN>   the input data type.
-     * @return the input channel instance.
-     */
-    @NotNull
-    public static <IN> InputChannel<IN> inputOf(@Nullable final Iterable<IN> inputs) {
-        return toInput(JRoutineCore.io().of(inputs));
-    }
-
-    /**
-     * Builds a new output channel.
-     *
-     * @param <OUT> the output data type.
-     * @return the output channel instance.
-     */
-    @NotNull
-    public static <OUT> OutputChannel<OUT> outputChannel() {
-        return toOutput(JRoutineCore.io().<OUT>buildChannel());
-    }
-
-    /**
-     * Builds a new output channel and binds it to the specified one.
-     *
-     * @param channel the channel to bind to.
-     * @param <OUT>   the output data type.
-     * @return the output channel instance.
-     */
-    @NotNull
-    @SuppressWarnings("unchecked")
-    public static <OUT> OutputChannel<OUT> outputFrom(@NotNull final Channel<OUT, ?> channel) {
-        final OutputChannel<OUT> outOutputChannel = outputChannel();
-        outOutputChannel.bind(channel).close();
-        return outOutputChannel;
-    }
-
-    /**
-     * Builds a new input channel wrapping the specified one.
-     *
-     * @param channel the channel to wrap.
-     * @param <IN>    the input data type.
-     * @return the input channel instance.
-     */
-    @NotNull
-    public static <IN> InputChannel<IN> toInput(@NotNull final Channel<IN, IN> channel) {
-        return new InputChannel<IN>(channel);
-    }
-
-    /**
-     * Builds a new output channel wrapping the specified one.
-     *
-     * @param channel the channel to wrap.
-     * @param <OUT>   the output data type.
-     * @return the output channel instance.
-     */
-    @NotNull
-    public static <OUT> OutputChannel<OUT> toOutput(@NotNull final Channel<OUT, OUT> channel) {
-        return new OutputChannel<OUT>(channel);
-    }
-
-    /**
-     * Replaces all the input and output channels in the specified parameters with newly created
-     * instances.
-     *
-     * @param params         the original method parameters.
-     * @param inputChannels  the list to fill with the newly created input channels.
-     * @param outputChannels the list to fill with the newly created output channels.
-     * @return the replaced parameters.
-     */
-    @NotNull
-    protected static Object[] replaceChannels(@NotNull final Object[] params,
-            @NotNull final ArrayList<InputChannel<?>> inputChannels,
-            @NotNull final ArrayList<OutputChannel<?>> outputChannels) {
-        final ArrayList<Object> parameters = new ArrayList<Object>(params.length);
-        for (final Object param : params) {
-            if (param instanceof InputChannel) {
-                final InputChannel<Object> inputChannel = toInput(JRoutineCore.io().buildChannel());
-                inputChannels.add(inputChannel);
-                parameters.add(inputChannel);
-
-            } else if (param instanceof OutputChannel) {
-                final OutputChannel<Object> outputChannel =
-                        toOutput(JRoutineCore.io().buildChannel());
-                outputChannels.add(outputChannel);
-                parameters.add(outputChannel);
-
-            } else {
-                parameters.add(param);
-            }
-        }
-
-        return parameters.toArray();
+    private SingleInvocationFactory(@NotNull final RoutineMethod instance,
+        @NotNull final Method method, @NotNull final Object[] params) {
+      super(asArgs(instance.getClass(), method, cloneArgs(params)));
+      mInstance = instance;
+      mMethod = method;
+      final ArrayList<InputChannel<?>> inputChannels =
+          (mInputChannels = new ArrayList<InputChannel<?>>());
+      final ArrayList<OutputChannel<?>> outputChannels =
+          (mOutputChannels = new ArrayList<OutputChannel<?>>());
+      mParams = replaceChannels(params, inputChannels, outputChannels);
     }
 
     @NotNull
-    public RoutineMethod apply(@NotNull final InvocationConfiguration configuration) {
-        mConfiguration = ConstantConditions.notNull("invocation configuration", configuration);
-        return this;
+    @Override
+    public Invocation<Selectable<Object>, Selectable<Object>> newInvocation() {
+      return new SingleInvocation(mInputChannels, mOutputChannels, mInstance, mMethod, mParams);
     }
-
-    @NotNull
-    public InvocationConfiguration.Builder<? extends RoutineMethod> applyInvocationConfiguration() {
-        return new Builder<RoutineMethod>(this, mConfiguration);
-    }
-
-    /**
-     * Calls the routine.
-     * <br>
-     * The output channel will produced the data returned by the method. In case the method does not
-     * return any output, the channel will be anyway notified of invocation abortion and completion.
-     * <p>
-     * Note that the specific method will be selected based on the specified parameters. If no
-     * matching method is found, the call will fail with an exception.
-     * <br>
-     * Note also that, in case no proper arguments are passed to the constructor, it will be
-     * possible to invoke this method only once.
-     *
-     * @param params the parameters.
-     * @param <OUT>  the output data type.
-     * @return the output channel instance.
-     */
-    @NotNull
-    public <OUT> OutputChannel<OUT> call(@Nullable final Object... params) {
-        final Object[] safeParams = asArgs(params);
-        final Class<? extends RoutineMethod> type = getClass();
-        final Method method = findBestMatchingMethod(type, safeParams);
-        final InvocationFactory<Selectable<Object>, Selectable<Object>> factory;
-        final Constructor<? extends RoutineMethod> constructor = mConstructor;
-        if (constructor != null) {
-            factory = new MultiInvocationFactory(type, constructor, mArgs, method, safeParams);
-
-        } else {
-            if (!mIsFirstCall.getAndSet(false)) {
-                throw new IllegalStateException(
-                        "cannot invoke the routine in more than once: please provide proper "
-                                + "constructor arguments");
-            }
-
-            setReturnType(method.getReturnType());
-            factory = new SingleInvocationFactory(this, method, safeParams);
-        }
-
-        return call(factory, InvocationMode.ASYNC, safeParams);
-    }
-
-    /**
-     * Calls the routine in parallel mode.
-     * <br>
-     * The output channel will produced the data returned by the method. In case the method does not
-     * return any output, the channel will be anyway notified of invocation abortion and completion.
-     * <p>
-     * Note that the specific method will be selected based on the specified parameters. If no
-     * matching method is found, the call will fail with an exception.
-     * <br>
-     * Note also that, in case no proper arguments are passed to the constructor, it will be
-     * possible to invoke this method only once.
-     *
-     * @param params the parameters.
-     * @param <OUT>  the output data type.
-     * @return the output channel instance.
-     * @see com.github.dm.jrt.core.routine.Routine Routine
-     */
-    @NotNull
-    public <OUT> OutputChannel<OUT> callParallel(@Nullable final Object... params) {
-        final Constructor<? extends RoutineMethod> constructor = mConstructor;
-        if (constructor == null) {
-            throw new IllegalStateException(
-                    "cannot invoke the routine in parallel mode: please provide proper "
-                            + "constructor arguments");
-        }
-
-        final Object[] safeParams = asArgs(params);
-        final Class<? extends RoutineMethod> type = getClass();
-        final Method method = findBestMatchingMethod(type, safeParams);
-        return call(new MultiInvocationFactory(type, constructor, mArgs, method, safeParams),
-                InvocationMode.PARALLEL, safeParams);
-    }
-
-    /**
-     * Returns the invocation configuration.
-     *
-     * @return the invocation configuration.
-     */
-    @NotNull
-    protected InvocationConfiguration getConfiguration() {
-        return mConfiguration;
-    }
-
-    /**
-     * Tells the routine to ignore the method return value, that is, it will not be passed to the
-     * output channel.
-     *
-     * @param <OUT> the output data type.
-     * @return the return value.
-     */
-    @SuppressWarnings("unchecked")
-    protected <OUT> OUT ignoreReturnValue() {
-        mLocalIgnore.set(true);
-        return (OUT) boxingDefault(mReturnType);
-    }
-
-    /**
-     * Returns the input channel which is ready to produce data. If the method takes no input
-     * channel as parameter, null will be returned.
-     * <p>
-     * Note this method will return null if called outside the routine method invocation or from
-     * a different thread.
-     *
-     * @param <IN> the input data type.
-     * @return the input channel producing data or null.
-     */
-    @SuppressWarnings("unchecked")
-    protected <IN> InputChannel<IN> switchInput() {
-        return (InputChannel<IN>) mLocalChannel.get();
-    }
-
-    @NotNull
-    @SuppressWarnings("unchecked")
-    private <OUT> OutputChannel<OUT> call(
-            @NotNull final InvocationFactory<Selectable<Object>, Selectable<Object>> factory,
-            @NotNull final InvocationMode mode, @NotNull final Object[] params) {
-        final ArrayList<InputChannel<?>> inputChannels = new ArrayList<InputChannel<?>>();
-        final ArrayList<OutputChannel<?>> outputChannels = new ArrayList<OutputChannel<?>>();
-        for (final Object param : params) {
-            if (param instanceof InputChannel) {
-                inputChannels.add((InputChannel<?>) param);
-
-            } else if (param instanceof OutputChannel) {
-                outputChannels.add((OutputChannel<?>) param);
-            }
-        }
-
-        final OutputChannel<OUT> resultChannel = outputChannel();
-        outputChannels.add(resultChannel);
-        final Channel<?, ? extends Selectable<Object>> inputChannel =
-                (!inputChannels.isEmpty()) ? Channels.merge(inputChannels).buildChannels()
-                        : JRoutineCore.io().<Selectable<Object>>of();
-        final Channel<Selectable<Object>, Selectable<Object>> outputChannel =
-                mode.invoke(JRoutineCore.with(factory).apply(getConfiguration()))
-                    .pass(inputChannel)
-                    .close();
-        final Map<Integer, Channel<?, Object>> channelMap =
-                Channels.selectOutput(0, outputChannels.size(), outputChannel).buildChannels();
-        for (final Entry<Integer, Channel<?, Object>> entry : channelMap.entrySet()) {
-            entry.getValue()
-                 .bind((OutputChannel<Object>) outputChannels.get(entry.getKey()))
-                 .close();
-        }
-
-        return resultChannel;
-    }
-
-    private boolean isIgnoreReturnValue() {
-        return (mLocalIgnore.get() != null);
-    }
-
-    private void resetIgnoreReturnValue() {
-        mLocalIgnore.set(null);
-    }
-
-    private void setLocalInput(@Nullable final InputChannel<?> inputChannel) {
-        mLocalChannel.set(inputChannel);
-    }
-
-    private void setReturnType(@NotNull final Class<?> returnType) {
-        mReturnType = returnType;
-    }
-
-    /**
-     * Implementation of a routine method wrapping an object method.
-     */
-    public static class ObjectRoutineMethod extends RoutineMethod
-            implements ObjectConfigurable<ObjectRoutineMethod> {
-
-        private final Method mMethod;
-
-        private final InvocationTarget<?> mTarget;
-
-        private ObjectConfiguration mConfiguration = ObjectConfiguration.defaultConfiguration();
-
-        /**
-         * Constructor.
-         *
-         * @param target the invocation target.
-         * @param method the method instance.
-         */
-        private ObjectRoutineMethod(@NotNull final InvocationTarget<?> target,
-                @NotNull final Method method) {
-            mTarget = target;
-            mMethod = method;
-        }
-
-        @NotNull
-        public ObjectRoutineMethod apply(@NotNull final ObjectConfiguration configuration) {
-            mConfiguration = ConstantConditions.notNull("object configuration", configuration);
-            return this;
-        }
-
-        @NotNull
-        @Override
-        public ObjectRoutineMethod apply(@NotNull final InvocationConfiguration configuration) {
-            return (ObjectRoutineMethod) super.apply(configuration);
-        }
-
-        @NotNull
-        @Override
-        @SuppressWarnings("unchecked")
-        public Builder<? extends ObjectRoutineMethod> applyInvocationConfiguration() {
-            return (Builder<? extends ObjectRoutineMethod>) super.applyInvocationConfiguration();
-        }
-
-        @NotNull
-        @Override
-        public <OUT> OutputChannel<OUT> call(@Nullable final Object... params) {
-            return call(InvocationMode.ASYNC, params);
-        }
-
-        @NotNull
-        @Override
-        public <OUT> OutputChannel<OUT> callParallel(@Nullable final Object... params) {
-            return call(InvocationMode.PARALLEL, params);
-        }
-
-        @NotNull
-        public ObjectConfiguration.Builder<? extends ObjectRoutineMethod>
-        applyObjectConfiguration() {
-            return new ObjectConfiguration.Builder<ObjectRoutineMethod>(this, mConfiguration);
-        }
-
-        @NotNull
-        @SuppressWarnings("unchecked")
-        private <OUT> OutputChannel<OUT> call(@NotNull final InvocationMode mode,
-                @Nullable final Object[] params) {
-            final Object[] safeParams = asArgs(params);
-            final Method method = mMethod;
-            if (method.getParameterTypes().length != safeParams.length) {
-                throw new IllegalArgumentException("wrong number of parameters: expected <" +
-                        method.getParameterTypes().length + "> but was <" + safeParams.length
-                        + ">");
-            }
-
-            final Routine<Object, Object> routine = JRoutineObject.with(mTarget)
-                                                                  .apply(getConfiguration())
-                                                                  .apply(mConfiguration)
-                                                                  .method(method);
-            final Channel<Object, Object> channel = mode.invoke(routine).sorted();
-            for (final Object param : safeParams) {
-                if (param instanceof InputChannel) {
-                    channel.pass((InputChannel<?>) param);
-
-                } else {
-                    channel.pass(param);
-                }
-            }
-
-            return (OutputChannel<OUT>) toOutput(channel.close());
-        }
-    }
-
-    /**
-     * Base invocation implementation.
-     */
-    private static abstract class AbstractInvocation
-            implements Invocation<Selectable<Object>, Selectable<Object>> {
-
-        private final boolean mReturnResults;
-
-        private boolean mIsAborted;
-
-        private boolean mIsBound;
-
-        private boolean mIsComplete;
-
-        /**
-         * Constructor.
-         *
-         * @param method the method instance.
-         */
-        private AbstractInvocation(@NotNull final Method method) {
-            mReturnResults = (boxingClass(method.getReturnType()) != Void.class);
-        }
-
-        public void onAbort(@NotNull final RoutineException reason) throws Exception {
-            mIsAborted = true;
-            final List<InputChannel<?>> inputChannels = getInputChannels();
-            for (final InputChannel<?> inputChannel : inputChannels) {
-                inputChannel.abort(reason);
-            }
-
-            try {
-                if (!mIsComplete) {
-                    internalInvoke((!inputChannels.isEmpty()) ? inputChannels.get(0) : null);
-                }
-
-            } finally {
-                resetIgnoreReturnValue();
-                for (final OutputChannel<?> outputChannel : getOutputChannels()) {
-                    outputChannel.abort(reason);
-                }
-            }
-        }
-
-        public void onComplete(@NotNull final Channel<Selectable<Object>, ?> result) throws
-                Exception {
-            bind(result);
-            mIsComplete = true;
-            if (!mIsAborted) {
-                final List<InputChannel<?>> inputChannels = getInputChannels();
-                for (final InputChannel<?> inputChannel : inputChannels) {
-                    inputChannel.close();
-                }
-
-                final List<OutputChannel<?>> outputChannels = getOutputChannels();
-                try {
-                    resetIgnoreReturnValue();
-                    final Object methodResult = internalInvoke(
-                            (!inputChannels.isEmpty()) ? inputChannels.get(0) : null);
-                    if (mReturnResults && !isIgnoreReturnValue()) {
-                        result.pass(new Selectable<Object>(methodResult, outputChannels.size()));
-                    }
-
-                } finally {
-                    resetIgnoreReturnValue();
-                }
-
-                for (final OutputChannel<?> outputChannel : outputChannels) {
-                    outputChannel.close();
-                }
-            }
-        }
-
-        public void onInput(final Selectable<Object> input,
-                @NotNull final Channel<Selectable<Object>, ?> result) throws Exception {
-            bind(result);
-            @SuppressWarnings("unchecked") final InputChannel<Object> inputChannel =
-                    (InputChannel<Object>) getInputChannels().get(input.index);
-            inputChannel.pass(input.data);
-            try {
-                resetIgnoreReturnValue();
-                final Object methodResult = internalInvoke(inputChannel);
-                if (mReturnResults && !isIgnoreReturnValue()) {
-                    result.pass(new Selectable<Object>(methodResult, getOutputChannels().size()));
-                }
-
-            } finally {
-                resetIgnoreReturnValue();
-            }
-        }
-
-        /**
-         * Returns the list of input channels representing the input of the method.
-         *
-         * @return the list of input channels.
-         */
-        @NotNull
-        protected abstract List<InputChannel<?>> getInputChannels();
-
-        /**
-         * Returns the list of output channels representing the output of the method.
-         *
-         * @return the list of output channels.
-         */
-        @NotNull
-        protected abstract List<OutputChannel<?>> getOutputChannels();
-
-        /**
-         * Invokes the method.
-         *
-         * @param inputChannel the ready input channel.
-         * @return the method result.
-         * @throws java.lang.Exception if an error occurred during the invocation.
-         */
-        @Nullable
-        protected abstract Object invokeMethod(@Nullable InputChannel<?> inputChannel) throws
-                Exception;
-
-        /**
-         * Checks if the method return value must be ignored.
-         *
-         * @return whether the return value must be ignored.
-         */
-        protected abstract boolean isIgnoreReturnValue();
-
-        /**
-         * Resets the method return value ignore flag.
-         */
-        protected abstract void resetIgnoreReturnValue();
-
-        private void bind(@NotNull final Channel<Selectable<Object>, ?> result) {
-            if (!mIsBound) {
-                mIsBound = true;
-                final List<OutputChannel<?>> outputChannels = getOutputChannels();
-                if (!outputChannels.isEmpty()) {
-                    result.pass(Channels.merge(outputChannels).buildChannels());
-                }
-            }
-        }
-
-        @Nullable
-        private Object internalInvoke(@Nullable final InputChannel<?> inputChannel) throws
-                Exception {
-            try {
-                return invokeMethod(inputChannel);
-
-            } catch (final InvocationTargetException e) {
-                throw InvocationException.wrapIfNeeded(e.getTargetException());
-            }
-        }
-
-        public void onRestart() throws Exception {
-            mIsBound = false;
-            mIsAborted = false;
-            mIsComplete = false;
-        }
-    }
-
-    /**
-     * Invocation implementation supporting multiple invocation of the routine method.
-     */
-    private static class MultiInvocation extends AbstractInvocation {
-
-        private final Object[] mArgs;
-
-        private final Constructor<? extends RoutineMethod> mConstructor;
-
-        private final ArrayList<InputChannel<?>> mInputChannels = new ArrayList<InputChannel<?>>();
-
-        private final Method mMethod;
-
-        private final Object[] mOrigParams;
-
-        private final ArrayList<OutputChannel<?>> mOutputChannels =
-                new ArrayList<OutputChannel<?>>();
-
-        private RoutineMethod mInstance;
-
-        private Object[] mParams;
-
-        /**
-         * Constructor.
-         *
-         * @param constructor the routine method constructor.
-         * @param args        the constructor arguments.
-         * @param method      the method instance.
-         * @param params      the method parameters.
-         */
-        public MultiInvocation(@NotNull final Constructor<? extends RoutineMethod> constructor,
-                @NotNull final Object[] args, @NotNull final Method method,
-                @NotNull final Object[] params) {
-            super(method);
-            mConstructor = constructor;
-            mArgs = args;
-            mMethod = method;
-            mOrigParams = params;
-        }
-
-        @NotNull
-        @Override
-        protected List<InputChannel<?>> getInputChannels() {
-            return mInputChannels;
-        }
-
-        @Override
-        public void onRestart() throws Exception {
-            super.onRestart();
-            final RoutineMethod instance = (mInstance = mConstructor.newInstance(mArgs));
-            instance.setReturnType(mMethod.getReturnType());
-            mParams = replaceChannels(mOrigParams, mInputChannels, mOutputChannels);
-        }
-
-        public void onRecycle(final boolean isReused) throws Exception {
-            mInputChannels.clear();
-            mOutputChannels.clear();
-        }
-
-        @NotNull
-        @Override
-        protected List<OutputChannel<?>> getOutputChannels() {
-            return mOutputChannels;
-        }
-
-        @Override
-        protected Object invokeMethod(@Nullable final InputChannel<?> inputChannel) throws
-                InvocationTargetException, IllegalAccessException {
-            final RoutineMethod instance = mInstance;
-            instance.setLocalInput(inputChannel);
-            try {
-                return mMethod.invoke(instance, mParams);
-
-            } finally {
-                instance.setLocalInput(null);
-            }
-        }
-
-        @Override
-        protected boolean isIgnoreReturnValue() {
-            return mInstance.isIgnoreReturnValue();
-        }
-
-        @Override
-        protected void resetIgnoreReturnValue() {
-            mInstance.resetIgnoreReturnValue();
-        }
-    }
-
-    /**
-     * Invocation factory supporting multiple invocation of the routine method.
-     */
-    private static class MultiInvocationFactory
-            extends InvocationFactory<Selectable<Object>, Selectable<Object>> {
-
-        private final Object[] mArgs;
-
-        private final Constructor<? extends RoutineMethod> mConstructor;
-
-        private final Method mMethod;
-
-        private final Object[] mParams;
-
-        /**
-         * Constructor.
-         *
-         * @param type        the routine method type.
-         * @param constructor the routine method constructor.
-         * @param args        the constructor arguments.
-         * @param method      the method instance.
-         * @param params      the method parameters.
-         */
-        private MultiInvocationFactory(@NotNull final Class<? extends RoutineMethod> type,
-                @NotNull final Constructor<? extends RoutineMethod> constructor,
-                @NotNull final Object[] args, @NotNull final Method method,
-                @NotNull final Object[] params) {
-            super(asArgs(type, args, method, cloneArgs(params)));
-            mConstructor = constructor;
-            mArgs = args;
-            mMethod = method;
-            mParams = cloneArgs(params);
-        }
-
-        @NotNull
-        @Override
-        public Invocation<Selectable<Object>, Selectable<Object>> newInvocation() {
-            return new MultiInvocation(mConstructor, mArgs, mMethod, mParams);
-        }
-    }
-
-    /**
-     * Invocation implementation supporting single invocation of the routine method.
-     */
-    private static class SingleInvocation extends AbstractInvocation {
-
-        private final ArrayList<InputChannel<?>> mInputChannels;
-
-        private final RoutineMethod mInstance;
-
-        private final Method mMethod;
-
-        private final ArrayList<OutputChannel<?>> mOutputChannels;
-
-        private final Object[] mParams;
-
-        /**
-         * Constructor.
-         *
-         * @param inputChannels  the list of input channels.
-         * @param outputChannels the list of output channels.
-         * @param instance       the target instance.
-         * @param method         the method instance.
-         * @param params         the method parameters.
-         */
-        private SingleInvocation(@NotNull final ArrayList<InputChannel<?>> inputChannels,
-                @NotNull final ArrayList<OutputChannel<?>> outputChannels,
-                @NotNull final RoutineMethod instance, @NotNull final Method method,
-                @NotNull final Object[] params) {
-            super(method);
-            mInputChannels = inputChannels;
-            mOutputChannels = outputChannels;
-            mInstance = instance;
-            mMethod = method;
-            mParams = params;
-        }
-
-        @Override
-        protected Object invokeMethod(@Nullable final InputChannel<?> inputChannel) throws
-                InvocationTargetException, IllegalAccessException {
-            final RoutineMethod instance = mInstance;
-            instance.setLocalInput(inputChannel);
-            try {
-                return mMethod.invoke(instance, mParams);
-
-            } finally {
-                instance.setLocalInput(null);
-            }
-        }
-
-        public void onRecycle(final boolean isReused) {
-        }
-
-        @NotNull
-        @Override
-        protected List<InputChannel<?>> getInputChannels() {
-            return mInputChannels;
-        }
-
-        @NotNull
-        @Override
-        protected List<OutputChannel<?>> getOutputChannels() {
-            return mOutputChannels;
-        }
-
-        @Override
-        protected boolean isIgnoreReturnValue() {
-            return mInstance.isIgnoreReturnValue();
-        }
-
-        @Override
-        protected void resetIgnoreReturnValue() {
-            mInstance.resetIgnoreReturnValue();
-        }
-    }
-
-    /**
-     * Invocation factory supporting single invocation of the routine method.
-     */
-    private static class SingleInvocationFactory
-            extends InvocationFactory<Selectable<Object>, Selectable<Object>> {
-
-        private final ArrayList<InputChannel<?>> mInputChannels;
-
-        private final RoutineMethod mInstance;
-
-        private final Method mMethod;
-
-        private final ArrayList<OutputChannel<?>> mOutputChannels;
-
-        private final Object[] mParams;
-
-        /**
-         * Constructor.
-         *
-         * @param instance the routine method instance.
-         * @param method   the method instance.
-         * @param params   the method parameters.
-         */
-        private SingleInvocationFactory(@NotNull final RoutineMethod instance,
-                @NotNull final Method method, @NotNull final Object[] params) {
-            super(asArgs(instance.getClass(), method, cloneArgs(params)));
-            mInstance = instance;
-            mMethod = method;
-            final ArrayList<InputChannel<?>> inputChannels =
-                    (mInputChannels = new ArrayList<InputChannel<?>>());
-            final ArrayList<OutputChannel<?>> outputChannels =
-                    (mOutputChannels = new ArrayList<OutputChannel<?>>());
-            mParams = replaceChannels(params, inputChannels, outputChannels);
-        }
-
-        @NotNull
-        @Override
-        public Invocation<Selectable<Object>, Selectable<Object>> newInvocation() {
-            return new SingleInvocation(mInputChannels, mOutputChannels, mInstance, mMethod,
-                    mParams);
-        }
-    }
+  }
 }

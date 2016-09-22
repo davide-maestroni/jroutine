@@ -36,63 +36,61 @@ import org.jetbrains.annotations.NotNull;
  * @param <OUT> the output data type.
  */
 class DefaultServiceRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OUT>
-        implements ServiceRoutineBuilder<IN, OUT> {
+    implements ServiceRoutineBuilder<IN, OUT> {
 
-    private final ServiceContext mContext;
+  private final ServiceContext mContext;
 
-    private final TargetInvocationFactory<IN, OUT> mTargetFactory;
+  private final TargetInvocationFactory<IN, OUT> mTargetFactory;
 
-    private ServiceConfiguration mServiceConfiguration =
-            ServiceConfiguration.defaultConfiguration();
+  private ServiceConfiguration mServiceConfiguration = ServiceConfiguration.defaultConfiguration();
 
-    /**
-     * Constructor.
-     *
-     * @param context the routine context.
-     * @param target  the invocation factory target.
-     */
-    DefaultServiceRoutineBuilder(@NotNull final ServiceContext context,
-            @NotNull final TargetInvocationFactory<IN, OUT> target) {
-        mContext = ConstantConditions.notNull("Service context", context);
-        mTargetFactory = ConstantConditions.notNull("target invocation factory", target);
-    }
+  /**
+   * Constructor.
+   *
+   * @param context the routine context.
+   * @param target  the invocation factory target.
+   */
+  DefaultServiceRoutineBuilder(@NotNull final ServiceContext context,
+      @NotNull final TargetInvocationFactory<IN, OUT> target) {
+    mContext = ConstantConditions.notNull("Service context", context);
+    mTargetFactory = ConstantConditions.notNull("target invocation factory", target);
+  }
 
-    @NotNull
-    @Override
-    public ServiceRoutineBuilder<IN, OUT> apply(
-            @NotNull final InvocationConfiguration configuration) {
-        super.apply(configuration);
-        return this;
-    }
+  @NotNull
+  @Override
+  public ServiceRoutineBuilder<IN, OUT> apply(
+      @NotNull final InvocationConfiguration configuration) {
+    super.apply(configuration);
+    return this;
+  }
 
-    @NotNull
-    @Override
-    @SuppressWarnings("unchecked")
-    public InvocationConfiguration.Builder<? extends ServiceRoutineBuilder<IN, OUT>>
-    applyInvocationConfiguration() {
-        return (Builder<? extends ServiceRoutineBuilder<IN, OUT>>) super
-                .applyInvocationConfiguration();
-    }
+  @NotNull
+  @Override
+  @SuppressWarnings("unchecked")
+  public InvocationConfiguration.Builder<? extends ServiceRoutineBuilder<IN, OUT>>
+  applyInvocationConfiguration() {
+    return (Builder<? extends ServiceRoutineBuilder<IN, OUT>>) super.applyInvocationConfiguration();
+  }
 
-    @NotNull
-    @Override
-    public ServiceRoutineBuilder<IN, OUT> apply(@NotNull final ServiceConfiguration configuration) {
-        mServiceConfiguration = ConstantConditions.notNull("Service configuration", configuration);
-        return this;
-    }
+  @NotNull
+  @Override
+  public ServiceRoutineBuilder<IN, OUT> apply(@NotNull final ServiceConfiguration configuration) {
+    mServiceConfiguration = ConstantConditions.notNull("Service configuration", configuration);
+    return this;
+  }
 
-    @NotNull
-    @Override
-    public ServiceConfiguration.Builder<? extends ServiceRoutineBuilder<IN, OUT>>
-    applyServiceConfiguration() {
-        final ServiceConfiguration config = mServiceConfiguration;
-        return new ServiceConfiguration.Builder<ServiceRoutineBuilder<IN, OUT>>(this, config);
-    }
+  @NotNull
+  @Override
+  public ServiceConfiguration.Builder<? extends ServiceRoutineBuilder<IN, OUT>>
+  applyServiceConfiguration() {
+    final ServiceConfiguration config = mServiceConfiguration;
+    return new ServiceConfiguration.Builder<ServiceRoutineBuilder<IN, OUT>>(this, config);
+  }
 
-    @NotNull
-    @Override
-    public Routine<IN, OUT> buildRoutine() {
-        return new ServiceRoutine<IN, OUT>(mContext, mTargetFactory, getConfiguration(),
-                mServiceConfiguration);
-    }
+  @NotNull
+  @Override
+  public Routine<IN, OUT> buildRoutine() {
+    return new ServiceRoutine<IN, OUT>(mContext, mTargetFactory, getConfiguration(),
+        mServiceConfiguration);
+  }
 }

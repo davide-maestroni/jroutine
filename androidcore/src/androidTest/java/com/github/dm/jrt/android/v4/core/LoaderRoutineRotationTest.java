@@ -45,191 +45,185 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @TargetApi(VERSION_CODES.FROYO)
 public class LoaderRoutineRotationTest
-        extends ActivityInstrumentationTestCase2<RotationTestActivity> {
+    extends ActivityInstrumentationTestCase2<RotationTestActivity> {
 
-    public LoaderRoutineRotationTest() {
+  public LoaderRoutineRotationTest() {
 
-        super(RotationTestActivity.class);
+    super(RotationTestActivity.class);
+  }
+
+  public void testActivityNotStaleResult() throws InterruptedException {
+
+    if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+      return;
     }
 
-    public void testActivityNotStaleResult() throws InterruptedException {
+    final UnitDuration timeout = UnitDuration.seconds(10);
+    final Routine<String, String> routine = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
+                                                                .with(factoryOf(ToUpperCase.class))
+                                                                .applyLoaderConfiguration()
+                                                                .withLoaderId(0)
+                                                                .withClashResolution(
+                                                                    ClashResolutionType.JOIN)
+                                                                .withResultStaleTime(
+                                                                    UnitDuration.minutes(1))
+                                                                .configured()
+                                                                .buildRoutine();
+    routine.call("test1");
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+    simulateRotation();
+    UnitDuration.seconds(5).sleepAtLeast();
+    assertThat(routine.call("test2").after(timeout).next()).isEqualTo("TEST1");
+  }
 
-            return;
-        }
+  public void testActivityRotationChannel() throws InterruptedException {
 
-        final UnitDuration timeout = UnitDuration.seconds(10);
-        final Routine<String, String> routine = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
-                                                                    .with(factoryOf(
-                                                                            ToUpperCase.class))
-                                                                    .applyLoaderConfiguration()
-                                                                    .withLoaderId(0)
-                                                                    .withClashResolution(
-                                                                            ClashResolutionType
-                                                                                    .JOIN)
-                                                                    .withResultStaleTime(
-                                                                            UnitDuration.minutes(1))
-                                                                    .configured()
-                                                                    .buildRoutine();
-        routine.call("test1");
+    if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
 
-        simulateRotation();
-        UnitDuration.seconds(5).sleepAtLeast();
-        assertThat(routine.call("test2").after(timeout).next()).isEqualTo("TEST1");
+      return;
     }
 
-    public void testActivityRotationChannel() throws InterruptedException {
+    final UnitDuration timeout = UnitDuration.seconds(10);
+    JRoutineLoaderCompat.on(loaderFrom(getActivity()))
+                        .with(factoryOf(ToUpperCase.class))
+                        .applyInvocationConfiguration()
+                        .withOutputOrder(OrderType.SORTED)
+                        .configured()
+                        .applyLoaderConfiguration()
+                        .withLoaderId(0)
+                        .configured()
+                        .call("test1", "test2");
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+    simulateRotation();
 
-            return;
-        }
+    final Channel<?, String> channel =
+        JRoutineLoaderCompat.on(loaderFrom(getActivity())).withId(0).buildChannel();
 
-        final UnitDuration timeout = UnitDuration.seconds(10);
-        JRoutineLoaderCompat.on(loaderFrom(getActivity()))
-                            .with(factoryOf(ToUpperCase.class))
-                            .applyInvocationConfiguration()
-                            .withOutputOrder(OrderType.SORTED)
-                            .configured()
-                            .applyLoaderConfiguration()
-                            .withLoaderId(0)
-                            .configured()
-                            .call("test1", "test2");
+    assertThat(channel.after(timeout).all()).containsExactly("TEST1", "TEST2");
+  }
 
-        simulateRotation();
+  public void testActivityRotationInputs() throws InterruptedException {
 
-        final Channel<?, String> channel =
-                JRoutineLoaderCompat.on(loaderFrom(getActivity())).withId(0).buildChannel();
+    if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
 
-        assertThat(channel.after(timeout).all()).containsExactly("TEST1", "TEST2");
+      return;
     }
 
-    public void testActivityRotationInputs() throws InterruptedException {
-
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            return;
-        }
-
-        final UnitDuration timeout = UnitDuration.seconds(10);
-        final Routine<String, String> routine1 = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
-                                                                     .with(factoryOf(
-                                                                             ToUpperCase.class))
-                                                                     .buildRoutine();
-        routine1.call("test1");
-        routine1.call("test2");
-
-        simulateRotation();
-
-        final Routine<String, String> routine2 = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
-                                                                     .with(factoryOf(
-                                                                             ToUpperCase.class))
-                                                                     .buildRoutine();
-        final Channel<?, String> result1 = routine2.call("test1").after(timeout);
-        final Channel<?, String> result2 = routine2.call("test2").after(timeout);
-
-        assertThat(result1.next()).isEqualTo("TEST1");
-        assertThat(result2.next()).isEqualTo("TEST2");
-    }
-
-    public void testActivityRotationSame() throws InterruptedException {
-
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            return;
-        }
-
-        final UnitDuration timeout = UnitDuration.seconds(10);
-        final Data data1 = new Data();
-        final Routine<Data, Data> routine1 = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
-                                                                 .with(factoryOf(Delay.class))
+    final UnitDuration timeout = UnitDuration.seconds(10);
+    final Routine<String, String> routine1 = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
+                                                                 .with(factoryOf(ToUpperCase.class))
                                                                  .buildRoutine();
-        routine1.call(data1);
-        routine1.call(data1);
+    routine1.call("test1");
+    routine1.call("test2");
 
-        simulateRotation();
+    simulateRotation();
 
-        final Routine<Data, Data> routine2 = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
-                                                                 .with(factoryOf(Delay.class))
+    final Routine<String, String> routine2 = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
+                                                                 .with(factoryOf(ToUpperCase.class))
                                                                  .buildRoutine();
-        final Channel<?, Data> result1 = routine2.call(data1).after(timeout);
-        final Channel<?, Data> result2 = routine2.call(data1).after(timeout);
+    final Channel<?, String> result1 = routine2.call("test1").after(timeout);
+    final Channel<?, String> result2 = routine2.call("test2").after(timeout);
 
-        assertThat(result1.next()).isSameAs(data1);
-        assertThat(result2.next()).isSameAs(data1);
+    assertThat(result1.next()).isEqualTo("TEST1");
+    assertThat(result2.next()).isEqualTo("TEST2");
+  }
+
+  public void testActivityRotationSame() throws InterruptedException {
+
+    if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+      return;
     }
 
-    public void testActivityStaleResult() throws InterruptedException {
+    final UnitDuration timeout = UnitDuration.seconds(10);
+    final Data data1 = new Data();
+    final Routine<Data, Data> routine1 = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
+                                                             .with(factoryOf(Delay.class))
+                                                             .buildRoutine();
+    routine1.call(data1);
+    routine1.call(data1);
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+    simulateRotation();
 
-            return;
-        }
+    final Routine<Data, Data> routine2 = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
+                                                             .with(factoryOf(Delay.class))
+                                                             .buildRoutine();
+    final Channel<?, Data> result1 = routine2.call(data1).after(timeout);
+    final Channel<?, Data> result2 = routine2.call(data1).after(timeout);
 
-        final UnitDuration timeout = UnitDuration.seconds(10);
-        final Routine<String, String> routine = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
-                                                                    .with(factoryOf(
-                                                                            ToUpperCase.class))
-                                                                    .applyLoaderConfiguration()
-                                                                    .withLoaderId(0)
-                                                                    .withClashResolution(
-                                                                            ClashResolutionType
-                                                                                    .JOIN)
-                                                                    .withResultStaleTime(zero())
-                                                                    .configured()
-                                                                    .buildRoutine();
-        routine.call("test1");
+    assertThat(result1.next()).isSameAs(data1);
+    assertThat(result2.next()).isSameAs(data1);
+  }
 
-        simulateRotation();
-        UnitDuration.seconds(5).sleepAtLeast();
-        assertThat(routine.call("test2").after(timeout).next()).isEqualTo("TEST2");
+  public void testActivityStaleResult() throws InterruptedException {
+
+    if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+      return;
     }
 
-    @TargetApi(VERSION_CODES.HONEYCOMB)
-    private void simulateRotation() throws InterruptedException {
+    final UnitDuration timeout = UnitDuration.seconds(10);
+    final Routine<String, String> routine = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
+                                                                .with(factoryOf(ToUpperCase.class))
+                                                                .applyLoaderConfiguration()
+                                                                .withLoaderId(0)
+                                                                .withClashResolution(
+                                                                    ClashResolutionType.JOIN)
+                                                                .withResultStaleTime(zero())
+                                                                .configured()
+                                                                .buildRoutine();
+    routine.call("test1");
 
-        final Semaphore semaphore = new Semaphore(0);
+    simulateRotation();
+    UnitDuration.seconds(5).sleepAtLeast();
+    assertThat(routine.call("test2").after(timeout).next()).isEqualTo("TEST2");
+  }
 
-        getActivity().runOnUiThread(new Runnable() {
+  @TargetApi(VERSION_CODES.HONEYCOMB)
+  private void simulateRotation() throws InterruptedException {
 
-            public void run() {
+    final Semaphore semaphore = new Semaphore(0);
 
-                getActivity().recreate();
-                semaphore.release();
-            }
-        });
+    getActivity().runOnUiThread(new Runnable() {
 
-        semaphore.acquire();
-        getInstrumentation().waitForIdleSync();
+      public void run() {
+
+        getActivity().recreate();
+        semaphore.release();
+      }
+    });
+
+    semaphore.acquire();
+    getInstrumentation().waitForIdleSync();
+  }
+
+  private static class Data {
+
+  }
+
+  private static class Delay extends CallContextInvocation<Data, Data> {
+
+    @Override
+    protected void onCall(@NotNull final List<? extends Data> inputs,
+        @NotNull final Channel<Data, ?> result) {
+
+      result.after(UnitDuration.millis(500)).pass(inputs);
     }
+  }
 
-    private static class Data {
+  private static class ToUpperCase extends CallContextInvocation<String, String> {
 
+    @Override
+    protected void onCall(@NotNull final List<? extends String> inputs,
+        @NotNull final Channel<String, ?> result) {
+
+      result.after(UnitDuration.millis(500));
+
+      for (final String input : inputs) {
+
+        result.pass(input.toUpperCase());
+      }
     }
-
-    private static class Delay extends CallContextInvocation<Data, Data> {
-
-        @Override
-        protected void onCall(@NotNull final List<? extends Data> inputs,
-                @NotNull final Channel<Data, ?> result) {
-
-            result.after(UnitDuration.millis(500)).pass(inputs);
-        }
-    }
-
-    private static class ToUpperCase extends CallContextInvocation<String, String> {
-
-        @Override
-        protected void onCall(@NotNull final List<? extends String> inputs,
-                @NotNull final Channel<String, ?> result) {
-
-            result.after(UnitDuration.millis(500));
-
-            for (final String input : inputs) {
-
-                result.pass(input.toUpperCase());
-            }
-        }
-    }
+  }
 }

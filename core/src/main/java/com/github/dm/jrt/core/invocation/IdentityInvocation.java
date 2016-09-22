@@ -29,28 +29,28 @@ import org.jetbrains.annotations.NotNull;
  */
 public class IdentityInvocation<DATA> extends MappingInvocation<DATA, DATA> {
 
-    private static final IdentityInvocation<Object> sInvocation = new IdentityInvocation<Object>();
+  private static final IdentityInvocation<Object> sInvocation = new IdentityInvocation<Object>();
 
-    /**
-     * Avoid instantiation.
-     */
-    private IdentityInvocation() {
-        super(null);
-    }
+  /**
+   * Avoid instantiation.
+   */
+  private IdentityInvocation() {
+    super(null);
+  }
 
-    /**
-     * Returns a factory of identity invocations.
-     *
-     * @param <DATA> the data type.
-     * @return the factory.
-     */
-    @NotNull
-    @SuppressWarnings("unchecked")
-    public static <DATA> MappingInvocation<DATA, DATA> factoryOf() {
-        return (MappingInvocation<DATA, DATA>) sInvocation;
-    }
+  /**
+   * Returns a factory of identity invocations.
+   *
+   * @param <DATA> the data type.
+   * @return the factory.
+   */
+  @NotNull
+  @SuppressWarnings("unchecked")
+  public static <DATA> MappingInvocation<DATA, DATA> factoryOf() {
+    return (MappingInvocation<DATA, DATA>) sInvocation;
+  }
 
-    public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) {
-        result.pass(input);
-    }
+  public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) {
+    result.pass(input);
+  }
 }

@@ -33,18 +33,17 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class ErrorResponseExceptionTest {
 
-    @Test
-    public void testException() throws IOException {
-        final Response<Object> response =
-                Response.error(400, ResponseBody.create(MediaType.parse("plain/text"), "Error"));
-        final ErrorResponseException exception = new ErrorResponseException(response);
-        assertThat(exception.code()).isEqualTo(response.code());
-        assertThat(exception.message()).isEqualTo(response.message());
-        assertThat(exception.headers().toMultimap()).isEqualTo(response.headers().toMultimap());
-        assertThat(exception.errorBody().contentType()).isEqualTo(
-                response.errorBody().contentType());
-        assertThat(exception.errorBody().contentLength()).isEqualTo(
-                response.errorBody().contentLength());
-        assertThat(exception.errorBody().string()).isEqualTo("Error");
-    }
+  @Test
+  public void testException() throws IOException {
+    final Response<Object> response =
+        Response.error(400, ResponseBody.create(MediaType.parse("plain/text"), "Error"));
+    final ErrorResponseException exception = new ErrorResponseException(response);
+    assertThat(exception.code()).isEqualTo(response.code());
+    assertThat(exception.message()).isEqualTo(response.message());
+    assertThat(exception.headers().toMultimap()).isEqualTo(response.headers().toMultimap());
+    assertThat(exception.errorBody().contentType()).isEqualTo(response.errorBody().contentType());
+    assertThat(exception.errorBody().contentLength()).isEqualTo(
+        response.errorBody().contentLength());
+    assertThat(exception.errorBody().string()).isEqualTo("Error");
+  }
 }

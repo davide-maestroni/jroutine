@@ -42,98 +42,96 @@ import static com.github.dm.jrt.core.runner.Runners.zeroDelayRunner;
  * @param <OUT> the output data type.
  */
 class DefaultLoaderRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OUT>
-        implements LoaderRoutineBuilder<IN, OUT> {
+    implements LoaderRoutineBuilder<IN, OUT> {
 
-    private final LoaderContextCompat mContext;
+  private final LoaderContextCompat mContext;
 
-    private final ContextInvocationFactory<IN, OUT> mFactory;
+  private final ContextInvocationFactory<IN, OUT> mFactory;
 
-    private LoaderConfiguration mLoaderConfiguration = LoaderConfiguration.defaultConfiguration();
+  private LoaderConfiguration mLoaderConfiguration = LoaderConfiguration.defaultConfiguration();
 
-    /**
-     * Constructor.
-     *
-     * @param context the routine context.
-     * @param factory the invocation factory.
-     * @throws java.lang.IllegalArgumentException if the class of the specified factory has not a
-     *                                            static scope.
-     */
-    DefaultLoaderRoutineBuilder(@NotNull final LoaderContextCompat context,
-            @NotNull final ContextInvocationFactory<IN, OUT> factory) {
-        mContext = ConstantConditions.notNull("Loader context", context);
-        final Class<? extends ContextInvocationFactory> factoryClass = factory.getClass();
-        if (!Reflection.hasStaticScope(factoryClass)) {
-            throw new IllegalArgumentException(
-                    "the factory class must have a static scope: " + factoryClass.getName());
-        }
-
-        mFactory = factory;
+  /**
+   * Constructor.
+   *
+   * @param context the routine context.
+   * @param factory the invocation factory.
+   * @throws java.lang.IllegalArgumentException if the class of the specified factory has not a
+   *                                            static scope.
+   */
+  DefaultLoaderRoutineBuilder(@NotNull final LoaderContextCompat context,
+      @NotNull final ContextInvocationFactory<IN, OUT> factory) {
+    mContext = ConstantConditions.notNull("Loader context", context);
+    final Class<? extends ContextInvocationFactory> factoryClass = factory.getClass();
+    if (!Reflection.hasStaticScope(factoryClass)) {
+      throw new IllegalArgumentException(
+          "the factory class must have a static scope: " + factoryClass.getName());
     }
 
-    @NotNull
-    @Override
-    public LoaderRoutineBuilder<IN, OUT> apply(
-            @NotNull final InvocationConfiguration configuration) {
-        super.apply(configuration);
-        return this;
+    mFactory = factory;
+  }
+
+  @NotNull
+  @Override
+  public LoaderRoutineBuilder<IN, OUT> apply(@NotNull final InvocationConfiguration configuration) {
+    super.apply(configuration);
+    return this;
+  }
+
+  @NotNull
+  @Override
+  @SuppressWarnings("unchecked")
+  public InvocationConfiguration.Builder<? extends
+      LoaderRoutineBuilder<IN, OUT>> applyInvocationConfiguration() {
+    return (Builder<? extends LoaderRoutineBuilder<IN, OUT>>) super.applyInvocationConfiguration();
+  }
+
+  @NotNull
+  @Override
+  public LoaderRoutineBuilder<IN, OUT> apply(@NotNull final LoaderConfiguration configuration) {
+    mLoaderConfiguration = ConstantConditions.notNull("Loader configuration", configuration);
+    return this;
+  }
+
+  @NotNull
+  @Override
+  public LoaderConfiguration.Builder<? extends LoaderRoutineBuilder<IN, OUT>>
+  applyLoaderConfiguration() {
+    final LoaderConfiguration config = mLoaderConfiguration;
+    return new LoaderConfiguration.Builder<LoaderRoutineBuilder<IN, OUT>>(this, config);
+  }
+
+  @NotNull
+  @Override
+  public LoaderRoutine<IN, OUT> buildRoutine() {
+    final InvocationConfiguration configuration = getConfiguration();
+    final Runner asyncRunner = configuration.getRunnerOrElse(null);
+    if (asyncRunner != null) {
+      configuration.newLogger(this)
+                   .wrn("the specified async runner will be ignored: %s", asyncRunner);
     }
 
-    @NotNull
-    @Override
-    @SuppressWarnings("unchecked")
-    public InvocationConfiguration.Builder<? extends
-            LoaderRoutineBuilder<IN, OUT>> applyInvocationConfiguration() {
-        return (Builder<? extends LoaderRoutineBuilder<IN, OUT>>) super
-                .applyInvocationConfiguration();
-    }
+    final InvocationConfiguration.Builder<InvocationConfiguration> builder =
+        configuration.builderFrom().withRunner(zeroDelayRunner(mainRunner()));
+    return new DefaultLoaderRoutine<IN, OUT>(mContext, mFactory, builder.configured(),
+        mLoaderConfiguration);
+  }
 
-    @NotNull
-    @Override
-    public LoaderRoutineBuilder<IN, OUT> apply(@NotNull final LoaderConfiguration configuration) {
-        mLoaderConfiguration = ConstantConditions.notNull("Loader configuration", configuration);
-        return this;
-    }
+  @Override
+  public void clear() {
+    buildRoutine().clear();
+  }
 
-    @NotNull
-    @Override
-    public LoaderConfiguration.Builder<? extends LoaderRoutineBuilder<IN, OUT>>
-    applyLoaderConfiguration() {
-        final LoaderConfiguration config = mLoaderConfiguration;
-        return new LoaderConfiguration.Builder<LoaderRoutineBuilder<IN, OUT>>(this, config);
-    }
+  @Override
+  public void clear(@Nullable final IN input) {
+    buildRoutine().clear(input);
+  }
 
-    @NotNull
-    @Override
-    public LoaderRoutine<IN, OUT> buildRoutine() {
-        final InvocationConfiguration configuration = getConfiguration();
-        final Runner asyncRunner = configuration.getRunnerOrElse(null);
-        if (asyncRunner != null) {
-            configuration.newLogger(this)
-                         .wrn("the specified async runner will be ignored: %s", asyncRunner);
-        }
+  public void clear(@Nullable final IN... inputs) {
+    buildRoutine().clear(inputs);
+  }
 
-        final InvocationConfiguration.Builder<InvocationConfiguration> builder =
-                configuration.builderFrom().withRunner(zeroDelayRunner(mainRunner()));
-        return new DefaultLoaderRoutine<IN, OUT>(mContext, mFactory, builder.configured(),
-                mLoaderConfiguration);
-    }
-
-    @Override
-    public void clear() {
-        buildRoutine().clear();
-    }
-
-    @Override
-    public void clear(@Nullable final IN input) {
-        buildRoutine().clear(input);
-    }
-
-    public void clear(@Nullable final IN... inputs) {
-        buildRoutine().clear(inputs);
-    }
-
-    @Override
-    public void clear(@Nullable final Iterable<? extends IN> inputs) {
-        buildRoutine().clear(inputs);
-    }
+  @Override
+  public void clear(@Nullable final Iterable<? extends IN> inputs) {
+    buildRoutine().clear(inputs);
+  }
 }

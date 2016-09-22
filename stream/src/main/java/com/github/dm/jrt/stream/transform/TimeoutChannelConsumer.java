@@ -37,75 +37,73 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 class TimeoutChannelConsumer<OUT> implements ChannelConsumer<OUT> {
 
-    private final AtomicLong mCount = new AtomicLong();
+  private final AtomicLong mCount = new AtomicLong();
 
-    private final Channel<OUT, ?> mOutputChannel;
+  private final Channel<OUT, ?> mOutputChannel;
 
-    private final Runner mRunner;
+  private final Runner mRunner;
 
-    private final long mTimeout;
+  private final long mTimeout;
 
-    private final TimeUnit mTimeoutUnit;
+  private final TimeUnit mTimeoutUnit;
 
-    private AbortExecution mExecution = new AbortExecution();
+  private AbortExecution mExecution = new AbortExecution();
+
+  /**
+   * Constructor.
+   *
+   * @param timeout       the timeout value.
+   * @param timeUnit      the timeout unit.
+   * @param runner        the runner instance.
+   * @param outputChannel the output channel.
+   */
+  TimeoutChannelConsumer(final long timeout, @NotNull final TimeUnit timeUnit,
+      @NotNull final Runner runner, @NotNull final Channel<OUT, ?> outputChannel) {
+    mTimeout = ConstantConditions.notNegative("timeout value", timeout);
+    mTimeoutUnit = ConstantConditions.notNull("timeout unit", timeUnit);
+    mRunner = ConstantConditions.notNull("runner instance", runner);
+    mOutputChannel = ConstantConditions.notNull("output channel", outputChannel);
+  }
+
+  public void onComplete() throws Exception {
+    mOutputChannel.close();
+  }
+
+  public void onError(@NotNull final RoutineException error) {
+    mOutputChannel.abort(error);
+  }
+
+  public void onOutput(final OUT output) {
+    restartTimeout();
+    mOutputChannel.pass(output);
+  }
+
+  private void restartTimeout() {
+    final Runner runner = mRunner;
+    runner.cancel(mExecution);
+    final AbortExecution execution = (mExecution = new AbortExecution());
+    runner.run(execution, mTimeout, mTimeoutUnit);
+  }
+
+  /**
+   * Execution aborting the output channel.
+   */
+  private class AbortExecution implements Execution {
+
+    private final long mExecutionCount;
 
     /**
      * Constructor.
-     *
-     * @param timeout       the timeout value.
-     * @param timeUnit      the timeout unit.
-     * @param runner        the runner instance.
-     * @param outputChannel the output channel.
      */
-    TimeoutChannelConsumer(final long timeout, @NotNull final TimeUnit timeUnit,
-            @NotNull final Runner runner, @NotNull final Channel<OUT, ?> outputChannel) {
-        mTimeout = ConstantConditions.notNegative("timeout value", timeout);
-        mTimeoutUnit = ConstantConditions.notNull("timeout unit", timeUnit);
-        mRunner = ConstantConditions.notNull("runner instance", runner);
-        mOutputChannel = ConstantConditions.notNull("output channel", outputChannel);
+    AbortExecution() {
+      mExecutionCount = mCount.incrementAndGet();
     }
 
-    public void onComplete() throws Exception {
-        mOutputChannel.close();
+    public void run() {
+      if (mExecutionCount == mCount.get()) {
+        mOutputChannel.abort(new ResultTimeoutException(
+            "timeout while waiting for inputs: [" + mTimeout + " " + mTimeout + "]"));
+      }
     }
-
-    public void onError(@NotNull final RoutineException error) {
-        mOutputChannel.abort(error);
-    }
-
-    public void onOutput(final OUT output) {
-        restartTimeout();
-        mOutputChannel.pass(output);
-    }
-
-    private void restartTimeout() {
-        final Runner runner = mRunner;
-        runner.cancel(mExecution);
-        final AbortExecution execution = (mExecution = new AbortExecution());
-        runner.run(execution, mTimeout, mTimeoutUnit);
-    }
-
-    /**
-     * Execution aborting the output channel.
-     */
-    private class AbortExecution implements Execution {
-
-        private final long mExecutionCount;
-
-        /**
-         * Constructor.
-         */
-        AbortExecution() {
-            mExecutionCount = mCount.incrementAndGet();
-        }
-
-        public void run() {
-            if (mExecutionCount == mCount.get()) {
-                final String message =
-                        String.format("timeout while waiting for inputs: [%d %s]", mTimeout,
-                                mTimeoutUnit);
-                mOutputChannel.abort(new ResultTimeoutException(message));
-            }
-        }
-    }
+  }
 }

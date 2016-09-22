@@ -30,95 +30,95 @@ import static org.junit.Assert.fail;
  */
 public class InvocationTargetTest {
 
-    @Test
-    public void testClassTarget() {
+  @Test
+  public void testClassTarget() {
 
-        final InvocationTarget<TargetClass> target = classOfType(TargetClass.class);
-        assertThat(target.getTarget()).isSameAs(TargetClass.class);
-        assertThat(target.getTargetClass()).isSameAs(TargetClass.class);
-        assertThat(target.isAssignableTo(TargetClass.class)).isTrue();
-        assertThat(target.isOfType(TargetClass.class)).isTrue();
-        assertThat(target.isAssignableTo(TestClass.class)).isTrue();
-        assertThat(target.isOfType(TestClass.class)).isFalse();
-        assertThat(target.isAssignableTo(String.class)).isFalse();
-        assertThat(target.isOfType(String.class)).isFalse();
-    }
+    final InvocationTarget<TargetClass> target = classOfType(TargetClass.class);
+    assertThat(target.getTarget()).isSameAs(TargetClass.class);
+    assertThat(target.getTargetClass()).isSameAs(TargetClass.class);
+    assertThat(target.isAssignableTo(TargetClass.class)).isTrue();
+    assertThat(target.isOfType(TargetClass.class)).isTrue();
+    assertThat(target.isAssignableTo(TestClass.class)).isTrue();
+    assertThat(target.isOfType(TestClass.class)).isFalse();
+    assertThat(target.isAssignableTo(String.class)).isFalse();
+    assertThat(target.isOfType(String.class)).isFalse();
+  }
 
-    @Test
-    public void testClassTargetEquals() {
+  @Test
+  public void testClassTargetEquals() {
 
-        final InvocationTarget<TargetClass> target = classOfType(TargetClass.class);
-        assertThat(target).isEqualTo(target);
-        assertThat(target).isNotEqualTo("");
-        assertThat(target.hashCode()).isEqualTo(classOfType(TargetClass.class).hashCode());
-        assertThat(target).isEqualTo(classOfType(TargetClass.class));
-        assertThat(target.hashCode()).isNotEqualTo(classOfType(TestClass.class).hashCode());
-        assertThat(target).isNotEqualTo(classOfType(TestClass.class));
-    }
+    final InvocationTarget<TargetClass> target = classOfType(TargetClass.class);
+    assertThat(target).isEqualTo(target);
+    assertThat(target).isNotEqualTo("");
+    assertThat(target.hashCode()).isEqualTo(classOfType(TargetClass.class).hashCode());
+    assertThat(target).isEqualTo(classOfType(TargetClass.class));
+    assertThat(target.hashCode()).isNotEqualTo(classOfType(TestClass.class).hashCode());
+    assertThat(target).isNotEqualTo(classOfType(TestClass.class));
+  }
 
-    @Test
-    @SuppressWarnings("ConstantConditions")
-    public void testClassTargetError() {
+  @Test
+  @SuppressWarnings("ConstantConditions")
+  public void testClassTargetError() {
 
-        try {
+    try {
 
-            classOfType(null);
+      classOfType(null);
 
-            fail();
+      fail();
 
-        } catch (final NullPointerException ignored) {
-
-        }
-    }
-
-    @Test
-    public void testInstanceTarget() {
-
-        final TargetClass t = new TargetClass();
-        final InvocationTarget<TargetClass> target = instance(t);
-        assertThat(target.getTarget()).isSameAs(t);
-        assertThat(target.getTargetClass()).isSameAs(TargetClass.class);
-        assertThat(target.isAssignableTo(TargetClass.class)).isTrue();
-        assertThat(target.isOfType(TargetClass.class)).isTrue();
-        assertThat(target.isAssignableTo(TestClass.class)).isTrue();
-        assertThat(target.isOfType(TestClass.class)).isTrue();
-        assertThat(target.isAssignableTo(String.class)).isFalse();
-        assertThat(target.isOfType(String.class)).isFalse();
-    }
-
-    @Test
-    public void testInstanceTargetEquals() {
-
-        final TargetClass t = new TargetClass();
-        final InvocationTarget<TargetClass> target = instance(t);
-        assertThat(target).isEqualTo(target);
-        assertThat(target).isNotEqualTo("");
-        assertThat(target.hashCode()).isEqualTo(instance(t).hashCode());
-        assertThat(target).isEqualTo(instance(t));
-        assertThat(target.hashCode()).isNotEqualTo(instance(new TestClass()).hashCode());
-        assertThat(target).isNotEqualTo(instance(new TestClass()));
-    }
-
-    @Test
-    @SuppressWarnings("ConstantConditions")
-    public void testInstanceTargetError() {
-
-        try {
-
-            instance(null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-    }
-
-    private static class TargetClass extends TestClass {
+    } catch (final NullPointerException ignored) {
 
     }
+  }
 
-    private static class TestClass {
+  @Test
+  public void testInstanceTarget() {
+
+    final TargetClass t = new TargetClass();
+    final InvocationTarget<TargetClass> target = instance(t);
+    assertThat(target.getTarget()).isSameAs(t);
+    assertThat(target.getTargetClass()).isSameAs(TargetClass.class);
+    assertThat(target.isAssignableTo(TargetClass.class)).isTrue();
+    assertThat(target.isOfType(TargetClass.class)).isTrue();
+    assertThat(target.isAssignableTo(TestClass.class)).isTrue();
+    assertThat(target.isOfType(TestClass.class)).isTrue();
+    assertThat(target.isAssignableTo(String.class)).isFalse();
+    assertThat(target.isOfType(String.class)).isFalse();
+  }
+
+  @Test
+  public void testInstanceTargetEquals() {
+
+    final TargetClass t = new TargetClass();
+    final InvocationTarget<TargetClass> target = instance(t);
+    assertThat(target).isEqualTo(target);
+    assertThat(target).isNotEqualTo("");
+    assertThat(target.hashCode()).isEqualTo(instance(t).hashCode());
+    assertThat(target).isEqualTo(instance(t));
+    assertThat(target.hashCode()).isNotEqualTo(instance(new TestClass()).hashCode());
+    assertThat(target).isNotEqualTo(instance(new TestClass()));
+  }
+
+  @Test
+  @SuppressWarnings("ConstantConditions")
+  public void testInstanceTargetError() {
+
+    try {
+
+      instance(null);
+
+      fail();
+
+    } catch (final NullPointerException ignored) {
 
     }
+  }
+
+  private static class TargetClass extends TestClass {
+
+  }
+
+  private static class TestClass {
+
+  }
 }

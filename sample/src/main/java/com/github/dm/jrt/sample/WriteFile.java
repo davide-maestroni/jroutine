@@ -37,44 +37,44 @@ import java.io.IOException;
  */
 public class WriteFile extends TemplateInvocation<ByteBuffer, Boolean> {
 
-    private final File mFile;
+  private final File mFile;
 
-    private BufferedOutputStream mOutputStream;
+  private BufferedOutputStream mOutputStream;
 
-    /**
-     * Constructor.
-     *
-     * @param file the output file.
-     */
-    public WriteFile(@NotNull final File file) {
-        mFile = file;
-    }
+  /**
+   * Constructor.
+   *
+   * @param file the output file.
+   */
+  public WriteFile(@NotNull final File file) {
+    mFile = file;
+  }
 
-    @Override
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    public void onAbort(@NotNull final RoutineException reason) throws IOException {
-        closeStream();
-        mFile.delete();
-    }
+  @Override
+  @SuppressWarnings("ResultOfMethodCallIgnored")
+  public void onAbort(@NotNull final RoutineException reason) throws IOException {
+    closeStream();
+    mFile.delete();
+  }
 
-    @Override
-    public void onComplete(@NotNull final Channel<Boolean, ?> result) throws IOException {
-        closeStream();
-        result.pass(true);
-    }
+  @Override
+  public void onComplete(@NotNull final Channel<Boolean, ?> result) throws IOException {
+    closeStream();
+    result.pass(true);
+  }
 
-    @Override
-    public void onInput(final ByteBuffer buffer, @NotNull final Channel<Boolean, ?> result) throws
-            IOException {
-        ByteChannel.inputStream(buffer).transferTo(mOutputStream);
-    }
+  @Override
+  public void onInput(final ByteBuffer buffer, @NotNull final Channel<Boolean, ?> result) throws
+      IOException {
+    ByteChannel.inputStream(buffer).transferTo(mOutputStream);
+  }
 
-    @Override
-    public void onRestart() throws FileNotFoundException {
-        mOutputStream = new BufferedOutputStream(new FileOutputStream(mFile));
-    }
+  @Override
+  public void onRestart() throws FileNotFoundException {
+    mOutputStream = new BufferedOutputStream(new FileOutputStream(mFile));
+  }
 
-    private void closeStream() throws IOException {
-        mOutputStream.close();
-    }
+  private void closeStream() throws IOException {
+    mOutputStream.close();
+  }
 }

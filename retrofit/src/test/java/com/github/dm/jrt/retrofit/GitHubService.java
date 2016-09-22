@@ -32,14 +32,14 @@ import retrofit2.http.Path;
  */
 public interface GitHubService {
 
-    @GET("users/{user}/repos")
-    Channel<Object, List<Repo>> getRepos(@Path("user") String user);
+  @GET("users/{user}/repos")
+  Channel<Object, List<Repo>> getRepos(@Path("user") String user);
 
-    @CallAdapterFactory("list")
-    @GET("users/{user}/repos")
-    Channel<Object, List<Repo>> listRepos(@Path("user") String user);
+  @CallAdapterFactory("list")
+  @GET("users/{user}/repos")
+  Channel<Object, List<Repo>> listRepos(@Path("user") String user);
 
-    @CallAdapterFactory("stream")
-    @GET("users/{user}/repos")
-    StreamBuilder<Object, List<Repo>> streamRepos(@Path("user") String user);
+  @CallAdapterFactory("stream")
+  @GET("users/{user}/repos")
+  StreamBuilder<Object, List<Repo>> streamRepos(@Path("user") String user);
 }

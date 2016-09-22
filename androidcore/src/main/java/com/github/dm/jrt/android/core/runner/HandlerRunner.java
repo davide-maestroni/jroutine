@@ -37,74 +37,74 @@ import java.util.concurrent.TimeUnit;
  */
 class HandlerRunner extends AsyncRunner {
 
-    private final WeakIdentityHashMap<Execution, WeakReference<ExecutionDecorator>> mExecutions =
-            new WeakIdentityHashMap<Execution, WeakReference<ExecutionDecorator>>();
+  private final WeakIdentityHashMap<Execution, WeakReference<ExecutionDecorator>> mExecutions =
+      new WeakIdentityHashMap<Execution, WeakReference<ExecutionDecorator>>();
 
-    private final Handler mHandler;
+  private final Handler mHandler;
+
+  /**
+   * Constructor.
+   *
+   * @param handler the handler to employ.
+   */
+  HandlerRunner(@NotNull final Handler handler) {
+    super(new HandlerThreadManager(handler.getLooper()));
+    mHandler = handler;
+  }
+
+  @Override
+  public void cancel(@NotNull final Execution execution) {
+    final ExecutionDecorator decorator;
+    synchronized (mExecutions) {
+      final WeakReference<ExecutionDecorator> reference = mExecutions.remove(execution);
+      decorator = (reference != null) ? reference.get() : null;
+    }
+
+    mHandler.removeCallbacks(decorator);
+  }
+
+  @Override
+  public void run(@NotNull final Execution execution, final long delay,
+      @NotNull final TimeUnit timeUnit) {
+    ExecutionDecorator decorator;
+    synchronized (mExecutions) {
+      final WeakIdentityHashMap<Execution, WeakReference<ExecutionDecorator>> executions =
+          mExecutions;
+      final WeakReference<ExecutionDecorator> reference = mExecutions.remove(execution);
+      decorator = (reference != null) ? reference.get() : null;
+      if (decorator == null) {
+        decorator = new ExecutionDecorator(execution);
+        executions.put(execution, new WeakReference<ExecutionDecorator>(decorator));
+      }
+    }
+
+    if (delay > 0) {
+      mHandler.postDelayed(decorator, timeUnit.toMillis(delay));
+
+    } else {
+      mHandler.post(decorator);
+    }
+  }
+
+  /**
+   * Thread manager implementation.
+   */
+  private static class HandlerThreadManager implements ThreadManager {
+
+    private final Looper mLooper;
 
     /**
      * Constructor.
      *
-     * @param handler the handler to employ.
+     * @param looper the handler looper.
      */
-    HandlerRunner(@NotNull final Handler handler) {
-        super(new HandlerThreadManager(handler.getLooper()));
-        mHandler = handler;
+    private HandlerThreadManager(@NotNull final Looper looper) {
+      mLooper = looper;
     }
 
     @Override
-    public void cancel(@NotNull final Execution execution) {
-        final ExecutionDecorator decorator;
-        synchronized (mExecutions) {
-            final WeakReference<ExecutionDecorator> reference = mExecutions.remove(execution);
-            decorator = (reference != null) ? reference.get() : null;
-        }
-
-        mHandler.removeCallbacks(decorator);
+    public boolean isManagedThread() {
+      return (mLooper == Looper.myLooper());
     }
-
-    @Override
-    public void run(@NotNull final Execution execution, final long delay,
-            @NotNull final TimeUnit timeUnit) {
-        ExecutionDecorator decorator;
-        synchronized (mExecutions) {
-            final WeakIdentityHashMap<Execution, WeakReference<ExecutionDecorator>> executions =
-                    mExecutions;
-            final WeakReference<ExecutionDecorator> reference = mExecutions.remove(execution);
-            decorator = (reference != null) ? reference.get() : null;
-            if (decorator == null) {
-                decorator = new ExecutionDecorator(execution);
-                executions.put(execution, new WeakReference<ExecutionDecorator>(decorator));
-            }
-        }
-
-        if (delay > 0) {
-            mHandler.postDelayed(decorator, timeUnit.toMillis(delay));
-
-        } else {
-            mHandler.post(decorator);
-        }
-    }
-
-    /**
-     * Thread manager implementation.
-     */
-    private static class HandlerThreadManager implements ThreadManager {
-
-        private final Looper mLooper;
-
-        /**
-         * Constructor.
-         *
-         * @param looper the handler looper.
-         */
-        private HandlerThreadManager(@NotNull final Looper looper) {
-            mLooper = looper;
-        }
-
-        @Override
-        public boolean isManagedThread() {
-            return (mLooper == Looper.myLooper());
-        }
-    }
+  }
 }

@@ -1089,7 +1089,8 @@ public class OperatorsTest {
                            .call("Z TEST", "test")
                            .after(seconds(3))
                            .next()).isEqualTo("Z TEST");
-    assertThat(JRoutineCore.with(Operators.max()).close().after(seconds(3)).all()).isEmpty();
+    assertThat(
+        JRoutineCore.with(Operators.<Integer>max()).close().after(seconds(3)).all()).isEmpty();
     assertThat(JRoutineCore.with(Operators.maxBy(String.CASE_INSENSITIVE_ORDER))
                            .close()
                            .after(seconds(3))
@@ -1115,7 +1116,8 @@ public class OperatorsTest {
                            .call("Z TEST", "test")
                            .after(seconds(3))
                            .next()).isEqualTo("test");
-    assertThat(JRoutineCore.with(Operators.min()).close().after(seconds(3)).all()).isEmpty();
+    assertThat(
+        JRoutineCore.with(Operators.<Integer>min()).close().after(seconds(3)).all()).isEmpty();
     assertThat(JRoutineCore.with(Operators.minBy(String.CASE_INSENSITIVE_ORDER))
                            .close()
                            .after(seconds(3))

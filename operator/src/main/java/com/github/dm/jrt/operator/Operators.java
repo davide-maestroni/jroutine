@@ -1788,8 +1788,9 @@ public class Operators {
    * @return the invocation factory instance.
    */
   @NotNull
-  public static <IN> InvocationFactory<? super IN, Object[]> toArray() {
-    return toArray(Object.class);
+  @SuppressWarnings("unchecked")
+  public static <IN> InvocationFactory<IN, Object[]> toArray() {
+    return (InvocationFactory<IN, Object[]>) toArray(Object.class);
   }
 
   /**
@@ -1800,7 +1801,7 @@ public class Operators {
    * @return the invocation factory instance.
    */
   @NotNull
-  public static <IN> InvocationFactory<? super IN, IN[]> toArray(
+  public static <IN> InvocationFactory<IN, IN[]> toArray(
       @NotNull final Class<? extends IN> componentType) {
     return new ToArrayInvocationFactory<IN>(componentType);
   }
@@ -1813,7 +1814,7 @@ public class Operators {
    * @return the invocation factory instance.
    */
   @NotNull
-  public static <IN> InvocationFactory<? super IN, IN[]> toArray(
+  public static <IN> InvocationFactory<IN, IN[]> toArray(
       @NotNull final ClassToken<? extends IN> componentType) {
     return toArray(componentType.getRawClass());
   }
@@ -1825,7 +1826,7 @@ public class Operators {
    * @return the invocation factory instance.
    */
   @NotNull
-  public static <IN> InvocationFactory<? super IN, List<IN>> toList() {
+  public static <IN> InvocationFactory<IN, List<IN>> toList() {
     return ToListInvocation.factoryOf();
   }
 
@@ -1838,7 +1839,7 @@ public class Operators {
    * @return the invocation factory instance.
    */
   @NotNull
-  public static <IN, KEY> InvocationFactory<? super IN, Map<KEY, IN>> toMap(
+  public static <IN, KEY> InvocationFactory<IN, Map<KEY, IN>> toMap(
       @NotNull final Function<? super IN, KEY> keyFunction) {
     return toMap(keyFunction, FunctionDecorator.<IN>identity());
   }
@@ -1854,7 +1855,7 @@ public class Operators {
    * @return the invocation factory instance.
    */
   @NotNull
-  public static <IN, KEY, VALUE> InvocationFactory<? super IN, Map<KEY, VALUE>> toMap(
+  public static <IN, KEY, VALUE> InvocationFactory<IN, Map<KEY, VALUE>> toMap(
       @NotNull final Function<? super IN, KEY> keyFunction,
       @NotNull final Function<? super IN, VALUE> valueFunction) {
     return new ToMapInvocationFactory<IN, KEY, VALUE>(FunctionDecorator.decorate(keyFunction),
@@ -1868,7 +1869,7 @@ public class Operators {
    * @return the invocation factory instance.
    */
   @NotNull
-  public static <IN> InvocationFactory<? super IN, Set<IN>> toSet() {
+  public static <IN> InvocationFactory<IN, Set<IN>> toSet() {
     return ToSetInvocation.factoryOf();
   }
 

@@ -36,6 +36,7 @@ import java.util.List;
  * <p>
  * Created by davide-maestroni on 09/21/2015.
  */
+@SuppressWarnings("WeakerAccess")
 public class Functions {
 
   /**

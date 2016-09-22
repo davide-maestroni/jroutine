@@ -24,6 +24,7 @@ import android.os.Looper;
  * <p>
  * Created by davide-maestroni on 12/17/2014.
  */
+@SuppressWarnings("WeakerAccess")
 public class MainRunner extends HandlerRunner {
 
   /**

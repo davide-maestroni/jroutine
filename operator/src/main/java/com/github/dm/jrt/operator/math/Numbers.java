@@ -29,6 +29,7 @@ import java.math.BigInteger;
  * <p>
  * Created by davide-maestroni on 05/02/2016.
  */
+@SuppressWarnings("WeakerAccess")
 public class Numbers {
 
   /**

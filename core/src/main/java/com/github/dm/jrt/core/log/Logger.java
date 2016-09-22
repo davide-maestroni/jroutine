@@ -35,6 +35,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * <p>
  * Created by davide-maestroni on 10/03/2014.
  */
+@SuppressWarnings("WeakerAccess")
 public class Logger {
 
   private static final int DEBUG_LEVEL = Level.DEBUG.ordinal();

@@ -36,6 +36,7 @@ import retrofit2.Response;
  * <p>
  * Created by davide-maestroni on 07/12/2016.
  */
+@SuppressWarnings("WeakerAccess")
 public class ErrorResponseException extends RoutineException {
 
   private final int mCode;

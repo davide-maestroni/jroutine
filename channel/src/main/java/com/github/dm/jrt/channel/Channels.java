@@ -36,6 +36,7 @@ import java.util.concurrent.Future;
  * <p>
  * Created by davide-maestroni on 03/15/2015.
  */
+@SuppressWarnings("WeakerAccess")
 public class Channels {
 
   /**

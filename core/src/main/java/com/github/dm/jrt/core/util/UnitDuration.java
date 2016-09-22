@@ -26,6 +26,7 @@ import java.util.concurrent.TimeUnit;
  * <p>
  * Created by davide-maestroni on 09/09/2014.
  */
+@SuppressWarnings("WeakerAccess")
 public class UnitDuration extends UnitTime {
 
   private static final long ONE_MILLI_NANOS = TimeUnit.MILLISECONDS.toNanos(1);

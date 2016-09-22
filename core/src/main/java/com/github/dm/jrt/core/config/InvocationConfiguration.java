@@ -82,6 +82,7 @@ import static com.github.dm.jrt.core.util.UnitDuration.fromUnit;
  * <p>
  * Created by davide-maestroni on 11/15/2014.
  */
+@SuppressWarnings("WeakerAccess")
 public final class InvocationConfiguration extends DeepEqualObject {
 
   /**

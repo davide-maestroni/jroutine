@@ -93,6 +93,7 @@ public class JRoutineLoaderObjectCompat {
   /**
    * Context based builder of Loader routine builders.
    */
+  @SuppressWarnings("WeakerAccess")
   public static class LoaderObjectBuilderCompat {
 
     private final LoaderContextCompat mContext;

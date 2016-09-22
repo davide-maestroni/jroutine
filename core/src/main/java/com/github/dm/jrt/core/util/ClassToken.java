@@ -44,6 +44,7 @@ import java.lang.reflect.Type;
  *
  * @param <TYPE> the class type.
  */
+@SuppressWarnings("WeakerAccess")
 public abstract class ClassToken<TYPE> {
 
   private Type mGenericType;

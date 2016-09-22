@@ -125,7 +125,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
     mInputQueue = new NestedQueue<IN>() {
 
       @Override
-      public void close() {
+      void close() {
         // Preventing closing
       }
     };

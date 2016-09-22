@@ -252,7 +252,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
      * @return the routine instance.
      */
     @NotNull
-    protected Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> getRoutine() {
+    Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> getRoutine() {
       return mRoutine;
     }
   }

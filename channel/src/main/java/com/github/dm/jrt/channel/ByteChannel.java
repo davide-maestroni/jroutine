@@ -64,6 +64,7 @@ import java.util.ArrayList;
  * <p>
  * Created by davide-maestroni on 08/26/2015.
  */
+@SuppressWarnings("WeakerAccess")
 public class ByteChannel {
 
   /**
@@ -232,12 +233,6 @@ public class ByteChannel {
   public static abstract class BufferInputStream extends InputStream {
 
     /**
-     * Constructor.
-     */
-    protected BufferInputStream() {
-    }
-
-    /**
      * Reads some bytes from the input stream and writes them into the specified output stream.
      *
      * @param out the output stream.
@@ -338,12 +333,6 @@ public class ByteChannel {
    * Output stream used to write data into the buffer channel.
    */
   public static abstract class BufferOutputStream extends OutputStream {
-
-    /**
-     * Constructor.
-     */
-    protected BufferOutputStream() {
-    }
 
     /**
      * Transfers all the bytes from the specified input stream and close it.

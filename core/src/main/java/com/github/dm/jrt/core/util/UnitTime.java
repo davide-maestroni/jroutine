@@ -25,6 +25,7 @@ import java.util.concurrent.TimeUnit;
  * <p>
  * Created by davide-maestroni on 09/09/2014.
  */
+@SuppressWarnings("WeakerAccess")
 public class UnitTime implements Comparable<UnitTime> {
 
   /**

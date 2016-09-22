@@ -96,6 +96,7 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * <p>
  * Created by davide-maestroni on 08/20/2016.
  */
+@SuppressWarnings("WeakerAccess")
 public class LoaderRoutineMethodCompat extends RoutineMethod
     implements LoaderConfigurable<LoaderRoutineMethodCompat> {
 

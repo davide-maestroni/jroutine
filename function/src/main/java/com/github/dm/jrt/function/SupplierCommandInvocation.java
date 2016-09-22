@@ -40,7 +40,7 @@ class SupplierCommandInvocation<OUT> extends CommandInvocation<OUT> {
    *
    * @param supplier the supplier instance.
    */
-  public SupplierCommandInvocation(@NotNull final SupplierDecorator<? extends OUT> supplier) {
+  SupplierCommandInvocation(@NotNull final SupplierDecorator<? extends OUT> supplier) {
     super(asArgs(ConstantConditions.notNull("supplier wrapper", supplier)));
     mSupplier = supplier;
   }

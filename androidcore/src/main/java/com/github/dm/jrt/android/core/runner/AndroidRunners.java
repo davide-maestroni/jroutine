@@ -33,6 +33,7 @@ import java.util.concurrent.Executor;
  * <p>
  * Created by davide-maestroni on 09/28/2014.
  */
+@SuppressWarnings("WeakerAccess")
 public class AndroidRunners {
 
   private static final Runner sMainRunner = new MainRunner();

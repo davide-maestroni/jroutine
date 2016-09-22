@@ -31,6 +31,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
  * <p>
  * Created by davide-maestroni on 12/28/2015.
  */
+@SuppressWarnings("WeakerAccess")
 public class LogSet extends CopyOnWriteArraySet<Log> implements Log {
 
   private static final long serialVersionUID = -1;

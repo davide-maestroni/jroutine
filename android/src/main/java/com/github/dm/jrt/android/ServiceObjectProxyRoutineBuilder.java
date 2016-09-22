@@ -37,6 +37,7 @@ import org.jetbrains.annotations.Nullable;
  * <p>
  * Created by davide-maestroni on 03/06/2016.
  */
+@SuppressWarnings("WeakerAccess")
 public interface ServiceObjectProxyRoutineBuilder
     extends ObjectProxyRoutineBuilder, ServiceObjectRoutineBuilder {
 

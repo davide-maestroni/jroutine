@@ -162,7 +162,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     mOutputQueue = new NestedQueue<Object>() {
 
       @Override
-      public void close() {
+      void close() {
         // Preventing closing
       }
     };
@@ -208,7 +208,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     mOutputQueue = new NestedQueue<Object>() {
 
       @Override
-      public void close() {
+      void close() {
         // Preventing closing
       }
     };

@@ -88,6 +88,7 @@ public class JRoutineServiceObject {
   /**
    * Context based builder of Service routine builders.
    */
+  @SuppressWarnings("WeakerAccess")
   public static class ServiceObjectBuilder {
 
     private final ServiceContext mContext;

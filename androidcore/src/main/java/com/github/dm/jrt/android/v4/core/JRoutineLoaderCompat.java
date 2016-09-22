@@ -152,6 +152,7 @@ public class JRoutineLoaderCompat {
   /**
    * Context based builder of Loader routine builders.
    */
+  @SuppressWarnings("WeakerAccess")
   public static class LoaderBuilderCompat {
 
     private final LoaderContextCompat mContext;

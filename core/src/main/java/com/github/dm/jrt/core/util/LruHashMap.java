@@ -31,6 +31,7 @@ import java.util.Map.Entry;
  * @param <K> the key type.
  * @param <V> the value type.
  */
+@SuppressWarnings("WeakerAccess")
 public class LruHashMap<K, V> extends LinkedHashMap<K, V> {
 
   private static final int DEFAULT_INITIAL_CAPACITY = 16;

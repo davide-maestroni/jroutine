@@ -76,6 +76,7 @@ import static com.github.dm.jrt.core.util.Reflection.newInstanceOf;
  * <p>
  * Created by davide-maestroni on 03/23/2015.
  */
+@SuppressWarnings("WeakerAccess")
 public class Builders {
 
   private static final int DEFAULT_CAPACITY = 16;

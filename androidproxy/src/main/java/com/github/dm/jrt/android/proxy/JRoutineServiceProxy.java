@@ -61,6 +61,7 @@ public class JRoutineServiceProxy {
   /**
    * Context based builder of Service routine builders.
    */
+  @SuppressWarnings("WeakerAccess")
   public static class ServiceProxyBuilder {
 
     private final ServiceContext mContext;

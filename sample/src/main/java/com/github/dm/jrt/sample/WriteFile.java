@@ -35,6 +35,7 @@ import java.io.IOException;
  * <p>
  * Created by davide-maestroni on 10/17/2014.
  */
+@SuppressWarnings("WeakerAccess")
 public class WriteFile extends TemplateInvocation<ByteBuffer, Boolean> {
 
   private final File mFile;

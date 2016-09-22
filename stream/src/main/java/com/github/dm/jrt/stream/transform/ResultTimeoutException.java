@@ -25,6 +25,7 @@ import org.jetbrains.annotations.Nullable;
  * <p>
  * Created by davide-maestroni on 07/28/2016.
  */
+@SuppressWarnings("WeakerAccess")
 public class ResultTimeoutException extends TimeoutException {
 
   /**

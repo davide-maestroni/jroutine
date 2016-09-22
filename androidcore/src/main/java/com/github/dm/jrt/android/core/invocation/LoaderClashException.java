@@ -21,6 +21,7 @@ package com.github.dm.jrt.android.core.invocation;
  * <p>
  * Created by davide-maestroni on 06/28/2016.
  */
+@SuppressWarnings("WeakerAccess")
 public class LoaderClashException extends LoaderInvocationException {
 
   /**

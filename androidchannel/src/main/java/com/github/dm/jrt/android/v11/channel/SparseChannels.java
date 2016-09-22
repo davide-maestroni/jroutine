@@ -35,6 +35,7 @@ import java.util.Map;
  * <p>
  * Created by davide-maestroni on 08/03/2015.
  */
+@SuppressWarnings("WeakerAccess")
 public class SparseChannels extends AndroidChannels {
 
   /**

@@ -43,6 +43,7 @@ import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
  * <p>
  * Created by davide-maestroni on 03/06/2016.
  */
+@SuppressWarnings("WeakerAccess")
 public class JRoutineAndroid extends SparseChannels {
 
   /**

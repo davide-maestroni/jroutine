@@ -327,7 +327,7 @@ public abstract class TargetInvocationFactory<IN, OUT> extends DeepEqualObject
    * @param <IN>  the input data type.
    * @param <OUT> the output data type.
    */
-  @SuppressWarnings("unused")
+  @SuppressWarnings({"unused", "WeakerAccess"})
   private static class TargetInvocationWrapper<IN, OUT> extends ContextInvocationWrapper<IN, OUT> {
 
     /**

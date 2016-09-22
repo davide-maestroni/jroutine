@@ -60,6 +60,7 @@ import java.util.concurrent.TimeUnit;
  * <p>
  * Created by davide-maestroni on 06/13/2016.
  */
+@SuppressWarnings("WeakerAccess")
 public class Operators {
 
   private static final BiConsumer<? extends Collection<?>, ?> sCollectConsumer =
@@ -70,9 +71,11 @@ public class Operators {
         }
       };
 
+  @SuppressWarnings("unchecked")
   private static final InvocationFactory<?, ?> sMax =
       BinaryOperatorInvocation.functionFactory(BiFunctionDecorator.max());
 
+  @SuppressWarnings("unchecked")
   private static final InvocationFactory<?, ?> sMin =
       BinaryOperatorInvocation.functionFactory(BiFunctionDecorator.min());
 

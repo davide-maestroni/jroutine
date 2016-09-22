@@ -42,6 +42,7 @@ import static com.github.dm.jrt.core.util.UnitDuration.zero;
  * <p>
  * Created by davide-maestroni on 10/17/2014.
  */
+@SuppressWarnings("WeakerAccess")
 public class Downloader {
 
   private static final Runner sReadRunner = Runners.poolRunner();

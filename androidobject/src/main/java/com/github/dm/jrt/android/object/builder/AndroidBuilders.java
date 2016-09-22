@@ -42,6 +42,7 @@ import java.lang.reflect.Method;
  * <p>
  * Created by davide-maestroni on 01/29/2016.
  */
+@SuppressWarnings("WeakerAccess")
 public class AndroidBuilders {
 
   /**

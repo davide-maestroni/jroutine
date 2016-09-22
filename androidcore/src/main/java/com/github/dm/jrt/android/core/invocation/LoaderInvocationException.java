@@ -24,6 +24,7 @@ import com.github.dm.jrt.core.error.RoutineException;
  * <p>
  * Created by davide-maestroni on 06/03/2015.
  */
+@SuppressWarnings("WeakerAccess")
 public class LoaderInvocationException extends RoutineException {
 
   private final int mId;

@@ -57,6 +57,7 @@ import static com.github.dm.jrt.function.FunctionDecorator.decorate;
  * <p>
  * Created by davide-maestroni on 07/04/2016.
  */
+@SuppressWarnings("WeakerAccess")
 public class JRoutineLoaderStreamCompat {
 
   /**

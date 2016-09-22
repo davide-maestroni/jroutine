@@ -62,7 +62,3 @@ javadoc {
             "${prefix}/function/",
             "${prefix}/operator/")
 }
-
-tasks.withType(FindBugs) {
-    excludeFilter = file('findbugs.xml')
-}

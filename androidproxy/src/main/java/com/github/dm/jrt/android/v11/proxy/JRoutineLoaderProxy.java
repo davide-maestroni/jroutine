@@ -66,6 +66,7 @@ public class JRoutineLoaderProxy {
   /**
    * Context based builder of Loader proxy routine builders.
    */
+  @SuppressWarnings("WeakerAccess")
   public static class LoaderProxyBuilder {
 
     private final LoaderContext mContext;

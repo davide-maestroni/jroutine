@@ -54,6 +54,7 @@ import retrofit2.Retrofit;
  * <p>
  * Created by davide-maestroni on 05/18/2016.
  */
+@SuppressWarnings("WeakerAccess")
 public class LoaderAdapterFactory extends ContextAdapterFactory {
 
   private final LoaderConfiguration mLoaderConfiguration;

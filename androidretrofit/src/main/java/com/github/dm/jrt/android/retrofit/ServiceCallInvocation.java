@@ -52,6 +52,7 @@ import static com.github.dm.jrt.core.util.UnitDuration.infinity;
  * <p>
  * Created by davide-maestroni on 05/17/2016.
  */
+@SuppressWarnings("WeakerAccess")
 public class ServiceCallInvocation
     extends TemplateContextInvocation<ParcelableSelectable<Object>, ParcelableSelectable<Object>> {
 

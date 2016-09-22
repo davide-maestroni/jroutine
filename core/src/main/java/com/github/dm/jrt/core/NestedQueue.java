@@ -64,7 +64,7 @@ class NestedQueue<E> {
    * @param element the element to add.
    * @throws java.lang.IllegalStateException if the queue has been already closed.
    */
-  public void add(@Nullable final E element) {
+  void add(@Nullable final E element) {
     checkOpen();
     mQueue.add(element);
   }
@@ -77,7 +77,7 @@ class NestedQueue<E> {
    * @param elements the element iterable.
    * @throws java.lang.IllegalStateException if the queue has been already closed.
    */
-  public void addAll(@NotNull final Iterable<? extends E> elements) {
+  void addAll(@NotNull final Iterable<? extends E> elements) {
     checkOpen();
     mQueue.addAll(elements);
   }
@@ -89,7 +89,7 @@ class NestedQueue<E> {
    * @throws java.lang.IllegalStateException if the queue has been already closed.
    */
   @NotNull
-  public NestedQueue<E> addNested() {
+  NestedQueue<E> addNested() {
     checkOpen();
     final InnerNestedQueue<E> queue = new InnerNestedQueue<E>();
     mQueue.add(queue);
@@ -100,7 +100,7 @@ class NestedQueue<E> {
   /**
    * Clears the queue.
    */
-  public void clear() {
+  void clear() {
     mQueue.clear();
   }
 
@@ -110,7 +110,7 @@ class NestedQueue<E> {
    * After the method returns no further additions can be made to this queue. Though, elements can
    * be safely removed.
    */
-  public void close() {
+  void close() {
     mClosed = true;
   }
 
@@ -119,7 +119,7 @@ class NestedQueue<E> {
    *
    * @return whether the queue is empty.
    */
-  public boolean isEmpty() {
+  boolean isEmpty() {
     return mQueueManager.isEmpty();
   }
 
@@ -129,7 +129,7 @@ class NestedQueue<E> {
    * @return the element.
    * @throws java.util.NoSuchElementException if the queue is empty.
    */
-  public E removeFirst() {
+  E removeFirst() {
     return mQueueManager.removeFirst();
   }
 
@@ -138,7 +138,7 @@ class NestedQueue<E> {
    *
    * @param collection the collection to fill.
    */
-  public void transferTo(@NotNull final Collection<? super E> collection) {
+  void transferTo(@NotNull final Collection<? super E> collection) {
     mQueueManager.transferTo(collection);
   }
 
@@ -147,7 +147,7 @@ class NestedQueue<E> {
    *
    * @param other the queue to fill.
    */
-  public void transferTo(@NotNull final SimpleQueue<? super E> other) {
+  void transferTo(@NotNull final SimpleQueue<? super E> other) {
     mQueueManager.transferTo(other);
   }
 

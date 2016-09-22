@@ -257,7 +257,7 @@ public class InvocationService extends Service {
    * @throws java.lang.Exception if an unexpected error occurs.
    */
   @NotNull
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "RedundantCast"})
   public ContextInvocationFactory<?, ?> getInvocationFactory(
       @NotNull final Class<? extends ContextInvocation<?, ?>> targetClass,
       @Nullable final Object... args) throws Exception {

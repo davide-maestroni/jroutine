@@ -59,6 +59,7 @@ import static com.github.dm.jrt.core.util.UnitDuration.fromUnit;
  * <p>
  * Created by davide-maestroni on 07/03/2015.
  */
+@SuppressWarnings("WeakerAccess")
 public final class ChannelConfiguration extends DeepEqualObject {
 
   /**

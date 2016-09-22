@@ -97,6 +97,7 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * <p>
  * Created by davide-maestroni on 08/18/2016.
  */
+@SuppressWarnings("WeakerAccess")
 public class ServiceRoutineMethod extends RoutineMethod
     implements ServiceConfigurable<ServiceRoutineMethod> {
 

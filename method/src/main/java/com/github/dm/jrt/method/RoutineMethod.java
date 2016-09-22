@@ -398,6 +398,7 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * <p>
  * Created by davide-maestroni on 08/10/2016.
  */
+@SuppressWarnings("WeakerAccess")
 public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
 
   private final Object[] mArgs;

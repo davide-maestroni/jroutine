@@ -44,6 +44,7 @@ import static com.github.dm.jrt.function.Functions.decorate;
  * <p>
  * Created by davide-maestroni on 07/06/2016.
  */
+@SuppressWarnings("WeakerAccess")
 public class Transformations {
 
   /**

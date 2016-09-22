@@ -64,6 +64,7 @@ import static com.github.dm.jrt.function.Functions.supplierFactory;
  * <p>
  * Created by davide-maestroni on 03/06/2016.
  */
+@SuppressWarnings("WeakerAccess")
 public class LoaderBuilder {
 
   private final LoaderContext mContext;

@@ -32,6 +32,7 @@ import retrofit2.http.Path;
  * <p>
  * Created by davide-maestroni on 03/25/2016.
  */
+@SuppressWarnings("unused")
 public interface GitHubService {
 
   @CacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)

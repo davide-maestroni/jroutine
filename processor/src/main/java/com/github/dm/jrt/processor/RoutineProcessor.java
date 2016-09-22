@@ -93,6 +93,7 @@ import javax.tools.JavaFileObject;
  * <p>
  * Created by davide-maestroni on 11/03/2014.
  */
+@SuppressWarnings("WeakerAccess")
 public class RoutineProcessor extends AbstractProcessor {
 
   protected static final String NEW_LINE = System.getProperty("line.separator");

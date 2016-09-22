@@ -62,6 +62,7 @@ public class JRoutineLoaderProxyCompat {
   /**
    * Context based builder of Loader proxy routine builders.
    */
+  @SuppressWarnings("WeakerAccess")
   public static class LoaderProxyBuilderCompat {
 
     private final LoaderContextCompat mContext;

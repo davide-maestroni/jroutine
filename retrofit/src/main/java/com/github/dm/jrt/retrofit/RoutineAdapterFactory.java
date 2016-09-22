@@ -37,6 +37,7 @@ import retrofit2.CallAdapter;
  * <p>
  * Created by davide-maestroni on 03/26/2016.
  */
+@SuppressWarnings("WeakerAccess")
 public class RoutineAdapterFactory extends AbstractAdapterFactory {
 
   private static final RoutineAdapterFactory sFactory =

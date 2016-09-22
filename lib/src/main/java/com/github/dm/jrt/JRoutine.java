@@ -58,6 +58,7 @@ import static com.github.dm.jrt.object.InvocationTarget.instance;
  * <p>
  * Created by davide-maestroni on 02/29/2016.
  */
+@SuppressWarnings("WeakerAccess")
 public class JRoutine extends Channels {
 
   /**

@@ -37,6 +37,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
+@SuppressWarnings("WeakerAccess")
 public class FunctionDecorator<IN, OUT> extends DeepEqualObject
     implements Function<IN, OUT>, Decorator {
 

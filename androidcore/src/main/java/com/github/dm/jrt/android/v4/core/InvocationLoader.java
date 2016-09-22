@@ -82,16 +82,6 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
     mLogger = logger.subContextLogger(this);
   }
 
-  /**
-   * Checks if the Loader inputs are equal to the specified ones.
-   *
-   * @param inputs the input data.
-   * @return whether the inputs are equal.
-   */
-  public boolean areSameInputs(@Nullable final List<? extends IN> inputs) {
-    return mInputs.equals(inputs);
-  }
-
   @Override
   public void deliverResult(final InvocationResult<OUT> data) {
     mLogger.dbg("delivering result: %s", data);
@@ -146,6 +136,16 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
                 .call(mInputs)
                 .bind(consumer);
     return consumer.createResult();
+  }
+
+  /**
+   * Checks if the Loader inputs are equal to the specified ones.
+   *
+   * @param inputs the input data.
+   * @return whether the inputs are equal.
+   */
+  boolean areSameInputs(@Nullable final List<? extends IN> inputs) {
+    return mInputs.equals(inputs);
   }
 
   /**

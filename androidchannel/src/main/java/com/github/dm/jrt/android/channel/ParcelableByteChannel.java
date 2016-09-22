@@ -76,6 +76,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * <p>
  * Created by davide-maestroni on 09/03/2015.
  */
+@SuppressWarnings("WeakerAccess")
 public class ParcelableByteChannel {
 
   private final ByteChannel mByteChannel;

@@ -28,6 +28,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <OUT> the output data type.
  */
+@SuppressWarnings("WeakerAccess")
 public class ChannelConsumerBuilder<OUT> implements ChannelConsumer<OUT> {
 
   private final ActionDecorator mOnComplete;

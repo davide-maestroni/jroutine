@@ -34,6 +34,7 @@ import java.net.URLConnection;
  * <p>
  * Created by davide-maestroni on 10/17/2014.
  */
+@SuppressWarnings("WeakerAccess")
 public class ReadConnection extends MappingInvocation<URI, ByteBuffer> {
 
   private static final int MAX_CHUNK_SIZE = 2048;

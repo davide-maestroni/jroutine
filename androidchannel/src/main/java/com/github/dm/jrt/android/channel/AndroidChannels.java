@@ -30,6 +30,7 @@ import java.util.Arrays;
  * <p>
  * Created by davide-maestroni on 06/18/2015.
  */
+@SuppressWarnings("WeakerAccess")
 public class AndroidChannels extends Channels {
 
   /**

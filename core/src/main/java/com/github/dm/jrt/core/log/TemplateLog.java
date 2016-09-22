@@ -36,6 +36,7 @@ import java.util.Locale;
  * <p>
  * Created by davide-maestroni on 10/03/2014.
  */
+@SuppressWarnings("WeakerAccess")
 public abstract class TemplateLog implements Log {
 
   private static final String DATE_FORMAT = "MM/dd HH:mm:ss.SSS z";

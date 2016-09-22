@@ -35,6 +35,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * @param <IN2> the second input data type.
  * @param <OUT> the output data type.
  */
+@SuppressWarnings("WeakerAccess")
 public class BiFunctionDecorator<IN1, IN2, OUT> extends DeepEqualObject
     implements BiFunction<IN1, IN2, OUT>, Decorator {
 

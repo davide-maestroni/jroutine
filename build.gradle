@@ -40,7 +40,8 @@ task clean(type: Delete) {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.14.1'
+    gradleVersion = project.getProperty('gradleVersion')
+    distributionType = Wrapper.DistributionType.ALL
 }
 
 gradle.projectsEvaluated {

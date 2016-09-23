@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.core;
 
-import com.github.dm.jrt.core.builder.TemplateRoutineBuilder;
+import com.github.dm.jrt.core.builder.AbstractRoutineBuilder;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -31,7 +31,7 @@ import org.jetbrains.annotations.NotNull;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class DefaultRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OUT> {
+class DefaultRoutineBuilder<IN, OUT> extends AbstractRoutineBuilder<IN, OUT> {
 
   private final InvocationFactory<IN, OUT> mFactory;
 

@@ -112,7 +112,6 @@ import org.jetbrains.annotations.NotNull;
  *
  *             &#64;Override
  *             public void onContext(&#64;Nonnull final Context context) {
- *                 super.onContext(context);
  *                 mRoutine = JRoutineService.on(serviceFrom(context))
  *                                           .with(factoryOf(LoadResourceUri.class))
  *                                           .buildRoutine();

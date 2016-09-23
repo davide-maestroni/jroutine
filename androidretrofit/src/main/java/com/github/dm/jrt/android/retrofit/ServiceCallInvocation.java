@@ -20,7 +20,7 @@ import com.github.dm.jrt.android.channel.AndroidChannels;
 import com.github.dm.jrt.android.channel.ParcelableByteChannel;
 import com.github.dm.jrt.android.channel.ParcelableByteChannel.ParcelableByteBuffer;
 import com.github.dm.jrt.android.channel.ParcelableSelectable;
-import com.github.dm.jrt.android.core.invocation.TemplateContextInvocation;
+import com.github.dm.jrt.android.core.invocation.AbstractContextInvocation;
 import com.github.dm.jrt.android.object.ContextInvocationTarget;
 import com.github.dm.jrt.channel.ByteChannel.BufferOutputStream;
 import com.github.dm.jrt.core.JRoutineCore;
@@ -54,7 +54,7 @@ import static com.github.dm.jrt.core.util.UnitDuration.infinity;
  */
 @SuppressWarnings("WeakerAccess")
 public class ServiceCallInvocation
-    extends TemplateContextInvocation<ParcelableSelectable<Object>, ParcelableSelectable<Object>> {
+    extends AbstractContextInvocation<ParcelableSelectable<Object>, ParcelableSelectable<Object>> {
 
   /**
    * The index of the selectable channel dedicated to the transfer of request and response body

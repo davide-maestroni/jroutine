@@ -20,7 +20,7 @@ import com.github.dm.jrt.android.core.builder.LoaderRoutineBuilder;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.core.routine.LoaderRoutine;
-import com.github.dm.jrt.core.builder.TemplateRoutineBuilder;
+import com.github.dm.jrt.core.builder.AbstractRoutineBuilder;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
 import com.github.dm.jrt.core.runner.Runner;
@@ -41,7 +41,7 @@ import static com.github.dm.jrt.core.runner.Runners.zeroDelayRunner;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class DefaultLoaderRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OUT>
+class DefaultLoaderRoutineBuilder<IN, OUT> extends AbstractRoutineBuilder<IN, OUT>
     implements LoaderRoutineBuilder<IN, OUT> {
 
   private final LoaderContextCompat mContext;

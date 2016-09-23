@@ -245,7 +245,7 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
     }
   }
 
-  public static class ContextTest extends TemplateContextInvocation<Object, Object> {
+  public static class ContextTest extends AbstractContextInvocation<Object, Object> {
 
     @Override
     public void onComplete(@NotNull final Channel<Object, ?> result) {

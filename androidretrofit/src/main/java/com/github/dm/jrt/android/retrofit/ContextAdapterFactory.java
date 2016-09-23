@@ -47,13 +47,28 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 public abstract class ContextAdapterFactory extends AbstractAdapterFactory {
 
+  private static final TemplateContextInvocation<Call<Object>, Object> sCallInvocation =
+      new TemplateContextInvocation<Call<Object>, Object>() {
+
+        public void onInput(final Call<Object> input,
+            @NotNull final Channel<Object, ?> result) throws IOException {
+          final Response<Object> response = input.execute();
+          if (response.isSuccessful()) {
+            result.pass(response.body());
+
+          } else {
+            result.abort(new ErrorResponseException(response));
+          }
+        }
+      };
+
   private static final ContextInvocationFactory<Call<Object>, Object> sCallInvocationFactory =
       new ContextInvocationFactory<Call<Object>, Object>(null) {
 
         @NotNull
         @Override
         public ContextInvocation<Call<Object>, Object> newInvocation() {
-          return new CallInvocation();
+          return sCallInvocation;
         }
       };
 
@@ -139,7 +154,7 @@ public abstract class ContextAdapterFactory extends AbstractAdapterFactory {
   private static class BodyAdapterInvocationFactory
       extends ContextInvocationFactory<Call<Object>, Object> {
 
-    private final TemplateContextInvocation<Call<Object>, Object> mInvocation;
+    private final BodyAdapterInvocation mInvocation;
 
     /**
      * Constructor.
@@ -157,24 +172,6 @@ public abstract class ContextAdapterFactory extends AbstractAdapterFactory {
     @Override
     public ContextInvocation<Call<Object>, Object> newInvocation() {
       return mInvocation;
-    }
-  }
-
-  /**
-   * Invocation implementation handling a Retrofit call.
-   */
-  private static class CallInvocation extends TemplateContextInvocation<Call<Object>, Object> {
-
-    @Override
-    public void onInput(final Call<Object> input, @NotNull final Channel<Object, ?> result) throws
-        IOException {
-      final Response<Object> response = input.execute();
-      if (response.isSuccessful()) {
-        result.pass(response.body());
-
-      } else {
-        result.abort(new ErrorResponseException(response));
-      }
     }
   }
 
@@ -207,7 +204,7 @@ public abstract class ContextAdapterFactory extends AbstractAdapterFactory {
   private static class ChannelAdapterInvocationFactory
       extends ContextInvocationFactory<Call<Object>, Object> {
 
-    private final TemplateContextInvocation<Call<Object>, Object> mInvocation;
+    private final ChannelAdapterInvocation mInvocation;
 
     /**
      * Constructor.

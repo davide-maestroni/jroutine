@@ -18,24 +18,32 @@ package com.github.dm.jrt.android.core.invocation;
 
 import android.content.Context;
 
-import com.github.dm.jrt.core.invocation.TemplateInvocation;
-
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Empty abstract implementation of a Context invocation.
+ * Base abstract implementation of a Context invocation.
  * <p>
- * This class is useful to avoid the need of implementing all the methods defined in the interface.
- * <p>
- * Created by davide-maestroni on 09/23/2016.
+ * Created by davide-maestroni on 01/08/2015.
  *
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-public abstract class TemplateContextInvocation<IN, OUT> extends TemplateInvocation<IN, OUT>
-    implements ContextInvocation<IN, OUT> {
+public abstract class AbstractContextInvocation<IN, OUT>
+    extends TemplateContextInvocation<IN, OUT> {
+
+  private Context mContext;
 
   @Override
   public void onContext(@NotNull final Context context) throws Exception {
+    mContext = context;
+  }
+
+  /**
+   * Returns this invocation Context.
+   *
+   * @return the Context of this invocation.
+   */
+  protected Context getContext() {
+    return mContext;
   }
 }

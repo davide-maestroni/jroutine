@@ -25,17 +25,14 @@ import com.github.dm.jrt.core.util.ConstantConditions;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Empty abstract implementation of a routine builder.
- * <p>
- * This class is useful to avoid the need of implementing some of the methods defined in the
- * interface.
+ * Base abstract implementation of a routine builder.
  * <p>
  * Created by davide-maestroni on 03/16/2015.
  *
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-public abstract class TemplateRoutineBuilder<IN, OUT> extends TemplateRoutine<IN, OUT>
+public abstract class AbstractRoutineBuilder<IN, OUT> extends TemplateRoutine<IN, OUT>
     implements RoutineBuilder<IN, OUT> {
 
   private InvocationConfiguration mConfiguration = InvocationConfiguration.defaultConfiguration();

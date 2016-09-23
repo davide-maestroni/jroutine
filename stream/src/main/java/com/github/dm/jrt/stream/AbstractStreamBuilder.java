@@ -17,8 +17,8 @@
 package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.core.ChannelInvocation;
+import com.github.dm.jrt.core.builder.AbstractRoutineBuilder;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
-import com.github.dm.jrt.core.builder.TemplateRoutineBuilder;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
@@ -63,7 +63,7 @@ import static com.github.dm.jrt.function.Functions.functionMapping;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-public abstract class AbstractStreamBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OUT>
+public abstract class AbstractStreamBuilder<IN, OUT> extends AbstractRoutineBuilder<IN, OUT>
     implements StreamBuilder<IN, OUT> {
 
   private FunctionDecorator<? extends Channel<?, ?>, ? extends Channel<?, ?>> mBindingFunction;

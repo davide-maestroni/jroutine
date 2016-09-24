@@ -238,6 +238,7 @@ public class ServiceCallInvocation
     }
 
     @Override
+    @SuppressWarnings("ThrowFromFinallyBlock")
     public void writeTo(final BufferedSink sink) throws IOException {
       final OutputStream outputStream = sink.outputStream();
       try {

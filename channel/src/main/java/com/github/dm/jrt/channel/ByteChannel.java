@@ -260,13 +260,15 @@ public class ByteChannel {
     public abstract int available();
 
     @Override
-    public abstract void close();
+    public void close() {
+    }
 
     @Override
     public abstract void mark(int readLimit);
 
     @Override
-    public abstract void reset();
+    public void reset() {
+    }
 
     /**
      * Reads all the bytes returned by the input stream and writes them into the specified
@@ -356,6 +358,7 @@ public class ByteChannel {
      *                             end of file, or if the input stream has been closed, or if
      *                             some other I/O error occurs.
      */
+    @SuppressWarnings("ThrowFromFinallyBlock")
     public long transferFrom(@NotNull final InputStream in) throws IOException {
       try {
         return writeAll(in);
@@ -407,10 +410,12 @@ public class ByteChannel {
     }
 
     @Override
-    public abstract void flush();
+    public void flush() {
+    }
 
     @Override
-    public abstract void close();
+    public void close() {
+    }
   }
 
   /**

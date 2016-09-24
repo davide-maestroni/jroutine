@@ -1,0 +1,284 @@
+<!--
+  ~ Copyright 2016 Davide Maestroni
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<html>
+<head>
+    <title>jroutine-android</title>
+</head>
+<body>
+<a href="https://github.com/davide-maestroni/jroutine" target="_blank">Parallel programming on the go.</a>
+<h1>Overview</h1>
+<p>
+    Android platform customization of the <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/core" target="_blank">jroutine-core</a> library.
+</p>
+<p>
+    This module provides the implementation of routines enabling asynchronous invocations inside dedicated Android Services and Loaders.<br>
+    The classes employ the very same concepts and interfaces of the JRoutine core library, so that it is possible to combine together Android specific and Java thread based routines.
+</p>
+<h2>Main concepts</h2>
+<ul>
+    <li>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-core/com/github/dm/jrt/android/core/invocation/ContextInvocation.html">ContextInvocation</a>
+        <p>
+            Interface representing an Android Context aware <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/core/com/github/dm/jrt/core/invocation/Invocation.html">Invocation</a>.
+        </p>
+    </li>
+    <li>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-core/com/github/dm/jrt/android/core/invocation/ContextInvocationFactory.html">ContextInvocationFactory</a>
+        <p>
+            A factory is needed to dynamically instantiate new Context invocation objects. In fact, the same routine can be invoked several times on different threads, and, each time, an invocation instance will be required to process the input data.
+            Invocation factories might be used to identify the invocation type, for this reason the constructor parameters (which should always be immutable or effectively so) are required to be passed to the base class.
+        </p>
+    </li>
+    <li>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-core/com/github/dm/jrt/android/core/routine/LoaderRoutine.html">LoaderRoutine</a>
+        <p>
+            A Loader routine object enables the execution of invocations inside a Loader instance.
+        </p>
+    </li>
+    <li>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-core/com/github/dm/jrt/android/core/builder/LoaderRoutineBuilder.html">LoaderRoutineBuilder</a>
+        <p>
+            Each Loader routine instance needs an invocation factory and a specific configuration, so routine builders provide a convenient way to set the required options.
+            The invocation factory and the inputs are automatically employed compute the specific Loader ID.
+            By design builders are not synchronized since the same instance is not meant to be used from different threads.
+        </p>
+    </li>
+    <li>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-core/com/github/dm/jrt/android/core/invocation/TargetInvocationFactory.html">TargetInvocationFactory</a>
+        <p>
+            A target invocation factory is meant to describe a factory of invocations to be used by an Android Service to build and run new invocations.
+        </p>
+    </li>
+    <li>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-core/com/github/dm/jrt/android/core/builder/ServiceRoutineBuilder.html">ServiceRoutineBuilder</a>
+        <p>
+            Routine instances running in a dedicated Service can be built through specifically configured routine builder.
+            Each Service routine instance needs a target invocation factory and a specific configuration, so routine builders provide a convenient way to set the required options.
+            By design builders are not synchronized since the same instance is not meant to be used from different threads.
+        </p>
+    </li>
+</ul>
+<h2>Main classes</h2>
+<ul>
+    <li>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-core/com/github/dm/jrt/android/core/log/AndroidLogs.html">AndroidLogs</a>
+        <p>
+            Utility class acting as a factory of log instances.
+        </p>
+    </li>
+    <li>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-core/com/github/dm/jrt/android/core/runner/AndroidRunners.html">AndroidRunners</a>
+        <p>
+            Utility class acting as a factory of runner instances.
+        </p>
+    </li>
+    <li>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-core/com/github/dm/jrt/android/v11/core/LoaderContext.html">LoaderContext</a>
+        <p>
+            A Loader context instance is meant to describe an Android Context to be used with Loader instances.
+        </p>
+    </li>
+    <li>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-core/com/github/dm/jrt/android/v11/core/JRoutineLoader.html">JRoutineLoader</a>
+        <p>
+            Utility class acting as a factory of Loader routine and channel builders.
+        </p>
+    </li>
+    <li>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-core/com/github/dm/jrt/android/v4/core/LoaderContextCompat.html">LoaderContextCompat</a>
+        <p>
+            A Loader context instance is meant to describe an Android Context to be used with Loader instances.
+            This class is specifically meant to employ the Android Support library for retro-compatibility.
+        </p>
+    </li>
+    <li>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-core/com/github/dm/jrt/android/v4/core/JRoutineLoaderCompat.html">JRoutineLoaderCompat</a>
+        <p>
+            Utility class acting as a factory of Loader routine and channel builders.
+            This class is specifically meant to employ the Android Support library for retro-compatibility.
+        </p>
+    </li>
+    <li>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-core/com/github/dm/jrt/android/core/ServiceContext.html">ServiceContext</a>
+        <p>
+            A Service context instance is meant to describe an Android Context to be used with Service instances.
+        </p>
+    </li>
+    <li>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-core/com/github/dm/jrt/android/core/JRoutineService.html">JRoutineService</a>
+        <p>
+            Utility class acting as a factory of Service routine builders.
+        </p>
+    </li>
+</ul>
+<h2>Dependencies</h2>
+<p>
+    Below a full list of the included modules:
+</p>
+<ul>
+    <li><a href="http://davide-maestroni.github.io/jroutine/javadoc/6/core" target="_blank">jroutine-core</a> &mdash; core routine and channel classes</li>
+</ul>
+<h2>Usage examples</h2>
+<p>
+    The code below shows how it is possible to load an image from the network in a background thread, by letting the library automatically handle any change in the configuration.<br>
+    Note that the very same examples can be re-written using JRoutineLoaderCompat class and a FragmentActivity.
+</p>
+<b>Example 1:</b> simple approach.
+<p>
+    Note that this approach is fairly naive, since it lets the framework retain the instance of the downloaded bitmap.<br>
+    A smarter implementation would involve the use of a dedicated cache.
+</p>
+<pre>
+    <code>
+        public class MainActivity extends Activity {
+
+            private static final String IMAGE_URI = "http://...";
+
+            &commat;Override
+            protected void onCreate(final Bundle savedInstanceState) {
+                super.onCreate(savedInstanceState);
+                setContentView(R.layout.main_layout);
+                final ImageView imageView = (ImageView) findViewById(R.id.image);
+                JRoutineLoader.on(loaderFrom(this))
+                              .with(factoryOf(LoadBitmap.class))
+                              .applyLoaderConfiguration()
+                              .withCacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
+                              .configured()
+                              .call(URI.create(IMAGE_URI))
+                              .bind(new TemplateChannelConsumer&lt;Bitmap&gt;() {
+
+                                  &commat;Override
+                                  public void onError(&commat;NotNull final RoutineException error) {
+                                      final Throwable cause = error.getCause();
+                                      Toast.makeText(MainTestActivity.this, (cause != null) ?
+                                              cause.getMessage() : "Cannot load image",
+                                              Toast.LENGTH_LONG).show();
+                                  }
+
+                                  &commat;Override
+                                  public void onOutput(final Bitmap bitmap) {
+                                      imageView.setImageBitmap(bitmap);
+                                  }
+                              });
+            }
+
+            public static class LoadBitmap extends TemplateContextInvocation&lt;URI, Bitmap&gt; {
+
+                &commat;Override
+                public void onInput(final URI uri, &commat;NotNull final Channel&lt;Bitmap, ?&gt; result) throws
+                        Exception {
+                    final URLConnection urlConnection = uri.toURL().openConnection();
+                    final InputStream inputStream = urlConnection.getInputStream();
+                    try {
+                        final Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                        if (bitmap != null) {
+                            result.pass(bitmap);
+
+                        } else {
+                            result.abort();
+                        }
+
+                    } finally {
+                        inputStream.close();
+                    }
+                }
+            }
+        }
+    </code>
+</pre>
+<b>Example 2:</b> load in a Service.
+<p>
+    The above example can be slightly modified to make the real loading happen in a dedicated Service.<br>
+    Note that the Service might even run in a separate process, since the Bitmap class implements the Parcelable interface. However, keep in mind that, depending on the specific image size, the amount of serialized data might exceed the parcel limits.
+</p>
+<pre>
+    <code>
+        public class MainActivity extends Activity {
+
+            private static final String IMAGE_URI = "http://...";
+
+            &commat;Override
+            protected void onCreate(final Bundle savedInstanceState) {
+                super.onCreate(savedInstanceState);
+                setContentView(R.layout.main_layout);
+                final ImageView imageView = (ImageView) findViewById(R.id.image);
+                JRoutineLoader.on(loaderFrom(this))
+                              .with(factoryOf(LoadBitmapFromService.class))
+                              .applyLoaderConfiguration()
+                              .withCacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
+                              .configured()
+                              .call(URI.create(IMAGE_URI))
+                              .bind(new TemplateChannelConsumer&lt;Bitmap&gt;() {
+
+                                  &commat;Override
+                                  public void onError(&commat;NotNull final RoutineException error) {
+                                      final Throwable cause = error.getCause();
+                                      Toast.makeText(MainTestActivity.this, (cause != null) ?
+                                              cause.getMessage() : "Cannot load image",
+                                              Toast.LENGTH_LONG).show();
+                                  }
+
+                                  &commat;Override
+                                  public void onOutput(final Bitmap bitmap) {
+                                      imageView.setImageBitmap(bitmap);
+                                  }
+                              });
+            }
+
+            public static class LoadBitmap extends TemplateContextInvocation&lt;URI, Bitmap&gt; {
+
+                &commat;Override
+                public void onInput(final URI uri, &commat;NotNull final Channel&lt;Bitmap, ?&gt; result) throws
+                        Exception {
+                    final URLConnection urlConnection = uri.toURL().openConnection();
+                    final InputStream inputStream = urlConnection.getInputStream();
+                    try {
+                        final Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                        if (bitmap != null) {
+                            result.pass(bitmap);
+
+                        } else {
+                            result.abort();
+                        }
+
+                    } finally {
+                       inputStream.close();
+                    }
+                }
+            }
+
+            public static class LoadBitmapFromService extends TemplateContextInvocation&lt;URI, Bitmap&gt; {
+
+                private Routine&lt;URI, Bitmap&gt; mRoutine;
+
+                &commat;Override
+                public void onContext(&commat;NotNull final Context context) {
+                    mRoutine = JRoutineService.on(serviceFrom(context))
+                                              .with(TargetInvocationFactory.factoryOf(LoadBitmap.class))
+                                              .buildRoutine();
+                }
+
+                &commat;Override
+                public void onInput(final URI uri, &commat;NotNull final Channel&lt;Bitmap, ?&gt; result) {
+                    result.pass(mRoutine.call(uri));
+                }
+            }
+        }
+    </code>
+</pre>
+</body>
+</html>

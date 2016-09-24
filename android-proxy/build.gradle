@@ -17,6 +17,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'jacoco'
 apply plugin: 'findbugs'
+apply plugin: 'com.neenbedankt.android-apt'
 apply plugin: 'com.github.ben-manes.versions'
 apply from: '../extra.gradle'
 
@@ -67,17 +68,17 @@ android {
 
 dependencies {
     androidTestCompile 'com.squareup.assertj:assertj-android:1.1.1'
+    apt project(':android-processor')
     compile 'com.android.support:support-v4:23.2.1'
 }
 
 conditionalDependencies {
-    compile name: 'android-channel', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
     compile name: 'android-core', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
-    compile name: 'android-method', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
     compile name: 'android-object', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
-    compile name: 'android-proxy', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
-    compile name: 'android-stream', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
-    compile name: 'lib', artifact: { it.parent.name }, version: '6.0.0'
+    compile name: 'android-processor', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
+    compile name: 'core', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
+    compile name: 'object', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
+    compile name: 'proxy', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
 }
 
 jacoco {
@@ -91,19 +92,11 @@ findbugs {
 tasks.withType(Javadoc) {
     def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/6'
     options.overview("${project.projectDir}/docs/overview.html")
-    options.links("${prefix}/android-channel/",
-            "${prefix}/android-core/",
-            "${prefix}/android-method/",
+    options.links("${prefix}/android-core/",
             "${prefix}/android-object/",
-            "${prefix}/android-proxy/",
-            "${prefix}/android-stream/",
-            "${prefix}/channel/",
+            "${prefix}/android-processor/",
             "${prefix}/core/",
-            "${prefix}/function/",
-            "${prefix}/lib/",
-            "${prefix}/method/",
             "${prefix}/object/",
-            "${prefix}/operator/",
-            "${prefix}/proxy/",
-            "${prefix}/stream/")
+            "${prefix}/processor/",
+            "${prefix}/proxy/")
 }

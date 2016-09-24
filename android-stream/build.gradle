@@ -56,16 +56,13 @@ android {
         preDexLibraries false
     }
 
-    packagingOptions {
-        exclude 'META-INF/services/javax.annotation.processing.Processor'
-    }
-
     lintOptions {
         disable 'MissingRegistered'
     }
 }
 
 dependencies {
+    androidTestCompile project(':operator')
     androidTestCompile 'com.squareup.assertj:assertj-android:1.1.1'
     compile 'com.android.support:support-v4:23.2.1'
 }
@@ -73,11 +70,10 @@ dependencies {
 conditionalDependencies {
     compile name: 'android-channel', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
     compile name: 'android-core', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
-    compile name: 'android-method', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
-    compile name: 'android-object', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
-    compile name: 'android-proxy', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
-    compile name: 'android-stream', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
-    compile name: 'lib', artifact: { it.parent.name }, version: '6.0.0'
+    compile name: 'channel', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
+    compile name: 'core', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
+    compile name: 'function', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
+    compile name: 'stream', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
 }
 
 jacoco {
@@ -93,17 +89,8 @@ tasks.withType(Javadoc) {
     options.overview("${project.projectDir}/docs/overview.html")
     options.links("${prefix}/android-channel/",
             "${prefix}/android-core/",
-            "${prefix}/android-method/",
-            "${prefix}/android-object/",
-            "${prefix}/android-proxy/",
-            "${prefix}/android-stream/",
             "${prefix}/channel/",
             "${prefix}/core/",
             "${prefix}/function/",
-            "${prefix}/lib/",
-            "${prefix}/method/",
-            "${prefix}/object/",
-            "${prefix}/operator/",
-            "${prefix}/proxy/",
             "${prefix}/stream/")
 }

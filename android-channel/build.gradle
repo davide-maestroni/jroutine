@@ -56,10 +56,6 @@ android {
         preDexLibraries false
     }
 
-    packagingOptions {
-        exclude 'META-INF/services/javax.annotation.processing.Processor'
-    }
-
     lintOptions {
         disable 'MissingRegistered'
     }
@@ -71,13 +67,9 @@ dependencies {
 }
 
 conditionalDependencies {
-    compile name: 'android-channel', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
     compile name: 'android-core', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
-    compile name: 'android-method', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
-    compile name: 'android-object', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
-    compile name: 'android-proxy', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
-    compile name: 'android-stream', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
-    compile name: 'lib', artifact: { it.parent.name }, version: '6.0.0'
+    compile name: 'channel', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
+    compile name: 'core', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
 }
 
 jacoco {
@@ -91,19 +83,7 @@ findbugs {
 tasks.withType(Javadoc) {
     def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/6'
     options.overview("${project.projectDir}/docs/overview.html")
-    options.links("${prefix}/android-channel/",
-            "${prefix}/android-core/",
-            "${prefix}/android-method/",
-            "${prefix}/android-object/",
-            "${prefix}/android-proxy/",
-            "${prefix}/android-stream/",
+    options.links("${prefix}/android-core/",
             "${prefix}/channel/",
-            "${prefix}/core/",
-            "${prefix}/function/",
-            "${prefix}/lib/",
-            "${prefix}/method/",
-            "${prefix}/object/",
-            "${prefix}/operator/",
-            "${prefix}/proxy/",
-            "${prefix}/stream/")
+            "${prefix}/core/")
 }

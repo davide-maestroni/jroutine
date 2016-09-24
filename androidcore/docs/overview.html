@@ -267,7 +267,6 @@
 
                 &commat;Override
                 public void onContext(&commat;NotNull final Context context) {
-                    super.onContext(context);
                     mRoutine = JRoutineService.on(serviceFrom(context))
                                               .with(TargetInvocationFactory.factoryOf(LoadBitmap.class))
                                               .buildRoutine();

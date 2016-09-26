@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.object.annotation;
 
-import com.github.dm.jrt.core.util.Backoff;
+import com.github.dm.jrt.core.common.Backoff;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -31,12 +31,12 @@ import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
 
+import static com.github.dm.jrt.core.common.BackoffBuilder.afterCount;
+import static com.github.dm.jrt.core.common.BackoffBuilder.noDelay;
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builder;
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builderFrom;
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builderFromInput;
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builderFromOutput;
-import static com.github.dm.jrt.core.util.BackoffBuilder.afterCount;
-import static com.github.dm.jrt.core.util.BackoffBuilder.noDelay;
 import static com.github.dm.jrt.core.util.UnitDuration.millis;
 import static com.github.dm.jrt.core.util.UnitDuration.zero;
 import static org.assertj.core.api.Assertions.assertThat;

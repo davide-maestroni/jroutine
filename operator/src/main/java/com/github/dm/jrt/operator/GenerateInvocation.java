@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.operator;
 
-import com.github.dm.jrt.core.error.RoutineException;
+import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 

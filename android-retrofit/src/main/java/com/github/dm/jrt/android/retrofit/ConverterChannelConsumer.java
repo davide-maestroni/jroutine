@@ -21,7 +21,7 @@ import com.github.dm.jrt.android.channel.ParcelableByteChannel.ParcelableByteBuf
 import com.github.dm.jrt.android.channel.ParcelableSelectable;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ChannelConsumer;
-import com.github.dm.jrt.core.error.RoutineException;
+import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.util.ConstantConditions;

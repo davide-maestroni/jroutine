@@ -29,10 +29,10 @@ import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
 
+import static com.github.dm.jrt.core.common.BackoffBuilder.afterCount;
+import static com.github.dm.jrt.core.common.BackoffBuilder.noDelay;
 import static com.github.dm.jrt.core.config.ChannelConfiguration.builder;
 import static com.github.dm.jrt.core.config.ChannelConfiguration.builderFrom;
-import static com.github.dm.jrt.core.util.BackoffBuilder.afterCount;
-import static com.github.dm.jrt.core.util.BackoffBuilder.noDelay;
 import static com.github.dm.jrt.core.util.UnitDuration.millis;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static com.github.dm.jrt.core.util.UnitDuration.zero;

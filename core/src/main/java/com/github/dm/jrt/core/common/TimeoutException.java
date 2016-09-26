@@ -14,26 +14,23 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.core.util;
+package com.github.dm.jrt.core.common;
+
+import org.jetbrains.annotations.Nullable;
 
 /**
- * Interface defining a backoff policy returning a delay in milliseconds.
- * <br>
- * The implementation should be stateless and rely only on the passed count to compute the delay.
- * In fact, the implementing class is likely to be called from different threads and with unrelated
- * count numbers.
+ * Exception indicating that a timeout occurred.
  * <p>
- * Created by davide-maestroni on 05/09/2016.
+ * Created by davide-maestroni on 11/25/2014.
  */
-public interface Backoff {
-
-  int NO_DELAY = -1;
+public class TimeoutException extends RoutineException {
 
   /**
-   * Gets the delay for the specified count.
+   * Constructor.
    *
-   * @param count the count (it must be positive).
-   * @return the delay in milliseconds.
+   * @param message the error message.
    */
-  long getDelay(int count);
+  public TimeoutException(@Nullable final String message) {
+    super(message);
+  }
 }

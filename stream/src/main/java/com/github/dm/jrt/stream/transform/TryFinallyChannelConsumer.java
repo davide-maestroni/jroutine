@@ -18,7 +18,7 @@ package com.github.dm.jrt.stream.transform;
 
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ChannelConsumer;
-import com.github.dm.jrt.core.error.RoutineException;
+import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.Action;
 

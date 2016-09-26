@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.android.core.invocation;
 
-import com.github.dm.jrt.core.error.RoutineException;
+import com.github.dm.jrt.core.common.RoutineException;
 
 /**
  * Base exception indicating that an unrecoverable error occurred during a Loader invocation

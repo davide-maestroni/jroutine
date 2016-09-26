@@ -19,7 +19,7 @@ package com.github.dm.jrt.sample;
 import com.github.dm.jrt.channel.ByteChannel;
 import com.github.dm.jrt.channel.ByteChannel.ByteBuffer;
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.error.RoutineException;
+import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
 
 import org.jetbrains.annotations.NotNull;

@@ -20,7 +20,7 @@ import com.github.dm.jrt.channel.Channels;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ChannelConsumer;
-import com.github.dm.jrt.core.error.RoutineException;
+import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.Consumer;

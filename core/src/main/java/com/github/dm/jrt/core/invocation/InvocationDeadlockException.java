@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.core.invocation;
 
-import com.github.dm.jrt.core.error.DeadlockException;
+import com.github.dm.jrt.core.common.DeadlockException;
 
 import org.jetbrains.annotations.Nullable;
 

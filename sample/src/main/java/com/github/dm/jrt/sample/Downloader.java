@@ -32,8 +32,8 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import static com.github.dm.jrt.core.common.BackoffBuilder.afterCount;
 import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
-import static com.github.dm.jrt.core.util.BackoffBuilder.afterCount;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static com.github.dm.jrt.core.util.UnitDuration.zero;
 

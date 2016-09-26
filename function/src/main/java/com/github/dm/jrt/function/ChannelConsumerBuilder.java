@@ -17,7 +17,7 @@
 package com.github.dm.jrt.function;
 
 import com.github.dm.jrt.core.channel.ChannelConsumer;
-import com.github.dm.jrt.core.error.RoutineException;
+import com.github.dm.jrt.core.common.RoutineException;
 
 import org.jetbrains.annotations.NotNull;
 

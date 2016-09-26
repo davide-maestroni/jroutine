@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.stream.transform;
 
-import com.github.dm.jrt.core.error.TimeoutException;
+import com.github.dm.jrt.core.common.TimeoutException;
 
 import org.jetbrains.annotations.Nullable;
 

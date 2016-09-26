@@ -1,10 +1,13 @@
 package com.github.dm.jrt.core.util;
 
+import com.github.dm.jrt.core.common.Backoff;
+import com.github.dm.jrt.core.common.BackoffBuilder;
+
 import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
 
-import static com.github.dm.jrt.core.util.Backoff.NO_DELAY;
+import static com.github.dm.jrt.core.common.Backoff.NO_DELAY;
 import static com.github.dm.jrt.core.util.UnitDuration.millis;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;

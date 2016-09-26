@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.core.util;
+package com.github.dm.jrt.core.common;
+
+import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.core.util.DeepEqualObject;
 
 import org.jetbrains.annotations.NotNull;
 

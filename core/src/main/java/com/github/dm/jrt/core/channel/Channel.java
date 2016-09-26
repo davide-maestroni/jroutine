@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.core.channel;
 
-import com.github.dm.jrt.core.error.RoutineException;
+import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.util.UnitDuration;
 
 import org.jetbrains.annotations.NotNull;
@@ -63,7 +63,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
    * causing the specified throwable to be passed as the abortion reason.
    * <br>
    * The throwable, unless it extends the base
-   * {@link com.github.dm.jrt.core.error.RoutineException RoutineException}, will be wrapped as
+   * {@link com.github.dm.jrt.core.common.RoutineException RoutineException}, will be wrapped as
    * the cause of an {@link com.github.dm.jrt.core.channel.AbortException AbortException}
    * instance.
    * <br>
@@ -95,8 +95,8 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
    * @param delay    the delay value.
    * @param timeUnit the delay time unit.
    * @return this channel.
-   * @throws com.github.dm.jrt.core.error.RoutineException if the execution has been aborted.
-   * @throws java.lang.IllegalArgumentException            if the specified delay is negative.
+   * @throws com.github.dm.jrt.core.common.RoutineException if the execution has been aborted.
+   * @throws java.lang.IllegalArgumentException             if the specified delay is negative.
    */
   @NotNull
   Channel<IN, OUT> after(long delay, @NotNull TimeUnit timeUnit);
@@ -115,7 +115,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
    *
    * @param delay the delay.
    * @return this channel.
-   * @throws com.github.dm.jrt.core.error.RoutineException if the execution has been aborted.
+   * @throws com.github.dm.jrt.core.common.RoutineException if the execution has been aborted.
    */
   @NotNull
   Channel<IN, OUT> after(@NotNull UnitDuration delay);
@@ -131,7 +131,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
    * @throws com.github.dm.jrt.core.channel.OutputTimeoutException if the channel is set to throw
    *                                                               an exception when the timeout
    *                                                               elapses.
-   * @throws com.github.dm.jrt.core.error.RoutineException         if the execution has been
+   * @throws com.github.dm.jrt.core.common.RoutineException        if the execution has been
    *                                                               aborted.
    * @throws java.lang.IllegalStateException                       if this channel is already
    *                                                               bound to a consumer or another
@@ -159,7 +159,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
    * @throws com.github.dm.jrt.core.channel.OutputTimeoutException if the channel is set to throw
    *                                                               an exception when the timeout
    *                                                               elapses.
-   * @throws com.github.dm.jrt.core.error.RoutineException         if the execution has been
+   * @throws com.github.dm.jrt.core.common.RoutineException        if the execution has been
    *                                                               aborted.
    * @throws java.lang.IllegalStateException                       if this channel is already
    *                                                               bound to a consumer or another
@@ -379,7 +379,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
    * @throws com.github.dm.jrt.core.channel.OutputTimeoutException if the channel is set to throw
    *                                                               an exception when the timeout
    *                                                               elapses.
-   * @throws com.github.dm.jrt.core.error.RoutineException         if the execution has been
+   * @throws com.github.dm.jrt.core.common.RoutineException        if the execution has been
    *                                                               aborted.
    * @throws java.lang.IllegalStateException                       if this channel is already
    *                                                               bound to a consumer or another
@@ -404,7 +404,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
    * @throws com.github.dm.jrt.core.channel.OutputTimeoutException if the channel is set to throw
    *                                                               an exception when the timeout
    *                                                               elapses.
-   * @throws com.github.dm.jrt.core.error.RoutineException         if the execution has been
+   * @throws com.github.dm.jrt.core.common.RoutineException        if the execution has been
    *                                                               aborted.
    * @throws java.lang.IllegalStateException                       if this channel is already
    *                                                               bound to a consumer or another
@@ -465,7 +465,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
    * @throws com.github.dm.jrt.core.channel.OutputTimeoutException if the channel is set to throw
    *                                                               an exception when the timeout
    *                                                               elapses.
-   * @throws com.github.dm.jrt.core.error.RoutineException         if the execution has been
+   * @throws com.github.dm.jrt.core.common.RoutineException        if the execution has been
    *                                                               aborted.
    * @throws java.lang.IllegalStateException                       if this channel is already
    *                                                               bound to a consumer or another
@@ -495,7 +495,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
    * @throws com.github.dm.jrt.core.channel.OutputTimeoutException if the channel is set to throw
    *                                                               an exception when the timeout
    *                                                               elapses.
-   * @throws com.github.dm.jrt.core.error.RoutineException         if the execution has been
+   * @throws com.github.dm.jrt.core.common.RoutineException        if the execution has been
    *                                                               aborted.
    * @throws java.lang.IllegalStateException                       if this channel is already
    *                                                               bound to a consumer or another
@@ -546,8 +546,8 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
    *
    * @param channel the channel.
    * @return this channel.
-   * @throws com.github.dm.jrt.core.error.RoutineException if the execution has been aborted.
-   * @throws java.lang.IllegalStateException               if this channel is already closed.
+   * @throws com.github.dm.jrt.core.common.RoutineException if the execution has been aborted.
+   * @throws java.lang.IllegalStateException                if this channel is already closed.
    * @see #after(UnitDuration)
    * @see #after(long, TimeUnit)
    * @see #now()
@@ -563,8 +563,8 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
    *
    * @param inputs the iterable returning the input data.
    * @return this channel.
-   * @throws com.github.dm.jrt.core.error.RoutineException if the execution has been aborted.
-   * @throws java.lang.IllegalStateException               if this channel is already closed.
+   * @throws com.github.dm.jrt.core.common.RoutineException if the execution has been aborted.
+   * @throws java.lang.IllegalStateException                if this channel is already closed.
    * @see #after(UnitDuration)
    * @see #after(long, TimeUnit)
    * @see #now()
@@ -580,8 +580,8 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
    *
    * @param input the input.
    * @return this channel.
-   * @throws com.github.dm.jrt.core.error.RoutineException if the execution has been aborted.
-   * @throws java.lang.IllegalStateException               if this channel is already closed.
+   * @throws com.github.dm.jrt.core.common.RoutineException if the execution has been aborted.
+   * @throws java.lang.IllegalStateException                if this channel is already closed.
    * @see #after(UnitDuration)
    * @see #after(long, TimeUnit)
    * @see #now()
@@ -597,8 +597,8 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
    *
    * @param inputs the input data.
    * @return this channel.
-   * @throws com.github.dm.jrt.core.error.RoutineException if the execution has been aborted.
-   * @throws java.lang.IllegalStateException               if this channel is already closed.
+   * @throws com.github.dm.jrt.core.common.RoutineException if the execution has been aborted.
+   * @throws java.lang.IllegalStateException                if this channel is already closed.
    * @see #after(UnitDuration)
    * @see #after(long, TimeUnit)
    * @see #now()
@@ -624,7 +624,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
    * @throws com.github.dm.jrt.core.channel.OutputTimeoutException if the channel is set to throw
    *                                                               an exception when the timeout
    *                                                               elapses.
-   * @throws com.github.dm.jrt.core.error.RoutineException         if the execution has been
+   * @throws com.github.dm.jrt.core.common.RoutineException        if the execution has been
    *                                                               aborted.
    * @throws java.lang.IllegalStateException                       if this channel is already
    *                                                               bound to a consumer or another
@@ -650,7 +650,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
    * threads will not interfere with each others.
    *
    * @return this channel.
-   * @throws com.github.dm.jrt.core.error.RoutineException if the execution has been aborted.
+   * @throws com.github.dm.jrt.core.common.RoutineException if the execution has been aborted.
    * @see #unsorted()
    */
   @NotNull
@@ -663,7 +663,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
    * Note that this method invocation will block the calling thread until the routine invocation
    * completes or is aborted, or the timeout elapses.
    *
-   * @throws com.github.dm.jrt.core.error.RoutineException if the execution has been aborted.
+   * @throws com.github.dm.jrt.core.common.RoutineException if the execution has been aborted.
    * @see #after(UnitDuration)
    * @see #after(long, TimeUnit)
    * @see #now()
@@ -683,7 +683,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
    * threads will not interfere with each others.
    *
    * @return this channel.
-   * @throws com.github.dm.jrt.core.error.RoutineException if the execution has been aborted.
+   * @throws com.github.dm.jrt.core.common.RoutineException if the execution has been aborted.
    * @see #sorted()
    */
   @NotNull

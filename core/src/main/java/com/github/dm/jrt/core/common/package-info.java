@@ -14,23 +14,9 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.core.error;
-
-import org.jetbrains.annotations.Nullable;
-
 /**
- * Exception indicating a possible deadlock.
+ * Common classes and definitions.
  * <p>
- * Created by davide-maestroni on 06/18/2015.
+ * Created by davide-maestroni on 01/30/2016.
  */
-public class DeadlockException extends RoutineException {
-
-  /**
-   * Constructor.
-   *
-   * @param message the error message.
-   */
-  public DeadlockException(@Nullable final String message) {
-    super(message);
-  }
-}
+package com.github.dm.jrt.core.common;

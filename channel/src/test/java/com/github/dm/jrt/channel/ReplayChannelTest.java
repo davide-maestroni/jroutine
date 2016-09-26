@@ -20,8 +20,8 @@ import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.TemplateChannelConsumer;
-import com.github.dm.jrt.core.error.RoutineException;
-import com.github.dm.jrt.core.error.TimeoutException;
+import com.github.dm.jrt.core.common.RoutineException;
+import com.github.dm.jrt.core.common.TimeoutException;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
 
 import org.jetbrains.annotations.NotNull;

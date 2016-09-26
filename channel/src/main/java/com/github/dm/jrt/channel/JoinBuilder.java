@@ -4,10 +4,10 @@ import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.channel.OutputDeadlockException;
+import com.github.dm.jrt.core.common.Backoff;
+import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
-import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
-import com.github.dm.jrt.core.util.Backoff;
 import com.github.dm.jrt.core.util.SimpleQueue;
 import com.github.dm.jrt.core.util.UnitDuration;
 

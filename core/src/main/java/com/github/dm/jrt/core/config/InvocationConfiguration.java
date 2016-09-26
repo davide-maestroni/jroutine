@@ -16,13 +16,13 @@
 
 package com.github.dm.jrt.core.config;
 
+import com.github.dm.jrt.core.common.Backoff;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.ChannelConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.log.Log;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.runner.Runner;
-import com.github.dm.jrt.core.util.Backoff;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.core.util.UnitDuration;
@@ -62,7 +62,7 @@ import static com.github.dm.jrt.core.util.UnitDuration.fromUnit;
  * <li>The backoff policy to be applied to the calling thread when the buffered input data exceed
  * the specified limit.</li>
  * <li>The maximum number of input data buffered in the invocation channel. When the number of data
- * exceeds it, a {@link com.github.dm.jrt.core.error.DeadlockException DeadlockException} will be
+ * exceeds it, a {@link com.github.dm.jrt.core.common.DeadlockException DeadlockException} will be
  * thrown.</li>
  * <li>The order in which data are dispatched through the result channel. The order of input data is
  * not guaranteed. Nevertheless, it is possible to force data to be delivered in the same order as
@@ -71,7 +71,7 @@ import static com.github.dm.jrt.core.util.UnitDuration.fromUnit;
  * <li>The backoff policy to be applied to the calling thread when the buffered output data exceed
  * the specified limit.</li>
  * <li>The maximum number of output data buffered in the result channel. When the number of data
- * exceeds it, a {@link com.github.dm.jrt.core.error.DeadlockException DeadlockException} will be
+ * exceeds it, a {@link com.github.dm.jrt.core.common.DeadlockException DeadlockException} will be
  * thrown.</li>
  * <li>The maximum timeout while waiting for a new output to be available before performing the
  * specified action.</li>

@@ -70,8 +70,8 @@ import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory
 import static com.github.dm.jrt.android.object.ContextInvocationTarget.classOfType;
 import static com.github.dm.jrt.android.object.ContextInvocationTarget.instanceOf;
 import static com.github.dm.jrt.android.v4.core.LoaderContextCompat.loaderFrom;
+import static com.github.dm.jrt.core.common.BackoffBuilder.afterCount;
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builder;
-import static com.github.dm.jrt.core.util.BackoffBuilder.afterCount;
 import static com.github.dm.jrt.core.util.UnitDuration.infinity;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;

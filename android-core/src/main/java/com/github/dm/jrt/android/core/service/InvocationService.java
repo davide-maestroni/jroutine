@@ -31,9 +31,9 @@ import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.core.AbstractRoutine;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ChannelConsumer;
+import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
-import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.log.Log;
@@ -685,9 +685,9 @@ public class InvocationService extends Service {
     /**
      * Binds the specified consumer to the channel.
      *
-     * @throws com.github.dm.jrt.core.error.RoutineException if the execution has been aborted.
-     * @throws java.lang.IllegalStateException               if the channel is already closed
-     *                                                       or already bound to a consumer.
+     * @throws com.github.dm.jrt.core.common.RoutineException if the execution has been aborted.
+     * @throws java.lang.IllegalStateException                if the channel is already closed
+     *                                                        or already bound to a consumer.
      */
     void bind(@NotNull final ChannelConsumer<Object> consumer) {
       mChannel.bind(consumer);
@@ -704,8 +704,8 @@ public class InvocationService extends Service {
      * Passes the specified input to the invocation channel.
      *
      * @param input the input.
-     * @throws com.github.dm.jrt.core.error.RoutineException if the execution has been aborted.
-     * @throws java.lang.IllegalStateException               if the channel is already closed.
+     * @throws com.github.dm.jrt.core.common.RoutineException if the execution has been aborted.
+     * @throws java.lang.IllegalStateException                if the channel is already closed.
      */
     void pass(@Nullable final Object input) {
       mChannel.pass(input);

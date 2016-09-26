@@ -25,7 +25,7 @@ import android.widget.Toast;
 
 import com.github.dm.jrt.android.v4.retrofit.LoaderAdapterFactoryCompat;
 import com.github.dm.jrt.core.channel.TemplateChannelConsumer;
-import com.github.dm.jrt.core.error.RoutineException;
+import com.github.dm.jrt.core.common.RoutineException;
 
 import org.jetbrains.annotations.NotNull;
 

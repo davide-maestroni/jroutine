@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.stream.builder;
 
-import com.github.dm.jrt.core.error.RoutineException;
+import com.github.dm.jrt.core.common.RoutineException;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -41,7 +41,7 @@ public class StreamBuildingException extends RoutineException {
    * Wraps the specified throwable.
    * <br>
    * If the cause is an instance of
-   * {@link com.github.dm.jrt.core.error.RoutineException RoutineException}, its cause will be
+   * {@link com.github.dm.jrt.core.common.RoutineException RoutineException}, its cause will be
    * wrapped instead.
    *
    * @param cause the throwable to wrap.

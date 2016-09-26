@@ -68,6 +68,10 @@ import java.lang.annotation.Target;
  * (unless immutable) in protected and non-protected code, or to call synchronous methods through
  * routines as well.
  * <p>
+ * Finally, be aware that a method might need to be made accessible in order to be called. That
+ * means that, in case a {@link java.lang.SecurityManager} is installed, a security exception might
+ * be raised based on the specific policy implemented.
+ * <p>
  * Remember also that, in order for the annotation to properly work at run time, the following rules
  * must be added to the project Proguard file (if employed for shrinking or obfuscation):
  * <pre>

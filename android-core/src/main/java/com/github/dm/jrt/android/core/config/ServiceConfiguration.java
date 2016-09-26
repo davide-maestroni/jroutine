@@ -40,7 +40,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * It must declare a default constructor to be correctly instantiated.</li>
  * <li>The class of the logger to be employed by the invocations executed in the configured Service.
  * It must declare a default constructor to be correctly instantiated.</li>
- * <li>The looper to employ to deliver the Service messages (by default the main thread one). Note
+ * <li>The Looper to employ to deliver the Service messages (by default the main thread one). Note
  * that, in any case, the outputs will be collected through the configured runner.</li>
  * </ul>
  * <p>
@@ -65,7 +65,7 @@ public final class ServiceConfiguration extends DeepEqualObject {
   /**
    * Constructor.
    *
-   * @param looper      the looper instance.
+   * @param looper      the Looper instance.
    * @param runnerClass the runner class.
    * @param runnerArgs  the runner constructor args.
    * @param logClass    the log class.
@@ -153,10 +153,10 @@ public final class ServiceConfiguration extends DeepEqualObject {
   }
 
   /**
-   * Returns the looper used for dispatching the messages from the Service (null by default).
+   * Returns the Looper used for dispatching the messages from the Service (null by default).
    *
    * @param valueIfNotSet the default value if none was set.
-   * @return the looper instance.
+   * @return the Looper instance.
    */
   public Looper getMessageLooperOrElse(@Nullable final Looper valueIfNotSet) {
     final Looper looper = mLooper;
@@ -322,10 +322,10 @@ public final class ServiceConfiguration extends DeepEqualObject {
     }
 
     /**
-     * Sets the looper on which the messages from the Service are dispatched. A null value means
+     * Sets the Looper on which the messages from the Service are dispatched. A null value means
      * that messages will be dispatched on the main thread (as by default).
      *
-     * @param looper the looper instance.
+     * @param looper the Looper instance.
      * @return this builder.
      */
     @NotNull

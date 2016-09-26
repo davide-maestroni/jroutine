@@ -25,6 +25,10 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Interface defining an invocation aware of the specific Android Context.
  * <p>
+ * The class {@link com.github.dm.jrt.android.core.invocation.TemplateContextInvocation
+ * TemplateContextInvocation} provides an abstract empty implementation of the Context invocation
+ * interface.
+ * <p>
  * Created by davide-maestroni on 01/08/2015.
  *
  * @param <IN>  the input data type.

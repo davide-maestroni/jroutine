@@ -24,12 +24,11 @@ import com.github.dm.jrt.core.util.ConstantConditions;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Utility class extending the base one in order to support additional routine builders specific to
- * the Android platform.
+ * Utility class supporting the creation of routine builders specific to the Android platform.
  * <br>
  * Routine invocations created through the returned builders can be safely restored after a change
  * in the configuration, so to avoid duplicated calls and memory leaks. Be aware, though, that the
- * invocation results will be dispatched on the configured looper thread, no matter the calling one
+ * invocation results will be dispatched on the configured Looper thread, no matter the calling one
  * was, so that, waiting for the outputs right after the routine invocation, may result in a
  * deadlock.
  * <br>
@@ -64,7 +63,7 @@ import org.jetbrains.annotations.NotNull;
  * <p>
  * Note however that, since the method might be invoked outside the calling context, it is not
  * possible to pass along the actual instance, but just the information needed to get or instantiate
- * it inside the Loader instance.
+ * it inside the Loader.
  * <p>
  * Created by davide-maestroni on 12/08/2014.
  *
@@ -115,7 +114,7 @@ public class JRoutineLoaderObjectCompat {
      * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
      * application Context.
      * <p>
-     * Note that the built routine results will be always dispatched on the configured looper
+     * Note that the built routine results will be always dispatched on the configured Looper
      * thread, thus waiting for the outputs immediately after its invocation may result in a
      * deadlock.
      * <br>

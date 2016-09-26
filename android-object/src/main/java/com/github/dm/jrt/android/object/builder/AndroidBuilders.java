@@ -37,7 +37,7 @@ import java.lang.reflect.Method;
 /**
  * Utility class providing helper methods used to implement a builder of routines.
  * <br>
- * Specifically, this class provided several utilities to manage routines used to call object
+ * Specifically, this class provides several utilities to manage routines used to call object
  * methods asynchronously.
  * <p>
  * Created by davide-maestroni on 01/29/2016.

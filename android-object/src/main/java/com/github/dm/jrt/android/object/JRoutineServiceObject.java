@@ -23,15 +23,14 @@ import com.github.dm.jrt.core.util.ConstantConditions;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Utility class extending the base one in order to support additional routine builders specific to
- * the Android platform.
+ * Utility class supporting the creation of routine builders specific to the Android platform.
  * <br>
  * Routine invocations created through the returned builder will be executed inside a Service
  * specified by the Service context. Be aware, though, that the invocation results will be
- * dispatched into the configured looper, so that, waiting for the outputs on the very same looper
+ * dispatched into the configured Looper, so that, waiting for the outputs on the very same Looper
  * thread, immediately after its invocation, will result in a deadlock.
  * <br>
- * By default output results are dispatched in the main looper.
+ * By default output results are dispatched in the main Looper.
  * <br>
  * Note that the configuration of the maximum number of concurrent invocations will not be shared
  * among synchronous and asynchronous invocations, but the invocations created inside the Service
@@ -110,9 +109,9 @@ public class JRoutineServiceObject {
      * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
      * invocation Service.
      * <p>
-     * Note that the built routine results will be dispatched into the configured looper, thus,
-     * waiting for the outputs on the very same looper thread, immediately after its invocation,
-     * will result in a deadlock. By default output results are dispatched in the main looper.
+     * Note that the built routine results will be dispatched into the configured Looper, thus,
+     * waiting for the outputs on the very same Looper thread, immediately after its invocation,
+     * will result in a deadlock. By default output results are dispatched in the main Looper.
      *
      * @param target the invocation target.
      * @return the routine builder instance.

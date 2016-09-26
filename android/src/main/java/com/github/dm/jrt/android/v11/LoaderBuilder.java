@@ -274,7 +274,7 @@ public class LoaderBuilder {
    * In order to prevent undesired leaks, the class of the specified factory must have a static
    * scope.
    * <p>
-   * Note that the built routine results will be always dispatched on the configured looper thread,
+   * Note that the built routine results will be always dispatched on the configured Looper thread,
    * thus waiting for the outputs immediately after its invocation may result in a deadlock.
    * <br>
    * Note also that the input data passed to the invocation channel will be cached, and the
@@ -302,7 +302,7 @@ public class LoaderBuilder {
    * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
    * application Context.
    * <p>
-   * Note that the built routine results will be always dispatched on the configured looper thread,
+   * Note that the built routine results will be always dispatched on the configured Looper thread,
    * thus waiting for the outputs immediately after its invocation may result in a deadlock.
    *
    * @param target the invocation target.
@@ -319,7 +319,7 @@ public class LoaderBuilder {
    * In order to prevent undesired leaks, the class of the specified factory must have a static
    * scope.
    * <p>
-   * Note that the built routine results will be always dispatched on the configured looper thread,
+   * Note that the built routine results will be always dispatched on the configured Looper thread,
    * thus waiting for the outputs immediately after its invocation may result in a deadlock.
    * <br>
    * Note also that the input data passed to the invocation channel will be cached, and the
@@ -381,7 +381,7 @@ public class LoaderBuilder {
    * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
    * application Context.
    * <p>
-   * Note that the built routine results will be always dispatched on the configured looper thread,
+   * Note that the built routine results will be always dispatched on the configured Looper thread,
    * thus waiting for the outputs immediately after its invocation may result in a deadlock.
    *
    * @param targetClass the invocation target class.
@@ -484,7 +484,7 @@ public class LoaderBuilder {
    * {@link com.github.dm.jrt.android.core.invocation.MissingLoaderException
    * MissingLoaderException}.
    * <p>
-   * Note that the built routine results will be always dispatched on the configured looper thread,
+   * Note that the built routine results will be always dispatched on the configured Looper thread,
    * thus waiting for the outputs immediately after its invocation may result in a deadlock.
    *
    * @param loaderId the Loader ID.
@@ -503,7 +503,7 @@ public class LoaderBuilder {
    * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
    * application Context.
    * <p>
-   * Note that the built routine results will be always dispatched on the configured looper thread,
+   * Note that the built routine results will be always dispatched on the configured Looper thread,
    * thus waiting for the outputs immediately after its invocation may result in a deadlock.
    *
    * @param targetClass the class of the invocation target.
@@ -522,7 +522,7 @@ public class LoaderBuilder {
    * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
    * application Context.
    * <p>
-   * Note that the built routine results will be always dispatched on the configured looper thread,
+   * Note that the built routine results will be always dispatched on the configured Looper thread,
    * thus waiting for the outputs immediately after its invocation may result in a deadlock.
    *
    * @param targetClass the class of the invocation target.

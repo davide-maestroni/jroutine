@@ -22,8 +22,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Through this annotation it is possible to set a specific Loader ID for a single method
- * invocations.
+ * Through this annotation it is possible to set a specific Loader ID for the invocations of a
+ * specific method.
  * <p>
  * This annotation is used to decorate methods that are to be invoked in an asynchronous way.
  * <br>

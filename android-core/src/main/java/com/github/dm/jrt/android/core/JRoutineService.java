@@ -25,8 +25,7 @@ import com.github.dm.jrt.core.util.ConstantConditions;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Utility class extending the base one in order to support additional routine builders specific to
- * the Android platform.
+ * Utility class supporting the creation of routine builders specific to the Android platform.
  * <br>
  * Routine invocations created through the returned builder will be executed inside a Service
  * specified by the Service context.
@@ -50,7 +49,6 @@ import org.jetbrains.annotations.NotNull;
  *
  *         &#64;Override
  *         protected void onCreate(final Bundle savedInstanceState) {
- *
  *             super.onCreate(savedInstanceState);
  *             setContentView(R.layout.my_activity_layout);
  *             final Routine&lt;URI, MyResource&gt; routine =
@@ -120,9 +118,9 @@ public class JRoutineService {
      * {@link com.github.dm.jrt.android.core.service.InvocationService#getInvocationFactory(
      *Class, Object...) getInvocationFactory(Class, Object...)} of the routine Service.
      * <p>
-     * Note that the built routine results will be dispatched into the configured looper, thus,
-     * waiting for the outputs on the very same looper thread, immediately after its invocation,
-     * will result in a deadlock. By default output results are dispatched in the main looper.
+     * Note that the built routine results will be dispatched into the configured Looper, thus,
+     * waiting for the outputs on the very same Looper thread, immediately after its invocation,
+     * will result in a deadlock. By default output results are dispatched in the main Looper.
      *
      * @param target the invocation target.
      * @param <IN>   the input data type.

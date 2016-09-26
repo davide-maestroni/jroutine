@@ -184,9 +184,9 @@ public class ServiceBuilder {
    * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the routine
    * Service.
    * <p>
-   * Note that the built routine results will be dispatched into the configured looper, thus,
-   * waiting for the outputs on the very same looper thread, immediately after its invocation,
-   * will result in a deadlock. By default output results are dispatched in the main looper.
+   * Note that the built routine results will be dispatched into the configured Looper, thus,
+   * waiting for the outputs on the very same Looper thread, immediately after its invocation,
+   * will result in a deadlock. By default output results are dispatched in the main Looper.
    * <br>
    * Note also that the invocation input data will be cached, and the results will be produced
    * only after the invocation channel is closed, so be sure to avoid streaming inputs in order to
@@ -207,9 +207,9 @@ public class ServiceBuilder {
    * {@link com.github.dm.jrt.android.core.service.InvocationService#getInvocationFactory(
    *Class, Object...) getInvocationFactory(Class, Object...)} of the routine Service.
    * <p>
-   * Note that the built routine results will be dispatched into the configured looper, thus,
-   * waiting for the outputs on the very same looper thread, immediately after its invocation,
-   * will result in a deadlock. By default output results are dispatched in the main looper.
+   * Note that the built routine results will be dispatched into the configured Looper, thus,
+   * waiting for the outputs on the very same Looper thread, immediately after its invocation,
+   * will result in a deadlock. By default output results are dispatched in the main Looper.
    *
    * @param target the invocation target.
    * @param <IN>   the input data type.
@@ -229,7 +229,7 @@ public class ServiceBuilder {
    * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the routine
    * Service.
    * <p>
-   * Note that the built routine results will be always dispatched on the configured looper thread,
+   * Note that the built routine results will be always dispatched on the configured Looper thread,
    * thus waiting for the outputs immediately after its invocation may result in a deadlock.
    *
    * @param targetClass the invocation target class.
@@ -247,7 +247,7 @@ public class ServiceBuilder {
    * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the routine
    * Service.
    * <p>
-   * Note that the built routine results will be always dispatched on the configured looper thread,
+   * Note that the built routine results will be always dispatched on the configured Looper thread,
    * thus waiting for the outputs immediately after its invocation may result in a deadlock.
    *
    * @param targetClass the class of the invocation target.
@@ -265,7 +265,7 @@ public class ServiceBuilder {
    * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the routine
    * Service.
    * <p>
-   * Note that the built routine results will be always dispatched on the configured looper thread,
+   * Note that the built routine results will be always dispatched on the configured Looper thread,
    * thus waiting for the outputs immediately after its invocation may result in a deadlock.
    *
    * @param targetClass the class of the invocation target.

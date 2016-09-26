@@ -72,7 +72,8 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * undesired leaks, the implementing class must be static. Moreover, each constructor must have the
  * Loader context as first argument.
  * <br>
- * Moreover, for the method to be executed inside the Loader, all the input channels must be closed.
+ * Note that, for the method to be executed inside the Loader, all the input channels must be
+ * closed.
  * <h2>How to access the Android Context</h2>
  * It is possible to get access to the Android Context (that is the application instance) from
  * inside the routine by calling the {@code getContext()} method. Like, for instance:

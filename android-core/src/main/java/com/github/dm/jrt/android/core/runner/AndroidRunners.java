@@ -46,9 +46,9 @@ public class AndroidRunners {
   }
 
   /**
-   * Returns a runner employing the specified handler.
+   * Returns a runner employing the specified Handler.
    *
-   * @param handler the handler.
+   * @param handler the Handler.
    * @return the runner instance.
    */
   @NotNull
@@ -57,7 +57,7 @@ public class AndroidRunners {
   }
 
   /**
-   * Returns a runner employing the specified handler thread.
+   * Returns a runner employing the specified Handler thread.
    *
    * @param thread the thread.
    * @return the runner instance.
@@ -72,9 +72,9 @@ public class AndroidRunners {
   }
 
   /**
-   * Returns a runner employing the specified looper.
+   * Returns a runner employing the specified Looper.
    *
-   * @param looper the looper instance.
+   * @param looper the Looper instance.
    * @return the runner instance.
    */
   @NotNull
@@ -83,7 +83,7 @@ public class AndroidRunners {
   }
 
   /**
-   * Returns the shared runner employing the main thread looper.
+   * Returns the shared runner employing the main thread Looper.
    *
    * @return the runner instance.
    */
@@ -93,7 +93,7 @@ public class AndroidRunners {
   }
 
   /**
-   * Returns a runner employing the calling thread looper.
+   * Returns a runner employing the calling thread Looper.
    *
    * @return the runner instance.
    */

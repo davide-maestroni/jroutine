@@ -60,18 +60,18 @@ public class ServiceCallInvocation
    * The index of the selectable channel dedicated to the transfer of request and response body
    * bytes.
    */
-  public static final int BYTES_INDEX = 1;
+  static final int BYTES_INDEX = 1;
 
   /**
    * The index of the selectable channel dedicated to the transfer of request and response body
    * media type.
    */
-  public static final int MEDIA_TYPE_INDEX = 0;
+  static final int MEDIA_TYPE_INDEX = 0;
 
   /**
    * The index of the selectable channel dedicated to the transfer of the request data.
    */
-  public static final int REQUEST_DATA_INDEX = -1;
+  static final int REQUEST_DATA_INDEX = -1;
 
   private boolean mHasMediaType;
 

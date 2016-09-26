@@ -200,7 +200,7 @@ public class PredicateDecorator<IN> extends DeepEqualObject implements Predicate
   }
 
   /**
-   * Returns a predicate decorator always returning the false.
+   * Returns a predicate decorator always returning false.
    * <br>
    * The returned object will support concatenation and comparison.
    *
@@ -214,7 +214,7 @@ public class PredicateDecorator<IN> extends DeepEqualObject implements Predicate
   }
 
   /**
-   * Returns a predicate decorator always returning the true.
+   * Returns a predicate decorator always returning true.
    * <br>
    * The returned object will support concatenation and comparison.
    *

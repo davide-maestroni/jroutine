@@ -24,13 +24,12 @@ import com.github.dm.jrt.core.util.ConstantConditions;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Utility class extending the base one in order to support additional routine builders specific to
- * the Android platform.
+ * Utility class supporting the creation of routine builders specific to the Android platform.
  * <br>
  * Routine invocations created through the returned builders can be safely restored after a change
  * in the configuration, so to avoid duplicated calls and memory leaks. Be aware, though, that the
- * invocation results will be dispatched on the configured looper thread, no matter the calling one
- * was, so that, waiting for the outputs on the very same looper thread, right after the routine
+ * invocation results will be dispatched on the configured Looper thread, no matter the calling one
+ * was, so that, waiting for the outputs on the very same Looper thread right after the routine
  * invocation, will result in a deadlock.
  * <br>
  * Note that the configuration of the maximum number of concurrent invocations might not work as
@@ -171,7 +170,7 @@ public class JRoutineLoaderCompat {
      * In order to prevent undesired leaks, the class of the specified factory must have a static
      * scope.
      * <p>
-     * Note that the built routine results will be always dispatched on the configured looper
+     * Note that the built routine results will be always dispatched on the configured Looper
      * thread, thus waiting for the outputs immediately after its invocation may result in a
      * deadlock.
      * <br>
@@ -200,7 +199,7 @@ public class JRoutineLoaderCompat {
      * {@link com.github.dm.jrt.android.core.invocation.MissingLoaderException
      * MissingLoaderException}.
      * <p>
-     * Note that the built routine results will be always dispatched on the configured looper
+     * Note that the built routine results will be always dispatched on the configured Looper
      * thread, thus waiting for the outputs immediately after its invocation may result in a
      * deadlock.
      *

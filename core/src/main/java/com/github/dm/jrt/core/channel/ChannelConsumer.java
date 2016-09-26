@@ -46,6 +46,9 @@ import org.jetbrains.annotations.NotNull;
  *     </code>
  * </pre>
  * <p>
+ * The class {@link com.github.dm.jrt.core.channel.TemplateChannelConsumer TemplateChannelConsumer}
+ * provides an abstract empty implementation of the channel consumer interface.
+ * <p>
  * Created by davide-maestroni on 09/07/2014.
  *
  * @param <OUT> the output data type.

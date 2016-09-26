@@ -52,9 +52,9 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
   private String mHeaderV4;
 
-  private TypeMirror mIdAnnotationType;
-
   private TypeMirror mInputClashAnnotationType;
+
+  private TypeMirror mLoaderIdAnnotationType;
 
   private TypeElement mLoaderProxyCompatElement;
 
@@ -88,19 +88,20 @@ public class ContextRoutineProcessor extends RoutineProcessor {
   @Override
   public synchronized void init(final ProcessingEnvironment processingEnv) {
     super.init(processingEnv);
-    mIdAnnotationType = getMirrorFromName("com.github.dm.jrt.android.object.annotation.LoaderId");
-    mLogClassAnnotationType =
-        getMirrorFromName("com.github.dm.jrt.android.object.annotation.ServiceLog");
-    mFactoryIdAnnotationType =
-        getMirrorFromName("com.github.dm.jrt.android.object.annotation.FactoryId");
-    mClashAnnotationType =
-        getMirrorFromName("com.github.dm.jrt.android.object.annotation.ClashResolution");
-    mInputClashAnnotationType =
-        getMirrorFromName("com.github.dm.jrt.android.object.annotation.InputClashResolution");
     mCacheAnnotationType =
         getMirrorFromName("com.github.dm.jrt.android.object.annotation.CacheStrategy");
+    mClashAnnotationType =
+        getMirrorFromName("com.github.dm.jrt.android.object.annotation.ClashResolution");
+    mFactoryIdAnnotationType =
+        getMirrorFromName("com.github.dm.jrt.android.object.annotation.FactoryId");
+    mLoaderIdAnnotationType =
+        getMirrorFromName("com.github.dm.jrt.android.object.annotation.LoaderId");
+    mInputClashAnnotationType =
+        getMirrorFromName("com.github.dm.jrt.android.object.annotation.MatchResolution");
     mStaleTimeAnnotationType =
         getMirrorFromName("com.github.dm.jrt.android.object.annotation.ResultStaleTime");
+    mLogClassAnnotationType =
+        getMirrorFromName("com.github.dm.jrt.android.object.annotation.ServiceLog");
     mRunnerClassAnnotationType =
         getMirrorFromName("com.github.dm.jrt.android.object.annotation.ServiceRunner");
     final Types typeUtils = processingEnv.getTypeUtils();
@@ -218,7 +219,7 @@ public class ContextRoutineProcessor extends RoutineProcessor {
     // We need to avoid explicit dependency on the android module...
     final StringBuilder builder = new StringBuilder();
     final Integer loaderId =
-        (Integer) getAnnotationValue(methodElement, mIdAnnotationType, "value");
+        (Integer) getAnnotationValue(methodElement, mLoaderIdAnnotationType, "value");
     if (loaderId != null) {
       builder.append(".withLoaderId(").append(loaderId).append(")");
     }
@@ -239,7 +240,7 @@ public class ContextRoutineProcessor extends RoutineProcessor {
     final Object inputResolutionType =
         getAnnotationValue(methodElement, mInputClashAnnotationType, "value");
     if (inputResolutionType != null) {
-      builder.append(".withInputClashResolution(com.github.dm.jrt.android.core.config"
+      builder.append(".withMatchResolution(com.github.dm.jrt.android.core.config"
           + ".LoaderConfiguration.ClashResolutionType.").append(resolutionType).append(")");
     }
 

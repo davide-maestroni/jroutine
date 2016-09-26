@@ -32,8 +32,7 @@ import java.lang.ref.WeakReference;
 /**
  * Class representing an Android Service context.
  * <p>
- * No strong reference to the wrapped contexts will be retained by this class implementations. So,
- * it is up to the caller to ensure that they are not garbage collected before being called.
+ * No strong reference to the wrapped contexts will be retained by this class implementations.
  * <p>
  * Created by davide-maestroni on 07/11/2015.
  */

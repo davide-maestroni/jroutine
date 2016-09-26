@@ -83,9 +83,9 @@ public class JRoutineServiceProxy {
      * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
      * invocation Service.
      * <p>
-     * Note that the built routine results will be dispatched into the configured looper, thus,
-     * waiting for the outputs on the very same looper thread, immediately after its invocation,
-     * will result in a deadlock. By default, output results are dispatched in the main looper.
+     * Note that the built routine results will be dispatched into the configured Looper, thus,
+     * waiting for the outputs on the very same Looper thread, immediately after its invocation,
+     * will result in a deadlock. By default, output results are dispatched in the main Looper.
      *
      * @param target the invocation target.
      * @return the routine builder instance.

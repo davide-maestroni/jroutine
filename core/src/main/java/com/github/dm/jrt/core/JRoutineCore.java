@@ -78,14 +78,14 @@ import org.jetbrains.annotations.NotNull;
  * <pre>
  *     <code>
  *
- *         routine2.call(routine1.close()).after(seconds(20).all();
+ *         routine2.call(routine1.close()).after(seconds(20)).all();
  *     </code>
  * </pre>
  * Or, in an equivalent way:
  * <pre>
  *     <code>
  *
- *         routine1.close().bind(routine2.call()).close().after(seconds(20).all();
+ *         routine1.close().bind(routine2.call()).close().after(seconds(20)).all();
  *     </code>
  * </pre>
  * <p>

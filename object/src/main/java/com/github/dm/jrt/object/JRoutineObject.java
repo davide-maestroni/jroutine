@@ -22,11 +22,9 @@ import com.github.dm.jrt.object.builder.ObjectRoutineBuilder;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * This utility class extends the base factory of routine builders.
+ * This utility class provides an additional way to build a routine, based on the asynchronous
+ * invocation of a method of an existing class or object via reflection.
  * <p>
- * The class provides an additional way to build a routine, based on the asynchronous invocation of
- * a method of an existing class or object via reflection.
- * <br>
  * It is possible to annotate selected methods to be asynchronously invoked, or to simply select
  * a method through its signature. It is also possible to build a proxy object whose methods will
  * in turn asynchronously invoke the target object ones.

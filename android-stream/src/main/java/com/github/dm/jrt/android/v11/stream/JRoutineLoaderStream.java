@@ -55,6 +55,10 @@ import static com.github.dm.jrt.function.FunctionDecorator.decorate;
  *     </code>
  * </pre>
  * <p>
+ * See {@link com.github.dm.jrt.android.v4.stream.JRoutineLoaderStreamCompat
+ * JRoutineLoaderStreamCompat} for support of API levels lower than
+ * {@link android.os.Build.VERSION_CODES#HONEYCOMB 11}.
+ * <p>
  * Created by davide-maestroni on 07/03/2016.
  */
 @SuppressWarnings("WeakerAccess")

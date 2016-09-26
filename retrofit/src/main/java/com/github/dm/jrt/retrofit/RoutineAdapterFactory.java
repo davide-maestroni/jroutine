@@ -33,7 +33,8 @@ import retrofit2.CallAdapter;
  * Abstract implementation of a call adapter factory supporting {@code Channel} and
  * {@code StreamBuilder} return types.
  * <br>
- * Note that the routines generated through the returned builders will ignore any input.
+ * Note that the routines generated through stream builders must be invoked and the returned channel
+ * closed before any result is produced.
  * <p>
  * Created by davide-maestroni on 03/26/2016.
  */

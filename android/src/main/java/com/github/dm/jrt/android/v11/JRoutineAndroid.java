@@ -41,6 +41,9 @@ import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
  * Class acting as a fa&ccedil;ade of all the JRoutine library features, specific to the Android
  * platform.
  * <p>
+ * See {@link com.github.dm.jrt.android.v4.JRoutineAndroidCompat JRoutineAndroidCompat} for support
+ * of API levels lower than {@link android.os.Build.VERSION_CODES#HONEYCOMB 11}.
+ * <p>
  * Created by davide-maestroni on 03/06/2016.
  */
 @SuppressWarnings("WeakerAccess")

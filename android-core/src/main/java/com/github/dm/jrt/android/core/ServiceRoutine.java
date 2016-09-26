@@ -201,7 +201,7 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
     /**
      * Constructor.
      *
-     * @param looper        the message looper.
+     * @param looper        the message Looper.
      * @param context       the Service context.
      * @param outputChannel the output channel.
      * @param logger        the logger instance.

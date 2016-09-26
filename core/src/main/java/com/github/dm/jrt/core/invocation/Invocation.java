@@ -100,7 +100,7 @@ import org.jetbrains.annotations.NotNull;
  * channel.
  * <p>
  * Be aware that there is no guarantee about how and when an invocation will produce a result. It
- * might return one or more output for each input, or no output at all.
+ * might return one or more outputs for each input, or no output at all.
  * <p>
  * Any exception escaping the invocation methods, unless it extends the base
  * {@link com.github.dm.jrt.core.error.RoutineException RoutineException}, will be wrapped as the

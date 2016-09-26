@@ -71,7 +71,7 @@ import static com.github.dm.jrt.core.util.Reflection.newInstanceOf;
 /**
  * Utility class providing helper methods used to implement a builder of routines.
  * <br>
- * Specifically, this class provided several utilities to manage routines used to call object
+ * Specifically, this class provides several utilities to manage routines used to call object
  * methods asynchronously.
  * <p>
  * Created by davide-maestroni on 03/23/2015.

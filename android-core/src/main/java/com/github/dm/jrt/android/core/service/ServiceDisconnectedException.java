@@ -23,7 +23,7 @@ import com.github.dm.jrt.core.error.RoutineException;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Exception indicating that the routine Service has unexpectedly disconnected.
+ * Exception indicating that the routine Service has been unexpectedly disconnected.
  * <p>
  * Created by davide-maestroni on 05/25/2015.
  */

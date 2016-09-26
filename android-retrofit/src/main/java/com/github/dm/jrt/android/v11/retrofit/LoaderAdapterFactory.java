@@ -52,6 +52,10 @@ import retrofit2.Retrofit;
  * Note that the routines generated through stream builders must be invoked and the returned channel
  * closed before any result is produced.
  * <p>
+ * See {@link com.github.dm.jrt.android.v4.retrofit.LoaderAdapterFactoryCompat
+ * LoaderAdapterFactoryCompat} for support of API levels lower than
+ * {@link android.os.Build.VERSION_CODES#HONEYCOMB 11}.
+ * <p>
  * Created by davide-maestroni on 05/18/2016.
  */
 @SuppressWarnings("WeakerAccess")

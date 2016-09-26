@@ -29,8 +29,8 @@ import org.jetbrains.annotations.NotNull;
  * <p>
  * Routine invocations started through the returned objects can be safely restored after a change in
  * the configuration, so to avoid duplicated calls and memory leaks. Be aware, though, that the
- * invocation results will be dispatched on the configured looper thread, no matter the calling one
- * was. If the invocation and the result looper are the same, waiting for the outputs right after
+ * invocation results will be dispatched on the configured Looper thread, no matter the calling one
+ * was. If the invocation and the result Looper are the same, waiting for the outputs right after
  * the routine invocation, may result in a deadlock.
  * <br>
  * Note that the configuration of the maximum number of concurrent invocations might not work as

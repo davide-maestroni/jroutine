@@ -26,11 +26,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Interface defining a builder of routine objects executed in a dedicated Service.
  * <br>
- * Note that the configuration of the maximum number of concurrent invocations will not be shared
- * among synchronous and asynchronous invocations, but the invocations created inside the Service
- * and the synchronous ones will respect the same limit separately.
- * <br>
- * Note also that, it is responsibility of the caller to ensure that the started invocations have
+ * Note that, it is responsibility of the caller to ensure that the started invocations have
  * completed or have been aborted when the relative Context (for example the Activity) is destroyed,
  * so to avoid the leak of IPC connections.
  * <p>

@@ -40,7 +40,6 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingConstructor
  *         public class MyFactory extends InvocationFactory&lt;String, Integer&gt; {
  *
  *             public MyFactory(final String regex) {
- *
  *                 super(Reflection.asArgs(regex));
  *                 mRegex = regex;
  *             }
@@ -56,7 +55,6 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingConstructor
  *         public class MyFactory extends InvocationFactory&lt;String, Integer&gt; {
  *
  *             public MyFactory() {
- *
  *                 super(null);
  *             }
  *

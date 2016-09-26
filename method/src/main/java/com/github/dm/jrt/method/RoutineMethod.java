@@ -65,7 +65,6 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * <br>
  * The method will be called each time a new input is passed to one of the input channels.
  * Additionally, the method is called once when the invocation is aborted and when it completes.
- * <br>
  * In the former case every input channel will behave as an aborted one (see {@link Channel}),
  * while, in the latter, no data will be available, so, it is always advisable to verify that an
  * input is ready before reading it.
@@ -146,13 +145,13 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * Note also that outputs will be collected through the channel returned by the {@code call()}
  * method.
  * <h2>Parallel and multiple invocations</h2>
- * In order to enable parallel invocation of the routine it is necessary to provide the proper
+ * In order to enable parallel invocation of the routine, it is necessary to provide the proper
  * parameters to the routine method non-default constructor. In fact, parallel invocations will
- * employ several instance of the implementing class.
+ * employ several instances of the implementing class.
  * <br>
  * Note that, for anonymous and inner classes, synthetic constructors will be created by the
- * compiler, hence the enclosing class along with any variable captured inside the method must be
- * explicitly pass to the constructor.
+ * compiler, hence the enclosing class, along with any variable captured inside the method, must be
+ * explicitly passed to the constructor.
  * <br>
  * Like, for example:
  * <pre>
@@ -197,8 +196,8 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  *         }
  *     </code>
  * </pre>
- * The same holds true for static class, with the only difference that only the declared parameters
- * must be passed:
+ * The same holds true for static classes, with the only difference that only the declared
+ * parameters must be passed:
  * <pre>
  *     <code>
  *
@@ -333,7 +332,7 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * <h2>Handling of abortion exception</h2>
  * The routine method is notified also when one of the input or output channels is aborted.
  * <br>
- * When that happens channel methods used to read or write data will throw a
+ * When that happens, channel methods used to read or write data will throw a
  * {@code RoutineException} with the abortion reason as cause. Hence, it is possible to properly
  * react to such event by catching the exception and inspecting it.
  * <br>

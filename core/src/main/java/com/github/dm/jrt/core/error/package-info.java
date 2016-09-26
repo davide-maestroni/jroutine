@@ -15,8 +15,8 @@
  */
 
 /**
- * Common error definitions.
+ * Common classes and definitions.
  * <p>
  * Created by davide-maestroni on 01/30/2016.
  */
-package com.github.dm.jrt.core.error;
+package com.github.dm.jrt.core.error; // TODO: 26/09/16 rename: common + move Backoff and DeepEqual

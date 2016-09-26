@@ -29,15 +29,6 @@ import java.lang.annotation.Target;
  * the target one completes, even if no result is expected (that is, the method returns a void
  * result).
  * <p>
- * This annotation is used to decorate methods that are to be invoked in an asynchronous way.
- * <br>
- * Note that the piece of code inside such methods will be automatically protected so to avoid
- * concurrency issues. Though, other parts of the code inside the same class will be not.
- * <br>
- * In order to prevent unexpected behaviors, it is advisable to avoid using the same class fields
- * (unless immutable) in protected and non-protected code, or to call synchronous methods through
- * routines as well.
- * <p>
  * The only use case in which this annotation is useful, is when an interface is used as a proxy
  * of another class methods. The interface can return the output in an asynchronous way. In such
  * case, the value specified in the annotation will indicate the mode in which the output is
@@ -61,6 +52,19 @@ import java.lang.annotation.Target;
  * </pre>
  * Note that the transfer mode is specifically chosen through the annotation {@code mode} attribute
  * (it's {@link AsyncOutput.OutputMode#VALUE VALUE} by default).
+ * <p>
+ * This annotation is used to decorate methods that are to be invoked in an asynchronous way.
+ * <br>
+ * Note that the piece of code inside such methods will be automatically protected so to avoid
+ * concurrency issues. Though, other parts of the code inside the same class will be not.
+ * <br>
+ * In order to prevent unexpected behaviors, it is advisable to avoid using the same class fields
+ * (unless immutable) in protected and non-protected code, or to call synchronous methods through
+ * routines as well.
+ * <p>
+ * Finally, be aware that a method might need to be made accessible in order to be called. That
+ * means that, in case a {@link java.lang.SecurityManager} is installed, a security exception might
+ * be raised based on the specific policy implemented.
  * <p>
  * Remember also that, in order for the annotation to properly work at run time, the following rules
  * must be added to the project Proguard file (if employed for shrinking or obfuscation):

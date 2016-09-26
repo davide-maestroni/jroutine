@@ -40,7 +40,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Decorator implementation making a call instance comparable (that is, {@code equals(Object)} and
+ * Decorator implementation making a call instance comparable, that is, {@code equals(Object)} and
  * {@code hashCode()} methods are properly implemented.
  * <p>
  * Created by davide-maestroni on 03/25/2016.

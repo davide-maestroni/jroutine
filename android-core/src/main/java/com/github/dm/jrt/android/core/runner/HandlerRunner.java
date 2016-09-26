@@ -45,7 +45,7 @@ class HandlerRunner extends AsyncRunner {
   /**
    * Constructor.
    *
-   * @param handler the handler to employ.
+   * @param handler the Handler to employ.
    */
   HandlerRunner(@NotNull final Handler handler) {
     super(new HandlerThreadManager(handler.getLooper()));
@@ -96,7 +96,7 @@ class HandlerRunner extends AsyncRunner {
     /**
      * Constructor.
      *
-     * @param looper the handler looper.
+     * @param looper the Handler Looper.
      */
     private HandlerThreadManager(@NotNull final Looper looper) {
       mLooper = looper;

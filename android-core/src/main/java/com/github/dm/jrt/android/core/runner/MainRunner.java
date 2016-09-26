@@ -20,7 +20,7 @@ import android.os.Handler;
 import android.os.Looper;
 
 /**
- * Implementation of a runner employing the main UI thread looper.
+ * Implementation of a runner employing the main UI thread Looper.
  * <p>
  * Created by davide-maestroni on 12/17/2014.
  */

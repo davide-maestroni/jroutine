@@ -63,7 +63,30 @@ import static com.github.dm.jrt.function.Functions.decorate;
  * Note, however, that a different {@code OkHttpClient} instance will be created by the Service. In
  * order to properly configure it, the target Service class should implement
  * {@link com.github.dm.jrt.android.object.builder.FactoryContext}, and return the configured
- * instance when requested.
+ * instance when requested. Like, for example:
+ * <pre>
+ *   <code>
+ *
+ *       public RetrofitService extends InvocationService implements FactoryContext {
+ *
+ *           private final OkHttpClient mClient;
+ *
+ *           public RetrofitService() {
+ *               mClient = new OkHttpClient.Builder().connectTimeout(20, TimeUnit.SECONDS).build();
+ *           }
+ *
+ *           &#64;Nullable
+ *           &lt;TYPE&gt; TYPE geInstance(&#64;NotNull final Class&lt;? extends TYPE&gt; type,
+ *                   &#64;NotNull final Object... args) {
+ *               if (type == OkHttpClient.class) {
+ *                   return type.cast(mClient);
+ *               }
+ *
+ *               return null;
+ *           }
+ *       }
+ *   </code>
+ * </pre>
  * <p>
  * Created by davide-maestroni on 05/16/2016.
  */

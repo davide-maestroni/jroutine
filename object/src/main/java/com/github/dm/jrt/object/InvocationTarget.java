@@ -27,6 +27,9 @@ import java.lang.ref.WeakReference;
  * Class representing an invocation target.
  * <br>
  * The target identifies a class or an instance whose methods are to be called asynchronously.
+ * <br>
+ * No strong reference to the target object will be retained, so, it's up to the caller to ensure
+ * that it does not get garbage collected.
  * <p>
  * Created by davide-maestroni on 08/20/2015.
  *

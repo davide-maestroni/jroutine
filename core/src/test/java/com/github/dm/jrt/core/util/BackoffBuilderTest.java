@@ -2,6 +2,7 @@ package com.github.dm.jrt.core.util;
 
 import com.github.dm.jrt.core.common.Backoff;
 import com.github.dm.jrt.core.common.BackoffBuilder;
+import com.github.dm.jrt.core.common.BackoffDecorator;
 
 import org.junit.Test;
 

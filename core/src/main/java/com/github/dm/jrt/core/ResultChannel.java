@@ -400,7 +400,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
       final TimeUnit timeoutUnit = outputTimeout.unit;
       final boolean isDone;
       try {
-        isDone = UnitDuration.waitTrue(timeout, timeoutUnit, mMutex, mIsComplete);
+        isDone = UnitDuration.waitUntil(mMutex, mIsComplete, timeout, timeoutUnit);
 
       } catch (final InterruptedException e) {
         throw new InvocationInterruptedException(e);
@@ -444,7 +444,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
       final TimeUnit timeoutUnit = outputTimeout.unit;
       final boolean isDone;
       try {
-        isDone = UnitDuration.waitTrue(timeout, timeoutUnit, mMutex, mIsError);
+        isDone = UnitDuration.waitUntil(mMutex, mIsError, timeout, timeoutUnit);
 
       } catch (final InterruptedException e) {
         throw new InvocationInterruptedException(e);
@@ -886,7 +886,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
         final boolean isTimeout;
         try {
-          isTimeout = !UnitDuration.waitTrue(timeout, timeUnit, mMutex, mOutputHasNext);
+          isTimeout = !UnitDuration.waitUntil(mMutex, mOutputHasNext, timeout, timeUnit);
 
         } catch (final InterruptedException e) {
           throw new InvocationInterruptedException(e);
@@ -976,7 +976,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         }
 
         try {
-          isTimeout = !UnitDuration.waitTrue(timeout, timeUnit, mMutex, mOutputNotEmpty);
+          isTimeout = !UnitDuration.waitUntil(mMutex, mOutputNotEmpty, timeout, timeUnit);
 
         } catch (final InterruptedException e) {
           throw new InvocationInterruptedException(e);
@@ -1023,7 +1023,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
       }
 
       mIWaitingOutput = true;
-      if (!UnitDuration.waitTrue(delay, TimeUnit.MILLISECONDS, mMutex, mHasOutputs)) {
+      if (!UnitDuration.waitUntil(mMutex, mHasOutputs, delay, TimeUnit.MILLISECONDS)) {
         mLogger.wrn("timeout while waiting for room in the output channel [%s %s]", delay,
             TimeUnit.MILLISECONDS);
       }

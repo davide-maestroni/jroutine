@@ -444,13 +444,13 @@ public class UnitDuration extends UnitTime {
    * <br>
    * If the specified time is negative, the method will wait indefinitely.
    *
+   * @param target the target object.
    * @param time   the time value.
    * @param unit   the time unit.
-   * @param target the target object.
    * @throws java.lang.InterruptedException if the current thread is interrupted.
    */
-  public static void wait(final long time, @NotNull final TimeUnit unit,
-      @NotNull final Object target) throws InterruptedException {
+  public static void wait(@NotNull final Object target, final long time,
+      @NotNull final TimeUnit unit) throws InterruptedException {
     if (time == 0) {
       return;
     }
@@ -469,16 +469,16 @@ public class UnitDuration extends UnitTime {
    * <br>
    * If the specified time is negative, the method will wait indefinitely.
    *
-   * @param time      the time value.
-   * @param unit      the time unit.
    * @param target    the target object.
    * @param milliTime the starting system time in milliseconds.
+   * @param time      the time value.
+   * @param unit      the time unit.
    * @return whether the wait happened at all.
    * @throws java.lang.InterruptedException if the current thread is interrupted.
    * @see System#currentTimeMillis()
    */
-  public static boolean waitSinceMillis(final long time, @NotNull final TimeUnit unit,
-      @NotNull final Object target, final long milliTime) throws InterruptedException {
+  public static boolean waitSinceMillis(@NotNull final Object target, final long milliTime,
+      final long time, @NotNull final TimeUnit unit) throws InterruptedException {
     if (time == 0) {
       return false;
     }
@@ -503,16 +503,16 @@ public class UnitDuration extends UnitTime {
    * <br>
    * If the specified time is negative, the method will wait indefinitely.
    *
-   * @param time     the time value.
-   * @param unit     the time unit.
    * @param target   the target object.
    * @param nanoTime the starting system time in nanoseconds.
+   * @param time     the time value.
+   * @param unit     the time unit.
    * @return whether the wait happened at all.
    * @throws java.lang.InterruptedException if the current thread is interrupted.
    * @see System#nanoTime()
    */
-  public static boolean waitSinceNanos(final long time, @NotNull final TimeUnit unit,
-      @NotNull final Object target, final long nanoTime) throws InterruptedException {
+  public static boolean waitSinceNanos(@NotNull final Object target, final long nanoTime,
+      final long time, @NotNull final TimeUnit unit) throws InterruptedException {
     if (time == 0) {
       return false;
     }
@@ -537,16 +537,15 @@ public class UnitDuration extends UnitTime {
    * <br>
    * If the specified time is negative, the method will wait indefinitely.
    *
-   * @param time      the time value.
-   * @param unit      the time unit.
    * @param target    the target object.
    * @param condition the condition to verify.
+   * @param time      the time value.
+   * @param unit      the time unit.
    * @return whether the check became true before the timeout elapsed.
    * @throws java.lang.InterruptedException if the current thread is interrupted.
    */
-  public static boolean waitTrue(final long time, @NotNull final TimeUnit unit,
-      @NotNull final Object target, @NotNull final Condition condition) throws
-      InterruptedException {
+  public static boolean waitUntil(@NotNull final Object target, @NotNull final Condition condition,
+      final long time, @NotNull final TimeUnit unit) throws InterruptedException {
     if (time == 0) {
       return condition.isTrue();
     }
@@ -562,7 +561,7 @@ public class UnitDuration extends UnitTime {
     if ((unit.toNanos(time) % ONE_MILLI_NANOS) == 0) {
       final long startMillis = System.currentTimeMillis();
       while (!condition.isTrue()) {
-        if (!waitSinceMillis(time, unit, target, startMillis)) {
+        if (!waitSinceMillis(target, startMillis, time, unit)) {
           return false;
         }
       }
@@ -570,7 +569,7 @@ public class UnitDuration extends UnitTime {
     } else {
       final long startNanos = System.nanoTime();
       while (!condition.isTrue()) {
-        if (!waitSinceNanos(time, unit, target, startNanos)) {
+        if (!waitSinceNanos(target, startNanos, time, unit)) {
           return false;
         }
       }
@@ -799,7 +798,7 @@ public class UnitDuration extends UnitTime {
    * @throws java.lang.InterruptedException if the current thread is interrupted.
    */
   public void wait(@NotNull final Object target) throws InterruptedException {
-    wait(isInfinite() ? -1 : value, unit, target);
+    wait(target, isInfinite() ? -1 : value, unit);
   }
 
   /**
@@ -814,7 +813,7 @@ public class UnitDuration extends UnitTime {
    */
   public boolean waitSinceMillis(@NotNull final Object target, final long milliTime) throws
       InterruptedException {
-    return waitSinceMillis(isInfinite() ? -1 : value, unit, target, milliTime);
+    return waitSinceMillis(target, milliTime, isInfinite() ? -1 : value, unit);
   }
 
   /**
@@ -829,7 +828,7 @@ public class UnitDuration extends UnitTime {
    */
   public boolean waitSinceNanos(@NotNull final Object target, final long nanoTime) throws
       InterruptedException {
-    return waitSinceNanos(isInfinite() ? -1 : value, unit, target, nanoTime);
+    return waitSinceNanos(target, nanoTime, isInfinite() ? -1 : value, unit);
   }
 
   /**
@@ -841,9 +840,9 @@ public class UnitDuration extends UnitTime {
    * @return whether the check became true before the timeout elapsed.
    * @throws java.lang.InterruptedException if the current thread is interrupted.
    */
-  public boolean waitTrue(@NotNull final Object target, @NotNull final Condition condition) throws
+  public boolean waitUntil(@NotNull final Object target, @NotNull final Condition condition) throws
       InterruptedException {
-    return waitTrue(isInfinite() ? -1 : value, unit, target, condition);
+    return waitUntil(target, condition, isInfinite() ? -1 : value, unit);
   }
 
   /**

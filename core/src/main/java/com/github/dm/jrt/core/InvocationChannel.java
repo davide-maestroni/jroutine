@@ -475,7 +475,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
 
     try {
       mIsWaitingInput = true;
-      if (!UnitDuration.waitTrue(delay, TimeUnit.MILLISECONDS, mMutex, mHasInputs)) {
+      if (!UnitDuration.waitUntil(mMutex, mHasInputs, delay, TimeUnit.MILLISECONDS)) {
         mLogger.dbg("timeout while waiting for room in the input channel [%s %s]", delay,
             TimeUnit.MILLISECONDS);
       }

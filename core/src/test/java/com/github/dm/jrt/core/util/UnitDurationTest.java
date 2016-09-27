@@ -74,7 +74,7 @@ public class UnitDurationTest {
   public void testCheckError() {
 
     try {
-      UnitDuration.seconds(1).waitTrue(null, new Condition() {
+      UnitDuration.seconds(1).waitUntil(null, new Condition() {
 
         public boolean isTrue() {
 
@@ -91,7 +91,7 @@ public class UnitDurationTest {
 
     try {
       synchronized (this) {
-        UnitDuration.seconds(1).waitTrue(this, null);
+        UnitDuration.seconds(1).waitUntil(this, null);
       }
 
       fail();
@@ -103,7 +103,7 @@ public class UnitDurationTest {
     }
 
     try {
-      UnitDuration.seconds(1).waitTrue(null, null);
+      UnitDuration.seconds(1).waitUntil(null, null);
       fail();
 
     } catch (final NullPointerException ignored) {
@@ -809,7 +809,7 @@ public class UnitDurationTest {
 
   @Test
   @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
-  public void testWaitTrueMilli() throws InterruptedException {
+  public void testWaitUntilMilli() throws InterruptedException {
 
     final Condition alwaysFalse = new Condition() {
 
@@ -828,13 +828,13 @@ public class UnitDurationTest {
 
     long startTime = System.currentTimeMillis();
     synchronized (this) {
-      assertThat(UnitDuration.millis(100).waitTrue(this, alwaysFalse)).isFalse();
+      assertThat(UnitDuration.millis(100).waitUntil(this, alwaysFalse)).isFalse();
     }
 
     assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(100);
     startTime = System.currentTimeMillis();
     synchronized (this) {
-      assertThat(UnitDuration.millis(100).waitTrue(this, alwaysTrue)).isTrue();
+      assertThat(UnitDuration.millis(100).waitUntil(this, alwaysTrue)).isTrue();
     }
 
     assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(0);
@@ -858,7 +858,7 @@ public class UnitDurationTest {
     };
     thread.start();
     synchronized (thread) {
-      assertThat(infinity().waitTrue(thread, new Condition() {
+      assertThat(infinity().waitUntil(thread, new Condition() {
 
         private boolean mToggle = true;
 
@@ -872,7 +872,7 @@ public class UnitDurationTest {
 
   @Test
   @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
-  public void testWaitTrueNano() throws InterruptedException {
+  public void testWaitUntilNano() throws InterruptedException {
 
     final Condition alwaysFalse = new Condition() {
 
@@ -891,13 +891,13 @@ public class UnitDurationTest {
 
     long startTime = System.nanoTime();
     synchronized (this) {
-      assertThat(UnitDuration.nanos(10573).waitTrue(this, alwaysFalse)).isFalse();
+      assertThat(UnitDuration.nanos(10573).waitUntil(this, alwaysFalse)).isFalse();
     }
 
     assertThat(System.nanoTime() - startTime).isGreaterThanOrEqualTo(100);
     startTime = System.nanoTime();
     synchronized (this) {
-      assertThat(UnitDuration.nanos(10573).waitTrue(this, alwaysTrue)).isTrue();
+      assertThat(UnitDuration.nanos(10573).waitUntil(this, alwaysTrue)).isTrue();
     }
 
     assertThat(System.nanoTime() - startTime).isGreaterThanOrEqualTo(0);
@@ -905,7 +905,7 @@ public class UnitDurationTest {
 
   @Test
   @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
-  public void testWaitTrueZero() throws InterruptedException {
+  public void testWaitUntilZero() throws InterruptedException {
 
     final Condition alwaysFalse = new Condition() {
 
@@ -924,13 +924,13 @@ public class UnitDurationTest {
 
     long startTime = System.currentTimeMillis();
     synchronized (this) {
-      assertThat(zero().waitTrue(this, alwaysFalse)).isFalse();
+      assertThat(zero().waitUntil(this, alwaysFalse)).isFalse();
     }
 
     assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(0);
     startTime = System.currentTimeMillis();
     synchronized (this) {
-      assertThat(zero().waitTrue(this, alwaysTrue)).isTrue();
+      assertThat(zero().waitUntil(this, alwaysTrue)).isTrue();
     }
 
     assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(0);

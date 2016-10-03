@@ -36,7 +36,9 @@ import com.github.dm.jrt.android.core.service.InvocationService;
 import com.github.dm.jrt.android.object.ContextInvocationTarget;
 import com.github.dm.jrt.android.proxy.annotation.LoaderProxy;
 import com.github.dm.jrt.android.proxy.annotation.ServiceProxy;
+import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
+import com.github.dm.jrt.core.channel.TemplateChannelConsumer;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.function.BiConsumer;
@@ -52,6 +54,7 @@ import com.github.dm.jrt.operator.Operators;
 import org.assertj.core.data.Offset;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -62,6 +65,7 @@ import static com.github.dm.jrt.android.object.ContextInvocationTarget.instanceO
 import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
 import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
+import static com.github.dm.jrt.function.SupplierDecorator.constant;
 import static com.github.dm.jrt.operator.Operators.appendAccept;
 import static com.github.dm.jrt.operator.sequence.Sequences.range;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -732,6 +736,189 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
     }
 
     testStream(getActivity());
+  }
+
+  public void testStreamAccept() {
+    if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+      return;
+    }
+
+    assertThat(
+        JRoutineAndroid.withStreamAccept(range(0, 3)).immediate().close().all()).containsExactly(0,
+        1, 2, 3);
+    assertThat(
+        JRoutineAndroid.withStreamAccept(2, range(1, 0)).immediate().close().all()).containsExactly(
+        1, 0, 1, 0);
+  }
+
+  public void testStreamAcceptAbort() {
+    if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+      return;
+    }
+
+    Channel<Integer, Integer> channel =
+        JRoutineAndroid.withStreamAccept(range(0, 3)).immediate().call();
+    assertThat(channel.abort()).isTrue();
+    assertThat(channel.getError()).isInstanceOf(AbortException.class);
+    channel = JRoutineAndroid.withStreamAccept(2, range(1, 0)).immediate().call();
+    assertThat(channel.abort()).isTrue();
+    assertThat(channel.getError()).isInstanceOf(AbortException.class);
+  }
+
+  @SuppressWarnings({"ConstantConditions", "ThrowableResultOfMethodCallIgnored"})
+  public void testStreamAcceptError() {
+    if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+      return;
+    }
+
+    assertThat(JRoutineAndroid.withStreamAccept(range(0, 3))
+                              .immediate()
+                              .call(31)
+                              .getError()
+                              .getCause()).isInstanceOf(IllegalStateException.class);
+    assertThat(JRoutineAndroid.withStreamAccept(2, range(1, 0))
+                              .immediate()
+                              .call(-17)
+                              .getError()
+                              .getCause()).isInstanceOf(IllegalStateException.class);
+  }
+
+  public void testStreamGet() {
+    if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+      return;
+    }
+
+    assertThat(
+        JRoutineAndroid.withStreamGet(constant("test")).immediate().close().all()).containsExactly(
+        "test");
+    assertThat(JRoutineAndroid.withStreamGet(2, constant("test2"))
+                              .immediate()
+                              .close()
+                              .all()).containsExactly("test2", "test2");
+  }
+
+  public void testStreamGetAbort() {
+    if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+      return;
+    }
+
+    Channel<String, String> channel =
+        JRoutineAndroid.withStreamGet(constant("test")).immediate().immediate().call();
+    assertThat(channel.abort()).isTrue();
+    assertThat(channel.getError()).isInstanceOf(AbortException.class);
+    channel = JRoutineAndroid.withStreamGet(2, constant("test2")).immediate().call();
+    assertThat(channel.abort()).isTrue();
+    assertThat(channel.getError()).isInstanceOf(AbortException.class);
+  }
+
+  @SuppressWarnings({"ConstantConditions", "ThrowableResultOfMethodCallIgnored"})
+  public void testStreamGetError() {
+    if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+      return;
+    }
+
+    assertThat(JRoutineAndroid.withStreamGet(constant("test"))
+                              .immediate()
+                              .call("test")
+                              .getError()
+                              .getCause()).isInstanceOf(IllegalStateException.class);
+    assertThat(JRoutineAndroid.withStreamGet(2, constant("test2"))
+                              .immediate()
+                              .call("test")
+                              .getError()
+                              .getCause()).isInstanceOf(IllegalStateException.class);
+  }
+
+  public void testStreamOf() {
+    if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+      return;
+    }
+
+    assertThat(JRoutineAndroid.withStreamOf("test")
+                              .on(loaderFrom(getActivity()))
+                              .close()
+                              .after(seconds(10))
+                              .all()).containsExactly("test");
+    assertThat(JRoutineAndroid.withStreamOf("test1", "test2", "test3")
+                              .on(loaderFrom(getActivity()))
+                              .close()
+                              .after(seconds(10))
+                              .all()).containsExactly("test1", "test2", "test3");
+    assertThat(JRoutineAndroid.withStreamOf(Arrays.asList("test1", "test2", "test3"))
+                              .on(loaderFrom(getActivity()))
+                              .close()
+                              .after(seconds(10))
+                              .all()).containsExactly("test1", "test2", "test3");
+    assertThat(JRoutineAndroid.withStreamOf(JRoutineAndroid.io().of("test1", "test2", "test3"))
+                              .on(loaderFrom(getActivity()))
+                              .close()
+                              .after(seconds(10))
+                              .all()).containsExactly("test1", "test2", "test3");
+  }
+
+  public void testStreamOfAbort() {
+    if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+      return;
+    }
+
+    Channel<String, String> channel =
+        JRoutineAndroid.withStreamOf("test").on(loaderFrom(getActivity())).call();
+    assertThat(channel.abort()).isTrue();
+    assertThat(channel.after(seconds(10)).getError()).isInstanceOf(AbortException.class);
+    channel = JRoutineAndroid.withStreamOf("test1", "test2", "test3")
+                             .on(loaderFrom(getActivity()))
+                             .call();
+    assertThat(channel.abort()).isTrue();
+    assertThat(channel.after(seconds(10)).getError()).isInstanceOf(AbortException.class);
+    channel = JRoutineAndroid.withStreamOf(Arrays.asList("test1", "test2", "test3"))
+                             .on(loaderFrom(getActivity()))
+                             .call();
+    assertThat(channel.abort()).isTrue();
+    assertThat(channel.after(seconds(10)).getError()).isInstanceOf(AbortException.class);
+    channel = JRoutineAndroid.withStreamOf(JRoutineAndroid.io().of("test1", "test2", "test3"))
+                             .on(loaderFrom(getActivity()))
+                             .call();
+    assertThat(channel.abort()).isTrue();
+    assertThat(channel.after(seconds(10)).getError()).isInstanceOf(AbortException.class);
+  }
+
+  @SuppressWarnings({"ConstantConditions", "ThrowableResultOfMethodCallIgnored"})
+  public void testStreamOfError() {
+    if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+      return;
+    }
+
+    assertThat(JRoutineAndroid.withStreamOf("test")
+                              .on(loaderFrom(getActivity()))
+                              .call("test")
+                              .after(seconds(10))
+                              .getError()
+                              .getCause()).isInstanceOf(IllegalStateException.class);
+    assertThat(JRoutineAndroid.withStreamOf("test1", "test2", "test3")
+                              .on(loaderFrom(getActivity()))
+                              .call("test")
+                              .after(seconds(10))
+                              .getError()
+                              .getCause()).isInstanceOf(IllegalStateException.class);
+    assertThat(JRoutineAndroid.withStreamOf(Arrays.asList("test1", "test2", "test3"))
+                              .on(loaderFrom(getActivity()))
+                              .call("test")
+                              .after(seconds(10))
+                              .getError()
+                              .getCause()).isInstanceOf(IllegalStateException.class);
+    assertThat(JRoutineAndroid.withStreamOf(JRoutineAndroid.io().of("test1", "test2", "test3"))
+                              .on(loaderFrom(getActivity()))
+                              .call("test")
+                              .after(seconds(10))
+                              .getError()
+                              .getCause()).isInstanceOf(IllegalStateException.class);
+    assertThat(JRoutineAndroid.withStreamOf(
+        JRoutineAndroid.io().buildChannel().bind(new TemplateChannelConsumer<Object>() {}))
+                              .on(loaderFrom(getActivity()))
+                              .close()
+                              .after(seconds(10))
+                              .getError()
+                              .getCause()).isInstanceOf(IllegalStateException.class);
   }
 
   public void testSupplierCommand() {

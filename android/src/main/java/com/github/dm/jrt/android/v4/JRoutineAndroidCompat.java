@@ -29,10 +29,15 @@ import com.github.dm.jrt.android.v4.channel.SparseChannelsCompat;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
 import com.github.dm.jrt.android.v4.stream.JRoutineLoaderStreamCompat;
 import com.github.dm.jrt.android.v4.stream.LoaderStreamBuilderCompat;
+import com.github.dm.jrt.channel.Channels;
 import com.github.dm.jrt.core.builder.ChannelBuilder;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.function.Consumer;
+import com.github.dm.jrt.function.Supplier;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import static com.github.dm.jrt.android.core.ServiceContext.serviceFrom;
 import static com.github.dm.jrt.android.v4.core.LoaderContextCompat.loaderFrom;
@@ -178,5 +183,165 @@ public class JRoutineAndroidCompat extends SparseChannelsCompat {
   @NotNull
   public static <IN> LoaderStreamBuilderCompat<IN, IN> withStream() {
     return JRoutineLoaderStreamCompat.withStream();
+  }
+
+  /**
+   * Returns a stream routine builder producing only the inputs passed by the specified consumer.
+   * <br>
+   * The data will be produced only when the invocation completes.
+   * <br>
+   * If any other input is passed to the built routine, the invocation will be aborted with an
+   * {@link java.lang.IllegalStateException}.
+   *
+   * @param consumer the consumer instance.
+   * @param <IN>     the input data type.
+   * @return the routine builder instance.
+   * @throws java.lang.IllegalArgumentException if the class of the specified consumer has not a
+   *                                            static scope.
+   */
+  @NotNull
+  public static <IN> LoaderStreamBuilderCompat<IN, IN> withStreamAccept(
+      @NotNull final Consumer<Channel<IN, ?>> consumer) {
+    return JRoutineLoaderStreamCompat.withStreamAccept(consumer);
+  }
+
+  /**
+   * Returns a stream routine builder producing only the inputs passed by the specified consumer.
+   * <br>
+   * The data will be produced by calling the consumer {@code count} number of times only when the
+   * invocation completes.
+   * <br>
+   * If any other input is passed to the built routine, the invocation will be aborted with an
+   * {@link java.lang.IllegalStateException}.
+   *
+   * @param count    the number of times the consumer is called.
+   * @param consumer the consumer instance.
+   * @param <IN>     the input data type.
+   * @return the routine builder instance.
+   * @throws java.lang.IllegalArgumentException if the class of the specified consumer has not a
+   *                                            static scope or the specified count number is 0 or
+   *                                            negative.
+   */
+  @NotNull
+  public static <IN> LoaderStreamBuilderCompat<IN, IN> withStreamAccept(final int count,
+      @NotNull final Consumer<Channel<IN, ?>> consumer) {
+    return JRoutineLoaderStreamCompat.withStreamAccept(count, consumer);
+  }
+
+  /**
+   * Returns a stream routine builder producing only the inputs returned by the specified supplier.
+   * <br>
+   * The data will be produced only when the invocation completes.
+   * <br>
+   * If any other input is passed to the built routine, the invocation will be aborted with an
+   * {@link java.lang.IllegalStateException}.
+   *
+   * @param supplier the supplier instance.
+   * @param <IN>     the input data type.
+   * @return the routine builder instance.
+   * @throws java.lang.IllegalArgumentException if the class of the specified supplier has not a
+   *                                            static scope.
+   */
+  @NotNull
+  public static <IN> LoaderStreamBuilderCompat<IN, IN> withStreamGet(
+      @NotNull final Supplier<IN> supplier) {
+    return JRoutineLoaderStreamCompat.withStreamGet(supplier);
+  }
+
+  /**
+   * Returns a stream routine builder producing only the inputs returned by the specified supplier.
+   * <br>
+   * The data will be produced by calling the supplier {@code count} number of times only when the
+   * invocation completes.
+   * <br>
+   * If any other input is passed to the built routine, the invocation will be aborted with an
+   * {@link java.lang.IllegalStateException}.
+   *
+   * @param count    the number of times the supplier is called.
+   * @param supplier the supplier instance.
+   * @param <IN>     the input data type.
+   * @return the routine builder instance.
+   * @throws java.lang.IllegalArgumentException if the class of the specified supplier has not a
+   *                                            static scope or the specified count number is 0 or
+   *                                            negative.
+   */
+  @NotNull
+  public static <IN> LoaderStreamBuilderCompat<IN, IN> withStreamGet(final int count,
+      @NotNull final Supplier<IN> supplier) {
+    return JRoutineLoaderStreamCompat.withStreamGet(count, supplier);
+  }
+
+  /**
+   * Returns a stream routine builder producing only the specified input.
+   * <br>
+   * The data will be produced only when the invocation completes.
+   * <br>
+   * If any other input is passed to the built routine, the invocation will be aborted with an
+   * {@link java.lang.IllegalStateException}.
+   *
+   * @param input the input.
+   * @param <IN>  the input data type.
+   * @return the routine builder instance.
+   */
+  @NotNull
+  public static <IN> LoaderStreamBuilderCompat<IN, IN> withStreamOf(@Nullable final IN input) {
+    return JRoutineLoaderStreamCompat.withStreamOf(input);
+  }
+
+  /**
+   * Returns a stream routine builder producing only the specified inputs.
+   * <br>
+   * The data will be produced only when the invocation completes.
+   * <br>
+   * If any other input is passed to the built routine, the invocation will be aborted with an
+   * {@link java.lang.IllegalStateException}.
+   *
+   * @param inputs the input data.
+   * @param <IN>   the input data type.
+   * @return the routine builder instance.
+   */
+  @NotNull
+  public static <IN> LoaderStreamBuilderCompat<IN, IN> withStreamOf(@Nullable final IN... inputs) {
+    return JRoutineLoaderStreamCompat.withStreamOf(inputs);
+  }
+
+  /**
+   * Returns a stream routine builder producing only the inputs returned by the specified iterable.
+   * <br>
+   * The data will be produced only when the invocation completes.
+   * <br>
+   * If any other input is passed to the built routine, the invocation will be aborted with an
+   * {@link java.lang.IllegalStateException}.
+   *
+   * @param inputs the inputs iterable.
+   * @param <IN>   the input data type.
+   * @return the routine builder instance.
+   */
+  @NotNull
+  public static <IN> LoaderStreamBuilderCompat<IN, IN> withStreamOf(
+      @Nullable final Iterable<? extends IN> inputs) {
+    return JRoutineLoaderStreamCompat.withStreamOf(inputs);
+  }
+
+  /**
+   * Returns a stream routine builder producing only the inputs returned by the specified channel.
+   * <br>
+   * The data will be produced only when the invocation completes.
+   * <br>
+   * If any other input is passed to the built routine, the invocation will be aborted with an
+   * {@link java.lang.IllegalStateException}.
+   * <p>
+   * Note that the passed channel will be bound as a result of the call, so, in order to support
+   * multiple invocations, consider wrapping the channel in a replayable one, by calling the
+   * {@link Channels#replay(Channel)} utility method.
+   *
+   * @param channel the input channel.
+   * @param <IN>    the input data type.
+   * @return the routine builder instance.
+   */
+  @NotNull
+  public static <IN> LoaderStreamBuilderCompat<IN, IN> withStreamOf(
+      @Nullable final Channel<?, ? extends IN> channel) {
+    return JRoutineLoaderStreamCompat.withStreamOf(channel);
   }
 }

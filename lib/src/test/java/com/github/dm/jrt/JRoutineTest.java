@@ -17,7 +17,9 @@
 package com.github.dm.jrt;
 
 import com.github.dm.jrt.ObjectProxyRoutineBuilder.BuilderType;
+import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
+import com.github.dm.jrt.core.channel.TemplateChannelConsumer;
 import com.github.dm.jrt.core.config.ChannelConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.invocation.CallInvocation;
 import com.github.dm.jrt.core.invocation.CommandInvocation;
@@ -46,6 +48,7 @@ import org.assertj.core.data.Offset;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
@@ -53,6 +56,7 @@ import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.core.util.UnitDuration.millis;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
+import static com.github.dm.jrt.function.Functions.constant;
 import static com.github.dm.jrt.function.Functions.functionMapping;
 import static com.github.dm.jrt.object.InvocationTarget.instance;
 import static com.github.dm.jrt.operator.Operators.appendAccept;
@@ -501,6 +505,133 @@ public class JRoutineTest {
                                              .close()
                                              .after(seconds(3))
                                              .next()).isCloseTo(21, Offset.offset(0.1));
+  }
+
+  @Test
+  public void testStreamAccept() {
+    assertThat(JRoutine.withStreamAccept(range(0, 3)).immediate().close().all()).containsExactly(0,
+        1, 2, 3);
+    assertThat(JRoutine.withStreamAccept(2, range(1, 0)).immediate().close().all()).containsExactly(
+        1, 0, 1, 0);
+  }
+
+  @Test
+  public void testStreamAcceptAbort() {
+    Channel<Integer, Integer> channel = JRoutine.withStreamAccept(range(0, 3)).immediate().call();
+    assertThat(channel.abort()).isTrue();
+    assertThat(channel.getError()).isInstanceOf(AbortException.class);
+    channel = JRoutine.withStreamAccept(2, range(1, 0)).immediate().call();
+    assertThat(channel.abort()).isTrue();
+    assertThat(channel.getError()).isInstanceOf(AbortException.class);
+  }
+
+  @Test
+  @SuppressWarnings({"ConstantConditions", "ThrowableResultOfMethodCallIgnored"})
+  public void testStreamAcceptError() {
+    assertThat(JRoutine.withStreamAccept(range(0, 3))
+                       .immediate()
+                       .call(31)
+                       .getError()
+                       .getCause()).isInstanceOf(IllegalStateException.class);
+    assertThat(JRoutine.withStreamAccept(2, range(1, 0))
+                       .immediate()
+                       .call(-17)
+                       .getError()
+                       .getCause()).isInstanceOf(IllegalStateException.class);
+  }
+
+  @Test
+  public void testStreamGet() {
+    assertThat(JRoutine.withStreamGet(constant("test")).immediate().close().all()).containsExactly(
+        "test");
+    assertThat(
+        JRoutine.withStreamGet(2, constant("test2")).immediate().close().all()).containsExactly(
+        "test2", "test2");
+  }
+
+  @Test
+  public void testStreamGetAbort() {
+    Channel<String, String> channel =
+        JRoutine.withStreamGet(constant("test")).immediate().immediate().call();
+    assertThat(channel.abort()).isTrue();
+    assertThat(channel.getError()).isInstanceOf(AbortException.class);
+    channel = JRoutine.withStreamGet(2, constant("test2")).immediate().call();
+    assertThat(channel.abort()).isTrue();
+    assertThat(channel.getError()).isInstanceOf(AbortException.class);
+  }
+
+  @Test
+  @SuppressWarnings({"ConstantConditions", "ThrowableResultOfMethodCallIgnored"})
+  public void testStreamGetError() {
+    assertThat(JRoutine.withStreamGet(constant("test"))
+                       .immediate()
+                       .call("test")
+                       .getError()
+                       .getCause()).isInstanceOf(IllegalStateException.class);
+    assertThat(
+        JRoutine.withStreamGet(2, constant("test2")).immediate().call("test").getError().getCause())
+        .isInstanceOf(IllegalStateException.class);
+  }
+
+  @Test
+  public void testStreamOf() {
+    assertThat(JRoutine.withStreamOf("test").immediate().close().all()).containsExactly("test");
+    assertThat(
+        JRoutine.withStreamOf("test1", "test2", "test3").immediate().close().all()).containsExactly(
+        "test1", "test2", "test3");
+    assertThat(JRoutine.withStreamOf(Arrays.asList("test1", "test2", "test3"))
+                       .immediate()
+                       .close()
+                       .all()).containsExactly("test1", "test2", "test3");
+    assertThat(JRoutine.withStreamOf(JRoutine.io().of("test1", "test2", "test3"))
+                       .immediate()
+                       .close()
+                       .all()).containsExactly("test1", "test2", "test3");
+  }
+
+  @Test
+  public void testStreamOfAbort() {
+    Channel<String, String> channel = JRoutine.withStreamOf("test").immediate().call();
+    assertThat(channel.abort()).isTrue();
+    assertThat(channel.getError()).isInstanceOf(AbortException.class);
+    channel = JRoutine.withStreamOf("test1", "test2", "test3").immediate().call();
+    assertThat(channel.abort()).isTrue();
+    assertThat(channel.getError()).isInstanceOf(AbortException.class);
+    channel = JRoutine.withStreamOf(Arrays.asList("test1", "test2", "test3")).immediate().call();
+    assertThat(channel.abort()).isTrue();
+    assertThat(channel.getError()).isInstanceOf(AbortException.class);
+    channel = JRoutine.withStreamOf(JRoutine.io().of("test1", "test2", "test3")).immediate().call();
+    assertThat(channel.abort()).isTrue();
+    assertThat(channel.getError()).isInstanceOf(AbortException.class);
+  }
+
+  @Test
+  @SuppressWarnings({"ConstantConditions", "ThrowableResultOfMethodCallIgnored"})
+  public void testStreamOfError() {
+    assertThat(
+        JRoutine.withStreamOf("test").immediate().call("test").getError().getCause()).isInstanceOf(
+        IllegalStateException.class);
+    assertThat(JRoutine.withStreamOf("test1", "test2", "test3")
+                       .immediate()
+                       .call("test")
+                       .getError()
+                       .getCause()).isInstanceOf(IllegalStateException.class);
+    assertThat(JRoutine.withStreamOf(Arrays.asList("test1", "test2", "test3"))
+                       .immediate()
+                       .call("test")
+                       .getError()
+                       .getCause()).isInstanceOf(IllegalStateException.class);
+    assertThat(JRoutine.withStreamOf(JRoutine.io().of("test1", "test2", "test3"))
+                       .immediate()
+                       .call("test")
+                       .getError()
+                       .getCause()).isInstanceOf(IllegalStateException.class);
+    assertThat(JRoutine.withStreamOf(
+        JRoutine.io().buildChannel().bind(new TemplateChannelConsumer<Object>() {}))
+                       .immediate()
+                       .close()
+                       .getError()
+                       .getCause()).isInstanceOf(IllegalStateException.class);
   }
 
   @Test

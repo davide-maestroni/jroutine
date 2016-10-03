@@ -443,4 +443,155 @@ public class JRoutine extends Channels {
   public static <IN> StreamBuilder<IN, IN> withStream() {
     return JRoutineStream.withStream();
   }
+
+  /**
+   * Returns a stream routine builder producing only the inputs passed by the specified consumer.
+   * <br>
+   * The data will be produced only when the invocation completes.
+   * <br>
+   * If any other input is passed to the built routine, the invocation will be aborted with an
+   * {@link java.lang.IllegalStateException}.
+   *
+   * @param consumer the consumer instance.
+   * @param <IN>     the input data type.
+   * @return the routine builder instance.
+   */
+  @NotNull
+  public static <IN> StreamBuilder<IN, IN> withStreamAccept(
+      @NotNull final Consumer<Channel<IN, ?>> consumer) {
+    return JRoutineStream.withStreamAccept(consumer);
+  }
+
+  /**
+   * Returns a stream routine builder producing only the inputs passed by the specified consumer.
+   * <br>
+   * The data will be produced by calling the consumer {@code count} number of times only when the
+   * invocation completes.
+   * <br>
+   * If any other input is passed to the built routine, the invocation will be aborted with an
+   * {@link java.lang.IllegalStateException}.
+   *
+   * @param count    the number of times the consumer is called.
+   * @param consumer the consumer instance.
+   * @param <IN>     the input data type.
+   * @return the routine builder instance.
+   * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
+   */
+  @NotNull
+  public static <IN> StreamBuilder<IN, IN> withStreamAccept(final int count,
+      @NotNull final Consumer<Channel<IN, ?>> consumer) {
+    return JRoutineStream.withStreamAccept(count, consumer);
+  }
+
+  /**
+   * Returns a stream routine builder producing only the inputs returned by the specified supplier.
+   * <br>
+   * The data will be produced only when the invocation completes.
+   * <br>
+   * If any other input is passed to the built routine, the invocation will be aborted with an
+   * {@link java.lang.IllegalStateException}.
+   *
+   * @param supplier the supplier instance.
+   * @param <IN>     the input data type.
+   * @return the routine builder instance.
+   */
+  @NotNull
+  public static <IN> StreamBuilder<IN, IN> withStreamGet(@NotNull final Supplier<IN> supplier) {
+    return JRoutineStream.withStreamGet(supplier);
+  }
+
+  /**
+   * Returns a stream routine builder producing only the inputs returned by the specified supplier.
+   * <br>
+   * The data will be produced by calling the supplier {@code count} number of times only when the
+   * invocation completes.
+   * <br>
+   * If any other input is passed to the built routine, the invocation will be aborted with an
+   * {@link java.lang.IllegalStateException}.
+   *
+   * @param count    the number of times the supplier is called.
+   * @param supplier the supplier instance.
+   * @param <IN>     the input data type.
+   * @return the routine builder instance.
+   * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
+   */
+  @NotNull
+  public static <IN> StreamBuilder<IN, IN> withStreamGet(final int count,
+      @NotNull final Supplier<IN> supplier) {
+    return JRoutineStream.withStreamGet(count, supplier);
+  }
+
+  /**
+   * Returns a stream routine builder producing only the specified input.
+   * <br>
+   * The data will be produced only when the invocation completes.
+   * <br>
+   * If any other input is passed to the built routine, the invocation will be aborted with an
+   * {@link java.lang.IllegalStateException}.
+   *
+   * @param input the input.
+   * @param <IN>  the input data type.
+   * @return the routine builder instance.
+   */
+  @NotNull
+  public static <IN> StreamBuilder<IN, IN> withStreamOf(@Nullable final IN input) {
+    return JRoutineStream.withStreamOf(input);
+  }
+
+  /**
+   * Returns a stream routine builder producing only the specified inputs.
+   * <br>
+   * The data will be produced only when the invocation completes.
+   * <br>
+   * If any other input is passed to the built routine, the invocation will be aborted with an
+   * {@link java.lang.IllegalStateException}.
+   *
+   * @param inputs the input data.
+   * @param <IN>   the input data type.
+   * @return the routine builder instance.
+   */
+  @NotNull
+  public static <IN> StreamBuilder<IN, IN> withStreamOf(@Nullable final IN... inputs) {
+    return JRoutineStream.withStreamOf(inputs);
+  }
+
+  /**
+   * Returns a stream routine builder producing only the inputs returned by the specified iterable.
+   * <br>
+   * The data will be produced only when the invocation completes.
+   * <br>
+   * If any other input is passed to the built routine, the invocation will be aborted with an
+   * {@link java.lang.IllegalStateException}.
+   *
+   * @param inputs the inputs iterable.
+   * @param <IN>   the input data type.
+   * @return the routine builder instance.
+   */
+  @NotNull
+  public static <IN> StreamBuilder<IN, IN> withStreamOf(
+      @Nullable final Iterable<? extends IN> inputs) {
+    return JRoutineStream.withStreamOf(inputs);
+  }
+
+  /**
+   * Returns a stream routine builder producing only the inputs returned by the specified channel.
+   * <br>
+   * The data will be produced only when the invocation completes.
+   * <br>
+   * If any other input is passed to the built routine, the invocation will be aborted with an
+   * {@link java.lang.IllegalStateException}.
+   * <p>
+   * Note that the passed channel will be bound as a result of the call, so, in order to support
+   * multiple invocations, consider wrapping the channel in a replayable one, by calling the
+   * {@link Channels#replay(Channel)} utility method.
+   *
+   * @param channel the input channel.
+   * @param <IN>    the input data type.
+   * @return the routine builder instance.
+   */
+  @NotNull
+  public static <IN> StreamBuilder<IN, IN> withStreamOf(
+      @Nullable final Channel<?, ? extends IN> channel) {
+    return JRoutineStream.withStreamOf(channel);
+  }
 }

@@ -353,6 +353,27 @@ public class SimpleQueueTest {
   }
 
   @Test
+  public void testRemoveAllError1() {
+    final SimpleQueue<Integer> queue = new SimpleQueue<Integer>();
+    for (int i = 0; i < 7; i++) {
+      queue.add(i);
+    }
+
+    for (int i = 6; i >= 0; i--) {
+      assertThat(queue.isEmpty()).isFalse();
+      assertThat(queue.peekFirst()).isEqualTo(0);
+      assertThat(queue.removeLast()).isEqualTo(i);
+    }
+
+    try {
+      queue.removeLast();
+      fail();
+
+    } catch (final NoSuchElementException ignored) {
+    }
+  }
+
+  @Test
   public void testRemoveClearError() {
     final SimpleQueue<Integer> queue = new SimpleQueue<Integer>();
     for (int i = 0; i < 7; i++) {
@@ -369,6 +390,22 @@ public class SimpleQueueTest {
   }
 
   @Test
+  public void testRemoveClearError1() {
+    final SimpleQueue<Integer> queue = new SimpleQueue<Integer>();
+    for (int i = 0; i < 7; i++) {
+      queue.add(i);
+    }
+
+    queue.clear();
+    try {
+      queue.removeLast();
+      fail();
+
+    } catch (final NoSuchElementException ignored) {
+    }
+  }
+
+  @Test
   public void testRemoveEmptyError() {
     final SimpleQueue<Integer> queue = new SimpleQueue<Integer>();
     try {
@@ -377,5 +414,32 @@ public class SimpleQueueTest {
 
     } catch (final NoSuchElementException ignored) {
     }
+  }
+
+  @Test
+  public void testRemoveEmptyError1() {
+    final SimpleQueue<Integer> queue = new SimpleQueue<Integer>();
+    try {
+      queue.removeLast();
+      fail();
+
+    } catch (final NoSuchElementException ignored) {
+    }
+  }
+
+  @Test
+  public void testRemoveLast() {
+    final SimpleQueue<Integer> queue = new SimpleQueue<Integer>();
+    for (int i = 0; i < 77; i++) {
+      queue.add(i);
+    }
+
+    for (int i = 76; i >= 0; i--) {
+      assertThat(queue.isEmpty()).isFalse();
+      assertThat(queue.peekFirst()).isEqualTo(0);
+      assertThat(queue.removeLast()).isEqualTo(i);
+    }
+
+    assertThat(queue.isEmpty()).isTrue();
   }
 }

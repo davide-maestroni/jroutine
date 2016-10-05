@@ -336,7 +336,7 @@ public class LoaderBuilder {
   @NotNull
   public <IN, OUT> LoaderRoutineBuilder<IN, OUT> with(
       @NotNull final InvocationFactory<IN, OUT> factory) {
-    return JRoutineLoader.on(mContext).with(factoryFrom(factory));
+    return with(factoryFrom(factory));
   }
 
   /**

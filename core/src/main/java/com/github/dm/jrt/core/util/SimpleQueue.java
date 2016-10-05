@@ -43,7 +43,7 @@ public class SimpleQueue<E> implements Iterable<E> {
 
   private int mMask;
 
-  private Object[] mQueue;
+  private Object[] mData;
 
   private volatile long mReplaceCount = Long.MIN_VALUE;
 
@@ -53,7 +53,7 @@ public class SimpleQueue<E> implements Iterable<E> {
    * Constructor.
    */
   public SimpleQueue() {
-    mQueue = new Object[DEFAULT_SIZE];
+    mData = new Object[DEFAULT_SIZE];
     mMask = DEFAULT_SIZE - 1;
   }
 
@@ -67,7 +67,7 @@ public class SimpleQueue<E> implements Iterable<E> {
     final int msb =
         Integer.highestOneBit(ConstantConditions.positive("minimum capacity", minCapacity));
     final int initialCapacity = (minCapacity == msb) ? msb : msb << 1;
-    mQueue = new Object[initialCapacity];
+    mData = new Object[initialCapacity];
     mMask = initialCapacity - 1;
   }
 
@@ -79,7 +79,7 @@ public class SimpleQueue<E> implements Iterable<E> {
   }
 
   /**
-   * Adds the specified element to the queue.
+   * Adds the specified element to end of the queue.
    * <p>
    * Note that the element can be null.
    *
@@ -88,7 +88,7 @@ public class SimpleQueue<E> implements Iterable<E> {
   public void add(@Nullable final E element) {
     final int last = mLast;
     final int newLast = (last + 1) & mMask;
-    mQueue[last] = element;
+    mData[last] = element;
     if (mFirst == newLast) {
       doubleCapacity();
     }
@@ -98,7 +98,7 @@ public class SimpleQueue<E> implements Iterable<E> {
   }
 
   /**
-   * Adds all the elements returned by the specified iterable.
+   * Adds all the elements returned by the specified iterable to end of the queue.
    * <p>
    * Note that any of the returned element can be null.
    *
@@ -126,7 +126,7 @@ public class SimpleQueue<E> implements Iterable<E> {
       newFirst = (mFirst + mask) & mask;
     }
 
-    mQueue[newFirst] = element;
+    mData[newFirst] = element;
     mFirst = newFirst;
     ++mSize;
   }
@@ -138,7 +138,7 @@ public class SimpleQueue<E> implements Iterable<E> {
     mFirst = 0;
     mLast = 0;
     mSize = 0;
-    Arrays.fill(mQueue, null);
+    Arrays.fill(mData, null);
   }
 
   /**
@@ -155,7 +155,7 @@ public class SimpleQueue<E> implements Iterable<E> {
   }
 
   /**
-   * Peeks the first element added into the queue.
+   * Peeks the first element of the queue.
    *
    * @return the element.
    * @throws java.util.NoSuchElementException if the queue is empty.
@@ -166,11 +166,11 @@ public class SimpleQueue<E> implements Iterable<E> {
       throw new NoSuchElementException();
     }
 
-    return (E) mQueue[mFirst];
+    return (E) mData[mFirst];
   }
 
   /**
-   * Removes the first element added into the queue.
+   * Removes the first element of the queue.
    *
    * @return the element.
    * @throws java.util.NoSuchElementException if the queue is empty.
@@ -181,11 +181,33 @@ public class SimpleQueue<E> implements Iterable<E> {
       throw new NoSuchElementException();
     }
 
-    final Object[] queue = mQueue;
+    final Object[] data = mData;
     final int first = mFirst;
     mFirst = (first + 1) & mMask;
-    final Object output = queue[first];
-    queue[first] = null;
+    final Object output = data[first];
+    data[first] = null;
+    --mSize;
+    return (E) output;
+  }
+
+  /**
+   * Removes the last element of the queue.
+   *
+   * @return the element.
+   * @throws java.util.NoSuchElementException if the queue is empty.
+   */
+  @SuppressWarnings("unchecked")
+  public E removeLast() {
+    if (isEmpty()) {
+      throw new NoSuchElementException();
+    }
+
+    final Object[] data = mData;
+    final int mask = mMask;
+    final int newLast = (mLast + mask) & mask;
+    mLast = newLast;
+    final Object output = data[newLast];
+    data[newLast] = null;
     --mSize;
     return (E) output;
   }
@@ -206,13 +228,13 @@ public class SimpleQueue<E> implements Iterable<E> {
    */
   @SuppressWarnings("unchecked")
   public void transferTo(@NotNull final Collection<? super E> collection) {
-    final Object[] queue = mQueue;
+    final Object[] data = mData;
     final int mask = mMask;
     final int last = mLast;
     int i = mFirst;
     while (i != last) {
-      collection.add((E) queue[i]);
-      queue[i] = null;
+      collection.add((E) data[i]);
+      data[i] = null;
       i = (i + 1) & mask;
     }
 
@@ -228,13 +250,13 @@ public class SimpleQueue<E> implements Iterable<E> {
    */
   @SuppressWarnings("unchecked")
   public void transferTo(@NotNull final SimpleQueue<? super E> other) {
-    final Object[] queue = mQueue;
+    final Object[] data = mData;
     final int mask = mMask;
     final int last = mLast;
     int i = mFirst;
     while (i != last) {
-      other.add((E) queue[i]);
-      queue[i] = null;
+      other.add((E) data[i]);
+      data[i] = null;
       i = (i + 1) & mask;
     }
 
@@ -244,17 +266,17 @@ public class SimpleQueue<E> implements Iterable<E> {
   }
 
   private void doubleCapacity() {
-    final Object[] queue = mQueue;
-    final int size = queue.length;
+    final Object[] data = mData;
+    final int size = data.length;
     final int newSize = size << 1;
     if (newSize < size) {
       throw new OutOfMemoryError();
     }
 
     final int first = mFirst;
-    final Object[] newQueue = new Object[newSize];
-    resizeArray(queue, newQueue, first);
-    mQueue = newQueue;
+    final Object[] newData = new Object[newSize];
+    resizeArray(data, newData, first);
+    mData = newData;
     final int shift = newSize - size;
     mFirst = first + shift;
     if (mLast >= first) {
@@ -307,7 +329,7 @@ public class SimpleQueue<E> implements Iterable<E> {
       }
 
       mPointer = (pointer + 1) & queue.mMask;
-      return (E) queue.mQueue[pointer];
+      return (E) queue.mData[pointer];
     }
 
     public void remove() {
@@ -334,7 +356,7 @@ public class SimpleQueue<E> implements Iterable<E> {
       }
 
       final int mask = queue.mMask;
-      queue.mQueue[(pointer + mask) & mask] = element;
+      queue.mData[(pointer + mask) & mask] = element;
     }
   }
 }

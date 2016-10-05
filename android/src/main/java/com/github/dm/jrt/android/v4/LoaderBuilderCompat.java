@@ -336,7 +336,7 @@ public class LoaderBuilderCompat {
   @NotNull
   public <IN, OUT> LoaderRoutineBuilder<IN, OUT> with(
       @NotNull final InvocationFactory<IN, OUT> factory) {
-    return JRoutineLoaderCompat.on(mContext).with(factoryFrom(factory));
+    return with(factoryFrom(factory));
   }
 
   /**

@@ -298,7 +298,7 @@ public class JRoutine extends Channels {
   @NotNull
   public static <IN, OUT> RoutineBuilder<IN, OUT> withCall(
       @NotNull final Function<? super List<IN>, ? extends OUT> function) {
-    return JRoutineCore.with(functionCall(function));
+    return with(functionCall(function));
   }
 
   /**
@@ -312,7 +312,7 @@ public class JRoutine extends Channels {
   @NotNull
   public static <IN, OUT> RoutineBuilder<IN, OUT> withCallConsumer(
       @NotNull final BiConsumer<? super List<IN>, ? super Channel<OUT, ?>> consumer) {
-    return JRoutineCore.with(consumerCall(consumer));
+    return with(consumerCall(consumer));
   }
 
   /**
@@ -331,7 +331,7 @@ public class JRoutine extends Channels {
    */
   @NotNull
   public static ObjectProxyRoutineBuilder withClassOfType(@NotNull final Class<?> targetClass) {
-    return new DefaultObjectProxyRoutineBuilder(classOfType(targetClass));
+    return with(classOfType(targetClass));
   }
 
   /**
@@ -344,7 +344,7 @@ public class JRoutine extends Channels {
   @NotNull
   public static <OUT> RoutineBuilder<Void, OUT> withCommand(
       @NotNull final Supplier<? extends OUT> supplier) {
-    return JRoutineCore.with(supplierCommand(supplier));
+    return with(supplierCommand(supplier));
   }
 
   /**
@@ -357,7 +357,7 @@ public class JRoutine extends Channels {
   @NotNull
   public static <OUT> RoutineBuilder<Void, OUT> withCommandConsumer(
       @NotNull final Consumer<? super Channel<OUT, ?>> consumer) {
-    return JRoutineCore.with(consumerCommand(consumer));
+    return with(consumerCommand(consumer));
   }
 
   /**
@@ -371,7 +371,7 @@ public class JRoutine extends Channels {
   @NotNull
   public static <IN, OUT> RoutineBuilder<IN, OUT> withFactory(
       @NotNull final Supplier<? extends Invocation<? super IN, ? extends OUT>> supplier) {
-    return JRoutineCore.with(supplierFactory(supplier));
+    return with(supplierFactory(supplier));
   }
 
   /**
@@ -384,7 +384,7 @@ public class JRoutine extends Channels {
   @NotNull
   public static <IN> RoutineBuilder<IN, IN> withFilter(
       @NotNull final Predicate<? super IN> predicate) {
-    return JRoutineCore.with(predicateFilter(predicate));
+    return with(predicateFilter(predicate));
   }
 
   /**
@@ -402,7 +402,7 @@ public class JRoutine extends Channels {
    */
   @NotNull
   public static ObjectProxyRoutineBuilder withInstance(@NotNull final Object object) {
-    return new DefaultObjectProxyRoutineBuilder(instance(object));
+    return with(instance(object));
   }
 
   /**
@@ -416,7 +416,7 @@ public class JRoutine extends Channels {
   @NotNull
   public static <IN, OUT> RoutineBuilder<IN, OUT> withMapping(
       @NotNull final Function<? super IN, ? extends OUT> function) {
-    return JRoutineCore.with(functionMapping(function));
+    return with(functionMapping(function));
   }
 
   /**
@@ -430,7 +430,7 @@ public class JRoutine extends Channels {
   @NotNull
   public static <IN, OUT> RoutineBuilder<IN, OUT> withMappingConsumer(
       @NotNull final BiConsumer<? super IN, ? super Channel<OUT, ?>> consumer) {
-    return JRoutineCore.with(consumerMapping(consumer));
+    return with(consumerMapping(consumer));
   }
 
   /**

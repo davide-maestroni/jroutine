@@ -97,9 +97,9 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  *         outputChannel.after(seconds(1)).all(); // expected values: 1, 4, 9
  *     </code>
  * </pre>
- * The {@code call()} method returns an output channel producing the outputs returned by the method.
- * In the above case no output is returned (in fact, the return type is {@code void}), still the
- * channel will be notified of the invocation abortion and completion.
+ * The {@code call()} method returns an output channel producing the outputs returned by the target
+ * method. In the above case no output is returned (in fact, the return type is {@code void}), still
+ * the channel will be notified of the invocation abortion and completion.
  * <p>
  * Several methods can be defined, though, be aware that the number and type of parameters are
  * employed to identify the method to call. Any clash in the method signatures will raise an
@@ -203,7 +203,7 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  *         }
  *     </code>
  * </pre>
- * The same holds true for static classes, with the only difference that only the declared
+ * The same holds true for static classes, with the only difference that just the declared
  * parameters must be passed:
  * <pre>
  *     <code>
@@ -234,7 +234,7 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * The routine method implementation allows for multiple input channels to deliver data to the
  * method invocation. In such case it is possible to easily identify the channel for which an input
  * is ready by calling the {@code switchInput()} protected method. The method will return one of the
- * input channels passed as parameters (since the vary same instance is returned == comparison is
+ * input channels passed as parameters (since the very same instance is returned == comparison is
  * allowed) or null, if the invocation takes no input channel.
  * <p>
  * For example, a routine printing the inputs of different types can be implemented as follows:

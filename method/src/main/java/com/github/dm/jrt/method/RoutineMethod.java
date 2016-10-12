@@ -412,7 +412,7 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  *                      .call(JRoutineCore.io().&lt;Channel&lt;String, String&gt;&gt;of(channel));
  *     </code>
  * </pre>
-
+ *
  * <p>
  * Created by davide-maestroni on 08/10/2016.
  */
@@ -532,7 +532,17 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
     return from(target, target.getTargetClass().getMethod(name, parameterTypes));
   }
 
-  // TODO: 12/10/16 javadoc
+  /**
+   * Gets the in/out annotation type related to the specified parameter and, if present, validates
+   * it.
+   *
+   * @param param       the parameter object.
+   * @param annotations the parameter annotation.
+   * @return the annotation class or null.
+   * @throws java.lang.IllegalArgumentException if the parameter annotations are invalid.
+   * @see com.github.dm.jrt.method.annotation.In In
+   * @see com.github.dm.jrt.method.annotation.Out Out
+   */
   @Nullable
   protected static Class<? extends Annotation> getAnnotationType(@NotNull final Object param,
       @NotNull final Annotation[] annotations) {

@@ -37,15 +37,16 @@ import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.Reflection;
-import com.github.dm.jrt.method.InputChannel;
-import com.github.dm.jrt.method.OutputChannel;
 import com.github.dm.jrt.method.RoutineMethod;
+import com.github.dm.jrt.method.annotation.In;
+import com.github.dm.jrt.method.annotation.Out;
 import com.github.dm.jrt.object.config.ObjectConfigurable;
 import com.github.dm.jrt.object.config.ObjectConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -86,8 +87,8 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  *                 super(context);
  *             }
  *
- *             void run(final InputChannel&lt;String&gt; input,
- *                     final OutputChannel&lt;String&gt; output) {
+ *             void run(&#64;In final Channel&lt;?, String&gt; input,
+ *                     &#64;Out final Channel&lt;String, ?&gt; output) {
  *                 final MyService service = (MyService) getContext();
  *                 // do it
  *             }
@@ -105,7 +106,7 @@ public class ServiceRoutineMethod extends RoutineMethod
 
   private final ServiceContext mContext;
 
-  private final ThreadLocal<InputChannel<?>> mLocalChannel = new ThreadLocal<InputChannel<?>>();
+  private final ThreadLocal<Channel<?, ?>> mLocalChannel = new ThreadLocal<Channel<?, ?>>();
 
   private final ThreadLocal<Context> mLocalContext = new ThreadLocal<Context>();
 
@@ -248,10 +249,9 @@ public class ServiceRoutineMethod extends RoutineMethod
    */
   @NotNull
   @Override
-  public <OUT> OutputChannel<OUT> call(@Nullable final Object... params) {
+  public <OUT> Channel<?, OUT> call(@Nullable final Object... params) {
     final Object[] safeParams = asArgs(params);
-    findBestMatchingMethod(getClass(), safeParams);
-    return call(InvocationMode.ASYNC, safeParams);
+    return call(findBestMatchingMethod(getClass(), safeParams), InvocationMode.ASYNC, safeParams);
   }
 
   /**
@@ -270,10 +270,10 @@ public class ServiceRoutineMethod extends RoutineMethod
    */
   @NotNull
   @Override
-  public <OUT> OutputChannel<OUT> callParallel(@Nullable final Object... params) {
+  public <OUT> Channel<?, OUT> callParallel(@Nullable final Object... params) {
     final Object[] safeParams = asArgs(params);
-    findBestMatchingMethod(getClass(), safeParams);
-    return call(InvocationMode.PARALLEL, safeParams);
+    return call(findBestMatchingMethod(getClass(), safeParams), InvocationMode.PARALLEL,
+        safeParams);
   }
 
   /**
@@ -301,8 +301,8 @@ public class ServiceRoutineMethod extends RoutineMethod
    */
   @Override
   @SuppressWarnings("unchecked")
-  protected <IN> InputChannel<IN> switchInput() {
-    return (InputChannel<IN>) mLocalChannel.get();
+  protected <IN> Channel<?, IN> switchInput() {
+    return (Channel<?, IN>) mLocalChannel.get();
   }
 
   @NotNull
@@ -342,23 +342,25 @@ public class ServiceRoutineMethod extends RoutineMethod
 
   @NotNull
   @SuppressWarnings("unchecked")
-  private <OUT> OutputChannel<OUT> call(@NotNull final InvocationMode mode,
-      @NotNull final Object[] params) {
-    final ArrayList<InputChannel<?>> inputChannels = new ArrayList<InputChannel<?>>();
-    final ArrayList<OutputChannel<?>> outputChannels = new ArrayList<OutputChannel<?>>();
+  private <OUT> Channel<?, OUT> call(@NotNull final Method method,
+      @NotNull final InvocationMode mode, @NotNull final Object[] params) {
+    final ArrayList<Channel<?, ?>> inputChannels = new ArrayList<Channel<?, ?>>();
+    final ArrayList<Channel<?, ?>> outputChannels = new ArrayList<Channel<?, ?>>();
+    final Annotation[][] annotations = method.getParameterAnnotations();
     for (int i = 0; i < params.length; ++i) {
       final Object param = params[i];
-      if (param instanceof InputChannel) {
+      final Class<? extends Annotation> annotationType = getAnnotationType(param, annotations[i]);
+      if (annotationType == In.class) {
         params[i] = InputChannelPlaceHolder.class;
-        inputChannels.add((InputChannel<?>) param);
+        inputChannels.add((Channel<?, ?>) param);
 
-      } else if (param instanceof OutputChannel) {
+      } else if (annotationType == Out.class) {
         params[i] = OutputChannelPlaceHolder.class;
-        outputChannels.add((OutputChannel<?>) param);
+        outputChannels.add((Channel<?, ?>) param);
       }
     }
 
-    final OutputChannel<OUT> resultChannel = outputChannel();
+    final Channel<OUT, OUT> resultChannel = JRoutineCore.io().buildChannel();
     outputChannels.add(resultChannel);
     final Channel<?, ? extends ParcelableSelectable<Object>> inputChannel =
         (!inputChannels.isEmpty()) ? AndroidChannels.mergeParcelable(inputChannels).buildChannels()
@@ -372,7 +374,7 @@ public class ServiceRoutineMethod extends RoutineMethod
     final Map<Integer, Channel<?, Object>> channelMap =
         AndroidChannels.selectOutput(0, outputChannels.size(), outputChannel).buildChannels();
     for (final Entry<Integer, Channel<?, Object>> entry : channelMap.entrySet()) {
-      entry.getValue().bind((OutputChannel<Object>) outputChannels.get(entry.getKey())).close();
+      entry.getValue().bind((Channel<Object, Object>) outputChannels.get(entry.getKey())).close();
     }
 
     return resultChannel;
@@ -390,7 +392,7 @@ public class ServiceRoutineMethod extends RoutineMethod
     mLocalContext.set(context);
   }
 
-  private void setLocalInput(@Nullable final InputChannel<?> inputChannel) {
+  private void setLocalInput(@Nullable final Channel<?, ?> inputChannel) {
     mLocalChannel.set(inputChannel);
   }
 
@@ -444,13 +446,13 @@ public class ServiceRoutineMethod extends RoutineMethod
 
     @NotNull
     @Override
-    public <OUT> OutputChannel<OUT> call(@Nullable final Object... params) {
+    public <OUT> Channel<?, OUT> call(@Nullable final Object... params) {
       return call(InvocationMode.ASYNC, params);
     }
 
     @NotNull
     @Override
-    public <OUT> OutputChannel<OUT> callParallel(@Nullable final Object... params) {
+    public <OUT> Channel<?, OUT> callParallel(@Nullable final Object... params) {
       return call(InvocationMode.PARALLEL, params);
     }
 
@@ -483,7 +485,7 @@ public class ServiceRoutineMethod extends RoutineMethod
 
     @NotNull
     @SuppressWarnings("unchecked")
-    private <OUT> OutputChannel<OUT> call(@NotNull final InvocationMode mode,
+    private <OUT> Channel<?, OUT> call(@NotNull final InvocationMode mode,
         @Nullable final Object[] params) {
       final Object[] safeParams = asArgs(params);
       final Method method = mMethod;
@@ -500,15 +502,15 @@ public class ServiceRoutineMethod extends RoutineMethod
                                                                    .method(method);
       final Channel<Object, Object> channel = mode.invoke(routine).sorted();
       for (final Object param : safeParams) {
-        if (param instanceof InputChannel) {
-          channel.pass((InputChannel<?>) param);
+        if (param instanceof Channel) {
+          channel.pass((Channel<?, ?>) param);
 
         } else {
           channel.pass(param);
         }
       }
 
-      return (OutputChannel<OUT>) toOutput(channel.close());
+      return (Channel<?, OUT>) channel.close();
     }
   }
 
@@ -530,13 +532,13 @@ public class ServiceRoutineMethod extends RoutineMethod
 
     private final Object[] mArgs;
 
-    private final ArrayList<InputChannel<?>> mInputChannels = new ArrayList<InputChannel<?>>();
+    private final ArrayList<Channel<?, ?>> mInputChannels = new ArrayList<Channel<?, ?>>();
 
     private final Method mMethod;
 
     private final Object[] mOrigParams;
 
-    private final ArrayList<OutputChannel<?>> mOutputChannels = new ArrayList<OutputChannel<?>>();
+    private final ArrayList<Channel<?, ?>> mOutputChannels = new ArrayList<Channel<?, ?>>();
 
     private final boolean mReturnResults;
 
@@ -570,10 +572,10 @@ public class ServiceRoutineMethod extends RoutineMethod
       for (int i = 0; i < params.length; ++i) {
         final Object param = params[i];
         if (param == InputChannelPlaceHolder.class) {
-          params[i] = ServiceRoutineMethod.inputChannel();
+          params[i] = JRoutineCore.io().buildChannel();
 
         } else if (param == OutputChannelPlaceHolder.class) {
-          params[i] = ServiceRoutineMethod.outputChannel();
+          params[i] = JRoutineCore.io().buildChannel();
         }
       }
 
@@ -587,8 +589,8 @@ public class ServiceRoutineMethod extends RoutineMethod
     @Override
     public void onAbort(@NotNull final RoutineException reason) throws Exception {
       mIsAborted = true;
-      final List<InputChannel<?>> inputChannels = mInputChannels;
-      for (final InputChannel<?> inputChannel : inputChannels) {
+      final List<Channel<?, ?>> inputChannels = mInputChannels;
+      for (final Channel<?, ?> inputChannel : inputChannels) {
         inputChannel.abort(reason);
       }
 
@@ -602,7 +604,7 @@ public class ServiceRoutineMethod extends RoutineMethod
       } finally {
         instance.resetIgnoreReturnValue();
         instance.setLocalInput(null);
-        for (final OutputChannel<?> outputChannel : mOutputChannels) {
+        for (final Channel<?, ?> outputChannel : mOutputChannels) {
           outputChannel.abort(reason);
         }
       }
@@ -614,15 +616,15 @@ public class ServiceRoutineMethod extends RoutineMethod
       bind(result);
       mIsComplete = true;
       if (!mIsAborted) {
-        final List<InputChannel<?>> inputChannels = mInputChannels;
-        for (final InputChannel<?> inputChannel : inputChannels) {
+        final List<Channel<?, ?>> inputChannels = mInputChannels;
+        for (final Channel<?, ?> inputChannel : inputChannels) {
           inputChannel.close();
         }
 
         final ServiceRoutineMethod instance = mInstance;
         instance.setLocalInput((!inputChannels.isEmpty()) ? inputChannels.get(0) : null);
         instance.resetIgnoreReturnValue();
-        final List<OutputChannel<?>> outputChannels = mOutputChannels;
+        final List<Channel<?, ?>> outputChannels = mOutputChannels;
         try {
           final Object methodResult = invokeMethod();
           if (mReturnResults && !instance.isIgnoreReturnValue()) {
@@ -634,7 +636,7 @@ public class ServiceRoutineMethod extends RoutineMethod
           instance.setLocalInput(null);
         }
 
-        for (final OutputChannel<?> outputChannel : outputChannels) {
+        for (final Channel<?, ?> outputChannel : outputChannels) {
           outputChannel.close();
         }
       }
@@ -644,8 +646,8 @@ public class ServiceRoutineMethod extends RoutineMethod
     public void onInput(final ParcelableSelectable<Object> input,
         @NotNull final Channel<ParcelableSelectable<Object>, ?> result) throws Exception {
       bind(result);
-      @SuppressWarnings("unchecked") final InputChannel<Object> inputChannel =
-          (InputChannel<Object>) mInputChannels.get(input.index);
+      @SuppressWarnings("unchecked") final Channel<Object, Object> inputChannel =
+          (Channel<Object, Object>) mInputChannels.get(input.index);
       inputChannel.pass(input.data);
       final ServiceRoutineMethod instance = mInstance;
       instance.setLocalInput(inputChannel);
@@ -675,7 +677,7 @@ public class ServiceRoutineMethod extends RoutineMethod
       final ServiceRoutineMethod instance =
           (mInstance = mConstructor.newInstance(mConstructorArgs));
       instance.setReturnType(mMethod.getReturnType());
-      mParams = replaceChannels(mOrigParams, mInputChannels, mOutputChannels);
+      mParams = replaceChannels(mMethod, mOrigParams, mInputChannels, mOutputChannels);
     }
 
     @Override
@@ -691,7 +693,7 @@ public class ServiceRoutineMethod extends RoutineMethod
     private void bind(@NotNull final Channel<ParcelableSelectable<Object>, ?> result) {
       if (!mIsBound) {
         mIsBound = true;
-        final List<OutputChannel<?>> outputChannels = mOutputChannels;
+        final List<Channel<?, ?>> outputChannels = mOutputChannels;
         if (!outputChannels.isEmpty()) {
           result.pass(AndroidChannels.mergeParcelable(outputChannels).buildChannels());
         }

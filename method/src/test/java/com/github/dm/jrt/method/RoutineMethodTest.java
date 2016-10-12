@@ -21,6 +21,8 @@ import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.runner.Runners;
+import com.github.dm.jrt.method.annotation.In;
+import com.github.dm.jrt.method.annotation.Out;
 
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
@@ -47,11 +49,11 @@ public class RoutineMethodTest {
   }
 
   private static void testStaticInternal() {
-    final InputChannel<String> inputStrings = RoutineMethod.inputChannel();
-    final OutputChannel<Object> outputLengths = RoutineMethod.outputChannel();
+    final Channel<String, String> inputStrings = JRoutineCore.io().buildChannel();
+    final Channel<Integer, Integer> outputLengths = JRoutineCore.io().buildChannel();
     new RoutineMethod() {
 
-      void length(final InputChannel<String> input, final OutputChannel<Integer> output) {
+      void length(@In final Channel<?, String> input, @Out final Channel<Integer, ?> output) {
         if (input.hasNext()) {
           output.pass(input.next().length());
         }
@@ -65,26 +67,26 @@ public class RoutineMethodTest {
     final Locale locale = Locale.getDefault();
     final RoutineMethod method = new RoutineMethod(locale) {
 
-      String switchCase(final InputChannel<String> input, final boolean isUpper) {
+      String switchCase(@In final Channel<?, String> input, final boolean isUpper) {
         final String str = input.next();
         return (isUpper) ? str.toUpperCase(locale) : str.toLowerCase(locale);
       }
     };
-    InputChannel<Object> inputChannel = RoutineMethod.inputChannel().pass("test");
+    Channel<Object, Object> inputChannel = JRoutineCore.io().buildChannel().pass("test");
     assertThat(method.call(inputChannel, true).after(seconds(1)).next()).isEqualTo("TEST");
-    inputChannel = RoutineMethod.inputChannel().pass("TEST");
+    inputChannel = JRoutineCore.io().buildChannel().pass("TEST");
     assertThat(method.call(inputChannel, false).after(seconds(1)).next()).isEqualTo("test");
   }
 
   @Test
   public void testAbort() {
-    final InputChannel<Integer> inputChannel = RoutineMethod.inputChannel();
-    final OutputChannel<Integer> outputChannel = RoutineMethod.outputChannel();
+    final Channel<Integer, Integer> inputChannel = JRoutineCore.io().buildChannel();
+    final Channel<Integer, Integer> outputChannel = JRoutineCore.io().buildChannel();
     new RoutineMethod() {
 
       private int mSum;
 
-      void sum(final InputChannel<Integer> input, final OutputChannel<Integer> output) {
+      void sum(@In final Channel<?, Integer> input, @Out final Channel<Integer, ?> output) {
         if (input.hasNext()) {
           mSum += input.next();
 
@@ -100,16 +102,16 @@ public class RoutineMethodTest {
 
   @Test
   public void testAbort2() {
-    final InputChannel<Integer> inputChannel1 = RoutineMethod.inputChannel();
-    final InputChannel<Integer> inputChannel2 = RoutineMethod.inputChannel();
-    final OutputChannel<Integer> outputChannel = RoutineMethod.outputChannel();
+    final Channel<Integer, Integer> inputChannel1 = JRoutineCore.io().buildChannel();
+    final Channel<Integer, Integer> inputChannel2 = JRoutineCore.io().buildChannel();
+    final Channel<Integer, Integer> outputChannel = JRoutineCore.io().buildChannel();
     new RoutineMethod() {
 
       private int mSum;
 
-      void sum(final InputChannel<Integer> input1, final InputChannel<Integer> input2,
-          final OutputChannel<Integer> output) {
-        final InputChannel<Integer> input = switchInput();
+      void sum(@In final Channel<?, Integer> input1, @In final Channel<?, Integer> input2,
+          @Out final Channel<Integer, ?> output) {
+        final Channel<?, Integer> input = switchInput();
         if (input.hasNext()) {
           mSum += input.next();
 
@@ -126,15 +128,15 @@ public class RoutineMethodTest {
 
   @Test
   public void testAbort3() {
-    final InputChannel<Integer> inputChannel1 = RoutineMethod.inputChannel();
-    final InputChannel<Integer> inputChannel2 = RoutineMethod.inputChannel();
-    final OutputChannel<Integer> outputChannel = RoutineMethod.outputChannel();
+    final Channel<Integer, Integer> inputChannel1 = JRoutineCore.io().buildChannel();
+    final Channel<Integer, Integer> inputChannel2 = JRoutineCore.io().buildChannel();
+    final Channel<Integer, Integer> outputChannel = JRoutineCore.io().buildChannel();
     new RoutineMethod() {
 
       private int mSum;
 
-      void sum(final InputChannel<Integer> input1, final InputChannel<Integer> input2,
-          final OutputChannel<Integer> output) {
+      void sum(@In final Channel<?, Integer> input1, @In final Channel<?, Integer> input2,
+          @Out final Channel<Integer, ?> output) {
         if (input1.equals(switchInput())) {
           if (input1.hasNext()) {
             mSum += input1.next();
@@ -153,32 +155,33 @@ public class RoutineMethodTest {
 
   @Test
   public void testBind() {
-    final InputChannel<Integer> inputChannel = RoutineMethod.inputChannel();
-    final OutputChannel<Integer> outputChannel = RoutineMethod.outputChannel();
+    final Channel<Integer, Integer> inputChannel = JRoutineCore.io().buildChannel();
+    final Channel<Integer, Integer> outputChannel = JRoutineCore.io().buildChannel();
     new RoutineMethod() {
 
-      public void square(final InputChannel<Integer> input, final OutputChannel<Integer> output) {
+      public void square(@In final Channel<?, Integer> input,
+          @Out final Channel<Integer, ?> output) {
         if (input.hasNext()) {
           final int i = input.next();
           output.pass(i * i);
         }
       }
     }.call(inputChannel, outputChannel);
-    final OutputChannel<Integer> resultChannel = RoutineMethod.outputChannel();
-    new SumRoutine().call(RoutineMethod.toInput(outputChannel), resultChannel);
+    final Channel<Integer, Integer> resultChannel = JRoutineCore.io().buildChannel();
+    new SumRoutine().call(outputChannel, resultChannel);
     inputChannel.pass(1, 2, 3, 4, 5).close();
     assertThat(resultChannel.after(seconds(1)).next()).isEqualTo(55);
   }
 
   @Test
   public void testCall() {
-    final InputChannel<Integer> inputChannel = RoutineMethod.inputChannel();
-    final OutputChannel<Integer> outputChannel = RoutineMethod.outputChannel();
+    final Channel<Integer, Integer> inputChannel = JRoutineCore.io().buildChannel();
+    final Channel<Integer, Integer> outputChannel = JRoutineCore.io().buildChannel();
     new RoutineMethod() {
 
       private int mSum;
 
-      public void sum(final InputChannel<Integer> input, final OutputChannel<Integer> output) {
+      public void sum(@In final Channel<?, Integer> input, @Out final Channel<Integer, ?> output) {
         if (input.hasNext()) {
           mSum += input.next();
 
@@ -191,7 +194,7 @@ public class RoutineMethodTest {
     assertThat(outputChannel.after(seconds(1)).next()).isEqualTo(15);
   }
 
-  @Test
+  @Test(expected = IllegalStateException.class)
   public void testCallError() {
     final RoutineMethod method = new RoutineMethod() {
 
@@ -200,18 +203,13 @@ public class RoutineMethodTest {
       }
     };
     assertThat(method.call().after(seconds(1)).next()).isEqualTo(0);
-    try {
-      method.call();
-      fail();
-
-    } catch (final IllegalStateException ignored) {
-    }
+    method.call();
   }
 
   @Test
   public void testCallSync() {
-    final InputChannel<Integer> inputChannel = RoutineMethod.inputChannel();
-    final OutputChannel<Integer> outputChannel = RoutineMethod.outputChannel();
+    final Channel<Integer, Integer> inputChannel = JRoutineCore.io().buildChannel();
+    final Channel<Integer, Integer> outputChannel = JRoutineCore.io().buildChannel();
     new SumRoutine().applyInvocationConfiguration()
                     .withRunner(Runners.syncRunner())
                     .configured()
@@ -227,11 +225,11 @@ public class RoutineMethodTest {
                             .after(seconds(1))
                             .next()).isEqualTo(4);
     assertThat(RoutineMethod.from(RoutineMethodTest.class.getMethod("length", String.class))
-                            .call(RoutineMethod.inputOf("test"))
+                            .call(JRoutineCore.io().of("test"))
                             .after(seconds(1))
                             .next()).isEqualTo(4);
-    final InputChannel<String> inputChannel = RoutineMethod.inputChannel();
-    final OutputChannel<Object> outputChannel =
+    final Channel<String, String> inputChannel = JRoutineCore.io().buildChannel();
+    final Channel<?, Object> outputChannel =
         RoutineMethod.from(RoutineMethodTest.class.getMethod("length", String.class))
                      .callParallel(inputChannel);
     inputChannel.pass("test", "test1", "test22").close();
@@ -245,11 +243,11 @@ public class RoutineMethodTest {
                             .after(seconds(1))
                             .next()).isEqualTo(4);
     assertThat(RoutineMethod.from(classOfType(RoutineMethodTest.class), "length", String.class)
-                            .call(RoutineMethod.inputOf("test"))
+                            .call(JRoutineCore.io().of("test"))
                             .after(seconds(1))
                             .next()).isEqualTo(4);
-    final InputChannel<String> inputChannel = RoutineMethod.inputChannel();
-    final OutputChannel<Object> outputChannel =
+    final Channel<String, String> inputChannel = JRoutineCore.io().buildChannel();
+    final Channel<?, Object> outputChannel =
         RoutineMethod.from(classOfType(RoutineMethodTest.class), "length", String.class)
                      .call(inputChannel);
     inputChannel.pass("test").close();
@@ -310,16 +308,6 @@ public class RoutineMethodTest {
   }
 
   @Test
-  public void testInputFrom() {
-    final Channel<String, String> channel = JRoutineCore.io().buildChannel();
-    final InputChannel<String> inputChannel = RoutineMethod.inputFrom(channel);
-    assertThat(channel.isBound()).isTrue();
-    assertThat(inputChannel.isOpen()).isFalse();
-    channel.pass("test");
-    assertThat(inputChannel.next()).isEqualTo("test");
-  }
-
-  @Test
   public void testInputFrom2() {
     final Channel<String, Integer> channel =
         JRoutineCore.with(new MappingInvocation<String, Integer>(null) {
@@ -328,26 +316,53 @@ public class RoutineMethodTest {
             result.pass(Integer.parseInt(input));
           }
         }).call();
-    final OutputChannel<Object> outputChannel = RoutineMethod.outputChannel();
-    new SumRoutine().call(RoutineMethod.inputFrom(channel), outputChannel);
+    final Channel<Object, Object> outputChannel = JRoutineCore.io().buildChannel();
+    new SumRoutine().call(channel, outputChannel);
     channel.pass("1", "2", "3", "4").close();
     assertThat(outputChannel.after(seconds(1)).next()).isEqualTo(10);
   }
 
   @Test
   public void testInputs() {
-    OutputChannel<Integer> outputChannel = RoutineMethod.outputChannel();
-    new SumRoutine().call(RoutineMethod.inputOf(), outputChannel);
+    Channel<Integer, Integer> outputChannel = JRoutineCore.io().buildChannel();
+    new SumRoutine().call(JRoutineCore.io().of(), outputChannel);
     assertThat(outputChannel.after(seconds(1)).next()).isEqualTo(0);
-    outputChannel = RoutineMethod.outputChannel();
-    new SumRoutine().call(RoutineMethod.inputOf(1), outputChannel);
+    outputChannel = JRoutineCore.io().buildChannel();
+    new SumRoutine().call(JRoutineCore.io().of(1), outputChannel);
     assertThat(outputChannel.after(seconds(1)).next()).isEqualTo(1);
-    outputChannel = RoutineMethod.outputChannel();
-    new SumRoutine().call(RoutineMethod.inputOf(1, 2, 3, 4, 5), outputChannel);
+    outputChannel = JRoutineCore.io().buildChannel();
+    new SumRoutine().call(JRoutineCore.io().of(1, 2, 3, 4, 5), outputChannel);
     assertThat(outputChannel.after(seconds(1)).next()).isEqualTo(15);
-    outputChannel = RoutineMethod.outputChannel();
-    new SumRoutine().call(RoutineMethod.inputOf(Arrays.asList(1, 2, 3, 4, 5)), outputChannel);
+    outputChannel = JRoutineCore.io().buildChannel();
+    new SumRoutine().call(JRoutineCore.io().of(Arrays.asList(1, 2, 3, 4, 5)), outputChannel);
     assertThat(outputChannel.after(seconds(1)).next()).isEqualTo(15);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testInvalidAnnotationIn() {
+    new RoutineMethod() {
+
+      void test(@In final int ignored) {
+      }
+    }.call(1);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testInvalidAnnotationInOut() {
+    new RoutineMethod() {
+
+      void test(@In @Out final Channel<?, ?> ignored) {
+      }
+    }.call(JRoutineCore.io().of());
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testInvalidAnnotationOut() {
+    new RoutineMethod() {
+
+      void test(@Out final int ignored) {
+      }
+    }.call(1);
   }
 
   @Test
@@ -360,7 +375,7 @@ public class RoutineMethodTest {
         super(RoutineMethodTest.this, i);
       }
 
-      public void sum(final InputChannel<Integer> input, final OutputChannel<Integer> output) {
+      public void sum(@In final Channel<?, Integer> input, @Out final Channel<Integer, ?> output) {
         if (input.hasNext()) {
           mSum += input.next();
 
@@ -370,8 +385,8 @@ public class RoutineMethodTest {
       }
     }
 
-    final InputChannel<Integer> inputChannel = RoutineMethod.inputChannel();
-    final OutputChannel<Integer> outputChannel = RoutineMethod.outputChannel();
+    final Channel<Integer, Integer> inputChannel = JRoutineCore.io().buildChannel();
+    final Channel<Integer, Integer> outputChannel = JRoutineCore.io().buildChannel();
     new SumRoutine(0).applyInvocationConfiguration()
                      .withRunner(Runners.syncRunner())
                      .configured()
@@ -391,7 +406,7 @@ public class RoutineMethodTest {
         super(RoutineMethodTest.this, i);
       }
 
-      public void sum(final InputChannel<Integer> input, final OutputChannel<Integer> output) {
+      public void sum(@In final Channel<?, Integer> input, @Out final Channel<Integer, ?> output) {
         if (input.hasNext()) {
           mSum += input.next();
 
@@ -402,8 +417,8 @@ public class RoutineMethodTest {
     }
 
     i[0] = 1;
-    final InputChannel<Integer> inputChannel = RoutineMethod.inputChannel();
-    final OutputChannel<Integer> outputChannel = RoutineMethod.outputChannel();
+    final Channel<Integer, Integer> inputChannel = JRoutineCore.io().buildChannel();
+    final Channel<Integer, Integer> outputChannel = JRoutineCore.io().buildChannel();
     new SumRoutine().applyInvocationConfiguration()
                     .withRunner(Runners.syncRunner())
                     .configured()
@@ -420,10 +435,10 @@ public class RoutineMethodTest {
         return "test";
       }
     }.call().after(seconds(1)).next()).isEqualTo("test");
-    final OutputChannel<String> outputChannel = RoutineMethod.outputChannel();
+    final Channel<String, String> outputChannel = JRoutineCore.io().buildChannel();
     new RoutineMethod() {
 
-      void get(final OutputChannel<String> outputChannel) {
+      void get(@Out final Channel<String, ?> outputChannel) {
         outputChannel.pass("test");
       }
     }.call(outputChannel);
@@ -431,19 +446,9 @@ public class RoutineMethodTest {
   }
 
   @Test
-  public void testOutputFrom() {
-    final Channel<String, String> channel = JRoutineCore.io().buildChannel();
-    final OutputChannel<String> outputChannel = RoutineMethod.outputFrom(channel);
-    assertThat(outputChannel.isBound()).isTrue();
-    assertThat(channel.isOpen()).isFalse();
-    outputChannel.pass("test");
-    assertThat(channel.next()).isEqualTo("test");
-  }
-
-  @Test
   public void testParallel() {
-    final InputChannel<Integer> inputChannel = RoutineMethod.inputChannel();
-    final OutputChannel<Integer> outputChannel = RoutineMethod.outputChannel();
+    final Channel<Integer, Integer> inputChannel = JRoutineCore.io().buildChannel();
+    final Channel<Integer, Integer> outputChannel = JRoutineCore.io().buildChannel();
     new SumRoutine().applyInvocationConfiguration()
                     .withRunner(Runners.syncRunner())
                     .configured()
@@ -454,10 +459,10 @@ public class RoutineMethodTest {
 
   @Test
   public void testParallel2() {
-    final InputChannel<String> inputStrings = RoutineMethod.inputChannel();
-    final OutputChannel<Object> outputChannel = new RoutineMethod(this) {
+    final Channel<String, String> inputStrings = JRoutineCore.io().buildChannel();
+    final Channel<?, Object> outputChannel = new RoutineMethod(this) {
 
-      int length(final InputChannel<String> input) {
+      int length(@In final Channel<String, String> input) {
         if (input.hasNext()) {
           return input.next().length();
         }
@@ -470,8 +475,8 @@ public class RoutineMethodTest {
 
   @Test
   public void testParallel3() {
-    final InputChannel<Integer> inputChannel = RoutineMethod.inputChannel();
-    final OutputChannel<Integer> outputChannel = RoutineMethod.outputChannel();
+    final Channel<Integer, Integer> inputChannel = JRoutineCore.io().buildChannel();
+    final Channel<Integer, Integer> outputChannel = JRoutineCore.io().buildChannel();
     new SumRoutineInner(0).applyInvocationConfiguration()
                           .withRunner(Runners.syncRunner())
                           .configured()
@@ -480,33 +485,28 @@ public class RoutineMethodTest {
     assertThat(outputChannel.all()).containsOnly(1, 2, 3, 4, 5);
   }
 
-  @Test
+  @Test(expected = IllegalStateException.class)
   public void testParallelError() {
-    try {
-      new RoutineMethod() {
+    new RoutineMethod() {
 
-        int zero() {
-          return 0;
-        }
-      }.callParallel();
-      fail();
-
-    } catch (final IllegalStateException ignored) {
-    }
+      int zero() {
+        return 0;
+      }
+    }.callParallel();
   }
 
   @Test
   public void testParams() {
     final RoutineMethod method = new RoutineMethod(this) {
 
-      String switchCase(final InputChannel<String> input, final boolean isUpper) {
+      String switchCase(@In final Channel<?, String> input, final boolean isUpper) {
         final String str = input.next();
         return (isUpper) ? str.toUpperCase() : str.toLowerCase();
       }
     };
-    InputChannel<Object> inputChannel = RoutineMethod.inputChannel().pass("test");
+    Channel<Object, Object> inputChannel = JRoutineCore.io().buildChannel().pass("test");
     assertThat(method.call(inputChannel, true).after(seconds(1)).next()).isEqualTo("TEST");
-    inputChannel = RoutineMethod.inputChannel().pass("TEST");
+    inputChannel = JRoutineCore.io().buildChannel().pass("TEST");
     assertThat(method.call(inputChannel, false).after(seconds(1)).next()).isEqualTo("test");
   }
 
@@ -515,23 +515,23 @@ public class RoutineMethodTest {
     final Locale locale = Locale.getDefault();
     final RoutineMethod method = new RoutineMethod(this, locale) {
 
-      String switchCase(final InputChannel<String> input, final boolean isUpper) {
+      String switchCase(@In final Channel<?, String> input, final boolean isUpper) {
         final String str = input.next();
         return (isUpper) ? str.toUpperCase(locale) : str.toLowerCase(locale);
       }
     };
-    InputChannel<Object> inputChannel = RoutineMethod.inputChannel().pass("test");
+    Channel<Object, Object> inputChannel = JRoutineCore.io().buildChannel().pass("test");
     assertThat(method.call(inputChannel, true).after(seconds(1)).next()).isEqualTo("TEST");
-    inputChannel = RoutineMethod.inputChannel().pass("TEST");
+    inputChannel = JRoutineCore.io().buildChannel().pass("TEST");
     assertThat(method.call(inputChannel, false).after(seconds(1)).next()).isEqualTo("test");
   }
 
   @Test
   public void testReturnValue() {
-    final InputChannel<String> inputStrings = RoutineMethod.inputChannel();
-    final OutputChannel<Object> outputChannel = new RoutineMethod() {
+    final Channel<String, String> inputStrings = JRoutineCore.io().buildChannel();
+    final Channel<?, Object> outputChannel = new RoutineMethod() {
 
-      int length(final InputChannel<String> input) {
+      int length(@In final Channel<?, String> input) {
         if (input.hasNext()) {
           return input.next().length();
         }
@@ -554,13 +554,13 @@ public class RoutineMethodTest {
 
   @Test
   public void testSwitchInput() {
-    final InputChannel<Integer> inputInts = RoutineMethod.inputChannel();
-    final InputChannel<String> inputStrings = RoutineMethod.inputChannel();
-    final OutputChannel<String> outputChannel = RoutineMethod.outputChannel();
+    final Channel<Integer, Integer> inputInts = JRoutineCore.io().buildChannel();
+    final Channel<String, String> inputStrings = JRoutineCore.io().buildChannel();
+    final Channel<String, String> outputChannel = JRoutineCore.io().buildChannel();
     new RoutineMethod() {
 
-      void run(final InputChannel<Integer> inputInts, final InputChannel<String> inputStrings,
-          final OutputChannel<String> output) {
+      void run(@In final Channel<?, Integer> inputInts, @In final Channel<?, String> inputStrings,
+          @Out final Channel<String, ?> output) {
         output.pass(switchInput().next().toString());
       }
     }.call(inputInts, inputStrings, outputChannel);
@@ -571,14 +571,14 @@ public class RoutineMethodTest {
 
   @Test
   public void testSwitchInput2() {
-    final InputChannel<Integer> inputInts = RoutineMethod.inputChannel();
-    final InputChannel<String> inputStrings = RoutineMethod.inputChannel();
-    final OutputChannel<String> outputChannel = RoutineMethod.outputChannel();
+    final Channel<Integer, Integer> inputInts = JRoutineCore.io().buildChannel();
+    final Channel<String, String> inputStrings = JRoutineCore.io().buildChannel();
+    final Channel<String, String> outputChannel = JRoutineCore.io().buildChannel();
     new RoutineMethod() {
 
-      void run(final InputChannel<Integer> inputInts, final InputChannel<String> inputStrings,
-          final OutputChannel<String> output) {
-        final InputChannel<?> inputChannel = switchInput();
+      void run(@In final Channel<?, Integer> inputInts, @In final Channel<?, String> inputStrings,
+          @Out final Channel<String, ?> output) {
+        final Channel<?, ?> inputChannel = switchInput();
         if (inputChannel == inputStrings) {
           output.pass(inputStrings.next());
         }
@@ -592,12 +592,12 @@ public class RoutineMethodTest {
   @Test
   public void testWrap() {
     final SumRoutineInner routine = new SumRoutineInner(0);
-    final InputChannel<Integer> inputChannel = RoutineMethod.inputChannel();
-    final OutputChannel<Integer> outputChannel = RoutineMethod.outputChannel();
+    final Channel<Integer, Integer> inputChannel = JRoutineCore.io().buildChannel();
+    final Channel<Integer, Integer> outputChannel = JRoutineCore.io().buildChannel();
     new RoutineMethod() {
 
-      void run(final SumRoutineInner routine, final InputChannel<Integer> input,
-          final OutputChannel<Integer> output) {
+      void run(final SumRoutineInner routine, @In final Channel<?, Integer> input,
+          @Out final Channel<Integer, ?> output) {
         routine.sum(input, output);
       }
     }.call(routine, inputChannel, outputChannel);
@@ -609,7 +609,7 @@ public class RoutineMethodTest {
 
     private int mSum;
 
-    public void sum(final InputChannel<Integer> input, final OutputChannel<Integer> output) {
+    public void sum(@In final Channel<?, Integer> input, @Out final Channel<Integer, ?> output) {
       if (input.hasNext()) {
         mSum += input.next();
 
@@ -627,7 +627,7 @@ public class RoutineMethodTest {
       super(RoutineMethodTest.this, i);
     }
 
-    public void sum(final InputChannel<Integer> input, final OutputChannel<Integer> output) {
+    public void sum(@In final Channel<?, Integer> input, @Out final Channel<Integer, ?> output) {
       if (input.hasNext()) {
         mSum += input.next();
 

@@ -73,13 +73,19 @@ public class UnitTime implements Comparable<UnitTime> {
    */
   protected static final long MAX_MINUTES = Long.MAX_VALUE / SECONDS_IN_MINUTE;
 
-  private static final int CACHE_HIGH = 63;
+  private static final int CACHE_TIME_HIGH = 63;
 
-  private static final int CACHE_LOW = -64;
+  private static final int CACHE_TIME_LOW = -64;
 
-  private static final int CACHE_SIZE = CACHE_HIGH - CACHE_LOW + 1;
+  private static final int CACHE_TIME_SIZE = CACHE_TIME_HIGH - CACHE_TIME_LOW + 1;
 
-  private static final UnitTime[][] sCaches = new UnitTime[TimeUnit.values().length][CACHE_SIZE];
+  private static final int CACHE_UNIT_HIGH = TimeUnit.values().length - 1;
+
+  private static final int CACHE_UNIT_LOW = TimeUnit.SECONDS.ordinal();
+
+  private static final int CACHE_UNIT_SIZE = CACHE_UNIT_HIGH - CACHE_UNIT_LOW + 1;
+
+  private static final UnitTime[][] sCaches = new UnitTime[CACHE_UNIT_SIZE][CACHE_TIME_SIZE];
 
   /**
    * The time unit.
@@ -187,8 +193,10 @@ public class UnitTime implements Comparable<UnitTime> {
    */
   @NotNull
   public static UnitTime fromUnit(final long time, @NotNull final TimeUnit unit) {
-    if ((time >= CACHE_LOW) && (time <= CACHE_HIGH)) {
-      return sCaches[unit.ordinal()][(int) time - CACHE_LOW];
+    final int ordinal = unit.ordinal();
+    if ((ordinal >= CACHE_UNIT_LOW) && (ordinal <= CACHE_UNIT_HIGH) && (time >= CACHE_TIME_LOW) &&
+        (time <= CACHE_TIME_HIGH)) {
+      return sCaches[ordinal - CACHE_UNIT_LOW][(int) time - CACHE_TIME_LOW];
     }
 
     return new UnitTime(time, ConstantConditions.notNull("time unit", unit));
@@ -618,10 +626,13 @@ public class UnitTime implements Comparable<UnitTime> {
   }
 
   static {
-    for (final TimeUnit timeUnit : TimeUnit.values()) {
-      final UnitTime[] cache = sCaches[timeUnit.ordinal()];
-      for (int i = 0; i < CACHE_SIZE; i++) {
-        cache[i] = new UnitTime(CACHE_LOW + i, timeUnit);
+    final UnitTime[][] caches = sCaches;
+    final TimeUnit[] timeUnits = TimeUnit.values();
+    for (int i = 0; i < CACHE_UNIT_SIZE; ++i) {
+      final TimeUnit timeUnit = timeUnits[CACHE_UNIT_LOW + i];
+      final UnitTime[] cache = caches[i];
+      for (int j = 0; j < CACHE_TIME_SIZE; ++j) {
+        cache[j] = new UnitTime(CACHE_TIME_LOW + j, timeUnit);
       }
     }
   }

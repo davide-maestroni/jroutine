@@ -28,16 +28,22 @@ import java.util.concurrent.TimeUnit;
 @SuppressWarnings("WeakerAccess")
 public class UnitDuration extends UnitTime {
 
-  private static final int CACHE_HIGH = 127;
+  private static final int CACHE_TIME_HIGH = 127;
 
-  private static final int CACHE_LOW = 0;
+  private static final int CACHE_TIME_LOW = 0;
 
-  private static final int CACHE_SIZE = CACHE_HIGH - CACHE_LOW + 1;
+  private static final int CACHE_TIME_SIZE = CACHE_TIME_HIGH - CACHE_TIME_LOW + 1;
+
+  private static final int CACHE_UNIT_HIGH = TimeUnit.values().length - 1;
+
+  private static final int CACHE_UNIT_LOW = TimeUnit.SECONDS.ordinal();
+
+  private static final int CACHE_UNIT_SIZE = CACHE_UNIT_HIGH - CACHE_UNIT_LOW + 1;
 
   private static final long ONE_MILLI_NANOS = TimeUnit.MILLISECONDS.toNanos(1);
 
   private static final UnitDuration[][] sCaches =
-      new UnitDuration[TimeUnit.values().length][CACHE_SIZE];
+      new UnitDuration[CACHE_UNIT_SIZE][CACHE_TIME_SIZE];
 
   private static final UnitDuration sInfinity = new UnitDuration(Long.MAX_VALUE, TimeUnit.SECONDS);
 
@@ -118,8 +124,10 @@ public class UnitDuration extends UnitTime {
    */
   @NotNull
   public static UnitDuration fromUnit(final long time, @NotNull final TimeUnit unit) {
-    if ((time >= CACHE_LOW) && (time <= CACHE_HIGH)) {
-      return sCaches[unit.ordinal()][(int) time - CACHE_LOW];
+    final int ordinal = unit.ordinal();
+    if ((ordinal >= CACHE_UNIT_LOW) && (ordinal <= CACHE_UNIT_HIGH) && (time >= CACHE_TIME_LOW) &&
+        (time <= CACHE_TIME_HIGH)) {
+      return sCaches[ordinal - CACHE_UNIT_LOW][(int) time - CACHE_TIME_LOW];
     }
 
     return new UnitDuration(time, unit);
@@ -858,10 +866,13 @@ public class UnitDuration extends UnitTime {
   }
 
   static {
-    for (final TimeUnit timeUnit : TimeUnit.values()) {
-      final UnitDuration[] cache = sCaches[timeUnit.ordinal()];
-      for (int i = 0; i < CACHE_SIZE; i++) {
-        cache[i] = new UnitDuration(CACHE_LOW + i, timeUnit);
+    final UnitTime[][] caches = sCaches;
+    final TimeUnit[] timeUnits = TimeUnit.values();
+    for (int i = 0; i < CACHE_UNIT_SIZE; ++i) {
+      final TimeUnit timeUnit = timeUnits[CACHE_UNIT_LOW + i];
+      final UnitTime[] cache = caches[i];
+      for (int j = 0; j < CACHE_TIME_SIZE; ++j) {
+        cache[j] = new UnitDuration(CACHE_TIME_LOW + j, timeUnit);
       }
     }
   }

@@ -73,9 +73,9 @@ public class UnitTime implements Comparable<UnitTime> {
    */
   protected static final long MAX_MINUTES = Long.MAX_VALUE / SECONDS_IN_MINUTE;
 
-  private static final int CACHE_HIGH = 127;
+  private static final int CACHE_HIGH = 63;
 
-  private static final int CACHE_LOW = -128;
+  private static final int CACHE_LOW = -64;
 
   private static final int CACHE_SIZE = CACHE_HIGH - CACHE_LOW + 1;
 

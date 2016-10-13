@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 @SuppressWarnings("WeakerAccess")
 public class UnitDuration extends UnitTime {
 
-  private static final int CACHE_HIGH = 255;
+  private static final int CACHE_HIGH = 127;
 
   private static final int CACHE_LOW = 0;
 

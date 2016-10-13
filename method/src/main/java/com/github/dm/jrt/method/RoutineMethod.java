@@ -19,6 +19,7 @@ package com.github.dm.jrt.method;
 import com.github.dm.jrt.channel.Channels;
 import com.github.dm.jrt.channel.Selectable;
 import com.github.dm.jrt.core.JRoutineCore;
+import com.github.dm.jrt.core.builder.ChannelBuilder;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.InvocationConfigurable;
@@ -584,16 +585,17 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
     final Annotation[][] annotations = method.getParameterAnnotations();
     final int length = params.length;
     final ArrayList<Object> parameters = new ArrayList<Object>(length);
+    final ChannelBuilder channelBuilder = JRoutineCore.io();
     for (int i = 0; i < length; ++i) {
       final Object param = params[i];
       final Class<? extends Annotation> annotationType = getAnnotationType(param, annotations[i]);
       if (annotationType == In.class) {
-        final Channel<Object, Object> inputChannel = JRoutineCore.io().buildChannel();
+        final Channel<Object, Object> inputChannel = channelBuilder.buildChannel();
         inputChannels.add(inputChannel);
         parameters.add(inputChannel);
 
       } else if (annotationType == Out.class) {
-        final Channel<Object, Object> outputChannel = JRoutineCore.io().buildChannel();
+        final Channel<Object, Object> outputChannel = channelBuilder.buildChannel();
         outputChannels.add(outputChannel);
         parameters.add(outputChannel);
 
@@ -748,11 +750,12 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
       }
     }
 
-    final Channel<OUT, OUT> resultChannel = JRoutineCore.io().buildChannel();
+    final ChannelBuilder channelBuilder = JRoutineCore.io();
+    final Channel<OUT, OUT> resultChannel = channelBuilder.buildChannel();
     outputChannels.add(resultChannel);
     final Channel<?, ? extends Selectable<Object>> inputChannel =
         (!inputChannels.isEmpty()) ? Channels.merge(inputChannels).buildChannels()
-            : JRoutineCore.io().<Selectable<Object>>of();
+            : channelBuilder.<Selectable<Object>>of();
     final Channel<Selectable<Object>, Selectable<Object>> outputChannel =
         mode.invoke(JRoutineCore.with(factory).apply(getConfiguration()))
             .pass(inputChannel)

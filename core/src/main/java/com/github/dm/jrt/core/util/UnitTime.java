@@ -73,6 +73,14 @@ public class UnitTime implements Comparable<UnitTime> {
    */
   protected static final long MAX_MINUTES = Long.MAX_VALUE / SECONDS_IN_MINUTE;
 
+  private static final int CACHE_HIGH = 127;
+
+  private static final int CACHE_LOW = -128;
+
+  private static final int CACHE_SIZE = CACHE_HIGH - CACHE_LOW + 1;
+
+  private static final UnitTime[][] sCaches = new UnitTime[TimeUnit.values().length][CACHE_SIZE];
+
   /**
    * The time unit.
    */
@@ -179,6 +187,10 @@ public class UnitTime implements Comparable<UnitTime> {
    */
   @NotNull
   public static UnitTime fromUnit(final long time, @NotNull final TimeUnit unit) {
+    if ((time >= CACHE_LOW) && (time <= CACHE_HIGH)) {
+      return sCaches[unit.ordinal()][(int) time - CACHE_LOW];
+    }
+
     return new UnitTime(time, ConstantConditions.notNull("time unit", unit));
   }
 
@@ -603,5 +615,14 @@ public class UnitTime implements Comparable<UnitTime> {
    */
   public long toSeconds() {
     return unit.toSeconds(value);
+  }
+
+  static {
+    for (final TimeUnit timeUnit : TimeUnit.values()) {
+      final UnitTime[] cache = sCaches[timeUnit.ordinal()];
+      for (int i = 0; i < CACHE_SIZE; i++) {
+        cache[i] = new UnitTime(CACHE_LOW + i, timeUnit);
+      }
+    }
   }
 }

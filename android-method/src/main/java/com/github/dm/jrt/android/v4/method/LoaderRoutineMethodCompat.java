@@ -31,6 +31,7 @@ import com.github.dm.jrt.android.v4.object.JRoutineLoaderObjectCompat;
 import com.github.dm.jrt.channel.Channels;
 import com.github.dm.jrt.channel.Selectable;
 import com.github.dm.jrt.core.JRoutineCore;
+import com.github.dm.jrt.core.builder.ChannelBuilder;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
@@ -402,11 +403,12 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
       }
     }
 
-    final Channel<?, OUT> resultChannel = JRoutineCore.io().buildChannel();
+    final ChannelBuilder channelBuilder = JRoutineCore.io();
+    final Channel<?, OUT> resultChannel = channelBuilder.buildChannel();
     outputChannels.add(resultChannel);
     final Channel<?, ? extends Selectable<Object>> inputChannel =
         (!inputChannels.isEmpty()) ? AndroidChannels.mergeParcelable(inputChannels).buildChannels()
-            : JRoutineCore.io().<Selectable<Object>>of();
+            : channelBuilder.<Selectable<Object>>of();
     final Channel<Selectable<Object>, Selectable<Object>> outputChannel = mode.invoke(
         JRoutineLoaderCompat.on(mContext)
                             .with(factory)

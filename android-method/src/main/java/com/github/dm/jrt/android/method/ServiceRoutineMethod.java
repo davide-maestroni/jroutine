@@ -29,6 +29,7 @@ import com.github.dm.jrt.android.core.invocation.ContextInvocation;
 import com.github.dm.jrt.android.object.ContextInvocationTarget;
 import com.github.dm.jrt.android.object.JRoutineServiceObject;
 import com.github.dm.jrt.core.JRoutineCore;
+import com.github.dm.jrt.core.builder.ChannelBuilder;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
@@ -360,11 +361,12 @@ public class ServiceRoutineMethod extends RoutineMethod
       }
     }
 
-    final Channel<OUT, OUT> resultChannel = JRoutineCore.io().buildChannel();
+    final ChannelBuilder channelBuilder = JRoutineCore.io();
+    final Channel<OUT, OUT> resultChannel = channelBuilder.buildChannel();
     outputChannels.add(resultChannel);
     final Channel<?, ? extends ParcelableSelectable<Object>> inputChannel =
         (!inputChannels.isEmpty()) ? AndroidChannels.mergeParcelable(inputChannels).buildChannels()
-            : JRoutineCore.io().<ParcelableSelectable<Object>>of();
+            : channelBuilder.<ParcelableSelectable<Object>>of();
     final Channel<ParcelableSelectable<Object>, ParcelableSelectable<Object>> outputChannel =
         mode.invoke(JRoutineService.on(mContext)
                                    .with(factoryOf(ServiceInvocation.class, getClass(), mArgs,
@@ -569,13 +571,14 @@ public class ServiceRoutineMethod extends RoutineMethod
      */
     private ServiceInvocation(@NotNull final Class<? extends ServiceRoutineMethod> type,
         @NotNull final Object[] args, @NotNull final Object[] params) {
+      final ChannelBuilder channelBuilder = JRoutineCore.io();
       for (int i = 0; i < params.length; ++i) {
         final Object param = params[i];
         if (param == InputChannelPlaceHolder.class) {
-          params[i] = JRoutineCore.io().buildChannel();
+          params[i] = channelBuilder.buildChannel();
 
         } else if (param == OutputChannelPlaceHolder.class) {
-          params[i] = JRoutineCore.io().buildChannel();
+          params[i] = channelBuilder.buildChannel();
         }
       }
 

@@ -18,7 +18,6 @@ package com.github.dm.jrt.core.util;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -29,17 +28,20 @@ import java.util.concurrent.TimeUnit;
 @SuppressWarnings("WeakerAccess")
 public class UnitDuration extends UnitTime {
 
+  private static final int CACHE_HIGH = 255;
+
+  private static final int CACHE_LOW = 0;
+
+  private static final int CACHE_SIZE = CACHE_HIGH - CACHE_LOW + 1;
+
   private static final long ONE_MILLI_NANOS = TimeUnit.MILLISECONDS.toNanos(1);
 
-  private static final UnitDuration sInfinity = seconds(Long.MAX_VALUE);
+  private static final UnitDuration[][] sCaches =
+      new UnitDuration[TimeUnit.values().length][CACHE_SIZE];
 
-  private static final UnitDuration sZero = millis(0);
+  private static final UnitDuration sInfinity = new UnitDuration(Long.MAX_VALUE, TimeUnit.SECONDS);
 
-  private static final HashMap<TimeUnit, UnitDuration> sZeroes =
-      new HashMap<TimeUnit, UnitDuration>() {{
-        final UnitDuration zero = sZero;
-        put(zero.unit, zero);
-      }};
+  private static final UnitDuration sZero = new UnitDuration(0, TimeUnit.MILLISECONDS);
 
   /**
    * Constructor.
@@ -116,6 +118,10 @@ public class UnitDuration extends UnitTime {
    */
   @NotNull
   public static UnitDuration fromUnit(final long time, @NotNull final TimeUnit unit) {
+    if ((time >= CACHE_LOW) && (time <= CACHE_HIGH)) {
+      return sCaches[unit.ordinal()][(int) time - CACHE_LOW];
+    }
+
     return new UnitDuration(time, unit);
   }
 
@@ -596,14 +602,7 @@ public class UnitDuration extends UnitTime {
    */
   @NotNull
   public static UnitDuration zero(@NotNull final TimeUnit unit) {
-    final HashMap<TimeUnit, UnitDuration> zeroes = sZeroes;
-    UnitDuration zero = zeroes.get(unit);
-    if (zero == null) {
-      zero = new UnitDuration(0, unit);
-      zeroes.put(unit, zero);
-    }
-
-    return zero;
+    return fromUnit(0, unit);
   }
 
   /**
@@ -856,5 +855,14 @@ public class UnitDuration extends UnitTime {
      * @return whether the condition is verified.
      */
     boolean isTrue();
+  }
+
+  static {
+    for (final TimeUnit timeUnit : TimeUnit.values()) {
+      final UnitDuration[] cache = sCaches[timeUnit.ordinal()];
+      for (int i = 0; i < CACHE_SIZE; i++) {
+        cache[i] = new UnitDuration(CACHE_LOW + i, timeUnit);
+      }
+    }
   }
 }

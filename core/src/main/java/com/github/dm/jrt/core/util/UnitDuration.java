@@ -47,7 +47,7 @@ public class UnitDuration extends UnitTime {
 
   private static final UnitDuration sInfinity = new UnitDuration(Long.MAX_VALUE, TimeUnit.SECONDS);
 
-  private static final UnitDuration sZero = new UnitDuration(0, TimeUnit.MILLISECONDS);
+  private static final UnitDuration[] sZeroes = new UnitDuration[TimeUnit.values().length];
 
   /**
    * Constructor.
@@ -125,6 +125,10 @@ public class UnitDuration extends UnitTime {
   @NotNull
   public static UnitDuration fromUnit(final long time, @NotNull final TimeUnit unit) {
     final int ordinal = unit.ordinal();
+    if (time == 0) {
+      return sZeroes[ordinal];
+    }
+
     if ((ordinal >= CACHE_UNIT_LOW) && (ordinal <= CACHE_UNIT_HIGH) && (time >= CACHE_TIME_LOW) &&
         (time <= CACHE_TIME_HIGH)) {
       return sCaches[ordinal - CACHE_UNIT_LOW][(int) time - CACHE_TIME_LOW];
@@ -599,7 +603,7 @@ public class UnitDuration extends UnitTime {
    */
   @NotNull
   public static UnitDuration zero() {
-    return sZero;
+    return zero(TimeUnit.MILLISECONDS);
   }
 
   /**
@@ -610,7 +614,7 @@ public class UnitDuration extends UnitTime {
    */
   @NotNull
   public static UnitDuration zero(@NotNull final TimeUnit unit) {
-    return fromUnit(0, unit);
+    return sZeroes[unit.ordinal()];
   }
 
   /**
@@ -866,8 +870,13 @@ public class UnitDuration extends UnitTime {
   }
 
   static {
-    final UnitTime[][] caches = sCaches;
+    final UnitDuration[] zeroes = sZeroes;
     final TimeUnit[] timeUnits = TimeUnit.values();
+    for (int i = 0; i < timeUnits.length; ++i) {
+      zeroes[i] = new UnitDuration(0, timeUnits[i]);
+    }
+
+    final UnitTime[][] caches = sCaches;
     for (int i = 0; i < CACHE_UNIT_SIZE; ++i) {
       final TimeUnit timeUnit = timeUnits[CACHE_UNIT_LOW + i];
       final UnitTime[] cache = caches[i];

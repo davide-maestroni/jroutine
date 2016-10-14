@@ -87,6 +87,8 @@ public class UnitTime implements Comparable<UnitTime> {
 
   private static final UnitTime[][] sCaches = new UnitTime[CACHE_UNIT_SIZE][CACHE_TIME_SIZE];
 
+  private static final UnitTime[] sZeroes = new UnitTime[TimeUnit.values().length];
+
   /**
    * The time unit.
    */
@@ -194,6 +196,10 @@ public class UnitTime implements Comparable<UnitTime> {
   @NotNull
   public static UnitTime fromUnit(final long time, @NotNull final TimeUnit unit) {
     final int ordinal = unit.ordinal();
+    if (time == 0) {
+      return sZeroes[ordinal];
+    }
+
     if ((ordinal >= CACHE_UNIT_LOW) && (ordinal <= CACHE_UNIT_HIGH) && (time >= CACHE_TIME_LOW) &&
         (time <= CACHE_TIME_HIGH)) {
       return sCaches[ordinal - CACHE_UNIT_LOW][(int) time - CACHE_TIME_LOW];
@@ -626,8 +632,13 @@ public class UnitTime implements Comparable<UnitTime> {
   }
 
   static {
-    final UnitTime[][] caches = sCaches;
+    final UnitTime[] zeroes = sZeroes;
     final TimeUnit[] timeUnits = TimeUnit.values();
+    for (int i = 0; i < timeUnits.length; ++i) {
+      zeroes[i] = new UnitTime(0, timeUnits[i]);
+    }
+
+    final UnitTime[][] caches = sCaches;
     for (int i = 0; i < CACHE_UNIT_SIZE; ++i) {
       final TimeUnit timeUnit = timeUnits[CACHE_UNIT_LOW + i];
       final UnitTime[] cache = caches[i];

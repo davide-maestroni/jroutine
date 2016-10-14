@@ -19,6 +19,7 @@ package com.github.dm.jrt.method;
 import com.github.dm.jrt.channel.Channels;
 import com.github.dm.jrt.channel.Selectable;
 import com.github.dm.jrt.core.JRoutineCore;
+import com.github.dm.jrt.core.builder.ChannelBuilder;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.InvocationConfigurable;
@@ -31,6 +32,8 @@ import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.Reflection;
+import com.github.dm.jrt.method.annotation.In;
+import com.github.dm.jrt.method.annotation.Out;
 import com.github.dm.jrt.object.InvocationTarget;
 import com.github.dm.jrt.object.JRoutineObject;
 import com.github.dm.jrt.object.config.ObjectConfigurable;
@@ -39,6 +42,7 @@ import com.github.dm.jrt.object.config.ObjectConfiguration;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -67,18 +71,23 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * Additionally, the method is called once when the invocation is aborted and when it completes.
  * In the former case every input channel will behave as an aborted one (see {@link Channel}),
  * while, in the latter, no data will be available, so, it is always advisable to verify that an
- * input is ready before reading it.
+ * input is available before reading it.
+ * <br>
+ * The method parameters used as input channels are identified by the
+ * {@link com.github.dm.jrt.method.annotation.In} annotation, while the output ones by the
+ * {@link com.github.dm.jrt.method.annotation.Out} annotation. Channel parameters without any
+ * specific annotation will be passed as is to the target method.
  * <p>
  * For example, a routine computing the square of integers can be implemented as follows:
  * <pre>
  *     <code>
  *
- *         final InputChannel&lt;Integer&gt; inputChannel = RoutineMethod.inputChannel();
- *         final OutputChannel&lt;Integer&gt; outputChannel = RoutineMethod.outputChannel();
+ *         final Channel&lt;Integer, Integer&gt; inputChannel = JRoutineCore.io().buildChannel();
+ *         final Channel&lt;Integer, Integer&gt; outputChannel = JRoutineCore.io().buildChannel();
  *         new RoutineMethod() {
  *
- *             public void square(final InputChannel&lt;Integer&gt; input,
- *                     final OutputChannel&lt;Integer&gt; output) {
+ *             public void square(&#64;In final Channel&lt;?, Integer&gt; input,
+ *                     &#64;Out final Channel&lt;Integer, ?&gt; output) {
  *                 if (input.hasNext()) {
  *                     final int i = input.next();
  *                     output.pass(i * i);
@@ -89,25 +98,26 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  *         outputChannel.after(seconds(1)).all(); // expected values: 1, 4, 9
  *     </code>
  * </pre>
- * The {@code call()} method returns an output channel producing the outputs returned by the method.
- * In the above case no output is returned (in fact, the return type is {@code void}), still the
- * channel will be notified of the invocation abortion and completion.
+ * The {@code call()} method returns an output channel producing the outputs returned by the target
+ * method. In the above case no output is returned (in fact, the return type is {@code void}), still
+ * the channel will be notified of the invocation abortion and completion.
  * <p>
  * Several methods can be defined, though, be aware that the number and type of parameters are
  * employed to identify the method to call. Any clash in the method signatures will raise an
  * exception.
  * <h2>Channels vs static parameters</h2>
- * When parameters other than {@code InputChannel}s and {@code OutputChannel}s are passed to the
- * {@code call()} method, the very same values are employed each time a new input is available.
+ * When parameters other than {@code Channel}s are passed to the {@code call()} method, the very
+ * same values are employed each time a new input is available.
  * <p>
  * For example, a routine transforming the case of a string can be implemented as follows:
  * <pre>
  *     <code>
  *
- *         final InputChannel&lt;String&gt; inputChannel = RoutineMethod.inputChannel();
- *         final OutputChannel&lt;String&gt; outputChannel = new RoutineMethod() {
+ *         final Channel&lt;String, String&gt; inputChannel = JRoutineCore.io().buildChannel();
+ *         final Channel&lt;?, String&gt; outputChannel = new RoutineMethod() {
  *
- *             String switchCase(final InputChannel&lt;String&gt; input, final boolean isUpper) {
+ *             public String switchCase(&#64;In final Channel&lt;?, String&gt; input,
+ *                     final boolean isUpper) {
  *                 if (input.hasNext()) {
  *                     final String str = input.next();
  *                     return (isUpper) ? str.toUpperCase() : str.toLowerCase();
@@ -119,31 +129,27 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  *         outputChannel.after(seconds(1)).all(); // expected values: "HELLO", "JROUTINE", "!"
  *     </code>
  * </pre>
- * Note that, when the invocation completes, that is, no input is available, the method
+ * Note that outputs will be collected through the channel returned by the {@code call()} method.
+ * <br>
+ * Note also that, when the invocation completes, that is, no input is available, the method
  * {@code ignoreReturnValue()} is called to avoid pushing any output to the result channel. The same
  * method can be called any time no output is produced.
  * <p>
- * In case the very same input or output channel instance has to be passed as parameter, it has to
- * be wrapped in another input channel, like shown below:
+ * In case the very same input or output channel instance has to be passed as parameter, it is
+ * sufficient to avoid in/out annotations, like shown below:
  * <pre>
  *     <code>
  *
- *         final OutputChannel&lt;String&gt; outputChannel = RoutineMethod.outputChannel();
+ *         final Channel&lt;String, String&gt; outputChannel = JRoutineCore.io().buildChannel();
  *         new MyRoutine() {
  *
- *             void run(final final InputChannel&lt;final OutputChannel&lt;String&gt;&gt; input) {
- *                 if (input.hasNext()) {
- *                     final OutputChannel&lt;String&gt; output = input.next();
- *                     // do it
- *                 }
+ *             void run(final Channel&lt;String, ?&gt; output) {
+ *                 output.pass("...");
  *             }
  *
- *         }.call(RoutineMethod.inputOf(outputChannel));
+ *         }.call(outputChannel);
  *     </code>
  * </pre>
- * <br>
- * Note also that outputs will be collected through the channel returned by the {@code call()}
- * method.
  * <h2>Parallel and multiple invocations</h2>
  * In order to enable parallel invocation of the routine, it is necessary to provide the proper
  * parameters to the routine method non-default constructor. In fact, parallel invocations will
@@ -158,10 +164,11 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  *     <code>
  *
  *         final Locale locale = Locale.getDefault();
- *         final InputChannel&lt;String&gt; inputChannel = RoutineMethod.inputChannel();
- *         final OutputChannel&lt;String&gt; outputChannel = new RoutineMethod(this, locale) {
+ *         final Channel&lt;String, String&gt; inputChannel = JRoutineCore.io().buildChannel();
+ *         final Channel&lt;?, String&gt; outputChannel = new RoutineMethod(this, locale) {
  *
- *             String switchCase(final InputChannel&lt;String&gt; input, final boolean isUpper) {
+ *             public String switchCase(&#64;In final Channel&lt;?, String&gt; input,
+ *                     final boolean isUpper) {
  *                 if (input.hasNext()) {
  *                     final String str = input.next();
  *                     return (isUpper) ? str.toUpperCase(locale) : str.toLowerCase(locale);
@@ -186,7 +193,8 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  *                 mLocale = locale;
  *             }
  *
- *             String switchCase(final InputChannel&lt;String&gt; input, final boolean isUpper) {
+ *             String switchCase(&#64;In final Channel&lt;?, String&gt; input,
+ *                    final boolean isUpper) {
  *                 if (input.hasNext()) {
  *                     final String str = input.next();
  *                     return (isUpper) ? str.toUpperCase(mLocale) : str.toLowerCase(mLocale);
@@ -196,7 +204,7 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  *         }
  *     </code>
  * </pre>
- * The same holds true for static classes, with the only difference that only the declared
+ * The same holds true for static classes, with the only difference that just the declared
  * parameters must be passed:
  * <pre>
  *     <code>
@@ -210,7 +218,8 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  *                 mLocale = locale;
  *             }
  *
- *             String switchCase(final InputChannel&lt;String&gt; input, final boolean isUpper) {
+ *             String switchCase(&#64;In final Channel&lt;?, String&gt; input,
+ *                    final boolean isUpper) {
  *                 if (input.hasNext()) {
  *                     final String str = input.next();
  *                     return (isUpper) ? str.toUpperCase(mLocale) : str.toLowerCase(mLocale);
@@ -226,22 +235,22 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * The routine method implementation allows for multiple input channels to deliver data to the
  * method invocation. In such case it is possible to easily identify the channel for which an input
  * is ready by calling the {@code switchInput()} protected method. The method will return one of the
- * input channels passed as parameters (since the vary same instance is returned == comparison is
+ * input channels passed as parameters (since the very same instance is returned == comparison is
  * allowed) or null, if the invocation takes no input channel.
  * <p>
  * For example, a routine printing the inputs of different types can be implemented as follows:
  * <pre>
  *     <code>
  *
- *         final InputChannel&lt;Integer&gt; inputInts = RoutineMethod.inputChannel();
- *         final InputChannel&lt;String&gt; inputStrings = RoutineMethod.inputChannel();
- *         final OutputChannel&lt;String&gt; outputChannel = RoutineMethod.outputChannel();
+ *         final Channel&lt;Integer, Integer&gt; inputInts = JRoutineCore.io().buildChannel();
+ *         final Channel&lt;String, String&gt; inputStrings = JRoutineCore.io().buildChannel();
+ *         final Channel&lt;String, String&gt; outputChannel = JRoutineCore.io().buildChannel();
  *         new RoutineMethod() {
  *
- *             void run(final InputChannel&lt;Integer&gt; inputInts,
- *                     final InputChannel&lt;String&gt; inputStrings,
- *                     final OutputChannel&lt;String&gt; output) {
- *                 final InputChannel&lt;?&gt; inputChannel = switchInput();
+ *             void run(&#64;In final Channel&lt;?, Integer&gt; inputInts,
+ *                     &#64;In final Channel&lt;?, String&gt; inputStrings,
+ *                     &#64;Out final Channel&lt;String, ?&gt; output) {
+ *                 final Channel&lt;?, ?&gt; inputChannel = switchInput();
  *                 if (inputChannel.hasNext()) {
  *                     if (inputChannel == inputInts) {
  *                         output.pass("Number: " + inputChannel.next());
@@ -271,32 +280,32 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * <pre>
  *     <code>
  *
- *         final InputChannel&lt;Integer&gt; inputChannel = RoutineMethod.inputChannel();
- *         final OutputChannel&lt;Integer&gt; outputChannel = RoutineMethod.outputChannel();
+ *         final Channel&lt;Integer, Integer&gt; inputChannel = JRoutineCore.io().buildChannel();
+ *         final Channel&lt;Integer, Integer&gt; outputChannel = JRoutineCore.io().buildChannel();
  *         new RoutineMethod() {
  *
- *             public void square(final InputChannel&lt;Integer&gt; input,
- *                     final OutputChannel&lt;Integer&gt; output) {
+ *             public void square(&#64;In final Channel&lt;?, Integer&gt; input,
+ *                     &#64;Out final Channel&lt;Integer, ?&gt; output) {
  *                 if (input.hasNext()) {
  *                     final int i = input.next();
  *                     output.pass(i * i);
  *                 }
  *             }
  *         }.call(inputChannel, outputChannel);
- *         final OutputChannel&lt;Integer&gt; resultChannel = RoutineMethod.outputChannel();
+ *         final Channel&lt;Integer, Integer&gt; resultChannel = JRoutineCore.io().buildChannel();
  *         new RoutineMethod() {
  *
  *             private int mSum;
  *
- *             public void sum(final InputChannel&lt;Integer&gt; input,
- *                     final OutputChannel&lt;Integer&gt; output) {
+ *             public void sum(&#64;In final Channel&lt;?, Integer&gt; input,
+ *                     &#64;Out final Channel&lt;Integer, ?&gt; output) {
  *                 if (input.hasNext()) {
  *                     mSum += input.next();
  *                 } else {
  *                     output.pass(mSum);
  *                 }
  *             }
- *         }.call(RoutineMethod.toInput(outputChannel), resultChannel);
+ *         }.call(outputChannel, resultChannel);
  *         inputChannel.pass(1, 2, 3, 4).close();
  *         resultChannel.after(seconds(1)).next(); // expected value: 30
  *     </code>
@@ -311,20 +320,20 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  *     <code>
  *
  *         final Channel&lt;String, Integer&gt; channel = parseRoutine.call();
- *         final OutputChannel&lt;Integer&gt; outputChannel = RoutineMethod.outputChannel();
+ *         final Channel&lt;Integer, Integer&gt; outputChannel = JRoutineCore.io().buildChannel();
  *         new RoutineMethod() {
  *
  *             private int mSum;
  *
- *             public void sum(final InputChannel&lt;Integer&gt; input,
- *                     final OutputChannel&lt;Integer&gt; output) {
+ *             public void sum(&#64;In final Channel&lt;?, Integer&gt; input,
+ *                     &#64;Out final Channel&lt;Integer, ?&gt; output) {
  *                 if (input.hasNext()) {
  *                     mSum += input.next();
  *                 } else {
  *                     output.pass(mSum);
  *                 }
  *             }
- *         }.call(RoutineMethod.inputFrom(channel), outputChannel);
+ *         }.call(channel, outputChannel);
  *         channel.pass("1", "2", "3", "4").close();
  *         outputChannel.after(seconds(1)).next(); // expected value: 10
  *     </code>
@@ -345,12 +354,12 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  *     <code>
  *
  *         final ExternalStorage storage = ExternalStorage.create();
- *         final InputChannel&lt;String&gt; inputChannel = RoutineMethod.inputChannel();
+ *         final Channel&lt;String, String&gt; inputChannel = JRoutineCore.io().buildChannel();
  *         new RoutineMethod(this, storage) {
  *
  *             private final StorageConnection mConnection = storage.openConnection();
  *
- *             void store(final InputChannel&lt;String&gt; input) {
+ *             void store(&#64;In final Channel&lt;?, String&gt; input) {
  *                 try {
  *                     if (input.hasNext()) {
  *                         mConnection.put(input.next());
@@ -386,14 +395,25 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * <pre>
  *     <code>
  *
- *         final InputChannel&lt;Object[]&gt; inputChannel = RoutineMethod.inputChannel();
- *         final OutputChannel&lt;String&gt; outputChannel =
+ *         final Channel&lt;Object[], Object[]&gt; inputChannel = JRoutineCore.io().buildChannel();
+ *         final Channel&lt;?, String&gt; outputChannel =
  *                RoutineMethod.from(String.class.getMethod("format", String.class, Object[].class))
  *                             .call("%s %s!", inputChannel);
  *         inputChannel.pass(new Object[]{"Hello", "JRoutine"}).close();
  *         outputChannel.after(seconds(1)).next(); // expected value: "Hello JRoutine!"
  *     </code>
  * </pre>
+ * In case the very same input or output channel instance has to be passed as parameter, it has to
+ * be wrapped in another input channel, like shown below:
+ * <pre>
+ *     <code>
+ *
+ *         final Channel&lt;String, String&gt; channel = JRoutineCore.io().buildChannel();
+ *         RoutineMethod.from(MyClass.class.getMethod("run", Channel.class))
+ *                      .call(JRoutineCore.io().&lt;Channel&lt;String, String&gt;&gt;of(channel));
+ *     </code>
+ * </pre>
+ *
  * <p>
  * Created by davide-maestroni on 08/10/2016.
  */
@@ -406,7 +426,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
 
   private final AtomicBoolean mIsFirstCall = new AtomicBoolean(true);
 
-  private final ThreadLocal<InputChannel<?>> mLocalChannel = new ThreadLocal<InputChannel<?>>();
+  private final ThreadLocal<Channel<?, ?>> mLocalChannel = new ThreadLocal<Channel<?, ?>>();
 
   private final ThreadLocal<Boolean> mLocalIgnore = new ThreadLocal<Boolean>();
 
@@ -514,158 +534,68 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
   }
 
   /**
-   * Builds a new input channel.
+   * Gets the in/out annotation type related to the specified parameter and, if present, validates
+   * it.
    *
-   * @param <IN> the input data type.
-   * @return the input channel instance.
+   * @param param       the parameter object.
+   * @param annotations the parameter annotation.
+   * @return the annotation class or null.
+   * @throws java.lang.IllegalArgumentException if the parameter annotations are invalid.
+   * @see com.github.dm.jrt.method.annotation.In In
+   * @see com.github.dm.jrt.method.annotation.Out Out
    */
-  @NotNull
-  public static <IN> InputChannel<IN> inputChannel() {
-    return toInput(JRoutineCore.io().<IN>buildChannel());
-  }
+  @Nullable
+  protected static Class<? extends Annotation> getAnnotationType(@NotNull final Object param,
+      @NotNull final Annotation[] annotations) {
+    Class<? extends Annotation> type = null;
+    for (final Annotation annotation : annotations) {
+      if (annotation instanceof In) {
+        if ((type != null) || !(param instanceof Channel)) {
+          throw new IllegalArgumentException("Invalid annotations for parameter: " + param);
+        }
 
-  /**
-   * Builds a new input channel and binds the specified one to it.
-   *
-   * @param channel the channel to bind.
-   * @param <IN>    the input data type.
-   * @return the input channel instance.
-   */
-  @NotNull
-  @SuppressWarnings("unchecked")
-  public static <IN> InputChannel<IN> inputFrom(@NotNull final Channel<?, IN> channel) {
-    final InputChannel<IN> inputChannel = inputChannel();
-    channel.bind(inputChannel).close();
-    return inputChannel;
-  }
+        type = In.class;
 
-  /**
-   * Builds a new input channel producing no data.
-   * <p>
-   * Note that the channel will be already closed.
-   *
-   * @param <IN> the input data type.
-   * @return the input channel instance.
-   */
-  @NotNull
-  public static <IN> InputChannel<IN> inputOf() {
-    return toInput(JRoutineCore.io().<IN>of());
-  }
+      } else if (annotation instanceof Out) {
+        if ((type != null) || !(param instanceof Channel)) {
+          throw new IllegalArgumentException("Invalid annotations for parameter: " + param);
+        }
 
-  /**
-   * Builds a new input channel producing the specified input.
-   * <p>
-   * Note that the channel will be already closed.
-   *
-   * @param input the input.
-   * @param <IN>  the input data type.
-   * @return the input channel instance.
-   */
-  @NotNull
-  public static <IN> InputChannel<IN> inputOf(@Nullable final IN input) {
-    return toInput(JRoutineCore.io().of(input));
-  }
+        type = Out.class;
+      }
+    }
 
-  /**
-   * Builds a new input channel producing the specified inputs.
-   * <p>
-   * Note that the channel will be already closed.
-   *
-   * @param inputs the inputs.
-   * @param <IN>   the input data type.
-   * @return the input channel instance.
-   */
-  @NotNull
-  public static <IN> InputChannel<IN> inputOf(@Nullable final IN... inputs) {
-    return toInput(JRoutineCore.io().of(inputs));
-  }
-
-  /**
-   * Builds a new input channel producing the inputs returned by the specified iterable.
-   * <p>
-   * Note that the channel will be already closed.
-   *
-   * @param inputs the iterable returning the input data.
-   * @param <IN>   the input data type.
-   * @return the input channel instance.
-   */
-  @NotNull
-  public static <IN> InputChannel<IN> inputOf(@Nullable final Iterable<IN> inputs) {
-    return toInput(JRoutineCore.io().of(inputs));
-  }
-
-  /**
-   * Builds a new output channel.
-   *
-   * @param <OUT> the output data type.
-   * @return the output channel instance.
-   */
-  @NotNull
-  public static <OUT> OutputChannel<OUT> outputChannel() {
-    return toOutput(JRoutineCore.io().<OUT>buildChannel());
-  }
-
-  /**
-   * Builds a new output channel and binds it to the specified one.
-   *
-   * @param channel the channel to bind to.
-   * @param <OUT>   the output data type.
-   * @return the output channel instance.
-   */
-  @NotNull
-  @SuppressWarnings("unchecked")
-  public static <OUT> OutputChannel<OUT> outputFrom(@NotNull final Channel<OUT, ?> channel) {
-    final OutputChannel<OUT> outOutputChannel = outputChannel();
-    outOutputChannel.bind(channel).close();
-    return outOutputChannel;
-  }
-
-  /**
-   * Builds a new input channel wrapping the specified one.
-   *
-   * @param channel the channel to wrap.
-   * @param <IN>    the input data type.
-   * @return the input channel instance.
-   */
-  @NotNull
-  public static <IN> InputChannel<IN> toInput(@NotNull final Channel<IN, IN> channel) {
-    return new InputChannel<IN>(channel);
-  }
-
-  /**
-   * Builds a new output channel wrapping the specified one.
-   *
-   * @param channel the channel to wrap.
-   * @param <OUT>   the output data type.
-   * @return the output channel instance.
-   */
-  @NotNull
-  public static <OUT> OutputChannel<OUT> toOutput(@NotNull final Channel<OUT, OUT> channel) {
-    return new OutputChannel<OUT>(channel);
+    return type;
   }
 
   /**
    * Replaces all the input and output channels in the specified parameters with newly created
    * instances.
    *
+   * @param method         the target method.
    * @param params         the original method parameters.
    * @param inputChannels  the list to fill with the newly created input channels.
    * @param outputChannels the list to fill with the newly created output channels.
    * @return the replaced parameters.
    */
   @NotNull
-  protected static Object[] replaceChannels(@NotNull final Object[] params,
-      @NotNull final ArrayList<InputChannel<?>> inputChannels,
-      @NotNull final ArrayList<OutputChannel<?>> outputChannels) {
-    final ArrayList<Object> parameters = new ArrayList<Object>(params.length);
-    for (final Object param : params) {
-      if (param instanceof InputChannel) {
-        final InputChannel<Object> inputChannel = toInput(JRoutineCore.io().buildChannel());
+  protected static Object[] replaceChannels(@NotNull final Method method,
+      @NotNull final Object[] params, @NotNull final ArrayList<Channel<?, ?>> inputChannels,
+      @NotNull final ArrayList<Channel<?, ?>> outputChannels) {
+    final Annotation[][] annotations = method.getParameterAnnotations();
+    final int length = params.length;
+    final ArrayList<Object> parameters = new ArrayList<Object>(length);
+    final ChannelBuilder channelBuilder = JRoutineCore.io();
+    for (int i = 0; i < length; ++i) {
+      final Object param = params[i];
+      final Class<? extends Annotation> annotationType = getAnnotationType(param, annotations[i]);
+      if (annotationType == In.class) {
+        final Channel<Object, Object> inputChannel = channelBuilder.buildChannel();
         inputChannels.add(inputChannel);
         parameters.add(inputChannel);
 
-      } else if (param instanceof OutputChannel) {
-        final OutputChannel<Object> outputChannel = toOutput(JRoutineCore.io().buildChannel());
+      } else if (annotationType == Out.class) {
+        final Channel<Object, Object> outputChannel = channelBuilder.buildChannel();
         outputChannels.add(outputChannel);
         parameters.add(outputChannel);
 
@@ -705,7 +635,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
    * @return the output channel instance.
    */
   @NotNull
-  public <OUT> OutputChannel<OUT> call(@Nullable final Object... params) {
+  public <OUT> Channel<?, OUT> call(@Nullable final Object... params) {
     final Object[] safeParams = asArgs(params);
     final Class<? extends RoutineMethod> type = getClass();
     final Method method = findBestMatchingMethod(type, safeParams);
@@ -725,7 +655,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
       factory = new SingleInvocationFactory(this, method, safeParams);
     }
 
-    return call(factory, InvocationMode.ASYNC, safeParams);
+    return call(factory, method, InvocationMode.ASYNC, safeParams);
   }
 
   /**
@@ -746,7 +676,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
    * @see com.github.dm.jrt.core.routine.Routine Routine
    */
   @NotNull
-  public <OUT> OutputChannel<OUT> callParallel(@Nullable final Object... params) {
+  public <OUT> Channel<?, OUT> callParallel(@Nullable final Object... params) {
     final Constructor<? extends RoutineMethod> constructor = mConstructor;
     if (constructor == null) {
       throw new IllegalStateException(
@@ -757,7 +687,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
     final Object[] safeParams = asArgs(params);
     final Class<? extends RoutineMethod> type = getClass();
     final Method method = findBestMatchingMethod(type, safeParams);
-    return call(new MultiInvocationFactory(type, constructor, mArgs, method, safeParams),
+    return call(new MultiInvocationFactory(type, constructor, mArgs, method, safeParams), method,
         InvocationMode.PARALLEL, safeParams);
   }
 
@@ -795,31 +725,37 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
    * @return the input channel producing data or null.
    */
   @SuppressWarnings("unchecked")
-  protected <IN> InputChannel<IN> switchInput() {
-    return (InputChannel<IN>) mLocalChannel.get();
+  protected <IN> Channel<?, IN> switchInput() {
+    return (Channel<?, IN>) mLocalChannel.get();
   }
 
   @NotNull
   @SuppressWarnings("unchecked")
-  private <OUT> OutputChannel<OUT> call(
+  private <OUT> Channel<?, OUT> call(
       @NotNull final InvocationFactory<Selectable<Object>, Selectable<Object>> factory,
-      @NotNull final InvocationMode mode, @NotNull final Object[] params) {
-    final ArrayList<InputChannel<?>> inputChannels = new ArrayList<InputChannel<?>>();
-    final ArrayList<OutputChannel<?>> outputChannels = new ArrayList<OutputChannel<?>>();
-    for (final Object param : params) {
-      if (param instanceof InputChannel) {
-        inputChannels.add((InputChannel<?>) param);
+      @NotNull final Method method, @NotNull final InvocationMode mode,
+      @NotNull final Object[] params) {
+    final ArrayList<Channel<?, ?>> inputChannels = new ArrayList<Channel<?, ?>>();
+    final ArrayList<Channel<?, ?>> outputChannels = new ArrayList<Channel<?, ?>>();
+    final Annotation[][] annotations = method.getParameterAnnotations();
+    final int length = params.length;
+    for (int i = 0; i < length; ++i) {
+      final Object param = params[i];
+      final Class<? extends Annotation> annotationType = getAnnotationType(param, annotations[i]);
+      if (annotationType == In.class) {
+        inputChannels.add((Channel<?, ?>) param);
 
-      } else if (param instanceof OutputChannel) {
-        outputChannels.add((OutputChannel<?>) param);
+      } else if (annotationType == Out.class) {
+        outputChannels.add((Channel<?, ?>) param);
       }
     }
 
-    final OutputChannel<OUT> resultChannel = outputChannel();
+    final ChannelBuilder channelBuilder = JRoutineCore.io();
+    final Channel<OUT, OUT> resultChannel = channelBuilder.buildChannel();
     outputChannels.add(resultChannel);
     final Channel<?, ? extends Selectable<Object>> inputChannel =
         (!inputChannels.isEmpty()) ? Channels.merge(inputChannels).buildChannels()
-            : JRoutineCore.io().<Selectable<Object>>of();
+            : channelBuilder.<Selectable<Object>>of();
     final Channel<Selectable<Object>, Selectable<Object>> outputChannel =
         mode.invoke(JRoutineCore.with(factory).apply(getConfiguration()))
             .pass(inputChannel)
@@ -827,7 +763,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
     final Map<Integer, Channel<?, Object>> channelMap =
         Channels.selectOutput(0, outputChannels.size(), outputChannel).buildChannels();
     for (final Entry<Integer, Channel<?, Object>> entry : channelMap.entrySet()) {
-      entry.getValue().bind((OutputChannel<Object>) outputChannels.get(entry.getKey())).close();
+      entry.getValue().bind((Channel<Object, Object>) outputChannels.get(entry.getKey())).close();
     }
 
     return resultChannel;
@@ -841,7 +777,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
     mLocalIgnore.set(null);
   }
 
-  private void setLocalInput(@Nullable final InputChannel<?> inputChannel) {
+  private void setLocalInput(@Nullable final Channel<?, ?> inputChannel) {
     mLocalChannel.set(inputChannel);
   }
 
@@ -894,13 +830,13 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
 
     @NotNull
     @Override
-    public <OUT> OutputChannel<OUT> call(@Nullable final Object... params) {
+    public <OUT> Channel<?, OUT> call(@Nullable final Object... params) {
       return call(InvocationMode.ASYNC, params);
     }
 
     @NotNull
     @Override
-    public <OUT> OutputChannel<OUT> callParallel(@Nullable final Object... params) {
+    public <OUT> Channel<?, OUT> callParallel(@Nullable final Object... params) {
       return call(InvocationMode.PARALLEL, params);
     }
 
@@ -911,7 +847,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
 
     @NotNull
     @SuppressWarnings("unchecked")
-    private <OUT> OutputChannel<OUT> call(@NotNull final InvocationMode mode,
+    private <OUT> Channel<?, OUT> call(@NotNull final InvocationMode mode,
         @Nullable final Object[] params) {
       final Object[] safeParams = asArgs(params);
       final Method method = mMethod;
@@ -926,15 +862,15 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
                                                             .method(method);
       final Channel<Object, Object> channel = mode.invoke(routine).sorted();
       for (final Object param : safeParams) {
-        if (param instanceof InputChannel) {
-          channel.pass((InputChannel<?>) param);
+        if (param instanceof Channel) {
+          channel.pass((Channel<?, ?>) param);
 
         } else {
           channel.pass(param);
         }
       }
 
-      return (OutputChannel<OUT>) toOutput(channel.close());
+      return (Channel<?, OUT>) channel.close();
     }
   }
 
@@ -963,8 +899,8 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
 
     public void onAbort(@NotNull final RoutineException reason) throws Exception {
       mIsAborted = true;
-      final List<InputChannel<?>> inputChannels = getInputChannels();
-      for (final InputChannel<?> inputChannel : inputChannels) {
+      final List<Channel<?, ?>> inputChannels = getInputChannels();
+      for (final Channel<?, ?> inputChannel : inputChannels) {
         inputChannel.abort(reason);
       }
 
@@ -975,7 +911,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
 
       } finally {
         resetIgnoreReturnValue();
-        for (final OutputChannel<?> outputChannel : getOutputChannels()) {
+        for (final Channel<?, ?> outputChannel : getOutputChannels()) {
           outputChannel.abort(reason);
         }
       }
@@ -985,12 +921,12 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
       bind(result);
       mIsComplete = true;
       if (!mIsAborted) {
-        final List<InputChannel<?>> inputChannels = getInputChannels();
-        for (final InputChannel<?> inputChannel : inputChannels) {
+        final List<Channel<?, ?>> inputChannels = getInputChannels();
+        for (final Channel<?, ?> inputChannel : inputChannels) {
           inputChannel.close();
         }
 
-        final List<OutputChannel<?>> outputChannels = getOutputChannels();
+        final List<Channel<?, ?>> outputChannels = getOutputChannels();
         try {
           resetIgnoreReturnValue();
           final Object methodResult =
@@ -1003,7 +939,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
           resetIgnoreReturnValue();
         }
 
-        for (final OutputChannel<?> outputChannel : outputChannels) {
+        for (final Channel<?, ?> outputChannel : outputChannels) {
           outputChannel.close();
         }
       }
@@ -1012,8 +948,8 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
     public void onInput(final Selectable<Object> input,
         @NotNull final Channel<Selectable<Object>, ?> result) throws Exception {
       bind(result);
-      @SuppressWarnings("unchecked") final InputChannel<Object> inputChannel =
-          (InputChannel<Object>) getInputChannels().get(input.index);
+      @SuppressWarnings("unchecked") final Channel<Object, Object> inputChannel =
+          (Channel<Object, Object>) getInputChannels().get(input.index);
       inputChannel.pass(input.data);
       try {
         resetIgnoreReturnValue();
@@ -1033,7 +969,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
      * @return the list of input channels.
      */
     @NotNull
-    protected abstract List<InputChannel<?>> getInputChannels();
+    protected abstract List<Channel<?, ?>> getInputChannels();
 
     /**
      * Returns the list of output channels representing the output of the method.
@@ -1041,7 +977,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
      * @return the list of output channels.
      */
     @NotNull
-    protected abstract List<OutputChannel<?>> getOutputChannels();
+    protected abstract List<Channel<?, ?>> getOutputChannels();
 
     /**
      * Invokes the method.
@@ -1051,7 +987,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
      * @throws java.lang.Exception if an error occurred during the invocation.
      */
     @Nullable
-    protected abstract Object invokeMethod(@Nullable InputChannel<?> inputChannel) throws Exception;
+    protected abstract Object invokeMethod(@Nullable Channel<?, ?> inputChannel) throws Exception;
 
     /**
      * Checks if the method return value must be ignored.
@@ -1068,7 +1004,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
     private void bind(@NotNull final Channel<Selectable<Object>, ?> result) {
       if (!mIsBound) {
         mIsBound = true;
-        final List<OutputChannel<?>> outputChannels = getOutputChannels();
+        final List<Channel<?, ?>> outputChannels = getOutputChannels();
         if (!outputChannels.isEmpty()) {
           result.pass(Channels.merge(outputChannels).buildChannels());
         }
@@ -1076,7 +1012,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
     }
 
     @Nullable
-    private Object internalInvoke(@Nullable final InputChannel<?> inputChannel) throws Exception {
+    private Object internalInvoke(@Nullable final Channel<?, ?> inputChannel) throws Exception {
       try {
         return invokeMethod(inputChannel);
 
@@ -1101,13 +1037,13 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
 
     private final Constructor<? extends RoutineMethod> mConstructor;
 
-    private final ArrayList<InputChannel<?>> mInputChannels = new ArrayList<InputChannel<?>>();
+    private final ArrayList<Channel<?, ?>> mInputChannels = new ArrayList<Channel<?, ?>>();
 
     private final Method mMethod;
 
     private final Object[] mOrigParams;
 
-    private final ArrayList<OutputChannel<?>> mOutputChannels = new ArrayList<OutputChannel<?>>();
+    private final ArrayList<Channel<?, ?>> mOutputChannels = new ArrayList<Channel<?, ?>>();
 
     private RoutineMethod mInstance;
 
@@ -1133,7 +1069,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
 
     @NotNull
     @Override
-    protected List<InputChannel<?>> getInputChannels() {
+    protected List<Channel<?, ?>> getInputChannels() {
       return mInputChannels;
     }
 
@@ -1141,8 +1077,9 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
     public void onRestart() throws Exception {
       super.onRestart();
       final RoutineMethod instance = (mInstance = mConstructor.newInstance(mArgs));
-      instance.setReturnType(mMethod.getReturnType());
-      mParams = replaceChannels(mOrigParams, mInputChannels, mOutputChannels);
+      final Method method = mMethod;
+      instance.setReturnType(method.getReturnType());
+      mParams = replaceChannels(method, mOrigParams, mInputChannels, mOutputChannels);
     }
 
     public void onRecycle(final boolean isReused) throws Exception {
@@ -1152,12 +1089,12 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
 
     @NotNull
     @Override
-    protected List<OutputChannel<?>> getOutputChannels() {
+    protected List<Channel<?, ?>> getOutputChannels() {
       return mOutputChannels;
     }
 
     @Override
-    protected Object invokeMethod(@Nullable final InputChannel<?> inputChannel) throws
+    protected Object invokeMethod(@Nullable final Channel<?, ?> inputChannel) throws
         InvocationTargetException, IllegalAccessException {
       final RoutineMethod instance = mInstance;
       instance.setLocalInput(inputChannel);
@@ -1226,13 +1163,13 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
    */
   private static class SingleInvocation extends AbstractInvocation {
 
-    private final ArrayList<InputChannel<?>> mInputChannels;
+    private final ArrayList<Channel<?, ?>> mInputChannels;
 
     private final RoutineMethod mInstance;
 
     private final Method mMethod;
 
-    private final ArrayList<OutputChannel<?>> mOutputChannels;
+    private final ArrayList<Channel<?, ?>> mOutputChannels;
 
     private final Object[] mParams;
 
@@ -1245,8 +1182,8 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
      * @param method         the method instance.
      * @param params         the method parameters.
      */
-    private SingleInvocation(@NotNull final ArrayList<InputChannel<?>> inputChannels,
-        @NotNull final ArrayList<OutputChannel<?>> outputChannels,
+    private SingleInvocation(@NotNull final ArrayList<Channel<?, ?>> inputChannels,
+        @NotNull final ArrayList<Channel<?, ?>> outputChannels,
         @NotNull final RoutineMethod instance, @NotNull final Method method,
         @NotNull final Object[] params) {
       super(method);
@@ -1258,7 +1195,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
     }
 
     @Override
-    protected Object invokeMethod(@Nullable final InputChannel<?> inputChannel) throws
+    protected Object invokeMethod(@Nullable final Channel<?, ?> inputChannel) throws
         InvocationTargetException, IllegalAccessException {
       final RoutineMethod instance = mInstance;
       instance.setLocalInput(inputChannel);
@@ -1275,13 +1212,13 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
 
     @NotNull
     @Override
-    protected List<InputChannel<?>> getInputChannels() {
+    protected List<Channel<?, ?>> getInputChannels() {
       return mInputChannels;
     }
 
     @NotNull
     @Override
-    protected List<OutputChannel<?>> getOutputChannels() {
+    protected List<Channel<?, ?>> getOutputChannels() {
       return mOutputChannels;
     }
 
@@ -1302,13 +1239,13 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
   private static class SingleInvocationFactory
       extends InvocationFactory<Selectable<Object>, Selectable<Object>> {
 
-    private final ArrayList<InputChannel<?>> mInputChannels;
+    private final ArrayList<Channel<?, ?>> mInputChannels;
 
     private final RoutineMethod mInstance;
 
     private final Method mMethod;
 
-    private final ArrayList<OutputChannel<?>> mOutputChannels;
+    private final ArrayList<Channel<?, ?>> mOutputChannels;
 
     private final Object[] mParams;
 
@@ -1324,11 +1261,11 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
       super(asArgs(instance.getClass(), method, cloneArgs(params)));
       mInstance = instance;
       mMethod = method;
-      final ArrayList<InputChannel<?>> inputChannels =
-          (mInputChannels = new ArrayList<InputChannel<?>>());
-      final ArrayList<OutputChannel<?>> outputChannels =
-          (mOutputChannels = new ArrayList<OutputChannel<?>>());
-      mParams = replaceChannels(params, inputChannels, outputChannels);
+      final ArrayList<Channel<?, ?>> inputChannels =
+          (mInputChannels = new ArrayList<Channel<?, ?>>());
+      final ArrayList<Channel<?, ?>> outputChannels =
+          (mOutputChannels = new ArrayList<Channel<?, ?>>());
+      mParams = replaceChannels(method, params, inputChannels, outputChannels);
     }
 
     @NotNull

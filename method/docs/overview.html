@@ -65,14 +65,14 @@
 <b>Example 1:</b> via routine method implementation.
 <pre>
     <code>
-        final InputChannel&lt;Integer&gt; inputInts = RoutineMethod.inputChannel();
-        final InputChannel&lt;String&gt; inputStrings = RoutineMethod.inputChannel();
-        final OutputChannel&lt;String&gt; outputChannel = RoutineMethod.outputChannel();
+        final Channel&lt;Integer, Integer&gt; inputInts = JRoutineCore.io().buildChannel();
+        final Channel&lt;String, String&gt; inputStrings = JRoutineCore.io().buildChannel();
+        final Channel&lt;String, String&gt; outputChannel = JRoutineCore.io().buildChannel();
         new RoutineMethod() {
 
-            void print(final InputChannel&lt;Integer&gt; inputInts,
-                    final InputChannel&lt;String&gt; inputStrings,
-                    final OutputChannel&lt;String&gt; output) {
+            void print(&commat;In final Channel&lt;?, Integer&gt; inputInts,
+                    &commat;In final Channel&lt;?, String&gt; inputStrings,
+                    &commat;Out final Channel&lt;String, ?&gt; output) {
                 final InputChannel&lt;?&gt; inputChannel = switchInput();
                 if (inputChannel.hasNext()) {
                     if (inputChannel == inputInts) {

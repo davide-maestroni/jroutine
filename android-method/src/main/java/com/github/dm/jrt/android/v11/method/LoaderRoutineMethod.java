@@ -31,6 +31,7 @@ import com.github.dm.jrt.android.v11.object.JRoutineLoaderObject;
 import com.github.dm.jrt.channel.Channels;
 import com.github.dm.jrt.channel.Selectable;
 import com.github.dm.jrt.core.JRoutineCore;
+import com.github.dm.jrt.core.builder.ChannelBuilder;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
@@ -39,15 +40,16 @@ import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.Reflection;
-import com.github.dm.jrt.method.InputChannel;
-import com.github.dm.jrt.method.OutputChannel;
 import com.github.dm.jrt.method.RoutineMethod;
+import com.github.dm.jrt.method.annotation.In;
+import com.github.dm.jrt.method.annotation.Out;
 import com.github.dm.jrt.object.config.ObjectConfigurable;
 import com.github.dm.jrt.object.config.ObjectConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -86,8 +88,8 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  *                 super(context);
  *             }
  *
- *             void run(final InputChannel&lt;String&gt; input,
- *                     final OutputChannel&lt;String&gt; output) {
+ *             void run(&#64;In final Channel&lt;?, String&gt; input,
+ *                     &#64;Out final Channel&lt;String, ?&gt; output) {
  *                 final MyApplication application = (MyApplication) getContext();
  *                 // do it
  *             }
@@ -113,7 +115,7 @@ public class LoaderRoutineMethod extends RoutineMethod
 
   private final AtomicBoolean mIsFirstCall = new AtomicBoolean(true);
 
-  private final ThreadLocal<InputChannel<?>> mLocalChannel = new ThreadLocal<InputChannel<?>>();
+  private final ThreadLocal<Channel<?, ?>> mLocalChannel = new ThreadLocal<Channel<?, ?>>();
 
   private final ThreadLocal<Context> mLocalContext = new ThreadLocal<Context>();
 
@@ -265,7 +267,7 @@ public class LoaderRoutineMethod extends RoutineMethod
    */
   @NotNull
   @Override
-  public <OUT> OutputChannel<OUT> call(@Nullable final Object... params) {
+  public <OUT> Channel<?, OUT> call(@Nullable final Object... params) {
     final Object[] safeParams = asArgs(params);
     final Class<? extends LoaderRoutineMethod> type = getClass();
     final Method method = findBestMatchingMethod(type, safeParams);
@@ -285,7 +287,7 @@ public class LoaderRoutineMethod extends RoutineMethod
       factory = new SingleInvocationFactory(this, method, safeParams);
     }
 
-    return call(factory, InvocationMode.ASYNC, safeParams);
+    return call(factory, method, InvocationMode.ASYNC, safeParams);
   }
 
   /**
@@ -304,7 +306,7 @@ public class LoaderRoutineMethod extends RoutineMethod
    */
   @NotNull
   @Override
-  public <OUT> OutputChannel<OUT> callParallel(@Nullable final Object... params) {
+  public <OUT> Channel<?, OUT> callParallel(@Nullable final Object... params) {
     final Constructor<? extends LoaderRoutineMethod> constructor = mConstructor;
     if (constructor == null) {
       throw new IllegalStateException(
@@ -315,7 +317,7 @@ public class LoaderRoutineMethod extends RoutineMethod
     final Object[] safeParams = asArgs(params);
     final Class<? extends LoaderRoutineMethod> type = getClass();
     final Method method = findBestMatchingMethod(type, safeParams);
-    return call(new MultiInvocationFactory(type, constructor, mArgs, method, safeParams),
+    return call(new MultiInvocationFactory(type, constructor, mArgs, method, safeParams), method,
         InvocationMode.PARALLEL, safeParams);
   }
 
@@ -344,8 +346,8 @@ public class LoaderRoutineMethod extends RoutineMethod
    */
   @Override
   @SuppressWarnings("unchecked")
-  protected <IN> InputChannel<IN> switchInput() {
-    return (InputChannel<IN>) mLocalChannel.get();
+  protected <IN> Channel<?, IN> switchInput() {
+    return (Channel<?, IN>) mLocalChannel.get();
   }
 
   @NotNull
@@ -385,25 +387,31 @@ public class LoaderRoutineMethod extends RoutineMethod
 
   @NotNull
   @SuppressWarnings("unchecked")
-  private <OUT> OutputChannel<OUT> call(
+  private <OUT> Channel<?, OUT> call(
       @NotNull final ContextInvocationFactory<Selectable<Object>, Selectable<Object>> factory,
-      @NotNull final InvocationMode mode, @NotNull final Object[] params) {
-    final ArrayList<InputChannel<?>> inputChannels = new ArrayList<InputChannel<?>>();
-    final ArrayList<OutputChannel<?>> outputChannels = new ArrayList<OutputChannel<?>>();
-    for (final Object param : params) {
-      if (param instanceof InputChannel) {
-        inputChannels.add((InputChannel<?>) param);
+      @NotNull final Method method, @NotNull final InvocationMode mode,
+      @NotNull final Object[] params) {
+    final ArrayList<Channel<?, ?>> inputChannels = new ArrayList<Channel<?, ?>>();
+    final ArrayList<Channel<?, ?>> outputChannels = new ArrayList<Channel<?, ?>>();
+    final Annotation[][] annotations = method.getParameterAnnotations();
+    final int length = params.length;
+    for (int i = 0; i < length; ++i) {
+      final Object param = params[i];
+      final Class<? extends Annotation> annotationType = getAnnotationType(param, annotations[i]);
+      if (annotationType == In.class) {
+        inputChannels.add((Channel<?, ?>) param);
 
-      } else if (param instanceof OutputChannel) {
-        outputChannels.add((OutputChannel<?>) param);
+      } else if (annotationType == Out.class) {
+        outputChannels.add((Channel<?, ?>) param);
       }
     }
 
-    final OutputChannel<OUT> resultChannel = outputChannel();
+    final ChannelBuilder channelBuilder = JRoutineCore.io();
+    final Channel<?, OUT> resultChannel = channelBuilder.buildChannel();
     outputChannels.add(resultChannel);
     final Channel<?, ? extends Selectable<Object>> inputChannel =
         (!inputChannels.isEmpty()) ? AndroidChannels.mergeParcelable(inputChannels).buildChannels()
-            : JRoutineCore.io().<Selectable<Object>>of();
+            : channelBuilder.<Selectable<Object>>of();
     final Channel<Selectable<Object>, Selectable<Object>> outputChannel = mode.invoke(JRoutineLoader
         .on(mContext)
         .with(factory)
@@ -412,7 +420,7 @@ public class LoaderRoutineMethod extends RoutineMethod
     final Map<Integer, Channel<?, Object>> channelMap =
         AndroidChannels.selectOutput(0, outputChannels.size(), outputChannel).buildChannels();
     for (final Entry<Integer, Channel<?, Object>> entry : channelMap.entrySet()) {
-      entry.getValue().bind((OutputChannel<Object>) outputChannels.get(entry.getKey())).close();
+      entry.getValue().bind((Channel<Object, Object>) outputChannels.get(entry.getKey())).close();
     }
 
     return resultChannel;
@@ -430,7 +438,7 @@ public class LoaderRoutineMethod extends RoutineMethod
     mLocalContext.set(context);
   }
 
-  private void setLocalInput(@Nullable final InputChannel<?> inputChannel) {
+  private void setLocalInput(@Nullable final Channel<?, ?> inputChannel) {
     mLocalChannel.set(inputChannel);
   }
 
@@ -491,13 +499,13 @@ public class LoaderRoutineMethod extends RoutineMethod
 
     @NotNull
     @Override
-    public <OUT> OutputChannel<OUT> call(@Nullable final Object... params) {
+    public <OUT> Channel<?, OUT> call(@Nullable final Object... params) {
       return call(InvocationMode.ASYNC, params);
     }
 
     @NotNull
     @Override
-    public <OUT> OutputChannel<OUT> callParallel(@Nullable final Object... params) {
+    public <OUT> Channel<?, OUT> callParallel(@Nullable final Object... params) {
       return call(InvocationMode.PARALLEL, params);
     }
 
@@ -523,7 +531,7 @@ public class LoaderRoutineMethod extends RoutineMethod
 
     @NotNull
     @SuppressWarnings("unchecked")
-    private <OUT> OutputChannel<OUT> call(@NotNull final InvocationMode mode,
+    private <OUT> Channel<?, OUT> call(@NotNull final InvocationMode mode,
         @Nullable final Object[] params) {
       final Object[] safeParams = asArgs(params);
       final Method method = mMethod;
@@ -540,15 +548,15 @@ public class LoaderRoutineMethod extends RoutineMethod
                                                                   .method(method);
       final Channel<Object, Object> channel = mode.invoke(routine).sorted();
       for (final Object param : safeParams) {
-        if (param instanceof InputChannel) {
-          channel.pass((InputChannel<?>) param);
+        if (param instanceof Channel) {
+          channel.pass((Channel<?, ?>) param);
 
         } else {
           channel.pass(param);
         }
       }
 
-      return (OutputChannel<OUT>) toOutput(channel.close());
+      return (Channel<?, OUT>) channel.close();
     }
   }
 
@@ -578,8 +586,8 @@ public class LoaderRoutineMethod extends RoutineMethod
     @Override
     public void onAbort(@NotNull final RoutineException reason) throws Exception {
       mIsAborted = true;
-      final List<InputChannel<?>> inputChannels = getInputChannels();
-      for (final InputChannel<?> inputChannel : inputChannels) {
+      final List<Channel<?, ?>> inputChannels = getInputChannels();
+      for (final Channel<?, ?> inputChannel : inputChannels) {
         inputChannel.abort(reason);
       }
 
@@ -590,7 +598,7 @@ public class LoaderRoutineMethod extends RoutineMethod
 
       } finally {
         resetIgnoreReturnValue();
-        for (final OutputChannel<?> outputChannel : getOutputChannels()) {
+        for (final Channel<?, ?> outputChannel : getOutputChannels()) {
           outputChannel.abort(reason);
         }
       }
@@ -601,12 +609,12 @@ public class LoaderRoutineMethod extends RoutineMethod
       bind(result);
       mIsComplete = true;
       if (!mIsAborted) {
-        final List<InputChannel<?>> inputChannels = getInputChannels();
-        for (final InputChannel<?> inputChannel : inputChannels) {
+        final List<Channel<?, ?>> inputChannels = getInputChannels();
+        for (final Channel<?, ?> inputChannel : inputChannels) {
           inputChannel.close();
         }
 
-        final List<OutputChannel<?>> outputChannels = getOutputChannels();
+        final List<Channel<?, ?>> outputChannels = getOutputChannels();
         try {
           resetIgnoreReturnValue();
           final Object methodResult =
@@ -619,7 +627,7 @@ public class LoaderRoutineMethod extends RoutineMethod
           resetIgnoreReturnValue();
         }
 
-        for (final OutputChannel<?> outputChannel : outputChannels) {
+        for (final Channel<?, ?> outputChannel : outputChannels) {
           outputChannel.close();
         }
       }
@@ -629,8 +637,8 @@ public class LoaderRoutineMethod extends RoutineMethod
     public void onInput(final Selectable<Object> input,
         @NotNull final Channel<Selectable<Object>, ?> result) throws Exception {
       bind(result);
-      @SuppressWarnings("unchecked") final InputChannel<Object> inputChannel =
-          (InputChannel<Object>) getInputChannels().get(input.index);
+      @SuppressWarnings("unchecked") final Channel<Object, Object> inputChannel =
+          (Channel<Object, Object>) getInputChannels().get(input.index);
       inputChannel.pass(input.data);
       try {
         resetIgnoreReturnValue();
@@ -650,7 +658,7 @@ public class LoaderRoutineMethod extends RoutineMethod
      * @return the list of input channels.
      */
     @NotNull
-    protected abstract List<InputChannel<?>> getInputChannels();
+    protected abstract List<Channel<?, ?>> getInputChannels();
 
     /**
      * Returns the list of output channels representing the output of the method.
@@ -658,7 +666,7 @@ public class LoaderRoutineMethod extends RoutineMethod
      * @return the list of output channels.
      */
     @NotNull
-    protected abstract List<OutputChannel<?>> getOutputChannels();
+    protected abstract List<Channel<?, ?>> getOutputChannels();
 
     /**
      * Invokes the method.
@@ -668,7 +676,7 @@ public class LoaderRoutineMethod extends RoutineMethod
      * @throws java.lang.Exception if an error occurred during the invocation.
      */
     @Nullable
-    protected abstract Object invokeMethod(@Nullable InputChannel<?> inputChannel) throws Exception;
+    protected abstract Object invokeMethod(@Nullable Channel<?, ?> inputChannel) throws Exception;
 
     /**
      * Checks if the method return value must be ignored.
@@ -685,7 +693,7 @@ public class LoaderRoutineMethod extends RoutineMethod
     private void bind(@NotNull final Channel<Selectable<Object>, ?> result) {
       if (!mIsBound) {
         mIsBound = true;
-        final List<OutputChannel<?>> outputChannels = getOutputChannels();
+        final List<Channel<?, ?>> outputChannels = getOutputChannels();
         if (!outputChannels.isEmpty()) {
           result.pass(Channels.merge(outputChannels).buildChannels());
         }
@@ -693,7 +701,7 @@ public class LoaderRoutineMethod extends RoutineMethod
     }
 
     @Nullable
-    private Object internalInvoke(@Nullable final InputChannel<?> inputChannel) throws Exception {
+    private Object internalInvoke(@Nullable final Channel<?, ?> inputChannel) throws Exception {
       try {
         return invokeMethod(inputChannel);
 
@@ -719,13 +727,13 @@ public class LoaderRoutineMethod extends RoutineMethod
 
     private final Constructor<? extends LoaderRoutineMethod> mConstructor;
 
-    private final ArrayList<InputChannel<?>> mInputChannels = new ArrayList<InputChannel<?>>();
+    private final ArrayList<Channel<?, ?>> mInputChannels = new ArrayList<Channel<?, ?>>();
 
     private final Method mMethod;
 
     private final Object[] mOrigParams;
 
-    private final ArrayList<OutputChannel<?>> mOutputChannels = new ArrayList<OutputChannel<?>>();
+    private final ArrayList<Channel<?, ?>> mOutputChannels = new ArrayList<Channel<?, ?>>();
 
     private Context mContext;
 
@@ -758,7 +766,7 @@ public class LoaderRoutineMethod extends RoutineMethod
 
     @NotNull
     @Override
-    protected List<InputChannel<?>> getInputChannels() {
+    protected List<Channel<?, ?>> getInputChannels() {
       return mInputChannels;
     }
 
@@ -766,8 +774,9 @@ public class LoaderRoutineMethod extends RoutineMethod
     public void onRestart() throws Exception {
       super.onRestart();
       final LoaderRoutineMethod instance = (mInstance = mConstructor.newInstance(mArgs));
-      instance.setReturnType(mMethod.getReturnType());
-      mParams = replaceChannels(mOrigParams, mInputChannels, mOutputChannels);
+      final Method method = mMethod;
+      instance.setReturnType(method.getReturnType());
+      mParams = replaceChannels(method, mOrigParams, mInputChannels, mOutputChannels);
     }
 
     @Override
@@ -778,12 +787,12 @@ public class LoaderRoutineMethod extends RoutineMethod
 
     @NotNull
     @Override
-    protected List<OutputChannel<?>> getOutputChannels() {
+    protected List<Channel<?, ?>> getOutputChannels() {
       return mOutputChannels;
     }
 
     @Override
-    protected Object invokeMethod(@Nullable final InputChannel<?> inputChannel) throws
+    protected Object invokeMethod(@Nullable final Channel<?, ?> inputChannel) throws
         InvocationTargetException, IllegalAccessException {
       final LoaderRoutineMethod instance = mInstance;
       instance.setLocalContext(mContext);
@@ -854,13 +863,13 @@ public class LoaderRoutineMethod extends RoutineMethod
    */
   private static class SingleInvocation extends AbstractInvocation {
 
-    private final ArrayList<InputChannel<?>> mInputChannels;
+    private final ArrayList<Channel<?, ?>> mInputChannels;
 
     private final LoaderRoutineMethod mInstance;
 
     private final Method mMethod;
 
-    private final ArrayList<OutputChannel<?>> mOutputChannels;
+    private final ArrayList<Channel<?, ?>> mOutputChannels;
 
     private final Object[] mParams;
 
@@ -875,8 +884,8 @@ public class LoaderRoutineMethod extends RoutineMethod
      * @param method         the method instance.
      * @param params         the method parameters.
      */
-    private SingleInvocation(@NotNull final ArrayList<InputChannel<?>> inputChannels,
-        @NotNull final ArrayList<OutputChannel<?>> outputChannels,
+    private SingleInvocation(@NotNull final ArrayList<Channel<?, ?>> inputChannels,
+        @NotNull final ArrayList<Channel<?, ?>> outputChannels,
         @NotNull final LoaderRoutineMethod instance, @NotNull final Method method,
         @NotNull final Object[] params) {
       super(method);
@@ -888,7 +897,7 @@ public class LoaderRoutineMethod extends RoutineMethod
     }
 
     @Override
-    protected Object invokeMethod(@Nullable final InputChannel<?> inputChannel) throws
+    protected Object invokeMethod(@Nullable final Channel<?, ?> inputChannel) throws
         InvocationTargetException, IllegalAccessException {
       final LoaderRoutineMethod instance = mInstance;
       instance.setLocalContext(mContext);
@@ -913,13 +922,13 @@ public class LoaderRoutineMethod extends RoutineMethod
 
     @NotNull
     @Override
-    protected List<InputChannel<?>> getInputChannels() {
+    protected List<Channel<?, ?>> getInputChannels() {
       return mInputChannels;
     }
 
     @NotNull
     @Override
-    protected List<OutputChannel<?>> getOutputChannels() {
+    protected List<Channel<?, ?>> getOutputChannels() {
       return mOutputChannels;
     }
 
@@ -940,13 +949,13 @@ public class LoaderRoutineMethod extends RoutineMethod
   private static class SingleInvocationFactory
       extends ContextInvocationFactory<Selectable<Object>, Selectable<Object>> {
 
-    private final ArrayList<InputChannel<?>> mInputChannels;
+    private final ArrayList<Channel<?, ?>> mInputChannels;
 
     private final LoaderRoutineMethod mInstance;
 
     private final Method mMethod;
 
-    private final ArrayList<OutputChannel<?>> mOutputChannels;
+    private final ArrayList<Channel<?, ?>> mOutputChannels;
 
     private final Object[] mParams;
 
@@ -962,11 +971,11 @@ public class LoaderRoutineMethod extends RoutineMethod
       super(asArgs(instance.getClass(), method, cloneArgs(params)));
       mInstance = instance;
       mMethod = method;
-      final ArrayList<InputChannel<?>> inputChannels =
-          (mInputChannels = new ArrayList<InputChannel<?>>());
-      final ArrayList<OutputChannel<?>> outputChannels =
-          (mOutputChannels = new ArrayList<OutputChannel<?>>());
-      mParams = replaceChannels(params, inputChannels, outputChannels);
+      final ArrayList<Channel<?, ?>> inputChannels =
+          (mInputChannels = new ArrayList<Channel<?, ?>>());
+      final ArrayList<Channel<?, ?>> outputChannels =
+          (mOutputChannels = new ArrayList<Channel<?, ?>>());
+      mParams = replaceChannels(method, params, inputChannels, outputChannels);
     }
 
     @NotNull

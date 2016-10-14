@@ -23,11 +23,12 @@ import android.test.ActivityInstrumentationTestCase2;
 
 import com.github.dm.jrt.android.core.ServiceContext;
 import com.github.dm.jrt.android.core.service.InvocationService;
+import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.AbortException;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
-import com.github.dm.jrt.method.InputChannel;
-import com.github.dm.jrt.method.OutputChannel;
-import com.github.dm.jrt.method.RoutineMethod;
+import com.github.dm.jrt.method.annotation.In;
+import com.github.dm.jrt.method.annotation.Out;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -57,16 +58,16 @@ public class RemoteServiceRoutineMethodTest extends ActivityInstrumentationTestC
   }
 
   private static void testAbort2(@NotNull final Activity activity) {
-    final InputChannel<Integer> inputChannel1 = RoutineMethod.inputChannel();
-    final InputChannel<Integer> inputChannel2 = RoutineMethod.inputChannel();
-    final OutputChannel<Integer> outputChannel = RoutineMethod.outputChannel();
+    final Channel<Integer, Integer> inputChannel1 = JRoutineCore.io().buildChannel();
+    final Channel<Integer, Integer> inputChannel2 = JRoutineCore.io().buildChannel();
+    final Channel<Integer, Integer> outputChannel = JRoutineCore.io().buildChannel();
     new ServiceRoutineMethod(serviceFrom(activity, RemoteTestService.class)) {
 
       private int mSum;
 
-      void sum(final InputChannel<Integer> input1, final InputChannel<Integer> input2,
-          final OutputChannel<Integer> output) {
-        final InputChannel<Integer> input = switchInput();
+      void sum(@In final Channel<?, Integer> input1, @In final Channel<?, Integer> input2,
+          @Out final Channel<Integer, ?> output) {
+        final Channel<?, Integer> input = switchInput();
         if (input.hasNext()) {
           mSum += input.next();
 
@@ -82,15 +83,15 @@ public class RemoteServiceRoutineMethodTest extends ActivityInstrumentationTestC
   }
 
   private static void testAbort3(@NotNull final Activity activity) {
-    final InputChannel<Integer> inputChannel1 = RoutineMethod.inputChannel();
-    final InputChannel<Integer> inputChannel2 = RoutineMethod.inputChannel();
-    final OutputChannel<Integer> outputChannel = RoutineMethod.outputChannel();
+    final Channel<Integer, Integer> inputChannel1 = JRoutineCore.io().buildChannel();
+    final Channel<Integer, Integer> inputChannel2 = JRoutineCore.io().buildChannel();
+    final Channel<Integer, Integer> outputChannel = JRoutineCore.io().buildChannel();
     new ServiceRoutineMethod(serviceFrom(activity, RemoteTestService.class)) {
 
       private int mSum;
 
-      void sum(final InputChannel<Integer> input1, final InputChannel<Integer> input2,
-          final OutputChannel<Integer> output) {
+      void sum(@In final Channel<?, Integer> input1, @In final Channel<?, Integer> input2,
+          @Out final Channel<Integer, ?> output) {
         if (input1.equals(switchInput())) {
           if (input1.hasNext()) {
             mSum += input1.next();
@@ -108,10 +109,10 @@ public class RemoteServiceRoutineMethodTest extends ActivityInstrumentationTestC
   }
 
   private static void testContext(@NotNull final Activity activity) {
-    final OutputChannel<Boolean> outputChannel = RoutineMethod.outputChannel();
+    final Channel<Boolean, Boolean> outputChannel = JRoutineCore.io().buildChannel();
     new ServiceRoutineMethod(serviceFrom(activity, RemoteTestService.class)) {
 
-      void test(final OutputChannel<Boolean> output) {
+      void test(@Out final Channel<Boolean, ?> output) {
         output.pass(getContext() instanceof InvocationService);
       }
     }.call(outputChannel);
@@ -126,10 +127,10 @@ public class RemoteServiceRoutineMethodTest extends ActivityInstrumentationTestC
         return "test";
       }
     }.call().after(seconds(10)).all()).containsExactly("test");
-    final OutputChannel<String> outputChannel = RoutineMethod.outputChannel();
+    final Channel<String, String> outputChannel = JRoutineCore.io().buildChannel();
     new ServiceRoutineMethod(context) {
 
-      void get(final OutputChannel<String> outputChannel) {
+      void get(@Out final Channel<String, ?> outputChannel) {
         outputChannel.pass("test");
       }
     }.call(outputChannel);
@@ -141,17 +142,17 @@ public class RemoteServiceRoutineMethodTest extends ActivityInstrumentationTestC
     final ServiceRoutineMethod method =
         new ServiceRoutineMethod(serviceFrom(activity, RemoteTestService.class), locale) {
 
-          String switchCase(final InputChannel<String> input, final boolean isUpper) {
+          String switchCase(@In final Channel<?, String> input, final boolean isUpper) {
             final String str = input.next();
             return (isUpper) ? str.toUpperCase(locale) : str.toLowerCase(locale);
           }
         };
-    InputChannel<Object> inputChannel = RoutineMethod.inputChannel().pass("test");
-    OutputChannel<String> outputChannel = method.call(inputChannel, true);
+    Channel<Object, Object> inputChannel = JRoutineCore.io().buildChannel().pass("test");
+    Channel<?, String> outputChannel = method.call(inputChannel, true);
     assertThat(outputChannel.after(seconds(10)).next()).isEqualTo("TEST");
     inputChannel.close();
     outputChannel.after(seconds(10)).getComplete();
-    inputChannel = RoutineMethod.inputChannel().pass("TEST");
+    inputChannel = JRoutineCore.io().buildChannel().pass("TEST");
     outputChannel = method.call(inputChannel, false);
     assertThat(outputChannel.after(seconds(10)).next()).isEqualTo("test");
     inputChannel.close();
@@ -159,31 +160,29 @@ public class RemoteServiceRoutineMethodTest extends ActivityInstrumentationTestC
   }
 
   private static void testReturnValue(@NotNull final Activity activity) {
-    final InputChannel<String> inputStrings = RoutineMethod.inputChannel();
-    final OutputChannel<Object> outputChannel =
+    final Channel<String, String> inputStrings = JRoutineCore.io().buildChannel();
+    final Channel<?, Object> outputChannel =
         new ServiceRoutineMethod(serviceFrom(activity, RemoteTestService.class)) {
 
-          int length(final InputChannel<String> input) {
+          int length(@In final Channel<?, String> input) {
             if (input.hasNext()) {
               return input.next().length();
             }
-            return 0;
+            return ignoreReturnValue();
           }
         }.call(inputStrings);
-    inputStrings.pass("test");
-    assertThat(outputChannel.after(seconds(10)).next()).isEqualTo(4);
-    inputStrings.close();
-    outputChannel.after(seconds(10)).getComplete();
+    inputStrings.pass("test").close();
+    assertThat(outputChannel.after(seconds(10)).all()).containsExactly(4);
   }
 
   private static void testSwitchInput(@NotNull final Activity activity) {
-    final InputChannel<Integer> inputInts = RoutineMethod.inputChannel();
-    final InputChannel<String> inputStrings = RoutineMethod.inputChannel();
-    final OutputChannel<String> outputChannel = RoutineMethod.outputChannel();
+    final Channel<Integer, Integer> inputInts = JRoutineCore.io().buildChannel();
+    final Channel<String, String> inputStrings = JRoutineCore.io().buildChannel();
+    final Channel<String, String> outputChannel = JRoutineCore.io().buildChannel();
     new ServiceRoutineMethod(serviceFrom(activity, RemoteTestService.class)) {
 
-      void run(final InputChannel<Integer> inputInts, final InputChannel<String> inputStrings,
-          final OutputChannel<String> output) {
+      void run(@In final Channel<?, Integer> inputInts, @In final Channel<?, String> inputStrings,
+          @Out final Channel<String, ?> output) {
         output.pass(switchInput().next().toString());
       }
     }.call(inputInts, inputStrings, outputChannel);
@@ -196,14 +195,14 @@ public class RemoteServiceRoutineMethodTest extends ActivityInstrumentationTestC
   }
 
   private static void testSwitchInput2(@NotNull final Activity activity) {
-    final InputChannel<Integer> inputInts = RoutineMethod.inputChannel();
-    final InputChannel<String> inputStrings = RoutineMethod.inputChannel();
-    final OutputChannel<String> outputChannel = RoutineMethod.outputChannel();
+    final Channel<Integer, Integer> inputInts = JRoutineCore.io().buildChannel();
+    final Channel<String, String> inputStrings = JRoutineCore.io().buildChannel();
+    final Channel<String, String> outputChannel = JRoutineCore.io().buildChannel();
     new ServiceRoutineMethod(serviceFrom(activity, RemoteTestService.class)) {
 
-      void run(final InputChannel<Integer> inputInts, final InputChannel<String> inputStrings,
-          final OutputChannel<String> output) {
-        final InputChannel<?> inputChannel = switchInput();
+      void run(@In final Channel<?, Integer> inputInts, @In final Channel<?, String> inputStrings,
+          @Out final Channel<String, ?> output) {
+        final Channel<?, ?> inputChannel = switchInput();
         if (inputChannel == inputStrings) {
           output.pass(inputStrings.next());
         }
@@ -217,8 +216,8 @@ public class RemoteServiceRoutineMethodTest extends ActivityInstrumentationTestC
   }
 
   public void testAbort() {
-    final InputChannel<Integer> inputChannel = RoutineMethod.inputChannel();
-    final OutputChannel<Integer> outputChannel = RoutineMethod.outputChannel();
+    final Channel<Integer, Integer> inputChannel = JRoutineCore.io().buildChannel();
+    final Channel<Integer, Integer> outputChannel = JRoutineCore.io().buildChannel();
     new SumRoutine(serviceFrom(getActivity(), RemoteTestService.class)).call(inputChannel,
         outputChannel);
     inputChannel.pass(1, 2, 3, 4).abort();
@@ -236,18 +235,18 @@ public class RemoteServiceRoutineMethodTest extends ActivityInstrumentationTestC
 
   public void testBind() {
     final ServiceContext context = serviceFrom(getActivity(), RemoteTestService.class);
-    final InputChannel<Integer> inputChannel = RoutineMethod.inputChannel();
-    final OutputChannel<Integer> outputChannel = RoutineMethod.outputChannel();
+    final Channel<Integer, Integer> inputChannel = JRoutineCore.io().buildChannel();
+    final Channel<Integer, Integer> outputChannel = JRoutineCore.io().buildChannel();
     new SquareRoutine(context).call(inputChannel, outputChannel);
-    final OutputChannel<Integer> resultChannel = RoutineMethod.outputChannel();
-    new SumRoutine(context).call(RoutineMethod.toInput(outputChannel), resultChannel);
+    final Channel<Integer, Integer> resultChannel = JRoutineCore.io().buildChannel();
+    new SumRoutine(context).call(outputChannel, resultChannel);
     inputChannel.pass(1, 2, 3, 4, 5).close();
     assertThat(resultChannel.after(seconds(10)).all()).containsExactly(55);
   }
 
   public void testCall() {
-    final InputChannel<Integer> inputChannel = RoutineMethod.inputChannel();
-    final OutputChannel<Integer> outputChannel = RoutineMethod.outputChannel();
+    final Channel<Integer, Integer> inputChannel = JRoutineCore.io().buildChannel();
+    final Channel<Integer, Integer> outputChannel = JRoutineCore.io().buildChannel();
     new SumRoutine(serviceFrom(getActivity(), RemoteTestService.class)).call(inputChannel,
         outputChannel);
     inputChannel.pass(1, 2, 3, 4, 5).close();
@@ -260,19 +259,19 @@ public class RemoteServiceRoutineMethodTest extends ActivityInstrumentationTestC
 
   public void testFromClass() throws NoSuchMethodException {
     assertThat(ServiceRoutineMethod.from(serviceFrom(getActivity(), RemoteTestService.class),
-        RemoteServiceRoutineMethodTest.class.getMethod("length", String.class))
+        ServiceRoutineMethodTest.class.getMethod("length", String.class))
                                    .call("test")
                                    .after(seconds(10))
                                    .next()).isEqualTo(4);
     assertThat(ServiceRoutineMethod.from(serviceFrom(getActivity(), RemoteTestService.class),
-        RemoteServiceRoutineMethodTest.class.getMethod("length", String.class))
-                                   .call(RoutineMethod.inputOf("test"))
+        ServiceRoutineMethodTest.class.getMethod("length", String.class))
+                                   .call(JRoutineCore.io().of("test"))
                                    .after(seconds(10))
                                    .next()).isEqualTo(4);
-    final InputChannel<String> inputChannel = RoutineMethod.inputChannel();
-    final OutputChannel<Object> outputChannel =
+    final Channel<String, String> inputChannel = JRoutineCore.io().buildChannel();
+    final Channel<?, Object> outputChannel =
         ServiceRoutineMethod.from(serviceFrom(getActivity(), RemoteTestService.class),
-            RemoteServiceRoutineMethodTest.class.getMethod("length", String.class))
+            ServiceRoutineMethodTest.class.getMethod("length", String.class))
                             .callParallel(inputChannel);
     inputChannel.pass("test", "test1", "test22").close();
     assertThat(outputChannel.after(seconds(10)).all()).containsOnly(4, 5, 6);
@@ -280,20 +279,19 @@ public class RemoteServiceRoutineMethodTest extends ActivityInstrumentationTestC
 
   public void testFromClass2() throws NoSuchMethodException {
     assertThat(ServiceRoutineMethod.from(serviceFrom(getActivity(), RemoteTestService.class),
-        classOfType(RemoteServiceRoutineMethodTest.class), "length", String.class)
+        classOfType(ServiceRoutineMethodTest.class), "length", String.class)
                                    .call("test")
                                    .after(seconds(10))
                                    .next()).isEqualTo(4);
     assertThat(ServiceRoutineMethod.from(serviceFrom(getActivity(), RemoteTestService.class),
-        classOfType(RemoteServiceRoutineMethodTest.class), "length", String.class)
-                                   .call(RoutineMethod.inputOf("test"))
+        classOfType(ServiceRoutineMethodTest.class), "length", String.class)
+                                   .call(JRoutineCore.io().of("test"))
                                    .after(seconds(10))
                                    .next()).isEqualTo(4);
-    final InputChannel<String> inputChannel = RoutineMethod.inputChannel();
-    final OutputChannel<Object> outputChannel =
+    final Channel<String, String> inputChannel = JRoutineCore.io().buildChannel();
+    final Channel<?, Object> outputChannel =
         ServiceRoutineMethod.from(serviceFrom(getActivity(), RemoteTestService.class),
-            classOfType(RemoteServiceRoutineMethodTest.class), "length", String.class)
-                            .call(inputChannel);
+            classOfType(ServiceRoutineMethodTest.class), "length", String.class).call(inputChannel);
     inputChannel.pass("test").close();
     assertThat(outputChannel.after(seconds(10)).next()).isEqualTo(4);
   }
@@ -310,7 +308,7 @@ public class RemoteServiceRoutineMethodTest extends ActivityInstrumentationTestC
     try {
       ServiceRoutineMethod.from(serviceFrom(getActivity(), RemoteTestService.class),
           instanceOf(String.class, "test"),
-          RemoteServiceRoutineMethodTest.class.getMethod("length", String.class));
+          ServiceRoutineMethodTest.class.getMethod("length", String.class));
       fail();
 
     } catch (final IllegalArgumentException ignored) {
@@ -354,8 +352,8 @@ public class RemoteServiceRoutineMethodTest extends ActivityInstrumentationTestC
   }
 
   public void testParallel() {
-    final InputChannel<Integer> inputChannel = RoutineMethod.inputChannel();
-    final OutputChannel<Integer> outputChannel = RoutineMethod.outputChannel();
+    final Channel<Integer, Integer> inputChannel = JRoutineCore.io().buildChannel();
+    final Channel<Integer, Integer> outputChannel = JRoutineCore.io().buildChannel();
     new SumRoutine(
         serviceFrom(getActivity(), RemoteTestService.class)).applyInvocationConfiguration()
                                                             .withOutputOrder(OrderType.SORTED)
@@ -368,12 +366,12 @@ public class RemoteServiceRoutineMethodTest extends ActivityInstrumentationTestC
 
   public void testParams() {
     final SwitchCase method = new SwitchCase(serviceFrom(getActivity(), RemoteTestService.class));
-    InputChannel<Object> inputChannel = RoutineMethod.inputChannel().pass("test");
-    OutputChannel<String> outputChannel = method.call(inputChannel, true);
+    Channel<Object, Object> inputChannel = JRoutineCore.io().buildChannel().pass("test");
+    Channel<?, String> outputChannel = method.call(inputChannel, true);
     assertThat(outputChannel.after(seconds(10)).next()).isEqualTo("TEST");
     inputChannel.close();
     outputChannel.after(seconds(10)).getComplete();
-    inputChannel = RoutineMethod.inputChannel().pass("TEST");
+    inputChannel = JRoutineCore.io().buildChannel().pass("TEST");
     outputChannel = method.call(inputChannel, false);
     assertThat(outputChannel.after(seconds(10)).next()).isEqualTo("test");
     inputChannel.close();
@@ -411,7 +409,7 @@ public class RemoteServiceRoutineMethodTest extends ActivityInstrumentationTestC
       super(context);
     }
 
-    public void square(final InputChannel<Integer> input, final OutputChannel<Integer> output) {
+    public void square(@In final Channel<?, Integer> input, @Out final Channel<Integer, ?> output) {
       if (input.hasNext()) {
         final int i = input.next();
         output.pass(i * i);
@@ -427,7 +425,7 @@ public class RemoteServiceRoutineMethodTest extends ActivityInstrumentationTestC
       super(context);
     }
 
-    public void sum(final InputChannel<Integer> input, final OutputChannel<Integer> output) {
+    public void sum(@In final Channel<?, Integer> input, @Out final Channel<Integer, ?> output) {
       if (input.hasNext()) {
         mSum += input.next();
 
@@ -443,7 +441,7 @@ public class RemoteServiceRoutineMethodTest extends ActivityInstrumentationTestC
       super(context);
     }
 
-    String switchCase(final InputChannel<String> input, final boolean isUpper) {
+    String switchCase(@In final Channel<?, String> input, final boolean isUpper) {
       final String str = input.next();
       return (isUpper) ? str.toUpperCase() : str.toLowerCase();
     }

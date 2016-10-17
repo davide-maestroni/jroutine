@@ -158,12 +158,12 @@ Please refer to the dedicated [Wiki page][wiki proguard].
 
 ## Artifacts
 
-Module | Latest Version
---- | ---
-JRoutine | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine)
-JRoutine-Proxy | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-proxy/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-proxy)
-JRoutine-Android | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-android/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-android)
-JRoutine-AndroidProxy | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-androidproxy/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-androidproxy)
+Module | Sub-Module | Latest Version
+--- | --- | ---
+jroutine-lib | | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine)
+| jroutine-proxy | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-proxy/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-proxy)
+jroutine-android | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-android/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-android)
+| jroutine-android-proxy | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-androidproxy/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-androidproxy)
 
 ## License
 

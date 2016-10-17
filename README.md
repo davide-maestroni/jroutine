@@ -198,5 +198,5 @@ Unless required by applicable law or agreed to in writing, software distributed 
 [javadoc retrofit]:http://davide-maestroni.github.io/jroutine/javadoc/6/retrofit
 [javadoc android]:http://davide-maestroni.github.io/jroutine/javadoc/6/android
 [javadoc android retrofit]:http://davide-maestroni.github.io/jroutine/javadoc/6/android-retrofit
-[javadoc routine]:http://davide-maestroni.github.io/jroutine/javadoc/6/core/com/github/dm/jrt/routine/Routine.html
-[javadoc runner]:http://davide-maestroni.github.io/jroutine/javadoc/6/core/com/github/dm/jrt/runner/Runner.html
+[javadoc routine]:http://davide-maestroni.github.io/jroutine/javadoc/6/core/com/github/dm/jrt/core/routine/Routine.html
+[javadoc runner]:http://davide-maestroni.github.io/jroutine/javadoc/6/core/com/github/dm/jrt/core/runner/Runner.html

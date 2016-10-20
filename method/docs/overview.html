@@ -32,8 +32,8 @@
     <li>
         <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/method/com/github/dm/jrt/method/RoutineMethod.html">RoutineMethod</a>
         <p>
-            Base class providing a simple way to implement a routine as an object method.
-            The method will receive input through <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/method/com/github/dm/jrt/method/InputChannel.html">InputChannel</a> instances and produce outputs through <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/method/com/github/dm/jrt/method/OutputChannel.html">OutputChannel</a> instances passed as parameters.
+            Base class providing a simple way to implement a routine as an object method.<br>
+            The method will receive input and produce outputs through channel instances passed as parameters.
         </p>
     </li>
 </ul>
@@ -61,7 +61,7 @@
             void print(&commat;In final Channel&lt;?, Integer&gt; inputInts,
                     &commat;In final Channel&lt;?, String&gt; inputStrings,
                     &commat;Out final Channel&lt;String, ?&gt; output) {
-                final InputChannel&lt;?&gt; inputChannel = switchInput();
+                final Channel&lt;?, ?&gt; inputChannel = switchInput();
                 if (inputChannel.hasNext()) {
                     if (inputChannel == inputInts) {
                         output.pass("Number: " + inputChannel.next());

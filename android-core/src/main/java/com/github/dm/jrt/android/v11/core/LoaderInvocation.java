@@ -356,6 +356,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   protected void onCall(@NotNull final List<? extends IN> inputs,
       @NotNull final Channel<OUT, ?> result) throws Exception {
     final LoaderContext context = mContext;
@@ -385,7 +386,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
     }
 
     final WeakReference<RoutineLoaderCallbacks<?>> callbackReference = callbackArray.get(loaderId);
-    @SuppressWarnings("unchecked") RoutineLoaderCallbacks<OUT> callbacks =
+    RoutineLoaderCallbacks<OUT> callbacks =
         (callbackReference != null) ? (RoutineLoaderCallbacks<OUT>) callbackReference.get() : null;
     if (clashType == ClashType.ABORT_BOTH) {
       final InvocationClashException clashException = new InvocationClashException(loaderId);

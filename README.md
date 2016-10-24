@@ -54,7 +54,7 @@ What the library has to offer is:
 * ***Functional builder***: it is also possible to build routines by employing functional programming paradigms.
 * ***Stream builder***: a Java8 stream-like builder is available to easily build routine by concatenating mapping functions.
 * ***Nice handling of Android configuration changes***: the same paradigm is applied to the Android platform so to support background tasks surviving changes in the configuration of Activities or Fragments.
-* ***Seamlessly run in a remote Service***: invocations can be easily configured to run in a dedicated Android service.
+* ***Seamlessly run in a remote Service***: invocations can be easily configured to run in a dedicated Android Service.
 * ***Fine dependency granularity***: import only the features you need.
 * ***Retrofit integration***: additional modules provides out-of-the-box integration with the [Retrofit][retrofit] library.
 

@@ -1,0 +1,364 @@
+<!--
+  ~ Copyright 2016 Davide Maestroni
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<html>
+<head>
+    <title>jroutine-android-proxy</title>
+</head>
+<body>
+<a href="https://github.com/davide-maestroni/jroutine" target="_blank">Parallel programming on the go.</a>
+<h1>Overview</h1>
+<p>
+    Java annotation proxy code generator based on the <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android" target="_blank">jroutine-android</a> libraries.
+</p>
+<p>
+    This module provides classes to enable asynchronous invocations of object or class methods, by wrapping them in compile time generated routines.<br>
+    Methods are invoked via generated code inside dedicated Android Services and Loaders.
+</p>
+<h2>Main concepts</h2>
+<ul>
+    <li>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-proxy/com/github/dm/jrt/android/proxy/annotation/LoaderProxy.html">LoaderProxy</a>
+        <p>
+            A LoaderProxy annotation will indicate which interface has to be implemented by the generated code to proxy the target class or instance, so that its methods are executed inside a Loader instance.
+        </p>
+    </li>
+    <li>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-proxy/com/github/dm/jrt/android/proxy/annotation/LoaderProxyCompat.html">LoaderProxyCompat</a>
+        <p>
+            A LoaderProxyCompat annotation will indicate which interface has to be implemented by the generated code to proxy the target class or instance, so that its methods are executed inside a Loader instance.
+            This class is specifically meant to employ the Android Support library for retro-compatibility.
+        </p>
+    </li>
+    <li>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-proxy/com/github/dm/jrt/android/proxy/annotation/ServiceProxy.html">ServiceProxy</a>
+        <p>
+            A ServiceProxy annotation will indicate which interface has to be implemented by the generated code to proxy the target class or instance, so that its methods are executed inside a dedicated Service.
+        </p>
+    </li>
+    <li>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-proxy/com/github/dm/jrt/android/proxy/builder/LoaderProxyRoutineBuilder.html">LoaderProxyRoutineBuilder</a>
+        <p>
+            Each generated proxy instance needs an invocation target and a specific configuration, so proxy routine builders provide a convenient way to set the required options.
+            Instances of this builder will handle only interfaces annotated with <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-proxy/com/github/dm/jrt/android/proxy/annotation/LoaderProxy.html">LoaderProxy</a> or
+            <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-proxy/com/github/dm/jrt/android/proxy/annotation/LoaderProxyCompat.html">LoaderProxyCompat</a> annotations.
+            By design builders are not synchronized since the same instance is not meant to be used from different threads.
+        </p>
+    </li>
+    <li>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-proxy/com/github/dm/jrt/android/proxy/builder/ServiceProxyRoutineBuilder.html">ServiceProxyRoutineBuilder</a>
+        <p>
+            Each generated proxy instance needs an invocation target and a specific configuration, so proxy routine builders provide a convenient way to set the required options.
+            Instances of this builder will handle only interfaces annotated with <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-proxy/com/github/dm/jrt/android/proxy/annotation/ServiceProxy.html">ServiceProxy</a> annotations.
+            By design builders are not synchronized since the same instance is not meant to be used from different threads.
+        </p>
+    </li>
+</ul>
+<h2>Main classes</h2>
+<ul>
+    <li>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-proxy/com/github/dm/jrt/android/v11/proxy/JRoutineLoaderProxy.html">JRoutineLoaderProxy</a>
+        <p>
+            Utility class acting as a factory of Loader proxy routine builders.
+        </p>
+    </li>
+    <li>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-proxy/com/github/dm/jrt/android/v4/proxy/JRoutineLoaderProxyCompat.html">JRoutineLoaderProxyCompat</a>
+        <p>
+            Utility class acting as a factory of Loader proxy routine builders.
+        </p>
+    </li>
+    <li>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-proxy/com/github/dm/jrt/android/proxy/JRoutineServiceProxy.html">JRoutineServiceProxy</a>
+        <p>
+            Utility class acting as a factory of Service proxy routine builders.
+        </p>
+    </li>
+</ul>
+<h2>Dependencies</h2>
+<p>
+    Below a full list of the included modules:
+</p>
+<ul>
+    <li><a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-core" target="_blank">jroutine-android-core</a> &mdash; core routine and channel classes</li>
+    <li><a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-object" target="_blank">jroutine-android-object</a> &mdash; routine wrapping object and class methods</li>
+    <li><a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-processor" target="_blank">jroutine-android-processor</a> &mdash; routine annotation pre-processor</li>
+    <li><a href="http://davide-maestroni.github.io/jroutine/javadoc/6/core" target="_blank">jroutine-core</a> &mdash; core routine and channel classes</li>
+    <li><a href="http://davide-maestroni.github.io/jroutine/javadoc/6/object" target="_blank">jroutine-object</a> &mdash; routines wrapping object and class methods</li>
+    <li><a href="http://davide-maestroni.github.io/jroutine/javadoc/6/processor" target="_blank">jroutine-processor</a> &mdash; routine annotation pre-processor</li>
+    <li><a href="http://davide-maestroni.github.io/jroutine/javadoc/6/proxy" target="_blank">jroutine-proxy</a> &mdash; code generation of routines wrapping object and class methods</li>
+</ul>
+<h2>Usage examples</h2>
+<p>
+    The code below shows how it is possible to load an image from the network in a background thread, by letting the library automatically handle any change in the configuration.<br>
+    Note that the very same examples can be re-written using JRoutineLoaderProxyCompat and a FragmentActivity, or the JRoutineServiceProxy class, in order to make the processing happen in a Service instead of a Loader.
+</p>
+<b>Example 1:</b> via code generation.
+<p>
+    Note that this approach is fairly naive, since it lets the framework retain the instance of the downloaded bitmap.<br>
+    A smarter implementation would involve the use of a dedicated cache.
+</p>
+<pre>
+    <code>
+        public class MainActivity extends Activity {
+
+            private static final String IMAGE_URI = "http://...";
+
+            private static final String LOAD_BITMAP = "load_bitmap";
+
+            &commat;Override
+            protected void onCreate(final Bundle savedInstanceState) {
+                super.onCreate(savedInstanceState);
+                setContentView(R.layout.main_layout);
+                final ImageView imageView = (ImageView) findViewById(R.id.image);
+                JRoutineLoaderProxy.on(loaderFrom(this))
+                                   .with(instanceOf(BitmapLoader.class))
+                                   .buildProxy(BitmapLoaderItf.class)
+                                   .loadFromUri(URI.create(IMAGE_URI))
+                                   .bind(new TemplateChannelConsumer&lt;Bitmap&gt;() {
+
+                                       &commat;Override
+                                       public void onError(&commat;NotNull final RoutineException error) {
+                                           final Throwable cause = error.getCause();
+                                           Toast.makeText(MainTestActivity.this, (cause != null) ?
+                                                   cause.getMessage() : "Cannot load image",
+                                                   Toast.LENGTH_LONG).show();
+                                       }
+
+                                       &commat;Override
+                                       public void onOutput(final Bitmap bitmap) {
+                                           imageView.setImageBitmap(bitmap);
+                                       }
+                                   });
+            }
+
+            &commat;LoaderProxy(BitmapLoader.class)
+            public interface BitmapLoaderItf {
+
+                &commat;Alias(LOAD_BITMAP)
+                &commat;CacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
+                &commat;AsyncOutput
+                &commat;NotNull
+                Channel&lt;?, Bitmap&gt; loadFromUri(&commat;NotNull URI uri);
+            }
+
+            public static class BitmapLoader {
+
+                &commat;Alias(LOAD_BITMAP)
+                &commat;NotNull
+                public Bitmap loadFromUri(&commat;NotNull final URI uri) throws IOException {
+                    final URLConnection urlConnection = uri.toURL().openConnection();
+                    final InputStream inputStream = urlConnection.getInputStream();
+                    try {
+                        final Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                        if (bitmap == null) {
+                            throw new IOException("failed to decode bitmap");
+                        }
+
+                        return bitmap;
+
+                    } finally {
+                        inputStream.close();
+                    }
+                }
+            }
+        }
+    </code>
+</pre>
+<b>Example 2:</b> via code generation with custom Context.
+<p>
+    It is possible to customize the creation of the wrapped object by using a Context wrapper as shown below.
+</p>
+<pre>
+    <code>
+        public class MainActivity extends Activity {
+
+            private static final String IMAGE_URI = "http://...";
+
+            private static final String LOAD_BITMAP = "load_bitmap";
+
+            &commat;Override
+            protected void onCreate(final Bundle savedInstanceState) {
+                super.onCreate(savedInstanceState);
+                setContentView(R.layout.main_layout);
+                final ImageView imageView = (ImageView) findViewById(R.id.image);
+                JRoutineLoaderProxy.on(loaderFrom(this, new MyContext(this)))
+                                   .with(instanceOf(BitmapLoader.class))
+                                   .buildProxy(BitmapLoaderItf.class)
+                                   .loadFromUri(URI.create(IMAGE_URI))
+                                   .bind(new TemplateChannelConsumer&lt;Bitmap&gt;() {
+
+                                       &commat;Override
+                                       public void onError(&commat;NotNull final RoutineException error) {
+                                           final Throwable cause = error.getCause();
+                                           Toast.makeText(MainTestActivity.this, (cause != null) ?
+                                                   cause.getMessage() : "Cannot load image",
+                                                   Toast.LENGTH_LONG).show();
+                                       }
+
+                                       &commat;Override
+                                       public void onOutput(final Bitmap bitmap) {
+                                           imageView.setImageBitmap(bitmap);
+                                       }
+                                   });
+            }
+
+            &commat;LoaderProxy(BitmapLoader.class)
+            public interface BitmapLoaderItf {
+
+                &commat;Alias(LOAD_BITMAP)
+                &commat;CacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
+                &commat;AsyncOutput
+                &commat;NotNull
+                Channel&lt;?, Bitmap&gt; loadFromUri(&commat;NotNull URI uri);
+            }
+
+            public static class BitmapLoader {
+
+                &commat;Alias(LOAD_BITMAP)
+                &commat;NotNull
+                public Bitmap loadFromUri(&commat;NotNull final URI uri) throws IOException {
+                    final URLConnection urlConnection = uri.toURL().openConnection();
+                    final InputStream inputStream = urlConnection.getInputStream();
+                    try {
+                        final Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                        if (bitmap == null) {
+                            throw new IOException("failed to decode bitmap");
+                        }
+
+                        return bitmap;
+
+                    } finally {
+                        inputStream.close();
+                    }
+                }
+            }
+
+            private static class MyContext extends FactoryContextWrapper {
+
+                private final BitmapLoader mLoader;
+
+                public MyContext(&commat;NotNull final Context base) {
+                    super(base);
+                    mLoader = new BitmapLoader();
+                }
+
+                &commat;Nullable
+                public &lt;TYPE&gt; TYPE geInstance(&commat;NotNull final Class&lt;? extends TYPE&gt; type,
+                        &commat;NotNull final Object... args) {
+                    if (type == BitmapLoader.class) {
+                        return type.cast(mLoader);
+                    }
+
+                    return null;
+                }
+            }
+        }
+    </code>
+</pre>
+<b>Example 3:</b> via code generation avoiding reflection.
+<p>
+    It is possible to completely avoid the use of reflection by explicitly employing the generated classes.
+</p>
+<pre>
+    <code>
+        public class MainActivity extends Activity {
+
+            private static final String IMAGE_URI = "http://...";
+
+            private static final String LOAD_BITMAP = "load_bitmap";
+
+            &commat;Override
+            protected void onCreate(final Bundle savedInstanceState) {
+                super.onCreate(savedInstanceState);
+                setContentView(R.layout.main_layout);
+                final ImageView imageView = (ImageView) findViewById(R.id.image);
+                LoaderProxy_MainActivity_BitmapLoaderItf.on(loaderFrom(this, new MyContext(this)))
+                                   .with(instanceOf(BitmapLoader.class))
+                                   .buildProxy()
+                                   .loadFromUri(URI.create(IMAGE_URI))
+                                   .bind(new TemplateChannelConsumer&lt;Bitmap&gt;() {
+
+                                       &commat;Override
+                                       public void onError(&commat;NotNull final RoutineException error) {
+                                           final Throwable cause = error.getCause();
+                                           Toast.makeText(MainTestActivity.this, (cause != null) ?
+                                                   cause.getMessage() : "Cannot load image",
+                                                   Toast.LENGTH_LONG).show();
+                                       }
+
+                                       &commat;Override
+                                       public void onOutput(final Bitmap bitmap) {
+                                           imageView.setImageBitmap(bitmap);
+                                       }
+                                   });
+            }
+
+            &commat;LoaderProxy(BitmapLoader.class)
+            public interface BitmapLoaderItf {
+
+                &commat;Alias(LOAD_BITMAP)
+                &commat;CacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
+                &commat;AsyncOutput
+                &commat;NotNull
+                Channel&lt;?, Bitmap&gt; loadFromUri(&commat;NotNull URI uri);
+            }
+
+            public static class BitmapLoader {
+
+                &commat;Alias(LOAD_BITMAP)
+                &commat;NotNull
+                public Bitmap loadFromUri(&commat;NotNull final URI uri) throws IOException {
+                    final URLConnection urlConnection = uri.toURL().openConnection();
+                    final InputStream inputStream = urlConnection.getInputStream();
+                    try {
+                        final Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                        if (bitmap == null) {
+                            throw new IOException("failed to decode bitmap");
+                        }
+
+                        return bitmap;
+
+                    } finally {
+                        inputStream.close();
+                    }
+                }
+            }
+
+            private static class MyContext extends FactoryContextWrapper {
+
+                private final BitmapLoader mLoader;
+
+                public MyContext(&commat;NotNull final Context base) {
+                    super(base);
+                    mLoader = new BitmapLoader();
+                }
+
+                &commat;Nullable
+                public &lt;TYPE&gt; TYPE geInstance(&commat;NotNull final Class&lt;? extends TYPE&gt; type,
+                        &commat;NotNull final Object... args) {
+                    if (type == BitmapLoader.class) {
+                        return type.cast(mLoader);
+                    }
+
+                    return null;
+                }
+            }
+        }
+    </code>
+</pre>
+</body>
+</html>

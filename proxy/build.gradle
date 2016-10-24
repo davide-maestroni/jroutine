@@ -1,9 +1,11 @@
 /*
+ * Copyright 2016 Davide Maestroni
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -11,23 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 apply plugin: 'java'
 apply plugin: 'jacoco'
 apply plugin: 'findbugs'
+apply plugin: 'com.github.ben-manes.versions'
 apply from: '../extra.gradle'
 
 group = project.getProperty('groupName')
 version = project.getProperty('releaseVersion')
 archivesBaseName = "${project.parent.name}-${project.name}"
-javaCompatibility = JavaVersion.VERSION_1_6
+compileJavaCompatibility = JavaVersion.VERSION_1_6
+compileTestJavaCompatibility = JavaVersion.VERSION_1_7
 
 dependencies {
     testCompile 'junit:junit:4.12'
-    testCompile 'org.assertj:assertj-core:1.7.1'
+    testCompile 'org.assertj:assertj-core:2.4.1'
 }
 conditionalDependencies {
-    compile name: 'processor', artifact: { "${it.parent.name}-${it.name}" }
-    compile name: 'library', artifact: { it.parent.name }
+    compile name: 'core', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
+    compile name: 'object', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
+    compile name: 'processor', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
 }
 
 jacocoTestReport {
@@ -37,13 +43,18 @@ jacocoTestReport {
     }
 }
 
+jacoco {
+    toolVersion project.getProperty('jacocoVersion')
+}
+
 findbugs {
-    toolVersion '3.0.1'
+    toolVersion project.getProperty('findbugsVersion')
 }
 
 javadoc {
+    def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/6'
     options.overview("${project.projectDir}/docs/overview.html")
-    options.links('http://docs.oracle.com/javase/7/docs/api/',
-            'http://davide-maestroni.github.io/jroutine/javadoc/library/',
-            'http://davide-maestroni.github.io/jroutine/javadoc/processor/')
+    options.links("${prefix}/core/",
+            "${prefix}/object/",
+            "${prefix}/processor/")
 }

@@ -1,9 +1,11 @@
 /*
+ * Copyright 2016 Davide Maestroni
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -11,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 apply plugin: 'com.android.library'
 apply plugin: 'jacoco'
 apply plugin: 'findbugs'
-apply plugin: 'com.github.kt3k.coveralls'
+apply plugin: 'com.github.ben-manes.versions'
 apply from: '../extra.gradle'
 
 group = project.getProperty('groupName')
@@ -22,12 +25,12 @@ version = project.getProperty('releaseVersion')
 archivesBaseName = "${project.parent.name}-${project.name}"
 
 android {
-    compileSdkVersion 22
-    buildToolsVersion '22.0.1'
+    compileSdkVersion 23
+    buildToolsVersion '23.0.3'
 
     defaultConfig {
         minSdkVersion 4
-        targetSdkVersion 22
+        targetSdkVersion 23
         versionCode Integer.parseInt(project.getProperty('releaseVersionCode'))
         versionName version
     }
@@ -35,7 +38,7 @@ android {
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
 
         debug {
@@ -45,33 +48,62 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_5
-        targetCompatibility JavaVersion.VERSION_1_5
+        sourceCompatibility JavaVersion.VERSION_1_6
+        targetCompatibility JavaVersion.VERSION_1_6
     }
 
     dexOptions {
         preDexLibraries false
     }
+
+    packagingOptions {
+        exclude 'META-INF/services/javax.annotation.processing.Processor'
+    }
+
+    lintOptions {
+        disable 'MissingRegistered'
+    }
 }
 
 dependencies {
-    androidTestCompile 'org.assertj:assertj-core:1.7.1'
-    compile 'com.android.support:support-v4:22.2.1'
+    androidTestCompile 'com.squareup.assertj:assertj-android:1.1.1'
+    compile 'com.android.support:support-v4:23.2.1'
 }
+
 conditionalDependencies {
-    compile name: 'library', artifact: { it.parent.name }
+    compile name: 'android-channel', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
+    compile name: 'android-core', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
+    compile name: 'android-method', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
+    compile name: 'android-object', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
+    compile name: 'android-proxy', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
+    compile name: 'android-stream', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
+    compile name: 'lib', artifact: { it.parent.name }, version: '6.0.0'
+}
+
+jacoco {
+    toolVersion project.getProperty('jacocoVersion')
 }
 
 findbugs {
-    toolVersion '3.0.1'
-}
-
-tasks.withType(FindBugs) {
-    excludeFilter = file('findbugs.xml')
+    toolVersion project.getProperty('findbugsVersion')
 }
 
 tasks.withType(Javadoc) {
+    def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/6'
     options.overview("${project.projectDir}/docs/overview.html")
-    options.links('http://docs.oracle.com/javase/7/docs/api/',
-            'http://davide-maestroni.github.io/jroutine/javadoc/library/')
+    options.links("${prefix}/android-channel/",
+            "${prefix}/android-core/",
+            "${prefix}/android-method/",
+            "${prefix}/android-object/",
+            "${prefix}/android-proxy/",
+            "${prefix}/android-stream/",
+            "${prefix}/channel/",
+            "${prefix}/core/",
+            "${prefix}/function/",
+            "${prefix}/lib/",
+            "${prefix}/method/",
+            "${prefix}/object/",
+            "${prefix}/operator/",
+            "${prefix}/proxy/",
+            "${prefix}/stream/")
 }

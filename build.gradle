@@ -1,12 +1,30 @@
+/*
+ * Copyright 2016 Davide Maestroni
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
     repositories {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.5.0'
-        classpath 'com.uphyca.gradle:gradle-android-apt-plugin:0.9.4'
-        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.4.0'
+        classpath 'com.android.tools.build:gradle:2.2.1'
+        classpath 'com.github.ben-manes:gradle-versions-plugin:0.13.0'
+        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
+        classpath "org.jacoco:org.jacoco.core:${project.getProperty('jacocoVersion')}"
+        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.6.3'
     }
 }
 
@@ -17,6 +35,77 @@ allprojects {
     }
 }
 
+task clean(type: Delete) {
+    delete buildDir
+}
+
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.9'
+    gradleVersion = project.getProperty('gradleVersion')
+    distributionType = Wrapper.DistributionType.ALL
+}
+
+gradle.projectsEvaluated {
+    apply plugin: 'com.github.kt3k.coveralls'
+    apply plugin: 'jacoco'
+
+    jacoco {
+        toolVersion project.getProperty('jacocoVersion')
+    }
+
+    def publishedProjects = subprojects.findAll {
+        it.plugins.hasPlugin('jacoco')
+    }
+
+    coveralls {
+        def sources = files()
+        publishedProjects.each {
+            if (it.plugins.hasPlugin('java')) {
+                sources += files(it.sourceSets.main.allSource.srcDirs)
+            } else {
+                sources += files(it.android.sourceSets.main.java.srcDirs)
+            }
+        }
+        sourceDirs = sources.flatten()
+        jacocoReportPath = "${buildDir}/reports/jacoco/jacocoFullReport/jacocoFullReport.xml"
+    }
+
+    task jacocoFullReport(type: JacocoReport, group: 'Coverage reports') {
+        description = 'Generates an aggregate report from all subprojects'
+        dependsOn(publishedProjects.test)
+
+        def additionalSources = files()
+        def sources = files()
+        def classes = files()
+        def execs = files()
+        publishedProjects.each {
+            if (it.plugins.hasPlugin('java')) {
+                additionalSources += files(it.sourceSets.main.allJava.srcDirs)
+                sources += files(it.sourceSets.main.allSource.srcDirs)
+                classes += files(it.sourceSets.main.output)
+                execs += files(it.jacocoTestReport.executionData)
+            } else {
+                sources += files(it.android.sourceSets.main.java.srcDirs)
+                classes += fileTree(dir: "${it.buildDir}/intermediates/classes/debug", exclude: ['**/R*.class', '**/BuildConfig.class'])
+                execs += fileTree("${it.buildDir}/outputs/code-coverage/connected")
+            }
+        }
+
+        additionalSourceDirs = additionalSources
+        sourceDirectories = sources
+        classDirectories = classes
+        executionData = execs
+
+        reports {
+            html.enabled = true // human readable
+            xml.enabled = true // required by coveralls
+        }
+
+        onlyIf = {
+            true
+        }
+
+        doFirst {
+            executionData = files(executionData.findAll { it.exists() })
+        }
+    }
 }

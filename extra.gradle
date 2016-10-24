@@ -1,9 +1,11 @@
 /*
+ * Copyright 2016 Davide Maestroni
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -11,8 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 apply plugin: 'maven'
 apply plugin: 'signing'
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'org.apache.ivy:ivy:2.4.0'
+    }
+}
 
 /*
     EXPORT JAR: ./gradlew eJ -PexportDir=$HOME/javadoc
@@ -20,25 +32,24 @@ apply plugin: 'signing'
 */
 
 Project.metaClass.toVersionRange = { String version ->
-
     def versions = version.split('\\.')
     "[" + versions[0] + "." + versions[1] + "," + versions[0] + "." + ++Integer.parseInt(versions[1]) + ")"
 }
-Project.metaClass.getWorkingBranch = {
 
+Project.metaClass.getWorkingBranch = {
     "git --git-dir=${rootDir}/.git --work-tree=${rootDir} rev-parse --abbrev-ref HEAD".execute().text.trim()
 }
-Project.metaClass.isWorkingBranch = { String branch ->
 
+Project.metaClass.isWorkingBranch = { String branch ->
     (branch != null) && branch.equals(delegate.workingBranch)
 }
-Project.metaClass.getJavaCompatibility = {
 
-    sourceCompatibility
+Project.metaClass.getCompileJavaCompatibility = {
+    compileJava.sourceCompatibility
 }
-Project.metaClass.setJavaCompatibility = { JavaVersion javaVersion ->
 
-    tasks.withType(JavaCompile) {
+Project.metaClass.setCompileJavaCompatibility = { JavaVersion javaVersion ->
+    compileJava {
         def javaHome = System.getenv("JAVA${javaVersion.ordinal() + 1}_HOME")
         if ((javaHome != null) && (javaHome.length() > 0)) {
             def jarPath = "${javaHome}/jre/lib/rt.jar"
@@ -54,25 +65,44 @@ Project.metaClass.setJavaCompatibility = { JavaVersion javaVersion ->
         targetCompatibility = javaVersion
     }
 }
-Project.metaClass.setJavaCompilerArgs = { args ->
 
+Project.metaClass.getCompileTestJavaCompatibility = {
+    compileTestJava.sourceCompatibility
+}
+
+Project.metaClass.setCompileTestJavaCompatibility = { JavaVersion javaVersion ->
+    compileTestJava {
+        def javaHome = System.getenv("JAVA${javaVersion.ordinal() + 1}_HOME")
+        if ((javaHome != null) && (javaHome.length() > 0)) {
+            def jarPath = "${javaHome}/jre/lib/rt.jar"
+            if (!file(jarPath).exists()) {
+                // Mac OS workaround
+                jarPath = "${javaHome}/../Classes/classes.jar"
+            }
+            if (file(jarPath).exists()) {
+                options.bootClasspath = jarPath
+            }
+        }
+        sourceCompatibility = javaVersion
+        targetCompatibility = javaVersion
+    }
+}
+
+Project.metaClass.setJavaCompilerArgs = { args ->
     tasks.withType(JavaCompile) {
         options.compilerArgs = args
     }
 }
-Project.metaClass.conditionalDependencies = { Closure closure ->
 
+Project.metaClass.conditionalDependencies = { Closure closure ->
     closure.delegate = new ConditionalDependencySpecs(delegate)
     closure.resolveStrategy = Closure.DELEGATE_FIRST
     closure()
 }
 
 afterEvaluate { project ->
-
     def artifactPackaging = 'jar'
-
     if (isJavaProject(project)) {
-
         if (project.plugins.hasPlugin('jacoco')) {
             project.task('jacocoTest', dependsOn: 'test') {
                 description = 'Runs the tests and generates the JaCoCo report files.'
@@ -96,7 +126,8 @@ afterEvaluate { project ->
 
         project.javadoc {
             title = "${project.archivesBaseName} ${version}"
-            options.links('http://docs.oracle.com/javase/7/docs/api/')
+            options.links('http://docs.oracle.com/javase/8/docs/api/',
+                    'http://www.atetric.com/atetric/javadoc/org.jetbrains/annotations/15.0/')
             options.windowTitle("Javadoc - ${project.archivesBaseName}")
             options.setMemberLevel(JavadocMemberLevel.PUBLIC)
         }
@@ -117,9 +148,7 @@ afterEvaluate { project ->
     }
 
     if (isAndroidProject(project)) {
-
         artifactPackaging = 'aar'
-
         if (project.plugins.hasPlugin('jacoco')) {
             project.task('jacocoTest', dependsOn: 'connectedCheck') {
                 description = 'Runs the tests and generates the JaCoCo report files.'
@@ -136,10 +165,9 @@ afterEvaluate { project ->
 
         project.task('jar', dependsOn: 'jarRelease')
 
-        project.android.libraryVariants.all { variant ->
-
+        def variants = getAndroidVariants(project)
+        variants.all { variant ->
             def buildTypeName = variant.buildType.name
-
             if (buildTypeName.equals("debug")) {
                 if (project.plugins.hasPlugin('findbugs')) {
                     project.task('findbugsMain', type: FindBugs, dependsOn: "assemble${buildTypeName.capitalize()}") {
@@ -163,7 +191,6 @@ afterEvaluate { project ->
 
             def variantName = variant.name.capitalize()
             addJavadocTask(project, variant, "javadoc${variantName}")
-
             if (variantName.equalsIgnoreCase('release')) {
                 addJavadocTask(project, variant, 'javadoc')
             }
@@ -196,7 +223,6 @@ afterEvaluate { project ->
 
     if (project.hasProperty('uploadEnabled') && project.hasProperty('repoUser')
             && project.hasProperty('repoName')) {
-
         signing {
             sign configurations.archives
         }
@@ -204,13 +230,11 @@ afterEvaluate { project ->
         def repoUser = project.getProperty('repoUser')
         def repoName = project.getProperty('repoName')
         def repoDescription = ""
-
         if (project.hasProperty('repoDescription')) {
             repoDescription = project.getProperty('repoDescription')
         }
 
         def userName = ""
-
         if (project.hasProperty('userName')) {
             userName = project.getProperty('userName')
         }
@@ -221,9 +245,7 @@ afterEvaluate { project ->
                     beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
                     def localRepoUrl = mavenLocal().url.toString()
-
                     if (file(localRepoUrl).exists()) {
-
                         // Upload the artifacts to the local repository
                         repository(url: localRepoUrl)
                     }
@@ -268,19 +290,27 @@ afterEvaluate { project ->
 }
 
 def isJavaProject(project) {
-
     project.plugins.hasPlugin('java')
 }
 
 def isAndroidProject(project) {
+    isAndroidLibrary(project) || isAndroidApplication(project)
+}
 
-    project.plugins.hasPlugin('com.android.library') || project.plugins.hasPlugin('com.android.application')
+def isAndroidLibrary(project) {
+    project.plugins.hasPlugin('com.android.library')
+}
+
+def isAndroidApplication(project) {
+    project.plugins.hasPlugin('com.android.application')
+}
+
+def getAndroidVariants(project) {
+    isAndroidLibrary(project) ? project.android.libraryVariants : project.android.applicationVariants
 }
 
 def addJavadocTask(project, variant, taskName) {
-
     def variantName = variant.name.capitalize()
-
     project.task(taskName, type: Javadoc, dependsOn: "assemble${variantName}") {
         description "Generates Javadoc from the ${variantName} build"
         source = variant.javaCompile.source
@@ -288,7 +318,8 @@ def addJavadocTask(project, variant, taskName) {
                 "${project.android.sdkDirectory}/platforms/${project.android.compileSdkVersion}/android.jar"
         classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar)
         title = "${project.archivesBaseName} ${project.version}"
-        options.links('http://docs.oracle.com/javase/7/docs/api/')
+        options.links('http://docs.oracle.com/javase/8/docs/api/',
+                'http://www.atetric.com/atetric/javadoc/org.jetbrains/annotations/15.0/')
         options.linksOffline('http://developer.android.com/reference/', "${project.android.sdkDirectory}/docs/reference/")
         options.windowTitle("Javadoc - ${project.archivesBaseName}")
         options.setMemberLevel(JavadocMemberLevel.PUBLIC)
@@ -297,29 +328,65 @@ def addJavadocTask(project, variant, taskName) {
     }
 }
 
+
+import org.apache.ivy.Ivy
+import org.apache.ivy.core.module.descriptor.DefaultDependencyDescriptor
+import org.apache.ivy.core.module.descriptor.DefaultModuleDescriptor
+import org.apache.ivy.core.module.id.ModuleRevisionId
+import org.apache.ivy.core.report.ResolveReport
+import org.apache.ivy.core.resolve.ResolveOptions
+import org.apache.ivy.core.settings.IvySettings
+import org.apache.ivy.plugins.parser.xml.XmlModuleDescriptorWriter
+import org.apache.ivy.plugins.resolver.URLResolver
+
 class ConditionalDependencySpecs {
 
     Project myProject
 
     ConditionalDependencySpecs(Project context) {
-
         myProject = context
     }
 
     def compile(Object config) {
-
-        def dependsOnProject = myProject.parent.subprojects.find { it.name.equals(config.name) };
-        myProject.dependencies {
-            if (!dependsOnProject.hasProperty('previewRelease') && dependsOnProject.hasProperty('releaseVersion')) {
-                delegate.compile group: myProject.group, name: config.artifact(dependsOnProject), version: myProject.toVersionRange(dependsOnProject.getProperty('releaseVersion'))
-            } else {
-                delegate.compile myProject.project(":${config.name}")
+        def name = config.name
+        def dependsOnProject = myProject.parent.subprojects.find { it.name.equals(name) }
+        def artifact = config.artifact(dependsOnProject)
+        def group = dependsOnProject.getProperty('groupName')
+        def version = config.version
+        def packaging = dependsOnProject.hasProperty('releaseVersionCode') ? 'aar' : 'jar'
+        if ('master'.equals(myProject.getWorkingBranch()) ? !myProject.hasProperty("local") : myProject.hasProperty("remote")) {
+            IvySettings settings = new IvySettings()
+            URLResolver resolver = new URLResolver()
+            resolver.setM2compatible(true)
+            resolver.setName('maven-central')
+            resolver.addArtifactPattern('http://repo1.maven.org/maven2/[organisation]/[module]/[revision]/[artifact](-[revision]).[ext]')
+            settings.addResolver(resolver)
+            settings.setDefaultResolver(resolver.name)
+            Ivy ivy = Ivy.newInstance(settings)
+            File ivyFile = File.createTempFile('ivy', '.xml')
+            ivyFile.deleteOnExit()
+            DefaultModuleDescriptor moduleDescriptor =
+                    DefaultModuleDescriptor.newDefaultInstance(ModuleRevisionId.newInstance(group, "${artifact}-caller", 'working'))
+            DefaultDependencyDescriptor dependencyDescriptor =
+                    new DefaultDependencyDescriptor(moduleDescriptor, ModuleRevisionId.newInstance(group, artifact, version), false, false, true)
+            moduleDescriptor.addDependency(dependencyDescriptor)
+            XmlModuleDescriptorWriter.write(moduleDescriptor, ivyFile)
+            String[] confs = ['default']
+            ResolveReport report = ivy.resolve(ivyFile.toURI().toURL(), new ResolveOptions().setConfs(confs))
+            if (report.getUnresolvedDependencies().length == 0) {
+                myProject.dependencies {
+                    delegate.compile group: group, name: artifact, version: version
+                }
+                return
             }
         }
-    }
 
-    def compile(String name) {
+        if (dependsOnProject.hasProperty('releaseVersion') && !dependsOnProject.getProperty('releaseVersion').equals(version)) {
+            throw new IllegalArgumentException("Could not find artifact: ${group}:${artifact}:${version}@${packaging}")
+        }
 
-        compile(name: name, artifact: { name })
+        myProject.dependencies {
+            delegate.compile myProject.project(":${name}")
+        }
     }
 }

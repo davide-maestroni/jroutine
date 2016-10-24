@@ -11,9 +11,9 @@ Inspired by the Go routines, this library provides a powerful, flexible, yet fam
 
 The main paradigm is based on routines and channels. A routine is the container in which a piece of code is executed asynchronously. It takes care of the synchronization and manages the invocation lifecycle. The channels are means of communication between the routine and the outside world.
 
-A routine can be invoked in a synchronous, asynchronous and parallel way. The main difference between the asynchronous and the parallel invocation is that, in the former, all the input data are processed by the same invocation instance, while, in the latter, each input item is (potentially) processed by a different one. For example, if the sum of the inputs has to be computed by the routine, an asynchronous invocation is the way to go, while, when the routine is used to compute, for instance, the square of a number, all the inputs can be safely processed in parallel.
+A routine can be invoked in asynchronous and parallel way. The main difference between the asynchronous and the parallel invocation is that, in the former, all the input data are processed by the same invocation instance, while, in the latter, each input item is (potentially) processed by a different one. For example, if the sum of the inputs has to be computed by the routine, an asynchronous invocation is the way to go, while, when the routine is used to compute, for instance, the square of a number, all the inputs can be safely processed in parallel.
 
-After the invocation, the routine returns an input channel which is used to pass the input parameters. Input data can be passed in bulk or streamed, delayed or fetched asynchronously from another channel. When done with the input, the channel is closed and returns an output channel used to read the invocation results.
+After the invocation, the routine returns a channel which is used to pass the input parameters. Input data can be passed in bulk or streamed, delayed or fetched asynchronously from another channel. When done with the input, the channel is closed. The same channel is used to read the invocation results, which might be published even before the invocation completes.
 
 The main way to define a routine is to implement an invocation object. Though, the library provides several other ways (always backed by invocations) to call any method of any object (even defined in third party source code) asynchronously.
 
@@ -21,27 +21,25 @@ The main way to define a routine is to implement an invocation object. Though, t
 
 The library adheres to [The Reactive Manifesto][reactive manifesto]. It's *responsive*, *resilient*, *elastic* and *message driven*.
 
-It's *responsive*, since commands are enqueued to be executed asynchronously so to never block the calling thread. Computation of asynchronous invocations happens only in response to inputs, and resources are freed as soon as the input is consumed. Resources are allocated only when needed, and reused when possible.<br/>
+It's *responsive*, since commands are enqueued to be executed asynchronously so to never block the calling thread. Computation of asynchronous invocations happens only in response to inputs. Resources are allocated only when needed, and reused when possible.<br/>
 It's *resilient*, since errors are gracefully handled and notified through the proper methods implemented by the specific invocation classes.<br/>
-It's *elastic*, since the needed number of threads is allocated in response to higher loads.<br/>
-It's *message driven*, since both ouputs and errors are dispatched along the chain of invocations.
+It's *elastic*, since the input and output queues adapt their size in response to higher loads. The thread pool can be also configured to automatically adapt to higher computation needs.<br/>
+It's *message driven*, since both outputs and errors are dispatched along the chain of invocations.
 
 ## Why not RxJava?
 
 Among the many open source libraries, [RxJava][rxjava] is one of the preferred choices when it comes to handle background tasks.
-Although [Reactive Extensions][reactivex] is a great tool for managing events and composing event listeners, it has not been clearly designed with parallel programming in mind.
-In fact, RxJava shows a few limits in this respect.
+Although [Reactive Extensions][reactivex] is a great tool for managing events and composing event listeners, it shows a few limits when it comes to parallel programming.
 The framework has once been compared, with a fitting example, to a line of domino pieces: once the first tile falls down, all the others are to follow, and there is no way to stop them other than to cut the line.
-Each time a background operation is required, the whole chain of observables/subscribers must be rebuilt from scratch and the chained functions get called recursively.
-While such design works great for simple events, it does not adapt so well to background tasks.
-After all, a network request does not really fit in the definition of "event".
+Each time a background operation is required, the whole chain of observables/subscribers must be re-built from scratch and the only way to "stop" the chained operations is to un-subscribe the listener.
+While such design works great for simple events, it does not adapt so well to background tasks (after all a network request does not really fit in the definition of "event").
 
-RxJava is still one of the best library for handling events, though, something specifically designed is needed to make parallel programming easily accessible and manageable.
+RxJava is still one of the best library for handling events and concatenate data transformations, though, something specifically designed is needed to make parallel programming easily accessible and manageable.
 
 ## Why JRoutine?
 
 The JRoutine library is based on a single paradigm, at the same time simple, but flexible and powerful enough to provide all the features needed to perform, manage and combine asynchronous tasks in any environment and on any platform.
-This paradigm is nothing but what any developer is already familiar to, that is, a function call.
+This paradigm is nothing but what any developer is already familiar to, that is, a function call: the routine is invoked, then the inputs are passed to the channel and finally outputs are read from it.
 
 What the library has to offer is:
 
@@ -53,15 +51,18 @@ What the library has to offer is:
 * ***Real processing abort***: invocations can be interrupted at any moment between two data are passed to the input or output channels, thus achieving real abortion of the processing and not a mere removal of a listener.
 * ***Non-recursive calls***: even during synchronous invocations, recursion is broken up in a sequential array of operations.
 * ***Automatic code generation***: as an alternative to reflection, existing methods can be made asynchronous through annotation pre-processing and compile-time code generation.
-* ***Nice handling of Android configuration changes***: the same paradigm is applied to the Android platform so to support background tasks surviving changes in the configuration of Activities or Fragments.
-* ***Seamlessly run in a remote Service***: invocations can be easily configured to run in a dedicated Android service.
 * ***Functional builder***: it is also possible to build routines by employing functional programming paradigms.
+* ***Stream builder***: a Java8 stream-like builder is available to easily build routine by concatenating mapping functions.
+* ***Nice handling of Android configuration changes***: the same paradigm is applied to the Android platform so to support background tasks surviving changes in the configuration of Activities or Fragments.
+* ***Seamlessly run in a remote Service***: invocations can be easily configured to run in a dedicated Android Service.
+* ***Fine dependency granularity***: import only the features you need.
+* ***Retrofit integration***: additional modules provides out-of-the-box integration with the [Retrofit][retrofit] library.
 
 And more:
 
-* ***350KB Jar***
 * ***Java 5+**** ***and Android 1.6+***
 * ***Nullity annotations***
+* ***High code coverage***
 
 (*) for older Java versions please have a look at [Retrotranslator][retrotranslator].
 
@@ -73,7 +74,7 @@ For anything else [GitHub][github] is a great source of inspiration.
 
 ## Usage
 
-Please have a look at the [Wiki][wiki].
+Please have a look at the dedicated [Wiki page][wiki usage].
 
 ## Code generation
 
@@ -98,9 +99,9 @@ apply plugin: 'com.neenbedankt.android-apt'
 dependencies {
     ...
     apt 'com.github.davide-maestroni:jroutine-processor:X.X.X'
-    apt 'com.github.davide-maestroni:jroutine-androidprocessor:X.X.X'
+    apt 'com.github.davide-maestroni:jroutine-android-processor:X.X.X'
     ...
-    compile 'com.github.davide-maestroni:jroutine-androidproxy:X.X.X'
+    compile 'com.github.davide-maestroni:jroutine-android-proxy:X.X.X'
     ...
 }
 ```
@@ -109,10 +110,10 @@ dependencies {
 
 Complete Javadoc with insights and examples is available for each module:
 
-* [JRoutine][javadoc]
-* [JRoutine-Proxy][javadoc proxy]
-* [JRoutine-Android][javadoc android]
-* [JRoutine-AndroidProxy][javadoc androidproxy]
+* [jroutine-lib][javadoc lib]
+* [jroutine-retrofit][javadoc retrofit]
+* [jroutine-android][javadoc android]
+* [jroutine-android-retrofit][javadoc android retrofit]
 
 The project contains an additional [sample][sample] module showing how to implement a file downloader with just 3 classes.
 
@@ -157,14 +158,35 @@ Please refer to the dedicated [Wiki page][wiki proguard].
 
 ## Artifacts
 
-Module | Latest Version
---- | ---
-JRoutine | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine)
-JRoutine-Proxy | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-proxy/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-proxy)
-JRoutine-Android | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-android/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-android)
-JRoutine-AndroidProxy | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-androidproxy/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-androidproxy)
+Module | Sub-Module | Latest Version
+--- | --- | ---
+jroutine-lib | | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine)
+ | jroutine-core | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-proxy/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-proxy)
+ | jroutine-channel | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-proxy/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-proxy)
+ | jroutine-function | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-proxy/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-proxy)
+ | jroutine-method | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-proxy/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-proxy)
+ | jroutine-object | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-proxy/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-proxy)
+ | jroutine-operator | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-proxy/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-proxy)
+ | jroutine-processor | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-proxy/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-proxy)
+ | jroutine-proxy | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-proxy/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-proxy)
+ | jroutine-stream | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-proxy/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-proxy)
+--- | --- | ---
+jroutine-retrofit | | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-proxy/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-proxy)
+--- | --- | ---
+jroutine-android | | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-android/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-android)
+ | jroutine-android-core | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-androidproxy/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-androidproxy)
+ | jroutine-android-channel | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-androidproxy/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-androidproxy)
+ | jroutine-android-method | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-androidproxy/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-androidproxy)
+ | jroutine-android-object | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-androidproxy/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-androidproxy)
+ | jroutine-android-processor | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-androidproxy/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-androidproxy)
+ | jroutine-android-proxy | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-androidproxy/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-androidproxy)
+ | jroutine-android-stream | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-androidproxy/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-androidproxy)
+--- | --- | ---
+jroutine-android-retrofit | | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-androidproxy/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-androidproxy)
 
 ## License
+
+Copyright 2016 Davide Maestroni
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
 
@@ -181,17 +203,19 @@ Unless required by applicable law or agreed to in writing, software distributed 
 [android sdk]:http://developer.android.com/sdk/terms.html
 [assertj]:http://joel-costigliola.github.io/assertj/
 [retrotranslator]:http://retrotranslator.sourceforge.net/
+[retrofit]:https://square.github.io/retrofit/
 [github]:https://github.com/
 [rxjava]:https://github.com/ReactiveX/RxJava
 [reactivex]:http://reactivex.io/
 [akka]:http://akka.io/
 [wiki]:https://github.com/davide-maestroni/jroutine/wiki
 [wiki build]:https://github.com/davide-maestroni/jroutine/wiki/Build-Instructions
+[wiki usage]:https://github.com/davide-maestroni/jroutine/wiki/Usage-Examples
 [wiki proguard]:https://github.com/davide-maestroni/jroutine/wiki/Proguard
 [sample]:https://github.com/davide-maestroni/jroutine/tree/master/sample
-[javadoc]:http://davide-maestroni.github.io/jroutine/javadoc/library
-[javadoc proxy]:http://davide-maestroni.github.io/jroutine/javadoc/proxy
-[javadoc android]:http://davide-maestroni.github.io/jroutine/javadoc/android
-[javadoc androidproxy]:http://davide-maestroni.github.io/jroutine/javadoc/androidproxy
-[javadoc routine]:http://davide-maestroni.github.io/jroutine/javadoc/library/com/github/dm/jrt/routine/Routine.html
-[javadoc runner]:http://davide-maestroni.github.io/jroutine/javadoc/library/com/github/dm/jrt/runner/Runner.html
+[javadoc lib]:http://davide-maestroni.github.io/jroutine/javadoc/6/lib
+[javadoc retrofit]:http://davide-maestroni.github.io/jroutine/javadoc/6/retrofit
+[javadoc android]:http://davide-maestroni.github.io/jroutine/javadoc/6/android
+[javadoc android retrofit]:http://davide-maestroni.github.io/jroutine/javadoc/6/android-retrofit
+[javadoc routine]:http://davide-maestroni.github.io/jroutine/javadoc/6/core/com/github/dm/jrt/core/routine/Routine.html
+[javadoc runner]:http://davide-maestroni.github.io/jroutine/javadoc/6/core/com/github/dm/jrt/core/runner/Runner.html

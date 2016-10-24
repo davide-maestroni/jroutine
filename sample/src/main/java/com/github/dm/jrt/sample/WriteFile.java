@@ -1,9 +1,11 @@
 /*
+ * Copyright 2016 Davide Maestroni
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -11,18 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.github.dm.jrt.sample;
 
-import com.github.dm.jrt.channel.ResultChannel;
-import com.github.dm.jrt.channel.RoutineException;
-import com.github.dm.jrt.core.ByteChannel;
-import com.github.dm.jrt.core.ByteChannel.BufferInputStream;
-import com.github.dm.jrt.core.ByteChannel.ByteBuffer;
-import com.github.dm.jrt.invocation.InvocationException;
-import com.github.dm.jrt.invocation.TemplateInvocation;
+import com.github.dm.jrt.channel.ByteChannel;
+import com.github.dm.jrt.channel.ByteChannel.ByteBuffer;
+import com.github.dm.jrt.core.channel.Channel;
+import com.github.dm.jrt.core.common.RoutineException;
+import com.github.dm.jrt.core.invocation.TemplateInvocation;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -32,82 +32,50 @@ import java.io.IOException;
 
 /**
  * Invocation writing the downloaded data into the output file.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 10/17/2014.
  */
+@SuppressWarnings("WeakerAccess")
 public class WriteFile extends TemplateInvocation<ByteBuffer, Boolean> {
 
-    private final File mFile;
+  private final File mFile;
 
-    private BufferedOutputStream mOutputStream;
+  private BufferedOutputStream mOutputStream;
 
-    /**
-     * Constructor.
-     *
-     * @param file the output file.
-     */
-    public WriteFile(@NotNull final File file) {
+  /**
+   * Constructor.
+   *
+   * @param file the output file.
+   */
+  public WriteFile(@NotNull final File file) {
+    mFile = file;
+  }
 
-        mFile = file;
-    }
+  @Override
+  @SuppressWarnings("ResultOfMethodCallIgnored")
+  public void onAbort(@NotNull final RoutineException reason) throws IOException {
+    closeStream();
+    mFile.delete();
+  }
 
-    @Override
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    public void onAbort(@Nullable final RoutineException reason) {
+  @Override
+  public void onComplete(@NotNull final Channel<Boolean, ?> result) throws IOException {
+    closeStream();
+    result.pass(true);
+  }
 
-        closeStream();
-        mFile.delete();
-    }
+  @Override
+  public void onInput(final ByteBuffer buffer, @NotNull final Channel<Boolean, ?> result) throws
+      IOException {
+    ByteChannel.inputStream(buffer).transferTo(mOutputStream);
+  }
 
-    @Override
-    public void onInitialize() {
+  @Override
+  public void onRestart() throws FileNotFoundException {
+    mOutputStream = new BufferedOutputStream(new FileOutputStream(mFile));
+  }
 
-        try {
-
-            mOutputStream = new BufferedOutputStream(new FileOutputStream(mFile));
-
-        } catch (final FileNotFoundException e) {
-
-            throw new InvocationException(e);
-        }
-    }
-
-    @Override
-    public void onInput(final ByteBuffer buffer, @NotNull final ResultChannel<Boolean> result) {
-
-        final BufferInputStream inputStream = ByteChannel.inputStream(buffer);
-        final BufferedOutputStream outputStream = mOutputStream;
-
-        try {
-
-            inputStream.readAll(outputStream);
-
-        } catch (final IOException e) {
-
-            throw new InvocationException(e);
-
-        } finally {
-
-            inputStream.close();
-        }
-    }
-
-    @Override
-    public void onResult(@NotNull final ResultChannel<Boolean> result) {
-
-        closeStream();
-        result.pass(true);
-    }
-
-    private void closeStream() {
-
-        try {
-
-            mOutputStream.close();
-
-        } catch (final IOException e) {
-
-            throw new InvocationException(e);
-        }
-    }
+  private void closeStream() throws IOException {
+    mOutputStream.close();
+  }
 }

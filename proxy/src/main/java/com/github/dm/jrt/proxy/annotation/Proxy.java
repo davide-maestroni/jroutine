@@ -1,9 +1,11 @@
 /*
+ * Copyright 2016 Davide Maestroni
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -11,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.github.dm.jrt.proxy.annotation;
 
 import java.lang.annotation.ElementType;
@@ -20,19 +23,23 @@ import java.lang.annotation.Target;
 
 /**
  * This annotation is used to indicate interfaces used as templates to generate proxy classes,
- * enabling asynchronous calls of the target instance methods.<br/>
+ * enabling asynchronous calls of the target instance methods.
+ * <br>
  * The target class is specified in the annotation value. A proxy class implementing the annotated
  * interface will be generated according to the specific annotation attributes.
- * <p/>
+ * <p>
  * The routines used for calling the methods will honor the attributes specified in any optional
- * <i>{@code com.github.dm.jrt.annotation.*}</i> annotations defined for each interface method.
- * <p/>
+ * <i>{@code com.github.dm.jrt.object.annotation.*}</i> annotations defined for each interface
+ * method.
+ * <p>
  * Special care must be taken when dealing with proxies of generic classes. First of all, the
  * proxy interface must declare the same generic types as the wrapped class or interface.
  * Additionally, the generic parameters must be declared as {@code Object} in order for the proxy
- * interface methods to match the target ones.<br/>
+ * interface methods to match the target ones.
+ * <br>
  * Be also aware that it is responsibility of the caller to ensure that the same instance is not
- * wrapped around two different generic interfaces.<br/>
+ * wrapped around two different generic interfaces.
+ * <br>
  * For example, a class of the type:
  * <pre>
  *     <code>
@@ -65,18 +72,14 @@ import java.lang.annotation.Target;
  *                 TYPE get(int i);
  *
  *                 &#64;Alias("get")
- *                 &#64;Output
- *                 OutputChannel&lt;TYPE&gt; getAsync(int i);
- *
- *                 &#64;Alias("get")
- *                 &#64;Output(OutputMode.COLLECTION)
- *                 List&lt;TYPE&gt; getList(int i);
+ *                 &#64;AsyncOutput
+ *                 Channel&lt;?, TYPE&gt; getAsync(int i);
  *             }
  *     </code>
  * </pre>
- * <p/>
- * Remember also that, in order for the annotation to properly work at run time, you will need to
- * add the following rules to your Proguard file (if employing it for shrinking or obfuscation):
+ * <p>
+ * Remember also that, in order for the annotation to properly work at run time, the following rules
+ * must be added to the project Proguard file (if employed for shrinking or obfuscation):
  * <pre>
  *     <code>
  *
@@ -96,67 +99,67 @@ import java.lang.annotation.Target;
  *         }
  *     </code>
  * </pre>
- * <p/>
+ * <p>
  * Created by davide-maestroni on 11/03/2014.
  *
- * @see com.github.dm.jrt.annotation Annotations
+ * @see com.github.dm.jrt.object.annotation Annotations
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Proxy {
 
-    /**
-     * Constant indicating a default class name or package.
-     */
-    String DEFAULT = "*";
+  /**
+   * Constant indicating a default class name or package.
+   */
+  String DEFAULT = "*";
 
-    /**
-     * Constant indicating the default generated class name prefix.
-     */
-    String DEFAULT_CLASS_PREFIX = "Proxy_";
+  /**
+   * Constant indicating the default generated class name prefix.
+   */
+  String DEFAULT_CLASS_PREFIX = "Proxy_";
 
-    /**
-     * Constant indicating the default generated class name suffix.
-     */
-    String DEFAULT_CLASS_SUFFIX = "";
+  /**
+   * Constant indicating the default generated class name suffix.
+   */
+  String DEFAULT_CLASS_SUFFIX = "";
 
-    /**
-     * The generated class name. By default the name is obtained by the interface simple name,
-     * prepending all the outer class names in case it is not a top level class.
-     * <p/>
-     * For instance, an interface named <code>MyItf</code> defined inside a class named
-     * <code>MyClass</code>, will result in the generation of a class named
-     * <code>Proxy_MyClass_MyItf</code>.
-     *
-     * @return the class name.
-     */
-    String className() default DEFAULT;
+  /**
+   * The generated class name. By default the name is obtained by the interface simple name,
+   * prepending all the outer class names in case it is not a top level class.
+   * <p>
+   * For instance, an interface named <code>MyItf</code> defined inside a class named
+   * <code>MyClass</code>, will result in the generation of a class named
+   * <code>Proxy_MyClass_MyItf</code>.
+   *
+   * @return the class name.
+   */
+  String className() default DEFAULT;
 
-    /**
-     * The generated class package. By default it is the same as the interface one.
-     *
-     * @return the package.
-     */
-    String classPackage() default DEFAULT;
+  /**
+   * The generated class package. By default it is the same as the interface one.
+   *
+   * @return the package.
+   */
+  String classPackage() default DEFAULT;
 
-    /**
-     * The generated class name prefix.
-     *
-     * @return the name prefix.
-     */
-    String classPrefix() default DEFAULT_CLASS_PREFIX;
+  /**
+   * The generated class name prefix.
+   *
+   * @return the name prefix.
+   */
+  String classPrefix() default DEFAULT_CLASS_PREFIX;
 
-    /**
-     * The generated class name suffix.
-     *
-     * @return the name suffix.
-     */
-    String classSuffix() default DEFAULT_CLASS_SUFFIX;
+  /**
+   * The generated class name suffix.
+   *
+   * @return the name suffix.
+   */
+  String classSuffix() default DEFAULT_CLASS_SUFFIX;
 
-    /**
-     * The wrapped class.
-     *
-     * @return the class.
-     */
-    Class<?> value();
+  /**
+   * The wrapped class.
+   *
+   * @return the class.
+   */
+  Class<?> value();
 }

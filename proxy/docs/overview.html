@@ -1,20 +1,74 @@
+<!--
+  ~ Copyright 2016 Davide Maestroni
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <html>
 <head>
     <title>jroutine-proxy</title>
 </head>
 <body>
 <a href="https://github.com/davide-maestroni/jroutine" target="_blank">Parallel programming on the go.</a>
+<h1>Overview</h1>
 <p>
-    Java annotation pre-processor based on the <a href="http://davide-maestroni.github.io/jroutine/javadoc/library" target="_blank">jroutine</a> library.
+    Java annotation pre-processor based on the <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/object" target="_blank">jroutine-object</a> library.
 </p>
+<p>
+    This module provides classes to enable asynchronous invocations of object or class methods, by wrapping them in compile time generated routines.
+</p>
+<h2>Main concepts</h2>
+<ul>
+    <li>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/proxy/com/github/dm/jrt/proxy/annotation/Proxy.html">Proxy</a>
+        <p>
+            A Proxy annotation will indicate which interface has to be implemented by the generated code to proxy the target class or instance.
+        </p>
+    </li>
+    <li>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/proxy/com/github/dm/jrt/proxy/builder/ProxyRoutineBuilder.html">ProxyRoutineBuilder</a>
+        <p>
+            Each generated proxy instance needs an invocation target and a specific configuration, so proxy routine builders provide a convenient way to set the required options.
+            By design builders are not synchronized since the same instance is not meant to be used from different threads.
+        </p>
+    </li>
+</ul>
+<h2>Main classes</h2>
+<ul>
+    <li>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/proxy/com/github/dm/jrt/proxy/JRoutineProxy.html">JRoutineProxy</a>
+        <p>
+            Utility class acting as a factory of proxy routine builders.
+        </p>
+    </li>
+</ul>
+<h2>Dependencies</h2>
+<p>
+    Below a full list of the included modules:
+</p>
+<ul>
+    <li><a href="http://davide-maestroni.github.io/jroutine/javadoc/6/core" target="_blank">jroutine-core</a> &mdash; core routine and channel classes</li>
+    <li><a href="http://davide-maestroni.github.io/jroutine/javadoc/6/object" target="_blank">jroutine-object</a> &mdash; routines wrapping object and class methods</li>
+    <li><a href="http://davide-maestroni.github.io/jroutine/javadoc/6/processor" target="_blank">jroutine-processor</a> &mdash; routine annotation pre-processor</li>
+</ul>
 <h2>Usage examples</h2>
 <p>
     The code below shows how it is possible to implement the computation of the root mean square of some input data, by distributing it in a number of background threads.
 </p>
 <b>Example 1:</b> via code generation.
 <p>
-    This approach allows the asynchronous invocation of an object methods by creating a proxy object.<br/>
-    In this case, the mean computation must actually wait for all the input data to be available before being invoked. Thus, it cannot really happen in a parallel way.<br/>
+    This approach allows the asynchronous invocation of an object methods by creating a proxy object.<br>
+    In this case, the mean computation must actually wait for all the input data to be available before being invoked. Thus, it cannot really happen in a parallel way.<br>
     Note that reflection is employed to create the proxy instance.
 </p>
 <pre>
@@ -22,42 +76,35 @@
         public class Main {
 
             public static void main(final String[] args) {
-
                 final Main main = new Main();
-                final AsyncMain proxy = JRoutineProxy.on(instance(main))
-                                                     .proxies()
+                final AsyncMain proxy = JRoutineProxy.with(instance(main))
+                                                     .applyObjectConfiguration()
                                                      .withSharedFields()
-                                                     .set()
-                                                     .invocations()
-                                                     .withReadTimeout(seconds(3))
-                                                     .set()
+                                                     .configured()
+                                                     .applyInvocationConfiguration()
+                                                     .withOutputTimeout(seconds(3))
+                                                     .configured()
                                                      .buildProxy(AsyncMain.class);
-                final double rms = proxy.squareRootMean(proxy.square(proxy.parseArg(args)));
+                final double rms = proxy.squareRootMean(proxy.square(proxy.parseArg(JRoutine.io().of(args))));
                 System.out.println(rms);
                 System.exit(0);
             }
 
             public int parseArg(final String arg) {
-
                 return Integer.parseInt(arg);
             }
 
             public int square(final int value) {
-
                 return value * value;
             }
 
             public double squareRootMean(final List&lt;Integer&gt; values) {
-
                 if (values.isEmpty()) {
-
                     return 0;
                 }
 
                 int sum = 0;
-
                 for (final int value : values) {
-
                     sum += value;
                 }
 
@@ -68,24 +115,22 @@
             public interface AsyncMain {
 
                 &commat;Invoke(InvocationMode.PARALLEL)
-                &commat;Output
-                OutputChannel&lt;Integer&gt; parseArg(
-                        &commat;Input(value = String.class, mode = InputMode.ELEMENT) String[] args);
+                &commat;AsyncOutput
+                Channel&lt;?, Integer&gt; parseArg(&commat;AsyncInput(String.class) Channel&lt;?, String&gt; args);
 
                 &commat;Invoke(InvocationMode.PARALLEL)
-                &commat;Output
-                OutputChannel&lt;Integer&gt; square(
-                        &commat;Input(value = int.class, mode = InputMode.ELEMENT) OutputChannel&lt;Integer&gt; value);
+                &commat;AsyncOutput
+                Channel&lt;?, Integer&gt; square(&commat;AsyncInput(int.class) Channel&lt;?, Integer&gt; value);
 
                 double squareRootMean(
-                        &commat;Input(value = List.class, mode = InputMode.COLLECTION) OutputChannel&lt;Integer&gt; values);
+                        &commat;AsyncInput(value = List.class, mode = InputMode.COLLECTION) Channel&lt;?, Integer&gt; values);
             }
         }
     </code>
 </pre>
 <b>Example 2:</b> via code generation (again).
 <p>
-    It is possible to completely avoid the use of reflection by slightly modifying the example above.<br/>
+    It is possible to completely avoid the use of reflection by slightly modifying the example above.<br>
     Note that, since the <i>Proxy_XXX</i> class is generated, a generic IDE may highlight an error even if the compilation is successful.
 </p>
 <pre>
@@ -93,42 +138,35 @@
         public class Main {
 
             public static void main(final String[] args) {
-
                 final Main main = new Main();
-                final AsyncMain proxy = Proxy_Main_AsyncMain.on(main)
-                                                            .proxies()
+                final AsyncMain proxy = Proxy_Main_AsyncMain.with(instance(main))
+                                                            .applyObjectConfiguration()
                                                             .withSharedFields()
-                                                            .set()
-                                                            .invocations()
-                                                            .withReadTimeout(seconds(3))
-                                                            .set()
+                                                            .configured()
+                                                            .applyInvocationConfiguration()
+                                                            .withOutputTimeout(seconds(3))
+                                                            .configured()
                                                             .buildProxy();
-                final double rms = proxy.squareRootMean(proxy.square(proxy.parseArg(args)));
+                final double rms = proxy.squareRootMean(proxy.square(proxy.parseArg(JRoutine.io().of(args))));
                 System.out.println(rms);
                 System.exit(0);
             }
 
             public int parseArg(final String arg) {
-
                 return Integer.parseInt(arg);
             }
 
             public int square(final int value) {
-
                 return value * value;
             }
 
             public double squareRootMean(final List&lt;Integer&gt; values) {
-
                 if (values.isEmpty()) {
-
                     return 0;
                 }
 
                 int sum = 0;
-
                 for (final int value : values) {
-
                     sum += value;
                 }
 
@@ -139,17 +177,15 @@
             public interface AsyncMain {
 
                 &commat;Invoke(InvocationMode.PARALLEL)
-                &commat;Output
-                OutputChannel&lt;Integer&gt; parseArg(
-                        &commat;Input(value = String.class, mode = InputMode.ELEMENT) String[] args);
+                &commat;AsyncOutput
+                Channel&lt;?, Integer&gt; parseArg(&commat;AsyncInput(String.class) Channel&lt;?, String&gt; args);
 
                 &commat;Invoke(InvocationMode.PARALLEL)
-                &commat;Output
-                OutputChannel&lt;Integer&gt; square(
-                        &commat;Input(value = int.class, mode = InputMode.ELEMENT) OutputChannel&lt;Integer&gt; value);
+                &commat;AsyncOutput
+                Channel&lt;?, Integer&gt; square(&commat;AsyncInput(int.class) Channel&lt;?, Integer&gt; value);
 
                 double squareRootMean(
-                        &commat;Input(value = List.class, mode = InputMode.COLLECTION) OutputChannel&lt;Integer&gt; values);
+                        &commat;AsyncInput(value = List.class, mode = InputMode.COLLECTION) Channel&lt;?, Integer&gt; values);
             }
         }
     </code>

@@ -125,7 +125,7 @@ The library artifacts will follow a specific versioning convention. Each version
 * ***Minor Version***: the minor version number will update when backward compatibility is broken. All the dependent artifact minor versions will be updated as well.
 * ***Revision Number***: the revision number will update when non-breaking changes are made (typically bug fixing). The dependent artifacts will not be impacted.
 
-In terms of backward compatibility, it is hence safe to depend on a specific major and minor version, ignoring the revision number (like, for instance: *4.2.+*).
+In terms of backward compatibility, it is hence safe, even if not advisable, to depend on a specific major and minor version, ignoring the revision number (like, for instance: *4.2.+*).
 
 ## Further development
 

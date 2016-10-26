@@ -115,7 +115,7 @@ Complete Javadoc with insights and examples is available for each module:
 * [jroutine-android][javadoc android]
 * [jroutine-android-retrofit][javadoc android retrofit]
 
-The project contains an additional [sample][sample] module showing how to implement a file downloader with just 3 classes.
+The project contains an additional [sample][sample] (showing how to implement a file downloader with just 3 classes) and [Android sample][android sample] (small application employing [Retrofit][retrofit] integration to fill a list) modules.
 
 ## Versioning Convention
 
@@ -213,6 +213,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
 [wiki usage]:https://github.com/davide-maestroni/jroutine/wiki/Usage-Examples
 [wiki proguard]:https://github.com/davide-maestroni/jroutine/wiki/Proguard
 [sample]:https://github.com/davide-maestroni/jroutine/tree/master/sample
+[android sample]:https://github.com/davide-maestroni/jroutine/tree/master/android-sample
 [javadoc lib]:http://davide-maestroni.github.io/jroutine/javadoc/6/lib
 [javadoc retrofit]:http://davide-maestroni.github.io/jroutine/javadoc/6/retrofit
 [javadoc android]:http://davide-maestroni.github.io/jroutine/javadoc/6/android

@@ -68,7 +68,7 @@ dependencies {
 }
 
 conditionalDependencies {
-    compile name: 'android-channel', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
+    compile name: 'android-channel', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.1'
     compile name: 'android-core', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
     compile name: 'channel', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
     compile name: 'core', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'

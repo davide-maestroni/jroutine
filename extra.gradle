@@ -330,6 +330,7 @@ def addJavadocTask(project, variant, taskName) {
 
 
 import org.apache.ivy.Ivy
+import org.apache.ivy.core.module.descriptor.DefaultDependencyArtifactDescriptor
 import org.apache.ivy.core.module.descriptor.DefaultDependencyDescriptor
 import org.apache.ivy.core.module.descriptor.DefaultModuleDescriptor
 import org.apache.ivy.core.module.id.ModuleRevisionId
@@ -369,6 +370,10 @@ class ConditionalDependencySpecs {
                     DefaultModuleDescriptor.newDefaultInstance(ModuleRevisionId.newInstance(group, "${artifact}-caller", 'working'))
             DefaultDependencyDescriptor dependencyDescriptor =
                     new DefaultDependencyDescriptor(moduleDescriptor, ModuleRevisionId.newInstance(group, artifact, version), false, false, true)
+            DefaultDependencyArtifactDescriptor dependencyArtifactDescriptor =
+                    new DefaultDependencyArtifactDescriptor(dependencyDescriptor, artifact, packaging, packaging, null, null)
+            dependencyArtifactDescriptor.addConfiguration('default')
+            dependencyDescriptor.addDependencyArtifact('default', dependencyArtifactDescriptor)
             moduleDescriptor.addDependency(dependencyDescriptor)
             XmlModuleDescriptorWriter.write(moduleDescriptor, ivyFile)
             String[] confs = ['default']

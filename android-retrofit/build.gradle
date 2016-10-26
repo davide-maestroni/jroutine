@@ -76,7 +76,7 @@ dependencies {
 
 conditionalDependencies {
     compile name: 'android-core', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
-    compile name: 'android-object', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
+    compile name: 'android-object', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.1'
     compile name: 'android-stream', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
     compile name: 'core', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
     compile name: 'object', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'

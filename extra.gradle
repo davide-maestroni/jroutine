@@ -348,10 +348,10 @@ class ConditionalDependencySpecs {
         myProject = context
     }
 
-    def compile(Object config) {
+    def compile(Map config) {
         def name = config.name
         def dependsOnProject = myProject.parent.subprojects.find { it.name.equals(name) }
-        def artifact = config.artifact(dependsOnProject)
+        def artifact = (config.get('artifact')) ? config.artifact(dependsOnProject) : "${dependsOnProject.parent.name}-${dependsOnProject.name}"
         def group = dependsOnProject.getProperty('groupName')
         def version = config.version
         def packaging = dependsOnProject.hasProperty('releaseVersionCode') ? 'aar' : 'jar'

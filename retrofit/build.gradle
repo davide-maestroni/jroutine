@@ -36,9 +36,9 @@ dependencies {
 }
 
 conditionalDependencies {
-    compile name: 'core', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
-    compile name: 'object', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
-    compile name: 'stream', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
+    compile name: 'core', version: '6.0.0'
+    compile name: 'object', version: '6.0.0'
+    compile name: 'stream', version: '6.0.0'
 }
 
 jacocoTestReport {

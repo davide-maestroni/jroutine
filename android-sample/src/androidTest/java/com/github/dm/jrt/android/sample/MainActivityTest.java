@@ -30,6 +30,7 @@ import android.view.View;
 import com.github.dm.jrt.core.util.UnitDuration;
 
 import org.hamcrest.Matcher;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -79,7 +80,7 @@ public class MainActivityTest {
       onData(anything()).inAdapterView(withId(R.id.repo_list))
                         .atPosition(0)
                         .check(matches(isDisplayed()));
-      onView(isRoot()).perform(new LandscapeOrientationAction());
+      onView(isRoot()).perform(new LandscapeOrientationAction(mActivityRule.getActivity()));
       onData(anything()).inAdapterView(withId(R.id.repo_list))
                         .atPosition(0)
                         .check(matches(isDisplayed()));
@@ -89,6 +90,12 @@ public class MainActivityTest {
   }
 
   private static class LandscapeOrientationAction implements ViewAction {
+
+    private final Activity mActivity;
+
+    private LandscapeOrientationAction(@NotNull final Activity activity) {
+      mActivity = activity;
+    }
 
     @Override
     public Matcher<View> getConstraints() {
@@ -103,8 +110,7 @@ public class MainActivityTest {
     @Override
     public void perform(final UiController uiController, final View view) {
       uiController.loopMainThreadUntilIdle();
-      ((Activity) view.getContext()).setRequestedOrientation(
-          ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+      mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
       if (getInstance().getActivitiesInStage(Stage.RESUMED).isEmpty()) {
         throw new RuntimeException("orientation change failed");
       }

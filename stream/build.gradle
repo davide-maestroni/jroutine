@@ -33,10 +33,10 @@ dependencies {
 }
 
 conditionalDependencies {
-    compile name: 'channel', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
-    compile name: 'core', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
-    compile name: 'function', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
-    compile name: 'operator', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
+    compile name: 'channel', version: '6.0.0'
+    compile name: 'core', version: '6.0.0'
+    compile name: 'function', version: '6.0.0'
+    compile name: 'operator', version: '6.0.0'
 }
 
 jacocoTestReport {

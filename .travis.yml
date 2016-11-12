@@ -8,8 +8,8 @@ jdk:
 android:
   components:
     # Platform tools
-    - tools
     - platform-tools
+    - tools
 
     # The BuildTools version
     - build-tools-23.0.3
@@ -29,7 +29,7 @@ env:
     - ANDROID_SDKS=android-10            ANDROID_TARGET=android-10  ANDROID_ABI=armeabi
     - ANDROID_SDKS=android-19,sysimg-19  ANDROID_TARGET=android-19  ANDROID_ABI=armeabi-v7a
     # The following configuration causes the Travis job to exceed the time limit...
-    - ANDROID_SDKS=android-22,sysimg-22  ANDROID_TARGET=android-22  ANDROID_ABI=armeabi-v7a
+    #- ANDROID_SDKS=android-21,sysimg-21  ANDROID_TARGET=android-21  ANDROID_ABI=armeabi-v7a
 
 # Emulator Management: Create, Start and Wait
 before_install:
@@ -38,6 +38,7 @@ before_install:
 before_script:
   - android-wait-for-emulator
   - adb shell input keyevent 82 &
+
 # The prepare step is needed to work around an issue with the support library dependencies in the gradle plugin
 script: ./gradlew clean prepareComAndroidSupportSupportVLibrary && travis_wait 50 ./gradlew --stacktrace connectedCheck
 

@@ -30,8 +30,6 @@ env:
     - ANDROID_SDKS=android-19,sysimg-19  ANDROID_TARGET=android-19  ANDROID_ABI=armeabi-v7a
     - ANDROID_SDKS=android-21,sysimg-21  ANDROID_TARGET=android-21  ANDROID_ABI=armeabi-v7a
 
-install: travis_wait mvn install
-
 # Emulator Management: Create, Start and Wait
 before_install:
   - echo no | android create avd --force -n test -t $ANDROID_TARGET --abi $ANDROID_ABI
@@ -40,7 +38,7 @@ before_script:
   - android-wait-for-emulator
   - adb shell input keyevent 82 &
 # The prepare step is needed to work around an issue with the support library dependencies in the gradle plugin
-script: ./gradlew clean prepareComAndroidSupportSupportVLibrary && ./gradlew --stacktrace connectedCheck
+script: ./gradlew clean prepareComAndroidSupportSupportVLibrary && travis_wait ./gradlew --stacktrace connectedCheck
 
 # Print reports
 after_failure: find . -name TEST-\*.xml -print -exec cat {} \;

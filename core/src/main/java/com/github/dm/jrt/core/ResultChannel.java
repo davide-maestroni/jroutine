@@ -53,7 +53,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantLock;
 
 import static com.github.dm.jrt.core.common.Backoff.NO_DELAY;
 import static com.github.dm.jrt.core.util.UnitDuration.fromUnit;
@@ -77,17 +76,8 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
       "cannot wait while no invocation instance is available"
           + "\nTry increasing the max number of instances";
 
-  private static final ReentrantMutex NO_MUTEX = new ReentrantMutex() {
-
-    public void acquire() {
-    }
-
-    public void release() {
-    }
-  };
-
-  private static final WeakIdentityHashMap<ChannelConsumer<?>, ReentrantMutex> sConsumerMutexes =
-      new WeakIdentityHashMap<ChannelConsumer<?>, ReentrantMutex>();
+  private static final WeakIdentityHashMap<ChannelConsumer<?>, Object> sConsumerMutexes =
+      new WeakIdentityHashMap<ChannelConsumer<?>, Object>();
 
   private static final LocalFence sInvocationFence = new LocalFence();
 
@@ -240,17 +230,12 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
   }
 
   @NotNull
-  private static ReentrantMutex getMutex(@NotNull final ChannelConsumer<?> consumer) {
-    if (consumer instanceof InternalChannelConsumer) {
-      return NO_MUTEX;
-    }
-
+  private static Object getMutex(@NotNull final ChannelConsumer<?> consumer) {
     synchronized (sConsumerMutexes) {
-      final WeakIdentityHashMap<ChannelConsumer<?>, ReentrantMutex> consumerMutexes =
-          sConsumerMutexes;
-      ReentrantMutex mutex = consumerMutexes.get(consumer);
+      final WeakIdentityHashMap<ChannelConsumer<?>, Object> consumerMutexes = sConsumerMutexes;
+      Object mutex = consumerMutexes.get(consumer);
       if (mutex == null) {
-        mutex = new DefaultMutex();
+        mutex = new Object();
         consumerMutexes.put(consumer, mutex);
       }
 
@@ -1113,38 +1098,6 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
   }
 
   /**
-   * Reentrant mutex.
-   */
-  private interface ReentrantMutex {
-
-    /**
-     * Acquires the mutex.
-     */
-    void acquire();
-
-    /**
-     * Releases the mutex.
-     */
-    void release();
-  }
-
-  /**
-   * Default implementation.
-   */
-  private static class DefaultMutex implements ReentrantMutex {
-
-    private final ReentrantLock mLock = new ReentrantLock();
-
-    public void acquire() {
-      mLock.lock();
-    }
-
-    public void release() {
-      mLock.unlock();
-    }
-  }
-
-  /**
    * The invocation has been aborted and the exception put into the output queue.
    */
   private class AbortChannelState extends ExceptionChannelState {
@@ -1238,7 +1191,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
     private final ChannelConsumer<? super OUT> mConsumer;
 
-    private final ReentrantMutex mConsumerMutex;
+    private final Object mConsumerMutex;
 
     private final SimpleQueue<Object> mQueue = new SimpleQueue<Object>();
 
@@ -1256,9 +1209,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     public void flushOutput(final boolean forceClose) {
       final Logger logger = mLogger;
       RoutineException abortException = null;
-      final ReentrantMutex mutex = mConsumerMutex;
-      mutex.acquire();
-      try {
+      synchronized (mConsumerMutex) {
         final NestedQueue<Object> outputQueue = mOutputQueue;
         final SimpleQueue<Object> queue = mQueue;
         final OutputChannelState currentState;
@@ -1312,9 +1263,6 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
           InvocationInterruptedException.throwIfInterrupt(t);
         }
-
-      } finally {
-        mutex.release();
       }
 
       if (abortException != null) {
@@ -1335,7 +1283,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
   /**
    * Default implementation of an channel consumer pushing the data into the output queue.
    */
-  private class DefaultChannelConsumer implements InternalChannelConsumer<OUT> {
+  private class DefaultChannelConsumer implements ChannelConsumer<OUT> {
 
     private final long mDelay;
 

@@ -782,7 +782,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
   /**
    * Default implementation of an channel consumer pushing the data into the input queue.
    */
-  private class DefaultChannelConsumer implements ChannelConsumer<IN> {
+  private class DefaultChannelConsumer implements InternalChannelConsumer<IN> {
 
     private final Channel<?, ? extends IN> mChannel;
 

@@ -205,7 +205,7 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
     final Runner throttlingRunner =
         mIsSyncRunner ? new SynchronizedRunner(runner) : Runners.throttlingRunner(runner, 1);
     return new InvocationChannel<IN, OUT>(mConfiguration,
-        new DefaultInvocationManager(throttlingRunner), throttlingRunner, runner, mLogger);
+        new DefaultInvocationManager(throttlingRunner), throttlingRunner, mLogger);
   }
 
   /**

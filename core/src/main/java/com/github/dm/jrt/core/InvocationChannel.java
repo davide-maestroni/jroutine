@@ -106,17 +106,16 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
   /**
    * Constructor.
    *
-   * @param configuration    the invocation configuration.
-   * @param manager          the invocation manager.
-   * @param invocationRunner the runner instance used to execute the invocation.
-   * @param resultRunner     the runner instance used to deliver the results.
-   * @param logger           the logger instance.
+   * @param configuration the invocation configuration.
+   * @param manager       the invocation manager.
+   * @param runner        the runner instance.
+   * @param logger        the logger instance.
    */
   InvocationChannel(@NotNull final InvocationConfiguration configuration,
-      @NotNull final InvocationManager<IN, OUT> manager, @NotNull final Runner invocationRunner,
-      @NotNull final Runner resultRunner, @NotNull final Logger logger) {
+      @NotNull final InvocationManager<IN, OUT> manager, @NotNull final Runner runner,
+      @NotNull final Logger logger) {
     mLogger = logger.subContextLogger(this);
-    mRunner = ConstantConditions.notNull("invocation runner", invocationRunner);
+    mRunner = ConstantConditions.notNull("invocation runner", runner);
     mInputOrder =
         new LocalValue<OrderType>(configuration.getInputOrderTypeOrElse(OrderType.UNSORTED));
     mInputBackoff = configuration.getInputBackoffOrElse(BackoffBuilder.noDelay());
@@ -164,7 +163,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
           }, 0, TimeUnit.MILLISECONDS);
         }
       }
-    }, resultRunner, logger);
+    }, runner, logger);
     mExecution =
         new InvocationExecution<IN, OUT>(manager, new DefaultExecutionObserver(), mResultChanel,
             logger);
@@ -782,7 +781,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
   /**
    * Default implementation of an channel consumer pushing the data into the input queue.
    */
-  private class DefaultChannelConsumer implements ChannelConsumer<IN> {
+  private class DefaultChannelConsumer implements InternalChannelConsumer<IN> {
 
     private final Channel<?, ? extends IN> mChannel;
 

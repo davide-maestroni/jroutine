@@ -27,7 +27,7 @@ import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.core.util.UnitDuration;
+import com.github.dm.jrt.core.util.DurationMeasure;
 import com.github.dm.jrt.function.Action;
 import com.github.dm.jrt.function.ActionDecorator;
 import com.github.dm.jrt.function.BiConsumer;
@@ -646,7 +646,7 @@ public class Operators {
    * @return the invocation factory instance.
    */
   @NotNull
-  public static <DATA> InvocationFactory<DATA, DATA> interval(@NotNull final UnitDuration delay) {
+  public static <DATA> InvocationFactory<DATA, DATA> interval(@NotNull final DurationMeasure delay) {
     return interval(delay.value, delay.unit);
   }
 

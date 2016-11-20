@@ -35,7 +35,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import static com.github.dm.jrt.core.util.UnitDuration.seconds;
+import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static com.github.dm.jrt.function.Functions.biSink;
 import static com.github.dm.jrt.function.Functions.castTo;
 import static com.github.dm.jrt.function.Functions.constant;

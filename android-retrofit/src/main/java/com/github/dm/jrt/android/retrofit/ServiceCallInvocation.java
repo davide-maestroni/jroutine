@@ -45,7 +45,7 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 import okio.BufferedSink;
 
-import static com.github.dm.jrt.core.util.UnitDuration.infinity;
+import static com.github.dm.jrt.core.util.DurationMeasure.infinity;
 
 /**
  * Implementation of a Context invocation handling OkHttp requests.

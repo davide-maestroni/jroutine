@@ -37,7 +37,7 @@ import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ClassToken;
-import com.github.dm.jrt.core.util.UnitDuration;
+import com.github.dm.jrt.core.util.DurationMeasure;
 import com.github.dm.jrt.object.annotation.Alias;
 import com.github.dm.jrt.object.annotation.AsyncInput;
 import com.github.dm.jrt.object.annotation.AsyncInput.InputMode;
@@ -60,7 +60,7 @@ import static com.github.dm.jrt.android.object.ContextInvocationTarget.classOfTy
 import static com.github.dm.jrt.android.object.ContextInvocationTarget.instanceOf;
 import static com.github.dm.jrt.android.v4.core.LoaderContextCompat.loaderFrom;
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builder;
-import static com.github.dm.jrt.core.util.UnitDuration.seconds;
+import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -1129,14 +1129,14 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
 
     public int getOne() throws InterruptedException {
 
-      UnitDuration.millis(2000).sleepAtLeast();
+      DurationMeasure.millis(2000).sleepAtLeast();
 
       return 1;
     }
 
     public int getTwo() throws InterruptedException {
 
-      UnitDuration.millis(2000).sleepAtLeast();
+      DurationMeasure.millis(2000).sleepAtLeast();
 
       return 2;
     }

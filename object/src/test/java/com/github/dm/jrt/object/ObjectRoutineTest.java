@@ -37,7 +37,7 @@ import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.runner.SyncRunner;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.DeepEqualObject;
-import com.github.dm.jrt.core.util.UnitDuration;
+import com.github.dm.jrt.core.util.DurationMeasure;
 import com.github.dm.jrt.object.annotation.Alias;
 import com.github.dm.jrt.object.annotation.AsyncInput;
 import com.github.dm.jrt.object.annotation.AsyncInput.InputMode;
@@ -75,8 +75,8 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builder;
-import static com.github.dm.jrt.core.util.UnitDuration.infinity;
-import static com.github.dm.jrt.core.util.UnitDuration.seconds;
+import static com.github.dm.jrt.core.util.DurationMeasure.infinity;
+import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static com.github.dm.jrt.object.InvocationTarget.classOfType;
 import static com.github.dm.jrt.object.InvocationTarget.instance;
 import static com.github.dm.jrt.object.builder.Builders.withAnnotations;
@@ -119,7 +119,7 @@ public class ObjectRoutineTest {
   @Test
   public void testAliasMethod() throws NoSuchMethodException {
 
-    final UnitDuration timeout = seconds(1);
+    final DurationMeasure timeout = seconds(1);
     final TestClass test = new TestClass();
     final Routine<Object, Object> routine = JRoutineObject.with(instance(test))
                                                           .applyInvocationConfiguration()
@@ -139,7 +139,7 @@ public class ObjectRoutineTest {
   @Test
   public void testAliasStaticMethod() throws NoSuchMethodException {
 
-    final UnitDuration timeout = seconds(1);
+    final DurationMeasure timeout = seconds(1);
     final Routine<Object, Object> routine = JRoutineObject.with(classOfType(TestStatic.class))
                                                           .applyInvocationConfiguration()
                                                           .withRunner(Runners.poolRunner())
@@ -183,7 +183,7 @@ public class ObjectRoutineTest {
   @Test
   public void testAsyncInputProxyRoutine() {
 
-    final UnitDuration timeout = seconds(1);
+    final DurationMeasure timeout = seconds(1);
     final Sum sum = new Sum();
     final SumItf sumAsync = JRoutineObject.with(instance(sum))
                                           .applyInvocationConfiguration()
@@ -216,7 +216,7 @@ public class ObjectRoutineTest {
   @Test
   public void testAsyncOutputProxyRoutine() {
 
-    final UnitDuration timeout = seconds(1);
+    final DurationMeasure timeout = seconds(1);
     final Count count = new Count();
     final CountItf countAsync = JRoutineObject.with(instance(count))
                                               .applyInvocationConfiguration()
@@ -322,7 +322,7 @@ public class ObjectRoutineTest {
   @Test
   public void testException() throws NoSuchMethodException {
 
-    final UnitDuration timeout = seconds(1);
+    final DurationMeasure timeout = seconds(1);
     final TestClass test = new TestClass();
     final Routine<Object, Object> routine3 =
         JRoutineObject.with(instance(test)).method(TestClass.THROW);
@@ -343,7 +343,7 @@ public class ObjectRoutineTest {
   @Test
   public void testException2() throws NoSuchMethodException {
 
-    final UnitDuration timeout = seconds(1);
+    final DurationMeasure timeout = seconds(1);
 
     final Routine<Object, Object> routine3 =
         JRoutineObject.with(classOfType(TestStatic.class)).method(TestStatic.THROW);
@@ -642,7 +642,7 @@ public class ObjectRoutineTest {
   @Test
   public void testMethod() throws NoSuchMethodException {
 
-    final UnitDuration timeout = seconds(1);
+    final DurationMeasure timeout = seconds(1);
     final TestClass test = new TestClass();
     final Routine<Object, Object> routine2 = JRoutineObject.with(instance(test))
                                                            .applyInvocationConfiguration()
@@ -661,7 +661,7 @@ public class ObjectRoutineTest {
   @Test
   public void testMethodBySignature() throws NoSuchMethodException {
 
-    final UnitDuration timeout = seconds(1);
+    final DurationMeasure timeout = seconds(1);
     final TestClass test = new TestClass();
     final Routine<Object, Object> routine1 = JRoutineObject.with(instance(test))
                                                            .applyInvocationConfiguration()
@@ -675,7 +675,7 @@ public class ObjectRoutineTest {
   @Test
   public void testMethodInterface() throws NoSuchMethodException {
 
-    final UnitDuration timeout = seconds(1);
+    final DurationMeasure timeout = seconds(1);
     final TestClassImpl test = new TestClassImpl();
     assertThat(JRoutineObject.with(instance(test))
                              .method(TestClassImpl.class.getMethod("getOne"))
@@ -854,7 +854,7 @@ public class ObjectRoutineTest {
   @Test
   public void testObjectStaticMethod() {
 
-    final UnitDuration timeout = seconds(1);
+    final DurationMeasure timeout = seconds(1);
     final TestStatic test = new TestStatic();
     final Routine<Object, Object> routine = JRoutineObject.with(instance(test))
                                                           .applyInvocationConfiguration()
@@ -1076,7 +1076,7 @@ public class ObjectRoutineTest {
   @SuppressWarnings("NullArgumentToVariableArgMethod")
   public void testProxyRoutine() {
 
-    final UnitDuration timeout = seconds(1);
+    final DurationMeasure timeout = seconds(1);
     final Square square = new Square();
     final SquareItf squareAsync = JRoutineObject.with(instance(square)).buildProxy(SquareItf.class);
 
@@ -1441,7 +1441,7 @@ public class ObjectRoutineTest {
   @Test
   public void testStaticMethod() throws NoSuchMethodException {
 
-    final UnitDuration timeout = seconds(1);
+    final DurationMeasure timeout = seconds(1);
     final Routine<Object, Object> routine2 = JRoutineObject.with(classOfType(TestStatic.class))
                                                            .applyInvocationConfiguration()
                                                            .withRunner(Runners.syncRunner())
@@ -1460,7 +1460,7 @@ public class ObjectRoutineTest {
   @Test
   public void testStaticMethodBySignature() throws NoSuchMethodException {
 
-    final UnitDuration timeout = seconds(1);
+    final DurationMeasure timeout = seconds(1);
     final Routine<Object, Object> routine1 = JRoutineObject.with(classOfType(TestStatic.class))
                                                            .applyInvocationConfiguration()
                                                            .withRunner(Runners.syncRunner())
@@ -2485,14 +2485,14 @@ public class ObjectRoutineTest {
 
     public int getOne() throws InterruptedException {
 
-      UnitDuration.millis(500).sleepAtLeast();
+      DurationMeasure.millis(500).sleepAtLeast();
 
       return 1;
     }
 
     public int getTwo() throws InterruptedException {
 
-      UnitDuration.millis(500).sleepAtLeast();
+      DurationMeasure.millis(500).sleepAtLeast();
 
       return 2;
     }
@@ -2572,14 +2572,14 @@ public class ObjectRoutineTest {
 
     public static int getOne() throws InterruptedException {
 
-      UnitDuration.millis(500).sleepAtLeast();
+      DurationMeasure.millis(500).sleepAtLeast();
 
       return 1;
     }
 
     public static int getTwo() throws InterruptedException {
 
-      UnitDuration.millis(500).sleepAtLeast();
+      DurationMeasure.millis(500).sleepAtLeast();
 
       return 2;
     }

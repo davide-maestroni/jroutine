@@ -29,7 +29,7 @@ import com.github.dm.jrt.core.log.Log;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.NullLog;
 import com.github.dm.jrt.core.runner.Runners;
-import com.github.dm.jrt.core.util.UnitDuration;
+import com.github.dm.jrt.core.util.DurationMeasure;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -43,8 +43,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.core.common.BackoffBuilder.noDelay;
-import static com.github.dm.jrt.core.util.UnitDuration.millis;
-import static com.github.dm.jrt.core.util.UnitDuration.seconds;
+import static com.github.dm.jrt.core.util.DurationMeasure.millis;
+import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -59,7 +59,7 @@ public class ChannelTest {
   @SuppressWarnings({"ConstantConditions", "ThrowableResultOfMethodCallIgnored"})
   public void testAbort() {
 
-    final UnitDuration timeout = seconds(1);
+    final DurationMeasure timeout = seconds(1);
     final Channel<String, String> channel = JRoutineCore.io().buildChannel();
     channel.abort(new IllegalStateException());
     try {
@@ -161,7 +161,7 @@ public class ChannelTest {
 
   @Test
   public void testAsynchronousInput() {
-    final UnitDuration timeout = seconds(1);
+    final DurationMeasure timeout = seconds(1);
     final Channel<String, String> channel = JRoutineCore.io().buildChannel();
     new Thread() {
 
@@ -185,7 +185,7 @@ public class ChannelTest {
 
   @Test
   public void testAsynchronousInput2() {
-    final UnitDuration timeout = seconds(1);
+    final DurationMeasure timeout = seconds(1);
     final Channel<String, String> channel1 = JRoutineCore.io()
                                                          .applyChannelConfiguration()
                                                          .withOrder(OrderType.SORTED)
@@ -220,7 +220,7 @@ public class ChannelTest {
 
   @Test
   public void testDelayedClose() {
-    final UnitDuration timeout = seconds(1);
+    final DurationMeasure timeout = seconds(1);
     final Channel<String, String> channel1 = JRoutineCore.io().buildChannel();
     channel1.after(seconds(2)).close();
     assertThat(channel1.now().pass("test").after(timeout).next()).isEqualTo("test");
@@ -493,7 +493,7 @@ public class ChannelTest {
 
   @Test
   public void testOrderType() {
-    final UnitDuration timeout = seconds(1);
+    final DurationMeasure timeout = seconds(1);
     final Channel<Object, Object> channel = JRoutineCore.io()
                                                         .applyChannelConfiguration()
                                                         .withOrder(OrderType.SORTED)
@@ -619,7 +619,7 @@ public class ChannelTest {
 
   @Test
   public void testReadFirst() {
-    final UnitDuration timeout = seconds(1);
+    final DurationMeasure timeout = seconds(1);
     final Channel<String, String> channel = JRoutineCore.io().buildChannel();
     new WeakThread(channel).start();
     final Channel<String, String> outputChannel =

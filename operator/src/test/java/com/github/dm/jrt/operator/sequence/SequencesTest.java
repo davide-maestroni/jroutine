@@ -31,7 +31,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
 
-import static com.github.dm.jrt.core.util.UnitDuration.seconds;
+import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static com.github.dm.jrt.function.Functions.consumerCommand;
 import static com.github.dm.jrt.operator.sequence.Sequences.range;
 import static com.github.dm.jrt.operator.sequence.Sequences.sequence;

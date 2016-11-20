@@ -36,7 +36,7 @@ import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.RunnerDecorator;
 import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ClassToken;
-import com.github.dm.jrt.core.util.UnitDuration;
+import com.github.dm.jrt.core.util.DurationMeasure;
 import com.github.dm.jrt.object.annotation.Alias;
 import com.github.dm.jrt.object.annotation.AsyncInput;
 import com.github.dm.jrt.object.annotation.AsyncInput.InputMode;
@@ -61,8 +61,8 @@ import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.android.core.ServiceContext.serviceFrom;
 import static com.github.dm.jrt.android.object.ContextInvocationTarget.instanceOf;
-import static com.github.dm.jrt.core.util.UnitDuration.infinity;
-import static com.github.dm.jrt.core.util.UnitDuration.seconds;
+import static com.github.dm.jrt.core.util.DurationMeasure.infinity;
+import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -80,7 +80,7 @@ public class RemoteServiceObjectRoutineTest extends ActivityInstrumentationTestC
 
   public void testAliasMethod() throws NoSuchMethodException {
 
-    final UnitDuration timeout = seconds(10);
+    final DurationMeasure timeout = seconds(10);
     final Routine<Object, Object> routine =
         JRoutineServiceObject.on(serviceFrom(getActivity(), RemoteInvocationService.class))
                              .with(instanceOf(TestClass.class))
@@ -108,7 +108,7 @@ public class RemoteServiceObjectRoutineTest extends ActivityInstrumentationTestC
 
   public void testAsyncInputProxyRoutine() {
 
-    final UnitDuration timeout = seconds(10);
+    final DurationMeasure timeout = seconds(10);
     final SumItf sumAsync =
         JRoutineServiceObject.on(serviceFrom(getActivity(), RemoteInvocationService.class))
                              .with(instanceOf(Sum.class))
@@ -139,7 +139,7 @@ public class RemoteServiceObjectRoutineTest extends ActivityInstrumentationTestC
 
   public void testAsyncOutputProxyRoutine() {
 
-    final UnitDuration timeout = seconds(10);
+    final DurationMeasure timeout = seconds(10);
     final CountItf countAsync =
         JRoutineServiceObject.on(serviceFrom(getActivity(), RemoteInvocationService.class))
                              .with(instanceOf(Count.class))
@@ -211,7 +211,7 @@ public class RemoteServiceObjectRoutineTest extends ActivityInstrumentationTestC
 
   public void testException() throws NoSuchMethodException {
 
-    final UnitDuration timeout = seconds(10);
+    final DurationMeasure timeout = seconds(10);
     final Routine<Object, Object> routine3 =
         JRoutineServiceObject.on(serviceFrom(getActivity(), RemoteInvocationService.class))
                              .with(instanceOf(TestClass.class))
@@ -461,7 +461,7 @@ public class RemoteServiceObjectRoutineTest extends ActivityInstrumentationTestC
 
   public void testMethod() throws NoSuchMethodException {
 
-    final UnitDuration timeout = seconds(10);
+    final DurationMeasure timeout = seconds(10);
     final Routine<Object, Object> routine2 =
         JRoutineServiceObject.on(serviceFrom(getActivity(), RemoteInvocationService.class))
                              .with(instanceOf(TestClass.class))
@@ -479,7 +479,7 @@ public class RemoteServiceObjectRoutineTest extends ActivityInstrumentationTestC
 
   public void testMethodBySignature() throws NoSuchMethodException {
 
-    final UnitDuration timeout = seconds(10);
+    final DurationMeasure timeout = seconds(10);
     final Routine<Object, Object> routine1 =
         JRoutineServiceObject.on(serviceFrom(getActivity(), RemoteInvocationService.class))
                              .with(instanceOf(TestClass.class))
@@ -783,7 +783,7 @@ public class RemoteServiceObjectRoutineTest extends ActivityInstrumentationTestC
   @SuppressWarnings("NullArgumentToVariableArgMethod")
   public void testProxyRoutine() {
 
-    final UnitDuration timeout = seconds(10);
+    final DurationMeasure timeout = seconds(10);
     final SquareItf squareAsync =
         JRoutineServiceObject.on(serviceFrom(getActivity(), RemoteInvocationService.class))
                              .with(instanceOf(Square.class))
@@ -1673,14 +1673,14 @@ public class RemoteServiceObjectRoutineTest extends ActivityInstrumentationTestC
 
     public int getOne() throws InterruptedException {
 
-      UnitDuration.seconds(2).sleepAtLeast();
+      DurationMeasure.seconds(2).sleepAtLeast();
 
       return 1;
     }
 
     public int getTwo() throws InterruptedException {
 
-      UnitDuration.seconds(2).sleepAtLeast();
+      DurationMeasure.seconds(2).sleepAtLeast();
 
       return 2;
     }

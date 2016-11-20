@@ -57,8 +57,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
-import static com.github.dm.jrt.core.util.UnitDuration.minutes;
-import static com.github.dm.jrt.core.util.UnitDuration.seconds;
+import static com.github.dm.jrt.core.util.DurationMeasure.minutes;
+import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static com.github.dm.jrt.function.Functions.functionMapping;
 import static com.github.dm.jrt.function.SupplierDecorator.constant;
 import static com.github.dm.jrt.operator.Operators.append;

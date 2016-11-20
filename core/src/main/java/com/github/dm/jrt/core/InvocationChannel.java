@@ -35,9 +35,9 @@ import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.core.util.DurationMeasure;
+import com.github.dm.jrt.core.util.DurationMeasure.Condition;
 import com.github.dm.jrt.core.util.LocalValue;
-import com.github.dm.jrt.core.util.UnitDuration;
-import com.github.dm.jrt.core.util.UnitDuration.Condition;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -51,8 +51,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.core.common.Backoff.NO_DELAY;
-import static com.github.dm.jrt.core.util.UnitDuration.fromUnit;
-import static com.github.dm.jrt.core.util.UnitDuration.zero;
+import static com.github.dm.jrt.core.util.DurationMeasure.fromUnit;
+import static com.github.dm.jrt.core.util.DurationMeasure.zero;
 
 /**
  * Default implementation of an invocation channel.
@@ -75,7 +75,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
 
   private final Backoff mInputBackoff;
 
-  private final LocalValue<UnitDuration> mInputDelay;
+  private final LocalValue<DurationMeasure> mInputDelay;
 
   private final LocalValue<OrderType> mInputOrder;
 
@@ -120,7 +120,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
         new LocalValue<OrderType>(configuration.getInputOrderTypeOrElse(OrderType.UNSORTED));
     mInputBackoff = configuration.getInputBackoffOrElse(BackoffBuilder.noDelay());
     mMaxInput = configuration.getInputMaxSizeOrElse(Integer.MAX_VALUE);
-    mInputDelay = new LocalValue<UnitDuration>(zero());
+    mInputDelay = new LocalValue<DurationMeasure>(zero());
     mInputQueue = new NestedQueue<IN>() {
 
       @Override
@@ -175,7 +175,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
   }
 
   public boolean abort(@Nullable final Throwable reason) {
-    final UnitDuration delay = mInputDelay.get();
+    final DurationMeasure delay = mInputDelay.get();
     final boolean isAbort;
     final Execution execution;
     synchronized (mMutex) {
@@ -202,7 +202,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
   }
 
   @NotNull
-  public Channel<IN, OUT> after(@NotNull final UnitDuration delay) {
+  public Channel<IN, OUT> after(@NotNull final DurationMeasure delay) {
     mInputDelay.set(ConstantConditions.notNull("input delay", delay));
     mResultChanel.after(delay);
     return this;
@@ -233,7 +233,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
 
   @NotNull
   public Channel<IN, OUT> close() {
-    final UnitDuration delay = mInputDelay.get();
+    final DurationMeasure delay = mInputDelay.get();
     final Execution execution;
     synchronized (mMutex) {
       execution = mState.onClose(delay);
@@ -355,7 +355,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
 
   @NotNull
   public Channel<IN, OUT> pass(@Nullable final Iterable<? extends IN> inputs) {
-    final UnitDuration delay = mInputDelay.get();
+    final DurationMeasure delay = mInputDelay.get();
     final Execution execution;
     synchronized (mMutex) {
       execution = mState.pass(inputs, delay);
@@ -376,7 +376,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
 
   @NotNull
   public Channel<IN, OUT> pass(@Nullable final IN input) {
-    final UnitDuration delay = mInputDelay.get();
+    final DurationMeasure delay = mInputDelay.get();
     final Execution execution;
     synchronized (mMutex) {
       execution = mState.pass(input, delay);
@@ -397,7 +397,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
 
   @NotNull
   public Channel<IN, OUT> pass(@Nullable final IN... inputs) {
-    final UnitDuration delay = mInputDelay.get();
+    final DurationMeasure delay = mInputDelay.get();
     final Execution execution;
     synchronized (mMutex) {
       execution = mState.pass(inputs, delay);
@@ -474,7 +474,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
 
     try {
       mIsWaitingInput = true;
-      if (!UnitDuration.waitUntil(mMutex, mHasInputs, delay, TimeUnit.MILLISECONDS)) {
+      if (!DurationMeasure.waitUntil(mMutex, mHasInputs, delay, TimeUnit.MILLISECONDS)) {
         mLogger.dbg("timeout while waiting for room in the input channel [%s %s]", delay,
             TimeUnit.MILLISECONDS);
       }
@@ -556,19 +556,19 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
     @Nullable
     @Override
     Execution pass(@Nullable final Iterable<? extends IN> inputs,
-        @NotNull final UnitDuration delay) {
+        @NotNull final DurationMeasure delay) {
       throw exception();
     }
 
     @Nullable
     @Override
-    Execution pass(@Nullable final IN input, @NotNull final UnitDuration delay) {
+    Execution pass(@Nullable final IN input, @NotNull final DurationMeasure delay) {
       throw exception();
     }
 
     @Nullable
     @Override
-    Execution pass(@Nullable final IN[] inputs, @NotNull final UnitDuration delay) {
+    Execution pass(@Nullable final IN[] inputs, @NotNull final DurationMeasure delay) {
       throw exception();
     }
   }
@@ -601,7 +601,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
 
     @Nullable
     @Override
-    Execution abortInvocation(@NotNull final UnitDuration delay, @Nullable final Throwable reason) {
+    Execution abortInvocation(@NotNull final DurationMeasure delay, @Nullable final Throwable reason) {
       mLogger.dbg(reason, "avoiding aborting since channel is closed");
       return null;
     }
@@ -638,14 +638,14 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
 
     @Nullable
     @Override
-    Execution onClose(@NotNull final UnitDuration delay) {
+    Execution onClose(@NotNull final DurationMeasure delay) {
       return null;
     }
 
     @Nullable
     @Override
     Execution pass(@Nullable final Iterable<? extends IN> inputs,
-        @NotNull final UnitDuration delay) {
+        @NotNull final DurationMeasure delay) {
       throw exception();
     }
 
@@ -662,13 +662,13 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
 
     @Nullable
     @Override
-    Execution pass(@Nullable final IN input, @NotNull final UnitDuration delay) {
+    Execution pass(@Nullable final IN input, @NotNull final DurationMeasure delay) {
       throw exception();
     }
 
     @Nullable
     @Override
-    Execution pass(@Nullable final IN[] inputs, @NotNull final UnitDuration delay) {
+    Execution pass(@Nullable final IN[] inputs, @NotNull final DurationMeasure delay) {
       throw exception();
     }
 
@@ -799,7 +799,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
      * @param channel the bound channel.
      */
     private DefaultChannelConsumer(@NotNull final Channel<?, ? extends IN> channel) {
-      final UnitDuration delay = mInputDelay.get();
+      final DurationMeasure delay = mInputDelay.get();
       mDelay = delay.value;
       mDelayUnit = delay.unit;
       final OrderType order = (mOrderType = mInputOrder.get());
@@ -1104,7 +1104,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
      * @return the execution to run or null.
      */
     @Nullable
-    Execution abortInvocation(@NotNull final UnitDuration delay, @Nullable final Throwable reason) {
+    Execution abortInvocation(@NotNull final DurationMeasure delay, @Nullable final Throwable reason) {
       final RoutineException abortException = AbortException.wrapIfNeeded(reason);
       if (delay.isZero()) {
         mLogger.dbg(reason, "aborting channel");
@@ -1254,7 +1254,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
      * @return the execution to run or null.
      */
     @Nullable
-    Execution onClose(@NotNull final UnitDuration delay) {
+    Execution onClose(@NotNull final DurationMeasure delay) {
       if (delay.isZero()) {
         mLogger.dbg("closing input channel");
         mState = new ClosedChannelState();
@@ -1405,7 +1405,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
      */
     @Nullable
     Execution pass(@Nullable final Iterable<? extends IN> inputs,
-        @NotNull final UnitDuration delay) {
+        @NotNull final DurationMeasure delay) {
       if (inputs == null) {
         mLogger.wrn("passing null iterable");
         return null;
@@ -1444,7 +1444,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
      * @return the execution to run or null.
      */
     @Nullable
-    Execution pass(@Nullable final IN input, @NotNull final UnitDuration delay) {
+    Execution pass(@Nullable final IN input, @NotNull final DurationMeasure delay) {
       mLogger.dbg("passing input [#%d+1]: %s [%s]", mInputCount, input, delay);
       ++mInputCount;
       checkMaxSize();
@@ -1472,7 +1472,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
      * @return the execution to run or null.
      */
     @Nullable
-    Execution pass(@Nullable final IN[] inputs, @NotNull final UnitDuration delay) {
+    Execution pass(@Nullable final IN[] inputs, @NotNull final DurationMeasure delay) {
       if (inputs == null) {
         mLogger.wrn("passing null input array");
         return null;

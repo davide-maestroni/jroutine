@@ -30,7 +30,7 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.Locale;
 
-import static com.github.dm.jrt.core.util.UnitDuration.seconds;
+import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static com.github.dm.jrt.object.InvocationTarget.classOfType;
 import static com.github.dm.jrt.object.InvocationTarget.instance;
 import static org.assertj.core.api.Assertions.assertThat;

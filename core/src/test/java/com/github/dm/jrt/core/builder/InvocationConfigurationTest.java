@@ -25,7 +25,6 @@ import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.Logs;
 import com.github.dm.jrt.core.log.NullLog;
 import com.github.dm.jrt.core.runner.Runners;
-import com.github.dm.jrt.core.util.UnitDuration;
 
 import org.junit.Test;
 
@@ -37,8 +36,8 @@ import static com.github.dm.jrt.core.config.InvocationConfiguration.builder;
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builderFrom;
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builderFromInput;
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builderFromOutput;
-import static com.github.dm.jrt.core.util.UnitDuration.millis;
-import static com.github.dm.jrt.core.util.UnitDuration.zero;
+import static com.github.dm.jrt.core.util.DurationMeasure.millis;
+import static com.github.dm.jrt.core.util.DurationMeasure.zero;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -166,7 +165,7 @@ public class InvocationConfigurationTest {
     assertThat(configuration).isNotEqualTo(
         builder().withOutputTimeout(1, TimeUnit.MILLISECONDS).configured());
     assertThat(configuration.builderFrom()
-                            .withOutputTimeout(UnitDuration.millis(1))
+                            .withOutputTimeout(millis(1))
                             .configured()).isNotEqualTo(
         builder().withOutputTimeout(1, TimeUnit.MILLISECONDS).configured());
   }
@@ -251,7 +250,7 @@ public class InvocationConfigurationTest {
         builder().withInputBackoff(afterCount(1).constantDelay(1, TimeUnit.MILLISECONDS))
                  .configured());
     assertThat(configuration.builderFrom()
-                            .withInputBackoff(afterCount(1).constantDelay(UnitDuration.millis(1)))
+                            .withInputBackoff(afterCount(1).constantDelay(millis(1)))
                             .configured()).isNotEqualTo(
         builder().withInputBackoff(afterCount(1).constantDelay(1, TimeUnit.MILLISECONDS))
                  .configured());
@@ -401,7 +400,7 @@ public class InvocationConfigurationTest {
         builder().withOutputBackoff(afterCount(1).constantDelay(1, TimeUnit.MILLISECONDS))
                  .configured());
     assertThat(configuration.builderFrom()
-                            .withOutputBackoff(afterCount(1).constantDelay(UnitDuration.millis(1)))
+                            .withOutputBackoff(afterCount(1).constantDelay(millis(1)))
                             .configured()).isNotEqualTo(
         builder().withOutputBackoff(afterCount(1).constantDelay(1, TimeUnit.MILLISECONDS))
                  .configured());

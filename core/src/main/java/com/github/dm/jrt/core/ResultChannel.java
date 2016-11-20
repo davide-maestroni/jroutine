@@ -36,11 +36,11 @@ import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.core.util.DurationMeasure;
+import com.github.dm.jrt.core.util.DurationMeasure.Condition;
 import com.github.dm.jrt.core.util.LocalFence;
 import com.github.dm.jrt.core.util.LocalValue;
 import com.github.dm.jrt.core.util.SimpleQueue;
-import com.github.dm.jrt.core.util.UnitDuration;
-import com.github.dm.jrt.core.util.UnitDuration.Condition;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 
 import org.jetbrains.annotations.NotNull;
@@ -56,8 +56,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static com.github.dm.jrt.core.common.Backoff.NO_DELAY;
-import static com.github.dm.jrt.core.util.UnitDuration.fromUnit;
-import static com.github.dm.jrt.core.util.UnitDuration.zero;
+import static com.github.dm.jrt.core.util.DurationMeasure.fromUnit;
+import static com.github.dm.jrt.core.util.DurationMeasure.zero;
 
 /**
  * Class handling the invocation output.
@@ -110,9 +110,9 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
   private final NestedQueue<Object> mOutputQueue;
 
-  private final UnitDuration mOutputTimeout;
+  private final DurationMeasure mOutputTimeout;
 
-  private final ThreadLocal<UnitDuration> mResultDelay = new ThreadLocal<UnitDuration>();
+  private final ThreadLocal<DurationMeasure> mResultDelay = new ThreadLocal<DurationMeasure>();
 
   private final LocalValue<OrderType> mResultOrder;
 
@@ -233,7 +233,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
   }
 
   public boolean abort(@Nullable final Throwable reason) {
-    final UnitDuration delay = getDelay();
+    final DurationMeasure delay = getDelay();
     final RoutineException abortException;
     synchronized (mMutex) {
       abortException = mState.abortInvocation(reason, delay);
@@ -259,7 +259,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
   }
 
   @NotNull
-  public Channel<OUT, OUT> after(@NotNull final UnitDuration delay) {
+  public Channel<OUT, OUT> after(@NotNull final DurationMeasure delay) {
     mResultDelay.set(ConstantConditions.notNull("result delay", delay));
     return this;
   }
@@ -306,7 +306,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
   @NotNull
   public Channel<OUT, OUT> close() {
-    final UnitDuration delay = getDelay();
+    final DurationMeasure delay = getDelay();
     final boolean isOpen;
     final Execution execution;
     final BindingHandler<OUT> handler;
@@ -356,7 +356,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
   @NotNull
   public Iterator<OUT> expiringIterator() {
     verifyBound();
-    final UnitDuration outputTimeout = getTimeout();
+    final DurationMeasure outputTimeout = getTimeout();
     return new ExpiringIterator(outputTimeout.value, outputTimeout.unit, mTimeoutActionType.get(),
         mTimeoutException.get());
   }
@@ -367,7 +367,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         return true;
       }
 
-      final UnitDuration outputTimeout = getTimeout();
+      final DurationMeasure outputTimeout = getTimeout();
       final long timeout = outputTimeout.value;
       if (timeout > 0) {
         checkCanWait();
@@ -385,7 +385,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
       final TimeUnit timeoutUnit = outputTimeout.unit;
       final boolean isDone;
       try {
-        isDone = UnitDuration.waitUntil(mMutex, mIsComplete, timeout, timeoutUnit);
+        isDone = DurationMeasure.waitUntil(mMutex, mIsComplete, timeout, timeoutUnit);
 
       } catch (final InterruptedException e) {
         throw new InvocationInterruptedException(e);
@@ -411,7 +411,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         return mAbortException;
       }
 
-      final UnitDuration outputTimeout = getTimeout();
+      final DurationMeasure outputTimeout = getTimeout();
       final long timeout = outputTimeout.value;
       if (timeout > 0) {
         checkCanWait();
@@ -429,7 +429,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
       final TimeUnit timeoutUnit = outputTimeout.unit;
       final boolean isDone;
       try {
-        isDone = UnitDuration.waitUntil(mMutex, mIsError, timeout, timeoutUnit);
+        isDone = DurationMeasure.waitUntil(mMutex, mIsError, timeout, timeoutUnit);
 
       } catch (final InterruptedException e) {
         throw new InvocationInterruptedException(e);
@@ -449,13 +449,13 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
   }
 
   public boolean hasNext() {
-    final UnitDuration outputTimeout = getTimeout();
+    final DurationMeasure outputTimeout = getTimeout();
     return isNextAvailable(outputTimeout.value, outputTimeout.unit, mTimeoutActionType.get(),
         mTimeoutException.get());
   }
 
   public OUT next() {
-    final UnitDuration outputTimeout = getTimeout();
+    final DurationMeasure outputTimeout = getTimeout();
     return readNext(outputTimeout.value, outputTimeout.unit, mTimeoutActionType.get(),
         mTimeoutException.get());
   }
@@ -530,7 +530,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
   @NotNull
   public Channel<OUT, OUT> pass(@Nullable final Iterable<? extends OUT> outputs) {
-    final UnitDuration delay = getDelay();
+    final DurationMeasure delay = getDelay();
     final Execution execution;
     final BindingHandler<OUT> handler;
     synchronized (mMutex) {
@@ -556,7 +556,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
   @NotNull
   public Channel<OUT, OUT> pass(@Nullable final OUT output) {
-    final UnitDuration delay = getDelay();
+    final DurationMeasure delay = getDelay();
     final Execution execution;
     final BindingHandler<OUT> handler;
     synchronized (mMutex) {
@@ -582,7 +582,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
   @NotNull
   public Channel<OUT, OUT> pass(@Nullable final OUT... outputs) {
-    final UnitDuration delay = getDelay();
+    final DurationMeasure delay = getDelay();
     final Execution execution;
     final BindingHandler<OUT> handler;
     synchronized (mMutex) {
@@ -620,7 +620,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         }
 
       } catch (final NoSuchElementException ignored) {
-        final UnitDuration outputTimeout = getTimeout();
+        final DurationMeasure outputTimeout = getTimeout();
         final long timeout = outputTimeout.value;
         final TimeUnit timeoutUnit = outputTimeout.unit;
         final TimeoutActionType timeoutAction = mTimeoutActionType.get();
@@ -670,7 +670,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
   @NotNull
   public Iterator<OUT> iterator() {
     verifyBound();
-    final UnitDuration outputTimeout = getTimeout();
+    final DurationMeasure outputTimeout = getTimeout();
     return new DefaultIterator(outputTimeout.value, outputTimeout.unit, mTimeoutActionType.get(),
         mTimeoutException.get());
   }
@@ -813,14 +813,14 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
   }
 
   @NotNull
-  private UnitDuration getDelay() {
-    final UnitDuration delay = mResultDelay.get();
+  private DurationMeasure getDelay() {
+    final DurationMeasure delay = mResultDelay.get();
     return (delay != null) ? delay : zero();
   }
 
   @NotNull
-  private UnitDuration getTimeout() {
-    final UnitDuration delay = mResultDelay.get();
+  private DurationMeasure getTimeout() {
+    final DurationMeasure delay = mResultDelay.get();
     return (delay != null) ? delay : mOutputTimeout;
   }
 
@@ -871,7 +871,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
         final boolean isTimeout;
         try {
-          isTimeout = !UnitDuration.waitUntil(mMutex, mOutputHasNext, timeout, timeUnit);
+          isTimeout = !DurationMeasure.waitUntil(mMutex, mOutputHasNext, timeout, timeUnit);
 
         } catch (final InterruptedException e) {
           throw new InvocationInterruptedException(e);
@@ -961,7 +961,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         }
 
         try {
-          isTimeout = !UnitDuration.waitUntil(mMutex, mOutputNotEmpty, timeout, timeUnit);
+          isTimeout = !DurationMeasure.waitUntil(mMutex, mOutputNotEmpty, timeout, timeUnit);
 
         } catch (final InterruptedException e) {
           throw new InvocationInterruptedException(e);
@@ -1008,7 +1008,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
       }
 
       mIWaitingOutput = true;
-      if (!UnitDuration.waitUntil(mMutex, mHasOutputs, delay, TimeUnit.MILLISECONDS)) {
+      if (!DurationMeasure.waitUntil(mMutex, mHasOutputs, delay, TimeUnit.MILLISECONDS)) {
         mLogger.wrn("timeout while waiting for room in the output channel [%s %s]", delay,
             TimeUnit.MILLISECONDS);
       }
@@ -1319,7 +1319,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
      * Constructor.
      */
     private DefaultChannelConsumer() {
-      final UnitDuration delay = getDelay();
+      final DurationMeasure delay = getDelay();
       mDelay = delay.value;
       mDelayUnit = delay.unit;
       final OrderType order = (mOrderType = mResultOrder.get());
@@ -1715,19 +1715,19 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     @Nullable
     @Override
     Execution pass(@Nullable final Iterable<? extends OUT> outputs,
-        @NotNull final UnitDuration delay) {
+        @NotNull final DurationMeasure delay) {
       throw abortException();
     }
 
     @Nullable
     @Override
-    Execution pass(@Nullable final OUT output, @NotNull final UnitDuration delay) {
+    Execution pass(@Nullable final OUT output, @NotNull final DurationMeasure delay) {
       throw abortException();
     }
 
     @Nullable
     @Override
-    Execution pass(@Nullable final OUT[] outputs, @NotNull final UnitDuration delay) {
+    Execution pass(@Nullable final OUT[] outputs, @NotNull final DurationMeasure delay) {
       throw abortException();
     }
 
@@ -1824,7 +1824,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     @Nullable
     @Override
     RoutineException abortInvocation(@Nullable final Throwable reason,
-        @NotNull final UnitDuration delay) {
+        @NotNull final DurationMeasure delay) {
       mLogger.dbg(reason, "avoiding aborting since channel is closed");
       return null;
     }
@@ -1913,7 +1913,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
      */
     @Nullable
     RoutineException abortInvocation(@Nullable final Throwable reason,
-        @NotNull final UnitDuration delay) {
+        @NotNull final DurationMeasure delay) {
       final RoutineException abortException = AbortException.wrapIfNeeded(reason);
       if (delay.isZero()) {
         mLogger.dbg(reason, "aborting channel");
@@ -1986,7 +1986,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
      * @return the execution to run or null.
      */
     @Nullable
-    Execution closeResultChannel(@NotNull final UnitDuration delay) {
+    Execution closeResultChannel(@NotNull final DurationMeasure delay) {
       if (delay.isZero()) {
         mLogger.dbg("closing result channel [#%d]", mPendingOutputCount);
         if (mPendingOutputCount > 0) {
@@ -2221,7 +2221,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
      */
     @Nullable
     Execution pass(@Nullable final Iterable<? extends OUT> outputs,
-        @NotNull final UnitDuration delay) {
+        @NotNull final DurationMeasure delay) {
       if (outputs == null) {
         mLogger.wrn("passing null iterable");
         return null;
@@ -2255,7 +2255,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
      * @return the execution to run or null.
      */
     @Nullable
-    Execution pass(@Nullable final OUT output, @NotNull final UnitDuration delay) {
+    Execution pass(@Nullable final OUT output, @NotNull final DurationMeasure delay) {
       mLogger.dbg("passing output [#%d+1]: %s [%s]", mOutputCount, output, delay);
       ++mOutputCount;
       checkMaxSize();
@@ -2278,7 +2278,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
      * @return the execution to run or null.
      */
     @Nullable
-    Execution pass(@Nullable final OUT[] outputs, @NotNull final UnitDuration delay) {
+    Execution pass(@Nullable final OUT[] outputs, @NotNull final DurationMeasure delay) {
       if (outputs == null) {
         mLogger.wrn("passing null output array");
         return null;
@@ -2352,7 +2352,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
     @Nullable
     @Override
-    Execution closeResultChannel(@NotNull final UnitDuration delay) {
+    Execution closeResultChannel(@NotNull final DurationMeasure delay) {
       mLogger.dbg("avoiding closing result channel since already closed");
       return null;
     }
@@ -2435,19 +2435,19 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     @Nullable
     @Override
     Execution pass(@Nullable final Iterable<? extends OUT> outputs,
-        @NotNull final UnitDuration delay) {
+        @NotNull final DurationMeasure delay) {
       throw exception();
     }
 
     @Nullable
     @Override
-    Execution pass(@Nullable final OUT output, @NotNull final UnitDuration delay) {
+    Execution pass(@Nullable final OUT output, @NotNull final DurationMeasure delay) {
       throw exception();
     }
 
     @Nullable
     @Override
-    Execution pass(@Nullable final OUT[] outputs, @NotNull final UnitDuration delay) {
+    Execution pass(@Nullable final OUT[] outputs, @NotNull final DurationMeasure delay) {
       throw exception();
     }
   }

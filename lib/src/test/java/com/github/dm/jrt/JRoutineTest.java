@@ -32,7 +32,7 @@ import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.NullLog;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runners;
-import com.github.dm.jrt.core.util.UnitDuration;
+import com.github.dm.jrt.core.util.DurationMeasure;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;
@@ -53,9 +53,9 @@ import java.util.List;
 
 import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
 import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
+import static com.github.dm.jrt.core.util.DurationMeasure.millis;
+import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
-import static com.github.dm.jrt.core.util.UnitDuration.millis;
-import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static com.github.dm.jrt.function.Functions.constant;
 import static com.github.dm.jrt.function.Functions.functionMapping;
 import static com.github.dm.jrt.object.InvocationTarget.instance;
@@ -74,7 +74,7 @@ public class JRoutineTest {
   @Test
   public void testAliasMethod() throws NoSuchMethodException {
 
-    final UnitDuration timeout = seconds(1);
+    final DurationMeasure timeout = seconds(1);
     final TestClass test = new TestClass();
     final Routine<Object, Object> routine = JRoutine.with(instance(test))
                                                     .applyInvocationConfiguration()
@@ -111,7 +111,7 @@ public class JRoutineTest {
   @Test
   public void testChainedRoutine() {
 
-    final UnitDuration timeout = seconds(1);
+    final DurationMeasure timeout = seconds(1);
     final CallInvocation<Integer, Integer> execSum = new CallInvocation<Integer, Integer>() {
 
       @Override

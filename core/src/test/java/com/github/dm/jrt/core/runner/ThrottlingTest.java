@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.github.dm.jrt.core.util.UnitDuration.millis;
+import static com.github.dm.jrt.core.util.DurationMeasure.millis;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**

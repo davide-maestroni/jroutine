@@ -43,8 +43,8 @@ import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ClassToken;
+import com.github.dm.jrt.core.util.DurationMeasure;
 import com.github.dm.jrt.core.util.Reflection;
-import com.github.dm.jrt.core.util.UnitDuration;
 import com.github.dm.jrt.object.annotation.Alias;
 import com.github.dm.jrt.object.annotation.AsyncInput;
 import com.github.dm.jrt.object.annotation.AsyncInput.InputMode;
@@ -73,8 +73,8 @@ import static com.github.dm.jrt.android.object.ContextInvocationTarget.instanceO
 import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
 import static com.github.dm.jrt.core.common.BackoffBuilder.afterCount;
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builder;
-import static com.github.dm.jrt.core.util.UnitDuration.infinity;
-import static com.github.dm.jrt.core.util.UnitDuration.seconds;
+import static com.github.dm.jrt.core.util.DurationMeasure.infinity;
+import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -98,7 +98,7 @@ public class LoaderObjectRoutineFragmentTest
       return;
     }
 
-    final UnitDuration timeout = seconds(10);
+    final DurationMeasure timeout = seconds(10);
     final TestFragment fragment =
         (TestFragment) getActivity().getFragmentManager().findFragmentById(R.id.test_fragment);
     final Routine<Object, Object> routine = JRoutineLoaderObject.on(loaderFrom(fragment))
@@ -141,7 +141,7 @@ public class LoaderObjectRoutineFragmentTest
       return;
     }
 
-    final UnitDuration timeout = seconds(10);
+    final DurationMeasure timeout = seconds(10);
     final TestFragment fragment =
         (TestFragment) getActivity().getFragmentManager().findFragmentById(R.id.test_fragment);
     final SumItf sumAsync = JRoutineLoaderObject.on(loaderFrom(fragment))
@@ -178,7 +178,7 @@ public class LoaderObjectRoutineFragmentTest
       return;
     }
 
-    final UnitDuration timeout = seconds(10);
+    final DurationMeasure timeout = seconds(10);
     final TestFragment fragment =
         (TestFragment) getActivity().getFragmentManager().findFragmentById(R.id.test_fragment);
     final CountItf countAsync = JRoutineLoaderObject.on(loaderFrom(fragment))
@@ -336,7 +336,7 @@ public class LoaderObjectRoutineFragmentTest
       return;
     }
 
-    final UnitDuration timeout = seconds(10);
+    final DurationMeasure timeout = seconds(10);
     final TestFragment fragment =
         (TestFragment) getActivity().getFragmentManager().findFragmentById(R.id.test_fragment);
     final Routine<Object, Object> routine3 = JRoutineLoaderObject.on(loaderFrom(fragment))
@@ -706,7 +706,7 @@ public class LoaderObjectRoutineFragmentTest
       return;
     }
 
-    final UnitDuration timeout = seconds(10);
+    final DurationMeasure timeout = seconds(10);
     final TestFragment fragment =
         (TestFragment) getActivity().getFragmentManager().findFragmentById(R.id.test_fragment);
     final Routine<Object, Object> routine2 = JRoutineLoaderObject.on(loaderFrom(fragment))
@@ -732,7 +732,7 @@ public class LoaderObjectRoutineFragmentTest
       return;
     }
 
-    final UnitDuration timeout = seconds(10);
+    final DurationMeasure timeout = seconds(10);
     final TestFragment fragment =
         (TestFragment) getActivity().getFragmentManager().findFragmentById(R.id.test_fragment);
     final Routine<Object, Object> routine1 = JRoutineLoaderObject.on(loaderFrom(fragment))
@@ -1077,7 +1077,7 @@ public class LoaderObjectRoutineFragmentTest
       return;
     }
 
-    final UnitDuration timeout = seconds(10);
+    final DurationMeasure timeout = seconds(10);
     final TestFragment fragment =
         (TestFragment) getActivity().getFragmentManager().findFragmentById(R.id.test_fragment);
     final SquareItf squareAsync = JRoutineLoaderObject.on(loaderFrom(fragment))
@@ -2025,14 +2025,14 @@ public class LoaderObjectRoutineFragmentTest
 
     public int getOne() throws InterruptedException {
 
-      UnitDuration.millis(2000).sleepAtLeast();
+      DurationMeasure.millis(2000).sleepAtLeast();
 
       return 1;
     }
 
     public int getTwo() throws InterruptedException {
 
-      UnitDuration.millis(2000).sleepAtLeast();
+      DurationMeasure.millis(2000).sleepAtLeast();
 
       return 2;
     }

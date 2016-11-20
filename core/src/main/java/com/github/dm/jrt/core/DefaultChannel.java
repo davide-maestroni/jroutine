@@ -26,7 +26,7 @@ import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.RunnerDecorator;
 import com.github.dm.jrt.core.runner.Runners;
-import com.github.dm.jrt.core.util.UnitDuration;
+import com.github.dm.jrt.core.util.DurationMeasure;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 
 import org.jetbrains.annotations.NotNull;
@@ -96,7 +96,7 @@ class DefaultChannel<DATA> implements Channel<DATA, DATA> {
   }
 
   @NotNull
-  public Channel<DATA, DATA> after(@NotNull final UnitDuration delay) {
+  public Channel<DATA, DATA> after(@NotNull final DurationMeasure delay) {
     mChannel.after(delay);
     return this;
   }

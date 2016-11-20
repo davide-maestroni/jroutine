@@ -22,7 +22,7 @@ import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.Builder;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.CacheStrategyType;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.ClashResolutionType;
-import com.github.dm.jrt.core.util.UnitDuration;
+import com.github.dm.jrt.core.util.DurationMeasure;
 
 import java.util.concurrent.TimeUnit;
 
@@ -190,11 +190,11 @@ public class LoaderConfigurationTest extends AndroidTestCase {
                                                        .withResultStaleTime(1, TimeUnit.SECONDS)
                                                        .configured();
     assertThat(configuration).isNotEqualTo(
-        builder().withResultStaleTime(UnitDuration.days(3)).configured());
+        builder().withResultStaleTime(DurationMeasure.days(3)).configured());
     assertThat(configuration.builderFrom()
-                            .withResultStaleTime(UnitDuration.hours(7))
+                            .withResultStaleTime(DurationMeasure.hours(7))
                             .configured()).isNotEqualTo(
-        builder().withResultStaleTime(UnitDuration.hours(7)).configured());
+        builder().withResultStaleTime(DurationMeasure.hours(7)).configured());
   }
 
   @SuppressWarnings("ConstantConditions")

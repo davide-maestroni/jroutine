@@ -22,7 +22,7 @@ import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
-import com.github.dm.jrt.core.util.UnitDuration;
+import com.github.dm.jrt.core.util.DurationMeasure;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -99,7 +99,7 @@ class ReplayChannel<OUT> implements Channel<OUT, OUT>, ChannelConsumer<OUT> {
   }
 
   @NotNull
-  public Channel<OUT, OUT> after(@NotNull final UnitDuration timeout) {
+  public Channel<OUT, OUT> after(@NotNull final DurationMeasure timeout) {
     mOutputChannel.after(timeout);
     return this;
   }

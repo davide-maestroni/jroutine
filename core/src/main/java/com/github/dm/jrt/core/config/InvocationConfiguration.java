@@ -25,15 +25,15 @@ import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DeepEqualObject;
-import com.github.dm.jrt.core.util.UnitDuration;
+import com.github.dm.jrt.core.util.DurationMeasure;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.TimeUnit;
 
+import static com.github.dm.jrt.core.util.DurationMeasure.fromUnit;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
-import static com.github.dm.jrt.core.util.UnitDuration.fromUnit;
 
 /**
  * Class storing the invocation configuration.
@@ -115,7 +115,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
 
   private final OrderType mOutputOrderType;
 
-  private final UnitDuration mOutputTimeout;
+  private final DurationMeasure mOutputTimeout;
 
   private final int mPriority;
 
@@ -146,7 +146,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
    * @param logLevel        the log level.
    */
   private InvocationConfiguration(@Nullable final Runner runner, final int priority,
-      final int maxInstances, final int coreInstances, @Nullable final UnitDuration outputTimeout,
+      final int maxInstances, final int coreInstances, @Nullable final DurationMeasure outputTimeout,
       @Nullable final TimeoutActionType actionType, @Nullable final OrderType inputOrderType,
       @Nullable final Backoff inputBackoff, final int inputMaxSize,
       @Nullable final OrderType outputOrderType, @Nullable final Backoff outputBackoff,
@@ -395,8 +395,8 @@ public final class InvocationConfiguration extends DeepEqualObject {
    * @param valueIfNotSet the default value if none was set.
    * @return the timeout.
    */
-  public UnitDuration getOutputTimeoutOrElse(@Nullable final UnitDuration valueIfNotSet) {
-    final UnitDuration outputTimeout = mOutputTimeout;
+  public DurationMeasure getOutputTimeoutOrElse(@Nullable final DurationMeasure valueIfNotSet) {
+    final DurationMeasure outputTimeout = mOutputTimeout;
     return (outputTimeout != null) ? outputTimeout : valueIfNotSet;
   }
 
@@ -586,7 +586,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
 
     private OrderType mOutputOrderType;
 
-    private UnitDuration mOutputTimeout;
+    private DurationMeasure mOutputTimeout;
 
     private int mPriority;
 
@@ -861,7 +861,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
      * @return this builder.
      */
     @NotNull
-    public Builder<TYPE> withOutputTimeout(@Nullable final UnitDuration timeout) {
+    public Builder<TYPE> withOutputTimeout(@Nullable final DurationMeasure timeout) {
       mOutputTimeout = timeout;
       return this;
     }
@@ -931,7 +931,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
         withCoreInstances(coreInvocations);
       }
 
-      final UnitDuration outputTimeout = configuration.mOutputTimeout;
+      final DurationMeasure outputTimeout = configuration.mOutputTimeout;
       if (outputTimeout != null) {
         withOutputTimeout(outputTimeout);
       }

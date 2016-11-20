@@ -9,8 +9,8 @@ import org.junit.Test;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.core.common.Backoff.NO_DELAY;
-import static com.github.dm.jrt.core.util.UnitDuration.millis;
-import static com.github.dm.jrt.core.util.UnitDuration.seconds;
+import static com.github.dm.jrt.core.util.DurationMeasure.millis;
+import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**

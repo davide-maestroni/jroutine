@@ -33,7 +33,7 @@ import com.github.dm.jrt.android.object.annotation.ServiceRunner;
 import com.github.dm.jrt.core.log.NullLog;
 import com.github.dm.jrt.core.runner.RunnerDecorator;
 import com.github.dm.jrt.core.runner.Runners;
-import com.github.dm.jrt.core.util.UnitDuration;
+import com.github.dm.jrt.core.util.DurationMeasure;
 
 import static com.github.dm.jrt.android.object.builder.AndroidBuilders.withAnnotations;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -55,7 +55,7 @@ public class AndroidBuildersTest extends AndroidTestCase {
                            .withFactoryId(13)
                            .withMatchResolution(ClashResolutionType.ABORT_THIS)
                            .withLoaderId(-77)
-                           .withResultStaleTime(UnitDuration.millis(333))
+                           .withResultStaleTime(DurationMeasure.millis(333))
                            .configured());
     assertThat(withAnnotations(
         ServiceConfiguration.builder().withRunnerArgs(1).withLogArgs(1).configured(),

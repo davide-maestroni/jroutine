@@ -52,7 +52,7 @@ import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.runner.SyncRunner;
 import com.github.dm.jrt.core.util.ClassToken;
-import com.github.dm.jrt.core.util.UnitDuration;
+import com.github.dm.jrt.core.util.DurationMeasure;
 
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
@@ -72,11 +72,11 @@ import java.util.concurrent.atomic.AtomicReference;
 import static com.github.dm.jrt.core.common.BackoffBuilder.afterCount;
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builder;
 import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
+import static com.github.dm.jrt.core.util.DurationMeasure.infinity;
+import static com.github.dm.jrt.core.util.DurationMeasure.millis;
+import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
+import static com.github.dm.jrt.core.util.DurationMeasure.zero;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
-import static com.github.dm.jrt.core.util.UnitDuration.infinity;
-import static com.github.dm.jrt.core.util.UnitDuration.millis;
-import static com.github.dm.jrt.core.util.UnitDuration.seconds;
-import static com.github.dm.jrt.core.util.UnitDuration.zero;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -90,7 +90,7 @@ public class RoutineTest {
   @Test
   @SuppressWarnings({"ThrowableResultOfMethodCallIgnored", "ConstantConditions"})
   public void testAbort() throws InterruptedException {
-    final UnitDuration timeout = seconds(1);
+    final DurationMeasure timeout = seconds(1);
     final Routine<String, String> routine =
         JRoutineCore.with(factoryOf(DelayedInvocation.class, millis(100))).buildRoutine();
     final Channel<String, String> channel = routine.call().pass("test1");
@@ -286,7 +286,7 @@ public class RoutineTest {
 
   @Test
   public void testCalls() {
-    final UnitDuration timeout = seconds(1);
+    final DurationMeasure timeout = seconds(1);
     final Routine<String, String> routine =
         JRoutineCore.with(IdentityInvocation.<String>factoryOf())
                     .applyInvocationConfiguration()
@@ -346,7 +346,7 @@ public class RoutineTest {
 
   @Test
   public void testChainedRoutine() {
-    final UnitDuration timeout = seconds(1);
+    final DurationMeasure timeout = seconds(1);
     final CallInvocation<Integer, Integer> execSum = new CallInvocation<Integer, Integer>() {
 
       @Override
@@ -463,7 +463,7 @@ public class RoutineTest {
 
   @Test
   public void testComposedRoutine() {
-    final UnitDuration timeout = seconds(1);
+    final DurationMeasure timeout = seconds(1);
     final CallInvocation<Integer, Integer> execSum = new CallInvocation<Integer, Integer>() {
 
       @Override
@@ -732,7 +732,7 @@ public class RoutineTest {
 
   @Test
   public void testDelayedAbort() throws InterruptedException {
-    final UnitDuration timeout = seconds(1);
+    final DurationMeasure timeout = seconds(1);
     final Routine<String, String> passingRoutine =
         JRoutineCore.with(IdentityInvocation.<String>factoryOf()).buildRoutine();
     final Channel<String, String> channel1 = passingRoutine.call();
@@ -762,7 +762,7 @@ public class RoutineTest {
 
   @Test
   public void testDelayedBind() {
-    final UnitDuration timeout = seconds(1);
+    final DurationMeasure timeout = seconds(1);
     final Routine<Object, Object> routine1 =
         JRoutineCore.with(IdentityInvocation.factoryOf()).buildRoutine();
     final Routine<Object, Object> routine2 =
@@ -780,7 +780,7 @@ public class RoutineTest {
 
   @Test
   public void testDelayedClose() {
-    final UnitDuration timeout = seconds(1);
+    final DurationMeasure timeout = seconds(1);
     final Routine<String, String> passingRoutine =
         JRoutineCore.with(IdentityInvocation.<String>factoryOf()).buildRoutine();
     final Channel<String, String> channel1 = passingRoutine.call();
@@ -819,7 +819,7 @@ public class RoutineTest {
 
   @Test
   public void testDelegation() {
-    final UnitDuration timeout = seconds(1);
+    final DurationMeasure timeout = seconds(1);
     final Routine<Object, Object> routine1 = JRoutineCore.with(IdentityInvocation.factoryOf())
                                                          .applyInvocationConfiguration()
                                                          .withRunner(Runners.syncRunner())
@@ -856,7 +856,7 @@ public class RoutineTest {
 
   @Test
   public void testDiscard() {
-    final UnitDuration timeout = seconds(1);
+    final DurationMeasure timeout = seconds(1);
     final Routine<String, String> routine1 = JRoutineCore.with(factoryOf(TestDiscard.class))
                                                          .applyInvocationConfiguration()
                                                          .withCoreInstances(0)
@@ -1863,7 +1863,7 @@ public class RoutineTest {
 
   @Test
   public void testRoutine() {
-    final UnitDuration timeout = seconds(1);
+    final DurationMeasure timeout = seconds(1);
     final TemplateInvocation<Integer, Integer> execSquare =
         new TemplateInvocation<Integer, Integer>() {
 
@@ -1925,7 +1925,7 @@ public class RoutineTest {
 
   @Test
   public void testRoutineFunction() {
-    final UnitDuration timeout = seconds(1);
+    final DurationMeasure timeout = seconds(1);
     final CallInvocation<Integer, Integer> execSum = new CallInvocation<Integer, Integer>() {
 
       @Override
@@ -2230,7 +2230,7 @@ public class RoutineTest {
 
   private void testChained(final Routine<String, String> before,
       final Routine<String, String> after, final String input, final String expected) {
-    final UnitDuration timeout = seconds(1);
+    final DurationMeasure timeout = seconds(1);
     try {
       for (final String s : before.call(after.call(input)).after(timeout)) {
         assertThat(s).isNotEmpty();
@@ -2339,7 +2339,7 @@ public class RoutineTest {
   }
 
   private void testConsumer(final ChannelConsumer<String> consumer) {
-    final UnitDuration timeout = seconds(1);
+    final DurationMeasure timeout = seconds(1);
     final String input = "test";
     final Routine<String, String> routine =
         JRoutineCore.with(factoryOf(DelayedInvocation.class, zero())).buildRoutine();
@@ -2357,7 +2357,7 @@ public class RoutineTest {
 
   private void testException(final Routine<String, String> routine, final String input,
       final String expected) {
-    final UnitDuration timeout = seconds(1);
+    final DurationMeasure timeout = seconds(1);
     try {
       routine.call(input).after(timeout).all();
       fail();
@@ -2582,9 +2582,9 @@ public class RoutineTest {
 
   private static class DelayedAbortInvocation extends TemplateInvocation<String, String> {
 
-    private final UnitDuration mDelay;
+    private final DurationMeasure mDelay;
 
-    public DelayedAbortInvocation(final UnitDuration delay) {
+    public DelayedAbortInvocation(final DurationMeasure delay) {
       mDelay = delay;
     }
 
@@ -2596,13 +2596,13 @@ public class RoutineTest {
 
   private static class DelayedChannelInvocation extends TemplateInvocation<String, String> {
 
-    private final UnitDuration mDelay;
+    private final DurationMeasure mDelay;
 
     private final Routine<String, String> mRoutine;
 
     private boolean mFlag;
 
-    public DelayedChannelInvocation(final UnitDuration delay) {
+    public DelayedChannelInvocation(final DurationMeasure delay) {
       mDelay = delay;
       mRoutine = JRoutineCore.with(factoryOf(DelayedInvocation.class, zero())).buildRoutine();
     }
@@ -2623,11 +2623,11 @@ public class RoutineTest {
 
   private static class DelayedInvocation extends TemplateInvocation<String, String> {
 
-    private final UnitDuration mDelay;
+    private final DurationMeasure mDelay;
 
     private boolean mFlag;
 
-    public DelayedInvocation(final UnitDuration delay) {
+    public DelayedInvocation(final DurationMeasure delay) {
       mDelay = delay;
     }
 
@@ -2649,13 +2649,13 @@ public class RoutineTest {
 
     private final int mCount;
 
-    private final UnitDuration mDelay;
+    private final DurationMeasure mDelay;
 
     private final ArrayList<String> mList;
 
     private boolean mFlag;
 
-    public DelayedListInvocation(final UnitDuration delay, final int listCount) {
+    public DelayedListInvocation(final DurationMeasure delay, final int listCount) {
       mDelay = delay;
       mCount = listCount;
       mList = new ArrayList<String>(listCount);
@@ -2911,9 +2911,9 @@ public class RoutineTest {
 
   private static class SleepInvocation extends MappingInvocation<Object, Object> {
 
-    private final UnitDuration mSleepDuration;
+    private final DurationMeasure mSleepDuration;
 
-    private SleepInvocation(@NotNull final UnitDuration sleepDuration) {
+    private SleepInvocation(@NotNull final DurationMeasure sleepDuration) {
       super(asArgs(sleepDuration));
       mSleepDuration = sleepDuration;
     }

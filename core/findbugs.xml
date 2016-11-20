@@ -27,7 +27,7 @@
         <Bug pattern="IT_NO_SUCH_ELEMENT"/>
     </Match>
     <Match>
-        <Class name="com.github.dm.jrt.core.util.UnitDuration"/>
+        <Class name="com.github.dm.jrt.core.util.DurationMeasure"/>
         <Or>
             <Method name="wait"/>
             <Method name="waitSinceMillis"/>
@@ -36,12 +36,12 @@
         <Bug pattern="WA_NOT_IN_LOOP"/>
     </Match>
     <Match>
-        <Class name="com.github.dm.jrt.core.util.UnitDuration"/>
+        <Class name="com.github.dm.jrt.core.util.DurationMeasure"/>
         <Method name="fromUnit"/>
         <Bug pattern="FE_FLOATING_POINT_EQUALITY"/>
     </Match>
     <Match>
-        <Class name="com.github.dm.jrt.core.util.UnitTime"/>
+        <Class name="com.github.dm.jrt.core.util.TimeMeasure"/>
         <Method name="fromUnit"/>
         <Bug pattern="FE_FLOATING_POINT_EQUALITY"/>
     </Match>

@@ -27,7 +27,7 @@ import android.support.test.runner.AndroidJUnit4;
 import android.support.test.runner.lifecycle.Stage;
 import android.view.View;
 
-import com.github.dm.jrt.core.util.UnitDuration;
+import com.github.dm.jrt.core.util.DurationMeasure;
 
 import org.hamcrest.Matcher;
 import org.jetbrains.annotations.NotNull;
@@ -61,7 +61,7 @@ public class MainActivityTest {
   public void testRepoList() throws InterruptedException {
     try {
       // Wait for the network request to complete
-      UnitDuration.seconds(10).sleepAtLeast();
+      DurationMeasure.seconds(10).sleepAtLeast();
       IdlingPolicies.setIdlingResourceTimeout(60, TimeUnit.SECONDS);
       onData(anything()).inAdapterView(withId(R.id.repo_list))
                         .atPosition(0)
@@ -75,7 +75,7 @@ public class MainActivityTest {
   public void testRepoListRotation() throws InterruptedException {
     try {
       // Wait for the network request to complete
-      UnitDuration.seconds(10).sleepAtLeast();
+      DurationMeasure.seconds(10).sleepAtLeast();
       IdlingPolicies.setIdlingResourceTimeout(60, TimeUnit.SECONDS);
       onData(anything()).inAdapterView(withId(R.id.repo_list))
                         .atPosition(0)

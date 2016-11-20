@@ -53,7 +53,7 @@ import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ClassToken;
-import com.github.dm.jrt.core.util.UnitDuration;
+import com.github.dm.jrt.core.util.DurationMeasure;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -68,8 +68,8 @@ import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory
 import static com.github.dm.jrt.android.v4.core.LoaderContextCompat.loaderFrom;
 import static com.github.dm.jrt.core.common.BackoffBuilder.afterCount;
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builder;
-import static com.github.dm.jrt.core.util.UnitDuration.millis;
-import static com.github.dm.jrt.core.util.UnitDuration.seconds;
+import static com.github.dm.jrt.core.util.DurationMeasure.millis;
+import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -89,7 +89,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
   public void testActivityAbort() {
 
-    final UnitDuration timeout = seconds(10);
+    final DurationMeasure timeout = seconds(10);
     final Routine<String, String> routine = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                                                                 .with(factoryOf(ToUpperCase.class))
                                                                 .applyLoaderConfiguration()
@@ -116,7 +116,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
   public void testActivityAbortInput() {
 
-    final UnitDuration timeout = seconds(10);
+    final DurationMeasure timeout = seconds(10);
     final Routine<String, String> routine = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                                                                 .with(factoryOf(ToUpperCase.class))
                                                                 .applyLoaderConfiguration()
@@ -252,7 +252,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
   public void testActivityClearError() {
 
-    final UnitDuration timeout = seconds(10);
+    final DurationMeasure timeout = seconds(10);
     final Data data1 = new Data();
     final Channel<?, Data> result1 = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                                                          .with(factoryOf(Abort.class))
@@ -303,7 +303,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
   public void testActivityClearResult() {
 
-    final UnitDuration timeout = seconds(10);
+    final DurationMeasure timeout = seconds(10);
     final Data data1 = new Data();
     final Channel<?, Data> result1 = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                                                          .with(factoryOf(Delay.class))
@@ -426,7 +426,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
   public void testActivityDelegation() {
 
-    final UnitDuration timeout = seconds(10);
+    final DurationMeasure timeout = seconds(10);
     final Routine<Object, Object> routine1 = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                                                                  .with(
                                                                      IdentityContextInvocation
@@ -455,7 +455,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
   public void testActivityInputs() {
 
-    final UnitDuration timeout = seconds(10);
+    final DurationMeasure timeout = seconds(10);
     final Routine<String, String> routine = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                                                                 .with(factoryOf(ToUpperCase.class))
                                                                 .buildRoutine();
@@ -497,7 +497,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
   public void testActivityKeep() {
 
-    final UnitDuration timeout = seconds(10);
+    final DurationMeasure timeout = seconds(10);
     final Routine<String, String> routine = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                                                                 .with(factoryOf(ToUpperCase.class))
                                                                 .applyLoaderConfiguration()
@@ -515,7 +515,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
   public void testActivityMissingRoutine() throws InterruptedException {
 
-    final UnitDuration timeout = seconds(10);
+    final DurationMeasure timeout = seconds(10);
     final Channel<?, String> channel =
         JRoutineLoaderCompat.on(loaderFrom(getActivity())).withId(0).buildChannel();
 
@@ -567,7 +567,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
   public void testActivityRestart() {
 
-    final UnitDuration timeout = seconds(10);
+    final DurationMeasure timeout = seconds(10);
     final Routine<String, String> routine = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                                                                 .with(factoryOf(ToUpperCase.class))
                                                                 .applyLoaderConfiguration()
@@ -594,7 +594,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
   public void testActivityRestartOnInput() {
 
-    final UnitDuration timeout = seconds(10);
+    final DurationMeasure timeout = seconds(10);
     final Routine<String, String> routine = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                                                                 .with(factoryOf(ToUpperCase.class))
                                                                 .applyLoaderConfiguration()
@@ -621,7 +621,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
   public void testActivityRetain() {
 
-    final UnitDuration timeout = seconds(10);
+    final DurationMeasure timeout = seconds(10);
     final Data data1 = new Data();
     final Channel<?, Data> result1 = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                                                          .with(factoryOf(Delay.class))
@@ -758,7 +758,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
   public void testActivitySame() {
 
-    final UnitDuration timeout = seconds(10);
+    final DurationMeasure timeout = seconds(10);
     final Data data1 = new Data();
     final Routine<Data, Data> routine = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                                                             .with(factoryOf(Delay.class))
@@ -810,7 +810,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
       }
     });
 
-    final UnitDuration timeout = seconds(10);
+    final DurationMeasure timeout = seconds(10);
     final Data data1 = new Data();
     final Channel<?, Data> result2 = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                                                          .with(factoryOf(Abort.class))
@@ -920,7 +920,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
   public void testFragmentAbort() {
 
-    final UnitDuration timeout = seconds(10);
+    final DurationMeasure timeout = seconds(10);
     final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                               .findFragmentById(R.id.test_fragment);
     final Routine<String, String> routine = JRoutineLoaderCompat.on(loaderFrom(fragment))
@@ -1064,7 +1064,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
   public void testFragmentChannel() {
 
-    final UnitDuration timeout = seconds(10);
+    final DurationMeasure timeout = seconds(10);
     final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                               .findFragmentById(R.id.test_fragment);
     final Routine<String, String> routine = JRoutineLoaderCompat.on(loaderFrom(fragment))
@@ -1154,7 +1154,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
   public void testFragmentDelegation() {
 
-    final UnitDuration timeout = seconds(10);
+    final DurationMeasure timeout = seconds(10);
     final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                               .findFragmentById(R.id.test_fragment);
     final Routine<Object, Object> routine1 = JRoutineLoaderCompat.on(loaderFrom(fragment))
@@ -1185,7 +1185,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
   public void testFragmentInputs() throws InterruptedException {
 
-    final UnitDuration timeout = seconds(10);
+    final DurationMeasure timeout = seconds(10);
     final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                               .findFragmentById(R.id.test_fragment);
     final Routine<String, String> routine = JRoutineLoaderCompat.on(loaderFrom(fragment))
@@ -1230,7 +1230,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
   public void testFragmentKeep() {
 
-    final UnitDuration timeout = seconds(10);
+    final DurationMeasure timeout = seconds(10);
     final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                               .findFragmentById(R.id.test_fragment);
     final Routine<String, String> routine = JRoutineLoaderCompat.on(loaderFrom(fragment))
@@ -1250,7 +1250,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
   public void testFragmentMissingRoutine() throws InterruptedException {
 
-    final UnitDuration timeout = seconds(10);
+    final DurationMeasure timeout = seconds(10);
     final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                               .findFragmentById(R.id.test_fragment);
     final Channel<?, String> channel =
@@ -1306,7 +1306,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
   public void testFragmentReset() {
 
-    final UnitDuration timeout = seconds(10);
+    final DurationMeasure timeout = seconds(10);
     final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                               .findFragmentById(R.id.test_fragment);
     final Routine<String, String> routine = JRoutineLoaderCompat.on(loaderFrom(fragment))
@@ -1335,7 +1335,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
   public void testFragmentRestart() {
 
-    final UnitDuration timeout = seconds(10);
+    final DurationMeasure timeout = seconds(10);
     final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                               .findFragmentById(R.id.test_fragment);
     final Routine<String, String> routine = JRoutineLoaderCompat.on(loaderFrom(fragment))
@@ -1434,7 +1434,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
   public void testFragmentSame() throws InterruptedException {
 
-    final UnitDuration timeout = seconds(10);
+    final DurationMeasure timeout = seconds(10);
     final Data data1 = new Data();
     final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                               .findFragmentById(R.id.test_fragment);
@@ -1449,7 +1449,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
   public void testInvocations() {
 
-    final UnitDuration timeout = seconds(10);
+    final DurationMeasure timeout = seconds(10);
     final Routine<String, String> routine1 = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                                                                  .with(
                                                                      IdentityContextInvocation
@@ -1730,7 +1730,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
     protected void onCall(@NotNull final List<? extends Data> inputs,
         @NotNull final Channel<Data, ?> result) {
 
-      result.after(UnitDuration.millis(500)).pass(inputs);
+      result.after(DurationMeasure.millis(500)).pass(inputs);
     }
   }
 
@@ -1774,7 +1774,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
     protected void onCall(@NotNull final List<? extends String> inputs,
         @NotNull final Channel<String, ?> result) {
 
-      result.after(UnitDuration.millis(500));
+      result.after(DurationMeasure.millis(500));
 
       for (final String input : inputs) {
 

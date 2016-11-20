@@ -8,8 +8,8 @@ import com.github.dm.jrt.core.common.Backoff;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
+import com.github.dm.jrt.core.util.DurationMeasure;
 import com.github.dm.jrt.core.util.SimpleQueue;
-import com.github.dm.jrt.core.util.UnitDuration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -232,7 +232,7 @@ class JoinBuilder<OUT> extends AbstractBuilder<Channel<?, List<OUT>>> {
 
           final long delay = backoff.getDelay(size);
           if (delay > 0) {
-            UnitDuration.sleepAtLeast(delay, TimeUnit.MILLISECONDS);
+            DurationMeasure.sleepAtLeast(delay, TimeUnit.MILLISECONDS);
           }
         }
       }

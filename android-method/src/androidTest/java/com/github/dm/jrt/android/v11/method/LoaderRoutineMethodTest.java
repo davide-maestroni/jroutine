@@ -39,7 +39,7 @@ import java.util.Locale;
 import static com.github.dm.jrt.android.object.ContextInvocationTarget.classOfType;
 import static com.github.dm.jrt.android.object.ContextInvocationTarget.instanceOf;
 import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
-import static com.github.dm.jrt.core.util.UnitDuration.seconds;
+import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**

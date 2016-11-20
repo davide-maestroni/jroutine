@@ -30,8 +30,8 @@ import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.core.util.DurationMeasure;
 import com.github.dm.jrt.core.util.LocalValue;
-import com.github.dm.jrt.core.util.UnitDuration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -48,8 +48,8 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static com.github.dm.jrt.core.util.UnitDuration.fromUnit;
-import static com.github.dm.jrt.core.util.UnitDuration.zero;
+import static com.github.dm.jrt.core.util.DurationMeasure.fromUnit;
+import static com.github.dm.jrt.core.util.DurationMeasure.zero;
 
 /**
  * Implementation of a channel backed by a Future instance.
@@ -70,7 +70,7 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
 
   private final Object mMutex = new Object();
 
-  private final LocalValue<UnitDuration> mOutputTimeout;
+  private final LocalValue<DurationMeasure> mOutputTimeout;
 
   private final Runner mRunner;
 
@@ -93,7 +93,7 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
     mFuture = ConstantConditions.notNull("future instance", future);
     mRunner = configuration.getRunnerOrElse(Runners.sharedRunner());
     mInterruptIfRunning = mayInterruptIfRunning;
-    mOutputTimeout = new LocalValue<UnitDuration>(configuration.getOutputTimeoutOrElse(zero()));
+    mOutputTimeout = new LocalValue<DurationMeasure>(configuration.getOutputTimeoutOrElse(zero()));
     mTimeoutActionType = new LocalValue<TimeoutActionType>(
         configuration.getOutputTimeoutActionOrElse(TimeoutActionType.FAIL));
   }
@@ -104,7 +104,7 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
 
   public boolean abort(@Nullable final Throwable reason) {
     final Future<OUT> future = mFuture;
-    final UnitDuration delay = mOutputTimeout.get();
+    final DurationMeasure delay = mOutputTimeout.get();
     if (delay.isZero()) {
       final boolean isCancelled = future.cancel(mInterruptIfRunning);
       if (isCancelled) {
@@ -133,7 +133,7 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
   }
 
   @NotNull
-  public Channel<OUT, OUT> after(@NotNull final UnitDuration delay) {
+  public Channel<OUT, OUT> after(@NotNull final DurationMeasure delay) {
     mOutputTimeout.set(ConstantConditions.notNull("delay", delay));
     return this;
   }
@@ -169,7 +169,7 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
       throw new IllegalStateException("the channel is already bound");
     }
 
-    final UnitDuration delay = mOutputTimeout.get();
+    final DurationMeasure delay = mOutputTimeout.get();
     mRunner.run(new Execution() {
 
       public void run() {
@@ -240,7 +240,7 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
   }
 
   public boolean getComplete() {
-    final UnitDuration delay = mOutputTimeout.get();
+    final DurationMeasure delay = mOutputTimeout.get();
     try {
       mFuture.get(delay.value, delay.unit);
       return true;
@@ -253,7 +253,7 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
 
   @Nullable
   public RoutineException getError() {
-    final UnitDuration delay = mOutputTimeout.get();
+    final DurationMeasure delay = mOutputTimeout.get();
     try {
       mFuture.get(delay.value, delay.unit);
 
@@ -273,13 +273,13 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
   }
 
   public boolean hasNext() {
-    final UnitDuration timeout = mOutputTimeout.get();
+    final DurationMeasure timeout = mOutputTimeout.get();
     return isNextAvailable(timeout.value, timeout.unit, mTimeoutActionType.get(),
         mTimeoutException.get());
   }
 
   public OUT next() {
-    final UnitDuration timeout = mOutputTimeout.get();
+    final DurationMeasure timeout = mOutputTimeout.get();
     return readNext(timeout.value, timeout.unit, mTimeoutActionType.get(), mTimeoutException.get());
   }
 
@@ -367,7 +367,7 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
         }
 
       } catch (final NoSuchElementException ignored) {
-        final UnitDuration timeout = mOutputTimeout.get();
+        final DurationMeasure timeout = mOutputTimeout.get();
         final TimeoutActionType timeoutAction = mTimeoutActionType.get();
         mLogger.wrn("skipping output timeout: %s => [%s]", timeout, timeoutAction);
         if (timeoutAction == TimeoutActionType.FAIL) {
@@ -532,7 +532,7 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
      * @param action    the timeout action.
      * @param exception the timeout exception.
      */
-    private ExpiringFutureIterator(@NotNull final UnitDuration delay,
+    private ExpiringFutureIterator(@NotNull final DurationMeasure delay,
         @NotNull final TimeoutActionType action, @Nullable final Throwable exception) {
       mDelayMillis = delay.toMillis();
       mAction = action;
@@ -582,7 +582,7 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
      * @param action    the timeout action.
      * @param exception the timeout exception.
      */
-    private FutureIterator(@NotNull final UnitDuration delay,
+    private FutureIterator(@NotNull final DurationMeasure delay,
         @NotNull final TimeoutActionType action, @Nullable final Throwable exception) {
       mTimeout = delay.value;
       mTimeUnit = delay.unit;

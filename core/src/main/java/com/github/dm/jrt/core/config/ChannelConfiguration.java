@@ -23,15 +23,15 @@ import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DeepEqualObject;
-import com.github.dm.jrt.core.util.UnitDuration;
+import com.github.dm.jrt.core.util.DurationMeasure;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.TimeUnit;
 
+import static com.github.dm.jrt.core.util.DurationMeasure.fromUnit;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
-import static com.github.dm.jrt.core.util.UnitDuration.fromUnit;
 
 /**
  * Class storing the channel configuration.
@@ -81,7 +81,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
 
   private final Level mLogLevel;
 
-  private final UnitDuration mOutputTimeout;
+  private final DurationMeasure mOutputTimeout;
 
   private final Runner mRunner;
 
@@ -102,7 +102,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
    * @param logLevel         the log level.
    */
   private ChannelConfiguration(@Nullable final Runner runner,
-      @Nullable final UnitDuration outputTimeout, @Nullable final TimeoutActionType actionType,
+      @Nullable final DurationMeasure outputTimeout, @Nullable final TimeoutActionType actionType,
       @Nullable final OrderType channelOrderType, @Nullable final Backoff channelBackoff,
       final int channelMaxSize, @Nullable final Log log, @Nullable final Level logLevel) {
     super(
@@ -236,8 +236,8 @@ public final class ChannelConfiguration extends DeepEqualObject {
    * @param valueIfNotSet the default value if none was set.
    * @return the timeout.
    */
-  public UnitDuration getOutputTimeoutOrElse(@Nullable final UnitDuration valueIfNotSet) {
-    final UnitDuration outputTimeout = mOutputTimeout;
+  public DurationMeasure getOutputTimeoutOrElse(@Nullable final DurationMeasure valueIfNotSet) {
+    final DurationMeasure outputTimeout = mOutputTimeout;
     return (outputTimeout != null) ? outputTimeout : valueIfNotSet;
   }
 
@@ -347,7 +347,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
 
     private Level mLogLevel;
 
-    private UnitDuration mOutputTimeout;
+    private DurationMeasure mOutputTimeout;
 
     private Runner mRunner;
 
@@ -405,7 +405,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
         withRunner(runner);
       }
 
-      final UnitDuration outputTimeout = configuration.mOutputTimeout;
+      final DurationMeasure outputTimeout = configuration.mOutputTimeout;
       if (outputTimeout != null) {
         withOutputTimeout(outputTimeout);
       }
@@ -551,7 +551,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
      * @return this builder.
      */
     @NotNull
-    public Builder<TYPE> withOutputTimeout(@Nullable final UnitDuration timeout) {
+    public Builder<TYPE> withOutputTimeout(@Nullable final DurationMeasure timeout) {
       mOutputTimeout = timeout;
       return this;
     }

@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.sample;
 
-import com.github.dm.jrt.core.util.UnitDuration;
+import com.github.dm.jrt.core.util.DurationMeasure;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -288,7 +288,7 @@ public class DownloaderTest {
       }
     }
 
-    downloader.abortAndWait(uri, UnitDuration.seconds(20));
+    downloader.abortAndWait(uri, DurationMeasure.seconds(20));
 
     assertThat(downloader.isDownloaded(uri)).isFalse();
     checkNotExists(outFile);
@@ -321,7 +321,7 @@ public class DownloaderTest {
       throw new IOException();
     }
 
-    mDownloader.waitDone(uri, UnitDuration.millis(timeout));
+    mDownloader.waitDone(uri, DurationMeasure.millis(timeout));
 
     if ((startTime + timeoutMs - System.currentTimeMillis()) < 0) {
 

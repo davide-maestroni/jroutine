@@ -18,7 +18,7 @@ package com.github.dm.jrt.core.common;
 
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DeepEqualObject;
-import com.github.dm.jrt.core.util.UnitDuration;
+import com.github.dm.jrt.core.util.DurationMeasure;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -105,7 +105,7 @@ public class BackoffBuilder {
    * @return the backoff instance.
    */
   @NotNull
-  public BaseBackoff constantDelay(@NotNull final UnitDuration delay) {
+  public BaseBackoff constantDelay(@NotNull final DurationMeasure delay) {
     return new ConstantBackoff(mCount, delay.toMillis());
   }
 
@@ -133,7 +133,7 @@ public class BackoffBuilder {
    * @return the backoff instance.
    */
   @NotNull
-  public BaseBackoff exponentialDelay(@NotNull final UnitDuration delay) {
+  public BaseBackoff exponentialDelay(@NotNull final DurationMeasure delay) {
     return new ExponentialBackoff(mCount, delay.toMillis());
   }
 
@@ -165,7 +165,7 @@ public class BackoffBuilder {
    * @return the backoff instance.
    */
   @NotNull
-  public BaseBackoff jitterDelay(@NotNull final UnitDuration delay) {
+  public BaseBackoff jitterDelay(@NotNull final DurationMeasure delay) {
     return new DecorrelatedJitterBackoff(mCount, delay.toMillis());
   }
 
@@ -193,7 +193,7 @@ public class BackoffBuilder {
    * @return the backoff instance.
    */
   @NotNull
-  public BaseBackoff linearDelay(@NotNull final UnitDuration delay) {
+  public BaseBackoff linearDelay(@NotNull final DurationMeasure delay) {
     return new LinearBackoff(mCount, delay.toMillis());
   }
 
@@ -219,7 +219,7 @@ public class BackoffBuilder {
      * @throws java.lang.IllegalArgumentException if the delay is negative.
      */
     @NotNull
-    public BaseBackoff cappedTo(@NotNull final UnitDuration delay) {
+    public BaseBackoff cappedTo(@NotNull final DurationMeasure delay) {
       return new CappedBackoff(this, delay.toMillis());
     }
 

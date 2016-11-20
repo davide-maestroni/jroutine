@@ -25,7 +25,7 @@ import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.core.util.UnitDuration;
+import com.github.dm.jrt.core.util.DurationMeasure;
 import com.github.dm.jrt.function.Action;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.BiFunction;
@@ -99,7 +99,7 @@ public class Transformations {
    */
   @NotNull
   public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> delay(
-      @NotNull final UnitDuration delay) {
+      @NotNull final DurationMeasure delay) {
     return delay(delay.value, delay.unit);
   }
 
@@ -148,7 +148,7 @@ public class Transformations {
    */
   @NotNull
   public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> lag(
-      @NotNull final UnitDuration delay) {
+      @NotNull final DurationMeasure delay) {
     return lag(delay.value, delay.unit);
   }
 
@@ -466,7 +466,7 @@ public class Transformations {
    */
   @NotNull
   public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> throttle(
-      final int maxInvocations, @NotNull final UnitDuration range) {
+      final int maxInvocations, @NotNull final DurationMeasure range) {
     return throttle(maxInvocations, range.value, range.unit);
   }
 
@@ -513,7 +513,7 @@ public class Transformations {
    */
   @NotNull
   public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> timeoutAfter(
-      @NotNull final UnitDuration timeout) {
+      @NotNull final DurationMeasure timeout) {
     return timeoutAfter(timeout.value, timeout.unit);
   }
 

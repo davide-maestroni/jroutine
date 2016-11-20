@@ -64,7 +64,7 @@ import static com.github.dm.jrt.android.object.ContextInvocationTarget.classOfTy
 import static com.github.dm.jrt.android.object.ContextInvocationTarget.instanceOf;
 import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
 import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
-import static com.github.dm.jrt.core.util.UnitDuration.seconds;
+import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static com.github.dm.jrt.function.SupplierDecorator.constant;
 import static com.github.dm.jrt.operator.Operators.appendAccept;
 import static com.github.dm.jrt.operator.sequence.Sequences.range;

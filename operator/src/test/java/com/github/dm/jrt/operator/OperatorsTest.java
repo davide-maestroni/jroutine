@@ -48,8 +48,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
-import static com.github.dm.jrt.core.util.UnitDuration.millis;
-import static com.github.dm.jrt.core.util.UnitDuration.seconds;
+import static com.github.dm.jrt.core.util.DurationMeasure.millis;
+import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static com.github.dm.jrt.operator.Operators.append;
 import static com.github.dm.jrt.operator.Operators.appendAccept;
 import static com.github.dm.jrt.operator.Operators.appendGet;

@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
  * Created by davide-maestroni on 09/09/2014.
  */
 @SuppressWarnings("WeakerAccess")
-public class UnitDuration extends UnitTime {
+public class DurationMeasure extends TimeMeasure {
 
   private static final int CACHE_TIME_HIGH = 127;
 
@@ -42,12 +42,13 @@ public class UnitDuration extends UnitTime {
 
   private static final long ONE_MILLI_NANOS = TimeUnit.MILLISECONDS.toNanos(1);
 
-  private static final UnitDuration[][] sCaches =
-      new UnitDuration[CACHE_UNIT_SIZE][CACHE_TIME_SIZE];
+  private static final DurationMeasure[][] sCaches =
+      new DurationMeasure[CACHE_UNIT_SIZE][CACHE_TIME_SIZE];
 
-  private static final UnitDuration sInfinity = new UnitDuration(Long.MAX_VALUE, TimeUnit.SECONDS);
+  private static final DurationMeasure sInfinity =
+      new DurationMeasure(Long.MAX_VALUE, TimeUnit.SECONDS);
 
-  private static final UnitDuration[] sZeroes = new UnitDuration[TimeUnit.values().length];
+  private static final DurationMeasure[] sZeroes = new DurationMeasure[TimeUnit.values().length];
 
   /**
    * Constructor.
@@ -56,7 +57,7 @@ public class UnitDuration extends UnitTime {
    * @param unit     the time unit.
    * @throws java.lang.IllegalArgumentException if the specified duration is negative.
    */
-  protected UnitDuration(final long duration, @NotNull final TimeUnit unit) {
+  protected DurationMeasure(final long duration, @NotNull final TimeUnit unit) {
     super(ConstantConditions.notNegative("time duration", duration), unit);
   }
 
@@ -69,7 +70,7 @@ public class UnitDuration extends UnitTime {
    * @return the time instance.
    */
   @NotNull
-  public static UnitDuration days(final double days) {
+  public static DurationMeasure days(final double days) {
     if ((days > MAX_DAYS) || (days < -MAX_DAYS)) {
       throw new IllegalArgumentException("time value overflow: " + days + " days");
     }
@@ -86,7 +87,7 @@ public class UnitDuration extends UnitTime {
    * @throws java.lang.IllegalArgumentException if the specified duration is negative.
    */
   @NotNull
-  public static UnitDuration days(final long days) {
+  public static DurationMeasure days(final long days) {
     if ((days > MAX_DAYS) || (days < -MAX_DAYS)) {
       throw new IllegalArgumentException("time value overflow: " + days + " days");
     }
@@ -104,7 +105,7 @@ public class UnitDuration extends UnitTime {
    * @return the time instance.
    */
   @NotNull
-  public static UnitDuration fromUnit(final double time, @NotNull final TimeUnit unit) {
+  public static DurationMeasure fromUnit(final double time, @NotNull final TimeUnit unit) {
     final int ordinal = unit.ordinal();
     if ((ordinal == 0) || (Math.rint(time) == time)) {
       return fromUnit(Math.round(time), unit);
@@ -123,7 +124,7 @@ public class UnitDuration extends UnitTime {
    * @throws java.lang.IllegalArgumentException if the specified duration is negative.
    */
   @NotNull
-  public static UnitDuration fromUnit(final long time, @NotNull final TimeUnit unit) {
+  public static DurationMeasure fromUnit(final long time, @NotNull final TimeUnit unit) {
     final int ordinal = unit.ordinal();
     if (time == 0) {
       return sZeroes[ordinal];
@@ -134,7 +135,7 @@ public class UnitDuration extends UnitTime {
       return sCaches[ordinal - CACHE_UNIT_LOW][(int) time - CACHE_TIME_LOW];
     }
 
-    return new UnitDuration(time, unit);
+    return new DurationMeasure(time, unit);
   }
 
   /**
@@ -146,7 +147,7 @@ public class UnitDuration extends UnitTime {
    * @return the time instance.
    */
   @NotNull
-  public static UnitDuration hours(final double hours) {
+  public static DurationMeasure hours(final double hours) {
     if ((hours > MAX_HOURS) || (hours < -MAX_HOURS)) {
       throw new IllegalArgumentException("time value overflow: " + hours + " hours");
     }
@@ -163,7 +164,7 @@ public class UnitDuration extends UnitTime {
    * @throws java.lang.IllegalArgumentException if the specified duration is negative.
    */
   @NotNull
-  public static UnitDuration hours(final long hours) {
+  public static DurationMeasure hours(final long hours) {
     if ((hours > MAX_HOURS) || (hours < -MAX_HOURS)) {
       throw new IllegalArgumentException("time value overflow: " + hours + " hours");
     }
@@ -177,7 +178,7 @@ public class UnitDuration extends UnitTime {
    * @return the infinity instance.
    */
   @NotNull
-  public static UnitDuration infinity() {
+  public static DurationMeasure infinity() {
     return sInfinity;
   }
 
@@ -190,7 +191,7 @@ public class UnitDuration extends UnitTime {
    * @return the time instance.
    */
   @NotNull
-  public static UnitDuration micros(final double micros) {
+  public static DurationMeasure micros(final double micros) {
     return fromUnit(micros, TimeUnit.MICROSECONDS);
   }
 
@@ -202,7 +203,7 @@ public class UnitDuration extends UnitTime {
    * @throws java.lang.IllegalArgumentException if the specified duration is negative.
    */
   @NotNull
-  public static UnitDuration micros(final long micros) {
+  public static DurationMeasure micros(final long micros) {
     return fromUnit(micros, TimeUnit.MICROSECONDS);
   }
 
@@ -215,7 +216,7 @@ public class UnitDuration extends UnitTime {
    * @return the time instance.
    */
   @NotNull
-  public static UnitDuration millis(final double millis) {
+  public static DurationMeasure millis(final double millis) {
     return fromUnit(millis, TimeUnit.MILLISECONDS);
   }
 
@@ -227,7 +228,7 @@ public class UnitDuration extends UnitTime {
    * @throws java.lang.IllegalArgumentException if the specified duration is negative.
    */
   @NotNull
-  public static UnitDuration millis(final long millis) {
+  public static DurationMeasure millis(final long millis) {
     return fromUnit(millis, TimeUnit.MILLISECONDS);
   }
 
@@ -240,7 +241,7 @@ public class UnitDuration extends UnitTime {
    * @return the time instance.
    */
   @NotNull
-  public static UnitDuration minutes(final double minutes) {
+  public static DurationMeasure minutes(final double minutes) {
     if ((minutes > MAX_MINUTES) || (minutes < -MAX_MINUTES)) {
       throw new IllegalArgumentException("time value overflow: " + minutes + " minutes");
     }
@@ -257,7 +258,7 @@ public class UnitDuration extends UnitTime {
    * @throws java.lang.IllegalArgumentException if the specified duration is negative.
    */
   @NotNull
-  public static UnitDuration minutes(final long minutes) {
+  public static DurationMeasure minutes(final long minutes) {
     if ((minutes > MAX_MINUTES) || (minutes < -MAX_MINUTES)) {
       throw new IllegalArgumentException("time value overflow: " + minutes + " minutes");
     }
@@ -274,7 +275,7 @@ public class UnitDuration extends UnitTime {
    * @return the time instance.
    */
   @NotNull
-  public static UnitDuration nanos(final double nanos) {
+  public static DurationMeasure nanos(final double nanos) {
     return fromUnit(nanos, TimeUnit.NANOSECONDS);
   }
 
@@ -286,7 +287,7 @@ public class UnitDuration extends UnitTime {
    * @throws java.lang.IllegalArgumentException if the specified duration is negative.
    */
   @NotNull
-  public static UnitDuration nanos(final long nanos) {
+  public static DurationMeasure nanos(final long nanos) {
     return fromUnit(nanos, TimeUnit.NANOSECONDS);
   }
 
@@ -299,7 +300,7 @@ public class UnitDuration extends UnitTime {
    * @return the time instance.
    */
   @NotNull
-  public static UnitDuration seconds(final double seconds) {
+  public static DurationMeasure seconds(final double seconds) {
     return fromUnit(seconds, TimeUnit.SECONDS);
   }
 
@@ -311,7 +312,7 @@ public class UnitDuration extends UnitTime {
    * @throws java.lang.IllegalArgumentException if the specified duration is negative.
    */
   @NotNull
-  public static UnitDuration seconds(final long seconds) {
+  public static DurationMeasure seconds(final long seconds) {
     return fromUnit(seconds, TimeUnit.SECONDS);
   }
 
@@ -411,7 +412,7 @@ public class UnitDuration extends UnitTime {
    * @see System#currentTimeMillis()
    */
   @NotNull
-  public static UnitDuration timeSinceMillis(final long milliTime) {
+  public static DurationMeasure timeSinceMillis(final long milliTime) {
     return millis(Math.max(0, System.currentTimeMillis() - milliTime));
   }
 
@@ -425,7 +426,7 @@ public class UnitDuration extends UnitTime {
    * @see System#nanoTime()
    */
   @NotNull
-  public static UnitDuration timeSinceNanos(final long nanoTime) {
+  public static DurationMeasure timeSinceNanos(final long nanoTime) {
     return nanos(Math.max(0, System.nanoTime() - nanoTime));
   }
 
@@ -439,7 +440,7 @@ public class UnitDuration extends UnitTime {
    * @see System#currentTimeMillis()
    */
   @NotNull
-  public static UnitDuration timeUntilMillis(final long milliTime) {
+  public static DurationMeasure timeUntilMillis(final long milliTime) {
     return millis(Math.max(0, milliTime - System.currentTimeMillis()));
   }
 
@@ -453,7 +454,7 @@ public class UnitDuration extends UnitTime {
    * @see System#nanoTime()
    */
   @NotNull
-  public static UnitDuration timeUntilNanos(final long nanoTime) {
+  public static DurationMeasure timeUntilNanos(final long nanoTime) {
     return nanos(Math.max(0, nanoTime - System.nanoTime()));
   }
 
@@ -602,7 +603,7 @@ public class UnitDuration extends UnitTime {
    * @return the zero duration.
    */
   @NotNull
-  public static UnitDuration zero() {
+  public static DurationMeasure zero() {
     return zero(TimeUnit.MILLISECONDS);
   }
 
@@ -613,7 +614,7 @@ public class UnitDuration extends UnitTime {
    * @return the zero duration.
    */
   @NotNull
-  public static UnitDuration zero(@NotNull final TimeUnit unit) {
+  public static DurationMeasure zero(@NotNull final TimeUnit unit) {
     return sZeroes[unit.ordinal()];
   }
 
@@ -624,7 +625,7 @@ public class UnitDuration extends UnitTime {
    */
   @NotNull
   @Override
-  public UnitDuration daysTime() {
+  public DurationMeasure daysTime() {
     return days(toDays());
   }
 
@@ -635,7 +636,7 @@ public class UnitDuration extends UnitTime {
    */
   @NotNull
   @Override
-  public UnitDuration hoursTime() {
+  public DurationMeasure hoursTime() {
     return hours(toHours());
   }
 
@@ -646,7 +647,7 @@ public class UnitDuration extends UnitTime {
    */
   @NotNull
   @Override
-  public UnitDuration microsTime() {
+  public DurationMeasure microsTime() {
     return micros(toMicros());
   }
 
@@ -657,7 +658,7 @@ public class UnitDuration extends UnitTime {
    */
   @NotNull
   @Override
-  public UnitDuration millisTime() {
+  public DurationMeasure millisTime() {
     return millis(toMillis());
   }
 
@@ -671,7 +672,7 @@ public class UnitDuration extends UnitTime {
    */
   @NotNull
   @Override
-  public UnitDuration minus(@NotNull final UnitTime time) {
+  public DurationMeasure minus(@NotNull final TimeMeasure time) {
     if (unit.compareTo(time.unit) > 0) {
       final long newTime = to(time.unit) - time.value;
       return (newTime >= 0) ? fromUnit(newTime, time.unit)
@@ -689,7 +690,7 @@ public class UnitDuration extends UnitTime {
    */
   @NotNull
   @Override
-  public UnitDuration minutesTime() {
+  public DurationMeasure minutesTime() {
     return minutes(toMinutes());
   }
 
@@ -700,7 +701,7 @@ public class UnitDuration extends UnitTime {
    */
   @NotNull
   @Override
-  public UnitDuration nanosTime() {
+  public DurationMeasure nanosTime() {
     return nanos(toNanos());
   }
 
@@ -714,7 +715,7 @@ public class UnitDuration extends UnitTime {
    */
   @NotNull
   @Override
-  public UnitDuration plus(@NotNull final UnitTime time) {
+  public DurationMeasure plus(@NotNull final TimeMeasure time) {
     if (unit.compareTo(time.unit) > 0) {
       final long newTime = to(time.unit) + time.value;
       return (newTime >= 0) ? fromUnit(newTime, time.unit)
@@ -732,7 +733,7 @@ public class UnitDuration extends UnitTime {
    */
   @NotNull
   @Override
-  public UnitDuration secondsTime() {
+  public DurationMeasure secondsTime() {
     return seconds(toSeconds());
   }
 
@@ -870,18 +871,18 @@ public class UnitDuration extends UnitTime {
   }
 
   static {
-    final UnitDuration[] zeroes = sZeroes;
+    final DurationMeasure[] zeroes = sZeroes;
     final TimeUnit[] timeUnits = TimeUnit.values();
     for (int i = 0; i < timeUnits.length; ++i) {
-      zeroes[i] = new UnitDuration(0, timeUnits[i]);
+      zeroes[i] = new DurationMeasure(0, timeUnits[i]);
     }
 
-    final UnitTime[][] caches = sCaches;
+    final TimeMeasure[][] caches = sCaches;
     for (int i = 0; i < CACHE_UNIT_SIZE; ++i) {
       final TimeUnit timeUnit = timeUnits[CACHE_UNIT_LOW + i];
-      final UnitTime[] cache = caches[i];
+      final TimeMeasure[] cache = caches[i];
       for (int j = 0; j < CACHE_TIME_SIZE; ++j) {
-        cache[j] = new UnitDuration(CACHE_TIME_LOW + j, timeUnit);
+        cache[j] = new DurationMeasure(CACHE_TIME_LOW + j, timeUnit);
       }
     }
   }

@@ -44,7 +44,7 @@ import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ClassToken;
-import com.github.dm.jrt.core.util.UnitDuration;
+import com.github.dm.jrt.core.util.DurationMeasure;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -54,8 +54,8 @@ import java.util.List;
 import static com.github.dm.jrt.android.core.ServiceContext.serviceFrom;
 import static com.github.dm.jrt.android.core.invocation.TargetInvocationFactory.factoryOf;
 import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
-import static com.github.dm.jrt.core.util.UnitDuration.millis;
-import static com.github.dm.jrt.core.util.UnitDuration.seconds;
+import static com.github.dm.jrt.core.util.DurationMeasure.millis;
+import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -73,7 +73,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
 
   public void testAbort() {
 
-    final UnitDuration timeout = seconds(10);
+    final DurationMeasure timeout = seconds(10);
     final Data data = new Data();
     final Channel<?, Data> channel =
         JRoutineService.on(serviceFrom(getActivity(), RemoteInvocationService.class))
@@ -183,7 +183,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
 
   public void testDecorator() {
 
-    final UnitDuration timeout = seconds(10);
+    final DurationMeasure timeout = seconds(10);
     final TargetInvocationFactory<String, String> targetFactory =
         factoryOf(new PassingWrapper<String>());
     final Routine<String, String> routine =
@@ -266,7 +266,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
 
   public void testInvocations() throws InterruptedException {
 
-    final UnitDuration timeout = seconds(10);
+    final DurationMeasure timeout = seconds(10);
     final TargetInvocationFactory<String, String> targetFactory =
         factoryOf(StringPassingInvocation.class);
     final Routine<String, String> routine1 =
@@ -288,7 +288,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
 
   public void testInvocations2() throws InterruptedException {
 
-    final UnitDuration timeout = seconds(10);
+    final DurationMeasure timeout = seconds(10);
     final ClassToken<StringCallInvocation> token = tokenOf(StringCallInvocation.class);
     final Routine<String, String> routine2 =
         JRoutineService.on(serviceFrom(getActivity(), RemoteInvocationService.class))
@@ -309,7 +309,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
 
   public void testInvocations3() throws InterruptedException {
 
-    final UnitDuration timeout = seconds(10);
+    final DurationMeasure timeout = seconds(10);
     final TargetInvocationFactory<String, String> targetFactory =
         factoryOf(StringCallInvocation.class);
     final Routine<String, String> routine3 =
@@ -328,7 +328,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
 
   public void testInvocations4() throws InterruptedException {
 
-    final UnitDuration timeout = seconds(10);
+    final DurationMeasure timeout = seconds(10);
     final TargetInvocationFactory<String, String> targetFactory =
         factoryOf(StringCallInvocation.class);
     final Routine<String, String> routine4 =
@@ -347,7 +347,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
 
   public void testInvocations5() throws InterruptedException {
 
-    final UnitDuration timeout = seconds(10);
+    final DurationMeasure timeout = seconds(10);
     final TargetInvocationFactory<Void, String> targetFactory =
         factoryOf(TextCommandInvocation.class);
     final Routine<Void, String> routine4 =
@@ -365,7 +365,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
 
   public void testParcelable() {
 
-    final UnitDuration timeout = seconds(10);
+    final DurationMeasure timeout = seconds(10);
     final MyParcelable p = new MyParcelable(33, -17);
     assertThat(JRoutineService.on(serviceFrom(getActivity(), RemoteInvocationService.class))
                               .with(factoryOf(MyParcelableInvocation.class))
@@ -376,7 +376,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
 
   public void testService() {
 
-    final UnitDuration timeout = seconds(10);
+    final DurationMeasure timeout = seconds(10);
     final Routine<String, String> routine =
         JRoutineService.on(serviceFrom(getActivity(), RemoteTestService.class))
                        .with(factoryOf(StringPassingInvocation.class))
@@ -503,7 +503,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
     @Override
     public void onInput(final Data d, @NotNull final Channel<Data, ?> result) {
 
-      result.after(UnitDuration.millis(500)).pass(d);
+      result.after(DurationMeasure.millis(500)).pass(d);
     }
   }
 
@@ -605,7 +605,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
     @Override
     public void onInput(final String s, @NotNull final Channel<String, ?> result) {
 
-      result.after(UnitDuration.millis(100)).pass(s);
+      result.after(DurationMeasure.millis(100)).pass(s);
     }
   }
 

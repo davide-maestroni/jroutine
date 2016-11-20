@@ -41,8 +41,8 @@ import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ClassToken;
+import com.github.dm.jrt.core.util.DurationMeasure;
 import com.github.dm.jrt.core.util.Reflection;
-import com.github.dm.jrt.core.util.UnitDuration;
 import com.github.dm.jrt.object.annotation.Alias;
 import com.github.dm.jrt.object.annotation.AsyncInput;
 import com.github.dm.jrt.object.annotation.AsyncInput.InputMode;
@@ -71,8 +71,8 @@ import static com.github.dm.jrt.android.object.ContextInvocationTarget.instanceO
 import static com.github.dm.jrt.android.v4.core.LoaderContextCompat.loaderFrom;
 import static com.github.dm.jrt.core.common.BackoffBuilder.afterCount;
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builder;
-import static com.github.dm.jrt.core.util.UnitDuration.infinity;
-import static com.github.dm.jrt.core.util.UnitDuration.seconds;
+import static com.github.dm.jrt.core.util.DurationMeasure.infinity;
+import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -168,7 +168,7 @@ public class LoaderObjectRoutineActivityTest
 
   public void testAliasMethod() throws NoSuchMethodException {
 
-    final UnitDuration timeout = seconds(10);
+    final DurationMeasure timeout = seconds(10);
     final Routine<Object, Object> routine = JRoutineLoaderObjectCompat.on(loaderFrom(getActivity()))
                                                                       .with(instanceOf(
                                                                           TestClass.class))
@@ -200,7 +200,7 @@ public class LoaderObjectRoutineActivityTest
 
   public void testAsyncInputProxyRoutine() {
 
-    final UnitDuration timeout = seconds(10);
+    final DurationMeasure timeout = seconds(10);
     final SumItf sumAsync = JRoutineLoaderObjectCompat.on(loaderFrom(getActivity()))
                                                       .with(instanceOf(Sum.class))
                                                       .applyInvocationConfiguration()
@@ -230,7 +230,7 @@ public class LoaderObjectRoutineActivityTest
 
   public void testAsyncOutputProxyRoutine() {
 
-    final UnitDuration timeout = seconds(10);
+    final DurationMeasure timeout = seconds(10);
     final CountItf countAsync = JRoutineLoaderObjectCompat.on(loaderFrom(getActivity()))
                                                           .with(instanceOf(Count.class))
                                                           .applyInvocationConfiguration()
@@ -365,7 +365,7 @@ public class LoaderObjectRoutineActivityTest
 
   public void testException() throws NoSuchMethodException {
 
-    final UnitDuration timeout = seconds(10);
+    final DurationMeasure timeout = seconds(10);
     final Routine<Object, Object> routine3 =
         JRoutineLoaderObjectCompat.on(loaderFrom(getActivity()))
                                   .with(instanceOf(TestClass.class))
@@ -615,7 +615,7 @@ public class LoaderObjectRoutineActivityTest
 
   public void testMethod() throws NoSuchMethodException {
 
-    final UnitDuration timeout = seconds(10);
+    final DurationMeasure timeout = seconds(10);
     final Routine<Object, Object> routine2 =
         JRoutineLoaderObjectCompat.on(loaderFrom(getActivity()))
                                   .with(instanceOf(TestClass.class))
@@ -634,7 +634,7 @@ public class LoaderObjectRoutineActivityTest
 
   public void testMethodBySignature() throws NoSuchMethodException {
 
-    final UnitDuration timeout = seconds(10);
+    final DurationMeasure timeout = seconds(10);
     final Routine<Object, Object> routine1 =
         JRoutineLoaderObjectCompat.on(loaderFrom(getActivity()))
                                   .with(instanceOf(TestClass.class))
@@ -934,7 +934,7 @@ public class LoaderObjectRoutineActivityTest
 
   public void testProxyRoutine() {
 
-    final UnitDuration timeout = seconds(10);
+    final DurationMeasure timeout = seconds(10);
     final SquareItf squareAsync = JRoutineLoaderObjectCompat.on(loaderFrom(getActivity()))
                                                             .with(instanceOf(Square.class))
                                                             .buildProxy(SquareItf.class);
@@ -1866,14 +1866,14 @@ public class LoaderObjectRoutineActivityTest
 
     public int getOne() throws InterruptedException {
 
-      UnitDuration.millis(2000).sleepAtLeast();
+      DurationMeasure.millis(2000).sleepAtLeast();
 
       return 1;
     }
 
     public int getTwo() throws InterruptedException {
 
-      UnitDuration.millis(2000).sleepAtLeast();
+      DurationMeasure.millis(2000).sleepAtLeast();
 
       return 2;
     }

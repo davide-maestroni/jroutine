@@ -52,7 +52,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 import static com.github.dm.jrt.android.core.ServiceContext.serviceFrom;
 import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
-import static com.github.dm.jrt.core.util.UnitDuration.seconds;
+import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static com.github.dm.jrt.function.Functions.onOutput;
 import static org.assertj.core.api.Assertions.assertThat;
 

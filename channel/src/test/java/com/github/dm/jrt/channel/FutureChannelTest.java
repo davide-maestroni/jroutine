@@ -23,7 +23,7 @@ import com.github.dm.jrt.core.channel.OutputTimeoutException;
 import com.github.dm.jrt.core.common.TimeoutException;
 import com.github.dm.jrt.core.config.ChannelConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
-import com.github.dm.jrt.core.util.UnitDuration;
+import com.github.dm.jrt.core.util.DurationMeasure;
 
 import org.junit.Test;
 
@@ -36,8 +36,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static com.github.dm.jrt.core.util.UnitDuration.millis;
-import static com.github.dm.jrt.core.util.UnitDuration.seconds;
+import static com.github.dm.jrt.core.util.DurationMeasure.millis;
+import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -58,7 +58,7 @@ public class FutureChannelTest {
             return "test";
           }
         }, 1, TimeUnit.SECONDS);
-    final UnitDuration timeout = seconds(1);
+    final DurationMeasure timeout = seconds(1);
     final Channel<?, String> channel = Channels.fromFuture(future).buildChannels();
     channel.abort(new IllegalStateException());
     try {
@@ -81,7 +81,7 @@ public class FutureChannelTest {
             return "test";
           }
         }, 1, TimeUnit.SECONDS);
-    final UnitDuration timeout = seconds(1);
+    final DurationMeasure timeout = seconds(1);
     final Channel<?, String> channel =
         Channels.fromFutureInterruptIfRunning(future).buildChannels();
     channel.abort(new IllegalStateException());

@@ -54,7 +54,7 @@ import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.fromFactory;
 import static com.github.dm.jrt.android.core.runner.AndroidRunners.mainRunner;
-import static com.github.dm.jrt.core.util.UnitDuration.infinity;
+import static com.github.dm.jrt.core.util.DurationMeasure.infinity;
 
 /**
  * Invocation implementation employing loaders to perform background operations.

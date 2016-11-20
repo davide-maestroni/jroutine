@@ -61,8 +61,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.github.dm.jrt.core.common.BackoffBuilder.afterCount;
 import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
-import static com.github.dm.jrt.core.util.UnitDuration.minutes;
-import static com.github.dm.jrt.core.util.UnitDuration.seconds;
+import static com.github.dm.jrt.core.util.DurationMeasure.minutes;
+import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static com.github.dm.jrt.function.Functions.constant;
 import static com.github.dm.jrt.function.Functions.functionMapping;
 import static com.github.dm.jrt.function.Functions.onOutput;

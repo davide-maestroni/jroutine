@@ -132,6 +132,15 @@ afterEvaluate { project ->
             options.setMemberLevel(JavadocMemberLevel.PUBLIC)
         }
 
+        if (project.plugins.hasPlugin('maven') && project.hasProperty('releaseVersion')) {
+            project.task('installSnapshot') {
+                description "Installs a SNAPSHOT version of the 'archives' artifacts into the local Maven repository."
+                project.version = "${project.version}-SNAPSHOT"
+            } << {
+                tasks.install.execute()
+            }
+        }
+
         project.artifacts {
             archives project.task('sourcesJar', type: Jar) {
                 description 'Generates sources Jar'
@@ -162,8 +171,6 @@ afterEvaluate { project ->
                 tasks.createDebugAndroidTestCoverageReport.execute()
             }
         }
-
-        project.task('jar', dependsOn: 'jarRelease')
 
         def variants = getAndroidVariants(project)
         variants.all { variant ->

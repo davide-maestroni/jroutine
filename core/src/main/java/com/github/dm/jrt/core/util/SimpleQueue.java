@@ -37,13 +37,13 @@ public class SimpleQueue<E> implements Iterable<E> {
 
   private static final int DEFAULT_SIZE = 1 << 3; // 8
 
+  private Object[] mData;
+
   private int mFirst;
 
   private int mLast;
 
   private int mMask;
-
-  private Object[] mData;
 
   private volatile long mReplaceCount = Long.MIN_VALUE;
 

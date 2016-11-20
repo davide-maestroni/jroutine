@@ -271,13 +271,16 @@ public class TimeMeasureTest {
     final TimeMeasure current = TimeMeasure.current();
     assertThat(current.minus(TimeMeasure.hours(2).minus(TimeMeasure.minutes(11)))).isNotEqualTo(
         current.minus(TimeMeasure.hours(2)).minus(TimeMeasure.minutes(11)));
-    assertThat(current.minus(TimeMeasure.hours(2).minus(TimeMeasure.minutes(11))).toMillis()).isEqualTo(
+    assertThat(
+        current.minus(TimeMeasure.hours(2).minus(TimeMeasure.minutes(11))).toMillis()).isEqualTo(
         current.toMillis() - TimeMeasure.hours(2).toMillis() + TimeMeasure.minutes(11).toMillis());
-    assertThat(current.minus(TimeMeasure.hours(2)).minus(TimeMeasure.minutes(11)).toMillis()).isEqualTo(
+    assertThat(
+        current.minus(TimeMeasure.hours(2)).minus(TimeMeasure.minutes(11)).toMillis()).isEqualTo(
         current.toMillis() - TimeMeasure.hours(2).toMillis() - TimeMeasure.minutes(11).toMillis());
     assertThat(TimeMeasure.minutes(-2).minus(TimeMeasure.seconds(31))).isEqualTo(
         TimeMeasure.millis(-151000));
-    assertThat(TimeMeasure.seconds(1).minus(TimeMeasure.millis(700))).isEqualTo(TimeMeasure.millis(300));
+    assertThat(TimeMeasure.seconds(1).minus(TimeMeasure.millis(700))).isEqualTo(
+        TimeMeasure.millis(300));
   }
 
   @Test
@@ -339,10 +342,13 @@ public class TimeMeasureTest {
     final TimeMeasure current = TimeMeasure.current();
     assertThat(current.plus(TimeMeasure.hours(2).plus(TimeMeasure.minutes(11)))).isEqualTo(
         current.plus(TimeMeasure.hours(2)).plus(TimeMeasure.minutes(11)));
-    assertThat(current.plus(TimeMeasure.hours(2)).plus(TimeMeasure.minutes(11)).toMillis()).isEqualTo(
+    assertThat(
+        current.plus(TimeMeasure.hours(2)).plus(TimeMeasure.minutes(11)).toMillis()).isEqualTo(
         current.toMillis() + TimeMeasure.hours(2).toMillis() + TimeMeasure.minutes(11).toMillis());
-    assertThat(TimeMeasure.minutes(-2).plus(TimeMeasure.seconds(31))).isEqualTo(TimeMeasure.millis(-89000));
-    assertThat(TimeMeasure.seconds(1).plus(TimeMeasure.millis(-700))).isEqualTo(TimeMeasure.millis(300));
+    assertThat(TimeMeasure.minutes(-2).plus(TimeMeasure.seconds(31))).isEqualTo(
+        TimeMeasure.millis(-89000));
+    assertThat(TimeMeasure.seconds(1).plus(TimeMeasure.millis(-700))).isEqualTo(
+        TimeMeasure.millis(300));
   }
 
   @Test

@@ -601,7 +601,8 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
 
     @Nullable
     @Override
-    Execution abortInvocation(@NotNull final DurationMeasure delay, @Nullable final Throwable reason) {
+    Execution abortInvocation(@NotNull final DurationMeasure delay,
+        @Nullable final Throwable reason) {
       mLogger.dbg(reason, "avoiding aborting since channel is closed");
       return null;
     }
@@ -1104,7 +1105,8 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
      * @return the execution to run or null.
      */
     @Nullable
-    Execution abortInvocation(@NotNull final DurationMeasure delay, @Nullable final Throwable reason) {
+    Execution abortInvocation(@NotNull final DurationMeasure delay,
+        @Nullable final Throwable reason) {
       final RoutineException abortException = AbortException.wrapIfNeeded(reason);
       if (delay.isZero()) {
         mLogger.dbg(reason, "aborting channel");

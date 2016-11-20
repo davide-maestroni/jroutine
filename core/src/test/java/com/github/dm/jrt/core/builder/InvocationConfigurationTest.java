@@ -164,9 +164,7 @@ public class InvocationConfigurationTest {
     assertThat(configuration).isNotEqualTo(builder().withOutputTimeout(zero()).configured());
     assertThat(configuration).isNotEqualTo(
         builder().withOutputTimeout(1, TimeUnit.MILLISECONDS).configured());
-    assertThat(configuration.builderFrom()
-                            .withOutputTimeout(millis(1))
-                            .configured()).isNotEqualTo(
+    assertThat(configuration.builderFrom().withOutputTimeout(millis(1)).configured()).isNotEqualTo(
         builder().withOutputTimeout(1, TimeUnit.MILLISECONDS).configured());
   }
 

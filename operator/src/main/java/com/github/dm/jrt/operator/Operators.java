@@ -646,7 +646,8 @@ public class Operators {
    * @return the invocation factory instance.
    */
   @NotNull
-  public static <DATA> InvocationFactory<DATA, DATA> interval(@NotNull final DurationMeasure delay) {
+  public static <DATA> InvocationFactory<DATA, DATA> interval(
+      @NotNull final DurationMeasure delay) {
     return interval(delay.value, delay.unit);
   }
 

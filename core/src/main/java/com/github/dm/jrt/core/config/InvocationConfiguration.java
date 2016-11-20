@@ -146,11 +146,12 @@ public final class InvocationConfiguration extends DeepEqualObject {
    * @param logLevel        the log level.
    */
   private InvocationConfiguration(@Nullable final Runner runner, final int priority,
-      final int maxInstances, final int coreInstances, @Nullable final DurationMeasure outputTimeout,
-      @Nullable final TimeoutActionType actionType, @Nullable final OrderType inputOrderType,
-      @Nullable final Backoff inputBackoff, final int inputMaxSize,
-      @Nullable final OrderType outputOrderType, @Nullable final Backoff outputBackoff,
-      final int outputMaxSize, @Nullable final Log log, @Nullable final Level logLevel) {
+      final int maxInstances, final int coreInstances,
+      @Nullable final DurationMeasure outputTimeout, @Nullable final TimeoutActionType actionType,
+      @Nullable final OrderType inputOrderType, @Nullable final Backoff inputBackoff,
+      final int inputMaxSize, @Nullable final OrderType outputOrderType,
+      @Nullable final Backoff outputBackoff, final int outputMaxSize, @Nullable final Log log,
+      @Nullable final Level logLevel) {
     super(asArgs(runner, priority, maxInstances, coreInstances, outputTimeout, actionType,
         inputOrderType, inputBackoff, inputMaxSize, outputOrderType, outputBackoff, outputMaxSize,
         log, logLevel));

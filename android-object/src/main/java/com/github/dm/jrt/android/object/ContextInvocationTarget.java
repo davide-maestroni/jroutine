@@ -256,17 +256,13 @@ public abstract class ContextInvocationTarget<TYPE> extends DeepEqualObject impl
 
     @NotNull
     @Override
-    @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
     public InvocationTarget<TYPE> getInvocationTarget(@NotNull final Context context) throws
         Exception {
       TYPE target = null;
       final Class<TYPE> targetClass = mTargetClass;
       final Object[] factoryArgs = mFactoryArgs;
       if (context instanceof FactoryContext) {
-        // The only safe way is to synchronize the factory using the very same instance
-        synchronized (context) {
-          target = ((FactoryContext) context).geInstance(targetClass, factoryArgs);
-        }
+        target = ((FactoryContext) context).geInstance(targetClass, factoryArgs);
       }
 
       if (target == null) {

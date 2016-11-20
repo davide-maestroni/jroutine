@@ -32,6 +32,8 @@ public interface FactoryContext {
    * <br>
    * If a null instance is returned, the constructor matching the specified arguments will be
    * called by default.
+   * <br>
+   * Note that it's up to the implementing class to ensure synchronization when needed.
    *
    * @param type   the type of the returned instance.
    * @param args   the custom arguments.

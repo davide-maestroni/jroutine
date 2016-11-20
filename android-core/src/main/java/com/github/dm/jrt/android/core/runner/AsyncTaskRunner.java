@@ -24,6 +24,8 @@ import android.os.Looper;
 
 import com.github.dm.jrt.core.runner.AsyncRunner;
 import com.github.dm.jrt.core.runner.Execution;
+import com.github.dm.jrt.core.runner.Runner;
+import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 
 import org.jetbrains.annotations.NotNull;
@@ -43,7 +45,7 @@ class AsyncTaskRunner extends AsyncRunner {
 
   private static final Void[] NO_PARAMS = new Void[0];
 
-  private static final MainRunner sMainRunner = new MainRunner();
+  private static final Runner sMainRunner = Runners.zeroDelayRunner(new MainRunner());
 
   private final Executor mExecutor;
 

@@ -67,7 +67,7 @@ dependencies {
 }
 
 conditionalDependencies {
-    compile name: 'core', version: '6.0.0'
+    compile name: 'core', version: '6.1.0'
 }
 
 jacoco {

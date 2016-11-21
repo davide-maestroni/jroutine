@@ -26,8 +26,8 @@ compileJavaCompatibility = JavaVersion.VERSION_1_6
 compileTestJavaCompatibility = JavaVersion.VERSION_1_7
 
 conditionalDependencies {
-    compile name: 'core', version: '6.0.0'
-    compile name: 'object', version: '6.0.0'
+    compile name: 'core', version: '6.1.0'
+    compile name: 'object', version: '6.1.0'
 }
 
 findbugs {

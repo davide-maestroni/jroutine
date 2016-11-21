@@ -33,14 +33,14 @@ dependencies {
 }
 
 conditionalDependencies {
-    compile name: 'channel', version: '6.0.0'
-    compile name: 'core', version: '6.0.0'
-    compile name: 'function', version: '6.0.0'
-    compile name: 'method', version: '6.0.0'
-    compile name: 'object', version: '6.0.0'
-    compile name: 'operator', version: '6.0.0'
-    compile name: 'proxy', version: '6.0.0'
-    compile name: 'stream', version: '6.0.0'
+    compile name: 'channel', version: '6.1.0'
+    compile name: 'core', version: '6.1.0'
+    compile name: 'function', version: '6.1.0'
+    compile name: 'method', version: '6.1.0'
+    compile name: 'object', version: '6.1.0'
+    compile name: 'operator', version: '6.1.0'
+    compile name: 'proxy', version: '6.1.0'
+    compile name: 'stream', version: '6.1.0'
 }
 
 jacocoTestReport {

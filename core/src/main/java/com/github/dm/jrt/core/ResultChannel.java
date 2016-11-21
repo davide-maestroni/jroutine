@@ -1176,28 +1176,23 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     public void run(@NotNull final BindingHandler<OUT> handler, final boolean forceClose) {
       // Need to make sure to pass the outputs to the consumer in the runner thread, so to avoid
       // deadlock issues
-      if (mRunner.isExecutionThread()) {
-        handler.flushOutput(forceClose);
-
-      } else {
-        final FlushExecution execution;
-        if (forceClose) {
-          if (mForcedFlushExecution == null) {
-            mForcedFlushExecution = new FlushExecution(true);
-          }
-
-          execution = mForcedFlushExecution;
-
-        } else {
-          if (mFlushExecution == null) {
-            mFlushExecution = new FlushExecution(false);
-          }
-
-          execution = mFlushExecution;
+      final FlushExecution execution;
+      if (forceClose) {
+        if (mForcedFlushExecution == null) {
+          mForcedFlushExecution = new FlushExecution(true);
         }
 
-        mRunner.run(execution, 0, TimeUnit.MILLISECONDS);
+        execution = mForcedFlushExecution;
+
+      } else {
+        if (mFlushExecution == null) {
+          mFlushExecution = new FlushExecution(false);
+        }
+
+        execution = mFlushExecution;
       }
+
+      mRunner.run(execution, 0, TimeUnit.MILLISECONDS);
     }
   }
 

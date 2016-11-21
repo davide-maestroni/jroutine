@@ -59,7 +59,7 @@ dependencies {
 }
 
 conditionalDependencies {
-    compile name: 'android-retrofit', version: '6.0.0'
+    compile name: 'android-retrofit', version: '6.1.0'
 }
 
 tasks.withType(Javadoc) {

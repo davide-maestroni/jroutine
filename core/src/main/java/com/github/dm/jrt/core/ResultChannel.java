@@ -47,6 +47,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -2280,7 +2281,8 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
       }
 
       final int size = outputs.length;
-      mLogger.dbg("passing array [#%d+%d]: %s [%s]", mOutputCount, size, outputs, delay);
+      mLogger.dbg("passing array [#%d+%d]: %s [%s]", mOutputCount, size, Arrays.toString(outputs),
+          delay);
       mOutputCount += size;
       checkMaxSize();
       final ArrayList<OUT> list = new ArrayList<OUT>(size);

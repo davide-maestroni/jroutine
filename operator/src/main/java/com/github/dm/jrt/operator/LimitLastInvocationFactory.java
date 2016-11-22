@@ -64,7 +64,7 @@ class LimitLastInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
 
     private final int mCount;
 
-    private SimpleQueue<DATA> mData = new SimpleQueue<DATA>();
+    private final SimpleQueue<DATA> mData = new SimpleQueue<DATA>();
 
     /**
      * Constructor.

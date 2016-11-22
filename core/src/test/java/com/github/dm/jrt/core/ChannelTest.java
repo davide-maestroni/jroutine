@@ -199,6 +199,7 @@ public class ChannelTest {
                 .after(millis(200))
                 .pass("test1", "test2")
                 .pass(Collections.singleton("test3"))
+                .now()
                 .close();
       }
     }.start();

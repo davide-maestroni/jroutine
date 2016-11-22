@@ -43,6 +43,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.IdentityHashMap;
@@ -1481,7 +1482,8 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
       }
 
       final int size = inputs.length;
-      mLogger.dbg("passing array [#%d+%d]: %s [%s]", mInputCount, size, inputs, delay);
+      mLogger.dbg("passing array [#%d+%d]: %s [%s]", mInputCount, size, Arrays.toString(inputs),
+          delay);
       mInputCount += size;
       checkMaxSize();
       final ArrayList<IN> list = new ArrayList<IN>(size);

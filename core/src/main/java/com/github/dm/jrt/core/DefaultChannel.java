@@ -47,10 +47,8 @@ import java.util.concurrent.TimeUnit;
  */
 class DefaultChannel<DATA> implements Channel<DATA, DATA> {
 
-  private static final WeakIdentityHashMap<Runner, WeakReference<ChannelRunner>> sRunners =
-      new WeakIdentityHashMap<Runner, WeakReference<ChannelRunner>>();
-
-  private static final Runner sSyncRunner = Runners.syncRunner();
+  private static final WeakIdentityHashMap<Runner, WeakReference<SynchronizedRunner>> sRunners =
+      new WeakIdentityHashMap<Runner, WeakReference<SynchronizedRunner>>();
 
   private final ResultChannel<DATA> mChannel;
 
@@ -62,14 +60,14 @@ class DefaultChannel<DATA> implements Channel<DATA, DATA> {
   DefaultChannel(@NotNull final ChannelConfiguration configuration) {
     final Logger logger = configuration.newLogger(this);
     final Runner wrapped = configuration.getRunnerOrElse(Runners.sharedRunner());
-    ChannelRunner channelRunner;
+    SynchronizedRunner channelRunner;
     synchronized (sRunners) {
-      final WeakIdentityHashMap<Runner, WeakReference<ChannelRunner>> runners = sRunners;
-      final WeakReference<ChannelRunner> runner = runners.get(wrapped);
+      final WeakIdentityHashMap<Runner, WeakReference<SynchronizedRunner>> runners = sRunners;
+      final WeakReference<SynchronizedRunner> runner = runners.get(wrapped);
       channelRunner = (runner != null) ? runner.get() : null;
       if (channelRunner == null) {
-        channelRunner = new ChannelRunner(wrapped);
-        runners.put(wrapped, new WeakReference<ChannelRunner>(channelRunner));
+        channelRunner = new SynchronizedRunner(new ChannelRunner(wrapped));
+        runners.put(wrapped, new WeakReference<SynchronizedRunner>(channelRunner));
       }
     }
 
@@ -309,7 +307,7 @@ class DefaultChannel<DATA> implements Channel<DATA, DATA> {
     public void run(@NotNull final Execution execution, final long delay,
         @NotNull final TimeUnit timeUnit) {
       if (delay == 0) {
-        sSyncRunner.run(execution, delay, timeUnit);
+        execution.run();
 
       } else {
         super.run(execution, delay, timeUnit);

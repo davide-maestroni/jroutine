@@ -89,7 +89,7 @@ class PrependOutputInvocationFactory<OUT> extends InvocationFactory<OUT, OUT> {
       mIsCalled = false;
     }
 
-    private void onResult(@NotNull final Channel<OUT, ?> result) throws Exception {
+    private void onResult(@NotNull final Channel<OUT, ?> result) {
       if (!mIsCalled) {
         mIsCalled = true;
         result.pass(mChannel);

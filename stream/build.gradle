@@ -28,6 +28,7 @@ compileTestJavaCompatibility = JavaVersion.VERSION_1_7
 
 dependencies {
     compile 'com.intellij:annotations:12.0'
+    testCompile project(':operator')
     testCompile 'junit:junit:4.12'
     testCompile 'org.assertj:assertj-core:2.4.1'
 }
@@ -36,7 +37,6 @@ conditionalDependencies {
     compile name: 'channel', version: '6.1.0'
     compile name: 'core', version: '6.1.0'
     compile name: 'function', version: '6.1.0'
-    compile name: 'operator', version: '6.1.0'
 }
 
 jacocoTestReport {
@@ -59,6 +59,5 @@ javadoc {
     options.overview("${project.projectDir}/docs/overview.html")
     options.links("${prefix}/channel/",
             "${prefix}/core/",
-            "${prefix}/function/",
-            "${prefix}/operator/")
+            "${prefix}/function/")
 }

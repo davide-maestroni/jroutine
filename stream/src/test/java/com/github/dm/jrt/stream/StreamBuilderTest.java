@@ -22,7 +22,6 @@ import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ExecutionDeadlockException;
 import com.github.dm.jrt.core.channel.InputDeadlockException;
-import com.github.dm.jrt.core.channel.OutputDeadlockException;
 import com.github.dm.jrt.core.channel.TemplateChannelConsumer;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.common.TimeoutException;
@@ -1351,9 +1350,11 @@ public class StreamBuilderTest {
   public void testMaxSizeDeadlock() {
     try {
       assertThat(JRoutineStream //
-          .<Integer>withStream().map(appendAccept(range(1, 1000)))
-                                .applyStreamInvocationConfiguration()
+          .<Integer>withStream().applyStreamInvocationConfiguration()
                                 .withRunner(getSingleThreadRunner())
+                                .configured()
+                                .map(appendAccept(range(1, 1000)))
+                                .applyStreamInvocationConfiguration()
                                 .withInputBackoff(afterCount(2).linearDelay(seconds(3)))
                                 .withOutputBackoff(afterCount(2).linearDelay(seconds(3)))
                                 .configured()
@@ -1395,51 +1396,11 @@ public class StreamBuilderTest {
 
     try {
       assertThat(JRoutineStream //
-          .<Integer>withStream().map(appendAccept(range(1, 1000)))
-                                .applyStreamInvocationConfiguration()
+          .<Integer>withStream().applyStreamInvocationConfiguration()
                                 .withRunner(getSingleThreadRunner())
-                                .withOutputBackoff(afterCount(2).linearDelay(seconds(3)))
                                 .configured()
-                                .map(Functions.<Number>identity())
-                                .map(new Function<Number, Double>() {
-
-                                  public Double apply(final Number number) {
-                                    final double value = number.doubleValue();
-                                    return Math.sqrt(value);
-                                  }
-                                })
-                                .sync()
-                                .map(new Function<Double, SumData>() {
-
-                                  public SumData apply(final Double aDouble) {
-                                    return new SumData(aDouble, 1);
-                                  }
-                                })
-                                .map(reduce(new BiFunction<SumData, SumData, SumData>() {
-
-                                  public SumData apply(final SumData data1, final SumData data2) {
-                                    return new SumData(data1.sum + data2.sum,
-                                        data1.count + data2.count);
-                                  }
-                                }))
-                                .map(new Function<SumData, Double>() {
-
-                                  public Double apply(final SumData data) {
-                                    return data.sum / data.count;
-                                  }
-                                })
-                                .close()
-                                .after(minutes(3))
-                                .next()).isCloseTo(21, Offset.offset(0.1));
-
-    } catch (final OutputDeadlockException ignored) {
-    }
-
-    try {
-      assertThat(JRoutineStream //
-          .<Integer>withStream().map(appendAccept(range(1, 1000)))
+                                .map(appendAccept(range(1, 1000)))
                                 .applyStreamInvocationConfiguration()
-                                .withRunner(getSingleThreadRunner())
                                 .withInputBackoff(afterCount(2).linearDelay(seconds(3)))
                                 .configured()
                                 .map(Functions.<Number>identity())

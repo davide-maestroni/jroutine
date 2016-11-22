@@ -62,12 +62,12 @@ android {
 }
 
 dependencies {
+    androidTestCompile project(':android-core')
     androidTestCompile 'com.squareup.assertj:assertj-android:1.1.1'
     compile 'com.android.support:support-v4:23.2.1'
 }
 
 conditionalDependencies {
-    compile name: 'android-core', version: '6.1.0'
     compile name: 'channel', version: '6.1.0'
     compile name: 'core', version: '6.1.0'
 }
@@ -83,7 +83,6 @@ findbugs {
 tasks.withType(Javadoc) {
     def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/6'
     options.overview("${project.projectDir}/docs/overview.html")
-    options.links("${prefix}/android-core/",
-            "${prefix}/channel/",
+    options.links("${prefix}/channel/",
             "${prefix}/core/")
 }

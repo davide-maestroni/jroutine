@@ -18,75 +18,75 @@ apply plugin: 'com.android.application'
 apply from: '../extra.gradle'
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion '23.0.3'
+  compileSdkVersion 23
+  buildToolsVersion '23.0.3'
 
-    defaultConfig {
-        applicationId 'com.github.dm.jrt.android.sample'
-        minSdkVersion 8
-        targetSdkVersion 23
-        versionCode 1
-        versionName '1.0'
+  defaultConfig {
+    applicationId 'com.github.dm.jrt.android.sample'
+    minSdkVersion 8
+    targetSdkVersion 23
+    versionCode 1
+    versionName '1.0'
 
-        testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner'
+    testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner'
+  }
+
+  buildTypes {
+    release {
+      minifyEnabled false
+      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
     }
+  }
 
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-    }
+  packagingOptions {
+    exclude 'META-INF/services/javax.annotation.processing.Processor'
+  }
 
-    packagingOptions {
-        exclude 'META-INF/services/javax.annotation.processing.Processor'
-    }
-
-    lintOptions {
-        disable 'InvalidPackage'
-    }
+  lintOptions {
+    disable 'InvalidPackage'
+  }
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:23.2.1'
-    compile 'com.squareup.retrofit2:retrofit:2.1.0'
-    compile 'com.squareup.retrofit2:converter-gson:2.1.0'
-    testCompile 'junit:junit:4.12'
-    androidTestCompile 'com.android.support:support-annotations:23.2.1'
-    androidTestCompile 'com.android.support.test:runner:0.5'
-    androidTestCompile 'com.android.support.test:rules:0.5'
-    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
+  compile 'com.android.support:appcompat-v7:23.2.1'
+  compile 'com.squareup.retrofit2:retrofit:2.1.0'
+  compile 'com.squareup.retrofit2:converter-gson:2.1.0'
+  testCompile 'junit:junit:4.12'
+  androidTestCompile 'com.android.support:support-annotations:23.2.1'
+  androidTestCompile 'com.android.support.test:runner:0.5'
+  androidTestCompile 'com.android.support.test:rules:0.5'
+  androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
 }
 
 conditionalDependencies {
-    compile name: 'android-retrofit', version: '6.1.0'
+  compile name: 'android-retrofit', version: '6.1.0'
 }
 
 tasks.withType(Javadoc) {
-    def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/6'
-    options.overview("${project.projectDir}/docs/overview.html")
-    options.links('https://square.github.io/retrofit/2.x/retrofit/',
-            "${prefix}/android/",
-            "${prefix}/android-channel/",
-            "${prefix}/android-core/",
-            "${prefix}/android-object/",
-            "${prefix}/android-proxy/",
-            "${prefix}/android-retrofit/",
-            "${prefix}/android-stream/",
-            "${prefix}/channel/",
-            "${prefix}/core/",
-            "${prefix}/function/",
-            "${prefix}/lib/",
-            "${prefix}/object/",
-            "${prefix}/operator/",
-            "${prefix}/proxy/",
-            "${prefix}/retrofit/",
-            "${prefix}/stream/")
+  def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/6'
+  options.overview("${project.projectDir}/docs/overview.html")
+  options.links('https://square.github.io/retrofit/2.x/retrofit/',
+      "${prefix}/android/",
+      "${prefix}/android-channel/",
+      "${prefix}/android-core/",
+      "${prefix}/android-object/",
+      "${prefix}/android-proxy/",
+      "${prefix}/android-retrofit/",
+      "${prefix}/android-stream/",
+      "${prefix}/channel/",
+      "${prefix}/core/",
+      "${prefix}/function/",
+      "${prefix}/lib/",
+      "${prefix}/object/",
+      "${prefix}/operator/",
+      "${prefix}/proxy/",
+      "${prefix}/retrofit/",
+      "${prefix}/stream/")
 }
 
 project.gradle.taskGraph.whenReady {
-    connectedDebugAndroidTest {
-        // Sample tests are quite unstable on Travis CI...
-        ignoreFailures = true
-    }
+  connectedDebugAndroidTest {
+    // Sample tests are quite unstable on Travis CI...
+    ignoreFailures = true
+  }
 }

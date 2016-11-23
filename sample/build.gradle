@@ -21,23 +21,23 @@ compileJavaCompatibility = JavaVersion.VERSION_1_5
 compileTestJavaCompatibility = JavaVersion.VERSION_1_7
 
 dependencies {
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.assertj:assertj-core:2.4.1'
+  testCompile 'junit:junit:4.12'
+  testCompile 'org.assertj:assertj-core:2.4.1'
 }
 
 conditionalDependencies {
-    compile name: 'lib', version: '6.1.0'
+  compile name: 'lib', version: '6.1.0'
 }
 
 javadoc {
-    def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/6'
-    options.overview("${project.projectDir}/docs/overview.html")
-    options.links("${prefix}/channel/",
-            "${prefix}/core/",
-            "${prefix}/function/",
-            "${prefix}/lib/",
-            "${prefix}/object/",
-            "${prefix}/operator/",
-            "${prefix}/proxy/",
-            "${prefix}/stream/")
+  def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/6'
+  options.overview("${project.projectDir}/docs/overview.html")
+  options.links("${prefix}/channel/",
+      "${prefix}/core/",
+      "${prefix}/function/",
+      "${prefix}/lib/",
+      "${prefix}/object/",
+      "${prefix}/operator/",
+      "${prefix}/proxy/",
+      "${prefix}/stream/")
 }

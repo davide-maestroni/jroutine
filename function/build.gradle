@@ -27,32 +27,32 @@ compileJavaCompatibility = JavaVersion.VERSION_1_5
 compileTestJavaCompatibility = JavaVersion.VERSION_1_7
 
 dependencies {
-    compile 'com.intellij:annotations:12.0'
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.assertj:assertj-core:2.4.1'
+  compile 'com.intellij:annotations:12.0'
+  testCompile 'junit:junit:4.12'
+  testCompile 'org.assertj:assertj-core:2.4.1'
 }
 
 conditionalDependencies {
-    compile name: 'core', version: '6.1.0'
+  compile name: 'core', version: '6.1.0'
 }
 
 jacocoTestReport {
-    reports {
-        xml.enabled = true // Coveralls plugin depends on xml format report
-        html.enabled = true
-    }
+  reports {
+    xml.enabled = true // Coveralls plugin depends on xml format report
+    html.enabled = true
+  }
 }
 
 jacoco {
-    toolVersion project.getProperty('jacocoVersion')
+  toolVersion project.getProperty('jacocoVersion')
 }
 
 findbugs {
-    toolVersion project.getProperty('findbugsVersion')
+  toolVersion project.getProperty('findbugsVersion')
 }
 
 javadoc {
-    def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/6'
-    options.overview("${project.projectDir}/docs/overview.html")
-    options.links("${prefix}/core/")
+  def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/6'
+  options.overview("${project.projectDir}/docs/overview.html")
+  options.links("${prefix}/core/")
 }

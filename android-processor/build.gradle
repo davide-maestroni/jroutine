@@ -26,19 +26,19 @@ compileJavaCompatibility = JavaVersion.VERSION_1_6
 compileTestJavaCompatibility = JavaVersion.VERSION_1_6
 
 conditionalDependencies {
-    compile name: 'processor', version: '6.1.0'
+  compile name: 'processor', version: '6.1.0'
 }
 
 findbugs {
-    toolVersion project.getProperty('findbugsVersion')
+  toolVersion project.getProperty('findbugsVersion')
 }
 
 javadoc {
-    def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/6'
-    options.overview("${project.projectDir}/docs/overview.html")
-    options.links("${prefix}/android-core/",
-            "${prefix}/android-object/",
-            "${prefix}/core/",
-            "${prefix}/object/",
-            "${prefix}/processor/")
+  def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/6'
+  options.overview("${project.projectDir}/docs/overview.html")
+  options.links("${prefix}/android-core/",
+      "${prefix}/android-object/",
+      "${prefix}/core/",
+      "${prefix}/object/",
+      "${prefix}/processor/")
 }

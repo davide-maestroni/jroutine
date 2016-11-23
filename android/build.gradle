@@ -25,85 +25,85 @@ version = project.getProperty('releaseVersion')
 archivesBaseName = "${project.parent.name}-${project.name}"
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion '23.0.3'
+  compileSdkVersion 23
+  buildToolsVersion '23.0.3'
 
-    defaultConfig {
-        minSdkVersion 4
-        targetSdkVersion 23
-        versionCode Integer.parseInt(project.getProperty('releaseVersionCode'))
-        versionName version
+  defaultConfig {
+    minSdkVersion 4
+    targetSdkVersion 23
+    versionCode Integer.parseInt(project.getProperty('releaseVersionCode'))
+    versionName version
+  }
+
+  buildTypes {
+    release {
+      minifyEnabled false
+      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
     }
 
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-
-        debug {
-            minifyEnabled false
-            testCoverageEnabled true
-        }
+    debug {
+      minifyEnabled false
+      testCoverageEnabled true
     }
+  }
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_6
-        targetCompatibility JavaVersion.VERSION_1_6
-    }
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_1_6
+    targetCompatibility JavaVersion.VERSION_1_6
+  }
 
-    dexOptions {
-        preDexLibraries false
-    }
+  dexOptions {
+    preDexLibraries false
+  }
 
-    packagingOptions {
-        exclude 'META-INF/services/javax.annotation.processing.Processor'
-    }
+  packagingOptions {
+    exclude 'META-INF/services/javax.annotation.processing.Processor'
+  }
 
-    lintOptions {
-        disable 'MissingRegistered'
-    }
+  lintOptions {
+    disable 'MissingRegistered'
+  }
 }
 
 dependencies {
-    androidTestCompile 'com.squareup.assertj:assertj-android:1.1.1'
-    compile 'com.android.support:support-v4:23.2.1'
+  androidTestCompile 'com.squareup.assertj:assertj-android:1.1.1'
+  compile 'com.android.support:support-v4:23.2.1'
 }
 
 conditionalDependencies {
-    compile name: 'android-channel', version: '6.1.0'
-    compile name: 'android-core', version: '6.1.0'
-    compile name: 'android-method', version: '6.1.0'
-    compile name: 'android-object', version: '6.1.0'
-    compile name: 'android-proxy', version: '6.1.0'
-    compile name: 'android-stream', version: '6.1.0'
-    compile name: 'lib', version: '6.1.0'
+  compile name: 'android-channel', version: '6.1.0'
+  compile name: 'android-core', version: '6.1.0'
+  compile name: 'android-method', version: '6.1.0'
+  compile name: 'android-object', version: '6.1.0'
+  compile name: 'android-proxy', version: '6.1.0'
+  compile name: 'android-stream', version: '6.1.0'
+  compile name: 'lib', version: '6.1.0'
 }
 
 jacoco {
-    toolVersion project.getProperty('jacocoVersion')
+  toolVersion project.getProperty('jacocoVersion')
 }
 
 findbugs {
-    toolVersion project.getProperty('findbugsVersion')
+  toolVersion project.getProperty('findbugsVersion')
 }
 
 tasks.withType(Javadoc) {
-    def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/6'
-    options.overview("${project.projectDir}/docs/overview.html")
-    options.links("${prefix}/android-channel/",
-            "${prefix}/android-core/",
-            "${prefix}/android-method/",
-            "${prefix}/android-object/",
-            "${prefix}/android-proxy/",
-            "${prefix}/android-stream/",
-            "${prefix}/channel/",
-            "${prefix}/core/",
-            "${prefix}/function/",
-            "${prefix}/lib/",
-            "${prefix}/method/",
-            "${prefix}/object/",
-            "${prefix}/operator/",
-            "${prefix}/proxy/",
-            "${prefix}/stream/")
+  def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/6'
+  options.overview("${project.projectDir}/docs/overview.html")
+  options.links("${prefix}/android-channel/",
+      "${prefix}/android-core/",
+      "${prefix}/android-method/",
+      "${prefix}/android-object/",
+      "${prefix}/android-proxy/",
+      "${prefix}/android-stream/",
+      "${prefix}/channel/",
+      "${prefix}/core/",
+      "${prefix}/function/",
+      "${prefix}/lib/",
+      "${prefix}/method/",
+      "${prefix}/object/",
+      "${prefix}/operator/",
+      "${prefix}/proxy/",
+      "${prefix}/stream/")
 }

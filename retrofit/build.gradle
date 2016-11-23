@@ -27,43 +27,43 @@ compileJavaCompatibility = JavaVersion.VERSION_1_5
 compileTestJavaCompatibility = JavaVersion.VERSION_1_7
 
 dependencies {
-    compile 'com.intellij:annotations:12.0'
-    compile 'com.squareup.retrofit2:retrofit:2.1.0'
-    testCompile project(':operator')
-    testCompile 'com.squareup.okhttp3:mockwebserver:3.4.1'
-    testCompile 'com.squareup.retrofit2:converter-gson:2.1.0'
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.assertj:assertj-core:2.4.1'
+  compile 'com.intellij:annotations:12.0'
+  compile 'com.squareup.retrofit2:retrofit:2.1.0'
+  testCompile project(':operator')
+  testCompile 'com.squareup.okhttp3:mockwebserver:3.4.1'
+  testCompile 'com.squareup.retrofit2:converter-gson:2.1.0'
+  testCompile 'junit:junit:4.12'
+  testCompile 'org.assertj:assertj-core:2.4.1'
 }
 
 conditionalDependencies {
-    compile name: 'core', version: '6.1.0'
-    compile name: 'object', version: '6.1.0'
-    compile name: 'stream', version: '6.1.0'
+  compile name: 'core', version: '6.1.0'
+  compile name: 'object', version: '6.1.0'
+  compile name: 'stream', version: '6.1.0'
 }
 
 jacocoTestReport {
-    reports {
-        xml.enabled = true // Coveralls plugin depends on xml format report
-        html.enabled = true
-    }
+  reports {
+    xml.enabled = true // Coveralls plugin depends on xml format report
+    html.enabled = true
+  }
 }
 
 jacoco {
-    toolVersion project.getProperty('jacocoVersion')
+  toolVersion project.getProperty('jacocoVersion')
 }
 
 findbugs {
-    toolVersion project.getProperty('findbugsVersion')
+  toolVersion project.getProperty('findbugsVersion')
 }
 
 javadoc {
-    def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/6'
-    options.overview("${project.projectDir}/docs/overview.html")
-    options.links('https://square.github.io/retrofit/2.x/retrofit/',
-            "${prefix}/channel/",
-            "${prefix}/core/",
-            "${prefix}/function/",
-            "${prefix}/object/",
-            "${prefix}/stream/")
+  def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/6'
+  options.overview("${project.projectDir}/docs/overview.html")
+  options.links('https://square.github.io/retrofit/2.x/retrofit/',
+      "${prefix}/channel/",
+      "${prefix}/core/",
+      "${prefix}/function/",
+      "${prefix}/object/",
+      "${prefix}/stream/")
 }

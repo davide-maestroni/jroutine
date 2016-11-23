@@ -47,8 +47,8 @@ import java.util.concurrent.TimeUnit;
  */
 class DefaultChannel<DATA> implements Channel<DATA, DATA> {
 
-  private static final WeakIdentityHashMap<Runner, WeakReference<SynchronizedRunner>> sRunners =
-      new WeakIdentityHashMap<Runner, WeakReference<SynchronizedRunner>>();
+  private static final WeakIdentityHashMap<Runner, WeakReference<ChannelRunner>> sRunners =
+      new WeakIdentityHashMap<Runner, WeakReference<ChannelRunner>>();
 
   private final ResultChannel<DATA> mChannel;
 
@@ -60,14 +60,14 @@ class DefaultChannel<DATA> implements Channel<DATA, DATA> {
   DefaultChannel(@NotNull final ChannelConfiguration configuration) {
     final Logger logger = configuration.newLogger(this);
     final Runner wrapped = configuration.getRunnerOrElse(Runners.sharedRunner());
-    SynchronizedRunner channelRunner;
+    ChannelRunner channelRunner;
     synchronized (sRunners) {
-      final WeakIdentityHashMap<Runner, WeakReference<SynchronizedRunner>> runners = sRunners;
-      final WeakReference<SynchronizedRunner> runner = runners.get(wrapped);
+      final WeakIdentityHashMap<Runner, WeakReference<ChannelRunner>> runners = sRunners;
+      final WeakReference<ChannelRunner> runner = runners.get(wrapped);
       channelRunner = (runner != null) ? runner.get() : null;
       if (channelRunner == null) {
-        channelRunner = new SynchronizedRunner(new ChannelRunner(wrapped));
-        runners.put(wrapped, new WeakReference<SynchronizedRunner>(channelRunner));
+        channelRunner = new ChannelRunner(wrapped);
+        runners.put(wrapped, new WeakReference<ChannelRunner>(channelRunner));
       }
     }
 

@@ -101,6 +101,8 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
   private final Condition mHasOutputs;
 
+  private final boolean mIsForcedSynchronization;
+
   private final Logger mLogger;
 
   private final int mMaxOutput;
@@ -161,7 +163,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
       @NotNull final AbortHandler handler, @NotNull final Runner runner,
       @NotNull final Logger logger) {
     this(InvocationConfiguration.builderFromOutput(configuration).configured(), handler, runner,
-        logger);
+        logger, true);
   }
 
   /**
@@ -175,6 +177,20 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
   ResultChannel(@NotNull final InvocationConfiguration configuration,
       @NotNull final AbortHandler handler, @NotNull final Runner runner,
       @NotNull final Logger logger) {
+    this(configuration, handler, runner, logger, false);
+  }
+
+  /**
+   * Constructor.
+   *
+   * @param configuration the invocation configuration.
+   * @param handler       the abort handler.
+   * @param runner        the runner instance.
+   * @param logger        the logger instance.
+   */
+  private ResultChannel(@NotNull final InvocationConfiguration configuration,
+      @NotNull final AbortHandler handler, @NotNull final Runner runner,
+      @NotNull final Logger logger, final boolean isForcedSynchronization) {
     mLogger = logger.subContextLogger(this);
     mHandler = ConstantConditions.notNull("abort handler", handler);
     mRunner = runner;
@@ -206,27 +222,9 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         return true;
       }
     };
+    mIsForcedSynchronization = isForcedSynchronization;
     mBindingHandler = new OutputHandler();
     mState = new OutputChannelState();
-  }
-
-  @NotNull
-  private static ReentrantMutex getMutex(@NotNull final ChannelConsumer<?> consumer) {
-    if (consumer instanceof InternalChannelConsumer) {
-      return NO_MUTEX;
-    }
-
-    synchronized (sConsumerMutexes) {
-      final WeakIdentityHashMap<ChannelConsumer<?>, ReentrantMutex> consumerMutexes =
-          sConsumerMutexes;
-      ReentrantMutex mutex = consumerMutexes.get(consumer);
-      if (mutex == null) {
-        mutex = new DefaultMutex();
-        consumerMutexes.put(consumer, mutex);
-      }
-
-      return mutex;
-    }
   }
 
   public boolean abort() {
@@ -817,6 +815,25 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
   private DurationMeasure getDelay() {
     final DurationMeasure delay = mResultDelay.get();
     return (delay != null) ? delay : zero();
+  }
+
+  @NotNull
+  private ReentrantMutex getMutex(@NotNull final ChannelConsumer<?> consumer) {
+    if (!mIsForcedSynchronization && (consumer instanceof InternalChannelConsumer)) {
+      return NO_MUTEX;
+    }
+
+    synchronized (sConsumerMutexes) {
+      final WeakIdentityHashMap<ChannelConsumer<?>, ReentrantMutex> consumerMutexes =
+          sConsumerMutexes;
+      ReentrantMutex mutex = consumerMutexes.get(consumer);
+      if (mutex == null) {
+        mutex = new DefaultMutex();
+        consumerMutexes.put(consumer, mutex);
+      }
+
+      return mutex;
+    }
   }
 
   @NotNull

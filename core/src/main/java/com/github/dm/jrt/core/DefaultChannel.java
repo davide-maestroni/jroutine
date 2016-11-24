@@ -50,6 +50,8 @@ class DefaultChannel<DATA> implements Channel<DATA, DATA> {
   private static final WeakIdentityHashMap<Runner, WeakReference<ChannelRunner>> sRunners =
       new WeakIdentityHashMap<Runner, WeakReference<ChannelRunner>>();
 
+  private static final Runner sSyncRunner = Runners.syncRunner();
+
   private final ResultChannel<DATA> mChannel;
 
   /**
@@ -73,7 +75,7 @@ class DefaultChannel<DATA> implements Channel<DATA, DATA> {
 
     final ChannelAbortHandler abortHandler = new ChannelAbortHandler();
     final ResultChannel<DATA> channel =
-        new ResultChannel<DATA>(configuration, abortHandler, channelRunner, logger);
+        new ResultChannel<DATA>(configuration, channelRunner, abortHandler, logger);
     abortHandler.setChannel(channel);
     mChannel = channel;
     logger.dbg("building channel with configuration: %s", configuration);
@@ -307,7 +309,7 @@ class DefaultChannel<DATA> implements Channel<DATA, DATA> {
     public void run(@NotNull final Execution execution, final long delay,
         @NotNull final TimeUnit timeUnit) {
       if (delay == 0) {
-        execution.run();
+        sSyncRunner.run(execution, delay, timeUnit);
 
       } else {
         super.run(execution, delay, timeUnit);

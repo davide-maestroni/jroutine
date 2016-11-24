@@ -54,7 +54,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantLock;
 
 import static com.github.dm.jrt.core.common.Backoff.NO_DELAY;
 import static com.github.dm.jrt.core.util.DurationMeasure.fromUnit;
@@ -78,17 +77,8 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
       "cannot wait while no invocation instance is available"
           + "\nTry increasing the max number of instances";
 
-  private static final ReentrantMutex NO_MUTEX = new ReentrantMutex() {
-
-    public void acquire() {
-    }
-
-    public void release() {
-    }
-  };
-
-  private static final WeakIdentityHashMap<ChannelConsumer<?>, ReentrantMutex> sConsumerMutexes =
-      new WeakIdentityHashMap<ChannelConsumer<?>, ReentrantMutex>();
+  private static final WeakIdentityHashMap<ChannelConsumer<?>, Object> sConsumerMutexes =
+      new WeakIdentityHashMap<ChannelConsumer<?>, Object>();
 
   private static final LocalFence sInvocationFence = new LocalFence();
 
@@ -100,8 +90,6 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
   private final AbortHandler mHandler;
 
   private final Condition mHasOutputs;
-
-  private final boolean mIsForcedSynchronization;
 
   private final Logger mLogger;
 
@@ -155,53 +143,60 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
    * Constructor.
    *
    * @param configuration the channel configuration.
-   * @param handler       the abort handler.
    * @param runner        the runner instance.
+   * @param handler       the abort handler.
    * @param logger        the logger instance.
    */
-  ResultChannel(@NotNull final ChannelConfiguration configuration,
-      @NotNull final AbortHandler handler, @NotNull final Runner runner,
-      @NotNull final Logger logger) {
-    this(InvocationConfiguration.builderFromOutput(configuration).configured(), handler, runner,
-        logger, true);
+  ResultChannel(@NotNull final ChannelConfiguration configuration, @NotNull final Runner runner,
+      @NotNull final AbortHandler handler, @NotNull final Logger logger) {
+    this(configuration.getOrderTypeOrElse(OrderType.UNSORTED),
+        configuration.getMaxSizeOrElse(Integer.MAX_VALUE), configuration.getBackoffOrElse(null),
+        configuration.getOutputTimeoutOrElse(zero()),
+        configuration.getOutputTimeoutActionOrElse(TimeoutActionType.FAIL), runner, handler,
+        logger);
   }
 
   /**
    * Constructor.
    *
    * @param configuration the invocation configuration.
-   * @param handler       the abort handler.
    * @param runner        the runner instance.
+   * @param handler       the abort handler.
    * @param logger        the logger instance.
    */
-  ResultChannel(@NotNull final InvocationConfiguration configuration,
-      @NotNull final AbortHandler handler, @NotNull final Runner runner,
-      @NotNull final Logger logger) {
-    this(configuration, handler, runner, logger, false);
+  ResultChannel(@NotNull final InvocationConfiguration configuration, @NotNull final Runner runner,
+      @NotNull final AbortHandler handler, @NotNull final Logger logger) {
+    this(configuration.getOutputOrderTypeOrElse(OrderType.UNSORTED),
+        configuration.getOutputMaxSizeOrElse(Integer.MAX_VALUE),
+        configuration.getOutputBackoffOrElse(null), configuration.getOutputTimeoutOrElse(zero()),
+        configuration.getOutputTimeoutActionOrElse(TimeoutActionType.FAIL), runner, handler,
+        logger);
   }
 
   /**
-   * Constructor.
+   * Contructor.
    *
-   * @param configuration the invocation configuration.
-   * @param handler       the abort handler.
-   * @param runner        the runner instance.
-   * @param logger        the logger instance.
+   * @param orderType         the channel order type.
+   * @param maxOutput         the maximum output size.
+   * @param backoff           the channel backoff or null.
+   * @param outputTimeout     the output timeout.
+   * @param timeoutActionType the timeout action type.
+   * @param runner            the runner instance.
+   * @param handler           the abort handler.
+   * @param logger            the logger instance.
    */
-  private ResultChannel(@NotNull final InvocationConfiguration configuration,
-      @NotNull final AbortHandler handler, @NotNull final Runner runner,
-      @NotNull final Logger logger, final boolean isForcedSynchronization) {
+  private ResultChannel(@NotNull final OrderType orderType, final int maxOutput,
+      @Nullable final Backoff backoff, @NotNull final DurationMeasure outputTimeout,
+      @NotNull final TimeoutActionType timeoutActionType, @NotNull final Runner runner,
+      @NotNull final AbortHandler handler, @NotNull final Logger logger) {
     mLogger = logger.subContextLogger(this);
     mHandler = ConstantConditions.notNull("abort handler", handler);
     mRunner = runner;
     mFlusher = runner.isSynchronous() ? new SyncFlusher() : new AsyncFlusher();
-    mResultOrder =
-        new LocalValue<OrderType>(configuration.getOutputOrderTypeOrElse(OrderType.UNSORTED));
-    mOutputTimeout = configuration.getOutputTimeoutOrElse(zero());
-    mTimeoutActionType = new LocalValue<TimeoutActionType>(
-        configuration.getOutputTimeoutActionOrElse(TimeoutActionType.FAIL));
-    mOutputBackoff = configuration.getOutputBackoffOrElse(BackoffBuilder.noDelay());
-    mMaxOutput = configuration.getOutputMaxSizeOrElse(Integer.MAX_VALUE);
+    mResultOrder = new LocalValue<OrderType>(orderType);
+    mOutputTimeout = outputTimeout;
+    mTimeoutActionType = new LocalValue<TimeoutActionType>(timeoutActionType);
+    mMaxOutput = maxOutput;
     mOutputQueue = new NestedQueue<Object>() {
 
       @Override
@@ -209,11 +204,12 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         // Preventing closing
       }
     };
-    final Backoff backoff = mOutputBackoff;
-    mHasOutputs = (configuration.getOutputBackoffOrElse(null) != null) ? new Condition() {
+    final Backoff outputBackoff =
+        mOutputBackoff = (backoff != null) ? backoff : BackoffBuilder.noDelay();
+    mHasOutputs = (backoff != null) ? new Condition() {
 
       public boolean isTrue() {
-        return (backoff.getDelay(mOutputCount) == NO_DELAY) || mIsWaitingInvocation || (
+        return (outputBackoff.getDelay(mOutputCount) == NO_DELAY) || mIsWaitingInvocation || (
             mAbortException != null);
       }
     } : new Condition() {
@@ -222,9 +218,22 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         return true;
       }
     };
-    mIsForcedSynchronization = isForcedSynchronization;
     mBindingHandler = new OutputHandler();
     mState = new OutputChannelState();
+  }
+
+  @NotNull
+  private static Object getMutex(@NotNull final ChannelConsumer<?> consumer) {
+    synchronized (sConsumerMutexes) {
+      final WeakIdentityHashMap<ChannelConsumer<?>, Object> consumerMutexes = sConsumerMutexes;
+      Object mutex = consumerMutexes.get(consumer);
+      if (mutex == null) {
+        mutex = new Object();
+        consumerMutexes.put(consumer, mutex);
+      }
+
+      return mutex;
+    }
   }
 
   public boolean abort() {
@@ -818,25 +827,6 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
   }
 
   @NotNull
-  private ReentrantMutex getMutex(@NotNull final ChannelConsumer<?> consumer) {
-    if (!mIsForcedSynchronization && (consumer instanceof InternalChannelConsumer)) {
-      return NO_MUTEX;
-    }
-
-    synchronized (sConsumerMutexes) {
-      final WeakIdentityHashMap<ChannelConsumer<?>, ReentrantMutex> consumerMutexes =
-          sConsumerMutexes;
-      ReentrantMutex mutex = consumerMutexes.get(consumer);
-      if (mutex == null) {
-        mutex = new DefaultMutex();
-        consumerMutexes.put(consumer, mutex);
-      }
-
-      return mutex;
-    }
-  }
-
-  @NotNull
   private DurationMeasure getTimeout() {
     final DurationMeasure delay = mResultDelay.get();
     return (delay != null) ? delay : mOutputTimeout;
@@ -1101,38 +1091,6 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
   }
 
   /**
-   * Reentrant mutex.
-   */
-  private interface ReentrantMutex {
-
-    /**
-     * Acquires the mutex.
-     */
-    void acquire();
-
-    /**
-     * Releases the mutex.
-     */
-    void release();
-  }
-
-  /**
-   * Default implementation.
-   */
-  private static class DefaultMutex implements ReentrantMutex {
-
-    private final ReentrantLock mLock = new ReentrantLock();
-
-    public void acquire() {
-      mLock.lock();
-    }
-
-    public void release() {
-      mLock.unlock();
-    }
-  }
-
-  /**
    * The invocation has been aborted and the exception put into the output queue.
    */
   private class AbortChannelState extends ExceptionChannelState {
@@ -1194,23 +1152,28 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     public void run(@NotNull final BindingHandler<OUT> handler, final boolean forceClose) {
       // Need to make sure to pass the outputs to the consumer in the runner thread, so to avoid
       // deadlock issues
-      final FlushExecution execution;
-      if (forceClose) {
-        if (mForcedFlushExecution == null) {
-          mForcedFlushExecution = new FlushExecution(true);
-        }
-
-        execution = mForcedFlushExecution;
+      if (mRunner.isExecutionThread()) {
+        handler.flushOutput(forceClose);
 
       } else {
-        if (mFlushExecution == null) {
-          mFlushExecution = new FlushExecution(false);
+        final FlushExecution execution;
+        if (forceClose) {
+          if (mForcedFlushExecution == null) {
+            mForcedFlushExecution = new FlushExecution(true);
+          }
+
+          execution = mForcedFlushExecution;
+
+        } else {
+          if (mFlushExecution == null) {
+            mFlushExecution = new FlushExecution(false);
+          }
+
+          execution = mFlushExecution;
         }
 
-        execution = mFlushExecution;
+        mRunner.run(execution, 0, TimeUnit.MILLISECONDS);
       }
-
-      mRunner.run(execution, 0, TimeUnit.MILLISECONDS);
     }
   }
 
@@ -1221,7 +1184,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
     private final ChannelConsumer<? super OUT> mConsumer;
 
-    private final ReentrantMutex mConsumerMutex;
+    private final Object mConsumerMutex;
 
     private final SimpleQueue<Object> mQueue = new SimpleQueue<Object>();
 
@@ -1239,9 +1202,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     public void flushOutput(final boolean forceClose) {
       final Logger logger = mLogger;
       RoutineException abortException = null;
-      final ReentrantMutex mutex = mConsumerMutex;
-      mutex.acquire();
-      try {
+      synchronized (mConsumerMutex) {
         final NestedQueue<Object> outputQueue = mOutputQueue;
         final SimpleQueue<Object> queue = mQueue;
         final OutputChannelState currentState;
@@ -1295,9 +1256,6 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
           InvocationInterruptedException.throwIfInterrupt(t);
         }
-
-      } finally {
-        mutex.release();
       }
 
       if (abortException != null) {
@@ -1318,7 +1276,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
   /**
    * Default implementation of an channel consumer pushing the data into the output queue.
    */
-  private class DefaultChannelConsumer implements InternalChannelConsumer<OUT> {
+  private class DefaultChannelConsumer implements ChannelConsumer<OUT> {
 
     private final long mDelay;
 

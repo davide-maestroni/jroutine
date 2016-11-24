@@ -29,6 +29,7 @@ import com.github.dm.jrt.core.channel.TemplateChannelConsumer;
 import com.github.dm.jrt.core.common.DeadlockException;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.common.TimeoutException;
+import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.ChannelConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
@@ -380,7 +381,7 @@ public class RoutineTest {
     final Logger logger = Logger.newLogger(new NullLog(), Level.DEBUG, this);
     try {
       new InvocationChannel<Object, Object>(InvocationConfiguration.defaultConfiguration(), null,
-          Runners.sharedRunner(), logger);
+          new SingleExecutionRunner(Runners.sharedRunner()), logger);
       fail();
 
     } catch (final NullPointerException ignored) {
@@ -396,7 +397,7 @@ public class RoutineTest {
 
     try {
       new InvocationChannel<Object, Object>(InvocationConfiguration.defaultConfiguration(),
-          new TestInvocationManager(), Runners.sharedRunner(), null);
+          new TestInvocationManager(), new SingleExecutionRunner(Runners.sharedRunner()), null);
       fail();
 
     } catch (final NullPointerException ignored) {
@@ -404,7 +405,7 @@ public class RoutineTest {
 
     try {
       new InvocationChannel<Object, Object>(null, new TestInvocationManager(),
-          Runners.sharedRunner(), logger);
+          new SingleExecutionRunner(Runners.sharedRunner()), logger);
       fail();
 
     } catch (final NullPointerException ignored) {
@@ -413,7 +414,8 @@ public class RoutineTest {
     try {
       final InvocationChannel<Object, Object> channel =
           new InvocationChannel<Object, Object>(InvocationConfiguration.defaultConfiguration(),
-              new TestInvocationManager(), Runners.sharedRunner(), logger);
+              new TestInvocationManager(), new SingleExecutionRunner(Runners.sharedRunner()),
+              logger);
       channel.close();
       channel.pass("test");
       fail();
@@ -425,7 +427,8 @@ public class RoutineTest {
 
       final InvocationChannel<Object, Object> channel =
           new InvocationChannel<Object, Object>(InvocationConfiguration.defaultConfiguration(),
-              new TestInvocationManager(), Runners.sharedRunner(), logger);
+              new TestInvocationManager(), new SingleExecutionRunner(Runners.sharedRunner()),
+              logger);
       channel.after(null);
       fail();
 
@@ -435,7 +438,8 @@ public class RoutineTest {
     try {
       final InvocationChannel<Object, Object> channel =
           new InvocationChannel<Object, Object>(InvocationConfiguration.defaultConfiguration(),
-              new TestInvocationManager(), Runners.sharedRunner(), logger);
+              new TestInvocationManager(), new SingleExecutionRunner(Runners.sharedRunner()),
+              logger);
       channel.after(1, null);
       fail();
 
@@ -445,7 +449,8 @@ public class RoutineTest {
     try {
       final InvocationChannel<Object, Object> channel =
           new InvocationChannel<Object, Object>(InvocationConfiguration.defaultConfiguration(),
-              new TestInvocationManager(), Runners.sharedRunner(), logger);
+              new TestInvocationManager(), new SingleExecutionRunner(Runners.sharedRunner()),
+              logger);
       channel.after(-1, TimeUnit.MILLISECONDS);
       fail();
 
@@ -984,7 +989,7 @@ public class RoutineTest {
     try {
       final ResultChannel<Object> channel =
           new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(),
-              new TestAbortHandler(), Runners.syncRunner(), logger);
+              Runners.syncRunner(), new TestAbortHandler(), logger);
       new InvocationExecution<Object, Object>(null, new TestExecutionObserver(), channel, logger);
       fail();
 
@@ -993,8 +998,8 @@ public class RoutineTest {
 
     try {
       final ResultChannel<Object> channel =
-          new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(),
-              new TestAbortHandler(), Runners.syncRunner(), logger);
+          new ResultChannel<Object>(ChannelConfiguration.defaultConfiguration(),
+              new SingleExecutionRunner(Runners.syncRunner()), new TestAbortHandler(), logger);
       new InvocationExecution<Object, Object>(new TestInvocationManager(), null, channel, logger);
       fail();
 
@@ -1012,7 +1017,7 @@ public class RoutineTest {
     try {
       final ResultChannel<Object> channel =
           new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(),
-              new TestAbortHandler(), Runners.syncRunner(), logger);
+              Runners.syncRunner(), new TestAbortHandler(), logger);
       new InvocationExecution<Object, Object>(new TestInvocationManager(),
           new TestExecutionObserver(), channel, null);
       fail();
@@ -1652,8 +1657,16 @@ public class RoutineTest {
   public void testResultChannelError() {
     final Logger logger = Logger.newLogger(new NullLog(), Level.DEBUG, this);
     try {
+      new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(),
+          Runners.sharedRunner(), null, logger);
+      fail();
+
+    } catch (final NullPointerException ignored) {
+    }
+
+    try {
       new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(), null,
-          Runners.sharedRunner(), logger);
+          new TestAbortHandler(), logger);
       fail();
 
     } catch (final NullPointerException ignored) {
@@ -1661,7 +1674,7 @@ public class RoutineTest {
 
     try {
       new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(),
-          new TestAbortHandler(), null, logger);
+          Runners.sharedRunner(), new TestAbortHandler(), null);
       fail();
 
     } catch (final NullPointerException ignored) {
@@ -1669,7 +1682,7 @@ public class RoutineTest {
 
     try {
       new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(),
-          new TestAbortHandler(), Runners.sharedRunner(), null);
+          Runners.sharedRunner(), new TestAbortHandler(), logger).after(null);
       fail();
 
     } catch (final NullPointerException ignored) {
@@ -1677,15 +1690,7 @@ public class RoutineTest {
 
     try {
       new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(),
-          new TestAbortHandler(), Runners.sharedRunner(), logger).after(null);
-      fail();
-
-    } catch (final NullPointerException ignored) {
-    }
-
-    try {
-      new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(),
-          new TestAbortHandler(), Runners.sharedRunner(), logger).after(0, null);
+          Runners.sharedRunner(), new TestAbortHandler(), logger).after(0, null);
       fail();
 
     } catch (final NullPointerException ignored) {
@@ -1694,7 +1699,7 @@ public class RoutineTest {
     try {
       final ResultChannel<Object> channel =
           new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(),
-              new TestAbortHandler(), Runners.sharedRunner(), logger);
+              Runners.sharedRunner(), new TestAbortHandler(), logger);
       channel.after(-1, TimeUnit.MILLISECONDS);
       fail();
 

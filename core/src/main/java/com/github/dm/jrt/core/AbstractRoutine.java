@@ -61,8 +61,6 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
   private final SimpleQueue<Invocation<IN, OUT>> mInvocations =
       new SimpleQueue<Invocation<IN, OUT>>();
 
-  private final boolean mIsSyncRunner;
-
   private final Logger mLogger;
 
   private final int mMaxInvocations;
@@ -94,7 +92,6 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
       mRunner = runner;
     }
 
-    mIsSyncRunner = runner.isSynchronous();
     mMaxInvocations = configuration.getMaxInstancesOrElse(DEFAULT_MAX_INVOCATIONS);
     mCoreInvocations = configuration.getCoreInstancesOrElse(DEFAULT_CORE_INVOCATIONS);
     mLogger = configuration.newLogger(this);
@@ -106,13 +103,11 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
    *
    * @param configuration the invocation configuration.
    * @param runner        the runner used for executing invocation.
-   * @param isSyncRunner  if the runner is synchronous.
    * @param logger        the logger instance.
    */
   private AbstractRoutine(@NotNull final InvocationConfiguration configuration,
-      @NotNull final Runner runner, final boolean isSyncRunner, @NotNull final Logger logger) {
+      @NotNull final Runner runner, @NotNull final Logger logger) {
     mConfiguration = configuration;
-    mIsSyncRunner = isSyncRunner;
     mRunner = runner;
     mMaxInvocations = DEFAULT_MAX_INVOCATIONS;
     mCoreInvocations = DEFAULT_CORE_INVOCATIONS;
@@ -185,15 +180,14 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
   @NotNull
   private Routine<IN, OUT> getElementRoutine() {
     if (mElementRoutine == null) {
-      mElementRoutine =
-          new AbstractRoutine<IN, OUT>(mConfiguration, mRunner, mIsSyncRunner, mLogger) {
+      mElementRoutine = new AbstractRoutine<IN, OUT>(mConfiguration, mRunner, mLogger) {
 
-            @NotNull
-            @Override
-            protected Invocation<IN, OUT> newInvocation() {
-              return new ParallelInvocation<IN, OUT>(AbstractRoutine.this);
-            }
-          };
+        @NotNull
+        @Override
+        protected Invocation<IN, OUT> newInvocation() {
+          return new ParallelInvocation<IN, OUT>(AbstractRoutine.this);
+        }
+      };
     }
 
     return mElementRoutine;
@@ -201,11 +195,9 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
 
   @NotNull
   private Channel<IN, OUT> invoke() {
-    final Runner runner = mRunner;
-    final Runner throttlingRunner =
-        mIsSyncRunner ? new SynchronizedRunner(runner) : Runners.throttlingRunner(runner, 1);
-    return new InvocationChannel<IN, OUT>(mConfiguration,
-        new DefaultInvocationManager(throttlingRunner), throttlingRunner, mLogger);
+    final SingleExecutionRunner runner = new SingleExecutionRunner(mRunner);
+    return new InvocationChannel<IN, OUT>(mConfiguration, new DefaultInvocationManager(runner),
+        runner, mLogger);
   }
 
   /**
@@ -276,14 +268,14 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
 
     private final CreateExecution mCreateExecution;
 
-    private final Runner mManagerRunner;
+    private final SingleExecutionRunner mManagerRunner;
 
     /**
      * Constructor.
      *
      * @param runner the runner used for asynchronous invocation.
      */
-    private DefaultInvocationManager(@NotNull final Runner runner) {
+    private DefaultInvocationManager(@NotNull final SingleExecutionRunner runner) {
       mManagerRunner = runner;
       mCreateExecution = new CreateExecution(this);
     }

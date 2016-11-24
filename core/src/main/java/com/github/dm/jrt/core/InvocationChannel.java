@@ -113,8 +113,8 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
    * @param logger        the logger instance.
    */
   InvocationChannel(@NotNull final InvocationConfiguration configuration,
-      @NotNull final InvocationManager<IN, OUT> manager, @NotNull final Runner runner,
-      @NotNull final Logger logger) {
+      @NotNull final InvocationManager<IN, OUT> manager,
+      @NotNull final SingleExecutionRunner runner, @NotNull final Logger logger) {
     mLogger = logger.subContextLogger(this);
     mRunner = ConstantConditions.notNull("invocation runner", runner);
     mInputOrder =
@@ -141,7 +141,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
         return true;
       }
     };
-    mResultChanel = new ResultChannel<OUT>(configuration, new AbortHandler() {
+    mResultChanel = new ResultChannel<OUT>(configuration, runner.decorated(), new AbortHandler() {
 
       public void onAbort(@NotNull final RoutineException reason, final long delay,
           @NotNull final TimeUnit timeUnit) {
@@ -164,7 +164,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
           }, 0, TimeUnit.MILLISECONDS);
         }
       }
-    }, runner, logger);
+    }, logger);
     mExecution =
         new InvocationExecution<IN, OUT>(manager, new DefaultExecutionObserver(), mResultChanel,
             logger);
@@ -783,7 +783,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
   /**
    * Default implementation of an channel consumer pushing the data into the input queue.
    */
-  private class DefaultChannelConsumer implements InternalChannelConsumer<IN> {
+  private class DefaultChannelConsumer implements ChannelConsumer<IN> {
 
     private final Channel<?, ? extends IN> mChannel;
 

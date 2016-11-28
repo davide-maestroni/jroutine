@@ -48,8 +48,8 @@ import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
 import static com.github.dm.jrt.core.util.DurationMeasure.micros;
 import static com.github.dm.jrt.core.util.DurationMeasure.millis;
 import static com.github.dm.jrt.core.util.DurationMeasure.nanos;
+import static com.github.dm.jrt.core.util.DurationMeasure.noTime;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
-import static com.github.dm.jrt.core.util.DurationMeasure.zero;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -84,7 +84,7 @@ public class RunnerTest extends AndroidTestCase {
           break;
 
         default:
-          delay = zero();
+          delay = noTime();
           break;
       }
 
@@ -124,7 +124,7 @@ public class RunnerTest extends AndroidTestCase {
           break;
 
         default:
-          delay = zero();
+          delay = noTime();
           break;
       }
 
@@ -135,7 +135,7 @@ public class RunnerTest extends AndroidTestCase {
     }
 
     final TestRecursiveExecution recursiveExecution =
-        new TestRecursiveExecution(runner, executions, delays, zero());
+        new TestRecursiveExecution(runner, executions, delays, noTime());
 
     runner.run(recursiveExecution, 0, TimeUnit.MILLISECONDS);
 
@@ -192,7 +192,7 @@ public class RunnerTest extends AndroidTestCase {
                                                     .close();
     assertThat(JRoutineCore.with(new HandlerInvocationFactory())
                            .call(channel)
-                           .after(seconds(30))
+                           .inMax(seconds(30))
                            .next()).isEqualTo(true);
   }
 
@@ -214,7 +214,7 @@ public class RunnerTest extends AndroidTestCase {
                                                    .close();
     assertThat(JRoutineCore.with(new LooperInvocationFactory())
                            .call(channel)
-                           .after(seconds(30))
+                           .inMax(seconds(30))
                            .next()).isEqualTo(true);
   }
 

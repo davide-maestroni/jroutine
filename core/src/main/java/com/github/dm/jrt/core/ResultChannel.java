@@ -57,7 +57,7 @@ import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.core.common.Backoff.NO_DELAY;
 import static com.github.dm.jrt.core.util.DurationMeasure.fromUnit;
-import static com.github.dm.jrt.core.util.DurationMeasure.zero;
+import static com.github.dm.jrt.core.util.DurationMeasure.noTime;
 
 /**
  * Class handling the invocation output.
@@ -101,9 +101,9 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
   private final NestedQueue<Object> mOutputQueue;
 
-  private final DurationMeasure mOutputTimeout;
+  private final LocalValue<DurationMeasure> mOutputTimeout;
 
-  private final ThreadLocal<DurationMeasure> mResultDelay = new ThreadLocal<DurationMeasure>();
+  private final LocalValue<DurationMeasure> mResultDelay;
 
   private final LocalValue<OrderType> mResultOrder;
 
@@ -151,7 +151,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
       @NotNull final AbortHandler handler, @NotNull final Logger logger) {
     this(configuration.getOrderTypeOrElse(OrderType.UNSORTED),
         configuration.getMaxSizeOrElse(Integer.MAX_VALUE), configuration.getBackoffOrElse(null),
-        configuration.getOutputTimeoutOrElse(zero()),
+        configuration.getOutputTimeoutOrElse(noTime()),
         configuration.getOutputTimeoutActionOrElse(TimeoutActionType.FAIL), runner, handler,
         logger);
   }
@@ -168,7 +168,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
       @NotNull final AbortHandler handler, @NotNull final Logger logger) {
     this(configuration.getOutputOrderTypeOrElse(OrderType.UNSORTED),
         configuration.getOutputMaxSizeOrElse(Integer.MAX_VALUE),
-        configuration.getOutputBackoffOrElse(null), configuration.getOutputTimeoutOrElse(zero()),
+        configuration.getOutputBackoffOrElse(null), configuration.getOutputTimeoutOrElse(noTime()),
         configuration.getOutputTimeoutActionOrElse(TimeoutActionType.FAIL), runner, handler,
         logger);
   }
@@ -194,7 +194,8 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     mRunner = runner;
     mFlusher = runner.isSynchronous() ? new SyncFlusher() : new AsyncFlusher();
     mResultOrder = new LocalValue<OrderType>(orderType);
-    mOutputTimeout = outputTimeout;
+    mResultDelay = new LocalValue<DurationMeasure>(noTime());
+    mOutputTimeout = new LocalValue<DurationMeasure>(outputTimeout);
     mTimeoutActionType = new LocalValue<TimeoutActionType>(timeoutActionType);
     mMaxOutput = maxOutput;
     mOutputQueue = new NestedQueue<Object>() {
@@ -241,7 +242,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
   }
 
   public boolean abort(@Nullable final Throwable reason) {
-    final DurationMeasure delay = getDelay();
+    final DurationMeasure delay = mResultDelay.get();
     final RoutineException abortException;
     synchronized (mMutex) {
       abortException = mState.abortInvocation(reason, delay);
@@ -270,6 +271,11 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
   public Channel<OUT, OUT> after(@NotNull final DurationMeasure delay) {
     mResultDelay.set(ConstantConditions.notNull("result delay", delay));
     return this;
+  }
+
+  @NotNull
+  public Channel<OUT, OUT> afterNoDelay() {
+    return after(noTime());
   }
 
   @NotNull
@@ -314,7 +320,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
   @NotNull
   public Channel<OUT, OUT> close() {
-    final DurationMeasure delay = getDelay();
+    final DurationMeasure delay = mResultDelay.get();
     final boolean isOpen;
     final Execution execution;
     final BindingHandler<OUT> handler;
@@ -364,7 +370,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
   @NotNull
   public Iterator<OUT> expiringIterator() {
     verifyBound();
-    final DurationMeasure outputTimeout = getTimeout();
+    final DurationMeasure outputTimeout = mOutputTimeout.get();
     return new ExpiringIterator(outputTimeout.value, outputTimeout.unit, mTimeoutActionType.get(),
         mTimeoutException.get());
   }
@@ -375,7 +381,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         return true;
       }
 
-      final DurationMeasure outputTimeout = getTimeout();
+      final DurationMeasure outputTimeout = mOutputTimeout.get();
       final long timeout = outputTimeout.value;
       if (timeout > 0) {
         checkCanWait();
@@ -419,7 +425,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         return mAbortException;
       }
 
-      final DurationMeasure outputTimeout = getTimeout();
+      final DurationMeasure outputTimeout = mOutputTimeout.get();
       final long timeout = outputTimeout.value;
       if (timeout > 0) {
         checkCanWait();
@@ -457,15 +463,31 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
   }
 
   public boolean hasNext() {
-    final DurationMeasure outputTimeout = getTimeout();
+    final DurationMeasure outputTimeout = mOutputTimeout.get();
     return isNextAvailable(outputTimeout.value, outputTimeout.unit, mTimeoutActionType.get(),
         mTimeoutException.get());
   }
 
   public OUT next() {
-    final DurationMeasure outputTimeout = getTimeout();
+    final DurationMeasure outputTimeout = mOutputTimeout.get();
     return readNext(outputTimeout.value, outputTimeout.unit, mTimeoutActionType.get(),
         mTimeoutException.get());
+  }
+
+  @NotNull
+  public Channel<OUT, OUT> inMax(final long timeout, @NotNull final TimeUnit timeUnit) {
+    return inMax(fromUnit(timeout, timeUnit));
+  }
+
+  @NotNull
+  public Channel<OUT, OUT> inMax(@NotNull final DurationMeasure timeout) {
+    mOutputTimeout.set(ConstantConditions.notNull("output timeout", timeout));
+    return this;
+  }
+
+  @NotNull
+  public Channel<OUT, OUT> inNoTime() {
+    return inMax(noTime());
   }
 
   public int inputCount() {
@@ -511,11 +533,6 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     return output;
   }
 
-  @NotNull
-  public Channel<OUT, OUT> now() {
-    return after(zero());
-  }
-
   public int outputCount() {
     synchronized (mMutex) {
       return mOutputCount;
@@ -538,7 +555,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
   @NotNull
   public Channel<OUT, OUT> pass(@Nullable final Iterable<? extends OUT> outputs) {
-    final DurationMeasure delay = getDelay();
+    final DurationMeasure delay = mResultDelay.get();
     final Execution execution;
     final BindingHandler<OUT> handler;
     synchronized (mMutex) {
@@ -564,7 +581,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
   @NotNull
   public Channel<OUT, OUT> pass(@Nullable final OUT output) {
-    final DurationMeasure delay = getDelay();
+    final DurationMeasure delay = mResultDelay.get();
     final Execution execution;
     final BindingHandler<OUT> handler;
     synchronized (mMutex) {
@@ -590,7 +607,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
   @NotNull
   public Channel<OUT, OUT> pass(@Nullable final OUT... outputs) {
-    final DurationMeasure delay = getDelay();
+    final DurationMeasure delay = mResultDelay.get();
     final Execution execution;
     final BindingHandler<OUT> handler;
     synchronized (mMutex) {
@@ -628,7 +645,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         }
 
       } catch (final NoSuchElementException ignored) {
-        final DurationMeasure outputTimeout = getTimeout();
+        final DurationMeasure outputTimeout = mOutputTimeout.get();
         final long timeout = outputTimeout.value;
         final TimeUnit timeoutUnit = outputTimeout.unit;
         final TimeoutActionType timeoutAction = mTimeoutActionType.get();
@@ -678,7 +695,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
   @NotNull
   public Iterator<OUT> iterator() {
     verifyBound();
-    final DurationMeasure outputTimeout = getTimeout();
+    final DurationMeasure outputTimeout = mOutputTimeout.get();
     return new DefaultIterator(outputTimeout.value, outputTimeout.unit, mTimeoutActionType.get(),
         mTimeoutException.get());
   }
@@ -692,7 +709,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
   boolean abortImmediately(@Nullable final Throwable reason) {
     RoutineException abortException = InvocationException.wrapIfNeeded(reason);
     synchronized (mMutex) {
-      abortException = mState.abortInvocation(abortException, zero());
+      abortException = mState.abortInvocation(abortException, noTime());
     }
 
     if (abortException != null) {
@@ -720,7 +737,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
     if (abortException != null) {
       for (final Channel<?, ? extends OUT> channel : channels) {
-        channel.now().abort(abortException);
+        channel.afterNoDelay().abort(abortException);
       }
 
       mFlusher.run(handler, false);
@@ -818,18 +835,6 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     synchronized (mMutex) {
       return mBindingHandler;
     }
-  }
-
-  @NotNull
-  private DurationMeasure getDelay() {
-    final DurationMeasure delay = mResultDelay.get();
-    return (delay != null) ? delay : zero();
-  }
-
-  @NotNull
-  private DurationMeasure getTimeout() {
-    final DurationMeasure delay = mResultDelay.get();
-    return (delay != null) ? delay : mOutputTimeout;
   }
 
   private void internalAbort(@NotNull final RoutineException abortException) {
@@ -1290,7 +1295,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
      * Constructor.
      */
     private DefaultChannelConsumer() {
-      final DurationMeasure delay = getDelay();
+      final DurationMeasure delay = mResultDelay.get();
       mDelay = delay.value;
       mDelayUnit = delay.unit;
       final OrderType order = (mOrderType = mResultOrder.get());

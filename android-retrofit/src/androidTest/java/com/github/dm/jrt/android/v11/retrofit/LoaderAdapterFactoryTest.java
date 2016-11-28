@@ -110,7 +110,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                             }
                           }))
                           .close()
-                          .after(seconds(10))
+                          .inMax(seconds(10))
                           .getError()).isNull();
       }
 
@@ -145,7 +145,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                             }
                           }))
                           .close()
-                          .after(seconds(10))
+                          .inMax(seconds(10))
                           .getError()).isNull();
       }
 
@@ -181,7 +181,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                           }
                         }))
                         .close()
-                        .after(seconds(10))
+                        .inMax(seconds(10))
                         .getError()).isNull();
 
     } finally {
@@ -265,7 +265,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                             }
                           }))
                           .close()
-                          .after(seconds(10))
+                          .inMax(seconds(10))
                           .getError()).isNull();
       }
 
@@ -300,7 +300,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                             }
                           }))
                           .close()
-                          .after(seconds(10))
+                          .inMax(seconds(10))
                           .getError()).isNull();
       }
 
@@ -336,7 +336,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                           }
                         }))
                         .close()
-                        .after(seconds(10))
+                        .inMax(seconds(10))
                         .getError()).isNull();
 
     } finally {

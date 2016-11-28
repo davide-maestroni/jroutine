@@ -105,6 +105,12 @@ class ReplayChannel<OUT> implements Channel<OUT, OUT>, ChannelConsumer<OUT> {
   }
 
   @NotNull
+  public Channel<OUT, OUT> afterNoDelay() {
+    mOutputChannel.afterNoDelay();
+    return this;
+  }
+
+  @NotNull
   public List<OUT> all() {
     return mOutputChannel.all();
   }
@@ -220,6 +226,24 @@ class ReplayChannel<OUT> implements Channel<OUT, OUT>, ChannelConsumer<OUT> {
     return mOutputChannel.next();
   }
 
+  @NotNull
+  public Channel<OUT, OUT> inMax(final long timeout, @NotNull final TimeUnit timeUnit) {
+    mOutputChannel.inMax(timeout, timeUnit);
+    return this;
+  }
+
+  @NotNull
+  public Channel<OUT, OUT> inMax(@NotNull final DurationMeasure timeout) {
+    mOutputChannel.inMax(timeout);
+    return this;
+  }
+
+  @NotNull
+  public Channel<OUT, OUT> inNoTime() {
+    mOutputChannel.inNoTime();
+    return this;
+  }
+
   public int inputCount() {
     return mChannel.inputCount();
   }
@@ -249,12 +273,6 @@ class ReplayChannel<OUT> implements Channel<OUT, OUT>, ChannelConsumer<OUT> {
 
   public OUT nextOrElse(final OUT output) {
     return mOutputChannel.nextOrElse(output);
-  }
-
-  @NotNull
-  public Channel<OUT, OUT> now() {
-    mOutputChannel.now();
-    return this;
   }
 
   public int outputCount() {

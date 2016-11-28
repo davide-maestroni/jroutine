@@ -35,7 +35,6 @@ import java.util.HashSet;
 import static com.github.dm.jrt.core.common.BackoffBuilder.afterCount;
 import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
-import static com.github.dm.jrt.core.util.DurationMeasure.zero;
 
 /**
  * The downloader implementation.
@@ -132,7 +131,7 @@ public class Downloader {
    */
   public boolean abortAndWait(final URI uri, final DurationMeasure timeout) {
     final Channel<?, Boolean> channel = mDownloads.remove(uri);
-    return (channel != null) && channel.abort() && channel.after(timeout).getComplete();
+    return (channel != null) && channel.abort() && channel.inMax(timeout).getComplete();
   }
 
   /**
@@ -174,7 +173,7 @@ public class Downloader {
    * @return whether the resource was downloaded.
    */
   public boolean isDownloaded(final URI uri) {
-    return waitDone(uri, zero());
+    return waitDone(uri, DurationMeasure.noTime());
   }
 
   /**
@@ -199,7 +198,7 @@ public class Downloader {
     final Channel<?, Boolean> channel = downloads.get(uri);
     // Check if the output channel is in the map, that is, the resource is currently downloading,
     // wait for the routine to complete
-    if ((channel != null) && channel.after(timeout).getComplete()) {
+    if ((channel != null) && channel.inMax(timeout).getComplete()) {
       // If complete, remove the resource from the download map
       downloads.remove(uri);
       // Read the result and, if successful, add the resource to the downloaded set

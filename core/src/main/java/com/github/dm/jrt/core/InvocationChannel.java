@@ -53,7 +53,7 @@ import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.core.common.Backoff.NO_DELAY;
 import static com.github.dm.jrt.core.util.DurationMeasure.fromUnit;
-import static com.github.dm.jrt.core.util.DurationMeasure.zero;
+import static com.github.dm.jrt.core.util.DurationMeasure.noTime;
 
 /**
  * Default implementation of an invocation channel.
@@ -121,7 +121,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
         new LocalValue<OrderType>(configuration.getInputOrderTypeOrElse(OrderType.UNSORTED));
     mInputBackoff = configuration.getInputBackoffOrElse(BackoffBuilder.noDelay());
     mMaxInput = configuration.getInputMaxSizeOrElse(Integer.MAX_VALUE);
-    mInputDelay = new LocalValue<DurationMeasure>(zero());
+    mInputDelay = new LocalValue<DurationMeasure>(noTime());
     mInputQueue = new NestedQueue<IN>() {
 
       @Override
@@ -205,8 +205,12 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
   @NotNull
   public Channel<IN, OUT> after(@NotNull final DurationMeasure delay) {
     mInputDelay.set(ConstantConditions.notNull("input delay", delay));
-    mResultChanel.after(delay);
     return this;
+  }
+
+  @NotNull
+  public Channel<IN, OUT> afterNoDelay() {
+    return after(noTime());
   }
 
   @NotNull
@@ -293,6 +297,24 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
     return mResultChanel.next();
   }
 
+  @NotNull
+  public Channel<IN, OUT> inMax(final long timeout, @NotNull final TimeUnit timeUnit) {
+    mResultChanel.inMax(timeout, timeUnit);
+    return this;
+  }
+
+  @NotNull
+  public Channel<IN, OUT> inMax(@NotNull final DurationMeasure timeout) {
+    mResultChanel.inMax(timeout);
+    return this;
+  }
+
+  @NotNull
+  public Channel<IN, OUT> inNoTime() {
+    mResultChanel.inNoTime();
+    return this;
+  }
+
   public int inputCount() {
     synchronized (mMutex) {
       return mState.inputCount();
@@ -320,11 +342,6 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
 
   public OUT nextOrElse(final OUT output) {
     return mResultChanel.nextOrElse(output);
-  }
-
-  @NotNull
-  public Channel<IN, OUT> now() {
-    return after(zero());
   }
 
   public int outputCount() {
@@ -879,7 +896,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
       }
 
       for (final Channel<?, ? extends IN> channel : channels) {
-        channel.now().abort(abortException);
+        channel.afterNoDelay().abort(abortException);
       }
     }
 

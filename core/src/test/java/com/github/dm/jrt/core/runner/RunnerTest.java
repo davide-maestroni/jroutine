@@ -35,8 +35,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import static com.github.dm.jrt.core.util.DurationMeasure.micros;
 import static com.github.dm.jrt.core.util.DurationMeasure.millis;
 import static com.github.dm.jrt.core.util.DurationMeasure.nanos;
+import static com.github.dm.jrt.core.util.DurationMeasure.noTime;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
-import static com.github.dm.jrt.core.util.DurationMeasure.zero;
 import static com.github.dm.jrt.core.util.TimeMeasure.current;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
@@ -481,7 +481,7 @@ public class RunnerTest {
           break;
 
         default:
-          delay = zero();
+          delay = noTime();
           break;
       }
 
@@ -521,7 +521,7 @@ public class RunnerTest {
           break;
 
         default:
-          delay = zero();
+          delay = noTime();
           break;
       }
 
@@ -532,7 +532,7 @@ public class RunnerTest {
     }
 
     final TestRecursiveExecution recursiveExecution =
-        new TestRecursiveExecution(runner, executions, delays, zero());
+        new TestRecursiveExecution(runner, executions, delays, noTime());
 
     runner.run(recursiveExecution, 0, TimeUnit.MILLISECONDS);
 

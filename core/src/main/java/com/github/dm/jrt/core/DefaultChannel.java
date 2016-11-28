@@ -102,6 +102,12 @@ class DefaultChannel<DATA> implements Channel<DATA, DATA> {
   }
 
   @NotNull
+  public Channel<DATA, DATA> afterNoDelay() {
+    mChannel.afterNoDelay();
+    return this;
+  }
+
+  @NotNull
   public List<DATA> all() {
     return mChannel.all();
   }
@@ -176,6 +182,24 @@ class DefaultChannel<DATA> implements Channel<DATA, DATA> {
     return mChannel.next();
   }
 
+  @NotNull
+  public Channel<DATA, DATA> inMax(final long timeout, @NotNull final TimeUnit timeUnit) {
+    mChannel.inMax(timeout, timeUnit);
+    return this;
+  }
+
+  @NotNull
+  public Channel<DATA, DATA> inMax(@NotNull final DurationMeasure timeout) {
+    mChannel.inMax(timeout);
+    return this;
+  }
+
+  @NotNull
+  public Channel<DATA, DATA> inNoTime() {
+    mChannel.inNoTime();
+    return this;
+  }
+
   public int inputCount() {
     return mChannel.inputCount();
   }
@@ -199,12 +223,6 @@ class DefaultChannel<DATA> implements Channel<DATA, DATA> {
 
   public DATA nextOrElse(final DATA output) {
     return mChannel.nextOrElse(output);
-  }
-
-  @NotNull
-  public Channel<DATA, DATA> now() {
-    mChannel.now();
-    return this;
   }
 
   public int outputCount() {

@@ -37,7 +37,7 @@ import static com.github.dm.jrt.core.config.InvocationConfiguration.builderFrom;
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builderFromInput;
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builderFromOutput;
 import static com.github.dm.jrt.core.util.DurationMeasure.millis;
-import static com.github.dm.jrt.core.util.DurationMeasure.zero;
+import static com.github.dm.jrt.core.util.DurationMeasure.noTime;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -161,7 +161,7 @@ public class InvocationConfigurationTest {
                                                            .withLog(new NullLog())
                                                            .withOutputMaxSize(100)
                                                            .configured();
-    assertThat(configuration).isNotEqualTo(builder().withOutputTimeout(zero()).configured());
+    assertThat(configuration).isNotEqualTo(builder().withOutputTimeout(noTime()).configured());
     assertThat(configuration).isNotEqualTo(
         builder().withOutputTimeout(1, TimeUnit.MILLISECONDS).configured());
     assertThat(configuration.builderFrom().withOutputTimeout(millis(1)).configured()).isNotEqualTo(

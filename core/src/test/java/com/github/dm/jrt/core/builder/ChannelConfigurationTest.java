@@ -34,8 +34,8 @@ import static com.github.dm.jrt.core.common.BackoffBuilder.noDelay;
 import static com.github.dm.jrt.core.config.ChannelConfiguration.builder;
 import static com.github.dm.jrt.core.config.ChannelConfiguration.builderFrom;
 import static com.github.dm.jrt.core.util.DurationMeasure.millis;
+import static com.github.dm.jrt.core.util.DurationMeasure.noTime;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
-import static com.github.dm.jrt.core.util.DurationMeasure.zero;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -207,7 +207,7 @@ public class ChannelConfigurationTest {
                                                         .withLog(new NullLog())
                                                         .withMaxSize(100)
                                                         .configured();
-    assertThat(configuration).isNotEqualTo(builder().withOutputTimeout(zero()).configured());
+    assertThat(configuration).isNotEqualTo(builder().withOutputTimeout(noTime()).configured());
     assertThat(configuration).isNotEqualTo(
         builder().withOutputTimeout(1, TimeUnit.MILLISECONDS).configured());
     assertThat(configuration.builderFrom().withOutputTimeout(millis(1)).configured()).isNotEqualTo(

@@ -93,19 +93,19 @@ public class OperatorsTest {
       public boolean test(final String s) {
         return "test1".equals(s);
       }
-    })).call("test", "test").after(seconds(3)).all()).containsExactly(false);
+    })).call("test", "test").inMax(seconds(3)).all()).containsExactly(false);
     assertThat(JRoutineCore.with(Operators.allMatch(new Predicate<String>() {
 
       public boolean test(final String s) {
         return "test".equals(s);
       }
-    })).call("test", "test").after(seconds(3)).all()).containsExactly(true);
+    })).call("test", "test").inMax(seconds(3)).all()).containsExactly(true);
     assertThat(JRoutineCore.with(Operators.allMatch(new Predicate<String>() {
 
       public boolean test(final String s) {
         return "test1".equals(s);
       }
-    })).call("test1", "test2").after(seconds(3)).all()).containsExactly(false);
+    })).call("test1", "test2").inMax(seconds(3)).all()).containsExactly(false);
   }
 
   @Test
@@ -115,37 +115,37 @@ public class OperatorsTest {
       public boolean test(final String s) {
         return "test1".equals(s);
       }
-    })).call("test", "test").after(seconds(3)).all()).containsExactly(false);
+    })).call("test", "test").inMax(seconds(3)).all()).containsExactly(false);
     assertThat(JRoutineCore.with(Operators.anyMatch(new Predicate<String>() {
 
       public boolean test(final String s) {
         return "test".equals(s);
       }
-    })).call("test", "test").after(seconds(3)).all()).containsExactly(true);
+    })).call("test", "test").inMax(seconds(3)).all()).containsExactly(true);
     assertThat(JRoutineCore.with(Operators.anyMatch(new Predicate<String>() {
 
       public boolean test(final String s) {
         return "test1".equals(s);
       }
-    })).call("test1", "test2").after(seconds(3)).all()).containsExactly(true);
+    })).call("test1", "test2").inMax(seconds(3)).all()).containsExactly(true);
   }
 
   @Test
   public void testAppend() {
     assertThat(
-        JRoutineCore.with(append("test2")).call("test1").after(seconds(3)).all()).containsExactly(
+        JRoutineCore.with(append("test2")).call("test1").inMax(seconds(3)).all()).containsExactly(
         "test1", "test2");
     assertThat(JRoutineCore.with(append("test2", "test3"))
                            .call("test1")
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly("test1", "test2", "test3");
     assertThat(JRoutineCore.with(append(Arrays.asList("test2", "test3")))
                            .call("test1")
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly("test1", "test2", "test3");
     assertThat(JRoutineCore.with(append(JRoutineCore.io().of("test2", "test3")))
                            .call("test1")
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly("test1", "test2", "test3");
   }
 
@@ -183,7 +183,7 @@ public class OperatorsTest {
                            .withRunner(Runners.syncRunner())
                            .configured()
                            .call("test1")
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly("test1", "TEST2", "TEST2", "TEST2");
     assertThat(JRoutineCore.with(appendAccept(3, new Consumer<Channel<String, ?>>() {
 
@@ -201,85 +201,85 @@ public class OperatorsTest {
       public String get() {
         return "TEST2";
       }
-    })).call("test1").after(seconds(3)).all()).containsExactly("test1", "TEST2");
+    })).call("test1").inMax(seconds(3)).all()).containsExactly("test1", "TEST2");
     assertThat(JRoutineCore.with(appendAccept(new Consumer<Channel<String, ?>>() {
 
       public void accept(final Channel<String, ?> resultChannel) {
         resultChannel.pass("TEST2");
       }
-    })).call("test1").after(seconds(3)).all()).containsExactly("test1", "TEST2");
+    })).call("test1").inMax(seconds(3)).all()).containsExactly("test1", "TEST2");
     assertThat(JRoutineCore.with(appendGet(3, new Supplier<String>() {
 
       public String get() {
         return "TEST2";
       }
-    })).call("test1").after(seconds(3)).all()).containsExactly("test1", "TEST2", "TEST2", "TEST2");
+    })).call("test1").inMax(seconds(3)).all()).containsExactly("test1", "TEST2", "TEST2", "TEST2");
     assertThat(JRoutineCore.with(appendAccept(3, new Consumer<Channel<String, ?>>() {
 
       public void accept(final Channel<String, ?> resultChannel) {
         resultChannel.pass("TEST2");
       }
-    })).call("test1").after(seconds(3)).all()).containsExactly("test1", "TEST2", "TEST2", "TEST2");
+    })).call("test1").inMax(seconds(3)).all()).containsExactly("test1", "TEST2", "TEST2", "TEST2");
     assertThat(JRoutineCore.with(appendGet(new Supplier<String>() {
 
       public String get() {
         return "TEST2";
       }
-    })).callParallel("test1").after(seconds(3)).all()).containsExactly("test1", "TEST2");
+    })).callParallel("test1").inMax(seconds(3)).all()).containsExactly("test1", "TEST2");
     assertThat(JRoutineCore.with(appendAccept(new Consumer<Channel<String, ?>>() {
 
       public void accept(final Channel<String, ?> resultChannel) {
         resultChannel.pass("TEST2");
       }
-    })).callParallel("test1").after(seconds(3)).all()).containsExactly("test1", "TEST2");
+    })).callParallel("test1").inMax(seconds(3)).all()).containsExactly("test1", "TEST2");
     assertThat(JRoutineCore.with(appendGet(3, new Supplier<String>() {
 
       public String get() {
         return "TEST2";
       }
-    })).callParallel("test1").after(seconds(3)).all()).containsExactly("test1", "TEST2", "TEST2",
+    })).callParallel("test1").inMax(seconds(3)).all()).containsExactly("test1", "TEST2", "TEST2",
         "TEST2");
     assertThat(JRoutineCore.with(appendAccept(3, new Consumer<Channel<String, ?>>() {
 
       public void accept(final Channel<String, ?> resultChannel) {
         resultChannel.pass("TEST2");
       }
-    })).callParallel("test1").after(seconds(3)).all()).containsExactly("test1", "TEST2", "TEST2",
+    })).callParallel("test1").inMax(seconds(3)).all()).containsExactly("test1", "TEST2", "TEST2",
         "TEST2");
   }
 
   @Test
   public void testAverage() {
-    assertThat(JRoutineCore.with(Operators.average()).close().after(seconds(3)).next()).isEqualTo(
+    assertThat(JRoutineCore.with(Operators.average()).close().inMax(seconds(3)).next()).isEqualTo(
         0);
-    assertThat(JRoutineCore.with(Operators.average()).call(1L, 2L, 3L, 4L).after(seconds(3)).next())
+    assertThat(JRoutineCore.with(Operators.average()).call(1L, 2L, 3L, 4L).inMax(seconds(3)).next())
         .isEqualTo(2L);
     assertThat(
-        JRoutineCore.with(Operators.average()).call(1, 2, 3, 4).after(seconds(3)).next()).isEqualTo(
+        JRoutineCore.with(Operators.average()).call(1, 2, 3, 4).inMax(seconds(3)).next()).isEqualTo(
         2);
     assertThat(JRoutineCore.with(Operators.average())
                            .call((short) 1, (short) 2, (short) 3, (short) 4)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo((short) 2);
     assertThat(JRoutineCore.with(Operators.average())
                            .call((byte) 1, (byte) 2, (byte) 3, (byte) 4)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo((byte) 2);
     assertThat(JRoutineCore.with(Operators.average())
                            .call(1.0, 2.0, 3.0, 4.0)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo(2.5);
-    assertThat(JRoutineCore.with(Operators.average()).call(1f, 2f, 3f, 4f).after(seconds(3)).next())
+    assertThat(JRoutineCore.with(Operators.average()).call(1f, 2f, 3f, 4f).inMax(seconds(3)).next())
         .isEqualTo(2.5f);
     assertThat(JRoutineCore.with(Operators.average())
                            .call(BigInteger.valueOf(1), BigInteger.valueOf(2),
                                BigInteger.valueOf(3), BigInteger.valueOf(4))
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo(BigInteger.valueOf(2));
     assertThat(JRoutineCore.with(Operators.average())
                            .call(new BigDecimal(1), new BigDecimal(2), new BigDecimal(3),
                                new BigDecimal(4))
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo(
         new BigDecimal(2.5).setScale(15, RoundingMode.HALF_EVEN));
   }
@@ -288,249 +288,249 @@ public class OperatorsTest {
   public void testAverageBig() {
     assertThat(JRoutineCore.with(Operators.<Integer>averageBig())
                            .call(1, 2, 3, 4)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo(new BigDecimal(2.5));
     assertThat(JRoutineCore.with(Operators.<Float>averageBig())
                            .call(1f, 2f, 3f, 4f)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo(new BigDecimal(2.5));
   }
 
   @Test
   public void testAverageByte() {
     assertThat(
-        JRoutineCore.with(Operators.averageByte()).close().after(seconds(3)).next()).isEqualTo(
+        JRoutineCore.with(Operators.averageByte()).close().inMax(seconds(3)).next()).isEqualTo(
         (byte) 0);
     assertThat(JRoutineCore.with(Operators.averageByte())
                            .call(1L, 2L, 3L, 4L)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo((byte) 2);
-    assertThat(JRoutineCore.with(Operators.averageByte()).call(1, 2, 3, 4).after(seconds(3)).next())
+    assertThat(JRoutineCore.with(Operators.averageByte()).call(1, 2, 3, 4).inMax(seconds(3)).next())
         .isEqualTo((byte) 2);
     assertThat(JRoutineCore.with(Operators.averageByte())
                            .call((short) 1, (short) 2, (short) 3, (short) 4)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo((byte) 2);
     assertThat(JRoutineCore.with(Operators.averageByte())
                            .call((byte) 1, (byte) 2, (byte) 3, (byte) 4)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo((byte) 2);
     assertThat(JRoutineCore.with(Operators.averageByte())
                            .call(1.0, 2.0, 3.0, 4.0)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo((byte) 2);
     assertThat(JRoutineCore.with(Operators.averageByte())
                            .call(1f, 2f, 3f, 4f)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo((byte) 2);
     assertThat(JRoutineCore.with(Operators.averageByte())
                            .call(BigInteger.valueOf(1), BigInteger.valueOf(2),
                                BigInteger.valueOf(3), BigInteger.valueOf(4))
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo((byte) 2);
     assertThat(JRoutineCore.with(Operators.averageByte())
                            .call(new BigDecimal(1), new BigDecimal(2), new BigDecimal(3),
                                new BigDecimal(4))
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo((byte) 2);
   }
 
   @Test
   public void testAverageDouble() {
     assertThat(
-        JRoutineCore.with(Operators.averageDouble()).close().after(seconds(3)).next()).isEqualTo(
+        JRoutineCore.with(Operators.averageDouble()).close().inMax(seconds(3)).next()).isEqualTo(
         0d);
     assertThat(JRoutineCore.with(Operators.averageDouble())
                            .call(1L, 2L, 3L, 4L)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo(2.5);
     assertThat(JRoutineCore.with(Operators.averageDouble())
                            .call(1, 2, 3, 4)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo(2.5);
     assertThat(JRoutineCore.with(Operators.averageDouble())
                            .call((short) 1, (short) 2, (short) 3, (short) 4)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo(2.5);
     assertThat(JRoutineCore.with(Operators.averageDouble())
                            .call((byte) 1, (byte) 2, (byte) 3, (byte) 4)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo(2.5);
     assertThat(JRoutineCore.with(Operators.averageDouble())
                            .call(1.0, 2.0, 3.0, 4.0)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo(2.5);
     assertThat(JRoutineCore.with(Operators.averageDouble())
                            .call(1f, 2f, 3f, 4f)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo(2.5);
     assertThat(JRoutineCore.with(Operators.averageDouble())
                            .call(BigInteger.valueOf(1), BigInteger.valueOf(2),
                                BigInteger.valueOf(3), BigInteger.valueOf(4))
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo(2.5);
     assertThat(JRoutineCore.with(Operators.averageDouble())
                            .call(new BigDecimal(1), new BigDecimal(2), new BigDecimal(3),
                                new BigDecimal(4))
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo(2.5);
   }
 
   @Test
   public void testAverageFloat() {
     assertThat(
-        JRoutineCore.with(Operators.averageFloat()).close().after(seconds(3)).next()).isEqualTo(0f);
+        JRoutineCore.with(Operators.averageFloat()).close().inMax(seconds(3)).next()).isEqualTo(0f);
     assertThat(JRoutineCore.with(Operators.averageFloat())
                            .call(1L, 2L, 3L, 4L)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo(2.5f);
     assertThat(JRoutineCore.with(Operators.averageFloat())
                            .call(1, 2, 3, 4)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo(2.5f);
     assertThat(JRoutineCore.with(Operators.averageFloat())
                            .call((short) 1, (short) 2, (short) 3, (short) 4)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo(2.5f);
     assertThat(JRoutineCore.with(Operators.averageFloat())
                            .call((byte) 1, (byte) 2, (byte) 3, (byte) 4)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo(2.5f);
     assertThat(JRoutineCore.with(Operators.averageFloat())
                            .call(1.0, 2.0, 3.0, 4.0)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo(2.5f);
     assertThat(JRoutineCore.with(Operators.averageFloat())
                            .call(1f, 2f, 3f, 4f)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo(2.5f);
     assertThat(JRoutineCore.with(Operators.averageFloat())
                            .call(BigInteger.valueOf(1), BigInteger.valueOf(2),
                                BigInteger.valueOf(3), BigInteger.valueOf(4))
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo(2.5f);
     assertThat(JRoutineCore.with(Operators.averageFloat())
                            .call(new BigDecimal(1), new BigDecimal(2), new BigDecimal(3),
                                new BigDecimal(4))
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo(2.5f);
   }
 
   @Test
   public void testAverageInteger() {
     assertThat(
-        JRoutineCore.with(Operators.averageInteger()).close().after(seconds(3)).next()).isEqualTo(
+        JRoutineCore.with(Operators.averageInteger()).close().inMax(seconds(3)).next()).isEqualTo(
         0);
     assertThat(
-        JRoutineCore.with(Operators.averageInteger()).call(1L, 2L, 3L, 4L).after(seconds(3)).next())
+        JRoutineCore.with(Operators.averageInteger()).call(1L, 2L, 3L, 4L).inMax(seconds(3)).next())
         .isEqualTo(2);
     assertThat(JRoutineCore.with(Operators.averageInteger())
                            .call(1, 2, 3, 4)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo(2);
     assertThat(JRoutineCore.with(Operators.averageInteger())
                            .call((short) 1, (short) 2, (short) 3, (short) 4)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo(2);
     assertThat(JRoutineCore.with(Operators.averageInteger())
                            .call((byte) 1, 2, (byte) 3, (byte) 4)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo(2);
     assertThat(JRoutineCore.with(Operators.averageInteger())
                            .call(1.0, 2.0, 3.0, 4.0)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo(2);
     assertThat(
-        JRoutineCore.with(Operators.averageInteger()).call(1f, 2f, 3f, 4f).after(seconds(3)).next())
+        JRoutineCore.with(Operators.averageInteger()).call(1f, 2f, 3f, 4f).inMax(seconds(3)).next())
         .isEqualTo(2);
     assertThat(JRoutineCore.with(Operators.averageInteger())
                            .call(BigInteger.valueOf(1), BigInteger.valueOf(2),
                                BigInteger.valueOf(3), BigInteger.valueOf(4))
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo(2);
     assertThat(JRoutineCore.with(Operators.averageInteger())
                            .call(new BigDecimal(1), new BigDecimal(2), new BigDecimal(3),
                                new BigDecimal(4))
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo(2);
   }
 
   @Test
   public void testAverageLong() {
     assertThat(
-        JRoutineCore.with(Operators.averageLong()).close().after(seconds(3)).next()).isEqualTo(0L);
+        JRoutineCore.with(Operators.averageLong()).close().inMax(seconds(3)).next()).isEqualTo(0L);
     assertThat(JRoutineCore.with(Operators.averageLong())
                            .call(1L, 2L, 3L, 4L)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo(2L);
-    assertThat(JRoutineCore.with(Operators.averageLong()).call(1, 2, 3, 4).after(seconds(3)).next())
+    assertThat(JRoutineCore.with(Operators.averageLong()).call(1, 2, 3, 4).inMax(seconds(3)).next())
         .isEqualTo(2L);
     assertThat(JRoutineCore.with(Operators.averageLong())
                            .call((short) 1, (short) 2, (short) 3, (short) 4)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo(2L);
     assertThat(JRoutineCore.with(Operators.averageLong())
                            .call((byte) 1, 2L, (byte) 3, (byte) 4)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo(2L);
     assertThat(JRoutineCore.with(Operators.averageLong())
                            .call(1.0, 2.0, 3.0, 4.0)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo(2L);
     assertThat(JRoutineCore.with(Operators.averageLong())
                            .call(1f, 2f, 3f, 4f)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo(2L);
     assertThat(JRoutineCore.with(Operators.averageLong())
                            .call(BigInteger.valueOf(1), BigInteger.valueOf(2),
                                BigInteger.valueOf(3), BigInteger.valueOf(4))
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo(2L);
     assertThat(JRoutineCore.with(Operators.averageLong())
                            .call(new BigDecimal(1), new BigDecimal(2), new BigDecimal(3),
                                new BigDecimal(4))
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo(2L);
   }
 
   @Test
   public void testAverageShort() {
     assertThat(
-        JRoutineCore.with(Operators.averageShort()).close().after(seconds(3)).next()).isEqualTo(
+        JRoutineCore.with(Operators.averageShort()).close().inMax(seconds(3)).next()).isEqualTo(
         (short) 0);
     assertThat(JRoutineCore.with(Operators.averageShort())
                            .call(1L, 2L, 3L, 4L)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo((short) 2);
     assertThat(JRoutineCore.with(Operators.averageShort())
                            .call(1, 2, 3, 4)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo((short) 2);
     assertThat(JRoutineCore.with(Operators.averageShort())
                            .call((short) 1, (short) 2, (short) 3, (short) 4)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo((short) 2);
     assertThat(JRoutineCore.with(Operators.averageShort())
                            .call((byte) 1, (short) 2, (byte) 3, (byte) 4)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo((short) 2);
     assertThat(JRoutineCore.with(Operators.averageShort())
                            .call(1.0, 2.0, 3.0, 4.0)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo((short) 2);
     assertThat(JRoutineCore.with(Operators.averageShort())
                            .call(1f, 2f, 3f, 4f)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo((short) 2);
     assertThat(JRoutineCore.with(Operators.averageShort())
                            .call(BigInteger.valueOf(1), BigInteger.valueOf(2),
                                BigInteger.valueOf(3), BigInteger.valueOf(4))
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo((short) 2);
     assertThat(JRoutineCore.with(Operators.averageShort())
                            .call(new BigDecimal(1), new BigDecimal(2), new BigDecimal(3),
                                new BigDecimal(4))
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo((short) 2);
   }
 
@@ -539,7 +539,7 @@ public class OperatorsTest {
   public void testCastTo() {
     assertThat(JRoutineCore.with(Operators.castTo(Number.class))
                            .call(1, 2.5)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly(1, 2.5);
     assertThat(Operators.castTo(String.class)).isEqualTo(Operators.castTo(String.class));
     assertThat(Operators.castTo(tokenOf(String.class))).isEqualTo(Operators.castTo(String.class));
@@ -561,7 +561,7 @@ public class OperatorsTest {
     }))
                            .call(new StringBuilder("test1"), new StringBuilder("test2"),
                                new StringBuilder("test3"))
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()
                            .toString()).isEqualTo("test1test2test3");
     assertThat(JRoutineCore.with(collect(new BiConsumer<StringBuilder, StringBuilder>() {
@@ -575,7 +575,7 @@ public class OperatorsTest {
                            .configured()
                            .call(new StringBuilder("test1"), new StringBuilder("test2"),
                                new StringBuilder("test3"))
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()
                            .toString()).isEqualTo("test1test2test3");
   }
@@ -587,7 +587,7 @@ public class OperatorsTest {
       public List<String> get() {
         return new ArrayList<String>();
       }
-    })).call("test1", "test2", "test3").after(seconds(3)).next()).containsExactly("test1", "test2",
+    })).call("test1", "test2", "test3").inMax(seconds(3)).next()).containsExactly("test1", "test2",
         "test3");
     assertThat(JRoutineCore.with(collectInto(new Supplier<List<String>>() {
 
@@ -599,14 +599,14 @@ public class OperatorsTest {
                            .withRunner(Runners.syncRunner())
                            .configured()
                            .call("test1", "test2", "test3")
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).containsExactly("test1", "test2", "test3");
     assertThat(JRoutineCore.with(collectInto(new Supplier<List<String>>() {
 
       public List<String> get() {
         return new ArrayList<String>();
       }
-    })).close().after(seconds(3)).next()).isEmpty();
+    })).close().inMax(seconds(3)).next()).isEmpty();
     assertThat(JRoutineCore.with(collectInto(new Supplier<List<String>>() {
 
       public List<String> get() {
@@ -617,7 +617,7 @@ public class OperatorsTest {
                            .withRunner(Runners.syncRunner())
                            .configured()
                            .close()
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEmpty();
   }
 
@@ -655,7 +655,7 @@ public class OperatorsTest {
       public void accept(final StringBuilder b, final String s) {
         b.append(s);
       }
-    })).call("test1", "test2", "test3").after(seconds(3)).next().toString()).isEqualTo(
+    })).call("test1", "test2", "test3").inMax(seconds(3)).next().toString()).isEqualTo(
         "test1test2test3");
     assertThat(JRoutineCore.with(collect(new Supplier<StringBuilder>() {
 
@@ -672,7 +672,7 @@ public class OperatorsTest {
                            .withRunner(Runners.syncRunner())
                            .configured()
                            .call("test1", "test2", "test3")
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()
                            .toString()).isEqualTo("test1test2test3");
     assertThat(JRoutineCore.with(collect(new Supplier<StringBuilder>() {
@@ -685,7 +685,7 @@ public class OperatorsTest {
       public void accept(final StringBuilder b, final String s) {
         b.append(s);
       }
-    })).close().after(seconds(3)).next().toString()).isEqualTo("");
+    })).close().inMax(seconds(3)).next().toString()).isEqualTo("");
     assertThat(JRoutineCore.with(collect(new Supplier<List<Object>>() {
 
       public List<Object> get() {
@@ -696,7 +696,7 @@ public class OperatorsTest {
       public void accept(final List<Object> l, final Object o) {
         l.add(o);
       }
-    })).close().after(seconds(3)).next()).isEmpty();
+    })).close().inMax(seconds(3)).next()).isEmpty();
   }
 
   @Test
@@ -727,18 +727,18 @@ public class OperatorsTest {
   public void testCount() {
     assertThat(JRoutineCore.with(Operators.count())
                            .call(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo(10);
-    assertThat(JRoutineCore.with(Operators.count()).close().after(seconds(3)).next()).isEqualTo(0);
+    assertThat(JRoutineCore.with(Operators.count()).close().inMax(seconds(3)).next()).isEqualTo(0);
   }
 
   @Test
   public void testDistinct() {
-    assertThat(JRoutineCore.with(Operators.distinct()).call("test", "test").after(seconds(3)).all())
+    assertThat(JRoutineCore.with(Operators.distinct()).call("test", "test").inMax(seconds(3)).all())
         .containsExactly("test");
     assertThat(JRoutineCore.with(Operators.distinct())
                            .call("test1", "test2")
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly("test1", "test2");
   }
 
@@ -753,7 +753,7 @@ public class OperatorsTest {
       }
     };
     List<Object> objects =
-        JRoutineCore.with(Operators.distinctIdentity()).call(o, o).after(seconds(3)).all();
+        JRoutineCore.with(Operators.distinctIdentity()).call(o, o).inMax(seconds(3)).all();
     assertThat(objects).hasSize(1);
     assertThat(objects.get(0)).isSameAs(o);
     final Object o1 = new Object() {
@@ -772,7 +772,7 @@ public class OperatorsTest {
         return true;
       }
     };
-    objects = JRoutineCore.with(Operators.distinctIdentity()).call(o1, o2).after(seconds(3)).all();
+    objects = JRoutineCore.with(Operators.distinctIdentity()).call(o1, o2).inMax(seconds(3)).all();
     assertThat(objects).hasSize(2);
     assertThat(objects.get(0)).isSameAs(o1);
     assertThat(objects.get(1)).isSameAs(o2);
@@ -782,9 +782,9 @@ public class OperatorsTest {
   public void testEqualTo() {
     assertThat(JRoutineCore.with(Operators.isEqualTo("test"))
                            .call("test", "test1", "test")
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly("test", "test");
-    assertThat(JRoutineCore.with(Operators.isEqualTo(0)).close().after(seconds(3)).all()).isEmpty();
+    assertThat(JRoutineCore.with(Operators.isEqualTo(0)).close().inMax(seconds(3)).all()).isEmpty();
     assertThat(Operators.isEqualTo("test")).isEqualTo(Operators.isEqualTo("test"));
     assertThat(Operators.isEqualTo(null)).isEqualTo(Operators.isEqualTo(null));
   }
@@ -792,11 +792,11 @@ public class OperatorsTest {
   @Test
   public void testFilter() {
     assertThat(
-        JRoutineCore.with(filter(Functions.isNotNull())).call(null, "test").after(seconds(3)).all())
+        JRoutineCore.with(filter(Functions.isNotNull())).call(null, "test").inMax(seconds(3)).all())
         .containsExactly("test");
     assertThat(JRoutineCore.with(filter(Functions.isNotNull()))
                            .callParallel(null, "test")
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly("test");
     assertThat(JRoutineCore.with(filter(Functions.isNotNull()))
                            .applyInvocationConfiguration()
@@ -809,7 +809,7 @@ public class OperatorsTest {
                            .withRunner(Runners.syncRunner())
                            .configured()
                            .callParallel(null, "test")
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly("test");
   }
 
@@ -818,13 +818,13 @@ public class OperatorsTest {
   public void testGroupBy() {
     assertThat(JRoutineCore.with(Operators.<Number>groupBy(3))
                            .call(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly(Arrays.<Number>asList(1, 2, 3),
         Arrays.<Number>asList(4, 5, 6), Arrays.<Number>asList(7, 8, 9),
         Collections.<Number>singletonList(10));
     assertThat(JRoutineCore.with(Operators.<Number>groupBy(13))
                            .call(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly(
         Arrays.<Number>asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
   }
@@ -865,7 +865,7 @@ public class OperatorsTest {
       public Object apply(final Integer i) {
         return i % 2;
       }
-    })).call(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).after(seconds(3)).all()).containsOnly(
+    })).call(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).inMax(seconds(3)).all()).containsOnly(
         Arrays.asList(2, 4, 6, 8, 10), Arrays.asList(1, 3, 5, 7, 9));
   }
 
@@ -901,24 +901,24 @@ public class OperatorsTest {
   public void testGroupByPlaceholder() {
     assertThat(JRoutineCore.with(Operators.<Number>groupBy(3, 0))
                            .call(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly(Arrays.<Number>asList(1, 2, 3),
         Arrays.<Number>asList(4, 5, 6), Arrays.<Number>asList(7, 8, 9),
         Arrays.<Number>asList(10, 0, 0));
     assertThat(JRoutineCore.with(Operators.<Number>groupBy(13, -1))
                            .call(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly(
         Arrays.<Number>asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, -1, -1, -1));
     assertThat(JRoutineCore.with(Operators.<Number>groupBy(3, -31))
                            .call(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly(Arrays.<Number>asList(1, 2, 3),
         Arrays.<Number>asList(4, 5, 6), Arrays.<Number>asList(7, 8, 9),
         Arrays.<Number>asList(10, -31, -31));
     assertThat(JRoutineCore.with(Operators.<Number>groupBy(13, 71))
                            .call(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly(
         Arrays.<Number>asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 71, 71, 71));
   }
@@ -956,7 +956,7 @@ public class OperatorsTest {
   public void testIdentity() {
     assertThat(JRoutineCore.with(Operators.identity())
                            .call(1, "test")
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly(1, "test");
   }
 
@@ -965,11 +965,11 @@ public class OperatorsTest {
   public void testInstanceOf() {
     assertThat(JRoutineCore.with(Operators.isInstanceOf(String.class))
                            .call(3, "test")
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly("test");
     assertThat(JRoutineCore.with(Operators.isInstanceOf(Number.class))
                            .close()
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).isEmpty();
     assertThat(Operators.isInstanceOf(String.class)).isEqualTo(
         Operators.isInstanceOf(String.class));
@@ -986,20 +986,20 @@ public class OperatorsTest {
     long startTime = System.currentTimeMillis();
     assertThat(JRoutineCore.with(Operators.interval(100, TimeUnit.MILLISECONDS))
                            .call(3, "test")
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsOnly(3, "test");
     assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(100);
     startTime = System.currentTimeMillis();
     assertThat(JRoutineCore.with(Operators.interval(millis(50)))
                            .call(3, "test")
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsOnly(3, "test");
     assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(50);
     startTime = System.currentTimeMillis();
     assertThat(JRoutineCore.with(
         Operators.interval(BackoffBuilder.afterCount(1).constantDelay(millis(200))))
                            .call(3, "test", null)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsOnly(3, "test", null);
     assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(200);
   }
@@ -1008,15 +1008,15 @@ public class OperatorsTest {
   public void testLimit() {
     assertThat(JRoutineCore.with(Operators.limit(5))
                            .call(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly(1, 2, 3, 4, 5);
     assertThat(JRoutineCore.with(Operators.limit(0))
                            .call(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).isEmpty();
     assertThat(JRoutineCore.with(Operators.limit(15))
                            .call(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
   }
 
@@ -1045,15 +1045,15 @@ public class OperatorsTest {
   public void testLimitLast() {
     assertThat(JRoutineCore.with(Operators.limitLast(5))
                            .call(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly(6, 7, 8, 9, 10);
     assertThat(JRoutineCore.with(Operators.limitLast(0))
                            .call(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).isEmpty();
     assertThat(JRoutineCore.with(Operators.limitLast(15))
                            .call(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
   }
 
@@ -1083,17 +1083,17 @@ public class OperatorsTest {
   public void testMax() {
     assertThat(JRoutineCore.with(Operators.<String>max())
                            .call("Z TEST", "test")
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo("test");
     assertThat(JRoutineCore.with(Operators.maxBy(String.CASE_INSENSITIVE_ORDER))
                            .call("Z TEST", "test")
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo("Z TEST");
     assertThat(
-        JRoutineCore.with(Operators.<Integer>max()).close().after(seconds(3)).all()).isEmpty();
+        JRoutineCore.with(Operators.<Integer>max()).close().inMax(seconds(3)).all()).isEmpty();
     assertThat(JRoutineCore.with(Operators.maxBy(String.CASE_INSENSITIVE_ORDER))
                            .close()
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).isEmpty();
     assertThat(Operators.maxBy(Collections.reverseOrder())).isEqualTo(
         Operators.maxBy(Collections.reverseOrder()));
@@ -1110,17 +1110,17 @@ public class OperatorsTest {
   public void testMin() {
     assertThat(JRoutineCore.with(Operators.<String>min())
                            .call("Z TEST", "test")
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo("Z TEST");
     assertThat(JRoutineCore.with(Operators.minBy(String.CASE_INSENSITIVE_ORDER))
                            .call("Z TEST", "test")
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo("test");
     assertThat(
-        JRoutineCore.with(Operators.<Integer>min()).close().after(seconds(3)).all()).isEmpty();
+        JRoutineCore.with(Operators.<Integer>min()).close().inMax(seconds(3)).all()).isEmpty();
     assertThat(JRoutineCore.with(Operators.minBy(String.CASE_INSENSITIVE_ORDER))
                            .close()
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).isEmpty();
     assertThat(Operators.minBy(Collections.reverseOrder())).isEqualTo(
         Operators.minBy(Collections.reverseOrder()));
@@ -1136,9 +1136,9 @@ public class OperatorsTest {
   public void testNone() {
     assertThat(JRoutineCore.with(Operators.none())
                            .call("test1", null, 3)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).isEmpty();
-    assertThat(JRoutineCore.with(Operators.none()).close().after(seconds(3)).all()).isEmpty();
+    assertThat(JRoutineCore.with(Operators.none()).close().inMax(seconds(3)).all()).isEmpty();
   }
 
   @Test
@@ -1148,19 +1148,19 @@ public class OperatorsTest {
       public boolean test(final String s) {
         return "test1".equals(s);
       }
-    })).call("test", "test").after(seconds(3)).all()).containsExactly(true);
+    })).call("test", "test").inMax(seconds(3)).all()).containsExactly(true);
     assertThat(JRoutineCore.with(Operators.noneMatch(new Predicate<String>() {
 
       public boolean test(final String s) {
         return "test".equals(s);
       }
-    })).call("test", "test").after(seconds(3)).all()).containsExactly(false);
+    })).call("test", "test").inMax(seconds(3)).all()).containsExactly(false);
     assertThat(JRoutineCore.with(Operators.noneMatch(new Predicate<String>() {
 
       public boolean test(final String s) {
         return "test1".equals(s);
       }
-    })).call("test1", "test2").after(seconds(3)).all()).containsExactly(false);
+    })).call("test1", "test2").inMax(seconds(3)).all()).containsExactly(false);
   }
 
   @Test
@@ -1170,29 +1170,29 @@ public class OperatorsTest {
       public boolean test(final String s) {
         return "test1".equals(s);
       }
-    })).call("test", "test").after(seconds(3)).all()).containsExactly(true);
+    })).call("test", "test").inMax(seconds(3)).all()).containsExactly(true);
     assertThat(JRoutineCore.with(Operators.notAllMatch(new Predicate<String>() {
 
       public boolean test(final String s) {
         return "test".equals(s);
       }
-    })).call("test", "test").after(seconds(3)).all()).containsExactly(false);
+    })).call("test", "test").inMax(seconds(3)).all()).containsExactly(false);
     assertThat(JRoutineCore.with(Operators.notAllMatch(new Predicate<String>() {
 
       public boolean test(final String s) {
         return "test1".equals(s);
       }
-    })).call("test1", "test2").after(seconds(3)).all()).containsExactly(true);
+    })).call("test1", "test2").inMax(seconds(3)).all()).containsExactly(true);
   }
 
   @Test
   public void testNotEqualTo() {
     assertThat(JRoutineCore.with(Operators.isNotEqualTo("test"))
                            .call("test", "test1", "test")
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly("test1");
     assertThat(
-        JRoutineCore.with(Operators.isNotEqualTo(0)).close().after(seconds(3)).all()).isEmpty();
+        JRoutineCore.with(Operators.isNotEqualTo(0)).close().inMax(seconds(3)).all()).isEmpty();
     assertThat(Operators.isNotEqualTo("test")).isEqualTo(Operators.isNotEqualTo("test"));
     assertThat(Operators.isNotEqualTo(null)).isEqualTo(Operators.isNotEqualTo(null));
   }
@@ -1202,11 +1202,11 @@ public class OperatorsTest {
   public void testNotInstanceOf() {
     assertThat(JRoutineCore.with(Operators.isNotInstanceOf(String.class))
                            .call(3, "test")
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly(3);
     assertThat(JRoutineCore.with(Operators.isNotInstanceOf(Number.class))
                            .close()
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).isEmpty();
     assertThat(Operators.isNotInstanceOf(String.class)).isEqualTo(
         Operators.isNotInstanceOf(String.class));
@@ -1223,10 +1223,10 @@ public class OperatorsTest {
     final Object ref = new Object();
     assertThat(JRoutineCore.with(Operators.isNotSameAs(ref))
                            .call("test", "test1", ref)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly("test", "test1");
     assertThat(
-        JRoutineCore.with(Operators.isNotSameAs(0)).close().after(seconds(3)).all()).isEmpty();
+        JRoutineCore.with(Operators.isNotSameAs(0)).close().inMax(seconds(3)).all()).isEmpty();
     assertThat(Operators.isNotSameAs(ref)).isNotSameAs(Operators.isEqualTo(ref));
     assertThat(Operators.isNotSameAs(null)).isNotSameAs(Operators.isEqualTo(null));
   }
@@ -1235,71 +1235,71 @@ public class OperatorsTest {
   public void testNull() {
     assertThat(JRoutineCore.with(Operators.isNotNull())
                            .call(3, null, "test", null)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly(3, "test");
     assertThat(JRoutineCore.with(Operators.isNull())
                            .call(3, null, "test", null)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly(null, null);
   }
 
   @Test
   public void testOrElse() {
     assertThat(
-        JRoutineCore.with(orElse("est")).call("test").after(seconds(3)).all()).containsExactly(
+        JRoutineCore.with(orElse("est")).call("test").inMax(seconds(3)).all()).containsExactly(
         "test");
     assertThat(JRoutineCore.with(orElse("est1", "est2"))
                            .call("test")
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly("test");
     assertThat(JRoutineCore.with(orElse(Arrays.asList("est1", "est2")))
                            .call("test")
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly("test");
     assertThat(JRoutineCore.with(orElseAccept(new Consumer<Channel<String, ?>>() {
 
       public void accept(final Channel<String, ?> result) {
         result.pass("est");
       }
-    })).call("test").after(seconds(3)).all()).containsExactly("test");
+    })).call("test").inMax(seconds(3)).all()).containsExactly("test");
     assertThat(JRoutineCore.with(orElseAccept(2, new Consumer<Channel<String, ?>>() {
 
       public void accept(final Channel<String, ?> result) {
         result.pass("est");
       }
-    })).close().after(seconds(3)).all()).containsExactly("est", "est");
+    })).close().inMax(seconds(3)).all()).containsExactly("est", "est");
     assertThat(JRoutineCore.with(orElseGet(new Supplier<String>() {
 
       public String get() {
         return "est";
       }
-    })).call("test").after(seconds(3)).all()).containsExactly("test");
+    })).call("test").inMax(seconds(3)).all()).containsExactly("test");
     assertThat(JRoutineCore.with(orElseGet(2, new Supplier<String>() {
 
       public String get() {
         return "est";
       }
-    })).close().after(seconds(3)).all()).containsExactly("est", "est");
+    })).close().inMax(seconds(3)).all()).containsExactly("est", "est");
     assertThat(JRoutineCore.with(orElse("est"))
                            .applyInvocationConfiguration()
                            .withRunner(Runners.syncRunner())
                            .configured()
                            .call("test")
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly("test");
     assertThat(JRoutineCore.with(orElse("est1", "est2"))
                            .applyInvocationConfiguration()
                            .withRunner(Runners.syncRunner())
                            .configured()
                            .call("test")
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly("test");
     assertThat(JRoutineCore.with(orElse(Arrays.asList("est1", "est2")))
                            .applyInvocationConfiguration()
                            .withRunner(Runners.syncRunner())
                            .configured()
                            .call("test")
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly("test");
     assertThat(JRoutineCore.with(orElseAccept(new Consumer<Channel<String, ?>>() {
 
@@ -1311,7 +1311,7 @@ public class OperatorsTest {
                            .withRunner(Runners.syncRunner())
                            .configured()
                            .call("test")
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly("test");
     assertThat(JRoutineCore.with(orElseAccept(2, new Consumer<Channel<String, ?>>() {
 
@@ -1323,7 +1323,7 @@ public class OperatorsTest {
                            .withRunner(Runners.syncRunner())
                            .configured()
                            .close()
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly("est", "est");
     assertThat(JRoutineCore.with(orElseGet(new Supplier<String>() {
 
@@ -1335,7 +1335,7 @@ public class OperatorsTest {
                            .withRunner(Runners.syncRunner())
                            .configured()
                            .call("test")
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly("test");
     assertThat(JRoutineCore.with(orElseGet(2, new Supplier<String>() {
 
@@ -1347,7 +1347,7 @@ public class OperatorsTest {
                            .withRunner(Runners.syncRunner())
                            .configured()
                            .close()
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly("est", "est");
   }
 
@@ -1388,11 +1388,11 @@ public class OperatorsTest {
   public void testOrElseThrow() {
     assertThat(JRoutineCore.with(orElseThrow(new IllegalStateException()))
                            .call("test")
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly("test");
     assertThat(JRoutineCore.with(orElseThrow(new IllegalStateException()))
                            .close()
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .getError()
                            .getCause()).isExactlyInstanceOf(IllegalStateException.class);
   }
@@ -1405,7 +1405,7 @@ public class OperatorsTest {
       public void perform() {
         isComplete.set(true);
       }
-    })).call("test1", "test2", "test3").after(seconds(3)).all()).containsExactly("test1", "test2",
+    })).call("test1", "test2", "test3").inMax(seconds(3)).all()).containsExactly("test1", "test2",
         "test3");
     assertThat(isComplete.get()).isTrue();
     isComplete.set(false);
@@ -1416,7 +1416,7 @@ public class OperatorsTest {
       }
     })).call();
     channel.abort(new NoSuchElementException());
-    assertThat(channel.after(seconds(3)).getError()).isExactlyInstanceOf(AbortException.class);
+    assertThat(channel.inMax(seconds(3)).getError()).isExactlyInstanceOf(AbortException.class);
     assertThat(isComplete.get()).isFalse();
   }
 
@@ -1431,7 +1431,7 @@ public class OperatorsTest {
           }
         })).call();
     assertThat(channel.abort()).isTrue();
-    assertThat(channel.after(seconds(3)).getError()).isExactlyInstanceOf(AbortException.class);
+    assertThat(channel.inMax(seconds(3)).getError()).isExactlyInstanceOf(AbortException.class);
     assertThat(isError.get()).isTrue();
     isError.set(false);
     assertThat(JRoutineCore.with(peekError(new Consumer<RoutineException>() {
@@ -1439,7 +1439,7 @@ public class OperatorsTest {
       public void accept(final RoutineException e) {
         isError.set(true);
       }
-    })).call("test").after(seconds(3)).all()).containsExactly("test");
+    })).call("test").inMax(seconds(3)).all()).containsExactly("test");
     assertThat(isError.get()).isFalse();
   }
 
@@ -1476,7 +1476,7 @@ public class OperatorsTest {
       public void accept(final String s) {
         data.add(s);
       }
-    })).call("test1", "test2", "test3").after(seconds(3)).all()).containsExactly("test1", "test2",
+    })).call("test1", "test2", "test3").inMax(seconds(3)).all()).containsExactly("test1", "test2",
         "test3");
     assertThat(data).containsExactly("test1", "test2", "test3");
   }
@@ -1484,19 +1484,19 @@ public class OperatorsTest {
   @Test
   public void testPrepend() {
     assertThat(
-        JRoutineCore.with(prepend("test2")).call("test1").after(seconds(3)).all()).containsExactly(
+        JRoutineCore.with(prepend("test2")).call("test1").inMax(seconds(3)).all()).containsExactly(
         "test2", "test1");
     assertThat(JRoutineCore.with(prepend("test2", "test3"))
                            .call("test1")
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly("test2", "test3", "test1");
     assertThat(JRoutineCore.with(prepend(Arrays.asList("test2", "test3")))
                            .call("test1")
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly("test2", "test3", "test1");
     assertThat(JRoutineCore.with(prepend(JRoutineCore.io().of("test2", "test3")))
                            .call("test1")
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly("test2", "test3", "test1");
   }
 
@@ -1534,7 +1534,7 @@ public class OperatorsTest {
                            .withRunner(Runners.syncRunner())
                            .configured()
                            .call("test1")
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly("TEST2", "TEST2", "TEST2", "test1");
     assertThat(JRoutineCore.with(prependAccept(3, new Consumer<Channel<String, ?>>() {
 
@@ -1552,50 +1552,50 @@ public class OperatorsTest {
       public String get() {
         return "TEST2";
       }
-    })).call("test1").after(seconds(3)).all()).containsExactly("TEST2", "test1");
+    })).call("test1").inMax(seconds(3)).all()).containsExactly("TEST2", "test1");
     assertThat(JRoutineCore.with(prependAccept(new Consumer<Channel<String, ?>>() {
 
       public void accept(final Channel<String, ?> resultChannel) {
         resultChannel.pass("TEST2");
       }
-    })).call("test1").after(seconds(3)).all()).containsExactly("TEST2", "test1");
+    })).call("test1").inMax(seconds(3)).all()).containsExactly("TEST2", "test1");
     assertThat(JRoutineCore.with(prependGet(3, new Supplier<String>() {
 
       public String get() {
         return "TEST2";
       }
-    })).call("test1").after(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2", "test1");
+    })).call("test1").inMax(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2", "test1");
     assertThat(JRoutineCore.with(prependAccept(3, new Consumer<Channel<String, ?>>() {
 
       public void accept(final Channel<String, ?> resultChannel) {
         resultChannel.pass("TEST2");
       }
-    })).call("test1").after(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2", "test1");
+    })).call("test1").inMax(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2", "test1");
     assertThat(JRoutineCore.with(prependGet(new Supplier<String>() {
 
       public String get() {
         return "TEST2";
       }
-    })).callParallel("test1").after(seconds(3)).all()).containsExactly("TEST2", "test1");
+    })).callParallel("test1").inMax(seconds(3)).all()).containsExactly("TEST2", "test1");
     assertThat(JRoutineCore.with(prependAccept(new Consumer<Channel<String, ?>>() {
 
       public void accept(final Channel<String, ?> resultChannel) {
         resultChannel.pass("TEST2");
       }
-    })).callParallel("test1").after(seconds(3)).all()).containsExactly("TEST2", "test1");
+    })).callParallel("test1").inMax(seconds(3)).all()).containsExactly("TEST2", "test1");
     assertThat(JRoutineCore.with(prependGet(3, new Supplier<String>() {
 
       public String get() {
         return "TEST2";
       }
-    })).callParallel("test1").after(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2",
+    })).callParallel("test1").inMax(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2",
         "test1");
     assertThat(JRoutineCore.with(prependAccept(3, new Consumer<Channel<String, ?>>() {
 
       public void accept(final Channel<String, ?> resultChannel) {
         resultChannel.pass("TEST2");
       }
-    })).callParallel("test1").after(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2",
+    })).callParallel("test1").inMax(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2",
         "test1");
   }
 
@@ -1606,7 +1606,7 @@ public class OperatorsTest {
       public String apply(final String s, final String s2) {
         return s + s2;
       }
-    })).call("test1", "test2", "test3").after(seconds(3)).all()).containsExactly("test1test2test3");
+    })).call("test1", "test2", "test3").inMax(seconds(3)).all()).containsExactly("test1test2test3");
     assertThat(JRoutineCore.with(reduce(new BiFunction<String, String, String>() {
 
       public String apply(final String s, final String s2) {
@@ -1643,7 +1643,7 @@ public class OperatorsTest {
       public StringBuilder apply(final StringBuilder b, final String s) {
         return b.append(s);
       }
-    })).call("test1", "test2", "test3").after(seconds(3)).next().toString()).isEqualTo(
+    })).call("test1", "test2", "test3").inMax(seconds(3)).next().toString()).isEqualTo(
         "test1test2test3");
     assertThat(JRoutineCore.with(reduce(new Supplier<StringBuilder>() {
 
@@ -1679,7 +1679,7 @@ public class OperatorsTest {
   public void testReplace() {
     assertThat(JRoutineCore.with(replace("test2", "test"))
                            .call("test1", "test2", "test3")
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly("test1", "test", "test3");
     assertThat(
         JRoutineCore.with(replaceAccept("test2", new BiConsumer<String, Channel<String, ?>>() {
@@ -1688,7 +1688,7 @@ public class OperatorsTest {
             assertThat(s).isEqualTo("test2");
             result.pass("test3", "test1");
           }
-        })).call("test1", "test2", "test3").after(seconds(3)).all()).containsExactly("test1",
+        })).call("test1", "test2", "test3").inMax(seconds(3)).all()).containsExactly("test1",
         "test3", "test1", "test3");
     assertThat(JRoutineCore.with(replaceApply("test2", new Function<String, String>() {
 
@@ -1696,7 +1696,7 @@ public class OperatorsTest {
         assertThat(s).isEqualTo("test2");
         return "test";
       }
-    })).call("test1", "test2", "test3").after(seconds(3)).all()).containsExactly("test1", "test",
+    })).call("test1", "test2", "test3").inMax(seconds(3)).all()).containsExactly("test1", "test",
         "test3");
   }
 
@@ -1726,7 +1726,7 @@ public class OperatorsTest {
     };
     assertThat(JRoutineCore.with(replaceSame(target, obj2))
                            .call(obj1, target, obj3)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly(obj1, obj2, obj3);
     assertThat(
         JRoutineCore.with(replaceSameAccept(target, new BiConsumer<Object, Channel<Object, ?>>() {
@@ -1735,7 +1735,7 @@ public class OperatorsTest {
             assertThat(o).isSameAs(target);
             result.pass(obj3, obj1);
           }
-        })).call(obj1, target, obj3).after(seconds(3)).all()).containsExactly(obj1, obj3, obj1,
+        })).call(obj1, target, obj3).inMax(seconds(3)).all()).containsExactly(obj1, obj3, obj1,
         obj3);
     assertThat(JRoutineCore.with(replaceSameApply(target, new Function<Object, Object>() {
 
@@ -1743,7 +1743,7 @@ public class OperatorsTest {
         assertThat(o).isSameAs(target);
         return obj2;
       }
-    })).call(obj1, target, obj3).after(seconds(3)).all()).containsExactly(obj1, obj2, obj3);
+    })).call(obj1, target, obj3).inMax(seconds(3)).all()).containsExactly(obj1, obj2, obj3);
   }
 
   @Test
@@ -1751,9 +1751,9 @@ public class OperatorsTest {
     final Object ref = new Object();
     assertThat(JRoutineCore.with(Operators.isSameAs(ref))
                            .call("test", "test1", ref)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly(ref);
-    assertThat(JRoutineCore.with(Operators.isSameAs(0)).close().after(seconds(3)).all()).isEmpty();
+    assertThat(JRoutineCore.with(Operators.isSameAs(0)).close().inMax(seconds(3)).all()).isEmpty();
     assertThat(Operators.isSameAs(ref)).isEqualTo(Operators.isSameAs(ref));
     assertThat(Operators.isSameAs(null)).isEqualTo(Operators.isSameAs(null));
   }
@@ -1762,15 +1762,15 @@ public class OperatorsTest {
   public void testSkip() {
     assertThat(JRoutineCore.with(Operators.skip(5))
                            .call(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly(6, 7, 8, 9, 10);
     assertThat(JRoutineCore.with(Operators.skip(15))
                            .call(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).isEmpty();
     assertThat(JRoutineCore.with(Operators.skip(0))
                            .call(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
   }
 
@@ -1799,15 +1799,15 @@ public class OperatorsTest {
   public void testSkipLast() {
     assertThat(JRoutineCore.with(Operators.skipLast(5))
                            .call(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly(1, 2, 3, 4, 5);
     assertThat(JRoutineCore.with(Operators.skipLast(15))
                            .call(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).isEmpty();
     assertThat(JRoutineCore.with(Operators.skipLast(0))
                            .call(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
   }
 
@@ -1836,106 +1836,106 @@ public class OperatorsTest {
   public void testSort() {
     assertThat(JRoutineCore.with(Operators.<Integer>sort())
                            .call(2, 5, 4, 3, 1)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly(1, 2, 3, 4, 5);
     assertThat(JRoutineCore.with(Operators.<String>sort())
                            .call("a", "C", "b")
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly("C", "a", "b");
     assertThat(JRoutineCore.with(Operators.sortBy(String.CASE_INSENSITIVE_ORDER))
                            .call("a", "C", "b")
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly("a", "b", "C");
   }
 
   @Test
   public void testSum() {
-    assertThat(JRoutineCore.with(Operators.sum()).close().after(seconds(3)).next()).isEqualTo(0);
+    assertThat(JRoutineCore.with(Operators.sum()).close().inMax(seconds(3)).next()).isEqualTo(0);
     assertThat(
-        JRoutineCore.with(Operators.sum()).call(1, 2, 3, 4).after(seconds(3)).next()).isEqualTo(10);
+        JRoutineCore.with(Operators.sum()).call(1, 2, 3, 4).inMax(seconds(3)).next()).isEqualTo(10);
   }
 
   @Test
   public void testSumBig() {
     assertThat(
-        JRoutineCore.with(Operators.sumBig()).call(1, 2, 3, 4).after(seconds(3)).next()).isEqualTo(
+        JRoutineCore.with(Operators.sumBig()).call(1, 2, 3, 4).inMax(seconds(3)).next()).isEqualTo(
         new BigDecimal(10));
   }
 
   @Test
   public void testSumByte() {
-    assertThat(JRoutineCore.with(Operators.sumByte()).close().after(seconds(3)).next()).isEqualTo(
+    assertThat(JRoutineCore.with(Operators.sumByte()).close().inMax(seconds(3)).next()).isEqualTo(
         (byte) 0);
     assertThat(
-        JRoutineCore.with(Operators.sumByte()).call(1, 2, 3, 4).after(seconds(3)).next()).isEqualTo(
+        JRoutineCore.with(Operators.sumByte()).call(1, 2, 3, 4).inMax(seconds(3)).next()).isEqualTo(
         (byte) 10);
   }
 
   @Test
   public void testSumDouble() {
-    assertThat(JRoutineCore.with(Operators.sumDouble()).close().after(seconds(3)).next()).isEqualTo(
+    assertThat(JRoutineCore.with(Operators.sumDouble()).close().inMax(seconds(3)).next()).isEqualTo(
         0d);
     assertThat(JRoutineCore.with(Operators.sumDouble())
                            .call(1, 2, 3, 4)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo(10d);
   }
 
   @Test
   public void testSumFloat() {
-    assertThat(JRoutineCore.with(Operators.sumFloat()).close().after(seconds(3)).next()).isEqualTo(
+    assertThat(JRoutineCore.with(Operators.sumFloat()).close().inMax(seconds(3)).next()).isEqualTo(
         0f);
     assertThat(JRoutineCore.with(Operators.sumFloat())
                            .call(1, 2, 3, 4)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo(10f);
   }
 
   @Test
   public void testSumInteger() {
     assertThat(
-        JRoutineCore.with(Operators.sumInteger()).close().after(seconds(3)).next()).isEqualTo(0);
+        JRoutineCore.with(Operators.sumInteger()).close().inMax(seconds(3)).next()).isEqualTo(0);
     assertThat(JRoutineCore.with(Operators.sumInteger())
                            .call(1, 2, 3, 4)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo(10);
   }
 
   @Test
   public void testSumLong() {
-    assertThat(JRoutineCore.with(Operators.sumLong()).close().after(seconds(3)).next()).isEqualTo(
+    assertThat(JRoutineCore.with(Operators.sumLong()).close().inMax(seconds(3)).next()).isEqualTo(
         0L);
     assertThat(
-        JRoutineCore.with(Operators.sumLong()).call(1, 2, 3, 4).after(seconds(3)).next()).isEqualTo(
+        JRoutineCore.with(Operators.sumLong()).call(1, 2, 3, 4).inMax(seconds(3)).next()).isEqualTo(
         10L);
   }
 
   @Test
   public void testSumShort() {
-    assertThat(JRoutineCore.with(Operators.sumShort()).close().after(seconds(3)).next()).isEqualTo(
+    assertThat(JRoutineCore.with(Operators.sumShort()).close().inMax(seconds(3)).next()).isEqualTo(
         (short) 0);
     assertThat(JRoutineCore.with(Operators.sumShort())
                            .call(1, 2, 3, 4)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo((short) 10);
   }
 
   @Test
   public void testThen() {
     assertThat(
-        JRoutineCore.with(then("test2")).call("test1").after(seconds(3)).all()).containsExactly(
+        JRoutineCore.with(then("test2")).call("test1").inMax(seconds(3)).all()).containsExactly(
         "test2");
     assertThat(JRoutineCore.with(then("test2", "test3"))
                            .call("test1")
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly("test2", "test3");
     assertThat(JRoutineCore.with(then(Arrays.asList("test2", "test3")))
                            .call("test1")
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly("test2", "test3");
     assertThat(JRoutineCore.with(then(JRoutineCore.io().of("test2", "test3")))
                            .call("test1")
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly("test2", "test3");
   }
 
@@ -1973,7 +1973,7 @@ public class OperatorsTest {
                            .withRunner(Runners.syncRunner())
                            .configured()
                            .call("test1")
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsExactly("TEST2", "TEST2", "TEST2");
     assertThat(JRoutineCore.with(thenAccept(3, new Consumer<Channel<String, ?>>() {
 
@@ -1991,49 +1991,49 @@ public class OperatorsTest {
       public String get() {
         return "TEST2";
       }
-    })).call("test1").after(seconds(3)).all()).containsExactly("TEST2");
+    })).call("test1").inMax(seconds(3)).all()).containsExactly("TEST2");
     assertThat(JRoutineCore.with(thenAccept(new Consumer<Channel<String, ?>>() {
 
       public void accept(final Channel<String, ?> resultChannel) {
         resultChannel.pass("TEST2");
       }
-    })).call("test1").after(seconds(3)).all()).containsExactly("TEST2");
+    })).call("test1").inMax(seconds(3)).all()).containsExactly("TEST2");
     assertThat(JRoutineCore.with(thenGet(3, new Supplier<String>() {
 
       public String get() {
         return "TEST2";
       }
-    })).call("test1").after(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2");
+    })).call("test1").inMax(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2");
     assertThat(JRoutineCore.with(thenAccept(3, new Consumer<Channel<String, ?>>() {
 
       public void accept(final Channel<String, ?> resultChannel) {
         resultChannel.pass("TEST2");
       }
-    })).call("test1").after(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2");
+    })).call("test1").inMax(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2");
     assertThat(JRoutineCore.with(thenGet(new Supplier<String>() {
 
       public String get() {
         return "TEST2";
       }
-    })).callParallel("test1").after(seconds(3)).all()).containsExactly("TEST2");
+    })).callParallel("test1").inMax(seconds(3)).all()).containsExactly("TEST2");
     assertThat(JRoutineCore.with(thenAccept(new Consumer<Channel<String, ?>>() {
 
       public void accept(final Channel<String, ?> resultChannel) {
         resultChannel.pass("TEST2");
       }
-    })).callParallel("test1").after(seconds(3)).all()).containsExactly("TEST2");
+    })).callParallel("test1").inMax(seconds(3)).all()).containsExactly("TEST2");
     assertThat(JRoutineCore.with(thenGet(3, new Supplier<String>() {
 
       public String get() {
         return "TEST2";
       }
-    })).callParallel("test1").after(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2");
+    })).callParallel("test1").inMax(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2");
     assertThat(JRoutineCore.with(thenAccept(3, new Consumer<Channel<String, ?>>() {
 
       public void accept(final Channel<String, ?> resultChannel) {
         resultChannel.pass("TEST2");
       }
-    })).callParallel("test1").after(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2");
+    })).callParallel("test1").inMax(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2");
   }
 
   @Test
@@ -2041,22 +2041,22 @@ public class OperatorsTest {
   public void testToArray() {
     assertThat(JRoutineCore.with(Operators.toArray(String.class))
                            .call("test", "test")
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).containsExactly("test", "test");
     assertThat(JRoutineCore.with(Operators.toArray(String.class))
                            .call("test1", "test2")
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).containsExactly("test1", "test2");
     assertThat(JRoutineCore.with(Operators.toArray(Number.class))
                            .call(1, 2)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).containsExactly(1, 2);
     assertThat(JRoutineCore.with(Operators.toArray())
                            .call("test1", "test2")
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).containsExactly("test1", "test2");
     assertThat(
-        JRoutineCore.with(Operators.toArray()).call(1, 2).after(seconds(3)).next()).containsExactly(
+        JRoutineCore.with(Operators.toArray()).call(1, 2).inMax(seconds(3)).next()).containsExactly(
         1, 2);
   }
 
@@ -2065,15 +2065,15 @@ public class OperatorsTest {
   public void testToArray2() {
     assertThat(JRoutineCore.with(Operators.toArray(tokenOf(String.class)))
                            .call("test", "test")
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).containsExactly("test", "test");
     assertThat(JRoutineCore.with(Operators.toArray(tokenOf(String.class)))
                            .call("test1", "test2")
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).containsExactly("test1", "test2");
     assertThat(JRoutineCore.with(Operators.toArray(tokenOf(Number.class)))
                            .call(1, 2)
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).containsExactly(1, 2);
   }
 
@@ -2081,11 +2081,11 @@ public class OperatorsTest {
   public void testToList() {
     assertThat(JRoutineCore.with(Operators.toList())
                            .call("test", "test")
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo(Arrays.asList("test", "test"));
     assertThat(JRoutineCore.with(Operators.toList())
                            .call("test1", "test2")
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo(Arrays.asList("test1", "test2"));
   }
 
@@ -2096,14 +2096,14 @@ public class OperatorsTest {
       public Integer apply(final String s) {
         return s.hashCode();
       }
-    })).call(Arrays.asList("test", "test")).after(seconds(3)).next()).isEqualTo(
+    })).call(Arrays.asList("test", "test")).inMax(seconds(3)).next()).isEqualTo(
         Collections.singletonMap("test".hashCode(), "test"));
     assertThat(JRoutineCore.with(Operators.toMap(new Function<String, Integer>() {
 
       public Integer apply(final String s) {
         return s.hashCode();
       }
-    })).call(Arrays.asList("test1", "test2")).after(seconds(3)).next()).isEqualTo(
+    })).call(Arrays.asList("test1", "test2")).inMax(seconds(3)).next()).isEqualTo(
         new HashMap<Integer, String>() {{
           put("test1".hashCode(), "test1");
           put("test2".hashCode(), "test2");
@@ -2114,9 +2114,9 @@ public class OperatorsTest {
   public void testToSet() {
     assertThat(JRoutineCore.with(Operators.toSet())
                            .call("test", "test")
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .next()).isEqualTo(Collections.singleton("test"));
-    assertThat(JRoutineCore.with(Operators.toSet()).call("test1", "test2").after(seconds(3)).next())
+    assertThat(JRoutineCore.with(Operators.toSet()).call("test1", "test2").inMax(seconds(3)).next())
         .isEqualTo(new HashSet<String>(Arrays.asList("test1", "test2")));
   }
 
@@ -2126,7 +2126,7 @@ public class OperatorsTest {
                            .call(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
                            .bind(JRoutineCore.with(Operators.<Number>unfold()).callParallel())
                            .close()
-                           .after(seconds(3))
+                           .inMax(seconds(3))
                            .all()).containsOnly(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
   }
 }

@@ -95,7 +95,7 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  *             }
  *         }.call(inputChannel, outputChannel);
  *         inputChannel.pass(1, 2, 3).close();
- *         outputChannel.after(seconds(1)).all(); // expected values: 1, 4, 9
+ *         outputChannel.inMax(seconds(1)).all(); // expected values: 1, 4, 9
  *     </code>
  * </pre>
  * The {@code call()} method returns an output channel producing the outputs returned by the target
@@ -126,7 +126,7 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  *             }
  *         }.call(inputChannel, true);
  *         inputChannel.pass("Hello", "JRoutine", "!").close();
- *         outputChannel.after(seconds(1)).all(); // expected values: "HELLO", "JROUTINE", "!"
+ *         outputChannel.inMax(seconds(1)).all(); // expected values: "HELLO", "JROUTINE", "!"
  *     </code>
  * </pre>
  * Note that outputs will be collected through the channel returned by the {@code call()} method.
@@ -177,7 +177,7 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  *             }
  *         }.callParallel(inputChannel, true);
  *         inputChannel.pass("Hello", "JRoutine", "!").close();
- *         outputChannel.after(seconds(1)).all(); // expected values: "HELLO", "JROUTINE", "!"
+ *         outputChannel.inMax(seconds(1)).all(); // expected values: "HELLO", "JROUTINE", "!"
  *     </code>
  * </pre>
  * Or, for an inner class:
@@ -307,7 +307,7 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  *             }
  *         }.call(outputChannel, resultChannel);
  *         inputChannel.pass(1, 2, 3, 4).close();
- *         resultChannel.after(seconds(1)).next(); // expected value: 30
+ *         resultChannel.inMax(seconds(1)).next(); // expected value: 30
  *     </code>
  * </pre>
  * Note how the input channel is closed before reading the output, since the sum routine relies
@@ -335,7 +335,7 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  *             }
  *         }.call(channel, outputChannel);
  *         channel.pass("1", "2", "3", "4").close();
- *         outputChannel.after(seconds(1)).next(); // expected value: 10
+ *         outputChannel.inMax(seconds(1)).next(); // expected value: 10
  *     </code>
  * </pre>
  * <h2>Handling of abortion exception</h2>
@@ -400,7 +400,7 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  *                RoutineMethod.from(String.class.getMethod("format", String.class, Object[].class))
  *                             .call("%s %s!", inputChannel);
  *         inputChannel.pass(new Object[]{"Hello", "JRoutine"}).close();
- *         outputChannel.after(seconds(1)).next(); // expected value: "Hello JRoutine!"
+ *         outputChannel.inMax(seconds(1)).next(); // expected value: "Hello JRoutine!"
  *     </code>
  * </pre>
  * In case the very same input or output channel instance has to be passed as parameter, it has to

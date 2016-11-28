@@ -35,7 +35,7 @@ import java.util.concurrent.Semaphore;
 
 import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.factoryOf;
 import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
-import static com.github.dm.jrt.core.util.DurationMeasure.zero;
+import static com.github.dm.jrt.core.util.DurationMeasure.noTime;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -74,7 +74,7 @@ public class LoaderRoutineRotationTest
 
     simulateRotation();
     DurationMeasure.seconds(5).sleepAtLeast();
-    assertThat(routine.call("test2").after(timeout).next()).isEqualTo("TEST1");
+    assertThat(routine.call("test2").inMax(timeout).next()).isEqualTo("TEST1");
   }
 
   public void testActivityRotationChannel() throws InterruptedException {
@@ -100,7 +100,7 @@ public class LoaderRoutineRotationTest
     final Channel<?, String> channel =
         JRoutineLoader.on(loaderFrom(getActivity())).withId(0).buildChannel();
 
-    assertThat(channel.after(timeout).all()).containsExactly("TEST1", "TEST2");
+    assertThat(channel.inMax(timeout).all()).containsExactly("TEST1", "TEST2");
   }
 
   public void testActivityRotationInputs() throws InterruptedException {
@@ -122,8 +122,8 @@ public class LoaderRoutineRotationTest
     final Routine<String, String> routine2 = JRoutineLoader.on(loaderFrom(getActivity()))
                                                            .with(factoryOf(ToUpperCase.class))
                                                            .buildRoutine();
-    final Channel<?, String> result1 = routine2.call("test1").after(timeout);
-    final Channel<?, String> result2 = routine2.call("test2").after(timeout);
+    final Channel<?, String> result1 = routine2.call("test1").inMax(timeout);
+    final Channel<?, String> result2 = routine2.call("test2").inMax(timeout);
 
     assertThat(result1.next()).isEqualTo("TEST1");
     assertThat(result2.next()).isEqualTo("TEST2");
@@ -147,8 +147,8 @@ public class LoaderRoutineRotationTest
 
     final Routine<Data, Data> routine2 =
         JRoutineLoader.on(loaderFrom(getActivity())).with(factoryOf(Delay.class)).buildRoutine();
-    final Channel<?, Data> result1 = routine2.call(data1).after(timeout);
-    final Channel<?, Data> result2 = routine2.call(data1).after(timeout);
+    final Channel<?, Data> result1 = routine2.call(data1).inMax(timeout);
+    final Channel<?, Data> result2 = routine2.call(data1).inMax(timeout);
 
     assertThat(result1.next()).isSameAs(data1);
     assertThat(result2.next()).isSameAs(data1);
@@ -168,14 +168,14 @@ public class LoaderRoutineRotationTest
                                                           .withLoaderId(0)
                                                           .withClashResolution(
                                                               ClashResolutionType.JOIN)
-                                                          .withResultStaleTime(zero())
+                                                          .withResultStaleTime(noTime())
                                                           .configured()
                                                           .buildRoutine();
     routine.call("test1");
 
     simulateRotation();
     DurationMeasure.seconds(5).sleepAtLeast();
-    assertThat(routine.call("test2").after(timeout).next()).isEqualTo("TEST2");
+    assertThat(routine.call("test2").inMax(timeout).next()).isEqualTo("TEST2");
   }
 
   private void simulateRotation() throws InterruptedException {

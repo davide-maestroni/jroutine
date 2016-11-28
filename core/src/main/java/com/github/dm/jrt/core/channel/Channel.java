@@ -54,7 +54,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
    * @return whether the channel status changed as a result of the call.
    * @see #after(DurationMeasure)
    * @see #after(long, TimeUnit)
-   * @see #now()
+   * @see #afterNoDelay()
    */
   boolean abort();
 
@@ -76,15 +76,16 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
    * @return whether the channel status changed as a result of the call.
    * @see #after(DurationMeasure)
    * @see #after(long, TimeUnit)
-   * @see #now()
+   * @see #afterNoDelay()
    */
   boolean abort(@Nullable Throwable reason);
 
   /**
    * Tells the channel to delay the following operations of the specified time duration.
    * <br>
-   * In case of read operations the value will represent the maximum allowed time before the
-   * operation completes.
+   * Read operations will not be affected.
+   * <p>
+   * By default the delay is set to 0.
    * <p>
    * Note that closing and abortion commands will be delayed as well. Note, however, that a
    * delayed abortion will not prevent the invocation from completing, as pending input data do.
@@ -104,8 +105,9 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
   /**
    * Tells the channel to delay the following operations of the specified time duration.
    * <br>
-   * In case of read operations the value will represent the maximum allowed time before the
-   * operation completes.
+   * Read operations will not be affected.
+   * <p>
+   * By default the delay is set to 0.
    * <p>
    * Note that closing and abortion commands will be delayed as well. Note, however, that a
    * delayed abortion will not prevent the invocation from completing, as pending input data do.
@@ -119,6 +121,21 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
    */
   @NotNull
   Channel<IN, OUT> after(@NotNull DurationMeasure delay);
+
+  /**
+   * Tells the channel to not delay the following operations.
+   * <br>
+   * Read operations will not be affected.
+   * <p>
+   * By default the delay is set to 0.
+   * <p>
+   * Note that the implementing class should ensure that calls of this method from different
+   * threads will not interfere with each others.
+   *
+   * @return this channel.
+   */
+  @NotNull
+  Channel<IN, OUT> afterNoDelay();
 
   /**
    * Consumes all the results by waiting for the routine to complete at the maximum for the set
@@ -136,9 +153,9 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
    * @throws java.lang.IllegalStateException                       if this channel is already
    *                                                               bound to a consumer or another
    *                                                               channel.
-   * @see #after(DurationMeasure)
-   * @see #after(long, TimeUnit)
-   * @see #now()
+   * @see #inMax(DurationMeasure)
+   * @see #inMax(long, TimeUnit)
+   * @see #inNoTime()
    * @see #eventuallyAbort()
    * @see #eventuallyAbort(Throwable)
    * @see #eventuallyContinue()
@@ -164,9 +181,9 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
    * @throws java.lang.IllegalStateException                       if this channel is already
    *                                                               bound to a consumer or another
    *                                                               channel.
-   * @see #after(DurationMeasure)
-   * @see #after(long, TimeUnit)
-   * @see #now()
+   * @see #inMax(DurationMeasure)
+   * @see #inMax(long, TimeUnit)
+   * @see #inNoTime()
    * @see #eventuallyAbort()
    * @see #eventuallyAbort(Throwable)
    * @see #eventuallyContinue()
@@ -191,7 +208,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
    * @throws java.lang.IllegalStateException if this channel is already bound.
    * @see #after(DurationMeasure)
    * @see #after(long, TimeUnit)
-   * @see #now()
+   * @see #afterNoDelay()
    */
   @NotNull
   <AFTER> Channel<? super OUT, AFTER> bind(@NotNull Channel<? super OUT, AFTER> channel);
@@ -213,7 +230,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
    * @throws java.lang.IllegalStateException if this channel is already bound.
    * @see #after(DurationMeasure)
    * @see #after(long, TimeUnit)
-   * @see #now()
+   * @see #afterNoDelay()
    */
   @NotNull
   Channel<IN, OUT> bind(@NotNull ChannelConsumer<? super OUT> consumer);
@@ -234,7 +251,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
    * @return this channel.
    * @see #after(DurationMeasure)
    * @see #after(long, TimeUnit)
-   * @see #now()
+   * @see #afterNoDelay()
    */
   @NotNull
   Channel<IN, OUT> close();
@@ -251,9 +268,9 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
    * threads will not interfere with each others.
    *
    * @return this channel.
-   * @see #after(DurationMeasure)
-   * @see #after(long, TimeUnit)
-   * @see #now()
+   * @see #inMax(DurationMeasure)
+   * @see #inMax(long, TimeUnit)
+   * @see #inNoTime()
    * @see #eventuallyAbort(Throwable)
    * @see #eventuallyContinue()
    * @see #eventuallyFail()
@@ -274,9 +291,9 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
    *
    * @param reason the throwable object identifying the reason of the invocation abortion.
    * @return this channel.
-   * @see #after(DurationMeasure)
-   * @see #after(long, TimeUnit)
-   * @see #now()
+   * @see #inMax(DurationMeasure)
+   * @see #inMax(long, TimeUnit)
+   * @see #inNoTime()
    * @see #eventuallyAbort()
    * @see #eventuallyContinue()
    * @see #eventuallyFail()
@@ -296,9 +313,9 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
    * threads will not interfere with each others.
    *
    * @return this channel.
-   * @see #after(DurationMeasure)
-   * @see #after(long, TimeUnit)
-   * @see #now()
+   * @see #inMax(DurationMeasure)
+   * @see #inMax(long, TimeUnit)
+   * @see #inNoTime()
    * @see #eventuallyAbort()
    * @see #eventuallyAbort(Throwable)
    * @see #eventuallyFail()
@@ -317,9 +334,9 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
    * threads will not interfere with each others.
    *
    * @return this channel.
-   * @see #after(DurationMeasure)
-   * @see #after(long, TimeUnit)
-   * @see #now()
+   * @see #inMax(DurationMeasure)
+   * @see #inMax(long, TimeUnit)
+   * @see #inNoTime()
    * @see #eventuallyAbort()
    * @see #eventuallyAbort(Throwable)
    * @see #eventuallyContinue()
@@ -331,9 +348,9 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
    * Returns an iterator whose lifetime cannot exceed the set delay.
    *
    * @return the iterator instance.
-   * @see #after(DurationMeasure)
-   * @see #after(long, TimeUnit)
-   * @see #now()
+   * @see #inMax(DurationMeasure)
+   * @see #inMax(long, TimeUnit)
+   * @see #inNoTime()
    * @see #eventuallyAbort(Throwable)
    * @see #eventuallyContinue()
    * @see #eventuallyFail()
@@ -348,9 +365,9 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
    * completes or is aborted, or the timeout elapses.
    *
    * @return whether the routine execution has completed.
-   * @see #after(DurationMeasure)
-   * @see #after(long, TimeUnit)
-   * @see #now()
+   * @see #inMax(DurationMeasure)
+   * @see #inMax(long, TimeUnit)
+   * @see #inNoTime()
    */
   boolean getComplete();
 
@@ -362,9 +379,9 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
    * completes or is aborted, or the timeout elapses.
    *
    * @return the invocation error or null.
-   * @see #after(DurationMeasure)
-   * @see #after(long, TimeUnit)
-   * @see #now()
+   * @see #inMax(DurationMeasure)
+   * @see #inMax(long, TimeUnit)
+   * @see #inNoTime()
    */
   @Nullable
   RoutineException getError();
@@ -384,9 +401,9 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
    * @throws java.lang.IllegalStateException                       if this channel is already
    *                                                               bound to a consumer or another
    *                                                               channel.
-   * @see #after(DurationMeasure)
-   * @see #after(long, TimeUnit)
-   * @see #now()
+   * @see #inMax(DurationMeasure)
+   * @see #inMax(long, TimeUnit)
+   * @see #inNoTime()
    * @see #eventuallyAbort()
    * @see #eventuallyAbort(Throwable)
    * @see #eventuallyContinue()
@@ -414,15 +431,62 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
    *                                                               the read timeout elapses and no
    *                                                               timeout exception is set to be
    *                                                               thrown).
-   * @see #after(DurationMeasure)
-   * @see #after(long, TimeUnit)
-   * @see #now()
+   * @see #inMax(DurationMeasure)
+   * @see #inMax(long, TimeUnit)
+   * @see #inNoTime()
    * @see #eventuallyAbort()
    * @see #eventuallyAbort(Throwable)
    * @see #eventuallyContinue()
    * @see #eventuallyFail()
    */
   OUT next();
+
+  /**
+   * Tells the channel to wait at maximum for the specified time duration for the following read
+   * operations to complete.
+   * <p>
+   * By default the timeout is set to 0 to avoid unexpected deadlocks.
+   * <p>
+   * Note that the implementing class should ensure that calls of this method from different
+   * threads will not interfere with each others.
+   *
+   * @param timeout  the timeout value.
+   * @param timeUnit the timeout time unit.
+   * @return this channel.
+   * @throws com.github.dm.jrt.core.common.RoutineException if the execution has been aborted.
+   * @throws java.lang.IllegalArgumentException             if the specified delay is negative.
+   */
+  @NotNull
+  Channel<IN, OUT> inMax(long timeout, @NotNull TimeUnit timeUnit);
+
+  /**
+   * Tells the channel to wait at maximum for the specified time duration for the following read
+   * operations to complete.
+   * <p>
+   * By default the timeout is set to 0 to avoid unexpected deadlocks.
+   * <p>
+   * Note that the implementing class should ensure that calls of this method from different
+   * threads will not interfere with each others.
+   *
+   * @param timeout the timeout.
+   * @return this channel.
+   * @throws com.github.dm.jrt.core.common.RoutineException if the execution has been aborted.
+   */
+  @NotNull
+  Channel<IN, OUT> inMax(@NotNull DurationMeasure timeout);
+
+  /**
+   * Tells the channel to not wait any time for the following read operations to complete.
+   * <p>
+   * By default the timeout is set to 0 to avoid unexpected deadlocks.
+   * <p>
+   * Note that the implementing class should ensure that calls of this method from different
+   * threads will not interfere with each others.
+   *
+   * @return this channel.
+   */
+  @NotNull
+  Channel<IN, OUT> inNoTime();
 
   /**
    * Returns the number of input data stored in the channel.
@@ -470,9 +534,9 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
    * @throws java.lang.IllegalStateException                       if this channel is already
    *                                                               bound to a consumer or another
    *                                                               channel.
-   * @see #after(DurationMeasure)
-   * @see #after(long, TimeUnit)
-   * @see #now()
+   * @see #inMax(DurationMeasure)
+   * @see #inMax(long, TimeUnit)
+   * @see #inNoTime()
    * @see #eventuallyAbort()
    * @see #eventuallyAbort(Throwable)
    * @see #eventuallyContinue()
@@ -505,28 +569,15 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
    *                                                               the read timeout elapses and no
    *                                                               timeout exception is set to be
    *                                                               thrown).
-   * @see #after(DurationMeasure)
-   * @see #after(long, TimeUnit)
-   * @see #now()
+   * @see #inMax(DurationMeasure)
+   * @see #inMax(long, TimeUnit)
+   * @see #inNoTime()
    * @see #eventuallyAbort()
    * @see #eventuallyAbort(Throwable)
    * @see #eventuallyContinue()
    * @see #eventuallyFail()
    */
   OUT nextOrElse(OUT output);
-
-  /**
-   * Tells the channel to not wait for results to be available.
-   * <p>
-   * By default the timeout is set to 0 to avoid unexpected deadlocks.
-   * <p>
-   * Note that the implementing class should ensure that calls of this method from different
-   * threads will not interfere with each others.
-   *
-   * @return this channel.
-   */
-  @NotNull
-  Channel<IN, OUT> now();
 
   /**
    * Returns the number of output data stored in the channel.
@@ -550,7 +601,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
    * @throws java.lang.IllegalStateException                if this channel is already closed.
    * @see #after(DurationMeasure)
    * @see #after(long, TimeUnit)
-   * @see #now()
+   * @see #afterNoDelay()
    */
   @NotNull
   Channel<IN, OUT> pass(@Nullable Channel<?, ? extends IN> channel);
@@ -567,7 +618,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
    * @throws java.lang.IllegalStateException                if this channel is already closed.
    * @see #after(DurationMeasure)
    * @see #after(long, TimeUnit)
-   * @see #now()
+   * @see #afterNoDelay()
    */
   @NotNull
   Channel<IN, OUT> pass(@Nullable Iterable<? extends IN> inputs);
@@ -584,7 +635,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
    * @throws java.lang.IllegalStateException                if this channel is already closed.
    * @see #after(DurationMeasure)
    * @see #after(long, TimeUnit)
-   * @see #now()
+   * @see #afterNoDelay()
    */
   @NotNull
   Channel<IN, OUT> pass(@Nullable IN input);
@@ -601,7 +652,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
    * @throws java.lang.IllegalStateException                if this channel is already closed.
    * @see #after(DurationMeasure)
    * @see #after(long, TimeUnit)
-   * @see #now()
+   * @see #afterNoDelay()
    */
   @NotNull
   Channel<IN, OUT> pass(@Nullable IN... inputs);
@@ -629,9 +680,9 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
    * @throws java.lang.IllegalStateException                       if this channel is already
    *                                                               bound to a consumer or another
    *                                                               channel.
-   * @see #after(DurationMeasure)
-   * @see #after(long, TimeUnit)
-   * @see #now()
+   * @see #inMax(DurationMeasure)
+   * @see #inMax(long, TimeUnit)
+   * @see #inNoTime()
    * @see #eventuallyAbort()
    * @see #eventuallyAbort(Throwable)
    * @see #eventuallyContinue()
@@ -664,9 +715,9 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
    * completes or is aborted, or the timeout elapses.
    *
    * @throws com.github.dm.jrt.core.common.RoutineException if the execution has been aborted.
-   * @see #after(DurationMeasure)
-   * @see #after(long, TimeUnit)
-   * @see #now()
+   * @see #inMax(DurationMeasure)
+   * @see #inMax(long, TimeUnit)
+   * @see #inNoTime()
    */
   void throwError();
 

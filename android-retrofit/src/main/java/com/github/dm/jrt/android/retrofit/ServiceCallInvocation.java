@@ -242,7 +242,7 @@ public class ServiceCallInvocation
     public void writeTo(final BufferedSink sink) throws IOException {
       final OutputStream outputStream = sink.outputStream();
       try {
-        for (final ParcelableByteBuffer buffer : mInputChannel.after(infinity())) {
+        for (final ParcelableByteBuffer buffer : mInputChannel.inMax(infinity())) {
           ParcelableByteChannel.inputStream(buffer).transferTo(outputStream);
         }
 

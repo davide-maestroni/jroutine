@@ -51,7 +51,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 import static com.github.dm.jrt.android.core.ServiceContext.serviceFrom;
 import static com.github.dm.jrt.android.v4.core.LoaderContextCompat.loaderFrom;
-import static com.github.dm.jrt.core.util.DurationMeasure.days;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static com.github.dm.jrt.function.Functions.onOutput;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -111,13 +110,13 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                             }
                           }))
                           .close()
-                          .after(days(10))
+                          .inMax(seconds(10))
                           .getError()).isNull();
       }
 
       {
         final GitHubService service = retrofit.create(GitHubService.class);
-        final List<Repo> repos = service.listRepos("octocat").after(days(10)).next();
+        final List<Repo> repos = service.listRepos("octocat").inMax(seconds(10)).next();
         assertThat(repos).hasSize(3);
         assertThat(repos.get(0).getId()).isEqualTo("1");
         assertThat(repos.get(0).getName()).isEqualTo("Repo1");
@@ -146,7 +145,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                             }
                           }))
                           .close()
-                          .after(days(10))
+                          .inMax(seconds(10))
                           .getError()).isNull();
       }
 
@@ -183,7 +182,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                           }
                         }))
                         .close()
-                        .after(seconds(10))
+                        .inMax(seconds(10))
                         .getError()).isNull();
 
     } finally {
@@ -268,7 +267,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                             }
                           }))
                           .close()
-                          .after(seconds(10))
+                          .inMax(seconds(10))
                           .getError()).isNull();
       }
 
@@ -303,7 +302,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                             }
                           }))
                           .close()
-                          .after(seconds(10))
+                          .inMax(seconds(10))
                           .getError()).isNull();
       }
 
@@ -340,7 +339,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                           }
                         }))
                         .close()
-                        .after(seconds(10))
+                        .inMax(seconds(10))
                         .getError()).isNull();
 
     } finally {

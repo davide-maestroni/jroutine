@@ -49,7 +49,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.github.dm.jrt.core.util.DurationMeasure.fromUnit;
-import static com.github.dm.jrt.core.util.DurationMeasure.zero;
+import static com.github.dm.jrt.core.util.DurationMeasure.noTime;
 
 /**
  * Implementation of a channel backed by a Future instance.
@@ -72,11 +72,13 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
 
   private final LocalValue<DurationMeasure> mOutputTimeout;
 
+  private final LocalValue<DurationMeasure> mResultDelay;
+
   private final Runner mRunner;
 
   private final LocalValue<TimeoutActionType> mTimeoutActionType;
 
-  private final LocalValue<Throwable> mTimeoutException = new LocalValue<Throwable>(null);
+  private final ThreadLocal<Throwable> mTimeoutException = new ThreadLocal<Throwable>();
 
   private boolean mIsOutput;
 
@@ -93,7 +95,9 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
     mFuture = ConstantConditions.notNull("future instance", future);
     mRunner = configuration.getRunnerOrElse(Runners.sharedRunner());
     mInterruptIfRunning = mayInterruptIfRunning;
-    mOutputTimeout = new LocalValue<DurationMeasure>(configuration.getOutputTimeoutOrElse(zero()));
+    mResultDelay = new LocalValue<DurationMeasure>(noTime());
+    mOutputTimeout =
+        new LocalValue<DurationMeasure>(configuration.getOutputTimeoutOrElse(noTime()));
     mTimeoutActionType = new LocalValue<TimeoutActionType>(
         configuration.getOutputTimeoutActionOrElse(TimeoutActionType.FAIL));
   }
@@ -104,7 +108,7 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
 
   public boolean abort(@Nullable final Throwable reason) {
     final Future<OUT> future = mFuture;
-    final DurationMeasure delay = mOutputTimeout.get();
+    final DurationMeasure delay = mResultDelay.get();
     if (delay.isZero()) {
       final boolean isCancelled = future.cancel(mInterruptIfRunning);
       if (isCancelled) {
@@ -134,8 +138,13 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
 
   @NotNull
   public Channel<OUT, OUT> after(@NotNull final DurationMeasure delay) {
-    mOutputTimeout.set(ConstantConditions.notNull("delay", delay));
+    mResultDelay.set(ConstantConditions.notNull("delay", delay));
     return this;
+  }
+
+  @NotNull
+  public Channel<OUT, OUT> afterNoDelay() {
+    return after(noTime());
   }
 
   @NotNull
@@ -169,7 +178,7 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
       throw new IllegalStateException("the channel is already bound");
     }
 
-    final DurationMeasure delay = mOutputTimeout.get();
+    final DurationMeasure delay = mResultDelay.get();
     mRunner.run(new Execution() {
 
       public void run() {
@@ -240,9 +249,9 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
   }
 
   public boolean getComplete() {
-    final DurationMeasure delay = mOutputTimeout.get();
+    final DurationMeasure timeout = mOutputTimeout.get();
     try {
-      mFuture.get(delay.value, delay.unit);
+      mFuture.get(timeout.value, timeout.unit);
       return true;
 
     } catch (final Exception ignored) {
@@ -253,9 +262,9 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
 
   @Nullable
   public RoutineException getError() {
-    final DurationMeasure delay = mOutputTimeout.get();
+    final DurationMeasure timeout = mOutputTimeout.get();
     try {
-      mFuture.get(delay.value, delay.unit);
+      mFuture.get(timeout.value, timeout.unit);
 
     } catch (final TimeoutException ignored) {
 
@@ -281,6 +290,22 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
   public OUT next() {
     final DurationMeasure timeout = mOutputTimeout.get();
     return readNext(timeout.value, timeout.unit, mTimeoutActionType.get(), mTimeoutException.get());
+  }
+
+  @NotNull
+  public Channel<OUT, OUT> inMax(final long timeout, @NotNull final TimeUnit timeUnit) {
+    return inMax(fromUnit(timeout, timeUnit));
+  }
+
+  @NotNull
+  public Channel<OUT, OUT> inMax(@NotNull final DurationMeasure timeout) {
+    mOutputTimeout.set(ConstantConditions.notNull("output timeout", timeout));
+    return this;
+  }
+
+  @NotNull
+  public Channel<OUT, OUT> inNoTime() {
+    return inMax(noTime());
   }
 
   public int inputCount() {
@@ -316,11 +341,6 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
     }
 
     return output;
-  }
-
-  @NotNull
-  public Channel<OUT, OUT> now() {
-    return after(zero());
   }
 
   public int outputCount() {
@@ -519,22 +539,22 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
 
     private final TimeoutActionType mAction;
 
-    private final long mDelayMillis;
-
     private final Throwable mException;
+
+    private final long mTimeoutMillis;
 
     private long mEndTime = Long.MIN_VALUE;
 
     /**
      * Constructor.
      *
-     * @param delay     the output delay.
+     * @param timeout   the output timeout.
      * @param action    the timeout action.
      * @param exception the timeout exception.
      */
-    private ExpiringFutureIterator(@NotNull final DurationMeasure delay,
+    private ExpiringFutureIterator(@NotNull final DurationMeasure timeout,
         @NotNull final TimeoutActionType action, @Nullable final Throwable exception) {
-      mDelayMillis = delay.toMillis();
+      mTimeoutMillis = timeout.toMillis();
       mAction = action;
       mException = exception;
     }
@@ -546,7 +566,7 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
     private long getTimeoutMillis() {
       synchronized (mMutex) {
         if (mEndTime == Long.MIN_VALUE) {
-          mEndTime = System.currentTimeMillis() + mDelayMillis;
+          mEndTime = System.currentTimeMillis() + mTimeoutMillis;
         }
 
         return Math.max(0, mEndTime - System.currentTimeMillis());
@@ -578,14 +598,14 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
     /**
      * Constructor.
      *
-     * @param delay     the output delay.
+     * @param timeout   the output timeout.
      * @param action    the timeout action.
      * @param exception the timeout exception.
      */
-    private FutureIterator(@NotNull final DurationMeasure delay,
+    private FutureIterator(@NotNull final DurationMeasure timeout,
         @NotNull final TimeoutActionType action, @Nullable final Throwable exception) {
-      mTimeout = delay.value;
-      mTimeUnit = delay.unit;
+      mTimeout = timeout.value;
+      mTimeUnit = timeout.unit;
       mAction = action;
       mException = exception;
     }

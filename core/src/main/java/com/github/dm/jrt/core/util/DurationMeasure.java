@@ -292,6 +292,27 @@ public class DurationMeasure extends TimeMeasure {
   }
 
   /**
+   * Returns the time duration instance representing the noTime.
+   *
+   * @return the noTime duration.
+   */
+  @NotNull
+  public static DurationMeasure noTime() {
+    return noTime(TimeUnit.MILLISECONDS);
+  }
+
+  /**
+   * Returns the time duration instance representing the noTime in the specified unit.
+   *
+   * @param unit the time unit.
+   * @return the noTime duration.
+   */
+  @NotNull
+  public static DurationMeasure noTime(@NotNull final TimeUnit unit) {
+    return sZeroes[unit.ordinal()];
+  }
+
+  /**
    * Creates and returns an object representing the specified number of seconds.
    * <br>
    * The returned time will have at maximum the same precision as the next more granular time unit.
@@ -405,7 +426,7 @@ public class DurationMeasure extends TimeMeasure {
   /**
    * Creates and returns an object representing the time range between now and a time in the past.
    * <br>
-   * If the specified is in the future, a {@code zero()} duration will be returned.
+   * If the specified is in the future, a {@code noTime()} duration will be returned.
    *
    * @param milliTime the system time in milliseconds.
    * @return the time duration instance.
@@ -419,7 +440,7 @@ public class DurationMeasure extends TimeMeasure {
   /**
    * Creates and returns an object representing the time range between now and a time in the past.
    * <br>
-   * If the specified is in the future, a {@code zero()} duration will be returned.
+   * If the specified is in the future, a {@code noTime()} duration will be returned.
    *
    * @param nanoTime the high precision system time in nanoseconds.
    * @return the time duration instance.
@@ -433,7 +454,7 @@ public class DurationMeasure extends TimeMeasure {
   /**
    * Creates and returns an object representing the time range between now and a time in the future.
    * <br>
-   * If the specified is in the past, a {@code zero()} duration will be returned.
+   * If the specified is in the past, a {@code noTime()} duration will be returned.
    *
    * @param milliTime the system time in milliseconds.
    * @return the time duration instance.
@@ -447,7 +468,7 @@ public class DurationMeasure extends TimeMeasure {
   /**
    * Creates and returns an object representing the time range between now and a time in the future.
    * <br>
-   * If the specified is in the past, a {@code zero()} duration will be returned.
+   * If the specified is in the past, a {@code noTime()} duration will be returned.
    *
    * @param nanoTime the high precision system time in nanoseconds.
    * @return the time duration instance.
@@ -595,27 +616,6 @@ public class DurationMeasure extends TimeMeasure {
     }
 
     return true;
-  }
-
-  /**
-   * Returns the time duration instance representing the zero.
-   *
-   * @return the zero duration.
-   */
-  @NotNull
-  public static DurationMeasure zero() {
-    return zero(TimeUnit.MILLISECONDS);
-  }
-
-  /**
-   * Returns the time duration instance representing the zero in the specified unit.
-   *
-   * @param unit the time unit.
-   * @return the zero duration.
-   */
-  @NotNull
-  public static DurationMeasure zero(@NotNull final TimeUnit unit) {
-    return sZeroes[unit.ordinal()];
   }
 
   /**

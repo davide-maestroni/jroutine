@@ -113,15 +113,15 @@ public class ProxyRoutineTest {
     final Size size = new Size();
     final SizeItf proxy = JRoutineObject.with(instance(size)).buildProxy(SizeItf.class);
     assertThat(
-        proxy.getSize(Arrays.asList("test1", "test2", "test3")).after(seconds(3)).next()).isEqualTo(
+        proxy.getSize(Arrays.asList("test1", "test2", "test3")).inMax(seconds(3)).next()).isEqualTo(
         3);
     assertThat(proxy.getSize()
                     .pass(Arrays.asList("test1", "test2", "test3"))
                     .close()
-                    .after(seconds(3))
+                    .inMax(seconds(3))
                     .next()).isEqualTo(3);
     assertThat(
-        proxy.getSize(new String[]{"test1", "test2", "test3"}).after(seconds(3)).next()).isEqualTo(
+        proxy.getSize(new String[]{"test1", "test2", "test3"}).inMax(seconds(3)).next()).isEqualTo(
         3);
   }
 

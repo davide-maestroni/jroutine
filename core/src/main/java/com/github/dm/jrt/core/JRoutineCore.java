@@ -57,7 +57,7 @@ import org.jetbrains.annotations.NotNull;
  *         channel.pass(routine1.close())
  *                .pass(routine2.close())
  *                .close();
- *                .after(seconds(20))
+ *                .inMax(seconds(20))
  *                .allInto(results);
  *     </code>
  * </pre>
@@ -67,8 +67,8 @@ import org.jetbrains.annotations.NotNull;
  *
  *         final Channel&lt;Void, Result&gt; output1 = routine1.close();
  *         final Channel&lt;Void, Result&gt; output2 = routine2.close();
- *         output1.after(seconds(20)).allInto(results);
- *         output2.after(seconds(20)).allInto(results);
+ *         output1.inMax(seconds(20)).allInto(results);
+ *         output2.inMax(seconds(20)).allInto(results);
  *     </code>
  * </pre>
  * (Note that, the order of the input or the output of the routine is not guaranteed unless properly
@@ -78,14 +78,14 @@ import org.jetbrains.annotations.NotNull;
  * <pre>
  *     <code>
  *
- *         routine2.call(routine1.close()).after(seconds(20)).all();
+ *         routine2.call(routine1.close()).inMax(seconds(20)).all();
  *     </code>
  * </pre>
  * Or, in an equivalent way:
  * <pre>
  *     <code>
  *
- *         routine1.close().bind(routine2.call()).close().after(seconds(20)).all();
+ *         routine1.close().bind(routine2.call()).close().inMax(seconds(20)).all();
  *     </code>
  * </pre>
  * <p>
@@ -106,7 +106,7 @@ import org.jetbrains.annotations.NotNull;
  *             }
  *         }.start();
  *
- *         channel.after(seconds(20)).allInto(results);
+ *         channel.inMax(seconds(20)).allInto(results);
  *     </code>
  * </pre>
  * <p>

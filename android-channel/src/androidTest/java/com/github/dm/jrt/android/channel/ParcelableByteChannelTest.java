@@ -67,7 +67,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     stream.write(b);
     stream.close();
     final BufferInputStream inputStream =
-        ParcelableByteChannel.inputStream(channel.close().after(seconds(10)).next());
+        ParcelableByteChannel.inputStream(channel.close().inMax(seconds(10)).next());
     assertThat(inputStream.available()).isEqualTo(16);
     assertThat(inputStream.read()).isNotEqualTo(-1);
     assertThat(inputStream.available()).isEqualTo(15);
@@ -88,7 +88,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     final BufferOutputStream stream = AndroidChannels.parcelableByteChannel().bind(channel);
     stream.write(new byte[]{31, 17, (byte) 155, 13});
     stream.flush();
-    final ParcelableByteBuffer buffer1 = result.after(seconds(10)).next();
+    final ParcelableByteBuffer buffer1 = result.inMax(seconds(10)).next();
     assertThat(buffer1).isEqualTo(buffer1);
     assertThat(buffer1).isNotEqualTo("test");
     stream.write(31);
@@ -96,7 +96,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     stream.write(155);
     stream.write(13);
     stream.flush();
-    final ParcelableByteBuffer buffer2 = result.after(seconds(10)).next();
+    final ParcelableByteBuffer buffer2 = result.inMax(seconds(10)).next();
     assertThat(buffer1).isNotSameAs(buffer2);
     assertThat(buffer1.hashCode()).isEqualTo(buffer2.hashCode());
     assertThat(buffer1).isEqualTo(buffer2);
@@ -104,7 +104,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     ParcelableByteChannel.inputStream(buffer2).close();
     stream.write(new byte[]{31, 17, (byte) 155});
     stream.flush();
-    final ParcelableByteBuffer buffer3 = result.after(seconds(10)).next();
+    final ParcelableByteBuffer buffer3 = result.inMax(seconds(10)).next();
     assertThat(buffer1).isNotSameAs(buffer3);
     assertThat(buffer1.hashCode()).isNotEqualTo(buffer3.hashCode());
     assertThat(buffer1).isNotEqualTo(buffer3);
@@ -146,8 +146,8 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     stream.close();
     final Channel<?, ParcelableByteBuffer> result = channel.close();
     final BufferInputStream inputStream =
-        ParcelableByteChannel.inputStream(result.after(seconds(10)).next(),
-            result.after(seconds(10)).next());
+        ParcelableByteChannel.inputStream(result.inMax(seconds(10)).next(),
+            result.inMax(seconds(10)).next());
     assertThat(inputStream.available()).isEqualTo(16);
     assertThat(inputStream.read()).isNotEqualTo(-1);
     assertThat(inputStream.available()).isEqualTo(15);
@@ -169,8 +169,8 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     stream.flush();
     final Channel<?, ParcelableByteBuffer> result = channel.close();
     final BufferInputStream inputStream =
-        ParcelableByteChannel.inputStream(result.after(seconds(10)).next(),
-            result.after(seconds(10)).next());
+        ParcelableByteChannel.inputStream(result.inMax(seconds(10)).next(),
+            result.inMax(seconds(10)).next());
     inputStream.close();
     assertThat(inputStream.read()).isEqualTo(-1);
   }
@@ -188,8 +188,8 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     stream.close();
     final Channel<?, ParcelableByteBuffer> result = channel.close();
     final BufferInputStream inputStream =
-        ParcelableByteChannel.inputStream(result.after(seconds(10)).next(),
-            result.after(seconds(10)).next());
+        ParcelableByteChannel.inputStream(result.inMax(seconds(10)).next(),
+            result.inMax(seconds(10)).next());
     assertThat(inputStream.read()).isEqualTo(1);
     assertThat(inputStream.markSupported()).isTrue();
     inputStream.mark(3);
@@ -215,8 +215,8 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     stream.flush();
     final Channel<?, ParcelableByteBuffer> result = channel.close();
     final BufferInputStream inputStream =
-        ParcelableByteChannel.inputStream(result.after(seconds(10)).next(),
-            result.after(seconds(10)).next());
+        ParcelableByteChannel.inputStream(result.inMax(seconds(10)).next(),
+            result.inMax(seconds(10)).next());
     assertThat(inputStream.read()).isEqualTo(31);
     assertThat(inputStream.read()).isEqualTo(17);
     assertThat(inputStream.read()).isEqualTo((byte) 155);
@@ -235,8 +235,8 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     stream.flush();
     final Channel<?, ParcelableByteBuffer> result = channel.close();
     final BufferInputStream inputStream =
-        ParcelableByteChannel.inputStream(result.after(seconds(10)).next(),
-            result.after(seconds(10)).next());
+        ParcelableByteChannel.inputStream(result.inMax(seconds(10)).next(),
+            result.inMax(seconds(10)).next());
     final byte[] b = new byte[16];
     assertThat(inputStream.read()).isEqualTo(31);
     assertThat(inputStream.read(b)).isEqualTo(3);
@@ -260,8 +260,8 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     stream.flush();
     final Channel<?, ParcelableByteBuffer> result = channel.close();
     final BufferInputStream inputStream =
-        ParcelableByteChannel.inputStream(result.after(seconds(10)).next(),
-            result.after(seconds(10)).next());
+        ParcelableByteChannel.inputStream(result.inMax(seconds(10)).next(),
+            result.inMax(seconds(10)).next());
     final byte[] b = new byte[16];
     assertThat(inputStream.read(b, 2, 3)).isEqualTo(3);
     assertThat(b[2]).isEqualTo((byte) 31);
@@ -288,8 +288,8 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     stream.flush();
     final Channel<?, ParcelableByteBuffer> result = channel.close();
     final BufferInputStream inputStream =
-        ParcelableByteChannel.inputStream(result.after(seconds(10)).next(),
-            result.after(seconds(10)).next());
+        ParcelableByteChannel.inputStream(result.inMax(seconds(10)).next(),
+            result.inMax(seconds(10)).next());
     final byte[] b = new byte[16];
 
     try {
@@ -377,8 +377,8 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     stream.flush();
     final Channel<?, ParcelableByteBuffer> result = channel.close();
     final BufferInputStream inputStream =
-        ParcelableByteChannel.inputStream(result.after(seconds(10)).next(),
-            result.after(seconds(10)).next());
+        ParcelableByteChannel.inputStream(result.inMax(seconds(10)).next(),
+            result.inMax(seconds(10)).next());
     final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     assertThat(inputStream.read(outputStream)).isEqualTo(3);
     assertThat(outputStream.size()).isEqualTo(3);
@@ -407,8 +407,8 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     stream.close();
     final Channel<?, ParcelableByteBuffer> result = channel.close();
     final BufferInputStream inputStream =
-        ParcelableByteChannel.inputStream(result.after(seconds(10)).next(),
-            result.after(seconds(10)).next());
+        ParcelableByteChannel.inputStream(result.inMax(seconds(10)).next(),
+            result.inMax(seconds(10)).next());
     assertThat(inputStream.available()).isEqualTo(8);
     assertThat(inputStream.skip(2)).isEqualTo(2);
     assertThat(inputStream.read()).isEqualTo(3);
@@ -433,7 +433,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     final BufferOutputStream stream = AndroidChannels.parcelableByteChannel(16, 16).bind(channel);
     stream.write(31);
     stream.flush();
-    final ParcelableByteBuffer buffer = channel.close().after(seconds(10)).next();
+    final ParcelableByteBuffer buffer = channel.close().inMax(seconds(10)).next();
     assertThat(buffer.size()).isEqualTo(1);
     final BufferInputStream inputStream = ParcelableByteChannel.inputStream(buffer);
     inputStream.close();
@@ -479,7 +479,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     stream.write(b);
     stream.close();
     final BufferInputStream inputStream =
-        ParcelableByteChannel.inputStream(channel.close().after(seconds(10)).next());
+        ParcelableByteChannel.inputStream(channel.close().inMax(seconds(10)).next());
     assertThat(inputStream.read()).isEqualTo(1);
     assertThat(inputStream.markSupported()).isTrue();
     inputStream.mark(3);
@@ -503,7 +503,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     final BufferOutputStream stream = AndroidChannels.parcelableByteChannel().bindDeep(channel);
     stream.close();
     final Channel<?, ParcelableByteBuffer> result =
-        channel.close().after(3, TimeUnit.SECONDS).eventuallyContinue();
+        channel.close().inMax(3, TimeUnit.SECONDS).eventuallyContinue();
     assertThat(result.all()).isEmpty();
     final byte[] b = new byte[16];
 
@@ -584,18 +584,18 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     stream.write(77);
     stream.flush();
     assertThat(
-        ParcelableByteChannel.inputStream(result.after(seconds(10)).next()).read()).isEqualTo(77);
+        ParcelableByteChannel.inputStream(result.inMax(seconds(10)).next()).read()).isEqualTo(77);
     stream.write(new byte[]{31, 17});
     stream.flush();
     BufferInputStream inputStream =
-        ParcelableByteChannel.inputStream(result.after(seconds(10)).next());
+        ParcelableByteChannel.inputStream(result.inMax(seconds(10)).next());
     assertThat(inputStream.read()).isEqualTo(31);
     assertThat(inputStream.read()).isEqualTo(17);
     assertThat(inputStream.read()).isEqualTo(-1);
     stream.write(new byte[]{1, (byte) 155, 13}, 1, 2);
     stream.flush();
     channel.close();
-    inputStream = ParcelableByteChannel.inputStream(result.after(seconds(10)).next());
+    inputStream = ParcelableByteChannel.inputStream(result.inMax(seconds(10)).next());
     assertThat(inputStream.read()).isEqualTo((byte) 155);
     assertThat(inputStream.read()).isEqualTo(13);
     assertThat(inputStream.read()).isEqualTo(-1);
@@ -613,7 +613,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     stream.write(77);
     stream.flush();
     BufferInputStream inputStream =
-        ParcelableByteChannel.inputStream(result.after(seconds(10)).next());
+        ParcelableByteChannel.inputStream(result.inMax(seconds(10)).next());
     byte[] b = new byte[16];
     assertThat(inputStream.read(b)).isEqualTo(1);
     assertThat(b[0]).isEqualTo((byte) 77);
@@ -621,7 +621,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     assertThat(b[0]).isEqualTo((byte) 77);
     stream.write(new byte[]{31, 17});
     stream.flush();
-    inputStream = ParcelableByteChannel.inputStream(result.after(seconds(10)).next());
+    inputStream = ParcelableByteChannel.inputStream(result.inMax(seconds(10)).next());
     assertThat(inputStream.read(b)).isEqualTo(2);
     assertThat(b[0]).isEqualTo((byte) 31);
     assertThat(b[1]).isEqualTo((byte) 17);
@@ -630,7 +630,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     assertThat(b[1]).isEqualTo((byte) 17);
     stream.write(new byte[]{1, (byte) 155, 13}, 1, 2);
     stream.flush();
-    inputStream = ParcelableByteChannel.inputStream(result.after(seconds(10)).next());
+    inputStream = ParcelableByteChannel.inputStream(result.inMax(seconds(10)).next());
     assertThat(inputStream.read(b)).isEqualTo(2);
     assertThat(b[0]).isEqualTo((byte) 155);
     assertThat(b[1]).isEqualTo((byte) 13);
@@ -640,7 +640,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     stream.write(new byte[]{11, 111});
     stream.flush();
     channel.close();
-    inputStream = ParcelableByteChannel.inputStream(result.after(seconds(10)).next());
+    inputStream = ParcelableByteChannel.inputStream(result.inMax(seconds(10)).next());
     b = new byte[1];
     assertThat(inputStream.read(b)).isEqualTo(1);
     assertThat(b[0]).isEqualTo((byte) 11);
@@ -662,7 +662,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     stream.write(77);
     stream.flush();
     BufferInputStream inputStream =
-        ParcelableByteChannel.inputStream(result.after(seconds(10)).next());
+        ParcelableByteChannel.inputStream(result.inMax(seconds(10)).next());
     final byte[] b = new byte[16];
     assertThat(inputStream.read(b, 0, 2)).isEqualTo(1);
     assertThat(b[0]).isEqualTo((byte) 77);
@@ -670,7 +670,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     assertThat(b[0]).isEqualTo((byte) 77);
     stream.write(new byte[]{31, 17});
     stream.flush();
-    inputStream = ParcelableByteChannel.inputStream(result.after(seconds(10)).next());
+    inputStream = ParcelableByteChannel.inputStream(result.inMax(seconds(10)).next());
     assertThat(inputStream.read(b, 1, 8)).isEqualTo(2);
     assertThat(b[0]).isEqualTo((byte) 77);
     assertThat(b[1]).isEqualTo((byte) 31);
@@ -681,7 +681,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     assertThat(b[2]).isEqualTo((byte) 17);
     stream.write(new byte[]{1, (byte) 155, 13}, 1, 2);
     stream.flush();
-    inputStream = ParcelableByteChannel.inputStream(result.after(seconds(10)).next());
+    inputStream = ParcelableByteChannel.inputStream(result.inMax(seconds(10)).next());
     assertThat(inputStream.read(b, 0, 4)).isEqualTo(2);
     assertThat(b[0]).isEqualTo((byte) 155);
     assertThat(b[1]).isEqualTo((byte) 13);
@@ -693,7 +693,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     stream.write(new byte[]{11, 111});
     stream.flush();
     channel.close();
-    inputStream = ParcelableByteChannel.inputStream(result.after(seconds(10)).next());
+    inputStream = ParcelableByteChannel.inputStream(result.inMax(seconds(10)).next());
     assertThat(inputStream.read(b, 1, 1)).isEqualTo(1);
     assertThat(b[0]).isEqualTo((byte) 155);
     assertThat(b[1]).isEqualTo((byte) 11);
@@ -719,7 +719,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     stream.write(77);
     stream.flush();
     final BufferInputStream inputStream =
-        ParcelableByteChannel.inputStream(channel.close().after(seconds(10)).next());
+        ParcelableByteChannel.inputStream(channel.close().inMax(seconds(10)).next());
     final byte[] b = new byte[16];
 
     try {
@@ -808,7 +808,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     stream.write(77);
     stream.flush();
     BufferInputStream inputStream =
-        ParcelableByteChannel.inputStream(result.after(seconds(10)).next());
+        ParcelableByteChannel.inputStream(result.inMax(seconds(10)).next());
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     assertThat(inputStream.read(outputStream)).isEqualTo(1);
     assertThat(outputStream.size()).isEqualTo(1);
@@ -818,7 +818,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     assertThat(outputStream.toByteArray()[0]).isEqualTo((byte) 77);
     stream.write(new byte[]{31, 17});
     stream.flush();
-    inputStream = ParcelableByteChannel.inputStream(result.after(seconds(10)).next());
+    inputStream = ParcelableByteChannel.inputStream(result.inMax(seconds(10)).next());
     outputStream = new ByteArrayOutputStream();
     assertThat(inputStream.read(outputStream)).isEqualTo(2);
     assertThat(outputStream.size()).isEqualTo(2);
@@ -829,7 +829,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     stream.write(new byte[]{1, (byte) 155, 13}, 1, 2);
     stream.flush();
     channel.close();
-    inputStream = ParcelableByteChannel.inputStream(result.after(seconds(10)).next());
+    inputStream = ParcelableByteChannel.inputStream(result.inMax(seconds(10)).next());
     outputStream = new ByteArrayOutputStream();
     assertThat(inputStream.read(outputStream)).isEqualTo(2);
     assertThat(outputStream.size()).isEqualTo(2);
@@ -851,7 +851,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     stream.write(b);
     stream.close();
     final BufferInputStream inputStream =
-        ParcelableByteChannel.inputStream(channel.close().after(seconds(10)).next());
+        ParcelableByteChannel.inputStream(channel.close().inMax(seconds(10)).next());
     assertThat(inputStream.available()).isEqualTo(8);
     assertThat(inputStream.skip(2)).isEqualTo(2);
     assertThat(inputStream.read()).isEqualTo(3);
@@ -880,7 +880,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     stream.write(new byte[]{4, 5, 6, 7, 8, 9}, 2, 3);
     stream.write(new ByteArrayInputStream(new byte[]{9, 10}));
     stream.close();
-    final List<ParcelableByteBuffer> inputStreams = channel.close().after(seconds(10)).all();
+    final List<ParcelableByteBuffer> inputStreams = channel.close().inMax(seconds(10)).all();
     assertThat(inputStreams).hasSize(5);
     final byte[] b = new byte[10];
     assertThat(ParcelableByteChannel.inputStream(inputStreams).read(b)).isEqualTo(10);
@@ -949,11 +949,11 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     stream.write(77);
     stream.flush();
     assertThat(
-        ParcelableByteChannel.inputStream(result.after(seconds(10)).next()).read()).isEqualTo(77);
+        ParcelableByteChannel.inputStream(result.inMax(seconds(10)).next()).read()).isEqualTo(77);
     stream.write(31);
     stream.flush();
     BufferInputStream inputStream =
-        ParcelableByteChannel.inputStream(result.after(seconds(10)).next());
+        ParcelableByteChannel.inputStream(result.inMax(seconds(10)).next());
     final byte[] b = new byte[16];
     assertThat(inputStream.read(b)).isEqualTo(1);
     assertThat(b[0]).isEqualTo((byte) 31);
@@ -963,7 +963,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     stream.write(155);
     stream.flush();
     channel.close();
-    inputStream = ParcelableByteChannel.inputStream(result.after(seconds(10)).next());
+    inputStream = ParcelableByteChannel.inputStream(result.inMax(seconds(10)).next());
     assertThat(inputStream.read(b, 1, 3)).isEqualTo(1);
     assertThat(b[0]).isEqualTo((byte) 31);
     assertThat(b[1]).isEqualTo((byte) 155);
@@ -984,13 +984,13 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     stream.write(new byte[]{77, 33});
     stream.flush();
     BufferInputStream inputStream =
-        ParcelableByteChannel.inputStream(result.after(seconds(10)).next());
+        ParcelableByteChannel.inputStream(result.inMax(seconds(10)).next());
     assertThat(inputStream.read()).isEqualTo(77);
     assertThat(inputStream.read()).isEqualTo(33);
     assertThat(inputStream.read()).isEqualTo(-1);
     stream.write(new byte[]{31, 17});
     stream.flush();
-    inputStream = ParcelableByteChannel.inputStream(result.after(seconds(10)).next());
+    inputStream = ParcelableByteChannel.inputStream(result.inMax(seconds(10)).next());
     final byte[] b = new byte[16];
     assertThat(inputStream.read(b)).isEqualTo(2);
     assertThat(b[0]).isEqualTo((byte) 31);
@@ -1001,7 +1001,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     stream.write(new byte[]{(byte) 155, 13});
     stream.flush();
     channel.close();
-    inputStream = ParcelableByteChannel.inputStream(result.after(seconds(10)).next());
+    inputStream = ParcelableByteChannel.inputStream(result.inMax(seconds(10)).next());
     assertThat(inputStream.read(b, 1, 3)).isEqualTo(2);
     assertThat(b[0]).isEqualTo((byte) 31);
     assertThat(b[1]).isEqualTo((byte) 155);
@@ -1023,12 +1023,12 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     stream.write(new byte[]{1, 77, 33}, 1, 1);
     stream.flush();
     BufferInputStream inputStream =
-        ParcelableByteChannel.inputStream(result.after(seconds(10)).next());
+        ParcelableByteChannel.inputStream(result.inMax(seconds(10)).next());
     assertThat(inputStream.read()).isEqualTo(77);
     assertThat(inputStream.read()).isEqualTo(-1);
     stream.write(new byte[]{31, 17, 1}, 0, 2);
     stream.flush();
-    inputStream = ParcelableByteChannel.inputStream(result.after(seconds(10)).next());
+    inputStream = ParcelableByteChannel.inputStream(result.inMax(seconds(10)).next());
     final byte[] b = new byte[16];
     assertThat(inputStream.read(b)).isEqualTo(2);
     assertThat(b[0]).isEqualTo((byte) 31);
@@ -1039,7 +1039,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     stream.write(new byte[]{1, (byte) 155, 13}, 1, 2);
     stream.flush();
     channel.close();
-    inputStream = ParcelableByteChannel.inputStream(result.after(seconds(10)).next());
+    inputStream = ParcelableByteChannel.inputStream(result.inMax(seconds(10)).next());
     assertThat(inputStream.read(b, 1, 3)).isEqualTo(2);
     assertThat(b[0]).isEqualTo((byte) 31);
     assertThat(b[1]).isEqualTo((byte) 155);
@@ -1142,10 +1142,10 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     stream.write(new byte[0]);
     stream.flush();
     final Channel<?, ParcelableByteBuffer> result = channel.close();
-    assertThat(result.after(seconds(10)).eventuallyContinue().all()).isEmpty();
+    assertThat(result.inMax(seconds(10)).eventuallyContinue().all()).isEmpty();
     stream.write(b, 8, 0);
     stream.flush();
-    assertThat(result.after(seconds(10)).eventuallyContinue().all()).isEmpty();
+    assertThat(result.inMax(seconds(10)).eventuallyContinue().all()).isEmpty();
   }
 
   public void testWriteInput() throws IOException {
@@ -1160,13 +1160,13 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     stream.write(new ByteArrayInputStream(new byte[]{77, 33}));
     stream.flush();
     BufferInputStream inputStream =
-        ParcelableByteChannel.inputStream(result.after(seconds(10)).next());
+        ParcelableByteChannel.inputStream(result.inMax(seconds(10)).next());
     assertThat(inputStream.read()).isEqualTo(77);
     assertThat(inputStream.read()).isEqualTo(33);
     assertThat(inputStream.read()).isEqualTo(-1);
     stream.write(new ByteArrayInputStream(new byte[]{31, 17}));
     stream.flush();
-    inputStream = ParcelableByteChannel.inputStream(result.after(seconds(10)).next());
+    inputStream = ParcelableByteChannel.inputStream(result.inMax(seconds(10)).next());
     final byte[] b = new byte[16];
     assertThat(inputStream.read(b)).isEqualTo(2);
     assertThat(b[0]).isEqualTo((byte) 31);
@@ -1177,7 +1177,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     stream.write(new ByteArrayInputStream(new byte[]{(byte) 155, 13}));
     stream.flush();
     channel.close();
-    inputStream = ParcelableByteChannel.inputStream(result.after(seconds(10)).next());
+    inputStream = ParcelableByteChannel.inputStream(result.inMax(seconds(10)).next());
     assertThat(inputStream.read(b, 1, 3)).isEqualTo(2);
     assertThat(b[0]).isEqualTo((byte) 31);
     assertThat(b[1]).isEqualTo((byte) 155);

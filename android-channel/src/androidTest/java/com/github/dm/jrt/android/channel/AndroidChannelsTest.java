@@ -97,9 +97,9 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
                    .pass(new ParcelableSelectable<String>("test5", 31))
                    .pass(new ParcelableSelectable<Integer>(5, 17))
                    .close();
-    assertThat(channel1.close().after(seconds(10)).all()).containsExactly("test1", "test2", "test3",
+    assertThat(channel1.close().inMax(seconds(10)).all()).containsExactly("test1", "test2", "test3",
         "test4", "test5");
-    assertThat(channel2.close().after(seconds(10)).all()).containsExactly(1, 2, 3, 4, 5);
+    assertThat(channel2.close().inMax(seconds(10)).all()).containsExactly(1, 2, 3, 4, 5);
   }
 
   public void testCombineAbort() {
@@ -118,7 +118,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      channel1.close().after(seconds(10)).next();
+      channel1.close().inMax(seconds(10)).next();
 
       fail();
 
@@ -128,7 +128,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      channel2.close().after(seconds(10)).next();
+      channel2.close().inMax(seconds(10)).next();
 
       fail();
 
@@ -148,7 +148,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      channel1.close().after(seconds(10)).next();
+      channel1.close().inMax(seconds(10)).next();
 
       fail();
 
@@ -158,7 +158,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      channel2.close().after(seconds(10)).next();
+      channel2.close().inMax(seconds(10)).next();
 
       fail();
 
@@ -180,7 +180,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      channel1.close().after(seconds(10)).next();
+      channel1.close().inMax(seconds(10)).next();
 
       fail();
 
@@ -190,7 +190,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      channel2.close().after(seconds(10)).next();
+      channel2.close().inMax(seconds(10)).next();
 
       fail();
 
@@ -212,7 +212,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      channel1.close().after(seconds(10)).next();
+      channel1.close().inMax(seconds(10)).next();
 
       fail();
 
@@ -222,7 +222,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      channel2.close().after(seconds(10)).next();
+      channel2.close().inMax(seconds(10)).next();
 
       fail();
 
@@ -245,7 +245,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      channel1.close().after(seconds(10)).next();
+      channel1.close().inMax(seconds(10)).next();
 
       fail();
 
@@ -255,7 +255,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      channel2.close().after(seconds(10)).next();
+      channel2.close().inMax(seconds(10)).next();
 
       fail();
 
@@ -353,9 +353,9 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
                    .buildChannels()
                    .pass(Collections.singletonList("test3-1"))
                    .close();
-    assertThat(channel1.close().after(seconds(10)).all()).containsExactly("test1-1", "test2-1",
+    assertThat(channel1.close().inMax(seconds(10)).all()).containsExactly("test1-1", "test2-1",
         "test3-1");
-    assertThat(channel2.close().after(seconds(10)).all()).containsExactly("test1-2", "test2-2");
+    assertThat(channel2.close().inMax(seconds(10)).all()).containsExactly("test1-2", "test2-2");
   }
 
   public void testDistributeAbort() {
@@ -374,7 +374,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      channel1.close().after(seconds(10)).next();
+      channel1.close().inMax(seconds(10)).next();
 
       fail();
 
@@ -384,7 +384,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      channel2.close().after(seconds(10)).next();
+      channel2.close().inMax(seconds(10)).next();
 
       fail();
 
@@ -406,7 +406,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      channel1.close().after(seconds(10)).next();
+      channel1.close().inMax(seconds(10)).next();
 
       fail();
 
@@ -416,7 +416,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      channel2.close().after(seconds(10)).next();
+      channel2.close().inMax(seconds(10)).next();
 
       fail();
 
@@ -438,7 +438,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      channel1.close().after(seconds(10)).all();
+      channel1.close().inMax(seconds(10)).all();
 
       fail();
 
@@ -491,9 +491,9 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
                    .buildChannels()
                    .pass(Collections.singletonList("test3-1"))
                    .close();
-    assertThat(channel1.close().after(seconds(10)).all()).containsExactly("test1-1", "test2-1",
+    assertThat(channel1.close().inMax(seconds(10)).all()).containsExactly("test1-1", "test2-1",
         "test3-1");
-    assertThat(channel2.close().after(seconds(10)).all()).containsExactly("test1-2", "test2-2",
+    assertThat(channel2.close().inMax(seconds(10)).all()).containsExactly("test1-2", "test2-2",
         placeholder);
   }
 
@@ -513,7 +513,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      channel1.close().after(seconds(10)).next();
+      channel1.close().inMax(seconds(10)).next();
 
       fail();
 
@@ -523,7 +523,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      channel2.close().after(seconds(10)).next();
+      channel2.close().inMax(seconds(10)).next();
 
       fail();
 
@@ -545,7 +545,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      channel1.close().after(seconds(10)).next();
+      channel1.close().inMax(seconds(10)).next();
 
       fail();
 
@@ -555,7 +555,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      channel2.close().after(seconds(10)).next();
+      channel2.close().inMax(seconds(10)).next();
 
       fail();
 
@@ -577,7 +577,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      channel1.close().after(seconds(10)).all();
+      channel1.close().inMax(seconds(10)).all();
 
       fail();
 
@@ -616,7 +616,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
                    .pass("test1", "test2", "test3")
                    .close();
     channel.close();
-    assertThat(channel.after(seconds(10)).all()).containsExactly(
+    assertThat(channel.inMax(seconds(10)).all()).containsExactly(
         new ParcelableSelectable<String>("test1", 33),
         new ParcelableSelectable<String>("test2", 33),
         new ParcelableSelectable<String>("test3", 33));
@@ -634,7 +634,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      channel.after(seconds(10)).all();
+      channel.inMax(seconds(10)).all();
 
       fail();
 
@@ -655,7 +655,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
                        new ParcelableSelectable<String>("test4", 333))
                    .close();
     channel.close();
-    assertThat(channel.after(seconds(10)).all()).containsExactly("test1", "test3");
+    assertThat(channel.inMax(seconds(10)).all()).containsExactly("test1", "test3");
   }
 
   public void testInputToSelectableAbort() {
@@ -666,7 +666,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      channel.after(seconds(10)).all();
+      channel.inMax(seconds(10)).all();
 
       fail();
 
@@ -687,7 +687,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     channel1.sorted().after(millis(100)).pass("testtest").pass("test2").close();
     channel2.sorted().after(millis(110)).pass(6).pass(4).close();
     assertThat(routine.call(AndroidChannels.join(channel1, channel2).buildChannels())
-                      .after(seconds(10))
+                      .inMax(seconds(10))
                       .all()).containsExactly('s', '2');
     channel1 = builder.buildChannel();
     channel2 = builder.buildChannel();
@@ -695,14 +695,14 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     channel2.sorted().after(millis(110)).pass(6).pass(4).close();
     assertThat(routine.call(
         AndroidChannels.join(Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannels())
-                      .after(seconds(10))
+                      .inMax(seconds(10))
                       .all()).containsExactly('s', '2');
     channel1 = builder.buildChannel();
     channel2 = builder.buildChannel();
     channel1.sorted().after(millis(100)).pass("testtest").pass("test2").pass("test3").close();
     channel2.sorted().after(millis(110)).pass(6).pass(4).close();
     assertThat(routine.call(AndroidChannels.join(channel1, channel2).buildChannels())
-                      .after(seconds(10))
+                      .inMax(seconds(10))
                       .all()).containsExactly('s', '2');
   }
 
@@ -721,7 +721,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     try {
 
       routine.call(AndroidChannels.join(channel1, channel2).buildChannels())
-             .after(seconds(10))
+             .inMax(seconds(10))
              .all();
 
       fail();
@@ -739,7 +739,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
       routine.call(
           AndroidChannels.join(Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannels())
-             .after(seconds(10))
+             .inMax(seconds(10))
              .all();
 
       fail();
@@ -784,7 +784,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     channel1.sorted().after(millis(100)).pass("testtest").pass("test2").close();
     channel2.sorted().after(millis(110)).pass(6).pass(4).close();
     assertThat(routine.call(AndroidChannels.join(new Object(), channel1, channel2).buildChannels())
-                      .after(seconds(10))
+                      .inMax(seconds(10))
                       .all()).containsExactly('s', '2');
     channel1 = builder.buildChannel();
     channel2 = builder.buildChannel();
@@ -792,7 +792,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     channel2.sorted().after(millis(110)).pass(6).pass(4).close();
     assertThat(routine.call(
         AndroidChannels.join(null, Arrays.<Channel<?, ?>>asList(channel1, channel2))
-                       .buildChannels()).after(seconds(10)).all()).containsExactly('s', '2');
+                       .buildChannels()).inMax(seconds(10)).all()).containsExactly('s', '2');
     channel1 = builder.buildChannel();
     channel2 = builder.buildChannel();
     channel1.sorted().after(millis(100)).pass("testtest").pass("test2").pass("test3").close();
@@ -801,7 +801,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     try {
 
       routine.call(AndroidChannels.join(new Object(), channel1, channel2).buildChannels())
-             .after(seconds(10))
+             .inMax(seconds(10))
              .all();
 
       fail();
@@ -826,7 +826,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     try {
 
       routine.call(AndroidChannels.join((Object) null, channel1, channel2).buildChannels())
-             .after(seconds(10))
+             .inMax(seconds(10))
              .all();
 
       fail();
@@ -844,7 +844,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
       routine.call(
           AndroidChannels.join(new Object(), Arrays.<Channel<?, ?>>asList(channel1, channel2))
-                         .buildChannels()).after(seconds(10)).all();
+                         .buildChannels()).inMax(seconds(10)).all();
 
       fail();
 
@@ -906,9 +906,9 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     channel1.close();
     channel2.close();
 
-    assertThat(channelMap.get(Sort.STRING).after(seconds(10)).all()).containsExactly("0", "1", "2",
+    assertThat(channelMap.get(Sort.STRING).inMax(seconds(10)).all()).containsExactly("0", "1", "2",
         "3");
-    assertThat(channelMap.get(Sort.INTEGER).after(seconds(10)).all()).containsExactly(0, 1, 2, 3);
+    assertThat(channelMap.get(Sort.INTEGER).inMax(seconds(10)).all()).containsExactly(0, 1, 2, 3);
   }
 
   @SuppressWarnings("unchecked")
@@ -924,7 +924,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     outputChannel = AndroidChannels.mergeParcelable(-7, channel1, channel2).buildChannels();
     channel1.pass("test1").close();
     channel2.pass(13).close();
-    assertThat(outputChannel.after(seconds(10)).all()).containsOnly(
+    assertThat(outputChannel.inMax(seconds(10)).all()).containsOnly(
         new ParcelableSelectable<String>("test1", -7), new ParcelableSelectable<Integer>(13, -6));
     channel1 = builder.buildChannel();
     channel2 = builder.buildChannel();
@@ -932,14 +932,14 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
         AndroidChannels.mergeParcelable(11, Arrays.asList(channel1, channel2)).buildChannels();
     channel2.pass(13).close();
     channel1.pass("test1").close();
-    assertThat(outputChannel.after(seconds(10)).all()).containsOnly(
+    assertThat(outputChannel.inMax(seconds(10)).all()).containsOnly(
         new ParcelableSelectable<String>("test1", 11), new ParcelableSelectable<Integer>(13, 12));
     channel1 = builder.buildChannel();
     channel2 = builder.buildChannel();
     outputChannel = AndroidChannels.mergeParcelable(channel1, channel2).buildChannels();
     channel1.pass("test2").close();
     channel2.pass(-17).close();
-    assertThat(outputChannel.after(seconds(10)).all()).containsOnly(
+    assertThat(outputChannel.inMax(seconds(10)).all()).containsOnly(
         new ParcelableSelectable<String>("test2", 0), new ParcelableSelectable<Integer>(-17, 1));
     channel1 = builder.buildChannel();
     channel2 = builder.buildChannel();
@@ -947,7 +947,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
         AndroidChannels.mergeParcelable(Arrays.asList(channel1, channel2)).buildChannels();
     channel1.pass("test2").close();
     channel2.pass(-17).close();
-    assertThat(outputChannel.after(seconds(10)).all()).containsOnly(
+    assertThat(outputChannel.inMax(seconds(10)).all()).containsOnly(
         new ParcelableSelectable<String>("test2", 0), new ParcelableSelectable<Integer>(-17, 1));
   }
 
@@ -982,7 +982,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     channel3.close();
     channel4.close();
 
-    assertThat(outputChannel.after(seconds(10)).all()).containsExactly("0", "1", "2", "3");
+    assertThat(outputChannel.inMax(seconds(10)).all()).containsExactly("0", "1", "2", "3");
   }
 
   @SuppressWarnings("unchecked")
@@ -1001,7 +1001,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      outputChannel.after(seconds(10)).all();
+      outputChannel.inMax(seconds(10)).all();
 
       fail();
 
@@ -1018,7 +1018,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      outputChannel.after(seconds(10)).all();
+      outputChannel.inMax(seconds(10)).all();
 
       fail();
 
@@ -1034,7 +1034,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      outputChannel.after(seconds(10)).all();
+      outputChannel.inMax(seconds(10)).all();
 
       fail();
 
@@ -1051,7 +1051,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      outputChannel.after(seconds(10)).all();
+      outputChannel.inMax(seconds(10)).all();
 
       fail();
 
@@ -1114,19 +1114,19 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
         new ParcelableSelectable<Object>(-11, Sort.INTEGER));
     channelMap = AndroidChannels.selectOutput(channel, Arrays.asList(Sort.INTEGER, Sort.STRING))
                                 .buildChannels();
-    assertThat(channelMap.get(Sort.INTEGER).after(seconds(10)).all()).containsOnly(-11);
-    assertThat(channelMap.get(Sort.STRING).after(seconds(10)).all()).containsOnly("test21");
+    assertThat(channelMap.get(Sort.INTEGER).inMax(seconds(10)).all()).containsOnly(-11);
+    assertThat(channelMap.get(Sort.STRING).inMax(seconds(10)).all()).containsOnly("test21");
     channel = routine.call(new ParcelableSelectable<Object>(-11, Sort.INTEGER),
         new ParcelableSelectable<Object>("test21", Sort.STRING));
     channelMap = AndroidChannels.selectOutput(channel, Sort.INTEGER, Sort.STRING).buildChannels();
-    assertThat(channelMap.get(Sort.INTEGER).after(seconds(10)).all()).containsOnly(-11);
-    assertThat(channelMap.get(Sort.STRING).after(seconds(10)).all()).containsOnly("test21");
+    assertThat(channelMap.get(Sort.INTEGER).inMax(seconds(10)).all()).containsOnly(-11);
+    assertThat(channelMap.get(Sort.STRING).inMax(seconds(10)).all()).containsOnly("test21");
     channel = routine.call(new ParcelableSelectable<Object>("test21", Sort.STRING),
         new ParcelableSelectable<Object>(-11, Sort.INTEGER));
     channelMap = AndroidChannels.selectOutput(Math.min(Sort.INTEGER, Sort.STRING), 2, channel)
                                 .buildChannels();
-    assertThat(channelMap.get(Sort.INTEGER).after(seconds(10)).all()).containsOnly(-11);
-    assertThat(channelMap.get(Sort.STRING).after(seconds(10)).all()).containsOnly("test21");
+    assertThat(channelMap.get(Sort.INTEGER).inMax(seconds(10)).all()).containsOnly(-11);
+    assertThat(channelMap.get(Sort.STRING).inMax(seconds(10)).all()).containsOnly("test21");
   }
 
   @SuppressWarnings("unchecked")
@@ -1146,7 +1146,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      channelMap.get(Sort.STRING).after(seconds(10)).all();
+      channelMap.get(Sort.STRING).inMax(seconds(10)).all();
 
       fail();
 
@@ -1156,7 +1156,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      channelMap.get(Sort.INTEGER).after(seconds(10)).all();
+      channelMap.get(Sort.INTEGER).inMax(seconds(10)).all();
 
       fail();
 
@@ -1173,7 +1173,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      channelMap.get(Sort.STRING).after(seconds(10)).all();
+      channelMap.get(Sort.STRING).inMax(seconds(10)).all();
 
       fail();
 
@@ -1183,7 +1183,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      channelMap.get(Sort.INTEGER).after(seconds(10)).all();
+      channelMap.get(Sort.INTEGER).inMax(seconds(10)).all();
 
       fail();
 
@@ -1201,7 +1201,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      channelMap.get(Sort.STRING).after(seconds(10)).all();
+      channelMap.get(Sort.STRING).inMax(seconds(10)).all();
 
       fail();
 
@@ -1211,7 +1211,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      channelMap.get(Sort.INTEGER).after(seconds(10)).all();
+      channelMap.get(Sort.INTEGER).inMax(seconds(10)).all();
 
       fail();
 
@@ -1258,7 +1258,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
         new ParcelableSelectable<String>("test3", 33),
         new ParcelableSelectable<String>("test4", 333));
     channel.close();
-    assertThat(outputChannel.after(seconds(10)).all()).containsExactly("test1", "test3");
+    assertThat(outputChannel.inMax(seconds(10)).all()).containsExactly("test1", "test3");
   }
 
   public void testOutputSelectAbort() {
@@ -1271,7 +1271,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      outputChannel.after(seconds(10)).all();
+      outputChannel.inMax(seconds(10)).all();
 
       fail();
 
@@ -1287,7 +1287,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     channel.pass("test1", "test2", "test3").close();
     assertThat(AndroidChannels.selectableOutputParcelable(channel, 33)
                               .buildChannels()
-                              .after(seconds(10))
+                              .inMax(seconds(10))
                               .all()).containsExactly(new ParcelableSelectable<String>("test1", 33),
         new ParcelableSelectable<String>("test2", 33),
         new ParcelableSelectable<String>("test3", 33));
@@ -1302,7 +1302,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
       AndroidChannels.selectableOutputParcelable(channel, 33)
                      .buildChannels()
-                     .after(seconds(10))
+                     .inMax(seconds(10))
                      .all();
 
       fail();

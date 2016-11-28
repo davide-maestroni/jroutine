@@ -466,9 +466,9 @@ public class TimeMeasure implements Comparable<TimeMeasure> {
   }
 
   /**
-   * Checks if this time is zero.
+   * Checks if this time is noTime.
    *
-   * @return whether this time value is zero.
+   * @return whether this time value is noTime.
    */
   public boolean isZero() {
     return (value == 0);

@@ -173,7 +173,7 @@ public interface LoaderStreamBuilderCompat<IN, OUT>
   @NotNull
   <BEFORE, AFTER> LoaderStreamBuilderCompat<BEFORE, AFTER> let(
       @NotNull Function<? super StreamBuilder<IN, OUT>, ? extends
-          StreamBuilder<BEFORE, AFTER>> liftFunction);
+          StreamBuilder<BEFORE, AFTER>> transformingFunction);
 
   /**
    * {@inheritDoc}
@@ -188,7 +188,7 @@ public interface LoaderStreamBuilderCompat<IN, OUT>
   @Override
   <BEFORE, AFTER> LoaderStreamBuilderCompat<BEFORE, AFTER> letWithConfig(
       @NotNull BiFunction<? extends StreamConfiguration, ? super StreamBuilder<IN, OUT>, ?
-          extends StreamBuilder<BEFORE, AFTER>> liftFunction);
+          extends StreamBuilder<BEFORE, AFTER>> transformingFunction);
 
   /**
    * {@inheritDoc}
@@ -197,7 +197,8 @@ public interface LoaderStreamBuilderCompat<IN, OUT>
   @Override
   <BEFORE, AFTER> LoaderStreamBuilderCompat<BEFORE, AFTER> lift(
       @NotNull Function<? extends Function<? super Channel<?, IN>, ? extends Channel<?, OUT>>, ?
-          extends Function<? super Channel<?, BEFORE>, ? extends Channel<?, AFTER>>> liftFunction);
+          extends Function<? super Channel<?, BEFORE>, ? extends Channel<?, AFTER>>>
+          liftingFunction);
 
   /**
    * {@inheritDoc}
@@ -210,7 +211,7 @@ public interface LoaderStreamBuilderCompat<IN, OUT>
   <BEFORE, AFTER> LoaderStreamBuilderCompat<BEFORE, AFTER> liftWithConfig(
       @NotNull BiFunction<? extends StreamConfiguration, ? extends Function<? super
           Channel<?, IN>, ? extends Channel<?, OUT>>, ? extends Function<? super
-          Channel<?, BEFORE>, ? extends Channel<?, AFTER>>> liftFunction);
+          Channel<?, BEFORE>, ? extends Channel<?, AFTER>>> liftingFunction);
 
   /**
    * {@inheritDoc}

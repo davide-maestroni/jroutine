@@ -165,9 +165,10 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends AbstractRoutineBuil
   @NotNull
   public <BEFORE, AFTER> StreamBuilder<BEFORE, AFTER> let(
       @NotNull final Function<? super StreamBuilder<IN, OUT>, ? extends
-          StreamBuilder<BEFORE, AFTER>> liftFunction) {
+          StreamBuilder<BEFORE, AFTER>> transformingFunction) {
     try {
-      return ConstantConditions.notNull("transformed stream builder", liftFunction.apply(this));
+      return ConstantConditions.notNull("transformed stream builder",
+          transformingFunction.apply(this));
 
     } catch (final Exception e) {
       throw StreamBuildingException.wrapIfNeeded(e);
@@ -178,11 +179,12 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends AbstractRoutineBuil
   @SuppressWarnings("unchecked")
   public <BEFORE, AFTER> StreamBuilder<BEFORE, AFTER> letWithConfig(
       @NotNull final BiFunction<? extends StreamConfiguration, ? super StreamBuilder<IN, OUT>, ?
-          extends StreamBuilder<BEFORE, AFTER>> liftFunction) {
+          extends StreamBuilder<BEFORE, AFTER>> transformingFunction) {
     try {
       return ConstantConditions.notNull("transformed stream",
           ((BiFunction<StreamConfiguration, ? super StreamBuilder<IN, OUT>, ? extends
-              StreamBuilder<BEFORE, AFTER>>) liftFunction).apply(mStreamConfiguration, this));
+              StreamBuilder<BEFORE, AFTER>>) transformingFunction).apply(mStreamConfiguration,
+              this));
 
     } catch (final Exception e) {
       throw StreamBuildingException.wrapIfNeeded(e);
@@ -194,11 +196,11 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends AbstractRoutineBuil
   public <BEFORE, AFTER> StreamBuilder<BEFORE, AFTER> lift(
       @NotNull final Function<? extends Function<? super Channel<?, IN>, ? extends
           Channel<?, OUT>>, ? extends Function<? super Channel<?, BEFORE>, ? extends
-          Channel<?, AFTER>>> liftFunction) {
+          Channel<?, AFTER>>> liftingFunction) {
     try {
       mBindingFunction = decorate(
           ((Function<Function<Channel<?, IN>, Channel<?, OUT>>, Function<Channel<?, BEFORE>,
-              Channel<?, AFTER>>>) liftFunction)
+              Channel<?, AFTER>>>) liftingFunction)
               .apply(getBindingFunction()));
       return (StreamBuilder<BEFORE, AFTER>) this;
 
@@ -215,11 +217,11 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends AbstractRoutineBuil
   public <BEFORE, AFTER> StreamBuilder<BEFORE, AFTER> liftWithConfig(
       @NotNull final BiFunction<? extends StreamConfiguration, ? extends Function<? super
           Channel<?, IN>, ? extends Channel<?, OUT>>, ? extends Function<? super
-          Channel<?, BEFORE>, ? extends Channel<?, AFTER>>> liftFunction) {
+          Channel<?, BEFORE>, ? extends Channel<?, AFTER>>> liftingFunction) {
     try {
       mBindingFunction = decorate(
           ((BiFunction<StreamConfiguration, Function<Channel<?, IN>, Channel<?, OUT>>,
-              Function<Channel<?, BEFORE>, Channel<?, AFTER>>>) liftFunction)
+              Function<Channel<?, BEFORE>, Channel<?, AFTER>>>) liftingFunction)
               .apply(mStreamConfiguration, getBindingFunction()));
       return (StreamBuilder<BEFORE, AFTER>) this;
 

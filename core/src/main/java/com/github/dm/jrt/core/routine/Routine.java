@@ -193,5 +193,5 @@ public interface Routine<IN, OUT> {
    * @return the invocation channel.
    */
   @NotNull
-  Channel<IN, OUT> close(); // TODO: 26/11/2016 execute()?
+  Channel<IN, OUT> close();
 }

@@ -209,9 +209,9 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
    * This method provides a convenient way to apply a set of configurations and concatenations
    * without breaking the fluent chain.
    *
-   * @param liftFunction the lift function.
-   * @param <BEFORE>     the concatenation input type.
-   * @param <AFTER>      the concatenation output type.
+   * @param transformingFunction the function modifying the stream.
+   * @param <BEFORE>             the concatenation input type.
+   * @param <AFTER>              the concatenation output type.
    * @return the lifted builder.
    * @throws com.github.dm.jrt.stream.builder.StreamBuildingException if an unexpected error
    *                                                                  occurred.
@@ -219,7 +219,7 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
   @NotNull
   <BEFORE, AFTER> StreamBuilder<BEFORE, AFTER> let(
       @NotNull Function<? super StreamBuilder<IN, OUT>, ? extends
-          StreamBuilder<BEFORE, AFTER>> liftFunction);
+          StreamBuilder<BEFORE, AFTER>> transformingFunction);
 
   /**
    * Transforms this stream by applying the specified function.
@@ -229,9 +229,9 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
    * This method provides a convenient way to apply a set of configurations and concatenations
    * without breaking the fluent chain.
    *
-   * @param liftFunction the lift function.
-   * @param <BEFORE>     the concatenation input type.
-   * @param <AFTER>      the concatenation output type.
+   * @param transformingFunction the function modifying the stream.
+   * @param <BEFORE>             the concatenation input type.
+   * @param <AFTER>              the concatenation output type.
    * @return the lifted builder.
    * @throws com.github.dm.jrt.stream.builder.StreamBuildingException if an unexpected error
    *                                                                  occurred.
@@ -239,7 +239,7 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
   @NotNull
   <BEFORE, AFTER> StreamBuilder<BEFORE, AFTER> letWithConfig(
       @NotNull BiFunction<? extends StreamConfiguration, ? super StreamBuilder<IN, OUT>, ?
-          extends StreamBuilder<BEFORE, AFTER>> liftFunction);
+          extends StreamBuilder<BEFORE, AFTER>> transformingFunction);
 
   /**
    * Transforms the stream by modifying the chain building function.
@@ -247,9 +247,9 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
    * The returned function will be employed when the routine instance is built (see
    * {@link #buildRoutine()}).
    *
-   * @param liftFunction the function modifying the flow one.
-   * @param <BEFORE>     the concatenation input type.
-   * @param <AFTER>      the concatenation output type.
+   * @param liftingFunction the function modifying the chain building one.
+   * @param <BEFORE>        the concatenation input type.
+   * @param <AFTER>         the concatenation output type.
    * @return this builder.
    * @throws com.github.dm.jrt.stream.builder.StreamBuildingException if an unexpected error
    *                                                                  occurred.
@@ -257,7 +257,7 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
   @NotNull
   <BEFORE, AFTER> StreamBuilder<BEFORE, AFTER> lift(@NotNull Function<? extends Function<? super
       Channel<?, IN>, ? extends Channel<?, OUT>>, ? extends Function<? super
-      Channel<?, BEFORE>, ? extends Channel<?, AFTER>>> liftFunction);
+      Channel<?, BEFORE>, ? extends Channel<?, AFTER>>> liftingFunction);
 
   /**
    * Transforms the stream by modifying the chain building function.
@@ -267,9 +267,9 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
    * The returned function will be employed when the routine instance is built (see
    * {@link #buildRoutine()}).
    *
-   * @param liftFunction the bi-function modifying the flow one.
-   * @param <BEFORE>     the concatenation input type.
-   * @param <AFTER>      the concatenation output type.
+   * @param liftingFunction the bi-function modifying the chain building one.
+   * @param <BEFORE>        the concatenation input type.
+   * @param <AFTER>         the concatenation output type.
    * @return this builder.
    * @throws com.github.dm.jrt.stream.builder.StreamBuildingException if an unexpected error
    *                                                                  occurred.
@@ -278,7 +278,7 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
   <BEFORE, AFTER> StreamBuilder<BEFORE, AFTER> liftWithConfig(
       @NotNull BiFunction<? extends StreamConfiguration, ? extends Function<? super
           Channel<?, IN>, ? extends Channel<?, OUT>>, ? extends Function<? super
-          Channel<?, BEFORE>, ? extends Channel<?, AFTER>>> liftFunction);
+          Channel<?, BEFORE>, ? extends Channel<?, AFTER>>> liftingFunction);
 
   /**
    * Concatenates a routine mapping this stream outputs by applying the specified function.

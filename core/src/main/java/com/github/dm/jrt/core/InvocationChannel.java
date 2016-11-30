@@ -315,7 +315,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
     return this;
   }
 
-  public int inputCount() {
+  public int inputSize() {
     synchronized (mMutex) {
       return mState.inputCount();
     }
@@ -326,7 +326,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
   }
 
   public boolean isEmpty() {
-    return (inputCount() == 0) && (outputCount() == 0);
+    return (inputSize() == 0) && (outputSize() == 0);
   }
 
   public boolean isOpen() {
@@ -344,8 +344,8 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
     return mResultChanel.nextOrElse(output);
   }
 
-  public int outputCount() {
-    return mResultChanel.outputCount();
+  public int outputSize() {
+    return mResultChanel.outputSize();
   }
 
   @NotNull
@@ -435,7 +435,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
   }
 
   public int size() {
-    return inputCount() + outputCount();
+    return inputSize() + outputSize();
   }
 
   @NotNull

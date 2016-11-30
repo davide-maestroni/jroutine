@@ -308,8 +308,8 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
     return inMax(noTime());
   }
 
-  public int inputCount() {
-    return outputCount();
+  public int inputSize() {
+    return outputSize();
   }
 
   public boolean isBound() {
@@ -317,7 +317,7 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
   }
 
   public boolean isEmpty() {
-    return (outputCount() == 0);
+    return (outputSize() == 0);
   }
 
   public boolean isOpen() {
@@ -343,7 +343,7 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
     return output;
   }
 
-  public int outputCount() {
+  public int outputSize() {
     if (mFuture.isDone()) {
       synchronized (mMutex) {
         return mIsOutput ? 0 : 1;
@@ -374,7 +374,7 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
   }
 
   public int size() {
-    return outputCount();
+    return outputSize();
   }
 
   @NotNull

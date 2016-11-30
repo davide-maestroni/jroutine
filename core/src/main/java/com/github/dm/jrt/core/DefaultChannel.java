@@ -200,8 +200,8 @@ class DefaultChannel<DATA> implements Channel<DATA, DATA> {
     return this;
   }
 
-  public int inputCount() {
-    return mChannel.inputCount();
+  public int inputSize() {
+    return mChannel.inputSize();
   }
 
   public boolean isBound() {
@@ -225,8 +225,8 @@ class DefaultChannel<DATA> implements Channel<DATA, DATA> {
     return mChannel.nextOrElse(output);
   }
 
-  public int outputCount() {
-    return mChannel.outputCount();
+  public int outputSize() {
+    return mChannel.outputSize();
   }
 
   @NotNull

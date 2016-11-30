@@ -398,14 +398,14 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                                                            .with(factoryOf(
                                                                StringPassingInvocation.class))
                                                            .call();
-    assertThat(channel.inputCount()).isEqualTo(0);
+    assertThat(channel.inputSize()).isEqualTo(0);
     channel.after(millis(500)).pass("test");
-    assertThat(channel.inputCount()).isEqualTo(1);
+    assertThat(channel.inputSize()).isEqualTo(1);
     final Channel<?, String> result = channel.afterNoDelay().close();
     assertThat(result.inMax(seconds(10)).getComplete()).isTrue();
-    assertThat(result.outputCount()).isEqualTo(1);
+    assertThat(result.outputSize()).isEqualTo(1);
     assertThat(result.size()).isEqualTo(1);
-    assertThat(result.skipNext(1).outputCount()).isEqualTo(0);
+    assertThat(result.skipNext(1).outputSize()).isEqualTo(0);
   }
 
   public void testTransform() {

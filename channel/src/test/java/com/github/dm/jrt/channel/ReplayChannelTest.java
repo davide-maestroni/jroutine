@@ -462,15 +462,16 @@ public class ReplayChannelTest {
 
     final Channel<Object, Object> channel =
         JRoutineCore.with(IdentityInvocation.factoryOf()).call();
-    assertThat(channel.inputCount()).isEqualTo(0);
+    assertThat(channel.inputSize()).isEqualTo(0);
     channel.after(millis(500)).pass("test");
-    assertThat(channel.inputCount()).isEqualTo(1);
-    assertThat(channel.outputCount()).isEqualTo(0);
-    final Channel<?, Object> result = Channels.replay(channel.afterNoDelay().close()).buildChannels();
+    assertThat(channel.inputSize()).isEqualTo(1);
+    assertThat(channel.outputSize()).isEqualTo(0);
+    final Channel<?, Object> result =
+        Channels.replay(channel.afterNoDelay().close()).buildChannels();
     assertThat(result.inMax(seconds(1)).getComplete()).isTrue();
-    assertThat(result.inputCount()).isEqualTo(0);
-    assertThat(result.outputCount()).isEqualTo(1);
+    assertThat(result.inputSize()).isEqualTo(0);
+    assertThat(result.outputSize()).isEqualTo(1);
     assertThat(result.size()).isEqualTo(1);
-    assertThat(result.skipNext(1).outputCount()).isEqualTo(0);
+    assertThat(result.skipNext(1).outputSize()).isEqualTo(0);
   }
 }

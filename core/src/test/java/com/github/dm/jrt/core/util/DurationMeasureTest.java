@@ -36,7 +36,7 @@ import static org.junit.Assert.fail;
  * <p>
  * Created by davide-maestroni on 10/02/2014.
  */
-public class UnitDurationTest {
+public class DurationMeasureTest {
 
   private static final long ONE_DAY_NANOS = DurationMeasure.days(1).toNanos();
 
@@ -509,9 +509,9 @@ public class UnitDurationTest {
         duration.toMillis() + TimeMeasure.hours(2).toMillis() + TimeMeasure.minutes(11).toMillis());
     assertThat(DurationMeasure.minutes(2).plus(TimeMeasure.seconds(-191))).isEqualTo(
         DurationMeasure.seconds(Long.MAX_VALUE - 70));
-    assertThat(noTime(TimeUnit.SECONDS).plus(DurationMeasure.seconds(3))).isEqualTo(
+    assertThat(DurationMeasure.zero(TimeUnit.SECONDS).plus(DurationMeasure.seconds(3))).isEqualTo(
         DurationMeasure.seconds(3));
-    assertThat(noTime(TimeUnit.SECONDS).plus(TimeMeasure.seconds(-3))).isEqualTo(
+    assertThat(DurationMeasure.zero(TimeUnit.SECONDS).plus(TimeMeasure.seconds(-3))).isEqualTo(
         DurationMeasure.seconds(Long.MAX_VALUE - 2));
     assertThat(DurationMeasure.seconds(1).plus(TimeMeasure.millis(-700))).isEqualTo(
         DurationMeasure.millis(300));

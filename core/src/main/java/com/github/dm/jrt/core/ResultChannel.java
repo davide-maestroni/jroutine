@@ -490,8 +490,8 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     return inMax(noTime());
   }
 
-  public int inputCount() {
-    return outputCount();
+  public int inputSize() {
+    return outputSize();
   }
 
   public boolean isBound() {
@@ -499,7 +499,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
   }
 
   public boolean isEmpty() {
-    return (outputCount() == 0);
+    return (outputSize() == 0);
   }
 
   public boolean isOpen() {
@@ -533,7 +533,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     return output;
   }
 
-  public int outputCount() {
+  public int outputSize() {
     synchronized (mMutex) {
       return mOutputCount;
     }
@@ -632,7 +632,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
   }
 
   public int size() {
-    return outputCount();
+    return outputSize();
   }
 
   @NotNull

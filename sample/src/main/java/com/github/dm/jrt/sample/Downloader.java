@@ -34,6 +34,7 @@ import java.util.HashSet;
 
 import static com.github.dm.jrt.core.common.BackoffBuilder.afterCount;
 import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
+import static com.github.dm.jrt.core.util.DurationMeasure.noTime;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 
 /**
@@ -173,7 +174,7 @@ public class Downloader {
    * @return whether the resource was downloaded.
    */
   public boolean isDownloaded(final URI uri) {
-    return waitDone(uri, DurationMeasure.noTime());
+    return waitDone(uri, noTime());
   }
 
   /**

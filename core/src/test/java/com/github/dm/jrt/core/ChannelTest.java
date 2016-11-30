@@ -632,30 +632,30 @@ public class ChannelTest {
   public void testSize() {
     final Channel<Object, Object> channel =
         JRoutineCore.with(IdentityInvocation.factoryOf()).call();
-    assertThat(channel.inputCount()).isEqualTo(0);
-    assertThat(channel.outputCount()).isEqualTo(0);
+    assertThat(channel.inputSize()).isEqualTo(0);
+    assertThat(channel.outputSize()).isEqualTo(0);
     channel.after(millis(500)).pass("test");
-    assertThat(channel.inputCount()).isEqualTo(1);
-    assertThat(channel.outputCount()).isEqualTo(0);
+    assertThat(channel.inputSize()).isEqualTo(1);
+    assertThat(channel.outputSize()).isEqualTo(0);
     channel.afterNoDelay().close();
     assertThat(channel.inMax(seconds(1)).getComplete()).isTrue();
-    assertThat(channel.inputCount()).isEqualTo(0);
-    assertThat(channel.outputCount()).isEqualTo(1);
+    assertThat(channel.inputSize()).isEqualTo(0);
+    assertThat(channel.outputSize()).isEqualTo(1);
     assertThat(channel.size()).isEqualTo(1);
-    assertThat(channel.skipNext(1).outputCount()).isEqualTo(0);
+    assertThat(channel.skipNext(1).outputSize()).isEqualTo(0);
 
     final Channel<Object, Object> channel1 = JRoutineCore.io().buildChannel();
-    assertThat(channel1.inputCount()).isEqualTo(0);
-    assertThat(channel1.outputCount()).isEqualTo(0);
+    assertThat(channel1.inputSize()).isEqualTo(0);
+    assertThat(channel1.outputSize()).isEqualTo(0);
     channel1.after(millis(500)).pass("test");
-    assertThat(channel1.inputCount()).isEqualTo(1);
-    assertThat(channel1.outputCount()).isEqualTo(1);
+    assertThat(channel1.inputSize()).isEqualTo(1);
+    assertThat(channel1.outputSize()).isEqualTo(1);
     channel1.afterNoDelay().close();
     assertThat(channel1.inMax(seconds(1)).getComplete()).isTrue();
-    assertThat(channel1.inputCount()).isEqualTo(1);
-    assertThat(channel1.outputCount()).isEqualTo(1);
+    assertThat(channel1.inputSize()).isEqualTo(1);
+    assertThat(channel1.outputSize()).isEqualTo(1);
     assertThat(channel1.size()).isEqualTo(1);
-    assertThat(channel1.skipNext(1).outputCount()).isEqualTo(0);
+    assertThat(channel1.skipNext(1).outputSize()).isEqualTo(0);
   }
 
   @Test

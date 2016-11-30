@@ -52,7 +52,7 @@ class ZeroDelayRunner extends RunnerDecorator {
    * Returns an instance wrapping the specified runner.
    *
    * @param wrapped the wrapped instance.
-   * @return the noTime delay runner.
+   * @return the zero delay runner.
    */
   @NotNull
   static ZeroDelayRunner getInstance(@NotNull final Runner wrapped) {

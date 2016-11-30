@@ -181,7 +181,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends AbstractRoutineBuil
       @NotNull final BiFunction<? extends StreamConfiguration, ? super StreamBuilder<IN, OUT>, ?
           extends StreamBuilder<BEFORE, AFTER>> transformingFunction) {
     try {
-      return ConstantConditions.notNull("transformed stream",
+      return ConstantConditions.notNull("transformed stream builder",
           ((BiFunction<StreamConfiguration, ? super StreamBuilder<IN, OUT>, ? extends
               StreamBuilder<BEFORE, AFTER>>) transformingFunction).apply(mStreamConfiguration,
               this));

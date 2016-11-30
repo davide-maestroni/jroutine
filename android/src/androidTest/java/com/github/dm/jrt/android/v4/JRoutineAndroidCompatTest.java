@@ -796,8 +796,7 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
 
   @ServiceProxy(TestClass.class)
   @LoaderProxyCompat(TestClass.class)
-  public interface TestAnnotatedProxy extends TestProxy {
-  }
+  public interface TestAnnotatedProxy extends TestProxy {}
 
   public interface TestProxy {
 

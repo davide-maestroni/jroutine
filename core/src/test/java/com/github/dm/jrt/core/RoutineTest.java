@@ -941,7 +941,7 @@ public class RoutineTest {
     assertThat(channel.isEmpty()).isTrue();
     assertThat(channel.pass("test1").after(millis(500)).pass("test2").isEmpty()).isFalse();
     final Channel<Object, Object> result = channel.afterNoDelay().close();
-    assertThat(result.outputCount()).isZero();
+    assertThat(result.outputSize()).isZero();
     assertThat(result.inMax(seconds(10)).getComplete()).isTrue();
     assertThat(channel.isEmpty()).isFalse();
     assertThat(result.isEmpty()).isFalse();
@@ -2028,14 +2028,14 @@ public class RoutineTest {
   public void testSize() {
     final Channel<Object, Object> channel =
         JRoutineCore.with(IdentityInvocation.factoryOf()).call();
-    assertThat(channel.inputCount()).isEqualTo(0);
+    assertThat(channel.inputSize()).isEqualTo(0);
     channel.after(millis(500)).pass("test");
-    assertThat(channel.inputCount()).isEqualTo(1);
+    assertThat(channel.inputSize()).isEqualTo(1);
     final Channel<Object, Object> result = channel.afterNoDelay().close();
     assertThat(result.inMax(seconds(1)).getComplete()).isTrue();
-    assertThat(result.outputCount()).isEqualTo(1);
+    assertThat(result.outputSize()).isEqualTo(1);
     assertThat(result.size()).isEqualTo(1);
-    assertThat(result.skipNext(1).outputCount()).isEqualTo(0);
+    assertThat(result.skipNext(1).outputSize()).isEqualTo(0);
   }
 
   @Test

@@ -72,7 +72,7 @@ class ParallelCountChannelConsumer<OUT> implements ChannelConsumer<OUT> {
     final Channel<OUT, ?>[] inputs = mInputs;
     final HashMap<Channel<OUT, ?>, Channel<?, ?>> channels = mChannels;
     for (final Entry<Channel<OUT, ?>, Channel<?, ?>> entry : channels.entrySet()) {
-      final int channelSize = entry.getValue().inputCount();
+      final int channelSize = entry.getValue().inputSize();
       if (channelSize < minSize) {
         count = 1;
         inputs[0] = entry.getKey();

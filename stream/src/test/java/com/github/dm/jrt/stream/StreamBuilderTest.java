@@ -266,8 +266,8 @@ public class StreamBuilderTest {
                              .afterNoDelay()
                              .close()
                              .next()).isEqualTo("test");
-    assertThat(JRoutineStream.withStream().sync().call().inputCount()).isZero();
-    assertThat(JRoutineStream.withStream().sync().call().outputCount()).isZero();
+    assertThat(JRoutineStream.withStream().sync().call().inputSize()).isZero();
+    assertThat(JRoutineStream.withStream().sync().call().outputSize()).isZero();
     assertThat(JRoutineStream.withStream().sync().call().size()).isZero();
     assertThat(JRoutineStream.withStream().sync().call().isBound()).isFalse();
     assertThat(JRoutineStream.withStream().sync().call().isEmpty()).isTrue();

@@ -244,8 +244,8 @@ class ReplayChannel<OUT> implements Channel<OUT, OUT>, ChannelConsumer<OUT> {
     return this;
   }
 
-  public int inputCount() {
-    return mChannel.inputCount();
+  public int inputSize() {
+    return mChannel.inputSize();
   }
 
   public boolean isBound() {
@@ -275,8 +275,8 @@ class ReplayChannel<OUT> implements Channel<OUT, OUT>, ChannelConsumer<OUT> {
     return mOutputChannel.nextOrElse(output);
   }
 
-  public int outputCount() {
-    return mOutputChannel.outputCount();
+  public int outputSize() {
+    return mOutputChannel.outputSize();
   }
 
   @NotNull

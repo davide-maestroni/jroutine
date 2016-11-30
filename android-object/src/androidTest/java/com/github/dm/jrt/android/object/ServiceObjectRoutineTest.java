@@ -830,6 +830,8 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
 
     assertThat(getOne.getComplete()).isTrue();
     assertThat(getTwo.getComplete()).isTrue();
+    assertThat(getOne.getError()).isNull();
+    assertThat(getTwo.getError()).isNull();
     assertThat(System.currentTimeMillis() - startTime).isLessThan(4000);
 
     startTime = System.currentTimeMillis();
@@ -839,6 +841,8 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
 
     assertThat(getOne.getComplete()).isTrue();
     assertThat(getTwo.getComplete()).isTrue();
+    assertThat(getOne.getError()).isNull();
+    assertThat(getTwo.getError()).isNull();
     assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(4000);
   }
 
@@ -1489,7 +1493,6 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
   public static class SharedFieldRunner extends RunnerDecorator {
 
     public SharedFieldRunner() {
-
       super(Runners.poolRunner(2));
     }
   }
@@ -1675,16 +1678,12 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
   private static class TestClass2 {
 
     public int getOne() throws InterruptedException {
-
       DurationMeasure.seconds(2).sleepAtLeast();
-
       return 1;
     }
 
     public int getTwo() throws InterruptedException {
-
       DurationMeasure.seconds(2).sleepAtLeast();
-
       return 2;
     }
   }
@@ -1694,7 +1693,6 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
     @Alias("test")
     @OutputTimeoutAction(TimeoutActionType.CONTINUE)
     public int getInt() throws InterruptedException {
-
       Thread.sleep(100);
       return 31;
     }

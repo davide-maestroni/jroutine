@@ -882,8 +882,9 @@ public class Builders {
      */
     void releasePartialMutex() {
       synchronized (mMutex) {
-        --mPartialMutexCount;
-        mMutex.notifyAll();
+        if (--mPartialMutexCount == 0) {
+          mMutex.notifyAll();
+        }
       }
     }
 
@@ -902,8 +903,9 @@ public class Builders {
     public void release() {
       mLock.unlock();
       synchronized (mMutex) {
-        --mFullMutexCount;
-        mMutex.notifyAll();
+        if (--mFullMutexCount == 0) {
+          mMutex.notifyAll();
+        }
       }
     }
   }

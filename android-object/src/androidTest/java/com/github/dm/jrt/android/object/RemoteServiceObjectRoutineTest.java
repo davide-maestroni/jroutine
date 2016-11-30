@@ -827,6 +827,8 @@ public class RemoteServiceObjectRoutineTest extends ActivityInstrumentationTestC
 
     assertThat(getOne.getComplete()).isTrue();
     assertThat(getTwo.getComplete()).isTrue();
+    assertThat(getOne.getError()).isNull();
+    assertThat(getTwo.getError()).isNull();
     assertThat(System.currentTimeMillis() - startTime).isLessThan(4000);
 
     startTime = System.currentTimeMillis();
@@ -836,6 +838,8 @@ public class RemoteServiceObjectRoutineTest extends ActivityInstrumentationTestC
 
     assertThat(getOne.getComplete()).isTrue();
     assertThat(getTwo.getComplete()).isTrue();
+    assertThat(getOne.getError()).isNull();
+    assertThat(getTwo.getError()).isNull();
     assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(4000);
   }
 

@@ -24,7 +24,7 @@ import com.github.dm.jrt.android.core.config.LoaderConfiguration.ClashResolution
 import com.github.dm.jrt.android.core.config.ServiceConfiguration;
 import com.github.dm.jrt.android.object.annotation.CacheStrategy;
 import com.github.dm.jrt.android.object.annotation.ClashResolution;
-import com.github.dm.jrt.android.object.annotation.FactoryId;
+import com.github.dm.jrt.android.object.annotation.InvocationId;
 import com.github.dm.jrt.android.object.annotation.LoaderId;
 import com.github.dm.jrt.android.object.annotation.MatchResolution;
 import com.github.dm.jrt.android.object.annotation.ResultStaleTime;
@@ -52,7 +52,7 @@ public class AndroidBuildersTest extends AndroidTestCase {
         LoaderConfiguration.builder()
                            .withCacheStrategy(CacheStrategyType.CACHE_IF_ERROR)
                            .withClashResolution(ClashResolutionType.ABORT_BOTH)
-                           .withFactoryId(13)
+                           .withInvocationId(13)
                            .withMatchResolution(ClashResolutionType.ABORT_THIS)
                            .withLoaderId(-77)
                            .withResultStaleTime(DurationMeasure.millis(333))
@@ -84,9 +84,9 @@ public class AndroidBuildersTest extends AndroidTestCase {
 
     @CacheStrategy(CacheStrategyType.CACHE_IF_ERROR)
     @ClashResolution(ClashResolutionType.ABORT_BOTH)
-    @FactoryId(13)
-    @MatchResolution(ClashResolutionType.ABORT_THIS)
+    @InvocationId(13)
     @LoaderId(-77)
+    @MatchResolution(ClashResolutionType.ABORT_THIS)
     @ResultStaleTime(333)
     @ServiceLog(NullLog.class)
     @ServiceRunner(MyRunner.class)

@@ -436,7 +436,7 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
                                     .withSharedFields()
                                     .configured()
                                     .applyLoaderConfiguration()
-                                    .withFactoryId(11)
+                                    .withInvocationId(11)
                                     .configured()
                                     .buildProxy(TestAnnotatedProxy.class)
                                     .getStringLow()

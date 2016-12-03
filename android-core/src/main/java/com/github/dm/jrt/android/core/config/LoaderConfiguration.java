@@ -38,7 +38,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * <ul>
  * <li>The Loader ID backing the routine invocation. If set to {@link #AUTO} (the default behavior)
  * the invocation factory and the inputs {@code hashCode()} will be used to compute the ID.</li>
- * <li>The factory ID which will override the factory {@code hashCode()} in the Loader ID
+ * <li>The invocation ID which will override the factory {@code hashCode()} in the Loader ID
  * computation.</li>
  * <li>The clash resolution to apply in case a Loader with the same ID is running at the moment the
  * routine is invoked.</li>
@@ -64,7 +64,7 @@ public final class LoaderConfiguration extends DeepEqualObject {
 
   private final ClashResolutionType mClashResolutionType;
 
-  private final int mFactoryId;
+  private final int mInvocationId;
 
   private final int mLoaderId;
 
@@ -78,20 +78,20 @@ public final class LoaderConfiguration extends DeepEqualObject {
    * Constructor.
    *
    * @param loaderId            the Loader ID.
-   * @param factoryId           the factory ID.
+   * @param invocationId        the invocation ID.
    * @param clashResolutionType the type of clash resolution.
    * @param matchResolutionType the type of match resolution.
    * @param strategyType        the cache strategy type.
    * @param staleTime           the stale time.
    */
-  private LoaderConfiguration(final int loaderId, final int factoryId,
+  private LoaderConfiguration(final int loaderId, final int invocationId,
       @Nullable final ClashResolutionType clashResolutionType,
       @Nullable final ClashResolutionType matchResolutionType,
       @Nullable final CacheStrategyType strategyType, @Nullable final DurationMeasure staleTime) {
-    super(asArgs(loaderId, factoryId, clashResolutionType, matchResolutionType, strategyType,
+    super(asArgs(loaderId, invocationId, clashResolutionType, matchResolutionType, strategyType,
         staleTime));
     mLoaderId = loaderId;
-    mFactoryId = factoryId;
+    mInvocationId = invocationId;
     mClashResolutionType = clashResolutionType;
     mMatchResolutionType = matchResolutionType;
     mStrategyType = strategyType;
@@ -166,14 +166,14 @@ public final class LoaderConfiguration extends DeepEqualObject {
   }
 
   /**
-   * Returns the factory ID (AUTO by default).
+   * Returns the invocation ID (AUTO by default).
    *
    * @param valueIfNotSet the default value if none was set.
-   * @return the factory ID.
+   * @return the invocation ID.
    */
-  public int getFactoryIdOrElse(final int valueIfNotSet) {
-    final int factoryId = mFactoryId;
-    return (factoryId != AUTO) ? factoryId : valueIfNotSet;
+  public int getInvocationIdOrElse(final int valueIfNotSet) {
+    final int invocationId = mInvocationId;
+    return (invocationId != AUTO) ? invocationId : valueIfNotSet;
   }
 
   /**
@@ -300,7 +300,7 @@ public final class LoaderConfiguration extends DeepEqualObject {
 
     private ClashResolutionType mClashResolutionType;
 
-    private int mFactoryId;
+    private int mInvocationId;
 
     private int mLoaderId;
 
@@ -318,7 +318,7 @@ public final class LoaderConfiguration extends DeepEqualObject {
     public Builder(@NotNull final Configurable<? extends TYPE> configurable) {
       mConfigurable = ConstantConditions.notNull("configurable instance", configurable);
       mLoaderId = AUTO;
-      mFactoryId = AUTO;
+      mInvocationId = AUTO;
     }
 
     /**
@@ -363,9 +363,9 @@ public final class LoaderConfiguration extends DeepEqualObject {
         withLoaderId(loaderId);
       }
 
-      final int factoryId = configuration.mFactoryId;
-      if (factoryId != AUTO) {
-        withFactoryId(factoryId);
+      final int invocationId = configuration.mInvocationId;
+      if (invocationId != AUTO) {
+        withInvocationId(invocationId);
       }
 
       final ClashResolutionType clashResolutionType = configuration.mClashResolutionType;
@@ -419,14 +419,14 @@ public final class LoaderConfiguration extends DeepEqualObject {
     }
 
     /**
-     * Tells the builder to identify the backing invocation factory with the specified ID.
+     * Tells the builder to identify the backing invocation with the specified ID.
      *
-     * @param factoryId the factory ID.
+     * @param invocationId the invocation ID.
      * @return this builder.
      */
     @NotNull
-    public Builder<TYPE> withFactoryId(final int factoryId) {
-      mFactoryId = factoryId;
+    public Builder<TYPE> withInvocationId(final int invocationId) {
+      mInvocationId = invocationId;
       return this;
     }
 
@@ -485,13 +485,13 @@ public final class LoaderConfiguration extends DeepEqualObject {
 
     @NotNull
     private LoaderConfiguration buildConfiguration() {
-      return new LoaderConfiguration(mLoaderId, mFactoryId, mClashResolutionType,
+      return new LoaderConfiguration(mLoaderId, mInvocationId, mClashResolutionType,
           mMatchResolutionType, mStrategyType, mStaleTime);
     }
 
     private void setConfiguration(@NotNull final LoaderConfiguration configuration) {
       mLoaderId = configuration.mLoaderId;
-      mFactoryId = configuration.mFactoryId;
+      mInvocationId = configuration.mInvocationId;
       mClashResolutionType = configuration.mClashResolutionType;
       mMatchResolutionType = configuration.mMatchResolutionType;
       mStrategyType = configuration.mStrategyType;

@@ -131,7 +131,7 @@
                 JRoutineLoaderStream.&lt;URI&gt;withStream()
                                     .immediate(()
                                     .applyLoaderConfiguration()
-                                    .withFactoryId(11) // explicitly set the factory ID so to make the invocation survive rotations
+                                    .withInvocationId(11) // explicitly set the invocation ID so to make the invocation survive rotations
                                     .configured()
                                     .map(loadUri())
                                     .on(loaderFrom(this))

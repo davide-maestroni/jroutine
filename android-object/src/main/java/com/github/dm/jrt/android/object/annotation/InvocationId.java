@@ -23,7 +23,7 @@ import java.lang.annotation.Target;
 
 /**
  * Through this annotation it is possible to set a specific ID to be used for identifying the
- * invocation factory backing a specific method.
+ * invocation backing a specific method.
  * <p>
  * This annotation is used to decorate methods that are to be invoked in an asynchronous way.
  * <br>
@@ -45,7 +45,7 @@ import java.lang.annotation.Target;
  *
  *         -keepattributes RuntimeVisibleAnnotations
  *         -keepclassmembers class ** {
- *              &#64;com.github.dm.jrt.android.object.annotation.FactoryId *;
+ *              &#64;com.github.dm.jrt.android.object.annotation.InvocationId *;
  *         }
  *     </code>
  * </pre>
@@ -56,10 +56,10 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface FactoryId {
+public @interface InvocationId {
 
   /**
-   * The routine ID.
+   * The invocation ID.
    *
    * @return the ID.
    */

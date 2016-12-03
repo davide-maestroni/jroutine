@@ -44,8 +44,6 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
   private TypeMirror mClashAnnotationType;
 
-  private TypeMirror mFactoryIdAnnotationType;
-
   private String mHeaderService;
 
   private String mHeaderV11;
@@ -53,6 +51,8 @@ public class ContextRoutineProcessor extends RoutineProcessor {
   private String mHeaderV4;
 
   private TypeMirror mInputClashAnnotationType;
+
+  private TypeMirror mInvocationIdAnnotationType;
 
   private TypeMirror mLoaderIdAnnotationType;
 
@@ -92,8 +92,8 @@ public class ContextRoutineProcessor extends RoutineProcessor {
         getMirrorFromName("com.github.dm.jrt.android.object.annotation.CacheStrategy");
     mClashAnnotationType =
         getMirrorFromName("com.github.dm.jrt.android.object.annotation.ClashResolution");
-    mFactoryIdAnnotationType =
-        getMirrorFromName("com.github.dm.jrt.android.object.annotation.FactoryId");
+    mInvocationIdAnnotationType =
+        getMirrorFromName("com.github.dm.jrt.android.object.annotation.InvocationId");
     mLoaderIdAnnotationType =
         getMirrorFromName("com.github.dm.jrt.android.object.annotation.LoaderId");
     mInputClashAnnotationType =
@@ -224,10 +224,10 @@ public class ContextRoutineProcessor extends RoutineProcessor {
       builder.append(".withLoaderId(").append(loaderId).append(")");
     }
 
-    final Integer factoryId =
-        (Integer) getAnnotationValue(methodElement, mFactoryIdAnnotationType, "value");
-    if (factoryId != null) {
-      builder.append(".withFactoryId(").append(factoryId).append(")");
+    final Integer invocationId =
+        (Integer) getAnnotationValue(methodElement, mInvocationIdAnnotationType, "value");
+    if (invocationId != null) {
+      builder.append(".withInvocationId(").append(invocationId).append(")");
     }
 
     final Object resolutionType = getAnnotationValue(methodElement, mClashAnnotationType, "value");

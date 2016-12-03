@@ -42,7 +42,7 @@ public class LoaderConfigurationTest extends AndroidTestCase {
     final ClashResolutionType resolutionType = ClashResolutionType.ABORT_OTHER;
     final CacheStrategyType strategyType = CacheStrategyType.CACHE;
     final LoaderConfiguration configuration = builder().withLoaderId(-1)
-                                                       .withFactoryId(71)
+                                                       .withInvocationId(71)
                                                        .withClashResolution(resolutionType)
                                                        .withMatchResolution(resolutionType)
                                                        .withCacheStrategy(strategyType)
@@ -82,7 +82,7 @@ public class LoaderConfigurationTest extends AndroidTestCase {
     final ClashResolutionType resolutionType = ClashResolutionType.ABORT_OTHER;
     final CacheStrategyType strategyType = CacheStrategyType.CACHE;
     final LoaderConfiguration configuration = builder().withLoaderId(-1)
-                                                       .withFactoryId(71)
+                                                       .withInvocationId(71)
                                                        .withClashResolution(resolutionType)
                                                        .withMatchResolution(resolutionType)
                                                        .withCacheStrategy(strategyType)
@@ -130,22 +130,6 @@ public class LoaderConfigurationTest extends AndroidTestCase {
         builder().withClashResolution(ClashResolutionType.JOIN).configured());
   }
 
-  public void testFactoryIdEquals() {
-
-    final ClashResolutionType resolutionType = ClashResolutionType.ABORT_OTHER;
-    final CacheStrategyType strategyType = CacheStrategyType.CACHE;
-    final LoaderConfiguration configuration = builder().withLoaderId(-1)
-                                                       .withFactoryId(71)
-                                                       .withClashResolution(resolutionType)
-                                                       .withMatchResolution(resolutionType)
-                                                       .withCacheStrategy(strategyType)
-                                                       .withResultStaleTime(1, TimeUnit.SECONDS)
-                                                       .configured();
-    assertThat(configuration).isNotEqualTo(builder().withFactoryId(3).configured());
-    assertThat(configuration.builderFrom().withFactoryId(27).configured()).isNotEqualTo(
-        builder().withFactoryId(27).configured());
-  }
-
   public void testIdEquals() {
 
     final ClashResolutionType resolutionType = ClashResolutionType.ABORT_OTHER;
@@ -159,6 +143,22 @@ public class LoaderConfigurationTest extends AndroidTestCase {
     assertThat(configuration).isNotEqualTo(builder().withLoaderId(3).configured());
     assertThat(configuration.builderFrom().withLoaderId(27).configured()).isNotEqualTo(
         builder().withLoaderId(27).configured());
+  }
+
+  public void testInvocationIdEquals() {
+
+    final ClashResolutionType resolutionType = ClashResolutionType.ABORT_OTHER;
+    final CacheStrategyType strategyType = CacheStrategyType.CACHE;
+    final LoaderConfiguration configuration = builder().withLoaderId(-1)
+                                                       .withInvocationId(71)
+                                                       .withClashResolution(resolutionType)
+                                                       .withMatchResolution(resolutionType)
+                                                       .withCacheStrategy(strategyType)
+                                                       .withResultStaleTime(1, TimeUnit.SECONDS)
+                                                       .configured();
+    assertThat(configuration).isNotEqualTo(builder().withInvocationId(3).configured());
+    assertThat(configuration.builderFrom().withInvocationId(27).configured()).isNotEqualTo(
+        builder().withInvocationId(27).configured());
   }
 
   public void testMatchResolutionEquals() {

@@ -20,7 +20,7 @@ import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.core.config.ServiceConfiguration;
 import com.github.dm.jrt.android.object.annotation.CacheStrategy;
 import com.github.dm.jrt.android.object.annotation.ClashResolution;
-import com.github.dm.jrt.android.object.annotation.FactoryId;
+import com.github.dm.jrt.android.object.annotation.InvocationId;
 import com.github.dm.jrt.android.object.annotation.LoaderId;
 import com.github.dm.jrt.android.object.annotation.MatchResolution;
 import com.github.dm.jrt.android.object.annotation.ResultStaleTime;
@@ -61,9 +61,9 @@ public class AndroidBuilders {
    * @return the modified configuration.
    * @see com.github.dm.jrt.android.object.annotation.CacheStrategy CacheStrategy
    * @see com.github.dm.jrt.android.object.annotation.ClashResolution ClashResolution
-   * @see com.github.dm.jrt.android.object.annotation.FactoryId FactoryId
-   * @see com.github.dm.jrt.android.object.annotation.MatchResolution MatchResolution
+   * @see com.github.dm.jrt.android.object.annotation.InvocationId InvocationId
    * @see com.github.dm.jrt.android.object.annotation.LoaderId LoaderId
+   * @see com.github.dm.jrt.android.object.annotation.MatchResolution MatchResolution
    * @see com.github.dm.jrt.android.object.annotation.ResultStaleTime ResultStaleTime
    */
   @NotNull
@@ -81,8 +81,8 @@ public class AndroidBuilders {
       if (annotationType == LoaderId.class) {
         builder.withLoaderId(((LoaderId) annotation).value());
 
-      } else if (annotationType == FactoryId.class) {
-        builder.withFactoryId(((FactoryId) annotation).value());
+      } else if (annotationType == InvocationId.class) {
+        builder.withInvocationId(((InvocationId) annotation).value());
 
       } else if (annotationType == ClashResolution.class) {
         builder.withClashResolution(((ClashResolution) annotation).value());
@@ -111,9 +111,9 @@ public class AndroidBuilders {
    * @return the modified configuration.
    * @see com.github.dm.jrt.android.object.annotation.CacheStrategy CacheStrategy
    * @see com.github.dm.jrt.android.object.annotation.ClashResolution ClashResolution
-   * @see com.github.dm.jrt.android.object.annotation.FactoryId FactoryId
-   * @see com.github.dm.jrt.android.object.annotation.MatchResolution MatchResolution
+   * @see com.github.dm.jrt.android.object.annotation.InvocationId InvocationId
    * @see com.github.dm.jrt.android.object.annotation.LoaderId LoaderId
+   * @see com.github.dm.jrt.android.object.annotation.MatchResolution MatchResolution
    * @see com.github.dm.jrt.android.object.annotation.ResultStaleTime ResultStaleTime
    */
   @NotNull

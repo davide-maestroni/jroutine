@@ -275,7 +275,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
                                        .withSharedFields()
                                        .configured()
                                        .applyLoaderConfiguration()
-                                       .withFactoryId(11)
+                                       .withInvocationId(11)
                                        .configured()
                                        .buildProxy();
 
@@ -301,7 +301,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
                                   .withSharedFields()
                                   .configured()
                                   .applyLoaderConfiguration()
-                                  .withFactoryId(11)
+                                  .withInvocationId(11)
                                   .configured()
                                   .buildProxy(ClassToken.tokenOf(TestProxy.class))).isSameAs(
         testProxy);

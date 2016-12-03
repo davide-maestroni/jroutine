@@ -979,52 +979,6 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
     assertThat(failed).isFalse();
   }
 
-  public void testFactoryId() {
-
-    if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-      return;
-    }
-
-    assertThat(JRoutineLoader.on(loaderFrom(getActivity()))
-                             .with(factoryOf(StringCallInvocation.class))
-                             .applyLoaderConfiguration()
-                             .withFactoryId(0)
-                             .withCacheStrategy(CacheStrategyType.CACHE)
-                             .configured()
-                             .call("test")
-                             .inMax(seconds(10))
-                             .all()).containsExactly("test");
-    assertThat(JRoutineLoader.on(loaderFrom(getActivity()))
-                             .with(factoryOf(ToUpperCase.class))
-                             .applyLoaderConfiguration()
-                             .withFactoryId(0)
-                             .withCacheStrategy(CacheStrategyType.CACHE)
-                             .configured()
-                             .call("test")
-                             .inMax(seconds(10))
-                             .all()).containsExactly("test");
-    final TestFragment fragment =
-        (TestFragment) getActivity().getFragmentManager().findFragmentById(R.id.test_fragment);
-    assertThat(JRoutineLoader.on(loaderFrom(fragment))
-                             .with(factoryOf(ToUpperCase.class))
-                             .applyLoaderConfiguration()
-                             .withFactoryId(0)
-                             .withCacheStrategy(CacheStrategyType.CACHE)
-                             .configured()
-                             .call("test")
-                             .inMax(seconds(10))
-                             .all()).containsExactly("TEST");
-    assertThat(JRoutineLoader.on(loaderFrom(fragment))
-                             .with(factoryOf(StringCallInvocation.class))
-                             .applyLoaderConfiguration()
-                             .withFactoryId(0)
-                             .withCacheStrategy(CacheStrategyType.CACHE)
-                             .configured()
-                             .call("test")
-                             .inMax(seconds(10))
-                             .all()).containsExactly("TEST");
-  }
-
   public void testFragmentAbort() {
 
     if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
@@ -1624,6 +1578,52 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
     assertThat(result1.next()).isSameAs(data1);
     assertThat(result2.next()).isSameAs(data1);
+  }
+
+  public void testInvocationId() {
+
+    if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+      return;
+    }
+
+    assertThat(JRoutineLoader.on(loaderFrom(getActivity()))
+                             .with(factoryOf(StringCallInvocation.class))
+                             .applyLoaderConfiguration()
+                             .withInvocationId(0)
+                             .withCacheStrategy(CacheStrategyType.CACHE)
+                             .configured()
+                             .call("test")
+                             .inMax(seconds(10))
+                             .all()).containsExactly("test");
+    assertThat(JRoutineLoader.on(loaderFrom(getActivity()))
+                             .with(factoryOf(ToUpperCase.class))
+                             .applyLoaderConfiguration()
+                             .withInvocationId(0)
+                             .withCacheStrategy(CacheStrategyType.CACHE)
+                             .configured()
+                             .call("test")
+                             .inMax(seconds(10))
+                             .all()).containsExactly("test");
+    final TestFragment fragment =
+        (TestFragment) getActivity().getFragmentManager().findFragmentById(R.id.test_fragment);
+    assertThat(JRoutineLoader.on(loaderFrom(fragment))
+                             .with(factoryOf(ToUpperCase.class))
+                             .applyLoaderConfiguration()
+                             .withInvocationId(0)
+                             .withCacheStrategy(CacheStrategyType.CACHE)
+                             .configured()
+                             .call("test")
+                             .inMax(seconds(10))
+                             .all()).containsExactly("TEST");
+    assertThat(JRoutineLoader.on(loaderFrom(fragment))
+                             .with(factoryOf(StringCallInvocation.class))
+                             .applyLoaderConfiguration()
+                             .withInvocationId(0)
+                             .withCacheStrategy(CacheStrategyType.CACHE)
+                             .configured()
+                             .call("test")
+                             .inMax(seconds(10))
+                             .all()).containsExactly("TEST");
   }
 
   public void testInvocations() {

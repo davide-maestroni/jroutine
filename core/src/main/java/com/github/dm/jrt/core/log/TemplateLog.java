@@ -45,10 +45,18 @@ public abstract class TemplateLog implements Log {
 
   private static final String LOG_FORMAT = "%s\t%s\t%s\t%s<%s>";
 
+  private static ThreadLocal<SimpleDateFormat> sDateFormatter =
+      new ThreadLocal<SimpleDateFormat>() {
+
+        @Override
+        protected SimpleDateFormat initialValue() {
+          return new SimpleDateFormat(DATE_FORMAT, Locale.getDefault());
+        }
+      };
+
   private static String format(@NotNull final Level level, @NotNull final List<Object> contexts,
       @Nullable final String message) {
-    return String.format(LOG_FORMAT,
-        new SimpleDateFormat(DATE_FORMAT, Locale.getDefault()).format(new Date()),
+    return String.format(LOG_FORMAT, sDateFormatter.get().format(new Date()),
         Thread.currentThread().getName(), contexts.toString(), level, message);
   }
 

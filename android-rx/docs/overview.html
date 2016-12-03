@@ -22,36 +22,25 @@
 <a href="https://github.com/davide-maestroni/jroutine" target="_blank">Parallel programming on the go.</a>
 <h1>Overview</h1>
 <p>
-    Android customization of Retrofit integration of the <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/lib" target="_blank">jroutine-lib</a> library.
+    Android integration of RxJava based on the <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android" target="_blank">jroutine-android</a> library.
 </p>
 <p>
-    This module provides classes integrating Android routines with the Retrofit library.<br>
-    Retrofit requests are executed inside dedicated Android Services and Loaders.
+    This module provides classes integrating Android routines with the RxJava library.<br>
+    RxJava data manipulation is executed inside dedicated Android Loaders.
 </p>
 <h2>Main classes</h2>
 <ul>
     <li>
-        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-retrofit/com/github/dm/jrt/android/v11/retrofit/LoaderAdapterFactory.html">LoaderAdapterFactory</a>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-rx/com/github/dm/jrt/android/v11/rx/JRoutineRx.html">JRoutineRx</a>
         <p>
-            Retrofit adapter factory supporting <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/core/com/github/dm/jrt/core/channel/Channel.html">Channel</a>s,
-            <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/stream/com/github/dm/jrt/stream/StreamBuilder.html">StreamBuilder</a>s and
-            <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-stream/com/github/dm/jrt/android/v11/stream/LoaderStreamBuilder.html">LoaderStreamBuilder</a>s.
+            Utility class enabling an observable to dispatch data to a dedicated Loader.
         </p>
     </li>
     <li>
-        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-retrofit/com/github/dm/jrt/android/v4/retrofit/LoaderAdapterFactoryCompat.html">LoaderAdapterFactoryCompat</a>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-rx/com/github/dm/jrt/android/v4/rx/JRoutineRxCompat.html">JRoutineRxCompat</a>
         <p>
-            Retrofit adapter factory supporting <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/core/com/github/dm/jrt/core/channel/Channel.html">Channel</a>s,
-            <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/stream/com/github/dm/jrt/stream/StreamBuilder.html">StreamBuilder</a>s and
-            <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-stream/com/github/dm/jrt/android/v4/stream/LoaderStreamBuilderCompat.html">LoaderStreamBuilderCompat</a>s.
+            Utility class enabling an observable to dispatch data to a dedicated Loader.<br>
             This class is specifically meant to employ the Android Support library for retro-compatibility.
-        </p>
-    </li>
-    <li>
-        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-retrofit/com/github/dm/jrt/android/retrofit/ServiceAdapterFactory.html">ServiceAdapterFactory</a>
-        <p>
-            Retrofit adapter factory supporting <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/core/com/github/dm/jrt/core/channel/Channel.html">Channel</a>s and
-            <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/stream/com/github/dm/jrt/stream/StreamBuilder.html">StreamBuilder</a>s.
         </p>
     </li>
 </ul>
@@ -60,23 +49,14 @@
     Below a full list of the included modules:
 </p>
 <ul>
-    <li><a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-channel" target="_blank">jroutine-android-channel</a> &mdash; utility classes extending channel functionalities</li>
     <li><a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-core" target="_blank">jroutine-android-core</a> &mdash; core routine and channel classes</li>
-    <li><a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-object" target="_blank">jroutine-android-object</a> &mdash; routine wrapping object and class methods</li>
-    <li><a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-stream" target="_blank">jroutine-android-stream</a> &mdash; stream-like routine concatenation</li>
-    <li><a href="http://davide-maestroni.github.io/jroutine/javadoc/6/channel" target="_blank">jroutine-channel</a> &mdash; utility classes extending channel functionalities</li>
     <li><a href="http://davide-maestroni.github.io/jroutine/javadoc/6/core" target="_blank">jroutine-core</a> &mdash; core routine and channel classes</li>
-    <li><a href="http://davide-maestroni.github.io/jroutine/javadoc/6/function" target="_blank">jroutine-function</a> &mdash; utility classes enabling function-based routines</li>
-    <li><a href="http://davide-maestroni.github.io/jroutine/javadoc/6/object" target="_blank">jroutine-object</a> &mdash; routines wrapping object and class methods</li>
-    <li><a href="http://davide-maestroni.github.io/jroutine/javadoc/6/operator" target="_blank">jroutine-operator</a> &mdash; utility classes implementing operator invocations</li>
-    <li><a href="http://davide-maestroni.github.io/jroutine/javadoc/6/retrofit" target="_blank">jroutine-retrofit</a> &mdash; Retrofit integration</li>
-    <li><a href="http://davide-maestroni.github.io/jroutine/javadoc/6/stream" target="_blank">jroutine-stream</a> &mdash; stream-like routine concatenation</li>
 </ul>
 <h2>Usage examples</h2>
 <p>
-    The code below shows how it is possible to configure Retrofit, so to employ Loaders or Services to execute calls to the network.
+    The code below shows how it is possible to configure an observable, so to employ Loaders to execute data processing.
 </p>
-<b>Example 1:</b> via Loader stream.
+<b>Example 1:</b> via Loader.
 <p>
     The lambda notation used in the example is just for demonstration purpose.
 </p>
@@ -84,19 +64,23 @@
     <code>
         public class MainActivity extends Activity {
 
-            private static final String USER_NAME = "...";
+            private static Action1&lt;String&gt; getAction(final Context context) {
+                return new Action1&lt;String&gt;() {
 
-            private static Consumer&lt;Repo&gt; addRepoTo(final ArrayAdapter adapter) {
-                return repo -> {
-                    adapter.add(repo);
+                    &commat;Override
+                    public void call(final String s) {
+                        Toast.makeText(context, s, Toast.LENGTH_LONG).show();
+                    }
                 };
             }
 
-            private static Consumer&lt;RoutineException&gt; showToast(final Activity activity) {
-                return error -> {
-                    final Throwable cause = error.getCause();
-                    Toast.makeText(activity, (cause != null) ? cause.getMessage() :
-                            "Cannot load repositories", Toast.LENGTH_LONG).show();
+            private static Func1&lt;String, String&gt; getMappingFunction() {
+                return new Func1&lt;String, String&gt;() {
+
+                    &commat;Override
+                    public String call(final String s) {
+                        return s + "!";
+                    }
                 };
             }
 
@@ -104,48 +88,19 @@
             protected void onCreate(final Bundle savedInstanceState) {
                 super.onCreate(savedInstanceState);
                 setContentView(R.layout.main_layout);
-                final ArrayAdapter adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
-                final ListView repoList = (ListView) findViewById(R.id.repo_list);
-                if (repoList != null) {
-                    repoList.setAdapter(adapter);
-                }
-
-                final LoaderAdapterFactory adapterFactory =
-                        LoaderAdapterFactory.on(loaderFrom(this)).buildFactory();
-                final GsonConverterFactory converterFactory = GsonConverterFactory.create();
-                final Retrofit retrofit =
-                        new Builder().baseUrl("https://api.github.com")
-                                     .addCallAdapterFactory(adapterFactory)
-                                     .addConverterFactory(converterFactory)
-                                     .build();
-                final GitHubService service = retrofit.create(GitHubService.class);
-                service.streamRepos(USER_NAME)
-                       .map(Operators.&lt;Repo&gt;unfold())
-                       .close()
-                       .bind(onOutput(addRepoTo(adapter)).andOnError(showToast(this)));
-            }
-
-            public interface GitHubService {
-
-                &commat;GET("users/{user}/repos")
-                StreamBuilder&lt;Object, List&lt;Repo&gt;&gt; streamRepos(&commat;Path("user") String user);
-            }
-
-            public static class Repo {
-
-                public String id;
-
-                public String name;
-
-                &commat;Override
-                public String toString() {
-                    return name;
-                }
+                JRoutineRx.withObservable(Observable.just("Hello RxJava"))
+                          .applyLoaderConfiguration()
+                          .withInvocationId(R.id.hello_invocation)
+                          .configured()
+                          .subscribeOn(loaderFrom(this))
+                          .map(getMappingFunction())
+                          .observeOn(AndroidSchedulers.mainThread())
+                          .subscribe(getAction(this));
             }
         }
     </code>
 </pre>
-<b>Example 2:</b> via Loader stream (with Support Library).
+<b>Example 2:</b> via Loader (with Support Library).
 <p>
     The lambda notation used in the example is just for demonstration purpose.
 </p>
@@ -153,88 +108,23 @@
     <code>
         public class MainActivity extends FragmentActivity {
 
-            private static final String USER_NAME = "...";
+            private static Action1&lt;String&gt; getAction(final Context context) {
+                return new Action1&lt;String&gt;() {
 
-            private static Consumer&lt;Repo&gt; addRepoTo(final ArrayAdapter adapter) {
-                return repo -> {
-                    adapter.add(repo);
+                    &commat;Override
+                    public void call(final String s) {
+                        Toast.makeText(context, s, Toast.LENGTH_LONG).show();
+                    }
                 };
             }
 
-            private static Consumer&lt;RoutineException&gt; showToast(final Activity activity) {
-                return error -> {
-                    final Throwable cause = error.getCause();
-                    Toast.makeText(activity, (cause != null) ? cause.getMessage() :
-                            "Cannot load repositories", Toast.LENGTH_LONG).show();
-                };
-            }
+            private static Func1&lt;String, String&gt; getMappingFunction() {
+                return new Func1&lt;String, String&gt;() {
 
-            &commat;Override
-            protected void onCreate(final Bundle savedInstanceState) {
-                super.onCreate(savedInstanceState);
-                setContentView(R.layout.main_layout);
-                final ArrayAdapter adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
-                final ListView repoList = (ListView) findViewById(R.id.repo_list);
-                if (repoList != null) {
-                    repoList.setAdapter(adapter);
-                }
-
-                final LoaderAdapterFactoryCompat adapterFactory =
-                        LoaderAdapterFactoryCompat.on(loaderFrom(this)).buildFactory();
-                final GsonConverterFactory converterFactory = GsonConverterFactory.create();
-                final Retrofit retrofit =
-                        new Builder().baseUrl("https://api.github.com")
-                                     .addCallAdapterFactory(adapterFactory)
-                                     .addConverterFactory(converterFactory)
-                                     .build();
-                final GitHubService service = retrofit.create(GitHubService.class);
-                service.streamRepos(USER_NAME)
-                       .map(Operators.&lt;Repo&gt;unfold())
-                       .close()
-                       .bind(onOutput(addRepoTo(adapter)).andOnError(showToast(this)));
-            }
-
-            public interface GitHubService {
-
-                &commat;GET("users/{user}/repos")
-                StreamBuilder&lt;Object, List&lt;Repo&gt;&gt; streamRepos(&commat;Path("user") String user);
-            }
-
-            public static class Repo {
-
-                public String id;
-
-                public String name;
-
-                &commat;Override
-                public String toString() {
-                    return name;
-                }
-            }
-        }
-    </code>
-</pre>
-<b>Example 3:</b> via Service.
-<p>
-    The lambda notation used in the example is just for demonstration purpose.
-</p>
-<pre>
-    <code>
-        public class MainActivity extends Activity {
-
-            private static final String USER_NAME = "...";
-
-            private static Consumer&lt;Repo&gt; addRepoTo(final ArrayAdapter adapter) {
-                return repo -> {
-                    adapter.add(repo);
-                };
-            }
-
-            private static Consumer&lt;RoutineException&gt; showToast(final Activity activity) {
-                return error -> {
-                    final Throwable cause = error.getCause();
-                    Toast.makeText(activity, (cause != null) ? cause.getMessage() :
-                            "Cannot load repositories", Toast.LENGTH_LONG).show();
+                    &commat;Override
+                    public String call(final String s) {
+                        return s + "!";
+                    }
                 };
             }
 
@@ -242,43 +132,14 @@
             protected void onCreate(final Bundle savedInstanceState) {
                 super.onCreate(savedInstanceState);
                 setContentView(R.layout.main_layout);
-                final ArrayAdapter adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
-                final ListView repoList = (ListView) findViewById(R.id.repo_list);
-                if (repoList != null) {
-                    repoList.setAdapter(adapter);
-                }
-
-                final ServiceAdapterFactory adapterFactory =
-                        ServiceAdapterFactory.on(serviceFrom(this, MyRetrofitService.class)).buildFactory();
-                final GsonConverterFactory converterFactory = GsonConverterFactory.create();
-                final Retrofit retrofit =
-                        new Builder().baseUrl("https://api.github.com")
-                                     .addCallAdapterFactory(adapterFactory)
-                                     .addConverterFactory(converterFactory)
-                                     .build();
-                final GitHubService service = retrofit.create(GitHubService.class);
-                service.streamRepos(USER_NAME)
-                       .map(Operators.&lt;Repo&gt;unfold())
-                       .close()
-                       .bind(onOutput(addRepoTo(adapter)).andOnError(showToast(this)));
-            }
-
-            public interface GitHubService {
-
-                &commat;GET("users/{user}/repos")
-                StreamBuilder&lt;Object, List&lt;Repo&gt;&gt; streamRepos(&commat;Path("user") String user);
-            }
-
-            public static class Repo {
-
-                public String id;
-
-                public String name;
-
-                &commat;Override
-                public String toString() {
-                    return name;
-                }
+                JRoutineRxCompat.withObservable(Observable.just("Hello RxJava"))
+                                .applyLoaderConfiguration()
+                                .withInvocationId(R.id.hello_invocation)
+                                .configured()
+                                .subscribeOn(loaderFrom(this))
+                                .map(getMappingFunction())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(getAction(this));
             }
         }
     </code>

@@ -151,7 +151,7 @@ public abstract class Runner {
    * Stops the runner.
    * <br>
    * The method is meant to signal that the runner is no more needed. In fact, as a consequence of
-   * the call, the runner itself may become unusable.
+   * the call, pending execution might get discarded and the runner itself may become unusable.
    * <br>
    * The specific implementation can leverage the method to eventually free allocated resources.
    */

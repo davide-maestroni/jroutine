@@ -440,6 +440,13 @@ public class InvocationService extends Service {
       invocation.onContext(mContext);
       return (Invocation<Object, Object>) invocation;
     }
+
+    private void stopRunner() {
+      final Runner runner = getConfiguration().getRunnerOrElse(null);
+      if (runner != null) {
+        runner.stop();
+      }
+    }
   }
 
   /**
@@ -577,6 +584,7 @@ public class InvocationService extends Service {
      */
     void clear() {
       mRoutine.clear();
+      mRoutine.stopRunner();
     }
 
     /**

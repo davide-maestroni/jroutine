@@ -133,9 +133,7 @@ public abstract class Runner {
    *
    * @return whether this runner is synchronous.
    */
-  public boolean isSynchronous() {
-    return false;
-  }
+  public abstract boolean isSynchronous();
 
   /**
    * Runs the specified execution (that is, it calls the {@link Execution#run()} method inside the
@@ -144,8 +142,20 @@ public abstract class Runner {
    * @param execution the execution.
    * @param delay     the execution delay.
    * @param timeUnit  the delay time unit.
+   * @throws java.lang.IllegalStateException it the runner is currently unable to fulfill the
+   *                                         execution (for instance, after being stopped).
    */
   public abstract void run(@NotNull Execution execution, long delay, @NotNull TimeUnit timeUnit);
+
+  /**
+   * Stops the runner.
+   * <br>
+   * The method is meant to signal that the runner is no more needed. In fact, as a consequence of
+   * the call, the runner itself may become unusable.
+   * <br>
+   * The specific implementation can leverage the method to eventually free allocated resources.
+   */
+  public abstract void stop();
 
   /**
    * Returns this runner thread manager.

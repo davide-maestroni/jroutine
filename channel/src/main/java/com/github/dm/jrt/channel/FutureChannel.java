@@ -31,7 +31,7 @@ import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DurationMeasure;
-import com.github.dm.jrt.core.util.LocalValue;
+import com.github.dm.jrt.core.util.LocalField;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -70,13 +70,13 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
 
   private final Object mMutex = new Object();
 
-  private final LocalValue<DurationMeasure> mOutputTimeout;
+  private final LocalField<DurationMeasure> mOutputTimeout;
 
-  private final LocalValue<DurationMeasure> mResultDelay;
+  private final LocalField<DurationMeasure> mResultDelay;
 
   private final Runner mRunner;
 
-  private final LocalValue<TimeoutActionType> mTimeoutActionType;
+  private final LocalField<TimeoutActionType> mTimeoutActionType;
 
   private final ThreadLocal<Throwable> mTimeoutException = new ThreadLocal<Throwable>();
 
@@ -95,10 +95,10 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
     mFuture = ConstantConditions.notNull("future instance", future);
     mRunner = configuration.getRunnerOrElse(Runners.sharedRunner());
     mInterruptIfRunning = mayInterruptIfRunning;
-    mResultDelay = new LocalValue<DurationMeasure>(noTime());
+    mResultDelay = new LocalField<DurationMeasure>(noTime());
     mOutputTimeout =
-        new LocalValue<DurationMeasure>(configuration.getOutputTimeoutOrElse(noTime()));
-    mTimeoutActionType = new LocalValue<TimeoutActionType>(
+        new LocalField<DurationMeasure>(configuration.getOutputTimeoutOrElse(noTime()));
+    mTimeoutActionType = new LocalField<TimeoutActionType>(
         configuration.getOutputTimeoutActionOrElse(TimeoutActionType.FAIL));
   }
 

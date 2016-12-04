@@ -25,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @param <T> the value type.
  */
-public class LocalValue<T> extends ThreadLocal<T> {
+public class LocalField<T> extends ThreadLocal<T> {
 
   private final T mInitialValue;
 
@@ -34,7 +34,7 @@ public class LocalValue<T> extends ThreadLocal<T> {
    *
    * @param initialValue the initial value.
    */
-  public LocalValue(@Nullable final T initialValue) {
+  public LocalField(@Nullable final T initialValue) {
     mInitialValue = initialValue;
   }
 

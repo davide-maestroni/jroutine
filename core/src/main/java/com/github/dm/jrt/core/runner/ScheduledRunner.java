@@ -75,6 +75,19 @@ class ScheduledRunner extends AsyncRunner {
     return scheduledRunner;
   }
 
+  /**
+   * Returns a runner instance employing the specified service.
+   * <br>
+   * The returned runner will shut down the service as soon as it is stopped.
+   *
+   * @param service the executor service.
+   * @return the runner.
+   */
+  @NotNull
+  static ScheduledRunner getStoppableInstance(@NotNull final ScheduledExecutorService service) {
+    return new StoppableScheduledRunner(service);
+  }
+
   @Override
   public void cancel(@NotNull final Execution execution) {
     final WeakHashMap<ScheduledFuture<?>, Void> scheduledFutures;
@@ -127,6 +140,30 @@ class ScheduledRunner extends AsyncRunner {
 
     private void setManaged() {
       mIsManaged.set(true);
+    }
+  }
+
+  /**
+   * Implementation of a scheduled runner shutting down the backing service as soon as the runnner
+   * is stopped.
+   */
+  private static class StoppableScheduledRunner extends ScheduledRunner {
+
+    private final ScheduledExecutorService mService;
+
+    /**
+     * Constructor.
+     *
+     * @param service the executor service.
+     */
+    private StoppableScheduledRunner(final ScheduledExecutorService service) {
+      super(service);
+      mService = service;
+    }
+
+    @Override
+    public void stop() {
+      mService.shutdown();
     }
   }
 

@@ -59,4 +59,9 @@ public class RunnerDecorator extends Runner {
       @NotNull final TimeUnit timeUnit) {
     mRunner.run(execution, delay, timeUnit);
   }
+
+  @Override
+  public void stop() {
+    mRunner.stop();
+  }
 }

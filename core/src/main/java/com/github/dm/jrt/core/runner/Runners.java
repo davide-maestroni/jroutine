@@ -70,7 +70,7 @@ public class Runners {
   @NotNull
   public static Runner dynamicPoolRunner(final int corePoolSize, final int maximumPoolSize,
       final long keepAliveTime, @NotNull final TimeUnit keepAliveUnit) {
-    return scheduledRunner(
+    return ScheduledRunner.getStoppableInstance(
         new DynamicScheduledThreadExecutor(corePoolSize, maximumPoolSize, keepAliveTime,
             keepAliveUnit));
   }
@@ -111,7 +111,7 @@ public class Runners {
    */
   @NotNull
   public static Runner poolRunner(final int poolSize) {
-    return scheduledRunner(Executors.newScheduledThreadPool(poolSize));
+    return ScheduledRunner.getStoppableInstance(Executors.newScheduledThreadPool(poolSize));
   }
 
   /**
@@ -177,9 +177,9 @@ public class Runners {
     synchronized (sMutex) {
       if (sSharedRunner == null) {
         final int processors = Runtime.getRuntime().availableProcessors();
-        sSharedRunner =
-            dynamicPoolRunner(Math.max(2, processors >> 1), Math.max(2, (processors << 2) - 1), 10L,
-                TimeUnit.SECONDS);
+        sSharedRunner = ScheduledRunner.getInstance(
+            new DynamicScheduledThreadExecutor(Math.max(2, processors >> 1),
+                Math.max(2, (processors << 2) - 1), 10L, TimeUnit.SECONDS));
       }
 
       return sSharedRunner;

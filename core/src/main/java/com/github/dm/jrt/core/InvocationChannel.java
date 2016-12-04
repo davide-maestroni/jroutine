@@ -37,7 +37,7 @@ import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DurationMeasure;
 import com.github.dm.jrt.core.util.DurationMeasure.Condition;
-import com.github.dm.jrt.core.util.LocalValue;
+import com.github.dm.jrt.core.util.LocalField;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -76,9 +76,9 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
 
   private final Backoff mInputBackoff;
 
-  private final LocalValue<DurationMeasure> mInputDelay;
+  private final LocalField<DurationMeasure> mInputDelay;
 
-  private final LocalValue<OrderType> mInputOrder;
+  private final LocalField<OrderType> mInputOrder;
 
   private final NestedQueue<IN> mInputQueue;
 
@@ -118,10 +118,10 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
     mLogger = logger.subContextLogger(this);
     mRunner = ConstantConditions.notNull("invocation runner", runner);
     mInputOrder =
-        new LocalValue<OrderType>(configuration.getInputOrderTypeOrElse(OrderType.UNSORTED));
+        new LocalField<OrderType>(configuration.getInputOrderTypeOrElse(OrderType.UNSORTED));
     mInputBackoff = configuration.getInputBackoffOrElse(BackoffBuilder.noDelay());
     mMaxInput = configuration.getInputMaxSizeOrElse(Integer.MAX_VALUE);
-    mInputDelay = new LocalValue<DurationMeasure>(noTime());
+    mInputDelay = new LocalField<DurationMeasure>(noTime());
     mInputQueue = new NestedQueue<IN>() {
 
       @Override

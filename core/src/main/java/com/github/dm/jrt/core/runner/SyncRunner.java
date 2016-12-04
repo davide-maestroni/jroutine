@@ -54,4 +54,8 @@ public abstract class SyncRunner extends Runner {
   public boolean isSynchronous() {
     return true;
   }
+
+  @Override
+  public void stop() {
+  }
 }

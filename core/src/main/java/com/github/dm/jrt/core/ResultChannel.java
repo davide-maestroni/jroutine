@@ -39,7 +39,7 @@ import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DurationMeasure;
 import com.github.dm.jrt.core.util.DurationMeasure.Condition;
 import com.github.dm.jrt.core.util.LocalFence;
-import com.github.dm.jrt.core.util.LocalValue;
+import com.github.dm.jrt.core.util.LocalField;
 import com.github.dm.jrt.core.util.SimpleQueue;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 
@@ -101,17 +101,17 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
   private final NestedQueue<Object> mOutputQueue;
 
-  private final LocalValue<DurationMeasure> mOutputTimeout;
+  private final LocalField<DurationMeasure> mOutputTimeout;
 
-  private final LocalValue<DurationMeasure> mResultDelay;
+  private final LocalField<DurationMeasure> mResultDelay;
 
-  private final LocalValue<OrderType> mResultOrder;
+  private final LocalField<OrderType> mResultOrder;
 
   private final Runner mRunner;
 
-  private final LocalValue<TimeoutActionType> mTimeoutActionType;
+  private final LocalField<TimeoutActionType> mTimeoutActionType;
 
-  private final LocalValue<Throwable> mTimeoutException = new LocalValue<Throwable>(null);
+  private final LocalField<Throwable> mTimeoutException = new LocalField<Throwable>(null);
 
   private RoutineException mAbortException;
 
@@ -193,10 +193,10 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     mHandler = ConstantConditions.notNull("abort handler", handler);
     mRunner = runner;
     mFlusher = runner.isSynchronous() ? new SyncFlusher() : new AsyncFlusher();
-    mResultOrder = new LocalValue<OrderType>(orderType);
-    mResultDelay = new LocalValue<DurationMeasure>(noTime());
-    mOutputTimeout = new LocalValue<DurationMeasure>(outputTimeout);
-    mTimeoutActionType = new LocalValue<TimeoutActionType>(timeoutActionType);
+    mResultOrder = new LocalField<OrderType>(orderType);
+    mResultDelay = new LocalField<DurationMeasure>(noTime());
+    mOutputTimeout = new LocalField<DurationMeasure>(outputTimeout);
+    mTimeoutActionType = new LocalField<TimeoutActionType>(timeoutActionType);
     mMaxOutput = maxOutput;
     mOutputQueue = new NestedQueue<Object>() {
 

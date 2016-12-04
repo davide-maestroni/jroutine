@@ -26,6 +26,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.Semaphore;
@@ -233,10 +234,17 @@ public class RunnerTest {
     final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
     final ScheduledRunner instance = ScheduledRunner.getInstance(executorService);
     assertThat(instance).isSameAs(ScheduledRunner.getInstance(executorService));
-    testRunner(instance);
-    testRunner(Runners.scheduledRunner(Executors.newCachedThreadPool()));
-    testRunner(Runners.scheduledRunner(executorService));
-    testRunner(new RunnerDecorator(instance));
+    final ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
+    try {
+      testRunner(instance);
+      testRunner(Runners.scheduledRunner(cachedThreadPool));
+      testRunner(Runners.scheduledRunner(executorService));
+      testRunner(new RunnerDecorator(instance));
+
+    } finally {
+      cachedThreadPool.shutdown();
+      executorService.shutdown();
+    }
   }
 
   @Test
@@ -457,89 +465,93 @@ public class RunnerTest {
   }
 
   private void testRunner(final Runner runner) throws InterruptedException {
+    try {
+      final Random random = new Random(System.currentTimeMillis());
+      final ArrayList<TestRunExecution> executions = new ArrayList<TestRunExecution>();
 
-    final Random random = new Random(System.currentTimeMillis());
-    final ArrayList<TestRunExecution> executions = new ArrayList<TestRunExecution>();
+      for (int i = 0; i < 13; i++) {
 
-    for (int i = 0; i < 13; i++) {
+        final DurationMeasure delay;
+        final int unit = random.nextInt(4);
 
-      final DurationMeasure delay;
-      final int unit = random.nextInt(4);
+        switch (unit) {
 
-      switch (unit) {
+          case 0:
+            delay = millis((long) Math.floor(random.nextFloat() * 500));
+            break;
 
-        case 0:
-          delay = millis((long) Math.floor(random.nextFloat() * 500));
-          break;
+          case 1:
+            delay = micros((long) Math.floor(random.nextFloat() * millis(500).toMicros()));
+            break;
 
-        case 1:
-          delay = micros((long) Math.floor(random.nextFloat() * millis(500).toMicros()));
-          break;
+          case 2:
+            delay = nanos((long) Math.floor(random.nextFloat() * millis(500).toNanos()));
+            break;
 
-        case 2:
-          delay = nanos((long) Math.floor(random.nextFloat() * millis(500).toNanos()));
-          break;
+          default:
+            delay = noTime();
+            break;
+        }
 
-        default:
-          delay = noTime();
-          break;
+        final TestRunExecution execution = new TestRunExecution(delay);
+        executions.add(execution);
+
+        runner.run(execution, delay.value, delay.unit);
       }
 
-      final TestRunExecution execution = new TestRunExecution(delay);
-      executions.add(execution);
+      for (final TestRunExecution execution : executions) {
 
-      runner.run(execution, delay.value, delay.unit);
-    }
-
-    for (final TestRunExecution execution : executions) {
-
-      execution.await();
-      assertThat(execution.isPassed()).isTrue();
-    }
-
-    executions.clear();
-
-    final ArrayList<DurationMeasure> delays = new ArrayList<DurationMeasure>();
-
-    for (int i = 0; i < 13; i++) {
-
-      final DurationMeasure delay;
-      final int unit = random.nextInt(4);
-
-      switch (unit) {
-
-        case 0:
-          delay = millis((long) Math.floor(random.nextFloat() * 500));
-          break;
-
-        case 1:
-          delay = micros((long) Math.floor(random.nextFloat() * millis(500).toMicros()));
-          break;
-
-        case 2:
-          delay = nanos((long) Math.floor(random.nextFloat() * millis(500).toNanos()));
-          break;
-
-        default:
-          delay = noTime();
-          break;
+        execution.await();
+        assertThat(execution.isPassed()).isTrue();
       }
 
-      delays.add(delay);
+      executions.clear();
 
-      final TestRunExecution execution = new TestRunExecution(delay);
-      executions.add(execution);
-    }
+      final ArrayList<DurationMeasure> delays = new ArrayList<DurationMeasure>();
 
-    final TestRecursiveExecution recursiveExecution =
-        new TestRecursiveExecution(runner, executions, delays, noTime());
+      for (int i = 0; i < 13; i++) {
 
-    runner.run(recursiveExecution, 0, TimeUnit.MILLISECONDS);
+        final DurationMeasure delay;
+        final int unit = random.nextInt(4);
 
-    for (final TestRunExecution execution : executions) {
+        switch (unit) {
 
-      execution.await();
-      assertThat(execution.isPassed()).isTrue();
+          case 0:
+            delay = millis((long) Math.floor(random.nextFloat() * 500));
+            break;
+
+          case 1:
+            delay = micros((long) Math.floor(random.nextFloat() * millis(500).toMicros()));
+            break;
+
+          case 2:
+            delay = nanos((long) Math.floor(random.nextFloat() * millis(500).toNanos()));
+            break;
+
+          default:
+            delay = noTime();
+            break;
+        }
+
+        delays.add(delay);
+
+        final TestRunExecution execution = new TestRunExecution(delay);
+        executions.add(execution);
+      }
+
+      final TestRecursiveExecution recursiveExecution =
+          new TestRecursiveExecution(runner, executions, delays, noTime());
+
+      runner.run(recursiveExecution, 0, TimeUnit.MILLISECONDS);
+
+      for (final TestRunExecution execution : executions) {
+
+        execution.await();
+        assertThat(execution.isPassed()).isTrue();
+      }
+
+    } finally {
+      runner.stop();
     }
   }
 

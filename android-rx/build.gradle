@@ -86,9 +86,10 @@ findbugs {
   toolVersion project.getProperty('findbugsVersion')
 }
 
-tasks.withType(Javadoc) { // TODO: rxjava docs
+tasks.withType(Javadoc) {
   def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/6'
   options.overview("${project.projectDir}/docs/overview.html")
-  options.links("${prefix}/android-core/",
+  options.links('http://reactivex.io/RxJava/javadoc/',
+      "${prefix}/android-core/",
       "${prefix}/core/")
 }

@@ -57,7 +57,7 @@ import static com.github.dm.jrt.android.core.runner.AndroidRunners.mainRunner;
 import static com.github.dm.jrt.core.util.DurationMeasure.infinity;
 
 /**
- * Invocation implementation employing loaders to perform background operations.
+ * Invocation implementation employing Loaders to perform background operations.
  * <p>
  * Created by davide-maestroni on 12/11/2014.
  *
@@ -140,7 +140,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
   }
 
   /**
-   * Destroys all the loaders with the specified invocation factory.
+   * Destroys all the Loaders with the specified invocation factory.
    *
    * @param context  the context instance.
    * @param loaderId the Loader ID.
@@ -153,7 +153,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
   }
 
   /**
-   * Destroys all the loaders with the specified invocation factory and inputs.
+   * Destroys all the Loaders with the specified invocation factory and inputs.
    *
    * @param context  the context instance.
    * @param loaderId the Loader ID.
@@ -547,7 +547,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
   }
 
   /**
-   * Execution implementation purging all loaders with a specific invocation factory.
+   * Execution implementation purging all Loaders with a specific invocation factory.
    */
   private static class ClearFactoryExecution implements Execution {
 

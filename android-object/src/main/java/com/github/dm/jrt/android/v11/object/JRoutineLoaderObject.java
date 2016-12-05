@@ -33,7 +33,7 @@ import org.jetbrains.annotations.NotNull;
  * deadlock.
  * <br>
  * Note that the configuration of the maximum number of concurrent invocations might not work as
- * expected. In fact, the number of running loaders cannot be computed.
+ * expected. In fact, the number of running Loaders cannot be computed.
  * <br>
  * Note also that the input data will be cached, and the results will be produced only after the
  * invocation channel is closed, so be sure to avoid streaming inputs in order to prevent starvation
@@ -50,7 +50,7 @@ import org.jetbrains.annotations.NotNull;
  * The routine invocations will be identified by an ID number. In case a clash is detected, that is,
  * an already running Loader with the same ID exists at the time the new invocation is executed,
  * the clash is resolved based on the strategy specified through the builder. When a clash cannot be
- * resolved, for example when loaders with different implementations share the same ID, the new
+ * resolved, for example when Loaders with different implementations share the same ID, the new
  * invocation is aborted with a
  * {@link com.github.dm.jrt.android.core.invocation.TypeClashException TypeClashException}.
  * <p>

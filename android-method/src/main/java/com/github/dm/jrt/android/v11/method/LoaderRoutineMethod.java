@@ -67,7 +67,7 @@ import static com.github.dm.jrt.core.util.Reflection.cloneArgs;
 import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
 
 /**
- * This class provides an easy way to implement a routine running in dedicated Android loaders,
+ * This class provides an easy way to implement a routine running in dedicated Android Loaders,
  * which can be combined in complex ways with other ones.
  * <h2>How to implement a routine</h2>
  * The class behaves like a {@link RoutineMethod} with a few differences. In order to avoid

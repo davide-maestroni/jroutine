@@ -34,7 +34,7 @@ import org.jetbrains.annotations.NotNull;
  * the routine invocation, may result in a deadlock.
  * <br>
  * Note that the configuration of the maximum number of concurrent invocations might not work as
- * expected, since the number of running loaders cannot be computed.
+ * expected, since the number of running Loaders cannot be computed.
  * <br>
  * Note also that the input data will be cached, so be sure to avoid streaming inputs in order to
  * prevent out of memory errors.

@@ -38,7 +38,7 @@ import static com.github.dm.jrt.android.v11.core.LoaderInvocation.clearLoaders;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
- * Routine implementation delegating to Android loaders the asynchronous processing.
+ * Routine implementation delegating to Android Loaders the asynchronous processing.
  * <p>
  * Created by davide-maestroni on 01/10/2015.
  *

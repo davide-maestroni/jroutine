@@ -15,8 +15,8 @@
  */
 
 /**
- * Retrofit adapters and utility classes employing Android Loaders to execute Retrofit calls.
+ * RxJava utility classes with support for the Android compatibility library.
  * <p>
- * Created by davide-maestroni on 05/19/2016.
+ * Created by davide-maestroni on 12/05/2016.
  */
-package com.github.dm.jrt.android.v11.retrofit;
+package com.github.dm.jrt.android.v4.rx;

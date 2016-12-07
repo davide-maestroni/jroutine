@@ -76,7 +76,6 @@ dependencies {
 }
 
 conditionalDependencies {
-  compile name: 'android-channel', version: '6.1.0'
   compile name: 'android-core', version: '6.1.0'
   compile name: 'android-object', version: '6.1.0'
   compile name: 'android-stream', version: '6.1.0'

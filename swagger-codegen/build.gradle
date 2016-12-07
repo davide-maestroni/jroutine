@@ -1,0 +1,52 @@
+/*
+ * Copyright 2016 Davide Maestroni
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+apply plugin: 'java'
+apply plugin: 'findbugs'
+apply plugin: 'com.github.ben-manes.versions'
+apply from: '../extra.gradle'
+
+group = project.getProperty('groupName')
+version = project.getProperty('releaseVersion')
+archivesBaseName = "${project.parent.name}-${project.name}"
+compileJavaCompatibility = JavaVersion.VERSION_1_5
+compileTestJavaCompatibility = JavaVersion.VERSION_1_7
+
+repositories {
+  maven {
+    url 'https://oss.sonatype.org/content/repositories/snapshots'
+  }
+}
+
+dependencies {
+  compile 'com.intellij:annotations:12.0'
+  compile 'io.swagger:swagger-codegen-cli:2.2.2-SNAPSHOT'
+  testCompile project(':retrofit')
+  testCompile 'com.squareup.okhttp3:mockwebserver:3.4.1'
+  testCompile 'com.squareup.retrofit2:converter-gson:2.1.0'
+  testCompile 'com.squareup.retrofit2:retrofit:2.1.0'
+  testCompile 'junit:junit:4.12'
+  testCompile 'org.assertj:assertj-core:2.4.1'
+}
+
+findbugs {
+  toolVersion project.getProperty('findbugsVersion')
+}
+
+javadoc {
+  options.overview("${project.projectDir}/docs/overview.html")
+  options.links('https://square.github.io/retrofit/2.x/retrofit/') // TODO: Swagger codegen
+}

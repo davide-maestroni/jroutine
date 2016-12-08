@@ -53,6 +53,7 @@ public class {{projectPrefix}}ApiClient {
     private Map<String, Interceptor> apiAuthorizations;
     private OkHttpClient.Builder okBuilder = new OkHttpClient.Builder();
     private Retrofit.Builder adapterBuilder;
+    private String baseUrl = "{{{baseUrl}}}";
 
     public {{projectPrefix}}ApiClient() {
         apiAuthorizations = new LinkedHashMap<String, Interceptor>();
@@ -125,15 +126,7 @@ public class {{projectPrefix}}ApiClient {
         return withAdapter(RoutineAdapterFactory.buildFactory());
     }
 
-    public {{projectPrefix}}ApiClient withDefaultAdapter(String baseUrl) {
-        return withAdapter(baseUrl, RoutineAdapterFactory.buildFactory());
-    }
-
     public {{projectPrefix}}ApiClient withAdapter(CallAdapter.Factory factory) {
-        return withAdapter("{{{baseUrl}}}", factory);
-    }
-
-    public {{projectPrefix}}ApiClient withAdapter(String baseUrl, CallAdapter.Factory factory) {
         Gson gson = new GsonBuilder()
                 .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
                 {{^java8}}
@@ -145,6 +138,7 @@ public class {{projectPrefix}}ApiClient {
                 .registerTypeAdapter(LocalDate.class, new LocalDateTypeAdapter())
                 .create();
 
+        String baseUrl = this.baseUrl;
         if(!baseUrl.endsWith("/"))
         	baseUrl = baseUrl + "/";
 
@@ -240,6 +234,11 @@ public class {{projectPrefix}}ApiClient {
         }
     }
 
+    /**
+     * Helper method to pre-set the oauth access token of the first oauth found in the apiAuthorizations (there should be only one)
+     * @param accessToken Access token
+     * @return this client
+     */
     public {{projectPrefix}}ApiClient withAccessToken(String accessToken) {
         setAccessToken(accessToken);
         return this;
@@ -267,6 +266,13 @@ public class {{projectPrefix}}ApiClient {
         }
     }
 
+    /**
+     * Helper method to configure the oauth accessCode/implicit flow parameters
+     * @param clientId Client ID
+     * @param clientSecret Client secret
+     * @param redirectURI Redirect URI
+     * @return this client
+     */
     public {{projectPrefix}}ApiClient withAuthorizationFlow(String clientId, String clientSecret, String redirectURI) {
         configureAuthorizationFlow(clientId, clientSecret, redirectURI);
         return this;
@@ -286,6 +292,11 @@ public class {{projectPrefix}}ApiClient {
         }
     }
 
+    /**
+     * Configures a listener which is notified when a new access token is received.
+     * @param accessTokenListener Access token listener
+     * @return this client
+     */
     public {{projectPrefix}}ApiClient withAccessTokenListener(AccessTokenListener accessTokenListener) {
         registerAccessTokenListener(accessTokenListener);
         return this;
@@ -302,6 +313,19 @@ public class {{projectPrefix}}ApiClient {
         }
         apiAuthorizations.put(authName, authorization);
         okBuilder.addInterceptor(authorization);
+    }
+
+    public String getBaseUrl() {
+        return baseUrl;
+    }
+
+    public void setBaseUrl(String baseUrl) {
+        this.baseUrl = baseUrl;
+    }
+
+    public {{projectPrefix}}ApiClient withBaseUrl(String baseUrl) {
+        this.baseUrl = baseUrl;
+        return this;
     }
 
     public Map<String, Interceptor> getApiAuthorizations() {
@@ -349,6 +373,11 @@ public class {{projectPrefix}}ApiClient {
         addAuthsToOkBuilder(this.okBuilder);
     }
 
+    /**
+     * Clones the okBuilder given in parameter, adds the auth interceptors and uses it to configure the Retrofit
+     * @param okClient An instance of OK HTTP client
+     * @return this client
+     */
     public {{projectPrefix}}ApiClient withOkClient(OkHttpClient okClient) {
         configureFromOkClient(okClient);
         return this;

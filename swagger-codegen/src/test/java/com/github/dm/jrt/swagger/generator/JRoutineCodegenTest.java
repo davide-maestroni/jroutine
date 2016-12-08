@@ -69,7 +69,8 @@ public class JRoutineCodegenTest {
                                  .configured()
                                  .buildFactory();
         final UsersApi service =
-            new UsersApiClient().withAdapter("http://localhost:" + server.getPort(), adapterFactory)
+            new UsersApiClient().withBaseUrl("http://localhost:" + server.getPort())
+                                .withAdapter(adapterFactory)
                                 .createService(UsersApi.class);
         final Repos repos = service.getRepos("octocat", null, null, null).next();
         assertThat(repos).hasSize(3);
@@ -94,7 +95,8 @@ public class JRoutineCodegenTest {
                                  .configured()
                                  .buildFactory();
         final UsersApi service =
-            new UsersApiClient().withAdapter("http://localhost:" + server.getPort(), adapterFactory)
+            new UsersApiClient().withBaseUrl("http://localhost:" + server.getPort())
+                                .withAdapter(adapterFactory)
                                 .createService(UsersApi.class);
         final Repos repos = service.getRepos("octocat", null, null, null).next();
         assertThat(repos).hasSize(3);
@@ -119,7 +121,8 @@ public class JRoutineCodegenTest {
                                  .configured()
                                  .buildFactory();
         final UsersApi service =
-            new UsersApiClient().withAdapter("http://localhost:" + server.getPort(), adapterFactory)
+            new UsersApiClient().withBaseUrl("http://localhost:" + server.getPort())
+                                .withAdapter(adapterFactory)
                                 .createService(UsersApi.class);
         final Repos repos = service.getRepos("octocat", null, null, null).next();
         assertThat(repos).hasSize(3);
@@ -150,7 +153,8 @@ public class JRoutineCodegenTest {
       {
         final RoutineAdapterFactory adapterFactory = RoutineAdapterFactory.buildFactory();
         final UsersApi service =
-            new UsersApiClient().withAdapter("http://localhost:" + server.getPort(), adapterFactory)
+            new UsersApiClient().withBaseUrl("http://localhost:" + server.getPort())
+                                .withAdapter(adapterFactory)
                                 .createService(UsersApi.class);
         assertThat(service.getReposBuilder("octocat", null, null, null)
                           .map(Operators.<Repo>unfold())
@@ -174,7 +178,8 @@ public class JRoutineCodegenTest {
         final RoutineAdapterFactory adapterFactory =
             RoutineAdapterFactory.builder().delegateFactory(factory).buildFactory();
         final UsersApi service =
-            new UsersApiClient().withAdapter("http://localhost:" + server.getPort(), adapterFactory)
+            new UsersApiClient().withBaseUrl("http://localhost:" + server.getPort())
+                                .withAdapter(adapterFactory)
                                 .createService(UsersApi.class);
         assertThat(service.getReposBuilder("octocat", null, null, null)
                           .map(Operators.<Repo>unfold())
@@ -198,7 +203,8 @@ public class JRoutineCodegenTest {
         final RoutineAdapterFactory adapterFactory =
             RoutineAdapterFactory.builder().delegateFactory(factory).buildFactory();
         final UsersApi service =
-            new UsersApiClient().withAdapter("http://localhost:" + server.getPort(), adapterFactory)
+            new UsersApiClient().withBaseUrl("http://localhost:" + server.getPort())
+                                .withAdapter(adapterFactory)
                                 .createService(UsersApi.class);
         assertThat(service.getReposBuilder("octocat", null, null, null)
                           .map(Operators.<Repo>unfold())

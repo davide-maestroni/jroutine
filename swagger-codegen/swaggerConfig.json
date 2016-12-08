@@ -1,0 +1,5 @@
+{
+  "invokerPackage": "com.github.dm.jrt.swagger.client",
+  "modelPackage": "com.github.dm.jrt.swagger.client.model",
+  "apiPackage": "com.github.dm.jrt.swagger.client.api"
+}

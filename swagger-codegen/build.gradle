@@ -17,6 +17,7 @@
 apply plugin: 'java'
 apply plugin: 'findbugs'
 apply plugin: 'com.github.ben-manes.versions'
+apply plugin: 'org.hidetake.swagger.generator'
 apply from: '../extra.gradle'
 
 group = project.getProperty('groupName')
@@ -34,11 +35,15 @@ repositories {
 dependencies {
   compile 'com.intellij:annotations:12.0'
   compile 'io.swagger:swagger-codegen-cli:2.2.2-SNAPSHOT'
+  swaggerCodegen project
+  testCompile project(':operator')
   testCompile project(':retrofit')
   testCompile 'com.squareup.okhttp3:mockwebserver:3.4.1'
   testCompile 'com.squareup.retrofit2:converter-gson:2.1.0'
+  testCompile 'com.squareup.retrofit2:converter-scalars:2.1.0'
   testCompile 'com.squareup.retrofit2:retrofit:2.1.0'
   testCompile 'junit:junit:4.12'
+  testCompile 'org.apache.oltu.oauth2:org.apache.oltu.oauth2.client:1.0.2'
   testCompile 'org.assertj:assertj-core:2.4.1'
 }
 
@@ -50,3 +55,18 @@ javadoc {
   options.overview("${project.projectDir}/docs/overview.html")
   options.links('https://square.github.io/retrofit/2.x/retrofit/') // TODO: Swagger codegen
 }
+
+generateSwaggerCode {
+  dependsOn 'jar'
+  inputFile = file('src/test/resources/swagger.yaml')
+  outputDir = file("$buildDir/swagger")
+  language = 'jroutine'
+  configFile = file('swaggerConfig.json')
+}
+
+task copySwaggerCode(type: Copy, dependsOn: 'generateSwaggerCode') {
+  from "$buildDir/swagger/src/main/java"
+  into 'src/test/java'
+}
+
+compileTestJava.dependsOn copySwaggerCode

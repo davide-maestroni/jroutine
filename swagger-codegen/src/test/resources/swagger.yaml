@@ -1,0 +1,78 @@
+swagger: '2.0'
+info:
+  title: GitHub test API
+  description: GitHub user API for testing
+  version: '0.0.1'
+host: api.github.com
+schemes:
+  - https
+basePath: /users
+paths:
+  /{user}/repos:
+    get:
+      operationId: getRepos
+      summary: Gets the user public repositories.
+      description: |
+        The endpoint returns a collection of public repositories owned by the specified user.
+      produces:
+        - application/json
+      parameters:
+        - name: user
+          in: path
+          description: The user name.
+          type: string
+        - name: type
+          in: query
+          description: The type of ownership.
+          enum: [all, owner, member]
+          default: owner
+        - name: sort
+          in: query
+          description: The type of sorting.
+          enum: [created, updated, pushed, full_name]
+          default: full_name
+        - name: direction
+          in: query
+          description: The direction of sorting. When using full_name default to asc, otherwise desc.
+          enum: [asc, desc]
+          default: desc
+      tags:
+        - Repos
+      responses:
+        200:
+          description: A list of repositories.
+          schema:
+            $ref: '#/definitions/Repos'
+definitions:
+  Repos:
+    description: Collection of repositories.
+    type: array
+    items:
+      $ref: '#/definitions/Repo'
+  Repo:
+    description: Repository object
+    type: object
+    properties:
+      id:
+        description: The repository ID.
+        type: number
+        example: 1296269
+      name:
+        description: The repository name.
+        type: string
+        example: Hello-World
+      full_name:
+        description: The repository full name.
+        type: string
+        example: octocat/Hello-World
+      description:
+        description: The repository description.
+        type: string
+        example: This your first repo!
+      private:
+        description: If the repository is private.
+        type: boolean
+        default: false
+        example: false
+
+

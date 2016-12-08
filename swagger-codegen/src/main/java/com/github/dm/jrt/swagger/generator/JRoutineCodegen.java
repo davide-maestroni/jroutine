@@ -114,6 +114,10 @@ public class JRoutineCodegen extends JavaClientCodegen {
         supportingFile.templateFile = "jroutine_ApiClient.mustache";
         supportingFile.destinationFilename = projectPrefix + "ApiClient.java";
       }
+
+      if ("auth/OAuthOkHttpClient.mustache".equals(supportingFile.templateFile)) {
+        supportingFile.templateFile = "auth/jroutine_OAuthOkHttpClient.mustache";
+      }
     }
   }
 

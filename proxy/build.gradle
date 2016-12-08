@@ -30,6 +30,7 @@ dependencies {
   testCompile 'junit:junit:4.12'
   testCompile 'org.assertj:assertj-core:2.4.1'
 }
+
 conditionalDependencies {
   compile name: 'core', version: '6.1.0'
   compile name: 'object', version: '6.1.0'

@@ -47,6 +47,14 @@ dependencies {
   testCompile 'org.assertj:assertj-core:2.4.1'
 }
 
+ext {
+  generatedSourceDir = 'src/test/java/com/github/dm/jrt/swagger/client'
+}
+
+clean {
+  delete generatedSourceDir
+}
+
 findbugs {
   toolVersion project.getProperty('findbugsVersion')
 }
@@ -64,6 +72,9 @@ generateSwaggerCode {
 }
 
 task copySwaggerCode(type: Copy, dependsOn: 'generateSwaggerCode') {
+  doFirst {
+    project.delete(generatedSourceDir)
+  }
   from "$buildDir/swagger/src/main/java"
   into 'src/test/java'
 }

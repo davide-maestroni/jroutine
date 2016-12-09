@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import io.swagger.codegen.CliOption;
 import io.swagger.codegen.CodegenOperation;
 import io.swagger.codegen.SupportingFile;
 import io.swagger.codegen.languages.JavaClientCodegen;
@@ -40,13 +41,88 @@ public class JRoutineCodegen extends JavaClientCodegen {
 
   private static final String BASE_URL = "baseUrl";
 
+  private static final String ENABLE_LOADERS = "enableLoaders";
+
+  private static final String PROJECT_NAME = "projectName";
+
   private static final String PROJECT_PREFIX = "projectPrefix";
+
+  private static final String USE_SUPPORT_LIBRARY = "useSupportLibrary";
 
   /**
    * Constructor.
    */
   public JRoutineCodegen() {
+    cliOptions.add(CliOption.newString(PROJECT_NAME,
+        "The name of the project to prepend to the API classes."));
+    cliOptions.add(CliOption.newBoolean(ENABLE_LOADERS,
+        "Whether to enable requests made through Android Loaders."));
+    cliOptions.add(CliOption.newBoolean(USE_SUPPORT_LIBRARY,
+        "Whether to use the Android Support Library to generate the source code."));
     setLibrary(RETROFIT_2);
+  }
+
+  @Override
+  public String getName() {
+    return "jroutine";
+  }
+
+  @Override
+  public void processOpts() {
+    super.processOpts();
+    final Map<String, String> apiTemplateFiles = this.apiTemplateFiles;
+    apiTemplateFiles.remove("api.mustache");
+    apiTemplateFiles.put("jroutine_api.mustache", ".java");
+    final Map<String, String> modelTemplateFiles = this.modelTemplateFiles;
+    modelTemplateFiles.remove("model.mustache");
+    modelTemplateFiles.put("jroutine_model.mustache", ".java");
+  }
+
+  @Override
+  public void preprocessSwagger(final Swagger swagger) {
+    super.preprocessSwagger(swagger);
+    final Map<String, Object> additionalProperties = this.additionalProperties;
+    final Object projectName = additionalProperties.get(PROJECT_NAME);
+    final String projectPrefix;
+    if (projectName != null) {
+      projectPrefix = camelize(projectName.toString());
+
+    } else {
+      projectPrefix = buildProjectPrefix(swagger);
+    }
+
+    additionalProperties.put(PROJECT_PREFIX, projectPrefix);
+    additionalProperties.put(BASE_URL, buildBaseUrl(swagger));
+    for (final SupportingFile supportingFile : supportingFiles) {
+      if ("ApiClient.mustache".equals(supportingFile.templateFile)) {
+        supportingFile.templateFile = "jroutine_ApiClient.mustache";
+        if (useAndroidSupportLibrary()) {
+          supportingFile.destinationFilename = projectPrefix + "ApiClientCompat.java";
+
+        } else {
+          supportingFile.destinationFilename = projectPrefix + "ApiClient.java";
+        }
+      }
+
+      if ("auth/OAuthOkHttpClient.mustache".equals(supportingFile.templateFile)) {
+        supportingFile.templateFile = "auth/jroutine_OAuthOkHttpClient.mustache";
+      }
+    }
+  }
+
+  @Override
+  public CodegenOperation fromOperation(final String path, final String httpMethod,
+      final Operation operation, final Map<String, Model> definitions, final Swagger swagger) {
+    final CodegenOperation codegenOperation =
+        super.fromOperation(path, httpMethod, operation, definitions, swagger);
+    codegenOperation.path = swagger.getBasePath() + codegenOperation.path;
+    return codegenOperation;
+  }
+
+  @Override
+  public String toApiName(final String name) {
+    final String apiName = super.toApiName(name);
+    return useAndroidSupportLibrary() ? apiName + "Compat" : apiName;
   }
 
   @Override
@@ -86,50 +162,6 @@ public class JRoutineCodegen extends JavaClientCodegen {
     co.baseName = basePath;
   }
 
-  @Override
-  public String getName() {
-    return "jroutine";
-  }
-
-  @Override
-  public void processOpts() {
-    super.processOpts();
-    final Map<String, String> apiTemplateFiles = this.apiTemplateFiles;
-    apiTemplateFiles.remove("api.mustache");
-    apiTemplateFiles.put("jroutine_api.mustache", ".java");
-    final Map<String, String> modelTemplateFiles = this.modelTemplateFiles;
-    modelTemplateFiles.remove("model.mustache");
-    modelTemplateFiles.put("jroutine_model.mustache", ".java");
-  }
-
-  @Override
-  public void preprocessSwagger(final Swagger swagger) {
-    super.preprocessSwagger(swagger);
-    final String projectPrefix = buildProjectPrefix(swagger);
-    final Map<String, Object> additionalProperties = this.additionalProperties;
-    additionalProperties.put(PROJECT_PREFIX, projectPrefix);
-    additionalProperties.put(BASE_URL, buildBaseUrl(swagger));
-    for (final SupportingFile supportingFile : supportingFiles) {
-      if ("ApiClient.mustache".equals(supportingFile.templateFile)) {
-        supportingFile.templateFile = "jroutine_ApiClient.mustache";
-        supportingFile.destinationFilename = projectPrefix + "ApiClient.java";
-      }
-
-      if ("auth/OAuthOkHttpClient.mustache".equals(supportingFile.templateFile)) {
-        supportingFile.templateFile = "auth/jroutine_OAuthOkHttpClient.mustache";
-      }
-    }
-  }
-
-  @Override
-  public CodegenOperation fromOperation(final String path, final String httpMethod,
-      final Operation operation, final Map<String, Model> definitions, final Swagger swagger) {
-    final CodegenOperation codegenOperation =
-        super.fromOperation(path, httpMethod, operation, definitions, swagger);
-    codegenOperation.path = swagger.getBasePath() + codegenOperation.path;
-    return codegenOperation;
-  }
-
   @NotNull
   private String buildBaseUrl(final Swagger swagger) {
     final String scheme;
@@ -159,5 +191,11 @@ public class JRoutineCodegen extends JavaClientCodegen {
     }
 
     return builder.toString();
+  }
+
+  private boolean useAndroidSupportLibrary() {
+    final Map<String, Object> additionalProperties = this.additionalProperties;
+    return additionalProperties.containsKey(ENABLE_LOADERS) && additionalProperties.containsKey(
+        USE_SUPPORT_LIBRARY);
   }
 }

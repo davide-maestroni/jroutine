@@ -158,7 +158,7 @@ public class JRoutineCodegenTest {
                                 .createService(UsersApi.class);
         assertThat(service.getReposBuilder("octocat", null, null, null)
                           .map(Operators.<Repo>unfold())
-                          .call()
+                          .close()
                           .bind(onOutput(new Consumer<Repo>() {
 
                             public void accept(final Repo repo) throws Exception {
@@ -168,7 +168,6 @@ public class JRoutineCodegenTest {
                               assertThat(repo.getPrivate()).isEqualTo(id == 3);
                             }
                           }))
-                          .close()
                           .inMax(seconds(3))
                           .getError()).isNull();
       }
@@ -183,7 +182,7 @@ public class JRoutineCodegenTest {
                                 .createService(UsersApi.class);
         assertThat(service.getReposBuilder("octocat", null, null, null)
                           .map(Operators.<Repo>unfold())
-                          .call()
+                          .close()
                           .bind(onOutput(new Consumer<Repo>() {
 
                             public void accept(final Repo repo) throws Exception {
@@ -193,7 +192,6 @@ public class JRoutineCodegenTest {
                               assertThat(repo.getPrivate()).isEqualTo(id == 3);
                             }
                           }))
-                          .close()
                           .inMax(seconds(3))
                           .getError()).isNull();
       }
@@ -208,7 +206,7 @@ public class JRoutineCodegenTest {
                                 .createService(UsersApi.class);
         assertThat(service.getReposBuilder("octocat", null, null, null)
                           .map(Operators.<Repo>unfold())
-                          .call()
+                          .close()
                           .bind(onOutput(new Consumer<Repo>() {
 
                             public void accept(final Repo repo) throws Exception {
@@ -218,7 +216,6 @@ public class JRoutineCodegenTest {
                               assertThat(repo.getPrivate()).isEqualTo(id == 3);
                             }
                           }))
-                          .close()
                           .inMax(seconds(3))
                           .getError()).isNull();
       }

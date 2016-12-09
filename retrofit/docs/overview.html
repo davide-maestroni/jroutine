@@ -87,7 +87,7 @@
                        .map(Operators.&lt;Repo&gt;unfold())
                        .close()
                        .bind(onOutput(System.out::println))
-                       .after(seconds(3))
+                       .inMax(seconds(3))
                        .getComplete();
                 System.exit(0);
             }

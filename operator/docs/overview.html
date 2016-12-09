@@ -83,7 +83,7 @@
                                                .close()
                                                .bind(sqrtRoutine.call())
                                                .close()
-                                               .after(seconds(3))
+                                               .inMax(seconds(3))
                                                .next();
                 System.out.println(rms);
                 System.exit(0);

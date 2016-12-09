@@ -105,7 +105,7 @@
                         })).buildRoutine();
                 final Double rms =
                         meanRoutine.call(squareRoutine.callParallel(parseRoutine.callParallel(args)))
-                                   .after(seconds(3))
+                                   .inMax(seconds(3))
                                    .next();
                 System.out.println(rms);
                 System.exit(0);

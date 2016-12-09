@@ -56,8 +56,8 @@ What the library has to offer is:
 * ***Nice handling of Android configuration changes***: the same paradigm is applied to the Android platform so to support background tasks surviving changes in the configuration of Activities or Fragments.
 * ***Seamlessly run in a remote Service***: invocations can be easily configured to run in a dedicated Android Service.
 * ***Fine dependency granularity***: import only the features you need.
-* ***Retrofit integration***: additional modules provides out-of-the-box integration with the [Retrofit][retrofit] library.
-* ***RxJava integration***: an additional module provides utility classes enabling an [RxJava][rxjava] Observable code to run into dedicated Android Loaders.
+* ***Retrofit integration***: additional modules provide out-of-the-box integration with the [Retrofit][retrofit] library.
+* ***RxJava integration***: additional module provide utility classes enabling [RxJava][rxjava] integration, like making an Observable code run into dedicated Android Loaders.
 * ***Swagger integration***: an additional module provides a generator enabling creation of client classes from a Swagger specification file.
 
 And more:
@@ -151,6 +151,7 @@ Complete Javadoc with insights and examples is available for each module:
 
 * [jroutine-lib][javadoc lib]
 * [jroutine-retrofit][javadoc retrofit]
+* [jroutine-rx][javadoc rx]
 * [jroutine-swagger-codegen][javadoc swagger codegen]
 * [jroutine-android][javadoc android]
 * [jroutine-android-retrofit][javadoc android retrofit]
@@ -259,6 +260,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
 [android sample]:https://github.com/davide-maestroni/jroutine/tree/master/android-sample
 [javadoc lib]:http://davide-maestroni.github.io/jroutine/javadoc/6/lib
 [javadoc retrofit]:http://davide-maestroni.github.io/jroutine/javadoc/6/retrofit
+[javadoc rx]:http://davide-maestroni.github.io/jroutine/javadoc/6/rx
 [javadoc swagger codegen]:http://davide-maestroni.github.io/jroutine/javadoc/6/swagger-codegen
 [javadoc android]:http://davide-maestroni.github.io/jroutine/javadoc/6/android
 [javadoc android retrofit]:http://davide-maestroni.github.io/jroutine/javadoc/6/android-retrofit

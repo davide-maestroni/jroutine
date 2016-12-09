@@ -121,6 +121,16 @@ plugins {
 
 ...
 
+dependencies {
+  ...
+  compile 'com.github.davide-maestroni:jroutine-retrofit:X.X.X'
+  ...
+  swaggerCodegen 'com.github.davide-maestroni:jroutine-swagger-codegen:X.X.X'
+  ...
+}
+
+...
+
 generateSwaggerCode {
   inputFile = file('swagger.yaml')
   outputDir = file("$buildDir/swagger")

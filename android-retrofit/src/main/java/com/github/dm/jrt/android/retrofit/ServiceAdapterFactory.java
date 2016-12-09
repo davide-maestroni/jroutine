@@ -167,7 +167,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
   private Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> buildRoutine(
       @NotNull final InvocationConfiguration invocationConfiguration,
       @NotNull final ServiceConfiguration serviceConfiguration) {
-    return JRoutineService.on(ConstantConditions.notNull("Service context", mServiceContext))
+    return JRoutineService.on(mServiceContext)
                           .with(factoryOf(ServiceCallInvocation.class))
                           .apply(invocationConfiguration)
                           .apply(serviceConfiguration)

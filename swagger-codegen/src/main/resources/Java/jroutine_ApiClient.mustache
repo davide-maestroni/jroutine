@@ -48,19 +48,19 @@ import {{invokerPackage}}.auth.OAuth.AccessTokenListener;
 import {{invokerPackage}}.auth.OAuthFlow;
 
 
-public class {{projectPrefix}}ApiClient{{#enableLoaders}}{{#useSupportLibrary}}Compat{{/useSupportLibrary}}{{/enableLoaders}} {
+public class {{projectPrefix}}ApiClient {
 
     private Map<String, Interceptor> apiAuthorizations;
     private OkHttpClient.Builder okBuilder = new OkHttpClient.Builder();
     private Retrofit.Builder adapterBuilder;
     private String baseUrl = "{{{baseUrl}}}";
 
-    public {{projectPrefix}}ApiClient{{#enableLoaders}}{{#useSupportLibrary}}Compat{{/useSupportLibrary}}{{/enableLoaders}}() {
+    public {{projectPrefix}}ApiClient() {
         apiAuthorizations = new LinkedHashMap<String, Interceptor>();
-        withDefaultAdapter();
+        withDefaultAdapterFactory();
     }
 
-    public {{projectPrefix}}ApiClient{{#enableLoaders}}{{#useSupportLibrary}}Compat{{/useSupportLibrary}}{{/enableLoaders}}(String[] authNames) {
+    public {{projectPrefix}}ApiClient(String[] authNames) {
         this();
         for(String authName : authNames) { {{#hasAuthMethods}}
             Interceptor auth;
@@ -80,7 +80,7 @@ public class {{projectPrefix}}ApiClient{{#enableLoaders}}{{#useSupportLibrary}}C
      * Basic constructor for single auth name
      * @param authName Authentication name
      */
-    public {{projectPrefix}}ApiClient{{#enableLoaders}}{{#useSupportLibrary}}Compat{{/useSupportLibrary}}{{/enableLoaders}}(String authName) {
+    public {{projectPrefix}}ApiClient(String authName) {
         this(new String[]{authName});
     }
 
@@ -89,7 +89,7 @@ public class {{projectPrefix}}ApiClient{{#enableLoaders}}{{#useSupportLibrary}}C
      * @param authName Authentication name
      * @param apiKey API key
      */
-    public {{projectPrefix}}ApiClient{{#enableLoaders}}{{#useSupportLibrary}}Compat{{/useSupportLibrary}}{{/enableLoaders}}(String authName, String apiKey) {
+    public {{projectPrefix}}ApiClient(String authName, String apiKey) {
         this(authName);
         this.setApiKey(apiKey);
     }
@@ -100,7 +100,7 @@ public class {{projectPrefix}}ApiClient{{#enableLoaders}}{{#useSupportLibrary}}C
      * @param username Username
      * @param password Password
      */
-    public {{projectPrefix}}ApiClient{{#enableLoaders}}{{#useSupportLibrary}}Compat{{/useSupportLibrary}}{{/enableLoaders}}(String authName, String username, String password) {
+    public {{projectPrefix}}ApiClient(String authName, String username, String password) {
         this(authName);
         this.setCredentials(username,  password);
     }
@@ -113,7 +113,7 @@ public class {{projectPrefix}}ApiClient{{#enableLoaders}}{{#useSupportLibrary}}C
      * @param username Username
      * @param password Password
      */
-    public {{projectPrefix}}ApiClient{{#enableLoaders}}{{#useSupportLibrary}}Compat{{/useSupportLibrary}}{{/enableLoaders}}(String authName, String clientId, String secret, String username, String password) {
+    public {{projectPrefix}}ApiClient(String authName, String clientId, String secret, String username, String password) {
         this(authName);
         this.getTokenEndPoint()
                 .setClientId(clientId)
@@ -122,11 +122,11 @@ public class {{projectPrefix}}ApiClient{{#enableLoaders}}{{#useSupportLibrary}}C
                 .setPassword(password);
     }
 
-    public {{projectPrefix}}ApiClient{{#enableLoaders}}{{#useSupportLibrary}}Compat{{/useSupportLibrary}}{{/enableLoaders}} withDefaultAdapter() {
-        return withAdapter(RoutineAdapterFactory.buildFactory());
+    public {{projectPrefix}}ApiClient withDefaultAdapterFactory() {
+        return withAdapterFactory(RoutineAdapterFactory.buildFactory());
     }
 
-    public {{projectPrefix}}ApiClient{{#enableLoaders}}{{#useSupportLibrary}}Compat{{/useSupportLibrary}}{{/enableLoaders}} withAdapter(CallAdapter.Factory factory) {
+    public {{projectPrefix}}ApiClient withAdapterFactory(CallAdapter.Factory factory) {
         Gson gson = new GsonBuilder()
                 .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
                 {{^java8}}
@@ -239,7 +239,7 @@ public class {{projectPrefix}}ApiClient{{#enableLoaders}}{{#useSupportLibrary}}C
      * @param accessToken Access token
      * @return this client
      */
-    public {{projectPrefix}}ApiClient{{#enableLoaders}}{{#useSupportLibrary}}Compat{{/useSupportLibrary}}{{/enableLoaders}} withAccessToken(String accessToken) {
+    public {{projectPrefix}}ApiClient withAccessToken(String accessToken) {
         setAccessToken(accessToken);
         return this;
     }
@@ -273,7 +273,7 @@ public class {{projectPrefix}}ApiClient{{#enableLoaders}}{{#useSupportLibrary}}C
      * @param redirectURI Redirect URI
      * @return this client
      */
-    public {{projectPrefix}}ApiClient{{#enableLoaders}}{{#useSupportLibrary}}Compat{{/useSupportLibrary}}{{/enableLoaders}} withAuthorizationFlow(String clientId, String clientSecret, String redirectURI) {
+    public {{projectPrefix}}ApiClient withAuthorizationFlow(String clientId, String clientSecret, String redirectURI) {
         configureAuthorizationFlow(clientId, clientSecret, redirectURI);
         return this;
     }
@@ -297,7 +297,7 @@ public class {{projectPrefix}}ApiClient{{#enableLoaders}}{{#useSupportLibrary}}C
      * @param accessTokenListener Access token listener
      * @return this client
      */
-    public {{projectPrefix}}ApiClient{{#enableLoaders}}{{#useSupportLibrary}}Compat{{/useSupportLibrary}}{{/enableLoaders}} withAccessTokenListener(AccessTokenListener accessTokenListener) {
+    public {{projectPrefix}}ApiClient withAccessTokenListener(AccessTokenListener accessTokenListener) {
         registerAccessTokenListener(accessTokenListener);
         return this;
     }
@@ -323,7 +323,7 @@ public class {{projectPrefix}}ApiClient{{#enableLoaders}}{{#useSupportLibrary}}C
         this.baseUrl = baseUrl;
     }
 
-    public {{projectPrefix}}ApiClient{{#enableLoaders}}{{#useSupportLibrary}}Compat{{/useSupportLibrary}}{{/enableLoaders}} withBaseUrl(String baseUrl) {
+    public {{projectPrefix}}ApiClient withBaseUrl(String baseUrl) {
         this.baseUrl = baseUrl;
         return this;
     }
@@ -336,7 +336,7 @@ public class {{projectPrefix}}ApiClient{{#enableLoaders}}{{#useSupportLibrary}}C
         this.apiAuthorizations = apiAuthorizations;
     }
 
-    public {{projectPrefix}}ApiClient{{#enableLoaders}}{{#useSupportLibrary}}Compat{{/useSupportLibrary}}{{/enableLoaders}} withApiAuthorizations(Map<String, Interceptor> apiAuthorizations) {
+    public {{projectPrefix}}ApiClient withApiAuthorizations(Map<String, Interceptor> apiAuthorizations) {
         this.apiAuthorizations = apiAuthorizations;
         return this;
     }
@@ -349,7 +349,7 @@ public class {{projectPrefix}}ApiClient{{#enableLoaders}}{{#useSupportLibrary}}C
         this.adapterBuilder = adapterBuilder;
     }
 
-    public {{projectPrefix}}ApiClient{{#enableLoaders}}{{#useSupportLibrary}}Compat{{/useSupportLibrary}}{{/enableLoaders}} withAdapterBuilder(Retrofit.Builder adapterBuilder) {
+    public {{projectPrefix}}ApiClient withAdapterBuilder(Retrofit.Builder adapterBuilder) {
         this.adapterBuilder = adapterBuilder;
         return this;
     }
@@ -378,7 +378,7 @@ public class {{projectPrefix}}ApiClient{{#enableLoaders}}{{#useSupportLibrary}}C
      * @param okClient An instance of OK HTTP client
      * @return this client
      */
-    public {{projectPrefix}}ApiClient{{#enableLoaders}}{{#useSupportLibrary}}Compat{{/useSupportLibrary}}{{/enableLoaders}} withOkClient(OkHttpClient okClient) {
+    public {{projectPrefix}}ApiClient withOkClient(OkHttpClient okClient) {
         configureFromOkClient(okClient);
         return this;
     }

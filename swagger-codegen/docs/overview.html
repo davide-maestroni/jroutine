@@ -22,11 +22,11 @@
 <a href="https://github.com/davide-maestroni/jroutine" target="_blank">Parallel programming on the go.</a>
 <h1>Overview</h1>
 <p>
-    Swagger generator based on the <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/retrofit" target="_blank">jroutine-retrofit</a> library.<br/>
-    The generator adds a custom "jroutine" language and additional command line options to enable support for Android classes. Run the generator with "config-help -l jroutine" for a complete list.
+    Swagger generator based on the <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/retrofit" target="_blank">jroutine-retrofit</a> library.
 </p>
 <p>
-    This module provides classes generating client code employing routines to perform network requests.
+    This module provides classes generating client code employing routines to perform network requests.<br/>
+    The generator adds a custom "jroutine" language and additional command line options to enable support for Android classes. Run the generator with "config-help -l jroutine" for a complete list.
 </p>
 <h2>Main classes</h2>
 <ul>
@@ -42,7 +42,7 @@
 <p>
     The code below shows how it is possible to generate, from a Swagger specification, a client calling the GitHub repo APIs.
 </p>
-<b>Example 1:</b> via code generation.
+<b>Example 1:</b> via default factory.
 <pre>
     <code>
         public class Main {
@@ -56,6 +56,135 @@
                        .inMax(seconds(3))
                        .getComplete();
                 System.exit(0);
+            }
+        }
+    </code>
+</pre>
+<b>Example 2:</b> via Android Service.
+<pre>
+    <code>
+        public class MainActivity extends Activity {
+
+            private static final String USER_NAME = "...";
+
+            private static Consumer&lt;Repo&gt; addRepoTo(final ArrayAdapter adapter) {
+                return repo -> {
+                    adapter.add(repo);
+                };
+            }
+
+            private static Consumer&lt;RoutineException&gt; showToast(final Activity activity) {
+                return error -> {
+                    final Throwable cause = error.getCause();
+                    Toast.makeText(activity, (cause != null) ? cause.getMessage() :
+                            "Cannot load repositories", Toast.LENGTH_LONG).show();
+                };
+            }
+
+            &commat;Override
+            protected void onCreate(final Bundle savedInstanceState) {
+                super.onCreate(savedInstanceState);
+                setContentView(R.layout.main_layout);
+                final ArrayAdapter adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
+                final ListView repoList = (ListView) findViewById(R.id.repo_list);
+                if (repoList != null) {
+                    repoList.setAdapter(adapter);
+                }
+
+                final ServiceAdapterFactory adapterFactory =
+                        ServiceAdapterFactory.on(serviceFrom(this)).buildFactory();
+                final RepoApi service = new RepoApiClient().withAdapterFactory(adapterFactory)
+                                                           .createService(RepoApi.class);
+                service.getReposBuilder(USER_NAME)
+                       .map(Operators.&lt;Repo&gt;unfold())
+                       .close()
+                       .bind(onOutput(addRepoTo(adapter)).andOnError(showToast(this)));
+            }
+        }
+    </code>
+</pre>
+<b>Example 3:</b> via Android Loader.
+<pre>
+    <code>
+        public class MainActivity extends Activity {
+
+            private static final String USER_NAME = "...";
+
+            private static Consumer&lt;Repo&gt; addRepoTo(final ArrayAdapter adapter) {
+                return repo -> {
+                    adapter.add(repo);
+                };
+            }
+
+            private static Consumer&lt;RoutineException&gt; showToast(final Activity activity) {
+                return error -> {
+                    final Throwable cause = error.getCause();
+                    Toast.makeText(activity, (cause != null) ? cause.getMessage() :
+                            "Cannot load repositories", Toast.LENGTH_LONG).show();
+                };
+            }
+
+            &commat;Override
+            protected void onCreate(final Bundle savedInstanceState) {
+                super.onCreate(savedInstanceState);
+                setContentView(R.layout.main_layout);
+                final ArrayAdapter adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
+                final ListView repoList = (ListView) findViewById(R.id.repo_list);
+                if (repoList != null) {
+                    repoList.setAdapter(adapter);
+                }
+
+                final LoaderAdapterFactory adapterFactory =
+                        LoaderAdapterFactory.on(loaderFrom(this)).buildFactory();
+                final RepoLoaderApi service = new RepoApiClient().withAdapterFactory(adapterFactory)
+                                                                 .createService(RepoLoaderApi.class);
+                service.getReposLoaderBuilder(USER_NAME)
+                       .map(Operators.&lt;Repo&gt;unfold())
+                       .close()
+                       .bind(onOutput(addRepoTo(adapter)).andOnError(showToast(this)));
+            }
+        }
+    </code>
+</pre>
+<b>Example 4:</b> via Android Loader (with Support Library).
+<pre>
+    <code>
+        public class MainActivity extends FragmentActivity {
+
+            private static final String USER_NAME = "...";
+
+            private static Consumer&lt;Repo&gt; addRepoTo(final ArrayAdapter adapter) {
+                return repo -> {
+                    adapter.add(repo);
+                };
+            }
+
+            private static Consumer&lt;RoutineException&gt; showToast(final Activity activity) {
+                return error -> {
+                    final Throwable cause = error.getCause();
+                    Toast.makeText(activity, (cause != null) ? cause.getMessage() :
+                            "Cannot load repositories", Toast.LENGTH_LONG).show();
+                };
+            }
+
+            &commat;Override
+            protected void onCreate(final Bundle savedInstanceState) {
+                super.onCreate(savedInstanceState);
+                setContentView(R.layout.main_layout);
+                final ArrayAdapter adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
+                final ListView repoList = (ListView) findViewById(R.id.repo_list);
+                if (repoList != null) {
+                    repoList.setAdapter(adapter);
+                }
+
+                final LoaderAdapterFactoryCompat adapterFactory =
+                        LoaderAdapterFactoryCompat.on(loaderFrom(this)).buildFactory();
+                final RepoLoaderApiCompat service = new RepoApiClient().withAdapterFactory(adapterFactory)
+                                                                       .createService(RepoLoaderApiCompat.class);
+                service.getReposLoaderBuilderCompat(USER_NAME)
+                       .map(Operators.&lt;Repo&gt;unfold())
+                       .close()
+                       .bind(onOutput(addRepoTo(adapter)).andOnError(showToast(this)));
             }
         }
     </code>

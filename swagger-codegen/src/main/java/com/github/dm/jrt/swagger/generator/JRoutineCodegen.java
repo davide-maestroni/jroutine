@@ -96,12 +96,7 @@ public class JRoutineCodegen extends JavaClientCodegen {
     for (final SupportingFile supportingFile : supportingFiles) {
       if ("ApiClient.mustache".equals(supportingFile.templateFile)) {
         supportingFile.templateFile = "jroutine_ApiClient.mustache";
-        if (useAndroidSupportLibrary()) {
-          supportingFile.destinationFilename = projectPrefix + "ApiClientCompat.java";
-
-        } else {
-          supportingFile.destinationFilename = projectPrefix + "ApiClient.java";
-        }
+        supportingFile.destinationFilename = projectPrefix + "ApiClient.java";
       }
 
       if ("auth/OAuthOkHttpClient.mustache".equals(supportingFile.templateFile)) {
@@ -121,8 +116,17 @@ public class JRoutineCodegen extends JavaClientCodegen {
 
   @Override
   public String toApiName(final String name) {
-    final String apiName = super.toApiName(name);
-    return useAndroidSupportLibrary() ? apiName + "Compat" : apiName;
+    final Map<String, Object> additionalProperties = this.additionalProperties;
+    if (additionalProperties.containsKey(ENABLE_LOADERS)) {
+      if (additionalProperties.containsKey(USE_SUPPORT_LIBRARY)) {
+        return ((name.length() == 0) ? "Default" : this.initialCaps(name)) + "LoaderApiCompat";
+
+      } else {
+        return ((name.length() == 0) ? "Default" : this.initialCaps(name)) + "LoaderApi";
+      }
+    }
+
+    return super.toApiName(name);
   }
 
   @Override
@@ -191,11 +195,5 @@ public class JRoutineCodegen extends JavaClientCodegen {
     }
 
     return builder.toString();
-  }
-
-  private boolean useAndroidSupportLibrary() {
-    final Map<String, Object> additionalProperties = this.additionalProperties;
-    return additionalProperties.containsKey(ENABLE_LOADERS) && additionalProperties.containsKey(
-        USE_SUPPORT_LIBRARY);
   }
 }

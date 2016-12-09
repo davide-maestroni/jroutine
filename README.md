@@ -84,7 +84,7 @@ In order to activate the proxy code generation through annotation pre-processors
 
 Note, however, that in an Android project explicit use of an APT plugin is required. For example, the Gradle build file can be modified as follows:
 
-```
+```groovy
 buildscript {
     ...
     dependencies {

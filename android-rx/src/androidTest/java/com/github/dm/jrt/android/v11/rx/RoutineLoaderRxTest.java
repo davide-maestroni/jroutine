@@ -59,7 +59,7 @@ public class RoutineLoaderRxTest extends ActivityInstrumentationTestCase2<TestAc
     final CountDownLatch latch = new CountDownLatch(3);
     final List<String> expected = Arrays.asList("TEST1", "TEST2", "TEST3");
     final AtomicBoolean isSuccess = new AtomicBoolean(true);
-    JRoutineLoaderRx.withObservable(Observable.just("test1", "test2", "test3"))
+    JRoutineLoaderRx.with(Observable.just("test1", "test2", "test3"))
                     .applyInvocationConfiguration()
                     .withLog(AndroidLogs.androidLog())
                     .configured()
@@ -100,7 +100,7 @@ public class RoutineLoaderRxTest extends ActivityInstrumentationTestCase2<TestAc
     final CountDownLatch latch = new CountDownLatch(3);
     final List<String> expected = Arrays.asList("TEST1", "TEST2", "TEST3");
     final AtomicBoolean isSuccess = new AtomicBoolean(true);
-    JRoutineLoaderRx.withObservable(Observable.just("test1", "test2", "test3"))
+    JRoutineLoaderRx.with(Observable.just("test1", "test2", "test3"))
                     .subscribeOn(loaderFrom(fragment))
                     .map(new Func1<String, String>() {
 

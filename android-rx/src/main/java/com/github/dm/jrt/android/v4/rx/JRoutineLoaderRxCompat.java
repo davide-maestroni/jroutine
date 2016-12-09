@@ -45,7 +45,7 @@ import rx.Subscriber;
  * <pre>
  *   <code>
  *
- *     JRoutineLoaderRxCompat.withObservable(myObservable)
+ *     JRoutineLoaderRxCompat.with(myObservable)
  *                           .applyLoaderConfiguration()
  *                           .withInvocationId(INVOCATION_ID)
  *                           .configured()
@@ -71,8 +71,7 @@ public class JRoutineLoaderRxCompat extends JRoutineRx {
    * @return the Loader observable.
    */
   @NotNull
-  public static <DATA> LoaderObservable<DATA> withObservable(
-      @NotNull final Observable<DATA> observable) {
+  public static <DATA> LoaderObservable<DATA> with(@NotNull final Observable<DATA> observable) {
     return new LoaderObservable<DATA>(observable);
   }
 

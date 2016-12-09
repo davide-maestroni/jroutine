@@ -54,7 +54,7 @@ public class RoutineRxCompatTest extends ActivityInstrumentationTestCase2<TestAc
     final CountDownLatch latch = new CountDownLatch(3);
     final List<String> expected = Arrays.asList("TEST1", "TEST2", "TEST3");
     final AtomicBoolean isSuccess = new AtomicBoolean(true);
-    JRoutineLoaderRxCompat.withObservable(Observable.just("test1", "test2", "test3"))
+    JRoutineLoaderRxCompat.with(Observable.just("test1", "test2", "test3"))
                           .applyInvocationConfiguration()
                           .withLog(AndroidLogs.androidLog())
                           .configured()
@@ -64,23 +64,23 @@ public class RoutineRxCompatTest extends ActivityInstrumentationTestCase2<TestAc
                           .subscribeOn(loaderFrom(getActivity()))
                           .map(new Func1<String, String>() {
 
-                      @Override
-                      public String call(final String s) {
-                        return s.toUpperCase();
-                      }
-                    })
+                            @Override
+                            public String call(final String s) {
+                              return s.toUpperCase();
+                            }
+                          })
                           .observeOn(AndroidSchedulers.mainThread())
                           .subscribe(new Action1<String>() {
 
-                      @Override
-                      public void call(final String s) {
-                        if (!expected.contains(s)) {
-                          isSuccess.set(false);
-                        }
+                            @Override
+                            public void call(final String s) {
+                              if (!expected.contains(s)) {
+                                isSuccess.set(false);
+                              }
 
-                        latch.countDown();
-                      }
-                    });
+                              latch.countDown();
+                            }
+                          });
     latch.await(10, TimeUnit.SECONDS);
     assertThat(isSuccess.get()).isTrue();
   }
@@ -91,27 +91,27 @@ public class RoutineRxCompatTest extends ActivityInstrumentationTestCase2<TestAc
     final CountDownLatch latch = new CountDownLatch(3);
     final List<String> expected = Arrays.asList("TEST1", "TEST2", "TEST3");
     final AtomicBoolean isSuccess = new AtomicBoolean(true);
-    JRoutineLoaderRxCompat.withObservable(Observable.just("test1", "test2", "test3"))
+    JRoutineLoaderRxCompat.with(Observable.just("test1", "test2", "test3"))
                           .subscribeOn(loaderFrom(fragment))
                           .map(new Func1<String, String>() {
 
-                      @Override
-                      public String call(final String s) {
-                        return s.toUpperCase();
-                      }
-                    })
+                            @Override
+                            public String call(final String s) {
+                              return s.toUpperCase();
+                            }
+                          })
                           .observeOn(AndroidSchedulers.mainThread())
                           .subscribe(new Action1<String>() {
 
-                      @Override
-                      public void call(final String s) {
-                        if (!expected.contains(s)) {
-                          isSuccess.set(false);
-                        }
+                            @Override
+                            public void call(final String s) {
+                              if (!expected.contains(s)) {
+                                isSuccess.set(false);
+                              }
 
-                        latch.countDown();
-                      }
-                    });
+                              latch.countDown();
+                            }
+                          });
     latch.await(10, TimeUnit.SECONDS);
     assertThat(isSuccess.get()).isTrue();
   }

@@ -88,7 +88,7 @@
             protected void onCreate(final Bundle savedInstanceState) {
                 super.onCreate(savedInstanceState);
                 setContentView(R.layout.main_layout);
-                JRoutineLoaderRx.withObservable(Observable.just("Hello RxJava"))
+                JRoutineLoaderRx.with(Observable.just("Hello RxJava"))
                                 .applyLoaderConfiguration()
                                 .withInvocationId(R.id.hello_invocation)
                                 .configured()
@@ -132,7 +132,7 @@
             protected void onCreate(final Bundle savedInstanceState) {
                 super.onCreate(savedInstanceState);
                 setContentView(R.layout.main_layout);
-                JRoutineLoaderRxCompat.withObservable(Observable.just("Hello RxJava"))
+                JRoutineLoaderRxCompat.with(Observable.just("Hello RxJava"))
                                       .applyLoaderConfiguration()
                                       .withInvocationId(R.id.hello_invocation)
                                       .configured()

@@ -22,24 +22,23 @@
 <a href="https://github.com/davide-maestroni/jroutine" target="_blank">Parallel programming on the go.</a>
 <h1>Overview</h1>
 <p>
-    Android integration of RxJava based on the <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android" target="_blank">jroutine-android</a> library.
+    Android integration of RxJava based on the <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-core" target="_blank">jroutine-android-core</a> library.
 </p>
 <p>
-    This module provides classes integrating Android routines with the RxJava library.<br>
-    RxJava data manipulation is executed inside dedicated Android Loaders.
+    This module provides classes integrating Android routines with the RxJava library.
 </p>
 <h2>Main classes</h2>
 <ul>
     <li>
-        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-rx/com/github/dm/jrt/android/v11/rx/JRoutineRx.html">JRoutineRx</a>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-rx/com/github/dm/jrt/android/v11/rx/JRoutineLoaderRx.html">JRoutineLoaderRx</a>
         <p>
-            Utility class enabling an observable to dispatch data to a dedicated Loader.
+            Utility class enabling an Observable to dispatch data to a dedicated Loader.
         </p>
     </li>
     <li>
-        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-rx/com/github/dm/jrt/android/v4/rx/JRoutineRxCompat.html">JRoutineRxCompat</a>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-rx/com/github/dm/jrt/android/v4/rx/JRoutineLoaderRxCompat.html">JRoutineLoaderRxCompat</a>
         <p>
-            Utility class enabling an observable to dispatch data to a dedicated Loader.<br>
+            Utility class enabling an Observable to dispatch data to a dedicated Loader.<br>
             This class is specifically meant to employ the Android Support library for retro-compatibility.
         </p>
     </li>
@@ -51,10 +50,11 @@
 <ul>
     <li><a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-core" target="_blank">jroutine-android-core</a> &mdash; core routine and channel classes</li>
     <li><a href="http://davide-maestroni.github.io/jroutine/javadoc/6/core" target="_blank">jroutine-core</a> &mdash; core routine and channel classes</li>
+    <li><a href="http://davide-maestroni.github.io/jroutine/javadoc/6/rx" target="_blank">jroutine-rx</a> &mdash; RxJava integration</li>
 </ul>
 <h2>Usage examples</h2>
 <p>
-    The code below shows how it is possible to configure an observable, so to employ Loaders to execute data processing.
+    The code below shows how it is possible to configure an Observable, so to employ Loaders to execute data processing.
 </p>
 <b>Example 1:</b> via Loader.
 <p>
@@ -88,14 +88,14 @@
             protected void onCreate(final Bundle savedInstanceState) {
                 super.onCreate(savedInstanceState);
                 setContentView(R.layout.main_layout);
-                JRoutineRx.withObservable(Observable.just("Hello RxJava"))
-                          .applyLoaderConfiguration()
-                          .withInvocationId(R.id.hello_invocation)
-                          .configured()
-                          .subscribeOn(loaderFrom(this))
-                          .map(getMappingFunction())
-                          .observeOn(AndroidSchedulers.mainThread())
-                          .subscribe(getAction(this));
+                JRoutineLoaderRx.withObservable(Observable.just("Hello RxJava"))
+                                .applyLoaderConfiguration()
+                                .withInvocationId(R.id.hello_invocation)
+                                .configured()
+                                .subscribeOn(loaderFrom(this))
+                                .map(getMappingFunction())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(getAction(this));
             }
         }
     </code>
@@ -132,14 +132,14 @@
             protected void onCreate(final Bundle savedInstanceState) {
                 super.onCreate(savedInstanceState);
                 setContentView(R.layout.main_layout);
-                JRoutineRxCompat.withObservable(Observable.just("Hello RxJava"))
-                                .applyLoaderConfiguration()
-                                .withInvocationId(R.id.hello_invocation)
-                                .configured()
-                                .subscribeOn(loaderFrom(this))
-                                .map(getMappingFunction())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe(getAction(this));
+                JRoutineLoaderRxCompat.withObservable(Observable.just("Hello RxJava"))
+                                      .applyLoaderConfiguration()
+                                      .withInvocationId(R.id.hello_invocation)
+                                      .configured()
+                                      .subscribeOn(loaderFrom(this))
+                                      .map(getMappingFunction())
+                                      .observeOn(AndroidSchedulers.mainThread())
+                                      .subscribe(getAction(this));
             }
         }
     </code>

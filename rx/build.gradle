@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-apply plugin: 'com.android.library'
+apply plugin: 'java'
 apply plugin: 'jacoco'
 apply plugin: 'findbugs'
 apply plugin: 'com.github.ben-manes.versions'
@@ -23,60 +23,25 @@ apply from: '../extra.gradle'
 group = project.getProperty('groupName')
 version = project.getProperty('releaseVersion')
 archivesBaseName = "${project.parent.name}-${project.name}"
-
-android {
-  compileSdkVersion 23
-  buildToolsVersion '23.0.3'
-
-  defaultConfig {
-    minSdkVersion 9
-    targetSdkVersion 23
-    versionCode Integer.parseInt(project.getProperty('releaseVersionCode'))
-    versionName version
-  }
-
-  buildTypes {
-    release {
-      minifyEnabled false
-      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-    }
-
-    debug {
-      minifyEnabled false
-      testCoverageEnabled true
-    }
-  }
-
-  compileOptions {
-    sourceCompatibility JavaVersion.VERSION_1_6
-    targetCompatibility JavaVersion.VERSION_1_6
-  }
-
-  dexOptions {
-    preDexLibraries false
-  }
-
-  packagingOptions {
-    exclude 'META-INF/services/javax.annotation.processing.Processor'
-  }
-
-  lintOptions {
-    disable 'MissingRegistered'
-    lintConfig file('lint.xml')
-  }
-}
+compileJavaCompatibility = JavaVersion.VERSION_1_5
+compileTestJavaCompatibility = JavaVersion.VERSION_1_7
 
 dependencies {
-  androidTestCompile 'com.squareup.assertj:assertj-android:1.1.1'
-  androidTestCompile 'io.reactivex:rxandroid:1.2.1'
-  compile 'com.android.support:support-v4:23.2.1'
+  compile 'com.intellij:annotations:12.0'
   compile 'io.reactivex:rxjava:1.2.3'
+  testCompile 'junit:junit:4.12'
+  testCompile 'org.assertj:assertj-core:2.4.1'
 }
 
 conditionalDependencies {
-  compile name: 'android-core', version: '6.1.0'
   compile name: 'core', version: '6.1.0'
-  compile name: 'rx', version: '6.1.0'
+}
+
+jacocoTestReport {
+  reports {
+    xml.enabled = true // Coveralls plugin depends on xml format report
+    html.enabled = true
+  }
 }
 
 jacoco {
@@ -87,10 +52,9 @@ findbugs {
   toolVersion project.getProperty('findbugsVersion')
 }
 
-tasks.withType(Javadoc) {
+javadoc {
   def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/6'
   options.overview("${project.projectDir}/docs/overview.html")
   options.links('http://reactivex.io/RxJava/javadoc/',
-      "${prefix}/android-core/",
       "${prefix}/core/")
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.android.v11.rx;
+package com.github.dm.jrt.android.v4.rx;
 
 import android.content.Context;
 
@@ -23,13 +23,14 @@ import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.core.invocation.ContextInvocation;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.core.routine.LoaderRoutine;
-import com.github.dm.jrt.android.v11.core.JRoutineLoader;
-import com.github.dm.jrt.android.v11.core.LoaderContext;
+import com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat;
+import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.InvocationConfigurable;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.rx.JRoutineRx;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -38,39 +39,29 @@ import rx.Observable.Operator;
 import rx.Subscriber;
 
 /**
- * Utility class enabling an observable to dispatch data to a dedicated Loader.
+ * Utility class integrating the JRoutine Android classes with RxJava ones.
  * <p>
  * The example below shows how it's possible to make the computation happen in a dedicated Loader:
  * <pre>
  *   <code>
  *
- *     JRoutineRx.withObservable(myObservable)
- *               .applyLoaderConfiguration()
- *               .withInvocationId(INVOCATION_ID)
- *               .configured()
- *               .subscribeOn(loaderFrom(activity))
- *               .map(getMappingFunction())
- *               .observeOn(AndroidSchedulers.mainThread())
- *               .subscribe(getAction());
+ *     JRoutineLoaderRxCompat.withObservable(myObservable)
+ *                           .applyLoaderConfiguration()
+ *                           .withInvocationId(INVOCATION_ID)
+ *                           .configured()
+ *                           .subscribeOn(loaderFrom(activity))
+ *                           .map(getMappingFunction())
+ *                           .observeOn(AndroidSchedulers.mainThread())
+ *                           .subscribe(getAction());
  *   </code>
  * </pre>
  * Note that the Loader ID by default will only depend on the inputs, so that, in order to avoid
  * clashing, it is advisable to explicitly set the invocation ID like in the example above.
  * <p>
- * See {@link com.github.dm.jrt.android.v4.rx.JRoutineRxCompat JRoutineRxCompat} for support of API
- * levels lower than {@link android.os.Build.VERSION_CODES#HONEYCOMB 11}.
- * <p>
  * Created by davide-maestroni on 12/02/2016.
  */
 @SuppressWarnings("WeakerAccess")
-public class JRoutineRx {
-
-  /**
-   * Avoid explicit instantiation.
-   */
-  private JRoutineRx() {
-    ConstantConditions.avoid();
-  }
+public class JRoutineLoaderRxCompat extends JRoutineRx {
 
   /**
    * Returns a Loader observable instance wrapping the specified one.
@@ -147,7 +138,7 @@ public class JRoutineRx {
      * @return the observable.
      */
     @NotNull
-    public Observable<DATA> subscribeOn(@NotNull final LoaderContext context) {
+    public Observable<DATA> subscribeOn(@NotNull final LoaderContextCompat context) {
       return mObservable.lift(
           new LoaderOperator<DATA>(context, mInvocationConfiguration, mLoaderConfiguration));
     }
@@ -160,7 +151,7 @@ public class JRoutineRx {
    */
   public static class LoaderOperator<DATA> implements Operator<DATA, DATA> {
 
-    private final LoaderContext mContext;
+    private final LoaderContextCompat mContext;
 
     private final InvocationConfiguration mInvocationConfiguration;
 
@@ -173,7 +164,7 @@ public class JRoutineRx {
      * @param invocationConfiguration the invocation configuration.
      * @param loaderConfiguration     the loader configuration.
      */
-    private LoaderOperator(@NotNull final LoaderContext context,
+    private LoaderOperator(@NotNull final LoaderContextCompat context,
         @NotNull final InvocationConfiguration invocationConfiguration,
         @NotNull final LoaderConfiguration loaderConfiguration) {
       mContext = ConstantConditions.notNull("loader context", context);
@@ -183,12 +174,13 @@ public class JRoutineRx {
 
     @Override
     public Subscriber<? super DATA> call(final Subscriber<? super DATA> subscriber) {
-      return new LoaderSubscriber<DATA>(JRoutineLoader.on(mContext)
-                                                      .with(new SubscriberInvocationFactory<DATA>(
-                                                          subscriber))
-                                                      .apply(mInvocationConfiguration)
-                                                      .apply(mLoaderConfiguration)
-                                                      .buildRoutine());
+      return new LoaderSubscriber<DATA>(JRoutineLoaderCompat.on(mContext)
+                                                            .with(
+                                                                new SubscriberInvocationFactory<DATA>(
+                                                                    subscriber))
+                                                            .apply(mInvocationConfiguration)
+                                                            .apply(mLoaderConfiguration)
+                                                            .buildRoutine());
     }
   }
 
@@ -282,10 +274,6 @@ public class JRoutineRx {
 
     @Override
     public void onRestart() {
-      final Subscriber<? super DATA> subscriber = mSubscriber;
-      if (!subscriber.isUnsubscribed()) {
-        subscriber.onStart();
-      }
     }
 
     @Override

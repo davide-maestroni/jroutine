@@ -57,6 +57,8 @@ What the library has to offer is:
 * ***Seamlessly run in a remote Service***: invocations can be easily configured to run in a dedicated Android Service.
 * ***Fine dependency granularity***: import only the features you need.
 * ***Retrofit integration***: additional modules provides out-of-the-box integration with the [Retrofit][retrofit] library.
+* ***RxJava integration***: an additional module provides utility classes enabling an [RxJava][rxjava] Observable code to run into dedicated Android Loaders.
+* ***Swagger integration***: an additional module provides a generator enabling creation of client classes from a Swagger specification file.
 
 And more:
 
@@ -106,14 +108,43 @@ dependencies {
 }
 ```
 
+## Swagger code generation
+
+A dedicated module of the library implements a custom Swagger generator enabling automatic creation of client classes, based on a Swagger specification file. The official Swagger documentation describes how to employ a [custom generator][swagger custom generator] with a new language ("jroutine" in this case), but it is also possible to make use of specific Gradle plugins (like [gradle-swagger-generator-plugin][gradle swagger generator plugin]) which easily embed Swagger code generation in your Gradle project. For example:
+
+```groovy
+plugins {
+  ...
+  id 'org.hidetake.swagger.generator' version '1.6.1'
+  ...
+}
+
+...
+
+generateSwaggerCode {
+  inputFile = file('swagger.yaml')
+  outputDir = file("$buildDir/swagger")
+  language = 'jroutine'
+  configFile = file('swaggerConfig.json')
+}
+```
+
+The generator will support all the command line options available in the Swagger Java client generator. Additionally, a few specific ones are available in the command line and configuration file. Namely:
+
+1. *"projectName"* - the string will be used as prefix of some of the generated classes (optional)
+2. *"enableLoaders"* - if present the generated classes will support routines running in dedicated Android Loaders (optional)
+3. *"useSupportLibrary"* - if present the generated classes will make use of the Android Support Library for retro-compatibility (optional)
+
 ## Documentation
 
 Complete Javadoc with insights and examples is available for each module:
 
 * [jroutine-lib][javadoc lib]
 * [jroutine-retrofit][javadoc retrofit]
+* [jroutine-swagger-codegen][javadoc swagger codegen]
 * [jroutine-android][javadoc android]
 * [jroutine-android-retrofit][javadoc android retrofit]
+* [jroutine-android-rx][javadoc android rx]
 
 The project contains an additional [sample][sample] (showing how to implement a file downloader with just 3 classes) and [Android sample][android sample] (small application employing [Retrofit][retrofit] integration to fill a list) modules.
 
@@ -158,31 +189,31 @@ Please refer to the dedicated [Wiki page][wiki proguard].
 
 ## Artifacts
 
-Module | Sub-Module | Latest Version
---- | --- | ---
-jroutine-lib | _(all below)_ | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-lib/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-lib)
- | jroutine-core | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-core)
- | jroutine-channel | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-channel/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-channel)
- | jroutine-function | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-function/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-function)
- | jroutine-method | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-method/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-method)
- | jroutine-object | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-object/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-object)
- | jroutine-operator | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-operator/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-operator)
- | jroutine-processor | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-processor/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-processor)
- | jroutine-proxy | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-proxy/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-proxy)
- | jroutine-stream | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-stream/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-stream)
+Module | Sub-Module | Summary | Latest Version
+--- | --- | --- | ---
+jroutine-lib | _(all below)_ | | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-lib/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-lib)
+ | jroutine-core | | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-core)
+ | jroutine-channel | | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-channel/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-channel)
+ | jroutine-function | | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-function/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-function)
+ | jroutine-method | | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-method/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-method)
+ | jroutine-object | | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-object/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-object)
+ | jroutine-operator | | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-operator/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-operator)
+ | jroutine-processor | | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-processor/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-processor)
+ | jroutine-proxy | | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-proxy/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-proxy)
+ | jroutine-stream | | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-stream/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-stream)
+ | | |
+jroutine-retrofit | | | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-retrofit/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-retrofit)
  | |
-jroutine-retrofit | | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-retrofit/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-retrofit)
- | |
-jroutine-android | _(all below)_ | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-android/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-android)
- | jroutine-android-core | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-android-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-android-core)
- | jroutine-android-channel | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-android-channel/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-android-channel)
- | jroutine-android-method | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-android-method/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-android-method)
- | jroutine-android-object | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-android-object/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-android-object)
- | jroutine-android-processor | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-android-processor/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-android-processor)
- | jroutine-android-proxy | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-android-proxy/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-android-proxy)
- | jroutine-android-stream | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-android-stream/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-android-stream)
- | |
-jroutine-android-retrofit | | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-android-retrofit/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-android-retrofit)
+jroutine-android | _(all below)_ | | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-android/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-android)
+ | jroutine-android-core | | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-android-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-android-core)
+ | jroutine-android-channel | | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-android-channel/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-android-channel)
+ | jroutine-android-method | | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-android-method/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-android-method)
+ | jroutine-android-object | | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-android-object/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-android-object)
+ | jroutine-android-processor | | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-android-processor/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-android-processor)
+ | jroutine-android-proxy | | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-android-proxy/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-android-proxy)
+ | jroutine-android-stream | | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-android-stream/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-android-stream)
+ | | |
+jroutine-android-retrofit | | | [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-android-retrofit/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.davide-maestroni/jroutine-android-retrofit)
 
 ## License
 
@@ -208,6 +239,8 @@ Unless required by applicable law or agreed to in writing, software distributed 
 [rxjava]:https://github.com/ReactiveX/RxJava
 [reactivex]:http://reactivex.io/
 [akka]:http://akka.io/
+[swagger custom generator]:https://github.com/swagger-api/swagger-codegen#making-your-own-codegen-modules
+[gradle swagger generator plugin]:https://github.com/int128/gradle-swagger-generator-plugin
 [wiki]:https://github.com/davide-maestroni/jroutine/wiki
 [wiki build]:https://github.com/davide-maestroni/jroutine/wiki/Build-Instructions
 [wiki usage]:https://github.com/davide-maestroni/jroutine/wiki/Usage-Examples
@@ -216,7 +249,9 @@ Unless required by applicable law or agreed to in writing, software distributed 
 [android sample]:https://github.com/davide-maestroni/jroutine/tree/master/android-sample
 [javadoc lib]:http://davide-maestroni.github.io/jroutine/javadoc/6/lib
 [javadoc retrofit]:http://davide-maestroni.github.io/jroutine/javadoc/6/retrofit
+[javadoc swagger codegen]:http://davide-maestroni.github.io/jroutine/javadoc/6/swagger-codegen
 [javadoc android]:http://davide-maestroni.github.io/jroutine/javadoc/6/android
 [javadoc android retrofit]:http://davide-maestroni.github.io/jroutine/javadoc/6/android-retrofit
+[javadoc android rx]:http://davide-maestroni.github.io/jroutine/javadoc/6/android-rx
 [javadoc routine]:http://davide-maestroni.github.io/jroutine/javadoc/6/core/com/github/dm/jrt/core/routine/Routine.html
 [javadoc runner]:http://davide-maestroni.github.io/jroutine/javadoc/6/core/com/github/dm/jrt/core/runner/Runner.html

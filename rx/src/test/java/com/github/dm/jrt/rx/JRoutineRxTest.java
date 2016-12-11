@@ -17,11 +17,14 @@
 package com.github.dm.jrt.rx;
 
 import com.github.dm.jrt.core.JRoutineCore;
+import com.github.dm.jrt.core.channel.Channel;
+import com.github.dm.jrt.core.invocation.InvocationException;
 
 import org.junit.Test;
 
 import java.util.concurrent.atomic.AtomicReference;
 
+import rx.Observable;
 import rx.Observer;
 import rx.functions.Action1;
 import rx.functions.Func1;
@@ -36,8 +39,49 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class JRoutineRxTest {
 
   @Test
+  public void testChannel() {
+    final Channel<?, String> channel =
+        JRoutineRx.from(Observable.just("test1", "test2")).buildChannel();
+    assertThat(channel.all()).containsExactly("test1", "test2");
+  }
+
+  @Test
+  @SuppressWarnings({"ThrowableResultOfMethodCallIgnored", "ConstantConditions"})
+  public void testChannelError() {
+    final Channel<?, String> channel =
+        JRoutineRx.from(Observable.just("test").map(new Func1<String, String>() {
+
+          public String call(final String s) {
+            throw new IllegalStateException(s);
+          }
+        })).buildChannel();
+    assertThat(channel.getError()).isExactlyInstanceOf(InvocationException.class);
+    assertThat(channel.getError().getCause()).isExactlyInstanceOf(IllegalStateException.class);
+    assertThat(channel.getError().getCause().getMessage()).isEqualTo("test");
+  }
+
+  @Test
+  public void testObservable() {
+    final AtomicReference<String> reference = new AtomicReference<String>();
+    JRoutineRx.observableFrom(JRoutineCore.of("test").buildChannel())
+              .map(new Func1<String, String>() {
+
+                public String call(final String s) {
+                  return s.toUpperCase();
+                }
+              })
+              .subscribe(new Action1<String>() {
+
+                public void call(final String s) {
+                  reference.set(s);
+                }
+              });
+    assertThat(reference.get()).isEqualTo("TEST");
+  }
+
+  @Test
   @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
-  public void testError() {
+  public void testObservableError() {
     final AtomicReference<String> reference = new AtomicReference<String>();
     final AtomicReference<Throwable> errorReference = new AtomicReference<Throwable>();
     JRoutineRx.observableFrom(JRoutineCore.of("test").buildChannel())
@@ -63,24 +107,5 @@ public class JRoutineRxTest {
     assertThat(reference.get()).isNull();
     assertThat(errorReference.get()).isExactlyInstanceOf(IllegalStateException.class);
     assertThat(errorReference.get().getMessage()).isEqualTo("test");
-  }
-
-  @Test
-  public void testObservable() {
-    final AtomicReference<String> reference = new AtomicReference<String>();
-    JRoutineRx.observableFrom(JRoutineCore.of("test").buildChannel())
-              .map(new Func1<String, String>() {
-
-                public String call(final String s) {
-                  return s.toUpperCase();
-                }
-              })
-              .subscribe(new Action1<String>() {
-
-                public void call(final String s) {
-                  reference.set(s);
-                }
-              });
-    assertThat(reference.get()).isEqualTo("TEST");
   }
 }

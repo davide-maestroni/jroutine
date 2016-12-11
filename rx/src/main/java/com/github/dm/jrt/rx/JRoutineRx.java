@@ -23,6 +23,7 @@ import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.ChannelConfiguration.Builder;
+import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
@@ -55,7 +56,13 @@ public class JRoutineRx {
     ConstantConditions.avoid();
   }
 
-  // TODO: 11/12/2016 javadoc
+  /**
+   * Returns a builder of channels fed by the specified observable.
+   *
+   * @param observable the observable instance.
+   * @param <OUT>      the output data type.
+   * @return the channel builder.
+   */
   @NotNull
   public static <OUT> ChannelBuilder<?, OUT> from(@NotNull final Observable<OUT> observable) {
     return new ObservableChannelBuilder<OUT>(observable);
@@ -75,12 +82,22 @@ public class JRoutineRx {
     return Observable.create(new OnSubscribeChannel<OUT>(channel));
   }
 
+  /**
+   * Builder of channels fed by an observable.
+   *
+   * @param <OUT> the output data type.
+   */
   public static class ObservableChannelBuilder<OUT> implements ChannelBuilder<OUT, OUT> {
 
     private final Observable<OUT> mObservable;
 
     private ChannelConfiguration mConfiguration = ChannelConfiguration.defaultConfiguration();
 
+    /**
+     * Constructor.
+     *
+     * @param observable the feeding observable.
+     */
     private ObservableChannelBuilder(@NotNull final Observable<OUT> observable) {
       mObservable = ConstantConditions.notNull("observable instance", observable);
     }
@@ -104,10 +121,20 @@ public class JRoutineRx {
     }
   }
 
+  /**
+   * Observer feeding a channel.
+   *
+   * @param <OUT> the output data type.
+   */
   private static class ChannelObserver<OUT> implements Observer<OUT> {
 
     private final Channel<OUT, ?> mChannel;
 
+    /**
+     * The channel instance.
+     *
+     * @param channel the channel.
+     */
     private ChannelObserver(@NotNull final Channel<OUT, ?> channel) {
       mChannel = channel;
     }
@@ -117,7 +144,7 @@ public class JRoutineRx {
     }
 
     public void onError(final Throwable e) {
-      mChannel.abort(e);
+      mChannel.abort(InvocationException.wrapIfNeeded(e));
     }
 
     public void onNext(final OUT out) {

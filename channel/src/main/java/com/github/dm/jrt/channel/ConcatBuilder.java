@@ -65,12 +65,11 @@ class ConcatBuilder<OUT> extends AbstractBuilder<Channel<?, OUT>> {
   @NotNull
   @Override
   protected Channel<?, OUT> build(@NotNull final ChannelConfiguration configuration) {
-    final Channel<OUT, OUT> outputChannel = JRoutineCore.io()
-                                                        .applyChannelConfiguration()
-                                                        .with(configuration)
-                                                        .withOrder(OrderType.SORTED)
-                                                        .configured()
-                                                        .buildChannel();
+    final Channel<OUT, OUT> outputChannel = JRoutineCore.<OUT>ofInputs().applyChannelConfiguration()
+                                                                        .with(configuration)
+                                                                        .withOrder(OrderType.SORTED)
+                                                                        .configured()
+                                                                        .buildChannel();
     for (final Channel<?, ? extends OUT> channel : mChannels) {
       channel.bind(outputChannel);
     }

@@ -16,15 +16,20 @@
 
 package com.github.dm.jrt.rx;
 
+import com.github.dm.jrt.core.JRoutineCore;
+import com.github.dm.jrt.core.builder.ChannelBuilder;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.common.RoutineException;
+import com.github.dm.jrt.core.config.ChannelConfiguration;
+import com.github.dm.jrt.core.config.ChannelConfiguration.Builder;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 
 import rx.Observable;
 import rx.Observable.OnSubscribe;
+import rx.Observer;
 import rx.Subscriber;
 
 /**
@@ -50,6 +55,12 @@ public class JRoutineRx {
     ConstantConditions.avoid();
   }
 
+  // TODO: 11/12/2016 javadoc
+  @NotNull
+  public static <OUT> ChannelBuilder<?, OUT> from(@NotNull final Observable<OUT> observable) {
+    return new ObservableChannelBuilder<OUT>(observable);
+  }
+
   /**
    * Creates a new observable from the specified channel.
    * <br>
@@ -62,6 +73,56 @@ public class JRoutineRx {
   @NotNull
   public static <OUT> Observable<OUT> observableFrom(@NotNull final Channel<?, OUT> channel) {
     return Observable.create(new OnSubscribeChannel<OUT>(channel));
+  }
+
+  public static class ObservableChannelBuilder<OUT> implements ChannelBuilder<OUT, OUT> {
+
+    private final Observable<OUT> mObservable;
+
+    private ChannelConfiguration mConfiguration = ChannelConfiguration.defaultConfiguration();
+
+    private ObservableChannelBuilder(@NotNull final Observable<OUT> observable) {
+      mObservable = ConstantConditions.notNull("observable instance", observable);
+    }
+
+    @NotNull
+    public ChannelBuilder<OUT, OUT> apply(@NotNull final ChannelConfiguration configuration) {
+      mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
+      return this;
+    }
+
+    @NotNull
+    public Builder<? extends ChannelBuilder<OUT, OUT>> applyChannelConfiguration() {
+      return new Builder<ChannelBuilder<OUT, OUT>>(this, mConfiguration);
+    }
+
+    @NotNull
+    public Channel<OUT, OUT> buildChannel() {
+      final Channel<OUT, OUT> channel = JRoutineCore.<OUT>ofInputs().buildChannel();
+      mObservable.subscribe(new ChannelObserver<OUT>(channel));
+      return channel;
+    }
+  }
+
+  private static class ChannelObserver<OUT> implements Observer<OUT> {
+
+    private final Channel<OUT, ?> mChannel;
+
+    private ChannelObserver(@NotNull final Channel<OUT, ?> channel) {
+      mChannel = channel;
+    }
+
+    public void onCompleted() {
+      mChannel.close();
+    }
+
+    public void onError(final Throwable e) {
+      mChannel.abort(e);
+    }
+
+    public void onNext(final OUT out) {
+      mChannel.pass(out);
+    }
   }
 
   /**

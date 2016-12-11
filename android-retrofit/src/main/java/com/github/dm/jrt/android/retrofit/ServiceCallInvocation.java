@@ -112,7 +112,7 @@ public class ServiceCallInvocation
 
       case BYTES_INDEX:
         if (mInputChannel == null) {
-          mInputChannel = JRoutineCore.io().buildChannel();
+          mInputChannel = JRoutineCore.<ParcelableByteBuffer>ofInputs().buildChannel();
         }
 
         final ParcelableByteBuffer buffer = input.data();
@@ -146,7 +146,7 @@ public class ServiceCallInvocation
     final Request request =
         mRequestData.requestWithBody(new AsyncRequestBody(mMediaType, mInputChannel));
     final Channel<ParcelableSelectable<Object>, ParcelableSelectable<Object>> outputChannel =
-        JRoutineCore.io().buildChannel();
+        JRoutineCore.<ParcelableSelectable<Object>>ofInputs().buildChannel();
     outputChannel.bind(result);
     getClient().newCall(request).enqueue(new Callback() {
 

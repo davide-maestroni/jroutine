@@ -257,7 +257,7 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
   }
 
   public void testIOChannel() {
-    assertThat(JRoutineAndroidCompat.io().of("test").next()).isEqualTo("test");
+    assertThat(JRoutineAndroidCompat.of("test").buildChannel().next()).isEqualTo("test");
   }
 
   public void testLoader() {
@@ -451,6 +451,20 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
 
     } catch (final NullPointerException ignored) {
     }
+  }
+
+  public void testOf() {
+    final Channel<?, Integer> channel = JRoutineAndroidCompat.of(2).buildChannel();
+    assertThat(channel.isOpen()).isFalse();
+    assertThat(channel.inMax(seconds(1)).all()).containsExactly(2);
+    assertThat(JRoutineAndroidCompat.of().buildChannel().inMax(seconds(1)).all()).isEmpty();
+    assertThat(
+        JRoutineAndroidCompat.of(-11, 73).buildChannel().inMax(seconds(1)).all()).containsExactly(
+        -11, 73);
+    assertThat(JRoutineAndroidCompat.of(Arrays.asList(3, 12, -7))
+                                    .buildChannel()
+                                    .inMax(seconds(1))
+                                    .all()).containsExactly(3, 12, -7);
   }
 
   public void testPredicateFilter() {
@@ -715,12 +729,12 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
                                     .close()
                                     .inMax(seconds(10))
                                     .all()).containsExactly("test1", "test2", "test3");
-    assertThat(
-        JRoutineAndroidCompat.withStreamOf(JRoutineAndroidCompat.io().of("test1", "test2", "test3"))
-                             .on(loaderFrom(getActivity()))
-                             .close()
-                             .inMax(seconds(10))
-                             .all()).containsExactly("test1", "test2", "test3");
+    assertThat(JRoutineAndroidCompat.withStreamOf(
+        JRoutineAndroidCompat.of("test1", "test2", "test3").buildChannel())
+                                    .on(loaderFrom(getActivity()))
+                                    .close()
+                                    .inMax(seconds(10))
+                                    .all()).containsExactly("test1", "test2", "test3");
   }
 
   public void testStreamOfAbort() {
@@ -738,10 +752,10 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
                                    .call();
     assertThat(channel.abort()).isTrue();
     assertThat(channel.inMax(seconds(10)).getError()).isInstanceOf(AbortException.class);
-    channel =
-        JRoutineAndroidCompat.withStreamOf(JRoutineAndroidCompat.io().of("test1", "test2", "test3"))
-                             .on(loaderFrom(getActivity()))
-                             .call();
+    channel = JRoutineAndroidCompat.withStreamOf(
+        JRoutineAndroidCompat.of("test1", "test2", "test3").buildChannel())
+                                   .on(loaderFrom(getActivity()))
+                                   .call();
     assertThat(channel.abort()).isTrue();
     assertThat(channel.inMax(seconds(10)).getError()).isInstanceOf(AbortException.class);
   }
@@ -766,15 +780,17 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
                                     .inMax(seconds(10))
                                     .getError()
                                     .getCause()).isInstanceOf(IllegalStateException.class);
-    assertThat(
-        JRoutineAndroidCompat.withStreamOf(JRoutineAndroidCompat.io().of("test1", "test2", "test3"))
-                             .on(loaderFrom(getActivity()))
-                             .call("test")
-                             .inMax(seconds(10))
-                             .getError()
-                             .getCause()).isInstanceOf(IllegalStateException.class);
     assertThat(JRoutineAndroidCompat.withStreamOf(
-        JRoutineAndroidCompat.io().buildChannel().bind(new TemplateChannelConsumer<Object>() {}))
+        JRoutineAndroidCompat.of("test1", "test2", "test3").buildChannel())
+                                    .on(loaderFrom(getActivity()))
+                                    .call("test")
+                                    .inMax(seconds(10))
+                                    .getError()
+                                    .getCause()).isInstanceOf(IllegalStateException.class);
+    assertThat(JRoutineAndroidCompat.withStreamOf(JRoutineAndroidCompat.ofInputs()
+                                                                       .buildChannel()
+                                                                       .bind(
+                                                                           new TemplateChannelConsumer<Object>() {}))
                                     .on(loaderFrom(getActivity()))
                                     .close()
                                     .inMax(seconds(10))

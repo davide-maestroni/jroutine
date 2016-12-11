@@ -22,6 +22,10 @@ import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * This utility class represents the entry point to the library by acting as a factory of routine
@@ -53,7 +57,8 @@ import org.jetbrains.annotations.NotNull;
  * <pre>
  *     <code>
  *
- *         final Channel&lt;Result, Result&gt; channel = JRoutineCore.io().buildChannel();
+ *         final Channel&lt;Result, Result&gt; channel =
+ *                 JRoutineCore.&lt;Result&gt;ofInputs().buildChannel();
  *         channel.pass(routine1.close())
  *                .pass(routine2.close())
  *                .close();
@@ -124,13 +129,77 @@ public class JRoutineCore {
   }
 
   /**
-   * Returns a channel builder.
+   * Returns a builder of channels producing no data.
+   * <p>
+   * Note that the returned channels will be already closed.
    *
+   * @param <OUT> the output data type.
    * @return the channel builder instance.
    */
   @NotNull
-  public static ChannelBuilder io() {
-    return new DefaultChannelBuilder();
+  public static <OUT> ChannelBuilder<?, OUT> of() {
+    return of(Collections.<OUT>emptyList());
+  }
+
+  /**
+   * Returns a builder of channels producing the specified output.
+   * <p>
+   * Note that the returned channels will be already closed.
+   *
+   * @param output the output.
+   * @param <OUT>  the output data type.
+   * @return the channel builder instance.
+   */
+  @NotNull
+  public static <OUT> ChannelBuilder<?, OUT> of(@Nullable OUT output) {
+    return of(Collections.singleton(output));
+  }
+
+  /**
+   * Returns a builder of channels producing the specified outputs.
+   * <p>
+   * Note that the returned channels will be already closed.
+   *
+   * @param outputs the output data.
+   * @param <OUT>   the output data type.
+   * @return the channel builder instance.
+   */
+  @NotNull
+  public static <OUT> ChannelBuilder<?, OUT> of(@Nullable OUT... outputs) {
+    if (outputs == null) {
+      return of();
+    }
+
+    return of(Arrays.asList(outputs));
+  }
+
+  /**
+   * Returns a builder of channels producing the specified outputs.
+   * <p>
+   * Note that the returned channels will be already closed.
+   *
+   * @param outputs the iterable returning the output data.
+   * @param <OUT>   the output data type.
+   * @return the channel builder instance.
+   */
+  @NotNull
+  public static <OUT> ChannelBuilder<?, OUT> of(@Nullable Iterable<OUT> outputs) {
+    if (outputs == null) {
+      return of();
+    }
+
+    return new DefaultChannelBuilder<OUT>(outputs);
+  }
+
+  /**
+   * Returns a channel builder.
+   *
+   * @param <DATA> the data type.
+   * @return the channel builder instance.
+   */
+  @NotNull
+  public static <DATA> ChannelBuilder<DATA, DATA> ofInputs() {
+    return new DefaultChannelBuilder<DATA>();
   }
 
   /**

@@ -59,13 +59,69 @@ public class JRoutineAndroidCompat extends SparseChannelsCompat {
   }
 
   /**
-   * Returns a channel builder.
+   * Returns a builder of channels producing no data.
+   * <p>
+   * Note that the returned channels will be already closed.
    *
+   * @param <OUT> the output data type.
    * @return the channel builder instance.
    */
   @NotNull
-  public static ChannelBuilder io() {
-    return JRoutine.io();
+  public static <OUT> ChannelBuilder<?, OUT> of() {
+    return JRoutine.of();
+  }
+
+  /**
+   * Returns a builder of channels producing the specified output.
+   * <p>
+   * Note that the returned channels will be already closed.
+   *
+   * @param output the output.
+   * @param <OUT>  the output data type.
+   * @return the channel builder instance.
+   */
+  @NotNull
+  public static <OUT> ChannelBuilder<?, OUT> of(@Nullable OUT output) {
+    return JRoutine.of(output);
+  }
+
+  /**
+   * Returns a builder of channels producing the specified outputs.
+   * <p>
+   * Note that the returned channels will be already closed.
+   *
+   * @param outputs the output data.
+   * @param <OUT>   the output data type.
+   * @return the channel builder instance.
+   */
+  @NotNull
+  public static <OUT> ChannelBuilder<?, OUT> of(@Nullable OUT... outputs) {
+    return JRoutine.of(outputs);
+  }
+
+  /**
+   * Returns a builder of channels producing the specified outputs.
+   * <p>
+   * Note that the returned channels will be already closed.
+   *
+   * @param outputs the iterable returning the output data.
+   * @param <OUT>   the output data type.
+   * @return the channel builder instance.
+   */
+  @NotNull
+  public static <OUT> ChannelBuilder<?, OUT> of(@Nullable Iterable<OUT> outputs) {
+    return JRoutine.of(outputs);
+  }
+
+  /**
+   * Returns a channel builder.
+   *
+   * @param <DATA> the data type.
+   * @return the channel builder instance.
+   */
+  @NotNull
+  public static <DATA> ChannelBuilder<DATA, DATA> ofInputs() {
+    return JRoutine.ofInputs();
   }
 
   /**

@@ -271,7 +271,7 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
   }
 
   public void testIOChannel() {
-    assertThat(JRoutineAndroid.io().of("test").next()).isEqualTo("test");
+    assertThat(JRoutineAndroid.of("test").buildChannel().next()).isEqualTo("test");
   }
 
   public void testLoader() {
@@ -494,6 +494,23 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
 
     } catch (final NullPointerException ignored) {
     }
+  }
+
+  public void testOf() {
+    if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+      return;
+    }
+
+    final Channel<?, Integer> channel = JRoutineAndroid.of(2).buildChannel();
+    assertThat(channel.isOpen()).isFalse();
+    assertThat(channel.inMax(seconds(1)).all()).containsExactly(2);
+    assertThat(JRoutineAndroid.of().buildChannel().inMax(seconds(1)).all()).isEmpty();
+    assertThat(JRoutineAndroid.of(-11, 73).buildChannel().inMax(seconds(1)).all()).containsExactly(
+        -11, 73);
+    assertThat(JRoutineAndroid.of(Arrays.asList(3, 12, -7))
+                              .buildChannel()
+                              .inMax(seconds(1))
+                              .all()).containsExactly(3, 12, -7);
   }
 
   public void testPredicateFilter() {
@@ -818,11 +835,12 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
                               .close()
                               .inMax(seconds(10))
                               .all()).containsExactly("test1", "test2", "test3");
-    assertThat(JRoutineAndroid.withStreamOf(JRoutineAndroid.io().of("test1", "test2", "test3"))
-                              .on(loaderFrom(getActivity()))
-                              .close()
-                              .inMax(seconds(10))
-                              .all()).containsExactly("test1", "test2", "test3");
+    assertThat(
+        JRoutineAndroid.withStreamOf(JRoutineAndroid.of("test1", "test2", "test3").buildChannel())
+                       .on(loaderFrom(getActivity()))
+                       .close()
+                       .inMax(seconds(10))
+                       .all()).containsExactly("test1", "test2", "test3");
   }
 
   public void testStreamOfAbort() {
@@ -844,9 +862,10 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
                              .call();
     assertThat(channel.abort()).isTrue();
     assertThat(channel.inMax(seconds(10)).getError()).isInstanceOf(AbortException.class);
-    channel = JRoutineAndroid.withStreamOf(JRoutineAndroid.io().of("test1", "test2", "test3"))
-                             .on(loaderFrom(getActivity()))
-                             .call();
+    channel =
+        JRoutineAndroid.withStreamOf(JRoutineAndroid.of("test1", "test2", "test3").buildChannel())
+                       .on(loaderFrom(getActivity()))
+                       .call();
     assertThat(channel.abort()).isTrue();
     assertThat(channel.inMax(seconds(10)).getError()).isInstanceOf(AbortException.class);
   }
@@ -875,14 +894,15 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
                               .inMax(seconds(10))
                               .getError()
                               .getCause()).isInstanceOf(IllegalStateException.class);
-    assertThat(JRoutineAndroid.withStreamOf(JRoutineAndroid.io().of("test1", "test2", "test3"))
-                              .on(loaderFrom(getActivity()))
-                              .call("test")
-                              .inMax(seconds(10))
-                              .getError()
-                              .getCause()).isInstanceOf(IllegalStateException.class);
+    assertThat(
+        JRoutineAndroid.withStreamOf(JRoutineAndroid.of("test1", "test2", "test3").buildChannel())
+                       .on(loaderFrom(getActivity()))
+                       .call("test")
+                       .inMax(seconds(10))
+                       .getError()
+                       .getCause()).isInstanceOf(IllegalStateException.class);
     assertThat(JRoutineAndroid.withStreamOf(
-        JRoutineAndroid.io().buildChannel().bind(new TemplateChannelConsumer<Object>() {}))
+        JRoutineAndroid.ofInputs().buildChannel().bind(new TemplateChannelConsumer<Object>() {}))
                               .on(loaderFrom(getActivity()))
                               .close()
                               .inMax(seconds(10))

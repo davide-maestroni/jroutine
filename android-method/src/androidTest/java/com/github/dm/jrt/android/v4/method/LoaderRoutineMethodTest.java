@@ -27,8 +27,8 @@ import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
-import com.github.dm.jrt.method.annotation.In;
-import com.github.dm.jrt.method.annotation.Out;
+import com.github.dm.jrt.method.annotation.Input;
+import com.github.dm.jrt.method.annotation.Output;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -58,15 +58,15 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
   }
 
   private static void testAbort2(@NotNull final FragmentActivity activity) {
-    final Channel<Integer, Integer> inputChannel1 = JRoutineCore.io().buildChannel();
-    final Channel<Integer, Integer> inputChannel2 = JRoutineCore.io().buildChannel();
-    final Channel<Integer, Integer> outputChannel = JRoutineCore.io().buildChannel();
+    final Channel<Integer, Integer> inputChannel1 = JRoutineCore.<Integer>ofInputs().buildChannel();
+    final Channel<Integer, Integer> inputChannel2 = JRoutineCore.<Integer>ofInputs().buildChannel();
+    final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
     new LoaderRoutineMethodCompat(loaderFrom(activity)) {
 
       private int mSum;
 
-      void sum(@In final Channel<?, Integer> input1, @In final Channel<?, Integer> input2,
-          @Out final Channel<Integer, ?> output) {
+      void sum(@Input final Channel<?, Integer> input1, @Input final Channel<?, Integer> input2,
+          @Output final Channel<Integer, ?> output) {
         final Channel<?, Integer> input = switchInput();
         if (input.hasNext()) {
           mSum += input.next();
@@ -83,15 +83,15 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
   }
 
   private static void testAbort3(@NotNull final FragmentActivity activity) {
-    final Channel<Integer, Integer> inputChannel1 = JRoutineCore.io().buildChannel();
-    final Channel<Integer, Integer> inputChannel2 = JRoutineCore.io().buildChannel();
-    final Channel<Integer, Integer> outputChannel = JRoutineCore.io().buildChannel();
+    final Channel<Integer, Integer> inputChannel1 = JRoutineCore.<Integer>ofInputs().buildChannel();
+    final Channel<Integer, Integer> inputChannel2 = JRoutineCore.<Integer>ofInputs().buildChannel();
+    final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
     new LoaderRoutineMethodCompat(loaderFrom(activity)) {
 
       private int mSum;
 
-      void sum(@In final Channel<?, Integer> input1, @In final Channel<?, Integer> input2,
-          @Out final Channel<Integer, ?> output) {
+      void sum(@Input final Channel<?, Integer> input1, @Input final Channel<?, Integer> input2,
+          @Output final Channel<Integer, ?> output) {
         if (input1.equals(switchInput())) {
           if (input1.hasNext()) {
             mSum += input1.next();
@@ -109,10 +109,10 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
   }
 
   private static void testContext(@NotNull final FragmentActivity activity) {
-    final Channel<Boolean, Boolean> outputChannel = JRoutineCore.io().buildChannel();
+    final Channel<Boolean, Boolean> outputChannel = JRoutineCore.<Boolean>ofInputs().buildChannel();
     new LoaderRoutineMethodCompat(loaderFrom(activity)) {
 
-      void test(@Out final Channel<Boolean, ?> output) {
+      void test(@Output final Channel<Boolean, ?> output) {
         output.pass(getContext() instanceof TestApp);
       }
     }.call(outputChannel);
@@ -127,10 +127,10 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
         return "test";
       }
     }.call().inMax(seconds(10)).all()).containsExactly("test");
-    final Channel<String, String> outputChannel = JRoutineCore.io().buildChannel();
+    final Channel<String, String> outputChannel = JRoutineCore.<String>ofInputs().buildChannel();
     new LoaderRoutineMethodCompat(context) {
 
-      void get(@Out final Channel<String, ?> outputChannel) {
+      void get(@Output final Channel<String, ?> outputChannel) {
         outputChannel.pass("test");
       }
     }.call(outputChannel);
@@ -142,7 +142,7 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
     final LoaderRoutineMethodCompat method =
         new LoaderRoutineMethodCompat(loaderFrom(activity), locale) {
 
-          String switchCase(@In final Channel<?, String> input, final boolean isUpper) {
+          String switchCase(@Input final Channel<?, String> input, final boolean isUpper) {
             if (input.hasNext()) {
               final String str = input.next();
               return (isUpper) ? str.toUpperCase(locale) : str.toLowerCase(locale);
@@ -150,10 +150,11 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
             return null;
           }
         };
-    Channel<Object, Object> inputChannel = JRoutineCore.io().buildChannel().pass("test").close();
+    Channel<Object, Object> inputChannel =
+        JRoutineCore.ofInputs().buildChannel().pass("test").close();
     Channel<?, String> outputChannel = method.call(inputChannel, true);
     assertThat(outputChannel.inMax(seconds(10)).next()).isEqualTo("TEST");
-    inputChannel = JRoutineCore.io().buildChannel().pass("TEST").close();
+    inputChannel = JRoutineCore.ofInputs().buildChannel().pass("TEST").close();
     outputChannel = method.call(inputChannel, false);
     assertThat(outputChannel.inMax(seconds(10)).next()).isEqualTo("test");
   }
@@ -162,7 +163,7 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
     final Locale locale = Locale.getDefault();
     final LoaderRoutineMethodCompat method = new LoaderRoutineMethodCompat(loaderFrom(activity)) {
 
-      String switchCase(@In final Channel<?, String> input, final boolean isUpper) {
+      String switchCase(@Input final Channel<?, String> input, final boolean isUpper) {
         if (input.hasNext()) {
           final String str = input.next();
           return (isUpper) ? str.toUpperCase(locale) : str.toLowerCase(locale);
@@ -170,9 +171,10 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
         return null;
       }
     };
-    final Channel<?, Object> outputChannel = method.call(JRoutineCore.io().of("test"), true);
+    final Channel<?, Object> outputChannel =
+        method.call(JRoutineCore.of("test").buildChannel(), true);
     assertThat(outputChannel.inMax(seconds(10)).next()).isEqualTo("TEST");
-    final Channel<String, String> inputChannel = JRoutineCore.io().of("test");
+    final Channel<?, String> inputChannel = JRoutineCore.of("test").buildChannel();
     try {
       method.call(inputChannel, false);
       fail();
@@ -182,10 +184,10 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
   }
 
   private static void testReturnValue(@NotNull final FragmentActivity activity) {
-    final Channel<String, String> inputStrings = JRoutineCore.io().buildChannel();
+    final Channel<String, String> inputStrings = JRoutineCore.<String>ofInputs().buildChannel();
     final Channel<?, Object> outputChannel = new LoaderRoutineMethodCompat(loaderFrom(activity)) {
 
-      int length(@In final Channel<?, String> input) {
+      int length(@Input final Channel<?, String> input) {
         if (input.hasNext()) {
           return input.next().length();
         }
@@ -197,13 +199,13 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
   }
 
   private static void testSwitchInput(@NotNull final FragmentActivity activity) {
-    final Channel<Integer, Integer> inputInts = JRoutineCore.io().buildChannel();
-    final Channel<String, String> inputStrings = JRoutineCore.io().buildChannel();
-    final Channel<String, String> outputChannel = JRoutineCore.io().buildChannel();
+    final Channel<Integer, Integer> inputInts = JRoutineCore.<Integer>ofInputs().buildChannel();
+    final Channel<String, String> inputStrings = JRoutineCore.<String>ofInputs().buildChannel();
+    final Channel<String, String> outputChannel = JRoutineCore.<String>ofInputs().buildChannel();
     new LoaderRoutineMethodCompat(loaderFrom(activity)) {
 
-      void run(@In final Channel<?, Integer> inputInts, @In final Channel<?, String> inputStrings,
-          @Out final Channel<String, ?> output) {
+      void run(@Input final Channel<?, Integer> inputInts,
+          @Input final Channel<?, String> inputStrings, @Output final Channel<String, ?> output) {
         final Channel<?, Object> inputChannel = switchInput();
         if (inputChannel.hasNext()) {
           output.pass(inputChannel.next().toString());
@@ -217,13 +219,13 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
   }
 
   private static void testSwitchInput2(@NotNull final FragmentActivity activity) {
-    final Channel<Integer, Integer> inputInts = JRoutineCore.io().buildChannel();
-    final Channel<String, String> inputStrings = JRoutineCore.io().buildChannel();
-    final Channel<String, String> outputChannel = JRoutineCore.io().buildChannel();
+    final Channel<Integer, Integer> inputInts = JRoutineCore.<Integer>ofInputs().buildChannel();
+    final Channel<String, String> inputStrings = JRoutineCore.<String>ofInputs().buildChannel();
+    final Channel<String, String> outputChannel = JRoutineCore.<String>ofInputs().buildChannel();
     new LoaderRoutineMethodCompat(loaderFrom(activity)) {
 
-      void run(@In final Channel<?, Integer> inputInts, @In final Channel<?, String> inputStrings,
-          @Out final Channel<String, ?> output) {
+      void run(@Input final Channel<?, Integer> inputInts,
+          @Input final Channel<?, String> inputStrings, @Output final Channel<String, ?> output) {
         final Channel<?, ?> inputChannel = switchInput();
         if (inputChannel == inputStrings) {
           output.pass(inputStrings.next());
@@ -236,8 +238,8 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
   }
 
   public void testAbort() {
-    final Channel<Integer, Integer> inputChannel = JRoutineCore.io().buildChannel();
-    final Channel<Integer, Integer> outputChannel = JRoutineCore.io().buildChannel();
+    final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
+    final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
     new SumRoutine(loaderFrom(getActivity())).call(inputChannel, outputChannel);
     inputChannel.pass(1, 2, 3, 4).abort();
     assertThat(outputChannel.inMax(seconds(10)).getError()).isExactlyInstanceOf(
@@ -254,18 +256,18 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
 
   public void testBind() {
     final LoaderContextCompat context = loaderFrom(getActivity());
-    final Channel<Integer, Integer> inputChannel = JRoutineCore.io().buildChannel();
-    final Channel<Integer, Integer> outputChannel = JRoutineCore.io().buildChannel();
+    final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
+    final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
     new SquareRoutine(context).call(inputChannel, outputChannel);
-    final Channel<Integer, Integer> resultChannel = JRoutineCore.io().buildChannel();
+    final Channel<Integer, Integer> resultChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
     new SumRoutine(context).call(outputChannel, resultChannel);
     inputChannel.pass(1, 2, 3, 4, 5).close();
     assertThat(resultChannel.inMax(seconds(10)).all()).containsExactly(55);
   }
 
   public void testCall() {
-    final Channel<Integer, Integer> inputChannel = JRoutineCore.io().buildChannel();
-    final Channel<Integer, Integer> outputChannel = JRoutineCore.io().buildChannel();
+    final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
+    final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
     new SumRoutine(loaderFrom(getActivity())).call(inputChannel, outputChannel);
     inputChannel.pass(1, 2, 3, 4, 5).close();
     assertThat(outputChannel.inMax(seconds(10)).all()).containsExactly(15);
@@ -283,10 +285,10 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
                                         .next()).isEqualTo(4);
     assertThat(LoaderRoutineMethodCompat.from(loaderFrom(getActivity()),
         LoaderRoutineMethodTest.class.getMethod("length", String.class))
-                                        .call(JRoutineCore.io().of("test"))
+                                        .call(JRoutineCore.of("test").buildChannel())
                                         .inMax(seconds(10))
                                         .next()).isEqualTo(4);
-    final Channel<String, String> inputChannel = JRoutineCore.io().buildChannel();
+    final Channel<String, String> inputChannel = JRoutineCore.<String>ofInputs().buildChannel();
     final Channel<?, Object> outputChannel =
         LoaderRoutineMethodCompat.from(loaderFrom(getActivity()),
             LoaderRoutineMethodTest.class.getMethod("length", String.class))
@@ -303,10 +305,10 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
                                         .next()).isEqualTo(4);
     assertThat(LoaderRoutineMethodCompat.from(loaderFrom(getActivity()),
         classOfType(LoaderRoutineMethodTest.class), "length", String.class)
-                                        .call(JRoutineCore.io().of("test"))
+                                        .call(JRoutineCore.of("test").buildChannel())
                                         .inMax(seconds(10))
                                         .next()).isEqualTo(4);
-    final Channel<String, String> inputChannel = JRoutineCore.io().buildChannel();
+    final Channel<String, String> inputChannel = JRoutineCore.<String>ofInputs().buildChannel();
     final Channel<?, Object> outputChannel =
         LoaderRoutineMethodCompat.from(loaderFrom(getActivity()),
             classOfType(LoaderRoutineMethodTest.class), "length", String.class).call(inputChannel);
@@ -368,8 +370,8 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
   }
 
   public void testParallel() {
-    final Channel<Integer, Integer> inputChannel = JRoutineCore.io().buildChannel();
-    final Channel<Integer, Integer> outputChannel = JRoutineCore.io().buildChannel();
+    final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
+    final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
     new SumRoutine(loaderFrom(getActivity())).applyInvocationConfiguration()
                                              .withOutputOrder(OrderType.SORTED)
                                              .configured()
@@ -380,10 +382,11 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
 
   public void testParams() {
     final SwitchCase method = new SwitchCase(loaderFrom(getActivity()));
-    Channel<Object, Object> inputChannel = JRoutineCore.io().buildChannel().pass("test").close();
+    Channel<Object, Object> inputChannel =
+        JRoutineCore.ofInputs().buildChannel().pass("test").close();
     Channel<?, String> outputChannel = method.call(inputChannel, true);
     assertThat(outputChannel.inMax(seconds(10)).next()).isEqualTo("TEST");
-    inputChannel = JRoutineCore.io().buildChannel().pass("TEST").close();
+    inputChannel = JRoutineCore.ofInputs().buildChannel().pass("TEST").close();
     outputChannel = method.call(inputChannel, false);
     assertThat(outputChannel.inMax(seconds(10)).next()).isEqualTo("test");
   }
@@ -423,7 +426,8 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
       super(context);
     }
 
-    public void square(@In final Channel<?, Integer> input, @Out final Channel<Integer, ?> output) {
+    public void square(@Input final Channel<?, Integer> input,
+        @Output final Channel<Integer, ?> output) {
       if (input.hasNext()) {
         final int i = input.next();
         output.pass(i * i);
@@ -439,7 +443,8 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
       super(context);
     }
 
-    public void sum(@In final Channel<?, Integer> input, @Out final Channel<Integer, ?> output) {
+    public void sum(@Input final Channel<?, Integer> input,
+        @Output final Channel<Integer, ?> output) {
       if (input.hasNext()) {
         mSum += input.next();
 
@@ -455,7 +460,7 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
       super(context);
     }
 
-    String switchCase(@In final Channel<?, String> input, final boolean isUpper) {
+    String switchCase(@Input final Channel<?, String> input, final boolean isUpper) {
       if (input.hasNext()) {
         final String str = input.next();
         return (isUpper) ? str.toUpperCase() : str.toLowerCase();

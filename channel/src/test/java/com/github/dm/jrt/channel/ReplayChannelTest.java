@@ -49,7 +49,8 @@ public class ReplayChannelTest {
   @Test
   public void testChannel() {
 
-    Channel<?, String> channel = Channels.replay(JRoutineCore.io().of("test")).buildChannels();
+    Channel<?, String> channel =
+        Channels.replay(JRoutineCore.of("test").buildChannel()).buildChannels();
     assertThat(channel.isOpen()).isFalse();
     assertThat(channel.abort()).isFalse();
     assertThat(channel.abort(null)).isFalse();
@@ -61,7 +62,8 @@ public class ReplayChannelTest {
     assertThat(channel.inMax(1, TimeUnit.SECONDS).hasNext()).isTrue();
     channel.inNoTime().allInto(results);
     assertThat(results).containsExactly("test");
-    channel = Channels.replay(JRoutineCore.io().of("test1", "test2", "test3")).buildChannels();
+    channel =
+        Channels.replay(JRoutineCore.of("test1", "test2", "test3").buildChannel()).buildChannels();
 
     try {
       channel.remove();
@@ -76,7 +78,9 @@ public class ReplayChannelTest {
     assertThat(channel.eventuallyContinue().nextOrElse("test4")).isEqualTo("test4");
 
     Iterator<String> iterator =
-        Channels.replay(JRoutineCore.io().of("test1", "test2", "test3")).buildChannels().iterator();
+        Channels.replay(JRoutineCore.of("test1", "test2", "test3").buildChannel())
+                .buildChannels()
+                .iterator();
     assertThat(iterator.hasNext()).isTrue();
     assertThat(iterator.next()).isEqualTo("test1");
 
@@ -88,7 +92,7 @@ public class ReplayChannelTest {
 
     }
 
-    iterator = Channels.replay(JRoutineCore.io().of("test1", "test2", "test3"))
+    iterator = Channels.replay(JRoutineCore.of("test1", "test2", "test3").buildChannel())
                        .buildChannels()
                        .expiringIterator();
     assertThat(iterator.hasNext()).isTrue();
@@ -102,8 +106,9 @@ public class ReplayChannelTest {
 
     }
 
-    channel = Channels.replay(JRoutineCore.io().<String>buildChannel().after(days(1)).pass("test"))
-                      .buildChannels();
+    channel =
+        Channels.replay(JRoutineCore.<String>ofInputs().buildChannel().after(days(1)).pass("test"))
+                .buildChannels();
 
     try {
       channel.eventuallyFail().next();
@@ -137,9 +142,9 @@ public class ReplayChannelTest {
       assertThat(e.getCause()).isNull();
     }
 
-    channel =
-        Channels.replay(JRoutineCore.io().<String>buildChannel().after(seconds(1)).pass("test"))
-                .buildChannels();
+    channel = Channels.replay(
+        JRoutineCore.<String>ofInputs().buildChannel().after(seconds(1)).pass("test"))
+                      .buildChannels();
 
     try {
       channel.eventuallyAbort(new IllegalArgumentException()).next();
@@ -153,7 +158,7 @@ public class ReplayChannelTest {
   @Test
   @SuppressWarnings("unchecked")
   public void testInvalidCalls() {
-    final Channel<String, String> inputChannel = JRoutineCore.io().buildChannel();
+    final Channel<String, String> inputChannel = JRoutineCore.<String>ofInputs().buildChannel();
     final Channel<Object, String> channel =
         (Channel<Object, String>) Channels.replay(inputChannel).buildChannels();
     try {
@@ -178,7 +183,7 @@ public class ReplayChannelTest {
     }
 
     try {
-      channel.pass(JRoutineCore.io().buildChannel());
+      channel.pass(JRoutineCore.ofInputs().buildChannel());
       fail();
 
     } catch (final IllegalStateException ignored) {
@@ -188,15 +193,15 @@ public class ReplayChannelTest {
   @Test
   public void testReplay() {
 
-    final Channel<Object, Object> inputChannel = JRoutineCore.io().buildChannel();
+    final Channel<Object, Object> inputChannel = JRoutineCore.ofInputs().buildChannel();
     final Channel<?, Object> channel = Channels.replay(inputChannel).buildChannels();
     assertThat(channel.isBound()).isFalse();
     assertThat(channel.isEmpty()).isTrue();
     inputChannel.pass("test1", "test2");
-    final Channel<Object, Object> output1 = JRoutineCore.io().buildChannel();
+    final Channel<Object, Object> output1 = JRoutineCore.ofInputs().buildChannel();
     channel.bind(output1).close();
     assertThat(output1.next()).isEqualTo("test1");
-    final Channel<Object, Object> output2 = JRoutineCore.io().buildChannel();
+    final Channel<Object, Object> output2 = JRoutineCore.ofInputs().buildChannel();
     channel.bind(output2).close();
     assertThat(channel.isOpen()).isFalse();
     channel.close();
@@ -214,13 +219,13 @@ public class ReplayChannelTest {
   @SuppressWarnings({"ConstantConditions", "ThrowableResultOfMethodCallIgnored"})
   public void testReplayAbort() {
 
-    Channel<Object, Object> inputChannel = JRoutineCore.io().buildChannel();
+    Channel<Object, Object> inputChannel = JRoutineCore.ofInputs().buildChannel();
     Channel<?, Object> channel = Channels.replay(inputChannel).buildChannels();
     inputChannel.pass("test1", "test2");
-    final Channel<Object, Object> output1 = JRoutineCore.io().buildChannel();
+    final Channel<Object, Object> output1 = JRoutineCore.ofInputs().buildChannel();
     channel.bind(output1).close();
     assertThat(output1.next()).isEqualTo("test1");
-    final Channel<Object, Object> output2 = JRoutineCore.io().buildChannel();
+    final Channel<Object, Object> output2 = JRoutineCore.ofInputs().buildChannel();
     channel.bind(output2).close();
     inputChannel.abort();
 
@@ -240,7 +245,7 @@ public class ReplayChannelTest {
 
     }
 
-    inputChannel = JRoutineCore.io().buildChannel();
+    inputChannel = JRoutineCore.ofInputs().buildChannel();
     channel = Channels.replay(inputChannel).buildChannels();
     inputChannel.pass("test").close();
     channel.bind(new TemplateChannelConsumer<Object>() {
@@ -258,7 +263,7 @@ public class ReplayChannelTest {
   @SuppressWarnings({"ConstantConditions", "ThrowableResultOfMethodCallIgnored"})
   public void testReplayAbortException() {
 
-    Channel<Object, Object> inputChannel = JRoutineCore.io().buildChannel();
+    Channel<Object, Object> inputChannel = JRoutineCore.ofInputs().buildChannel();
     Channel<?, Object> channel = Channels.replay(inputChannel).buildChannels();
     channel.bind(new TemplateChannelConsumer<Object>() {
 
@@ -270,7 +275,7 @@ public class ReplayChannelTest {
     });
     inputChannel.abort();
     assertThat(channel.getError().getCause()).isNull();
-    inputChannel = JRoutineCore.io().buildChannel();
+    inputChannel = JRoutineCore.ofInputs().buildChannel();
     channel = Channels.replay(inputChannel).buildChannels();
     channel.bind(new TemplateChannelConsumer<Object>() {
 
@@ -283,7 +288,7 @@ public class ReplayChannelTest {
     inputChannel.abort();
     assertThat(channel.getError().getCause()).isNull();
 
-    inputChannel = JRoutineCore.io().buildChannel();
+    inputChannel = JRoutineCore.ofInputs().buildChannel();
     channel = Channels.replay(inputChannel).buildChannels();
     inputChannel.abort();
     channel.bind(new TemplateChannelConsumer<Object>() {
@@ -295,7 +300,7 @@ public class ReplayChannelTest {
       }
     });
     assertThat(channel.getError().getCause()).isNull();
-    inputChannel = JRoutineCore.io().buildChannel();
+    inputChannel = JRoutineCore.ofInputs().buildChannel();
     channel = Channels.replay(inputChannel).buildChannels();
     inputChannel.abort();
     channel.bind(new TemplateChannelConsumer<Object>() {
@@ -312,7 +317,7 @@ public class ReplayChannelTest {
   @Test
   public void testReplayConsumer() {
 
-    final Channel<Object, Object> inputChannel = JRoutineCore.io().buildChannel();
+    final Channel<Object, Object> inputChannel = JRoutineCore.ofInputs().buildChannel();
     final Channel<?, Object> channel = Channels.replay(inputChannel).buildChannels();
     assertThat(channel.isBound()).isFalse();
     assertThat(channel.isEmpty()).isTrue();
@@ -339,7 +344,7 @@ public class ReplayChannelTest {
   @Test
   public void testReplayError() {
 
-    final Channel<Object, Object> inputChannel = JRoutineCore.io().buildChannel();
+    final Channel<Object, Object> inputChannel = JRoutineCore.ofInputs().buildChannel();
     final Channel<?, Object> channel = Channels.replay(inputChannel).buildChannels();
     channel.eventuallyContinue();
     try {
@@ -408,7 +413,7 @@ public class ReplayChannelTest {
   @Test
   public void testReplayException() {
 
-    Channel<Object, Object> inputChannel = JRoutineCore.io().buildChannel();
+    Channel<Object, Object> inputChannel = JRoutineCore.ofInputs().buildChannel();
     Channel<?, Object> channel = Channels.replay(inputChannel).buildChannels();
     channel.bind(new TemplateChannelConsumer<Object>() {
 
@@ -419,7 +424,7 @@ public class ReplayChannelTest {
       }
     });
     inputChannel.pass("test").close().throwError();
-    inputChannel = JRoutineCore.io().buildChannel();
+    inputChannel = JRoutineCore.ofInputs().buildChannel();
     channel = Channels.replay(inputChannel).buildChannels();
     channel.bind(new TemplateChannelConsumer<Object>() {
 
@@ -431,7 +436,7 @@ public class ReplayChannelTest {
     });
     inputChannel.pass("test").close().throwError();
 
-    inputChannel = JRoutineCore.io().buildChannel();
+    inputChannel = JRoutineCore.ofInputs().buildChannel();
     channel = Channels.replay(inputChannel).buildChannels();
     inputChannel.pass("test").close();
     channel.bind(new TemplateChannelConsumer<Object>() {
@@ -443,7 +448,7 @@ public class ReplayChannelTest {
       }
     });
     channel.throwError();
-    inputChannel = JRoutineCore.io().buildChannel();
+    inputChannel = JRoutineCore.ofInputs().buildChannel();
     channel = Channels.replay(inputChannel).buildChannels();
     inputChannel.pass("test").close();
     channel.bind(new TemplateChannelConsumer<Object>() {

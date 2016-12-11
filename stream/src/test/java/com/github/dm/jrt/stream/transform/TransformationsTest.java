@@ -410,8 +410,8 @@ public class TransformationsTest {
 
   @Test
   public void testRetryConsumerError() {
-    final Channel<Object, Object> inputChannel = JRoutineCore.io().buildChannel();
-    final Channel<Object, Object> outputChannel = JRoutineCore.io().buildChannel();
+    final Channel<Object, Object> inputChannel = JRoutineCore.ofInputs().buildChannel();
+    final Channel<Object, Object> outputChannel = JRoutineCore.ofInputs().buildChannel();
     new RetryChannelConsumer<Object, Object>(inputChannel, outputChannel, Runners.syncRunner(),
         new Function<Channel<?, Object>, Channel<?, Object>>() {
 
@@ -430,8 +430,8 @@ public class TransformationsTest {
 
   @Test
   public void testRetryConsumerError2() {
-    final Channel<Object, Object> inputChannel = JRoutineCore.io().buildChannel();
-    final Channel<Object, Object> outputChannel = JRoutineCore.io().buildChannel();
+    final Channel<Object, Object> inputChannel = JRoutineCore.ofInputs().buildChannel();
+    final Channel<Object, Object> outputChannel = JRoutineCore.ofInputs().buildChannel();
     new RetryChannelConsumer<Object, Object>(inputChannel, outputChannel, Runners.syncRunner(),
         new Function<Channel<?, Object>, Channel<?, Object>>() {
 

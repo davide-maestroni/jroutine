@@ -73,14 +73,14 @@
 <b>Example 1:</b> via Service routine method.
 <pre>
     <code>
-        final Channel&lt;Integer, Integer&gt; inputInts = JRoutineCore.io().buildChannel();
-        final Channel&lt;String, String&gt; inputStrings = JRoutineCore.io().buildChannel();
-        final Channel&lt;String, String&gt; outputChannel = JRoutineCore.io().buildChannel();
+        final Channel&lt;Integer, Integer&gt; inputInts = JRoutineCore.&lt;Integer&gt;ofInputs().buildChannel();
+        final Channel&lt;String, String&gt; inputStrings = JRoutineCore.&lt;String&gt;ofInputs().buildChannel();
+        final Channel&lt;String, String&gt; outputChannel = JRoutineCore.&lt;String&gt;ofInputs().buildChannel();
         new ServiceRoutineMethod(serviceFrom(activity)) {
 
-            void print(&commat;In final Channel&lt;?, Integer&gt; inputInts,
-                    &commat;In final Channel&lt;?, String&gt; inputStrings,
-                    &commat;Out final Channel&lt;String, ?&gt; output) {
+            void print(&commat;Input final Channel&lt;?, Integer&gt; inputInts,
+                    &commat;Input final Channel&lt;?, String&gt; inputStrings,
+                    &commat;Output final Channel&lt;String, ?&gt; output) {
                 final Channel&lt;?, ?&gt; inputChannel = switchInput();
                 if (inputChannel.hasNext()) {
                     if (inputChannel == inputInts) {
@@ -103,14 +103,14 @@
 <b>Example 2:</b> via Loader routine method.
 <pre>
     <code>
-        final Channel&lt;Integer, Integer&gt; inputInts = JRoutineCore.io().buildChannel();
-        final Channel&lt;String, String&gt; inputStrings = JRoutineCore.io().buildChannel();
-        final Channel&lt;String, String&gt; outputChannel = JRoutineCore.io().buildChannel();
+        final Channel&lt;Integer, Integer&gt; inputInts = JRoutineCore.&lt;Integer&gt;ofInputs().buildChannel();
+        final Channel&lt;String, String&gt; inputStrings = JRoutineCore.&lt;String&gt;ofInputs().buildChannel();
+        final Channel&lt;String, String&gt; outputChannel = JRoutineCore.&lt;String&gt;ofInputs().buildChannel();
         new LoaderRoutineMethod(loaderFrom(activity)) {
 
-            void print(&commat;In final Channel&lt;?, Integer&gt; inputInts,
-                    &commat;In final Channel&lt;?, String&gt; inputStrings,
-                    &commat;Out final Channel&lt;String, ?&gt; output) {
+            void print(&commat;Input final Channel&lt;?, Integer&gt; inputInts,
+                    &commat;Input final Channel&lt;?, String&gt; inputStrings,
+                    &commat;Output final Channel&lt;String, ?&gt; output) {
                 final Channel&lt;?, ?&gt; inputChannel = switchInput();
                 if (inputChannel.hasNext()) {
                     if (inputChannel == inputInts) {

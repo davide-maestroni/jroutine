@@ -53,8 +53,8 @@ class InputFilterBuilder<IN> extends AbstractBuilder<Channel<Selectable<IN>, ?>>
   @Override
   protected Channel<Selectable<IN>, ?> build(@NotNull final ChannelConfiguration configuration) {
     final Channel<Selectable<IN>, Selectable<IN>> inputChannel =
-        JRoutineCore.io().apply(configuration).buildChannel();
-    final Channel<IN, IN> outputChannel = JRoutineCore.io().buildChannel();
+        JRoutineCore.<Selectable<IN>>ofInputs().apply(configuration).buildChannel();
+    final Channel<IN, IN> outputChannel = JRoutineCore.<IN>ofInputs().buildChannel();
     outputChannel.bind(mChannel);
     return inputChannel.bind(new FilterChannelConsumer<IN>(outputChannel, mIndex));
   }

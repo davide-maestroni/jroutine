@@ -452,10 +452,16 @@ public class SparseChannelsCompatTest extends ActivityInstrumentationTestCase2<T
 
   public void testMap() {
 
-    final ChannelBuilder builder =
-        JRoutineCore.io().applyChannelConfiguration().withOrder(OrderType.SORTED).configured();
-    final Channel<String, String> channel1 = builder.buildChannel();
-    final Channel<Integer, Integer> channel2 = builder.buildChannel();
+    final ChannelBuilder<String, String> builder1 =
+        JRoutineCore.<String>ofInputs().applyChannelConfiguration()
+                                       .withOrder(OrderType.SORTED)
+                                       .configured();
+    final ChannelBuilder<Integer, Integer> builder2 =
+        JRoutineCore.<Integer>ofInputs().applyChannelConfiguration()
+                                        .withOrder(OrderType.SORTED)
+                                        .configured();
+    final Channel<String, String> channel1 = builder1.buildChannel();
+    final Channel<Integer, Integer> channel2 = builder2.buildChannel();
 
     final Channel<?, ? extends ParcelableSelectable<Object>> channel =
         SparseChannelsCompat.mergeParcelable(Arrays.<Channel<?, ?>>asList(channel1, channel2))
@@ -489,10 +495,16 @@ public class SparseChannelsCompatTest extends ActivityInstrumentationTestCase2<T
   @SuppressWarnings("unchecked")
   public void testMerge() {
 
-    final ChannelBuilder builder =
-        JRoutineCore.io().applyChannelConfiguration().withOrder(OrderType.SORTED).configured();
-    final Channel<String, String> channel1 = builder.buildChannel();
-    final Channel<Integer, Integer> channel2 = builder.buildChannel();
+    final ChannelBuilder<String, String> builder1 =
+        JRoutineCore.<String>ofInputs().applyChannelConfiguration()
+                                       .withOrder(OrderType.SORTED)
+                                       .configured();
+    final ChannelBuilder<Integer, Integer> builder2 =
+        JRoutineCore.<Integer>ofInputs().applyChannelConfiguration()
+                                        .withOrder(OrderType.SORTED)
+                                        .configured();
+    final Channel<String, String> channel1 = builder1.buildChannel();
+    final Channel<Integer, Integer> channel2 = builder2.buildChannel();
     final SparseArrayCompat<Channel<?, ?>> channelMap = new SparseArrayCompat<Channel<?, ?>>(2);
     channelMap.put(7, channel1);
     channelMap.put(-3, channel2);
@@ -507,10 +519,16 @@ public class SparseChannelsCompatTest extends ActivityInstrumentationTestCase2<T
   @SuppressWarnings("unchecked")
   public void testMergeAbort() {
 
-    final ChannelBuilder builder =
-        JRoutineCore.io().applyChannelConfiguration().withOrder(OrderType.SORTED).configured();
-    final Channel<String, String> channel1 = builder.buildChannel();
-    final Channel<Integer, Integer> channel2 = builder.buildChannel();
+    final ChannelBuilder<String, String> builder1 =
+        JRoutineCore.<String>ofInputs().applyChannelConfiguration()
+                                       .withOrder(OrderType.SORTED)
+                                       .configured();
+    final ChannelBuilder<Integer, Integer> builder2 =
+        JRoutineCore.<Integer>ofInputs().applyChannelConfiguration()
+                                        .withOrder(OrderType.SORTED)
+                                        .configured();
+    final Channel<String, String> channel1 = builder1.buildChannel();
+    final Channel<Integer, Integer> channel2 = builder2.buildChannel();
     final SparseArrayCompat<Channel<?, ?>> channelMap = new SparseArrayCompat<Channel<?, ?>>(2);
     channelMap.put(7, channel1);
     channelMap.put(-3, channel2);
@@ -701,7 +719,7 @@ public class SparseChannelsCompatTest extends ActivityInstrumentationTestCase2<T
   public void testOutputSelect() {
 
     final Channel<ParcelableSelectable<String>, ParcelableSelectable<String>> channel =
-        JRoutineCore.io().buildChannel();
+        JRoutineCore.<ParcelableSelectable<String>>ofInputs().buildChannel();
     final Channel<?, String> outputChannel =
         SparseChannelsCompat.selectOutputParcelable(channel, 33).buildChannels().get(33);
     channel.pass(new ParcelableSelectable<String>("test1", 33),
@@ -715,7 +733,7 @@ public class SparseChannelsCompatTest extends ActivityInstrumentationTestCase2<T
   public void testOutputSelectAbort() {
 
     final Channel<ParcelableSelectable<String>, ParcelableSelectable<String>> channel =
-        JRoutineCore.io().buildChannel();
+        JRoutineCore.<ParcelableSelectable<String>>ofInputs().buildChannel();
     final Channel<?, String> outputChannel =
         SparseChannelsCompat.selectOutputParcelable(channel, 33).buildChannels().get(33);
     channel.abort();

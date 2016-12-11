@@ -67,13 +67,13 @@ class CombineMapBuilder<IN> extends AbstractBuilder<Channel<Selectable<? extends
     final int size = channelMap.size();
     final SparseArray<Channel<IN, ?>> inputChannelMap = new SparseArray<Channel<IN, ?>>(size);
     for (int i = 0; i < size; ++i) {
-      final Channel<IN, IN> outputChannel = JRoutineCore.io().buildChannel();
+      final Channel<IN, IN> outputChannel = JRoutineCore.<IN>ofInputs().buildChannel();
       outputChannel.bind((Channel<IN, ?>) channelMap.valueAt(i));
       inputChannelMap.put(channelMap.keyAt(i), outputChannel);
     }
 
     final Channel<Selectable<? extends IN>, Selectable<? extends IN>> inputChannel =
-        JRoutineCore.io().apply(configuration).buildChannel();
+        JRoutineCore.<Selectable<? extends IN>>ofInputs().apply(configuration).buildChannel();
     inputChannel.bind(new SortingMapChannelConsumer<IN>(inputChannelMap));
     return inputChannel;
   }

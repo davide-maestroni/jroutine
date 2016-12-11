@@ -89,7 +89,8 @@ class BindThrottle<IN, OUT>
 
     public Channel<?, OUT> apply(final Channel<?, IN> channel) throws Exception {
       final ChannelConfiguration configuration = mConfiguration;
-      final Channel<OUT, OUT> outputChannel = JRoutineCore.io().apply(configuration).buildChannel();
+      final Channel<OUT, OUT> outputChannel =
+          JRoutineCore.<OUT>ofInputs().apply(configuration).buildChannel();
       final boolean isBind;
       synchronized (mMutex) {
         isBind = (++mCount <= mMaxCount);

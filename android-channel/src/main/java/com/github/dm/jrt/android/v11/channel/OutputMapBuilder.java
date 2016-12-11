@@ -103,7 +103,7 @@ class OutputMapBuilder<OUT> extends AbstractBuilder<SparseArray<Channel<?, OUT>>
         channels = new SparseArray<Channel<?, ?>>(size);
         for (final Integer index : indexes) {
           final Channel<OUT, OUT> outputChannel =
-              JRoutineCore.io().apply(configuration).buildChannel();
+              JRoutineCore.<OUT>ofInputs().apply(configuration).buildChannel();
           inputMap.append(index, outputChannel);
           channelMap.append(index, outputChannel);
           channels.append(index, outputChannel);

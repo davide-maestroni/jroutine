@@ -140,7 +140,7 @@ public class Operators {
    */
   @NotNull
   public static <DATA> InvocationFactory<DATA, DATA> append(@Nullable final DATA output) {
-    return append(Channels.replay(JRoutineCore.io().of(output)).buildChannels());
+    return append(Channels.replay(JRoutineCore.of(output).buildChannel()).buildChannels());
   }
 
   /**
@@ -152,7 +152,7 @@ public class Operators {
    */
   @NotNull
   public static <DATA> InvocationFactory<DATA, DATA> append(@Nullable final DATA... outputs) {
-    return append(Channels.replay(JRoutineCore.io().of(outputs)).buildChannels());
+    return append(Channels.replay(JRoutineCore.of(outputs).buildChannel()).buildChannels());
   }
 
   /**
@@ -166,7 +166,7 @@ public class Operators {
   @NotNull
   public static <DATA> InvocationFactory<DATA, DATA> append(
       @Nullable final Iterable<? extends DATA> outputs) {
-    return append(Channels.replay(JRoutineCore.io().of(outputs)).buildChannels());
+    return append(Channels.replay(JRoutineCore.of(outputs).buildChannel()).buildChannels());
   }
 
   /**
@@ -918,7 +918,7 @@ public class Operators {
    */
   @NotNull
   public static <DATA> InvocationFactory<DATA, DATA> orElse(@Nullable final DATA output) {
-    return orElse(Channels.replay(JRoutineCore.io().of(output)).buildChannels());
+    return orElse(Channels.replay(JRoutineCore.of(output).buildChannel()).buildChannels());
   }
 
   /**
@@ -931,7 +931,7 @@ public class Operators {
    */
   @NotNull
   public static <DATA> InvocationFactory<DATA, DATA> orElse(@Nullable final DATA... outputs) {
-    return orElse(Channels.replay(JRoutineCore.io().of(outputs)).buildChannels());
+    return orElse(Channels.replay(JRoutineCore.of(outputs).buildChannel()).buildChannels());
   }
 
   /**
@@ -945,7 +945,7 @@ public class Operators {
   @NotNull
   public static <DATA> InvocationFactory<DATA, DATA> orElse(
       @Nullable final Iterable<? extends DATA> outputs) {
-    return orElse(Channels.replay(JRoutineCore.io().of(outputs)).buildChannels());
+    return orElse(Channels.replay(JRoutineCore.of(outputs).buildChannel()).buildChannels());
   }
 
   /**
@@ -1118,7 +1118,7 @@ public class Operators {
    */
   @NotNull
   public static <DATA> InvocationFactory<DATA, DATA> prepend(@Nullable final DATA output) {
-    return prepend(Channels.replay(JRoutineCore.io().of(output)).buildChannels());
+    return prepend(Channels.replay(JRoutineCore.of(output).buildChannel()).buildChannels());
   }
 
   /**
@@ -1133,7 +1133,7 @@ public class Operators {
    */
   @NotNull
   public static <DATA> InvocationFactory<DATA, DATA> prepend(@Nullable final DATA... outputs) {
-    return prepend(Channels.replay(JRoutineCore.io().of(outputs)).buildChannels());
+    return prepend(Channels.replay(JRoutineCore.of(outputs).buildChannel()).buildChannels());
   }
 
   /**
@@ -1150,7 +1150,7 @@ public class Operators {
   @NotNull
   public static <DATA> InvocationFactory<DATA, DATA> prepend(
       @Nullable final Iterable<? extends DATA> outputs) {
-    return prepend(Channels.replay(JRoutineCore.io().of(outputs)).buildChannels());
+    return prepend(Channels.replay(JRoutineCore.of(outputs).buildChannel()).buildChannels());
   }
 
   /**
@@ -1646,7 +1646,7 @@ public class Operators {
    */
   @NotNull
   public static <IN, OUT> InvocationFactory<IN, OUT> then(@Nullable final OUT output) {
-    return then(Channels.replay(JRoutineCore.io().of(output)).buildChannels());
+    return then(Channels.replay(JRoutineCore.of(output).buildChannel()).buildChannels());
   }
 
   /**
@@ -1662,7 +1662,7 @@ public class Operators {
    */
   @NotNull
   public static <IN, OUT> InvocationFactory<IN, OUT> then(@Nullable final OUT... outputs) {
-    return then(Channels.replay(JRoutineCore.io().of(outputs)).buildChannels());
+    return then(Channels.replay(JRoutineCore.of(outputs).buildChannel()).buildChannels());
   }
 
   /**
@@ -1679,7 +1679,7 @@ public class Operators {
   @NotNull
   public static <IN, OUT> InvocationFactory<IN, OUT> then(
       @Nullable final Iterable<? extends OUT> outputs) {
-    return then(Channels.replay(JRoutineCore.io().of(outputs)).buildChannels());
+    return then(Channels.replay(JRoutineCore.of(outputs).buildChannel()).buildChannels());
   }
 
   /**

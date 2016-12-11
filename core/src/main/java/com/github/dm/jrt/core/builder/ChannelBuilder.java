@@ -20,7 +20,6 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfigurable;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Interface defining a builder of channel objects.
@@ -28,62 +27,17 @@ import org.jetbrains.annotations.Nullable;
  * Note that the passed inputs might be delivered through the configured runner.
  * <p>
  * Created by davide-maestroni on 03/07/2015.
+ *
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  */
-public interface ChannelBuilder extends ChannelConfigurable<ChannelBuilder> {
+public interface ChannelBuilder<IN, OUT> extends ChannelConfigurable<ChannelBuilder<IN, OUT>> {
 
   /**
    * Builds and returns a channel instance.
    *
-   * @param <DATA> the data type.
    * @return the newly created channel.
    */
   @NotNull
-  <DATA> Channel<DATA, DATA> buildChannel();
-
-  /**
-   * Builds and returns a channel producing no data.
-   * <p>
-   * Note that the returned channel will be already closed.
-   *
-   * @param <DATA> the data type.
-   * @return the newly created channel.
-   */
-  @NotNull
-  <DATA> Channel<DATA, DATA> of();
-
-  /**
-   * Builds and returns a channel producing the specified input.
-   * <p>
-   * Note that the returned channel will be already closed.
-   *
-   * @param input  the input.
-   * @param <DATA> the data type.
-   * @return the newly created channel.
-   */
-  @NotNull
-  <DATA> Channel<DATA, DATA> of(@Nullable DATA input);
-
-  /**
-   * Builds and returns a channel producing the specified inputs.
-   * <p>
-   * Note that the returned channel will be already closed.
-   *
-   * @param inputs the input data.
-   * @param <DATA> the data type.
-   * @return the newly created channel.
-   */
-  @NotNull
-  <DATA> Channel<DATA, DATA> of(@Nullable DATA... inputs);
-
-  /**
-   * Builds and returns a channel producing the specified inputs.
-   * <p>
-   * Note that the returned channel will be already closed.
-   *
-   * @param inputs the iterable returning the input data.
-   * @param <DATA> the data type.
-   * @return the newly created channel.
-   */
-  @NotNull
-  <DATA> Channel<DATA, DATA> of(@Nullable Iterable<DATA> inputs);
+  Channel<IN, OUT> buildChannel();
 }

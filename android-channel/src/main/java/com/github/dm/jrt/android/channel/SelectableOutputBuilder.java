@@ -53,7 +53,7 @@ class SelectableOutputBuilder<OUT> extends AbstractBuilder<Channel<?, Parcelable
   protected Channel<?, ParcelableSelectable<OUT>> build(
       @NotNull final ChannelConfiguration configuration) {
     final Channel<ParcelableSelectable<OUT>, ParcelableSelectable<OUT>> outputChannel =
-        JRoutineCore.io().apply(configuration).buildChannel();
+        JRoutineCore.<ParcelableSelectable<OUT>>ofInputs().apply(configuration).buildChannel();
     mChannel.bind(new SelectableChannelConsumer<OUT, OUT>(outputChannel, mIndex));
     return outputChannel;
   }

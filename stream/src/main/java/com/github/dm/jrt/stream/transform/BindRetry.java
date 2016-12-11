@@ -64,7 +64,8 @@ class BindRetry<IN, OUT> implements Function<Channel<?, IN>, Channel<?, OUT>> {
   public Channel<?, OUT> apply(final Channel<?, IN> channel) {
     final ChannelConfiguration configuration = mConfiguration;
     final Channel<?, IN> inputChannel = Channels.replay(channel).buildChannels();
-    final Channel<OUT, OUT> outputChannel = JRoutineCore.io().apply(configuration).buildChannel();
+    final Channel<OUT, OUT> outputChannel =
+        JRoutineCore.<OUT>ofInputs().apply(configuration).buildChannel();
     new RetryChannelConsumer<IN, OUT>(inputChannel, outputChannel,
         configuration.getRunnerOrElse(Runners.sharedRunner()), mBindingFunction,
         mBackoffFunction).run();

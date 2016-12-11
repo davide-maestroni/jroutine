@@ -156,7 +156,8 @@ public class ParcelableByteChannel {
    */
   @NotNull
   public BufferOutputStream bind(@NotNull final Channel<? super ParcelableByteBuffer, ?> channel) {
-    final Channel<ByteBuffer, ByteBuffer> outputChannel = JRoutineCore.io().buildChannel();
+    final Channel<ByteBuffer, ByteBuffer> outputChannel =
+        JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
     outputChannel.bind(new BufferChannelConsumer(channel));
     return mByteChannel.bind(outputChannel);
   }
@@ -172,7 +173,8 @@ public class ParcelableByteChannel {
   @NotNull
   public BufferOutputStream bindDeep(
       @NotNull final Channel<? super ParcelableByteBuffer, ?> channel) {
-    final Channel<ByteBuffer, ByteBuffer> outputChannel = JRoutineCore.io().buildChannel();
+    final Channel<ByteBuffer, ByteBuffer> outputChannel =
+        JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
     outputChannel.bind(new BufferChannelConsumer(channel));
     return mByteChannel.bindDeep(outputChannel);
   }
@@ -205,7 +207,8 @@ public class ParcelableByteChannel {
           @Override
           public ParcelableByteBuffer createFromParcel(final Parcel in) {
             final byte[] data = in.createByteArray();
-            final Channel<ByteBuffer, ByteBuffer> channel = JRoutineCore.io().buildChannel();
+            final Channel<ByteBuffer, ByteBuffer> channel =
+                JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
             final BufferOutputStream outputStream =
                 Channels.byteChannel(Math.max(data.length, 1)).bind(channel);
             try {

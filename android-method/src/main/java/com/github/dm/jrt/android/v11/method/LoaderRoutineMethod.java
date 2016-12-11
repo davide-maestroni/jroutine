@@ -31,7 +31,6 @@ import com.github.dm.jrt.android.v11.object.JRoutineLoaderObject;
 import com.github.dm.jrt.channel.Channels;
 import com.github.dm.jrt.channel.Selectable;
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.builder.ChannelBuilder;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
@@ -41,8 +40,8 @@ import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.Reflection;
 import com.github.dm.jrt.method.RoutineMethod;
-import com.github.dm.jrt.method.annotation.In;
-import com.github.dm.jrt.method.annotation.Out;
+import com.github.dm.jrt.method.annotation.Input;
+import com.github.dm.jrt.method.annotation.Output;
 import com.github.dm.jrt.object.config.ObjectConfigurable;
 import com.github.dm.jrt.object.config.ObjectConfiguration;
 
@@ -88,8 +87,8 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  *                 super(context);
  *             }
  *
- *             void run(&#64;In final Channel&lt;?, String&gt; input,
- *                     &#64;Out final Channel&lt;String, ?&gt; output) {
+ *             void run(&#64;Input final Channel&lt;?, String&gt; input,
+ *                     &#64;Output final Channel&lt;String, ?&gt; output) {
  *                 final MyApplication application = (MyApplication) getContext();
  *                 // do it
  *             }
@@ -398,20 +397,19 @@ public class LoaderRoutineMethod extends RoutineMethod
     for (int i = 0; i < length; ++i) {
       final Object param = params[i];
       final Class<? extends Annotation> annotationType = getAnnotationType(param, annotations[i]);
-      if (annotationType == In.class) {
+      if (annotationType == Input.class) {
         inputChannels.add((Channel<?, ?>) param);
 
-      } else if (annotationType == Out.class) {
+      } else if (annotationType == Output.class) {
         outputChannels.add((Channel<?, ?>) param);
       }
     }
 
-    final ChannelBuilder channelBuilder = JRoutineCore.io();
-    final Channel<?, OUT> resultChannel = channelBuilder.buildChannel();
+    final Channel<?, OUT> resultChannel = JRoutineCore.<OUT>ofInputs().buildChannel();
     outputChannels.add(resultChannel);
     final Channel<?, ? extends Selectable<Object>> inputChannel =
         (!inputChannels.isEmpty()) ? AndroidChannels.mergeParcelable(inputChannels).buildChannels()
-            : channelBuilder.<Selectable<Object>>of();
+            : JRoutineCore.<Selectable<Object>>of().buildChannel();
     final Channel<Selectable<Object>, Selectable<Object>> outputChannel = mode.invoke(JRoutineLoader
         .on(mContext)
         .with(factory)

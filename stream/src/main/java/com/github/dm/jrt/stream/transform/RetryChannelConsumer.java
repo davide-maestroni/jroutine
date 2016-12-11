@@ -92,7 +92,7 @@ class RetryChannelConsumer<IN, OUT> implements Execution, ChannelConsumer<OUT> {
   }
 
   public void run() {
-    final Channel<IN, IN> channel = JRoutineCore.io().buildChannel();
+    final Channel<IN, IN> channel = JRoutineCore.<IN>ofInputs().buildChannel();
     mInputChannel.bind(new SafeChannelConsumer<IN>(channel));
     try {
       mBindingFunction.apply(channel).bind(this);

@@ -106,8 +106,9 @@ afterEvaluate { project ->
     if (project.plugins.hasPlugin('jacoco')) {
       project.task('jacocoTest', dependsOn: 'test') {
         description = 'Runs the tests and generates the JaCoCo report files.'
-      } << {
-        tasks.jacocoTestReport.execute()
+        doLast {
+          tasks.jacocoTestReport.execute()
+        }
       }
     }
 

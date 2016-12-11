@@ -53,9 +53,10 @@ class InputSelectBuilder<DATA, IN extends DATA> extends AbstractBuilder<Channel<
   @NotNull
   @Override
   protected Channel<IN, ?> build(@NotNull final ChannelConfiguration configuration) {
-    final Channel<IN, IN> inputChannel = JRoutineCore.io().apply(configuration).buildChannel();
+    final Channel<IN, IN> inputChannel =
+        JRoutineCore.<IN>ofInputs().apply(configuration).buildChannel();
     final Channel<ParcelableSelectable<DATA>, ParcelableSelectable<DATA>> outputChannel =
-        JRoutineCore.io().buildChannel();
+        JRoutineCore.<ParcelableSelectable<DATA>>ofInputs().buildChannel();
     outputChannel.bind(mChannel);
     return inputChannel.bind(new SelectableChannelConsumer<DATA, IN>(outputChannel, mIndex));
   }

@@ -25,7 +25,7 @@ import java.lang.annotation.Target;
  * Annotation identifying a channel parameter used to pass output data from the routine method.
  * <br>
  * The annotated parameter must be of type {@link com.github.dm.jrt.core.channel.Channel} and must
- * not include also the {@link com.github.dm.jrt.method.annotation.In} annotation.
+ * not include also the {@link com.github.dm.jrt.method.annotation.Input} annotation.
  * <p>
  * Remember that, in order for the annotation to properly work at run time, the following rules
  * must be added to the project Proguard file (if employed for shrinking or obfuscation):
@@ -34,7 +34,7 @@ import java.lang.annotation.Target;
  *
  *         -keepattributes RuntimeVisibleAnnotations
  *         -keepclassmembers class ** {
- *              &#64;com.github.dm.jrt.method.annotation.Out *;
+ *              &#64;com.github.dm.jrt.method.annotation.Output *;
  *         }
  *     </code>
  * </pre>
@@ -43,6 +43,6 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Out {
+public @interface Output {
 
 }

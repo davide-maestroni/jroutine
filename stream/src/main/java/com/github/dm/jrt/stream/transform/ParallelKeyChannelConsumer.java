@@ -79,7 +79,7 @@ class ParallelKeyChannelConsumer<IN, OUT> extends BindMap<IN, OUT> implements Ch
     final Object key = mKeyFunction.apply(output);
     Channel<IN, IN> inputChannel = channels.get(key);
     if (inputChannel == null) {
-      inputChannel = JRoutineCore.io().buildChannel();
+      inputChannel = JRoutineCore.<IN>ofInputs().buildChannel();
       mOutputChannel.pass(super.apply(inputChannel));
       channels.put(key, inputChannel);
     }

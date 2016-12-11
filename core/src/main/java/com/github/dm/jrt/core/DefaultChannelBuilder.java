@@ -23,14 +23,17 @@ import com.github.dm.jrt.core.config.ChannelConfiguration.Builder;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Class implementing a builder of channel objects.
  * <p>
  * Created by davide-maestroni on 10/25/2014.
+ *
+ * @param <DATA> the data type.
  */
-class DefaultChannelBuilder implements ChannelBuilder {
+class DefaultChannelBuilder<DATA> implements ChannelBuilder<DATA, DATA> {
+
+  private final Iterable<DATA> mData;
 
   private ChannelConfiguration mConfiguration = ChannelConfiguration.defaultConfiguration();
 
@@ -38,41 +41,37 @@ class DefaultChannelBuilder implements ChannelBuilder {
    * Constructor.
    */
   DefaultChannelBuilder() {
+    mData = null;
+  }
+
+  /**
+   * Constructor.
+   *
+   * @param data the output data.
+   */
+  DefaultChannelBuilder(@NotNull Iterable<DATA> data) {
+    mData = ConstantConditions.notNull("data", data);
   }
 
   @NotNull
-  public ChannelBuilder apply(@NotNull final ChannelConfiguration configuration) {
+  public ChannelBuilder<DATA, DATA> apply(@NotNull final ChannelConfiguration configuration) {
     mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
     return this;
   }
 
   @NotNull
-  public Builder<? extends ChannelBuilder> applyChannelConfiguration() {
-    return new Builder<ChannelBuilder>(this, mConfiguration);
+  public Builder<? extends ChannelBuilder<DATA, DATA>> applyChannelConfiguration() {
+    return new Builder<ChannelBuilder<DATA, DATA>>(this, mConfiguration);
   }
 
   @NotNull
-  public <DATA> Channel<DATA, DATA> buildChannel() {
-    return new DefaultChannel<DATA>(mConfiguration);
-  }
+  public Channel<DATA, DATA> buildChannel() {
+    final DefaultChannel<DATA> channel = new DefaultChannel<DATA>(mConfiguration);
+    final Iterable<DATA> data = mData;
+    if (data != null) {
+      channel.pass(data).close();
+    }
 
-  @NotNull
-  public <DATA> Channel<DATA, DATA> of() {
-    return this.<DATA>buildChannel().close();
-  }
-
-  @NotNull
-  public <DATA> Channel<DATA, DATA> of(@Nullable final DATA input) {
-    return this.<DATA>buildChannel().pass(input).close();
-  }
-
-  @NotNull
-  public <DATA> Channel<DATA, DATA> of(@Nullable final DATA... inputs) {
-    return this.<DATA>buildChannel().pass(inputs).close();
-  }
-
-  @NotNull
-  public <DATA> Channel<DATA, DATA> of(@Nullable final Iterable<DATA> inputs) {
-    return this.<DATA>buildChannel().pass(inputs).close();
+    return channel;
   }
 }

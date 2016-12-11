@@ -84,7 +84,7 @@ class DefaultLoaderChannelBuilder implements LoaderChannelBuilder {
     final LoaderContextCompat context = mContext;
     final Object component = context.getComponent();
     if (component == null) {
-      final Channel<OUT, OUT> channel = JRoutineCore.io().buildChannel();
+      final Channel<OUT, OUT> channel = JRoutineCore.<OUT>ofInputs().buildChannel();
       channel.abort(new MissingLoaderException(loaderId));
       return channel.close();
     }

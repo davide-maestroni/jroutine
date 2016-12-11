@@ -311,7 +311,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
     @Override
     public Channel<?, Object> apply(final Channel<?, ParcelableSelectable<Object>> channel) {
       final Channel<Object, Object> outputChannel =
-          JRoutineCore.io().apply(mConfiguration).buildChannel();
+          JRoutineCore.ofInputs().apply(mConfiguration).buildChannel();
       mRoutine.call(channel).bind(new ConverterChannelConsumer(mConverter, outputChannel));
       return outputChannel;
     }
@@ -354,7 +354,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
     @Override
     public <OUT> Channel adapt(final Call<OUT> call) {
       final Channel<Object, Object> outputChannel =
-          JRoutineCore.io().apply(mChannelConfiguration).buildChannel();
+          JRoutineCore.ofInputs().apply(mChannelConfiguration).buildChannel();
       getRoutine().call(invokeCall(call))
                   .bind(new ConverterChannelConsumer(mConverter, outputChannel));
       return outputChannel;

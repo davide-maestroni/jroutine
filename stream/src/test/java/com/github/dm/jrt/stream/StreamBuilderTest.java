@@ -95,7 +95,7 @@ public class StreamBuilderTest {
   @Test
   @SuppressWarnings({"ConstantConditions", "ThrowableResultOfMethodCallIgnored"})
   public void testAbort() {
-    final Channel<Object, Object> channel = JRoutineCore.io().buildChannel();
+    final Channel<Object, Object> channel = JRoutineCore.ofInputs().buildChannel();
     final Channel<Object, Object> streamChannel = JRoutineStream.withStream().call(channel);
     channel.abort(new IllegalArgumentException());
     try {
@@ -182,7 +182,7 @@ public class StreamBuilderTest {
                     .sync()
                     .map(append((Object) "test"))
                     .call()
-                    .bind(JRoutineCore.io().buildChannel())
+                    .bind(JRoutineCore.ofInputs().buildChannel())
                     .next();
       fail();
 
@@ -280,7 +280,7 @@ public class StreamBuilderTest {
     assertThat(JRoutineStream.withStream()
                              .sync()
                              .call()
-                             .pass(JRoutineCore.io().of("test"))
+                             .pass(JRoutineCore.of("test").buildChannel())
                              .next()).isEqualTo("test");
     assertThat(JRoutineStream.withStream().sync().call().sorted().pass("test").next()).isEqualTo(
         "test");
@@ -1527,10 +1527,11 @@ public class StreamBuilderTest {
                              .immediate()
                              .close()
                              .all()).containsExactly("test1", "test2", "test3");
-    assertThat(JRoutineStream.withStreamOf(JRoutineCore.io().of("test1", "test2", "test3"))
-                             .immediate()
-                             .close()
-                             .all()).containsExactly("test1", "test2", "test3");
+    assertThat(
+        JRoutineStream.withStreamOf(JRoutineCore.of("test1", "test2", "test3").buildChannel())
+                      .immediate()
+                      .close()
+                      .all()).containsExactly("test1", "test2", "test3");
   }
 
   @Test
@@ -1545,7 +1546,7 @@ public class StreamBuilderTest {
         JRoutineStream.withStreamOf(Arrays.asList("test1", "test2", "test3")).immediate().call();
     assertThat(channel.abort()).isTrue();
     assertThat(channel.getError()).isInstanceOf(AbortException.class);
-    channel = JRoutineStream.withStreamOf(JRoutineCore.io().of("test1", "test2", "test3"))
+    channel = JRoutineStream.withStreamOf(JRoutineCore.of("test1", "test2", "test3").buildChannel())
                             .immediate()
                             .call();
     assertThat(channel.abort()).isTrue();
@@ -1570,13 +1571,14 @@ public class StreamBuilderTest {
                              .call("test")
                              .getError()
                              .getCause()).isInstanceOf(IllegalStateException.class);
-    assertThat(JRoutineStream.withStreamOf(JRoutineCore.io().of("test1", "test2", "test3"))
-                             .immediate()
-                             .call("test")
-                             .getError()
-                             .getCause()).isInstanceOf(IllegalStateException.class);
+    assertThat(
+        JRoutineStream.withStreamOf(JRoutineCore.of("test1", "test2", "test3").buildChannel())
+                      .immediate()
+                      .call("test")
+                      .getError()
+                      .getCause()).isInstanceOf(IllegalStateException.class);
     assertThat(JRoutineStream.withStreamOf(
-        JRoutineCore.io().buildChannel().bind(new TemplateChannelConsumer<Object>() {}))
+        JRoutineCore.ofInputs().buildChannel().bind(new TemplateChannelConsumer<Object>() {}))
                              .immediate()
                              .close()
                              .getError()

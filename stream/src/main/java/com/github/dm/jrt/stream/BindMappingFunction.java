@@ -53,7 +53,8 @@ class BindMappingFunction<IN, OUT> implements Function<Channel<?, IN>, Channel<?
   }
 
   public Channel<?, OUT> apply(final Channel<?, IN> channel) {
-    final Channel<OUT, OUT> outputChannel = JRoutineCore.io().apply(mConfiguration).buildChannel();
+    final Channel<OUT, OUT> outputChannel =
+        JRoutineCore.<OUT>ofInputs().apply(mConfiguration).buildChannel();
     channel.bind(new MappingFunctionConsumer<IN, OUT>(mMappingFunction, outputChannel));
     return outputChannel;
   }

@@ -60,11 +60,12 @@ class BindParallelCount<IN, OUT> extends BindMap<IN, OUT> {
 
   public Channel<?, OUT> apply(final Channel<?, IN> channel) {
     final int count = mCount;
-    final Channel<OUT, OUT> outputChannel = JRoutineCore.io().apply(mConfiguration).buildChannel();
+    final Channel<OUT, OUT> outputChannel =
+        JRoutineCore.<OUT>ofInputs().apply(mConfiguration).buildChannel();
     final HashMap<Channel<IN, IN>, Channel<?, OUT>> channels =
         new HashMap<Channel<IN, IN>, Channel<?, OUT>>(count);
     for (int i = 0; i < count; ++i) {
-      final Channel<IN, IN> inputChannel = JRoutineCore.io().buildChannel();
+      final Channel<IN, IN> inputChannel = JRoutineCore.<IN>ofInputs().buildChannel();
       final Channel<?, OUT> invocationChannel = super.apply(inputChannel);
       outputChannel.pass(invocationChannel);
       channels.put(inputChannel, invocationChannel);

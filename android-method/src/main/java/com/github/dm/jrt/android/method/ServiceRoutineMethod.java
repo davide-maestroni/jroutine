@@ -39,8 +39,8 @@ import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.Reflection;
 import com.github.dm.jrt.method.RoutineMethod;
-import com.github.dm.jrt.method.annotation.In;
-import com.github.dm.jrt.method.annotation.Out;
+import com.github.dm.jrt.method.annotation.Input;
+import com.github.dm.jrt.method.annotation.Output;
 import com.github.dm.jrt.object.config.ObjectConfigurable;
 import com.github.dm.jrt.object.config.ObjectConfiguration;
 
@@ -88,8 +88,8 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  *                 super(context);
  *             }
  *
- *             void run(&#64;In final Channel&lt;?, String&gt; input,
- *                     &#64;Out final Channel&lt;String, ?&gt; output) {
+ *             void run(&#64;Input final Channel&lt;?, String&gt; input,
+ *                     &#64;Output final Channel&lt;String, ?&gt; output) {
  *                 final MyService service = (MyService) getContext();
  *                 // do it
  *             }
@@ -351,22 +351,21 @@ public class ServiceRoutineMethod extends RoutineMethod
     for (int i = 0; i < params.length; ++i) {
       final Object param = params[i];
       final Class<? extends Annotation> annotationType = getAnnotationType(param, annotations[i]);
-      if (annotationType == In.class) {
+      if (annotationType == Input.class) {
         params[i] = InputChannelPlaceHolder.class;
         inputChannels.add((Channel<?, ?>) param);
 
-      } else if (annotationType == Out.class) {
+      } else if (annotationType == Output.class) {
         params[i] = OutputChannelPlaceHolder.class;
         outputChannels.add((Channel<?, ?>) param);
       }
     }
 
-    final ChannelBuilder channelBuilder = JRoutineCore.io();
-    final Channel<OUT, OUT> resultChannel = channelBuilder.buildChannel();
+    final Channel<OUT, OUT> resultChannel = JRoutineCore.<OUT>ofInputs().buildChannel();
     outputChannels.add(resultChannel);
     final Channel<?, ? extends ParcelableSelectable<Object>> inputChannel =
         (!inputChannels.isEmpty()) ? AndroidChannels.mergeParcelable(inputChannels).buildChannels()
-            : channelBuilder.<ParcelableSelectable<Object>>of();
+            : JRoutineCore.<ParcelableSelectable<Object>>of().buildChannel();
     final Channel<ParcelableSelectable<Object>, ParcelableSelectable<Object>> outputChannel =
         mode.invoke(JRoutineService.on(mContext)
                                    .with(factoryOf(ServiceInvocation.class, getClass(), mArgs,
@@ -571,7 +570,7 @@ public class ServiceRoutineMethod extends RoutineMethod
      */
     private ServiceInvocation(@NotNull final Class<? extends ServiceRoutineMethod> type,
         @NotNull final Object[] args, @NotNull final Object[] params) {
-      final ChannelBuilder channelBuilder = JRoutineCore.io();
+      final ChannelBuilder<?, ?> channelBuilder = JRoutineCore.ofInputs();
       for (int i = 0; i < params.length; ++i) {
         final Object param = params[i];
         if (param == InputChannelPlaceHolder.class) {

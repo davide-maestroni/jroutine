@@ -261,8 +261,11 @@ public class FutureChannelTest {
             return "test";
           }
         });
-    final Channel<? super String, String> channel =
-        Channels.fromFuture(future).buildChannels().bind(JRoutineCore.io().<String>buildChannel());
+    final Channel<? super String, String> channel = Channels.fromFuture(future)
+                                                            .buildChannels()
+                                                            .bind(
+                                                                JRoutineCore.<String>ofInputs()
+                                                                    .buildChannel());
     assertThat(channel.inMax(seconds(1)).next()).isEqualTo("test");
     assertThat(channel.isOpen()).isTrue();
     assertThat(channel.afterNoDelay().close().isOpen()).isFalse();
@@ -280,7 +283,7 @@ public class FutureChannelTest {
     final Channel<?, String> channel = Channels.fromFuture(future).buildChannels();
     assertThat(channel.isBound()).isFalse();
     final Channel<? super String, String> outputChannel =
-        channel.bind(JRoutineCore.io().<String>buildChannel());
+        channel.bind(JRoutineCore.<String>ofInputs().buildChannel());
     assertThat(channel.isBound()).isTrue();
     channel.abort();
     assertThat(outputChannel.inMax(seconds(1)).getError()).isExactlyInstanceOf(
@@ -298,9 +301,9 @@ public class FutureChannelTest {
           }
         }, 3, TimeUnit.SECONDS);
     final Channel<?, String> channel = Channels.fromFuture(future).buildChannels();
-    channel.bind(JRoutineCore.io().<String>buildChannel());
+    channel.bind(JRoutineCore.<String>ofInputs().buildChannel());
     try {
-      channel.bind(JRoutineCore.io().<String>buildChannel());
+      channel.bind(JRoutineCore.<String>ofInputs().buildChannel());
       fail();
 
     } catch (final IllegalStateException ignored) {
@@ -679,7 +682,7 @@ public class FutureChannelTest {
     }
 
     try {
-      channel.unsorted().pass(JRoutineCore.io().buildChannel());
+      channel.unsorted().pass(JRoutineCore.ofInputs().buildChannel());
       fail();
 
     } catch (final IllegalStateException ignored) {
@@ -720,7 +723,7 @@ public class FutureChannelTest {
     }
 
     try {
-      channel.unsorted().pass(JRoutineCore.io().buildChannel());
+      channel.unsorted().pass(JRoutineCore.ofInputs().buildChannel());
       fail();
 
     } catch (final AbortException ignored) {

@@ -1210,12 +1210,12 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                          .close()
                                          .inMax(seconds(10))
                                          .all()).containsExactly("test1", "test2", "test3");
-    assertThat(
-        JRoutineLoaderStreamCompat.withStreamOf(JRoutineCore.io().of("test1", "test2", "test3"))
-                                  .on(loaderFrom(getActivity()))
-                                  .close()
-                                  .inMax(seconds(10))
-                                  .all()).containsExactly("test1", "test2", "test3");
+    assertThat(JRoutineLoaderStreamCompat.withStreamOf(
+        JRoutineCore.of("test1", "test2", "test3").buildChannel())
+                                         .on(loaderFrom(getActivity()))
+                                         .close()
+                                         .inMax(seconds(10))
+                                         .all()).containsExactly("test1", "test2", "test3");
   }
 
   public void testStreamOfAbort() {
@@ -1233,10 +1233,10 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                         .call();
     assertThat(channel.abort()).isTrue();
     assertThat(channel.inMax(seconds(10)).getError()).isInstanceOf(AbortException.class);
-    channel =
-        JRoutineLoaderStreamCompat.withStreamOf(JRoutineCore.io().of("test1", "test2", "test3"))
-                                  .on(loaderFrom(getActivity()))
-                                  .call();
+    channel = JRoutineLoaderStreamCompat.withStreamOf(
+        JRoutineCore.of("test1", "test2", "test3").buildChannel())
+                                        .on(loaderFrom(getActivity()))
+                                        .call();
     assertThat(channel.abort()).isTrue();
     assertThat(channel.inMax(seconds(10)).getError()).isInstanceOf(AbortException.class);
   }
@@ -1261,15 +1261,15 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                          .inMax(seconds(10))
                                          .getError()
                                          .getCause()).isInstanceOf(IllegalStateException.class);
-    assertThat(
-        JRoutineLoaderStreamCompat.withStreamOf(JRoutineCore.io().of("test1", "test2", "test3"))
-                                  .on(loaderFrom(getActivity()))
-                                  .call("test")
-                                  .inMax(seconds(10))
-                                  .getError()
-                                  .getCause()).isInstanceOf(IllegalStateException.class);
     assertThat(JRoutineLoaderStreamCompat.withStreamOf(
-        JRoutineCore.io().buildChannel().bind(new TemplateChannelConsumer<Object>() {}))
+        JRoutineCore.of("test1", "test2", "test3").buildChannel())
+                                         .on(loaderFrom(getActivity()))
+                                         .call("test")
+                                         .inMax(seconds(10))
+                                         .getError()
+                                         .getCause()).isInstanceOf(IllegalStateException.class);
+    assertThat(JRoutineLoaderStreamCompat.withStreamOf(
+        JRoutineCore.ofInputs().buildChannel().bind(new TemplateChannelConsumer<Object>() {}))
                                          .on(loaderFrom(getActivity()))
                                          .close()
                                          .inMax(seconds(10))

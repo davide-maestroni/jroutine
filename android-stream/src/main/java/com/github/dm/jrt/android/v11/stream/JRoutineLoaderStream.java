@@ -137,7 +137,7 @@ public class JRoutineLoaderStream {
             return decorate(function).andThen(new Function<Channel<?, IN>, Channel<?, IN>>() {
 
               public Channel<?, IN> apply(final Channel<?, IN> inputs) {
-                final Channel<IN, IN> outputChannel = JRoutineCore.io().buildChannel();
+                final Channel<IN, IN> outputChannel = JRoutineCore.<IN>ofInputs().buildChannel();
                 inputs.bind(new ChannelConsumer<IN>() {
 
                   public void onComplete() {
@@ -224,7 +224,7 @@ public class JRoutineLoaderStream {
             return decorate(function).andThen(new Function<Channel<?, IN>, Channel<?, IN>>() {
 
               public Channel<?, IN> apply(final Channel<?, IN> inputs) {
-                final Channel<IN, IN> outputChannel = JRoutineCore.io().buildChannel();
+                final Channel<IN, IN> outputChannel = JRoutineCore.<IN>ofInputs().buildChannel();
                 inputs.bind(new ChannelConsumer<IN>() {
 
                   public void onComplete() {
@@ -270,7 +270,7 @@ public class JRoutineLoaderStream {
    */
   @NotNull
   public static <IN> LoaderStreamBuilder<IN, IN> withStreamOf(@Nullable final IN input) {
-    return withStreamOf(Channels.replay(JRoutineCore.io().of(input)).buildChannels());
+    return withStreamOf(Channels.replay(JRoutineCore.of(input).buildChannel()).buildChannels());
   }
 
   /**
@@ -287,7 +287,7 @@ public class JRoutineLoaderStream {
    */
   @NotNull
   public static <IN> LoaderStreamBuilder<IN, IN> withStreamOf(@Nullable final IN... inputs) {
-    return withStreamOf(Channels.replay(JRoutineCore.io().of(inputs)).buildChannels());
+    return withStreamOf(Channels.replay(JRoutineCore.of(inputs).buildChannel()).buildChannels());
   }
 
   /**
@@ -305,7 +305,7 @@ public class JRoutineLoaderStream {
   @NotNull
   public static <IN> LoaderStreamBuilder<IN, IN> withStreamOf(
       @Nullable final Iterable<? extends IN> inputs) {
-    return withStreamOf(Channels.replay(JRoutineCore.io().of(inputs)).buildChannels());
+    return withStreamOf(Channels.replay(JRoutineCore.of(inputs).buildChannel()).buildChannels());
   }
 
   /**
@@ -336,7 +336,7 @@ public class JRoutineLoaderStream {
             return decorate(function).andThen(new Function<Channel<?, IN>, Channel<?, IN>>() {
 
               public Channel<?, IN> apply(final Channel<?, IN> inputs) {
-                final Channel<IN, IN> outputChannel = JRoutineCore.io().buildChannel();
+                final Channel<IN, IN> outputChannel = JRoutineCore.<IN>ofInputs().buildChannel();
                 inputs.bind(new ChannelConsumer<IN>() {
 
                   public void onComplete() {

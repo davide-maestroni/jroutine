@@ -35,8 +35,6 @@ import retrofit2.Retrofit;
 import retrofit2.Retrofit.Builder;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-import static com.github.dm.jrt.android.v4.core.LoaderContextCompat.loaderFrom;
-
 /**
  * Main Activity.
  * <p>

@@ -24,5 +24,4 @@ import android.app.Application;
  * Created by davide-maestroni on 12/02/2016.
  */
 @SuppressWarnings("unused")
-public class TestApp extends Application {
-}
+public class TestApp extends Application {}

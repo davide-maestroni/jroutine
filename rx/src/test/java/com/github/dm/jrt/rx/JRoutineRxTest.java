@@ -40,24 +40,26 @@ public class JRoutineRxTest {
   public void testError() {
     final AtomicReference<String> reference = new AtomicReference<String>();
     final AtomicReference<Throwable> errorReference = new AtomicReference<Throwable>();
-    JRoutineRx.observableFrom(JRoutineCore.io().of("test")).map(new Func1<String, String>() {
+    JRoutineRx.observableFrom(JRoutineCore.of("test").buildChannel())
+              .map(new Func1<String, String>() {
 
-      public String call(final String s) {
-        throw new IllegalStateException(s);
-      }
-    }).subscribe(new Observer<String>() {
+                public String call(final String s) {
+                  throw new IllegalStateException(s);
+                }
+              })
+              .subscribe(new Observer<String>() {
 
-      public void onCompleted() {
-      }
+                public void onCompleted() {
+                }
 
-      public void onError(final Throwable e) {
-        errorReference.set(e);
-      }
+                public void onError(final Throwable e) {
+                  errorReference.set(e);
+                }
 
-      public void onNext(final String s) {
-        reference.set(s);
-      }
-    });
+                public void onNext(final String s) {
+                  reference.set(s);
+                }
+              });
     assertThat(reference.get()).isNull();
     assertThat(errorReference.get()).isExactlyInstanceOf(IllegalStateException.class);
     assertThat(errorReference.get().getMessage()).isEqualTo("test");
@@ -66,17 +68,19 @@ public class JRoutineRxTest {
   @Test
   public void testObservable() {
     final AtomicReference<String> reference = new AtomicReference<String>();
-    JRoutineRx.observableFrom(JRoutineCore.io().of("test")).map(new Func1<String, String>() {
+    JRoutineRx.observableFrom(JRoutineCore.of("test").buildChannel())
+              .map(new Func1<String, String>() {
 
-      public String call(final String s) {
-        return s.toUpperCase();
-      }
-    }).subscribe(new Action1<String>() {
+                public String call(final String s) {
+                  return s.toUpperCase();
+                }
+              })
+              .subscribe(new Action1<String>() {
 
-      public void call(final String s) {
-        reference.set(s);
-      }
-    });
+                public void call(final String s) {
+                  reference.set(s);
+                }
+              });
     assertThat(reference.get()).isEqualTo("TEST");
   }
 }

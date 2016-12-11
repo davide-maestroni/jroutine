@@ -64,7 +64,8 @@ class BindMappingAllConsumer<IN, OUT> implements Function<Channel<?, IN>, Channe
   }
 
   public Channel<?, OUT> apply(final Channel<?, IN> channel) {
-    final Channel<OUT, OUT> outputChannel = JRoutineCore.io().apply(mConfiguration).buildChannel();
+    final Channel<OUT, OUT> outputChannel =
+        JRoutineCore.<OUT>ofInputs().apply(mConfiguration).buildChannel();
     channel.bind((mInvocationMode == InvocationMode.ASYNC) ? new MappingConsumerConsumer<IN, OUT>(
         mMappingConsumer, outputChannel)
         : new MappingConsumerConsumerParallel<IN, OUT>(mMappingConsumer, outputChannel));

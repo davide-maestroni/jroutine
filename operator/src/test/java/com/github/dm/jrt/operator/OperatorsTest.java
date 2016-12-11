@@ -143,7 +143,7 @@ public class OperatorsTest {
                            .call("test1")
                            .inMax(seconds(3))
                            .all()).containsExactly("test1", "test2", "test3");
-    assertThat(JRoutineCore.with(append(JRoutineCore.io().of("test2", "test3")))
+    assertThat(JRoutineCore.with(append(JRoutineCore.of("test2", "test3").buildChannel()))
                            .call("test1")
                            .inMax(seconds(3))
                            .all()).containsExactly("test1", "test2", "test3");
@@ -1494,7 +1494,7 @@ public class OperatorsTest {
                            .call("test1")
                            .inMax(seconds(3))
                            .all()).containsExactly("test2", "test3", "test1");
-    assertThat(JRoutineCore.with(prepend(JRoutineCore.io().of("test2", "test3")))
+    assertThat(JRoutineCore.with(prepend(JRoutineCore.of("test2", "test3").buildChannel()))
                            .call("test1")
                            .inMax(seconds(3))
                            .all()).containsExactly("test2", "test3", "test1");
@@ -1933,7 +1933,7 @@ public class OperatorsTest {
                            .call("test1")
                            .inMax(seconds(3))
                            .all()).containsExactly("test2", "test3");
-    assertThat(JRoutineCore.with(then(JRoutineCore.io().of("test2", "test3")))
+    assertThat(JRoutineCore.with(then(JRoutineCore.of("test2", "test3").buildChannel()))
                            .call("test1")
                            .inMax(seconds(3))
                            .all()).containsExactly("test2", "test3");

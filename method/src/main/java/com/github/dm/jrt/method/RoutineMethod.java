@@ -32,8 +32,8 @@ import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.Reflection;
-import com.github.dm.jrt.method.annotation.In;
-import com.github.dm.jrt.method.annotation.Out;
+import com.github.dm.jrt.method.annotation.Input;
+import com.github.dm.jrt.method.annotation.Output;
 import com.github.dm.jrt.object.InvocationTarget;
 import com.github.dm.jrt.object.JRoutineObject;
 import com.github.dm.jrt.object.config.ObjectConfigurable;
@@ -74,20 +74,22 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * input is available before reading it.
  * <br>
  * The method parameters used as input channels are identified by the
- * {@link com.github.dm.jrt.method.annotation.In} annotation, while the output ones by the
- * {@link com.github.dm.jrt.method.annotation.Out} annotation. Channel parameters without any
+ * {@link com.github.dm.jrt.method.annotation.Input} annotation, while the output ones by the
+ * {@link com.github.dm.jrt.method.annotation.Output} annotation. Channel parameters without any
  * specific annotation will be passed as is to the target method.
  * <p>
  * For example, a routine computing the square of integers can be implemented as follows:
  * <pre>
  *     <code>
  *
- *         final Channel&lt;Integer, Integer&gt; inputChannel = JRoutineCore.io().buildChannel();
- *         final Channel&lt;Integer, Integer&gt; outputChannel = JRoutineCore.io().buildChannel();
+ *         final Channel&lt;Integer, Integer&gt; inputChannel =
+ *                 JRoutineCore.&lt;Integer&gt;ofInputs().buildChannel();
+ *         final Channel&lt;Integer, Integer&gt; outputChannel =
+ *                 JRoutineCore.&lt;Integer&gt;ofInputs().buildChannel();
  *         new RoutineMethod() {
  *
- *             public void square(&#64;In final Channel&lt;?, Integer&gt; input,
- *                     &#64;Out final Channel&lt;Integer, ?&gt; output) {
+ *             public void square(&#64;Input final Channel&lt;?, Integer&gt; input,
+ *                     &#64;Output final Channel&lt;Integer, ?&gt; output) {
  *                 if (input.hasNext()) {
  *                     final int i = input.next();
  *                     output.pass(i * i);
@@ -113,10 +115,11 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * <pre>
  *     <code>
  *
- *         final Channel&lt;String, String&gt; inputChannel = JRoutineCore.io().buildChannel();
+ *         final Channel&lt;String, String&gt; inputChannel =
+ *                 JRoutineCore.&lt;String&gt;ofInputs().buildChannel();
  *         final Channel&lt;?, String&gt; outputChannel = new RoutineMethod() {
  *
- *             public String switchCase(&#64;In final Channel&lt;?, String&gt; input,
+ *             public String switchCase(&#64;Input final Channel&lt;?, String&gt; input,
  *                     final boolean isUpper) {
  *                 if (input.hasNext()) {
  *                     final String str = input.next();
@@ -140,7 +143,8 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * <pre>
  *     <code>
  *
- *         final Channel&lt;String, String&gt; outputChannel = JRoutineCore.io().buildChannel();
+ *         final Channel&lt;String, String&gt; outputChannel =
+ *                 JRoutineCore.&lt;String&gt;ofInputs().buildChannel();
  *         new MyRoutine() {
  *
  *             void run(final Channel&lt;String, ?&gt; output) {
@@ -164,10 +168,11 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  *     <code>
  *
  *         final Locale locale = Locale.getDefault();
- *         final Channel&lt;String, String&gt; inputChannel = JRoutineCore.io().buildChannel();
+ *         final Channel&lt;String, String&gt; inputChannel =
+ *                 JRoutineCore.&lt;String&gt;ofInputs().buildChannel();
  *         final Channel&lt;?, String&gt; outputChannel = new RoutineMethod(this, locale) {
  *
- *             public String switchCase(&#64;In final Channel&lt;?, String&gt; input,
+ *             public String switchCase(&#64;Input final Channel&lt;?, String&gt; input,
  *                     final boolean isUpper) {
  *                 if (input.hasNext()) {
  *                     final String str = input.next();
@@ -193,7 +198,7 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  *                 mLocale = locale;
  *             }
  *
- *             String switchCase(&#64;In final Channel&lt;?, String&gt; input,
+ *             String switchCase(&#64;Input final Channel&lt;?, String&gt; input,
  *                    final boolean isUpper) {
  *                 if (input.hasNext()) {
  *                     final String str = input.next();
@@ -218,7 +223,7 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  *                 mLocale = locale;
  *             }
  *
- *             String switchCase(&#64;In final Channel&lt;?, String&gt; input,
+ *             String switchCase(&#64;Input final Channel&lt;?, String&gt; input,
  *                    final boolean isUpper) {
  *                 if (input.hasNext()) {
  *                     final String str = input.next();
@@ -242,14 +247,17 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * <pre>
  *     <code>
  *
- *         final Channel&lt;Integer, Integer&gt; inputInts = JRoutineCore.io().buildChannel();
- *         final Channel&lt;String, String&gt; inputStrings = JRoutineCore.io().buildChannel();
- *         final Channel&lt;String, String&gt; outputChannel = JRoutineCore.io().buildChannel();
+ *         final Channel&lt;Integer, Integer&gt; inputInts =
+ *                 JRoutineCore.&lt;Integer&gt;ofInputs().buildChannel();
+ *         final Channel&lt;String, String&gt; inputStrings =
+ *                 JRoutineCore.&lt;String&gt;ofInputs().buildChannel();
+ *         final Channel&lt;String, String&gt; outputChannel =
+ *                 JRoutineCore.&lt;String&gt;ofInputs().buildChannel();
  *         new RoutineMethod() {
  *
- *             void run(&#64;In final Channel&lt;?, Integer&gt; inputInts,
- *                     &#64;In final Channel&lt;?, String&gt; inputStrings,
- *                     &#64;Out final Channel&lt;String, ?&gt; output) {
+ *             void run(&#64;Input final Channel&lt;?, Integer&gt; inputInts,
+ *                     &#64;Input final Channel&lt;?, String&gt; inputStrings,
+ *                     &#64;Output final Channel&lt;String, ?&gt; output) {
  *                 final Channel&lt;?, ?&gt; inputChannel = switchInput();
  *                 if (inputChannel.hasNext()) {
  *                     if (inputChannel == inputInts) {
@@ -280,25 +288,28 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * <pre>
  *     <code>
  *
- *         final Channel&lt;Integer, Integer&gt; inputChannel = JRoutineCore.io().buildChannel();
- *         final Channel&lt;Integer, Integer&gt; outputChannel = JRoutineCore.io().buildChannel();
+ *         final Channel&lt;Integer, Integer&gt; inputChannel =
+ *                 JRoutineCore.&lt;Integer&gt;ofInputs().buildChannel();
+ *         final Channel&lt;Integer, Integer&gt; outputChannel =
+ *                 JRoutineCore.&lt;Integer&gt;ofInputs().buildChannel();
  *         new RoutineMethod() {
  *
- *             public void square(&#64;In final Channel&lt;?, Integer&gt; input,
- *                     &#64;Out final Channel&lt;Integer, ?&gt; output) {
+ *             public void square(&#64;Input final Channel&lt;?, Integer&gt; input,
+ *                     &#64;Output final Channel&lt;Integer, ?&gt; output) {
  *                 if (input.hasNext()) {
  *                     final int i = input.next();
  *                     output.pass(i * i);
  *                 }
  *             }
  *         }.call(inputChannel, outputChannel);
- *         final Channel&lt;Integer, Integer&gt; resultChannel = JRoutineCore.io().buildChannel();
+ *         final Channel&lt;Integer, Integer&gt; resultChannel =
+ *                 JRoutineCore.&lt;Integer&gt;ofInputs().buildChannel();
  *         new RoutineMethod() {
  *
  *             private int mSum;
  *
- *             public void sum(&#64;In final Channel&lt;?, Integer&gt; input,
- *                     &#64;Out final Channel&lt;Integer, ?&gt; output) {
+ *             public void sum(&#64;Input final Channel&lt;?, Integer&gt; input,
+ *                     &#64;Output final Channel&lt;Integer, ?&gt; output) {
  *                 if (input.hasNext()) {
  *                     mSum += input.next();
  *                 } else {
@@ -320,13 +331,14 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  *     <code>
  *
  *         final Channel&lt;String, Integer&gt; channel = parseRoutine.call();
- *         final Channel&lt;Integer, Integer&gt; outputChannel = JRoutineCore.io().buildChannel();
+ *         final Channel&lt;Integer, Integer&gt; outputChannel =
+ *                 JRoutineCore.&lt;Integer&gt;ofInputs().buildChannel();
  *         new RoutineMethod() {
  *
  *             private int mSum;
  *
- *             public void sum(&#64;In final Channel&lt;?, Integer&gt; input,
- *                     &#64;Out final Channel&lt;Integer, ?&gt; output) {
+ *             public void sum(&#64;Input final Channel&lt;?, Integer&gt; input,
+ *                     &#64;Output final Channel&lt;Integer, ?&gt; output) {
  *                 if (input.hasNext()) {
  *                     mSum += input.next();
  *                 } else {
@@ -354,12 +366,13 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  *     <code>
  *
  *         final ExternalStorage storage = ExternalStorage.create();
- *         final Channel&lt;String, String&gt; inputChannel = JRoutineCore.io().buildChannel();
+ *         final Channel&lt;String, String&gt; inputChannel =
+ *                 JRoutineCore.&lt;String&gt;ofInputs().buildChannel();
  *         new RoutineMethod(this, storage) {
  *
  *             private final StorageConnection mConnection = storage.openConnection();
  *
- *             void store(&#64;In final Channel&lt;?, String&gt; input) {
+ *             void store(&#64;Input final Channel&lt;?, String&gt; input) {
  *                 try {
  *                     if (input.hasNext()) {
  *                         mConnection.put(input.next());
@@ -395,10 +408,12 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * <pre>
  *     <code>
  *
- *         final Channel&lt;Object[], Object[]&gt; inputChannel = JRoutineCore.io().buildChannel();
+ *         final Channel&lt;Object[], Object[]&gt; inputChannel =
+ *                 JRoutineCore.&lt;Object[]&gt;ofInputs().buildChannel();
  *         final Channel&lt;?, String&gt; outputChannel =
- *                RoutineMethod.from(String.class.getMethod("format", String.class, Object[].class))
- *                             .call("%s %s!", inputChannel);
+ *                 RoutineMethod.from(
+ *                     String.class.getMethod("format", String.class, Object[].class))
+ *                              .call("%s %s!", inputChannel);
  *         inputChannel.pass(new Object[]{"Hello", "JRoutine"}).close();
  *         outputChannel.inMax(seconds(1)).next(); // expected value: "Hello JRoutine!"
  *     </code>
@@ -408,9 +423,11 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * <pre>
  *     <code>
  *
- *         final Channel&lt;String, String&gt; channel = JRoutineCore.io().buildChannel();
+ *         final Channel&lt;String, String&gt; channel =
+ *                 JRoutineCore.&lt;String&gt;ofInputs().buildChannel();
  *         RoutineMethod.from(MyClass.class.getMethod("run", Channel.class))
- *                      .call(JRoutineCore.io().&lt;Channel&lt;String, String&gt;&gt;of(channel));
+ *                      .call(JRoutineCore.&lt;Channel&lt;String, String&gt;&gt;of(channel)
+ *                                        .buildChannel());
  *     </code>
  * </pre>
  *
@@ -541,27 +558,27 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
    * @param annotations the parameter annotation.
    * @return the annotation class or null.
    * @throws java.lang.IllegalArgumentException if the parameter annotations are invalid.
-   * @see com.github.dm.jrt.method.annotation.In In
-   * @see com.github.dm.jrt.method.annotation.Out Out
+   * @see com.github.dm.jrt.method.annotation.Input Input
+   * @see com.github.dm.jrt.method.annotation.Output Output
    */
   @Nullable
   protected static Class<? extends Annotation> getAnnotationType(@NotNull final Object param,
       @NotNull final Annotation[] annotations) {
     Class<? extends Annotation> type = null;
     for (final Annotation annotation : annotations) {
-      if (annotation instanceof In) {
+      if (annotation instanceof Input) {
         if ((type != null) || !(param instanceof Channel)) {
           throw new IllegalArgumentException("Invalid annotations for parameter: " + param);
         }
 
-        type = In.class;
+        type = Input.class;
 
-      } else if (annotation instanceof Out) {
+      } else if (annotation instanceof Output) {
         if ((type != null) || !(param instanceof Channel)) {
           throw new IllegalArgumentException("Invalid annotations for parameter: " + param);
         }
 
-        type = Out.class;
+        type = Output.class;
       }
     }
 
@@ -585,16 +602,16 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
     final Annotation[][] annotations = method.getParameterAnnotations();
     final int length = params.length;
     final ArrayList<Object> parameters = new ArrayList<Object>(length);
-    final ChannelBuilder channelBuilder = JRoutineCore.io();
+    final ChannelBuilder<Object, Object> channelBuilder = JRoutineCore.ofInputs();
     for (int i = 0; i < length; ++i) {
       final Object param = params[i];
       final Class<? extends Annotation> annotationType = getAnnotationType(param, annotations[i]);
-      if (annotationType == In.class) {
+      if (annotationType == Input.class) {
         final Channel<Object, Object> inputChannel = channelBuilder.buildChannel();
         inputChannels.add(inputChannel);
         parameters.add(inputChannel);
 
-      } else if (annotationType == Out.class) {
+      } else if (annotationType == Output.class) {
         final Channel<Object, Object> outputChannel = channelBuilder.buildChannel();
         outputChannels.add(outputChannel);
         parameters.add(outputChannel);
@@ -742,20 +759,19 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
     for (int i = 0; i < length; ++i) {
       final Object param = params[i];
       final Class<? extends Annotation> annotationType = getAnnotationType(param, annotations[i]);
-      if (annotationType == In.class) {
+      if (annotationType == Input.class) {
         inputChannels.add((Channel<?, ?>) param);
 
-      } else if (annotationType == Out.class) {
+      } else if (annotationType == Output.class) {
         outputChannels.add((Channel<?, ?>) param);
       }
     }
 
-    final ChannelBuilder channelBuilder = JRoutineCore.io();
-    final Channel<OUT, OUT> resultChannel = channelBuilder.buildChannel();
+    final Channel<OUT, OUT> resultChannel = JRoutineCore.<OUT>ofInputs().buildChannel();
     outputChannels.add(resultChannel);
     final Channel<?, ? extends Selectable<Object>> inputChannel =
         (!inputChannels.isEmpty()) ? Channels.merge(inputChannels).buildChannels()
-            : channelBuilder.<Selectable<Object>>of();
+            : JRoutineCore.<Selectable<Object>>of().buildChannel();
     final Channel<Selectable<Object>, Selectable<Object>> outputChannel =
         mode.invoke(JRoutineCore.with(factory).apply(getConfiguration()))
             .pass(inputChannel)

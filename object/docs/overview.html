@@ -141,7 +141,7 @@
                                                       .withOutputTimeout(seconds(3))
                                                       .configured()
                                                       .buildProxy(AsyncMain.class);
-                final double rms = proxy.squareRootMean(proxy.square(proxy.parseArg(JRoutineCore.io().of(args))));
+                final double rms = proxy.squareRootMean(proxy.square(proxy.parseArg(JRoutineCore.of(args).buildChannel())));
                 System.out.println(rms);
                 System.exit(0);
             }

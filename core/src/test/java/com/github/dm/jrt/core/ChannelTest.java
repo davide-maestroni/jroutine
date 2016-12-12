@@ -507,6 +507,8 @@ public class ChannelTest {
                            .buildChannel()
                            .inMax(seconds(1))
                            .all()).containsExactly(3, 12, -7);
+    assertThat(JRoutineCore.of((Object[]) null).buildChannel().all()).isEmpty();
+    assertThat(JRoutineCore.of((List<Object>) null).buildChannel().all()).isEmpty();
   }
 
   @Test

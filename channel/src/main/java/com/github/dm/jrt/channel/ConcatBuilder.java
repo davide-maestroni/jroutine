@@ -17,8 +17,8 @@
 package com.github.dm.jrt.channel;
 
 import com.github.dm.jrt.core.JRoutineCore;
+import com.github.dm.jrt.core.builder.AbstractChannelBuilder;
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 
 import org.jetbrains.annotations.NotNull;
@@ -32,7 +32,7 @@ import java.util.ArrayList;
  *
  * @param <OUT> the output data type.
  */
-class ConcatBuilder<OUT> extends AbstractBuilder<Channel<?, OUT>> {
+class ConcatBuilder<OUT> extends AbstractChannelBuilder<OUT, OUT> {
 
   private final ArrayList<Channel<?, ? extends OUT>> mChannels;
 
@@ -63,10 +63,9 @@ class ConcatBuilder<OUT> extends AbstractBuilder<Channel<?, OUT>> {
   }
 
   @NotNull
-  @Override
-  protected Channel<?, OUT> build(@NotNull final ChannelConfiguration configuration) {
+  public Channel<OUT, OUT> buildChannel() {
     final Channel<OUT, OUT> outputChannel = JRoutineCore.<OUT>ofInputs().applyChannelConfiguration()
-                                                                        .with(configuration)
+                                                                        .with(getConfiguration())
                                                                         .withOrder(OrderType.SORTED)
                                                                         .configured()
                                                                         .buildChannel();

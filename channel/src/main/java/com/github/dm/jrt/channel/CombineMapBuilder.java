@@ -17,6 +17,7 @@
 package com.github.dm.jrt.channel;
 
 import com.github.dm.jrt.core.JRoutineCore;
+import com.github.dm.jrt.core.builder.AbstractChannelBuilder;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 
@@ -33,7 +34,8 @@ import java.util.Map.Entry;
  *
  * @param <IN> the input data type.
  */
-class CombineMapBuilder<IN> extends AbstractBuilder<Channel<Selectable<? extends IN>, ?>> {
+class CombineMapBuilder<IN>
+    extends AbstractChannelBuilder<Selectable<? extends IN>, Selectable<? extends IN>> {
 
   private final HashMap<Integer, Channel<? extends IN, ?>> mChannelMap;
 
@@ -60,13 +62,12 @@ class CombineMapBuilder<IN> extends AbstractBuilder<Channel<Selectable<? extends
   }
 
   @NotNull
-  @Override
   @SuppressWarnings("unchecked")
-  protected Channel<Selectable<? extends IN>, ?> build(
-      @NotNull final ChannelConfiguration configuration) {
+  public Channel<Selectable<? extends IN>, Selectable<? extends IN>> buildChannel() {
     final HashMap<Integer, Channel<? extends IN, ?>> channelMap = mChannelMap;
     final HashMap<Integer, Channel<IN, ?>> inputChannelMap =
         new HashMap<Integer, Channel<IN, ?>>(channelMap.size());
+    final ChannelConfiguration configuration = getConfiguration();
     for (final Entry<Integer, Channel<? extends IN, ?>> entry : channelMap.entrySet()) {
       final Channel<IN, IN> outputChannel =
           JRoutineCore.<IN>ofInputs().apply(configuration).buildChannel();

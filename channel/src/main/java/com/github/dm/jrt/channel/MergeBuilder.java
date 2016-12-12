@@ -1,8 +1,8 @@
 package com.github.dm.jrt.channel;
 
 import com.github.dm.jrt.core.JRoutineCore;
+import com.github.dm.jrt.core.builder.AbstractChannelBuilder;
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.config.ChannelConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -15,7 +15,7 @@ import java.util.ArrayList;
  *
  * @param <OUT> the output data type.
  */
-class MergeBuilder<OUT> extends AbstractBuilder<Channel<?, Selectable<OUT>>> {
+class MergeBuilder<OUT> extends AbstractChannelBuilder<Selectable<OUT>, Selectable<OUT>> {
 
   private final ArrayList<Channel<?, ? extends OUT>> mChannels;
 
@@ -51,13 +51,12 @@ class MergeBuilder<OUT> extends AbstractBuilder<Channel<?, Selectable<OUT>>> {
   }
 
   @NotNull
-  @Override
-  protected Channel<?, Selectable<OUT>> build(@NotNull final ChannelConfiguration configuration) {
+  public Channel<Selectable<OUT>, Selectable<OUT>> buildChannel() {
     final Channel<Selectable<OUT>, Selectable<OUT>> outputChannel =
-        JRoutineCore.<Selectable<OUT>>ofInputs().apply(configuration).buildChannel();
+        JRoutineCore.<Selectable<OUT>>ofInputs().apply(getConfiguration()).buildChannel();
     int i = mStartIndex;
     for (final Channel<?, ? extends OUT> channel : mChannels) {
-      outputChannel.pass(new SelectableOutputBuilder<OUT>(channel, i++).buildChannels());
+      outputChannel.pass(new SelectableOutputBuilder<OUT>(channel, i++).buildChannel());
     }
 
     return outputChannel.close();

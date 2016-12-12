@@ -246,7 +246,7 @@ public class JRoutineStream {
    */
   @NotNull
   public static <IN> StreamBuilder<IN, IN> withStreamOf(@Nullable final IN input) {
-    return withStreamOf(Channels.replay(JRoutineCore.of(input).buildChannel()).buildChannels());
+    return withStreamOf(Channels.replay(JRoutineCore.of(input).buildChannel()).buildChannel());
   }
 
   /**
@@ -263,7 +263,7 @@ public class JRoutineStream {
    */
   @NotNull
   public static <IN> StreamBuilder<IN, IN> withStreamOf(@Nullable final IN... inputs) {
-    return withStreamOf(Channels.replay(JRoutineCore.of(inputs).buildChannel()).buildChannels());
+    return withStreamOf(Channels.replay(JRoutineCore.of(inputs).buildChannel()).buildChannel());
   }
 
   /**
@@ -281,7 +281,7 @@ public class JRoutineStream {
   @NotNull
   public static <IN> StreamBuilder<IN, IN> withStreamOf(
       @Nullable final Iterable<? extends IN> inputs) {
-    return withStreamOf(Channels.replay(JRoutineCore.of(inputs).buildChannel()).buildChannels());
+    return withStreamOf(Channels.replay(JRoutineCore.of(inputs).buildChannel()).buildChannel());
   }
 
   /**

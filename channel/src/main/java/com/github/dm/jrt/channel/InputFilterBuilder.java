@@ -17,10 +17,10 @@
 package com.github.dm.jrt.channel;
 
 import com.github.dm.jrt.core.JRoutineCore;
+import com.github.dm.jrt.core.builder.AbstractChannelBuilder;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.common.RoutineException;
-import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
@@ -32,7 +32,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <IN> the input data type.
  */
-class InputFilterBuilder<IN> extends AbstractBuilder<Channel<Selectable<IN>, ?>> {
+class InputFilterBuilder<IN> extends AbstractChannelBuilder<Selectable<IN>, Selectable<IN>> {
 
   private final Channel<? super IN, ?> mChannel;
 
@@ -50,10 +50,9 @@ class InputFilterBuilder<IN> extends AbstractBuilder<Channel<Selectable<IN>, ?>>
   }
 
   @NotNull
-  @Override
-  protected Channel<Selectable<IN>, ?> build(@NotNull final ChannelConfiguration configuration) {
+  public Channel<Selectable<IN>, Selectable<IN>> buildChannel() {
     final Channel<Selectable<IN>, Selectable<IN>> inputChannel =
-        JRoutineCore.<Selectable<IN>>ofInputs().apply(configuration).buildChannel();
+        JRoutineCore.<Selectable<IN>>ofInputs().apply(getConfiguration()).buildChannel();
     final Channel<IN, IN> outputChannel = JRoutineCore.<IN>ofInputs().buildChannel();
     outputChannel.bind(mChannel);
     return inputChannel.bind(new FilterChannelConsumer<IN>(outputChannel, mIndex));

@@ -1,6 +1,7 @@
 package com.github.dm.jrt.channel;
 
 import com.github.dm.jrt.core.JRoutineCore;
+import com.github.dm.jrt.core.builder.AbstractChannelBuilder;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.channel.OutputDeadlockException;
@@ -25,7 +26,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @param <OUT> the output data type.
  */
-class JoinBuilder<OUT> extends AbstractBuilder<Channel<?, List<OUT>>> {
+class JoinBuilder<OUT> extends AbstractChannelBuilder<List<OUT>, List<OUT>> {
 
   private final ArrayList<Channel<?, ? extends OUT>> mChannels;
 
@@ -65,9 +66,9 @@ class JoinBuilder<OUT> extends AbstractBuilder<Channel<?, List<OUT>>> {
   }
 
   @NotNull
-  @Override
-  protected Channel<?, List<OUT>> build(@NotNull final ChannelConfiguration configuration) {
+  public Channel<List<OUT>, List<OUT>> buildChannel() {
     final ArrayList<Channel<?, ? extends OUT>> channels = mChannels;
+    final ChannelConfiguration configuration = getConfiguration();
     final Channel<List<OUT>, List<OUT>> outputChannel =
         JRoutineCore.<List<OUT>>ofInputs().apply(configuration).buildChannel();
     final Object mutex = new Object();

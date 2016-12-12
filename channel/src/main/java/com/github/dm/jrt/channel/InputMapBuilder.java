@@ -1,5 +1,6 @@
 package com.github.dm.jrt.channel;
 
+import com.github.dm.jrt.channel.builder.AbstractChannelMapBuilder;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -19,7 +20,7 @@ import java.util.Set;
  * @param <DATA> the channel data type.
  * @param <IN>   the input data type.
  */
-class InputMapBuilder<DATA, IN extends DATA> extends AbstractBuilder<Map<Integer, Channel<IN, ?>>> {
+class InputMapBuilder<DATA, IN extends DATA> extends AbstractChannelMapBuilder<Integer, IN, IN> {
 
   private final Channel<? super Selectable<DATA>, ?> mChannel;
 
@@ -46,15 +47,15 @@ class InputMapBuilder<DATA, IN extends DATA> extends AbstractBuilder<Map<Integer
   }
 
   @NotNull
-  @Override
-  protected Map<Integer, Channel<IN, ?>> build(@NotNull final ChannelConfiguration configuration) {
+  public Map<Integer, ? extends Channel<IN, IN>> buildChannelMap() {
     final HashSet<Integer> indexes = mIndexes;
     final Channel<? super Selectable<DATA>, ?> channel = mChannel;
-    final HashMap<Integer, Channel<IN, ?>> channelMap =
-        new HashMap<Integer, Channel<IN, ?>>(indexes.size());
+    final HashMap<Integer, Channel<IN, IN>> channelMap =
+        new HashMap<Integer, Channel<IN, IN>>(indexes.size());
+    final ChannelConfiguration configuration = getConfiguration();
     for (final Integer index : indexes) {
-      final Channel<IN, ?> inputChannel =
-          new InputSelectBuilder<DATA, IN>(channel, index).apply(configuration).buildChannels();
+      final Channel<IN, IN> inputChannel =
+          new InputSelectBuilder<DATA, IN>(channel, index).apply(configuration).buildChannel();
       channelMap.put(index, inputChannel);
     }
 

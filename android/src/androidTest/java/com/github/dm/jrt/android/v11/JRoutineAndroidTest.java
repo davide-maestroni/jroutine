@@ -511,6 +511,8 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
                               .buildChannel()
                               .inMax(seconds(1))
                               .all()).containsExactly(3, 12, -7);
+    assertThat(JRoutineAndroid.of((Object[]) null).buildChannel().all()).isEmpty();
+    assertThat(JRoutineAndroid.of((List<Object>) null).buildChannel().all()).isEmpty();
   }
 
   public void testPredicateFilter() {

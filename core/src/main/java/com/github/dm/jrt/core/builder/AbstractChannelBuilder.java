@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.channel;
+package com.github.dm.jrt.core.builder;
 
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.ChannelConfiguration.Builder;
@@ -23,38 +23,35 @@ import com.github.dm.jrt.core.util.ConstantConditions;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Abstract base builder implementation.
+ * Base abstract implementation of a channel builder.
  * <p>
- * Created by davide-maestroni on 02/26/2016.
+ * Created by davide-maestroni on 12/11/2016.
  *
- * @param <TYPE> the built object type.
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  */
-public abstract class AbstractBuilder<TYPE> implements ChannelsBuilder<TYPE> {
+public abstract class AbstractChannelBuilder<IN, OUT> implements ChannelBuilder<IN, OUT> {
 
   private ChannelConfiguration mConfiguration = ChannelConfiguration.defaultConfiguration();
 
   @NotNull
-  public ChannelsBuilder<TYPE> apply(@NotNull final ChannelConfiguration configuration) {
+  public ChannelBuilder<IN, OUT> apply(@NotNull final ChannelConfiguration configuration) {
     mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
     return this;
   }
 
   @NotNull
-  public Builder<ChannelsBuilder<TYPE>> applyChannelConfiguration() {
-    return new Builder<ChannelsBuilder<TYPE>>(this, mConfiguration);
-  }
-
-  @NotNull
-  public TYPE buildChannels() {
-    return build(mConfiguration);
+  public Builder<? extends ChannelBuilder<IN, OUT>> applyChannelConfiguration() {
+    return new Builder<ChannelBuilder<IN, OUT>>(this, mConfiguration);
   }
 
   /**
-   * Builds and returns an object instance.
+   * Returns the current configuration.
    *
-   * @param configuration the instance configuration.
-   * @return the object instance.
+   * @return the channel configuration.
    */
   @NotNull
-  protected abstract TYPE build(@NotNull ChannelConfiguration configuration);
+  protected ChannelConfiguration getConfiguration() {
+    return mConfiguration;
+  }
 }

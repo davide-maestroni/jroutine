@@ -16,10 +16,9 @@
 
 package com.github.dm.jrt.android.channel;
 
-import com.github.dm.jrt.channel.AbstractBuilder;
 import com.github.dm.jrt.core.JRoutineCore;
+import com.github.dm.jrt.core.builder.AbstractChannelBuilder;
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.config.ChannelConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -32,7 +31,8 @@ import java.util.ArrayList;
  *
  * @param <OUT> the output data type.
  */
-class MergeBuilder<OUT> extends AbstractBuilder<Channel<?, ParcelableSelectable<OUT>>> {
+class MergeBuilder<OUT>
+    extends AbstractChannelBuilder<ParcelableSelectable<OUT>, ParcelableSelectable<OUT>> {
 
   private final ArrayList<Channel<?, ? extends OUT>> mChannels;
 
@@ -69,13 +69,12 @@ class MergeBuilder<OUT> extends AbstractBuilder<Channel<?, ParcelableSelectable<
 
   @NotNull
   @Override
-  protected Channel<?, ParcelableSelectable<OUT>> build(
-      @NotNull final ChannelConfiguration configuration) {
+  public Channel<ParcelableSelectable<OUT>, ParcelableSelectable<OUT>> buildChannel() {
     final Channel<ParcelableSelectable<OUT>, ParcelableSelectable<OUT>> outputChannel =
-        JRoutineCore.<ParcelableSelectable<OUT>>ofInputs().apply(configuration).buildChannel();
+        JRoutineCore.<ParcelableSelectable<OUT>>ofInputs().apply(getConfiguration()).buildChannel();
     int i = mStartIndex;
     for (final Channel<?, ? extends OUT> channel : mChannels) {
-      outputChannel.pass(AndroidChannels.selectableOutputParcelable(channel, i++).buildChannels());
+      outputChannel.pass(AndroidChannels.selectableOutputParcelable(channel, i++).buildChannel());
     }
 
     return outputChannel.close();

@@ -19,7 +19,7 @@ package com.github.dm.jrt.android.v11.channel;
 import android.util.SparseArray;
 
 import com.github.dm.jrt.android.channel.ParcelableSelectable;
-import com.github.dm.jrt.channel.AbstractBuilder;
+import com.github.dm.jrt.android.v11.channel.builder.AbstractChannelArrayBuilder;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
@@ -42,7 +42,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  *
  * @param <OUT> the output data type.
  */
-class OutputMapBuilder<OUT> extends AbstractBuilder<SparseArray<Channel<?, OUT>>> {
+class OutputMapBuilder<OUT> extends AbstractChannelArrayBuilder<OUT, OUT> {
 
   private static final WeakIdentityHashMap<Channel<?, ?>, HashMap<SelectInfo,
       SparseArray<Channel<?, ?>>>>
@@ -76,7 +76,7 @@ class OutputMapBuilder<OUT> extends AbstractBuilder<SparseArray<Channel<?, OUT>>
   @NotNull
   @Override
   @SuppressWarnings("unchecked")
-  protected SparseArray<Channel<?, OUT>> build(@NotNull final ChannelConfiguration configuration) {
+  public SparseArray<? extends Channel<OUT, OUT>> buildChannelArray() {
     final HashSet<Integer> indexes = mIndexes;
     final Channel<?, ? extends ParcelableSelectable<? extends OUT>> channel = mChannel;
     synchronized (sOutputChannels) {
@@ -89,13 +89,14 @@ class OutputMapBuilder<OUT> extends AbstractBuilder<SparseArray<Channel<?, OUT>>
       }
 
       final int size = indexes.size();
+      final ChannelConfiguration configuration = getConfiguration();
       final SelectInfo selectInfo = new SelectInfo(configuration, indexes);
-      final SparseArray<Channel<?, OUT>> channelMap = new SparseArray<Channel<?, OUT>>(size);
+      final SparseArray<Channel<OUT, OUT>> channelMap = new SparseArray<Channel<OUT, OUT>>(size);
       SparseArray<Channel<?, ?>> channels = channelMaps.get(selectInfo);
       if (channels != null) {
         final int channelSize = channels.size();
         for (int i = 0; i < channelSize; ++i) {
-          channelMap.append(channels.keyAt(i), (Channel<?, OUT>) channels.valueAt(i));
+          channelMap.append(channels.keyAt(i), (Channel<OUT, OUT>) channels.valueAt(i));
         }
 
       } else {

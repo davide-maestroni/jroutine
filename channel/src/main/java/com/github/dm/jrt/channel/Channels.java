@@ -16,6 +16,8 @@
 
 package com.github.dm.jrt.channel;
 
+import com.github.dm.jrt.channel.builder.ChannelMapBuilder;
+import com.github.dm.jrt.core.builder.ChannelBuilder;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
@@ -71,8 +73,7 @@ public class Channels {
    */
   @NotNull
   @SuppressWarnings("unchecked")
-  public static <OUT> ChannelsBuilder<? extends Channel<?, OUT>> blend(
-      @NotNull final Channel<?, ?>... channels) {
+  public static <OUT> ChannelBuilder<?, OUT> blend(@NotNull final Channel<?, ?>... channels) {
     final int length = channels.length;
     if (length == 0) {
       throw new IllegalArgumentException("the array of channels must not be empty");
@@ -105,7 +106,7 @@ public class Channels {
    *                                            null object.
    */
   @NotNull
-  public static <OUT> ChannelsBuilder<? extends Channel<?, OUT>> blend(
+  public static <OUT> ChannelBuilder<?, OUT> blend(
       @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
     return new BlendBuilder<OUT>(channels);
   }
@@ -173,7 +174,7 @@ public class Channels {
    *                                            object.
    */
   @NotNull
-  public static <IN> ChannelsBuilder<? extends Channel<Selectable<? extends IN>, ?>> combine(
+  public static <IN> ChannelBuilder<Selectable<? extends IN>, ?> combine(
       @NotNull final Channel<?, ?>... channels) {
     return combine(0, channels);
   }
@@ -205,8 +206,8 @@ public class Channels {
    */
   @NotNull
   @SuppressWarnings("unchecked")
-  public static <IN> ChannelsBuilder<? extends Channel<Selectable<? extends IN>, ?>> combine(
-      final int startIndex, @NotNull final Channel<?, ?>... channels) {
+  public static <IN> ChannelBuilder<Selectable<? extends IN>, ?> combine(final int startIndex,
+      @NotNull final Channel<?, ?>... channels) {
     final int length = channels.length;
     if (length == 0) {
       throw new IllegalArgumentException("the array of channels must not be empty");
@@ -241,8 +242,8 @@ public class Channels {
    *                                            null object.
    */
   @NotNull
-  public static <IN> ChannelsBuilder<? extends Channel<Selectable<? extends IN>, ?>> combine(
-      final int startIndex, @NotNull final Iterable<? extends Channel<? extends IN, ?>> channels) {
+  public static <IN> ChannelBuilder<Selectable<? extends IN>, ?> combine(final int startIndex,
+      @NotNull final Iterable<? extends Channel<? extends IN, ?>> channels) {
     return new CombineBuilder<IN>(startIndex, channels);
   }
 
@@ -271,7 +272,7 @@ public class Channels {
    *                                            null object.
    */
   @NotNull
-  public static <IN> ChannelsBuilder<? extends Channel<Selectable<? extends IN>, ?>> combine(
+  public static <IN> ChannelBuilder<Selectable<? extends IN>, ?> combine(
       @NotNull final Iterable<? extends Channel<? extends IN, ?>> channels) {
     return combine(0, channels);
   }
@@ -301,7 +302,7 @@ public class Channels {
    *                                            object.
    */
   @NotNull
-  public static <IN> ChannelsBuilder<? extends Channel<Selectable<? extends IN>, ?>> combine(
+  public static <IN> ChannelBuilder<Selectable<? extends IN>, ?> combine(
       @NotNull final Map<Integer, ? extends Channel<? extends IN, ?>> channels) {
     return new CombineMapBuilder<IN>(channels);
   }
@@ -333,8 +334,7 @@ public class Channels {
    */
   @NotNull
   @SuppressWarnings("unchecked")
-  public static <OUT> ChannelsBuilder<? extends Channel<?, OUT>> concat(
-      @NotNull final Channel<?, ?>... channels) {
+  public static <OUT> ChannelBuilder<?, OUT> concat(@NotNull final Channel<?, ?>... channels) {
     final int length = channels.length;
     if (length == 0) {
       throw new IllegalArgumentException("the array of channels must not be empty");
@@ -369,7 +369,7 @@ public class Channels {
    *                                            null object.
    */
   @NotNull
-  public static <OUT> ChannelsBuilder<? extends Channel<?, OUT>> concat(
+  public static <OUT> ChannelBuilder<?, OUT> concat(
       @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
     return new ConcatBuilder<OUT>(channels);
   }
@@ -398,7 +398,7 @@ public class Channels {
    *                                            object.
    */
   @NotNull
-  public static <IN> ChannelsBuilder<? extends Channel<List<? extends IN>, ?>> distribute(
+  public static <IN> ChannelBuilder<List<? extends IN>, ?> distribute(
       @NotNull final Channel<?, ?>... channels) {
     return distribute(false, null, channels);
   }
@@ -430,7 +430,7 @@ public class Channels {
    *                                            object.
    */
   @NotNull
-  public static <IN> ChannelsBuilder<? extends Channel<List<? extends IN>, ?>> distribute(
+  public static <IN> ChannelBuilder<List<? extends IN>, ?> distribute(
       @Nullable final IN placeholder, @NotNull final Channel<?, ?>... channels) {
     return distribute(true, placeholder, channels);
   }
@@ -462,7 +462,7 @@ public class Channels {
    *                                            null object.
    */
   @NotNull
-  public static <IN> ChannelsBuilder<? extends Channel<List<? extends IN>, ?>> distribute(
+  public static <IN> ChannelBuilder<List<? extends IN>, ?> distribute(
       @Nullable final IN placeholder,
       @NotNull final Iterable<? extends Channel<? extends IN, ?>> channels) {
     return distribute(true, placeholder, channels);
@@ -492,7 +492,7 @@ public class Channels {
    *                                            null object.
    */
   @NotNull
-  public static <IN> ChannelsBuilder<? extends Channel<List<? extends IN>, ?>> distribute(
+  public static <IN> ChannelBuilder<List<? extends IN>, ?> distribute(
       @NotNull final Iterable<? extends Channel<? extends IN, ?>> channels) {
     return distribute(false, null, channels);
   }
@@ -512,8 +512,7 @@ public class Channels {
    * @return the channel builder.
    */
   @NotNull
-  public static <OUT> ChannelsBuilder<? extends Channel<?, OUT>> fromFuture(
-      @NotNull final Future<OUT> future) {
+  public static <OUT> ChannelBuilder<?, OUT> fromFuture(@NotNull final Future<OUT> future) {
     return new FutureChannelBuilder<OUT>(future, false);
   }
 
@@ -532,7 +531,7 @@ public class Channels {
    * @return the channel builder.
    */
   @NotNull
-  public static <OUT> ChannelsBuilder<? extends Channel<?, OUT>> fromFutureInterruptIfRunning(
+  public static <OUT> ChannelBuilder<?, OUT> fromFutureInterruptIfRunning(
       @NotNull final Future<OUT> future) {
     return new FutureChannelBuilder<OUT>(future, true);
   }
@@ -563,8 +562,7 @@ public class Channels {
    *                                            object.
    */
   @NotNull
-  public static <OUT> ChannelsBuilder<? extends Channel<?, List<OUT>>> join(
-      @NotNull final Channel<?, ?>... channels) {
+  public static <OUT> ChannelBuilder<?, List<OUT>> join(@NotNull final Channel<?, ?>... channels) {
     return join(false, null, channels);
   }
 
@@ -594,7 +592,7 @@ public class Channels {
    *                                            null object.
    */
   @NotNull
-  public static <OUT> ChannelsBuilder<? extends Channel<?, List<OUT>>> join(
+  public static <OUT> ChannelBuilder<?, List<OUT>> join(
       @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
     return join(false, null, channels);
   }
@@ -629,8 +627,8 @@ public class Channels {
    *                                            object.
    */
   @NotNull
-  public static <OUT> ChannelsBuilder<? extends Channel<?, List<OUT>>> join(
-      @Nullable final OUT placeholder, @NotNull final Channel<?, ?>... channels) {
+  public static <OUT> ChannelBuilder<?, List<OUT>> join(@Nullable final OUT placeholder,
+      @NotNull final Channel<?, ?>... channels) {
     return join(true, placeholder, channels);
   }
 
@@ -664,8 +662,7 @@ public class Channels {
    *                                            null object.
    */
   @NotNull
-  public static <OUT> ChannelsBuilder<? extends Channel<?, List<OUT>>> join(
-      @Nullable final OUT placeholder,
+  public static <OUT> ChannelBuilder<?, List<OUT>> join(@Nullable final OUT placeholder,
       @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
     return join(true, placeholder, channels);
   }
@@ -696,7 +693,7 @@ public class Channels {
    *                                            object.
    */
   @NotNull
-  public static <OUT> ChannelsBuilder<? extends Channel<?, Selectable<OUT>>> merge(
+  public static <OUT> ChannelBuilder<?, Selectable<OUT>> merge(
       @NotNull final Channel<?, ?>... channels) {
     return merge(0, channels);
   }
@@ -729,8 +726,8 @@ public class Channels {
    */
   @NotNull
   @SuppressWarnings("unchecked")
-  public static <OUT> ChannelsBuilder<? extends Channel<?, Selectable<OUT>>> merge(
-      final int startIndex, @NotNull final Channel<?, ?>... channels) {
+  public static <OUT> ChannelBuilder<?, Selectable<OUT>> merge(final int startIndex,
+      @NotNull final Channel<?, ?>... channels) {
     if (channels.length == 0) {
       throw new IllegalArgumentException("the array of channels must not be empty");
     }
@@ -765,8 +762,8 @@ public class Channels {
    *                                            null object.
    */
   @NotNull
-  public static <OUT> ChannelsBuilder<? extends Channel<?, Selectable<OUT>>> merge(
-      final int startIndex, @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
+  public static <OUT> ChannelBuilder<?, Selectable<OUT>> merge(final int startIndex,
+      @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
     return new MergeBuilder<OUT>(startIndex, channels);
   }
 
@@ -796,7 +793,7 @@ public class Channels {
    *                                            null object.
    */
   @NotNull
-  public static <OUT> ChannelsBuilder<? extends Channel<?, Selectable<OUT>>> merge(
+  public static <OUT> ChannelBuilder<?, Selectable<OUT>> merge(
       @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
     return merge(0, channels);
   }
@@ -827,7 +824,7 @@ public class Channels {
    *                                            object.
    */
   @NotNull
-  public static <OUT> ChannelsBuilder<? extends Channel<?, Selectable<OUT>>> merge(
+  public static <OUT> ChannelBuilder<?, Selectable<OUT>> merge(
       @NotNull final Map<Integer, ? extends Channel<?, ? extends OUT>> channels) {
     return new MergeMapBuilder<OUT>(channels);
   }
@@ -860,8 +857,7 @@ public class Channels {
    * @return the replaying channel builder.
    */
   @NotNull
-  public static <OUT> ChannelsBuilder<? extends Channel<?, OUT>> replay(
-      @NotNull final Channel<?, OUT> channel) {
+  public static <OUT> ChannelBuilder<?, OUT> replay(@NotNull final Channel<?, OUT> channel) {
     return new ReplayChannelBuilder<OUT>(channel);
   }
 
@@ -885,7 +881,7 @@ public class Channels {
    * @return the channel builder.
    */
   @NotNull
-  public static <DATA, IN extends DATA> ChannelsBuilder<? extends Channel<IN, ?>> selectInput(
+  public static <DATA, IN extends DATA> ChannelBuilder<IN, ?> selectInput(
       @NotNull final Channel<? super Selectable<DATA>, ?> channel, final int index) {
     return new InputSelectBuilder<DATA, IN>(channel, index);
   }
@@ -913,8 +909,7 @@ public class Channels {
    *                                        object.
    */
   @NotNull
-  public static <DATA, IN extends DATA> ChannelsBuilder<? extends Map<Integer, Channel<IN, ?>>>
-  selectInput(
+  public static <DATA, IN extends DATA> ChannelMapBuilder<Integer, IN, ?> selectInput(
       @NotNull final Channel<? super Selectable<DATA>, ?> channel, @NotNull final int... indexes) {
     final HashSet<Integer> indexSet = new HashSet<Integer>();
     for (final int index : indexes) {
@@ -947,8 +942,7 @@ public class Channels {
    *                                        object.
    */
   @NotNull
-  public static <DATA, IN extends DATA> ChannelsBuilder<? extends Map<Integer, Channel<IN, ?>>>
-  selectInput(
+  public static <DATA, IN extends DATA> ChannelMapBuilder<Integer, IN, ?> selectInput(
       @NotNull final Channel<? super Selectable<DATA>, ?> channel,
       @NotNull final Iterable<Integer> indexes) {
     final HashSet<Integer> indexSet = new HashSet<Integer>();
@@ -982,8 +976,7 @@ public class Channels {
    * @throws java.lang.IllegalArgumentException if the specified range size is not positive.
    */
   @NotNull
-  public static <DATA, IN extends DATA> ChannelsBuilder<? extends Map<Integer, Channel<IN, ?>>>
-  selectInput(
+  public static <DATA, IN extends DATA> ChannelMapBuilder<Integer, IN, ?> selectInput(
       final int startIndex, final int rangeSize,
       @NotNull final Channel<? super Selectable<DATA>, ?> channel) {
     ConstantConditions.positive("range size", rangeSize);
@@ -1024,7 +1017,7 @@ public class Channels {
    *                                        object.
    */
   @NotNull
-  public static <OUT> ChannelsBuilder<? extends Map<Integer, Channel<?, OUT>>> selectOutput(
+  public static <OUT> ChannelMapBuilder<Integer, ?, OUT> selectOutput(
       @NotNull final Channel<?, ? extends Selectable<? extends OUT>> channel,
       @NotNull final int... indexes) {
     final HashSet<Integer> indexSet = new HashSet<Integer>();
@@ -1063,7 +1056,7 @@ public class Channels {
    *                                        object.
    */
   @NotNull
-  public static <OUT> ChannelsBuilder<? extends Map<Integer, Channel<?, OUT>>> selectOutput(
+  public static <OUT> ChannelMapBuilder<Integer, ?, OUT> selectOutput(
       @NotNull final Channel<?, ? extends Selectable<? extends OUT>> channel,
       @NotNull final Iterable<Integer> indexes) {
     final HashSet<Integer> indexSet = new HashSet<Integer>();
@@ -1102,9 +1095,8 @@ public class Channels {
    * @throws java.lang.IllegalArgumentException if the specified range size is not positive.
    */
   @NotNull
-  public static <OUT> ChannelsBuilder<? extends Map<Integer, Channel<?, OUT>>> selectOutput(
-      final int startIndex, final int rangeSize,
-      @NotNull final Channel<?, ? extends Selectable<? extends OUT>> channel) {
+  public static <OUT> ChannelMapBuilder<Integer, ?, OUT> selectOutput(final int startIndex,
+      final int rangeSize, @NotNull final Channel<?, ? extends Selectable<? extends OUT>> channel) {
     ConstantConditions.positive("range size", rangeSize);
     final HashSet<Integer> indexSet = new HashSet<Integer>();
     final int endIndex = startIndex + rangeSize;
@@ -1136,7 +1128,7 @@ public class Channels {
    * @return the selectable channel builder.
    */
   @NotNull
-  public static <IN> ChannelsBuilder<? extends Channel<Selectable<IN>, ?>> selectableInput(
+  public static <IN> ChannelBuilder<Selectable<IN>, ?> selectableInput(
       @NotNull final Channel<? super IN, ?> channel, final int index) {
     return new InputFilterBuilder<IN>(channel, index);
   }
@@ -1165,16 +1157,15 @@ public class Channels {
    * @return the selectable channel builder.
    */
   @NotNull
-  public static <OUT> ChannelsBuilder<? extends Channel<?, Selectable<OUT>>> selectableOutput(
+  public static <OUT> ChannelBuilder<?, Selectable<OUT>> selectableOutput(
       @NotNull final Channel<?, ? extends OUT> channel, final int index) {
     return new SelectableOutputBuilder<OUT>(channel, index);
   }
 
   @NotNull
   @SuppressWarnings("unchecked")
-  private static <IN> ChannelsBuilder<? extends Channel<List<? extends IN>, ?>> distribute(
-      final boolean isFlush, @Nullable final IN placeholder,
-      @NotNull final Channel<?, ?>... channels) {
+  private static <IN> ChannelBuilder<List<? extends IN>, ?> distribute(final boolean isFlush,
+      @Nullable final IN placeholder, @NotNull final Channel<?, ?>... channels) {
     final int length = channels.length;
     if (length == 0) {
       throw new IllegalArgumentException("the array of channels must not be empty");
@@ -1185,14 +1176,14 @@ public class Channels {
   }
 
   @NotNull
-  private static <IN> ChannelsBuilder<? extends Channel<List<? extends IN>, ?>> distribute(
-      final boolean isFlush, @Nullable final IN placeholder,
+  private static <IN> ChannelBuilder<List<? extends IN>, ?> distribute(final boolean isFlush,
+      @Nullable final IN placeholder,
       @NotNull final Iterable<? extends Channel<? extends IN, ?>> channels) {
     return new DistributeBuilder<IN>(isFlush, placeholder, channels);
   }
 
   @NotNull
-  private static <OUT> ChannelsBuilder<? extends Channel<?, List<OUT>>> join(final boolean isFlush,
+  private static <OUT> ChannelBuilder<?, List<OUT>> join(final boolean isFlush,
       @Nullable final OUT placeholder,
       @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
     return new JoinBuilder<OUT>(isFlush, placeholder, channels);
@@ -1200,7 +1191,7 @@ public class Channels {
 
   @NotNull
   @SuppressWarnings("unchecked")
-  private static <OUT> ChannelsBuilder<? extends Channel<?, List<OUT>>> join(final boolean isFlush,
+  private static <OUT> ChannelBuilder<?, List<OUT>> join(final boolean isFlush,
       @Nullable final OUT placeholder, @NotNull final Channel<?, ?>... channels) {
     final int length = channels.length;
     if (length == 0) {

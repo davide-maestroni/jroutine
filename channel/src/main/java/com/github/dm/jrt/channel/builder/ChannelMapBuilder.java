@@ -14,36 +14,32 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.channel;
+package com.github.dm.jrt.channel.builder;
 
-import com.github.dm.jrt.core.builder.AbstractChannelBuilder;
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.core.config.ChannelConfigurable;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Map;
+
 /**
- * Builder implementation returning a replaying channel.
+ * Interface defining a builder of maps of channels.
  * <p>
- * Created by davide-maestroni on 02/26/2016.
+ * Created by davide-maestroni on 12/12/2016.
  *
+ * @param <KEY> the key type.
+ * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class ReplayChannelBuilder<OUT> extends AbstractChannelBuilder<OUT, OUT> {
-
-  private final Channel<?, OUT> mChannel;
+public interface ChannelMapBuilder<KEY, IN, OUT>
+    extends ChannelConfigurable<ChannelMapBuilder<KEY, IN, OUT>> {
 
   /**
-   * Constructor.
+   * Builds and return a new channel map.
    *
-   * @param channel the channel.
+   * @return the newly created map of channels.
    */
-  ReplayChannelBuilder(@NotNull final Channel<?, OUT> channel) {
-    mChannel = ConstantConditions.notNull("channel instance", channel);
-  }
-
   @NotNull
-  public Channel<OUT, OUT> buildChannel() {
-    return new ReplayChannel<OUT>(getConfiguration(), mChannel);
-  }
+  Map<KEY, ? extends Channel<IN, OUT>> buildChannelMap();
 }

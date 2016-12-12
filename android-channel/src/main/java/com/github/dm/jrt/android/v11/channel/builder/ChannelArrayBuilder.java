@@ -14,36 +14,31 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.channel;
+package com.github.dm.jrt.android.v11.channel.builder;
 
-import com.github.dm.jrt.core.builder.AbstractChannelBuilder;
+import android.util.SparseArray;
+
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.core.config.ChannelConfigurable;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Builder implementation returning a replaying channel.
+ * Interface defining a builder of sparse arrays of channels.
  * <p>
- * Created by davide-maestroni on 02/26/2016.
+ * Created by davide-maestroni on 12/12/2016.
  *
+ * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class ReplayChannelBuilder<OUT> extends AbstractChannelBuilder<OUT, OUT> {
-
-  private final Channel<?, OUT> mChannel;
+public interface ChannelArrayBuilder<IN, OUT>
+    extends ChannelConfigurable<ChannelArrayBuilder<IN, OUT>> {
 
   /**
-   * Constructor.
+   * Builds and return a new channel sparse array.
    *
-   * @param channel the channel.
+   * @return the newly created array of channels.
    */
-  ReplayChannelBuilder(@NotNull final Channel<?, OUT> channel) {
-    mChannel = ConstantConditions.notNull("channel instance", channel);
-  }
-
   @NotNull
-  public Channel<OUT, OUT> buildChannel() {
-    return new ReplayChannel<OUT>(getConfiguration(), mChannel);
-  }
+  SparseArray<? extends Channel<IN, OUT>> buildChannelArray();
 }

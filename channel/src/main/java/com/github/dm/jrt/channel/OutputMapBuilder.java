@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.channel;
 
+import com.github.dm.jrt.channel.builder.AbstractChannelMapBuilder;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
@@ -40,7 +41,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  *
  * @param <OUT> the output data type.
  */
-class OutputMapBuilder<OUT> extends AbstractBuilder<Map<Integer, Channel<?, OUT>>> {
+class OutputMapBuilder<OUT> extends AbstractChannelMapBuilder<Integer, OUT, OUT> {
 
   private static final WeakIdentityHashMap<Channel<?, ?>, HashMap<SelectInfo, HashMap<Integer,
       Channel<?, ?>>>>
@@ -73,9 +74,8 @@ class OutputMapBuilder<OUT> extends AbstractBuilder<Map<Integer, Channel<?, OUT>
   }
 
   @NotNull
-  @Override
   @SuppressWarnings("unchecked")
-  protected Map<Integer, Channel<?, OUT>> build(@NotNull final ChannelConfiguration configuration) {
+  public Map<Integer, ? extends Channel<OUT, OUT>> buildChannelMap() {
     final HashSet<Integer> indexes = mIndexes;
     final Channel<?, ? extends Selectable<? extends OUT>> channel = mChannel;
     synchronized (sOutputChannels) {
@@ -89,13 +89,14 @@ class OutputMapBuilder<OUT> extends AbstractBuilder<Map<Integer, Channel<?, OUT>
       }
 
       final int size = indexes.size();
+      final ChannelConfiguration configuration = getConfiguration();
       final SelectInfo selectInfo = new SelectInfo(configuration, indexes);
-      final HashMap<Integer, Channel<?, OUT>> channelMap =
-          new HashMap<Integer, Channel<?, OUT>>(size);
+      final HashMap<Integer, Channel<OUT, OUT>> channelMap =
+          new HashMap<Integer, Channel<OUT, OUT>>(size);
       HashMap<Integer, Channel<?, ?>> channels = channelMaps.get(selectInfo);
       if (channels != null) {
         for (final Entry<Integer, Channel<?, ?>> entry : channels.entrySet()) {
-          channelMap.put(entry.getKey(), (Channel<?, OUT>) entry.getValue());
+          channelMap.put(entry.getKey(), (Channel<OUT, OUT>) entry.getValue());
         }
 
       } else {

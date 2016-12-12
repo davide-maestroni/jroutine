@@ -16,8 +16,8 @@
 
 package com.github.dm.jrt.channel;
 
+import com.github.dm.jrt.core.builder.AbstractChannelBuilder;
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
@@ -29,7 +29,7 @@ import java.util.concurrent.Future;
  * <p>
  * Created by davide-maestroni on 08/31/2016.
  */
-class FutureChannelBuilder<OUT> extends AbstractBuilder<Channel<?, OUT>> {
+class FutureChannelBuilder<OUT> extends AbstractChannelBuilder<OUT, OUT> {
 
   private final Future<OUT> mFuture;
 
@@ -47,8 +47,7 @@ class FutureChannelBuilder<OUT> extends AbstractBuilder<Channel<?, OUT>> {
   }
 
   @NotNull
-  @Override
-  protected Channel<?, OUT> build(@NotNull final ChannelConfiguration configuration) {
-    return new FutureChannel<OUT>(configuration, mFuture, mInterruptIfRunning);
+  public Channel<OUT, OUT> buildChannel() {
+    return new FutureChannel<OUT>(getConfiguration(), mFuture, mInterruptIfRunning);
   }
 }

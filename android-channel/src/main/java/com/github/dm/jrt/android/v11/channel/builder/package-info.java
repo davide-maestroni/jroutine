@@ -14,26 +14,10 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.channel;
-
-import com.github.dm.jrt.core.config.ChannelConfigurable;
-
-import org.jetbrains.annotations.NotNull;
-
 /**
- * Interface defining a generic configurable builder of channels.
+ * Classes and interfaces related to channel builders with support for Android sparse array
+ * collections.
  * <p>
- * Created by davide-maestroni on 02/26/2016.
- *
- * @param <TYPE> the built object type.
+ * Created by davide-maestroni on 12/12/2016.
  */
-public interface ChannelsBuilder<TYPE> extends ChannelConfigurable<ChannelsBuilder<TYPE>> {
-
-  /**
-   * Builds and returns an object instance.
-   *
-   * @return the object instance.
-   */
-  @NotNull
-  TYPE buildChannels();
-}
+package com.github.dm.jrt.android.v11.channel.builder;

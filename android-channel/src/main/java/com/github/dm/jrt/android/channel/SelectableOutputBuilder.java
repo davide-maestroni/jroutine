@@ -16,10 +16,9 @@
 
 package com.github.dm.jrt.android.channel;
 
-import com.github.dm.jrt.channel.AbstractBuilder;
 import com.github.dm.jrt.core.JRoutineCore;
+import com.github.dm.jrt.core.builder.AbstractChannelBuilder;
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
@@ -31,7 +30,8 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <OUT> the output data type.
  */
-class SelectableOutputBuilder<OUT> extends AbstractBuilder<Channel<?, ParcelableSelectable<OUT>>> {
+class SelectableOutputBuilder<OUT>
+    extends AbstractChannelBuilder<ParcelableSelectable<OUT>, ParcelableSelectable<OUT>> {
 
   private final Channel<?, ? extends OUT> mChannel;
 
@@ -50,10 +50,9 @@ class SelectableOutputBuilder<OUT> extends AbstractBuilder<Channel<?, Parcelable
 
   @NotNull
   @Override
-  protected Channel<?, ParcelableSelectable<OUT>> build(
-      @NotNull final ChannelConfiguration configuration) {
+  public Channel<ParcelableSelectable<OUT>, ParcelableSelectable<OUT>> buildChannel() {
     final Channel<ParcelableSelectable<OUT>, ParcelableSelectable<OUT>> outputChannel =
-        JRoutineCore.<ParcelableSelectable<OUT>>ofInputs().apply(configuration).buildChannel();
+        JRoutineCore.<ParcelableSelectable<OUT>>ofInputs().apply(getConfiguration()).buildChannel();
     mChannel.bind(new SelectableChannelConsumer<OUT, OUT>(outputChannel, mIndex));
     return outputChannel;
   }

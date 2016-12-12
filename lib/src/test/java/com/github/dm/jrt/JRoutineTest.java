@@ -443,6 +443,8 @@ public class JRoutineTest {
                        .buildChannel()
                        .inMax(seconds(1))
                        .all()).containsExactly(3, 12, -7);
+    assertThat(JRoutine.of((Object[]) null).buildChannel().all()).isEmpty();
+    assertThat(JRoutine.of((List<Object>) null).buildChannel().all()).isEmpty();
   }
 
   @Test

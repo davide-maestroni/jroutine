@@ -63,19 +63,19 @@
 <b>Example 1:</b> blending the output of two channels.
 <pre>
     <code>
-      final Channel&lt;?, Object&gt; channel = Channels.blend(channel1, channel2).buildChannels();
+      final Channel&lt;?, Object&gt; channel = Channels.blend(channel1, channel2).buildChannel();
     </code>
 </pre>
 <b>Example 2:</b> concatenating the output of two channels.
 <pre>
     <code>
-      final Channel&lt;?, Object&gt; channel = Channels.concat(channel1, channel2).buildChannels();
+      final Channel&lt;?, Object&gt; channel = Channels.concat(channel1, channel2).buildChannel();
     </code>
 </pre>
 <b>Example 3:</b> joining the output of two channels.
 <pre>
     <code>
-      final Channel&lt;?, List&lt;Object&gt;&gt; channel = Channels.join(channel1, channel2).buildChannels();
+      final Channel&lt;?, List&lt;Object&gt;&gt; channel = Channels.join(channel1, channel2).buildChannel();
     </code>
 </pre>
 </body>

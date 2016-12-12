@@ -770,15 +770,15 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
     final Channel<OUT, OUT> resultChannel = JRoutineCore.<OUT>ofInputs().buildChannel();
     outputChannels.add(resultChannel);
     final Channel<?, ? extends Selectable<Object>> inputChannel =
-        (!inputChannels.isEmpty()) ? Channels.merge(inputChannels).buildChannels()
+        (!inputChannels.isEmpty()) ? Channels.merge(inputChannels).buildChannel()
             : JRoutineCore.<Selectable<Object>>of().buildChannel();
     final Channel<Selectable<Object>, Selectable<Object>> outputChannel =
         mode.invoke(JRoutineCore.with(factory).apply(getConfiguration()))
             .pass(inputChannel)
             .close();
-    final Map<Integer, Channel<?, Object>> channelMap =
-        Channels.selectOutput(0, outputChannels.size(), outputChannel).buildChannels();
-    for (final Entry<Integer, Channel<?, Object>> entry : channelMap.entrySet()) {
+    final Map<Integer, ? extends Channel<?, Object>> channelMap =
+        Channels.selectOutput(0, outputChannels.size(), outputChannel).buildChannelMap();
+    for (final Entry<Integer, ? extends Channel<?, Object>> entry : channelMap.entrySet()) {
       entry.getValue().bind((Channel<Object, Object>) outputChannels.get(entry.getKey())).close();
     }
 
@@ -1022,7 +1022,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
         mIsBound = true;
         final List<Channel<?, ?>> outputChannels = getOutputChannels();
         if (!outputChannels.isEmpty()) {
-          result.pass(Channels.merge(outputChannels).buildChannels());
+          result.pass(Channels.merge(outputChannels).buildChannel());
         }
       }
     }

@@ -20,7 +20,7 @@ import android.util.SparseArray;
 
 import com.github.dm.jrt.android.channel.AndroidChannels;
 import com.github.dm.jrt.android.channel.ParcelableSelectable;
-import com.github.dm.jrt.channel.AbstractBuilder;
+import com.github.dm.jrt.android.v11.channel.builder.AbstractChannelArrayBuilder;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -37,7 +37,7 @@ import java.util.HashSet;
  * @param <DATA> the channel data type.
  * @param <IN>   the input data type.
  */
-class InputMapBuilder<DATA, IN extends DATA> extends AbstractBuilder<SparseArray<Channel<IN, ?>>> {
+class InputMapBuilder<DATA, IN extends DATA> extends AbstractChannelArrayBuilder<IN, IN> {
 
   private final Channel<? super ParcelableSelectable<DATA>, ?> mChannel;
 
@@ -65,14 +65,16 @@ class InputMapBuilder<DATA, IN extends DATA> extends AbstractBuilder<SparseArray
 
   @NotNull
   @Override
-  protected SparseArray<Channel<IN, ?>> build(@NotNull final ChannelConfiguration configuration) {
+  public SparseArray<? extends Channel<IN, IN>> buildChannelArray() {
     final HashSet<Integer> indexes = mIndexes;
     final Channel<? super ParcelableSelectable<DATA>, ?> channel = mChannel;
-    final SparseArray<Channel<IN, ?>> channelMap = new SparseArray<Channel<IN, ?>>(indexes.size());
+    final SparseArray<Channel<IN, IN>> channelMap =
+        new SparseArray<Channel<IN, IN>>(indexes.size());
+    final ChannelConfiguration configuration = getConfiguration();
     for (final Integer index : indexes) {
-      final Channel<IN, ?> inputChannel =
-          AndroidChannels.<DATA, IN>selectInputParcelable(channel, index).apply(configuration)
-                                                                         .buildChannels();
+      @SuppressWarnings("unchecked") final Channel<IN, IN> inputChannel =
+          (Channel<IN, IN>) AndroidChannels.<DATA, IN>selectInputParcelable(channel, index).apply(
+              configuration).buildChannel();
       channelMap.put(index, inputChannel);
     }
 

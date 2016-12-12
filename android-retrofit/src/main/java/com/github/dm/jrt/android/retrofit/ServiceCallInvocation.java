@@ -187,7 +187,7 @@ public class ServiceCallInvocation
     }
 
     final Channel<Object, ?> channel =
-        AndroidChannels.selectInputParcelable(result, BYTES_INDEX).buildChannels();
+        AndroidChannels.selectInputParcelable(result, BYTES_INDEX).buildChannel();
     final BufferOutputStream outputStream =
         AndroidChannels.parcelableByteChannel().bindDeep(channel);
     try {

@@ -17,7 +17,7 @@
 package com.github.dm.jrt.android.channel;
 
 import com.github.dm.jrt.channel.Channels;
-import com.github.dm.jrt.channel.ChannelsBuilder;
+import com.github.dm.jrt.core.builder.ChannelBuilder;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
@@ -59,8 +59,7 @@ public class AndroidChannels extends Channels {
    * @see Channels#merge(Channel...)
    */
   @NotNull
-  public static <OUT> ChannelsBuilder<? extends Channel<?, ParcelableSelectable<OUT>>>
-  mergeParcelable(
+  public static <OUT> ChannelBuilder<?, ParcelableSelectable<OUT>> mergeParcelable(
       @NotNull final Channel<?, ?>... channels) {
     return mergeParcelable(0, channels);
   }
@@ -86,8 +85,7 @@ public class AndroidChannels extends Channels {
    */
   @NotNull
   @SuppressWarnings("unchecked")
-  public static <OUT> ChannelsBuilder<? extends Channel<?, ParcelableSelectable<OUT>>>
-  mergeParcelable(
+  public static <OUT> ChannelBuilder<?, ParcelableSelectable<OUT>> mergeParcelable(
       final int startIndex, @NotNull final Channel<?, ?>... channels) {
     return (MergeBuilder<OUT>) new MergeBuilder<Object>(startIndex, Arrays.asList(channels));
   }
@@ -112,8 +110,7 @@ public class AndroidChannels extends Channels {
    * @see Channels#merge(int, Iterable)
    */
   @NotNull
-  public static <OUT> ChannelsBuilder<? extends Channel<?, ParcelableSelectable<OUT>>>
-  mergeParcelable(
+  public static <OUT> ChannelBuilder<?, ParcelableSelectable<OUT>> mergeParcelable(
       final int startIndex, @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
     return new MergeBuilder<OUT>(startIndex, channels);
   }
@@ -137,8 +134,7 @@ public class AndroidChannels extends Channels {
    * @see Channels#merge(Iterable)
    */
   @NotNull
-  public static <OUT> ChannelsBuilder<? extends Channel<?, ParcelableSelectable<OUT>>>
-  mergeParcelable(
+  public static <OUT> ChannelBuilder<?, ParcelableSelectable<OUT>> mergeParcelable(
       @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
     return mergeParcelable(0, channels);
   }
@@ -203,8 +199,7 @@ public class AndroidChannels extends Channels {
    * @see Channels#selectInput(Channel, int)
    */
   @NotNull
-  public static <DATA, IN extends DATA> ChannelsBuilder<? extends Channel<IN, ?>>
-  selectInputParcelable(
+  public static <DATA, IN extends DATA> ChannelBuilder<IN, ?> selectInputParcelable(
       @NotNull final Channel<? super ParcelableSelectable<DATA>, ?> channel, final int index) {
     return new InputSelectBuilder<DATA, IN>(channel, index);
   }
@@ -226,8 +221,7 @@ public class AndroidChannels extends Channels {
    * @see Channels#selectableOutput(Channel, int)
    */
   @NotNull
-  public static <OUT> ChannelsBuilder<? extends Channel<?, ParcelableSelectable<OUT>>>
-  selectableOutputParcelable(
+  public static <OUT> ChannelBuilder<?, ParcelableSelectable<OUT>> selectableOutputParcelable(
       @NotNull final Channel<?, ? extends OUT> channel, final int index) {
     return new SelectableOutputBuilder<OUT>(channel, index);
   }

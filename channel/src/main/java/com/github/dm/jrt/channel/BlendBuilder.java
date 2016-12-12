@@ -17,8 +17,8 @@
 package com.github.dm.jrt.channel;
 
 import com.github.dm.jrt.core.JRoutineCore;
+import com.github.dm.jrt.core.builder.AbstractChannelBuilder;
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.config.ChannelConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -31,7 +31,7 @@ import java.util.ArrayList;
  *
  * @param <OUT> the output data type.
  */
-class BlendBuilder<OUT> extends AbstractBuilder<Channel<?, OUT>> {
+class BlendBuilder<OUT> extends AbstractChannelBuilder<OUT, OUT> {
 
   private final ArrayList<Channel<?, ? extends OUT>> mChannels;
 
@@ -62,10 +62,9 @@ class BlendBuilder<OUT> extends AbstractBuilder<Channel<?, OUT>> {
   }
 
   @NotNull
-  @Override
-  protected Channel<?, OUT> build(@NotNull final ChannelConfiguration configuration) {
+  public Channel<OUT, OUT> buildChannel() {
     final Channel<OUT, OUT> outputChannel =
-        JRoutineCore.<OUT>ofInputs().apply(configuration).buildChannel();
+        JRoutineCore.<OUT>ofInputs().apply(getConfiguration()).buildChannel();
     for (final Channel<?, ? extends OUT> channel : mChannels) {
       channel.bind(outputChannel);
     }

@@ -17,6 +17,7 @@
 package com.github.dm.jrt.channel;
 
 import com.github.dm.jrt.core.JRoutineCore;
+import com.github.dm.jrt.core.builder.AbstractChannelBuilder;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.common.RoutineException;
@@ -35,7 +36,7 @@ import java.util.List;
  *
  * @param <IN> the input data type.
  */
-class DistributeBuilder<IN> extends AbstractBuilder<Channel<List<? extends IN>, ?>> {
+class DistributeBuilder<IN> extends AbstractChannelBuilder<List<? extends IN>, List<? extends IN>> {
 
   private final ArrayList<Channel<? extends IN, ?>> mChannels;
 
@@ -75,12 +76,11 @@ class DistributeBuilder<IN> extends AbstractBuilder<Channel<List<? extends IN>, 
   }
 
   @NotNull
-  @Override
   @SuppressWarnings("unchecked")
-  protected Channel<List<? extends IN>, ?> build(
-      @NotNull final ChannelConfiguration configuration) {
+  public Channel<List<? extends IN>, List<? extends IN>> buildChannel() {
     final ArrayList<Channel<? extends IN, ?>> channels = mChannels;
     final ArrayList<Channel<?, ?>> channelList = new ArrayList<Channel<?, ?>>(channels.size());
+    final ChannelConfiguration configuration = getConfiguration();
     for (final Channel<? extends IN, ?> channel : channels) {
       final Channel<IN, IN> outputChannel =
           JRoutineCore.<IN>ofInputs().apply(configuration).buildChannel();

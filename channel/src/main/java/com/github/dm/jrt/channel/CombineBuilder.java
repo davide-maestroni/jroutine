@@ -17,6 +17,7 @@
 package com.github.dm.jrt.channel;
 
 import com.github.dm.jrt.core.JRoutineCore;
+import com.github.dm.jrt.core.builder.AbstractChannelBuilder;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.common.RoutineException;
@@ -33,7 +34,8 @@ import java.util.ArrayList;
  *
  * @param <IN> the input data type.
  */
-class CombineBuilder<IN> extends AbstractBuilder<Channel<Selectable<? extends IN>, ?>> {
+class CombineBuilder<IN>
+    extends AbstractChannelBuilder<Selectable<? extends IN>, Selectable<? extends IN>> {
 
   private final ArrayList<Channel<? extends IN, ?>> mChannels;
 
@@ -69,13 +71,12 @@ class CombineBuilder<IN> extends AbstractBuilder<Channel<Selectable<? extends IN
   }
 
   @NotNull
-  @Override
   @SuppressWarnings("unchecked")
-  protected Channel<Selectable<? extends IN>, ?> build(
-      @NotNull final ChannelConfiguration configuration) {
+  public Channel<Selectable<? extends IN>, Selectable<? extends IN>> buildChannel() {
     final ArrayList<Channel<? extends IN, ?>> channels = mChannels;
     final ArrayList<Channel<? extends IN, ?>> channelList =
         new ArrayList<Channel<? extends IN, ?>>(channels.size());
+    final ChannelConfiguration configuration = getConfiguration();
     for (final Channel<? extends IN, ?> channel : channels) {
       final Channel<IN, IN> outputChannel =
           JRoutineCore.<IN>ofInputs().apply(configuration).buildChannel();

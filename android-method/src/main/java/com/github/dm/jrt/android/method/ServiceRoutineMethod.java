@@ -364,7 +364,7 @@ public class ServiceRoutineMethod extends RoutineMethod
     final Channel<OUT, OUT> resultChannel = JRoutineCore.<OUT>ofInputs().buildChannel();
     outputChannels.add(resultChannel);
     final Channel<?, ? extends ParcelableSelectable<Object>> inputChannel =
-        (!inputChannels.isEmpty()) ? AndroidChannels.mergeParcelable(inputChannels).buildChannels()
+        (!inputChannels.isEmpty()) ? AndroidChannels.mergeParcelable(inputChannels).buildChannel()
             : JRoutineCore.<ParcelableSelectable<Object>>of().buildChannel();
     final Channel<ParcelableSelectable<Object>, ParcelableSelectable<Object>> outputChannel =
         mode.invoke(JRoutineService.on(mContext)
@@ -372,9 +372,9 @@ public class ServiceRoutineMethod extends RoutineMethod
                                        params))
                                    .apply(getConfiguration())
                                    .apply(getServiceConfiguration())).pass(inputChannel).close();
-    final Map<Integer, Channel<?, Object>> channelMap =
-        AndroidChannels.selectOutput(0, outputChannels.size(), outputChannel).buildChannels();
-    for (final Entry<Integer, Channel<?, Object>> entry : channelMap.entrySet()) {
+    final Map<Integer, ? extends Channel<?, Object>> channelMap =
+        AndroidChannels.selectOutput(0, outputChannels.size(), outputChannel).buildChannelMap();
+    for (final Entry<Integer, ? extends Channel<?, Object>> entry : channelMap.entrySet()) {
       entry.getValue().bind((Channel<Object, Object>) outputChannels.get(entry.getKey())).close();
     }
 
@@ -697,7 +697,7 @@ public class ServiceRoutineMethod extends RoutineMethod
         mIsBound = true;
         final List<Channel<?, ?>> outputChannels = mOutputChannels;
         if (!outputChannels.isEmpty()) {
-          result.pass(AndroidChannels.mergeParcelable(outputChannels).buildChannels());
+          result.pass(AndroidChannels.mergeParcelable(outputChannels).buildChannel());
         }
       }
     }

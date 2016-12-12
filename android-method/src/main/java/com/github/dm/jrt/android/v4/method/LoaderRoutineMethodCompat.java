@@ -405,16 +405,16 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
     final Channel<?, OUT> resultChannel = JRoutineCore.<OUT>ofInputs().buildChannel();
     outputChannels.add(resultChannel);
     final Channel<?, ? extends Selectable<Object>> inputChannel =
-        (!inputChannels.isEmpty()) ? AndroidChannels.mergeParcelable(inputChannels).buildChannels()
+        (!inputChannels.isEmpty()) ? AndroidChannels.mergeParcelable(inputChannels).buildChannel()
             : JRoutineCore.<Selectable<Object>>of().buildChannel();
     final Channel<Selectable<Object>, Selectable<Object>> outputChannel = mode.invoke(
         JRoutineLoaderCompat.on(mContext)
                             .with(factory)
                             .apply(getConfiguration())
                             .apply(getLoaderConfiguration())).pass(inputChannel).close();
-    final Map<Integer, Channel<?, Object>> channelMap =
-        AndroidChannels.selectOutput(0, outputChannels.size(), outputChannel).buildChannels();
-    for (final Entry<Integer, Channel<?, Object>> entry : channelMap.entrySet()) {
+    final Map<Integer, ? extends Channel<?, Object>> channelMap =
+        AndroidChannels.selectOutput(0, outputChannels.size(), outputChannel).buildChannelMap();
+    for (final Entry<Integer, ? extends Channel<?, Object>> entry : channelMap.entrySet()) {
       entry.getValue().bind((Channel<Object, Object>) outputChannels.get(entry.getKey())).close();
     }
 
@@ -692,7 +692,7 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
         mIsBound = true;
         final List<Channel<?, ?>> outputChannels = getOutputChannels();
         if (!outputChannels.isEmpty()) {
-          result.pass(Channels.merge(outputChannels).buildChannels());
+          result.pass(Channels.merge(outputChannels).buildChannel());
         }
       }
     }

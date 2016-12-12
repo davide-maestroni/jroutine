@@ -17,8 +17,8 @@
 package com.github.dm.jrt.channel;
 
 import com.github.dm.jrt.core.JRoutineCore;
+import com.github.dm.jrt.core.builder.AbstractChannelBuilder;
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
@@ -30,7 +30,8 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <OUT> the output data type.
  */
-class SelectableOutputBuilder<OUT> extends AbstractBuilder<Channel<?, Selectable<OUT>>> {
+class SelectableOutputBuilder<OUT>
+    extends AbstractChannelBuilder<Selectable<OUT>, Selectable<OUT>> {
 
   private final Channel<?, ? extends OUT> mChannel;
 
@@ -48,10 +49,9 @@ class SelectableOutputBuilder<OUT> extends AbstractBuilder<Channel<?, Selectable
   }
 
   @NotNull
-  @Override
-  protected Channel<?, Selectable<OUT>> build(@NotNull final ChannelConfiguration configuration) {
+  public Channel<Selectable<OUT>, Selectable<OUT>> buildChannel() {
     final Channel<Selectable<OUT>, Selectable<OUT>> outputChannel =
-        JRoutineCore.<Selectable<OUT>>ofInputs().apply(configuration).buildChannel();
+        JRoutineCore.<Selectable<OUT>>ofInputs().apply(getConfiguration()).buildChannel();
     mChannel.bind(new SelectableChannelConsumer<OUT, OUT>(outputChannel, mIndex));
     return outputChannel;
   }

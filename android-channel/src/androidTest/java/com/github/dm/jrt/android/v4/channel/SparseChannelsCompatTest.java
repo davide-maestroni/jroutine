@@ -29,14 +29,18 @@ import com.github.dm.jrt.core.builder.ChannelBuilder;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
+import com.github.dm.jrt.core.log.Log;
+import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.routine.Routine;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.factoryOf;
@@ -329,6 +333,24 @@ public class SparseChannelsCompatTest extends ActivityInstrumentationTestCase2<T
     } catch (final IllegalArgumentException ignored) {
 
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  public void testConfiguration() {
+    final Channel<ParcelableSelectable<String>, ParcelableSelectable<String>> channel =
+        JRoutineCore.<ParcelableSelectable<String>>ofInputs().buildChannel();
+    final TestLog testLog = new TestLog();
+    SparseChannelsCompat.selectInputParcelable(3, 1, channel)
+                        .applyChannelConfiguration()
+                        .withLog(testLog)
+                        .withLogLevel(Level.DEBUG)
+                        .configured()
+                        .buildChannelArray()
+                        .get(3)
+                        .pass("test")
+                        .close();
+    assertThat(channel.close().all()).containsExactly(new ParcelableSelectable<String>("test", 3));
+    assertThat(testLog.mLogCount).isGreaterThan(0);
   }
 
   public void testConstructor() {
@@ -790,6 +812,29 @@ public class SparseChannelsCompatTest extends ActivityInstrumentationTestCase2<T
                                                                                     .close();
           break;
       }
+    }
+  }
+
+  private static class TestLog implements Log {
+
+    private int mLogCount;
+
+    @Override
+    public void dbg(@NotNull final List<Object> contexts, @Nullable final String message,
+        @Nullable final Throwable throwable) {
+      ++mLogCount;
+    }
+
+    @Override
+    public void err(@NotNull final List<Object> contexts, @Nullable final String message,
+        @Nullable final Throwable throwable) {
+      ++mLogCount;
+    }
+
+    @Override
+    public void wrn(@NotNull final List<Object> contexts, @Nullable final String message,
+        @Nullable final Throwable throwable) {
+      ++mLogCount;
     }
   }
 }

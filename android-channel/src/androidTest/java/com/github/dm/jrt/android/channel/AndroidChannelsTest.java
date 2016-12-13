@@ -29,10 +29,13 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
+import com.github.dm.jrt.core.log.Log;
+import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ClassToken;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -315,6 +318,20 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     } catch (final IllegalArgumentException ignored) {
 
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  public void testConfiguration() {
+    final Channel<?, String> channel = JRoutineCore.of("test").buildChannel();
+    final TestLog testLog = new TestLog();
+    assertThat(AndroidChannels.selectableOutputParcelable(channel, 3)
+                              .applyChannelConfiguration()
+                              .withLog(testLog)
+                              .withLogLevel(Level.DEBUG)
+                              .configured()
+                              .buildChannel()
+                              .all()).containsExactly(new ParcelableSelectable<String>("test", 3));
+    assertThat(testLog.mLogCount).isGreaterThan(0);
   }
 
   public void testConstructor() {
@@ -1421,6 +1438,29 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
                                                                                .close();
           break;
       }
+    }
+  }
+
+  private static class TestLog implements Log {
+
+    private int mLogCount;
+
+    @Override
+    public void dbg(@NotNull final List<Object> contexts, @Nullable final String message,
+        @Nullable final Throwable throwable) {
+      ++mLogCount;
+    }
+
+    @Override
+    public void err(@NotNull final List<Object> contexts, @Nullable final String message,
+        @Nullable final Throwable throwable) {
+      ++mLogCount;
+    }
+
+    @Override
+    public void wrn(@NotNull final List<Object> contexts, @Nullable final String message,
+        @Nullable final Throwable throwable) {
+      ++mLogCount;
     }
   }
 }

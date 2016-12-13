@@ -26,12 +26,14 @@ import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
+import com.github.dm.jrt.core.log.Log;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ClassToken;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -573,6 +575,40 @@ public class ChannelsTest {
     } catch (final NullPointerException ignored) {
 
     }
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void testConfiguration() {
+    final Channel<?, String> channel = JRoutineCore.of("test").buildChannel();
+    final TestLog testLog = new TestLog();
+    assertThat(Channels.selectableOutput(channel, 3)
+                       .applyChannelConfiguration()
+                       .withLog(testLog)
+                       .withLogLevel(Level.DEBUG)
+                       .configured()
+                       .buildChannel()
+                       .all()).containsExactly(new Selectable<String>("test", 3));
+    assertThat(testLog.mLogCount).isGreaterThan(0);
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void testConfigurationMap() {
+    final Channel<Selectable<String>, Selectable<String>> channel =
+        JRoutineCore.<Selectable<String>>ofInputs().buildChannel();
+    final TestLog testLog = new TestLog();
+    Channels.selectInput(3, 1, channel)
+            .applyChannelConfiguration()
+            .withLog(testLog)
+            .withLogLevel(Level.DEBUG)
+            .configured()
+            .buildChannelMap()
+            .get(3)
+            .pass("test")
+            .close();
+    assertThat(channel.close().all()).containsExactly(new Selectable<String>("test", 3));
+    assertThat(testLog.mLogCount).isGreaterThan(0);
   }
 
   @Test
@@ -2144,6 +2180,26 @@ public class ChannelsTest {
                                                               .close();
           break;
       }
+    }
+  }
+
+  private static class TestLog implements Log {
+
+    private int mLogCount;
+
+    public void dbg(@NotNull final List<Object> contexts, @Nullable final String message,
+        @Nullable final Throwable throwable) {
+      ++mLogCount;
+    }
+
+    public void err(@NotNull final List<Object> contexts, @Nullable final String message,
+        @Nullable final Throwable throwable) {
+      ++mLogCount;
+    }
+
+    public void wrn(@NotNull final List<Object> contexts, @Nullable final String message,
+        @Nullable final Throwable throwable) {
+      ++mLogCount;
     }
   }
 }

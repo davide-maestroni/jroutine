@@ -45,12 +45,18 @@
 </ul>
 <h2>Usage examples</h2>
 <p>
-    The code below shows how it is possible create an Observable from a channel.
+    The code below shows how it is possible create an Observable from a channel, and the contrary as well.
 </p>
-<b>Example 1:</b> via factory.
+<b>Example 1:</b> Observable from channel.
 <pre>
     <code>
         JRoutineRx.observableFrom(myChannel).subscribe(getAction());
+    </code>
+</pre>
+<b>Example 2:</b> channel from Observable.
+<pre>
+    <code>
+        JRoutineRx.from(myObservable).buildChannel().bind(getConsumer());
     </code>
 </pre>
 </body>

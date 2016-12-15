@@ -44,6 +44,14 @@ import rx.Subscriber;
  *   </code>
  * </pre>
  * <p>
+ * In a dual way, a channel can be created from an Observable:
+ * <pre>
+ *   <code>
+ *
+ *     JRoutineRx.from(myObservable).buildChannel().bind(getConsumer());
+ *   </code>
+ * </pre>
+ * <p>
  * Created by davide-maestroni on 12/09/2016.
  */
 @SuppressWarnings("WeakerAccess")
@@ -83,11 +91,42 @@ public class JRoutineRx {
   }
 
   /**
+   * Observer feeding a channel.
+   *
+   * @param <OUT> the output data type.
+   */
+  private static class ChannelObserver<OUT> implements Observer<OUT> {
+
+    private final Channel<OUT, ?> mChannel;
+
+    /**
+     * The channel instance.
+     *
+     * @param channel the channel.
+     */
+    private ChannelObserver(@NotNull final Channel<OUT, ?> channel) {
+      mChannel = channel;
+    }
+
+    public void onCompleted() {
+      mChannel.close();
+    }
+
+    public void onError(final Throwable e) {
+      mChannel.abort(InvocationException.wrapIfNeeded(e));
+    }
+
+    public void onNext(final OUT out) {
+      mChannel.pass(out);
+    }
+  }
+
+  /**
    * Builder of channels fed by an observable.
    *
    * @param <OUT> the output data type.
    */
-  public static class ObservableChannelBuilder<OUT> implements ChannelBuilder<OUT, OUT> {
+  private static class ObservableChannelBuilder<OUT> implements ChannelBuilder<OUT, OUT> {
 
     private final Observable<OUT> mObservable;
 
@@ -118,37 +157,6 @@ public class JRoutineRx {
       final Channel<OUT, OUT> channel = JRoutineCore.<OUT>ofInputs().buildChannel();
       mObservable.subscribe(new ChannelObserver<OUT>(channel));
       return channel;
-    }
-  }
-
-  /**
-   * Observer feeding a channel.
-   *
-   * @param <OUT> the output data type.
-   */
-  private static class ChannelObserver<OUT> implements Observer<OUT> {
-
-    private final Channel<OUT, ?> mChannel;
-
-    /**
-     * The channel instance.
-     *
-     * @param channel the channel.
-     */
-    private ChannelObserver(@NotNull final Channel<OUT, ?> channel) {
-      mChannel = channel;
-    }
-
-    public void onCompleted() {
-      mChannel.close();
-    }
-
-    public void onError(final Throwable e) {
-      mChannel.abort(InvocationException.wrapIfNeeded(e));
-    }
-
-    public void onNext(final OUT out) {
-      mChannel.pass(out);
     }
   }
 

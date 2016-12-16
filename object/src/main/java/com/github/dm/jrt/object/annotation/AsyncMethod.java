@@ -33,30 +33,21 @@ import java.lang.annotation.Target;
  * expected by the target method.
  * <p>
  * For example, a method taking two integers:
- * <pre>
- *     <code>
- *
- *         public int sum(int i1, int i2);
- *     </code>
- * </pre>
+ * <pre><code>
+ * public int sum(int i1, int i2);
+ * </code></pre>
  * <p>
  * can be proxied by a method defined as:
- * <pre>
- *     <code>
- *
- *         &#64;AsyncMethod({int.class, int.class})
- *         public Channel&lt;Integer, Integer&gt; sum();
- *     </code>
- * </pre>
+ * <pre><code>
+ * &#64;AsyncMethod({int.class, int.class})
+ * public Channel&lt;Integer, Integer&gt; sum();
+ * </code></pre>
  * <p>
  * The proxying method can also return the routine wrapping the target one, as:
- * <pre>
- *     <code>
- *
- *         &#64;AsyncMethod({int.class, int.class})
- *         public Routine&lt;Integer, Integer&gt; sum();
- *     </code>
- * </pre>
+ * <pre><code>
+ * &#64;AsyncMethod({int.class, int.class})
+ * public Routine&lt;Integer, Integer&gt; sum();
+ * </code></pre>
  * In such case, it is up to the caller to invoke it in the proper mode.
  * <p>
  * This annotation is used to decorate methods that are to be invoked in an asynchronous way.
@@ -74,15 +65,12 @@ import java.lang.annotation.Target;
  * <p>
  * Remember also that, in order for the annotation to properly work at run time, the following rules
  * must be added to the project Proguard file (if employed for shrinking or obfuscation):
- * <pre>
- *     <code>
- *
- *         -keepattributes RuntimeVisibleAnnotations
- *         -keepclassmembers class ** {
- *              &#64;com.github.dm.jrt.object.annotation.AsyncMethod *;
- *         }
- *     </code>
- * </pre>
+ * <pre><code>
+ * -keepattributes RuntimeVisibleAnnotations
+ * -keepclassmembers class ** {
+ *   &#64;com.github.dm.jrt.object.annotation.AsyncMethod *;
+ * }
+ * </code></pre>
  * <p>
  * Created by davide-maestroni on 05/22/2015.
  */

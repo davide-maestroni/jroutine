@@ -39,21 +39,18 @@ import static com.github.dm.jrt.function.FunctionDecorator.decorate;
  * <p>
  * A stream routine builder allows to easily build a concatenation of invocations as a single
  * routine.
- * <br>
+ * <p>
  * For instance, a routine computing the root mean square of a number of integers can be defined as:
- * <pre>
- *     <code>
- *
- *         final Routine&lt;Integer, Double&gt; rms =
- *                 JRoutineLoaderStream.&lt;Integer&gt;withStream()
- *                                     .immediate()
- *                                     .map(i -&gt; i * i)
- *                                     .map(averageFloat())
- *                                     .map(Math::sqrt)
- *                                     .on(loaderFrom(activity))
- *                                     .buildRoutine();
- *     </code>
- * </pre>
+ * <pre><code>
+ * final Routine&lt;Integer, Double&gt; rms =
+ *     JRoutineLoaderStream.&lt;Integer&gt;withStream()
+ *                         .immediate()
+ *                         .map(i -&gt; i * i)
+ *                         .map(averageFloat())
+ *                         .map(Math::sqrt)
+ *                         .on(loaderFrom(activity))
+ *                         .buildRoutine();
+ * </code></pre>
  * <p>
  * See {@link com.github.dm.jrt.android.v4.stream.JRoutineLoaderStreamCompat
  * JRoutineLoaderStreamCompat} for support of API levels lower than

@@ -77,24 +77,23 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * closed.
  * <h2>How to access the Android Context</h2>
  * It is possible to get access to the Android Context (that is the application instance) from
- * inside the routine by calling the {@code getContext()} method. Like, for instance:
- * <pre>
- *     <code>
+ * inside the routine by calling the {@code getContext()} method.
+ * <p>
+ * Like, for instance:
+ * <pre><code>
+ * public static class MyMethod extends LoaderRoutineMethodCompat {
  *
- *         public static class MyMethod extends LoaderRoutineMethodCompat {
+ *   public MyMethod(final LoaderContextCompat context) {
+ *     super(context);
+ *   }
  *
- *             public MyMethod(final LoaderContextCompat context) {
- *                 super(context);
- *             }
- *
- *             void run(&#64;Input final Channel&lt;?, String&gt; input,
- *                     &#64;Output final Channel&lt;String, ?&gt; output) {
- *                 final MyApplication application = (MyApplication) getContext();
- *                 // do it
- *             }
- *         }
- *     </code>
- * </pre>
+ *   void run(&#64;Input final Channel&lt;?, String&gt; input,
+ *       &#64;Output final Channel&lt;String, ?&gt; output) {
+ *     final MyApplication application = (MyApplication) getContext();
+ *     // do it
+ *   }
+ * }
+ * </code></pre>
  * <p>
  * Created by davide-maestroni on 08/20/2016.
  */

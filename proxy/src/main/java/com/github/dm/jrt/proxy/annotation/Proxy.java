@@ -39,66 +39,54 @@ import java.lang.annotation.Target;
  * <br>
  * Be also aware that it is responsibility of the caller to ensure that the same instance is not
  * wrapped around two different generic interfaces.
- * <br>
+ * <p>
  * For example, a class of the type:
- * <pre>
- *     <code>
+ * <pre><code>
+ * public class MyList&lt;TYPE&gt; {
  *
- *             public class MyList&lt;TYPE&gt; {
+ *   private final ArrayList&lt;TYPE&gt; mList = new ArrayList&lt;TYPE&gt;();
  *
- *                 private final ArrayList&lt;TYPE&gt; mList = new ArrayList&lt;TYPE&gt;();
+ *   public void add(final TYPE element) {
+ *     mList.add(element);
+ *   }
  *
- *                 public void add(final TYPE element) {
- *
- *                     mList.add(element);
- *                 }
- *
- *                 public TYPE get(final int i) {
- *
- *                     return mList.get(i);
- *                 }
- *             }
- *     </code>
- * </pre>
+ *   public TYPE get(final int i) {
+ *     return mList.get(i);
+ *   }
+ * }
+ * </code></pre>
+ * <p>
  * can be correctly wrapped by an interface of the type:
- * <pre>
- *     <code>
+ * <pre><code>
+ * &#64;Proxy(MyList.class)
+ * public interface MyListAsync&lt;TYPE&gt; {
  *
- *             &#64;Proxy(MyList.class)
- *             public interface MyListAsync&lt;TYPE&gt; {
+ *   void add(Object element);
  *
- *                 void add(Object element);
+ *   TYPE get(int i);
  *
- *                 TYPE get(int i);
- *
- *                 &#64;Alias("get")
- *                 &#64;AsyncOutput
- *                 Channel&lt;?, TYPE&gt; getAsync(int i);
- *             }
- *     </code>
- * </pre>
+ *   &#64;Alias("get")
+ *   &#64;AsyncOutput
+ *   Channel&lt;?, TYPE&gt; getAsync(int i);
+ * }
+ * </code></pre>
  * <p>
  * Remember also that, in order for the annotation to properly work at run time, the following rules
  * must be added to the project Proguard file (if employed for shrinking or obfuscation):
- * <pre>
- *     <code>
- *
- *         -keepattributes RuntimeVisibleAnnotations
- *         -keepclassmembers class ** {
- *              &#64;com.github.dm.jrt.proxy.annotation.Proxy *;
- *         }
- *     </code>
- * </pre>
+ * <pre><code>
+ * -keepattributes RuntimeVisibleAnnotations
+ * -keepclassmembers class ** {
+ *   &#64;com.github.dm.jrt.proxy.annotation.Proxy *;
+ * }
+ * </code></pre>
+ * <p>
  * Be sure also to include a proper rule in your Proguard file, so to keep the name of all the
  * classes implementing the specific mirror interface, like, for example:
- * <pre>
- *     <code>
- *
- *         -keep public class * extends my.mirror.Interface {
- *              public &lt;init&gt;;
- *         }
- *     </code>
- * </pre>
+ * <pre><code>
+ * -keep public class * extends my.mirror.Interface {
+ *   public &lt;init&gt;;
+ * }
+ * </code></pre>
  * <p>
  * Created by davide-maestroni on 11/03/2014.
  *
@@ -127,9 +115,8 @@ public @interface Proxy {
    * The generated class name. By default the name is obtained by the interface simple name,
    * prepending all the outer class names in case it is not a top level class.
    * <p>
-   * For instance, an interface named <code>MyItf</code> defined inside a class named
-   * <code>MyClass</code>, will result in the generation of a class named
-   * <code>Proxy_MyClass_MyItf</code>.
+   * For instance, an interface named {@code MyItf} defined inside a class named {@code MyClass},
+   * will result in the generation of a class named {@code Proxy_MyClass_MyItf}.
    *
    * @return the class name.
    */

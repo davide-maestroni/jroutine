@@ -41,23 +41,19 @@ import org.jetbrains.annotations.NotNull;
  * <b>Some usage examples</b>
  * <p>
  * <b>Example 1:</b> Asynchronously get the output of two routines.
- * <pre>
- *     <code>
+ * <pre><code>
+ * public interface AsyncCallback {
  *
- *         public interface AsyncCallback {
+ *   public void onResults(&#64;AsyncInput(Result.class) Channel&lt;?, Result&gt; result1,
+ *       &#64;AsyncInput(Result.class) Channel&lt;?, Result&gt; result2);
+ * }
  *
- *             public void onResults(
- *                  &#64;AsyncInput(Result.class) Channel&lt;?, Result&gt; result1,
- *                  &#64;AsyncInput(Result.class) Channel&lt;?, Result&gt; result2);
- *         }
- *
- *         final AsyncCallback callback = JRoutineObject.with(instance(myCallback))
- *                                                      .buildProxy(AsyncCallback.class);
- *         callback.onResults(routine1.call(), routine2.call());
- *     </code>
- * </pre>
- * Where the object <code>myCallback</code> implements a method
- * <code>public void onResults(Result result1, Result result2)</code>.
+ * final AsyncCallback callback = JRoutineObject.with(instance(myCallback))
+ *                                              .buildProxy(AsyncCallback.class);
+ * callback.onResults(routine1.call(), routine2.call());
+ * </code></pre>
+ * Where the object {@code myCallback} implements a method
+ * {@code public void onResults(Result result1, Result result2)}.
  * <p>
  * Created by davide-maestroni on 09/07/2014.
  *

@@ -75,7 +75,7 @@ public interface ServiceProxyRoutineBuilder
    * class name and package will be chosen according to the specific annotation attributes.
    * <br>
    * It is actually possible to avoid the use of reflection for the proxy object instantiation by
-   * explicitly calling the <code>&lt;generated_class_name&gt;.with()</code> method.
+   * explicitly calling the {@code &lt;generated_class_name&gt;.on()} method.
    * <br>
    * Note, however, that, since the class is generated, a generic IDE may highlight an error even
    * if the compilation is successful.
@@ -104,7 +104,7 @@ public interface ServiceProxyRoutineBuilder
    * class name and package will be chosen according to the specific annotation attributes.
    * <br>
    * It is actually possible to avoid the use of reflection for the proxy object instantiation by
-   * explicitly calling the <code>&lt;generated_class_name&gt;.with()</code> method.
+   * explicitly calling the {@code &lt;generated_class_name&gt;.on()} method.
    * <br>
    * Note, however, that, since the class is generated, a generic IDE may highlight an error even
    * if the compilation is successful.

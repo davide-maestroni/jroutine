@@ -400,14 +400,11 @@ public class Operators {
 
   /**
    * Returns a factory of invocations accumulating data through the specified consumer.
-   * <br>
+   * <p>
    * The output will be computed as follows:
-   * <pre>
-   *     <code>
-   *
-   *         consumer.accept(acc, input);
-   *     </code>
-   * </pre>
+   * <pre><code>
+   * consumer.accept(acc, input);
+   * </code></pre>
    * where the initial accumulated value will be the the first input.
    * <br>
    * The accumulated value will be passed as result only when the invocation completes.
@@ -424,14 +421,11 @@ public class Operators {
 
   /**
    * Returns a factory of invocations accumulating data through the specified consumer.
-   * <br>
+   * <p>
    * The output will be computed as follows:
-   * <pre>
-   *     <code>
-   *
-   *         consumer.accept(acc, input);
-   *     </code>
-   * </pre>
+   * <pre><code>
+   * consumer.accept(acc, input);
+   * </code></pre>
    * where the initial accumulated value will be the one returned by the specified supplier.
    * <br>
    * The accumulated value will be passed as result only when the invocation completes.
@@ -525,12 +519,9 @@ public class Operators {
    * <p>
    * Given a numeric sequence of inputs starting from 0, and a key function returning the modulo
    * 2 of such numbers, the final output will be:
-   * <pre>
-   *     <code>
-   *
-   *         =&gt; [(0, 2, 4, 6, 8, ..., N), (1, 3, 5, 7, 9, ..., N + 1)]
-   *     </code>
-   * </pre>
+   * <pre><code>
+   * =&gt; [(0, 2, 4, 6, 8, ..., N), (1, 3, 5, 7, 9, ..., N + 1)]
+   * </code></pre>
    * <p>
    * Note that the groups will be produced only after the invocation completes.
    * <br>
@@ -550,12 +541,9 @@ public class Operators {
    * Returns a factory of invocations grouping the input data in collections of the specified size.
    * <p>
    * Given a numeric sequence of inputs starting from 0, and a size of 3, the final output will be:
-   * <pre>
-   *     <code>
-   *
-   *         =&gt; [(0, 1, 2), (3, 4, 5), ..., (N, N + 1)]
-   *     </code>
-   * </pre>
+   * <pre><code>
+   * =&gt; [(0, 1, 2), (3, 4, 5), ..., (N, N + 1)]
+   * </code></pre>
    *
    * @param size   the group size.
    * @param <DATA> the data type.
@@ -574,12 +562,9 @@ public class Operators {
    * spaces will be filled with the specified placeholder instance.
    * <p>
    * Given a numeric sequence of inputs starting from 0, and a size of 3, the final output will be:
-   * <pre>
-   *     <code>
-   *
-   *         =? [(0, 1, 2), (3, 4, 5), ..., (N, N + 1, placeholder)]
-   *     </code>
-   * </pre>
+   * <pre><code>
+   * =? [(0, 1, 2), (3, 4, 5), ..., (N, N + 1, placeholder)]
+   * </code></pre>
    *
    * @param size        the group size.
    * @param placeholder the placeholder object used to fill the missing data needed to reach
@@ -776,12 +761,9 @@ public class Operators {
    * <p>
    * Given a numeric sequence of inputs starting from 0, and a limit count of 5, the final output
    * will be:
-   * <pre>
-   *     <code>
-   *
-   *         =&gt; [0, 1, 2, 3, 4]
-   *     </code>
-   * </pre>
+   * <pre><code>
+   * =&gt; [0, 1, 2, 3, 4]
+   * </code></pre>
    *
    * @param count  the maximum number of data to pass.
    * @param <DATA> the data type.
@@ -799,12 +781,9 @@ public class Operators {
    * <p>
    * Given a numeric sequence of inputs from 0 to 9, and a limit count of 5, the final output
    * will be:
-   * <pre>
-   *     <code>
-   *
-   *         =&gt; [5, 6, 7, 8, 9]
-   *     </code>
-   * </pre>
+   * <pre><code>
+   * =&gt; [5, 6, 7, 8, 9]
+   * </code></pre>
    *
    * @param count  the maximum number of data to pass.
    * @param <DATA> the data type.
@@ -1262,14 +1241,11 @@ public class Operators {
 
   /**
    * Returns a factory of invocations accumulating data through the specified function.
-   * <br>
+   * <p>
    * The output will be computed as follows:
-   * <pre>
-   *     <code>
-   *
-   *         acc = function.apply(acc, input);
-   *     </code>
-   * </pre>
+   * <pre><code>
+   * acc = function.apply(acc, input);
+   * </code></pre>
    * where the initial accumulated value will be the the first input.
    * <br>
    * The accumulated value will be passed as result only when the invocation completes.
@@ -1286,14 +1262,11 @@ public class Operators {
 
   /**
    * Returns a factory of invocations accumulating data through the specified function.
-   * <br>
+   * <p>
    * The output will be computed as follows:
-   * <pre>
-   *     <code>
-   *
-   *         acc = function.apply(acc, input);
-   *     </code>
-   * </pre>
+   * <pre><code>
+   * acc = function.apply(acc, input);
+   * </code></pre>
    * where the initial accumulated value will be the one returned by the specified supplier.
    * <br>
    * The accumulated value will be passed as result only when the invocation completes.
@@ -1472,12 +1445,9 @@ public class Operators {
    * <p>
    * Given a numeric sequence of inputs starting from 0, and a skip count of 5, the final output
    * will be:
-   * <pre>
-   *     <code>
-   *
-   *         =&gt; [5, 6, 7, ...]
-   *     </code>
-   * </pre>
+   * <pre><code>
+   * =&gt; [5, 6, 7, ...]
+   * </code></pre>
    *
    * @param count  the number of data to skip.
    * @param <DATA> the data type.
@@ -1494,12 +1464,9 @@ public class Operators {
    * <p>
    * Given a numeric sequence of inputs from 0 to 9, and a skip count of 5, the final output
    * will be:
-   * <pre>
-   *     <code>
-   *
-   *         =&gt; [0, 1, 2, 3, 4]
-   *     </code>
-   * </pre>
+   * <pre><code>
+   * =&gt; [0, 1, 2, 3, 4]
+   * </code></pre>
    *
    * @param count  the number of data to skip.
    * @param <DATA> the data type.

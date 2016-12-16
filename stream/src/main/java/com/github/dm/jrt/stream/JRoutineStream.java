@@ -38,19 +38,15 @@ import static com.github.dm.jrt.function.FunctionDecorator.decorate;
  * <p>
  * A stream routine builder allows to easily build a concatenation of invocations as a single
  * routine.
- * <br>
+ * <p>
  * For instance, a routine computing the root mean square of a number of integers can be defined as:
- * <pre>
- *     <code>
- *
- *         final Routine&lt;Integer, Double&gt; rms =
- *                 JRoutineStream.&lt;Integer&gt;withStream()
- *                               .map(i -&gt; i * i)
- *                               .map(averageFloat())
- *                               .map(Math::sqrt)
- *                               .buildRoutine();
- *     </code>
- * </pre>
+ * <pre><code>
+ * final Routine&lt;Integer, Double&gt; rms = JRoutineStream.&lt;Integer&gt;withStream()
+ *                                                          .map(i -&gt; i * i)
+ *                                                          .map(averageFloat())
+ *                                                          .map(Math::sqrt)
+ *                                                          .buildRoutine();
+ * </code></pre>
  * <p>
  * Created by davide-maestroni on 07/01/2016.
  */

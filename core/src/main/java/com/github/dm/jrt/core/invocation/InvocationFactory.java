@@ -31,37 +31,34 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingConstructor
 
 /**
  * Abstract class defining an invocation factory.
- * <br>
+ * <p>
  * The inheriting class must specify the constructor arguments to be used in the {@code equals()}
  * and {@code hashCode()} implementations. Like for example:
- * <pre>
- *     <code>
+ * <pre><code>
+ * public class MyFactory extends InvocationFactory&lt;String, Integer&gt; {
  *
- *         public class MyFactory extends InvocationFactory&lt;String, Integer&gt; {
+ *   private final String mRegex;
  *
- *             public MyFactory(final String regex) {
- *                 super(Reflection.asArgs(regex));
- *                 mRegex = regex;
- *             }
+ *   public MyFactory(final String regex) {
+ *     super(Reflection.asArgs(regex));
+ *     mRegex = regex;
+ *   }
  *
- *             ...
- *         }
- *     </code>
- * </pre>
+ *   ...
+ * }
+ * </code></pre>
+ * <p>
  * Or {@code null}, in case the constructor takes no arguments:
- * <pre>
- *     <code>
+ * <pre><code>
+ * public class MyFactory extends InvocationFactory&lt;String, Integer&gt; {
  *
- *         public class MyFactory extends InvocationFactory&lt;String, Integer&gt; {
+ *   public MyFactory() {
+ *     super(null);
+ *   }
  *
- *             public MyFactory() {
- *                 super(null);
- *             }
- *
- *             ...
- *         }
- *     </code>
- * </pre>
+ *   ...
+ * }
+ * </code></pre>
  * <p>
  * Created by davide-maestroni on 02/12/2015.
  *

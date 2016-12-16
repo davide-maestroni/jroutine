@@ -78,24 +78,23 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * to the input and output data.
  * <h2>How to access the Android Context</h2>
  * It is possible to get access to the Android Context (that is the Service instance) from inside
- * the routine by calling the {@code getContext()} method. Like, for instance:
- * <pre>
- *     <code>
+ * the routine by calling the {@code getContext()} method.
+ * <p>
+ * Like, for instance:
+ * <pre><code>
+ * public static class MyMethod extends ServiceRoutineMethod {
  *
- *         public static class MyMethod extends ServiceRoutineMethod {
+ *   public MyMethod(final ServiceContext context) {
+ *     super(context);
+ *   }
  *
- *             public MyMethod(final ServiceContext context) {
- *                 super(context);
- *             }
- *
- *             void run(&#64;Input final Channel&lt;?, String&gt; input,
- *                     &#64;Output final Channel&lt;String, ?&gt; output) {
- *                 final MyService service = (MyService) getContext();
- *                 // do it
- *             }
- *         }
- *     </code>
- * </pre>
+ *   void run(&#64;Input final Channel&lt;?, String&gt; input,
+ *       &#64;Output final Channel&lt;String, ?&gt; output) {
+ *     final MyService service = (MyService) getContext();
+ *     // do it
+ *   }
+ * }
+ * </code></pre>
  * <p>
  * Created by davide-maestroni on 08/18/2016.
  */

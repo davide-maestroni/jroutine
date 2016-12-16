@@ -35,14 +35,11 @@ import java.util.List;
  * Though, it is also possible to completely remove the log source code (and related strings) from
  * the released code by using Proguard and adding, for example, the following rule to the
  * configuration file:
- * <pre>
- *     <code>
- *
- *         -assumenosideeffects class com.github.dm.jrt.core.log.Logger {
- *             public void dbg(...);
- *         }
- *     </code>
- * </pre>
+ * <pre><code>
+ * -assumenosideeffects class com.github.dm.jrt.core.log.Logger {
+ *   public void dbg(...);
+ * }
+ * </code></pre>
  * <p>
  * Created by davide-maestroni on 10/03/2014.
  *

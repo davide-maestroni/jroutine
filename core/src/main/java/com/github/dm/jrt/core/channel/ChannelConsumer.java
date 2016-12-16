@@ -26,25 +26,22 @@ import org.jetbrains.annotations.NotNull;
  * The same instance can be safely bound to different channels.
  * <p>
  * The typical lifecycle of a consumer object is the following:
- * <pre>
- *     <code>
- *
- *                     |     ---------
- *                     |    |         |
- *                     V    V         |
- *                ----------------    |
- *                |  onOutput()  |----
- *                ----------------
- *                     |    |
- *                     |    |
- *       |       ------      ------       |
- *       |      |                  |      |
- *       V      V                  V      V
- *   ----------------          ----------------
- *   | onComplete() |          |  onError()   |
- *   ----------------          ----------------
- *     </code>
- * </pre>
+ * <pre><code>
+ *                      |     ---------
+ *                      |    |         |
+ *                      V    V         |
+ *                 ----------------    |
+ *                 |  onOutput()  |----
+ *                 ----------------
+ *                      |    |
+ *                      |    |
+ *        |       ------      ------       |
+ *        |      |                  |      |
+ *        V      V                  V      V
+ *    ----------------          ----------------
+ *    | onComplete() |          |  onError()   |
+ *    ----------------          ----------------
+ * </code></pre>
  * <p>
  * The class {@link com.github.dm.jrt.core.channel.TemplateChannelConsumer TemplateChannelConsumer}
  * provides an abstract empty implementation of the channel consumer interface.

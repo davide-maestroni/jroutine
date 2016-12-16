@@ -32,27 +32,22 @@ import java.util.ArrayList;
  * channels.
  * <p>
  * For example, an invocation writing bytes can be implemented as:
- * <pre>
- *     <code>
- *
- *         public void onInput(final IN in, final Channel&lt;ByteBuffer, ?&gt; result) {
- *             ...
- *             final BufferOutputStream outputStream = Channels.byteChannel().bind(result);
- *             ...
- *         }
- *     </code>
- * </pre>
+ * <pre><code>
+ * public void onInput(final IN in, final Channel&lt;ByteBuffer, ?&gt; result) {
+ *   ...
+ *   final BufferOutputStream outputStream = Channels.byteChannel().bind(result);
+ *   ...
+ * }
+ * </code></pre>
+ * <p>
  * While an invocation reading them:
- * <pre>
- *     <code>
- *
- *         public void onInput(final ByteBuffer buffer, final Channel&lt;OUT, ?&gt; result) {
- *             ...
- *             final BufferInputStream inputStream = ByteChannel.inputStream(buffer);
- *             ...
- *         }
- *     </code>
- * </pre>
+ * <pre><code>
+ * public void onInput(final ByteBuffer buffer, final Channel&lt;OUT, ?&gt; result) {
+ *   ...
+ *   final BufferInputStream inputStream = ByteChannel.inputStream(buffer);
+ *   ...
+ * }
+ * </code></pre>
  * <p>
  * Each instance maintains a pool of byte buffers which are re-used to minimize memory consumption.
  * When the pool is empty, additional buffers are created in order to avoid blocking the caller
@@ -236,11 +231,10 @@ public class ByteChannel {
      * Reads some bytes from the input stream and writes them into the specified output stream.
      *
      * @param out the output stream.
-     * @return the total number of bytes read into the buffer, or <code>-1</code> if there is no
-     * more data because the end of the stream has been reached.
-     * @throws java.io.IOException if an I/O error occurs. In particular, an
-     *                             <code>IOException</code> may be thrown if the output stream
-     *                             has been closed.
+     * @return the total number of bytes read into the buffer, or {@code -1} if there is no more
+     * data because the end of the stream has been reached.
+     * @throws java.io.IOException if an I/O error occurs. In particular, an {@code IOException} may
+     *                             be thrown if the output stream has been closed.
      */
     public abstract int read(@NotNull OutputStream out) throws IOException;
 
@@ -273,22 +267,18 @@ public class ByteChannel {
     /**
      * Reads all the bytes returned by the input stream and writes them into the specified
      * output stream.
-     * <br>
+     * <p>
      * Calling this method has the same effect as calling:
-     * <pre>
-     *     <code>
-     *
-     *         while (inputStream.read(outputStream) &gt; 0) {
-     *             // Keep looping
-     *         }
-     *     </code>
-     * </pre>
+     * <pre><code>
+     * while (inputStream.read(outputStream) &gt; 0) {
+     *   // Keep looping
+     * }
+     * </code></pre>
      *
      * @param out the output stream.
      * @return the total number of bytes read.
-     * @throws java.io.IOException if an I/O error occurs. In particular, an
-     *                             <code>IOException</code> may be thrown if the output stream
-     *                             has been closed.
+     * @throws java.io.IOException if an I/O error occurs. In particular, an {@code IOException} may
+     *                             be thrown if the output stream has been closed.
      */
     public long readAll(@NotNull final OutputStream out) throws IOException {
       long count = 0;
@@ -301,25 +291,21 @@ public class ByteChannel {
 
     /**
      * Transfers all the bytes to the specified output stream and close this one.
-     * <br>
+     * <p>
      * Calling this method has the same effect as calling:
-     * <pre>
-     *     <code>
+     * <pre><code>
+     * try {
+     *   readAll(out);
      *
-     *         try {
-     *             readAll(out);
-     *
-     *         } finally {
-     *             close();
-     *         }
-     *     </code>
-     * </pre>
+     * } finally {
+     *   close();
+     * }
+     * </code></pre>
      *
      * @param out the output stream.
      * @return the total number of bytes read.
-     * @throws java.io.IOException if an I/O error occurs. In particular, an
-     *                             <code>IOException</code> may be thrown if the output stream
-     *                             has been closed.
+     * @throws java.io.IOException if an I/O error occurs. In particular, an {@code IOException} may
+     *                             be thrown if the output stream has been closed.
      */
     public long transferTo(@NotNull final OutputStream out) throws IOException {
       try {
@@ -338,19 +324,16 @@ public class ByteChannel {
 
     /**
      * Transfers all the bytes from the specified input stream and close it.
-     * <br>
+     * <p>
      * Calling this method has the same effect as calling:
-     * <pre>
-     *     <code>
+     * <pre><code>
+     * try {
+     *   writeAll(in);
      *
-     *         try {
-     *             writeAll(in);
-     *
-     *         } finally {
-     *             in.close();
-     *         }
-     *     </code>
-     * </pre>
+     * } finally {
+     *   in.close();
+     * }
+     * </code></pre>
      *
      * @param in the input stream.
      * @return the total number of bytes written.
@@ -372,27 +355,24 @@ public class ByteChannel {
      * Writes some bytes into the output stream by reading them from the specified input stream.
      *
      * @param in the input stream.
-     * @return the total number of bytes written into the buffer, or <code>-1</code> if there is
-     * no more data because the end of the stream has been reached.
-     * @throws java.io.IOException If the first byte cannot be read for any reason other than
-     *                             end of file, or if the input stream has been closed, or if
-     *                             some other I/O error occurs.
+     * @return the total number of bytes written into the buffer, or {@code -1} if there is no more
+     * data because the end of the stream has been reached.
+     * @throws java.io.IOException If the first byte cannot be read for any reason other than end of
+     *                             file, or if the input stream has been closed, or if some other
+     *                             I/O error occurs.
      */
     public abstract int write(@NotNull InputStream in) throws IOException;
 
     /**
      * Writes all the returned bytes into the output stream by reading them from the specified
      * input stream.
-     * <br>
+     * <p>
      * Calling this method has the same effect as calling:
-     * <pre>
-     *     <code>
-     *
-     *         while (outputStream.write(inputStream) &gt; 0) {
-     *             // Keep looping
-     *         }
-     *     </code>
-     * </pre>
+     * <pre><code>
+     * while (outputStream.write(inputStream) &gt; 0) {
+     *   // Keep looping
+     * }
+     * </code></pre>
      *
      * @param in the input stream.
      * @return the total number of bytes written.
@@ -460,11 +440,10 @@ public class ByteChannel {
      * Reads some bytes from the input stream and writes them into the specified output stream.
      *
      * @param out the output stream.
-     * @return the total number of bytes read into the buffer, or <code>-1</code> if there is no
-     * more data because the end of the stream has been reached.
-     * @throws java.io.IOException if an I/O error occurs. In particular, an
-     *                             <code>IOException</code> may be thrown if the output stream
-     *                             has been closed.
+     * @return the total number of bytes read into the buffer, or {@code -1} if there is no more
+     * data because the end of the stream has been reached.
+     * @throws java.io.IOException if an I/O error occurs. In particular, an {@code IOException} may
+     *                             be thrown if the output stream has been closed.
      */
     public int read(@NotNull final OutputStream out) throws IOException {
       synchronized (mMutex) {

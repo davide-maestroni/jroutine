@@ -31,20 +31,14 @@ import java.lang.annotation.Target;
  * by the target method.
  * <p>
  * For example, a method taking two integers:
- * <pre>
- *     <code>
- *
- *         public int sum(int i1, int i2);
- *     </code>
- * </pre>
+ * <pre><code>
+ * public int sum(int i1, int i2);
+ * </code></pre>
  * <p>
  * can be proxied by a method defined as:
- * <pre>
- *     <code>
- *
- *         public int sum(&#64;AsyncInput(int.class) Channel&lt;?, Integer&gt; i1, int i2);
- *     </code>
- * </pre>
+ * <pre><code>
+ * public int sum(&#64;AsyncInput(int.class) Channel&lt;?, Integer&gt; i1, int i2);
+ * </code></pre>
  * Note that the transfer mode is specifically chosen through the annotation {@code mode} attribute
  * (it's {@link AsyncInput.InputMode#VALUE VALUE} by default).
  * <p>
@@ -63,15 +57,12 @@ import java.lang.annotation.Target;
  * <p>
  * Remember also that, in order for the annotation to properly work at run time, the following rules
  * must be added to the project Proguard file (if employed for shrinking or obfuscation):
- * <pre>
- *     <code>
- *
- *         -keepattributes RuntimeVisibleAnnotations
- *         -keepclassmembers class ** {
- *              &#64;com.github.dm.jrt.object.annotation.AsyncInput *;
- *         }
- *     </code>
- * </pre>
+ * <pre><code>
+ * -keepattributes RuntimeVisibleAnnotations
+ * -keepclassmembers class ** {
+ *   &#64;com.github.dm.jrt.object.annotation.AsyncInput *;
+ * }
+ * </code></pre>
  * <p>
  * Created by davide-maestroni on 05/23/2015.
  */

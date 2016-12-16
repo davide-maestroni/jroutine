@@ -42,19 +42,16 @@ import rx.Subscriber;
  * Utility class integrating the JRoutine Android classes with RxJava ones.
  * <p>
  * The example below shows how it's possible to make the computation happen in a dedicated Loader:
- * <pre>
- *   <code>
- *
- *     JRoutineLoaderRx.with(myObservable)
- *                     .applyLoaderConfiguration()
- *                     .withInvocationId(INVOCATION_ID)
- *                     .configured()
- *                     .subscribeOn(loaderFrom(activity))
- *                     .map(getMappingFunction())
- *                     .observeOn(AndroidSchedulers.mainThread())
- *                     .subscribe(getAction());
- *   </code>
- * </pre>
+ * <pre><code>
+ * JRoutineLoaderRx.with(myObservable)
+ *                 .applyLoaderConfiguration()
+ *                 .withInvocationId(INVOCATION_ID)
+ *                 .configured()
+ *                 .subscribeOn(loaderFrom(activity))
+ *                 .map(getMappingFunction())
+ *                 .observeOn(AndroidSchedulers.mainThread())
+ *                 .subscribe(getAction());
+ * </code></pre>
  * Note that the Loader ID by default will only depend on the inputs, so that, in order to avoid
  * clashing, it is advisable to explicitly set the invocation ID like in the example above.
  * <p>

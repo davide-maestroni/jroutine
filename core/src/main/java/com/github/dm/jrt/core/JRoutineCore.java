@@ -41,79 +41,63 @@ import java.util.Collections;
  * <b>Some usage examples</b>
  * <p>
  * <b>Example 1:</b> Configure and build a routine.
- * <pre>
- *     <code>
- *
- *         final Routine&lt;Input, Result&gt; routine =
- *                 JRoutineCore.with(myFactory)
- *                             .applyInvocationConfiguration()
- *                             .withLogLevel(Level.WARNING)
- *                             .configured()
- *                             .buildRoutine();
- *     </code>
- * </pre>
+ * <pre><code>
+ * final Routine&lt;Input, Result&gt; routine =
+ *     JRoutineCore.with(myFactory)
+ *                 .applyInvocationConfiguration()
+ *                 .withLogLevel(Level.WARNING)
+ *                 .configured()
+ *                 .buildRoutine();
+ * </code></pre>
  * <p>
  * <b>Example 2:</b> Asynchronously merge the output of two routines.
- * <pre>
- *     <code>
- *
- *         final Channel&lt;Result, Result&gt; channel =
- *                 JRoutineCore.&lt;Result&gt;ofInputs().buildChannel();
- *         channel.pass(routine1.close())
- *                .pass(routine2.close())
- *                .close();
- *                .inMax(seconds(20))
- *                .allInto(results);
- *     </code>
- * </pre>
+ * <pre><code>
+ * final Channel&lt;Result, Result&gt; channel =
+ *     JRoutineCore.&lt;Result&gt;ofInputs().buildChannel();
+ * channel.pass(routine1.close())
+ *        .pass(routine2.close())
+ *        .close();
+ *        .inMax(seconds(20))
+ *        .allInto(results);
+ * </code></pre>
+ * <p>
  * Or simply:
- * <pre>
- *     <code>
- *
- *         final Channel&lt;Void, Result&gt; output1 = routine1.close();
- *         final Channel&lt;Void, Result&gt; output2 = routine2.close();
- *         output1.inMax(seconds(20)).allInto(results);
- *         output2.inMax(seconds(20)).allInto(results);
- *     </code>
- * </pre>
+ * <pre><code>
+ * final Channel&lt;Void, Result&gt; output1 = routine1.close();
+ * final Channel&lt;Void, Result&gt; output2 = routine2.close();
+ * output1.inMax(seconds(20)).allInto(results);
+ * output2.inMax(seconds(20)).allInto(results);
+ * </code></pre>
  * (Note that, the order of the input or the output of the routine is not guaranteed unless properly
  * configured)
  * <p>
  * <b>Example 3:</b> Asynchronously concatenate the output of two routines.
- * <pre>
- *     <code>
- *
- *         routine2.call(routine1.close()).inMax(seconds(20)).all();
- *     </code>
- * </pre>
+ * <pre><code>
+ * routine2.call(routine1.close()).inMax(seconds(20)).all();
+ * </code></pre>
+ * <p>
  * Or, in an equivalent way:
- * <pre>
- *     <code>
- *
- *         routine1.close().bind(routine2.call()).close().inMax(seconds(20)).all();
- *     </code>
- * </pre>
+ * <pre><code>
+ * routine1.close().bind(routine2.call()).close().inMax(seconds(20)).all();
+ * </code></pre>
  * <p>
  * <b>Example 4:</b> Asynchronously feed a routine from a different thread.
- * <pre>
- *     <code>
+ * <pre><code>
+ * final Routine&lt;Result, Result&gt; routine =
+ *     JRoutineCore.with(IdentityInvocation.&lt;Result&gt;factoryOf())
+ *                 .buildRoutine();
+ * final Channel&lt;Result, Result&gt; channel = routine.call();
  *
- *         final Routine&lt;Result, Result&gt; routine =
- *                  JRoutineCore.with(IdentityInvocation.&lt;Result&gt;factoryOf())
- *                              .buildRoutine();
- *         final Channel&lt;Result, Result&gt; channel = routine.call();
+ * new Thread() {
  *
- *         new Thread() {
+ *   &#64;Override
+ *   public void run() {
+ *     channel.pass(new Result()).close();
+ *   }
+ * }.start();
  *
- *             &#64;Override
- *             public void run() {
- *                 channel.pass(new Result()).close();
- *             }
- *         }.start();
- *
- *         channel.inMax(seconds(20)).allInto(results);
- *     </code>
- * </pre>
+ * channel.inMax(seconds(20)).allInto(results);
+ * </code></pre>
  * <p>
  * Created by davide-maestroni on 09/07/2014.
  *

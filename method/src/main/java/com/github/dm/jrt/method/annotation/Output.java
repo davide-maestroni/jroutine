@@ -29,15 +29,12 @@ import java.lang.annotation.Target;
  * <p>
  * Remember that, in order for the annotation to properly work at run time, the following rules
  * must be added to the project Proguard file (if employed for shrinking or obfuscation):
- * <pre>
- *     <code>
- *
- *         -keepattributes RuntimeVisibleAnnotations
- *         -keepclassmembers class ** {
- *              &#64;com.github.dm.jrt.method.annotation.Output *;
- *         }
- *     </code>
- * </pre>
+ * <pre><code>
+ * -keepattributes RuntimeVisibleAnnotations
+ * -keepclassmembers class ** {
+ *   &#64;com.github.dm.jrt.method.annotation.Output *;
+ * }
+ * </code></pre>
  * <p>
  * Created by davide-maestroni on 10/12/2016.
  */

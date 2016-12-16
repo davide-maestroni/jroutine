@@ -37,20 +37,14 @@ import rx.Subscriber;
  * Utility class integrating the JRoutine classes with RxJava ones.
  * <p>
  * The example below shows how it's possible to create an Observable instance from a channel:
- * <pre>
- *   <code>
- *
- *     JRoutineRx.observableFrom(myChannel).subscribe(getAction());
- *   </code>
- * </pre>
+ * <pre><code>
+ * JRoutineRx.observableFrom(myChannel).subscribe(getAction());
+ * </code></pre>
  * <p>
  * In a dual way, a channel can be created from an Observable:
- * <pre>
- *   <code>
- *
- *     JRoutineRx.from(myObservable).buildChannel().bind(getConsumer());
- *   </code>
- * </pre>
+ * <pre><code>
+ * JRoutineRx.from(myObservable).buildChannel().bind(getConsumer());
+ * </code></pre>
  * <p>
  * Created by davide-maestroni on 12/09/2016.
  */

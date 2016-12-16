@@ -25,20 +25,17 @@ import java.lang.reflect.Type;
  * Utility abstract class used to work around Java type erasure.
  * <p>
  * By using class objects it is impossible to distinguish between two different generic classes.
- * For example there is no way to declare a <code>Class&lt;List&lt;String&gt;&gt;</code> as
- * opposed to <code>Class&lt;List&lt;Integer&gt;&gt;</code>.
+ * For example there is no way to declare a {@code Class&lt;List&lt;String&gt;&gt;} as opposed to
+ * {@code Class&lt;List&lt;Integer&gt;&gt;}.
  * <br>
  * The workaround consists in forcing the inheritance from a special generic class, then inspected
  * via reflection, to obtain the generic type rather than the class object.
  * <p>
  * Remember also that, in order for the annotation to properly work at run time, the following rules
  * must be added to the project Proguard file (if employed for shrinking or obfuscation):
- * <pre>
- *     <code>
- *
- *         -keepattributes Signature
- *     </code>
- * </pre>
+ * <pre><code>
+ * -keepattributes Signature
+ * </code></pre>
  * <p>
  * Created by davide-maestroni on 06/14/2014.
  *

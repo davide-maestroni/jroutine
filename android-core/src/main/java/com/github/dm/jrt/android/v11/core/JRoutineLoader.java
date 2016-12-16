@@ -54,77 +54,70 @@ import org.jetbrains.annotations.NotNull;
  * {@link com.github.dm.jrt.android.core.invocation.TypeClashException TypeClashException}.
  * <p>
  * For example, in order to get a resource from the network, needed to fill an Activity UI:
- * <pre>
- *     <code>
+ * <pre><code>
+ * &#64;Override
+ * protected void onCreate(final Bundle savedInstanceState) {
+ *   super.onCreate(savedInstanceState);
+ *   setContentView(R.layout.my_activity_layout);
+ *   if (savedInstanceState != null) {
+ *     mResource = savedInstanceState.getParcelable(RESOURCE_KEY);
+ *   }
  *
- *         &#64;Override
- *         protected void onCreate(final Bundle savedInstanceState) {
- *             super.onCreate(savedInstanceState);
- *             setContentView(R.layout.my_activity_layout);
- *             if (savedInstanceState != null) {
- *                 mResource = savedInstanceState.getParcelable(RESOURCE_KEY);
- *             }
+ *   if (mResource != null) {
+ *     displayResource(mResource);
  *
- *             if (mResource != null) {
- *                 displayResource(mResource);
+ *   } else {
+ *     final Routine&lt;URI, MyResource&gt; routine =
+ *         JRoutineLoader.on(loaderFrom(this))
+ *                       .with(factoryOf(LoadResource.class))
+ *                       .buildRoutine();
+ *     routine.call(RESOURCE_URI)
+ *            .bind(new TemplateChannelConsumer&lt;MyResource&gt;() {
  *
- *             } else {
- *                 final Routine&lt;URI, MyResource&gt; routine =
- *                         JRoutineLoader.on(loaderFrom(this))
- *                                       .with(factoryOf(LoadResource.class))
- *                                       .buildRoutine();
- *                 routine.call(RESOURCE_URI)
- *                        .bind(new TemplateChannelConsumer&lt;MyResource&gt;() {
+ *                &#64;Override
+ *                public void onError(&#64;NotNull final RoutineException error) {
+ *                  displayError(error);
+ *                }
  *
- *                            &#64;Override
- *                            public void onError(&#64;NotNull final RoutineException error) {
- *                                displayError(error);
- *                            }
+ *                &#64;Override
+ *                public void onOutput(final MyResource resource) {
+ *                  mResource = resource;
+ *                  displayResource(resource);
+ *                }
+ *            });
+ *   }
+ * }
  *
- *                            &#64;Override
- *                            public void onOutput(final MyResource resource) {
- *                                mResource = resource;
- *                                displayResource(resource);
- *                            }
- *                        });
- *             }
- *         }
- *
- *         &#64;Override
- *         protected void onSaveInstanceState(final Bundle outState) {
- *
- *             super.onSaveInstanceState(outState);
- *             outState.putParcelable(RESOURCE_KEY, mResource);
- *         }
- *     </code>
- * </pre>
+ * &#64;Override
+ * protected void onSaveInstanceState(final Bundle outState) {
+ *   super.onSaveInstanceState(outState);
+ *   outState.putParcelable(RESOURCE_KEY, mResource);
+ * }
+ * </code></pre>
  * The above code will ensure that the loading process survives any configuration change and the
  * resulting resource is dispatched only once.
  * <p>
  * Note that the invocation may be implemented so to run in a dedicated Service:
- * <pre>
- *     <code>
+ * <pre><code>
+ * public class LoadResource extends CallContextInvocation&lt;URI, MyResource&gt; {
  *
- *         public class LoadResource extends CallContextInvocation&lt;URI, MyResource&gt; {
+ *   private Routine&lt;URI, MyResource&gt; mRoutine;
  *
- *             private Routine&lt;URI, MyResource&gt; mRoutine;
+ *   &#64;Override
+ *   public void onContext(&#64;Nonnull final Context context) {
+ *     super.onContext(context);
+ *     mRoutine = JRoutineService.on(serviceFrom(context))
+ *                               .with(factoryOf(LoadResourceUri.class))
+ *                               .buildRoutine();
+ *   }
  *
- *             &#64;Override
- *             public void onContext(&#64;Nonnull final Context context) {
- *                 super.onContext(context);
- *                 mRoutine = JRoutineService.on(serviceFrom(context))
- *                                           .with(factoryOf(LoadResourceUri.class))
- *                                           .buildRoutine();
- *             }
- *
- *             &#64;Override
- *             protected void onCall(final List&lt;? extends URI&gt; uris,
- *                     &#64;Nonnull final Channel&lt;MyResource, ?&gt; result) {
- *                 result.pass(mRoutine.call(uris));
- *             }
- *         }
- *     </code>
- * </pre>
+ *   &#64;Override
+ *   protected void onCall(final List&lt;? extends URI&gt; uris,
+ *       &#64;Nonnull final Channel&lt;MyResource, ?&gt; result) {
+ *     result.pass(mRoutine.call(uris));
+ *   }
+ * }
+ * </code></pre>
  * <p>
  * See {@link com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat JRoutineLoaderCompat} for
  * support of API levels lower than {@value android.os.Build.VERSION_CODES#HONEYCOMB}.

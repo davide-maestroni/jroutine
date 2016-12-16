@@ -26,29 +26,23 @@ import java.lang.annotation.Target;
  * running obfuscation tools.
  * <p>
  * For example, the following code:
- * <pre>
- *     <code>
+ * <pre><code>
+ * public class MyClass {
  *
- *         public class MyClass {
+ *   public static final String METHOD_NAME = "get";
  *
- *             public static final String METHOD_NAME = "get";
- *
- *             &#64;Alias(METHOD_NAME)
- *             public int getOne() {
- *
- *                 return 1;
- *             }
- *         }
- *     </code>
- * </pre>
+ *   &#64;Alias(METHOD_NAME)
+ *   public int getOne() {
+ *     return 1;
+ *   }
+ * }
+ * </code></pre>
+ * <p>
  * allows to asynchronously call the method independently from its original name like:
- * <pre>
- *     <code>
- *
- *         final MyClass myInstance = new MyClass();
- *         JRoutineObject.with(instance(myInstance)).method(MyClass.METHOD_NAME).call();
- *     </code>
- * </pre>
+ * <pre><code>
+ * final MyClass myInstance = new MyClass();
+ * JRoutineObject.with(instance(myInstance)).method(MyClass.METHOD_NAME).call();
+ * </code></pre>
  * <p>
  * The same considerations apply to static class methods.
  * <p>
@@ -67,15 +61,12 @@ import java.lang.annotation.Target;
  * <p>
  * Remember also that, in order for the annotation to properly work at run time, the following rules
  * must be added to the project Proguard file (if employed for shrinking or obfuscation):
- * <pre>
- *     <code>
- *
- *         -keepattributes RuntimeVisibleAnnotations
- *         -keepclassmembers class ** {
- *              &#64;com.github.dm.jrt.object.annotation.Alias *;
- *         }
- *     </code>
- * </pre>
+ * <pre><code>
+ * -keepattributes RuntimeVisibleAnnotations
+ * -keepclassmembers class ** {
+ *   &#64;com.github.dm.jrt.object.annotation.Alias *;
+ * }
+ * </code></pre>
  * <p>
  * Created by davide-maestroni on 01/22/2015.
  */

@@ -37,25 +37,20 @@ import java.lang.annotation.Target;
  * <p>
  * Remember also that, in order for the annotation to properly work at run time, the following rules
  * must be added to the project Proguard file (if employed for shrinking or obfuscation):
- * <pre>
- *     <code>
- *
- *         -keepattributes RuntimeVisibleAnnotations
- *         -keepclassmembers class ** {
- *              &#64;com.github.dm.jrt.android.proxy.annotation.ServiceProxy *;
- *         }
- *     </code>
- * </pre>
+ * <pre><code>
+ * -keepattributes RuntimeVisibleAnnotations
+ * -keepclassmembers class ** {
+ *   &#64;com.github.dm.jrt.android.proxy.annotation.ServiceProxy *;
+ * }
+ * </code></pre>
+ * <p>
  * Be sure also to include a proper rule in your Proguard file, so to keep the name of all the
  * classes implementing the specific mirror interface, like, for example:
- * <pre>
- *     <code>
- *
- *         -keep public class * extends my.mirror.Interface {
- *              public &lt;init&gt;;
- *         }
- *     </code>
- * </pre>
+ * <pre><code>
+ * -keep public class * extends my.mirror.Interface {
+ *   public &lt;init&gt;;
+ * }
+ * </code></pre>
  * <p>
  * Created by davide-maestroni on 05/13/2015.
  *

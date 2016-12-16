@@ -44,33 +44,30 @@ import org.jetbrains.annotations.NotNull;
  * use {@link android.os.Parcelable} objects instead.
  * <p>
  * For example, in order to get a resource from the network, needed to fill an Activity UI:
- * <pre>
- *     <code>
+ * <pre><code>
+ * &#64;Override
+ * protected void onCreate(final Bundle savedInstanceState) {
+ *   super.onCreate(savedInstanceState);
+ *   setContentView(R.layout.my_activity_layout);
+ *   final Routine&lt;URI, MyResource&gt; routine =
+ *       JRoutineService.on(serviceFrom(this))
+ *                      .with(factoryOf(LoadResourceUri.class))
+ *                      .buildRoutine();
+ *   routine.call(RESOURCE_URI)
+ *          .bind(new TemplateChannelConsumer&lt;MyResource&gt;() {
  *
- *         &#64;Override
- *         protected void onCreate(final Bundle savedInstanceState) {
- *             super.onCreate(savedInstanceState);
- *             setContentView(R.layout.my_activity_layout);
- *             final Routine&lt;URI, MyResource&gt; routine =
- *                     JRoutineService.on(serviceFrom(this))
- *                                    .with(factoryOf(LoadResourceUri.class))
- *                                    .buildRoutine();
- *             routine.call(RESOURCE_URI)
- *                    .bind(new TemplateChannelConsumer&lt;MyResource&gt;() {
+ *              &#64;Override
+ *              public void onError(&#64;NotNull final RoutineException error) {
+ *                displayError(error);
+ *              }
  *
- *                        &#64;Override
- *                        public void onError(&#64;NotNull final RoutineException error) {
- *                            displayError(error);
- *                        }
- *
- *                        &#64;Override
- *                        public void onOutput(final MyResource resource) {
- *                            displayResource(resource);
- *                        }
- *                    });
- *         }
- *     </code>
- * </pre>
+ *              &#64;Override
+ *              public void onOutput(final MyResource resource) {
+ *                displayResource(resource);
+ *              }
+ *          });
+ * }
+ * </code></pre>
  * <p>
  * Created by davide-maestroni on 01/08/2015.
  */

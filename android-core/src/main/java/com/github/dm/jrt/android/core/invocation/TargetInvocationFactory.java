@@ -41,21 +41,17 @@ import static com.github.dm.jrt.core.util.Reflection.newInstanceOf;
  * invocation in order to be automatically instantiated via reflection.
  * <br>
  * The latter class will inherit from {@link ContextInvocationWrapper}.
- * <br>
+ * <p>
  * It is possible to avoid that, by creating a target invocation factory of a common invocation by
  * defining a specialized class like:
- * <pre>
- *     <code>
+ * <pre><code>
+ * public class MyInvocationWrapper&lt;IN, OUT&gt; extends ContextInvocationWrapper&lt;IN, OUT&gt; {
  *
- *         public class MyInvocationWrapper&lt;IN, OUT&gt;
- *                 extends ContextInvocationWrapper&lt;IN, OUT&gt; {
- *
- *             public MyInvocationWrapper(final String arg) {
- *                 super(new MyInvocation&lt;IN, OUT&gt;(arg));
- *             }
- *         }
- *     </code>
- * </pre>
+ *   public MyInvocationWrapper(final String arg) {
+ *     super(new MyInvocation&lt;IN, OUT&gt;(arg));
+ *   }
+ * }
+ * </code></pre>
  * <p>
  * Created by davide-maestroni on 08/20/2015.
  *

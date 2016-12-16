@@ -79,27 +79,24 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * specific annotation will be passed as is to the target method.
  * <p>
  * For example, a routine computing the square of integers can be implemented as follows:
- * <pre>
- *     <code>
+ * <pre><code>
+ * final Channel&lt;Integer, Integer&gt; inputChannel =
+ *     JRoutineCore.&lt;Integer&gt;ofInputs().buildChannel();
+ * final Channel&lt;Integer, Integer&gt; outputChannel =
+ *     JRoutineCore.&lt;Integer&gt;ofInputs().buildChannel();
+ * new RoutineMethod() {
  *
- *         final Channel&lt;Integer, Integer&gt; inputChannel =
- *                 JRoutineCore.&lt;Integer&gt;ofInputs().buildChannel();
- *         final Channel&lt;Integer, Integer&gt; outputChannel =
- *                 JRoutineCore.&lt;Integer&gt;ofInputs().buildChannel();
- *         new RoutineMethod() {
- *
- *             public void square(&#64;Input final Channel&lt;?, Integer&gt; input,
- *                     &#64;Output final Channel&lt;Integer, ?&gt; output) {
- *                 if (input.hasNext()) {
- *                     final int i = input.next();
- *                     output.pass(i * i);
- *                 }
- *             }
- *         }.call(inputChannel, outputChannel);
- *         inputChannel.pass(1, 2, 3).close();
- *         outputChannel.inMax(seconds(1)).all(); // expected values: 1, 4, 9
- *     </code>
- * </pre>
+ *   public void square(&#64;Input final Channel&lt;?, Integer&gt; input,
+ *       &#64;Output final Channel&lt;Integer, ?&gt; output) {
+ *     if (input.hasNext()) {
+ *       final int i = input.next();
+ *       output.pass(i * i);
+ *     }
+ *   }
+ * }.call(inputChannel, outputChannel);
+ * inputChannel.pass(1, 2, 3).close();
+ * outputChannel.inMax(seconds(1)).all(); // expected values: 1, 4, 9
+ * </code></pre>
  * The {@code call()} method returns an output channel producing the outputs returned by the target
  * method. In the above case no output is returned (in fact, the return type is {@code void}), still
  * the channel will be notified of the invocation abortion and completion.
@@ -112,26 +109,23 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * same values are employed each time a new input is available.
  * <p>
  * For example, a routine transforming the case of a string can be implemented as follows:
- * <pre>
- *     <code>
+ * <pre><code>
+ * final Channel&lt;String, String&gt; inputChannel =
+ *     JRoutineCore.&lt;String&gt;ofInputs().buildChannel();
+ * final Channel&lt;?, String&gt; outputChannel = new RoutineMethod() {
  *
- *         final Channel&lt;String, String&gt; inputChannel =
- *                 JRoutineCore.&lt;String&gt;ofInputs().buildChannel();
- *         final Channel&lt;?, String&gt; outputChannel = new RoutineMethod() {
- *
- *             public String switchCase(&#64;Input final Channel&lt;?, String&gt; input,
- *                     final boolean isUpper) {
- *                 if (input.hasNext()) {
- *                     final String str = input.next();
- *                     return (isUpper) ? str.toUpperCase() : str.toLowerCase();
- *                 }
- *                 return ignoreReturnValue();
- *             }
- *         }.call(inputChannel, true);
- *         inputChannel.pass("Hello", "JRoutine", "!").close();
- *         outputChannel.inMax(seconds(1)).all(); // expected values: "HELLO", "JROUTINE", "!"
- *     </code>
- * </pre>
+ *   public String switchCase(&#64;Input final Channel&lt;?, String&gt; input,
+ *       final boolean isUpper) {
+ *     if (input.hasNext()) {
+ *       final String str = input.next();
+ *       return (isUpper) ? str.toUpperCase() : str.toLowerCase();
+ *     }
+ *     return ignoreReturnValue();
+ *   }
+ * }.call(inputChannel, true);
+ * inputChannel.pass("Hello", "JRoutine", "!").close();
+ * outputChannel.inMax(seconds(1)).all(); // expected values: "HELLO", "JROUTINE", "!"
+ * </code></pre>
  * Note that outputs will be collected through the channel returned by the {@code call()} method.
  * <br>
  * Note also that, when the invocation completes, that is, no input is available, the method
@@ -140,20 +134,17 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * <p>
  * In case the very same input or output channel instance has to be passed as parameter, it is
  * sufficient to avoid in/out annotations, like shown below:
- * <pre>
- *     <code>
+ * <pre><code>
+ * final Channel&lt;String, String&gt; outputChannel =
+ *     JRoutineCore.&lt;String&gt;ofInputs().buildChannel();
+ * new MyRoutine() {
  *
- *         final Channel&lt;String, String&gt; outputChannel =
- *                 JRoutineCore.&lt;String&gt;ofInputs().buildChannel();
- *         new MyRoutine() {
+ *   void run(final Channel&lt;String, ?&gt; output) {
+ *     output.pass("...");
+ *   }
  *
- *             void run(final Channel&lt;String, ?&gt; output) {
- *                 output.pass("...");
- *             }
- *
- *         }.call(outputChannel);
- *     </code>
- * </pre>
+ * }.call(outputChannel);
+ * </code></pre>
  * <h2>Parallel and multiple invocations</h2>
  * In order to enable parallel invocation of the routine, it is necessary to provide the proper
  * parameters to the routine method non-default constructor. In fact, parallel invocations will
@@ -162,78 +153,71 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * Note that, for anonymous and inner classes, synthetic constructors will be created by the
  * compiler, hence the enclosing class, along with any variable captured inside the method, must be
  * explicitly passed to the constructor.
- * <br>
+ * <p>
  * Like, for example:
- * <pre>
- *     <code>
+ * <pre><code>
+ * final Locale locale = Locale.getDefault();
+ * final Channel&lt;String, String&gt; inputChannel =
+ *     JRoutineCore.&lt;String&gt;ofInputs().buildChannel();
+ * final Channel&lt;?, String&gt; outputChannel = new RoutineMethod(this, locale) {
  *
- *         final Locale locale = Locale.getDefault();
- *         final Channel&lt;String, String&gt; inputChannel =
- *                 JRoutineCore.&lt;String&gt;ofInputs().buildChannel();
- *         final Channel&lt;?, String&gt; outputChannel = new RoutineMethod(this, locale) {
- *
- *             public String switchCase(&#64;Input final Channel&lt;?, String&gt; input,
- *                     final boolean isUpper) {
- *                 if (input.hasNext()) {
- *                     final String str = input.next();
- *                     return (isUpper) ? str.toUpperCase(locale) : str.toLowerCase(locale);
- *                 }
- *                 return ignoreReturnValue();
- *             }
- *         }.callParallel(inputChannel, true);
- *         inputChannel.pass("Hello", "JRoutine", "!").close();
- *         outputChannel.inMax(seconds(1)).all(); // expected values: "HELLO", "JROUTINE", "!"
- *     </code>
- * </pre>
+ *   public String switchCase(&#64;Input final Channel&lt;?, String&gt; input,
+ *        final boolean isUpper) {
+ *     if (input.hasNext()) {
+ *       final String str = input.next();
+ *       return (isUpper) ? str.toUpperCase(locale) : str.toLowerCase(locale);
+ *     }
+ *     return ignoreReturnValue();
+ *   }
+ * }.callParallel(inputChannel, true);
+ * inputChannel.pass("Hello", "JRoutine", "!").close();
+ * outputChannel.inMax(seconds(1)).all(); // expected values: "HELLO", "JROUTINE", "!"
+ * </code></pre>
+ * <p>
  * Or, for an inner class:
- * <pre>
- *     <code>
+ * <pre><code>
+ * class MyMethod extends RoutineMethod {
  *
- *         class MyMethod extends RoutineMethod {
+ *   private final Locale mLocale;
  *
- *             private final Locale mLocale;
+ *   MyMethod(final Locale locale) {
+ *     super(OuterClass.this, locale);
+ *     mLocale = locale;
+ *   }
  *
- *             MyMethod(final Locale locale) {
- *                 super(OuterClass.this, locale);
- *                 mLocale = locale;
- *             }
- *
- *             String switchCase(&#64;Input final Channel&lt;?, String&gt; input,
- *                    final boolean isUpper) {
- *                 if (input.hasNext()) {
- *                     final String str = input.next();
- *                     return (isUpper) ? str.toUpperCase(mLocale) : str.toLowerCase(mLocale);
- *                 }
- *                 return ignoreReturnValue();
- *             }
- *         }
- *     </code>
- * </pre>
+ *   String switchCase(&#64;Input final Channel&lt;?, String&gt; input,
+ *       final boolean isUpper) {
+ *     if (input.hasNext()) {
+ *       final String str = input.next();
+ *       return (isUpper) ? str.toUpperCase(mLocale) : str.toLowerCase(mLocale);
+ *     }
+ *     return ignoreReturnValue();
+ *   }
+ * }
+ * </code></pre>
+ * <p>
  * The same holds true for static classes, with the only difference that just the declared
  * parameters must be passed:
- * <pre>
- *     <code>
+ * <pre><code>
+ * static class MyMethod extends RoutineMethod {
  *
- *         static class MyMethod extends RoutineMethod {
+ *   private final Locale mLocale;
  *
- *             private final Locale mLocale;
+ *   MyMethod(final Locale locale) {
+ *     super(locale);
+ *     mLocale = locale;
+ *   }
  *
- *             MyMethod(final Locale locale) {
- *                 super(locale);
- *                 mLocale = locale;
- *             }
- *
- *             String switchCase(&#64;Input final Channel&lt;?, String&gt; input,
- *                    final boolean isUpper) {
- *                 if (input.hasNext()) {
- *                     final String str = input.next();
- *                     return (isUpper) ? str.toUpperCase(mLocale) : str.toLowerCase(mLocale);
- *                 }
- *                 return ignoreReturnValue();
- *             }
- *         }
- *     </code>
- * </pre>
+ *   String switchCase(&#64;Input final Channel&lt;?, String&gt; input,
+ *       final boolean isUpper) {
+ *     if (input.hasNext()) {
+ *       final String str = input.next();
+ *       return (isUpper) ? str.toUpperCase(mLocale) : str.toLowerCase(mLocale);
+ *     }
+ *     return ignoreReturnValue();
+ *   }
+ * }
+ * </code></pre>
  * The above conditions must be met also to be able to invoke the same routine several times through
  * the {@code call()} method.
  * <h2>Multiple inputs</h2>
@@ -244,112 +228,103 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * allowed) or null, if the invocation takes no input channel.
  * <p>
  * For example, a routine printing the inputs of different types can be implemented as follows:
- * <pre>
- *     <code>
+ * <pre><code>
+ * final Channel&lt;Integer, Integer&gt; inputInts =
+ *     JRoutineCore.&lt;Integer&gt;ofInputs().buildChannel();
+ * final Channel&lt;String, String&gt; inputStrings =
+ *     JRoutineCore.&lt;String&gt;ofInputs().buildChannel();
+ * final Channel&lt;String, String&gt; outputChannel =
+ *     JRoutineCore.&lt;String&gt;ofInputs().buildChannel();
+ * new RoutineMethod() {
  *
- *         final Channel&lt;Integer, Integer&gt; inputInts =
- *                 JRoutineCore.&lt;Integer&gt;ofInputs().buildChannel();
- *         final Channel&lt;String, String&gt; inputStrings =
- *                 JRoutineCore.&lt;String&gt;ofInputs().buildChannel();
- *         final Channel&lt;String, String&gt; outputChannel =
- *                 JRoutineCore.&lt;String&gt;ofInputs().buildChannel();
- *         new RoutineMethod() {
+ *   void run(&#64;Input final Channel&lt;?, Integer&gt; inputInts,
+ *       &#64;Input final Channel&lt;?, String&gt; inputStrings,
+ *       &#64;Output final Channel&lt;String, ?&gt; output) {
+ *     final Channel&lt;?, ?&gt; inputChannel = switchInput();
+ *     if (inputChannel.hasNext()) {
+ *       if (inputChannel == inputInts) {
+ *         output.pass("Number: " + inputChannel.next());
+ *       } else if (inputChannel == inputStrings) {
+ *         output.pass("String: " + inputChannel.next());
+ *       }
+ *     }
+ *   }
+ * }.call(inputInts, inputStrings, outputChannel);
+ * inputStrings.pass("Hello", "JRoutine", "!");
+ * inputInts.pass(1, 2, 3);
+ * outputChannel.bind(new TemplateChannelConsumer&lt;String&gt;() {
  *
- *             void run(&#64;Input final Channel&lt;?, Integer&gt; inputInts,
- *                     &#64;Input final Channel&lt;?, String&gt; inputStrings,
- *                     &#64;Output final Channel&lt;String, ?&gt; output) {
- *                 final Channel&lt;?, ?&gt; inputChannel = switchInput();
- *                 if (inputChannel.hasNext()) {
- *                     if (inputChannel == inputInts) {
- *                         output.pass("Number: " + inputChannel.next());
- *                     } else if (inputChannel == inputStrings) {
- *                         output.pass("String: " + inputChannel.next());
- *                     }
- *                 }
- *             }
- *         }.call(inputInts, inputStrings, outputChannel);
- *         inputStrings.pass("Hello", "JRoutine", "!");
- *         inputInts.pass(1, 2, 3);
- *         outputChannel.bind(new TemplateChannelConsumer&lt;String&gt;() {
- *
- *             &#64;Override
- *             public void onOutput(final String out) {
- *                 System.out.println(out);
- *             }
- *         });
- *     </code>
- * </pre>
+ *   &#64;Override
+ *   public void onOutput(final String out) {
+ *     System.out.println(out);
+ *   }
+ * });
+ * </code></pre>
  * <h2>Routine concatenation</h2>
  * The output channels passed as parameters, or the one returned by the method, can be successfully
  * bound to other channels in order to concatenate several routine invocations.
- * <br>
+ * <p>
  * The same is true for other method routines, when output channels can be passed as inputs as shown
  * in the following example:
- * <pre>
- *     <code>
+ * <pre><code>
+ * final Channel&lt;Integer, Integer&gt; inputChannel =
+ *     JRoutineCore.&lt;Integer&gt;ofInputs().buildChannel();
+ * final Channel&lt;Integer, Integer&gt; outputChannel =
+ *     JRoutineCore.&lt;Integer&gt;ofInputs().buildChannel();
+ * new RoutineMethod() {
  *
- *         final Channel&lt;Integer, Integer&gt; inputChannel =
- *                 JRoutineCore.&lt;Integer&gt;ofInputs().buildChannel();
- *         final Channel&lt;Integer, Integer&gt; outputChannel =
- *                 JRoutineCore.&lt;Integer&gt;ofInputs().buildChannel();
- *         new RoutineMethod() {
+ *   public void square(&#64;Input final Channel&lt;?, Integer&gt; input,
+ *       &#64;Output final Channel&lt;Integer, ?&gt; output) {
+ *     if (input.hasNext()) {
+ *       final int i = input.next();
+ *       output.pass(i * i);
+ *     }
+ *   }
+ * }.call(inputChannel, outputChannel);
+ * final Channel&lt;Integer, Integer&gt; resultChannel =
+ *     JRoutineCore.&lt;Integer&gt;ofInputs().buildChannel();
+ * new RoutineMethod() {
  *
- *             public void square(&#64;Input final Channel&lt;?, Integer&gt; input,
- *                     &#64;Output final Channel&lt;Integer, ?&gt; output) {
- *                 if (input.hasNext()) {
- *                     final int i = input.next();
- *                     output.pass(i * i);
- *                 }
- *             }
- *         }.call(inputChannel, outputChannel);
- *         final Channel&lt;Integer, Integer&gt; resultChannel =
- *                 JRoutineCore.&lt;Integer&gt;ofInputs().buildChannel();
- *         new RoutineMethod() {
+ *   private int mSum;
  *
- *             private int mSum;
- *
- *             public void sum(&#64;Input final Channel&lt;?, Integer&gt; input,
- *                     &#64;Output final Channel&lt;Integer, ?&gt; output) {
- *                 if (input.hasNext()) {
- *                     mSum += input.next();
- *                 } else {
- *                     output.pass(mSum);
- *                 }
- *             }
- *         }.call(outputChannel, resultChannel);
- *         inputChannel.pass(1, 2, 3, 4).close();
- *         resultChannel.inMax(seconds(1)).next(); // expected value: 30
- *     </code>
- * </pre>
+ *   public void sum(&#64;Input final Channel&lt;?, Integer&gt; input,
+ *       &#64;Output final Channel&lt;Integer, ?&gt; output) {
+ *     if (input.hasNext()) {
+ *       mSum += input.next();
+ *     } else {
+ *       output.pass(mSum);
+ *     }
+ *   }
+ * }.call(outputChannel, resultChannel);
+ * inputChannel.pass(1, 2, 3, 4).close();
+ * resultChannel.inMax(seconds(1)).next(); // expected value: 30
+ * </code></pre>
  * Note how the input channel is closed before reading the output, since the sum routine relies
  * on the completion notification before producing any result.
- * <br>
+ * <p>
  * It is also possible to feed the routine method with outputs coming from another routine. In case,
  * for instance, a routine parsing strings into integers has already been implemented, it can be
  * concatenated to the sum routine method as shown below:
- * <pre>
- *     <code>
+ * <pre><code>
+ * final Channel&lt;String, Integer&gt; channel = parseRoutine.call();
+ * final Channel&lt;Integer, Integer&gt; outputChannel =
+ *     JRoutineCore.&lt;Integer&gt;ofInputs().buildChannel();
+ * new RoutineMethod() {
  *
- *         final Channel&lt;String, Integer&gt; channel = parseRoutine.call();
- *         final Channel&lt;Integer, Integer&gt; outputChannel =
- *                 JRoutineCore.&lt;Integer&gt;ofInputs().buildChannel();
- *         new RoutineMethod() {
+ *   private int mSum;
  *
- *             private int mSum;
- *
- *             public void sum(&#64;Input final Channel&lt;?, Integer&gt; input,
- *                     &#64;Output final Channel&lt;Integer, ?&gt; output) {
- *                 if (input.hasNext()) {
- *                     mSum += input.next();
- *                 } else {
- *                     output.pass(mSum);
- *                 }
- *             }
- *         }.call(channel, outputChannel);
- *         channel.pass("1", "2", "3", "4").close();
- *         outputChannel.inMax(seconds(1)).next(); // expected value: 10
- *     </code>
- * </pre>
+ *   public void sum(&#64;Input final Channel&lt;?, Integer&gt; input,
+ *       &#64;Output final Channel&lt;Integer, ?&gt; output) {
+ *     if (input.hasNext()) {
+ *       mSum += input.next();
+ *     } else {
+ *       output.pass(mSum);
+ *     }
+ *   }
+ * }.call(channel, outputChannel);
+ * channel.pass("1", "2", "3", "4").close();
+ * outputChannel.inMax(seconds(1)).next(); // expected value: 10
+ * </code></pre>
  * <h2>Handling of abortion exception</h2>
  * The routine method is notified also when one of the input or output channels is aborted.
  * <br>
@@ -362,35 +337,32 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * <p>
  * The following example shows how to implement a routine cleaning up external resources when the
  * invocation completes or is aborted:
- * <pre>
- *     <code>
+ * <pre><code>
+ * final ExternalStorage storage = ExternalStorage.create();
+ * final Channel&lt;String, String&gt; inputChannel =
+ *     JRoutineCore.&lt;String&gt;ofInputs().buildChannel();
+ * new RoutineMethod(this, storage) {
  *
- *         final ExternalStorage storage = ExternalStorage.create();
- *         final Channel&lt;String, String&gt; inputChannel =
- *                 JRoutineCore.&lt;String&gt;ofInputs().buildChannel();
- *         new RoutineMethod(this, storage) {
+ *   private final StorageConnection mConnection = storage.openConnection();
  *
- *             private final StorageConnection mConnection = storage.openConnection();
- *
- *             void store(&#64;Input final Channel&lt;?, String&gt; input) {
- *                 try {
- *                     if (input.hasNext()) {
- *                         mConnection.put(input.next());
- *                     } else {
- *                         mConnection.close();
- *                     }
- *                 } catch(final RoutineException e) {
- *                     final Throwable t = e.getCause();
- *                     if (t instanceof FlushConnectionException) {
- *                         mConnection.close();
- *                     } else {
- *                         mConnection.rollback();
- *                     }
- *                 }
- *             }
- *         }.call(inputChannel);
- *     </code>
- * </pre>
+ *   void store(&#64;Input final Channel&lt;?, String&gt; input) {
+ *     try {
+ *       if (input.hasNext()) {
+ *         mConnection.put(input.next());
+ *       } else {
+ *         mConnection.close();
+ *       }
+ *     } catch(final RoutineException e) {
+ *       final Throwable t = e.getCause();
+ *       if (t instanceof FlushConnectionException) {
+ *         mConnection.close();
+ *       } else {
+ *         mConnection.rollback();
+ *       }
+ *     }
+ *   }
+ * }.call(inputChannel);
+ * </code></pre>
  * <h2>Wrapping existing method</h2>
  * An additional way to create a routine method is by wrapping a method of an existing object or
  * class. The routine is created by calling one of the provided {@code from()} methods.
@@ -405,32 +377,25 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * Results can be collected through the returned output channel.
  * <p>
  * For example, a routine wrapping the {@code String.format()} method can be built as shown below:
- * <pre>
- *     <code>
- *
- *         final Channel&lt;Object[], Object[]&gt; inputChannel =
- *                 JRoutineCore.&lt;Object[]&gt;ofInputs().buildChannel();
- *         final Channel&lt;?, String&gt; outputChannel =
- *                 RoutineMethod.from(
- *                     String.class.getMethod("format", String.class, Object[].class))
- *                              .call("%s %s!", inputChannel);
- *         inputChannel.pass(new Object[]{"Hello", "JRoutine"}).close();
- *         outputChannel.inMax(seconds(1)).next(); // expected value: "Hello JRoutine!"
- *     </code>
- * </pre>
+ * <pre><code>
+ * final Channel&lt;Object[], Object[]&gt; inputChannel =
+ *     JRoutineCore.&lt;Object[]&gt;ofInputs().buildChannel();
+ * final Channel&lt;?, String&gt; outputChannel =
+ *     RoutineMethod.from(String.class.getMethod("format", String.class, Object[].class))
+ *                  .call("%s %s!", inputChannel);
+ * inputChannel.pass(new Object[]{"Hello", "JRoutine"}).close();
+ * outputChannel.inMax(seconds(1)).next(); // expected value: "Hello JRoutine!"
+ * </code></pre>
+ * <p>
  * In case the very same input or output channel instance has to be passed as parameter, it has to
  * be wrapped in another input channel, like shown below:
- * <pre>
- *     <code>
- *
- *         final Channel&lt;String, String&gt; channel =
- *                 JRoutineCore.&lt;String&gt;ofInputs().buildChannel();
- *         RoutineMethod.from(MyClass.class.getMethod("run", Channel.class))
- *                      .call(JRoutineCore.&lt;Channel&lt;String, String&gt;&gt;of(channel)
- *                                        .buildChannel());
- *     </code>
- * </pre>
- *
+ * <pre><code>
+ * final Channel&lt;String, String&gt; channel =
+ *     JRoutineCore.&lt;String&gt;ofInputs().buildChannel();
+ * RoutineMethod.from(MyClass.class.getMethod("run", Channel.class))
+ *              .call(JRoutineCore.&lt;Channel&lt;String, String&gt;&gt;of(channel)
+ *                                .buildChannel());
+ * </code></pre>
  * <p>
  * Created by davide-maestroni on 08/10/2016.
  */

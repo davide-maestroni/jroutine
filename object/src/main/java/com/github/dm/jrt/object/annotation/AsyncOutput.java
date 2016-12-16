@@ -35,21 +35,15 @@ import java.lang.annotation.Target;
  * transferred outside the routine.
  * <p>
  * For example, a method returning an integer:
- * <pre>
- *     <code>
- *
- *         public int sum(int i1, int i2);
- *     </code>
- * </pre>
+ * <pre><code>
+ * public int sum(int i1, int i2);
+ * </code></pre>
  * <p>
  * can be proxied by a method defined as:
- * <pre>
- *     <code>
- *
- *         &#64;AsyncOutput
- *         public Channel&lt;?, Integer&gt; sum(int i1, int i2);
- *     </code>
- * </pre>
+ * <pre><code>
+ * &#64;AsyncOutput
+ * public Channel&lt;?, Integer&gt; sum(int i1, int i2);
+ * </code></pre>
  * Note that the transfer mode is specifically chosen through the annotation {@code mode} attribute
  * (it's {@link AsyncOutput.OutputMode#VALUE VALUE} by default).
  * <p>
@@ -68,15 +62,12 @@ import java.lang.annotation.Target;
  * <p>
  * Remember also that, in order for the annotation to properly work at run time, the following rules
  * must be added to the project Proguard file (if employed for shrinking or obfuscation):
- * <pre>
- *     <code>
- *
- *         -keepattributes RuntimeVisibleAnnotations
- *         -keepclassmembers class ** {
- *              &#64;com.github.dm.jrt.object.annotation.AsyncOutput *;
- *         }
- *     </code>
- * </pre>
+ * <pre><code>
+ * -keepattributes RuntimeVisibleAnnotations
+ * -keepclassmembers class ** {
+ *   &#64;com.github.dm.jrt.object.annotation.AsyncOutput *;
+ * }
+ * </code></pre>
  * <p>
  * Created by davide-maestroni on 05/24/2015.
  */

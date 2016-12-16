@@ -57,12 +57,9 @@ public class Channels {
    * Note also that the returned channel will be already closed.
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
-   * <pre>
-   *     <code>
-   *
-   *         =&gt; [B, A, A, C, B, C, B, A, B, ...]
-   *     </code>
-   * </pre>
+   * <pre><code>
+   * =&gt; [B, A, A, C, B, C, B, A, B, ...]
+   * </code></pre>
    *
    * @param channels the array of channels.
    * @param <OUT>    the output data type.
@@ -91,12 +88,9 @@ public class Channels {
    * Note also that the returned channel will be already closed.
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
-   * <pre>
-   *     <code>
-   *
-   *         =&gt; [B, A, A, C, B, C, B, A, B, ...]
-   *     </code>
-   * </pre>
+   * <pre><code>
+   * =&gt; [B, A, A, C, B, C, B, A, B, ...]
+   * </code></pre>
    *
    * @param channels the iterable of channels.
    * @param <OUT>    the output data type.
@@ -157,14 +151,11 @@ public class Channels {
    * Note that the builder will successfully create several channel instances.
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, their final output will be:
-   * <pre>
-   *     <code>
-   *
-   *         A =&gt; [Select(IN, 0).data, Select(IN, 0).data, Select(IN, 0).data, ...]
-   *         B =&gt; [Select(IN, 1).data, Select(IN, 1).data, Select(IN, 1).data, ...]
-   *         C =&gt; [Select(IN, 2).data, Select(IN, 2).data, Select(IN, 2).data, ...]
-   *     </code>
-   * </pre>
+   * <pre><code>
+   * A =&gt; [Selectable(IN, 0).data, Selectable(IN, 0).data, Selectable(IN, 0).data, ...]
+   * B =&gt; [Selectable(IN, 1).data, Selectable(IN, 1).data, Selectable(IN, 1).data, ...]
+   * C =&gt; [Selectable(IN, 2).data, Selectable(IN, 2).data, Selectable(IN, 2).data, ...]
+   * </code></pre>
    *
    * @param channels the array of channels.
    * @param <IN>     the input data type.
@@ -187,14 +178,11 @@ public class Channels {
    * Note that the builder will successfully create several channel instances.
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, their final output will be:
-   * <pre>
-   *     <code>
-   *
-   *         A =&gt; [Select(IN, startIndex + 0).data, Select(IN, startIndex + 0).data, ...]
-   *         B =&gt; [Select(IN, startIndex + 1).data, Select(IN, startIndex + 1).data, ...]
-   *         C =&gt; [Select(IN, startIndex + 2).data, Select(IN, startIndex + 2).data, ...]
-   *     </code>
-   * </pre>
+   * <pre><code>
+   * A =&gt; [Selectable(IN, startIndex + 0).data, Selectable(IN, startIndex + 0).data, ...]
+   * B =&gt; [Selectable(IN, startIndex + 1).data, Selectable(IN, startIndex + 1).data, ...]
+   * C =&gt; [Selectable(IN, startIndex + 2).data, Selectable(IN, startIndex + 2).data, ...]
+   * </code></pre>
    *
    * @param startIndex the selectable start index.
    * @param channels   the array of channels.
@@ -224,14 +212,11 @@ public class Channels {
    * Note that the builder will successfully create several channel instances.
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, their final output will be:
-   * <pre>
-   *     <code>
-   *
-   *         A =&gt; [Select(IN, startIndex + 0).data, Select(IN, startIndex + 0).data, ...]
-   *         B =&gt; [Select(IN, startIndex + 1).data, Select(IN, startIndex + 1).data, ...]
-   *         C =&gt; [Select(IN, startIndex + 2).data, Select(IN, startIndex + 2).data, ...]
-   *     </code>
-   * </pre>
+   * <pre><code>
+   * A =&gt; [Selectable(IN, startIndex + 0).data, Selectable(IN, startIndex + 0).data, ...]
+   * B =&gt; [Selectable(IN, startIndex + 1).data, Selectable(IN, startIndex + 1).data, ...]
+   * C =&gt; [Selectable(IN, startIndex + 2).data, Selectable(IN, startIndex + 2).data, ...]
+   * </code></pre>
    *
    * @param startIndex the selectable start index.
    * @param channels   the iterable of channels.
@@ -255,14 +240,11 @@ public class Channels {
    * Note that the builder will successfully create several channel instances.
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, their final output will be:
-   * <pre>
-   *     <code>
-   *
-   *         A =&gt; [Select(IN, 0).data, Select(IN, 0).data, Select(IN, 0).data, ...]
-   *         B =&gt; [Select(IN, 1).data, Select(IN, 1).data, Select(IN, 1).data, ...]
-   *         C =&gt; [Select(IN, 2).data, Select(IN, 2).data, Select(IN, 2).data, ...]
-   *     </code>
-   * </pre>
+   * <pre><code>
+   * A =&gt; [Selectable(IN, 0).data, Selectable(IN, 0).data, Selectable(IN, 0).data, ...]
+   * B =&gt; [Selectable(IN, 1).data, Selectable(IN, 1).data, Selectable(IN, 1).data, ...]
+   * C =&gt; [Selectable(IN, 2).data, Selectable(IN, 2).data, Selectable(IN, 2).data, ...]
+   * </code></pre>
    *
    * @param channels the iterable of channels.
    * @param <IN>     the input data type.
@@ -285,14 +267,11 @@ public class Channels {
    * Note that the builder will successfully create several channel instances.
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, their final output will be:
-   * <pre>
-   *     <code>
-   *
-   *         A =&gt; [Select(IN, key(A)).data, Select(IN, key(A)).data, ...]
-   *         B =&gt; [Select(IN, key(B)).data, Select(IN, key(B)).data, ...]
-   *         C =&gt; [Select(IN, key(C)).data, Select(IN, key(C)).data, ...]
-   *     </code>
-   * </pre>
+   * <pre><code>
+   * A =&gt; [Selectable(IN, key(A)).data, Selectable(IN, key(A)).data, ...]
+   * B =&gt; [Selectable(IN, key(B)).data, Selectable(IN, key(B)).data, ...]
+   * C =&gt; [Selectable(IN, key(C)).data, Selectable(IN, key(C)).data, ...]
+   * </code></pre>
    *
    * @param channels the map of indexes and channels.
    * @param <IN>     the input data type.
@@ -318,12 +297,9 @@ public class Channels {
    * Note also that the returned channel will be already closed.
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
-   * <pre>
-   *     <code>
-   *
-   *         =&gt; [A, A, A, ..., B, B, B, ..., C, C, C, ...]
-   *     </code>
-   * </pre>
+   * <pre><code>
+   * =&gt; [A, A, A, ..., B, B, B, ..., C, C, C, ...]
+   * </code></pre>
    *
    * @param channels the array of channels.
    * @param <OUT>    the output data type.
@@ -354,12 +330,9 @@ public class Channels {
    * Note also that the returned channel will be already closed.
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
-   * <pre>
-   *     <code>
-   *
-   *         =&gt; [A, A, A, ..., B, B, B, ..., C, C, C, ...]
-   *     </code>
-   * </pre>
+   * <pre><code>
+   * =&gt; [A, A, A, ..., B, B, B, ..., C, C, C, ...]
+   * </code></pre>
    *
    * @param channels the iterable of channels.
    * @param <OUT>    the output data type.
@@ -381,14 +354,11 @@ public class Channels {
    * Note that the builder will successfully create several channel instances.
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, their final output will be:
-   * <pre>
-   *     <code>
-   *
-   *         A =&gt; [list(0), list(0), list(0), ..., list(0), ..., list(0), ...]
-   *         B =&gt; [list(1), list(1), list(1), ..., list(1), ..., list(1)]
-   *         C =&gt; [list(2), list(2), list(2), ..., list(2)]
-   *     </code>
-   * </pre>
+   * <pre><code>
+   * A =&gt; [list(0), list(0), list(0), ..., list(0), ..., list(0), ...]
+   * B =&gt; [list(1), list(1), list(1), ..., list(1), ..., list(1)]
+   * C =&gt; [list(2), list(2), list(2), ..., list(2)]
+   * </code></pre>
    *
    * @param channels the array of channels.
    * @param <IN>     the input data type.
@@ -412,14 +382,11 @@ public class Channels {
    * Note that the builder will successfully create several channel instances.
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, their final output will be:
-   * <pre>
-   *     <code>
-   *
-   *         A =&gt; [list(0), list(0), list(0), ..., list(0), ..., list(0), ...]
-   *         B =&gt; [list(1), list(1), list(1), ..., list(1), ..., list(1), placeholder, ...]
-   *         C =&gt; [list(2), list(2), list(2), ..., list(2), placeholder, placeholder, ...]
-   *     </code>
-   * </pre>
+   * <pre><code>
+   * A =&gt; [list(0), list(0), list(0), ..., list(0), ..., list(0), ...]
+   * B =&gt; [list(1), list(1), list(1), ..., list(1), ..., list(1), placeholder, ...]
+   * C =&gt; [list(2), list(2), list(2), ..., list(2), placeholder, placeholder, ...]
+   * </code></pre>
    *
    * @param placeholder the placeholder instance.
    * @param channels    the array of channels.
@@ -444,14 +411,11 @@ public class Channels {
    * Note that the builder will successfully create several channel instances.
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, their final output will be:
-   * <pre>
-   *     <code>
-   *
-   *         A =&gt; [list(0), list(0), list(0), ..., list(0), ..., list(0), ...]
-   *         B =&gt; [list(1), list(1), list(1), ..., list(1), ..., list(1), placeholder, ...]
-   *         C =&gt; [list(2), list(2), list(2), ..., list(2), placeholder, placeholder, ...]
-   *     </code>
-   * </pre>
+   * <pre><code>
+   * A =&gt; [list(0), list(0), list(0), ..., list(0), ..., list(0), ...]
+   * B =&gt; [list(1), list(1), list(1), ..., list(1), ..., list(1), placeholder, ...]
+   * C =&gt; [list(2), list(2), list(2), ..., list(2), placeholder, placeholder, ...]
+   * </code></pre>
    *
    * @param placeholder the placeholder instance.
    * @param channels    the iterable of channels.
@@ -475,14 +439,11 @@ public class Channels {
    * Note that the builder will successfully create several channel instances.
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, their final output will be:
-   * <pre>
-   *     <code>
-   *
-   *         A =&gt; [list(0), list(0), list(0), ..., list(0), ..., list(0), ...]
-   *         B =&gt; [list(1), list(1), list(1), ..., list(1), ..., list(1)]
-   *         C =&gt; [list(2), list(2), list(2), ..., list(2)]
-   *     </code>
-   * </pre>
+   * <pre><code>
+   * A =&gt; [list(0), list(0), list(0), ..., list(0), ..., list(0), ...]
+   * B =&gt; [list(1), list(1), list(1), ..., list(1), ..., list(1)]
+   * C =&gt; [list(2), list(2), list(2), ..., list(2)]
+   * </code></pre>
    *
    * @param channels the iterable of channels.
    * @param <IN>     the input data type.
@@ -547,12 +508,9 @@ public class Channels {
    * Note also that the returned channel will be already closed.
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
-   * <pre>
-   *     <code>
-   *
-   *         =&gt; [(A, B, C), (A, B, C), (A, B, C), ...]
-   *     </code>
-   * </pre>
+   * <pre><code>
+   * =&gt; [(A, B, C), (A, B, C), (A, B, C), ...]
+   * </code></pre>
    *
    * @param channels the array of channels.
    * @param <OUT>    the output data type.
@@ -577,12 +535,9 @@ public class Channels {
    * Note also that the returned channel will be already closed.
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
-   * <pre>
-   *     <code>
-   *
-   *         =&gt; [(A, B, C), (A, B, C), (A, B, C), ...]
-   *     </code>
-   * </pre>
+   * <pre><code>
+   * =&gt; [(A, B, C), (A, B, C), (A, B, C), ...]
+   * </code></pre>
    *
    * @param channels the iterable of channels.
    * @param <OUT>    the output data type.
@@ -611,12 +566,9 @@ public class Channels {
    * Note also that the returned channel will be already closed.
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
-   * <pre>
-   *     <code>
-   *
-   *         =&gt; [(A, B, C), ..., (placeholder, B, C), ..., (placeholder, B, placeholder), ...]
-   *     </code>
-   * </pre>
+   * <pre><code>
+   * =&gt; [(A, B, C), ..., (placeholder, B, C), ..., (placeholder, B, placeholder), ...]
+   * </code></pre>
    *
    * @param placeholder the placeholder instance.
    * @param channels    the array of channels.
@@ -646,12 +598,9 @@ public class Channels {
    * Note also that the returned channel will be already closed.
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
-   * <pre>
-   *     <code>
-   *
-   *         =&gt; [(A, B, C), ..., (placeholder, B, C), ..., (placeholder, B, placeholder), ...]
-   *     </code>
-   * </pre>
+   * <pre><code>
+   * =&gt; [(A, B, C), ..., (placeholder, B, C), ..., (placeholder, B, placeholder), ...]
+   * </code></pre>
    *
    * @param placeholder the placeholder instance.
    * @param channels    the iterable of channels.
@@ -678,12 +627,9 @@ public class Channels {
    * Note also that the returned channel will be already closed.
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
-   * <pre>
-   *     <code>
-   *
-   *         =&gt; [Select(B, 1), Select(A, 0), Select(A, 0), Select(C, 2), Select(A, 0), ...]
-   *     </code>
-   * </pre>
+   * <pre><code>
+   * =&gt; [Selectable(B, 1), Selectable(A, 0), Selectable(C, 2), Selectable(A, 0), ...]
+   * </code></pre>
    *
    * @param channels the channels to merge.
    * @param <OUT>    the output data type.
@@ -709,12 +655,9 @@ public class Channels {
    * Note also that the returned channel will be already closed.
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
-   * <pre>
-   *     <code>
-   *
-   *         =&gt; [Select(B, startIndex + 1), Select(A, startIndex + 0), ...]
-   *     </code>
-   * </pre>
+   * <pre><code>
+   * =&gt; [Selectable(B, startIndex + 1), Selectable(A, startIndex + 0), ...]
+   * </code></pre>
    *
    * @param startIndex the selectable start index.
    * @param channels   the array of channels.
@@ -746,12 +689,9 @@ public class Channels {
    * Note also that the returned channel will be already closed.
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
-   * <pre>
-   *     <code>
-   *
-   *         =&gt; [Select(B, startIndex + 1), Select(A, startIndex + 0), ...]
-   *     </code>
-   * </pre>
+   * <pre><code>
+   * =&gt; [Selectable(B, startIndex + 1), Selectable(A, startIndex + 0), ...]
+   * </code></pre>
    *
    * @param startIndex the selectable start index.
    * @param channels   the iterable of channels.
@@ -778,12 +718,9 @@ public class Channels {
    * Note also that the returned channel will be already closed.
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
-   * <pre>
-   *     <code>
-   *
-   *         =&gt; [Select(B, 1), Select(A, 0), Select(A, 0), Select(C, 2), Select(A, 0), ...]
-   *     </code>
-   * </pre>
+   * <pre><code>
+   * =&gt; [Selectable(B, 1), Selectable(A, 0), Selectable(C, 2), Selectable(A, 0), ...]
+   * </code></pre>
    *
    * @param channels the channels to merge.
    * @param <OUT>    the output data type.
@@ -809,12 +746,9 @@ public class Channels {
    * Note also that the returned channel will be already closed.
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
-   * <pre>
-   *     <code>
-   *
-   *         =&gt; [Select(B, key(B)), Select(A, key(A)), Select(C, key(C)), ...]
-   *     </code>
-   * </pre>
+   * <pre><code>
+   * =&gt; [Selectable(B, key(B)), Selectable(A, key(A)), Selectable(C, key(C)), ...]
+   * </code></pre>
    *
    * @param channels the map of indexes and channels.
    * @param <OUT>    the output data type.
@@ -845,12 +779,9 @@ public class Channels {
    * Note also that the returned channel will be already closed.
    * <p>
    * Given channel {@code A}, the final output will be:
-   * <pre>
-   *     <code>
-   *
-   *         =&gt; [A, A, A, ...] =&gt; [A, A, A, ...] =&gt; [A, A, A, ...] ...
-   *     </code>
-   * </pre>
+   * <pre><code>
+   * =&gt; [A, A, A, ...] =&gt; [A, A, A, ...] =&gt; [A, A, A, ...] ...
+   * </code></pre>
    *
    * @param channel the channel.
    * @param <OUT>   the output data type.
@@ -867,12 +798,9 @@ public class Channels {
    * Note that the builder will successfully create several channel instances.
    * <p>
    * Given channel {@code A}, its final output will be:
-   * <pre>
-   *     <code>
-   *
-   *         A =&gt; [Select(IN, index), Select(IN, index), Select(IN, index), ...]
-   *     </code>
-   * </pre>
+   * <pre><code>
+   * A =&gt; [Selectable(IN, index), Selectable(IN, index), Selectable(IN, index), ...]
+   * </code></pre>
    *
    * @param channel the selectable channel.
    * @param index   the channel index.
@@ -893,12 +821,9 @@ public class Channels {
    * <p>
    * Given channel {@code A} and channels {@code IN1}, {@code IN2} and {@code IN3} in the returned
    * map, the final output of {@code A} will be:
-   * <pre>
-   *     <code>
-   *
-   *         A =&gt; [Select(IN2, indexes[1]), Select(IN1, indexes[0]), ...]
-   *     </code>
-   * </pre>
+   * <pre><code>
+   * A =&gt; [Selectable(IN2, indexes[1]), Selectable(IN1, indexes[0]), ...]
+   * </code></pre>
    *
    * @param channel the selectable channel.
    * @param indexes the array of indexes.
@@ -926,12 +851,9 @@ public class Channels {
    * <p>
    * Given channel {@code A} and channels {@code IN1}, {@code IN2} and {@code IN3} in the returned
    * map, the final output of {@code A} will be:
-   * <pre>
-   *     <code>
-   *
-   *         A =&gt; [Select(IN2, indexes[1]), Select(IN1, indexes[0]), ...]
-   *     </code>
-   * </pre>
+   * <pre><code>
+   * A =&gt; [Selectable(IN2, indexes[1]), Selectable(IN1, indexes[0]), ...]
+   * </code></pre>
    *
    * @param channel the selectable channel.
    * @param indexes the iterable returning the channel indexes.
@@ -960,12 +882,9 @@ public class Channels {
    * <p>
    * Given channel {@code A} and channels {@code IN1}, {@code IN2} and {@code IN3} in the returned
    * map, the final output of {@code A} will be:
-   * <pre>
-   *     <code>
-   *
-   *         A =&gt; [Select(IN2, startIndex + 1), Select(IN1, startIndex + 0), ...]
-   *     </code>
-   * </pre>
+   * <pre><code>
+   * A =&gt; [Selectable(IN2, startIndex + 1), Selectable(IN1, startIndex + 0), ...]
+   * </code></pre>
    *
    * @param startIndex the selectable start index.
    * @param rangeSize  the size of the range of indexes (must be positive).
@@ -1000,14 +919,11 @@ public class Channels {
    * <p>
    * Given channels {@code A}, {@code B} and {@code C} in the returned map, the final output will
    * be:
-   * <pre>
-   *     <code>
-   *
-   *         A =&gt; [Select(IN, indexes[0]).data, Select(IN, indexes[0]).data, ...]
-   *         B =&gt; [Select(IN, indexes[1]).data, Select(IN, indexes[1]).data, ...]
-   *         C =&gt; [Select(IN, indexes[2]).data, Select(IN, indexes[2]).data, ...]
-   *     </code>
-   * </pre>
+   * <pre><code>
+   * A =&gt; [Selectable(IN, indexes[0]).data, Selectable(IN, indexes[0]).data, ...]
+   * B =&gt; [Selectable(IN, indexes[1]).data, Selectable(IN, indexes[1]).data, ...]
+   * C =&gt; [Selectable(IN, indexes[2]).data, Selectable(IN, indexes[2]).data, ...]
+   * </code></pre>
    *
    * @param channel the selectable channel.
    * @param indexes the list of indexes.
@@ -1039,14 +955,11 @@ public class Channels {
    * <p>
    * Given channels {@code A}, {@code B} and {@code C} in the returned map, the final output will
    * be:
-   * <pre>
-   *     <code>
-   *
-   *         A =&gt; [Select(IN, indexes[0]).data, Select(IN, indexes[0]).data, ...]
-   *         B =&gt; [Select(IN, indexes[1]).data, Select(IN, indexes[1]).data, ...]
-   *         C =&gt; [Select(IN, indexes[2]).data, Select(IN, indexes[2]).data, ...]
-   *     </code>
-   * </pre>
+   * <pre><code>
+   * A =&gt; [Selectable(IN, indexes[0]).data, Selectable(IN, indexes[0]).data, ...]
+   * B =&gt; [Selectable(IN, indexes[1]).data, Selectable(IN, indexes[1]).data, ...]
+   * C =&gt; [Selectable(IN, indexes[2]).data, Selectable(IN, indexes[2]).data, ...]
+   * </code></pre>
    *
    * @param channel the selectable channel.
    * @param indexes the iterable returning the channel indexes.
@@ -1078,14 +991,11 @@ public class Channels {
    * <p>
    * Given channels {@code A}, {@code B} and {@code C} in the returned map, the final output will
    * be:
-   * <pre>
-   *     <code>
-   *
-   *         A =&gt; [Select(IN, startIndex + 0).data, Select(IN, startIndex + 0).data, ...]
-   *         B =&gt; [Select(IN, startIndex + 1).data, Select(IN, startIndex + 1).data, ...]
-   *         C =&gt; [Select(IN, startIndex + 2).data, Select(IN, startIndex + 2).data, ...]
-   *     </code>
-   * </pre>
+   * <pre><code>
+   * A =&gt; [Selectable(IN, startIndex + 0).data, Selectable(IN, startIndex + 0).data, ...]
+   * B =&gt; [Selectable(IN, startIndex + 1).data, Selectable(IN, startIndex + 1).data, ...]
+   * C =&gt; [Selectable(IN, startIndex + 2).data, Selectable(IN, startIndex + 2).data, ...]
+   * </code></pre>
    *
    * @param startIndex the selectable start index.
    * @param rangeSize  the size of the range of indexes (must be positive).
@@ -1115,12 +1025,9 @@ public class Channels {
    * Note that the builder will return the same instance for the same input and equal configuration.
    * <p>
    * Given channel {@code A}, its final output will be:
-   * <pre>
-   *     <code>
-   *
-   *         A =&gt; [Select(IN, index).data, Select(IN, index).data, Select(IN, index).data, ...]
-   *     </code>
-   * </pre>
+   * <pre><code>
+   * A =&gt; [Selectable(IN, index).data, Selectable(IN, index).data, ...]
+   * </code></pre>
    *
    * @param channel the channel to make selectable.
    * @param index   the channel index.
@@ -1144,12 +1051,9 @@ public class Channels {
    * Note also that the returned channel will be already closed.
    * <p>
    * Given channel {@code A}, the final output will be:
-   * <pre>
-   *     <code>
-   *
-   *         =&gt; [Select(A, index), Select(A, index), Select(A, index), ...]
-   *     </code>
-   * </pre>
+   * <pre><code>
+   * =&gt; [Selectable(A, index), Selectable(A, index), Selectable(A, index), ...]
+   * </code></pre>
    *
    * @param channel the channel to make selectable.
    * @param index   the channel index.

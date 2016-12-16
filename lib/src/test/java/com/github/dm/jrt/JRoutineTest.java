@@ -87,7 +87,7 @@ public class JRoutineTest {
                                                     .withLog(new NullLog())
                                                     .configured()
                                                     .method(TestClass.GET);
-    assertThat(routine.close().inMax(timeout).all()).containsExactly(-77L);
+    assertThat(routine.close().in(timeout).all()).containsExactly(-77L);
   }
 
   @Test
@@ -105,7 +105,7 @@ public class JRoutineTest {
         return builder.toString();
       }
     }).buildRoutine();
-    assertThat(routine.call("test", "1").inMax(seconds(1)).all()).containsOnly("test1");
+    assertThat(routine.call("test", "1").in(seconds(1)).all()).containsOnly("test1");
   }
 
   @Test
@@ -140,8 +140,8 @@ public class JRoutineTest {
           }
         })).buildRoutine();
 
-    assertThat(
-        sumRoutine.call(squareRoutine.call(1, 2, 3, 4)).inMax(timeout).all()).containsExactly(30);
+    assertThat(sumRoutine.call(squareRoutine.call(1, 2, 3, 4)).in(timeout).all()).containsExactly(
+        30);
   }
 
   @Test
@@ -169,7 +169,7 @@ public class JRoutineTest {
   public void testCommandInvocation() {
 
     final Routine<Void, String> routine = JRoutine.with(new GetString()).buildRoutine();
-    assertThat(routine.close().inMax(seconds(1)).all()).containsOnly("test");
+    assertThat(routine.close().in(seconds(1)).all()).containsOnly("test");
   }
 
   @Test
@@ -198,7 +198,7 @@ public class JRoutineTest {
             result.pass("test", "1");
           }
         }).buildRoutine();
-    assertThat(routine.close().inMax(seconds(1)).all()).containsOnly("test", "1");
+    assertThat(routine.close().in(seconds(1)).all()).containsOnly("test", "1");
   }
 
   @Test
@@ -217,7 +217,7 @@ public class JRoutineTest {
             result.pass(builder.toString());
           }
         }).buildRoutine();
-    assertThat(routine.call("test", "1").inMax(seconds(1)).all()).containsOnly("test1");
+    assertThat(routine.call("test", "1").in(seconds(1)).all()).containsOnly("test1");
   }
 
   @Test
@@ -231,7 +231,7 @@ public class JRoutineTest {
             result.pass(o.toString());
           }
         }).buildRoutine();
-    assertThat(routine.call("test", 1).inMax(seconds(1)).all()).containsOnly("test", "1");
+    assertThat(routine.call("test", 1).in(seconds(1)).all()).containsOnly("test", "1");
   }
 
   @Test
@@ -244,7 +244,7 @@ public class JRoutineTest {
         return o.toString();
       }
     }).buildRoutine();
-    assertThat(routine.call("test", 1).inMax(seconds(1)).all()).containsOnly("test", "1");
+    assertThat(routine.call("test", 1).in(seconds(1)).all()).containsOnly("test", "1");
   }
 
   @Test
@@ -252,7 +252,7 @@ public class JRoutineTest {
     assertThat(JRoutine.withInstance("test")
                        .method("toString")
                        .close()
-                       .inMax(seconds(1))
+                       .in(seconds(1))
                        .all()).containsExactly("test");
   }
 
@@ -261,28 +261,28 @@ public class JRoutineTest {
 
     final Routine<String, String> routine =
         JRoutine.with((Invocation<String, String>) new ToCase()).buildRoutine();
-    assertThat(routine.call("TEST").inMax(seconds(1)).all()).containsOnly("test");
+    assertThat(routine.call("TEST").in(seconds(1)).all()).containsOnly("test");
   }
 
   @Test
   public void testInvocationAndArgs() {
 
     final Routine<String, String> routine = JRoutine.with(new ToCase(), true).buildRoutine();
-    assertThat(routine.call("test").inMax(seconds(1)).all()).containsOnly("TEST");
+    assertThat(routine.call("test").in(seconds(1)).all()).containsOnly("TEST");
   }
 
   @Test
   public void testInvocationClass() {
 
     final Routine<String, String> routine = JRoutine.with(ToCase.class).buildRoutine();
-    assertThat(routine.call("TEST").inMax(seconds(1)).all()).containsOnly("test");
+    assertThat(routine.call("TEST").in(seconds(1)).all()).containsOnly("test");
   }
 
   @Test
   public void testInvocationClassAndArgs() {
 
     final Routine<String, String> routine = JRoutine.with(ToCase.class, true).buildRoutine();
-    assertThat(routine.call("test").inMax(seconds(1)).all()).containsOnly("TEST");
+    assertThat(routine.call("test").in(seconds(1)).all()).containsOnly("TEST");
   }
 
   @Test
@@ -290,14 +290,14 @@ public class JRoutineTest {
 
     final Routine<String, String> routine =
         JRoutine.with((InvocationFactory<String, String>) new ToCase()).buildRoutine();
-    assertThat(routine.call("TEST").inMax(seconds(1)).all()).containsOnly("test");
+    assertThat(routine.call("TEST").in(seconds(1)).all()).containsOnly("test");
   }
 
   @Test
   public void testInvocationToken() {
 
     final Routine<String, String> routine = JRoutine.with(tokenOf(ToCase.class)).buildRoutine();
-    assertThat(routine.call("TEST").inMax(seconds(1)).all()).containsOnly("test");
+    assertThat(routine.call("TEST").in(seconds(1)).all()).containsOnly("test");
   }
 
   @Test
@@ -305,14 +305,14 @@ public class JRoutineTest {
 
     final Routine<String, String> routine =
         JRoutine.with(tokenOf(ToCase.class), true).buildRoutine();
-    assertThat(routine.call("test").inMax(seconds(1)).all()).containsOnly("TEST");
+    assertThat(routine.call("test").in(seconds(1)).all()).containsOnly("TEST");
   }
 
   @Test
   public void testMappingInvocation() {
 
     final Routine<String, String> routine = JRoutine.with(new ToCase()).buildRoutine();
-    assertThat(routine.call("TEST").inMax(seconds(1)).all()).containsOnly("test");
+    assertThat(routine.call("TEST").in(seconds(1)).all()).containsOnly("test");
   }
 
   @Test
@@ -435,14 +435,12 @@ public class JRoutineTest {
   public void testOf() {
     final Channel<?, Integer> channel = JRoutine.of(2).buildChannel();
     assertThat(channel.isOpen()).isFalse();
-    assertThat(channel.inMax(seconds(1)).all()).containsExactly(2);
-    assertThat(JRoutine.of().buildChannel().inMax(seconds(1)).all()).isEmpty();
-    assertThat(JRoutine.of(-11, 73).buildChannel().inMax(seconds(1)).all()).containsExactly(-11,
-        73);
-    assertThat(JRoutine.of(Arrays.asList(3, 12, -7))
-                       .buildChannel()
-                       .inMax(seconds(1))
-                       .all()).containsExactly(3, 12, -7);
+    assertThat(channel.in(seconds(1)).all()).containsExactly(2);
+    assertThat(JRoutine.of().buildChannel().in(seconds(1)).all()).isEmpty();
+    assertThat(JRoutine.of(-11, 73).buildChannel().in(seconds(1)).all()).containsExactly(-11, 73);
+    assertThat(
+        JRoutine.of(Arrays.asList(3, 12, -7)).buildChannel().in(seconds(1)).all()).containsExactly(
+        3, 12, -7);
     assertThat(JRoutine.of((Object[]) null).buildChannel().all()).isEmpty();
     assertThat(JRoutine.of((List<Object>) null).buildChannel().all()).isEmpty();
   }
@@ -475,7 +473,7 @@ public class JRoutineTest {
         return s.length() > 1;
       }
     }).buildRoutine();
-    assertThat(routine.call("test", "1").inMax(seconds(1)).all()).containsOnly("test");
+    assertThat(routine.call("test", "1").in(seconds(1)).all()).containsOnly("test");
   }
 
   @Test
@@ -519,7 +517,7 @@ public class JRoutineTest {
                                              .sync()
                                              .map(Operators.<Double>averageDouble())
                                              .close()
-                                             .inMax(seconds(3))
+                                             .in(seconds(3))
                                              .next()).isCloseTo(21, Offset.offset(0.1));
   }
 
@@ -662,7 +660,7 @@ public class JRoutineTest {
         return "test";
       }
     }).buildRoutine();
-    assertThat(routine.close().inMax(seconds(1)).all()).containsOnly("test");
+    assertThat(routine.close().in(seconds(1)).all()).containsOnly("test");
   }
 
   @Test
@@ -675,7 +673,7 @@ public class JRoutineTest {
         return new ToCase();
       }
     }).buildRoutine();
-    assertThat(routine.call("TEST").inMax(seconds(1)).all()).containsOnly("test");
+    assertThat(routine.call("TEST").in(seconds(1)).all()).containsOnly("test");
   }
 
   public interface TestItf {

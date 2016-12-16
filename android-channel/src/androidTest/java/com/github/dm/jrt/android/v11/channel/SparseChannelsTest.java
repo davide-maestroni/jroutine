@@ -119,9 +119,9 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
                   .pass(new ParcelableSelectable<String>("test5", 31))
                   .pass(new ParcelableSelectable<Integer>(5, 17))
                   .close();
-    assertThat(channel1.close().inMax(seconds(10)).all()).containsExactly("test1", "test2", "test3",
+    assertThat(channel1.close().in(seconds(10)).all()).containsExactly("test1", "test2", "test3",
         "test4", "test5");
-    assertThat(channel2.close().inMax(seconds(10)).all()).containsExactly(1, 2, 3, 4, 5);
+    assertThat(channel2.close().in(seconds(10)).all()).containsExactly(1, 2, 3, 4, 5);
   }
 
   public void testCombineAbort() {
@@ -145,7 +145,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
 
     try {
 
-      channel1.close().inMax(seconds(10)).next();
+      channel1.close().in(seconds(10)).next();
 
       fail();
 
@@ -155,7 +155,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
 
     try {
 
-      channel2.close().inMax(seconds(10)).next();
+      channel2.close().in(seconds(10)).next();
 
       fail();
 
@@ -175,7 +175,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
 
     try {
 
-      channel1.close().inMax(seconds(10)).next();
+      channel1.close().in(seconds(10)).next();
 
       fail();
 
@@ -185,7 +185,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
 
     try {
 
-      channel2.close().inMax(seconds(10)).next();
+      channel2.close().in(seconds(10)).next();
 
       fail();
 
@@ -205,7 +205,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
 
     try {
 
-      channel1.close().inMax(seconds(10)).next();
+      channel1.close().in(seconds(10)).next();
 
       fail();
 
@@ -215,7 +215,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
 
     try {
 
-      channel2.close().inMax(seconds(10)).next();
+      channel2.close().in(seconds(10)).next();
 
       fail();
 
@@ -237,7 +237,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
 
     try {
 
-      channel1.close().inMax(seconds(10)).next();
+      channel1.close().in(seconds(10)).next();
 
       fail();
 
@@ -247,7 +247,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
 
     try {
 
-      channel2.close().inMax(seconds(10)).next();
+      channel2.close().in(seconds(10)).next();
 
       fail();
 
@@ -270,7 +270,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
 
     try {
 
-      channel1.close().inMax(seconds(10)).next();
+      channel1.close().in(seconds(10)).next();
 
       fail();
 
@@ -280,7 +280,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
 
     try {
 
-      channel2.close().inMax(seconds(10)).next();
+      channel2.close().in(seconds(10)).next();
 
       fail();
 
@@ -400,20 +400,20 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
                       .buildChannelArray();
     channelMap.get(Sort.INTEGER).pass(-11).close();
     channelMap.get(Sort.STRING).pass("test21").close();
-    assertThat(channel.close().inMax(seconds(10)).all()).containsOnlyElementsOf(outputs);
+    assertThat(channel.close().in(seconds(10)).all()).containsOnlyElementsOf(outputs);
     channel = routine.call();
     channelMap = SparseChannels.selectInputParcelable(channel, Sort.INTEGER, Sort.STRING)
                                .buildChannelArray();
     channelMap.get(Sort.INTEGER).pass(-11).close();
     channelMap.get(Sort.STRING).pass("test21").close();
-    assertThat(channel.close().inMax(seconds(10)).all()).containsOnlyElementsOf(outputs);
+    assertThat(channel.close().in(seconds(10)).all()).containsOnlyElementsOf(outputs);
     channel = routine.call();
     channelMap =
         SparseChannels.selectInputParcelable(Math.min(Sort.INTEGER, Sort.STRING), 2, channel)
                       .buildChannelArray();
     channelMap.get(Sort.INTEGER).pass(-11).close();
     channelMap.get(Sort.STRING).pass("test21").close();
-    assertThat(channel.close().inMax(seconds(10)).all()).containsOnlyElementsOf(outputs);
+    assertThat(channel.close().in(seconds(10)).all()).containsOnlyElementsOf(outputs);
   }
 
   public void testInputMapAbort() {
@@ -436,7 +436,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
 
     try {
 
-      channel.close().inMax(seconds(10)).all();
+      channel.close().in(seconds(10)).all();
 
       fail();
 
@@ -452,7 +452,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
 
     try {
 
-      channel.close().inMax(seconds(10)).all();
+      channel.close().in(seconds(10)).all();
 
       fail();
 
@@ -469,7 +469,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
 
     try {
 
-      channel.close().inMax(seconds(10)).all();
+      channel.close().in(seconds(10)).all();
 
       fail();
 
@@ -539,9 +539,9 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
     channel1.close();
     channel2.close();
 
-    assertThat(channelMap.get(Sort.STRING).inMax(seconds(10)).all()).containsExactly("0", "1", "2",
+    assertThat(channelMap.get(Sort.STRING).in(seconds(10)).all()).containsExactly("0", "1", "2",
         "3");
-    assertThat(channelMap.get(Sort.INTEGER).inMax(seconds(10)).all()).containsExactly(0, 1, 2, 3);
+    assertThat(channelMap.get(Sort.INTEGER).in(seconds(10)).all()).containsExactly(0, 1, 2, 3);
   }
 
   @SuppressWarnings("unchecked")
@@ -569,7 +569,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
         SparseChannels.mergeParcelable(channelMap).buildChannel();
     channel1.pass("test3").close();
     channel2.pass(111).close();
-    assertThat(outputChannel.inMax(seconds(10)).all()).containsOnly(
+    assertThat(outputChannel.in(seconds(10)).all()).containsOnly(
         new ParcelableSelectable<String>("test3", 7), new ParcelableSelectable<Integer>(111, -3));
   }
 
@@ -601,7 +601,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
 
     try {
 
-      outputChannel.inMax(seconds(10)).all();
+      outputChannel.in(seconds(10)).all();
 
       fail();
 
@@ -645,21 +645,21 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
     channelMap =
         SparseChannels.selectOutputParcelable(channel, Arrays.asList(Sort.INTEGER, Sort.STRING))
                       .buildChannelArray();
-    assertThat(channelMap.get(Sort.INTEGER).inMax(seconds(10)).all()).containsOnly(-11);
-    assertThat(channelMap.get(Sort.STRING).inMax(seconds(10)).all()).containsOnly("test21");
+    assertThat(channelMap.get(Sort.INTEGER).in(seconds(10)).all()).containsOnly(-11);
+    assertThat(channelMap.get(Sort.STRING).in(seconds(10)).all()).containsOnly("test21");
     channel = routine.call(new ParcelableSelectable<Object>(-11, Sort.INTEGER),
         new ParcelableSelectable<Object>("test21", Sort.STRING));
     channelMap = SparseChannels.selectOutputParcelable(channel, Sort.INTEGER, Sort.STRING)
                                .buildChannelArray();
-    assertThat(channelMap.get(Sort.INTEGER).inMax(seconds(10)).all()).containsOnly(-11);
-    assertThat(channelMap.get(Sort.STRING).inMax(seconds(10)).all()).containsOnly("test21");
+    assertThat(channelMap.get(Sort.INTEGER).in(seconds(10)).all()).containsOnly(-11);
+    assertThat(channelMap.get(Sort.STRING).in(seconds(10)).all()).containsOnly("test21");
     channel = routine.call(new ParcelableSelectable<Object>("test21", Sort.STRING),
         new ParcelableSelectable<Object>(-11, Sort.INTEGER));
     channelMap =
         SparseChannels.selectOutputParcelable(Math.min(Sort.INTEGER, Sort.STRING), 2, channel)
                       .buildChannelArray();
-    assertThat(channelMap.get(Sort.INTEGER).inMax(seconds(10)).all()).containsOnly(-11);
-    assertThat(channelMap.get(Sort.STRING).inMax(seconds(10)).all()).containsOnly("test21");
+    assertThat(channelMap.get(Sort.INTEGER).in(seconds(10)).all()).containsOnly(-11);
+    assertThat(channelMap.get(Sort.STRING).in(seconds(10)).all()).containsOnly("test21");
   }
 
   @SuppressWarnings("unchecked")
@@ -685,7 +685,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
 
     try {
 
-      channelMap.get(Sort.STRING).inMax(seconds(10)).all();
+      channelMap.get(Sort.STRING).in(seconds(10)).all();
 
       fail();
 
@@ -695,7 +695,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
 
     try {
 
-      channelMap.get(Sort.INTEGER).inMax(seconds(10)).all();
+      channelMap.get(Sort.INTEGER).in(seconds(10)).all();
 
       fail();
 
@@ -713,7 +713,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
 
     try {
 
-      channelMap.get(Sort.STRING).inMax(seconds(10)).all();
+      channelMap.get(Sort.STRING).in(seconds(10)).all();
 
       fail();
 
@@ -723,7 +723,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
 
     try {
 
-      channelMap.get(Sort.INTEGER).inMax(seconds(10)).all();
+      channelMap.get(Sort.INTEGER).in(seconds(10)).all();
 
       fail();
 
@@ -742,7 +742,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
 
     try {
 
-      channelMap.get(Sort.STRING).inMax(seconds(10)).all();
+      channelMap.get(Sort.STRING).in(seconds(10)).all();
 
       fail();
 
@@ -752,7 +752,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
 
     try {
 
-      channelMap.get(Sort.INTEGER).inMax(seconds(10)).all();
+      channelMap.get(Sort.INTEGER).in(seconds(10)).all();
 
       fail();
 
@@ -814,7 +814,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
         new ParcelableSelectable<String>("test3", 33),
         new ParcelableSelectable<String>("test4", 333));
     channel.close();
-    assertThat(outputChannel.inMax(seconds(10)).all()).containsExactly("test1", "test3");
+    assertThat(outputChannel.in(seconds(10)).all()).containsExactly("test1", "test3");
   }
 
   public void testOutputSelectAbort() {
@@ -832,7 +832,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
 
     try {
 
-      outputChannel.inMax(seconds(10)).all();
+      outputChannel.in(seconds(10)).all();
 
       fail();
 

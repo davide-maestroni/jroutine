@@ -59,7 +59,7 @@ public class ReplayChannelTest {
     assertThat(channel.getComplete()).isTrue();
     assertThat(channel.isBound()).isFalse();
     final ArrayList<String> results = new ArrayList<String>();
-    assertThat(channel.inMax(1, TimeUnit.SECONDS).hasNext()).isTrue();
+    assertThat(channel.in(1, TimeUnit.SECONDS).hasNext()).isTrue();
     channel.inNoTime().allInto(results);
     assertThat(results).containsExactly("test");
     channel =
@@ -391,7 +391,7 @@ public class ReplayChannelTest {
 
     }
 
-    channel.inMax(seconds(3));
+    channel.in(seconds(3));
     try {
       channel.remove();
       fail();
@@ -400,7 +400,7 @@ public class ReplayChannelTest {
 
     }
 
-    channel.inMax(3, TimeUnit.SECONDS);
+    channel.in(3, TimeUnit.SECONDS);
     try {
       channel.remove();
       fail();
@@ -473,7 +473,7 @@ public class ReplayChannelTest {
     assertThat(channel.outputSize()).isEqualTo(0);
     final Channel<?, Object> result =
         Channels.replay(channel.afterNoDelay().close()).buildChannel();
-    assertThat(result.inMax(seconds(1)).getComplete()).isTrue();
+    assertThat(result.in(seconds(1)).getComplete()).isTrue();
     assertThat(result.inputSize()).isEqualTo(0);
     assertThat(result.outputSize()).isEqualTo(1);
     assertThat(result.size()).isEqualTo(1);

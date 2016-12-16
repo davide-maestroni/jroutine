@@ -178,7 +178,7 @@ public class RoutineAdapterFactoryTest {
                             }
                           }))
                           .close()
-                          .inMax(seconds(3))
+                          .in(seconds(3))
                           .getError()).isNull();
       }
 
@@ -206,7 +206,7 @@ public class RoutineAdapterFactoryTest {
                             }
                           }))
                           .close()
-                          .inMax(seconds(3))
+                          .in(seconds(3))
                           .getError()).isNull();
       }
 
@@ -234,7 +234,7 @@ public class RoutineAdapterFactoryTest {
                             }
                           }))
                           .close()
-                          .inMax(seconds(3))
+                          .in(seconds(3))
                           .getError()).isNull();
       }
 

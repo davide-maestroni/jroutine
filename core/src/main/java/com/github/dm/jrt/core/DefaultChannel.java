@@ -183,14 +183,14 @@ class DefaultChannel<DATA> implements Channel<DATA, DATA> {
   }
 
   @NotNull
-  public Channel<DATA, DATA> inMax(final long timeout, @NotNull final TimeUnit timeUnit) {
-    mChannel.inMax(timeout, timeUnit);
+  public Channel<DATA, DATA> in(final long timeout, @NotNull final TimeUnit timeUnit) {
+    mChannel.in(timeout, timeUnit);
     return this;
   }
 
   @NotNull
-  public Channel<DATA, DATA> inMax(@NotNull final DurationMeasure timeout) {
-    mChannel.inMax(timeout);
+  public Channel<DATA, DATA> in(@NotNull final DurationMeasure timeout) {
+    mChannel.in(timeout);
     return this;
   }
 

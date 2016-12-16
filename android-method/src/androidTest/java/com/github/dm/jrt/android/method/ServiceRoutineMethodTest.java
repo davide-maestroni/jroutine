@@ -78,8 +78,7 @@ public class ServiceRoutineMethodTest extends ActivityInstrumentationTestCase2<T
     }.call(inputChannel1, inputChannel2, outputChannel);
     inputChannel1.pass(1, 2, 3, 4);
     inputChannel2.abort();
-    assertThat(outputChannel.inMax(seconds(10)).getError()).isExactlyInstanceOf(
-        AbortException.class);
+    assertThat(outputChannel.in(seconds(10)).getError()).isExactlyInstanceOf(AbortException.class);
   }
 
   private static void testAbort3(@NotNull final Activity activity) {
@@ -104,8 +103,7 @@ public class ServiceRoutineMethodTest extends ActivityInstrumentationTestCase2<T
     }.call(inputChannel1, inputChannel2, outputChannel);
     inputChannel1.pass(1, 2, 3, 4);
     inputChannel2.abort();
-    assertThat(outputChannel.inMax(seconds(10)).getError()).isExactlyInstanceOf(
-        AbortException.class);
+    assertThat(outputChannel.in(seconds(10)).getError()).isExactlyInstanceOf(AbortException.class);
   }
 
   private static void testContext(@NotNull final Activity activity) {
@@ -116,7 +114,7 @@ public class ServiceRoutineMethodTest extends ActivityInstrumentationTestCase2<T
         output.pass(getContext() instanceof InvocationService);
       }
     }.call(outputChannel);
-    assertThat(outputChannel.inMax(seconds(10)).all()).containsExactly(true);
+    assertThat(outputChannel.in(seconds(10)).all()).containsExactly(true);
   }
 
   private static void testNoInputs(@NotNull final Activity activity) {
@@ -126,7 +124,7 @@ public class ServiceRoutineMethodTest extends ActivityInstrumentationTestCase2<T
       String get() {
         return "test";
       }
-    }.call().inMax(seconds(10)).all()).containsExactly("test");
+    }.call().in(seconds(10)).all()).containsExactly("test");
     final Channel<String, String> outputChannel = JRoutineCore.<String>ofInputs().buildChannel();
     new ServiceRoutineMethod(context) {
 
@@ -134,7 +132,7 @@ public class ServiceRoutineMethodTest extends ActivityInstrumentationTestCase2<T
         outputChannel.pass("test");
       }
     }.call(outputChannel);
-    assertThat(outputChannel.inMax(seconds(10)).all()).containsExactly("test");
+    assertThat(outputChannel.in(seconds(10)).all()).containsExactly("test");
   }
 
   private static void testParams2(@NotNull final Activity activity) {
@@ -148,14 +146,14 @@ public class ServiceRoutineMethodTest extends ActivityInstrumentationTestCase2<T
     };
     Channel<Object, Object> inputChannel = JRoutineCore.ofInputs().buildChannel().pass("test");
     Channel<?, String> outputChannel = method.call(inputChannel, true);
-    assertThat(outputChannel.inMax(seconds(10)).next()).isEqualTo("TEST");
+    assertThat(outputChannel.in(seconds(10)).next()).isEqualTo("TEST");
     inputChannel.close();
-    outputChannel.inMax(seconds(10)).getComplete();
+    outputChannel.in(seconds(10)).getComplete();
     inputChannel = JRoutineCore.ofInputs().buildChannel().pass("TEST");
     outputChannel = method.call(inputChannel, false);
-    assertThat(outputChannel.inMax(seconds(10)).next()).isEqualTo("test");
+    assertThat(outputChannel.in(seconds(10)).next()).isEqualTo("test");
     inputChannel.close();
-    outputChannel.inMax(seconds(10)).getComplete();
+    outputChannel.in(seconds(10)).getComplete();
   }
 
   private static void testReturnValue(@NotNull final Activity activity) {
@@ -170,7 +168,7 @@ public class ServiceRoutineMethodTest extends ActivityInstrumentationTestCase2<T
       }
     }.call(inputStrings);
     inputStrings.pass("test").close();
-    assertThat(outputChannel.inMax(seconds(10)).all()).containsExactly(4);
+    assertThat(outputChannel.in(seconds(10)).all()).containsExactly(4);
   }
 
   private static void testSwitchInput(@NotNull final Activity activity) {
@@ -186,10 +184,9 @@ public class ServiceRoutineMethodTest extends ActivityInstrumentationTestCase2<T
     }.call(inputInts, inputStrings, outputChannel);
     inputStrings.pass("test1", "test2");
     inputInts.pass(1, 2, 3);
-    assertThat(outputChannel.inMax(seconds(10)).next(4)).containsExactly("test1", "test2", "1",
-        "2");
+    assertThat(outputChannel.in(seconds(10)).next(4)).containsExactly("test1", "test2", "1", "2");
     inputStrings.abort();
-    outputChannel.inMax(seconds(10)).getComplete();
+    outputChannel.in(seconds(10)).getComplete();
   }
 
   private static void testSwitchInput2(@NotNull final Activity activity) {
@@ -208,9 +205,9 @@ public class ServiceRoutineMethodTest extends ActivityInstrumentationTestCase2<T
     }.call(inputInts, inputStrings, outputChannel);
     inputStrings.pass("test1", "test2");
     inputInts.pass(1, 2, 3);
-    assertThat(outputChannel.inMax(seconds(10)).next(2)).containsExactly("test1", "test2");
+    assertThat(outputChannel.in(seconds(10)).next(2)).containsExactly("test1", "test2");
     inputStrings.abort();
-    outputChannel.inMax(seconds(10)).getComplete();
+    outputChannel.in(seconds(10)).getComplete();
   }
 
   public void testAbort() {
@@ -218,8 +215,7 @@ public class ServiceRoutineMethodTest extends ActivityInstrumentationTestCase2<T
     final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
     new SumRoutine(serviceFrom(getActivity())).call(inputChannel, outputChannel);
     inputChannel.pass(1, 2, 3, 4).abort();
-    assertThat(outputChannel.inMax(seconds(10)).getError()).isExactlyInstanceOf(
-        AbortException.class);
+    assertThat(outputChannel.in(seconds(10)).getError()).isExactlyInstanceOf(AbortException.class);
   }
 
   public void testAbort2() {
@@ -238,7 +234,7 @@ public class ServiceRoutineMethodTest extends ActivityInstrumentationTestCase2<T
     final Channel<Integer, Integer> resultChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
     new SumRoutine(context).call(outputChannel, resultChannel);
     inputChannel.pass(1, 2, 3, 4, 5).close();
-    assertThat(resultChannel.inMax(seconds(10)).all()).containsExactly(55);
+    assertThat(resultChannel.in(seconds(10)).all()).containsExactly(55);
   }
 
   public void testCall() {
@@ -246,7 +242,7 @@ public class ServiceRoutineMethodTest extends ActivityInstrumentationTestCase2<T
     final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
     new SumRoutine(serviceFrom(getActivity())).call(inputChannel, outputChannel);
     inputChannel.pass(1, 2, 3, 4, 5).close();
-    assertThat(outputChannel.inMax(seconds(10)).all()).containsExactly(15);
+    assertThat(outputChannel.in(seconds(10)).all()).containsExactly(15);
   }
 
   public void testContext() {
@@ -257,37 +253,37 @@ public class ServiceRoutineMethodTest extends ActivityInstrumentationTestCase2<T
     assertThat(ServiceRoutineMethod.from(serviceFrom(getActivity()),
         ServiceRoutineMethodTest.class.getMethod("length", String.class))
                                    .call("test")
-                                   .inMax(seconds(10))
+                                   .in(seconds(10))
                                    .next()).isEqualTo(4);
     assertThat(ServiceRoutineMethod.from(serviceFrom(getActivity()),
         ServiceRoutineMethodTest.class.getMethod("length", String.class))
                                    .call(JRoutineCore.of("test").buildChannel())
-                                   .inMax(seconds(10))
+                                   .in(seconds(10))
                                    .next()).isEqualTo(4);
     final Channel<String, String> inputChannel = JRoutineCore.<String>ofInputs().buildChannel();
     final Channel<?, Object> outputChannel = ServiceRoutineMethod.from(serviceFrom(getActivity()),
         ServiceRoutineMethodTest.class.getMethod("length", String.class))
                                                                  .callParallel(inputChannel);
     inputChannel.pass("test", "test1", "test22").close();
-    assertThat(outputChannel.inMax(seconds(10)).all()).containsOnly(4, 5, 6);
+    assertThat(outputChannel.in(seconds(10)).all()).containsOnly(4, 5, 6);
   }
 
   public void testFromClass2() throws NoSuchMethodException {
     assertThat(ServiceRoutineMethod.from(serviceFrom(getActivity()),
         classOfType(ServiceRoutineMethodTest.class), "length", String.class)
                                    .call("test")
-                                   .inMax(seconds(10))
+                                   .in(seconds(10))
                                    .next()).isEqualTo(4);
     assertThat(ServiceRoutineMethod.from(serviceFrom(getActivity()),
         classOfType(ServiceRoutineMethodTest.class), "length", String.class)
                                    .call(JRoutineCore.of("test").buildChannel())
-                                   .inMax(seconds(10))
+                                   .in(seconds(10))
                                    .next()).isEqualTo(4);
     final Channel<String, String> inputChannel = JRoutineCore.<String>ofInputs().buildChannel();
     final Channel<?, Object> outputChannel = ServiceRoutineMethod.from(serviceFrom(getActivity()),
         classOfType(ServiceRoutineMethodTest.class), "length", String.class).call(inputChannel);
     inputChannel.pass("test").close();
-    assertThat(outputChannel.inMax(seconds(10)).next()).isEqualTo(4);
+    assertThat(outputChannel.in(seconds(10)).next()).isEqualTo(4);
   }
 
   public void testFromError() throws NoSuchMethodException {
@@ -310,28 +306,28 @@ public class ServiceRoutineMethodTest extends ActivityInstrumentationTestCase2<T
   public void testFromInstance() throws NoSuchMethodException {
     final String test = "test";
     assertThat(ServiceRoutineMethod.from(serviceFrom(getActivity()), instanceOf(String.class, test),
-        String.class.getMethod("toString")).call().inMax(seconds(10)).next()).isEqualTo("test");
+        String.class.getMethod("toString")).call().in(seconds(10)).next()).isEqualTo("test");
     assertThat(ServiceRoutineMethod.from(serviceFrom(getActivity()), instanceOf(String.class, test),
         String.class.getMethod("toString"))
                                    .applyObjectConfiguration()
                                    .withSharedFields()
                                    .configured()
                                    .call()
-                                   .inMax(seconds(10))
+                                   .in(seconds(10))
                                    .next()).isEqualTo("test");
   }
 
   public void testFromInstance2() throws NoSuchMethodException {
     final String test = "test";
     assertThat(ServiceRoutineMethod.from(serviceFrom(getActivity()), instanceOf(String.class, test),
-        "toString").call().inMax(seconds(10)).next()).isEqualTo("test");
+        "toString").call().in(seconds(10)).next()).isEqualTo("test");
     assertThat(ServiceRoutineMethod.from(serviceFrom(getActivity()), instanceOf(String.class, test),
         "toString")
                                    .applyObjectConfiguration()
                                    .withSharedFields()
                                    .configured()
                                    .call()
-                                   .inMax(seconds(10))
+                                   .in(seconds(10))
                                    .next()).isEqualTo("test");
   }
 
@@ -347,21 +343,21 @@ public class ServiceRoutineMethodTest extends ActivityInstrumentationTestCase2<T
                                               .configured()
                                               .callParallel(inputChannel, outputChannel);
     inputChannel.pass(1, 2, 3, 4, 5).close();
-    assertThat(outputChannel.inMax(seconds(10)).all()).containsOnly(1, 2, 3, 4, 5);
+    assertThat(outputChannel.in(seconds(10)).all()).containsOnly(1, 2, 3, 4, 5);
   }
 
   public void testParams() {
     final SwitchCase method = new SwitchCase(serviceFrom(getActivity()));
     Channel<Object, Object> inputChannel = JRoutineCore.ofInputs().buildChannel().pass("test");
     Channel<?, String> outputChannel = method.call(inputChannel, true);
-    assertThat(outputChannel.inMax(seconds(10)).next()).isEqualTo("TEST");
+    assertThat(outputChannel.in(seconds(10)).next()).isEqualTo("TEST");
     inputChannel.close();
-    outputChannel.inMax(seconds(10)).getComplete();
+    outputChannel.in(seconds(10)).getComplete();
     inputChannel = JRoutineCore.ofInputs().buildChannel().pass("TEST");
     outputChannel = method.call(inputChannel, false);
-    assertThat(outputChannel.inMax(seconds(10)).next()).isEqualTo("test");
+    assertThat(outputChannel.in(seconds(10)).next()).isEqualTo("test");
     inputChannel.close();
-    outputChannel.inMax(seconds(10)).getComplete();
+    outputChannel.in(seconds(10)).getComplete();
   }
 
   public void testParams2() {

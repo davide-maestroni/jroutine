@@ -298,14 +298,14 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
   }
 
   @NotNull
-  public Channel<IN, OUT> inMax(final long timeout, @NotNull final TimeUnit timeUnit) {
-    mResultChanel.inMax(timeout, timeUnit);
+  public Channel<IN, OUT> in(final long timeout, @NotNull final TimeUnit timeUnit) {
+    mResultChanel.in(timeout, timeUnit);
     return this;
   }
 
   @NotNull
-  public Channel<IN, OUT> inMax(@NotNull final DurationMeasure timeout) {
-    mResultChanel.inMax(timeout);
+  public Channel<IN, OUT> in(@NotNull final DurationMeasure timeout) {
+    mResultChanel.in(timeout);
     return this;
   }
 

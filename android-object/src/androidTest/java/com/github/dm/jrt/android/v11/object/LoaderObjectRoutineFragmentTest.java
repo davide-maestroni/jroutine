@@ -114,7 +114,7 @@ public class LoaderObjectRoutineFragmentTest
                                                                 .configured()
                                                                 .method(TestClass.GET);
 
-    assertThat(routine.close().inMax(timeout).all()).containsExactly(-77L);
+    assertThat(routine.close().in(timeout).all()).containsExactly(-77L);
   }
 
   public void testArgs() {
@@ -130,7 +130,7 @@ public class LoaderObjectRoutineFragmentTest
                                    .with(instanceOf(TestArgs.class, 17))
                                    .method("getId")
                                    .close()
-                                   .inMax(seconds(10))
+                                   .in(seconds(10))
                                    .next()).isEqualTo(17);
   }
 
@@ -302,7 +302,7 @@ public class LoaderObjectRoutineFragmentTest
                                    .with(instanceOf(String.class))
                                    .method("toString")
                                    .close()
-                                   .inMax(seconds(10))
+                                   .in(seconds(10))
                                    .next()).isEqualTo("test1");
   }
 
@@ -345,7 +345,7 @@ public class LoaderObjectRoutineFragmentTest
 
     try {
 
-      routine3.call(new IllegalArgumentException("test")).inMax(timeout).all();
+      routine3.call(new IllegalArgumentException("test")).in(timeout).all();
 
       fail();
 
@@ -721,7 +721,7 @@ public class LoaderObjectRoutineFragmentTest
                                                                  .method(TestClass.class.getMethod(
                                                                      "getLong"));
 
-    assertThat(routine2.close().inMax(timeout).all()).containsExactly(-77L);
+    assertThat(routine2.close().in(timeout).all()).containsExactly(-77L);
 
   }
 
@@ -742,7 +742,7 @@ public class LoaderObjectRoutineFragmentTest
                                                                  .configured()
                                                                  .method("getLong");
 
-    assertThat(routine1.close().inMax(timeout).all()).containsExactly(-77L);
+    assertThat(routine1.close().in(timeout).all()).containsExactly(-77L);
   }
 
   public void testMissingAliasMethodError() {
@@ -1110,7 +1110,7 @@ public class LoaderObjectRoutineFragmentTest
 
     final Channel<Integer, Integer> channel2 = JRoutineCore.<Integer>ofInputs().buildChannel();
     channel2.pass(1, 2, 3).close();
-    assertThat(squareAsync.computeParallel(channel2).inMax(timeout).all()).containsOnly(1, 4, 9);
+    assertThat(squareAsync.computeParallel(channel2).in(timeout).all()).containsOnly(1, 4, 9);
   }
 
   public void testSharedFields() throws NoSuchMethodException {

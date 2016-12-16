@@ -133,7 +133,7 @@ public class ObjectRoutineTest {
                                                           .configured()
                                                           .method(TestClass.GET);
 
-    assertThat(routine.close().inMax(timeout).all()).containsExactly(-77L);
+    assertThat(routine.close().in(timeout).all()).containsExactly(-77L);
   }
 
   @Test
@@ -148,7 +148,7 @@ public class ObjectRoutineTest {
                                                           .configured()
                                                           .method(TestStatic.GET);
 
-    assertThat(routine.close().inMax(timeout).all()).containsExactly(-77L);
+    assertThat(routine.close().in(timeout).all()).containsExactly(-77L);
   }
 
   @Test
@@ -171,12 +171,11 @@ public class ObjectRoutineTest {
     final Size size = new Size();
     final SizeItf proxy = JRoutineObject.with(instance(size)).buildProxy(SizeItf.class);
     assertThat(
-        proxy.getSize(Arrays.asList("test1", "test2", "test3")).inMax(seconds(3)).next()).isEqualTo(
-        3);
+        proxy.getSize(Arrays.asList("test1", "test2", "test3")).in(seconds(3)).next()).isEqualTo(3);
     assertThat(proxy.getSize()
                     .pass(Arrays.asList("test1", "test2", "test3"))
                     .close()
-                    .inMax(seconds(3))
+                    .in(seconds(3))
                     .next()).isEqualTo(3);
   }
 
@@ -329,7 +328,7 @@ public class ObjectRoutineTest {
 
     try {
 
-      routine3.call(new IllegalArgumentException("test")).inMax(timeout).all();
+      routine3.call(new IllegalArgumentException("test")).in(timeout).all();
 
       fail();
 
@@ -350,7 +349,7 @@ public class ObjectRoutineTest {
 
     try {
 
-      routine3.call(new IllegalArgumentException("test")).inMax(timeout).all();
+      routine3.call(new IllegalArgumentException("test")).in(timeout).all();
 
       fail();
 
@@ -655,7 +654,7 @@ public class ObjectRoutineTest {
                                                            .method(TestClass.class.getMethod(
                                                                "getLong"));
 
-    assertThat(routine2.close().inMax(timeout).all()).containsExactly(-77L);
+    assertThat(routine2.close().in(timeout).all()).containsExactly(-77L);
   }
 
   @Test
@@ -669,7 +668,7 @@ public class ObjectRoutineTest {
                                                            .configured()
                                                            .method("getLong");
 
-    assertThat(routine1.close().inMax(timeout).all()).containsExactly(-77L);
+    assertThat(routine1.close().in(timeout).all()).containsExactly(-77L);
   }
 
   @Test
@@ -680,32 +679,32 @@ public class ObjectRoutineTest {
     assertThat(JRoutineObject.with(instance(test))
                              .method(TestClassImpl.class.getMethod("getOne"))
                              .close()
-                             .inMax(timeout)
+                             .in(timeout)
                              .all()).containsExactly(1);
     assertThat(JRoutineObject.with(instance(test))
                              .method("getOne")
                              .close()
-                             .inMax(timeout)
+                             .in(timeout)
                              .all()).containsExactly(1);
     assertThat(JRoutineObject.with(instance(test))
                              .method(TestClassImpl.GET)
                              .close()
-                             .inMax(timeout)
+                             .in(timeout)
                              .all()).containsExactly(1);
     assertThat(JRoutineObject.with(classOfType(TestClassImpl.class))
                              .method(TestClassImpl.STATIC_GET)
                              .call(3)
-                             .inMax(timeout)
+                             .in(timeout)
                              .all()).containsExactly(3);
     assertThat(JRoutineObject.with(classOfType(TestClassImpl.class))
                              .method("sget")
                              .call(-3)
-                             .inMax(timeout)
+                             .in(timeout)
                              .all()).containsExactly(-3);
     assertThat(JRoutineObject.with(classOfType(TestClassImpl.class))
                              .method("get", int.class)
                              .callParallel(17)
-                             .inMax(timeout)
+                             .in(timeout)
                              .all()).containsExactly(17);
 
     assertThat(
@@ -716,7 +715,7 @@ public class ObjectRoutineTest {
       JRoutineObject.with(classOfType(TestClassImpl.class))
                     .method("sget")
                     .close()
-                    .inMax(timeout)
+                    .in(timeout)
                     .all();
 
       fail();
@@ -744,7 +743,7 @@ public class ObjectRoutineTest {
     assertThat(JRoutineObject.with(instance(test))
                              .buildProxy(TestInterfaceAsync.class)
                              .getOne()
-                             .inMax(timeout)
+                             .in(timeout)
                              .next()).isEqualTo(1);
 
     final TestInterfaceAsync testInterfaceAsync = JRoutineObject.with(instance(test))
@@ -864,7 +863,7 @@ public class ObjectRoutineTest {
                                                           .configured()
                                                           .method(TestStatic.GET);
 
-    assertThat(routine.close().inMax(timeout).all()).containsExactly(-77L);
+    assertThat(routine.close().in(timeout).all()).containsExactly(-77L);
   }
 
   @Test
@@ -1106,7 +1105,7 @@ public class ObjectRoutineTest {
 
     final Channel<Integer, Integer> channel2 = JRoutineCore.<Integer>ofInputs().buildChannel();
     channel2.pass(1, 2, 3).close();
-    assertThat(squareAsync.computeParallel(channel2).inMax(timeout).all()).containsOnly(1, 4, 9);
+    assertThat(squareAsync.computeParallel(channel2).in(timeout).all()).containsOnly(1, 4, 9);
   }
 
   @Test
@@ -1472,7 +1471,7 @@ public class ObjectRoutineTest {
                                                            .method(TestStatic.class.getMethod(
                                                                "getLong"));
 
-    assertThat(routine2.close().inMax(timeout).all()).containsExactly(-77L);
+    assertThat(routine2.close().in(timeout).all()).containsExactly(-77L);
   }
 
   @Test
@@ -1486,7 +1485,7 @@ public class ObjectRoutineTest {
                                                            .configured()
                                                            .method("getLong");
 
-    assertThat(routine1.close().inMax(timeout).all()).containsExactly(-77L);
+    assertThat(routine1.close().in(timeout).all()).containsExactly(-77L);
   }
 
   @Test

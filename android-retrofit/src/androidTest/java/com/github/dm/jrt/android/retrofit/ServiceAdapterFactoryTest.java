@@ -159,7 +159,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
                           }
                         }))
                         .close()
-                        .inMax(seconds(10))
+                        .in(seconds(10))
                         .getError()).isNull();
 
     } finally {

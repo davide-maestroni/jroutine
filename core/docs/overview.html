@@ -123,7 +123,7 @@
                         JRoutineCore.with(InvocationFactory.factoryOf(SquareRootMean.class)).buildRoutine();
                 final Double rms =
                         meanRoutine.call(squareRoutine.callParallel(parseRoutine.parallelCall(args)))
-                                   .inMax(seconds(3))
+                                   .in(seconds(3))
                                    .next();
                 // Or:
                 // final Double rms = parseRoutine.callParallel(args)
@@ -131,7 +131,7 @@
                 //                                .close()
                 //                                .bind(meanRoutine.call())
                 //                                .close()
-                //                                .inMax(seconds(3))
+                //                                .in(seconds(3))
                 //                                .next();
                 System.out.println(rms);
                 System.exit(0);
@@ -200,7 +200,7 @@
                         JRoutineCore.with(new SquareRootMeanFactory()).buildRoutine();
                 final Double rms =
                         meanRoutine.call(squareRoutine.callParallel(parseRoutine.parallelCall(args)))
-                                   .inMax(seconds(3))
+                                   .in(seconds(3))
                                    .next();
                 // Or:
                 // final Double rms = parseRoutine.callParallel(args)
@@ -208,7 +208,7 @@
                 //                                .close()
                 //                                .bind(meanRoutine.call())
                 //                                .close()
-                //                                .inMax(seconds(3))
+                //                                .in(seconds(3))
                 //                                .next();
                 System.out.println(rms);
                 System.exit(0);

@@ -63,7 +63,7 @@ public class ProviderAdapterFactoryTest {
                                              .addConverterFactory(converterFactory)
                                              .build();
       final GitHubService service = retrofit.create(GitHubService.class);
-      service.listRepos("octocat").inMax(seconds(1)).next();
+      service.listRepos("octocat").in(seconds(1)).next();
       assertThat(factory1.isCalled()).isTrue();
       assertThat(factory2.isCalled()).isFalse();
       assertThat(defaultFactory.isCalled()).isFalse();
@@ -92,7 +92,7 @@ public class ProviderAdapterFactoryTest {
                                              .addConverterFactory(converterFactory)
                                              .build();
       final GitHubService service = retrofit.create(GitHubService.class);
-      service.listRepos("octocat").inMax(seconds(1)).next();
+      service.listRepos("octocat").in(seconds(1)).next();
       assertThat(factory1.isCalled()).isTrue();
       assertThat(defaultFactory.isCalled()).isFalse();
       factory1.setCalled(false);
@@ -121,7 +121,7 @@ public class ProviderAdapterFactoryTest {
                                              .addConverterFactory(converterFactory)
                                              .build();
       final GitHubService service = retrofit.create(GitHubService.class);
-      service.listRepos("octocat").inMax(seconds(1)).next();
+      service.listRepos("octocat").in(seconds(1)).next();
       assertThat(factory1.isCalled()).isTrue();
       assertThat(defaultFactory.isCalled()).isFalse();
       factory1.setCalled(false);
@@ -173,7 +173,7 @@ public class ProviderAdapterFactoryTest {
                                            .addConverterFactory(converterFactory)
                                            .build();
     final GitHubService service = retrofit.create(GitHubService.class);
-    service.listRepos("octocat").inMax(seconds(1)).next();
+    service.listRepos("octocat").in(seconds(1)).next();
     assertThat(factory.isCalled()).isTrue();
     try {
       service.streamRepos("octocat");

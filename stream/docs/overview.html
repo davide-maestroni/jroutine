@@ -86,7 +86,7 @@
                                                  .map(Math::sqrt)
                                                  .async()
                                                  .call(args)
-                                                 .inMax(seconds(1))
+                                                 .in(seconds(1))
                                                  .next();
                 System.out.println(rms);
                 System.exit(0);

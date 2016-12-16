@@ -293,19 +293,19 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
   }
 
   @NotNull
-  public Channel<OUT, OUT> inMax(final long timeout, @NotNull final TimeUnit timeUnit) {
-    return inMax(fromUnit(timeout, timeUnit));
+  public Channel<OUT, OUT> in(final long timeout, @NotNull final TimeUnit timeUnit) {
+    return in(fromUnit(timeout, timeUnit));
   }
 
   @NotNull
-  public Channel<OUT, OUT> inMax(@NotNull final DurationMeasure timeout) {
+  public Channel<OUT, OUT> in(@NotNull final DurationMeasure timeout) {
     mOutputTimeout.set(ConstantConditions.notNull("output timeout", timeout));
     return this;
   }
 
   @NotNull
   public Channel<OUT, OUT> inNoTime() {
-    return inMax(noTime());
+    return in(noTime());
   }
 
   public int inputSize() {

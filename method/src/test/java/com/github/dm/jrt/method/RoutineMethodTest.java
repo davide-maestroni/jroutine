@@ -60,7 +60,7 @@ public class RoutineMethodTest {
       }
     }.callParallel(inputStrings, outputLengths);
     inputStrings.pass("test", "test1", "test22");
-    assertThat(outputLengths.inMax(seconds(1)).next(3)).containsOnly(4, 5, 6);
+    assertThat(outputLengths.in(seconds(1)).next(3)).containsOnly(4, 5, 6);
   }
 
   private static void testStaticInternal2() {
@@ -73,9 +73,9 @@ public class RoutineMethodTest {
       }
     };
     Channel<Object, Object> inputChannel = JRoutineCore.ofInputs().buildChannel().pass("test");
-    assertThat(method.call(inputChannel, true).inMax(seconds(1)).next()).isEqualTo("TEST");
+    assertThat(method.call(inputChannel, true).in(seconds(1)).next()).isEqualTo("TEST");
     inputChannel = JRoutineCore.ofInputs().buildChannel().pass("TEST");
-    assertThat(method.call(inputChannel, false).inMax(seconds(1)).next()).isEqualTo("test");
+    assertThat(method.call(inputChannel, false).in(seconds(1)).next()).isEqualTo("test");
   }
 
   @Test
@@ -96,8 +96,7 @@ public class RoutineMethodTest {
       }
     }.call(inputChannel, outputChannel);
     inputChannel.pass(1, 2, 3, 4).abort();
-    assertThat(outputChannel.inMax(seconds(1)).getError()).isExactlyInstanceOf(
-        AbortException.class);
+    assertThat(outputChannel.in(seconds(1)).getError()).isExactlyInstanceOf(AbortException.class);
   }
 
   @Test
@@ -122,8 +121,7 @@ public class RoutineMethodTest {
     }.call(inputChannel1, inputChannel2, outputChannel);
     inputChannel1.pass(1, 2, 3, 4);
     inputChannel2.abort();
-    assertThat(outputChannel.inMax(seconds(1)).getError()).isExactlyInstanceOf(
-        AbortException.class);
+    assertThat(outputChannel.in(seconds(1)).getError()).isExactlyInstanceOf(AbortException.class);
   }
 
   @Test
@@ -149,8 +147,7 @@ public class RoutineMethodTest {
     }.call(inputChannel1, inputChannel2, outputChannel);
     inputChannel1.pass(1, 2, 3, 4);
     inputChannel2.abort();
-    assertThat(outputChannel.inMax(seconds(1)).getError()).isExactlyInstanceOf(
-        AbortException.class);
+    assertThat(outputChannel.in(seconds(1)).getError()).isExactlyInstanceOf(AbortException.class);
   }
 
   @Test
@@ -170,7 +167,7 @@ public class RoutineMethodTest {
     final Channel<Integer, Integer> resultChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
     new SumRoutine().call(outputChannel, resultChannel);
     inputChannel.pass(1, 2, 3, 4, 5).close();
-    assertThat(resultChannel.inMax(seconds(1)).next()).isEqualTo(55);
+    assertThat(resultChannel.in(seconds(1)).next()).isEqualTo(55);
   }
 
   @Test
@@ -192,7 +189,7 @@ public class RoutineMethodTest {
       }
     }.call(inputChannel, outputChannel);
     inputChannel.pass(1, 2, 3, 4, 5).close();
-    assertThat(outputChannel.inMax(seconds(1)).next()).isEqualTo(15);
+    assertThat(outputChannel.in(seconds(1)).next()).isEqualTo(15);
   }
 
   @Test(expected = IllegalStateException.class)
@@ -203,7 +200,7 @@ public class RoutineMethodTest {
         return 0;
       }
     };
-    assertThat(method.call().inMax(seconds(1)).next()).isEqualTo(0);
+    assertThat(method.call().in(seconds(1)).next()).isEqualTo(0);
     method.call();
   }
 
@@ -223,36 +220,36 @@ public class RoutineMethodTest {
   public void testFromClass() throws NoSuchMethodException {
     assertThat(RoutineMethod.from(RoutineMethodTest.class.getMethod("length", String.class))
                             .call("test")
-                            .inMax(seconds(1))
+                            .in(seconds(1))
                             .next()).isEqualTo(4);
     assertThat(RoutineMethod.from(RoutineMethodTest.class.getMethod("length", String.class))
                             .call(JRoutineCore.of("test").buildChannel())
-                            .inMax(seconds(1))
+                            .in(seconds(1))
                             .next()).isEqualTo(4);
     final Channel<String, String> inputChannel = JRoutineCore.<String>ofInputs().buildChannel();
     final Channel<?, Object> outputChannel =
         RoutineMethod.from(RoutineMethodTest.class.getMethod("length", String.class))
                      .callParallel(inputChannel);
     inputChannel.pass("test", "test1", "test22").close();
-    assertThat(outputChannel.inMax(seconds(1)).all()).containsOnly(4, 5, 6);
+    assertThat(outputChannel.in(seconds(1)).all()).containsOnly(4, 5, 6);
   }
 
   @Test
   public void testFromClass2() throws NoSuchMethodException {
     assertThat(RoutineMethod.from(classOfType(RoutineMethodTest.class), "length", String.class)
                             .call("test")
-                            .inMax(seconds(1))
+                            .in(seconds(1))
                             .next()).isEqualTo(4);
     assertThat(RoutineMethod.from(classOfType(RoutineMethodTest.class), "length", String.class)
                             .call(JRoutineCore.of("test").buildChannel())
-                            .inMax(seconds(1))
+                            .in(seconds(1))
                             .next()).isEqualTo(4);
     final Channel<String, String> inputChannel = JRoutineCore.<String>ofInputs().buildChannel();
     final Channel<?, Object> outputChannel =
         RoutineMethod.from(classOfType(RoutineMethodTest.class), "length", String.class)
                      .call(inputChannel);
     inputChannel.pass("test").close();
-    assertThat(outputChannel.inMax(seconds(1)).next()).isEqualTo(4);
+    assertThat(outputChannel.in(seconds(1)).next()).isEqualTo(4);
   }
 
   @Test
@@ -278,7 +275,7 @@ public class RoutineMethodTest {
     final String test = "test";
     assertThat(RoutineMethod.from(instance(test), String.class.getMethod("toString"))
                             .call()
-                            .inMax(seconds(1))
+                            .in(seconds(1))
                             .next()).isEqualTo("test");
     assertThat(RoutineMethod.from(instance(test), String.class.getMethod("toString"))
                             .applyInvocationConfiguration()
@@ -295,7 +292,7 @@ public class RoutineMethodTest {
   public void testFromInstance2() throws NoSuchMethodException {
     final String test = "test";
     assertThat(
-        RoutineMethod.from(instance(test), "toString").call().inMax(seconds(1)).next()).isEqualTo(
+        RoutineMethod.from(instance(test), "toString").call().in(seconds(1)).next()).isEqualTo(
         "test");
     assertThat(RoutineMethod.from(instance(test), "toString")
                             .applyInvocationConfiguration()
@@ -320,24 +317,24 @@ public class RoutineMethodTest {
     final Channel<Object, Object> outputChannel = JRoutineCore.ofInputs().buildChannel();
     new SumRoutine().call(channel, outputChannel);
     channel.pass("1", "2", "3", "4").close();
-    assertThat(outputChannel.inMax(seconds(1)).next()).isEqualTo(10);
+    assertThat(outputChannel.in(seconds(1)).next()).isEqualTo(10);
   }
 
   @Test
   public void testInputs() {
     Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
     new SumRoutine().call(JRoutineCore.of().buildChannel(), outputChannel);
-    assertThat(outputChannel.inMax(seconds(1)).next()).isEqualTo(0);
+    assertThat(outputChannel.in(seconds(1)).next()).isEqualTo(0);
     outputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
     new SumRoutine().call(JRoutineCore.of(1).buildChannel(), outputChannel);
-    assertThat(outputChannel.inMax(seconds(1)).next()).isEqualTo(1);
+    assertThat(outputChannel.in(seconds(1)).next()).isEqualTo(1);
     outputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
     new SumRoutine().call(JRoutineCore.of(1, 2, 3, 4, 5).buildChannel(), outputChannel);
-    assertThat(outputChannel.inMax(seconds(1)).next()).isEqualTo(15);
+    assertThat(outputChannel.in(seconds(1)).next()).isEqualTo(15);
     outputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
     new SumRoutine().call(JRoutineCore.of(Arrays.asList(1, 2, 3, 4, 5)).buildChannel(),
         outputChannel);
-    assertThat(outputChannel.inMax(seconds(1)).next()).isEqualTo(15);
+    assertThat(outputChannel.in(seconds(1)).next()).isEqualTo(15);
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -438,7 +435,7 @@ public class RoutineMethodTest {
       String get() {
         return "test";
       }
-    }.call().inMax(seconds(1)).next()).isEqualTo("test");
+    }.call().in(seconds(1)).next()).isEqualTo("test");
     final Channel<String, String> outputChannel = JRoutineCore.<String>ofInputs().buildChannel();
     new RoutineMethod() {
 
@@ -446,7 +443,7 @@ public class RoutineMethodTest {
         outputChannel.pass("test");
       }
     }.call(outputChannel);
-    assertThat(outputChannel.inMax(seconds(1)).next()).isEqualTo("test");
+    assertThat(outputChannel.in(seconds(1)).next()).isEqualTo("test");
   }
 
   @Test
@@ -474,7 +471,7 @@ public class RoutineMethodTest {
       }
     }.callParallel(inputStrings);
     inputStrings.pass("test");
-    assertThat(outputChannel.inMax(seconds(1)).next()).isEqualTo(4);
+    assertThat(outputChannel.in(seconds(1)).next()).isEqualTo(4);
   }
 
   @Test
@@ -509,9 +506,9 @@ public class RoutineMethodTest {
       }
     };
     Channel<Object, Object> inputChannel = JRoutineCore.ofInputs().buildChannel().pass("test");
-    assertThat(method.call(inputChannel, true).inMax(seconds(1)).next()).isEqualTo("TEST");
+    assertThat(method.call(inputChannel, true).in(seconds(1)).next()).isEqualTo("TEST");
     inputChannel = JRoutineCore.ofInputs().buildChannel().pass("TEST");
-    assertThat(method.call(inputChannel, false).inMax(seconds(1)).next()).isEqualTo("test");
+    assertThat(method.call(inputChannel, false).in(seconds(1)).next()).isEqualTo("test");
   }
 
   @Test
@@ -525,9 +522,9 @@ public class RoutineMethodTest {
       }
     };
     Channel<Object, Object> inputChannel = JRoutineCore.ofInputs().buildChannel().pass("test");
-    assertThat(method.call(inputChannel, true).inMax(seconds(1)).next()).isEqualTo("TEST");
+    assertThat(method.call(inputChannel, true).in(seconds(1)).next()).isEqualTo("TEST");
     inputChannel = JRoutineCore.ofInputs().buildChannel().pass("TEST");
-    assertThat(method.call(inputChannel, false).inMax(seconds(1)).next()).isEqualTo("test");
+    assertThat(method.call(inputChannel, false).in(seconds(1)).next()).isEqualTo("test");
   }
 
   @Test
@@ -543,7 +540,7 @@ public class RoutineMethodTest {
       }
     }.call(inputStrings);
     inputStrings.pass("test").close();
-    assertThat(outputChannel.inMax(seconds(1)).all()).containsExactly(4);
+    assertThat(outputChannel.in(seconds(1)).all()).containsExactly(4);
   }
 
   @Test
@@ -570,7 +567,7 @@ public class RoutineMethodTest {
     }.call(inputInts, inputStrings, outputChannel);
     inputStrings.pass("test1", "test2");
     inputInts.pass(1, 2, 3);
-    assertThat(outputChannel.inMax(seconds(1)).next(4)).containsExactly("test1", "test2", "1", "2");
+    assertThat(outputChannel.in(seconds(1)).next(4)).containsExactly("test1", "test2", "1", "2");
   }
 
   @Test
@@ -590,7 +587,7 @@ public class RoutineMethodTest {
     }.call(inputInts, inputStrings, outputChannel);
     inputStrings.pass("test1", "test2");
     inputInts.pass(1, 2, 3);
-    assertThat(outputChannel.inMax(seconds(1)).next(2)).containsExactly("test1", "test2");
+    assertThat(outputChannel.in(seconds(1)).next(2)).containsExactly("test1", "test2");
   }
 
   @Test
@@ -606,7 +603,7 @@ public class RoutineMethodTest {
       }
     }.call(routine, inputChannel, outputChannel);
     inputChannel.pass(1, 2, 3, 4, 5).close();
-    assertThat(outputChannel.inMax(seconds(1)).next()).isEqualTo(15);
+    assertThat(outputChannel.in(seconds(1)).next()).isEqualTo(15);
   }
 
   private static class SumRoutine extends RoutineMethod {

@@ -57,7 +57,7 @@ import java.util.Collections;
  * channel.pass(routine1.close())
  *        .pass(routine2.close())
  *        .close();
- *        .inMax(seconds(20))
+ *        .in(seconds(20))
  *        .allInto(results);
  * </code></pre>
  * <p>
@@ -65,20 +65,20 @@ import java.util.Collections;
  * <pre><code>
  * final Channel&lt;Void, Result&gt; output1 = routine1.close();
  * final Channel&lt;Void, Result&gt; output2 = routine2.close();
- * output1.inMax(seconds(20)).allInto(results);
- * output2.inMax(seconds(20)).allInto(results);
+ * output1.in(seconds(20)).allInto(results);
+ * output2.in(seconds(20)).allInto(results);
  * </code></pre>
  * (Note that, the order of the input or the output of the routine is not guaranteed unless properly
  * configured)
  * <p>
  * <b>Example 3:</b> Asynchronously concatenate the output of two routines.
  * <pre><code>
- * routine2.call(routine1.close()).inMax(seconds(20)).all();
+ * routine2.call(routine1.close()).in(seconds(20)).all();
  * </code></pre>
  * <p>
  * Or, in an equivalent way:
  * <pre><code>
- * routine1.close().bind(routine2.call()).close().inMax(seconds(20)).all();
+ * routine1.close().bind(routine2.call()).close().in(seconds(20)).all();
  * </code></pre>
  * <p>
  * <b>Example 4:</b> Asynchronously feed a routine from a different thread.
@@ -96,7 +96,7 @@ import java.util.Collections;
  *   }
  * }.start();
  *
- * channel.inMax(seconds(20)).allInto(results);
+ * channel.in(seconds(20)).allInto(results);
  * </code></pre>
  * <p>
  * Created by davide-maestroni on 09/07/2014.

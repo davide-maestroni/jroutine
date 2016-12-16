@@ -192,7 +192,7 @@ public class RunnerTest extends AndroidTestCase {
                                                     .close();
     assertThat(JRoutineCore.with(new HandlerInvocationFactory())
                            .call(channel)
-                           .inMax(seconds(30))
+                           .in(seconds(30))
                            .next()).isEqualTo(true);
   }
 
@@ -214,7 +214,7 @@ public class RunnerTest extends AndroidTestCase {
                                                    .close();
     assertThat(JRoutineCore.with(new LooperInvocationFactory())
                            .call(channel)
-                           .inMax(seconds(30))
+                           .in(seconds(30))
                            .next()).isEqualTo(true);
   }
 

@@ -227,14 +227,14 @@ class ReplayChannel<OUT> implements Channel<OUT, OUT>, ChannelConsumer<OUT> {
   }
 
   @NotNull
-  public Channel<OUT, OUT> inMax(final long timeout, @NotNull final TimeUnit timeUnit) {
-    mOutputChannel.inMax(timeout, timeUnit);
+  public Channel<OUT, OUT> in(final long timeout, @NotNull final TimeUnit timeUnit) {
+    mOutputChannel.in(timeout, timeUnit);
     return this;
   }
 
   @NotNull
-  public Channel<OUT, OUT> inMax(@NotNull final DurationMeasure timeout) {
-    mOutputChannel.inMax(timeout);
+  public Channel<OUT, OUT> in(@NotNull final DurationMeasure timeout) {
+    mOutputChannel.in(timeout);
     return this;
   }
 

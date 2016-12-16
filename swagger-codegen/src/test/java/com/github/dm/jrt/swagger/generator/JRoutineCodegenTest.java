@@ -168,7 +168,7 @@ public class JRoutineCodegenTest {
                               assertThat(repo.getPrivate()).isEqualTo(id == 3);
                             }
                           }))
-                          .inMax(seconds(3))
+                          .in(seconds(3))
                           .getError()).isNull();
       }
 
@@ -192,7 +192,7 @@ public class JRoutineCodegenTest {
                               assertThat(repo.getPrivate()).isEqualTo(id == 3);
                             }
                           }))
-                          .inMax(seconds(3))
+                          .in(seconds(3))
                           .getError()).isNull();
       }
 
@@ -216,7 +216,7 @@ public class JRoutineCodegenTest {
                               assertThat(repo.getPrivate()).isEqualTo(id == 3);
                             }
                           }))
-                          .inMax(seconds(3))
+                          .in(seconds(3))
                           .getError()).isNull();
       }
 

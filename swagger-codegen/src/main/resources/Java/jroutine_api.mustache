@@ -20,6 +20,11 @@ import java.util.List;
 import java.util.Map;
 {{/fullJavaUtil}}
 
+{{#usePlay24WS}}
+import play.libs.F;
+import retrofit2.Response;
+{{/usePlay24WS}}
+
 {{#operations}}
 public interface {{classname}} {
   {{#operation}}

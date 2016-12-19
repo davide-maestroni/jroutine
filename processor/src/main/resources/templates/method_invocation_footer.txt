@@ -15,4 +15,4 @@
  */
 
 // GENERATED CODE - PLEASE DO NOT EDIT
-    }
+  }

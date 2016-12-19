@@ -16,22 +16,22 @@
 
 // GENERATED CODE - PLEASE DO NOT EDIT
 
-        @Override
-        @SuppressWarnings({"unchecked", "ConstantConditions", "SynchronizeOnNonFinalField"})
-        protected void onCall(@org.jetbrains.annotations.NotNull final java.util.List<?> objects,
-                @org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.channel.Channel<${resultClassName}, ?> result) throws Exception {
-            int i = 0;
-            final ${componentType}[] array = new ${componentType}[objects.size()];
-            for (final Object object : objects) {
-                array[i++] = (${boxedType}) object;
-            }
+    @Override
+    @SuppressWarnings({"unchecked", "ConstantConditions", "SynchronizeOnNonFinalField"})
+    protected void onCall(@org.jetbrains.annotations.NotNull final java.util.List<?> objects,
+        @org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.channel.Channel<${resultClassName}, ?> result) throws Exception {
+      int i = 0;
+      final ${componentType}[] array = new ${componentType}[objects.size()];
+      for (final Object object : objects) {
+        array[i++] = (${boxedType}) object;
+      }
 
-            final com.github.dm.jrt.object.common.Mutex mutex = mMutex;
-            mutex.acquire();
-            try {
-                result.pass(${invocationTarget}.${targetMethodName}(array));
+      final com.github.dm.jrt.object.common.Mutex mutex = mMutex;
+      mutex.acquire();
+      try {
+        result.pass(${invocationTarget}.${targetMethodName}(array));
 
-            } finally {
-                mutex.release();
-            }
-        }
+      } finally {
+        mutex.release();
+      }
+    }

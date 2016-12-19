@@ -16,19 +16,19 @@
 
 // GENERATED CODE - PLEASE DO NOT EDIT
 
-        @Override
-        @SuppressWarnings({"unchecked", "ConstantConditions", "SynchronizeOnNonFinalField"})
-        protected void onCall(@org.jetbrains.annotations.NotNull final java.util.List<?> objects,
-                @org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.channel.Channel<${resultClassName}, ?> result) throws Exception {
-            final com.github.dm.jrt.object.common.Mutex mutex = mMutex;
-            mutex.acquire();
-            try {
-                result.sorted();
-                for (final ${resultClassName} element : ${invocationTarget}.${targetMethodName}(${paramValues})) {
-                    result.pass(element);
-                }
-
-            } finally {
-                mutex.release();
-            }
+    @Override
+    @SuppressWarnings({"unchecked", "ConstantConditions", "SynchronizeOnNonFinalField"})
+    protected void onCall(@org.jetbrains.annotations.NotNull final java.util.List<?> objects,
+        @org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.channel.Channel<${resultClassName}, ?> result) throws Exception {
+      final com.github.dm.jrt.object.common.Mutex mutex = mMutex;
+      mutex.acquire();
+      try {
+        result.sorted();
+        for (final ${resultClassName} element : ${invocationTarget}.${targetMethodName}(${paramValues})) {
+          result.pass(element);
         }
+
+      } finally {
+        mutex.release();
+      }
+    }

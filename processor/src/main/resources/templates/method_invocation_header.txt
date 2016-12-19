@@ -16,15 +16,15 @@
 
 // GENERATED CODE - PLEASE DO NOT EDIT
 
-    private static class Invocation${methodCount}${genericTypes} extends com.github.dm.jrt.core.invocation.CallInvocation<Object, ${resultClassName}> {
+  private static class Invocation${methodCount}${genericTypes} extends com.github.dm.jrt.core.invocation.CallInvocation<Object, ${resultClassName}> {
 
-        private final com.github.dm.jrt.object.common.Mutex mMutex;
+    private final com.github.dm.jrt.object.common.Mutex mMutex;
 
-        @SuppressWarnings("unused")
-        private final com.github.dm.jrt.object.InvocationTarget<?> mTarget;
+    @SuppressWarnings("unused")
+    private final com.github.dm.jrt.object.InvocationTarget<?> mTarget;
 
-        private Invocation${methodCount}(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.object.config.ObjectConfiguration objectConfiguration,
-                 @org.jetbrains.annotations.NotNull final com.github.dm.jrt.object.InvocationTarget<?> target) {
-            mMutex = com.github.dm.jrt.object.builder.Builders.getSharedMutex(${mutexTarget}, ${sharedFields});
-            mTarget = target;
-        }
+    private Invocation${methodCount}(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.object.config.ObjectConfiguration objectConfiguration,
+        @org.jetbrains.annotations.NotNull final com.github.dm.jrt.object.InvocationTarget<?> target) {
+      mMutex = com.github.dm.jrt.object.builder.Builders.getSharedMutex(${mutexTarget}, ${sharedFields});
+      mTarget = target;
+    }

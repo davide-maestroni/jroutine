@@ -66,8 +66,6 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
   private String mMethodHeaderV1;
 
-  private String mMethodInvocationFooter;
-
   private String mMethodInvocationHeader;
 
   private TypeMirror mRunnerClassAnnotationType;
@@ -145,7 +143,7 @@ public class ContextRoutineProcessor extends RoutineProcessor {
     final TypeElement loaderProxyElement = mLoaderProxyElement;
     if (annotationElement == serviceProxyElement) {
       if (mHeaderService == null) {
-        mHeaderService = parseTemplate("/android/templates/header.txt");
+        mHeaderService = parseTemplate("/templates/android/header.txt");
       }
 
       return mHeaderService;
@@ -153,7 +151,7 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
     if (annotationElement == loaderProxyCompatElement) {
       if (mHeaderV4 == null) {
-        mHeaderV4 = parseTemplate("/android/v4/templates/header.txt");
+        mHeaderV4 = parseTemplate("/templates/android/v4/header.txt");
       }
 
       return mHeaderV4;
@@ -161,7 +159,7 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
     if (annotationElement == loaderProxyElement) {
       if (mHeaderV11 == null) {
-        mHeaderV11 = parseTemplate("/android/v11/templates/header.txt");
+        mHeaderV11 = parseTemplate("/templates/android/v11/header.txt");
       }
 
       return mHeaderV11;
@@ -177,29 +175,17 @@ public class ContextRoutineProcessor extends RoutineProcessor {
       @NotNull final ExecutableElement methodElement, final int count) throws IOException {
     if (annotationElement != mServiceProxyElement) {
       if (mMethodHeaderV1 == null) {
-        mMethodHeaderV1 = parseTemplate("/android/v1/templates/method_header.txt");
+        mMethodHeaderV1 = parseTemplate("/templates/android/v1/method_header.txt");
       }
 
       return mMethodHeaderV1.replace("${loaderBuilderOptions}", buildLoaderOptions(methodElement));
     }
 
     if (mMethodHeader == null) {
-      mMethodHeader = parseTemplate("/android/templates/method_header.txt");
+      mMethodHeader = parseTemplate("/templates/android/method_header.txt");
     }
 
     return mMethodHeader.replace("${serviceBuilderOptions}", buildServiceOptions(methodElement));
-  }
-
-  @NotNull
-  @Override
-  protected String getMethodInvocationFooterTemplate(@NotNull final TypeElement annotationElement,
-      @NotNull final TypeElement element, @NotNull final Element targetElement,
-      @NotNull final ExecutableElement methodElement, final int count) throws IOException {
-    if (mMethodInvocationFooter == null) {
-      mMethodInvocationFooter = parseTemplate("/android/templates/method_invocation_footer.txt");
-    }
-
-    return mMethodInvocationFooter;
   }
 
   @NotNull
@@ -208,7 +194,7 @@ public class ContextRoutineProcessor extends RoutineProcessor {
       @NotNull final TypeElement element, @NotNull final Element targetElement,
       @NotNull final ExecutableElement methodElement, final int count) throws IOException {
     if (mMethodInvocationHeader == null) {
-      mMethodInvocationHeader = parseTemplate("/android/templates/method_invocation_header.txt");
+      mMethodInvocationHeader = parseTemplate("/templates/android/method_invocation_header.txt");
     }
 
     return mMethodInvocationHeader;

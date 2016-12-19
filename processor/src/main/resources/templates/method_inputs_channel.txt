@@ -16,7 +16,7 @@
 
 // GENERATED CODE - PLEASE DO NOT EDIT
 
-    @SuppressWarnings({"unchecked", "RedundantCast"})
-    public ${resultType} ${methodName}() {
-        return (${resultType}) ${invokeMode}.invoke(this.mRoutine${methodCount});
-    }
+  @SuppressWarnings({"unchecked", "RedundantCast"})
+  public ${resultType} ${methodName}() {
+    return (${resultType}) ${invokeMode}.invoke(this.mRoutine${methodCount});
+  }

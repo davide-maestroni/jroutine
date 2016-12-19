@@ -16,22 +16,21 @@
 
 // GENERATED CODE - PLEASE DO NOT EDIT
 
-        @Override
-        @SuppressWarnings({"unchecked", "ConstantConditions", "SynchronizeOnNonFinalField"})
-        protected void onCall(@org.jetbrains.annotations.NotNull final java.util.List<?> objects,
-                @org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.channel.Channel<${resultClassName}, ?> result) throws Exception {
-            if (objects.size() > ${maxParamSize}) {
-                throw new IllegalArgumentException(
-                        "wrong number of input parameters for method '${targetMethodName}': was " +
-                        objects.size() + " while expected " + (${maxParamSize}));
-            }
+    @Override
+    @SuppressWarnings({"unchecked", "ConstantConditions", "SynchronizeOnNonFinalField"})
+    protected void onCall(@org.jetbrains.annotations.NotNull final java.util.List<?> objects,
+        @org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.channel.Channel<${resultClassName}, ?> result) throws Exception {
+      if (objects.size() > ${maxParamSize}) {
+        throw new IllegalArgumentException("wrong number of input parameters for method '${targetMethodName}': was " +
+            objects.size() + " while expected " + (${maxParamSize}));
+      }
 
-            final com.github.dm.jrt.object.common.Mutex mutex = mMutex;
-            mutex.acquire();
-            try {
-                result.pass(${invocationTarget}.${targetMethodName}(${paramValues}));
+      final com.github.dm.jrt.object.common.Mutex mutex = mMutex;
+      mutex.acquire();
+      try {
+        result.pass(${invocationTarget}.${targetMethodName}(${paramValues}));
 
-            } finally {
-                mutex.release();
-            }
-        }
+      } finally {
+        mutex.release();
+      }
+    }

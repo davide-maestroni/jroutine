@@ -1,0 +1,46 @@
+/*
+ * Copyright 2016 Davide Maestroni
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+// GENERATED CODE - PLEASE DO NOT EDIT
+
+  private static class ContextInvocation${methodCount}${genericTypes} extends com.github.dm.jrt.android.core.invocation.CallContextInvocation<Object, ${resultClassName}> {
+
+    private final  com.github.dm.jrt.android.object.ContextInvocationTarget<?> mContextTarget;
+
+    private final java.util.Set<String> mSharedFields;
+
+    @SuppressWarnings("unused")
+    private Object mInstance;
+
+    private com.github.dm.jrt.object.common.Mutex mMutex = com.github.dm.jrt.object.common.Mutex.NO_MUTEX;
+
+    @SuppressWarnings("unused")
+    private com.github.dm.jrt.object.InvocationTarget mTarget;
+
+    private ContextInvocation${methodCount}(@org.jetbrains.annotations.Nullable final java.util.Set<String> sharedFields,
+        @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.object.ContextInvocationTarget<?> target) {
+      mSharedFields = sharedFields;
+      mContextTarget = target;
+    }
+
+    @Override
+    public void onContext(@org.jetbrains.annotations.NotNull final android.content.Context context) throws Exception {
+      super.onContext(context);
+      final com.github.dm.jrt.object.InvocationTarget<?> target = mContextTarget.getInvocationTarget(context);
+      mMutex = com.github.dm.jrt.object.builder.Builders.getSharedMutex(${mutexTarget}, mSharedFields);
+      mTarget = target;
+      mInstance = target.getTarget();
+    }

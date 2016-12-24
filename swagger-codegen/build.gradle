@@ -23,7 +23,7 @@ apply from: '../extra.gradle'
 group = project.getProperty('groupName')
 version = project.getProperty('releaseVersion')
 archivesBaseName = "${project.parent.name}-${project.name}"
-compileJavaCompatibility = JavaVersion.VERSION_1_5
+compileJavaCompatibility = JavaVersion.VERSION_1_6
 compileTestJavaCompatibility = JavaVersion.VERSION_1_7
 
 repositories {

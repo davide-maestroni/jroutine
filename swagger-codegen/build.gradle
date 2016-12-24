@@ -32,9 +32,13 @@ repositories {
   }
 }
 
+ext {
+  swaggerVersion = '2.2.2-SNAPSHOT'
+}
+
 dependencies {
   compile 'com.intellij:annotations:12.0'
-  compile 'io.swagger:swagger-codegen-cli:2.2.2-SNAPSHOT'
+  compile "io.swagger:swagger-codegen-cli:${swaggerVersion}"
   swaggerCodegen project
   testCompile project(':operator')
   testCompile project(':retrofit')
@@ -63,6 +67,17 @@ javadoc {
   options.overview("${project.projectDir}/docs/overview.html")
 }
 
+task generateProperties {
+  def outDir = "${buildDir}/generated/properties"
+  project.sourceSets.main.resources.srcDir outDir
+  doFirst {
+    file(outDir).mkdirs()
+    def propFile = new File(outDir, 'project.properties')
+    propFile << "swaggerVersion=${project.swaggerVersion}\n"
+    propFile << "projectVersion=${project.version}\n"
+  }
+}
+
 generateSwaggerCode {
   dependsOn 'jar'
   inputFile = file('src/test/resources/swagger.yaml')
@@ -80,3 +95,4 @@ task copySwaggerCode(type: Copy, dependsOn: 'generateSwaggerCode') {
 }
 
 compileTestJava.dependsOn copySwaggerCode
+compileJava.dependsOn generateProperties

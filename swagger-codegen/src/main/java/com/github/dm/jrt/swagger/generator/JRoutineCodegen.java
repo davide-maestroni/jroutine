@@ -20,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -43,9 +44,13 @@ public class JRoutineCodegen extends JavaClientCodegen {
 
   private static final String ENABLE_LOADERS = "enableLoaders";
 
+  private static final String JROUTINE_CODEGEN_VERSION = "jroutineCodegenVersion";
+
   private static final String PROJECT_NAME = "projectName";
 
   private static final String PROJECT_PREFIX = "projectPrefix";
+
+  private static final String SWAGGER_CODEGEN_VERSION = "swaggerCodegenVersion";
 
   private static final String USE_SUPPORT_LIBRARY = "useSupportLibrary";
 
@@ -53,13 +58,25 @@ public class JRoutineCodegen extends JavaClientCodegen {
    * Constructor.
    */
   public JRoutineCodegen() {
+    ProjectProperties projectProperties = new ProjectProperties();
+    try {
+      projectProperties = ProjectProperties.readProjectProperties();
+
+    } catch (final IOException e) {
+      e.printStackTrace();
+    }
+
+    final List<CliOption> cliOptions = this.cliOptions;
     cliOptions.add(CliOption.newString(PROJECT_NAME,
         "The name of the project to prepend to the API classes."));
     cliOptions.add(CliOption.newBoolean(ENABLE_LOADERS,
         "Whether to enable requests made through Android Loaders."));
     cliOptions.add(CliOption.newBoolean(USE_SUPPORT_LIBRARY,
         "Whether to use the Android Support Library to generate the source code."));
-    setLibrary(RETROFIT_2);
+    super.setLibrary(RETROFIT_2);
+    final Map<String, Object> additionalProperties = this.additionalProperties;
+    additionalProperties.put(JROUTINE_CODEGEN_VERSION, projectProperties.getProjectVersion());
+    additionalProperties.put(SWAGGER_CODEGEN_VERSION, projectProperties.getSwaggerVersion());
   }
 
   @Override
@@ -69,6 +86,9 @@ public class JRoutineCodegen extends JavaClientCodegen {
 
   @Override
   public void processOpts() {
+    final Map<String, Object> additionalProperties = this.additionalProperties;
+    additionalProperties.remove(USE_RX_JAVA);
+    additionalProperties.remove("usePlay24WS");
     super.processOpts();
     final Map<String, String> apiTemplateFiles = this.apiTemplateFiles;
     apiTemplateFiles.remove("api.mustache");
@@ -164,6 +184,10 @@ public class JRoutineCodegen extends JavaClientCodegen {
 
     opList.add(co);
     co.baseName = basePath;
+  }
+
+  @Override
+  public void setLibrary(final String library) {
   }
 
   @NotNull

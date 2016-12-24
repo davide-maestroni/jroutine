@@ -1,3 +1,5 @@
+{{>jroutine_license}}
+
 package {{package}};
 
 import {{invokerPackage}}.CollectionFormats.*;
@@ -19,11 +21,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 {{/fullJavaUtil}}
-
-{{#usePlay24WS}}
-import play.libs.F;
-import retrofit2.Response;
-{{/usePlay24WS}}
 
 {{#operations}}
 public interface {{classname}} {
@@ -68,7 +65,7 @@ public interface {{classname}} {
   {{/prioritizedContentTypes}}
   {{/formParams}}
   @{{httpMethod}}("{{path}}")
-  StreamBuilder<Object, {{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Void{{/returnType}}> {{operationId}}Builder({{^allParams}});{{/allParams}}
+  StreamBuilder<Object, {{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Void{{/returnType}}> {{operationId}}Stream({{^allParams}});{{/allParams}}
     {{#allParams}}{{>libraries/retrofit2/queryParams}}{{>libraries/retrofit2/pathParams}}{{>libraries/retrofit2/headerParams}}{{>libraries/retrofit2/bodyParams}}{{>libraries/retrofit2/formParams}}{{#hasMore}}, {{/hasMore}}{{^hasMore}}
   );{{/hasMore}}{{/allParams}}
 {{#enableLoaders}}
@@ -90,7 +87,7 @@ public interface {{classname}} {
   {{/prioritizedContentTypes}}
   {{/formParams}}
   @{{httpMethod}}("{{path}}")
-  LoaderStreamBuilder{{#useSupportLibrary}}Compat{{/useSupportLibrary}}<Object, {{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Void{{/returnType}}> {{operationId}}LoaderBuilder({{^allParams}});{{/allParams}}
+  LoaderStreamBuilder{{#useSupportLibrary}}Compat{{/useSupportLibrary}}<Object, {{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Void{{/returnType}}> {{operationId}}LoaderStream({{^allParams}});{{/allParams}}
     {{#allParams}}{{>libraries/retrofit2/queryParams}}{{>libraries/retrofit2/pathParams}}{{>libraries/retrofit2/headerParams}}{{>libraries/retrofit2/bodyParams}}{{>libraries/retrofit2/formParams}}{{#hasMore}}, {{/hasMore}}{{^hasMore}}
   );{{/hasMore}}{{/allParams}}{{/enableLoaders}}
 

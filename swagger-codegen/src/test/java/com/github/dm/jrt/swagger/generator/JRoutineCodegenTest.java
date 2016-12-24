@@ -156,7 +156,7 @@ public class JRoutineCodegenTest {
             new UsersApiClient().withBaseUrl("http://localhost:" + server.getPort())
                                 .withAdapterFactory(adapterFactory)
                                 .createService(UsersApi.class);
-        assertThat(service.getReposBuilder("octocat", null, null, null)
+        assertThat(service.getReposStream("octocat", null, null, null)
                           .map(Operators.<Repo>unfold())
                           .close()
                           .bind(onOutput(new Consumer<Repo>() {
@@ -180,7 +180,7 @@ public class JRoutineCodegenTest {
             new UsersApiClient().withBaseUrl("http://localhost:" + server.getPort())
                                 .withAdapterFactory(adapterFactory)
                                 .createService(UsersApi.class);
-        assertThat(service.getReposBuilder("octocat", null, null, null)
+        assertThat(service.getReposStream("octocat", null, null, null)
                           .map(Operators.<Repo>unfold())
                           .close()
                           .bind(onOutput(new Consumer<Repo>() {
@@ -204,7 +204,7 @@ public class JRoutineCodegenTest {
             new UsersApiClient().withBaseUrl("http://localhost:" + server.getPort())
                                 .withAdapterFactory(adapterFactory)
                                 .createService(UsersApi.class);
-        assertThat(service.getReposBuilder("octocat", null, null, null)
+        assertThat(service.getReposStream("octocat", null, null, null)
                           .map(Operators.<Repo>unfold())
                           .close()
                           .bind(onOutput(new Consumer<Repo>() {

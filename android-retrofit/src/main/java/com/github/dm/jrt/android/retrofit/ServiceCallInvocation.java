@@ -17,12 +17,13 @@
 package com.github.dm.jrt.android.retrofit;
 
 import com.github.dm.jrt.android.channel.AndroidChannels;
-import com.github.dm.jrt.android.channel.ParcelableByteChannel;
-import com.github.dm.jrt.android.channel.ParcelableByteChannel.ParcelableByteBuffer;
 import com.github.dm.jrt.android.channel.ParcelableSelectable;
+import com.github.dm.jrt.android.channel.io.ParcelableByteChannel;
+import com.github.dm.jrt.android.channel.io.ParcelableByteChannel.ParcelableByteBuffer;
 import com.github.dm.jrt.android.core.invocation.AbstractContextInvocation;
 import com.github.dm.jrt.android.object.ContextInvocationTarget;
-import com.github.dm.jrt.channel.ByteChannel.BufferOutputStream;
+import com.github.dm.jrt.channel.builder.OutputStreamConfiguration.CloseActionType;
+import com.github.dm.jrt.channel.io.ByteChannel.BufferOutputStream;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
@@ -188,8 +189,12 @@ public class ServiceCallInvocation
 
     final Channel<Object, ?> channel =
         AndroidChannels.selectInputParcelable(result, BYTES_INDEX).buildChannel();
-    final BufferOutputStream outputStream =
-        AndroidChannels.parcelableByteChannel().bindDeep(channel);
+    final BufferOutputStream outputStream = ParcelableByteChannel.from(channel)
+                                                                 .applyOutputStreamConfiguration()
+                                                                 .withOnClose(
+                                                                     CloseActionType.CLOSE_CHANNEL)
+                                                                 .configured()
+                                                                 .buildOutputStream();
     try {
       outputStream.transferFrom(responseBody.byteStream());
 
@@ -243,7 +248,7 @@ public class ServiceCallInvocation
       final OutputStream outputStream = sink.outputStream();
       try {
         for (final ParcelableByteBuffer buffer : mInputChannel.in(infinity())) {
-          ParcelableByteChannel.inputStream(buffer).transferTo(outputStream);
+          ParcelableByteChannel.getInputStream(buffer).transferTo(outputStream);
         }
 
       } finally {

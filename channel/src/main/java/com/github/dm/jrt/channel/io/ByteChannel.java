@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Davide Maestroni
+ * Copyright 2017 Davide Maestroni
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,11 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.channel;
+package com.github.dm.jrt.channel.io;
 
+import com.github.dm.jrt.channel.builder.OutputStreamConfiguration;
+import com.github.dm.jrt.channel.builder.OutputStreamConfiguration.Builder;
+import com.github.dm.jrt.channel.builder.OutputStreamConfiguration.CloseActionType;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.SimpleQueue;
@@ -35,7 +38,7 @@ import java.util.ArrayList;
  * <pre><code>
  * public void onInput(final IN in, final Channel&lt;ByteBuffer, ?&gt; result) {
  *   ...
- *   final BufferOutputStream outputStream = Channels.byteChannel().bind(result);
+ *   final BufferOutputStream outputStream = ByteChannel.from(result).buildOutputStream();
  *   ...
  * }
  * </code></pre>
@@ -44,7 +47,7 @@ import java.util.ArrayList;
  * <pre><code>
  * public void onInput(final ByteBuffer buffer, final Channel&lt;OUT, ?&gt; result) {
  *   ...
- *   final BufferInputStream inputStream = ByteChannel.inputStream(buffer);
+ *   final BufferInputStream inputStream = ByteChannel.getInputStream(buffer);
  *   ...
  * }
  * </code></pre>
@@ -62,19 +65,15 @@ import java.util.ArrayList;
 @SuppressWarnings("WeakerAccess")
 public class ByteChannel {
 
-  /**
-   * The default buffer size in number of bytes.
-   */
-  public static final int DEFAULT_BUFFER_SIZE = 16 << 10;
+  private static final int DEFAULT_BUFFER_SIZE = 16 << 10;
 
-  /**
-   * The default core pool size.
-   */
-  public static final int DEFAULT_POOL_SIZE = 16;
+  private static final int DEFAULT_POOL_SIZE = 16;
 
   private static final int DEFAULT_MEM_SIZE = DEFAULT_POOL_SIZE * DEFAULT_BUFFER_SIZE;
 
-  private final SimpleQueue<ByteBuffer> mBufferPool = new SimpleQueue<ByteBuffer>();
+  private final SimpleQueue<ByteBuffer> mBufferPool;
+
+  private final OutputStreamConfiguration mConfiguration;
 
   private final int mCorePoolSize;
 
@@ -82,35 +81,66 @@ public class ByteChannel {
 
   /**
    * Constructor.
-   */
-  ByteChannel() {
-    this(DEFAULT_BUFFER_SIZE, DEFAULT_POOL_SIZE);
-  }
-
-  /**
-   * Constructor.
    *
-   * @param dataBufferSize the data buffer size.
-   * @throws java.lang.IllegalArgumentException if the specified buffer size is 0 or negative.
+   * @param configuration the output stream configuration.
    */
-  ByteChannel(final int dataBufferSize) {
-    this(dataBufferSize, DEFAULT_MEM_SIZE / Math.max(dataBufferSize, 1));
+  private ByteChannel(@NotNull final OutputStreamConfiguration configuration) {
+    mConfiguration = configuration;
+    final int bufferSize =
+        (mDataBufferSize = configuration.getBufferSizeOrElse(DEFAULT_BUFFER_SIZE));
+    final int poolSize =
+        (mCorePoolSize = configuration.getCorePoolSizeOrElse(DEFAULT_MEM_SIZE / bufferSize));
+    mBufferPool = new SimpleQueue<ByteBuffer>(Math.max(poolSize, 1));
   }
 
   /**
-   * Constructor.
+   * Returns a builder of buffer output streams.
+   * <p>
+   * The built streams will not close the underlying channel by default.
    *
-   * @param dataBufferSize the data buffer size.
-   * @param corePoolSize   the maximum number of retained data buffers.
-   * @throws java.lang.IllegalArgumentException if the specified buffer size is 0 or negative.
+   * @param channel the output channel to feed with data.
+   * @return the output stream builder.
    */
-  ByteChannel(final int dataBufferSize, final int corePoolSize) {
-    mDataBufferSize = ConstantConditions.positive("data buffer size", dataBufferSize);
-    mCorePoolSize = corePoolSize;
+  @NotNull
+  public static OutputStreamBuilder from(@NotNull final Channel<? super ByteBuffer, ?> channel) {
+    return new DefaultOutputStreamBuilder(channel);
   }
 
   /**
-   * Creates an input stream returning the data contained in the specified buffer.
+   * Gets an input stream returning the concatenation of the data contained in the specified
+   * buffers.
+   * <p>
+   * Note that only one input stream can be created for each buffer.
+   *
+   * @param buffers the byte buffers whose data have to be concatenated.
+   * @return the input stream.
+   * @throws java.lang.IllegalStateException if an input stream has been already created for one
+   *                                         of the specified buffers.
+   */
+  @NotNull
+  public static BufferInputStream getInputStream(@NotNull final ByteBuffer... buffers) {
+    return new MultiBufferInputStream(buffers);
+  }
+
+  /**
+   * Gets an input stream returning the concatenation of the data contained in the specified
+   * buffers.
+   * <p>
+   * Note that only one input stream can be created for each buffer.
+   *
+   * @param buffers the byte buffers whose data have to be concatenated.
+   * @return the input stream.
+   * @throws java.lang.IllegalStateException if an input stream has been already created for one
+   *                                         of the specified buffers.
+   */
+  @NotNull
+  public static BufferInputStream getInputStream(
+      @NotNull final Iterable<? extends ByteBuffer> buffers) {
+    return new MultiBufferInputStream(buffers);
+  }
+
+  /**
+   * Gets an input stream returning the data contained in the specified buffer.
    * <p>
    * Note that only one input stream can be created for each buffer.
    *
@@ -120,69 +150,12 @@ public class ByteChannel {
    *                                         specified buffer.
    */
   @NotNull
-  public static BufferInputStream inputStream(@NotNull final ByteBuffer buffer) {
+  public static BufferInputStream getInputStream(@NotNull final ByteBuffer buffer) {
     return buffer.getStream();
-  }
-
-  /**
-   * Creates an input stream returning the concatenation of the data contained in the specified
-   * buffers.
-   * <p>
-   * Note that only one input stream can be created for each buffer.
-   *
-   * @param buffers the byte buffers whose data have to be concatenated.
-   * @return the input stream.
-   * @throws java.lang.IllegalStateException if an input stream has been already created for one
-   *                                         of the specified buffers.
-   */
-  @NotNull
-  public static BufferInputStream inputStream(@NotNull final ByteBuffer... buffers) {
-    return new MultiBufferInputStream(buffers);
-  }
-
-  /**
-   * Creates an input stream returning the concatenation of the data contained in the specified
-   * buffers.
-   * <p>
-   * Note that only one input stream can be created for each buffer.
-   *
-   * @param buffers the byte buffers whose data have to be concatenated.
-   * @return the input stream.
-   * @throws java.lang.IllegalStateException if an input stream has been already created for one
-   *                                         of the specified buffers.
-   */
-  @NotNull
-  public static BufferInputStream inputStream(
-      @NotNull final Iterable<? extends ByteBuffer> buffers) {
-    return new MultiBufferInputStream(buffers);
   }
 
   private static boolean outOfBound(final int off, final int len, final int bytes) {
     return (off < 0) || (len < 0) || (len > bytes - off) || ((off + len) < 0);
-  }
-
-  /**
-   * Returns the output stream used to write bytes into the specified channel.
-   *
-   * @param channel the channel to which pass the data.
-   * @return the output stream.
-   */
-  @NotNull
-  public BufferOutputStream bind(@NotNull final Channel<? super ByteBuffer, ?> channel) {
-    return new DefaultBufferOutputStream(channel, false);
-  }
-
-  /**
-   * Returns the output stream used to write bytes into the specified channel.
-   * <br>
-   * The channel will be automatically closed as soon as the output stream is.
-   *
-   * @param channel the channel to which pass the data.
-   * @return the output stream.
-   */
-  @NotNull
-  public BufferOutputStream bindDeep(@NotNull final Channel<? super ByteBuffer, ?> channel) {
-    return new DefaultBufferOutputStream(channel, true);
   }
 
   @NotNull
@@ -200,6 +173,12 @@ public class ByteChannel {
     }
 
     return new ByteBuffer(mDataBufferSize);
+  }
+
+  @NotNull
+  private BufferOutputStream getOutputStream(
+      @NotNull final Channel<? super ByteBuffer, ?> channel) {
+    return new DefaultBufferOutputStream(mConfiguration, channel);
   }
 
   private void release(@NotNull final ByteBuffer buffer) {
@@ -395,6 +374,42 @@ public class ByteChannel {
 
     @Override
     public void close() {
+    }
+  }
+
+  /**
+   * Default implementation of an output stream builder.
+   */
+  private static class DefaultOutputStreamBuilder implements OutputStreamBuilder {
+
+    private final Channel<? super ByteBuffer, ?> mChannel;
+
+    private OutputStreamConfiguration mConfiguration =
+        OutputStreamConfiguration.defaultConfiguration();
+
+    /**
+     * Constructor.
+     *
+     * @param channel the output channel to feed with data.
+     */
+    private DefaultOutputStreamBuilder(@NotNull final Channel<? super ByteBuffer, ?> channel) {
+      mChannel = ConstantConditions.notNull("channel instance", channel);
+    }
+
+    @NotNull
+    public OutputStreamBuilder apply(@NotNull final OutputStreamConfiguration configuration) {
+      mConfiguration = ConstantConditions.notNull("output stream configuration", configuration);
+      return this;
+    }
+
+    @NotNull
+    public Builder<? extends OutputStreamBuilder> applyOutputStreamConfiguration() {
+      return new Builder<OutputStreamBuilder>(this, mConfiguration);
+    }
+
+    @NotNull
+    public BufferOutputStream buildOutputStream() {
+      return new ByteChannel(mConfiguration).getOutputStream(mChannel);
     }
   }
 
@@ -648,14 +663,14 @@ public class ByteChannel {
    * {@code BufferOutputStream}s and passed to the underlying channel.
    * <br>
    * The data contained in a buffer can be read through the dedicated {@code BufferInputStream}
-   * returned by one of the {@code ByteChannel.inputStream()} methods. Note that only one input
+   * returned by one of the {@code ByteChannel.getInputStream()} methods. Note that only one input
    * stream can be created for each buffer, any further attempt will generate an exception.
    * <br>
    * Used buffers will be released as soon as the corresponding input stream is closed.
    *
-   * @see ByteChannel#inputStream(ByteBuffer)
-   * @see ByteChannel#inputStream(ByteBuffer...)
-   * @see ByteChannel#inputStream(Iterable)
+   * @see ByteChannel#getInputStream(ByteBuffer)
+   * @see ByteChannel#getInputStream(ByteBuffer...)
+   * @see ByteChannel#getInputStream(Iterable)
    */
   public class ByteBuffer {
 
@@ -747,6 +762,44 @@ public class ByteChannel {
       mState = updated;
     }
 
+    private void copyFrom(@NotNull final byte[] src, final int srcPos, final int dstPos,
+        final int len) {
+      synchronized (mMutex) {
+        final BufferState state = mState;
+        if (state != BufferState.WRITE) {
+          throw new IllegalStateException(
+              "attempting to write buffer data while in illegal state: " + state);
+        }
+      }
+
+      System.arraycopy(src, srcPos, mBuffer, dstPos, len);
+    }
+
+    private void copyTo(final int srcPos, @NotNull final byte[] dest, final int dstPos,
+        final int len) {
+      synchronized (mMutex) {
+        final BufferState state = mState;
+        if (state != BufferState.READ) {
+          throw new IllegalStateException(
+              "attempting to read buffer data while in illegal state: " + state);
+        }
+      }
+
+      System.arraycopy(mBuffer, srcPos, dest, dstPos, len);
+    }
+
+    private byte getByte(final int pos) {
+      synchronized (mMutex) {
+        final BufferState state = mState;
+        if (state != BufferState.READ) {
+          throw new IllegalStateException(
+              "attempting to read buffer data while in illegal state: " + state);
+        }
+      }
+
+      return mBuffer[pos];
+    }
+
     @NotNull
     private BufferInputStream getStream() {
       synchronized (mMutex) {
@@ -754,6 +807,10 @@ public class ByteChannel {
             "attempting to get buffer stream while in illegal state");
         return mStream;
       }
+    }
+
+    private int length() {
+      return mBuffer.length;
     }
 
     @NotNull
@@ -767,17 +824,17 @@ public class ByteChannel {
       return this;
     }
 
-    @NotNull
-    private byte[] readBuffer() {
+    private int readFrom(@NotNull final InputStream in, final int off, final int len) throws
+        IOException {
       synchronized (mMutex) {
         final BufferState state = mState;
-        if (state != BufferState.READ) {
+        if (state != BufferState.WRITE) {
           throw new IllegalStateException(
-              "attempting to read buffer data while in illegal state: " + state);
+              "attempting to write buffer data while in illegal state: " + state);
         }
       }
 
-      return mBuffer;
+      return in.read(mBuffer, off, len);
     }
 
     private void recycle() {
@@ -790,8 +847,7 @@ public class ByteChannel {
       release(new ByteBuffer(mBuffer));
     }
 
-    @NotNull
-    private byte[] writeBuffer() {
+    private void setByte(final int pos, final byte b) {
       synchronized (mMutex) {
         final BufferState state = mState;
         if (state != BufferState.WRITE) {
@@ -800,7 +856,20 @@ public class ByteChannel {
         }
       }
 
-      return mBuffer;
+      mBuffer[pos] = b;
+    }
+
+    private void writeTo(@NotNull final OutputStream out, final int off, final int len) throws
+        IOException {
+      synchronized (mMutex) {
+        final BufferState state = mState;
+        if (state != BufferState.READ) {
+          throw new IllegalStateException(
+              "attempting to read buffer data while in illegal state: " + state);
+        }
+      }
+
+      out.write(mBuffer, off, len);
     }
   }
 
@@ -839,7 +908,7 @@ public class ByteChannel {
         }
 
         final int count = size - offset;
-        out.write(buffer.readBuffer(), offset, count);
+        buffer.writeTo(out, offset, count);
         mOffset = size;
         return count;
       }
@@ -861,7 +930,7 @@ public class ByteChannel {
         }
 
         final int count = Math.min(len, size - offset);
-        System.arraycopy(buffer.readBuffer(), offset, b, 0, count);
+        buffer.copyTo(offset, b, 0, count);
         mOffset += count;
         return count;
       }
@@ -885,7 +954,7 @@ public class ByteChannel {
         }
 
         final int count = Math.min(len, size - offset);
-        System.arraycopy(buffer.readBuffer(), offset, b, off, count);
+        buffer.copyTo(offset, b, off, count);
         mOffset += count;
         return count;
       }
@@ -897,9 +966,10 @@ public class ByteChannel {
         final long skipped = Math.min(mBuffer.size() - mOffset, n);
         if (skipped > 0) {
           mOffset += skipped;
+          return skipped;
         }
 
-        return skipped;
+        return 0;
       }
     }
 
@@ -939,7 +1009,7 @@ public class ByteChannel {
           return -1;
         }
 
-        return buffer.readBuffer()[mOffset++];
+        return buffer.getByte(mOffset++);
       }
     }
 
@@ -963,7 +1033,7 @@ public class ByteChannel {
 
     private final Channel<? super ByteBuffer, ?> mChannel;
 
-    private final boolean mCloseChannel;
+    private final CloseActionType mCloseAction;
 
     private final Object mMutex = new Object();
 
@@ -976,13 +1046,13 @@ public class ByteChannel {
     /**
      * Constructor
      *
-     * @param channel      the channel to which pass the data.
-     * @param closeChannel whether the underlying channel must be closed when this stream is.
+     * @param configuration the output stream configuration.
+     * @param channel       the channel to which pass the data.
      */
-    private DefaultBufferOutputStream(@NotNull final Channel<? super ByteBuffer, ?> channel,
-        final boolean closeChannel) {
-      mChannel = ConstantConditions.notNull("channel instance", channel);
-      mCloseChannel = closeChannel;
+    private DefaultBufferOutputStream(@NotNull final OutputStreamConfiguration configuration,
+        @NotNull final Channel<? super ByteBuffer, ?> channel) {
+      mChannel = channel;
+      mCloseAction = configuration.getCloseActionTypeOrElse(CloseActionType.CLOSE_STREAM);
     }
 
     @Override
@@ -997,12 +1067,11 @@ public class ByteChannel {
         }
 
         byteBuffer = getBuffer();
-        final byte[] buffer = byteBuffer.writeBuffer();
-        final int length = buffer.length;
+        final int length = byteBuffer.length();
         final int offset = mOffset;
-        read = in.read(buffer, offset, length - offset);
+        read = byteBuffer.readFrom(in, offset, length - offset);
         if (read > 0) {
-          mOffset += Math.max(read, 0);
+          mOffset += read;
           size = mOffset;
           isPass = (size >= length);
           if (isPass) {
@@ -1043,16 +1112,24 @@ public class ByteChannel {
 
     @Override
     public void close() {
-      synchronized (mMutex) {
-        if (mIsClosed) {
-          return;
-        }
+      final CloseActionType closeAction = mCloseAction;
+      if (closeAction == CloseActionType.IGNORE) {
+        return;
+      }
 
-        mIsClosed = true;
+      if ((closeAction == CloseActionType.CLOSE_STREAM) || (closeAction
+          == CloseActionType.CLOSE_CHANNEL)) {
+        synchronized (mMutex) {
+          if (mIsClosed) {
+            return;
+          }
+
+          mIsClosed = true;
+        }
       }
 
       flush();
-      if (mCloseChannel) {
+      if (closeAction == CloseActionType.CLOSE_CHANNEL) {
         mChannel.close();
       }
     }
@@ -1068,10 +1145,9 @@ public class ByteChannel {
         }
 
         byteBuffer = getBuffer();
-        final byte[] buffer = byteBuffer.writeBuffer();
-        buffer[mOffset++] = (byte) b;
+        byteBuffer.setByte(mOffset++, (byte) b);
         size = mOffset;
-        isPass = (size >= buffer.length);
+        isPass = (size >= byteBuffer.length());
         if (isPass) {
           mOffset = 0;
           mBuffer = null;
@@ -1101,11 +1177,10 @@ public class ByteChannel {
           }
 
           byteBuffer = getBuffer();
-          final byte[] buffer = byteBuffer.writeBuffer();
-          final int length = buffer.length;
+          final int length = byteBuffer.length();
           final int offset = mOffset;
           final int count = Math.min(len - written, length - offset);
-          System.arraycopy(b, written, buffer, offset, count);
+          byteBuffer.copyFrom(b, written, offset, count);
           written += count;
           mOffset += count;
           size = mOffset;
@@ -1143,11 +1218,10 @@ public class ByteChannel {
           }
 
           byteBuffer = getBuffer();
-          final byte[] buffer = byteBuffer.writeBuffer();
-          final int length = buffer.length;
+          final int length = byteBuffer.length();
           final int offset = mOffset;
           final int count = Math.min(len - written, length - offset);
-          System.arraycopy(b, off + written, buffer, offset, count);
+          byteBuffer.copyFrom(b, off + written, offset, count);
           written += count;
           mOffset += count;
           size = mOffset;

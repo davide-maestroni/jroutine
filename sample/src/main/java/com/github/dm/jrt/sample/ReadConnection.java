@@ -16,9 +16,9 @@
 
 package com.github.dm.jrt.sample;
 
-import com.github.dm.jrt.channel.ByteChannel.BufferOutputStream;
-import com.github.dm.jrt.channel.ByteChannel.ByteBuffer;
-import com.github.dm.jrt.channel.Channels;
+import com.github.dm.jrt.channel.io.ByteChannel;
+import com.github.dm.jrt.channel.io.ByteChannel.BufferOutputStream;
+import com.github.dm.jrt.channel.io.ByteChannel.ByteBuffer;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
 
@@ -59,7 +59,11 @@ public class ReadConnection extends MappingInvocation<URI, ByteBuffer> {
 
     // We employ the utility class dedicated to the optimized transfer of bytes through a routine
     // channel
-    final BufferOutputStream outputStream = Channels.byteChannel(MAX_CHUNK_SIZE).bind(result);
+    final BufferOutputStream outputStream = ByteChannel.from(result)
+                                                       .applyOutputStreamConfiguration()
+                                                       .withBufferSize(MAX_CHUNK_SIZE)
+                                                       .configured()
+                                                       .buildOutputStream();
     try {
       outputStream.transferFrom(connection.getInputStream());
 

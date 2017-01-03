@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Davide Maestroni
+ * Copyright 2017 Davide Maestroni
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.android.channel;
+package com.github.dm.jrt.android.channel.io;
 
 import android.annotation.TargetApi;
 import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
-import com.github.dm.jrt.android.channel.ParcelableByteChannel.ParcelableByteBuffer;
+import com.github.dm.jrt.android.channel.TestActivity;
+import com.github.dm.jrt.android.channel.io.ParcelableByteChannel.ParcelableByteBuffer;
 import com.github.dm.jrt.android.core.JRoutineService;
 import com.github.dm.jrt.android.core.invocation.TemplateContextInvocation;
-import com.github.dm.jrt.channel.ByteChannel.BufferInputStream;
-import com.github.dm.jrt.channel.ByteChannel.BufferOutputStream;
+import com.github.dm.jrt.channel.builder.OutputStreamConfiguration.CloseActionType;
+import com.github.dm.jrt.channel.io.ByteChannel.BufferInputStream;
+import com.github.dm.jrt.channel.io.ByteChannel.BufferOutputStream;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 
@@ -62,12 +64,17 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
         JRoutineService.on(serviceFrom(getActivity()))
                        .with(factoryOf(PassingInvocation.class))
                        .call();
-    final BufferOutputStream stream = AndroidChannels.parcelableByteChannel().bindDeep(channel);
+    final BufferOutputStream stream = ParcelableByteChannel.from(channel)
+                                                           .applyOutputStreamConfiguration()
+                                                           .withOnClose(
+                                                               CloseActionType.CLOSE_STREAM)
+                                                           .configured()
+                                                           .buildOutputStream();
     final byte[] b = new byte[16];
     stream.write(b);
     stream.close();
     final BufferInputStream inputStream =
-        ParcelableByteChannel.inputStream(channel.close().in(seconds(10)).next());
+        ParcelableByteChannel.getInputStream(channel.close().in(seconds(10)).next());
     assertThat(inputStream.available()).isEqualTo(16);
     assertThat(inputStream.read()).isNotEqualTo(-1);
     assertThat(inputStream.available()).isEqualTo(15);
@@ -85,7 +92,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
                                                                    .with(factoryOf(
                                                                        PassingInvocation.class))
                                                                    .call(channel);
-    final BufferOutputStream stream = AndroidChannels.parcelableByteChannel().bind(channel);
+    final BufferOutputStream stream = ParcelableByteChannel.from(channel).buildOutputStream();
     stream.write(new byte[]{31, 17, (byte) 155, 13});
     stream.flush();
     final ParcelableByteBuffer buffer1 = result.in(seconds(10)).next();
@@ -101,7 +108,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     assertThat(buffer1.hashCode()).isEqualTo(buffer2.hashCode());
     assertThat(buffer1).isEqualTo(buffer2);
     assertThat(buffer2).isEqualTo(buffer1);
-    ParcelableByteChannel.inputStream(buffer2).close();
+    ParcelableByteChannel.getInputStream(buffer2).close();
     stream.write(new byte[]{31, 17, (byte) 155});
     stream.flush();
     final ParcelableByteBuffer buffer3 = result.in(seconds(10)).next();
@@ -111,42 +118,25 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     assertThat(buffer3).isNotEqualTo(buffer1);
   }
 
-  public void testChannelError() {
-
-    try {
-
-      AndroidChannels.parcelableByteChannel(-1);
-
-      fail();
-
-    } catch (final IllegalArgumentException ignored) {
-
-    }
-
-    try {
-
-      AndroidChannels.parcelableByteChannel(-1, 0);
-
-      fail();
-
-    } catch (final IllegalArgumentException ignored) {
-
-    }
-  }
-
   public void testConcatAvailable() throws IOException {
 
     final Channel<ParcelableByteBuffer, ParcelableByteBuffer> channel =
         JRoutineService.on(serviceFrom(getActivity()))
                        .with(factoryOf(PassingInvocation.class))
                        .call();
-    final BufferOutputStream stream = AndroidChannels.parcelableByteChannel(8).bindDeep(channel);
+    final BufferOutputStream stream = ParcelableByteChannel.from(channel)
+                                                           .applyOutputStreamConfiguration()
+                                                           .withBufferSize(8)
+                                                           .withOnClose(
+                                                               CloseActionType.CLOSE_STREAM)
+                                                           .configured()
+                                                           .buildOutputStream();
     final byte[] b = new byte[16];
     stream.write(b);
     stream.close();
     final Channel<?, ParcelableByteBuffer> result = channel.close();
     final BufferInputStream inputStream =
-        ParcelableByteChannel.inputStream(result.in(seconds(10)).next(),
+        ParcelableByteChannel.getInputStream(result.in(seconds(10)).next(),
             result.in(seconds(10)).next());
     assertThat(inputStream.available()).isEqualTo(16);
     assertThat(inputStream.read()).isNotEqualTo(-1);
@@ -164,12 +154,16 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
         JRoutineService.on(serviceFrom(getActivity()))
                        .with(factoryOf(PassingInvocation.class))
                        .call();
-    final BufferOutputStream stream = AndroidChannels.parcelableByteChannel(2).bind(channel);
+    final BufferOutputStream stream = ParcelableByteChannel.from(channel)
+                                                           .applyOutputStreamConfiguration()
+                                                           .withBufferSize(2)
+                                                           .configured()
+                                                           .buildOutputStream();
     stream.write(new byte[]{31, 17, (byte) 155, 13});
     stream.flush();
     final Channel<?, ParcelableByteBuffer> result = channel.close();
     final BufferInputStream inputStream =
-        ParcelableByteChannel.inputStream(result.in(seconds(10)).next(),
+        ParcelableByteChannel.getInputStream(result.in(seconds(10)).next(),
             result.in(seconds(10)).next());
     inputStream.close();
     assertThat(inputStream.read()).isEqualTo(-1);
@@ -181,14 +175,20 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
         JRoutineService.on(serviceFrom(getActivity()))
                        .with(factoryOf(PassingInvocation.class))
                        .call();
-    final BufferOutputStream stream = AndroidChannels.parcelableByteChannel(4).bindDeep(channel);
+    final BufferOutputStream stream = ParcelableByteChannel.from(channel)
+                                                           .applyOutputStreamConfiguration()
+                                                           .withBufferSize(4)
+                                                           .withOnClose(
+                                                               CloseActionType.CLOSE_STREAM)
+                                                           .configured()
+                                                           .buildOutputStream();
     final byte[] b =
         new byte[]{(byte) 1, (byte) 2, (byte) 3, (byte) 4, (byte) 5, (byte) 6, (byte) 7, (byte) 8};
     stream.write(b);
     stream.close();
     final Channel<?, ParcelableByteBuffer> result = channel.close();
     final BufferInputStream inputStream =
-        ParcelableByteChannel.inputStream(result.in(seconds(10)).next(),
+        ParcelableByteChannel.getInputStream(result.in(seconds(10)).next(),
             result.in(seconds(10)).next());
     assertThat(inputStream.read()).isEqualTo(1);
     assertThat(inputStream.markSupported()).isTrue();
@@ -210,12 +210,16 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
         JRoutineService.on(serviceFrom(getActivity()))
                        .with(factoryOf(PassingInvocation.class))
                        .call();
-    final BufferOutputStream stream = AndroidChannels.parcelableByteChannel(2).bind(channel);
+    final BufferOutputStream stream = ParcelableByteChannel.from(channel)
+                                                           .applyOutputStreamConfiguration()
+                                                           .withBufferSize(2)
+                                                           .configured()
+                                                           .buildOutputStream();
     stream.write(new byte[]{31, 17, (byte) 155, 13});
     stream.flush();
     final Channel<?, ParcelableByteBuffer> result = channel.close();
     final BufferInputStream inputStream =
-        ParcelableByteChannel.inputStream(result.in(seconds(10)).next(),
+        ParcelableByteChannel.getInputStream(result.in(seconds(10)).next(),
             result.in(seconds(10)).next());
     assertThat(inputStream.read()).isEqualTo(31);
     assertThat(inputStream.read()).isEqualTo(17);
@@ -230,12 +234,16 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
         JRoutineService.on(serviceFrom(getActivity()))
                        .with(factoryOf(PassingInvocation.class))
                        .call();
-    final BufferOutputStream stream = AndroidChannels.parcelableByteChannel(2).bind(channel);
+    final BufferOutputStream stream = ParcelableByteChannel.from(channel)
+                                                           .applyOutputStreamConfiguration()
+                                                           .withBufferSize(2)
+                                                           .configured()
+                                                           .buildOutputStream();
     stream.write(new byte[]{31, 17, (byte) 155, 13});
     stream.flush();
     final Channel<?, ParcelableByteBuffer> result = channel.close();
     final BufferInputStream inputStream =
-        ParcelableByteChannel.inputStream(result.in(seconds(10)).next(),
+        ParcelableByteChannel.getInputStream(result.in(seconds(10)).next(),
             result.in(seconds(10)).next());
     final byte[] b = new byte[16];
     assertThat(inputStream.read()).isEqualTo(31);
@@ -255,12 +263,16 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
         JRoutineService.on(serviceFrom(getActivity()))
                        .with(factoryOf(PassingInvocation.class))
                        .call();
-    final BufferOutputStream stream = AndroidChannels.parcelableByteChannel(3).bind(channel);
+    final BufferOutputStream stream = ParcelableByteChannel.from(channel)
+                                                           .applyOutputStreamConfiguration()
+                                                           .withBufferSize(3)
+                                                           .configured()
+                                                           .buildOutputStream();
     stream.write(new byte[]{31, 17, (byte) 155, 13});
     stream.flush();
     final Channel<?, ParcelableByteBuffer> result = channel.close();
     final BufferInputStream inputStream =
-        ParcelableByteChannel.inputStream(result.in(seconds(10)).next(),
+        ParcelableByteChannel.getInputStream(result.in(seconds(10)).next(),
             result.in(seconds(10)).next());
     final byte[] b = new byte[16];
     assertThat(inputStream.read(b, 2, 3)).isEqualTo(3);
@@ -283,12 +295,16 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
         JRoutineService.on(serviceFrom(getActivity()))
                        .with(factoryOf(PassingInvocation.class))
                        .call();
-    final BufferOutputStream stream = AndroidChannels.parcelableByteChannel(2).bind(channel);
+    final BufferOutputStream stream = ParcelableByteChannel.from(channel)
+                                                           .applyOutputStreamConfiguration()
+                                                           .withBufferSize(2)
+                                                           .configured()
+                                                           .buildOutputStream();
     stream.write(new byte[]{31, 17, (byte) 155, 13});
     stream.flush();
     final Channel<?, ParcelableByteBuffer> result = channel.close();
     final BufferInputStream inputStream =
-        ParcelableByteChannel.inputStream(result.in(seconds(10)).next(),
+        ParcelableByteChannel.getInputStream(result.in(seconds(10)).next(),
             result.in(seconds(10)).next());
     final byte[] b = new byte[16];
 
@@ -372,12 +388,16 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
         JRoutineService.on(serviceFrom(getActivity()))
                        .with(factoryOf(PassingInvocation.class))
                        .call();
-    final BufferOutputStream stream = AndroidChannels.parcelableByteChannel(3).bind(channel);
+    final BufferOutputStream stream = ParcelableByteChannel.from(channel)
+                                                           .applyOutputStreamConfiguration()
+                                                           .withBufferSize(3)
+                                                           .configured()
+                                                           .buildOutputStream();
     stream.write(new byte[]{31, 17, (byte) 155, 13});
     stream.flush();
     final Channel<?, ParcelableByteBuffer> result = channel.close();
     final BufferInputStream inputStream =
-        ParcelableByteChannel.inputStream(result.in(seconds(10)).next(),
+        ParcelableByteChannel.getInputStream(result.in(seconds(10)).next(),
             result.in(seconds(10)).next());
     final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     assertThat(inputStream.read(outputStream)).isEqualTo(3);
@@ -400,14 +420,18 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
         JRoutineService.on(serviceFrom(getActivity()))
                        .with(factoryOf(PassingInvocation.class))
                        .call();
-    final BufferOutputStream stream = AndroidChannels.parcelableByteChannel(4).bind(channel);
+    final BufferOutputStream stream = ParcelableByteChannel.from(channel)
+                                                           .applyOutputStreamConfiguration()
+                                                           .withBufferSize(4)
+                                                           .configured()
+                                                           .buildOutputStream();
     final byte[] b =
         new byte[]{(byte) 1, (byte) 2, (byte) 3, (byte) 4, (byte) 5, (byte) 6, (byte) 7, (byte) 8};
     stream.write(b);
     stream.close();
     final Channel<?, ParcelableByteBuffer> result = channel.close();
     final BufferInputStream inputStream =
-        ParcelableByteChannel.inputStream(result.in(seconds(10)).next(),
+        ParcelableByteChannel.getInputStream(result.in(seconds(10)).next(),
             result.in(seconds(10)).next());
     assertThat(inputStream.available()).isEqualTo(8);
     assertThat(inputStream.skip(2)).isEqualTo(2);
@@ -430,12 +454,17 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
         JRoutineService.on(serviceFrom(getActivity()))
                        .with(factoryOf(PassingInvocation.class))
                        .call();
-    final BufferOutputStream stream = AndroidChannels.parcelableByteChannel(16, 16).bind(channel);
+    final BufferOutputStream stream = ParcelableByteChannel.from(channel)
+                                                           .applyOutputStreamConfiguration()
+                                                           .withBufferSize(16)
+                                                           .withCorePoolSize(16)
+                                                           .configured()
+                                                           .buildOutputStream();
     stream.write(31);
     stream.flush();
     final ParcelableByteBuffer buffer = channel.close().in(seconds(10)).next();
     assertThat(buffer.size()).isEqualTo(1);
-    final BufferInputStream inputStream = ParcelableByteChannel.inputStream(buffer);
+    final BufferInputStream inputStream = ParcelableByteChannel.getInputStream(buffer);
     inputStream.close();
     final byte[] b = new byte[16];
     assertThat(inputStream.available()).isZero();
@@ -473,13 +502,18 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
         JRoutineService.on(serviceFrom(getActivity()))
                        .with(factoryOf(PassingInvocation.class))
                        .call();
-    final BufferOutputStream stream = AndroidChannels.parcelableByteChannel().bindDeep(channel);
+    final BufferOutputStream stream = ParcelableByteChannel.from(channel)
+                                                           .applyOutputStreamConfiguration()
+                                                           .withOnClose(
+                                                               CloseActionType.CLOSE_STREAM)
+                                                           .configured()
+                                                           .buildOutputStream();
     final byte[] b =
         new byte[]{(byte) 1, (byte) 2, (byte) 3, (byte) 4, (byte) 5, (byte) 6, (byte) 7, (byte) 8};
     stream.write(b);
     stream.close();
     final BufferInputStream inputStream =
-        ParcelableByteChannel.inputStream(channel.close().in(seconds(10)).next());
+        ParcelableByteChannel.getInputStream(channel.close().in(seconds(10)).next());
     assertThat(inputStream.read()).isEqualTo(1);
     assertThat(inputStream.markSupported()).isTrue();
     inputStream.mark(3);
@@ -500,7 +534,12 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
         JRoutineService.on(serviceFrom(getActivity()))
                        .with(factoryOf(PassingInvocation.class))
                        .call();
-    final BufferOutputStream stream = AndroidChannels.parcelableByteChannel().bindDeep(channel);
+    final BufferOutputStream stream = ParcelableByteChannel.from(channel)
+                                                           .applyOutputStreamConfiguration()
+                                                           .withOnClose(
+                                                               CloseActionType.CLOSE_STREAM)
+                                                           .configured()
+                                                           .buildOutputStream();
     stream.close();
     final Channel<?, ParcelableByteBuffer> result =
         channel.close().in(3, TimeUnit.SECONDS).eventuallyContinue();
@@ -557,10 +596,10 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
 
     final Channel<ParcelableByteBuffer, ParcelableByteBuffer> channel =
         JRoutineCore.<ParcelableByteBuffer>ofInputs().buildChannel();
-    final BufferOutputStream stream = AndroidChannels.parcelableByteChannel().bind(channel);
+    final BufferOutputStream stream = ParcelableByteChannel.from(channel).buildOutputStream();
     stream.write(new byte[]{31, 17, (byte) 155, 13});
     stream.flush();
-    final BufferInputStream inputStream = ParcelableByteChannel.inputStream(channel.next());
+    final BufferInputStream inputStream = ParcelableByteChannel.getInputStream(channel.next());
     final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     assertThat(inputStream.readAll(outputStream)).isEqualTo(4);
     assertThat(outputStream.size()).isEqualTo(4);
@@ -580,22 +619,22 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
                                                                    .with(factoryOf(
                                                                        PassingInvocation.class))
                                                                    .call(channel);
-    final BufferOutputStream stream = AndroidChannels.parcelableByteChannel().bind(channel);
+    final BufferOutputStream stream = ParcelableByteChannel.from(channel).buildOutputStream();
     stream.write(77);
     stream.flush();
-    assertThat(ParcelableByteChannel.inputStream(result.in(seconds(10)).next()).read()).isEqualTo(
+    assertThat(ParcelableByteChannel.getInputStream(result.in(seconds(10)).next()).read()).isEqualTo(
         77);
     stream.write(new byte[]{31, 17});
     stream.flush();
     BufferInputStream inputStream =
-        ParcelableByteChannel.inputStream(result.in(seconds(10)).next());
+        ParcelableByteChannel.getInputStream(result.in(seconds(10)).next());
     assertThat(inputStream.read()).isEqualTo(31);
     assertThat(inputStream.read()).isEqualTo(17);
     assertThat(inputStream.read()).isEqualTo(-1);
     stream.write(new byte[]{1, (byte) 155, 13}, 1, 2);
     stream.flush();
     channel.close();
-    inputStream = ParcelableByteChannel.inputStream(result.in(seconds(10)).next());
+    inputStream = ParcelableByteChannel.getInputStream(result.in(seconds(10)).next());
     assertThat(inputStream.read()).isEqualTo((byte) 155);
     assertThat(inputStream.read()).isEqualTo(13);
     assertThat(inputStream.read()).isEqualTo(-1);
@@ -609,11 +648,11 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
                                                                    .with(factoryOf(
                                                                        PassingInvocation.class))
                                                                    .call(channel);
-    final BufferOutputStream stream = AndroidChannels.parcelableByteChannel().bind(channel);
+    final BufferOutputStream stream = ParcelableByteChannel.from(channel).buildOutputStream();
     stream.write(77);
     stream.flush();
     BufferInputStream inputStream =
-        ParcelableByteChannel.inputStream(result.in(seconds(10)).next());
+        ParcelableByteChannel.getInputStream(result.in(seconds(10)).next());
     byte[] b = new byte[16];
     assertThat(inputStream.read(b)).isEqualTo(1);
     assertThat(b[0]).isEqualTo((byte) 77);
@@ -621,7 +660,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     assertThat(b[0]).isEqualTo((byte) 77);
     stream.write(new byte[]{31, 17});
     stream.flush();
-    inputStream = ParcelableByteChannel.inputStream(result.in(seconds(10)).next());
+    inputStream = ParcelableByteChannel.getInputStream(result.in(seconds(10)).next());
     assertThat(inputStream.read(b)).isEqualTo(2);
     assertThat(b[0]).isEqualTo((byte) 31);
     assertThat(b[1]).isEqualTo((byte) 17);
@@ -630,7 +669,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     assertThat(b[1]).isEqualTo((byte) 17);
     stream.write(new byte[]{1, (byte) 155, 13}, 1, 2);
     stream.flush();
-    inputStream = ParcelableByteChannel.inputStream(result.in(seconds(10)).next());
+    inputStream = ParcelableByteChannel.getInputStream(result.in(seconds(10)).next());
     assertThat(inputStream.read(b)).isEqualTo(2);
     assertThat(b[0]).isEqualTo((byte) 155);
     assertThat(b[1]).isEqualTo((byte) 13);
@@ -640,7 +679,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     stream.write(new byte[]{11, 111});
     stream.flush();
     channel.close();
-    inputStream = ParcelableByteChannel.inputStream(result.in(seconds(10)).next());
+    inputStream = ParcelableByteChannel.getInputStream(result.in(seconds(10)).next());
     b = new byte[1];
     assertThat(inputStream.read(b)).isEqualTo(1);
     assertThat(b[0]).isEqualTo((byte) 11);
@@ -658,11 +697,11 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
                                                                    .with(factoryOf(
                                                                        PassingInvocation.class))
                                                                    .call(channel);
-    final BufferOutputStream stream = AndroidChannels.parcelableByteChannel().bind(channel);
+    final BufferOutputStream stream = ParcelableByteChannel.from(channel).buildOutputStream();
     stream.write(77);
     stream.flush();
     BufferInputStream inputStream =
-        ParcelableByteChannel.inputStream(result.in(seconds(10)).next());
+        ParcelableByteChannel.getInputStream(result.in(seconds(10)).next());
     final byte[] b = new byte[16];
     assertThat(inputStream.read(b, 0, 2)).isEqualTo(1);
     assertThat(b[0]).isEqualTo((byte) 77);
@@ -670,7 +709,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     assertThat(b[0]).isEqualTo((byte) 77);
     stream.write(new byte[]{31, 17});
     stream.flush();
-    inputStream = ParcelableByteChannel.inputStream(result.in(seconds(10)).next());
+    inputStream = ParcelableByteChannel.getInputStream(result.in(seconds(10)).next());
     assertThat(inputStream.read(b, 1, 8)).isEqualTo(2);
     assertThat(b[0]).isEqualTo((byte) 77);
     assertThat(b[1]).isEqualTo((byte) 31);
@@ -681,7 +720,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     assertThat(b[2]).isEqualTo((byte) 17);
     stream.write(new byte[]{1, (byte) 155, 13}, 1, 2);
     stream.flush();
-    inputStream = ParcelableByteChannel.inputStream(result.in(seconds(10)).next());
+    inputStream = ParcelableByteChannel.getInputStream(result.in(seconds(10)).next());
     assertThat(inputStream.read(b, 0, 4)).isEqualTo(2);
     assertThat(b[0]).isEqualTo((byte) 155);
     assertThat(b[1]).isEqualTo((byte) 13);
@@ -693,7 +732,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     stream.write(new byte[]{11, 111});
     stream.flush();
     channel.close();
-    inputStream = ParcelableByteChannel.inputStream(result.in(seconds(10)).next());
+    inputStream = ParcelableByteChannel.getInputStream(result.in(seconds(10)).next());
     assertThat(inputStream.read(b, 1, 1)).isEqualTo(1);
     assertThat(b[0]).isEqualTo((byte) 155);
     assertThat(b[1]).isEqualTo((byte) 11);
@@ -715,11 +754,11 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
         JRoutineService.on(serviceFrom(getActivity()))
                        .with(factoryOf(PassingInvocation.class))
                        .call();
-    final BufferOutputStream stream = AndroidChannels.parcelableByteChannel().bind(channel);
+    final BufferOutputStream stream = ParcelableByteChannel.from(channel).buildOutputStream();
     stream.write(77);
     stream.flush();
     final BufferInputStream inputStream =
-        ParcelableByteChannel.inputStream(channel.close().in(seconds(10)).next());
+        ParcelableByteChannel.getInputStream(channel.close().in(seconds(10)).next());
     final byte[] b = new byte[16];
 
     try {
@@ -804,11 +843,11 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
                                                                    .with(factoryOf(
                                                                        PassingInvocation.class))
                                                                    .call(channel);
-    final BufferOutputStream stream = AndroidChannels.parcelableByteChannel().bind(channel);
+    final BufferOutputStream stream = ParcelableByteChannel.from(channel).buildOutputStream();
     stream.write(77);
     stream.flush();
     BufferInputStream inputStream =
-        ParcelableByteChannel.inputStream(result.in(seconds(10)).next());
+        ParcelableByteChannel.getInputStream(result.in(seconds(10)).next());
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     assertThat(inputStream.read(outputStream)).isEqualTo(1);
     assertThat(outputStream.size()).isEqualTo(1);
@@ -818,7 +857,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     assertThat(outputStream.toByteArray()[0]).isEqualTo((byte) 77);
     stream.write(new byte[]{31, 17});
     stream.flush();
-    inputStream = ParcelableByteChannel.inputStream(result.in(seconds(10)).next());
+    inputStream = ParcelableByteChannel.getInputStream(result.in(seconds(10)).next());
     outputStream = new ByteArrayOutputStream();
     assertThat(inputStream.read(outputStream)).isEqualTo(2);
     assertThat(outputStream.size()).isEqualTo(2);
@@ -829,7 +868,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     stream.write(new byte[]{1, (byte) 155, 13}, 1, 2);
     stream.flush();
     channel.close();
-    inputStream = ParcelableByteChannel.inputStream(result.in(seconds(10)).next());
+    inputStream = ParcelableByteChannel.getInputStream(result.in(seconds(10)).next());
     outputStream = new ByteArrayOutputStream();
     assertThat(inputStream.read(outputStream)).isEqualTo(2);
     assertThat(outputStream.size()).isEqualTo(2);
@@ -845,13 +884,18 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
         JRoutineService.on(serviceFrom(getActivity()))
                        .with(factoryOf(PassingInvocation.class))
                        .call();
-    final BufferOutputStream stream = AndroidChannels.parcelableByteChannel().bindDeep(channel);
+    final BufferOutputStream stream = ParcelableByteChannel.from(channel)
+                                                           .applyOutputStreamConfiguration()
+                                                           .withOnClose(
+                                                               CloseActionType.CLOSE_STREAM)
+                                                           .configured()
+                                                           .buildOutputStream();
     final byte[] b =
         new byte[]{(byte) 1, (byte) 2, (byte) 3, (byte) 4, (byte) 5, (byte) 6, (byte) 7, (byte) 8};
     stream.write(b);
     stream.close();
     final BufferInputStream inputStream =
-        ParcelableByteChannel.inputStream(channel.close().in(seconds(10)).next());
+        ParcelableByteChannel.getInputStream(channel.close().in(seconds(10)).next());
     assertThat(inputStream.available()).isEqualTo(8);
     assertThat(inputStream.skip(2)).isEqualTo(2);
     assertThat(inputStream.read()).isEqualTo(3);
@@ -873,7 +917,11 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
         JRoutineService.on(serviceFrom(getActivity()))
                        .with(factoryOf(PassingInvocation.class))
                        .call();
-    final BufferOutputStream stream = AndroidChannels.parcelableByteChannel(2).bind(channel);
+    final BufferOutputStream stream = ParcelableByteChannel.from(channel)
+                                                           .applyOutputStreamConfiguration()
+                                                           .withBufferSize(2)
+                                                           .configured()
+                                                           .buildOutputStream();
     stream.write(1);
     stream.write(2);
     stream.write(new byte[]{3, 4, 5});
@@ -883,7 +931,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     final List<ParcelableByteBuffer> inputStreams = channel.close().in(seconds(10)).all();
     assertThat(inputStreams).hasSize(5);
     final byte[] b = new byte[10];
-    assertThat(ParcelableByteChannel.inputStream(inputStreams).read(b)).isEqualTo(10);
+    assertThat(ParcelableByteChannel.getInputStream(inputStreams).read(b)).isEqualTo(10);
     assertThat(b).containsExactly((byte) 1, (byte) 2, (byte) 3, (byte) 4, (byte) 5, (byte) 6,
         (byte) 7, (byte) 8, (byte) 9, (byte) 10);
   }
@@ -892,10 +940,14 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
 
     final Channel<ParcelableByteBuffer, ParcelableByteBuffer> channel =
         JRoutineCore.<ParcelableByteBuffer>ofInputs().buildChannel();
-    final BufferOutputStream stream = AndroidChannels.parcelableByteChannel(4).bind(channel);
+    final BufferOutputStream stream = ParcelableByteChannel.from(channel)
+                                                           .applyOutputStreamConfiguration()
+                                                           .withBufferSize(4)
+                                                           .configured()
+                                                           .buildOutputStream();
     stream.transferFrom(new ByteArrayInputStream(new byte[]{77, 33, (byte) 155, 13}));
     stream.flush();
-    final BufferInputStream inputStream = ParcelableByteChannel.inputStream(channel.next());
+    final BufferInputStream inputStream = ParcelableByteChannel.getInputStream(channel.next());
     assertThat(inputStream.read()).isEqualTo(77);
     assertThat(inputStream.read()).isEqualTo(33);
     assertThat(inputStream.read()).isEqualTo((byte) 155);
@@ -907,10 +959,10 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
 
     final Channel<ParcelableByteBuffer, ParcelableByteBuffer> channel =
         JRoutineCore.<ParcelableByteBuffer>ofInputs().buildChannel();
-    final BufferOutputStream stream = AndroidChannels.parcelableByteChannel().bind(channel);
+    final BufferOutputStream stream = ParcelableByteChannel.from(channel).buildOutputStream();
     stream.write(new byte[]{31, 17, (byte) 155, 13});
     stream.flush();
-    final BufferInputStream inputStream = ParcelableByteChannel.inputStream(channel.next());
+    final BufferInputStream inputStream = ParcelableByteChannel.getInputStream(channel.next());
     final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     assertThat(inputStream.transferTo(outputStream)).isEqualTo(4);
     assertThat(outputStream.size()).isEqualTo(4);
@@ -926,10 +978,14 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
 
     final Channel<ParcelableByteBuffer, ParcelableByteBuffer> channel =
         JRoutineCore.<ParcelableByteBuffer>ofInputs().buildChannel();
-    final BufferOutputStream stream = AndroidChannels.parcelableByteChannel(4).bind(channel);
+    final BufferOutputStream stream = ParcelableByteChannel.from(channel)
+                                                           .applyOutputStreamConfiguration()
+                                                           .withBufferSize(4)
+                                                           .configured()
+                                                           .buildOutputStream();
     stream.writeAll(new ByteArrayInputStream(new byte[]{77, 33, (byte) 155, 13}));
     stream.flush();
-    final BufferInputStream inputStream = ParcelableByteChannel.inputStream(channel.next());
+    final BufferInputStream inputStream = ParcelableByteChannel.getInputStream(channel.next());
     assertThat(inputStream.read()).isEqualTo(77);
     assertThat(inputStream.read()).isEqualTo(33);
     assertThat(inputStream.read()).isEqualTo((byte) 155);
@@ -945,15 +1001,15 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
                                                                    .with(factoryOf(
                                                                        PassingInvocation.class))
                                                                    .call(channel);
-    final BufferOutputStream stream = AndroidChannels.parcelableByteChannel().bind(channel);
+    final BufferOutputStream stream = ParcelableByteChannel.from(channel).buildOutputStream();
     stream.write(77);
     stream.flush();
-    assertThat(ParcelableByteChannel.inputStream(result.in(seconds(10)).next()).read()).isEqualTo(
+    assertThat(ParcelableByteChannel.getInputStream(result.in(seconds(10)).next()).read()).isEqualTo(
         77);
     stream.write(31);
     stream.flush();
     BufferInputStream inputStream =
-        ParcelableByteChannel.inputStream(result.in(seconds(10)).next());
+        ParcelableByteChannel.getInputStream(result.in(seconds(10)).next());
     final byte[] b = new byte[16];
     assertThat(inputStream.read(b)).isEqualTo(1);
     assertThat(b[0]).isEqualTo((byte) 31);
@@ -963,7 +1019,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     stream.write(155);
     stream.flush();
     channel.close();
-    inputStream = ParcelableByteChannel.inputStream(result.in(seconds(10)).next());
+    inputStream = ParcelableByteChannel.getInputStream(result.in(seconds(10)).next());
     assertThat(inputStream.read(b, 1, 3)).isEqualTo(1);
     assertThat(b[0]).isEqualTo((byte) 31);
     assertThat(b[1]).isEqualTo((byte) 155);
@@ -980,17 +1036,17 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
                                                                    .with(factoryOf(
                                                                        PassingInvocation.class))
                                                                    .call(channel);
-    final BufferOutputStream stream = AndroidChannels.parcelableByteChannel().bind(channel);
+    final BufferOutputStream stream = ParcelableByteChannel.from(channel).buildOutputStream();
     stream.write(new byte[]{77, 33});
     stream.flush();
     BufferInputStream inputStream =
-        ParcelableByteChannel.inputStream(result.in(seconds(10)).next());
+        ParcelableByteChannel.getInputStream(result.in(seconds(10)).next());
     assertThat(inputStream.read()).isEqualTo(77);
     assertThat(inputStream.read()).isEqualTo(33);
     assertThat(inputStream.read()).isEqualTo(-1);
     stream.write(new byte[]{31, 17});
     stream.flush();
-    inputStream = ParcelableByteChannel.inputStream(result.in(seconds(10)).next());
+    inputStream = ParcelableByteChannel.getInputStream(result.in(seconds(10)).next());
     final byte[] b = new byte[16];
     assertThat(inputStream.read(b)).isEqualTo(2);
     assertThat(b[0]).isEqualTo((byte) 31);
@@ -1001,7 +1057,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     stream.write(new byte[]{(byte) 155, 13});
     stream.flush();
     channel.close();
-    inputStream = ParcelableByteChannel.inputStream(result.in(seconds(10)).next());
+    inputStream = ParcelableByteChannel.getInputStream(result.in(seconds(10)).next());
     assertThat(inputStream.read(b, 1, 3)).isEqualTo(2);
     assertThat(b[0]).isEqualTo((byte) 31);
     assertThat(b[1]).isEqualTo((byte) 155);
@@ -1019,16 +1075,16 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
                                                                    .with(factoryOf(
                                                                        PassingInvocation.class))
                                                                    .call(channel);
-    final BufferOutputStream stream = AndroidChannels.parcelableByteChannel().bind(channel);
+    final BufferOutputStream stream = ParcelableByteChannel.from(channel).buildOutputStream();
     stream.write(new byte[]{1, 77, 33}, 1, 1);
     stream.flush();
     BufferInputStream inputStream =
-        ParcelableByteChannel.inputStream(result.in(seconds(10)).next());
+        ParcelableByteChannel.getInputStream(result.in(seconds(10)).next());
     assertThat(inputStream.read()).isEqualTo(77);
     assertThat(inputStream.read()).isEqualTo(-1);
     stream.write(new byte[]{31, 17, 1}, 0, 2);
     stream.flush();
-    inputStream = ParcelableByteChannel.inputStream(result.in(seconds(10)).next());
+    inputStream = ParcelableByteChannel.getInputStream(result.in(seconds(10)).next());
     final byte[] b = new byte[16];
     assertThat(inputStream.read(b)).isEqualTo(2);
     assertThat(b[0]).isEqualTo((byte) 31);
@@ -1039,7 +1095,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     stream.write(new byte[]{1, (byte) 155, 13}, 1, 2);
     stream.flush();
     channel.close();
-    inputStream = ParcelableByteChannel.inputStream(result.in(seconds(10)).next());
+    inputStream = ParcelableByteChannel.getInputStream(result.in(seconds(10)).next());
     assertThat(inputStream.read(b, 1, 3)).isEqualTo(2);
     assertThat(b[0]).isEqualTo((byte) 31);
     assertThat(b[1]).isEqualTo((byte) 155);
@@ -1051,11 +1107,8 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
 
   @SuppressWarnings({"ConstantConditions", "ResultOfMethodCallIgnored"})
   public void testWriteError() throws IOException {
-
     try {
-
-      AndroidChannels.parcelableByteChannel().bind(null);
-
+      ParcelableByteChannel.from(null);
       fail();
 
     } catch (final NullPointerException ignored) {
@@ -1066,77 +1119,55 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
         JRoutineService.on(serviceFrom(getActivity()))
                        .with(factoryOf(PassingInvocation.class))
                        .call();
-    final BufferOutputStream stream = AndroidChannels.parcelableByteChannel().bind(channel);
+    final BufferOutputStream stream = ParcelableByteChannel.from(channel).buildOutputStream();
     final byte[] b = new byte[16];
-
     try {
-
       stream.write(null, 0, 2);
-
       fail();
 
     } catch (final NullPointerException ignored) {
-
     }
 
     try {
-
       stream.write(b, -1, 1);
-
       fail();
 
     } catch (final IndexOutOfBoundsException ignored) {
-
     }
 
     try {
-
       stream.write(b, 0, -1);
-
       fail();
 
     } catch (final IndexOutOfBoundsException ignored) {
-
     }
 
     try {
-
       stream.write(b, 8, 16);
-
       fail();
 
     } catch (final IndexOutOfBoundsException ignored) {
-
     }
 
     try {
-
       stream.write((byte[]) null);
-
       fail();
 
     } catch (final NullPointerException ignored) {
-
     }
 
     try {
-
       stream.write((InputStream) null);
-
       fail();
 
     } catch (final NullPointerException ignored) {
-
     }
 
     try {
-
       stream.writeAll(null);
-
       fail();
 
     } catch (final NullPointerException ignored) {
-
     }
 
     stream.write(new byte[0]);
@@ -1156,17 +1187,21 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
                                                                    .with(factoryOf(
                                                                        PassingInvocation.class))
                                                                    .call(channel);
-    final BufferOutputStream stream = AndroidChannels.parcelableByteChannel(4).bind(channel);
+    final BufferOutputStream stream = ParcelableByteChannel.from(channel)
+                                                           .applyOutputStreamConfiguration()
+                                                           .withBufferSize(4)
+                                                           .configured()
+                                                           .buildOutputStream();
     stream.write(new ByteArrayInputStream(new byte[]{77, 33}));
     stream.flush();
     BufferInputStream inputStream =
-        ParcelableByteChannel.inputStream(result.in(seconds(10)).next());
+        ParcelableByteChannel.getInputStream(result.in(seconds(10)).next());
     assertThat(inputStream.read()).isEqualTo(77);
     assertThat(inputStream.read()).isEqualTo(33);
     assertThat(inputStream.read()).isEqualTo(-1);
     stream.write(new ByteArrayInputStream(new byte[]{31, 17}));
     stream.flush();
-    inputStream = ParcelableByteChannel.inputStream(result.in(seconds(10)).next());
+    inputStream = ParcelableByteChannel.getInputStream(result.in(seconds(10)).next());
     final byte[] b = new byte[16];
     assertThat(inputStream.read(b)).isEqualTo(2);
     assertThat(b[0]).isEqualTo((byte) 31);
@@ -1177,7 +1212,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     stream.write(new ByteArrayInputStream(new byte[]{(byte) 155, 13}));
     stream.flush();
     channel.close();
-    inputStream = ParcelableByteChannel.inputStream(result.in(seconds(10)).next());
+    inputStream = ParcelableByteChannel.getInputStream(result.in(seconds(10)).next());
     assertThat(inputStream.read(b, 1, 3)).isEqualTo(2);
     assertThat(b[0]).isEqualTo((byte) 31);
     assertThat(b[1]).isEqualTo((byte) 155);
@@ -1192,7 +1227,6 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
 
     public void onInput(final ParcelableByteBuffer input,
         @NotNull final Channel<ParcelableByteBuffer, ?> result) {
-
       result.pass(input);
     }
   }

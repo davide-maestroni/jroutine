@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Davide Maestroni
+ * Copyright 2017 Davide Maestroni
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.channel;
+package com.github.dm.jrt.channel.io;
 
-import com.github.dm.jrt.channel.ByteChannel.BufferInputStream;
-import com.github.dm.jrt.channel.ByteChannel.BufferOutputStream;
-import com.github.dm.jrt.channel.ByteChannel.ByteBuffer;
+import com.github.dm.jrt.channel.builder.OutputStreamConfiguration.CloseActionType;
+import com.github.dm.jrt.channel.io.ByteChannel.BufferInputStream;
+import com.github.dm.jrt.channel.io.ByteChannel.BufferOutputStream;
+import com.github.dm.jrt.channel.io.ByteChannel.ByteBuffer;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 
@@ -46,11 +47,15 @@ public class ByteChannelTest {
 
     final Channel<ByteBuffer, ByteBuffer> channel =
         JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
-    final BufferOutputStream stream = Channels.byteChannel().bindDeep(channel);
+    final BufferOutputStream stream = ByteChannel.from(channel)
+                                                 .applyOutputStreamConfiguration()
+                                                 .withOnClose(CloseActionType.CLOSE_CHANNEL)
+                                                 .configured()
+                                                 .buildOutputStream();
     final byte[] b = new byte[16];
     stream.write(b);
     stream.close();
-    final BufferInputStream inputStream = ByteChannel.inputStream(channel.next());
+    final BufferInputStream inputStream = ByteChannel.getInputStream(channel.next());
     assertThat(inputStream.available()).isEqualTo(16);
     assertThat(inputStream.read()).isNotEqualTo(-1);
     assertThat(inputStream.available()).isEqualTo(15);
@@ -65,7 +70,7 @@ public class ByteChannelTest {
 
     final Channel<ByteBuffer, ByteBuffer> channel =
         JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
-    final BufferOutputStream stream = Channels.byteChannel().bind(channel);
+    final BufferOutputStream stream = ByteChannel.from(channel).buildOutputStream();
     stream.write(new byte[]{31, 17, (byte) 155, 13});
     stream.flush();
     final ByteBuffer buffer1 = channel.next();
@@ -80,7 +85,7 @@ public class ByteChannelTest {
     assertThat(buffer1.hashCode()).isEqualTo(buffer2.hashCode());
     assertThat(buffer1).isEqualTo(buffer2);
     assertThat(buffer2).isEqualTo(buffer1);
-    ByteChannel.inputStream(buffer2).close();
+    ByteChannel.getInputStream(buffer2).close();
     stream.write(new byte[]{31, 17, (byte) 155});
     stream.flush();
     final ByteBuffer buffer3 = channel.next();
@@ -90,39 +95,21 @@ public class ByteChannelTest {
   }
 
   @Test
-  public void testChannelError() {
-
-    try {
-
-      Channels.byteChannel(-1);
-
-      fail();
-
-    } catch (final IllegalArgumentException ignored) {
-
-    }
-
-    try {
-
-      Channels.byteChannel(-1, 0);
-
-      fail();
-
-    } catch (final IllegalArgumentException ignored) {
-
-    }
-  }
-
-  @Test
   public void testConcatAvailable() throws IOException {
 
     final Channel<ByteBuffer, ByteBuffer> channel =
         JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
-    final BufferOutputStream stream = Channels.byteChannel(8).bindDeep(channel);
+    final BufferOutputStream stream = ByteChannel.from(channel)
+                                                 .applyOutputStreamConfiguration()
+                                                 .withBufferSize(8)
+                                                 .withOnClose(CloseActionType.CLOSE_CHANNEL)
+                                                 .configured()
+                                                 .buildOutputStream();
     final byte[] b = new byte[16];
     stream.write(b);
     stream.close();
-    final BufferInputStream inputStream = ByteChannel.inputStream(channel.next(), channel.next());
+    final BufferInputStream inputStream =
+        ByteChannel.getInputStream(channel.next(), channel.next());
     assertThat(inputStream.available()).isEqualTo(16);
     assertThat(inputStream.read()).isNotEqualTo(-1);
     assertThat(inputStream.available()).isEqualTo(15);
@@ -138,10 +125,15 @@ public class ByteChannelTest {
 
     final Channel<ByteBuffer, ByteBuffer> channel =
         JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
-    final BufferOutputStream stream = Channels.byteChannel(2).bind(channel);
+    final BufferOutputStream stream = ByteChannel.from(channel)
+                                                 .applyOutputStreamConfiguration()
+                                                 .withBufferSize(2)
+                                                 .configured()
+                                                 .buildOutputStream();
     stream.write(new byte[]{31, 17, (byte) 155, 13});
     stream.flush();
-    final BufferInputStream inputStream = ByteChannel.inputStream(channel.next(), channel.next());
+    final BufferInputStream inputStream =
+        ByteChannel.getInputStream(channel.next(), channel.next());
     inputStream.close();
     assertThat(inputStream.read()).isEqualTo(-1);
   }
@@ -151,12 +143,18 @@ public class ByteChannelTest {
 
     final Channel<ByteBuffer, ByteBuffer> channel =
         JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
-    final BufferOutputStream stream = Channels.byteChannel(4).bindDeep(channel);
+    final BufferOutputStream stream = ByteChannel.from(channel)
+                                                 .applyOutputStreamConfiguration()
+                                                 .withBufferSize(4)
+                                                 .withOnClose(CloseActionType.CLOSE_CHANNEL)
+                                                 .configured()
+                                                 .buildOutputStream();
     final byte[] b =
         new byte[]{(byte) 1, (byte) 2, (byte) 3, (byte) 4, (byte) 5, (byte) 6, (byte) 7, (byte) 8};
     stream.write(b);
     stream.close();
-    final BufferInputStream inputStream = ByteChannel.inputStream(channel.next(), channel.next());
+    final BufferInputStream inputStream =
+        ByteChannel.getInputStream(channel.next(), channel.next());
     assertThat(inputStream.read()).isEqualTo(1);
     assertThat(inputStream.markSupported()).isTrue();
     inputStream.mark(3);
@@ -176,10 +174,15 @@ public class ByteChannelTest {
 
     final Channel<ByteBuffer, ByteBuffer> channel =
         JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
-    final BufferOutputStream stream = Channels.byteChannel(2).bind(channel);
+    final BufferOutputStream stream = ByteChannel.from(channel)
+                                                 .applyOutputStreamConfiguration()
+                                                 .withBufferSize(2)
+                                                 .configured()
+                                                 .buildOutputStream();
     stream.write(new byte[]{31, 17, (byte) 155, 13});
     stream.flush();
-    final BufferInputStream inputStream = ByteChannel.inputStream(channel.next(), channel.next());
+    final BufferInputStream inputStream =
+        ByteChannel.getInputStream(channel.next(), channel.next());
     assertThat(inputStream.read()).isEqualTo(31);
     assertThat(inputStream.read()).isEqualTo(17);
     assertThat(inputStream.read()).isEqualTo((byte) 155);
@@ -192,10 +195,15 @@ public class ByteChannelTest {
 
     final Channel<ByteBuffer, ByteBuffer> channel =
         JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
-    final BufferOutputStream stream = Channels.byteChannel(2).bind(channel);
+    final BufferOutputStream stream = ByteChannel.from(channel)
+                                                 .applyOutputStreamConfiguration()
+                                                 .withBufferSize(2)
+                                                 .configured()
+                                                 .buildOutputStream();
     stream.write(new byte[]{31, 17, (byte) 155, 13});
     stream.flush();
-    final BufferInputStream inputStream = ByteChannel.inputStream(channel.next(), channel.next());
+    final BufferInputStream inputStream =
+        ByteChannel.getInputStream(channel.next(), channel.next());
     final byte[] b = new byte[16];
     assertThat(inputStream.read()).isEqualTo(31);
     assertThat(inputStream.read(b)).isEqualTo(3);
@@ -213,10 +221,15 @@ public class ByteChannelTest {
 
     final Channel<ByteBuffer, ByteBuffer> channel =
         JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
-    final BufferOutputStream stream = Channels.byteChannel(3).bind(channel);
+    final BufferOutputStream stream = ByteChannel.from(channel)
+                                                 .applyOutputStreamConfiguration()
+                                                 .withBufferSize(3)
+                                                 .configured()
+                                                 .buildOutputStream();
     stream.write(new byte[]{31, 17, (byte) 155, 13});
     stream.flush();
-    final BufferInputStream inputStream = ByteChannel.inputStream(channel.next(), channel.next());
+    final BufferInputStream inputStream =
+        ByteChannel.getInputStream(channel.next(), channel.next());
     final byte[] b = new byte[16];
     assertThat(inputStream.read(b, 2, 3)).isEqualTo(3);
     assertThat(b[2]).isEqualTo((byte) 31);
@@ -237,10 +250,15 @@ public class ByteChannelTest {
 
     final Channel<ByteBuffer, ByteBuffer> channel =
         JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
-    final BufferOutputStream stream = Channels.byteChannel(2).bind(channel);
+    final BufferOutputStream stream = ByteChannel.from(channel)
+                                                 .applyOutputStreamConfiguration()
+                                                 .withBufferSize(2)
+                                                 .configured()
+                                                 .buildOutputStream();
     stream.write(new byte[]{31, 17, (byte) 155, 13});
     stream.flush();
-    final BufferInputStream inputStream = ByteChannel.inputStream(channel.next(), channel.next());
+    final BufferInputStream inputStream =
+        ByteChannel.getInputStream(channel.next(), channel.next());
     final byte[] b = new byte[16];
 
     try {
@@ -322,10 +340,15 @@ public class ByteChannelTest {
 
     final Channel<ByteBuffer, ByteBuffer> channel =
         JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
-    final BufferOutputStream stream = Channels.byteChannel(3).bind(channel);
+    final BufferOutputStream stream = ByteChannel.from(channel)
+                                                 .applyOutputStreamConfiguration()
+                                                 .withBufferSize(3)
+                                                 .configured()
+                                                 .buildOutputStream();
     stream.write(new byte[]{31, 17, (byte) 155, 13});
     stream.flush();
-    final BufferInputStream inputStream = ByteChannel.inputStream(channel.next(), channel.next());
+    final BufferInputStream inputStream =
+        ByteChannel.getInputStream(channel.next(), channel.next());
     final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     assertThat(inputStream.read(outputStream)).isEqualTo(3);
     assertThat(outputStream.size()).isEqualTo(3);
@@ -346,12 +369,17 @@ public class ByteChannelTest {
 
     final Channel<ByteBuffer, ByteBuffer> channel =
         JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
-    final BufferOutputStream stream = Channels.byteChannel(4).bind(channel);
+    final BufferOutputStream stream = ByteChannel.from(channel)
+                                                 .applyOutputStreamConfiguration()
+                                                 .withBufferSize(4)
+                                                 .configured()
+                                                 .buildOutputStream();
     final byte[] b =
         new byte[]{(byte) 1, (byte) 2, (byte) 3, (byte) 4, (byte) 5, (byte) 6, (byte) 7, (byte) 8};
     stream.write(b);
     stream.close();
-    final BufferInputStream inputStream = ByteChannel.inputStream(channel.next(), channel.next());
+    final BufferInputStream inputStream =
+        ByteChannel.getInputStream(channel.next(), channel.next());
     assertThat(inputStream.available()).isEqualTo(8);
     assertThat(inputStream.skip(2)).isEqualTo(2);
     assertThat(inputStream.read()).isEqualTo(3);
@@ -372,12 +400,15 @@ public class ByteChannelTest {
 
     final Channel<ByteBuffer, ByteBuffer> channel =
         JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
-    final BufferOutputStream stream =
-        Channels.byteChannel(ByteChannel.DEFAULT_BUFFER_SIZE, 0).bind(channel);
+    final BufferOutputStream stream = ByteChannel.from(channel)
+                                                 .applyOutputStreamConfiguration()
+                                                 .withCorePoolSize(0)
+                                                 .configured()
+                                                 .buildOutputStream();
     stream.write(31);
     stream.flush();
     final ByteBuffer buffer = channel.next();
-    final BufferInputStream inputStream = ByteChannel.inputStream(buffer);
+    final BufferInputStream inputStream = ByteChannel.getInputStream(buffer);
     inputStream.close();
     stream.write(77);
     stream.flush();
@@ -389,11 +420,11 @@ public class ByteChannelTest {
 
     final Channel<ByteBuffer, ByteBuffer> channel =
         JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
-    final BufferOutputStream stream = Channels.byteChannel().bind(channel);
+    final BufferOutputStream stream = ByteChannel.from(channel).buildOutputStream();
     stream.write(31);
     stream.flush();
     final ByteBuffer buffer = channel.next();
-    final BufferInputStream inputStream = ByteChannel.inputStream(buffer);
+    final BufferInputStream inputStream = ByteChannel.getInputStream(buffer);
     inputStream.close();
     final byte[] b = new byte[16];
     assertThat(inputStream.available()).isZero();
@@ -430,12 +461,16 @@ public class ByteChannelTest {
 
     final Channel<ByteBuffer, ByteBuffer> channel =
         JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
-    final BufferOutputStream stream = Channels.byteChannel().bindDeep(channel);
+    final BufferOutputStream stream = ByteChannel.from(channel)
+                                                 .applyOutputStreamConfiguration()
+                                                 .withOnClose(CloseActionType.CLOSE_CHANNEL)
+                                                 .configured()
+                                                 .buildOutputStream();
     final byte[] b =
         new byte[]{(byte) 1, (byte) 2, (byte) 3, (byte) 4, (byte) 5, (byte) 6, (byte) 7, (byte) 8};
     stream.write(b);
     stream.close();
-    final BufferInputStream inputStream = ByteChannel.inputStream(channel.next());
+    final BufferInputStream inputStream = ByteChannel.getInputStream(channel.next());
     assertThat(inputStream.read()).isEqualTo(1);
     assertThat(inputStream.markSupported()).isTrue();
     inputStream.mark(3);
@@ -455,7 +490,11 @@ public class ByteChannelTest {
 
     final Channel<ByteBuffer, ByteBuffer> channel =
         JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
-    final BufferOutputStream stream = Channels.byteChannel().bindDeep(channel);
+    final BufferOutputStream stream = ByteChannel.from(channel)
+                                                 .applyOutputStreamConfiguration()
+                                                 .withOnClose(CloseActionType.CLOSE_CHANNEL)
+                                                 .configured()
+                                                 .buildOutputStream();
     stream.close();
     assertThat(channel.eventuallyContinue().all()).isEmpty();
     final byte[] b = new byte[16];
@@ -511,10 +550,10 @@ public class ByteChannelTest {
 
     final Channel<ByteBuffer, ByteBuffer> channel =
         JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
-    final BufferOutputStream stream = Channels.byteChannel().bind(channel);
+    final BufferOutputStream stream = ByteChannel.from(channel).buildOutputStream();
     stream.write(new byte[]{31, 17, (byte) 155, 13});
     stream.flush();
-    final BufferInputStream inputStream = ByteChannel.inputStream(channel.next());
+    final BufferInputStream inputStream = ByteChannel.getInputStream(channel.next());
     final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     assertThat(inputStream.readAll(outputStream)).isEqualTo(4);
     assertThat(outputStream.size()).isEqualTo(4);
@@ -531,19 +570,19 @@ public class ByteChannelTest {
 
     final Channel<ByteBuffer, ByteBuffer> channel =
         JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
-    final BufferOutputStream stream = Channels.byteChannel().bind(channel);
+    final BufferOutputStream stream = ByteChannel.from(channel).buildOutputStream();
     stream.write(77);
     stream.flush();
-    assertThat(ByteChannel.inputStream(channel.next()).read()).isEqualTo(77);
+    assertThat(ByteChannel.getInputStream(channel.next()).read()).isEqualTo(77);
     stream.write(new byte[]{31, 17});
     stream.flush();
-    BufferInputStream inputStream = ByteChannel.inputStream(channel.next());
+    BufferInputStream inputStream = ByteChannel.getInputStream(channel.next());
     assertThat(inputStream.read()).isEqualTo(31);
     assertThat(inputStream.read()).isEqualTo(17);
     assertThat(inputStream.read()).isEqualTo(-1);
     stream.write(new byte[]{1, (byte) 155, 13}, 1, 2);
     stream.flush();
-    inputStream = ByteChannel.inputStream(channel.next());
+    inputStream = ByteChannel.getInputStream(channel.next());
     assertThat(inputStream.read()).isEqualTo((byte) 155);
     assertThat(inputStream.read()).isEqualTo(13);
     assertThat(inputStream.read()).isEqualTo(-1);
@@ -554,10 +593,10 @@ public class ByteChannelTest {
 
     final Channel<ByteBuffer, ByteBuffer> channel =
         JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
-    final BufferOutputStream stream = Channels.byteChannel().bind(channel);
+    final BufferOutputStream stream = ByteChannel.from(channel).buildOutputStream();
     stream.write(77);
     stream.flush();
-    BufferInputStream inputStream = ByteChannel.inputStream(channel.next());
+    BufferInputStream inputStream = ByteChannel.getInputStream(channel.next());
     byte[] b = new byte[16];
     assertThat(inputStream.read(b)).isEqualTo(1);
     assertThat(b[0]).isEqualTo((byte) 77);
@@ -565,7 +604,7 @@ public class ByteChannelTest {
     assertThat(b[0]).isEqualTo((byte) 77);
     stream.write(new byte[]{31, 17});
     stream.flush();
-    inputStream = ByteChannel.inputStream(channel.next());
+    inputStream = ByteChannel.getInputStream(channel.next());
     assertThat(inputStream.read(b)).isEqualTo(2);
     assertThat(b[0]).isEqualTo((byte) 31);
     assertThat(b[1]).isEqualTo((byte) 17);
@@ -574,7 +613,7 @@ public class ByteChannelTest {
     assertThat(b[1]).isEqualTo((byte) 17);
     stream.write(new byte[]{1, (byte) 155, 13}, 1, 2);
     stream.flush();
-    inputStream = ByteChannel.inputStream(channel.next());
+    inputStream = ByteChannel.getInputStream(channel.next());
     assertThat(inputStream.read(b)).isEqualTo(2);
     assertThat(b[0]).isEqualTo((byte) 155);
     assertThat(b[1]).isEqualTo((byte) 13);
@@ -583,7 +622,7 @@ public class ByteChannelTest {
     assertThat(b[1]).isEqualTo((byte) 13);
     stream.write(new byte[]{11, 111});
     stream.flush();
-    inputStream = ByteChannel.inputStream(channel.next());
+    inputStream = ByteChannel.getInputStream(channel.next());
     b = new byte[1];
     assertThat(inputStream.read(b)).isEqualTo(1);
     assertThat(b[0]).isEqualTo((byte) 11);
@@ -598,10 +637,10 @@ public class ByteChannelTest {
 
     final Channel<ByteBuffer, ByteBuffer> channel =
         JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
-    final BufferOutputStream stream = Channels.byteChannel().bind(channel);
+    final BufferOutputStream stream = ByteChannel.from(channel).buildOutputStream();
     stream.write(77);
     stream.flush();
-    BufferInputStream inputStream = ByteChannel.inputStream(channel.next());
+    BufferInputStream inputStream = ByteChannel.getInputStream(channel.next());
     final byte[] b = new byte[16];
     assertThat(inputStream.read(b, 0, 2)).isEqualTo(1);
     assertThat(b[0]).isEqualTo((byte) 77);
@@ -609,7 +648,7 @@ public class ByteChannelTest {
     assertThat(b[0]).isEqualTo((byte) 77);
     stream.write(new byte[]{31, 17});
     stream.flush();
-    inputStream = ByteChannel.inputStream(channel.next());
+    inputStream = ByteChannel.getInputStream(channel.next());
     assertThat(inputStream.read(b, 1, 8)).isEqualTo(2);
     assertThat(b[0]).isEqualTo((byte) 77);
     assertThat(b[1]).isEqualTo((byte) 31);
@@ -620,7 +659,7 @@ public class ByteChannelTest {
     assertThat(b[2]).isEqualTo((byte) 17);
     stream.write(new byte[]{1, (byte) 155, 13}, 1, 2);
     stream.flush();
-    inputStream = ByteChannel.inputStream(channel.next());
+    inputStream = ByteChannel.getInputStream(channel.next());
     assertThat(inputStream.read(b, 0, 4)).isEqualTo(2);
     assertThat(b[0]).isEqualTo((byte) 155);
     assertThat(b[1]).isEqualTo((byte) 13);
@@ -631,7 +670,7 @@ public class ByteChannelTest {
     assertThat(b[2]).isEqualTo((byte) 17);
     stream.write(new byte[]{11, 111});
     stream.flush();
-    inputStream = ByteChannel.inputStream(channel.next());
+    inputStream = ByteChannel.getInputStream(channel.next());
     assertThat(inputStream.read(b, 1, 1)).isEqualTo(1);
     assertThat(b[0]).isEqualTo((byte) 155);
     assertThat(b[1]).isEqualTo((byte) 11);
@@ -652,10 +691,10 @@ public class ByteChannelTest {
 
     final Channel<ByteBuffer, ByteBuffer> channel =
         JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
-    final BufferOutputStream stream = Channels.byteChannel().bind(channel);
+    final BufferOutputStream stream = ByteChannel.from(channel).buildOutputStream();
     stream.write(77);
     stream.flush();
-    final BufferInputStream inputStream = ByteChannel.inputStream(channel.next());
+    final BufferInputStream inputStream = ByteChannel.getInputStream(channel.next());
     final byte[] b = new byte[16];
 
     try {
@@ -737,10 +776,10 @@ public class ByteChannelTest {
 
     final Channel<ByteBuffer, ByteBuffer> channel =
         JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
-    final BufferOutputStream stream = Channels.byteChannel().bind(channel);
+    final BufferOutputStream stream = ByteChannel.from(channel).buildOutputStream();
     stream.write(77);
     stream.flush();
-    BufferInputStream inputStream = ByteChannel.inputStream(channel.next());
+    BufferInputStream inputStream = ByteChannel.getInputStream(channel.next());
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     assertThat(inputStream.read(outputStream)).isEqualTo(1);
     assertThat(outputStream.size()).isEqualTo(1);
@@ -750,7 +789,7 @@ public class ByteChannelTest {
     assertThat(outputStream.toByteArray()[0]).isEqualTo((byte) 77);
     stream.write(new byte[]{31, 17});
     stream.flush();
-    inputStream = ByteChannel.inputStream(channel.next());
+    inputStream = ByteChannel.getInputStream(channel.next());
     outputStream = new ByteArrayOutputStream();
     assertThat(inputStream.read(outputStream)).isEqualTo(2);
     assertThat(outputStream.size()).isEqualTo(2);
@@ -760,7 +799,7 @@ public class ByteChannelTest {
     assertThat(outputStream.toByteArray()).containsExactly((byte) 31, (byte) 17);
     stream.write(new byte[]{1, (byte) 155, 13}, 1, 2);
     stream.flush();
-    inputStream = ByteChannel.inputStream(channel.next());
+    inputStream = ByteChannel.getInputStream(channel.next());
     outputStream = new ByteArrayOutputStream();
     assertThat(inputStream.read(outputStream)).isEqualTo(2);
     assertThat(outputStream.size()).isEqualTo(2);
@@ -775,12 +814,16 @@ public class ByteChannelTest {
 
     final Channel<ByteBuffer, ByteBuffer> channel =
         JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
-    final BufferOutputStream stream = Channels.byteChannel().bindDeep(channel);
+    final BufferOutputStream stream = ByteChannel.from(channel)
+                                                 .applyOutputStreamConfiguration()
+                                                 .withOnClose(CloseActionType.CLOSE_CHANNEL)
+                                                 .configured()
+                                                 .buildOutputStream();
     final byte[] b =
         new byte[]{(byte) 1, (byte) 2, (byte) 3, (byte) 4, (byte) 5, (byte) 6, (byte) 7, (byte) 8};
     stream.write(b);
     stream.close();
-    final BufferInputStream inputStream = ByteChannel.inputStream(channel.next());
+    final BufferInputStream inputStream = ByteChannel.getInputStream(channel.next());
     assertThat(inputStream.available()).isEqualTo(8);
     assertThat(inputStream.skip(2)).isEqualTo(2);
     assertThat(inputStream.read()).isEqualTo(3);
@@ -801,7 +844,11 @@ public class ByteChannelTest {
 
     final Channel<ByteBuffer, ByteBuffer> channel =
         JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
-    final BufferOutputStream stream = Channels.byteChannel(2).bind(channel);
+    final BufferOutputStream stream = ByteChannel.from(channel)
+                                                 .applyOutputStreamConfiguration()
+                                                 .withBufferSize(2)
+                                                 .configured()
+                                                 .buildOutputStream();
     stream.write(1);
     stream.write(2);
     stream.write(new byte[]{3, 4, 5});
@@ -811,7 +858,7 @@ public class ByteChannelTest {
     final List<ByteBuffer> inputStreams = channel.close().all();
     assertThat(inputStreams).hasSize(5);
     final byte[] b = new byte[10];
-    assertThat(ByteChannel.inputStream(inputStreams).read(b)).isEqualTo(10);
+    assertThat(ByteChannel.getInputStream(inputStreams).read(b)).isEqualTo(10);
     assertThat(b).containsExactly((byte) 1, (byte) 2, (byte) 3, (byte) 4, (byte) 5, (byte) 6,
         (byte) 7, (byte) 8, (byte) 9, (byte) 10);
   }
@@ -821,10 +868,14 @@ public class ByteChannelTest {
 
     final Channel<ByteBuffer, ByteBuffer> channel =
         JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
-    final BufferOutputStream stream = Channels.byteChannel(4).bind(channel);
+    final BufferOutputStream stream = ByteChannel.from(channel)
+                                                 .applyOutputStreamConfiguration()
+                                                 .withBufferSize(4)
+                                                 .configured()
+                                                 .buildOutputStream();
     stream.transferFrom(new ByteArrayInputStream(new byte[]{77, 33, (byte) 155, 13}));
     stream.flush();
-    final BufferInputStream inputStream = ByteChannel.inputStream(channel.next());
+    final BufferInputStream inputStream = ByteChannel.getInputStream(channel.next());
     assertThat(inputStream.read()).isEqualTo(77);
     assertThat(inputStream.read()).isEqualTo(33);
     assertThat(inputStream.read()).isEqualTo((byte) 155);
@@ -837,10 +888,10 @@ public class ByteChannelTest {
 
     final Channel<ByteBuffer, ByteBuffer> channel =
         JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
-    final BufferOutputStream stream = Channels.byteChannel().bind(channel);
+    final BufferOutputStream stream = ByteChannel.from(channel).buildOutputStream();
     stream.write(new byte[]{31, 17, (byte) 155, 13});
     stream.flush();
-    final BufferInputStream inputStream = ByteChannel.inputStream(channel.next());
+    final BufferInputStream inputStream = ByteChannel.getInputStream(channel.next());
     final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     assertThat(inputStream.transferTo(outputStream)).isEqualTo(4);
     assertThat(outputStream.size()).isEqualTo(4);
@@ -857,10 +908,14 @@ public class ByteChannelTest {
 
     final Channel<ByteBuffer, ByteBuffer> channel =
         JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
-    final BufferOutputStream stream = Channels.byteChannel(4).bind(channel);
+    final BufferOutputStream stream = ByteChannel.from(channel)
+                                                 .applyOutputStreamConfiguration()
+                                                 .withBufferSize(4)
+                                                 .configured()
+                                                 .buildOutputStream();
     stream.writeAll(new ByteArrayInputStream(new byte[]{77, 33, (byte) 155, 13}));
     stream.flush();
-    final BufferInputStream inputStream = ByteChannel.inputStream(channel.next());
+    final BufferInputStream inputStream = ByteChannel.getInputStream(channel.next());
     assertThat(inputStream.read()).isEqualTo(77);
     assertThat(inputStream.read()).isEqualTo(33);
     assertThat(inputStream.read()).isEqualTo((byte) 155);
@@ -873,13 +928,13 @@ public class ByteChannelTest {
 
     final Channel<ByteBuffer, ByteBuffer> channel =
         JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
-    final BufferOutputStream stream = Channels.byteChannel().bind(channel);
+    final BufferOutputStream stream = ByteChannel.from(channel).buildOutputStream();
     stream.write(77);
     stream.flush();
-    assertThat(ByteChannel.inputStream(channel.next()).read()).isEqualTo(77);
+    assertThat(ByteChannel.getInputStream(channel.next()).read()).isEqualTo(77);
     stream.write(31);
     stream.flush();
-    BufferInputStream inputStream = ByteChannel.inputStream(channel.next());
+    BufferInputStream inputStream = ByteChannel.getInputStream(channel.next());
     final byte[] b = new byte[16];
     assertThat(inputStream.read(b)).isEqualTo(1);
     assertThat(b[0]).isEqualTo((byte) 31);
@@ -888,7 +943,7 @@ public class ByteChannelTest {
     assertThat(inputStream.read(b, 3, 3)).isEqualTo(-1);
     stream.write(155);
     stream.flush();
-    inputStream = ByteChannel.inputStream(channel.next());
+    inputStream = ByteChannel.getInputStream(channel.next());
     assertThat(inputStream.read(b, 1, 3)).isEqualTo(1);
     assertThat(b[0]).isEqualTo((byte) 31);
     assertThat(b[1]).isEqualTo((byte) 155);
@@ -902,16 +957,16 @@ public class ByteChannelTest {
 
     final Channel<ByteBuffer, ByteBuffer> channel =
         JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
-    final BufferOutputStream stream = Channels.byteChannel().bind(channel);
+    final BufferOutputStream stream = ByteChannel.from(channel).buildOutputStream();
     stream.write(new byte[]{77, 33});
     stream.flush();
-    BufferInputStream inputStream = ByteChannel.inputStream(channel.next());
+    BufferInputStream inputStream = ByteChannel.getInputStream(channel.next());
     assertThat(inputStream.read()).isEqualTo(77);
     assertThat(inputStream.read()).isEqualTo(33);
     assertThat(inputStream.read()).isEqualTo(-1);
     stream.write(new byte[]{31, 17});
     stream.flush();
-    inputStream = ByteChannel.inputStream(channel.next());
+    inputStream = ByteChannel.getInputStream(channel.next());
     final byte[] b = new byte[16];
     assertThat(inputStream.read(b)).isEqualTo(2);
     assertThat(b[0]).isEqualTo((byte) 31);
@@ -921,7 +976,7 @@ public class ByteChannelTest {
     assertThat(inputStream.read(b, 3, 3)).isEqualTo(-1);
     stream.write(new byte[]{(byte) 155, 13});
     stream.flush();
-    inputStream = ByteChannel.inputStream(channel.next());
+    inputStream = ByteChannel.getInputStream(channel.next());
     assertThat(inputStream.read(b, 1, 3)).isEqualTo(2);
     assertThat(b[0]).isEqualTo((byte) 31);
     assertThat(b[1]).isEqualTo((byte) 155);
@@ -936,15 +991,15 @@ public class ByteChannelTest {
 
     final Channel<ByteBuffer, ByteBuffer> channel =
         JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
-    final BufferOutputStream stream = Channels.byteChannel().bind(channel);
+    final BufferOutputStream stream = ByteChannel.from(channel).buildOutputStream();
     stream.write(new byte[]{1, 77, 33}, 1, 1);
     stream.flush();
-    BufferInputStream inputStream = ByteChannel.inputStream(channel.next());
+    BufferInputStream inputStream = ByteChannel.getInputStream(channel.next());
     assertThat(inputStream.read()).isEqualTo(77);
     assertThat(inputStream.read()).isEqualTo(-1);
     stream.write(new byte[]{31, 17, 1}, 0, 2);
     stream.flush();
-    inputStream = ByteChannel.inputStream(channel.next());
+    inputStream = ByteChannel.getInputStream(channel.next());
     final byte[] b = new byte[16];
     assertThat(inputStream.read(b)).isEqualTo(2);
     assertThat(b[0]).isEqualTo((byte) 31);
@@ -954,7 +1009,7 @@ public class ByteChannelTest {
     assertThat(inputStream.read(b, 3, 3)).isEqualTo(-1);
     stream.write(new byte[]{1, (byte) 155, 13}, 1, 2);
     stream.flush();
-    inputStream = ByteChannel.inputStream(channel.next());
+    inputStream = ByteChannel.getInputStream(channel.next());
     assertThat(inputStream.read(b, 1, 3)).isEqualTo(2);
     assertThat(b[0]).isEqualTo((byte) 31);
     assertThat(b[1]).isEqualTo((byte) 155);
@@ -970,7 +1025,7 @@ public class ByteChannelTest {
 
     try {
 
-      Channels.byteChannel().bind(null);
+      ByteChannel.from(null);
 
       fail();
 
@@ -980,7 +1035,7 @@ public class ByteChannelTest {
 
     final Channel<ByteBuffer, ByteBuffer> channel =
         JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
-    final BufferOutputStream stream = Channels.byteChannel().bind(channel);
+    final BufferOutputStream stream = ByteChannel.from(channel).buildOutputStream();
     final byte[] b = new byte[16];
 
     try {
@@ -1072,16 +1127,20 @@ public class ByteChannelTest {
 
     final Channel<ByteBuffer, ByteBuffer> channel =
         JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
-    final BufferOutputStream stream = Channels.byteChannel(4).bind(channel);
+    final BufferOutputStream stream = ByteChannel.from(channel)
+                                                 .applyOutputStreamConfiguration()
+                                                 .withBufferSize(4)
+                                                 .configured()
+                                                 .buildOutputStream();
     stream.write(new ByteArrayInputStream(new byte[]{77, 33}));
     stream.flush();
-    BufferInputStream inputStream = ByteChannel.inputStream(channel.next());
+    BufferInputStream inputStream = ByteChannel.getInputStream(channel.next());
     assertThat(inputStream.read()).isEqualTo(77);
     assertThat(inputStream.read()).isEqualTo(33);
     assertThat(inputStream.read()).isEqualTo(-1);
     stream.write(new ByteArrayInputStream(new byte[]{31, 17}));
     stream.flush();
-    inputStream = ByteChannel.inputStream(channel.next());
+    inputStream = ByteChannel.getInputStream(channel.next());
     final byte[] b = new byte[16];
     assertThat(inputStream.read(b)).isEqualTo(2);
     assertThat(b[0]).isEqualTo((byte) 31);
@@ -1091,7 +1150,7 @@ public class ByteChannelTest {
     assertThat(inputStream.read(b, 3, 3)).isEqualTo(-1);
     stream.write(new ByteArrayInputStream(new byte[]{(byte) 155, 13}));
     stream.flush();
-    inputStream = ByteChannel.inputStream(channel.next());
+    inputStream = ByteChannel.getInputStream(channel.next());
     assertThat(inputStream.read(b, 1, 3)).isEqualTo(2);
     assertThat(b[0]).isEqualTo((byte) 31);
     assertThat(b[1]).isEqualTo((byte) 155);

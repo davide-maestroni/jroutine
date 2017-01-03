@@ -74,7 +74,17 @@ import static com.github.dm.jrt.object.builder.Builders.invokeRoutine;
 class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder {
 
   private static final HashMap<String, Class<?>> sPrimitiveClassMap =
-      new HashMap<String, Class<?>>();
+      new HashMap<String, Class<?>>(9) {{
+        put(boolean.class.getName(), boolean.class);
+        put(byte.class.getName(), byte.class);
+        put(char.class.getName(), char.class);
+        put(int.class.getName(), int.class);
+        put(long.class.getName(), long.class);
+        put(float.class.getName(), float.class);
+        put(double.class.getName(), double.class);
+        put(short.class.getName(), short.class);
+        put(void.class.getName(), void.class);
+      }};
 
   private final ServiceContext mContext;
 
@@ -557,17 +567,5 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder 
       return invokeRoutine(routine, method, asArgs(args), methodInfo.invocationMode, inputMode,
           outputMode);
     }
-  }
-
-  static {
-    final HashMap<String, Class<?>> classMap = sPrimitiveClassMap;
-    classMap.put(byte.class.getName(), byte.class);
-    classMap.put(char.class.getName(), char.class);
-    classMap.put(int.class.getName(), int.class);
-    classMap.put(long.class.getName(), long.class);
-    classMap.put(float.class.getName(), float.class);
-    classMap.put(double.class.getName(), double.class);
-    classMap.put(short.class.getName(), short.class);
-    classMap.put(void.class.getName(), void.class);
   }
 }

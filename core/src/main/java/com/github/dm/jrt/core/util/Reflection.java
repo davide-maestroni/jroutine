@@ -47,9 +47,30 @@ public class Reflection {
   public static final Class<?>[] NO_PARAMS = new Class[0];
 
   private static final HashMap<Class<?>, Class<?>> sBoxingClasses =
-      new HashMap<Class<?>, Class<?>>(9);
+      new HashMap<Class<?>, Class<?>>(9) {{
+        put(boolean.class, Boolean.class);
+        put(byte.class, Byte.class);
+        put(char.class, Character.class);
+        put(double.class, Double.class);
+        put(float.class, Float.class);
+        put(int.class, Integer.class);
+        put(long.class, Long.class);
+        put(short.class, Short.class);
+        put(void.class, Void.class);
+      }};
 
-  private static final HashMap<Class<?>, Object> sDefaultValues = new HashMap<Class<?>, Object>();
+  private static final HashMap<Class<?>, Object> sDefaultValues =
+      new HashMap<Class<?>, Object>(9) {{
+        put(boolean.class, false);
+        put(byte.class, (byte) 0);
+        put(char.class, (char) 0);
+        put(double.class, (double) 0);
+        put(float.class, (float) 0);
+        put(int.class, 0);
+        put(long.class, (long) 0);
+        put(short.class, (short) 0);
+        put(void.class, null);
+      }};
 
   /**
    * Avoid explicit instantiation.
@@ -438,31 +459,5 @@ public class Reflection {
       mMethod.setAccessible(true);
       return null;
     }
-  }
-
-  static {
-    final HashMap<Class<?>, Class<?>> boxMap = sBoxingClasses;
-    boxMap.put(boolean.class, Boolean.class);
-    boxMap.put(byte.class, Byte.class);
-    boxMap.put(char.class, Character.class);
-    boxMap.put(double.class, Double.class);
-    boxMap.put(float.class, Float.class);
-    boxMap.put(int.class, Integer.class);
-    boxMap.put(long.class, Long.class);
-    boxMap.put(short.class, Short.class);
-    boxMap.put(void.class, Void.class);
-  }
-
-  static {
-    final HashMap<Class<?>, Object> defaultMap = sDefaultValues;
-    defaultMap.put(boolean.class, false);
-    defaultMap.put(byte.class, (byte) 0);
-    defaultMap.put(char.class, (char) 0);
-    defaultMap.put(double.class, (double) 0);
-    defaultMap.put(float.class, (float) 0);
-    defaultMap.put(int.class, 0);
-    defaultMap.put(long.class, (long) 0);
-    defaultMap.put(short.class, (short) 0);
-    defaultMap.put(void.class, null);
   }
 }

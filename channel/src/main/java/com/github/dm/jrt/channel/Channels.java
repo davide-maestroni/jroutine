@@ -106,44 +106,6 @@ public class Channels {
   }
 
   /**
-   * Returns a new byte channel.
-   *
-   * @return the byte channel.
-   */
-  @NotNull
-  public static ByteChannel byteChannel() {
-    return new ByteChannel();
-  }
-
-  /**
-   * Returns a new byte channel.
-   *
-   * @param dataBufferSize the size of the data buffer used to transfer the bytes through the
-   *                       routine channels.
-   * @return the byte channel.
-   * @throws IllegalArgumentException if the specified size is 0 or negative.
-   */
-  @NotNull
-  public static ByteChannel byteChannel(final int dataBufferSize) {
-    return new ByteChannel(dataBufferSize);
-  }
-
-  /**
-   * Returns a new byte channel.
-   *
-   * @param dataBufferSize the size of the data buffer used to transfer the bytes through the
-   *                       routine channels.
-   * @param corePoolSize   the maximum number of buffers retained in the pool. Additional buffers
-   *                       created to fulfill the bytes requirement will be discarded.
-   * @return the byte channel.
-   * @throws IllegalArgumentException if the specified size is not positive.
-   */
-  @NotNull
-  public static ByteChannel byteChannel(final int dataBufferSize, final int corePoolSize) {
-    return new ByteChannel(dataBufferSize, corePoolSize);
-  }
-
-  /**
    * Returns a builder of channels combining the specified instances into a selectable one.
    * <br>
    * The selectable indexes will be the position in the array.

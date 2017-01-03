@@ -18,7 +18,9 @@ package com.github.dm.jrt.android.retrofit;
 
 import com.github.dm.jrt.android.channel.AndroidChannels;
 import com.github.dm.jrt.android.channel.ParcelableSelectable;
-import com.github.dm.jrt.channel.ByteChannel.BufferOutputStream;
+import com.github.dm.jrt.android.channel.io.ParcelableByteChannel;
+import com.github.dm.jrt.channel.builder.OutputStreamConfiguration.CloseActionType;
+import com.github.dm.jrt.channel.io.ByteChannel.BufferOutputStream;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
 
@@ -67,8 +69,13 @@ class CallMappingInvocation extends MappingInvocation<Call<?>, ParcelableSelecta
       if (buffer.size() > 0) {
         final Channel<Object, ?> channel =
             AndroidChannels.selectInputParcelable(result, BYTES_INDEX).buildChannel();
-        final BufferOutputStream outputStream =
-            AndroidChannels.parcelableByteChannel().bindDeep(channel);
+        final BufferOutputStream outputStream = ParcelableByteChannel.from(channel)
+                                                                     .applyOutputStreamConfiguration()
+                                                                     .withOnClose(
+                                                                         CloseActionType
+                                                                             .CLOSE_CHANNEL)
+                                                                     .configured()
+                                                                     .buildOutputStream();
         try {
           outputStream.transferFrom(buffer.inputStream());
 

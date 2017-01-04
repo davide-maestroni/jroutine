@@ -26,8 +26,7 @@ import org.jetbrains.annotations.NotNull;
  * <p>
  * Created by davide-maestroni on 01/01/2017.
  */
-public interface BufferStreamBuilder
-    extends BufferStreamConfigurable<BufferStreamBuilder> {
+public interface BufferStreamBuilder extends BufferStreamConfigurable<BufferStreamBuilder> {
 
   /**
    * Builds a new output stream instance.

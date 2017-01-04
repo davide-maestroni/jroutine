@@ -622,8 +622,8 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     final BufferOutputStream stream = ParcelableByteChannel.from(channel).buildOutputStream();
     stream.write(77);
     stream.flush();
-    assertThat(ParcelableByteChannel.getInputStream(result.in(seconds(10)).next()).read()).isEqualTo(
-        77);
+    assertThat(
+        ParcelableByteChannel.getInputStream(result.in(seconds(10)).next()).read()).isEqualTo(77);
     stream.write(new byte[]{31, 17});
     stream.flush();
     BufferInputStream inputStream =
@@ -1004,8 +1004,8 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     final BufferOutputStream stream = ParcelableByteChannel.from(channel).buildOutputStream();
     stream.write(77);
     stream.flush();
-    assertThat(ParcelableByteChannel.getInputStream(result.in(seconds(10)).next()).read()).isEqualTo(
-        77);
+    assertThat(
+        ParcelableByteChannel.getInputStream(result.in(seconds(10)).next()).read()).isEqualTo(77);
     stream.write(31);
     stream.flush();
     BufferInputStream inputStream =

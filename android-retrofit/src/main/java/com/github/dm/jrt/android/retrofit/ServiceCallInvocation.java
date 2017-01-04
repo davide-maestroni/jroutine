@@ -22,7 +22,7 @@ import com.github.dm.jrt.android.channel.io.ParcelableByteChannel;
 import com.github.dm.jrt.android.channel.io.ParcelableByteChannel.ParcelableByteBuffer;
 import com.github.dm.jrt.android.core.invocation.AbstractContextInvocation;
 import com.github.dm.jrt.android.object.ContextInvocationTarget;
-import com.github.dm.jrt.channel.builder.OutputStreamConfiguration.CloseActionType;
+import com.github.dm.jrt.channel.builder.BufferStreamConfiguration.CloseActionType;
 import com.github.dm.jrt.channel.io.ByteChannel.BufferOutputStream;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
@@ -190,7 +190,7 @@ public class ServiceCallInvocation
     final Channel<Object, ?> channel =
         AndroidChannels.selectInputParcelable(result, BYTES_INDEX).buildChannel();
     final BufferOutputStream outputStream = ParcelableByteChannel.from(channel)
-                                                                 .applyOutputStreamConfiguration()
+                                                                 .applyBufferStreamConfiguration()
                                                                  .withOnClose(
                                                                      CloseActionType.CLOSE_CHANNEL)
                                                                  .configured()

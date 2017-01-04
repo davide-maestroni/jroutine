@@ -16,9 +16,9 @@
 
 package com.github.dm.jrt.channel.io;
 
-import com.github.dm.jrt.channel.builder.OutputStreamConfiguration;
-import com.github.dm.jrt.channel.builder.OutputStreamConfiguration.Builder;
-import com.github.dm.jrt.channel.builder.OutputStreamConfiguration.CloseActionType;
+import com.github.dm.jrt.channel.builder.BufferStreamConfiguration;
+import com.github.dm.jrt.channel.builder.BufferStreamConfiguration.Builder;
+import com.github.dm.jrt.channel.builder.BufferStreamConfiguration.CloseActionType;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.SimpleQueue;
@@ -73,7 +73,7 @@ public class ByteChannel {
 
   private final SimpleQueue<ByteBuffer> mBufferPool;
 
-  private final OutputStreamConfiguration mConfiguration;
+  private final BufferStreamConfiguration mConfiguration;
 
   private final int mCorePoolSize;
 
@@ -84,7 +84,7 @@ public class ByteChannel {
    *
    * @param configuration the output stream configuration.
    */
-  private ByteChannel(@NotNull final OutputStreamConfiguration configuration) {
+  private ByteChannel(@NotNull final BufferStreamConfiguration configuration) {
     mConfiguration = configuration;
     final int bufferSize =
         (mDataBufferSize = configuration.getBufferSizeOrElse(DEFAULT_BUFFER_SIZE));
@@ -102,8 +102,8 @@ public class ByteChannel {
    * @return the output stream builder.
    */
   @NotNull
-  public static OutputStreamBuilder from(@NotNull final Channel<? super ByteBuffer, ?> channel) {
-    return new DefaultOutputStreamBuilder(channel);
+  public static BufferStreamBuilder from(@NotNull final Channel<? super ByteBuffer, ?> channel) {
+    return new DefaultBufferStreamBuilder(channel);
   }
 
   /**
@@ -380,31 +380,31 @@ public class ByteChannel {
   /**
    * Default implementation of an output stream builder.
    */
-  private static class DefaultOutputStreamBuilder implements OutputStreamBuilder {
+  private static class DefaultBufferStreamBuilder implements BufferStreamBuilder {
 
     private final Channel<? super ByteBuffer, ?> mChannel;
 
-    private OutputStreamConfiguration mConfiguration =
-        OutputStreamConfiguration.defaultConfiguration();
+    private BufferStreamConfiguration mConfiguration =
+        BufferStreamConfiguration.defaultConfiguration();
 
     /**
      * Constructor.
      *
      * @param channel the output channel to feed with data.
      */
-    private DefaultOutputStreamBuilder(@NotNull final Channel<? super ByteBuffer, ?> channel) {
+    private DefaultBufferStreamBuilder(@NotNull final Channel<? super ByteBuffer, ?> channel) {
       mChannel = ConstantConditions.notNull("channel instance", channel);
     }
 
     @NotNull
-    public OutputStreamBuilder apply(@NotNull final OutputStreamConfiguration configuration) {
+    public BufferStreamBuilder apply(@NotNull final BufferStreamConfiguration configuration) {
       mConfiguration = ConstantConditions.notNull("output stream configuration", configuration);
       return this;
     }
 
     @NotNull
-    public Builder<? extends OutputStreamBuilder> applyOutputStreamConfiguration() {
-      return new Builder<OutputStreamBuilder>(this, mConfiguration);
+    public Builder<? extends BufferStreamBuilder> applyBufferStreamConfiguration() {
+      return new Builder<BufferStreamBuilder>(this, mConfiguration);
     }
 
     @NotNull
@@ -764,39 +764,15 @@ public class ByteChannel {
 
     private void copyFrom(@NotNull final byte[] src, final int srcPos, final int dstPos,
         final int len) {
-      synchronized (mMutex) {
-        final BufferState state = mState;
-        if (state != BufferState.WRITE) {
-          throw new IllegalStateException(
-              "attempting to write buffer data while in illegal state: " + state);
-        }
-      }
-
       System.arraycopy(src, srcPos, mBuffer, dstPos, len);
     }
 
     private void copyTo(final int srcPos, @NotNull final byte[] dest, final int dstPos,
         final int len) {
-      synchronized (mMutex) {
-        final BufferState state = mState;
-        if (state != BufferState.READ) {
-          throw new IllegalStateException(
-              "attempting to read buffer data while in illegal state: " + state);
-        }
-      }
-
       System.arraycopy(mBuffer, srcPos, dest, dstPos, len);
     }
 
     private byte getByte(final int pos) {
-      synchronized (mMutex) {
-        final BufferState state = mState;
-        if (state != BufferState.READ) {
-          throw new IllegalStateException(
-              "attempting to read buffer data while in illegal state: " + state);
-        }
-      }
-
       return mBuffer[pos];
     }
 
@@ -826,14 +802,6 @@ public class ByteChannel {
 
     private int readFrom(@NotNull final InputStream in, final int off, final int len) throws
         IOException {
-      synchronized (mMutex) {
-        final BufferState state = mState;
-        if (state != BufferState.WRITE) {
-          throw new IllegalStateException(
-              "attempting to write buffer data while in illegal state: " + state);
-        }
-      }
-
       return in.read(mBuffer, off, len);
     }
 
@@ -848,27 +816,11 @@ public class ByteChannel {
     }
 
     private void setByte(final int pos, final byte b) {
-      synchronized (mMutex) {
-        final BufferState state = mState;
-        if (state != BufferState.WRITE) {
-          throw new IllegalStateException(
-              "attempting to write buffer data while in illegal state: " + state);
-        }
-      }
-
       mBuffer[pos] = b;
     }
 
     private void writeTo(@NotNull final OutputStream out, final int off, final int len) throws
         IOException {
-      synchronized (mMutex) {
-        final BufferState state = mState;
-        if (state != BufferState.READ) {
-          throw new IllegalStateException(
-              "attempting to read buffer data while in illegal state: " + state);
-        }
-      }
-
       out.write(mBuffer, off, len);
     }
   }
@@ -1049,7 +1001,7 @@ public class ByteChannel {
      * @param configuration the output stream configuration.
      * @param channel       the channel to which pass the data.
      */
-    private DefaultBufferOutputStream(@NotNull final OutputStreamConfiguration configuration,
+    private DefaultBufferOutputStream(@NotNull final BufferStreamConfiguration configuration,
         @NotNull final Channel<? super ByteBuffer, ?> channel) {
       mChannel = channel;
       mCloseAction = configuration.getCloseActionTypeOrElse(CloseActionType.CLOSE_STREAM);

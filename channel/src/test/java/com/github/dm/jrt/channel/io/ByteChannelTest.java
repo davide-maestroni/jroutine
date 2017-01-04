@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.channel.io;
 
-import com.github.dm.jrt.channel.builder.OutputStreamConfiguration.CloseActionType;
+import com.github.dm.jrt.channel.builder.BufferStreamConfiguration.CloseActionType;
 import com.github.dm.jrt.channel.io.ByteChannel.BufferInputStream;
 import com.github.dm.jrt.channel.io.ByteChannel.BufferOutputStream;
 import com.github.dm.jrt.channel.io.ByteChannel.ByteBuffer;
@@ -48,7 +48,7 @@ public class ByteChannelTest {
     final Channel<ByteBuffer, ByteBuffer> channel =
         JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
     final BufferOutputStream stream = ByteChannel.from(channel)
-                                                 .applyOutputStreamConfiguration()
+                                                 .applyBufferStreamConfiguration()
                                                  .withOnClose(CloseActionType.CLOSE_CHANNEL)
                                                  .configured()
                                                  .buildOutputStream();
@@ -100,7 +100,7 @@ public class ByteChannelTest {
     final Channel<ByteBuffer, ByteBuffer> channel =
         JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
     final BufferOutputStream stream = ByteChannel.from(channel)
-                                                 .applyOutputStreamConfiguration()
+                                                 .applyBufferStreamConfiguration()
                                                  .withBufferSize(8)
                                                  .withOnClose(CloseActionType.CLOSE_CHANNEL)
                                                  .configured()
@@ -126,7 +126,7 @@ public class ByteChannelTest {
     final Channel<ByteBuffer, ByteBuffer> channel =
         JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
     final BufferOutputStream stream = ByteChannel.from(channel)
-                                                 .applyOutputStreamConfiguration()
+                                                 .applyBufferStreamConfiguration()
                                                  .withBufferSize(2)
                                                  .configured()
                                                  .buildOutputStream();
@@ -144,7 +144,7 @@ public class ByteChannelTest {
     final Channel<ByteBuffer, ByteBuffer> channel =
         JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
     final BufferOutputStream stream = ByteChannel.from(channel)
-                                                 .applyOutputStreamConfiguration()
+                                                 .applyBufferStreamConfiguration()
                                                  .withBufferSize(4)
                                                  .withOnClose(CloseActionType.CLOSE_CHANNEL)
                                                  .configured()
@@ -175,7 +175,7 @@ public class ByteChannelTest {
     final Channel<ByteBuffer, ByteBuffer> channel =
         JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
     final BufferOutputStream stream = ByteChannel.from(channel)
-                                                 .applyOutputStreamConfiguration()
+                                                 .applyBufferStreamConfiguration()
                                                  .withBufferSize(2)
                                                  .configured()
                                                  .buildOutputStream();
@@ -196,7 +196,7 @@ public class ByteChannelTest {
     final Channel<ByteBuffer, ByteBuffer> channel =
         JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
     final BufferOutputStream stream = ByteChannel.from(channel)
-                                                 .applyOutputStreamConfiguration()
+                                                 .applyBufferStreamConfiguration()
                                                  .withBufferSize(2)
                                                  .configured()
                                                  .buildOutputStream();
@@ -222,7 +222,7 @@ public class ByteChannelTest {
     final Channel<ByteBuffer, ByteBuffer> channel =
         JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
     final BufferOutputStream stream = ByteChannel.from(channel)
-                                                 .applyOutputStreamConfiguration()
+                                                 .applyBufferStreamConfiguration()
                                                  .withBufferSize(3)
                                                  .configured()
                                                  .buildOutputStream();
@@ -251,7 +251,7 @@ public class ByteChannelTest {
     final Channel<ByteBuffer, ByteBuffer> channel =
         JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
     final BufferOutputStream stream = ByteChannel.from(channel)
-                                                 .applyOutputStreamConfiguration()
+                                                 .applyBufferStreamConfiguration()
                                                  .withBufferSize(2)
                                                  .configured()
                                                  .buildOutputStream();
@@ -341,7 +341,7 @@ public class ByteChannelTest {
     final Channel<ByteBuffer, ByteBuffer> channel =
         JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
     final BufferOutputStream stream = ByteChannel.from(channel)
-                                                 .applyOutputStreamConfiguration()
+                                                 .applyBufferStreamConfiguration()
                                                  .withBufferSize(3)
                                                  .configured()
                                                  .buildOutputStream();
@@ -370,7 +370,7 @@ public class ByteChannelTest {
     final Channel<ByteBuffer, ByteBuffer> channel =
         JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
     final BufferOutputStream stream = ByteChannel.from(channel)
-                                                 .applyOutputStreamConfiguration()
+                                                 .applyBufferStreamConfiguration()
                                                  .withBufferSize(4)
                                                  .configured()
                                                  .buildOutputStream();
@@ -401,7 +401,7 @@ public class ByteChannelTest {
     final Channel<ByteBuffer, ByteBuffer> channel =
         JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
     final BufferOutputStream stream = ByteChannel.from(channel)
-                                                 .applyOutputStreamConfiguration()
+                                                 .applyBufferStreamConfiguration()
                                                  .withCorePoolSize(0)
                                                  .configured()
                                                  .buildOutputStream();
@@ -462,7 +462,7 @@ public class ByteChannelTest {
     final Channel<ByteBuffer, ByteBuffer> channel =
         JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
     final BufferOutputStream stream = ByteChannel.from(channel)
-                                                 .applyOutputStreamConfiguration()
+                                                 .applyBufferStreamConfiguration()
                                                  .withOnClose(CloseActionType.CLOSE_CHANNEL)
                                                  .configured()
                                                  .buildOutputStream();
@@ -491,7 +491,7 @@ public class ByteChannelTest {
     final Channel<ByteBuffer, ByteBuffer> channel =
         JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
     final BufferOutputStream stream = ByteChannel.from(channel)
-                                                 .applyOutputStreamConfiguration()
+                                                 .applyBufferStreamConfiguration()
                                                  .withOnClose(CloseActionType.CLOSE_CHANNEL)
                                                  .configured()
                                                  .buildOutputStream();
@@ -815,7 +815,7 @@ public class ByteChannelTest {
     final Channel<ByteBuffer, ByteBuffer> channel =
         JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
     final BufferOutputStream stream = ByteChannel.from(channel)
-                                                 .applyOutputStreamConfiguration()
+                                                 .applyBufferStreamConfiguration()
                                                  .withOnClose(CloseActionType.CLOSE_CHANNEL)
                                                  .configured()
                                                  .buildOutputStream();
@@ -845,7 +845,7 @@ public class ByteChannelTest {
     final Channel<ByteBuffer, ByteBuffer> channel =
         JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
     final BufferOutputStream stream = ByteChannel.from(channel)
-                                                 .applyOutputStreamConfiguration()
+                                                 .applyBufferStreamConfiguration()
                                                  .withBufferSize(2)
                                                  .configured()
                                                  .buildOutputStream();
@@ -869,7 +869,7 @@ public class ByteChannelTest {
     final Channel<ByteBuffer, ByteBuffer> channel =
         JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
     final BufferOutputStream stream = ByteChannel.from(channel)
-                                                 .applyOutputStreamConfiguration()
+                                                 .applyBufferStreamConfiguration()
                                                  .withBufferSize(4)
                                                  .configured()
                                                  .buildOutputStream();
@@ -909,7 +909,7 @@ public class ByteChannelTest {
     final Channel<ByteBuffer, ByteBuffer> channel =
         JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
     final BufferOutputStream stream = ByteChannel.from(channel)
-                                                 .applyOutputStreamConfiguration()
+                                                 .applyBufferStreamConfiguration()
                                                  .withBufferSize(4)
                                                  .configured()
                                                  .buildOutputStream();
@@ -1128,7 +1128,7 @@ public class ByteChannelTest {
     final Channel<ByteBuffer, ByteBuffer> channel =
         JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
     final BufferOutputStream stream = ByteChannel.from(channel)
-                                                 .applyOutputStreamConfiguration()
+                                                 .applyBufferStreamConfiguration()
                                                  .withBufferSize(4)
                                                  .configured()
                                                  .buildOutputStream();

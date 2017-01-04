@@ -25,6 +25,7 @@ import android.test.ActivityInstrumentationTestCase2;
 
 import com.github.dm.jrt.ObjectProxyRoutineBuilder.BuilderType;
 import com.github.dm.jrt.android.R;
+import com.github.dm.jrt.android.channel.io.ParcelableByteChannel.ParcelableByteBuffer;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.CacheStrategyType;
 import com.github.dm.jrt.android.core.invocation.CallContextInvocation;
 import com.github.dm.jrt.android.core.invocation.TargetInvocationFactory;
@@ -35,6 +36,8 @@ import com.github.dm.jrt.android.core.service.InvocationService;
 import com.github.dm.jrt.android.object.ContextInvocationTarget;
 import com.github.dm.jrt.android.proxy.annotation.LoaderProxyCompat;
 import com.github.dm.jrt.android.proxy.annotation.ServiceProxy;
+import com.github.dm.jrt.channel.io.ByteChannel.BufferInputStream;
+import com.github.dm.jrt.channel.io.ByteChannel.BufferOutputStream;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.TemplateChannelConsumer;
@@ -53,6 +56,8 @@ import com.github.dm.jrt.operator.Operators;
 import org.assertj.core.data.Offset;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -226,6 +231,60 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
 
   public void testCallFunction() {
     testCallFunction(getActivity());
+  }
+
+  public void testConcatReadOutput() throws IOException {
+    final Channel<ParcelableByteBuffer, ParcelableByteBuffer> channel =
+        JRoutineAndroidCompat.<ParcelableByteBuffer>ofInputs().buildChannel();
+    final BufferOutputStream stream = JRoutineAndroidCompat.from(channel)
+                                                           .applyBufferStreamConfiguration()
+                                                           .withBufferSize(3)
+                                                           .configured()
+                                                           .buildOutputStream();
+    stream.write(new byte[]{31, 17, (byte) 155, 13});
+    stream.flush();
+    final BufferInputStream inputStream =
+        JRoutineAndroidCompat.getInputStream(channel.next(), channel.next());
+    final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    assertThat(inputStream.read(outputStream)).isEqualTo(3);
+    assertThat(outputStream.size()).isEqualTo(3);
+    assertThat(outputStream.toByteArray()).containsExactly((byte) 31, (byte) 17, (byte) 155);
+    assertThat(inputStream.read(outputStream)).isEqualTo(1);
+    assertThat(outputStream.size()).isEqualTo(4);
+    assertThat(outputStream.toByteArray()).containsExactly((byte) 31, (byte) 17, (byte) 155,
+        (byte) 13);
+    assertThat(inputStream.read(outputStream)).isEqualTo(-1);
+    assertThat(outputStream.size()).isEqualTo(4);
+    assertThat(outputStream.toByteArray()).containsExactly((byte) 31, (byte) 17, (byte) 155,
+        (byte) 13);
+    assertThat(inputStream.read(outputStream)).isEqualTo(-1);
+  }
+
+  public void testConcatReadOutput2() throws IOException {
+    final Channel<ParcelableByteBuffer, ParcelableByteBuffer> channel =
+        JRoutineAndroidCompat.<ParcelableByteBuffer>ofInputs().buildChannel();
+    final BufferOutputStream stream = JRoutineAndroidCompat.from(channel)
+                                                           .applyBufferStreamConfiguration()
+                                                           .withBufferSize(3)
+                                                           .configured()
+                                                           .buildOutputStream();
+    stream.write(new byte[]{31, 17, (byte) 155, 13});
+    stream.flush();
+    final BufferInputStream inputStream =
+        JRoutineAndroidCompat.getInputStream(channel.eventuallyContinue().all());
+    final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    assertThat(inputStream.read(outputStream)).isEqualTo(3);
+    assertThat(outputStream.size()).isEqualTo(3);
+    assertThat(outputStream.toByteArray()).containsExactly((byte) 31, (byte) 17, (byte) 155);
+    assertThat(inputStream.read(outputStream)).isEqualTo(1);
+    assertThat(outputStream.size()).isEqualTo(4);
+    assertThat(outputStream.toByteArray()).containsExactly((byte) 31, (byte) 17, (byte) 155,
+        (byte) 13);
+    assertThat(inputStream.read(outputStream)).isEqualTo(-1);
+    assertThat(outputStream.size()).isEqualTo(4);
+    assertThat(outputStream.toByteArray()).containsExactly((byte) 31, (byte) 17, (byte) 155,
+        (byte) 13);
+    assertThat(inputStream.read(outputStream)).isEqualTo(-1);
   }
 
   public void testConstructor() {
@@ -471,6 +530,24 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
 
   public void testPredicateFilter() {
     testPredicateFilter(getActivity());
+  }
+
+  public void testReadAll() throws IOException {
+    final Channel<ParcelableByteBuffer, ParcelableByteBuffer> channel =
+        JRoutineAndroidCompat.<ParcelableByteBuffer>ofInputs().buildChannel();
+    final BufferOutputStream stream = JRoutineAndroidCompat.from(channel).buildOutputStream();
+    stream.write(new byte[]{31, 17, (byte) 155, 13});
+    stream.flush();
+    final BufferInputStream inputStream = JRoutineAndroidCompat.getInputStream(channel.next());
+    final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    assertThat(inputStream.readAll(outputStream)).isEqualTo(4);
+    assertThat(outputStream.size()).isEqualTo(4);
+    assertThat(outputStream.toByteArray()).containsExactly((byte) 31, (byte) 17, (byte) 155,
+        (byte) 13);
+    assertThat(inputStream.read(outputStream)).isEqualTo(-1);
+    assertThat(outputStream.size()).isEqualTo(4);
+    assertThat(outputStream.toByteArray()).containsExactly((byte) 31, (byte) 17, (byte) 155,
+        (byte) 13);
   }
 
   public void testService() {

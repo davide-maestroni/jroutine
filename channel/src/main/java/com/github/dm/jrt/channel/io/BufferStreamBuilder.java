@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.channel.io;
 
-import com.github.dm.jrt.channel.builder.OutputStreamConfigurable;
+import com.github.dm.jrt.channel.builder.BufferStreamConfigurable;
 import com.github.dm.jrt.channel.io.ByteChannel.BufferOutputStream;
 
 import org.jetbrains.annotations.NotNull;
@@ -26,7 +26,8 @@ import org.jetbrains.annotations.NotNull;
  * <p>
  * Created by davide-maestroni on 01/01/2017.
  */
-public interface OutputStreamBuilder extends OutputStreamConfigurable<OutputStreamBuilder> {
+public interface BufferStreamBuilder
+    extends BufferStreamConfigurable<BufferStreamBuilder> {
 
   /**
    * Builds a new output stream instance.

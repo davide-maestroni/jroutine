@@ -24,7 +24,7 @@ import com.github.dm.jrt.android.channel.TestActivity;
 import com.github.dm.jrt.android.channel.io.ParcelableByteChannel.ParcelableByteBuffer;
 import com.github.dm.jrt.android.core.JRoutineService;
 import com.github.dm.jrt.android.core.invocation.TemplateContextInvocation;
-import com.github.dm.jrt.channel.builder.OutputStreamConfiguration.CloseActionType;
+import com.github.dm.jrt.channel.builder.BufferStreamConfiguration.CloseActionType;
 import com.github.dm.jrt.channel.io.ByteChannel.BufferInputStream;
 import com.github.dm.jrt.channel.io.ByteChannel.BufferOutputStream;
 import com.github.dm.jrt.core.JRoutineCore;
@@ -65,7 +65,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
                        .with(factoryOf(PassingInvocation.class))
                        .call();
     final BufferOutputStream stream = ParcelableByteChannel.from(channel)
-                                                           .applyOutputStreamConfiguration()
+                                                           .applyBufferStreamConfiguration()
                                                            .withOnClose(
                                                                CloseActionType.CLOSE_STREAM)
                                                            .configured()
@@ -125,7 +125,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
                        .with(factoryOf(PassingInvocation.class))
                        .call();
     final BufferOutputStream stream = ParcelableByteChannel.from(channel)
-                                                           .applyOutputStreamConfiguration()
+                                                           .applyBufferStreamConfiguration()
                                                            .withBufferSize(8)
                                                            .withOnClose(
                                                                CloseActionType.CLOSE_STREAM)
@@ -155,7 +155,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
                        .with(factoryOf(PassingInvocation.class))
                        .call();
     final BufferOutputStream stream = ParcelableByteChannel.from(channel)
-                                                           .applyOutputStreamConfiguration()
+                                                           .applyBufferStreamConfiguration()
                                                            .withBufferSize(2)
                                                            .configured()
                                                            .buildOutputStream();
@@ -176,7 +176,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
                        .with(factoryOf(PassingInvocation.class))
                        .call();
     final BufferOutputStream stream = ParcelableByteChannel.from(channel)
-                                                           .applyOutputStreamConfiguration()
+                                                           .applyBufferStreamConfiguration()
                                                            .withBufferSize(4)
                                                            .withOnClose(
                                                                CloseActionType.CLOSE_STREAM)
@@ -211,7 +211,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
                        .with(factoryOf(PassingInvocation.class))
                        .call();
     final BufferOutputStream stream = ParcelableByteChannel.from(channel)
-                                                           .applyOutputStreamConfiguration()
+                                                           .applyBufferStreamConfiguration()
                                                            .withBufferSize(2)
                                                            .configured()
                                                            .buildOutputStream();
@@ -235,7 +235,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
                        .with(factoryOf(PassingInvocation.class))
                        .call();
     final BufferOutputStream stream = ParcelableByteChannel.from(channel)
-                                                           .applyOutputStreamConfiguration()
+                                                           .applyBufferStreamConfiguration()
                                                            .withBufferSize(2)
                                                            .configured()
                                                            .buildOutputStream();
@@ -264,7 +264,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
                        .with(factoryOf(PassingInvocation.class))
                        .call();
     final BufferOutputStream stream = ParcelableByteChannel.from(channel)
-                                                           .applyOutputStreamConfiguration()
+                                                           .applyBufferStreamConfiguration()
                                                            .withBufferSize(3)
                                                            .configured()
                                                            .buildOutputStream();
@@ -296,7 +296,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
                        .with(factoryOf(PassingInvocation.class))
                        .call();
     final BufferOutputStream stream = ParcelableByteChannel.from(channel)
-                                                           .applyOutputStreamConfiguration()
+                                                           .applyBufferStreamConfiguration()
                                                            .withBufferSize(2)
                                                            .configured()
                                                            .buildOutputStream();
@@ -389,7 +389,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
                        .with(factoryOf(PassingInvocation.class))
                        .call();
     final BufferOutputStream stream = ParcelableByteChannel.from(channel)
-                                                           .applyOutputStreamConfiguration()
+                                                           .applyBufferStreamConfiguration()
                                                            .withBufferSize(3)
                                                            .configured()
                                                            .buildOutputStream();
@@ -421,7 +421,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
                        .with(factoryOf(PassingInvocation.class))
                        .call();
     final BufferOutputStream stream = ParcelableByteChannel.from(channel)
-                                                           .applyOutputStreamConfiguration()
+                                                           .applyBufferStreamConfiguration()
                                                            .withBufferSize(4)
                                                            .configured()
                                                            .buildOutputStream();
@@ -455,7 +455,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
                        .with(factoryOf(PassingInvocation.class))
                        .call();
     final BufferOutputStream stream = ParcelableByteChannel.from(channel)
-                                                           .applyOutputStreamConfiguration()
+                                                           .applyBufferStreamConfiguration()
                                                            .withBufferSize(16)
                                                            .withCorePoolSize(16)
                                                            .configured()
@@ -503,7 +503,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
                        .with(factoryOf(PassingInvocation.class))
                        .call();
     final BufferOutputStream stream = ParcelableByteChannel.from(channel)
-                                                           .applyOutputStreamConfiguration()
+                                                           .applyBufferStreamConfiguration()
                                                            .withOnClose(
                                                                CloseActionType.CLOSE_STREAM)
                                                            .configured()
@@ -535,7 +535,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
                        .with(factoryOf(PassingInvocation.class))
                        .call();
     final BufferOutputStream stream = ParcelableByteChannel.from(channel)
-                                                           .applyOutputStreamConfiguration()
+                                                           .applyBufferStreamConfiguration()
                                                            .withOnClose(
                                                                CloseActionType.CLOSE_STREAM)
                                                            .configured()
@@ -885,7 +885,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
                        .with(factoryOf(PassingInvocation.class))
                        .call();
     final BufferOutputStream stream = ParcelableByteChannel.from(channel)
-                                                           .applyOutputStreamConfiguration()
+                                                           .applyBufferStreamConfiguration()
                                                            .withOnClose(
                                                                CloseActionType.CLOSE_STREAM)
                                                            .configured()
@@ -918,7 +918,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
                        .with(factoryOf(PassingInvocation.class))
                        .call();
     final BufferOutputStream stream = ParcelableByteChannel.from(channel)
-                                                           .applyOutputStreamConfiguration()
+                                                           .applyBufferStreamConfiguration()
                                                            .withBufferSize(2)
                                                            .configured()
                                                            .buildOutputStream();
@@ -941,7 +941,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     final Channel<ParcelableByteBuffer, ParcelableByteBuffer> channel =
         JRoutineCore.<ParcelableByteBuffer>ofInputs().buildChannel();
     final BufferOutputStream stream = ParcelableByteChannel.from(channel)
-                                                           .applyOutputStreamConfiguration()
+                                                           .applyBufferStreamConfiguration()
                                                            .withBufferSize(4)
                                                            .configured()
                                                            .buildOutputStream();
@@ -979,7 +979,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     final Channel<ParcelableByteBuffer, ParcelableByteBuffer> channel =
         JRoutineCore.<ParcelableByteBuffer>ofInputs().buildChannel();
     final BufferOutputStream stream = ParcelableByteChannel.from(channel)
-                                                           .applyOutputStreamConfiguration()
+                                                           .applyBufferStreamConfiguration()
                                                            .withBufferSize(4)
                                                            .configured()
                                                            .buildOutputStream();
@@ -1188,7 +1188,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
                                                                        PassingInvocation.class))
                                                                    .call(channel);
     final BufferOutputStream stream = ParcelableByteChannel.from(channel)
-                                                           .applyOutputStreamConfiguration()
+                                                           .applyBufferStreamConfiguration()
                                                            .withBufferSize(4)
                                                            .configured()
                                                            .buildOutputStream();

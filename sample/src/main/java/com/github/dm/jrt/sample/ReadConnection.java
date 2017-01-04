@@ -60,7 +60,7 @@ public class ReadConnection extends MappingInvocation<URI, ByteBuffer> {
     // We employ the utility class dedicated to the optimized transfer of bytes through a routine
     // channel
     final BufferOutputStream outputStream = ByteChannel.from(result)
-                                                       .applyOutputStreamConfiguration()
+                                                       .applyBufferStreamConfiguration()
                                                        .withBufferSize(MAX_CHUNK_SIZE)
                                                        .configured()
                                                        .buildOutputStream();

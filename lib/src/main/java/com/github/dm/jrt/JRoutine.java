@@ -17,6 +17,10 @@
 package com.github.dm.jrt;
 
 import com.github.dm.jrt.channel.Channels;
+import com.github.dm.jrt.channel.io.BufferStreamBuilder;
+import com.github.dm.jrt.channel.io.ByteChannel;
+import com.github.dm.jrt.channel.io.ByteChannel.BufferInputStream;
+import com.github.dm.jrt.channel.io.ByteChannel.ByteBuffer;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.ChannelBuilder;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
@@ -66,6 +70,67 @@ public class JRoutine extends Channels {
    */
   protected JRoutine() {
     ConstantConditions.avoid();
+  }
+
+  /**
+   * Returns a builder of buffer output streams.
+   * <p>
+   * The built streams will not close the underlying channel by default.
+   *
+   * @param channel the output channel to feed with data.
+   * @return the output stream builder.
+   */
+  @NotNull
+  public static BufferStreamBuilder from(@NotNull final Channel<? super ByteBuffer, ?> channel) {
+    return ByteChannel.from(channel);
+  }
+
+  /**
+   * Gets an input stream returning the concatenation of the data contained in the specified
+   * buffers.
+   * <p>
+   * Note that only one input stream can be created for each buffer.
+   *
+   * @param buffers the byte buffers whose data have to be concatenated.
+   * @return the input stream.
+   * @throws java.lang.IllegalStateException if an input stream has been already created for one
+   *                                         of the specified buffers.
+   */
+  @NotNull
+  public static BufferInputStream getInputStream(@NotNull final ByteBuffer... buffers) {
+    return ByteChannel.getInputStream(buffers);
+  }
+
+  /**
+   * Gets an input stream returning the concatenation of the data contained in the specified
+   * buffers.
+   * <p>
+   * Note that only one input stream can be created for each buffer.
+   *
+   * @param buffers the byte buffers whose data have to be concatenated.
+   * @return the input stream.
+   * @throws java.lang.IllegalStateException if an input stream has been already created for one
+   *                                         of the specified buffers.
+   */
+  @NotNull
+  public static BufferInputStream getInputStream(
+      @NotNull final Iterable<? extends ByteBuffer> buffers) {
+    return ByteChannel.getInputStream(buffers);
+  }
+
+  /**
+   * Gets an input stream returning the data contained in the specified buffer.
+   * <p>
+   * Note that only one input stream can be created for each buffer.
+   *
+   * @param buffer the byte buffer.
+   * @return the input stream.
+   * @throws java.lang.IllegalStateException if an input stream has been already created for the
+   *                                         specified buffer.
+   */
+  @NotNull
+  public static BufferInputStream getInputStream(@NotNull final ByteBuffer buffer) {
+    return ByteChannel.getInputStream(buffer);
   }
 
   /**

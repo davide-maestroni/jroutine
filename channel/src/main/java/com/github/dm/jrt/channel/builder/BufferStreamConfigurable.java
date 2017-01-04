@@ -16,8 +16,8 @@
 
 package com.github.dm.jrt.channel.builder;
 
-import com.github.dm.jrt.channel.builder.OutputStreamConfiguration.Builder;
-import com.github.dm.jrt.channel.builder.OutputStreamConfiguration.Configurable;
+import com.github.dm.jrt.channel.builder.BufferStreamConfiguration.Builder;
+import com.github.dm.jrt.channel.builder.BufferStreamConfiguration.Configurable;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -28,7 +28,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <TYPE> the object type.
  */
-public interface OutputStreamConfigurable<TYPE> extends Configurable<TYPE> {
+public interface BufferStreamConfigurable<TYPE> extends Configurable<TYPE> {
 
   /**
    * Gets the output stream configuration builder related to the instance.
@@ -40,5 +40,5 @@ public interface OutputStreamConfigurable<TYPE> extends Configurable<TYPE> {
    * @return the output stream configuration builder.
    */
   @NotNull
-  Builder<? extends TYPE> applyOutputStreamConfiguration();
+  Builder<? extends TYPE> applyBufferStreamConfiguration();
 }

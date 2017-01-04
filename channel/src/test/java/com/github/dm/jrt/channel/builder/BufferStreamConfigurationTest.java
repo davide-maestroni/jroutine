@@ -16,13 +16,13 @@
 
 package com.github.dm.jrt.channel.builder;
 
-import com.github.dm.jrt.channel.builder.OutputStreamConfiguration.Builder;
-import com.github.dm.jrt.channel.builder.OutputStreamConfiguration.CloseActionType;
+import com.github.dm.jrt.channel.builder.BufferStreamConfiguration.Builder;
+import com.github.dm.jrt.channel.builder.BufferStreamConfiguration.CloseActionType;
 
 import org.junit.Test;
 
-import static com.github.dm.jrt.channel.builder.OutputStreamConfiguration.builder;
-import static com.github.dm.jrt.channel.builder.OutputStreamConfiguration.builderFrom;
+import static com.github.dm.jrt.channel.builder.BufferStreamConfiguration.builder;
+import static com.github.dm.jrt.channel.builder.BufferStreamConfiguration.builderFrom;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -31,11 +31,11 @@ import static org.junit.Assert.fail;
  * <p>
  * Created by davide-maestroni on 01/02/2017.
  */
-public class OutputStreamConfigurationTest {
+public class BufferStreamConfigurationTest {
 
   @Test
   public void testBufferSizeEquals() {
-    final OutputStreamConfiguration configuration = builder().withBufferSize(11)
+    final BufferStreamConfiguration configuration = builder().withBufferSize(11)
                                                              .withCorePoolSize(17)
                                                              .withOnClose(
                                                                  CloseActionType.CLOSE_CHANNEL)
@@ -64,7 +64,7 @@ public class OutputStreamConfigurationTest {
 
   @Test
   public void testBuildFrom() {
-    final OutputStreamConfiguration configuration = builder().withBufferSize(11)
+    final BufferStreamConfiguration configuration = builder().withBufferSize(11)
                                                              .withCorePoolSize(17)
                                                              .withOnClose(
                                                                  CloseActionType.CLOSE_CHANNEL)
@@ -73,9 +73,9 @@ public class OutputStreamConfigurationTest {
         configuration.hashCode());
     assertThat(builderFrom(configuration).configured()).isEqualTo(configuration);
     assertThat(builderFrom(null).configured().hashCode()).isEqualTo(
-        OutputStreamConfiguration.defaultConfiguration().hashCode());
+        BufferStreamConfiguration.defaultConfiguration().hashCode());
     assertThat(builderFrom(null).configured()).isEqualTo(
-        OutputStreamConfiguration.defaultConfiguration());
+        BufferStreamConfiguration.defaultConfiguration());
   }
 
   @Test
@@ -89,7 +89,7 @@ public class OutputStreamConfigurationTest {
     }
 
     try {
-      new Builder<Object>(null, OutputStreamConfiguration.defaultConfiguration());
+      new Builder<Object>(null, BufferStreamConfiguration.defaultConfiguration());
       fail();
 
     } catch (final NullPointerException ignored) {
@@ -98,7 +98,7 @@ public class OutputStreamConfigurationTest {
 
   @Test
   public void testBuilderFromEquals() {
-    final OutputStreamConfiguration configuration = builder().withBufferSize(11)
+    final BufferStreamConfiguration configuration = builder().withBufferSize(11)
                                                              .withCorePoolSize(17)
                                                              .withOnClose(
                                                                  CloseActionType.CLOSE_CHANNEL)
@@ -106,12 +106,12 @@ public class OutputStreamConfigurationTest {
     assertThat(builder().with(configuration).configured()).isEqualTo(configuration);
     assertThat(configuration.builderFrom().configured()).isEqualTo(configuration);
     assertThat(configuration.builderFrom().with(null).configured()).isEqualTo(
-        OutputStreamConfiguration.defaultConfiguration());
+        BufferStreamConfiguration.defaultConfiguration());
   }
 
   @Test
   public void testCloseActionEquals() {
-    final OutputStreamConfiguration configuration = builder().withBufferSize(11)
+    final BufferStreamConfiguration configuration = builder().withBufferSize(11)
                                                              .withCorePoolSize(17)
                                                              .withOnClose(
                                                                  CloseActionType.CLOSE_CHANNEL)
@@ -126,7 +126,7 @@ public class OutputStreamConfigurationTest {
 
   @Test
   public void testPoolSizeEquals() {
-    final OutputStreamConfiguration configuration = builder().withBufferSize(11)
+    final BufferStreamConfiguration configuration = builder().withBufferSize(11)
                                                              .withCorePoolSize(17)
                                                              .withOnClose(
                                                                  CloseActionType.CLOSE_CHANNEL)

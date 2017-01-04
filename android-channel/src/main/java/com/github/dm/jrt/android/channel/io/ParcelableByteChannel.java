@@ -19,13 +19,13 @@ package com.github.dm.jrt.android.channel.io;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.github.dm.jrt.channel.builder.OutputStreamConfiguration;
-import com.github.dm.jrt.channel.builder.OutputStreamConfiguration.Builder;
+import com.github.dm.jrt.channel.builder.BufferStreamConfiguration;
+import com.github.dm.jrt.channel.builder.BufferStreamConfiguration.Builder;
+import com.github.dm.jrt.channel.io.BufferStreamBuilder;
 import com.github.dm.jrt.channel.io.ByteChannel;
 import com.github.dm.jrt.channel.io.ByteChannel.BufferInputStream;
 import com.github.dm.jrt.channel.io.ByteChannel.BufferOutputStream;
 import com.github.dm.jrt.channel.io.ByteChannel.ByteBuffer;
-import com.github.dm.jrt.channel.io.OutputStreamBuilder;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ChannelConsumer;
@@ -91,9 +91,9 @@ public class ParcelableByteChannel {
    * @return the output stream builder.
    */
   @NotNull
-  public static OutputStreamBuilder from(
+  public static BufferStreamBuilder from(
       @NotNull final Channel<? super ParcelableByteBuffer, ?> channel) {
-    return new DefaultOutputStreamBuilder(channel);
+    return new DefaultBufferStreamBuilder(channel);
   }
 
   /**
@@ -186,7 +186,7 @@ public class ParcelableByteChannel {
             final Channel<ByteBuffer, ByteBuffer> channel =
                 JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
             final BufferOutputStream outputStream = ByteChannel.from(channel)
-                                                               .applyOutputStreamConfiguration()
+                                                               .applyBufferStreamConfiguration()
                                                                .withBufferSize(
                                                                    Math.max(data.length, 1))
                                                                .configured()
@@ -298,32 +298,32 @@ public class ParcelableByteChannel {
   /**
    * Default implementation of an output stream builder.
    */
-  private static class DefaultOutputStreamBuilder implements OutputStreamBuilder {
+  private static class DefaultBufferStreamBuilder implements BufferStreamBuilder {
 
     private final Channel<? super ParcelableByteBuffer, ?> mChannel;
 
-    private OutputStreamConfiguration mConfiguration =
-        OutputStreamConfiguration.defaultConfiguration();
+    private BufferStreamConfiguration mConfiguration =
+        BufferStreamConfiguration.defaultConfiguration();
 
     /**
      * Constructor.
      *
      * @param channel the output channel to feed with data.
      */
-    private DefaultOutputStreamBuilder(
+    private DefaultBufferStreamBuilder(
         @NotNull final Channel<? super ParcelableByteBuffer, ?> channel) {
       mChannel = ConstantConditions.notNull("channel instance", channel);
     }
 
     @NotNull
-    public OutputStreamBuilder apply(@NotNull final OutputStreamConfiguration configuration) {
+    public BufferStreamBuilder apply(@NotNull final BufferStreamConfiguration configuration) {
       mConfiguration = ConstantConditions.notNull("output stream configuration", configuration);
       return this;
     }
 
     @NotNull
-    public Builder<? extends OutputStreamBuilder> applyOutputStreamConfiguration() {
-      return new Builder<OutputStreamBuilder>(this, mConfiguration);
+    public Builder<? extends BufferStreamBuilder> applyBufferStreamConfiguration() {
+      return new Builder<BufferStreamBuilder>(this, mConfiguration);
     }
 
     @NotNull

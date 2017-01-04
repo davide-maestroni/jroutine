@@ -40,7 +40,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * Created by davide-maestroni on 01/01/2017.
  */
 @SuppressWarnings("WeakerAccess")
-public class OutputStreamConfiguration extends DeepEqualObject {
+public class BufferStreamConfiguration extends DeepEqualObject {
 
   /**
    * Constant indicating the default value of an integer attribute.
@@ -49,7 +49,7 @@ public class OutputStreamConfiguration extends DeepEqualObject {
 
   private static final DefaultConfigurable sDefaultConfigurable = new DefaultConfigurable();
 
-  private static final OutputStreamConfiguration sDefaultConfiguration =
+  private static final BufferStreamConfiguration sDefaultConfiguration =
       builder().buildConfiguration();
 
   private final int mBufferSize;
@@ -65,7 +65,7 @@ public class OutputStreamConfiguration extends DeepEqualObject {
    * @param corePoolSize the core pool size.
    * @param closeAction  the close action.
    */
-  private OutputStreamConfiguration(final int bufferSize, final int corePoolSize,
+  private BufferStreamConfiguration(final int bufferSize, final int corePoolSize,
       @Nullable final CloseActionType closeAction) {
     super(asArgs(bufferSize, corePoolSize, closeAction));
     mBufferSize = bufferSize;
@@ -79,8 +79,8 @@ public class OutputStreamConfiguration extends DeepEqualObject {
    * @return the builder.
    */
   @NotNull
-  public static Builder<OutputStreamConfiguration> builder() {
-    return new Builder<OutputStreamConfiguration>(sDefaultConfigurable);
+  public static Builder<BufferStreamConfiguration> builder() {
+    return new Builder<BufferStreamConfiguration>(sDefaultConfigurable);
   }
 
   /**
@@ -90,10 +90,10 @@ public class OutputStreamConfiguration extends DeepEqualObject {
    * @return the builder.
    */
   @NotNull
-  public static Builder<OutputStreamConfiguration> builderFrom(
-      @Nullable final OutputStreamConfiguration initialConfiguration) {
+  public static Builder<BufferStreamConfiguration> builderFrom(
+      @Nullable final BufferStreamConfiguration initialConfiguration) {
     return (initialConfiguration == null) ? builder()
-        : new Builder<OutputStreamConfiguration>(sDefaultConfigurable, initialConfiguration);
+        : new Builder<BufferStreamConfiguration>(sDefaultConfigurable, initialConfiguration);
   }
 
   /**
@@ -102,7 +102,7 @@ public class OutputStreamConfiguration extends DeepEqualObject {
    * @return the configuration instance.
    */
   @NotNull
-  public static OutputStreamConfiguration defaultConfiguration() {
+  public static BufferStreamConfiguration defaultConfiguration() {
     return sDefaultConfiguration;
   }
 
@@ -112,7 +112,7 @@ public class OutputStreamConfiguration extends DeepEqualObject {
    * @return the builder.
    */
   @NotNull
-  public Builder<OutputStreamConfiguration> builderFrom() {
+  public Builder<BufferStreamConfiguration> builderFrom() {
     return builderFrom(this);
   }
 
@@ -195,7 +195,7 @@ public class OutputStreamConfiguration extends DeepEqualObject {
      * @return the configurable instance.
      */
     @NotNull
-    TYPE apply(@NotNull OutputStreamConfiguration configuration);
+    TYPE apply(@NotNull BufferStreamConfiguration configuration);
   }
 
   /**
@@ -231,7 +231,7 @@ public class OutputStreamConfiguration extends DeepEqualObject {
      * @param initialConfiguration the initial object configuration.
      */
     public Builder(@NotNull final Configurable<? extends TYPE> configurable,
-        @NotNull final OutputStreamConfiguration initialConfiguration) {
+        @NotNull final BufferStreamConfiguration initialConfiguration) {
       mConfigurable = ConstantConditions.notNull("configurable instance", configurable);
       setConfiguration(initialConfiguration);
     }
@@ -255,7 +255,7 @@ public class OutputStreamConfiguration extends DeepEqualObject {
      * @return this builder.
      */
     @NotNull
-    public Builder<TYPE> with(@Nullable final OutputStreamConfiguration configuration) {
+    public Builder<TYPE> with(@Nullable final BufferStreamConfiguration configuration) {
       if (configuration == null) {
         setConfiguration(defaultConfiguration());
         return this;
@@ -328,11 +328,11 @@ public class OutputStreamConfiguration extends DeepEqualObject {
     }
 
     @NotNull
-    private OutputStreamConfiguration buildConfiguration() {
-      return new OutputStreamConfiguration(mBufferSize, mCorePoolSize, mCloseAction);
+    private BufferStreamConfiguration buildConfiguration() {
+      return new BufferStreamConfiguration(mBufferSize, mCorePoolSize, mCloseAction);
     }
 
-    private void setConfiguration(@NotNull final OutputStreamConfiguration configuration) {
+    private void setConfiguration(@NotNull final BufferStreamConfiguration configuration) {
       mBufferSize = configuration.mBufferSize;
       mCorePoolSize = configuration.mCorePoolSize;
       mCloseAction = configuration.mCloseAction;
@@ -342,10 +342,10 @@ public class OutputStreamConfiguration extends DeepEqualObject {
   /**
    * Default configurable implementation.
    */
-  private static class DefaultConfigurable implements Configurable<OutputStreamConfiguration> {
+  private static class DefaultConfigurable implements Configurable<BufferStreamConfiguration> {
 
     @NotNull
-    public OutputStreamConfiguration apply(@NotNull final OutputStreamConfiguration configuration) {
+    public BufferStreamConfiguration apply(@NotNull final BufferStreamConfiguration configuration) {
       return configuration;
     }
   }

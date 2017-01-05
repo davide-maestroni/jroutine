@@ -61,9 +61,8 @@ class CallMappingInvocation extends MappingInvocation<Call<?>, ParcelableFlow<Ob
     final RequestBody body = request.body();
     if (body != null) {
       final MediaType mediaType = body.contentType();
-      result.pass(
-          new ParcelableFlow<Object>(MEDIA_TYPE_ID,
-              (mediaType != null) ? mediaType.toString() : null));
+      result.pass(new ParcelableFlow<Object>(MEDIA_TYPE_ID,
+          (mediaType != null) ? mediaType.toString() : null));
       final Buffer buffer = new Buffer();
       body.writeTo(buffer);
       if (buffer.size() > 0) {

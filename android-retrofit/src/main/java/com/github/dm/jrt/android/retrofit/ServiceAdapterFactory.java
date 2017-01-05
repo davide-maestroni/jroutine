@@ -298,8 +298,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
      */
     private BindService(@NotNull final ChannelConfiguration configuration,
         @NotNull final Converter<ResponseBody, ?> converter,
-        @NotNull final Routine<ParcelableFlow<Object>, ParcelableFlow<Object>>
-            routine) {
+        @NotNull final Routine<ParcelableFlow<Object>, ParcelableFlow<Object>> routine) {
       mConfiguration = configuration;
       mConverter = converter;
       mRoutine = routine;
@@ -362,7 +361,8 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
    * Stream routine builder adapter implementation.
    */
   private static class StreamBuilderAdapter extends BaseAdapter<StreamBuilder> implements
-      BiFunction<StreamConfiguration, Function<Channel<?, Call<?>>, Channel<?, ParcelableFlow<Object>>>, Function<Channel<?, Call<?>>, Channel<?, Object>>> {
+      BiFunction<StreamConfiguration, Function<Channel<?, Call<?>>, Channel<?,
+          ParcelableFlow<Object>>>, Function<Channel<?, Call<?>>, Channel<?, Object>>> {
 
     private final Converter<ResponseBody, ?> mConverter;
 
@@ -388,8 +388,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
     @Override
     public Function<Channel<?, Call<?>>, Channel<?, Object>> apply(
         final StreamConfiguration streamConfiguration,
-        final Function<Channel<?, Call<?>>, Channel<?, ParcelableFlow<Object>>> function)
-        throws
+        final Function<Channel<?, Call<?>>, Channel<?, ParcelableFlow<Object>>> function) throws
         Exception {
       return decorate(function).andThen(
           new BindService(streamConfiguration.toChannelConfiguration(), mConverter, getRoutine()));

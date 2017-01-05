@@ -409,11 +409,11 @@ public class LoaderRoutineMethod extends RoutineMethod
     final Channel<?, ? extends Flow<Object>> inputChannel =
         (!inputChannels.isEmpty()) ? AndroidChannels.mergeParcelable(inputChannels).buildChannel()
             : JRoutineCore.<Flow<Object>>of().buildChannel();
-    final Channel<Flow<Object>, Flow<Object>> outputChannel = mode.invoke(JRoutineLoader
-        .on(mContext)
-        .with(factory)
-        .apply(getConfiguration())
-        .apply(getLoaderConfiguration())).pass(inputChannel).close();
+    final Channel<Flow<Object>, Flow<Object>> outputChannel = mode.invoke(
+        JRoutineLoader.on(mContext)
+                      .with(factory)
+                      .apply(getConfiguration())
+                      .apply(getLoaderConfiguration())).pass(inputChannel).close();
     final Map<Integer, ? extends Channel<?, Object>> channelMap =
         AndroidChannels.flowOutput(0, outputChannels.size(), outputChannel).buildChannelMap();
     for (final Entry<Integer, ? extends Channel<?, Object>> entry : channelMap.entrySet()) {

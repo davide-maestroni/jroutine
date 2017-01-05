@@ -68,8 +68,7 @@ class InputMapBuilder<DATA, IN extends DATA> extends AbstractChannelArrayBuilder
   public SparseArray<? extends Channel<IN, IN>> buildChannelArray() {
     final HashSet<Integer> ids = mIds;
     final Channel<? super ParcelableFlow<DATA>, ?> channel = mChannel;
-    final SparseArray<Channel<IN, IN>> channelMap =
-        new SparseArray<Channel<IN, IN>>(ids.size());
+    final SparseArray<Channel<IN, IN>> channelMap = new SparseArray<Channel<IN, IN>>(ids.size());
     final ChannelConfiguration configuration = getConfiguration();
     for (final Integer id : ids) {
       @SuppressWarnings("unchecked") final Channel<IN, IN> inputChannel =

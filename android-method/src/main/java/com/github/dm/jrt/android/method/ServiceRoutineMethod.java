@@ -365,12 +365,11 @@ public class ServiceRoutineMethod extends RoutineMethod
     final Channel<?, ? extends ParcelableFlow<Object>> inputChannel =
         (!inputChannels.isEmpty()) ? AndroidChannels.mergeParcelable(inputChannels).buildChannel()
             : JRoutineCore.<ParcelableFlow<Object>>of().buildChannel();
-    final Channel<ParcelableFlow<Object>, ParcelableFlow<Object>> outputChannel =
-        mode.invoke(JRoutineService.on(mContext)
-                                   .with(factoryOf(ServiceInvocation.class, getClass(), mArgs,
-                                       params))
-                                   .apply(getConfiguration())
-                                   .apply(getServiceConfiguration())).pass(inputChannel).close();
+    final Channel<ParcelableFlow<Object>, ParcelableFlow<Object>> outputChannel = mode.invoke(
+        JRoutineService.on(mContext)
+                       .with(factoryOf(ServiceInvocation.class, getClass(), mArgs, params))
+                       .apply(getConfiguration())
+                       .apply(getServiceConfiguration())).pass(inputChannel).close();
     final Map<Integer, ? extends Channel<?, Object>> channelMap =
         AndroidChannels.flowOutput(0, outputChannels.size(), outputChannel).buildChannelMap();
     for (final Entry<Integer, ? extends Channel<?, Object>> entry : channelMap.entrySet()) {

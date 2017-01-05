@@ -624,6 +624,38 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
   }
 
   @SuppressWarnings("unchecked")
+  public void testInputFlow() {
+
+    final Channel<String, String> channel = JRoutineCore.<String>ofInputs().buildChannel();
+    AndroidChannels.inputFlow(channel, 33)
+                   .buildChannel()
+                   .pass(new ParcelableFlow<String>(33, "test1"),
+                       new ParcelableFlow<String>(-33, "test2"),
+                       new ParcelableFlow<String>(33, "test3"),
+                       new ParcelableFlow<String>(333, "test4"))
+                   .close();
+    channel.close();
+    assertThat(channel.in(seconds(10)).all()).containsExactly("test1", "test3");
+  }
+
+  public void testInputFlowAbort() {
+
+    final Channel<String, String> channel = JRoutineCore.<String>ofInputs().buildChannel();
+    AndroidChannels.inputFlow(channel, 33).buildChannel().abort();
+    channel.close();
+
+    try {
+
+      channel.in(seconds(10)).all();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+  }
+
+  @SuppressWarnings("unchecked")
   public void testInputSelect() {
 
     final Channel<ParcelableFlow<String>, ParcelableFlow<String>> channel =
@@ -646,38 +678,6 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
                    .buildChannel()
                    .pass("test1", "test2", "test3")
                    .abort();
-    channel.close();
-
-    try {
-
-      channel.in(seconds(10)).all();
-
-      fail();
-
-    } catch (final AbortException ignored) {
-
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  public void testInputFlow() {
-
-    final Channel<String, String> channel = JRoutineCore.<String>ofInputs().buildChannel();
-    AndroidChannels.inputFlow(channel, 33)
-                   .buildChannel()
-                   .pass(new ParcelableFlow<String>(33, "test1"),
-                       new ParcelableFlow<String>(-33, "test2"),
-                       new ParcelableFlow<String>(33, "test3"),
-                       new ParcelableFlow<String>(333, "test4"))
-                   .close();
-    channel.close();
-    assertThat(channel.in(seconds(10)).all()).containsExactly("test1", "test3");
-  }
-
-  public void testInputFlowAbort() {
-
-    final Channel<String, String> channel = JRoutineCore.<String>ofInputs().buildChannel();
-    AndroidChannels.inputFlow(channel, 33).buildChannel().abort();
     channel.close();
 
     try {
@@ -1143,6 +1143,34 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
   }
 
   @SuppressWarnings("unchecked")
+  public void testOutputFlow() {
+
+    final Channel<String, String> channel = JRoutineCore.<String>ofInputs().buildChannel();
+    channel.pass("test1", "test2", "test3").close();
+    assertThat(AndroidChannels.outputParcelableFlow(channel, 33)
+                              .buildChannel()
+                              .in(seconds(10))
+                              .all()).containsExactly(new ParcelableFlow<String>(33, "test1"),
+        new ParcelableFlow<String>(33, "test2"), new ParcelableFlow<String>(33, "test3"));
+  }
+
+  public void testOutputFlowAbort() {
+
+    final Channel<String, String> channel = JRoutineCore.<String>ofInputs().buildChannel();
+    channel.pass("test1", "test2", "test3").abort();
+
+    try {
+
+      AndroidChannels.outputParcelableFlow(channel, 33).buildChannel().in(seconds(10)).all();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+  }
+
+  @SuppressWarnings("unchecked")
   public void testOutputMap() {
 
     final Routine<ParcelableFlow<Object>, ParcelableFlow<Object>> routine =
@@ -1309,34 +1337,6 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     try {
 
       outputChannel.in(seconds(10)).all();
-
-      fail();
-
-    } catch (final AbortException ignored) {
-
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  public void testOutputFlow() {
-
-    final Channel<String, String> channel = JRoutineCore.<String>ofInputs().buildChannel();
-    channel.pass("test1", "test2", "test3").close();
-    assertThat(AndroidChannels.outputParcelableFlow(channel, 33)
-                              .buildChannel()
-                              .in(seconds(10))
-                              .all()).containsExactly(new ParcelableFlow<String>(33, "test1"),
-        new ParcelableFlow<String>(33, "test2"), new ParcelableFlow<String>(33, "test3"));
-  }
-
-  public void testOutputFlowAbort() {
-
-    final Channel<String, String> channel = JRoutineCore.<String>ofInputs().buildChannel();
-    channel.pass("test1", "test2", "test3").abort();
-
-    try {
-
-      AndroidChannels.outputParcelableFlow(channel, 33).buildChannel().in(seconds(10)).all();
 
       fail();
 

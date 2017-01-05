@@ -32,8 +32,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <IN> the input data type.
  */
-class CombineMapBuilder<IN>
-    extends AbstractChannelBuilder<Flow<? extends IN>, Flow<? extends IN>> {
+class CombineMapBuilder<IN> extends AbstractChannelBuilder<Flow<? extends IN>, Flow<? extends IN>> {
 
   private final SparseArrayCompat<? extends Channel<? extends IN, ?>> mChannelMap;
 

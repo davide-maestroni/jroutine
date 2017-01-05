@@ -19,7 +19,7 @@ package com.github.dm.jrt.android.v11.channel;
 import android.util.SparseArray;
 
 import com.github.dm.jrt.android.channel.AndroidChannels;
-import com.github.dm.jrt.android.channel.ParcelableSelectable;
+import com.github.dm.jrt.android.channel.ParcelableFlow;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.AbstractChannelBuilder;
 import com.github.dm.jrt.core.channel.Channel;
@@ -34,7 +34,7 @@ import org.jetbrains.annotations.NotNull;
  * @param <OUT> the output data type.
  */
 class MergeMapBuilder<OUT>
-    extends AbstractChannelBuilder<ParcelableSelectable<OUT>, ParcelableSelectable<OUT>> {
+    extends AbstractChannelBuilder<ParcelableFlow<OUT>, ParcelableFlow<OUT>> {
 
   private final SparseArray<? extends Channel<?, ? extends OUT>> mChannelMap;
 
@@ -61,14 +61,14 @@ class MergeMapBuilder<OUT>
 
   @NotNull
   @Override
-  public Channel<ParcelableSelectable<OUT>, ParcelableSelectable<OUT>> buildChannel() {
+  public Channel<ParcelableFlow<OUT>, ParcelableFlow<OUT>> buildChannel() {
     final SparseArray<? extends Channel<?, ? extends OUT>> channelMap = mChannelMap;
-    final Channel<ParcelableSelectable<OUT>, ParcelableSelectable<OUT>> outputChannel =
-        JRoutineCore.<ParcelableSelectable<OUT>>ofInputs().apply(getConfiguration()).buildChannel();
+    final Channel<ParcelableFlow<OUT>, ParcelableFlow<OUT>> outputChannel =
+        JRoutineCore.<ParcelableFlow<OUT>>ofInputs().apply(getConfiguration()).buildChannel();
     final int size = channelMap.size();
     for (int i = 0; i < size; ++i) {
       outputChannel.pass(
-          AndroidChannels.selectableOutputParcelable(channelMap.valueAt(i), channelMap.keyAt(i))
+          AndroidChannels.outputParcelableFlow(channelMap.valueAt(i), channelMap.keyAt(i))
                          .buildChannel());
     }
 

@@ -34,8 +34,7 @@ import java.util.Map.Entry;
  *
  * @param <IN> the input data type.
  */
-class CombineMapBuilder<IN>
-    extends AbstractChannelBuilder<Selectable<? extends IN>, Selectable<? extends IN>> {
+class CombineMapBuilder<IN> extends AbstractChannelBuilder<Flow<? extends IN>, Flow<? extends IN>> {
 
   private final HashMap<Integer, Channel<? extends IN, ?>> mChannelMap;
 
@@ -63,7 +62,7 @@ class CombineMapBuilder<IN>
 
   @NotNull
   @SuppressWarnings("unchecked")
-  public Channel<Selectable<? extends IN>, Selectable<? extends IN>> buildChannel() {
+  public Channel<Flow<? extends IN>, Flow<? extends IN>> buildChannel() {
     final HashMap<Integer, Channel<? extends IN, ?>> channelMap = mChannelMap;
     final HashMap<Integer, Channel<IN, ?>> inputChannelMap =
         new HashMap<Integer, Channel<IN, ?>>(channelMap.size());
@@ -75,8 +74,8 @@ class CombineMapBuilder<IN>
       inputChannelMap.put(entry.getKey(), outputChannel);
     }
 
-    final Channel<Selectable<? extends IN>, Selectable<? extends IN>> inputChannel =
-        JRoutineCore.<Selectable<? extends IN>>ofInputs().apply(configuration).buildChannel();
+    final Channel<Flow<? extends IN>, Flow<? extends IN>> inputChannel =
+        JRoutineCore.<Flow<? extends IN>>ofInputs().apply(configuration).buildChannel();
     return inputChannel.bind(new SortingMapChannelConsumer<IN>(inputChannelMap));
   }
 }

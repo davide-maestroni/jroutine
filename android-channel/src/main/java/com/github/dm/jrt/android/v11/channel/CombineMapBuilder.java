@@ -18,7 +18,7 @@ package com.github.dm.jrt.android.v11.channel;
 
 import android.util.SparseArray;
 
-import com.github.dm.jrt.channel.Selectable;
+import com.github.dm.jrt.channel.Flow;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.AbstractChannelBuilder;
 import com.github.dm.jrt.core.channel.Channel;
@@ -33,7 +33,7 @@ import org.jetbrains.annotations.NotNull;
  * @param <IN> the input data type.
  */
 class CombineMapBuilder<IN>
-    extends AbstractChannelBuilder<Selectable<? extends IN>, Selectable<? extends IN>> {
+    extends AbstractChannelBuilder<Flow<? extends IN>, Flow<? extends IN>> {
 
   private final SparseArray<? extends Channel<? extends IN, ?>> mChannelMap;
 
@@ -60,7 +60,7 @@ class CombineMapBuilder<IN>
 
   @NotNull
   @Override
-  public Channel<Selectable<? extends IN>, Selectable<? extends IN>> buildChannel() {
+  public Channel<Flow<? extends IN>, Flow<? extends IN>> buildChannel() {
     final SparseArray<? extends Channel<? extends IN, ?>> channelMap = mChannelMap;
     final int size = channelMap.size();
     final SparseArray<Channel<IN, ?>> inputChannelMap = new SparseArray<Channel<IN, ?>>(size);
@@ -70,8 +70,8 @@ class CombineMapBuilder<IN>
       inputChannelMap.put(channelMap.keyAt(i), outputChannel);
     }
 
-    final Channel<Selectable<? extends IN>, Selectable<? extends IN>> inputChannel =
-        JRoutineCore.<Selectable<? extends IN>>ofInputs().apply(getConfiguration()).buildChannel();
+    final Channel<Flow<? extends IN>, Flow<? extends IN>> inputChannel =
+        JRoutineCore.<Flow<? extends IN>>ofInputs().apply(getConfiguration()).buildChannel();
     inputChannel.bind(new SortingMapChannelConsumer<IN>(inputChannelMap));
     return inputChannel;
   }

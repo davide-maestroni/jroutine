@@ -26,58 +26,58 @@ import com.github.dm.jrt.core.util.ConstantConditions;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Builder implementation returning a channel making an input one selectable.
+ * Builder implementation returning a flow channel feeding an input one.
  * <p>
  * Created by davide-maestroni on 02/26/2016.
  *
  * @param <IN> the input data type.
  */
-class InputFilterBuilder<IN> extends AbstractChannelBuilder<Selectable<IN>, Selectable<IN>> {
+class InputFilterBuilder<IN> extends AbstractChannelBuilder<Flow<IN>, Flow<IN>> {
 
   private final Channel<? super IN, ?> mChannel;
 
-  private final int mIndex;
+  private final int mId;
 
   /**
    * Constructor.
    *
    * @param channel the channel.
-   * @param index   the selectable index.
+   * @param id      the flow ID.
    */
-  InputFilterBuilder(@NotNull final Channel<? super IN, ?> channel, final int index) {
+  InputFilterBuilder(@NotNull final Channel<? super IN, ?> channel, final int id) {
     mChannel = ConstantConditions.notNull("channel instance", channel);
-    mIndex = index;
+    mId = id;
   }
 
   @NotNull
-  public Channel<Selectable<IN>, Selectable<IN>> buildChannel() {
-    final Channel<Selectable<IN>, Selectable<IN>> inputChannel =
-        JRoutineCore.<Selectable<IN>>ofInputs().apply(getConfiguration()).buildChannel();
+  public Channel<Flow<IN>, Flow<IN>> buildChannel() {
+    final Channel<Flow<IN>, Flow<IN>> inputChannel =
+        JRoutineCore.<Flow<IN>>ofInputs().apply(getConfiguration()).buildChannel();
     final Channel<IN, IN> outputChannel = JRoutineCore.<IN>ofInputs().buildChannel();
     outputChannel.bind(mChannel);
-    return inputChannel.bind(new FilterChannelConsumer<IN>(outputChannel, mIndex));
+    return inputChannel.bind(new FilterChannelConsumer<IN>(outputChannel, mId));
   }
 
   /**
-   * Channel consumer filtering selectable data.
+   * Channel consumer filtering flow data.
    *
    * @param <IN> the input data type.
    */
-  private static class FilterChannelConsumer<IN> implements ChannelConsumer<Selectable<IN>> {
+  private static class FilterChannelConsumer<IN> implements ChannelConsumer<Flow<IN>> {
 
     private final Channel<? super IN, ?> mChannel;
 
-    private final int mIndex;
+    private final int mId;
 
     /**
      * Constructor.
      *
      * @param channel the channel to feed.
-     * @param index   the index to filter.
+     * @param id      the ID to filter.
      */
-    private FilterChannelConsumer(@NotNull final Channel<? super IN, ?> channel, final int index) {
+    private FilterChannelConsumer(@NotNull final Channel<? super IN, ?> channel, final int id) {
       mChannel = channel;
-      mIndex = index;
+      mId = id;
     }
 
     public void onComplete() {
@@ -88,9 +88,9 @@ class InputFilterBuilder<IN> extends AbstractChannelBuilder<Selectable<IN>, Sele
       mChannel.abort(error);
     }
 
-    public void onOutput(final Selectable<IN> selectable) {
-      if (selectable.index == mIndex) {
-        mChannel.pass(selectable.data);
+    public void onOutput(final Flow<IN> flow) {
+      if (flow.id == mId) {
+        mChannel.pass(flow.data);
       }
     }
   }

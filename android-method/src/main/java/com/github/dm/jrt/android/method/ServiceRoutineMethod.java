@@ -19,7 +19,7 @@ package com.github.dm.jrt.android.method;
 import android.content.Context;
 
 import com.github.dm.jrt.android.channel.AndroidChannels;
-import com.github.dm.jrt.android.channel.ParcelableSelectable;
+import com.github.dm.jrt.android.channel.ParcelableFlow;
 import com.github.dm.jrt.android.core.JRoutineService;
 import com.github.dm.jrt.android.core.ServiceContext;
 import com.github.dm.jrt.android.core.config.ServiceConfigurable;
@@ -362,17 +362,17 @@ public class ServiceRoutineMethod extends RoutineMethod
 
     final Channel<OUT, OUT> resultChannel = JRoutineCore.<OUT>ofInputs().buildChannel();
     outputChannels.add(resultChannel);
-    final Channel<?, ? extends ParcelableSelectable<Object>> inputChannel =
+    final Channel<?, ? extends ParcelableFlow<Object>> inputChannel =
         (!inputChannels.isEmpty()) ? AndroidChannels.mergeParcelable(inputChannels).buildChannel()
-            : JRoutineCore.<ParcelableSelectable<Object>>of().buildChannel();
-    final Channel<ParcelableSelectable<Object>, ParcelableSelectable<Object>> outputChannel =
+            : JRoutineCore.<ParcelableFlow<Object>>of().buildChannel();
+    final Channel<ParcelableFlow<Object>, ParcelableFlow<Object>> outputChannel =
         mode.invoke(JRoutineService.on(mContext)
                                    .with(factoryOf(ServiceInvocation.class, getClass(), mArgs,
                                        params))
                                    .apply(getConfiguration())
                                    .apply(getServiceConfiguration())).pass(inputChannel).close();
     final Map<Integer, ? extends Channel<?, Object>> channelMap =
-        AndroidChannels.selectOutput(0, outputChannels.size(), outputChannel).buildChannelMap();
+        AndroidChannels.flowOutput(0, outputChannels.size(), outputChannel).buildChannelMap();
     for (final Entry<Integer, ? extends Channel<?, Object>> entry : channelMap.entrySet()) {
       entry.getValue().bind((Channel<Object, Object>) outputChannels.get(entry.getKey())).close();
     }
@@ -528,7 +528,7 @@ public class ServiceRoutineMethod extends RoutineMethod
    * Context invocation implementation.
    */
   private static class ServiceInvocation
-      implements ContextInvocation<ParcelableSelectable<Object>, ParcelableSelectable<Object>> {
+      implements ContextInvocation<ParcelableFlow<Object>, ParcelableFlow<Object>> {
 
     private final Object[] mArgs;
 
@@ -612,7 +612,7 @@ public class ServiceRoutineMethod extends RoutineMethod
     }
 
     @Override
-    public void onComplete(@NotNull final Channel<ParcelableSelectable<Object>, ?> result) throws
+    public void onComplete(@NotNull final Channel<ParcelableFlow<Object>, ?> result) throws
         Exception {
       bind(result);
       mIsComplete = true;
@@ -629,7 +629,7 @@ public class ServiceRoutineMethod extends RoutineMethod
         try {
           final Object methodResult = invokeMethod();
           if (mReturnResults && !instance.isIgnoreReturnValue()) {
-            result.pass(new ParcelableSelectable<Object>(methodResult, outputChannels.size()));
+            result.pass(new ParcelableFlow<Object>(outputChannels.size(), methodResult));
           }
 
         } finally {
@@ -644,18 +644,18 @@ public class ServiceRoutineMethod extends RoutineMethod
     }
 
     @Override
-    public void onInput(final ParcelableSelectable<Object> input,
-        @NotNull final Channel<ParcelableSelectable<Object>, ?> result) throws Exception {
+    public void onInput(final ParcelableFlow<Object> input,
+        @NotNull final Channel<ParcelableFlow<Object>, ?> result) throws Exception {
       bind(result);
       @SuppressWarnings("unchecked") final Channel<Object, Object> inputChannel =
-          (Channel<Object, Object>) mInputChannels.get(input.index);
+          (Channel<Object, Object>) mInputChannels.get(input.id);
       inputChannel.pass(input.data);
       final ServiceRoutineMethod instance = mInstance;
       instance.setLocalInput(inputChannel);
       try {
         final Object methodResult = invokeMethod();
         if (mReturnResults && !instance.isIgnoreReturnValue()) {
-          result.pass(new ParcelableSelectable<Object>(methodResult, mOutputChannels.size()));
+          result.pass(new ParcelableFlow<Object>(mOutputChannels.size(), methodResult));
         }
 
       } finally {
@@ -691,7 +691,7 @@ public class ServiceRoutineMethod extends RoutineMethod
       mConstructor = Reflection.findBestMatchingConstructor(mType, constructorArgs);
     }
 
-    private void bind(@NotNull final Channel<ParcelableSelectable<Object>, ?> result) {
+    private void bind(@NotNull final Channel<ParcelableFlow<Object>, ?> result) {
       if (!mIsBound) {
         mIsBound = true;
         final List<Channel<?, ?>> outputChannels = mOutputChannels;

@@ -19,43 +19,43 @@ package com.github.dm.jrt.android.channel;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.github.dm.jrt.channel.Selectable;
+import com.github.dm.jrt.channel.Flow;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Data class storing information about the origin of the data.
+ * Data class storing information about the specific flow of data.
  * <p>
  * Created by davide-maestroni on 02/26/2016.
  *
  * @param <DATA> the data type.
  */
-public class ParcelableSelectable<DATA> extends Selectable<DATA> implements Parcelable {
+public class ParcelableFlow<DATA> extends Flow<DATA> implements Parcelable {
 
   /**
    * Creator instance needed by the parcelable protocol.
    */
-  public static final Creator<ParcelableSelectable> CREATOR = new Creator<ParcelableSelectable>() {
+  public static final Creator<ParcelableFlow> CREATOR = new Creator<ParcelableFlow>() {
 
     @Override
-    public ParcelableSelectable createFromParcel(final Parcel source) {
-      return new ParcelableSelectable(source);
+    public ParcelableFlow createFromParcel(final Parcel source) {
+      return new ParcelableFlow(source);
     }
 
     @Override
-    public ParcelableSelectable[] newArray(final int size) {
-      return new ParcelableSelectable[size];
+    public ParcelableFlow[] newArray(final int size) {
+      return new ParcelableFlow[size];
     }
   };
 
   /**
    * Constructor.
    *
-   * @param data  the data object.
-   * @param index the channel index.
+   * @param id   the flow ID.
+   * @param data the data object.
    */
-  public ParcelableSelectable(final DATA data, final int index) {
-    super(data, index);
+  public ParcelableFlow(final int id, final DATA data) {
+    super(id, data);
   }
 
   /**
@@ -64,8 +64,8 @@ public class ParcelableSelectable<DATA> extends Selectable<DATA> implements Parc
    * @param source the source parcel.
    */
   @SuppressWarnings("unchecked")
-  protected ParcelableSelectable(@NotNull final Parcel source) {
-    super((DATA) source.readValue(ParcelableSelectable.class.getClassLoader()), source.readInt());
+  protected ParcelableFlow(@NotNull final Parcel source) {
+    super(source.readInt(), (DATA) source.readValue(ParcelableFlow.class.getClassLoader()));
   }
 
   @Override
@@ -75,7 +75,7 @@ public class ParcelableSelectable<DATA> extends Selectable<DATA> implements Parc
 
   @Override
   public void writeToParcel(final Parcel dest, final int flags) {
+    dest.writeInt(id);
     dest.writeValue(data);
-    dest.writeInt(index);
   }
 }

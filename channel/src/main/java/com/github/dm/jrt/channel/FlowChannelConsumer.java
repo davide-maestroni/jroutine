@@ -24,29 +24,28 @@ import com.github.dm.jrt.core.util.ConstantConditions;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Channel consumer transforming data into selectable ones.
+ * Channel consumer transforming data into flow ones.
  * <p>
  * Created by davide-maestroni on 02/26/2016.
  *
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class SelectableChannelConsumer<OUT, IN extends OUT> implements ChannelConsumer<IN> {
+class FlowChannelConsumer<OUT, IN extends OUT> implements ChannelConsumer<IN> {
 
-  private final Channel<? super Selectable<OUT>, ?> mChannel;
+  private final Channel<? super Flow<OUT>, ?> mChannel;
 
-  private final int mIndex;
+  private final int mId;
 
   /**
    * Constructor.
    *
-   * @param channel the selectable channel.
-   * @param index   the selectable index.
+   * @param channel the flow channel.
+   * @param id      the flow ID.
    */
-  SelectableChannelConsumer(@NotNull final Channel<? super Selectable<OUT>, ?> channel,
-      final int index) {
+  FlowChannelConsumer(@NotNull final Channel<? super Flow<OUT>, ?> channel, final int id) {
     mChannel = ConstantConditions.notNull("channel instance", channel);
-    mIndex = index;
+    mId = id;
   }
 
   public void onComplete() {
@@ -58,6 +57,6 @@ class SelectableChannelConsumer<OUT, IN extends OUT> implements ChannelConsumer<
   }
 
   public void onOutput(final IN input) {
-    mChannel.pass(new Selectable<OUT>(input, mIndex));
+    mChannel.pass(new Flow<OUT>(mId, input));
   }
 }

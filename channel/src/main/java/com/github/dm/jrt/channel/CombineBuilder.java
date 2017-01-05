@@ -34,23 +34,22 @@ import java.util.ArrayList;
  *
  * @param <IN> the input data type.
  */
-class CombineBuilder<IN>
-    extends AbstractChannelBuilder<Selectable<? extends IN>, Selectable<? extends IN>> {
+class CombineBuilder<IN> extends AbstractChannelBuilder<Flow<? extends IN>, Flow<? extends IN>> {
 
   private final ArrayList<Channel<? extends IN, ?>> mChannels;
 
-  private final int mStartIndex;
+  private final int mStartId;
 
   /**
    * Constructor.
    *
-   * @param startIndex the selectable start index.
-   * @param channels   the channels to combine.
+   * @param startId  the flow start ID.
+   * @param channels the channels to combine.
    * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
    * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
    *                                            null object.
    */
-  CombineBuilder(final int startIndex,
+  CombineBuilder(final int startId,
       @NotNull final Iterable<? extends Channel<? extends IN, ?>> channels) {
     final ArrayList<Channel<? extends IN, ?>> channelList =
         new ArrayList<Channel<? extends IN, ?>>();
@@ -66,13 +65,13 @@ class CombineBuilder<IN>
       throw new IllegalArgumentException("the collection of channels must not be empty");
     }
 
-    mStartIndex = startIndex;
+    mStartId = startId;
     mChannels = channelList;
   }
 
   @NotNull
   @SuppressWarnings("unchecked")
-  public Channel<Selectable<? extends IN>, Selectable<? extends IN>> buildChannel() {
+  public Channel<Flow<? extends IN>, Flow<? extends IN>> buildChannel() {
     final ArrayList<Channel<? extends IN, ?>> channels = mChannels;
     final ArrayList<Channel<? extends IN, ?>> channelList =
         new ArrayList<Channel<? extends IN, ?>>(channels.size());
@@ -84,32 +83,32 @@ class CombineBuilder<IN>
       channelList.add(outputChannel);
     }
 
-    final Channel<Selectable<? extends IN>, ?> inputChannel =
-        JRoutineCore.<Selectable<? extends IN>>ofInputs().apply(configuration).buildChannel();
-    return inputChannel.bind(new SortingArrayChannelConsumer(mStartIndex, channelList));
+    final Channel<Flow<? extends IN>, ?> inputChannel =
+        JRoutineCore.<Flow<? extends IN>>ofInputs().apply(configuration).buildChannel();
+    return inputChannel.bind(new SortingArrayChannelConsumer(mStartId, channelList));
   }
 
   /**
-   * Channel consumer sorting selectable inputs among a list of channels.
+   * Channel consumer sorting flow inputs among a list of channels.
    */
   private static class SortingArrayChannelConsumer<IN>
-      implements ChannelConsumer<Selectable<? extends IN>> {
+      implements ChannelConsumer<Flow<? extends IN>> {
 
     private final ArrayList<Channel<? extends IN, ?>> mChannelList;
 
     private final int mSize;
 
-    private final int mStartIndex;
+    private final int mStartId;
 
     /**
      * Constructor.
      *
-     * @param startIndex the selectable start index.
-     * @param channels   the list of channels.
+     * @param startId  the flow start ID.
+     * @param channels the list of channels.
      */
-    private SortingArrayChannelConsumer(final int startIndex,
+    private SortingArrayChannelConsumer(final int startId,
         @NotNull final ArrayList<Channel<? extends IN, ?>> channels) {
-      mStartIndex = startIndex;
+      mStartId = startId;
       mChannelList = channels;
       mSize = channels.size();
     }
@@ -126,16 +125,16 @@ class CombineBuilder<IN>
       }
     }
 
-    public void onOutput(final Selectable<? extends IN> selectable) {
-      final int index = selectable.index - mStartIndex;
-      if ((index < 0) || (index >= mSize)) {
+    public void onOutput(final Flow<? extends IN> flow) {
+      final int id = flow.id - mStartId;
+      if ((id < 0) || (id >= mSize)) {
         return;
       }
 
       @SuppressWarnings("unchecked") final Channel<IN, ?> channel =
-          (Channel<IN, ?>) mChannelList.get(index);
+          (Channel<IN, ?>) mChannelList.get(id);
       if (channel != null) {
-        channel.pass(selectable.data);
+        channel.pass(flow.data);
       }
     }
   }

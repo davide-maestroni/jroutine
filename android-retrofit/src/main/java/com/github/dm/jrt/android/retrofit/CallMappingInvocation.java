@@ -17,7 +17,7 @@
 package com.github.dm.jrt.android.retrofit;
 
 import com.github.dm.jrt.android.channel.AndroidChannels;
-import com.github.dm.jrt.android.channel.ParcelableSelectable;
+import com.github.dm.jrt.android.channel.ParcelableFlow;
 import com.github.dm.jrt.android.channel.io.ParcelableByteChannel;
 import com.github.dm.jrt.channel.builder.BufferStreamConfiguration.CloseActionType;
 import com.github.dm.jrt.channel.io.ByteChannel.BufferOutputStream;
@@ -34,9 +34,9 @@ import okhttp3.RequestBody;
 import okio.Buffer;
 import retrofit2.Call;
 
-import static com.github.dm.jrt.android.retrofit.ServiceCallInvocation.BYTES_INDEX;
-import static com.github.dm.jrt.android.retrofit.ServiceCallInvocation.MEDIA_TYPE_INDEX;
-import static com.github.dm.jrt.android.retrofit.ServiceCallInvocation.REQUEST_DATA_INDEX;
+import static com.github.dm.jrt.android.retrofit.ServiceCallInvocation.BYTES_ID;
+import static com.github.dm.jrt.android.retrofit.ServiceCallInvocation.MEDIA_TYPE_ID;
+import static com.github.dm.jrt.android.retrofit.ServiceCallInvocation.REQUEST_DATA_ID;
 
 /**
  * Mapping invocation used to split the Retrofit call into request data and body, so to be more
@@ -44,7 +44,7 @@ import static com.github.dm.jrt.android.retrofit.ServiceCallInvocation.REQUEST_D
  * <p>
  * Created by davide-maestroni on 05/19/2016.
  */
-class CallMappingInvocation extends MappingInvocation<Call<?>, ParcelableSelectable<Object>> {
+class CallMappingInvocation extends MappingInvocation<Call<?>, ParcelableFlow<Object>> {
 
   /**
    * Constructor.
@@ -55,20 +55,20 @@ class CallMappingInvocation extends MappingInvocation<Call<?>, ParcelableSelecta
 
   @Override
   public void onInput(final Call<?> input,
-      @NotNull final Channel<ParcelableSelectable<Object>, ?> result) throws IOException {
+      @NotNull final Channel<ParcelableFlow<Object>, ?> result) throws IOException {
     final Request request = input.request();
-    result.pass(new ParcelableSelectable<Object>(RequestData.of(request), REQUEST_DATA_INDEX));
+    result.pass(new ParcelableFlow<Object>(REQUEST_DATA_ID, RequestData.of(request)));
     final RequestBody body = request.body();
     if (body != null) {
       final MediaType mediaType = body.contentType();
       result.pass(
-          new ParcelableSelectable<Object>((mediaType != null) ? mediaType.toString() : null,
-              MEDIA_TYPE_INDEX));
+          new ParcelableFlow<Object>(MEDIA_TYPE_ID,
+              (mediaType != null) ? mediaType.toString() : null));
       final Buffer buffer = new Buffer();
       body.writeTo(buffer);
       if (buffer.size() > 0) {
         final Channel<Object, ?> channel =
-            AndroidChannels.selectInputParcelable(result, BYTES_INDEX).buildChannel();
+            AndroidChannels.parcelableFlowInput(result, BYTES_ID).buildChannel();
         final BufferOutputStream outputStream = ParcelableByteChannel.from(channel)
                                                                      .applyBufferStreamConfiguration()
                                                                      .withOnClose(

@@ -16,52 +16,44 @@
 
 package com.github.dm.jrt.android.channel;
 
+import com.github.dm.jrt.core.JRoutineCore;
+import com.github.dm.jrt.core.builder.AbstractChannelBuilder;
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.channel.ChannelConsumer;
-import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Channel consumer transforming data into selectable ones.
+ * Builder implementation returning a channel making the output data a flow.
  * <p>
  * Created by davide-maestroni on 02/26/2016.
  *
- * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class SelectableChannelConsumer<OUT, IN extends OUT> implements ChannelConsumer<IN> {
+class OutputFlowBuilder<OUT>
+    extends AbstractChannelBuilder<ParcelableFlow<OUT>, ParcelableFlow<OUT>> {
 
-  private final Channel<? super
-      ParcelableSelectable<OUT>, ?> mChannel;
+  private final Channel<?, ? extends OUT> mChannel;
 
-  private final int mIndex;
+  private final int mId;
 
   /**
    * Constructor.
    *
-   * @param channel the selectable channel.
-   * @param index   the selectable index.
+   * @param channel the output channel.
+   * @param id      the flow ID.
    */
-  SelectableChannelConsumer(@NotNull final Channel<? super
-      ParcelableSelectable<OUT>, ?> channel, final int index) {
+  OutputFlowBuilder(@NotNull final Channel<?, ? extends OUT> channel, final int id) {
     mChannel = ConstantConditions.notNull("channel instance", channel);
-    mIndex = index;
+    mId = id;
   }
 
+  @NotNull
   @Override
-  public void onComplete() {
-    mChannel.close();
-  }
-
-  @Override
-  public void onError(@NotNull final RoutineException error) {
-    mChannel.abort(error);
-  }
-
-  @Override
-  public void onOutput(final IN input) {
-    mChannel.pass(new ParcelableSelectable<OUT>(input, mIndex));
+  public Channel<ParcelableFlow<OUT>, ParcelableFlow<OUT>> buildChannel() {
+    final Channel<ParcelableFlow<OUT>, ParcelableFlow<OUT>> outputChannel =
+        JRoutineCore.<ParcelableFlow<OUT>>ofInputs().apply(getConfiguration()).buildChannel();
+    mChannel.bind(new FlowChannelConsumer<OUT, OUT>(outputChannel, mId));
+    return outputChannel;
   }
 }

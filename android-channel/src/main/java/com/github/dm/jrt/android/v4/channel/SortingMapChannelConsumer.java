@@ -18,7 +18,7 @@ package com.github.dm.jrt.android.v4.channel;
 
 import android.support.v4.util.SparseArrayCompat;
 
-import com.github.dm.jrt.channel.Selectable;
+import com.github.dm.jrt.channel.Flow;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.common.RoutineException;
@@ -32,7 +32,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <OUT> the output data type.
  */
-class SortingMapChannelConsumer<OUT> implements ChannelConsumer<Selectable<? extends OUT>> {
+class SortingMapChannelConsumer<OUT> implements ChannelConsumer<Flow<? extends OUT>> {
 
   private final SparseArrayCompat<Channel<OUT, ?>> mChannels;
 
@@ -70,10 +70,10 @@ class SortingMapChannelConsumer<OUT> implements ChannelConsumer<Selectable<? ext
   }
 
   @Override
-  public void onOutput(final Selectable<? extends OUT> selectable) {
-    final Channel<OUT, ?> channel = mChannels.get(selectable.index);
+  public void onOutput(final Flow<? extends OUT> flow) {
+    final Channel<OUT, ?> channel = mChannels.get(flow.id);
     if (channel != null) {
-      channel.pass(selectable.data);
+      channel.pass(flow.data);
     }
   }
 }

@@ -17,7 +17,7 @@ import java.util.Map.Entry;
  *
  * @param <OUT> the output data type.
  */
-class MergeMapBuilder<OUT> extends AbstractChannelBuilder<Selectable<OUT>, Selectable<OUT>> {
+class MergeMapBuilder<OUT> extends AbstractChannelBuilder<Flow<OUT>, Flow<OUT>> {
 
   private final HashMap<Integer, Channel<?, ? extends OUT>> mChannelMap;
 
@@ -44,12 +44,12 @@ class MergeMapBuilder<OUT> extends AbstractChannelBuilder<Selectable<OUT>, Selec
   }
 
   @NotNull
-  public Channel<Selectable<OUT>, Selectable<OUT>> buildChannel() {
-    final Channel<Selectable<OUT>, Selectable<OUT>> outputChannel =
-        JRoutineCore.<Selectable<OUT>>ofInputs().apply(getConfiguration()).buildChannel();
+  public Channel<Flow<OUT>, Flow<OUT>> buildChannel() {
+    final Channel<Flow<OUT>, Flow<OUT>> outputChannel =
+        JRoutineCore.<Flow<OUT>>ofInputs().apply(getConfiguration()).buildChannel();
     for (final Entry<Integer, ? extends Channel<?, ? extends OUT>> entry : mChannelMap.entrySet()) {
       outputChannel.pass(
-          new SelectableOutputBuilder<OUT>(entry.getValue(), entry.getKey()).buildChannel());
+          new OutputFlowBuilder<OUT>(entry.getValue(), entry.getKey()).buildChannel());
     }
 
     return outputChannel.close();

@@ -19,9 +19,9 @@ package com.github.dm.jrt.android.v11.channel;
 import android.util.SparseArray;
 
 import com.github.dm.jrt.android.channel.AndroidChannels;
-import com.github.dm.jrt.android.channel.ParcelableSelectable;
+import com.github.dm.jrt.android.channel.ParcelableFlow;
 import com.github.dm.jrt.android.v11.channel.builder.ChannelArrayBuilder;
-import com.github.dm.jrt.channel.Selectable;
+import com.github.dm.jrt.channel.Flow;
 import com.github.dm.jrt.core.builder.ChannelBuilder;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -50,219 +50,215 @@ public class SparseChannels extends AndroidChannels {
   }
 
   /**
-   * Returns a builder of channels combining the specified instances into a selectable one.
+   * Returns a builder of channels combining the specified instances into a flow one.
    * <br>
-   * The selectable indexes will be the keys of the specified map.
+   * The flow IDs will be the keys of the specified map.
    * <p>
    * Note that the builder will successfully create only one channel instance, and that the passed
    * ones will be bound as a result of the creation.
    * <br>
    * Note also that the returned channel will be already closed.
    *
-   * @param channels the map of indexes and channels.
+   * @param channels the map of IDs and channels.
    * @param <IN>     the input data type.
-   * @return the selectable channel builder.
+   * @return the flow channel builder.
    * @throws java.lang.IllegalArgumentException if the specified map is empty.
    * @throws java.lang.NullPointerException     if the specified map is null or contains a null
    *                                            object.
    * @see AndroidChannels#combine(Map)
    */
   @NotNull
-  public static <IN> ChannelBuilder<Selectable<? extends IN>, ?> combine(
+  public static <IN> ChannelBuilder<Flow<? extends IN>, ?> combine(
       @NotNull final SparseArray<? extends Channel<? extends IN, ?>> channels) {
     return new CombineMapBuilder<IN>(channels);
   }
 
   /**
-   * Returns a builder of channels merging the specified instances into a selectable one.
+   * Returns a builder of channels merging the specified instances into a flow one.
    * <br>
-   * The selectable indexes will be the keys of the specified sparse array.
+   * The flow IDs will be the keys of the specified sparse array.
    * <p>
    * Note that the builder will successfully create only one channel instance, and that the passed
    * ones will be bound as a result of the creation.
    * <br>
    * Note also that the returned channel will be already closed.
    *
-   * @param channels the map of indexes and channels.
+   * @param channels the map of IDs and channels.
    * @param <OUT>    the output data type.
-   * @return the selectable channel builder.
+   * @return the flow channel builder.
    * @throws java.lang.IllegalArgumentException if the specified map is empty.
    * @throws java.lang.NullPointerException     if the specified map is null or contains a null
    *                                            object.
    * @see AndroidChannels#merge(Map)
    */
   @NotNull
-  public static <OUT> ChannelBuilder<?, ParcelableSelectable<OUT>> mergeParcelable(
+  public static <OUT> ChannelBuilder<?, ParcelableFlow<OUT>> mergeParcelable(
       @NotNull final SparseArray<? extends Channel<?, ? extends OUT>> channels) {
     return new MergeMapBuilder<OUT>(channels);
   }
 
   /**
-   * Returns a builder of maps of channels accepting the data identified by the specified indexes.
+   * Returns a builder of maps of channels accepting the data identified by the specified IDs.
    * <p>
    * Note that the builder will successfully create several channel map instances.
    *
-   * @param channel the selectable channel.
-   * @param indexes the array of indexes.
+   * @param channel the flow channel.
+   * @param ids     the array of IDs.
    * @param <DATA>  the channel data type.
    * @param <IN>    the input data type.
-   * @return the map of indexes and channels builder.
+   * @return the map of IDs and channels builder.
    * @throws java.lang.NullPointerException if the specified array is null or contains a null
    *                                        object.
-   * @see AndroidChannels#selectInput(Channel, int)
+   * @see AndroidChannels#flowInput(Channel, int)
    */
   @NotNull
-  public static <DATA, IN extends DATA> ChannelArrayBuilder<IN, ?> selectInputParcelable(
-      @NotNull final Channel<? super ParcelableSelectable<DATA>, ?> channel,
-      @NotNull final int... indexes) {
-    final HashSet<Integer> indexSet = new HashSet<Integer>();
-    for (final int index : indexes) {
-      indexSet.add(index);
+  public static <DATA, IN extends DATA> ChannelArrayBuilder<IN, ?> parcelableFlowInput(
+      @NotNull final Channel<? super ParcelableFlow<DATA>, ?> channel, @NotNull final int... ids) {
+    final HashSet<Integer> idSet = new HashSet<Integer>();
+    for (final int id : ids) {
+      idSet.add(id);
     }
 
-    return new InputMapBuilder<DATA, IN>(channel, indexSet);
+    return new InputMapBuilder<DATA, IN>(channel, idSet);
   }
 
   /**
-   * Returns a builder of maps of channels accepting the data identified by the specified indexes.
+   * Returns a builder of maps of channels accepting the data identified by the specified IDs.
    * <p>
    * Note that the builder will successfully create several channel map instances.
    *
-   * @param channel the selectable channel.
-   * @param indexes the iterable returning the channel indexes.
+   * @param channel the flow channel.
+   * @param ids     the iterable returning the flow IDs.
    * @param <DATA>  the channel data type.
    * @param <IN>    the input data type.
-   * @return the map of indexes and channels builder.
+   * @return the map of IDs and channels builder.
    * @throws java.lang.NullPointerException if the specified iterable is null or returns a null
    *                                        object.
-   * @see AndroidChannels#selectInput(Channel, Iterable)
+   * @see AndroidChannels#flowInput(Channel, Iterable)
    */
   @NotNull
-  public static <DATA, IN extends DATA> ChannelArrayBuilder<IN, ?> selectInputParcelable(
-      @NotNull final Channel<? super ParcelableSelectable<DATA>, ?> channel,
-      @NotNull final Iterable<Integer> indexes) {
-    final HashSet<Integer> indexSet = new HashSet<Integer>();
-    for (final Integer index : indexes) {
-      indexSet.add(index);
+  public static <DATA, IN extends DATA> ChannelArrayBuilder<IN, ?> parcelableFlowInput(
+      @NotNull final Channel<? super ParcelableFlow<DATA>, ?> channel,
+      @NotNull final Iterable<Integer> ids) {
+    final HashSet<Integer> idSet = new HashSet<Integer>();
+    for (final Integer id : ids) {
+      idSet.add(id);
     }
 
-    return new InputMapBuilder<DATA, IN>(channel, indexSet);
+    return new InputMapBuilder<DATA, IN>(channel, idSet);
   }
 
   /**
-   * Returns a builder of maps of channels accepting the data identified by the specified indexes.
+   * Returns a builder of maps of channels accepting the data identified by the specified IDs.
    * <p>
    * Note that the builder will successfully create several channel map instances.
    *
-   * @param startIndex the selectable start index.
-   * @param rangeSize  the size of the range of indexes (must be positive).
-   * @param channel    the selectable channel.
-   * @param <DATA>     the channel data type.
-   * @param <IN>       the input data type.
-   * @return the map of indexes and channels builder.
+   * @param startId   the flow start ID.
+   * @param rangeSize the size of the range of IDs (must be positive).
+   * @param channel   the flow channel.
+   * @param <DATA>    the channel data type.
+   * @param <IN>      the input data type.
+   * @return the map of IDs and channels builder.
    * @throws java.lang.IllegalArgumentException if the specified range size is not positive.
-   * @see AndroidChannels#selectInput(int, int, Channel)
+   * @see AndroidChannels#flowInput(int, int, Channel)
    */
   @NotNull
-  public static <DATA, IN extends DATA> ChannelArrayBuilder<IN, ?> selectInputParcelable(
-      final int startIndex, final int rangeSize,
-      @NotNull final Channel<? super ParcelableSelectable<DATA>, ?> channel) {
+  public static <DATA, IN extends DATA> ChannelArrayBuilder<IN, ?> parcelableFlowInput(
+      final int startId, final int rangeSize,
+      @NotNull final Channel<? super ParcelableFlow<DATA>, ?> channel) {
     ConstantConditions.positive("range size", rangeSize);
-    final HashSet<Integer> indexSet = new HashSet<Integer>();
-    final int endIndex = startIndex + rangeSize;
-    for (int i = startIndex; i < endIndex; ++i) {
-      indexSet.add(i);
+    final HashSet<Integer> idSet = new HashSet<Integer>();
+    final int endId = startId + rangeSize;
+    for (int i = startId; i < endId; ++i) {
+      idSet.add(i);
     }
 
-    return new InputMapBuilder<DATA, IN>(channel, indexSet);
+    return new InputMapBuilder<DATA, IN>(channel, idSet);
   }
 
   /**
-   * Returns a builder of maps of channels returning the output data filtered by the specified
-   * indexes.
+   * Returns a builder of maps of channels returning the output data filtered by the specified IDs.
    * <p>
    * Note that the builder will return the same map for the same inputs and equal configuration,
    * and that the passed channels will be bound as a result of the creation.
    * <br>
    * Note also that the returned channels will be already closed.
    *
-   * @param channel the selectable channel.
-   * @param indexes the list of indexes.
+   * @param channel the flow channel.
+   * @param ids     the list of IDs.
    * @param <OUT>   the output data type.
-   * @return the map of indexes and channels builder.
+   * @return the map of IDs and channels builder.
    * @throws java.lang.NullPointerException if the specified array is null or contains a null
    *                                        object.
-   * @see AndroidChannels#selectOutput(Channel, int...)
+   * @see AndroidChannels#flowOutput(Channel, int...)
    */
   @NotNull
-  public static <OUT> ChannelArrayBuilder<?, OUT> selectOutputParcelable(
-      @NotNull final Channel<?, ? extends ParcelableSelectable<? extends OUT>> channel,
-      @NotNull final int... indexes) {
-    final HashSet<Integer> indexSet = new HashSet<Integer>();
-    for (final int index : indexes) {
-      indexSet.add(index);
+  public static <OUT> ChannelArrayBuilder<?, OUT> parcelableFlowOutput(
+      @NotNull final Channel<?, ? extends ParcelableFlow<? extends OUT>> channel,
+      @NotNull final int... ids) {
+    final HashSet<Integer> idSet = new HashSet<Integer>();
+    for (final int id : ids) {
+      idSet.add(id);
     }
 
-    return new OutputMapBuilder<OUT>(channel, indexSet);
+    return new OutputMapBuilder<OUT>(channel, idSet);
   }
 
   /**
-   * Returns a builder of maps of channels returning the output data filtered by the specified
-   * indexes.
+   * Returns a builder of maps of channels returning the output data filtered by the specified IDs.
    * <p>
    * Note that the builder will return the same map for the same inputs and equal configuration,
    * and that the passed channels will be bound as a result of the creation.
    * <br>
    * Note also that the returned channels will be already closed.
    *
-   * @param channel the selectable channel.
-   * @param indexes the iterable returning the channel indexes.
+   * @param channel the flow channel.
+   * @param ids     the iterable returning the flow IDs.
    * @param <OUT>   the output data type.
-   * @return the map of indexes and channels builder.
+   * @return the map of IDs and channels builder.
    * @throws java.lang.NullPointerException if the specified iterable is null or returns a null
    *                                        object.
-   * @see AndroidChannels#selectOutput(Channel, Iterable)
+   * @see AndroidChannels#flowOutput(Channel, Iterable)
    */
   @NotNull
-  public static <OUT> ChannelArrayBuilder<?, OUT> selectOutputParcelable(
-      @NotNull final Channel<?, ? extends ParcelableSelectable<? extends OUT>> channel,
-      @NotNull final Iterable<Integer> indexes) {
-    final HashSet<Integer> indexSet = new HashSet<Integer>();
-    for (final Integer index : indexes) {
-      indexSet.add(index);
+  public static <OUT> ChannelArrayBuilder<?, OUT> parcelableFlowOutput(
+      @NotNull final Channel<?, ? extends ParcelableFlow<? extends OUT>> channel,
+      @NotNull final Iterable<Integer> ids) {
+    final HashSet<Integer> idSet = new HashSet<Integer>();
+    for (final Integer id : ids) {
+      idSet.add(id);
     }
 
-    return new OutputMapBuilder<OUT>(channel, indexSet);
+    return new OutputMapBuilder<OUT>(channel, idSet);
   }
 
   /**
-   * Returns a builder of maps of channels returning the output data filtered by the specified
-   * indexes.
+   * Returns a builder of maps of channels returning the output data filtered by the specified IDs.
    * <p>
    * Note that the builder will return the same map for the same inputs and equal configuration,
    * and that the passed channels will be bound as a result of the creation.
    * <br>
    * Note also that the returned channels will be already closed.
    *
-   * @param startIndex the selectable start index.
-   * @param rangeSize  the size of the range of indexes (must be positive).
-   * @param channel    the selectable channel.
-   * @param <OUT>      the output data type.
-   * @return the map of indexes and channels builder.
+   * @param startId   the flow start ID.
+   * @param rangeSize the size of the range of IDs (must be positive).
+   * @param channel   the flow channel.
+   * @param <OUT>     the output data type.
+   * @return the map of IDs and channels builder.
    * @throws java.lang.IllegalArgumentException if the specified range size is not positive.
-   * @see AndroidChannels#selectOutput(int, int, Channel)
+   * @see AndroidChannels#flowOutput(int, int, Channel)
    */
   @NotNull
-  public static <OUT> ChannelArrayBuilder<?, OUT> selectOutputParcelable(final int startIndex,
+  public static <OUT> ChannelArrayBuilder<?, OUT> parcelableFlowOutput(final int startId,
       final int rangeSize,
-      @NotNull final Channel<?, ? extends ParcelableSelectable<? extends OUT>> channel) {
+      @NotNull final Channel<?, ? extends ParcelableFlow<? extends OUT>> channel) {
     ConstantConditions.positive("range size", rangeSize);
-    final HashSet<Integer> indexSet = new HashSet<Integer>();
-    final int endIndex = startIndex + rangeSize;
-    for (int i = startIndex; i < endIndex; ++i) {
-      indexSet.add(i);
+    final HashSet<Integer> idSet = new HashSet<Integer>();
+    final int endId = startId + rangeSize;
+    for (int i = startId; i < endId; ++i) {
+      idSet.add(i);
     }
 
-    return new OutputMapBuilder<OUT>(channel, indexSet);
+    return new OutputMapBuilder<OUT>(channel, idSet);
   }
 }

@@ -74,31 +74,31 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
                                                               .sorted();
     AndroidChannels.combine(channel1, channel2)
                    .buildChannel()
-                   .pass(new ParcelableSelectable<String>("test1", 0))
-                   .pass(new ParcelableSelectable<Integer>(1, 1))
+                   .pass(new ParcelableFlow<String>(0, "test1"))
+                   .pass(new ParcelableFlow<Integer>(1, 1))
                    .close();
     AndroidChannels.combine(3, channel1, channel2)
                    .buildChannel()
-                   .pass(new ParcelableSelectable<String>("test2", 3))
-                   .pass(new ParcelableSelectable<Integer>(2, 4))
+                   .pass(new ParcelableFlow<String>(3, "test2"))
+                   .pass(new ParcelableFlow<Integer>(4, 2))
                    .close();
     AndroidChannels.combine(Arrays.<Channel<?, ?>>asList(channel1, channel2))
                    .buildChannel()
-                   .pass(new ParcelableSelectable<String>("test3", 0))
-                   .pass(new ParcelableSelectable<Integer>(3, 1))
+                   .pass(new ParcelableFlow<String>(0, "test3"))
+                   .pass(new ParcelableFlow<Integer>(1, 3))
                    .close();
     AndroidChannels.combine(-5, Arrays.<Channel<?, ?>>asList(channel1, channel2))
                    .buildChannel()
-                   .pass(new ParcelableSelectable<String>("test4", -5))
-                   .pass(new ParcelableSelectable<Integer>(4, -4))
+                   .pass(new ParcelableFlow<String>(-5, "test4"))
+                   .pass(new ParcelableFlow<Integer>(-4, 4))
                    .close();
     final HashMap<Integer, Channel<?, ?>> map = new HashMap<Integer, Channel<?, ?>>(2);
     map.put(31, channel1);
     map.put(17, channel2);
     AndroidChannels.combine(map)
                    .buildChannel()
-                   .pass(new ParcelableSelectable<String>("test5", 31))
-                   .pass(new ParcelableSelectable<Integer>(5, 17))
+                   .pass(new ParcelableFlow<String>(31, "test5"))
+                   .pass(new ParcelableFlow<Integer>(17, 5))
                    .close();
     assertThat(channel1.close().in(seconds(10)).all()).containsExactly("test1", "test2", "test3",
         "test4", "test5");
@@ -324,13 +324,13 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
   public void testConfiguration() {
     final Channel<?, String> channel = JRoutineCore.of("test").buildChannel();
     final TestLog testLog = new TestLog();
-    assertThat(AndroidChannels.selectableOutputParcelable(channel, 3)
+    assertThat(AndroidChannels.outputParcelableFlow(channel, 3)
                               .applyChannelConfiguration()
                               .withLog(testLog)
                               .withLogLevel(Level.DEBUG)
                               .configured()
                               .buildChannel()
-                              .all()).containsExactly(new ParcelableSelectable<String>("test", 3));
+                              .all()).containsExactly(new ParcelableFlow<String>(3, "test"));
     assertThat(testLog.mLogCount).isGreaterThan(0);
   }
 
@@ -626,24 +626,23 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
   @SuppressWarnings("unchecked")
   public void testInputSelect() {
 
-    final Channel<ParcelableSelectable<String>, ParcelableSelectable<String>> channel =
-        JRoutineCore.<ParcelableSelectable<String>>ofInputs().buildChannel();
-    AndroidChannels.selectInputParcelable(channel, 33)
+    final Channel<ParcelableFlow<String>, ParcelableFlow<String>> channel =
+        JRoutineCore.<ParcelableFlow<String>>ofInputs().buildChannel();
+    AndroidChannels.parcelableFlowInput(channel, 33)
                    .buildChannel()
                    .pass("test1", "test2", "test3")
                    .close();
     channel.close();
     assertThat(channel.in(seconds(10)).all()).containsExactly(
-        new ParcelableSelectable<String>("test1", 33),
-        new ParcelableSelectable<String>("test2", 33),
-        new ParcelableSelectable<String>("test3", 33));
+        new ParcelableFlow<String>(33, "test1"), new ParcelableFlow<String>(33, "test2"),
+        new ParcelableFlow<String>(33, "test3"));
   }
 
   public void testInputSelectAbort() {
 
-    final Channel<ParcelableSelectable<String>, ParcelableSelectable<String>> channel =
-        JRoutineCore.<ParcelableSelectable<String>>ofInputs().buildChannel();
-    AndroidChannels.selectInputParcelable(channel, 33)
+    final Channel<ParcelableFlow<String>, ParcelableFlow<String>> channel =
+        JRoutineCore.<ParcelableFlow<String>>ofInputs().buildChannel();
+    AndroidChannels.parcelableFlowInput(channel, 33)
                    .buildChannel()
                    .pass("test1", "test2", "test3")
                    .abort();
@@ -661,24 +660,24 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
   }
 
   @SuppressWarnings("unchecked")
-  public void testInputToSelectable() {
+  public void testInputFlow() {
 
     final Channel<String, String> channel = JRoutineCore.<String>ofInputs().buildChannel();
-    AndroidChannels.selectableInput(channel, 33)
+    AndroidChannels.inputFlow(channel, 33)
                    .buildChannel()
-                   .pass(new ParcelableSelectable<String>("test1", 33),
-                       new ParcelableSelectable<String>("test2", -33),
-                       new ParcelableSelectable<String>("test3", 33),
-                       new ParcelableSelectable<String>("test4", 333))
+                   .pass(new ParcelableFlow<String>(33, "test1"),
+                       new ParcelableFlow<String>(-33, "test2"),
+                       new ParcelableFlow<String>(33, "test3"),
+                       new ParcelableFlow<String>(333, "test4"))
                    .close();
     channel.close();
     assertThat(channel.in(seconds(10)).all()).containsExactly("test1", "test3");
   }
 
-  public void testInputToSelectableAbort() {
+  public void testInputFlowAbort() {
 
     final Channel<String, String> channel = JRoutineCore.<String>ofInputs().buildChannel();
-    AndroidChannels.selectableInput(channel, 33).buildChannel().abort();
+    AndroidChannels.inputFlow(channel, 33).buildChannel().abort();
     channel.close();
 
     try {
@@ -909,18 +908,18 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     final Channel<String, String> channel1 = builder1.buildChannel();
     final Channel<Integer, Integer> channel2 = builder2.buildChannel();
 
-    final Channel<?, ? extends ParcelableSelectable<Object>> channel =
+    final Channel<?, ? extends ParcelableFlow<Object>> channel =
         AndroidChannels.mergeParcelable(Arrays.<Channel<?, ?>>asList(channel1, channel2))
                        .buildChannel();
-    final Channel<?, ParcelableSelectable<Object>> output =
-        JRoutineService.on(serviceFrom(getActivity()))
-                       .with(factoryOf(Sort.class))
-                       .applyInvocationConfiguration()
-                       .withInputOrder(OrderType.SORTED)
-                       .configured()
-                       .call(channel);
+    final Channel<?, ParcelableFlow<Object>> output = JRoutineService.on(serviceFrom(getActivity()))
+                                                                     .with(factoryOf(Sort.class))
+                                                                     .applyInvocationConfiguration()
+                                                                     .withInputOrder(
+                                                                         OrderType.SORTED)
+                                                                     .configured()
+                                                                     .call(channel);
     final Map<Integer, ? extends Channel<?, Object>> channelMap =
-        AndroidChannels.selectOutput(output, Sort.INTEGER, Sort.STRING).buildChannelMap();
+        AndroidChannels.flowOutput(output, Sort.INTEGER, Sort.STRING).buildChannelMap();
 
     for (int i = 0; i < 4; i++) {
 
@@ -950,14 +949,14 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
                                         .configured();
     Channel<String, String> channel1;
     Channel<Integer, Integer> channel2;
-    Channel<?, ? extends ParcelableSelectable<?>> outputChannel;
+    Channel<?, ? extends ParcelableFlow<?>> outputChannel;
     channel1 = builder1.buildChannel();
     channel2 = builder2.buildChannel();
     outputChannel = AndroidChannels.mergeParcelable(-7, channel1, channel2).buildChannel();
     channel1.pass("test1").close();
     channel2.pass(13).close();
     assertThat(outputChannel.in(seconds(10)).all()).containsOnly(
-        new ParcelableSelectable<String>("test1", -7), new ParcelableSelectable<Integer>(13, -6));
+        new ParcelableFlow<String>(-7, "test1"), new ParcelableFlow<Integer>(-6, 13));
     channel1 = builder1.buildChannel();
     channel2 = builder2.buildChannel();
     outputChannel =
@@ -965,14 +964,14 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     channel2.pass(13).close();
     channel1.pass("test1").close();
     assertThat(outputChannel.in(seconds(10)).all()).containsOnly(
-        new ParcelableSelectable<String>("test1", 11), new ParcelableSelectable<Integer>(13, 12));
+        new ParcelableFlow<String>(11, "test1"), new ParcelableFlow<Integer>(12, 13));
     channel1 = builder1.buildChannel();
     channel2 = builder2.buildChannel();
     outputChannel = AndroidChannels.mergeParcelable(channel1, channel2).buildChannel();
     channel1.pass("test2").close();
     channel2.pass(-17).close();
     assertThat(outputChannel.in(seconds(10)).all()).containsOnly(
-        new ParcelableSelectable<String>("test2", 0), new ParcelableSelectable<Integer>(-17, 1));
+        new ParcelableFlow<String>(0, "test2"), new ParcelableFlow<Integer>(1, -17));
     channel1 = builder1.buildChannel();
     channel2 = builder2.buildChannel();
     outputChannel =
@@ -980,7 +979,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     channel1.pass("test2").close();
     channel2.pass(-17).close();
     assertThat(outputChannel.in(seconds(10)).all()).containsOnly(
-        new ParcelableSelectable<String>("test2", 0), new ParcelableSelectable<Integer>(-17, 1));
+        new ParcelableFlow<String>(0, "test2"), new ParcelableFlow<Integer>(1, -17));
   }
 
   @SuppressWarnings("unchecked")
@@ -995,7 +994,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     final Channel<String, String> channel3 = builder.buildChannel();
     final Channel<String, String> channel4 = builder.buildChannel();
 
-    final Routine<ParcelableSelectable<String>, String> routine =
+    final Routine<ParcelableFlow<String>, String> routine =
         JRoutineCore.with(InvocationFactory.factoryOf(new ClassToken<Amb<String>>() {}))
                     .buildRoutine();
     final Channel<?, String> outputChannel = routine.call(
@@ -1032,7 +1031,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
                                         .configured();
     Channel<String, String> channel1;
     Channel<Integer, Integer> channel2;
-    Channel<?, ? extends ParcelableSelectable<?>> outputChannel;
+    Channel<?, ? extends ParcelableFlow<?>> outputChannel;
     channel1 = builder1.buildChannel();
     channel2 = builder2.buildChannel();
     outputChannel = AndroidChannels.mergeParcelable(-7, channel1, channel2).buildChannel();
@@ -1146,24 +1145,24 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
   @SuppressWarnings("unchecked")
   public void testOutputMap() {
 
-    final Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> routine =
+    final Routine<ParcelableFlow<Object>, ParcelableFlow<Object>> routine =
         JRoutineService.on(serviceFrom(getActivity())).with(factoryOf(Sort.class)).buildRoutine();
     Map<Integer, ? extends Channel<?, Object>> channelMap;
-    Channel<?, ParcelableSelectable<Object>> channel;
-    channel = routine.call(new ParcelableSelectable<Object>("test21", Sort.STRING),
-        new ParcelableSelectable<Object>(-11, Sort.INTEGER));
-    channelMap = AndroidChannels.selectOutput(channel, Arrays.asList(Sort.INTEGER, Sort.STRING))
+    Channel<?, ParcelableFlow<Object>> channel;
+    channel = routine.call(new ParcelableFlow<Object>(Sort.STRING, "test21"),
+        new ParcelableFlow<Object>(Sort.INTEGER, -11));
+    channelMap = AndroidChannels.flowOutput(channel, Arrays.asList(Sort.INTEGER, Sort.STRING))
                                 .buildChannelMap();
     assertThat(channelMap.get(Sort.INTEGER).in(seconds(10)).all()).containsOnly(-11);
     assertThat(channelMap.get(Sort.STRING).in(seconds(10)).all()).containsOnly("test21");
-    channel = routine.call(new ParcelableSelectable<Object>(-11, Sort.INTEGER),
-        new ParcelableSelectable<Object>("test21", Sort.STRING));
-    channelMap = AndroidChannels.selectOutput(channel, Sort.INTEGER, Sort.STRING).buildChannelMap();
+    channel = routine.call(new ParcelableFlow<Object>(Sort.INTEGER, -11),
+        new ParcelableFlow<Object>(Sort.STRING, "test21"));
+    channelMap = AndroidChannels.flowOutput(channel, Sort.INTEGER, Sort.STRING).buildChannelMap();
     assertThat(channelMap.get(Sort.INTEGER).in(seconds(10)).all()).containsOnly(-11);
     assertThat(channelMap.get(Sort.STRING).in(seconds(10)).all()).containsOnly("test21");
-    channel = routine.call(new ParcelableSelectable<Object>("test21", Sort.STRING),
-        new ParcelableSelectable<Object>(-11, Sort.INTEGER));
-    channelMap = AndroidChannels.selectOutput(Math.min(Sort.INTEGER, Sort.STRING), 2, channel)
+    channel = routine.call(new ParcelableFlow<Object>(Sort.STRING, "test21"),
+        new ParcelableFlow<Object>(Sort.INTEGER, -11));
+    channelMap = AndroidChannels.flowOutput(Math.min(Sort.INTEGER, Sort.STRING), 2, channel)
                                 .buildChannelMap();
     assertThat(channelMap.get(Sort.INTEGER).in(seconds(10)).all()).containsOnly(-11);
     assertThat(channelMap.get(Sort.STRING).in(seconds(10)).all()).containsOnly("test21");
@@ -1172,15 +1171,15 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
   @SuppressWarnings("unchecked")
   public void testOutputMapAbort() {
 
-    final Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> routine =
+    final Routine<ParcelableFlow<Object>, ParcelableFlow<Object>> routine =
         JRoutineService.on(serviceFrom(getActivity())).with(factoryOf(Sort.class)).buildRoutine();
     Map<Integer, ? extends Channel<?, Object>> channelMap;
-    Channel<?, ParcelableSelectable<Object>> channel;
+    Channel<?, ParcelableFlow<Object>> channel;
     channel = routine.call()
                      .after(millis(100))
-                     .pass(new ParcelableSelectable<Object>("test21", Sort.STRING),
-                         new ParcelableSelectable<Object>(-11, Sort.INTEGER));
-    channelMap = AndroidChannels.selectOutput(channel, Arrays.asList(Sort.INTEGER, Sort.STRING))
+                     .pass(new ParcelableFlow<Object>(Sort.STRING, "test21"),
+                         new ParcelableFlow<Object>(Sort.INTEGER, -11));
+    channelMap = AndroidChannels.flowOutput(channel, Arrays.asList(Sort.INTEGER, Sort.STRING))
                                 .buildChannelMap();
     channel.abort();
 
@@ -1206,9 +1205,9 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     channel = routine.call()
                      .after(millis(100))
-                     .pass(new ParcelableSelectable<Object>(-11, Sort.INTEGER),
-                         new ParcelableSelectable<Object>("test21", Sort.STRING));
-    channelMap = AndroidChannels.selectOutput(channel, Sort.INTEGER, Sort.STRING).buildChannelMap();
+                     .pass(new ParcelableFlow<Object>(Sort.INTEGER, -11),
+                         new ParcelableFlow<Object>(Sort.STRING, "test21"));
+    channelMap = AndroidChannels.flowOutput(channel, Sort.INTEGER, Sort.STRING).buildChannelMap();
     channel.abort();
 
     try {
@@ -1233,9 +1232,9 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     channel = routine.call()
                      .after(millis(100))
-                     .pass(new ParcelableSelectable<Object>("test21", Sort.STRING),
-                         new ParcelableSelectable<Object>(-11, Sort.INTEGER));
-    channelMap = AndroidChannels.selectOutput(Math.min(Sort.INTEGER, Sort.STRING), 2, channel)
+                     .pass(new ParcelableFlow<Object>(Sort.STRING, "test21"),
+                         new ParcelableFlow<Object>(Sort.INTEGER, -11));
+    channelMap = AndroidChannels.flowOutput(Math.min(Sort.INTEGER, Sort.STRING), 2, channel)
                                 .buildChannelMap();
     channel.abort();
 
@@ -1262,21 +1261,21 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
   public void testOutputMapCache() {
 
-    final Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> routine =
+    final Routine<ParcelableFlow<Object>, ParcelableFlow<Object>> routine =
         JRoutineService.on(serviceFrom(getActivity())).with(factoryOf(Sort.class)).buildRoutine();
-    final Channel<?, ParcelableSelectable<Object>> channel = routine.call();
+    final Channel<?, ParcelableFlow<Object>> channel = routine.call();
     final Map<Integer, ? extends Channel<?, Object>> channelMap =
-        AndroidChannels.selectOutput(channel, Arrays.asList(Sort.INTEGER, Sort.STRING))
+        AndroidChannels.flowOutput(channel, Arrays.asList(Sort.INTEGER, Sort.STRING))
                        .buildChannelMap();
     assertThat(channelMap).isEqualTo(
-        AndroidChannels.selectOutput(channel, Sort.INTEGER, Sort.STRING).buildChannelMap());
+        AndroidChannels.flowOutput(channel, Sort.INTEGER, Sort.STRING).buildChannelMap());
   }
 
   public void testOutputMapError() {
 
     try {
 
-      AndroidChannels.selectOutput(0, 0,
+      AndroidChannels.flowOutput(0, 0,
           JRoutineService.on(serviceFrom(getActivity())).with(factoryOf(Sort.class)).call());
 
       fail();
@@ -1289,24 +1288,22 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
   @SuppressWarnings("unchecked")
   public void testOutputSelect() {
 
-    final Channel<ParcelableSelectable<String>, ParcelableSelectable<String>> channel =
-        JRoutineCore.<ParcelableSelectable<String>>ofInputs().buildChannel();
+    final Channel<ParcelableFlow<String>, ParcelableFlow<String>> channel =
+        JRoutineCore.<ParcelableFlow<String>>ofInputs().buildChannel();
     final Channel<?, String> outputChannel =
-        AndroidChannels.selectOutput(channel, 33).buildChannelMap().get(33);
-    channel.pass(new ParcelableSelectable<String>("test1", 33),
-        new ParcelableSelectable<String>("test2", -33),
-        new ParcelableSelectable<String>("test3", 33),
-        new ParcelableSelectable<String>("test4", 333));
+        AndroidChannels.flowOutput(channel, 33).buildChannelMap().get(33);
+    channel.pass(new ParcelableFlow<String>(33, "test1"), new ParcelableFlow<String>(-33, "test2"),
+        new ParcelableFlow<String>(33, "test3"), new ParcelableFlow<String>(333, "test4"));
     channel.close();
     assertThat(outputChannel.in(seconds(10)).all()).containsExactly("test1", "test3");
   }
 
   public void testOutputSelectAbort() {
 
-    final Channel<ParcelableSelectable<String>, ParcelableSelectable<String>> channel =
-        JRoutineCore.<ParcelableSelectable<String>>ofInputs().buildChannel();
+    final Channel<ParcelableFlow<String>, ParcelableFlow<String>> channel =
+        JRoutineCore.<ParcelableFlow<String>>ofInputs().buildChannel();
     final Channel<?, String> outputChannel =
-        AndroidChannels.selectOutput(channel, 33).buildChannelMap().get(33);
+        AndroidChannels.flowOutput(channel, 33).buildChannelMap().get(33);
     channel.abort();
 
     try {
@@ -1321,26 +1318,25 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
   }
 
   @SuppressWarnings("unchecked")
-  public void testOutputToSelectable() {
+  public void testOutputFlow() {
 
     final Channel<String, String> channel = JRoutineCore.<String>ofInputs().buildChannel();
     channel.pass("test1", "test2", "test3").close();
-    assertThat(AndroidChannels.selectableOutputParcelable(channel, 33)
+    assertThat(AndroidChannels.outputParcelableFlow(channel, 33)
                               .buildChannel()
                               .in(seconds(10))
-                              .all()).containsExactly(new ParcelableSelectable<String>("test1", 33),
-        new ParcelableSelectable<String>("test2", 33),
-        new ParcelableSelectable<String>("test3", 33));
+                              .all()).containsExactly(new ParcelableFlow<String>(33, "test1"),
+        new ParcelableFlow<String>(33, "test2"), new ParcelableFlow<String>(33, "test3"));
   }
 
-  public void testOutputToSelectableAbort() {
+  public void testOutputFlowAbort() {
 
     final Channel<String, String> channel = JRoutineCore.<String>ofInputs().buildChannel();
     channel.pass("test1", "test2", "test3").abort();
 
     try {
 
-      AndroidChannels.selectableOutputParcelable(channel, 33).buildChannel().in(seconds(10)).all();
+      AndroidChannels.outputParcelableFlow(channel, 33).buildChannel().in(seconds(10)).all();
 
       fail();
 
@@ -1349,23 +1345,21 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     }
   }
 
-  private static class Amb<DATA>
-      extends TemplateContextInvocation<ParcelableSelectable<DATA>, DATA> {
+  private static class Amb<DATA> extends TemplateContextInvocation<ParcelableFlow<DATA>, DATA> {
 
     private static final int NO_INDEX = Integer.MIN_VALUE;
 
     private int mFirstIndex;
 
     @Override
-    public void onInput(final ParcelableSelectable<DATA> input,
-        @NotNull final Channel<DATA, ?> result) {
+    public void onInput(final ParcelableFlow<DATA> input, @NotNull final Channel<DATA, ?> result) {
 
       if (mFirstIndex == NO_INDEX) {
 
-        mFirstIndex = input.index;
+        mFirstIndex = input.id;
         result.pass(input.data);
 
-      } else if (mFirstIndex == input.index) {
+      } else if (mFirstIndex == input.id) {
 
         result.pass(input.data);
       }
@@ -1404,33 +1398,31 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     }
   }
 
-  private static class Sort extends
-      TemplateContextInvocation<ParcelableSelectable<Object>, ParcelableSelectable<Object>> {
+  private static class Sort
+      extends TemplateContextInvocation<ParcelableFlow<Object>, ParcelableFlow<Object>> {
 
     private static final int INTEGER = 1;
 
     private static final int STRING = 0;
 
-    public void onInput(final ParcelableSelectable<Object> selectable,
-        @NotNull final Channel<ParcelableSelectable<Object>, ?> result) {
+    public void onInput(final ParcelableFlow<Object> flow,
+        @NotNull final Channel<ParcelableFlow<Object>, ?> result) {
 
-      switch (selectable.index) {
+      switch (flow.id) {
 
         case INTEGER:
-          AndroidChannels.<Object, Integer>selectInputParcelable(result, INTEGER).buildChannel()
-                                                                                 .pass(
-                                                                                     (Integer)
-                                                                                         selectable.data)
-                                                                                 .close();
+          AndroidChannels.<Object, Integer>parcelableFlowInput(result, INTEGER).buildChannel()
+                                                                               .pass(
+                                                                                   (Integer) flow
+                                                                                       .data)
+                                                                               .close();
           break;
 
         case STRING:
-          AndroidChannels.<Object, String>selectInputParcelable(result, STRING).buildChannel()
-                                                                               .pass(
-                                                                                   (String)
-                                                                                       selectable
-                                                                                           .data)
-                                                                               .close();
+          AndroidChannels.<Object, String>parcelableFlowInput(result, STRING).buildChannel()
+                                                                             .pass(
+                                                                                 (String) flow.data)
+                                                                             .close();
           break;
       }
     }

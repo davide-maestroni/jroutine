@@ -19,7 +19,7 @@ package com.github.dm.jrt.android.v11.channel;
 import android.util.SparseArray;
 
 import com.github.dm.jrt.android.channel.AndroidChannels;
-import com.github.dm.jrt.android.channel.ParcelableSelectable;
+import com.github.dm.jrt.android.channel.ParcelableFlow;
 import com.github.dm.jrt.android.v11.channel.builder.AbstractChannelArrayBuilder;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
@@ -30,7 +30,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashSet;
 
 /**
- * Builder implementation returning a map of channels accepting selectable data.
+ * Builder implementation returning a map of channels accepting flow data.
  * <p>
  * Created by davide-maestroni on 06/18/2016.
  *
@@ -39,43 +39,43 @@ import java.util.HashSet;
  */
 class InputMapBuilder<DATA, IN extends DATA> extends AbstractChannelArrayBuilder<IN, IN> {
 
-  private final Channel<? super ParcelableSelectable<DATA>, ?> mChannel;
+  private final Channel<? super ParcelableFlow<DATA>, ?> mChannel;
 
-  private final HashSet<Integer> mIndexes;
+  private final HashSet<Integer> mIds;
 
   /**
    * Constructor.
    *
-   * @param channel the selectable channel.
-   * @param indexes the set of indexes.
-   * @throws java.lang.NullPointerException if the specified set of indexes is null or contains a
+   * @param channel the flow channel.
+   * @param ids     the set of IDs.
+   * @throws java.lang.NullPointerException if the specified set of IDs is null or contains a
    *                                        null object.
    */
-  InputMapBuilder(@NotNull final Channel<? super ParcelableSelectable<DATA>, ?> channel,
-      @NotNull final HashSet<Integer> indexes) {
+  InputMapBuilder(@NotNull final Channel<? super ParcelableFlow<DATA>, ?> channel,
+      @NotNull final HashSet<Integer> ids) {
     mChannel = ConstantConditions.notNull("channel instance", channel);
-    final HashSet<Integer> indexSet =
-        new HashSet<Integer>(ConstantConditions.notNull("set of indexes", indexes));
-    if (indexSet.contains(null)) {
-      throw new NullPointerException("the set of indexes must not contain null objects");
+    final HashSet<Integer> idSet =
+        new HashSet<Integer>(ConstantConditions.notNull("set of IDs", ids));
+    if (idSet.contains(null)) {
+      throw new NullPointerException("the set of IDs must not contain null objects");
     }
 
-    mIndexes = indexSet;
+    mIds = idSet;
   }
 
   @NotNull
   @Override
   public SparseArray<? extends Channel<IN, IN>> buildChannelArray() {
-    final HashSet<Integer> indexes = mIndexes;
-    final Channel<? super ParcelableSelectable<DATA>, ?> channel = mChannel;
+    final HashSet<Integer> ids = mIds;
+    final Channel<? super ParcelableFlow<DATA>, ?> channel = mChannel;
     final SparseArray<Channel<IN, IN>> channelMap =
-        new SparseArray<Channel<IN, IN>>(indexes.size());
+        new SparseArray<Channel<IN, IN>>(ids.size());
     final ChannelConfiguration configuration = getConfiguration();
-    for (final Integer index : indexes) {
+    for (final Integer id : ids) {
       @SuppressWarnings("unchecked") final Channel<IN, IN> inputChannel =
-          (Channel<IN, IN>) AndroidChannels.<DATA, IN>selectInputParcelable(channel, index).apply(
+          (Channel<IN, IN>) AndroidChannels.<DATA, IN>parcelableFlowInput(channel, id).apply(
               configuration).buildChannel();
-      channelMap.put(index, inputChannel);
+      channelMap.put(id, inputChannel);
     }
 
     return channelMap;

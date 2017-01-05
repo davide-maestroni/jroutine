@@ -35,7 +35,7 @@ import java.util.Set;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
- * Builder implementation returning a map of channels returning selectable output data.
+ * Builder implementation returning a map of channels returning flow output data.
  * <p>
  * Created by davide-maestroni on 02/26/2016.
  *
@@ -43,57 +43,55 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class OutputMapBuilder<OUT> extends AbstractChannelMapBuilder<Integer, OUT, OUT> {
 
-  private static final WeakIdentityHashMap<Channel<?, ?>, HashMap<SelectInfo, HashMap<Integer,
+  private static final WeakIdentityHashMap<Channel<?, ?>, HashMap<FlowInfo, HashMap<Integer,
       Channel<?, ?>>>>
       sOutputChannels =
-      new WeakIdentityHashMap<Channel<?, ?>, HashMap<SelectInfo, HashMap<Integer, Channel<?,
-          ?>>>>();
+      new WeakIdentityHashMap<Channel<?, ?>, HashMap<FlowInfo, HashMap<Integer, Channel<?, ?>>>>();
 
-  private final Channel<?, ? extends Selectable<? extends OUT>> mChannel;
+  private final Channel<?, ? extends Flow<? extends OUT>> mChannel;
 
-  private final HashSet<Integer> mIndexes;
+  private final HashSet<Integer> mIds;
 
   /**
    * Constructor.
    *
-   * @param channel the selectable channel.
-   * @param indexes the set of indexes.
-   * @throws java.lang.NullPointerException if the specified set of indexes is null or contains a
+   * @param channel the flow channel.
+   * @param ids     the set of IDs.
+   * @throws java.lang.NullPointerException if the specified set of IDs is null or contains a
    *                                        null object.
    */
-  OutputMapBuilder(@NotNull final Channel<?, ? extends Selectable<? extends OUT>> channel,
-      @NotNull final Set<Integer> indexes) {
+  OutputMapBuilder(@NotNull final Channel<?, ? extends Flow<? extends OUT>> channel,
+      @NotNull final Set<Integer> ids) {
     mChannel = ConstantConditions.notNull("channel instance", channel);
-    final HashSet<Integer> indexSet =
-        new HashSet<Integer>(ConstantConditions.notNull("set of indexes", indexes));
-    if (indexSet.contains(null)) {
-      throw new NullPointerException("the set of indexes must not contain null objects");
+    final HashSet<Integer> idSet =
+        new HashSet<Integer>(ConstantConditions.notNull("set of IDs", ids));
+    if (idSet.contains(null)) {
+      throw new NullPointerException("the set of IDs must not contain null objects");
     }
 
-    mIndexes = indexSet;
+    mIds = idSet;
   }
 
   @NotNull
   @SuppressWarnings("unchecked")
   public Map<Integer, ? extends Channel<OUT, OUT>> buildChannelMap() {
-    final HashSet<Integer> indexes = mIndexes;
-    final Channel<?, ? extends Selectable<? extends OUT>> channel = mChannel;
+    final HashSet<Integer> ids = mIds;
+    final Channel<?, ? extends Flow<? extends OUT>> channel = mChannel;
     synchronized (sOutputChannels) {
-      final WeakIdentityHashMap<Channel<?, ?>, HashMap<SelectInfo, HashMap<Integer, Channel<?, ?>>>>
+      final WeakIdentityHashMap<Channel<?, ?>, HashMap<FlowInfo, HashMap<Integer, Channel<?, ?>>>>
           outputChannels = sOutputChannels;
-      HashMap<SelectInfo, HashMap<Integer, Channel<?, ?>>> channelMaps =
-          outputChannels.get(channel);
+      HashMap<FlowInfo, HashMap<Integer, Channel<?, ?>>> channelMaps = outputChannels.get(channel);
       if (channelMaps == null) {
-        channelMaps = new HashMap<SelectInfo, HashMap<Integer, Channel<?, ?>>>();
+        channelMaps = new HashMap<FlowInfo, HashMap<Integer, Channel<?, ?>>>();
         outputChannels.put(channel, channelMaps);
       }
 
-      final int size = indexes.size();
+      final int size = ids.size();
       final ChannelConfiguration configuration = getConfiguration();
-      final SelectInfo selectInfo = new SelectInfo(configuration, indexes);
+      final FlowInfo flowInfo = new FlowInfo(configuration, ids);
       final HashMap<Integer, Channel<OUT, OUT>> channelMap =
           new HashMap<Integer, Channel<OUT, OUT>>(size);
-      HashMap<Integer, Channel<?, ?>> channels = channelMaps.get(selectInfo);
+      HashMap<Integer, Channel<?, ?>> channels = channelMaps.get(flowInfo);
       if (channels != null) {
         for (final Entry<Integer, Channel<?, ?>> entry : channels.entrySet()) {
           channelMap.put(entry.getKey(), (Channel<OUT, OUT>) entry.getValue());
@@ -103,16 +101,16 @@ class OutputMapBuilder<OUT> extends AbstractChannelMapBuilder<Integer, OUT, OUT>
         final HashMap<Integer, Channel<OUT, ?>> inputMap =
             new HashMap<Integer, Channel<OUT, ?>>(size);
         channels = new HashMap<Integer, Channel<?, ?>>(size);
-        for (final Integer index : indexes) {
+        for (final Integer id : ids) {
           final Channel<OUT, OUT> outputChannel =
               JRoutineCore.<OUT>ofInputs().apply(configuration).buildChannel();
-          inputMap.put(index, outputChannel);
-          channelMap.put(index, outputChannel);
-          channels.put(index, outputChannel);
+          inputMap.put(id, outputChannel);
+          channelMap.put(id, outputChannel);
+          channels.put(id, outputChannel);
         }
 
         channel.bind(new SortingMapChannelConsumer<OUT>(inputMap));
-        channelMaps.put(selectInfo, channels);
+        channelMaps.put(flowInfo, channels);
       }
 
       return channelMap;
@@ -122,17 +120,17 @@ class OutputMapBuilder<OUT> extends AbstractChannelMapBuilder<Integer, OUT, OUT>
   /**
    * Class used as key to identify a specific map of output channels.
    */
-  private static class SelectInfo extends DeepEqualObject {
+  private static class FlowInfo extends DeepEqualObject {
 
     /**
      * Constructor.
      *
      * @param configuration the channel configuration.
-     * @param indexes       the set of indexes,
+     * @param ids           the set of IDs.
      */
-    private SelectInfo(@NotNull final ChannelConfiguration configuration,
-        @NotNull final HashSet<Integer> indexes) {
-      super(asArgs(configuration, indexes));
+    private FlowInfo(@NotNull final ChannelConfiguration configuration,
+        @NotNull final HashSet<Integer> ids) {
+      super(asArgs(configuration, ids));
     }
   }
 }

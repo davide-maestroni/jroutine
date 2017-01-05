@@ -40,8 +40,11 @@ public class JRoutineRxTest {
 
   @Test
   public void testChannel() {
-    final Channel<?, String> channel =
-        JRoutineRx.from(Observable.just("test1", "test2")).buildChannel();
+    final Channel<?, String> channel = JRoutineRx.from(Observable.just("test1", "test2"))
+                                                 .applyChannelConfiguration()
+                                                 .withMaxSize(2)
+                                                 .configured()
+                                                 .buildChannel();
     assertThat(channel.all()).containsExactly("test1", "test2");
   }
 

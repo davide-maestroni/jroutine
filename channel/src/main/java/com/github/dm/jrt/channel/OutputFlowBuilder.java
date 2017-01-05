@@ -24,35 +24,34 @@ import com.github.dm.jrt.core.util.ConstantConditions;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Builder implementation returning a channel making an output one selectable.
+ * Builder implementation returning a channel making the output data a flow.
  * <p>
  * Created by davide-maestroni on 02/26/2016.
  *
  * @param <OUT> the output data type.
  */
-class SelectableOutputBuilder<OUT>
-    extends AbstractChannelBuilder<Selectable<OUT>, Selectable<OUT>> {
+class OutputFlowBuilder<OUT> extends AbstractChannelBuilder<Flow<OUT>, Flow<OUT>> {
 
   private final Channel<?, ? extends OUT> mChannel;
 
-  private final int mIndex;
+  private final int mId;
 
   /**
    * Constructor.
    *
    * @param channel the channel.
-   * @param index   the selectable index.
+   * @param id      the flow ID.
    */
-  SelectableOutputBuilder(@NotNull final Channel<?, ? extends OUT> channel, final int index) {
+  OutputFlowBuilder(@NotNull final Channel<?, ? extends OUT> channel, final int id) {
     mChannel = ConstantConditions.notNull("channel instance", channel);
-    mIndex = index;
+    mId = id;
   }
 
   @NotNull
-  public Channel<Selectable<OUT>, Selectable<OUT>> buildChannel() {
-    final Channel<Selectable<OUT>, Selectable<OUT>> outputChannel =
-        JRoutineCore.<Selectable<OUT>>ofInputs().apply(getConfiguration()).buildChannel();
-    mChannel.bind(new SelectableChannelConsumer<OUT, OUT>(outputChannel, mIndex));
+  public Channel<Flow<OUT>, Flow<OUT>> buildChannel() {
+    final Channel<Flow<OUT>, Flow<OUT>> outputChannel =
+        JRoutineCore.<Flow<OUT>>ofInputs().apply(getConfiguration()).buildChannel();
+    mChannel.bind(new FlowChannelConsumer<OUT, OUT>(outputChannel, mId));
     return outputChannel;
   }
 }

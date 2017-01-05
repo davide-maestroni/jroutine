@@ -16,44 +16,52 @@
 
 package com.github.dm.jrt.android.channel;
 
-import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.builder.AbstractChannelBuilder;
 import com.github.dm.jrt.core.channel.Channel;
+import com.github.dm.jrt.core.channel.ChannelConsumer;
+import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Builder implementation returning a channel making an output one selectable.
+ * Channel consumer transforming data into flow ones.
  * <p>
  * Created by davide-maestroni on 02/26/2016.
  *
+ * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class SelectableOutputBuilder<OUT>
-    extends AbstractChannelBuilder<ParcelableSelectable<OUT>, ParcelableSelectable<OUT>> {
+class FlowChannelConsumer<OUT, IN extends OUT> implements ChannelConsumer<IN> {
 
-  private final Channel<?, ? extends OUT> mChannel;
+  private final Channel<? super
+      ParcelableFlow<OUT>, ?> mChannel;
 
-  private final int mIndex;
+  private final int mId;
 
   /**
    * Constructor.
    *
-   * @param channel the output channel.
-   * @param index   the selectable index.
+   * @param channel the flow channel.
+   * @param id      the flow ID.
    */
-  SelectableOutputBuilder(@NotNull final Channel<?, ? extends OUT> channel, final int index) {
+  FlowChannelConsumer(@NotNull final Channel<? super
+      ParcelableFlow<OUT>, ?> channel, final int id) {
     mChannel = ConstantConditions.notNull("channel instance", channel);
-    mIndex = index;
+    mId = id;
   }
 
-  @NotNull
   @Override
-  public Channel<ParcelableSelectable<OUT>, ParcelableSelectable<OUT>> buildChannel() {
-    final Channel<ParcelableSelectable<OUT>, ParcelableSelectable<OUT>> outputChannel =
-        JRoutineCore.<ParcelableSelectable<OUT>>ofInputs().apply(getConfiguration()).buildChannel();
-    mChannel.bind(new SelectableChannelConsumer<OUT, OUT>(outputChannel, mIndex));
-    return outputChannel;
+  public void onComplete() {
+    mChannel.close();
+  }
+
+  @Override
+  public void onError(@NotNull final RoutineException error) {
+    mChannel.abort(error);
+  }
+
+  @Override
+  public void onOutput(final IN input) {
+    mChannel.pass(new ParcelableFlow<OUT>(mId, input));
   }
 }

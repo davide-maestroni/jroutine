@@ -17,13 +17,13 @@
 package com.github.dm.jrt.channel;
 
 /**
- * Data class storing information about the origin of the data.
+ * Data class storing information about the specific flow of data.
  * <p>
  * Created by davide-maestroni on 02/26/2016.
  *
  * @param <DATA> the data type.
  */
-public class Selectable<DATA> {
+public class Flow<DATA> {
 
   /**
    * The data object.
@@ -31,19 +31,19 @@ public class Selectable<DATA> {
   public final DATA data;
 
   /**
-   * The origin channel index.
+   * The flow ID.
    */
-  public final int index;
+  public final int id;
 
   /**
    * Constructor.
    *
-   * @param data  the data object.
-   * @param index the channel index.
+   * @param id   the flow ID.
+   * @param data the data object.
    */
-  public Selectable(final DATA data, final int index) {
+  public Flow(final int id, final DATA data) {
     this.data = data;
-    this.index = index;
+    this.id = id;
   }
 
   /**
@@ -60,7 +60,7 @@ public class Selectable<DATA> {
   @Override
   public int hashCode() {
     int result = (data != null) ? data.hashCode() : 0;
-    result = 31 * result + index;
+    result = 31 * result + id;
     return result;
   }
 
@@ -70,16 +70,16 @@ public class Selectable<DATA> {
       return true;
     }
 
-    if (!(o instanceof Selectable)) {
+    if (!(o instanceof Flow)) {
       return false;
     }
 
-    final Selectable<?> that = (Selectable<?>) o;
-    return (index == that.index) && ((data != null) ? data.equals(that.data) : (that.data == null));
+    final Flow<?> that = (Flow<?>) o;
+    return (id == that.id) && ((data != null) ? data.equals(that.data) : (that.data == null));
   }
 
   @Override
   public String toString() {
-    return "Selectable{data=" + data + ", index=" + index + "}";
+    return "Flow{data=" + data + ", id=" + id + "}";
   }
 }

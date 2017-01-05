@@ -18,7 +18,7 @@ package com.github.dm.jrt.android.v11.channel;
 
 import android.util.SparseArray;
 
-import com.github.dm.jrt.android.channel.ParcelableSelectable;
+import com.github.dm.jrt.android.channel.ParcelableFlow;
 import com.github.dm.jrt.android.v11.channel.builder.AbstractChannelArrayBuilder;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
@@ -36,7 +36,7 @@ import java.util.Set;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
- * Builder implementation returning a map of channels returning selectable output data.
+ * Builder implementation returning a map of channels returning flow output data.
  * <p>
  * Created by davide-maestroni on 02/26/2016.
  *
@@ -44,55 +44,55 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class OutputMapBuilder<OUT> extends AbstractChannelArrayBuilder<OUT, OUT> {
 
-  private static final WeakIdentityHashMap<Channel<?, ?>, HashMap<SelectInfo,
+  private static final WeakIdentityHashMap<Channel<?, ?>, HashMap<FlowInfo,
       SparseArray<Channel<?, ?>>>>
       sOutputChannels =
-      new WeakIdentityHashMap<Channel<?, ?>, HashMap<SelectInfo, SparseArray<Channel<?, ?>>>>();
+      new WeakIdentityHashMap<Channel<?, ?>, HashMap<FlowInfo, SparseArray<Channel<?, ?>>>>();
 
-  private final Channel<?, ? extends ParcelableSelectable<? extends OUT>> mChannel;
+  private final Channel<?, ? extends ParcelableFlow<? extends OUT>> mChannel;
 
-  private final HashSet<Integer> mIndexes;
+  private final HashSet<Integer> mIds;
 
   /**
    * Constructor.
    *
-   * @param channel the selectable channel.
-   * @param indexes the set of indexes.
-   * @throws java.lang.NullPointerException if the specified set of indexes is null or contains a
+   * @param channel the flow channel.
+   * @param ids     the set of IDs.
+   * @throws java.lang.NullPointerException if the specified set of IDs is null or contains a
    *                                        null object.
    */
-  OutputMapBuilder(@NotNull final Channel<?, ? extends ParcelableSelectable<? extends OUT>> channel,
-      @NotNull final Set<Integer> indexes) {
+  OutputMapBuilder(@NotNull final Channel<?, ? extends ParcelableFlow<? extends OUT>> channel,
+      @NotNull final Set<Integer> ids) {
     mChannel = ConstantConditions.notNull("channel instance", channel);
-    final HashSet<Integer> indexSet =
-        new HashSet<Integer>(ConstantConditions.notNull("set of indexes", indexes));
-    if (indexSet.contains(null)) {
-      throw new NullPointerException("the set of indexes must not contain null objects");
+    final HashSet<Integer> idSet =
+        new HashSet<Integer>(ConstantConditions.notNull("set of IDs", ids));
+    if (idSet.contains(null)) {
+      throw new NullPointerException("the set of IDs must not contain null objects");
     }
 
-    mIndexes = indexSet;
+    mIds = idSet;
   }
 
   @NotNull
   @Override
   @SuppressWarnings("unchecked")
   public SparseArray<? extends Channel<OUT, OUT>> buildChannelArray() {
-    final HashSet<Integer> indexes = mIndexes;
-    final Channel<?, ? extends ParcelableSelectable<? extends OUT>> channel = mChannel;
+    final HashSet<Integer> ids = mIds;
+    final Channel<?, ? extends ParcelableFlow<? extends OUT>> channel = mChannel;
     synchronized (sOutputChannels) {
-      final WeakIdentityHashMap<Channel<?, ?>, HashMap<SelectInfo, SparseArray<Channel<?, ?>>>>
+      final WeakIdentityHashMap<Channel<?, ?>, HashMap<FlowInfo, SparseArray<Channel<?, ?>>>>
           outputChannels = sOutputChannels;
-      HashMap<SelectInfo, SparseArray<Channel<?, ?>>> channelMaps = outputChannels.get(channel);
+      HashMap<FlowInfo, SparseArray<Channel<?, ?>>> channelMaps = outputChannels.get(channel);
       if (channelMaps == null) {
-        channelMaps = new HashMap<SelectInfo, SparseArray<Channel<?, ?>>>();
+        channelMaps = new HashMap<FlowInfo, SparseArray<Channel<?, ?>>>();
         outputChannels.put(channel, channelMaps);
       }
 
-      final int size = indexes.size();
+      final int size = ids.size();
       final ChannelConfiguration configuration = getConfiguration();
-      final SelectInfo selectInfo = new SelectInfo(configuration, indexes);
+      final FlowInfo flowInfo = new FlowInfo(configuration, ids);
       final SparseArray<Channel<OUT, OUT>> channelMap = new SparseArray<Channel<OUT, OUT>>(size);
-      SparseArray<Channel<?, ?>> channels = channelMaps.get(selectInfo);
+      SparseArray<Channel<?, ?>> channels = channelMaps.get(flowInfo);
       if (channels != null) {
         final int channelSize = channels.size();
         for (int i = 0; i < channelSize; ++i) {
@@ -102,16 +102,16 @@ class OutputMapBuilder<OUT> extends AbstractChannelArrayBuilder<OUT, OUT> {
       } else {
         final SparseArray<Channel<OUT, ?>> inputMap = new SparseArray<Channel<OUT, ?>>(size);
         channels = new SparseArray<Channel<?, ?>>(size);
-        for (final Integer index : indexes) {
+        for (final Integer id : ids) {
           final Channel<OUT, OUT> outputChannel =
               JRoutineCore.<OUT>ofInputs().apply(configuration).buildChannel();
-          inputMap.append(index, outputChannel);
-          channelMap.append(index, outputChannel);
-          channels.append(index, outputChannel);
+          inputMap.append(id, outputChannel);
+          channelMap.append(id, outputChannel);
+          channels.append(id, outputChannel);
         }
 
         channel.bind(new SortingMapChannelConsumer<OUT>(inputMap));
-        channelMaps.put(selectInfo, channels);
+        channelMaps.put(flowInfo, channels);
       }
 
       return channelMap;
@@ -121,17 +121,17 @@ class OutputMapBuilder<OUT> extends AbstractChannelArrayBuilder<OUT, OUT> {
   /**
    * Class used as key to identify a specific map of output channels.
    */
-  private static class SelectInfo extends DeepEqualObject {
+  private static class FlowInfo extends DeepEqualObject {
 
     /**
      * Constructor.
      *
      * @param configuration the channel configuration.
-     * @param indexes       the set of indexes,
+     * @param ids           the set of IDs.
      */
-    private SelectInfo(@NotNull final ChannelConfiguration configuration,
-        @NotNull final HashSet<Integer> indexes) {
-      super(asArgs(configuration, indexes));
+    private FlowInfo(@NotNull final ChannelConfiguration configuration,
+        @NotNull final HashSet<Integer> ids) {
+      super(asArgs(configuration, ids));
     }
   }
 }

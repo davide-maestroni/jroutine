@@ -17,7 +17,7 @@
 package com.github.dm.jrt.android.retrofit;
 
 import com.github.dm.jrt.android.channel.AndroidChannels;
-import com.github.dm.jrt.android.channel.ParcelableSelectable;
+import com.github.dm.jrt.android.channel.ParcelableFlow;
 import com.github.dm.jrt.android.channel.io.ParcelableByteChannel;
 import com.github.dm.jrt.android.channel.io.ParcelableByteChannel.ParcelableByteBuffer;
 import com.github.dm.jrt.android.core.invocation.AbstractContextInvocation;
@@ -55,24 +55,22 @@ import static com.github.dm.jrt.core.util.DurationMeasure.infinity;
  */
 @SuppressWarnings("WeakerAccess")
 public class ServiceCallInvocation
-    extends AbstractContextInvocation<ParcelableSelectable<Object>, ParcelableSelectable<Object>> {
+    extends AbstractContextInvocation<ParcelableFlow<Object>, ParcelableFlow<Object>> {
 
   /**
-   * The index of the selectable channel dedicated to the transfer of request and response body
-   * bytes.
+   * The ID of the flow dedicated to the transfer of request and response body bytes.
    */
-  static final int BYTES_INDEX = 1;
+  static final int BYTES_ID = 1;
 
   /**
-   * The index of the selectable channel dedicated to the transfer of request and response body
-   * media type.
+   * The ID of the flow dedicated to the transfer of request and response body media type.
    */
-  static final int MEDIA_TYPE_INDEX = 0;
+  static final int MEDIA_TYPE_ID = 0;
 
   /**
-   * The index of the selectable channel dedicated to the transfer of the request data.
+   * The ID of the flow dedicated to the transfer of the request data.
    */
-  static final int REQUEST_DATA_INDEX = -1;
+  static final int REQUEST_DATA_ID = -1;
 
   private boolean mHasMediaType;
 
@@ -85,7 +83,7 @@ public class ServiceCallInvocation
   private RequestData mRequestData;
 
   @Override
-  public void onComplete(@NotNull final Channel<ParcelableSelectable<Object>, ?> result) throws
+  public void onComplete(@NotNull final Channel<ParcelableFlow<Object>, ?> result) throws
       Exception {
     final Channel<ParcelableByteBuffer, ParcelableByteBuffer> inputChannel = mInputChannel;
     if (inputChannel != null) {
@@ -98,20 +96,20 @@ public class ServiceCallInvocation
   }
 
   @Override
-  public void onInput(final ParcelableSelectable<Object> input,
-      @NotNull final Channel<ParcelableSelectable<Object>, ?> result) throws Exception {
-    switch (input.index) {
-      case REQUEST_DATA_INDEX:
+  public void onInput(final ParcelableFlow<Object> input,
+      @NotNull final Channel<ParcelableFlow<Object>, ?> result) throws Exception {
+    switch (input.id) {
+      case REQUEST_DATA_ID:
         mRequestData = input.data();
         break;
 
-      case MEDIA_TYPE_INDEX:
+      case MEDIA_TYPE_ID:
         mHasMediaType = true;
         final String mediaType = input.data();
         mMediaType = (mediaType != null) ? MediaType.parse(mediaType) : null;
         break;
 
-      case BYTES_INDEX:
+      case BYTES_ID:
         if (mInputChannel == null) {
           mInputChannel = JRoutineCore.<ParcelableByteBuffer>ofInputs().buildChannel();
         }
@@ -121,7 +119,7 @@ public class ServiceCallInvocation
         break;
 
       default:
-        throw new IllegalArgumentException("unknown selectable index: " + input.index);
+        throw new IllegalArgumentException("unknown flow ID: " + input.id);
     }
 
     if (mHasMediaType && (mRequestData != null) && (mInputChannel != null)) {
@@ -137,7 +135,7 @@ public class ServiceCallInvocation
     mHasMediaType = false;
   }
 
-  private void asyncRequest(@NotNull final Channel<ParcelableSelectable<Object>, ?> result) throws
+  private void asyncRequest(@NotNull final Channel<ParcelableFlow<Object>, ?> result) throws
       Exception {
     if (mIsRequest) {
       return;
@@ -146,8 +144,8 @@ public class ServiceCallInvocation
     mIsRequest = true;
     final Request request =
         mRequestData.requestWithBody(new AsyncRequestBody(mMediaType, mInputChannel));
-    final Channel<ParcelableSelectable<Object>, ParcelableSelectable<Object>> outputChannel =
-        JRoutineCore.<ParcelableSelectable<Object>>ofInputs().buildChannel();
+    final Channel<ParcelableFlow<Object>, ParcelableFlow<Object>> outputChannel =
+        JRoutineCore.<ParcelableFlow<Object>>ofInputs().buildChannel();
     outputChannel.bind(result);
     getClient().newCall(request).enqueue(new Callback() {
 
@@ -181,14 +179,14 @@ public class ServiceCallInvocation
   }
 
   private void publishResult(@NotNull final ResponseBody responseBody,
-      @NotNull final Channel<ParcelableSelectable<Object>, ?> result) throws IOException {
+      @NotNull final Channel<ParcelableFlow<Object>, ?> result) throws IOException {
     final MediaType mediaType = responseBody.contentType();
     if (mediaType != null) {
-      result.pass(new ParcelableSelectable<Object>(mediaType.toString(), MEDIA_TYPE_INDEX));
+      result.pass(new ParcelableFlow<Object>(MEDIA_TYPE_ID, mediaType.toString()));
     }
 
     final Channel<Object, ?> channel =
-        AndroidChannels.selectInputParcelable(result, BYTES_INDEX).buildChannel();
+        AndroidChannels.parcelableFlowInput(result, BYTES_ID).buildChannel();
     final BufferOutputStream outputStream = ParcelableByteChannel.from(channel)
                                                                  .applyBufferStreamConfiguration()
                                                                  .withOnClose(
@@ -203,7 +201,7 @@ public class ServiceCallInvocation
     }
   }
 
-  private void syncRequest(@NotNull final Channel<ParcelableSelectable<Object>, ?> result) throws
+  private void syncRequest(@NotNull final Channel<ParcelableFlow<Object>, ?> result) throws
       Exception {
     final Request request = mRequestData.requestWithBody(null);
     final Response response = getClient().newCall(request).execute();

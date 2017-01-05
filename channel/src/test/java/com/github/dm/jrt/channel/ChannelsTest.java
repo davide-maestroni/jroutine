@@ -188,31 +188,31 @@ public class ChannelsTest {
         JRoutineCore.with(IdentityInvocation.<Integer>factoryOf()).call().sorted();
     Channels.combine(channel1, channel2)
             .buildChannel()
-            .pass(new Selectable<String>("test1", 0))
-            .pass(new Selectable<Integer>(1, 1))
+            .pass(new Flow<String>(0, "test1"))
+            .pass(new Flow<Integer>(1, 1))
             .close();
     Channels.combine(3, channel1, channel2)
             .buildChannel()
-            .pass(new Selectable<String>("test2", 3))
-            .pass(new Selectable<Integer>(2, 4))
+            .pass(new Flow<String>(3, "test2"))
+            .pass(new Flow<Integer>(4, 2))
             .close();
     Channels.combine(Arrays.<Channel<?, ?>>asList(channel1, channel2))
             .buildChannel()
-            .pass(new Selectable<String>("test3", 0))
-            .pass(new Selectable<Integer>(3, 1))
+            .pass(new Flow<String>(0, "test3"))
+            .pass(new Flow<Integer>(1, 3))
             .close();
     Channels.combine(-5, Arrays.<Channel<?, ?>>asList(channel1, channel2))
             .buildChannel()
-            .pass(new Selectable<String>("test4", -5))
-            .pass(new Selectable<Integer>(4, -4))
+            .pass(new Flow<String>(-5, "test4"))
+            .pass(new Flow<Integer>(-4, 4))
             .close();
     final HashMap<Integer, Channel<?, ?>> map = new HashMap<Integer, Channel<?, ?>>(2);
     map.put(31, channel1);
     map.put(17, channel2);
     Channels.combine(map)
             .buildChannel()
-            .pass(new Selectable<String>("test5", 31))
-            .pass(new Selectable<Integer>(5, 17))
+            .pass(new Flow<String>(31, "test5"))
+            .pass(new Flow<Integer>(17, 5))
             .close();
     assertThat(channel1.close().in(seconds(1)).all()).containsExactly("test1", "test2", "test3",
         "test4", "test5");
@@ -581,23 +581,23 @@ public class ChannelsTest {
   public void testConfiguration() {
     final Channel<?, String> channel = JRoutineCore.of("test").buildChannel();
     final TestLog testLog = new TestLog();
-    assertThat(Channels.selectableOutput(channel, 3)
+    assertThat(Channels.outputFlow(channel, 3)
                        .applyChannelConfiguration()
                        .withLog(testLog)
                        .withLogLevel(Level.DEBUG)
                        .configured()
                        .buildChannel()
-                       .all()).containsExactly(new Selectable<String>("test", 3));
+                       .all()).containsExactly(new Flow<String>(3, "test"));
     assertThat(testLog.mLogCount).isGreaterThan(0);
   }
 
   @Test
   @SuppressWarnings("unchecked")
   public void testConfigurationMap() {
-    final Channel<Selectable<String>, Selectable<String>> channel =
-        JRoutineCore.<Selectable<String>>ofInputs().buildChannel();
+    final Channel<Flow<String>, Flow<String>> channel =
+        JRoutineCore.<Flow<String>>ofInputs().buildChannel();
     final TestLog testLog = new TestLog();
-    Channels.selectInput(3, 1, channel)
+    Channels.flowInput(3, 1, channel)
             .applyChannelConfiguration()
             .withLog(testLog)
             .withLogLevel(Level.DEBUG)
@@ -606,7 +606,7 @@ public class ChannelsTest {
             .get(3)
             .pass("test")
             .close();
-    assertThat(channel.close().all()).containsExactly(new Selectable<String>("test", 3));
+    assertThat(channel.close().all()).containsExactly(new Flow<String>(3, "test"));
     assertThat(testLog.mLogCount).isGreaterThan(0);
   }
 
@@ -907,27 +907,27 @@ public class ChannelsTest {
   @Test
   public void testInputMap() {
 
-    final ArrayList<Selectable<Object>> outputs = new ArrayList<Selectable<Object>>();
-    outputs.add(new Selectable<Object>("test21", Sort.STRING));
-    outputs.add(new Selectable<Object>(-11, Sort.INTEGER));
-    final Routine<Selectable<Object>, Selectable<Object>> routine =
+    final ArrayList<Flow<Object>> outputs = new ArrayList<Flow<Object>>();
+    outputs.add(new Flow<Object>(Sort.STRING, "test21"));
+    outputs.add(new Flow<Object>(Sort.INTEGER, -11));
+    final Routine<Flow<Object>, Flow<Object>> routine =
         JRoutineCore.with(new Sort()).buildRoutine();
     Map<Integer, ? extends Channel<Object, ?>> channelMap;
-    Channel<Selectable<Object>, Selectable<Object>> channel;
+    Channel<Flow<Object>, Flow<Object>> channel;
     channel = routine.call();
     channelMap =
-        Channels.selectInput(channel, Arrays.asList(Sort.INTEGER, Sort.STRING)).buildChannelMap();
+        Channels.flowInput(channel, Arrays.asList(Sort.INTEGER, Sort.STRING)).buildChannelMap();
     channelMap.get(Sort.INTEGER).pass(-11).close();
     channelMap.get(Sort.STRING).pass("test21").close();
     assertThat(channel.close().in(seconds(10)).all()).containsOnlyElementsOf(outputs);
     channel = routine.call();
-    channelMap = Channels.selectInput(channel, Sort.INTEGER, Sort.STRING).buildChannelMap();
+    channelMap = Channels.flowInput(channel, Sort.INTEGER, Sort.STRING).buildChannelMap();
     channelMap.get(Sort.INTEGER).pass(-11).close();
     channelMap.get(Sort.STRING).pass("test21").close();
     assertThat(channel.close().in(seconds(10)).all()).containsOnlyElementsOf(outputs);
     channel = routine.call();
     channelMap =
-        Channels.selectInput(Math.min(Sort.INTEGER, Sort.STRING), 2, channel).buildChannelMap();
+        Channels.flowInput(Math.min(Sort.INTEGER, Sort.STRING), 2, channel).buildChannelMap();
     channelMap.get(Sort.INTEGER).pass(-11).close();
     channelMap.get(Sort.STRING).pass("test21").close();
     assertThat(channel.close().in(seconds(10)).all()).containsOnlyElementsOf(outputs);
@@ -936,13 +936,13 @@ public class ChannelsTest {
   @Test
   public void testInputMapAbort() {
 
-    final Routine<Selectable<Object>, Selectable<Object>> routine =
+    final Routine<Flow<Object>, Flow<Object>> routine =
         JRoutineCore.with(new Sort()).buildRoutine();
     Map<Integer, ? extends Channel<Object, ?>> channelMap;
-    Channel<Selectable<Object>, Selectable<Object>> channel;
+    Channel<Flow<Object>, Flow<Object>> channel;
     channel = routine.call();
     channelMap =
-        Channels.selectInput(channel, Arrays.asList(Sort.INTEGER, Sort.STRING)).buildChannelMap();
+        Channels.flowInput(channel, Arrays.asList(Sort.INTEGER, Sort.STRING)).buildChannelMap();
     channelMap.get(Sort.INTEGER).pass(-11).close();
     channelMap.get(Sort.STRING).abort();
 
@@ -957,7 +957,7 @@ public class ChannelsTest {
     }
 
     channel = routine.call();
-    channelMap = Channels.selectInput(channel, Sort.INTEGER, Sort.STRING).buildChannelMap();
+    channelMap = Channels.flowInput(channel, Sort.INTEGER, Sort.STRING).buildChannelMap();
     channelMap.get(Sort.INTEGER).abort();
     channelMap.get(Sort.STRING).pass("test21").close();
 
@@ -973,7 +973,7 @@ public class ChannelsTest {
 
     channel = routine.call();
     channelMap =
-        Channels.selectInput(Math.min(Sort.INTEGER, Sort.STRING), 2, channel).buildChannelMap();
+        Channels.flowInput(Math.min(Sort.INTEGER, Sort.STRING), 2, channel).buildChannelMap();
     channelMap.get(Sort.INTEGER).abort();
     channelMap.get(Sort.STRING).abort();
 
@@ -992,7 +992,7 @@ public class ChannelsTest {
   public void testInputMapError() {
 
     try {
-      Channels.selectInput(0, 0, JRoutineCore.with(new Sort()).call());
+      Channels.flowInput(0, 0, JRoutineCore.with(new Sort()).call());
       fail();
 
     } catch (final IllegalArgumentException ignored) {
@@ -1004,20 +1004,20 @@ public class ChannelsTest {
   @SuppressWarnings("unchecked")
   public void testInputSelect() {
 
-    final Channel<Selectable<String>, Selectable<String>> channel =
-        JRoutineCore.<Selectable<String>>ofInputs().buildChannel();
-    Channels.selectInput(channel, 33).buildChannel().pass("test1", "test2", "test3").close();
+    final Channel<Flow<String>, Flow<String>> channel =
+        JRoutineCore.<Flow<String>>ofInputs().buildChannel();
+    Channels.flowInput(channel, 33).buildChannel().pass("test1", "test2", "test3").close();
     assertThat(channel.close().in(seconds(1)).all()).containsExactly(
-        new Selectable<String>("test1", 33), new Selectable<String>("test2", 33),
-        new Selectable<String>("test3", 33));
+        new Flow<String>(33, "test1"), new Flow<String>(33, "test2"),
+        new Flow<String>(33, "test3"));
   }
 
   @Test
   public void testInputSelectAbort() {
 
-    final Channel<Selectable<String>, Selectable<String>> channel =
-        JRoutineCore.<Selectable<String>>ofInputs().buildChannel();
-    Channels.selectInput(channel, 33).buildChannel().pass("test1", "test2", "test3").abort();
+    final Channel<Flow<String>, Flow<String>> channel =
+        JRoutineCore.<Flow<String>>ofInputs().buildChannel();
+    Channels.flowInput(channel, 33).buildChannel().pass("test1", "test2", "test3").abort();
 
     try {
 
@@ -1034,11 +1034,11 @@ public class ChannelsTest {
   @SuppressWarnings("ConstantConditions")
   public void testInputSelectError() {
 
-    final Channel<Selectable<String>, Selectable<String>> channel =
-        JRoutineCore.<Selectable<String>>ofInputs().buildChannel();
+    final Channel<Flow<String>, Flow<String>> channel =
+        JRoutineCore.<Flow<String>>ofInputs().buildChannel();
 
     try {
-      Channels.selectInput(channel, (int[]) null);
+      Channels.flowInput(channel, (int[]) null);
       fail();
 
     } catch (final NullPointerException ignored) {
@@ -1046,7 +1046,7 @@ public class ChannelsTest {
     }
 
     try {
-      Channels.selectInput(channel, (List<Integer>) null);
+      Channels.flowInput(channel, (List<Integer>) null);
       fail();
 
     } catch (final NullPointerException ignored) {
@@ -1054,7 +1054,7 @@ public class ChannelsTest {
     }
 
     try {
-      Channels.selectInput(channel, Collections.<Integer>singletonList(null));
+      Channels.flowInput(channel, Collections.<Integer>singletonList(null));
       fail();
 
     } catch (final NullPointerException ignored) {
@@ -1064,22 +1064,22 @@ public class ChannelsTest {
 
   @Test
   @SuppressWarnings("unchecked")
-  public void testInputToSelectable() {
+  public void testInputFlow() {
 
     final Channel<String, String> channel = JRoutineCore.<String>ofInputs().buildChannel();
-    Channels.selectableInput(channel, 33)
+    Channels.inputFlow(channel, 33)
             .buildChannel()
-            .pass(new Selectable<String>("test1", 33), new Selectable<String>("test2", -33),
-                new Selectable<String>("test3", 33), new Selectable<String>("test4", 333))
+            .pass(new Flow<String>(33, "test1"), new Flow<String>(-33, "test2"),
+                new Flow<String>(33, "test3"), new Flow<String>(333, "test4"))
             .close();
     assertThat(channel.close().in(seconds(1)).all()).containsExactly("test1", "test3");
   }
 
   @Test
-  public void testInputToSelectableAbort() {
+  public void testInputFlowAbort() {
 
     final Channel<String, String> channel = JRoutineCore.<String>ofInputs().buildChannel();
-    Channels.selectableInput(channel, 33).buildChannel().abort();
+    Channels.inputFlow(channel, 33).buildChannel().abort();
 
     try {
 
@@ -1373,15 +1373,15 @@ public class ChannelsTest {
     final Channel<String, String> channel1 = builder1.buildChannel();
     final Channel<Integer, Integer> channel2 = builder2.buildChannel();
 
-    final Channel<?, ? extends Selectable<Object>> channel =
+    final Channel<?, ? extends Flow<Object>> channel =
         Channels.merge(Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannel();
-    final Channel<?, Selectable<Object>> output = JRoutineCore.with(new Sort())
-                                                              .applyInvocationConfiguration()
-                                                              .withInputOrder(OrderType.SORTED)
-                                                              .configured()
-                                                              .call(channel);
+    final Channel<?, Flow<Object>> output = JRoutineCore.with(new Sort())
+                                                        .applyInvocationConfiguration()
+                                                        .withInputOrder(OrderType.SORTED)
+                                                        .configured()
+                                                        .call(channel);
     final Map<Integer, ? extends Channel<?, Object>> channelMap =
-        Channels.selectOutput(output, Sort.INTEGER, Sort.STRING).buildChannelMap();
+        Channels.flowOutput(output, Sort.INTEGER, Sort.STRING).buildChannelMap();
 
     for (int i = 0; i < 4; i++) {
 
@@ -1411,36 +1411,36 @@ public class ChannelsTest {
                                         .configured();
     Channel<String, String> channel1;
     Channel<Integer, Integer> channel2;
-    Channel<?, ? extends Selectable<?>> outputChannel;
+    Channel<?, ? extends Flow<?>> outputChannel;
     channel1 = builder1.buildChannel();
     channel2 = builder2.buildChannel();
     outputChannel = Channels.merge(-7, channel1, channel2).buildChannel();
     channel1.pass("test1").close();
     channel2.pass(13).close();
-    assertThat(outputChannel.in(seconds(1)).all()).containsOnly(new Selectable<String>("test1", -7),
-        new Selectable<Integer>(13, -6));
+    assertThat(outputChannel.in(seconds(1)).all()).containsOnly(new Flow<String>(-7, "test1"),
+        new Flow<Integer>(-6, 13));
     channel1 = builder1.buildChannel();
     channel2 = builder2.buildChannel();
     outputChannel =
         Channels.merge(11, Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannel();
     channel2.pass(13).close();
     channel1.pass("test1").close();
-    assertThat(outputChannel.in(seconds(1)).all()).containsOnly(new Selectable<String>("test1", 11),
-        new Selectable<Integer>(13, 12));
+    assertThat(outputChannel.in(seconds(1)).all()).containsOnly(new Flow<String>(11, "test1"),
+        new Flow<Integer>(12, 13));
     channel1 = builder1.buildChannel();
     channel2 = builder2.buildChannel();
     outputChannel = Channels.merge(channel1, channel2).buildChannel();
     channel1.pass("test2").close();
     channel2.pass(-17).close();
-    assertThat(outputChannel.in(seconds(1)).all()).containsOnly(new Selectable<String>("test2", 0),
-        new Selectable<Integer>(-17, 1));
+    assertThat(outputChannel.in(seconds(1)).all()).containsOnly(new Flow<String>(0, "test2"),
+        new Flow<Integer>(1, -17));
     channel1 = builder1.buildChannel();
     channel2 = builder2.buildChannel();
     outputChannel = Channels.merge(Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannel();
     channel1.pass("test2").close();
     channel2.pass(-17).close();
-    assertThat(outputChannel.in(seconds(1)).all()).containsOnly(new Selectable<String>("test2", 0),
-        new Selectable<Integer>(-17, 1));
+    assertThat(outputChannel.in(seconds(1)).all()).containsOnly(new Flow<String>(0, "test2"),
+        new Flow<Integer>(1, -17));
     channel1 = builder1.buildChannel();
     channel2 = builder2.buildChannel();
     final HashMap<Integer, Channel<?, ?>> channelMap = new HashMap<Integer, Channel<?, ?>>(2);
@@ -1449,8 +1449,8 @@ public class ChannelsTest {
     outputChannel = Channels.merge(channelMap).buildChannel();
     channel1.pass("test3").close();
     channel2.pass(111).close();
-    assertThat(outputChannel.in(seconds(1)).all()).containsOnly(new Selectable<String>("test3", 7),
-        new Selectable<Integer>(111, -3));
+    assertThat(outputChannel.in(seconds(1)).all()).containsOnly(new Flow<String>(7, "test3"),
+        new Flow<Integer>(-3, 111));
   }
 
   @Test
@@ -1466,7 +1466,7 @@ public class ChannelsTest {
     final Channel<String, String> channel3 = builder.buildChannel();
     final Channel<String, String> channel4 = builder.buildChannel();
 
-    final Routine<Selectable<String>, String> routine =
+    final Routine<Flow<String>, String> routine =
         JRoutineCore.with(factoryOf(new ClassToken<Amb<String>>() {})).buildRoutine();
     final Channel<?, String> outputChannel = routine.call(
         Channels.merge(Arrays.asList(channel1, channel2, channel3, channel4)).buildChannel());
@@ -1501,7 +1501,7 @@ public class ChannelsTest {
                                         .configured();
     Channel<String, String> channel1;
     Channel<Integer, Integer> channel2;
-    Channel<?, ? extends Selectable<?>> outputChannel;
+    Channel<?, ? extends Flow<?>> outputChannel;
     channel1 = builder1.buildChannel();
     channel2 = builder2.buildChannel();
     outputChannel = Channels.merge(-7, channel1, channel2).buildChannel();
@@ -1695,30 +1695,30 @@ public class ChannelsTest {
   @SuppressWarnings("unchecked")
   public void testOutputMap() {
 
-    final Routine<Selectable<Object>, Selectable<Object>> routine = JRoutineCore.with(new Sort())
-                                                                                .applyInvocationConfiguration()
-                                                                                .withRunner(
+    final Routine<Flow<Object>, Flow<Object>> routine = JRoutineCore.with(new Sort())
+                                                                    .applyInvocationConfiguration()
+                                                                    .withRunner(
                                                                                     Runners
                                                                                         .syncRunner())
-                                                                                .configured()
-                                                                                .buildRoutine();
+                                                                    .configured()
+                                                                    .buildRoutine();
     Map<Integer, ? extends Channel<?, Object>> channelMap;
-    Channel<?, Selectable<Object>> channel;
-    channel = routine.call(new Selectable<Object>("test21", Sort.STRING),
-        new Selectable<Object>(-11, Sort.INTEGER));
+    Channel<?, Flow<Object>> channel;
+    channel = routine.call(new Flow<Object>(Sort.STRING, "test21"),
+        new Flow<Object>(Sort.INTEGER, -11));
     channelMap =
-        Channels.selectOutput(channel, Arrays.asList(Sort.INTEGER, Sort.STRING)).buildChannelMap();
+        Channels.flowOutput(channel, Arrays.asList(Sort.INTEGER, Sort.STRING)).buildChannelMap();
     assertThat(channelMap.get(Sort.INTEGER).in(seconds(1)).all()).containsOnly(-11);
     assertThat(channelMap.get(Sort.STRING).in(seconds(1)).all()).containsOnly("test21");
-    channel = routine.call(new Selectable<Object>(-11, Sort.INTEGER),
-        new Selectable<Object>("test21", Sort.STRING));
-    channelMap = Channels.selectOutput(channel, Sort.INTEGER, Sort.STRING).buildChannelMap();
+    channel = routine.call(new Flow<Object>(Sort.INTEGER, -11),
+        new Flow<Object>(Sort.STRING, "test21"));
+    channelMap = Channels.flowOutput(channel, Sort.INTEGER, Sort.STRING).buildChannelMap();
     assertThat(channelMap.get(Sort.INTEGER).in(seconds(1)).all()).containsOnly(-11);
     assertThat(channelMap.get(Sort.STRING).in(seconds(1)).all()).containsOnly("test21");
-    channel = routine.call(new Selectable<Object>("test21", Sort.STRING),
-        new Selectable<Object>(-11, Sort.INTEGER));
+    channel = routine.call(new Flow<Object>(Sort.STRING, "test21"),
+        new Flow<Object>(Sort.INTEGER, -11));
     channelMap =
-        Channels.selectOutput(Math.min(Sort.INTEGER, Sort.STRING), 2, channel).buildChannelMap();
+        Channels.flowOutput(Math.min(Sort.INTEGER, Sort.STRING), 2, channel).buildChannelMap();
     assertThat(channelMap.get(Sort.INTEGER).in(seconds(1)).all()).containsOnly(-11);
     assertThat(channelMap.get(Sort.STRING).in(seconds(1)).all()).containsOnly("test21");
   }
@@ -1727,16 +1727,16 @@ public class ChannelsTest {
   @SuppressWarnings("unchecked")
   public void testOutputMapAbort() {
 
-    final Routine<Selectable<Object>, Selectable<Object>> routine =
+    final Routine<Flow<Object>, Flow<Object>> routine =
         JRoutineCore.with(new Sort()).buildRoutine();
     Map<Integer, ? extends Channel<?, Object>> channelMap;
-    Channel<?, Selectable<Object>> channel;
+    Channel<?, Flow<Object>> channel;
     channel = routine.call()
                      .after(millis(100))
-                     .pass(new Selectable<Object>("test21", Sort.STRING),
-                         new Selectable<Object>(-11, Sort.INTEGER));
+                     .pass(new Flow<Object>(Sort.STRING, "test21"),
+                         new Flow<Object>(Sort.INTEGER, -11));
     channelMap =
-        Channels.selectOutput(channel, Arrays.asList(Sort.INTEGER, Sort.STRING)).buildChannelMap();
+        Channels.flowOutput(channel, Arrays.asList(Sort.INTEGER, Sort.STRING)).buildChannelMap();
     channel.abort();
 
     try {
@@ -1761,9 +1761,9 @@ public class ChannelsTest {
 
     channel = routine.call()
                      .after(millis(100))
-                     .pass(new Selectable<Object>(-11, Sort.INTEGER),
-                         new Selectable<Object>("test21", Sort.STRING));
-    channelMap = Channels.selectOutput(channel, Sort.INTEGER, Sort.STRING).buildChannelMap();
+                     .pass(new Flow<Object>(Sort.INTEGER, -11),
+                         new Flow<Object>(Sort.STRING, "test21"));
+    channelMap = Channels.flowOutput(channel, Sort.INTEGER, Sort.STRING).buildChannelMap();
     channel.abort();
 
     try {
@@ -1788,10 +1788,10 @@ public class ChannelsTest {
 
     channel = routine.call()
                      .after(millis(100))
-                     .pass(new Selectable<Object>("test21", Sort.STRING),
-                         new Selectable<Object>(-11, Sort.INTEGER));
+                     .pass(new Flow<Object>(Sort.STRING, "test21"),
+                         new Flow<Object>(Sort.INTEGER, -11));
     channelMap =
-        Channels.selectOutput(Math.min(Sort.INTEGER, Sort.STRING), 2, channel).buildChannelMap();
+        Channels.flowOutput(Math.min(Sort.INTEGER, Sort.STRING), 2, channel).buildChannelMap();
     channel.abort();
 
     try {
@@ -1818,20 +1818,20 @@ public class ChannelsTest {
   @Test
   public void testOutputMapCache() {
 
-    final Routine<Selectable<Object>, Selectable<Object>> routine =
+    final Routine<Flow<Object>, Flow<Object>> routine =
         JRoutineCore.with(factoryOf(Sort.class)).buildRoutine();
-    final Channel<?, Selectable<Object>> channel = routine.call();
+    final Channel<?, Flow<Object>> channel = routine.call();
     final Map<Integer, ? extends Channel<?, Object>> channelMap =
-        Channels.selectOutput(channel, Arrays.asList(Sort.INTEGER, Sort.STRING)).buildChannelMap();
+        Channels.flowOutput(channel, Arrays.asList(Sort.INTEGER, Sort.STRING)).buildChannelMap();
     assertThat(channelMap).isEqualTo(
-        Channels.selectOutput(channel, Sort.INTEGER, Sort.STRING).buildChannelMap());
+        Channels.flowOutput(channel, Sort.INTEGER, Sort.STRING).buildChannelMap());
   }
 
   @Test
   public void testOutputMapError() {
 
     try {
-      Channels.selectOutput(0, 0, JRoutineCore.with(new Sort()).call());
+      Channels.flowOutput(0, 0, JRoutineCore.with(new Sort()).call());
       fail();
 
     } catch (final IllegalArgumentException ignored) {
@@ -1843,12 +1843,12 @@ public class ChannelsTest {
   @SuppressWarnings("unchecked")
   public void testOutputSelect() {
 
-    final Channel<Selectable<String>, Selectable<String>> channel =
-        JRoutineCore.<Selectable<String>>ofInputs().buildChannel();
+    final Channel<Flow<String>, Flow<String>> channel =
+        JRoutineCore.<Flow<String>>ofInputs().buildChannel();
     final Channel<?, String> outputChannel =
-        Channels.selectOutput(channel, 33).buildChannelMap().get(33);
-    channel.pass(new Selectable<String>("test1", 33), new Selectable<String>("test2", -33),
-        new Selectable<String>("test3", 33), new Selectable<String>("test4", 333));
+        Channels.flowOutput(channel, 33).buildChannelMap().get(33);
+    channel.pass(new Flow<String>(33, "test1"), new Flow<String>(-33, "test2"),
+        new Flow<String>(33, "test3"), new Flow<String>(333, "test4"));
     channel.close();
     assertThat(outputChannel.in(seconds(1)).all()).containsExactly("test1", "test3");
   }
@@ -1856,10 +1856,10 @@ public class ChannelsTest {
   @Test
   public void testOutputSelectAbort() {
 
-    final Channel<Selectable<String>, Selectable<String>> channel =
-        JRoutineCore.<Selectable<String>>ofInputs().buildChannel();
+    final Channel<Flow<String>, Flow<String>> channel =
+        JRoutineCore.<Flow<String>>ofInputs().buildChannel();
     final Channel<?, String> outputChannel =
-        Channels.selectOutput(channel, 33).buildChannelMap().get(33);
+        Channels.flowOutput(channel, 33).buildChannelMap().get(33);
     channel.abort();
 
     try {
@@ -1877,11 +1877,11 @@ public class ChannelsTest {
   @SuppressWarnings("ConstantConditions")
   public void testOutputSelectError() {
 
-    final Channel<Selectable<String>, Selectable<String>> channel =
-        JRoutineCore.<Selectable<String>>ofInputs().buildChannel();
+    final Channel<Flow<String>, Flow<String>> channel =
+        JRoutineCore.<Flow<String>>ofInputs().buildChannel();
 
     try {
-      Channels.selectOutput(channel, (int[]) null);
+      Channels.flowOutput(channel, (int[]) null);
       fail();
 
     } catch (final NullPointerException ignored) {
@@ -1889,7 +1889,7 @@ public class ChannelsTest {
     }
 
     try {
-      Channels.selectOutput(channel, (List<Integer>) null);
+      Channels.flowOutput(channel, (List<Integer>) null);
       fail();
 
     } catch (final NullPointerException ignored) {
@@ -1897,7 +1897,7 @@ public class ChannelsTest {
     }
 
     try {
-      Channels.selectOutput(channel, Collections.<Integer>singletonList(null));
+      Channels.flowOutput(channel, Collections.<Integer>singletonList(null));
       fail();
 
     } catch (final NullPointerException ignored) {
@@ -1907,25 +1907,25 @@ public class ChannelsTest {
 
   @Test
   @SuppressWarnings("unchecked")
-  public void testOutputToSelectable() {
+  public void testOutputFlow() {
 
     final Channel<String, String> channel = JRoutineCore.<String>ofInputs().buildChannel();
     channel.pass("test1", "test2", "test3").close();
     assertThat(
-        Channels.selectableOutput(channel, 33).buildChannel().in(seconds(1)).all()).containsExactly(
-        new Selectable<String>("test1", 33), new Selectable<String>("test2", 33),
-        new Selectable<String>("test3", 33));
+        Channels.outputFlow(channel, 33).buildChannel().in(seconds(1)).all()).containsExactly(
+        new Flow<String>(33, "test1"), new Flow<String>(33, "test2"),
+        new Flow<String>(33, "test3"));
   }
 
   @Test
-  public void testOutputToSelectableAbort() {
+  public void testOutputFlowAbort() {
 
     final Channel<String, String> channel = JRoutineCore.<String>ofInputs().buildChannel();
     channel.pass("test1", "test2", "test3").abort();
 
     try {
 
-      Channels.selectableOutput(channel, 33).buildChannel().in(seconds(1)).all();
+      Channels.outputFlow(channel, 33).buildChannel().in(seconds(1)).all();
 
       fail();
 
@@ -1951,35 +1951,35 @@ public class ChannelsTest {
   @SuppressWarnings("unchecked")
   public void testSelectMap() {
 
-    final Routine<Selectable<Object>, Selectable<Object>> routine =
+    final Routine<Flow<Object>, Flow<Object>> routine =
         JRoutineCore.with(new Sort()).buildRoutine();
-    final Channel<Selectable<Object>, Selectable<Object>> inputChannel =
-        JRoutineCore.<Selectable<Object>>ofInputs().buildChannel();
-    final Channel<?, Selectable<Object>> outputChannel = routine.call(inputChannel);
+    final Channel<Flow<Object>, Flow<Object>> inputChannel =
+        JRoutineCore.<Flow<Object>>ofInputs().buildChannel();
+    final Channel<?, Flow<Object>> outputChannel = routine.call(inputChannel);
     final Channel<?, Object> intChannel =
-        Channels.selectOutput(outputChannel, Sort.INTEGER, Sort.STRING)
+        Channels.flowOutput(outputChannel, Sort.INTEGER, Sort.STRING)
                 .applyChannelConfiguration()
                 .withLogLevel(Level.WARNING)
                 .configured()
                 .buildChannelMap()
                 .get(Sort.INTEGER);
     final Channel<?, Object> strChannel =
-        Channels.selectOutput(outputChannel, Sort.STRING, Sort.INTEGER)
+        Channels.flowOutput(outputChannel, Sort.STRING, Sort.INTEGER)
                 .applyChannelConfiguration()
                 .withLogLevel(Level.WARNING)
                 .configured()
                 .buildChannelMap()
                 .get(Sort.STRING);
-    inputChannel.pass(new Selectable<Object>("test21", Sort.STRING),
-        new Selectable<Object>(-11, Sort.INTEGER));
+    inputChannel.pass(new Flow<Object>(Sort.STRING, "test21"),
+        new Flow<Object>(Sort.INTEGER, -11));
     assertThat(intChannel.in(seconds(10)).next()).isEqualTo(-11);
     assertThat(strChannel.in(seconds(10)).next()).isEqualTo("test21");
-    inputChannel.pass(new Selectable<Object>(-11, Sort.INTEGER),
-        new Selectable<Object>("test21", Sort.STRING));
+    inputChannel.pass(new Flow<Object>(Sort.INTEGER, -11),
+        new Flow<Object>(Sort.STRING, "test21"));
     assertThat(intChannel.in(seconds(10)).next()).isEqualTo(-11);
     assertThat(strChannel.in(seconds(10)).next()).isEqualTo("test21");
-    inputChannel.pass(new Selectable<Object>("test21", Sort.STRING),
-        new Selectable<Object>(-11, Sort.INTEGER));
+    inputChannel.pass(new Flow<Object>(Sort.STRING, "test21"),
+        new Flow<Object>(Sort.INTEGER, -11));
     assertThat(intChannel.in(seconds(10)).next()).isEqualTo(-11);
     assertThat(strChannel.in(seconds(10)).next()).isEqualTo("test21");
   }
@@ -1988,20 +1988,20 @@ public class ChannelsTest {
   @SuppressWarnings("unchecked")
   public void testSelectMapAbort() {
 
-    final Routine<Selectable<Object>, Selectable<Object>> routine =
+    final Routine<Flow<Object>, Flow<Object>> routine =
         JRoutineCore.with(new Sort()).buildRoutine();
-    Channel<Selectable<Object>, Selectable<Object>> inputChannel =
-        JRoutineCore.<Selectable<Object>>ofInputs().buildChannel();
-    Channel<?, Selectable<Object>> outputChannel = routine.call(inputChannel);
-    Channels.selectOutput(outputChannel, Sort.INTEGER, Sort.STRING).buildChannelMap();
+    Channel<Flow<Object>, Flow<Object>> inputChannel =
+        JRoutineCore.<Flow<Object>>ofInputs().buildChannel();
+    Channel<?, Flow<Object>> outputChannel = routine.call(inputChannel);
+    Channels.flowOutput(outputChannel, Sort.INTEGER, Sort.STRING).buildChannelMap();
     inputChannel.after(millis(100))
-                .pass(new Selectable<Object>("test21", Sort.STRING),
-                    new Selectable<Object>(-11, Sort.INTEGER))
+                .pass(new Flow<Object>(Sort.STRING, "test21"),
+                    new Flow<Object>(Sort.INTEGER, -11))
                 .abort();
 
     try {
 
-      Channels.selectOutput(outputChannel, Sort.STRING, Sort.INTEGER)
+      Channels.flowOutput(outputChannel, Sort.STRING, Sort.INTEGER)
               .buildChannelMap()
               .get(Sort.STRING)
               .in(seconds(1))
@@ -2015,7 +2015,7 @@ public class ChannelsTest {
 
     try {
 
-      Channels.selectOutput(outputChannel, Sort.INTEGER, Sort.STRING)
+      Channels.flowOutput(outputChannel, Sort.INTEGER, Sort.STRING)
               .buildChannelMap()
               .get(Sort.INTEGER)
               .in(seconds(1))
@@ -2027,17 +2027,17 @@ public class ChannelsTest {
 
     }
 
-    inputChannel = JRoutineCore.<Selectable<Object>>ofInputs().buildChannel();
+    inputChannel = JRoutineCore.<Flow<Object>>ofInputs().buildChannel();
     outputChannel = routine.call(inputChannel);
-    Channels.selectOutput(outputChannel, Sort.INTEGER, Sort.STRING).buildChannelMap();
+    Channels.flowOutput(outputChannel, Sort.INTEGER, Sort.STRING).buildChannelMap();
     inputChannel.after(millis(100))
-                .pass(new Selectable<Object>(-11, Sort.INTEGER),
-                    new Selectable<Object>("test21", Sort.STRING))
+                .pass(new Flow<Object>(Sort.INTEGER, -11),
+                    new Flow<Object>(Sort.STRING, "test21"))
                 .abort();
 
     try {
 
-      Channels.selectOutput(outputChannel, Sort.STRING, Sort.INTEGER)
+      Channels.flowOutput(outputChannel, Sort.STRING, Sort.INTEGER)
               .buildChannelMap()
               .get(Sort.STRING)
               .in(seconds(1))
@@ -2051,7 +2051,7 @@ public class ChannelsTest {
 
     try {
 
-      Channels.selectOutput(outputChannel, Sort.STRING, Sort.INTEGER)
+      Channels.flowOutput(outputChannel, Sort.STRING, Sort.INTEGER)
               .buildChannelMap()
               .get(Sort.INTEGER)
               .in(seconds(1))
@@ -2063,17 +2063,17 @@ public class ChannelsTest {
 
     }
 
-    inputChannel = JRoutineCore.<Selectable<Object>>ofInputs().buildChannel();
+    inputChannel = JRoutineCore.<Flow<Object>>ofInputs().buildChannel();
     outputChannel = routine.call(inputChannel);
-    Channels.selectOutput(outputChannel, Sort.STRING, Sort.INTEGER).buildChannelMap();
+    Channels.flowOutput(outputChannel, Sort.STRING, Sort.INTEGER).buildChannelMap();
     inputChannel.after(millis(100))
-                .pass(new Selectable<Object>("test21", Sort.STRING),
-                    new Selectable<Object>(-11, Sort.INTEGER))
+                .pass(new Flow<Object>(Sort.STRING, "test21"),
+                    new Flow<Object>(Sort.INTEGER, -11))
                 .abort();
 
     try {
 
-      Channels.selectOutput(outputChannel, Sort.INTEGER, Sort.STRING)
+      Channels.flowOutput(outputChannel, Sort.INTEGER, Sort.STRING)
               .buildChannelMap()
               .get(Sort.STRING)
               .in(seconds(1))
@@ -2087,7 +2087,7 @@ public class ChannelsTest {
 
     try {
 
-      Channels.selectOutput(outputChannel, Sort.INTEGER, Sort.STRING)
+      Channels.flowOutput(outputChannel, Sort.INTEGER, Sort.STRING)
               .buildChannelMap()
               .get(Sort.INTEGER)
               .in(seconds(1))
@@ -2100,21 +2100,21 @@ public class ChannelsTest {
     }
   }
 
-  private static class Amb<DATA> extends TemplateInvocation<Selectable<DATA>, DATA> {
+  private static class Amb<DATA> extends TemplateInvocation<Flow<DATA>, DATA> {
 
     private static final int NO_INDEX = Integer.MIN_VALUE;
 
     private int mFirstIndex;
 
     @Override
-    public void onInput(final Selectable<DATA> input, @NotNull final Channel<DATA, ?> result) {
+    public void onInput(final Flow<DATA> input, @NotNull final Channel<DATA, ?> result) {
 
       if (mFirstIndex == NO_INDEX) {
 
-        mFirstIndex = input.index;
+        mFirstIndex = input.id;
         result.pass(input.data);
 
-      } else if (mFirstIndex == input.index) {
+      } else if (mFirstIndex == input.id) {
 
         result.pass(input.data);
       }
@@ -2145,7 +2145,7 @@ public class ChannelsTest {
     }
   }
 
-  private static class Sort extends MappingInvocation<Selectable<Object>, Selectable<Object>> {
+  private static class Sort extends MappingInvocation<Flow<Object>, Flow<Object>> {
 
     private static final int INTEGER = 1;
 
@@ -2159,21 +2159,21 @@ public class ChannelsTest {
       super(null);
     }
 
-    public void onInput(final Selectable<Object> selectable,
-        @NotNull final Channel<Selectable<Object>, ?> result) {
+    public void onInput(final Flow<Object> flow,
+        @NotNull final Channel<Flow<Object>, ?> result) {
 
-      switch (selectable.index) {
+      switch (flow.id) {
 
         case INTEGER:
-          Channels.<Object, Integer>selectInput(result, INTEGER).buildChannel()
-                                                                .pass(selectable.<Integer>data())
-                                                                .close();
+          Channels.<Object, Integer>flowInput(result, INTEGER).buildChannel()
+                                                              .pass(flow.<Integer>data())
+                                                              .close();
           break;
 
         case STRING:
-          Channels.<Object, String>selectInput(result, STRING).buildChannel()
-                                                              .pass(selectable.<String>data())
-                                                              .close();
+          Channels.<Object, String>flowInput(result, STRING).buildChannel()
+                                                            .pass(flow.<String>data())
+                                                            .close();
           break;
       }
     }

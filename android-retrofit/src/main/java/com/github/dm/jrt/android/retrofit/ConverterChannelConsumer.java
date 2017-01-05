@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.android.retrofit;
 
-import com.github.dm.jrt.android.channel.ParcelableSelectable;
+import com.github.dm.jrt.android.channel.ParcelableFlow;
 import com.github.dm.jrt.android.channel.io.ParcelableByteChannel;
 import com.github.dm.jrt.android.channel.io.ParcelableByteChannel.ParcelableByteBuffer;
 import com.github.dm.jrt.core.channel.Channel;
@@ -35,8 +35,8 @@ import okhttp3.MediaType;
 import okhttp3.ResponseBody;
 import retrofit2.Converter;
 
-import static com.github.dm.jrt.android.retrofit.ServiceCallInvocation.BYTES_INDEX;
-import static com.github.dm.jrt.android.retrofit.ServiceCallInvocation.MEDIA_TYPE_INDEX;
+import static com.github.dm.jrt.android.retrofit.ServiceCallInvocation.BYTES_ID;
+import static com.github.dm.jrt.android.retrofit.ServiceCallInvocation.MEDIA_TYPE_ID;
 
 /**
  * Channel consumer implementation converting the request response body into and instance of the
@@ -44,7 +44,7 @@ import static com.github.dm.jrt.android.retrofit.ServiceCallInvocation.MEDIA_TYP
  * <p>
  * Created by davide-maestroni on 05/18/2016.
  */
-class ConverterChannelConsumer implements ChannelConsumer<ParcelableSelectable<Object>> {
+class ConverterChannelConsumer implements ChannelConsumer<ParcelableFlow<Object>> {
 
   private final Converter<ResponseBody, ?> mConverter;
 
@@ -85,20 +85,20 @@ class ConverterChannelConsumer implements ChannelConsumer<ParcelableSelectable<O
   }
 
   @Override
-  public void onOutput(final ParcelableSelectable<Object> output) throws IOException {
-    switch (output.index) {
-      case MEDIA_TYPE_INDEX:
+  public void onOutput(final ParcelableFlow<Object> output) throws IOException {
+    switch (output.id) {
+      case MEDIA_TYPE_ID:
         final String mediaType = output.data();
         mMediaType = MediaType.parse(mediaType);
         break;
 
-      case BYTES_INDEX:
+      case BYTES_ID:
         final ParcelableByteBuffer buffer = output.data();
         ParcelableByteChannel.getInputStream(buffer).transferTo(mOutputStream);
         break;
 
       default:
-        throw new IllegalArgumentException("unknown selectable index: " + output.index);
+        throw new IllegalArgumentException("unknown flow ID: " + output.id);
     }
   }
 }

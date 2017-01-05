@@ -34,7 +34,7 @@ import java.util.concurrent.Future;
  * Utility class for handling routine channels.
  * <br>
  * The class provides several methods to split and merge channels together, making also possible to
- * transfer data in multiple sub-channels, each one identified by a specific index.
+ * transfer data in multiple streams, each one identified by a specific ID.
  * <p>
  * Created by davide-maestroni on 03/15/2015.
  */
@@ -106,144 +106,144 @@ public class Channels {
   }
 
   /**
-   * Returns a builder of channels combining the specified instances into a selectable one.
+   * Returns a builder of channels combining the specified instances into a flow one.
    * <br>
-   * The selectable indexes will be the position in the array.
+   * The flow IDs will be the position in the array.
    * <p>
    * Note that the builder will successfully create several channel instances.
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, their final output will be:
    * <pre><code>
-   * A =&gt; [Selectable(IN, 0).data, Selectable(IN, 0).data, Selectable(IN, 0).data, ...]
-   * B =&gt; [Selectable(IN, 1).data, Selectable(IN, 1).data, Selectable(IN, 1).data, ...]
-   * C =&gt; [Selectable(IN, 2).data, Selectable(IN, 2).data, Selectable(IN, 2).data, ...]
+   * A =&gt; [Flow(0, IN).data, Flow(0, IN).data, Flow(0, IN).data, ...]
+   * B =&gt; [Flow(1, IN).data, Flow(1, IN).data, Flow(1, IN).data, ...]
+   * C =&gt; [Flow(2, IN).data, Flow(2, IN).data, Flow(2, IN).data, ...]
    * </code></pre>
    *
    * @param channels the array of channels.
    * @param <IN>     the input data type.
-   * @return the selectable channel builder.
+   * @return the flow channel builder.
    * @throws java.lang.IllegalArgumentException if the specified array is empty.
    * @throws java.lang.NullPointerException     if the specified array is null or contains a null
    *                                            object.
    */
   @NotNull
-  public static <IN> ChannelBuilder<Selectable<? extends IN>, ?> combine(
+  public static <IN> ChannelBuilder<Flow<? extends IN>, ?> combine(
       @NotNull final Channel<?, ?>... channels) {
     return combine(0, channels);
   }
 
   /**
-   * Returns a builder of channels combining the specified instances into a selectable one.
+   * Returns a builder of channels combining the specified instances into a flow one.
    * <br>
-   * The selectable indexes will start from the specified one.
+   * The flow IDs will start from the specified one.
    * <p>
    * Note that the builder will successfully create several channel instances.
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, their final output will be:
    * <pre><code>
-   * A =&gt; [Selectable(IN, startIndex + 0).data, Selectable(IN, startIndex + 0).data, ...]
-   * B =&gt; [Selectable(IN, startIndex + 1).data, Selectable(IN, startIndex + 1).data, ...]
-   * C =&gt; [Selectable(IN, startIndex + 2).data, Selectable(IN, startIndex + 2).data, ...]
+   * A =&gt; [Flow(startId + 0, IN).data, Flow(startId + 0, IN).data, ...]
+   * B =&gt; [Flow(startId + 1, IN).data, Flow(startId + 1, IN).data, ...]
+   * C =&gt; [Flow(startId + 2, IN).data, Flow(startId + 2, IN).data, ...]
    * </code></pre>
    *
-   * @param startIndex the selectable start index.
-   * @param channels   the array of channels.
-   * @param <IN>       the input data type.
-   * @return the selectable channel builder.
+   * @param startId  the flow start ID.
+   * @param channels the array of channels.
+   * @param <IN>     the input data type.
+   * @return the flow channel builder.
    * @throws java.lang.IllegalArgumentException if the specified array is empty.
    * @throws java.lang.NullPointerException     if the specified array is null or contains a null
    *                                            object.
    */
   @NotNull
   @SuppressWarnings("unchecked")
-  public static <IN> ChannelBuilder<Selectable<? extends IN>, ?> combine(final int startIndex,
+  public static <IN> ChannelBuilder<Flow<? extends IN>, ?> combine(final int startId,
       @NotNull final Channel<?, ?>... channels) {
     final int length = channels.length;
     if (length == 0) {
       throw new IllegalArgumentException("the array of channels must not be empty");
     }
 
-    return (CombineBuilder<IN>) new CombineBuilder<Object>(startIndex, Arrays.asList(channels));
+    return (CombineBuilder<IN>) new CombineBuilder<Object>(startId, Arrays.asList(channels));
   }
 
   /**
-   * Returns a builder of channels combining the specified instances into a selectable one.
+   * Returns a builder of channels combining the specified instances into a flow one.
    * <br>
-   * The selectable indexes will start from the specified one.
+   * The flow IDs will start from the specified one.
    * <p>
    * Note that the builder will successfully create several channel instances.
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, their final output will be:
    * <pre><code>
-   * A =&gt; [Selectable(IN, startIndex + 0).data, Selectable(IN, startIndex + 0).data, ...]
-   * B =&gt; [Selectable(IN, startIndex + 1).data, Selectable(IN, startIndex + 1).data, ...]
-   * C =&gt; [Selectable(IN, startIndex + 2).data, Selectable(IN, startIndex + 2).data, ...]
+   * A =&gt; [Flow(startId + 0, IN).data, Flow(startId + 0, IN).data, ...]
+   * B =&gt; [Flow(startId + 1, IN).data, Flow(startId + 1, IN).data, ...]
+   * C =&gt; [Flow(startId + 2, IN).data, Flow(startId + 2, IN).data, ...]
    * </code></pre>
    *
-   * @param startIndex the selectable start index.
-   * @param channels   the iterable of channels.
-   * @param <IN>       the input data type.
-   * @return the selectable channel builder.
+   * @param startId  the flow start ID.
+   * @param channels the iterable of channels.
+   * @param <IN>     the input data type.
+   * @return the flow channel builder.
    * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
    * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
    *                                            null object.
    */
   @NotNull
-  public static <IN> ChannelBuilder<Selectable<? extends IN>, ?> combine(final int startIndex,
+  public static <IN> ChannelBuilder<Flow<? extends IN>, ?> combine(final int startId,
       @NotNull final Iterable<? extends Channel<? extends IN, ?>> channels) {
-    return new CombineBuilder<IN>(startIndex, channels);
+    return new CombineBuilder<IN>(startId, channels);
   }
 
   /**
-   * Returns a builder of channels combining the specified instances into a selectable one.
+   * Returns a builder of channels combining the specified instances into a flow one.
    * <br>
-   * The selectable indexes will be the position in the iterable.
+   * The flow IDs will be the position in the iterable.
    * <p>
    * Note that the builder will successfully create several channel instances.
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, their final output will be:
    * <pre><code>
-   * A =&gt; [Selectable(IN, 0).data, Selectable(IN, 0).data, Selectable(IN, 0).data, ...]
-   * B =&gt; [Selectable(IN, 1).data, Selectable(IN, 1).data, Selectable(IN, 1).data, ...]
-   * C =&gt; [Selectable(IN, 2).data, Selectable(IN, 2).data, Selectable(IN, 2).data, ...]
+   * A =&gt; [Flow(0, IN).data, Flow(0, IN).data, Flow(0, IN).data, ...]
+   * B =&gt; [Flow(1, IN).data, Flow(1, IN).data, Flow(1, IN).data, ...]
+   * C =&gt; [Flow(2, IN).data, Flow(2, IN).data, Flow(2, IN).data, ...]
    * </code></pre>
    *
    * @param channels the iterable of channels.
    * @param <IN>     the input data type.
-   * @return the selectable channel builder.
+   * @return the flow channel builder.
    * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
    * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
    *                                            null object.
    */
   @NotNull
-  public static <IN> ChannelBuilder<Selectable<? extends IN>, ?> combine(
+  public static <IN> ChannelBuilder<Flow<? extends IN>, ?> combine(
       @NotNull final Iterable<? extends Channel<? extends IN, ?>> channels) {
     return combine(0, channels);
   }
 
   /**
-   * Returns a builder of channels combining the specified instances into a selectable one.
+   * Returns a builder of channels combining the specified instances into a flow one.
    * <br>
-   * The selectable indexes will be the keys of the specified map.
+   * The flow IDs will be the keys of the specified map.
    * <p>
    * Note that the builder will successfully create several channel instances.
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, their final output will be:
    * <pre><code>
-   * A =&gt; [Selectable(IN, key(A)).data, Selectable(IN, key(A)).data, ...]
-   * B =&gt; [Selectable(IN, key(B)).data, Selectable(IN, key(B)).data, ...]
-   * C =&gt; [Selectable(IN, key(C)).data, Selectable(IN, key(C)).data, ...]
+   * A =&gt; [Flow(key(A), IN).data, Flow(key(A), IN).data, ...]
+   * B =&gt; [Flow(key(B), IN).data, Flow(key(B), IN).data, ...]
+   * C =&gt; [Flow(key(C), IN).data, Flow(key(C), IN).data, ...]
    * </code></pre>
    *
-   * @param channels the map of indexes and channels.
+   * @param channels the map of IDs and channels.
    * @param <IN>     the input data type.
-   * @return the selectable channel builder.
+   * @return the flow channel builder.
    * @throws java.lang.IllegalArgumentException if the specified map is empty.
    * @throws java.lang.NullPointerException     if the specified map is null or contains a null
    *                                            object.
    */
   @NotNull
-  public static <IN> ChannelBuilder<Selectable<? extends IN>, ?> combine(
+  public static <IN> ChannelBuilder<Flow<? extends IN>, ?> combine(
       @NotNull final Map<Integer, ? extends Channel<? extends IN, ?>> channels) {
     return new CombineMapBuilder<IN>(channels);
   }
@@ -421,6 +421,226 @@ public class Channels {
   }
 
   /**
+   * Returns a builder of channels transforming the input data into flow ones.
+   * <p>
+   * Note that the builder will successfully create several channel instances.
+   * <p>
+   * Given channel {@code A}, its final output will be:
+   * <pre><code>
+   * A =&gt; [Flow(id, IN), Flow(id, IN), Flow(id, IN), ...]
+   * </code></pre>
+   *
+   * @param channel the flow channel.
+   * @param id      the flow ID.
+   * @param <DATA>  the channel data type.
+   * @param <IN>    the input data type.
+   * @return the channel builder.
+   */
+  @NotNull
+  public static <DATA, IN extends DATA> ChannelBuilder<IN, ?> flowInput(
+      @NotNull final Channel<? super Flow<DATA>, ?> channel, final int id) {
+    return new FlowInputBuilder<DATA, IN>(channel, id);
+  }
+
+  /**
+   * Returns a builder of maps of channels accepting the data identified by the specified IDs.
+   * <p>
+   * Note that the builder will successfully create several channel map instances.
+   * <p>
+   * Given channel {@code A} and channels {@code IN1}, {@code IN2} and {@code IN3} in the returned
+   * map, the final output of {@code A} will be:
+   * <pre><code>
+   * A =&gt; [Flow(ids[1], IN2), Flow(ids[0], IN1), Flow(ids[2], IN3), ...]
+   * </code></pre>
+   *
+   * @param channel the flow channel.
+   * @param ids     the array of IDs.
+   * @param <DATA>  the channel data type.
+   * @param <IN>    the input data type.
+   * @return the map of IDs and channels builder.
+   * @throws java.lang.NullPointerException if the specified array is null or contains a null
+   *                                        object.
+   */
+  @NotNull
+  public static <DATA, IN extends DATA> ChannelMapBuilder<Integer, IN, ?> flowInput(
+      @NotNull final Channel<? super Flow<DATA>, ?> channel, @NotNull final int... ids) {
+    final HashSet<Integer> idSet = new HashSet<Integer>();
+    for (final int id : ids) {
+      idSet.add(id);
+    }
+
+    return new FlowInputMapBuilder<DATA, IN>(channel, idSet);
+  }
+
+  /**
+   * Returns a builder of maps of channels accepting the data identified by the specified IDs.
+   * <p>
+   * Note that the builder will successfully create several channel map instances.
+   * <p>
+   * Given channel {@code A} and channels {@code IN1}, {@code IN2} and {@code IN3} in the returned
+   * map, the final output of {@code A} will be:
+   * <pre><code>
+   * A =&gt; [Flow(ids[1], IN2), Flow(ids[0], IN1), Flow(ids[2], IN3), ...]
+   * </code></pre>
+   *
+   * @param channel the flow channel.
+   * @param ids     the iterable returning the flow IDs.
+   * @param <DATA>  the channel data type.
+   * @param <IN>    the input data type.
+   * @return the map of IDs and channels builder.
+   * @throws java.lang.NullPointerException if the specified iterable is null or returns a null
+   *                                        object.
+   */
+  @NotNull
+  public static <DATA, IN extends DATA> ChannelMapBuilder<Integer, IN, ?> flowInput(
+      @NotNull final Channel<? super Flow<DATA>, ?> channel, @NotNull final Iterable<Integer> ids) {
+    final HashSet<Integer> idSet = new HashSet<Integer>();
+    for (final Integer id : ids) {
+      idSet.add(id);
+    }
+
+    return new FlowInputMapBuilder<DATA, IN>(channel, idSet);
+  }
+
+  /**
+   * Returns a builder of maps of channels accepting the data identified by the specified IDs.
+   * <p>
+   * Note that the builder will successfully create several channel map instances.
+   * <p>
+   * Given channel {@code A} and channels {@code IN1}, {@code IN2} and {@code IN3} in the returned
+   * map, the final output of {@code A} will be:
+   * <pre><code>
+   * A =&gt; [Flow(startId + 1, IN2), Flow(startId + 0, IN1), Flow(startId + 2, IN3), ...]
+   * </code></pre>
+   *
+   * @param startId   the flow start ID.
+   * @param rangeSize the size of the range of IDs (must be positive).
+   * @param channel   the flow channel.
+   * @param <DATA>    the channel data type.
+   * @param <IN>      the input data type.
+   * @return the map of IDs and channels builder.
+   * @throws java.lang.IllegalArgumentException if the specified range size is not positive.
+   */
+  @NotNull
+  public static <DATA, IN extends DATA> ChannelMapBuilder<Integer, IN, ?> flowInput(
+      final int startId, final int rangeSize,
+      @NotNull final Channel<? super Flow<DATA>, ?> channel) {
+    ConstantConditions.positive("range size", rangeSize);
+    final HashSet<Integer> idSet = new HashSet<Integer>();
+    final int endId = startId + rangeSize;
+    for (int i = startId; i < endId; ++i) {
+      idSet.add(i);
+    }
+
+    return new FlowInputMapBuilder<DATA, IN>(channel, idSet);
+  }
+
+  /**
+   * Returns a builder of maps of channels returning the output data filtered by the specified IDs.
+   * <p>
+   * Note that the builder will return the same map for the same inputs and equal configuration,
+   * and that the passed channels will be bound as a result of the creation.
+   * <br>
+   * Note also that the returned channels will be already closed.
+   * <p>
+   * Given channels {@code A}, {@code B} and {@code C} in the returned map, the final output will
+   * be:
+   * <pre><code>
+   * A =&gt; [Flow(ids[0], IN).data, Flow(ids[0], IN).data, ...]
+   * B =&gt; [Flow(ids[1], IN).data, Flow(ids[1], IN).data, ...]
+   * C =&gt; [Flow(ids[2], IN).data, Flow(ids[2], IN).data, ...]
+   * </code></pre>
+   *
+   * @param channel the flow channel.
+   * @param ids     the list of IDs.
+   * @param <OUT>   the output data type.
+   * @return the map of IDs and channels builder.
+   * @throws java.lang.NullPointerException if the specified array is null or contains a null
+   *                                        object.
+   */
+  @NotNull
+  public static <OUT> ChannelMapBuilder<Integer, ?, OUT> flowOutput(
+      @NotNull final Channel<?, ? extends Flow<? extends OUT>> channel, @NotNull final int... ids) {
+    final HashSet<Integer> idSet = new HashSet<Integer>();
+    for (final int id : ids) {
+      idSet.add(id);
+    }
+
+    return new OutputMapBuilder<OUT>(channel, idSet);
+  }
+
+  /**
+   * Returns a builder of maps of channels returning the output data filtered by the specified IDs.
+   * <p>
+   * Note that the builder will return the same map for the same inputs and equal configuration,
+   * and that the passed channels will be bound as a result of the creation.
+   * <br>
+   * Note also that the returned channels will be already closed.
+   * <p>
+   * Given channels {@code A}, {@code B} and {@code C} in the returned map, the final output will
+   * be:
+   * <pre><code>
+   * A =&gt; [Flow(ids[0], IN).data, Flow(ids[0], IN).data, ...]
+   * B =&gt; [Flow(ids[1], IN).data, Flow(ids[1], IN).data, ...]
+   * C =&gt; [Flow(ids[2], IN).data, Flow(ids[2], IN).data, ...]
+   * </code></pre>
+   *
+   * @param channel the flow channel.
+   * @param ids     the iterable returning the flow IDs.
+   * @param <OUT>   the output data type.
+   * @return the map of IDs and channels builder.
+   * @throws java.lang.NullPointerException if the specified iterable is null or returns a null
+   *                                        object.
+   */
+  @NotNull
+  public static <OUT> ChannelMapBuilder<Integer, ?, OUT> flowOutput(
+      @NotNull final Channel<?, ? extends Flow<? extends OUT>> channel,
+      @NotNull final Iterable<Integer> ids) {
+    final HashSet<Integer> idSet = new HashSet<Integer>();
+    for (final Integer id : ids) {
+      idSet.add(id);
+    }
+
+    return new OutputMapBuilder<OUT>(channel, idSet);
+  }
+
+  /**
+   * Returns a builder of maps of channels returning the output data filtered by the specified IDs.
+   * <p>
+   * Note that the builder will return the same map for the same inputs and equal configuration,
+   * and that the passed channels will be bound as a result of the creation.
+   * <br>
+   * Note also that the returned channels will be already closed.
+   * <p>
+   * Given channels {@code A}, {@code B} and {@code C} in the returned map, the final output will
+   * be:
+   * <pre><code>
+   * A =&gt; [Flow(startId + 0, IN).data, Flow(startId + 0, IN).data, ...]
+   * B =&gt; [Flow(startId + 1, IN).data, Flow(startId + 1, IN).data, ...]
+   * C =&gt; [Flow(startId + 2, IN).data, Flow(startId + 2, IN).data, ...]
+   * </code></pre>
+   *
+   * @param startId   the flow start ID.
+   * @param rangeSize the size of the range of IDs (must be positive).
+   * @param channel   the flow channel.
+   * @param <OUT>     the output data type.
+   * @return the map of IDs and channels builder.
+   * @throws java.lang.IllegalArgumentException if the specified range size is not positive.
+   */
+  @NotNull
+  public static <OUT> ChannelMapBuilder<Integer, ?, OUT> flowOutput(final int startId,
+      final int rangeSize, @NotNull final Channel<?, ? extends Flow<? extends OUT>> channel) {
+    ConstantConditions.positive("range size", rangeSize);
+    final HashSet<Integer> idSet = new HashSet<Integer>();
+    final int endId = startId + rangeSize;
+    for (int i = startId; i < endId; ++i) {
+      idSet.add(i);
+    }
+
+    return new OutputMapBuilder<OUT>(channel, idSet);
+  }
+
+  /**
    * Returns a builder of channels producing the result of the specified Future.
    * <br>
    * If the channel is aborted the Future will be cancelled with {@code mayInterruptIfRunning} set
@@ -457,6 +677,29 @@ public class Channels {
   public static <OUT> ChannelBuilder<?, OUT> fromFutureInterruptIfRunning(
       @NotNull final Future<OUT> future) {
     return new FutureChannelBuilder<OUT>(future, true);
+  }
+
+  /**
+   * Returns a builder of flow channels feeding the specified one.
+   * <br>
+   * Each output will be filtered based on the specified ID.
+   * <p>
+   * Note that the builder will return the same instance for the same input and equal configuration.
+   * <p>
+   * Given channel {@code A}, its final output will be:
+   * <pre><code>
+   * A =&gt; [Flow(id, IN).data, Flow(id, IN).data, ...]
+   * </code></pre>
+   *
+   * @param channel the channel to feed.
+   * @param id      the flow ID.
+   * @param <IN>    the input data type.
+   * @return the flow channel builder.
+   */
+  @NotNull
+  public static <IN> ChannelBuilder<Flow<IN>, ?> inputFlow(
+      @NotNull final Channel<? super IN, ?> channel, final int id) {
+    return new InputFilterBuilder<IN>(channel, id);
   }
 
   /**
@@ -579,9 +822,9 @@ public class Channels {
   }
 
   /**
-   * Returns a builder of channels merging the specified instances into a selectable one.
+   * Returns a builder of channels merging the specified instances into a flow one.
    * <br>
-   * The selectable indexes will be the position in the array.
+   * The flow IDs will be the position in the array.
    * <p>
    * Note that the builder will successfully create only one channel instance, and that the passed
    * ones will be bound as a result of the creation.
@@ -590,26 +833,25 @@ public class Channels {
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
    * <pre><code>
-   * =&gt; [Selectable(B, 1), Selectable(A, 0), Selectable(C, 2), Selectable(A, 0), ...]
+   * =&gt; [Flow(1, B), Flow(0, A), Flow(2, C), Flow(0, A), ...]
    * </code></pre>
    *
    * @param channels the channels to merge.
    * @param <OUT>    the output data type.
-   * @return the selectable channel builder.
+   * @return the flow channel builder.
    * @throws java.lang.IllegalArgumentException if the specified array is empty.
    * @throws java.lang.NullPointerException     if the specified array is null or contains a null
    *                                            object.
    */
   @NotNull
-  public static <OUT> ChannelBuilder<?, Selectable<OUT>> merge(
-      @NotNull final Channel<?, ?>... channels) {
+  public static <OUT> ChannelBuilder<?, Flow<OUT>> merge(@NotNull final Channel<?, ?>... channels) {
     return merge(0, channels);
   }
 
   /**
-   * Returns a builder of channels merging the specified instances into a selectable one.
+   * Returns a builder of channels merging the specified instances into a flow one.
    * <br>
-   * The selectable indexes will start from the specified one.
+   * The flow IDs will start from the specified one.
    * <p>
    * Note that the builder will successfully create only one channel instance, and that the passed
    * ones will be bound as a result of the creation.
@@ -618,32 +860,32 @@ public class Channels {
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
    * <pre><code>
-   * =&gt; [Selectable(B, startIndex + 1), Selectable(A, startIndex + 0), ...]
+   * =&gt; [Flow(startId + 1, B), Flow(startId + 0, A), Flow(startId + 2, C), ...]
    * </code></pre>
    *
-   * @param startIndex the selectable start index.
-   * @param channels   the array of channels.
-   * @param <OUT>      the output data type.
-   * @return the selectable channel builder.
+   * @param startId  the flow start ID.
+   * @param channels the array of channels.
+   * @param <OUT>    the output data type.
+   * @return the flow channel builder.
    * @throws java.lang.IllegalArgumentException if the specified array is empty.
    * @throws java.lang.NullPointerException     if the specified array is null or contains a null
    *                                            object.
    */
   @NotNull
   @SuppressWarnings("unchecked")
-  public static <OUT> ChannelBuilder<?, Selectable<OUT>> merge(final int startIndex,
+  public static <OUT> ChannelBuilder<?, Flow<OUT>> merge(final int startId,
       @NotNull final Channel<?, ?>... channels) {
     if (channels.length == 0) {
       throw new IllegalArgumentException("the array of channels must not be empty");
     }
 
-    return (MergeBuilder<OUT>) new MergeBuilder<Object>(startIndex, Arrays.asList(channels));
+    return (MergeBuilder<OUT>) new MergeBuilder<Object>(startId, Arrays.asList(channels));
   }
 
   /**
-   * Returns a builder of channels merging the specified instances into a selectable one.
+   * Returns a builder of channels merging the specified instances into a flow one.
    * <br>
-   * The selectable indexes will start from the specified one.
+   * The flow IDs will start from the specified one.
    * <p>
    * Note that the builder will successfully create only one channel instance, and that the passed
    * ones will be bound as a result of the creation.
@@ -652,27 +894,27 @@ public class Channels {
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
    * <pre><code>
-   * =&gt; [Selectable(B, startIndex + 1), Selectable(A, startIndex + 0), ...]
+   * =&gt; [Flow(startId + 1, B), Flow(startId + 0, A), Flow(startId + 2, C), ...]
    * </code></pre>
    *
-   * @param startIndex the selectable start index.
-   * @param channels   the iterable of channels.
-   * @param <OUT>      the output data type.
-   * @return the selectable channel builder.
+   * @param startId  the flow start ID.
+   * @param channels the iterable of channels.
+   * @param <OUT>    the output data type.
+   * @return the flow channel builder.
    * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
    * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
    *                                            null object.
    */
   @NotNull
-  public static <OUT> ChannelBuilder<?, Selectable<OUT>> merge(final int startIndex,
+  public static <OUT> ChannelBuilder<?, Flow<OUT>> merge(final int startId,
       @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
-    return new MergeBuilder<OUT>(startIndex, channels);
+    return new MergeBuilder<OUT>(startId, channels);
   }
 
   /**
-   * Returns a builder of channels merging the specified instances into a selectable one.
+   * Returns a builder of channels merging the specified instances into a flow one.
    * <br>
-   * The selectable indexes will be the position in the iterable.
+   * The flow IDs will be the position in the iterable.
    * <p>
    * Note that the builder will successfully create only one channel instance, and that the passed
    * ones will be bound as a result of the creation.
@@ -681,26 +923,26 @@ public class Channels {
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
    * <pre><code>
-   * =&gt; [Selectable(B, 1), Selectable(A, 0), Selectable(C, 2), Selectable(A, 0), ...]
+   * =&gt; [Flow(1, B), Flow(0, A), Flow(2, C), Flow(0, A), ...]
    * </code></pre>
    *
    * @param channels the channels to merge.
    * @param <OUT>    the output data type.
-   * @return the selectable channel builder.
+   * @return the flow channel builder.
    * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
    * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
    *                                            null object.
    */
   @NotNull
-  public static <OUT> ChannelBuilder<?, Selectable<OUT>> merge(
+  public static <OUT> ChannelBuilder<?, Flow<OUT>> merge(
       @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
     return merge(0, channels);
   }
 
   /**
-   * Returns a builder of channels merging the specified instances into a selectable one.
+   * Returns a builder of channels merging the specified instances into a flow one.
    * <br>
-   * The selectable indexes will be the keys of the specified map.
+   * The flow IDs will be the keys of the specified map.
    * <p>
    * Note that the builder will successfully create only one channel instance, and that the passed
    * ones will be bound as a result of the creation.
@@ -709,20 +951,46 @@ public class Channels {
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
    * <pre><code>
-   * =&gt; [Selectable(B, key(B)), Selectable(A, key(A)), Selectable(C, key(C)), ...]
+   * =&gt; [Flow(key(B), B), Flow(key(A), A), Flow(key(C), C), ...]
    * </code></pre>
    *
-   * @param channels the map of indexes and channels.
+   * @param channels the map of IDs and channels.
    * @param <OUT>    the output data type.
-   * @return the selectable channel builder.
+   * @return the flow channel builder.
    * @throws java.lang.IllegalArgumentException if the specified map is empty.
    * @throws java.lang.NullPointerException     if the specified map is null or contains a null
    *                                            object.
    */
   @NotNull
-  public static <OUT> ChannelBuilder<?, Selectable<OUT>> merge(
+  public static <OUT> ChannelBuilder<?, Flow<OUT>> merge(
       @NotNull final Map<Integer, ? extends Channel<?, ? extends OUT>> channels) {
     return new MergeMapBuilder<OUT>(channels);
+  }
+
+  /**
+   * Returns a builder of channels making the data of the specified one a flow.
+   * <br>
+   * Each output will be passed along unchanged.
+   * <p>
+   * Note that the builder will successfully create only one channel instance, and that the passed
+   * one will be bound as a result of the creation.
+   * <br>
+   * Note also that the returned channel will be already closed.
+   * <p>
+   * Given channel {@code A}, the final output will be:
+   * <pre><code>
+   * =&gt; [Flow(id, A), Flow(id, A), Flow(id, A), ...]
+   * </code></pre>
+   *
+   * @param channel the channel.
+   * @param id      the flow ID.
+   * @param <OUT>   the output data type.
+   * @return the flow channel builder.
+   */
+  @NotNull
+  public static <OUT> ChannelBuilder<?, Flow<OUT>> outputFlow(
+      @NotNull final Channel<?, ? extends OUT> channel, final int id) {
+    return new OutputFlowBuilder<OUT>(channel, id);
   }
 
   /**
@@ -752,280 +1020,6 @@ public class Channels {
   @NotNull
   public static <OUT> ChannelBuilder<?, OUT> replay(@NotNull final Channel<?, OUT> channel) {
     return new ReplayChannelBuilder<OUT>(channel);
-  }
-
-  /**
-   * Returns a builder of channels transforming the input data into selectable ones.
-   * <p>
-   * Note that the builder will successfully create several channel instances.
-   * <p>
-   * Given channel {@code A}, its final output will be:
-   * <pre><code>
-   * A =&gt; [Selectable(IN, index), Selectable(IN, index), Selectable(IN, index), ...]
-   * </code></pre>
-   *
-   * @param channel the selectable channel.
-   * @param index   the channel index.
-   * @param <DATA>  the channel data type.
-   * @param <IN>    the input data type.
-   * @return the channel builder.
-   */
-  @NotNull
-  public static <DATA, IN extends DATA> ChannelBuilder<IN, ?> selectInput(
-      @NotNull final Channel<? super Selectable<DATA>, ?> channel, final int index) {
-    return new InputSelectBuilder<DATA, IN>(channel, index);
-  }
-
-  /**
-   * Returns a builder of maps of channels accepting the data identified by the specified indexes.
-   * <p>
-   * Note that the builder will successfully create several channel map instances.
-   * <p>
-   * Given channel {@code A} and channels {@code IN1}, {@code IN2} and {@code IN3} in the returned
-   * map, the final output of {@code A} will be:
-   * <pre><code>
-   * A =&gt; [Selectable(IN2, indexes[1]), Selectable(IN1, indexes[0]), ...]
-   * </code></pre>
-   *
-   * @param channel the selectable channel.
-   * @param indexes the array of indexes.
-   * @param <DATA>  the channel data type.
-   * @param <IN>    the input data type.
-   * @return the map of indexes and channels builder.
-   * @throws java.lang.NullPointerException if the specified array is null or contains a null
-   *                                        object.
-   */
-  @NotNull
-  public static <DATA, IN extends DATA> ChannelMapBuilder<Integer, IN, ?> selectInput(
-      @NotNull final Channel<? super Selectable<DATA>, ?> channel, @NotNull final int... indexes) {
-    final HashSet<Integer> indexSet = new HashSet<Integer>();
-    for (final int index : indexes) {
-      indexSet.add(index);
-    }
-
-    return new InputMapBuilder<DATA, IN>(channel, indexSet);
-  }
-
-  /**
-   * Returns a builder of maps of channels accepting the data identified by the specified indexes.
-   * <p>
-   * Note that the builder will successfully create several channel map instances.
-   * <p>
-   * Given channel {@code A} and channels {@code IN1}, {@code IN2} and {@code IN3} in the returned
-   * map, the final output of {@code A} will be:
-   * <pre><code>
-   * A =&gt; [Selectable(IN2, indexes[1]), Selectable(IN1, indexes[0]), ...]
-   * </code></pre>
-   *
-   * @param channel the selectable channel.
-   * @param indexes the iterable returning the channel indexes.
-   * @param <DATA>  the channel data type.
-   * @param <IN>    the input data type.
-   * @return the map of indexes and channels builder.
-   * @throws java.lang.NullPointerException if the specified iterable is null or returns a null
-   *                                        object.
-   */
-  @NotNull
-  public static <DATA, IN extends DATA> ChannelMapBuilder<Integer, IN, ?> selectInput(
-      @NotNull final Channel<? super Selectable<DATA>, ?> channel,
-      @NotNull final Iterable<Integer> indexes) {
-    final HashSet<Integer> indexSet = new HashSet<Integer>();
-    for (final Integer index : indexes) {
-      indexSet.add(index);
-    }
-
-    return new InputMapBuilder<DATA, IN>(channel, indexSet);
-  }
-
-  /**
-   * Returns a builder of maps of channels accepting the data identified by the specified indexes.
-   * <p>
-   * Note that the builder will successfully create several channel map instances.
-   * <p>
-   * Given channel {@code A} and channels {@code IN1}, {@code IN2} and {@code IN3} in the returned
-   * map, the final output of {@code A} will be:
-   * <pre><code>
-   * A =&gt; [Selectable(IN2, startIndex + 1), Selectable(IN1, startIndex + 0), ...]
-   * </code></pre>
-   *
-   * @param startIndex the selectable start index.
-   * @param rangeSize  the size of the range of indexes (must be positive).
-   * @param channel    the selectable channel.
-   * @param <DATA>     the channel data type.
-   * @param <IN>       the input data type.
-   * @return the map of indexes and channels builder.
-   * @throws java.lang.IllegalArgumentException if the specified range size is not positive.
-   */
-  @NotNull
-  public static <DATA, IN extends DATA> ChannelMapBuilder<Integer, IN, ?> selectInput(
-      final int startIndex, final int rangeSize,
-      @NotNull final Channel<? super Selectable<DATA>, ?> channel) {
-    ConstantConditions.positive("range size", rangeSize);
-    final HashSet<Integer> indexSet = new HashSet<Integer>();
-    final int endIndex = startIndex + rangeSize;
-    for (int i = startIndex; i < endIndex; ++i) {
-      indexSet.add(i);
-    }
-
-    return new InputMapBuilder<DATA, IN>(channel, indexSet);
-  }
-
-  /**
-   * Returns a builder of maps of channels returning the output data filtered by the specified
-   * indexes.
-   * <p>
-   * Note that the builder will return the same map for the same inputs and equal configuration,
-   * and that the passed channels will be bound as a result of the creation.
-   * <br>
-   * Note also that the returned channels will be already closed.
-   * <p>
-   * Given channels {@code A}, {@code B} and {@code C} in the returned map, the final output will
-   * be:
-   * <pre><code>
-   * A =&gt; [Selectable(IN, indexes[0]).data, Selectable(IN, indexes[0]).data, ...]
-   * B =&gt; [Selectable(IN, indexes[1]).data, Selectable(IN, indexes[1]).data, ...]
-   * C =&gt; [Selectable(IN, indexes[2]).data, Selectable(IN, indexes[2]).data, ...]
-   * </code></pre>
-   *
-   * @param channel the selectable channel.
-   * @param indexes the list of indexes.
-   * @param <OUT>   the output data type.
-   * @return the map of indexes and channels builder.
-   * @throws java.lang.NullPointerException if the specified array is null or contains a null
-   *                                        object.
-   */
-  @NotNull
-  public static <OUT> ChannelMapBuilder<Integer, ?, OUT> selectOutput(
-      @NotNull final Channel<?, ? extends Selectable<? extends OUT>> channel,
-      @NotNull final int... indexes) {
-    final HashSet<Integer> indexSet = new HashSet<Integer>();
-    for (final int index : indexes) {
-      indexSet.add(index);
-    }
-
-    return new OutputMapBuilder<OUT>(channel, indexSet);
-  }
-
-  /**
-   * Returns a builder of maps of channels returning the output data filtered by the specified
-   * indexes.
-   * <p>
-   * Note that the builder will return the same map for the same inputs and equal configuration,
-   * and that the passed channels will be bound as a result of the creation.
-   * <br>
-   * Note also that the returned channels will be already closed.
-   * <p>
-   * Given channels {@code A}, {@code B} and {@code C} in the returned map, the final output will
-   * be:
-   * <pre><code>
-   * A =&gt; [Selectable(IN, indexes[0]).data, Selectable(IN, indexes[0]).data, ...]
-   * B =&gt; [Selectable(IN, indexes[1]).data, Selectable(IN, indexes[1]).data, ...]
-   * C =&gt; [Selectable(IN, indexes[2]).data, Selectable(IN, indexes[2]).data, ...]
-   * </code></pre>
-   *
-   * @param channel the selectable channel.
-   * @param indexes the iterable returning the channel indexes.
-   * @param <OUT>   the output data type.
-   * @return the map of indexes and channels builder.
-   * @throws java.lang.NullPointerException if the specified iterable is null or returns a null
-   *                                        object.
-   */
-  @NotNull
-  public static <OUT> ChannelMapBuilder<Integer, ?, OUT> selectOutput(
-      @NotNull final Channel<?, ? extends Selectable<? extends OUT>> channel,
-      @NotNull final Iterable<Integer> indexes) {
-    final HashSet<Integer> indexSet = new HashSet<Integer>();
-    for (final Integer index : indexes) {
-      indexSet.add(index);
-    }
-
-    return new OutputMapBuilder<OUT>(channel, indexSet);
-  }
-
-  /**
-   * Returns a builder of maps of channels returning the output data filtered by the specified
-   * indexes.
-   * <p>
-   * Note that the builder will return the same map for the same inputs and equal configuration,
-   * and that the passed channels will be bound as a result of the creation.
-   * <br>
-   * Note also that the returned channels will be already closed.
-   * <p>
-   * Given channels {@code A}, {@code B} and {@code C} in the returned map, the final output will
-   * be:
-   * <pre><code>
-   * A =&gt; [Selectable(IN, startIndex + 0).data, Selectable(IN, startIndex + 0).data, ...]
-   * B =&gt; [Selectable(IN, startIndex + 1).data, Selectable(IN, startIndex + 1).data, ...]
-   * C =&gt; [Selectable(IN, startIndex + 2).data, Selectable(IN, startIndex + 2).data, ...]
-   * </code></pre>
-   *
-   * @param startIndex the selectable start index.
-   * @param rangeSize  the size of the range of indexes (must be positive).
-   * @param channel    the selectable channel.
-   * @param <OUT>      the output data type.
-   * @return the map of indexes and channels builder.
-   * @throws java.lang.IllegalArgumentException if the specified range size is not positive.
-   */
-  @NotNull
-  public static <OUT> ChannelMapBuilder<Integer, ?, OUT> selectOutput(final int startIndex,
-      final int rangeSize, @NotNull final Channel<?, ? extends Selectable<? extends OUT>> channel) {
-    ConstantConditions.positive("range size", rangeSize);
-    final HashSet<Integer> indexSet = new HashSet<Integer>();
-    final int endIndex = startIndex + rangeSize;
-    for (int i = startIndex; i < endIndex; ++i) {
-      indexSet.add(i);
-    }
-
-    return new OutputMapBuilder<OUT>(channel, indexSet);
-  }
-
-  /**
-   * Returns a builder of selectable channels feeding the specified one.
-   * <br>
-   * Each output will be filtered based on the specified index.
-   * <p>
-   * Note that the builder will return the same instance for the same input and equal configuration.
-   * <p>
-   * Given channel {@code A}, its final output will be:
-   * <pre><code>
-   * A =&gt; [Selectable(IN, index).data, Selectable(IN, index).data, ...]
-   * </code></pre>
-   *
-   * @param channel the channel to make selectable.
-   * @param index   the channel index.
-   * @param <IN>    the input data type.
-   * @return the selectable channel builder.
-   */
-  @NotNull
-  public static <IN> ChannelBuilder<Selectable<IN>, ?> selectableInput(
-      @NotNull final Channel<? super IN, ?> channel, final int index) {
-    return new InputFilterBuilder<IN>(channel, index);
-  }
-
-  /**
-   * Returns a builder of channels making the specified one selectable.
-   * <br>
-   * Each output will be passed along unchanged.
-   * <p>
-   * Note that the builder will successfully create only one channel instance, and that the passed
-   * one will be bound as a result of the creation.
-   * <br>
-   * Note also that the returned channel will be already closed.
-   * <p>
-   * Given channel {@code A}, the final output will be:
-   * <pre><code>
-   * =&gt; [Selectable(A, index), Selectable(A, index), Selectable(A, index), ...]
-   * </code></pre>
-   *
-   * @param channel the channel to make selectable.
-   * @param index   the channel index.
-   * @param <OUT>   the output data type.
-   * @return the selectable channel builder.
-   */
-  @NotNull
-  public static <OUT> ChannelBuilder<?, Selectable<OUT>> selectableOutput(
-      @NotNull final Channel<?, ? extends OUT> channel, final int index) {
-    return new SelectableOutputBuilder<OUT>(channel, index);
   }
 
   @NotNull

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.channel;
+package com.github.dm.jrt.android.channel;
 
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.AbstractChannelBuilder;
@@ -24,37 +24,38 @@ import com.github.dm.jrt.core.util.ConstantConditions;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Builder implementation returning a channel passing selectable data to an channel.
+ * Builder implementation returning a channel passing flow data to an input one.
  * <p>
  * Created by davide-maestroni on 02/26/2016.
  *
  * @param <DATA> the channel data type.
  * @param <IN>   the input data type.
  */
-class InputSelectBuilder<DATA, IN extends DATA> extends AbstractChannelBuilder<IN, IN> {
+class FlowInputBuilder<DATA, IN extends DATA> extends AbstractChannelBuilder<IN, IN> {
 
-  private final Channel<? super Selectable<DATA>, ?> mChannel;
+  private final Channel<? super ParcelableFlow<DATA>, ?> mChannel;
 
-  private final int mIndex;
+  private final int mId;
 
   /**
    * Constructor.
    *
-   * @param channel the channel.
-   * @param index   the selectable index.
+   * @param channel the input channel.
+   * @param id      the flow ID.
    */
-  InputSelectBuilder(@NotNull final Channel<? super Selectable<DATA>, ?> channel, final int index) {
+  FlowInputBuilder(@NotNull final Channel<? super ParcelableFlow<DATA>, ?> channel, final int id) {
     mChannel = ConstantConditions.notNull("channel instance", channel);
-    mIndex = index;
+    mId = id;
   }
 
   @NotNull
+  @Override
   public Channel<IN, IN> buildChannel() {
     final Channel<IN, IN> inputChannel =
         JRoutineCore.<IN>ofInputs().apply(getConfiguration()).buildChannel();
-    final Channel<Selectable<DATA>, Selectable<DATA>> selectableChannel =
-        JRoutineCore.<Selectable<DATA>>ofInputs().buildChannel();
-    selectableChannel.bind(mChannel);
-    return inputChannel.bind(new SelectableChannelConsumer<DATA, IN>(selectableChannel, mIndex));
+    final Channel<ParcelableFlow<DATA>, ParcelableFlow<DATA>> outputChannel =
+        JRoutineCore.<ParcelableFlow<DATA>>ofInputs().buildChannel();
+    outputChannel.bind(mChannel);
+    return inputChannel.bind(new FlowChannelConsumer<DATA, IN>(outputChannel, mId));
   }
 }

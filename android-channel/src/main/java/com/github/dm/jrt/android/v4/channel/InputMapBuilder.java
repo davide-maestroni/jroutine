@@ -14,28 +14,12 @@
  * limitations under the License.
  */
 
-/*
- * Copyright 2016 Davide Maestroni
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.github.dm.jrt.android.v4.channel;
 
 import android.support.v4.util.SparseArrayCompat;
 
 import com.github.dm.jrt.android.channel.AndroidChannels;
-import com.github.dm.jrt.android.channel.ParcelableSelectable;
+import com.github.dm.jrt.android.channel.ParcelableFlow;
 import com.github.dm.jrt.android.v4.channel.builder.AbstractChannelArrayCompatBuilder;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
@@ -46,7 +30,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashSet;
 
 /**
- * Builder implementation returning a map of channels accepting selectable data.
+ * Builder implementation returning a map of channels accepting flow data.
  * <p>
  * Created by davide-maestroni on 06/18/2016.
  *
@@ -55,43 +39,43 @@ import java.util.HashSet;
  */
 class InputMapBuilder<DATA, IN extends DATA> extends AbstractChannelArrayCompatBuilder<IN, IN> {
 
-  private final Channel<? super ParcelableSelectable<DATA>, ?> mChannel;
+  private final Channel<? super ParcelableFlow<DATA>, ?> mChannel;
 
-  private final HashSet<Integer> mIndexes;
+  private final HashSet<Integer> mIds;
 
   /**
    * Constructor.
    *
-   * @param channel the selectable channel.
-   * @param indexes the set of indexes.
-   * @throws java.lang.NullPointerException if the specified set of indexes is null or contains a
+   * @param channel the flow channel.
+   * @param ids     the set of IDs.
+   * @throws java.lang.NullPointerException if the specified set of IDs is null or contains a
    *                                        null object.
    */
-  InputMapBuilder(@NotNull final Channel<? super ParcelableSelectable<DATA>, ?> channel,
-      @NotNull final HashSet<Integer> indexes) {
+  InputMapBuilder(@NotNull final Channel<? super ParcelableFlow<DATA>, ?> channel,
+      @NotNull final HashSet<Integer> ids) {
     mChannel = ConstantConditions.notNull("channel instance", channel);
-    final HashSet<Integer> indexSet =
-        new HashSet<Integer>(ConstantConditions.notNull("set of indexes", indexes));
-    if (indexSet.contains(null)) {
-      throw new NullPointerException("the set of indexes must not contain null objects");
+    final HashSet<Integer> idSet =
+        new HashSet<Integer>(ConstantConditions.notNull("set of IDs", ids));
+    if (idSet.contains(null)) {
+      throw new NullPointerException("the set of IDs must not contain null objects");
     }
 
-    mIndexes = indexSet;
+    mIds = idSet;
   }
 
   @NotNull
   @Override
   public SparseArrayCompat<? extends Channel<IN, IN>> buildChannelArray() {
-    final HashSet<Integer> indexes = mIndexes;
-    final Channel<? super ParcelableSelectable<DATA>, ?> channel = mChannel;
+    final HashSet<Integer> ids = mIds;
+    final Channel<? super ParcelableFlow<DATA>, ?> channel = mChannel;
     final SparseArrayCompat<Channel<IN, IN>> channelMap =
-        new SparseArrayCompat<Channel<IN, IN>>(indexes.size());
+        new SparseArrayCompat<Channel<IN, IN>>(ids.size());
     final ChannelConfiguration configuration = getConfiguration();
-    for (final Integer index : indexes) {
+    for (final Integer id : ids) {
       @SuppressWarnings("unchecked") final Channel<IN, IN> inputChannel =
-          (Channel<IN, IN>) AndroidChannels.<DATA, IN>selectInputParcelable(channel, index).apply(
+          (Channel<IN, IN>) AndroidChannels.<DATA, IN>parcelableFlowInput(channel, id).apply(
               configuration).buildChannel();
-      channelMap.put(index, inputChannel);
+      channelMap.put(id, inputChannel);
     }
 
     return channelMap;

@@ -32,14 +32,14 @@ import java.util.Map;
  *
  * @param <OUT> the output data type.
  */
-class SortingMapChannelConsumer<OUT> implements ChannelConsumer<Selectable<? extends OUT>> {
+class SortingMapChannelConsumer<OUT> implements ChannelConsumer<Flow<? extends OUT>> {
 
   private final HashMap<Integer, Channel<OUT, ?>> mChannels;
 
   /**
    * Constructor.
    *
-   * @param channels the map of indexes and channels.
+   * @param channels the map of IDs and channels.
    * @throws java.lang.NullPointerException if the specified map is null or contains a null
    *                                        object.
    */
@@ -65,10 +65,10 @@ class SortingMapChannelConsumer<OUT> implements ChannelConsumer<Selectable<? ext
     }
   }
 
-  public void onOutput(final Selectable<? extends OUT> selectable) {
-    final Channel<OUT, ?> channel = mChannels.get(selectable.index);
+  public void onOutput(final Flow<? extends OUT> flow) {
+    final Channel<OUT, ?> channel = mChannels.get(flow.id);
     if (channel != null) {
-      channel.pass(selectable.data);
+      channel.pass(flow.data);
     }
   }
 }

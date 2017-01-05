@@ -25,29 +25,28 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 
 /**
- * Builder implementation merging data from a set of channels into selectable objects.
+ * Builder implementation merging data from a set of output channels into a flow one.
  * <p>
  * Created by davide-maestroni on 02/26/2016.
  *
  * @param <OUT> the output data type.
  */
-class MergeBuilder<OUT>
-    extends AbstractChannelBuilder<ParcelableSelectable<OUT>, ParcelableSelectable<OUT>> {
+class MergeBuilder<OUT> extends AbstractChannelBuilder<ParcelableFlow<OUT>, ParcelableFlow<OUT>> {
 
   private final ArrayList<Channel<?, ? extends OUT>> mChannels;
 
-  private final int mStartIndex;
+  private final int mStartId;
 
   /**
    * Constructor.
    *
-   * @param startIndex the selectable start index.
-   * @param channels   the channels to merge.
+   * @param startId  the flow start ID.
+   * @param channels the channels to merge.
    * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
    * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
    *                                            null object.
    */
-  MergeBuilder(final int startIndex,
+  MergeBuilder(final int startId,
       @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
     final ArrayList<Channel<?, ? extends OUT>> channelList =
         new ArrayList<Channel<?, ? extends OUT>>();
@@ -63,18 +62,18 @@ class MergeBuilder<OUT>
       throw new IllegalArgumentException("the collection of channels must not be empty");
     }
 
-    mStartIndex = startIndex;
+    mStartId = startId;
     mChannels = channelList;
   }
 
   @NotNull
   @Override
-  public Channel<ParcelableSelectable<OUT>, ParcelableSelectable<OUT>> buildChannel() {
-    final Channel<ParcelableSelectable<OUT>, ParcelableSelectable<OUT>> outputChannel =
-        JRoutineCore.<ParcelableSelectable<OUT>>ofInputs().apply(getConfiguration()).buildChannel();
-    int i = mStartIndex;
+  public Channel<ParcelableFlow<OUT>, ParcelableFlow<OUT>> buildChannel() {
+    final Channel<ParcelableFlow<OUT>, ParcelableFlow<OUT>> outputChannel =
+        JRoutineCore.<ParcelableFlow<OUT>>ofInputs().apply(getConfiguration()).buildChannel();
+    int i = mStartId;
     for (final Channel<?, ? extends OUT> channel : mChannels) {
-      outputChannel.pass(AndroidChannels.selectableOutputParcelable(channel, i++).buildChannel());
+      outputChannel.pass(AndroidChannels.outputParcelableFlow(channel, i++).buildChannel());
     }
 
     return outputChannel.close();

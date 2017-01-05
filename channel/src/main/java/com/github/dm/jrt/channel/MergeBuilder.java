@@ -9,28 +9,28 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 
 /**
- * Builder implementation merging data from a set of output channels into selectable objects.
+ * Builder implementation merging data from a set of output channels into a flow one.
  * <p>
  * Created by davide-maestroni on 05/03/2016.
  *
  * @param <OUT> the output data type.
  */
-class MergeBuilder<OUT> extends AbstractChannelBuilder<Selectable<OUT>, Selectable<OUT>> {
+class MergeBuilder<OUT> extends AbstractChannelBuilder<Flow<OUT>, Flow<OUT>> {
 
   private final ArrayList<Channel<?, ? extends OUT>> mChannels;
 
-  private final int mStartIndex;
+  private final int mStartId;
 
   /**
    * Constructor.
    *
-   * @param startIndex the selectable start index.
-   * @param channels   the channels to merge.
+   * @param startId  the flow start ID.
+   * @param channels the channels to merge.
    * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
    * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
    *                                            null object.
    */
-  MergeBuilder(final int startIndex,
+  MergeBuilder(final int startId,
       @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
     final ArrayList<Channel<?, ? extends OUT>> channelList =
         new ArrayList<Channel<?, ? extends OUT>>();
@@ -46,17 +46,17 @@ class MergeBuilder<OUT> extends AbstractChannelBuilder<Selectable<OUT>, Selectab
       throw new IllegalArgumentException("the collection of channels must not be empty");
     }
 
-    mStartIndex = startIndex;
+    mStartId = startId;
     mChannels = channelList;
   }
 
   @NotNull
-  public Channel<Selectable<OUT>, Selectable<OUT>> buildChannel() {
-    final Channel<Selectable<OUT>, Selectable<OUT>> outputChannel =
-        JRoutineCore.<Selectable<OUT>>ofInputs().apply(getConfiguration()).buildChannel();
-    int i = mStartIndex;
+  public Channel<Flow<OUT>, Flow<OUT>> buildChannel() {
+    final Channel<Flow<OUT>, Flow<OUT>> outputChannel =
+        JRoutineCore.<Flow<OUT>>ofInputs().apply(getConfiguration()).buildChannel();
+    int i = mStartId;
     for (final Channel<?, ? extends OUT> channel : mChannels) {
-      outputChannel.pass(new SelectableOutputBuilder<OUT>(channel, i++).buildChannel());
+      outputChannel.pass(new OutputFlowBuilder<OUT>(channel, i++).buildChannel());
     }
 
     return outputChannel.close();

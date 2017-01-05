@@ -21,23 +21,22 @@ import org.junit.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Selectable unit test.
+ * Flow unit test.
  * <p>
  * Created by davide-maestroni on 02/24/2016.
  */
-public class SelectableTest {
+public class FlowTest {
 
   @Test
   public void testEquals() {
-
-    final Selectable<Object> selectable = new Selectable<Object>("test", 0);
-    assertThat(selectable).isEqualTo(selectable);
-    assertThat(selectable).isNotEqualTo(null);
-    assertThat(selectable).isNotEqualTo("test");
-    assertThat(selectable).isNotEqualTo(new Selectable<Object>("test1", 0));
-    assertThat(selectable).isNotEqualTo(new Selectable<Object>("test", 1));
-    assertThat(selectable).isEqualTo(new Selectable<Object>("test", 0));
-    assertThat(selectable.hashCode()).isEqualTo(new Selectable<Object>("test", 0).hashCode());
-    assertThat(selectable.toString()).isEqualTo(new Selectable<Object>("test", 0).toString());
+    final Flow<Object> flow = new Flow<Object>(0, "test");
+    assertThat(flow).isEqualTo(flow);
+    assertThat(flow).isNotEqualTo(null);
+    assertThat(flow).isNotEqualTo("test");
+    assertThat(flow).isNotEqualTo(new Flow<Object>(0, "test1"));
+    assertThat(flow).isNotEqualTo(new Flow<Object>(1, "test"));
+    assertThat(flow).isEqualTo(new Flow<Object>(0, "test"));
+    assertThat(flow.hashCode()).isEqualTo(new Flow<Object>(0, "test").hashCode());
+    assertThat(flow.toString()).isEqualTo(new Flow<Object>(0, "test").toString());
   }
 }

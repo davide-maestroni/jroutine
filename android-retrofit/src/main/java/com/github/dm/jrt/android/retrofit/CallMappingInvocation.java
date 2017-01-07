@@ -19,7 +19,6 @@ package com.github.dm.jrt.android.retrofit;
 import com.github.dm.jrt.android.channel.AndroidChannels;
 import com.github.dm.jrt.android.channel.ParcelableFlow;
 import com.github.dm.jrt.android.channel.io.ParcelableByteChannel;
-import com.github.dm.jrt.channel.builder.BufferStreamConfiguration.CloseActionType;
 import com.github.dm.jrt.channel.io.ByteChannel.BufferOutputStream;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
@@ -31,12 +30,15 @@ import java.io.IOException;
 import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.RequestBody;
-import okio.Buffer;
+import okio.BufferedSink;
+import okio.Okio;
 import retrofit2.Call;
 
 import static com.github.dm.jrt.android.retrofit.ServiceCallInvocation.BYTES_ID;
 import static com.github.dm.jrt.android.retrofit.ServiceCallInvocation.MEDIA_TYPE_ID;
 import static com.github.dm.jrt.android.retrofit.ServiceCallInvocation.REQUEST_DATA_ID;
+import static com.github.dm.jrt.channel.builder.BufferStreamConfiguration.CloseActionType
+    .CLOSE_CHANNEL;
 
 /**
  * Mapping invocation used to split the Retrofit call into request data and body, so to be more
@@ -63,25 +65,16 @@ class CallMappingInvocation extends MappingInvocation<Call<?>, ParcelableFlow<Ob
       final MediaType mediaType = body.contentType();
       result.pass(new ParcelableFlow<Object>(MEDIA_TYPE_ID,
           (mediaType != null) ? mediaType.toString() : null));
-      final Buffer buffer = new Buffer();
+      final Channel<Object, ?> channel =
+          AndroidChannels.parcelableFlowInput(result, BYTES_ID).buildChannel();
+      final BufferOutputStream outputStream = ParcelableByteChannel.from(channel)
+                                                                   .applyBufferStreamConfiguration()
+                                                                   .withOnClose(CLOSE_CHANNEL)
+                                                                   .configured()
+                                                                   .buildOutputStream();
+      final BufferedSink buffer = Okio.buffer(Okio.sink(outputStream));
       body.writeTo(buffer);
-      if (buffer.size() > 0) {
-        final Channel<Object, ?> channel =
-            AndroidChannels.parcelableFlowInput(result, BYTES_ID).buildChannel();
-        final BufferOutputStream outputStream = ParcelableByteChannel.from(channel)
-                                                                     .applyBufferStreamConfiguration()
-                                                                     .withOnClose(
-                                                                         CloseActionType
-                                                                             .CLOSE_CHANNEL)
-                                                                     .configured()
-                                                                     .buildOutputStream();
-        try {
-          outputStream.transferFrom(buffer.inputStream());
-
-        } finally {
-          outputStream.close();
-        }
-      }
+      buffer.close();
     }
   }
 }

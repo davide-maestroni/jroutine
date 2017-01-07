@@ -19,11 +19,11 @@ package com.github.dm.jrt.android.retrofit;
 import com.github.dm.jrt.android.channel.AndroidChannels;
 import com.github.dm.jrt.android.channel.ParcelableFlow;
 import com.github.dm.jrt.android.channel.io.ParcelableByteChannel;
-import com.github.dm.jrt.android.channel.io.ParcelableByteChannel.ParcelableByteBuffer;
+import com.github.dm.jrt.android.channel.io.ParcelableByteChannel.ParcelableByteChunk;
 import com.github.dm.jrt.android.core.invocation.AbstractContextInvocation;
 import com.github.dm.jrt.android.object.ContextInvocationTarget;
-import com.github.dm.jrt.channel.builder.BufferStreamConfiguration.CloseActionType;
-import com.github.dm.jrt.channel.io.ByteChannel.BufferOutputStream;
+import com.github.dm.jrt.channel.builder.ChunkStreamConfiguration.CloseActionType;
+import com.github.dm.jrt.channel.io.ByteChannel.ChunkOutputStream;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
@@ -74,9 +74,9 @@ public class ServiceCallInvocation
 
   private boolean mHasMediaType;
 
-  private Channel<ParcelableByteBuffer, ParcelableByteBuffer> mInputChannel;
+  private Channel<ParcelableByteChunk, ParcelableByteChunk> mInputChannel;
 
-  private boolean mIsRequest;
+  private boolean mIsAsyncRequest;
 
   private MediaType mMediaType;
 
@@ -85,10 +85,12 @@ public class ServiceCallInvocation
   @Override
   public void onComplete(@NotNull final Channel<ParcelableFlow<Object>, ?> result) throws
       Exception {
-    final Channel<ParcelableByteBuffer, ParcelableByteBuffer> inputChannel = mInputChannel;
+    final Channel<ParcelableByteChunk, ParcelableByteChunk> inputChannel = mInputChannel;
     if (inputChannel != null) {
       inputChannel.close();
-      asyncRequest(result);
+      if (!mIsAsyncRequest) {
+        asyncRequest(result);
+      }
 
     } else {
       syncRequest(result);
@@ -111,18 +113,19 @@ public class ServiceCallInvocation
 
       case BYTES_ID:
         if (mInputChannel == null) {
-          mInputChannel = JRoutineCore.<ParcelableByteBuffer>ofInputs().buildChannel();
+          mInputChannel = JRoutineCore.<ParcelableByteChunk>ofInputs().buildChannel();
         }
 
-        final ParcelableByteBuffer buffer = input.data();
-        mInputChannel.pass(buffer);
+        final ParcelableByteChunk chunk = input.data();
+        mInputChannel.pass(chunk);
         break;
 
       default:
         throw new IllegalArgumentException("unknown flow ID: " + input.id);
     }
 
-    if (mHasMediaType && (mRequestData != null) && (mInputChannel != null)) {
+    if (!mIsAsyncRequest && mHasMediaType && (mRequestData != null) && (mInputChannel != null)) {
+      mIsAsyncRequest = true;
       asyncRequest(result);
     }
   }
@@ -137,11 +140,6 @@ public class ServiceCallInvocation
 
   private void asyncRequest(@NotNull final Channel<ParcelableFlow<Object>, ?> result) throws
       Exception {
-    if (mIsRequest) {
-      return;
-    }
-
-    mIsRequest = true;
     final Request request =
         mRequestData.requestWithBody(new AsyncRequestBody(mMediaType, mInputChannel));
     final Channel<ParcelableFlow<Object>, ParcelableFlow<Object>> outputChannel =
@@ -172,7 +170,7 @@ public class ServiceCallInvocation
 
   @NotNull
   private OkHttpClient getClient() throws Exception {
-    return (OkHttpClient) ConstantConditions.notNull("http client instance", ContextInvocationTarget
+    return ConstantConditions.notNull("http client instance", (OkHttpClient) ContextInvocationTarget
         .instanceOf(OkHttpClient.class)
         .getInvocationTarget(getContext())
         .getTarget());
@@ -181,18 +179,19 @@ public class ServiceCallInvocation
   private void publishResult(@NotNull final ResponseBody responseBody,
       @NotNull final Channel<ParcelableFlow<Object>, ?> result) throws IOException {
     final MediaType mediaType = responseBody.contentType();
-    if (mediaType != null) {
-      result.pass(new ParcelableFlow<Object>(MEDIA_TYPE_ID, mediaType.toString()));
-    }
-
+    result.pass(new ParcelableFlow<Object>(ConverterChannelConsumer.MEDIA_TYPE_ID,
+        (mediaType != null) ? mediaType.toString() : null));
+    result.pass(new ParcelableFlow<Object>(ConverterChannelConsumer.CONTENT_LENGTH_ID,
+        responseBody.contentLength()));
     final Channel<Object, ?> channel =
-        AndroidChannels.parcelableFlowInput(result, BYTES_ID).buildChannel();
-    final BufferOutputStream outputStream = ParcelableByteChannel.from(channel)
-                                                                 .applyBufferStreamConfiguration()
-                                                                 .withOnClose(
-                                                                     CloseActionType.CLOSE_CHANNEL)
-                                                                 .configured()
-                                                                 .buildOutputStream();
+        AndroidChannels.parcelableFlowInput(result, ConverterChannelConsumer.BYTES_ID)
+                       .buildChannel();
+    final ChunkOutputStream outputStream = ParcelableByteChannel.withOutput(channel)
+                                                                .applyChunkStreamConfiguration()
+                                                                .withOnClose(
+                                                                    CloseActionType.CLOSE_CHANNEL)
+                                                                .configured()
+                                                                .buildOutputStream();
     try {
       outputStream.transferFrom(responseBody.byteStream());
 
@@ -219,7 +218,7 @@ public class ServiceCallInvocation
    */
   private static class AsyncRequestBody extends RequestBody {
 
-    private final Channel<ParcelableByteBuffer, ParcelableByteBuffer> mInputChannel;
+    private final Channel<ParcelableByteChunk, ParcelableByteChunk> mInputChannel;
 
     private final MediaType mMediaType;
 
@@ -230,7 +229,7 @@ public class ServiceCallInvocation
      * @param inputChannel the input channel.
      */
     private AsyncRequestBody(@Nullable final MediaType mediaType,
-        @NotNull final Channel<ParcelableByteBuffer, ParcelableByteBuffer> inputChannel) {
+        @NotNull final Channel<ParcelableByteChunk, ParcelableByteChunk> inputChannel) {
       mMediaType = mediaType;
       mInputChannel = inputChannel;
     }
@@ -245,8 +244,8 @@ public class ServiceCallInvocation
     public void writeTo(final BufferedSink sink) throws IOException {
       final OutputStream outputStream = sink.outputStream();
       try {
-        for (final ParcelableByteBuffer buffer : mInputChannel.in(infinity())) {
-          ParcelableByteChannel.getInputStream(buffer).transferTo(outputStream);
+        for (final ParcelableByteChunk chunk : mInputChannel.in(infinity())) {
+          ParcelableByteChannel.getInputStream(chunk).transferTo(outputStream);
         }
 
       } finally {

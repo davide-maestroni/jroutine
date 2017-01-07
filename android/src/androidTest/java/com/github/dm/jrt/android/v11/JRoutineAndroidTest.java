@@ -26,7 +26,7 @@ import android.test.ActivityInstrumentationTestCase2;
 
 import com.github.dm.jrt.ObjectProxyRoutineBuilder.BuilderType;
 import com.github.dm.jrt.android.R;
-import com.github.dm.jrt.android.channel.io.ParcelableByteChannel.ParcelableByteBuffer;
+import com.github.dm.jrt.android.channel.io.ParcelableByteChannel.ParcelableByteChunk;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.CacheStrategyType;
 import com.github.dm.jrt.android.core.invocation.CallContextInvocation;
 import com.github.dm.jrt.android.core.invocation.TargetInvocationFactory;
@@ -37,8 +37,8 @@ import com.github.dm.jrt.android.core.service.InvocationService;
 import com.github.dm.jrt.android.object.ContextInvocationTarget;
 import com.github.dm.jrt.android.proxy.annotation.LoaderProxy;
 import com.github.dm.jrt.android.proxy.annotation.ServiceProxy;
-import com.github.dm.jrt.channel.io.ByteChannel.BufferInputStream;
-import com.github.dm.jrt.channel.io.ByteChannel.BufferOutputStream;
+import com.github.dm.jrt.channel.io.ByteChannel.ChunkInputStream;
+import com.github.dm.jrt.channel.io.ByteChannel.ChunkOutputStream;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.TemplateChannelConsumer;
@@ -236,16 +236,16 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
       return;
     }
 
-    final Channel<ParcelableByteBuffer, ParcelableByteBuffer> channel =
-        JRoutineAndroid.<ParcelableByteBuffer>ofInputs().buildChannel();
-    final BufferOutputStream stream = JRoutineAndroid.from(channel)
-                                                     .applyBufferStreamConfiguration()
-                                                     .withBufferSize(3)
-                                                     .configured()
-                                                     .buildOutputStream();
+    final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
+        JRoutineAndroid.<ParcelableByteChunk>ofInputs().buildChannel();
+    final ChunkOutputStream stream = JRoutineAndroid.withOutput(channel)
+                                                    .applyChunkStreamConfiguration()
+                                                    .withChunkSize(3)
+                                                    .configured()
+                                                    .buildOutputStream();
     stream.write(new byte[]{31, 17, (byte) 155, 13});
     stream.flush();
-    final BufferInputStream inputStream =
+    final ChunkInputStream inputStream =
         JRoutineAndroid.getInputStream(channel.next(), channel.next());
     final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     assertThat(inputStream.read(outputStream)).isEqualTo(3);
@@ -267,16 +267,16 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
       return;
     }
 
-    final Channel<ParcelableByteBuffer, ParcelableByteBuffer> channel =
-        JRoutineAndroid.<ParcelableByteBuffer>ofInputs().buildChannel();
-    final BufferOutputStream stream = JRoutineAndroid.from(channel)
-                                                     .applyBufferStreamConfiguration()
-                                                     .withBufferSize(3)
-                                                     .configured()
-                                                     .buildOutputStream();
+    final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
+        JRoutineAndroid.<ParcelableByteChunk>ofInputs().buildChannel();
+    final ChunkOutputStream stream = JRoutineAndroid.withOutput(channel)
+                                                    .applyChunkStreamConfiguration()
+                                                    .withChunkSize(3)
+                                                    .configured()
+                                                    .buildOutputStream();
     stream.write(new byte[]{31, 17, (byte) 155, 13});
     stream.flush();
-    final BufferInputStream inputStream =
+    final ChunkInputStream inputStream =
         JRoutineAndroid.getInputStream(channel.eventuallyContinue().all());
     final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     assertThat(inputStream.read(outputStream)).isEqualTo(3);
@@ -596,12 +596,12 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
       return;
     }
 
-    final Channel<ParcelableByteBuffer, ParcelableByteBuffer> channel =
-        JRoutineAndroid.<ParcelableByteBuffer>ofInputs().buildChannel();
-    final BufferOutputStream stream = JRoutineAndroid.from(channel).buildOutputStream();
+    final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
+        JRoutineAndroid.<ParcelableByteChunk>ofInputs().buildChannel();
+    final ChunkOutputStream stream = JRoutineAndroid.withOutput(channel).buildOutputStream();
     stream.write(new byte[]{31, 17, (byte) 155, 13});
     stream.flush();
-    final BufferInputStream inputStream = JRoutineAndroid.getInputStream(channel.next());
+    final ChunkInputStream inputStream = JRoutineAndroid.getInputStream(channel.next());
     final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     assertThat(inputStream.readAll(outputStream)).isEqualTo(4);
     assertThat(outputStream.size()).isEqualTo(4);

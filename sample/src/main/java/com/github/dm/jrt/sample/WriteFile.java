@@ -17,7 +17,7 @@
 package com.github.dm.jrt.sample;
 
 import com.github.dm.jrt.channel.io.ByteChannel;
-import com.github.dm.jrt.channel.io.ByteChannel.ByteBuffer;
+import com.github.dm.jrt.channel.io.ByteChannel.ByteChunk;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
@@ -36,7 +36,7 @@ import java.io.IOException;
  * Created by davide-maestroni on 10/17/2014.
  */
 @SuppressWarnings("WeakerAccess")
-public class WriteFile extends TemplateInvocation<ByteBuffer, Boolean> {
+public class WriteFile extends TemplateInvocation<ByteChunk, Boolean> {
 
   private final File mFile;
 
@@ -65,9 +65,9 @@ public class WriteFile extends TemplateInvocation<ByteBuffer, Boolean> {
   }
 
   @Override
-  public void onInput(final ByteBuffer buffer, @NotNull final Channel<Boolean, ?> result) throws
+  public void onInput(final ByteChunk chunk, @NotNull final Channel<Boolean, ?> result) throws
       IOException {
-    ByteChannel.getInputStream(buffer).transferTo(mOutputStream);
+    ByteChannel.getInputStream(chunk).transferTo(mOutputStream);
   }
 
   @Override

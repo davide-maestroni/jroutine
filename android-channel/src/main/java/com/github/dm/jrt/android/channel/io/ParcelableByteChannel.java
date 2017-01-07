@@ -19,13 +19,13 @@ package com.github.dm.jrt.android.channel.io;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.github.dm.jrt.channel.builder.BufferStreamConfiguration;
-import com.github.dm.jrt.channel.builder.BufferStreamConfiguration.Builder;
-import com.github.dm.jrt.channel.io.BufferStreamBuilder;
+import com.github.dm.jrt.channel.builder.ChunkStreamConfiguration;
+import com.github.dm.jrt.channel.builder.ChunkStreamConfiguration.Builder;
 import com.github.dm.jrt.channel.io.ByteChannel;
-import com.github.dm.jrt.channel.io.ByteChannel.BufferInputStream;
-import com.github.dm.jrt.channel.io.ByteChannel.BufferOutputStream;
-import com.github.dm.jrt.channel.io.ByteChannel.ByteBuffer;
+import com.github.dm.jrt.channel.io.ByteChannel.ByteChunk;
+import com.github.dm.jrt.channel.io.ByteChannel.ChunkInputStream;
+import com.github.dm.jrt.channel.io.ByteChannel.ChunkOutputStream;
+import com.github.dm.jrt.channel.io.ChunkOutputStreamBuilder;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ChannelConsumer;
@@ -47,24 +47,25 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * <p>
  * For example, an invocation writing bytes can be implemented as:
  * <pre><code>
- * public void onInput(final IN in, final Channel&lt;ParcelableByteBuffer, ?&gt; result) {
+ * public void onInput(final IN in, final Channel&lt;ParcelableByteChunk, ?&gt; result) {
  *   ...
- *   final BufferOutputStream outputStream = ParcelableByteChannel.from(result).buildOutputStream();
+ *   final ChunkOutputStream outputStream = ParcelableByteChannel.withOutput(result)
+ *                                                                .buildOutputStream();
  *   ...
  * }
  * </code></pre>
  * <p>
  * While an invocation reading them:
  * <pre><code>
- * public void onInput(final ParcelableByteBuffer buffer, final Channel&lt;OUT, ?&gt; result) {
+ * public void onInput(final ParcelableByteChunk chunk, final Channel&lt;OUT, ?&gt; result) {
  *   ...
- *   final BufferInputStream getInputStream = ParcelableByteChannel.getInputStream(buffer);
+ *   final ChunkInputStream getInputStream = ParcelableByteChannel.getInputStream(chunk);
  *   ...
  * }
  * </code></pre>
- * The generated buffers implement the parcelable interface.
+ * The generated chunks implement the parcelable interface.
  * <br>
- * Note that the streams used to write into and read from buffers should be properly closed as the
+ * Note that the streams used to write into and read from chunks should be properly closed as the
  * Java best practices suggest.
  * <p>
  * Created by davide-maestroni on 09/03/2015.
@@ -79,11 +80,69 @@ public class ParcelableByteChannel {
   }
 
   /**
-   * Returns a builder of buffer output streams.
+   * Creates an input stream returning the concatenation of the data contained in the specified
+   * chunks.
+   * <p>
+   * Note that only one input stream can be created for each chunk.
+   *
+   * @param chunks the byte chunks whose data have to be concatenated.
+   * @return the input stream.
+   * @throws java.lang.IllegalStateException if an input stream has been already created for one
+   *                                         of the specified chunks.
+   */
+  @NotNull
+  public static ChunkInputStream getInputStream(@NotNull final ParcelableByteChunk... chunks) {
+    final ArrayList<ByteChunk> byteChunks = new ArrayList<ByteChunk>(chunks.length);
+    for (final ParcelableByteChunk chunk : chunks) {
+      byteChunks.add(chunk.getChunk());
+    }
+
+    return ByteChannel.getInputStream(byteChunks);
+  }
+
+  /**
+   * Creates an input stream returning the concatenation of the data contained in the specified
+   * chunks.
+   * <p>
+   * Note that only one input stream can be created for each chunk.
+   *
+   * @param chunks the byte chunks whose data have to be concatenated.
+   * @return the input stream.
+   * @throws java.lang.IllegalStateException if an input stream has been already created for one
+   *                                         of the specified chunks.
+   */
+  @NotNull
+  public static ChunkInputStream getInputStream(
+      @NotNull final Iterable<? extends ParcelableByteChunk> chunks) {
+    final ArrayList<ByteChunk> byteChunks = new ArrayList<ByteChunk>();
+    for (final ParcelableByteChunk chunk : chunks) {
+      byteChunks.add(chunk.getChunk());
+    }
+
+    return ByteChannel.getInputStream(byteChunks);
+  }
+
+  /**
+   * Creates an input stream returning the data contained in the specified chunk.
+   * <p>
+   * Note that only one input stream can be created for each chunk.
+   *
+   * @param chunk the byte chunk.
+   * @return the input stream.
+   * @throws java.lang.IllegalStateException if an input stream has been already created for the
+   *                                         specified chunk.
+   */
+  @NotNull
+  public static ChunkInputStream getInputStream(@NotNull final ParcelableByteChunk chunk) {
+    return ByteChannel.getInputStream(chunk.getChunk());
+  }
+
+  /**
+   * Returns a builder of chunk output streams.
    * <br>
-   * Since the byte buffers generated by the channel are likely to be part of a remote procedure
+   * Since the byte chunks generated by the channel are likely to be part of a remote procedure
    * call, be aware of the limits imposed by the Android OS architecture when choosing a specific
-   * buffer size (see {@link android.os.TransactionTooLargeException}).
+   * chunk size (see {@link android.os.TransactionTooLargeException}).
    * <p>
    * The built streams will not close the underlying channel by default.
    *
@@ -91,135 +150,75 @@ public class ParcelableByteChannel {
    * @return the output stream builder.
    */
   @NotNull
-  public static BufferStreamBuilder from(
-      @NotNull final Channel<? super ParcelableByteBuffer, ?> channel) {
-    return new DefaultBufferStreamBuilder(channel);
+  public static ChunkOutputStreamBuilder withOutput(
+      @NotNull final Channel<? super ParcelableByteChunk, ?> channel) {
+    return new DefaultChunkOutputStreamBuilder(channel);
   }
 
   /**
-   * Creates an input stream returning the concatenation of the data contained in the specified
-   * buffers.
+   * Parcelable chunk of bytes.
    * <p>
-   * Note that only one input stream can be created for each buffer.
-   *
-   * @param buffers the byte buffers whose data have to be concatenated.
-   * @return the input stream.
-   * @throws java.lang.IllegalStateException if an input stream has been already created for one
-   *                                         of the specified buffers.
-   */
-  @NotNull
-  public static BufferInputStream getInputStream(@NotNull final ParcelableByteBuffer... buffers) {
-    final ArrayList<ByteBuffer> byteBuffers = new ArrayList<ByteBuffer>(buffers.length);
-    for (final ParcelableByteBuffer buffer : buffers) {
-      byteBuffers.add(buffer.getBuffer());
-    }
-
-    return ByteChannel.getInputStream(byteBuffers);
-  }
-
-  /**
-   * Creates an input stream returning the concatenation of the data contained in the specified
-   * buffers.
-   * <p>
-   * Note that only one input stream can be created for each buffer.
-   *
-   * @param buffers the byte buffers whose data have to be concatenated.
-   * @return the input stream.
-   * @throws java.lang.IllegalStateException if an input stream has been already created for one
-   *                                         of the specified buffers.
-   */
-  @NotNull
-  public static BufferInputStream getInputStream(
-      @NotNull final Iterable<? extends ParcelableByteBuffer> buffers) {
-    final ArrayList<ByteBuffer> byteBuffers = new ArrayList<ByteBuffer>();
-    for (final ParcelableByteBuffer buffer : buffers) {
-      byteBuffers.add(buffer.getBuffer());
-    }
-
-    return ByteChannel.getInputStream(byteBuffers);
-  }
-
-  /**
-   * Creates an input stream returning the data contained in the specified buffer.
-   * <p>
-   * Note that only one input stream can be created for each buffer.
-   *
-   * @param buffer the byte buffer.
-   * @return the input stream.
-   * @throws java.lang.IllegalStateException if an input stream has been already created for the
-   *                                         specified buffer.
-   */
-  @NotNull
-  public static BufferInputStream getInputStream(@NotNull final ParcelableByteBuffer buffer) {
-    return ByteChannel.getInputStream(buffer.getBuffer());
-  }
-
-  /**
-   * Parcelable buffer of bytes.
-   * <p>
-   * Buffer instances are managed by the owning byte channel and recycled when released, in order
-   * to minimize memory consumption. Byte buffers are automatically acquired by
-   * {@code BufferOutputStream}s and passed to the underlying channel.
+   * Chunk instances are managed by the owning byte channel and recycled when released, in order
+   * to minimize memory consumption. Byte chunks are automatically acquired by
+   * {@code ChunkOutputStream}s and passed to the underlying channel.
    * <br>
-   * The data contained in a buffer can be read through the dedicated {@code BufferInputStream}
+   * The data contained in a chunk can be read through the dedicated {@code ChunkInputStream}
    * returned by one of the {@code ParcelableByteChannel.getInputStream()} methods. Note that
    * only one
-   * input stream can be created for each buffer, any further attempt will generate an exception.
+   * input stream can be created for each chunk, any further attempt will generate an exception.
    * <br>
-   * Used buffers will be released as soon as the corresponding input stream is closed.
+   * Used chunks will be released as soon as the corresponding input stream is closed.
    *
-   * @see ParcelableByteChannel#getInputStream(ParcelableByteBuffer)
-   * @see ParcelableByteChannel#getInputStream(ParcelableByteBuffer...)
+   * @see ParcelableByteChannel#getInputStream(ParcelableByteChunk)
+   * @see ParcelableByteChannel#getInputStream(ParcelableByteChunk...)
    * @see ParcelableByteChannel#getInputStream(Iterable)
    */
-  public static class ParcelableByteBuffer extends DeepEqualObject implements Parcelable {
+  public static class ParcelableByteChunk extends DeepEqualObject implements Parcelable {
 
     /**
      * Creator instance needed by the parcelable protocol.
      */
-    public static final Creator<ParcelableByteBuffer> CREATOR =
-        new Creator<ParcelableByteBuffer>() {
+    public static final Creator<ParcelableByteChunk> CREATOR = new Creator<ParcelableByteChunk>() {
 
-          @Override
-          public ParcelableByteBuffer createFromParcel(final Parcel in) {
-            final byte[] data = in.createByteArray();
-            final Channel<ByteBuffer, ByteBuffer> channel =
-                JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
-            final BufferOutputStream outputStream = ByteChannel.from(channel)
-                                                               .applyBufferStreamConfiguration()
-                                                               .withBufferSize(
-                                                                   Math.max(data.length, 1))
-                                                               .configured()
-                                                               .buildOutputStream();
-            try {
-              outputStream.write(data);
-              outputStream.close();
-              return new ParcelableByteBuffer(channel.next());
+      @Override
+      public ParcelableByteChunk createFromParcel(final Parcel in) {
+        final byte[] data = in.createByteArray();
+        final Channel<ByteChunk, ByteChunk> channel =
+            JRoutineCore.<ByteChunk>ofInputs().buildChannel();
+        final ChunkOutputStream outputStream = ByteChannel.withOutput(channel)
+                                                          .applyChunkStreamConfiguration()
+                                                          .withChunkSize(Math.max(data.length, 1))
+                                                          .configured()
+                                                          .buildOutputStream();
+        try {
+          outputStream.write(data);
+          outputStream.close();
+          return new ParcelableByteChunk(channel.next());
 
-            } catch (final IOException e) {
-              // It should never happen...
-              throw new IllegalStateException(e);
-            }
-          }
+        } catch (final IOException e) {
+          // It should never happen...
+          throw new IllegalStateException(e);
+        }
+      }
 
-          @Override
-          public ParcelableByteBuffer[] newArray(final int size) {
-            return new ParcelableByteBuffer[size];
-          }
-        };
+      @Override
+      public ParcelableByteChunk[] newArray(final int size) {
+        return new ParcelableByteChunk[size];
+      }
+    };
 
     private static final byte[] EMPTY_ARRAY = new byte[0];
 
-    private final ByteBuffer mBuffer;
+    private final ByteChunk mChunk;
 
     /**
      * Constructor.
      *
-     * @param buffer the backing byte buffer or null.
+     * @param chunk the backing byte chunk or null.
      */
-    private ParcelableByteBuffer(@NotNull final ByteBuffer buffer) {
-      super(asArgs(ConstantConditions.notNull("byte buffer", buffer)));
-      mBuffer = buffer;
+    private ParcelableByteChunk(@NotNull final ByteChunk chunk) {
+      super(asArgs(ConstantConditions.notNull("byte chunk", chunk)));
+      mChunk = chunk;
     }
 
     @Override
@@ -229,9 +228,9 @@ public class ParcelableByteChannel {
 
     @Override
     public void writeToParcel(final Parcel dest, final int flags) {
-      final ByteBuffer buffer = mBuffer;
-      if (buffer != null) {
-        final BufferInputStream inputStream = ByteChannel.getInputStream(buffer);
+      final ByteChunk chunk = mChunk;
+      if (chunk != null) {
+        final ChunkInputStream inputStream = ByteChannel.getInputStream(chunk);
         final ParcelOutputStream outputStream = new ParcelOutputStream(inputStream.available());
         try {
           inputStream.transferTo(outputStream);
@@ -248,34 +247,34 @@ public class ParcelableByteChannel {
     }
 
     /**
-     * Returns the size in number of bytes of this buffer.
+     * Returns the size in number of bytes of this chunk.
      *
-     * @return the buffer size.
+     * @return the chunk size.
      */
     public int size() {
-      final ByteBuffer buffer = mBuffer;
-      return (buffer != null) ? buffer.size() : 0;
+      final ByteChunk chunk = mChunk;
+      return (chunk != null) ? chunk.size() : 0;
     }
 
     @NotNull
-    private ByteBuffer getBuffer() {
-      return mBuffer;
+    private ByteChunk getChunk() {
+      return mChunk;
     }
   }
 
   /**
-   * Channel consumer transforming byte buffers into parcelable buffers.
+   * Channel consumer transforming byte chunks into parcelable chunks.
    */
-  private static class BufferChannelConsumer implements ChannelConsumer<ByteBuffer> {
+  private static class ChunkChannelConsumer implements ChannelConsumer<ByteChunk> {
 
-    private final Channel<? super ParcelableByteBuffer, ?> mChannel;
+    private final Channel<? super ParcelableByteChunk, ?> mChannel;
 
     /**
      * Constructor.
      *
      * @param channel the channel to which to pass the data.
      */
-    private BufferChannelConsumer(@NotNull final Channel<? super ParcelableByteBuffer, ?> channel) {
+    private ChunkChannelConsumer(@NotNull final Channel<? super ParcelableByteChunk, ?> channel) {
       mChannel = ConstantConditions.notNull("channel instance", channel);
     }
 
@@ -290,48 +289,48 @@ public class ParcelableByteChannel {
     }
 
     @Override
-    public void onOutput(final ByteBuffer output) {
-      mChannel.pass(new ParcelableByteBuffer(output));
+    public void onOutput(final ByteChunk output) {
+      mChannel.pass(new ParcelableByteChunk(output));
     }
   }
 
   /**
    * Default implementation of an output stream builder.
    */
-  private static class DefaultBufferStreamBuilder implements BufferStreamBuilder {
+  private static class DefaultChunkOutputStreamBuilder implements ChunkOutputStreamBuilder {
 
-    private final Channel<? super ParcelableByteBuffer, ?> mChannel;
+    private final Channel<? super ParcelableByteChunk, ?> mChannel;
 
-    private BufferStreamConfiguration mConfiguration =
-        BufferStreamConfiguration.defaultConfiguration();
+    private ChunkStreamConfiguration mConfiguration =
+        ChunkStreamConfiguration.defaultConfiguration();
 
     /**
      * Constructor.
      *
      * @param channel the output channel to feed with data.
      */
-    private DefaultBufferStreamBuilder(
-        @NotNull final Channel<? super ParcelableByteBuffer, ?> channel) {
+    private DefaultChunkOutputStreamBuilder(
+        @NotNull final Channel<? super ParcelableByteChunk, ?> channel) {
       mChannel = ConstantConditions.notNull("channel instance", channel);
     }
 
     @NotNull
-    public BufferStreamBuilder apply(@NotNull final BufferStreamConfiguration configuration) {
+    public ChunkOutputStreamBuilder apply(@NotNull final ChunkStreamConfiguration configuration) {
       mConfiguration = ConstantConditions.notNull("output stream configuration", configuration);
       return this;
     }
 
     @NotNull
-    public Builder<? extends BufferStreamBuilder> applyBufferStreamConfiguration() {
-      return new Builder<BufferStreamBuilder>(this, mConfiguration);
+    public Builder<? extends ChunkOutputStreamBuilder> applyChunkStreamConfiguration() {
+      return new Builder<ChunkOutputStreamBuilder>(this, mConfiguration);
     }
 
     @NotNull
-    public BufferOutputStream buildOutputStream() {
-      final Channel<ByteBuffer, ByteBuffer> outputChannel =
-          JRoutineCore.<ByteBuffer>ofInputs().buildChannel();
-      outputChannel.bind(new BufferChannelConsumer(mChannel));
-      return ByteChannel.from(outputChannel).apply(mConfiguration).buildOutputStream();
+    public ChunkOutputStream buildOutputStream() {
+      final Channel<ByteChunk, ByteChunk> outputChannel =
+          JRoutineCore.<ByteChunk>ofInputs().buildChannel();
+      outputChannel.bind(new ChunkChannelConsumer(mChannel));
+      return ByteChannel.withOutput(outputChannel).apply(mConfiguration).buildOutputStream();
     }
   }
 

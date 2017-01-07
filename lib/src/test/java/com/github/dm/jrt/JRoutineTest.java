@@ -17,9 +17,9 @@
 package com.github.dm.jrt;
 
 import com.github.dm.jrt.ObjectProxyRoutineBuilder.BuilderType;
-import com.github.dm.jrt.channel.io.ByteChannel.BufferInputStream;
-import com.github.dm.jrt.channel.io.ByteChannel.BufferOutputStream;
-import com.github.dm.jrt.channel.io.ByteChannel.ByteBuffer;
+import com.github.dm.jrt.channel.io.ByteChannel.ByteChunk;
+import com.github.dm.jrt.channel.io.ByteChannel.ChunkInputStream;
+import com.github.dm.jrt.channel.io.ByteChannel.ChunkOutputStream;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.TemplateChannelConsumer;
@@ -180,15 +180,15 @@ public class JRoutineTest {
   @Test
   public void testConcatReadOutput() throws IOException {
 
-    final Channel<ByteBuffer, ByteBuffer> channel = JRoutine.<ByteBuffer>ofInputs().buildChannel();
-    final BufferOutputStream stream = JRoutine.from(channel)
-                                              .applyBufferStreamConfiguration()
-                                              .withBufferSize(3)
-                                              .configured()
-                                              .buildOutputStream();
+    final Channel<ByteChunk, ByteChunk> channel = JRoutine.<ByteChunk>ofInputs().buildChannel();
+    final ChunkOutputStream stream = JRoutine.withOutput(channel)
+                                             .applyChunkStreamConfiguration()
+                                             .withChunkSize(3)
+                                             .configured()
+                                             .buildOutputStream();
     stream.write(new byte[]{31, 17, (byte) 155, 13});
     stream.flush();
-    final BufferInputStream inputStream = JRoutine.getInputStream(channel.next(), channel.next());
+    final ChunkInputStream inputStream = JRoutine.getInputStream(channel.next(), channel.next());
     final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     assertThat(inputStream.read(outputStream)).isEqualTo(3);
     assertThat(outputStream.size()).isEqualTo(3);
@@ -207,15 +207,15 @@ public class JRoutineTest {
   @Test
   public void testConcatReadOutput2() throws IOException {
 
-    final Channel<ByteBuffer, ByteBuffer> channel = JRoutine.<ByteBuffer>ofInputs().buildChannel();
-    final BufferOutputStream stream = JRoutine.from(channel)
-                                              .applyBufferStreamConfiguration()
-                                              .withBufferSize(3)
-                                              .configured()
-                                              .buildOutputStream();
+    final Channel<ByteChunk, ByteChunk> channel = JRoutine.<ByteChunk>ofInputs().buildChannel();
+    final ChunkOutputStream stream = JRoutine.withOutput(channel)
+                                             .applyChunkStreamConfiguration()
+                                             .withChunkSize(3)
+                                             .configured()
+                                             .buildOutputStream();
     stream.write(new byte[]{31, 17, (byte) 155, 13});
     stream.flush();
-    final BufferInputStream inputStream =
+    final ChunkInputStream inputStream =
         JRoutine.getInputStream(channel.eventuallyContinue().all());
     final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     assertThat(inputStream.read(outputStream)).isEqualTo(3);
@@ -568,11 +568,11 @@ public class JRoutineTest {
   @Test
   public void testReadAll() throws IOException {
 
-    final Channel<ByteBuffer, ByteBuffer> channel = JRoutine.<ByteBuffer>ofInputs().buildChannel();
-    final BufferOutputStream stream = JRoutine.from(channel).buildOutputStream();
+    final Channel<ByteChunk, ByteChunk> channel = JRoutine.<ByteChunk>ofInputs().buildChannel();
+    final ChunkOutputStream stream = JRoutine.withOutput(channel).buildOutputStream();
     stream.write(new byte[]{31, 17, (byte) 155, 13});
     stream.flush();
-    final BufferInputStream inputStream = JRoutine.getInputStream(channel.next());
+    final ChunkInputStream inputStream = JRoutine.getInputStream(channel.next());
     final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     assertThat(inputStream.readAll(outputStream)).isEqualTo(4);
     assertThat(outputStream.size()).isEqualTo(4);

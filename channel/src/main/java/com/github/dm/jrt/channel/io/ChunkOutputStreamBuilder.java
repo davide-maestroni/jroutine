@@ -16,17 +16,18 @@
 
 package com.github.dm.jrt.channel.io;
 
-import com.github.dm.jrt.channel.builder.BufferStreamConfigurable;
-import com.github.dm.jrt.channel.io.ByteChannel.BufferOutputStream;
+import com.github.dm.jrt.channel.builder.ChunkStreamConfigurable;
+import com.github.dm.jrt.channel.io.ByteChannel.ChunkOutputStream;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Interface defining a builder of buffer output streams.
+ * Interface defining a builder of chunk output streams.
  * <p>
  * Created by davide-maestroni on 01/01/2017.
  */
-public interface BufferStreamBuilder extends BufferStreamConfigurable<BufferStreamBuilder> {
+public interface ChunkOutputStreamBuilder
+    extends ChunkStreamConfigurable<ChunkOutputStreamBuilder> {
 
   /**
    * Builds a new output stream instance.
@@ -34,5 +35,5 @@ public interface BufferStreamBuilder extends BufferStreamConfigurable<BufferStre
    * @return the output stream instance.
    */
   @NotNull
-  BufferOutputStream buildOutputStream();
+  ChunkOutputStream buildOutputStream();
 }

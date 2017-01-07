@@ -21,12 +21,12 @@ import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.github.dm.jrt.android.channel.TestActivity;
-import com.github.dm.jrt.android.channel.io.ParcelableByteChannel.ParcelableByteBuffer;
+import com.github.dm.jrt.android.channel.io.ParcelableByteChannel.ParcelableByteChunk;
 import com.github.dm.jrt.android.core.JRoutineService;
 import com.github.dm.jrt.android.core.invocation.TemplateContextInvocation;
-import com.github.dm.jrt.channel.builder.BufferStreamConfiguration.CloseActionType;
-import com.github.dm.jrt.channel.io.ByteChannel.BufferInputStream;
-import com.github.dm.jrt.channel.io.ByteChannel.BufferOutputStream;
+import com.github.dm.jrt.channel.builder.ChunkStreamConfiguration.CloseActionType;
+import com.github.dm.jrt.channel.io.ByteChannel.ChunkInputStream;
+import com.github.dm.jrt.channel.io.ByteChannel.ChunkOutputStream;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 
@@ -60,20 +60,19 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
 
   public void testAvailable() throws IOException {
 
-    final Channel<ParcelableByteBuffer, ParcelableByteBuffer> channel =
+    final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
         JRoutineService.on(serviceFrom(getActivity()))
                        .with(factoryOf(PassingInvocation.class))
                        .call();
-    final BufferOutputStream stream = ParcelableByteChannel.from(channel)
-                                                           .applyBufferStreamConfiguration()
-                                                           .withOnClose(
-                                                               CloseActionType.CLOSE_STREAM)
-                                                           .configured()
-                                                           .buildOutputStream();
+    final ChunkOutputStream stream = ParcelableByteChannel.withOutput(channel)
+                                                          .applyChunkStreamConfiguration()
+                                                          .withOnClose(CloseActionType.CLOSE_STREAM)
+                                                          .configured()
+                                                          .buildOutputStream();
     final byte[] b = new byte[16];
     stream.write(b);
     stream.close();
-    final BufferInputStream inputStream =
+    final ChunkInputStream inputStream =
         ParcelableByteChannel.getInputStream(channel.close().in(seconds(10)).next());
     assertThat(inputStream.available()).isEqualTo(16);
     assertThat(inputStream.read()).isNotEqualTo(-1);
@@ -86,16 +85,16 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
 
   public void testBufferEquals() throws IOException {
 
-    final Channel<ParcelableByteBuffer, ParcelableByteBuffer> channel =
-        JRoutineCore.<ParcelableByteBuffer>ofInputs().buildChannel();
-    final Channel<?, ParcelableByteBuffer> result = JRoutineService.on(serviceFrom(getActivity()))
-                                                                   .with(factoryOf(
-                                                                       PassingInvocation.class))
-                                                                   .call(channel);
-    final BufferOutputStream stream = ParcelableByteChannel.from(channel).buildOutputStream();
+    final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
+        JRoutineCore.<ParcelableByteChunk>ofInputs().buildChannel();
+    final Channel<?, ParcelableByteChunk> result = JRoutineService.on(serviceFrom(getActivity()))
+                                                                  .with(factoryOf(
+                                                                      PassingInvocation.class))
+                                                                  .call(channel);
+    final ChunkOutputStream stream = ParcelableByteChannel.withOutput(channel).buildOutputStream();
     stream.write(new byte[]{31, 17, (byte) 155, 13});
     stream.flush();
-    final ParcelableByteBuffer buffer1 = result.in(seconds(10)).next();
+    final ParcelableByteChunk buffer1 = result.in(seconds(10)).next();
     assertThat(buffer1).isEqualTo(buffer1);
     assertThat(buffer1).isNotEqualTo("test");
     stream.write(31);
@@ -103,7 +102,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     stream.write(155);
     stream.write(13);
     stream.flush();
-    final ParcelableByteBuffer buffer2 = result.in(seconds(10)).next();
+    final ParcelableByteChunk buffer2 = result.in(seconds(10)).next();
     assertThat(buffer1).isNotSameAs(buffer2);
     assertThat(buffer1.hashCode()).isEqualTo(buffer2.hashCode());
     assertThat(buffer1).isEqualTo(buffer2);
@@ -111,7 +110,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     ParcelableByteChannel.getInputStream(buffer2).close();
     stream.write(new byte[]{31, 17, (byte) 155});
     stream.flush();
-    final ParcelableByteBuffer buffer3 = result.in(seconds(10)).next();
+    final ParcelableByteChunk buffer3 = result.in(seconds(10)).next();
     assertThat(buffer1).isNotSameAs(buffer3);
     assertThat(buffer1.hashCode()).isNotEqualTo(buffer3.hashCode());
     assertThat(buffer1).isNotEqualTo(buffer3);
@@ -120,22 +119,21 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
 
   public void testConcatAvailable() throws IOException {
 
-    final Channel<ParcelableByteBuffer, ParcelableByteBuffer> channel =
+    final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
         JRoutineService.on(serviceFrom(getActivity()))
                        .with(factoryOf(PassingInvocation.class))
                        .call();
-    final BufferOutputStream stream = ParcelableByteChannel.from(channel)
-                                                           .applyBufferStreamConfiguration()
-                                                           .withBufferSize(8)
-                                                           .withOnClose(
-                                                               CloseActionType.CLOSE_STREAM)
-                                                           .configured()
-                                                           .buildOutputStream();
+    final ChunkOutputStream stream = ParcelableByteChannel.withOutput(channel)
+                                                          .applyChunkStreamConfiguration()
+                                                          .withChunkSize(8)
+                                                          .withOnClose(CloseActionType.CLOSE_STREAM)
+                                                          .configured()
+                                                          .buildOutputStream();
     final byte[] b = new byte[16];
     stream.write(b);
     stream.close();
-    final Channel<?, ParcelableByteBuffer> result = channel.close();
-    final BufferInputStream inputStream =
+    final Channel<?, ParcelableByteChunk> result = channel.close();
+    final ChunkInputStream inputStream =
         ParcelableByteChannel.getInputStream(result.in(seconds(10)).next(),
             result.in(seconds(10)).next());
     assertThat(inputStream.available()).isEqualTo(16);
@@ -150,19 +148,19 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
   @SuppressWarnings("ResultOfMethodCallIgnored")
   public void testConcatClose() throws IOException {
 
-    final Channel<ParcelableByteBuffer, ParcelableByteBuffer> channel =
+    final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
         JRoutineService.on(serviceFrom(getActivity()))
                        .with(factoryOf(PassingInvocation.class))
                        .call();
-    final BufferOutputStream stream = ParcelableByteChannel.from(channel)
-                                                           .applyBufferStreamConfiguration()
-                                                           .withBufferSize(2)
-                                                           .configured()
-                                                           .buildOutputStream();
+    final ChunkOutputStream stream = ParcelableByteChannel.withOutput(channel)
+                                                          .applyChunkStreamConfiguration()
+                                                          .withChunkSize(2)
+                                                          .configured()
+                                                          .buildOutputStream();
     stream.write(new byte[]{31, 17, (byte) 155, 13});
     stream.flush();
-    final Channel<?, ParcelableByteBuffer> result = channel.close();
-    final BufferInputStream inputStream =
+    final Channel<?, ParcelableByteChunk> result = channel.close();
+    final ChunkInputStream inputStream =
         ParcelableByteChannel.getInputStream(result.in(seconds(10)).next(),
             result.in(seconds(10)).next());
     inputStream.close();
@@ -171,23 +169,22 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
 
   public void testConcatMark() throws IOException {
 
-    final Channel<ParcelableByteBuffer, ParcelableByteBuffer> channel =
+    final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
         JRoutineService.on(serviceFrom(getActivity()))
                        .with(factoryOf(PassingInvocation.class))
                        .call();
-    final BufferOutputStream stream = ParcelableByteChannel.from(channel)
-                                                           .applyBufferStreamConfiguration()
-                                                           .withBufferSize(4)
-                                                           .withOnClose(
-                                                               CloseActionType.CLOSE_STREAM)
-                                                           .configured()
-                                                           .buildOutputStream();
+    final ChunkOutputStream stream = ParcelableByteChannel.withOutput(channel)
+                                                          .applyChunkStreamConfiguration()
+                                                          .withChunkSize(4)
+                                                          .withOnClose(CloseActionType.CLOSE_STREAM)
+                                                          .configured()
+                                                          .buildOutputStream();
     final byte[] b =
         new byte[]{(byte) 1, (byte) 2, (byte) 3, (byte) 4, (byte) 5, (byte) 6, (byte) 7, (byte) 8};
     stream.write(b);
     stream.close();
-    final Channel<?, ParcelableByteBuffer> result = channel.close();
-    final BufferInputStream inputStream =
+    final Channel<?, ParcelableByteChunk> result = channel.close();
+    final ChunkInputStream inputStream =
         ParcelableByteChannel.getInputStream(result.in(seconds(10)).next(),
             result.in(seconds(10)).next());
     assertThat(inputStream.read()).isEqualTo(1);
@@ -206,19 +203,19 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
 
   public void testConcatReadByte() throws IOException {
 
-    final Channel<ParcelableByteBuffer, ParcelableByteBuffer> channel =
+    final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
         JRoutineService.on(serviceFrom(getActivity()))
                        .with(factoryOf(PassingInvocation.class))
                        .call();
-    final BufferOutputStream stream = ParcelableByteChannel.from(channel)
-                                                           .applyBufferStreamConfiguration()
-                                                           .withBufferSize(2)
-                                                           .configured()
-                                                           .buildOutputStream();
+    final ChunkOutputStream stream = ParcelableByteChannel.withOutput(channel)
+                                                          .applyChunkStreamConfiguration()
+                                                          .withChunkSize(2)
+                                                          .configured()
+                                                          .buildOutputStream();
     stream.write(new byte[]{31, 17, (byte) 155, 13});
     stream.flush();
-    final Channel<?, ParcelableByteBuffer> result = channel.close();
-    final BufferInputStream inputStream =
+    final Channel<?, ParcelableByteChunk> result = channel.close();
+    final ChunkInputStream inputStream =
         ParcelableByteChannel.getInputStream(result.in(seconds(10)).next(),
             result.in(seconds(10)).next());
     assertThat(inputStream.read()).isEqualTo(31);
@@ -230,19 +227,19 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
 
   public void testConcatReadByteArray() throws IOException {
 
-    final Channel<ParcelableByteBuffer, ParcelableByteBuffer> channel =
+    final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
         JRoutineService.on(serviceFrom(getActivity()))
                        .with(factoryOf(PassingInvocation.class))
                        .call();
-    final BufferOutputStream stream = ParcelableByteChannel.from(channel)
-                                                           .applyBufferStreamConfiguration()
-                                                           .withBufferSize(2)
-                                                           .configured()
-                                                           .buildOutputStream();
+    final ChunkOutputStream stream = ParcelableByteChannel.withOutput(channel)
+                                                          .applyChunkStreamConfiguration()
+                                                          .withChunkSize(2)
+                                                          .configured()
+                                                          .buildOutputStream();
     stream.write(new byte[]{31, 17, (byte) 155, 13});
     stream.flush();
-    final Channel<?, ParcelableByteBuffer> result = channel.close();
-    final BufferInputStream inputStream =
+    final Channel<?, ParcelableByteChunk> result = channel.close();
+    final ChunkInputStream inputStream =
         ParcelableByteChannel.getInputStream(result.in(seconds(10)).next(),
             result.in(seconds(10)).next());
     final byte[] b = new byte[16];
@@ -259,19 +256,19 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
 
   public void testConcatReadBytes() throws IOException {
 
-    final Channel<ParcelableByteBuffer, ParcelableByteBuffer> channel =
+    final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
         JRoutineService.on(serviceFrom(getActivity()))
                        .with(factoryOf(PassingInvocation.class))
                        .call();
-    final BufferOutputStream stream = ParcelableByteChannel.from(channel)
-                                                           .applyBufferStreamConfiguration()
-                                                           .withBufferSize(3)
-                                                           .configured()
-                                                           .buildOutputStream();
+    final ChunkOutputStream stream = ParcelableByteChannel.withOutput(channel)
+                                                          .applyChunkStreamConfiguration()
+                                                          .withChunkSize(3)
+                                                          .configured()
+                                                          .buildOutputStream();
     stream.write(new byte[]{31, 17, (byte) 155, 13});
     stream.flush();
-    final Channel<?, ParcelableByteBuffer> result = channel.close();
-    final BufferInputStream inputStream =
+    final Channel<?, ParcelableByteChunk> result = channel.close();
+    final ChunkInputStream inputStream =
         ParcelableByteChannel.getInputStream(result.in(seconds(10)).next(),
             result.in(seconds(10)).next());
     final byte[] b = new byte[16];
@@ -291,19 +288,19 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
   @SuppressWarnings({"ConstantConditions", "ResultOfMethodCallIgnored"})
   public void testConcatReadError() throws IOException {
 
-    final Channel<ParcelableByteBuffer, ParcelableByteBuffer> channel =
+    final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
         JRoutineService.on(serviceFrom(getActivity()))
                        .with(factoryOf(PassingInvocation.class))
                        .call();
-    final BufferOutputStream stream = ParcelableByteChannel.from(channel)
-                                                           .applyBufferStreamConfiguration()
-                                                           .withBufferSize(2)
-                                                           .configured()
-                                                           .buildOutputStream();
+    final ChunkOutputStream stream = ParcelableByteChannel.withOutput(channel)
+                                                          .applyChunkStreamConfiguration()
+                                                          .withChunkSize(2)
+                                                          .configured()
+                                                          .buildOutputStream();
     stream.write(new byte[]{31, 17, (byte) 155, 13});
     stream.flush();
-    final Channel<?, ParcelableByteBuffer> result = channel.close();
-    final BufferInputStream inputStream =
+    final Channel<?, ParcelableByteChunk> result = channel.close();
+    final ChunkInputStream inputStream =
         ParcelableByteChannel.getInputStream(result.in(seconds(10)).next(),
             result.in(seconds(10)).next());
     final byte[] b = new byte[16];
@@ -384,19 +381,19 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
 
   public void testConcatReadOutput() throws IOException {
 
-    final Channel<ParcelableByteBuffer, ParcelableByteBuffer> channel =
+    final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
         JRoutineService.on(serviceFrom(getActivity()))
                        .with(factoryOf(PassingInvocation.class))
                        .call();
-    final BufferOutputStream stream = ParcelableByteChannel.from(channel)
-                                                           .applyBufferStreamConfiguration()
-                                                           .withBufferSize(3)
-                                                           .configured()
-                                                           .buildOutputStream();
+    final ChunkOutputStream stream = ParcelableByteChannel.withOutput(channel)
+                                                          .applyChunkStreamConfiguration()
+                                                          .withChunkSize(3)
+                                                          .configured()
+                                                          .buildOutputStream();
     stream.write(new byte[]{31, 17, (byte) 155, 13});
     stream.flush();
-    final Channel<?, ParcelableByteBuffer> result = channel.close();
-    final BufferInputStream inputStream =
+    final Channel<?, ParcelableByteChunk> result = channel.close();
+    final ChunkInputStream inputStream =
         ParcelableByteChannel.getInputStream(result.in(seconds(10)).next(),
             result.in(seconds(10)).next());
     final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -416,21 +413,21 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
 
   public void testConcatSkip() throws IOException {
 
-    final Channel<ParcelableByteBuffer, ParcelableByteBuffer> channel =
+    final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
         JRoutineService.on(serviceFrom(getActivity()))
                        .with(factoryOf(PassingInvocation.class))
                        .call();
-    final BufferOutputStream stream = ParcelableByteChannel.from(channel)
-                                                           .applyBufferStreamConfiguration()
-                                                           .withBufferSize(4)
-                                                           .configured()
-                                                           .buildOutputStream();
+    final ChunkOutputStream stream = ParcelableByteChannel.withOutput(channel)
+                                                          .applyChunkStreamConfiguration()
+                                                          .withChunkSize(4)
+                                                          .configured()
+                                                          .buildOutputStream();
     final byte[] b =
         new byte[]{(byte) 1, (byte) 2, (byte) 3, (byte) 4, (byte) 5, (byte) 6, (byte) 7, (byte) 8};
     stream.write(b);
     stream.close();
-    final Channel<?, ParcelableByteBuffer> result = channel.close();
-    final BufferInputStream inputStream =
+    final Channel<?, ParcelableByteChunk> result = channel.close();
+    final ChunkInputStream inputStream =
         ParcelableByteChannel.getInputStream(result.in(seconds(10)).next(),
             result.in(seconds(10)).next());
     assertThat(inputStream.available()).isEqualTo(8);
@@ -450,21 +447,21 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
 
   public void testInputClose() throws IOException {
 
-    final Channel<ParcelableByteBuffer, ParcelableByteBuffer> channel =
+    final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
         JRoutineService.on(serviceFrom(getActivity()))
                        .with(factoryOf(PassingInvocation.class))
                        .call();
-    final BufferOutputStream stream = ParcelableByteChannel.from(channel)
-                                                           .applyBufferStreamConfiguration()
-                                                           .withBufferSize(16)
-                                                           .withCorePoolSize(16)
-                                                           .configured()
-                                                           .buildOutputStream();
+    final ChunkOutputStream stream = ParcelableByteChannel.withOutput(channel)
+                                                          .applyChunkStreamConfiguration()
+                                                          .withChunkSize(16)
+                                                          .withCorePoolSize(16)
+                                                          .configured()
+                                                          .buildOutputStream();
     stream.write(31);
     stream.flush();
-    final ParcelableByteBuffer buffer = channel.close().in(seconds(10)).next();
+    final ParcelableByteChunk buffer = channel.close().in(seconds(10)).next();
     assertThat(buffer.size()).isEqualTo(1);
-    final BufferInputStream inputStream = ParcelableByteChannel.getInputStream(buffer);
+    final ChunkInputStream inputStream = ParcelableByteChannel.getInputStream(buffer);
     inputStream.close();
     final byte[] b = new byte[16];
     assertThat(inputStream.available()).isZero();
@@ -498,21 +495,20 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
 
   public void testMark() throws IOException {
 
-    final Channel<ParcelableByteBuffer, ParcelableByteBuffer> channel =
+    final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
         JRoutineService.on(serviceFrom(getActivity()))
                        .with(factoryOf(PassingInvocation.class))
                        .call();
-    final BufferOutputStream stream = ParcelableByteChannel.from(channel)
-                                                           .applyBufferStreamConfiguration()
-                                                           .withOnClose(
-                                                               CloseActionType.CLOSE_STREAM)
-                                                           .configured()
-                                                           .buildOutputStream();
+    final ChunkOutputStream stream = ParcelableByteChannel.withOutput(channel)
+                                                          .applyChunkStreamConfiguration()
+                                                          .withOnClose(CloseActionType.CLOSE_STREAM)
+                                                          .configured()
+                                                          .buildOutputStream();
     final byte[] b =
         new byte[]{(byte) 1, (byte) 2, (byte) 3, (byte) 4, (byte) 5, (byte) 6, (byte) 7, (byte) 8};
     stream.write(b);
     stream.close();
-    final BufferInputStream inputStream =
+    final ChunkInputStream inputStream =
         ParcelableByteChannel.getInputStream(channel.close().in(seconds(10)).next());
     assertThat(inputStream.read()).isEqualTo(1);
     assertThat(inputStream.markSupported()).isTrue();
@@ -530,18 +526,17 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
 
   public void testOutputClose() {
 
-    final Channel<ParcelableByteBuffer, ParcelableByteBuffer> channel =
+    final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
         JRoutineService.on(serviceFrom(getActivity()))
                        .with(factoryOf(PassingInvocation.class))
                        .call();
-    final BufferOutputStream stream = ParcelableByteChannel.from(channel)
-                                                           .applyBufferStreamConfiguration()
-                                                           .withOnClose(
-                                                               CloseActionType.CLOSE_STREAM)
-                                                           .configured()
-                                                           .buildOutputStream();
+    final ChunkOutputStream stream = ParcelableByteChannel.withOutput(channel)
+                                                          .applyChunkStreamConfiguration()
+                                                          .withOnClose(CloseActionType.CLOSE_STREAM)
+                                                          .configured()
+                                                          .buildOutputStream();
     stream.close();
-    final Channel<?, ParcelableByteBuffer> result =
+    final Channel<?, ParcelableByteChunk> result =
         channel.close().in(3, TimeUnit.SECONDS).eventuallyContinue();
     assertThat(result.all()).isEmpty();
     final byte[] b = new byte[16];
@@ -594,12 +589,12 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
 
   public void testReadAll() throws IOException {
 
-    final Channel<ParcelableByteBuffer, ParcelableByteBuffer> channel =
-        JRoutineCore.<ParcelableByteBuffer>ofInputs().buildChannel();
-    final BufferOutputStream stream = ParcelableByteChannel.from(channel).buildOutputStream();
+    final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
+        JRoutineCore.<ParcelableByteChunk>ofInputs().buildChannel();
+    final ChunkOutputStream stream = ParcelableByteChannel.withOutput(channel).buildOutputStream();
     stream.write(new byte[]{31, 17, (byte) 155, 13});
     stream.flush();
-    final BufferInputStream inputStream = ParcelableByteChannel.getInputStream(channel.next());
+    final ChunkInputStream inputStream = ParcelableByteChannel.getInputStream(channel.next());
     final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     assertThat(inputStream.readAll(outputStream)).isEqualTo(4);
     assertThat(outputStream.size()).isEqualTo(4);
@@ -613,20 +608,20 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
 
   public void testReadByte() throws IOException {
 
-    final Channel<ParcelableByteBuffer, ParcelableByteBuffer> channel =
-        JRoutineCore.<ParcelableByteBuffer>ofInputs().buildChannel();
-    final Channel<?, ParcelableByteBuffer> result = JRoutineService.on(serviceFrom(getActivity()))
-                                                                   .with(factoryOf(
-                                                                       PassingInvocation.class))
-                                                                   .call(channel);
-    final BufferOutputStream stream = ParcelableByteChannel.from(channel).buildOutputStream();
+    final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
+        JRoutineCore.<ParcelableByteChunk>ofInputs().buildChannel();
+    final Channel<?, ParcelableByteChunk> result = JRoutineService.on(serviceFrom(getActivity()))
+                                                                  .with(factoryOf(
+                                                                      PassingInvocation.class))
+                                                                  .call(channel);
+    final ChunkOutputStream stream = ParcelableByteChannel.withOutput(channel).buildOutputStream();
     stream.write(77);
     stream.flush();
     assertThat(
         ParcelableByteChannel.getInputStream(result.in(seconds(10)).next()).read()).isEqualTo(77);
     stream.write(new byte[]{31, 17});
     stream.flush();
-    BufferInputStream inputStream =
+    ChunkInputStream inputStream =
         ParcelableByteChannel.getInputStream(result.in(seconds(10)).next());
     assertThat(inputStream.read()).isEqualTo(31);
     assertThat(inputStream.read()).isEqualTo(17);
@@ -642,16 +637,16 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
 
   public void testReadByteArray() throws IOException {
 
-    final Channel<ParcelableByteBuffer, ParcelableByteBuffer> channel =
-        JRoutineCore.<ParcelableByteBuffer>ofInputs().buildChannel();
-    final Channel<?, ParcelableByteBuffer> result = JRoutineService.on(serviceFrom(getActivity()))
-                                                                   .with(factoryOf(
-                                                                       PassingInvocation.class))
-                                                                   .call(channel);
-    final BufferOutputStream stream = ParcelableByteChannel.from(channel).buildOutputStream();
+    final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
+        JRoutineCore.<ParcelableByteChunk>ofInputs().buildChannel();
+    final Channel<?, ParcelableByteChunk> result = JRoutineService.on(serviceFrom(getActivity()))
+                                                                  .with(factoryOf(
+                                                                      PassingInvocation.class))
+                                                                  .call(channel);
+    final ChunkOutputStream stream = ParcelableByteChannel.withOutput(channel).buildOutputStream();
     stream.write(77);
     stream.flush();
-    BufferInputStream inputStream =
+    ChunkInputStream inputStream =
         ParcelableByteChannel.getInputStream(result.in(seconds(10)).next());
     byte[] b = new byte[16];
     assertThat(inputStream.read(b)).isEqualTo(1);
@@ -691,16 +686,16 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
 
   public void testReadBytes() throws IOException {
 
-    final Channel<ParcelableByteBuffer, ParcelableByteBuffer> channel =
-        JRoutineCore.<ParcelableByteBuffer>ofInputs().buildChannel();
-    final Channel<?, ParcelableByteBuffer> result = JRoutineService.on(serviceFrom(getActivity()))
-                                                                   .with(factoryOf(
-                                                                       PassingInvocation.class))
-                                                                   .call(channel);
-    final BufferOutputStream stream = ParcelableByteChannel.from(channel).buildOutputStream();
+    final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
+        JRoutineCore.<ParcelableByteChunk>ofInputs().buildChannel();
+    final Channel<?, ParcelableByteChunk> result = JRoutineService.on(serviceFrom(getActivity()))
+                                                                  .with(factoryOf(
+                                                                      PassingInvocation.class))
+                                                                  .call(channel);
+    final ChunkOutputStream stream = ParcelableByteChannel.withOutput(channel).buildOutputStream();
     stream.write(77);
     stream.flush();
-    BufferInputStream inputStream =
+    ChunkInputStream inputStream =
         ParcelableByteChannel.getInputStream(result.in(seconds(10)).next());
     final byte[] b = new byte[16];
     assertThat(inputStream.read(b, 0, 2)).isEqualTo(1);
@@ -750,14 +745,14 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
   @SuppressWarnings({"ConstantConditions", "ResultOfMethodCallIgnored"})
   public void testReadError() throws IOException {
 
-    final Channel<ParcelableByteBuffer, ParcelableByteBuffer> channel =
+    final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
         JRoutineService.on(serviceFrom(getActivity()))
                        .with(factoryOf(PassingInvocation.class))
                        .call();
-    final BufferOutputStream stream = ParcelableByteChannel.from(channel).buildOutputStream();
+    final ChunkOutputStream stream = ParcelableByteChannel.withOutput(channel).buildOutputStream();
     stream.write(77);
     stream.flush();
-    final BufferInputStream inputStream =
+    final ChunkInputStream inputStream =
         ParcelableByteChannel.getInputStream(channel.close().in(seconds(10)).next());
     final byte[] b = new byte[16];
 
@@ -837,16 +832,16 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
 
   public void testReadOutput() throws IOException {
 
-    final Channel<ParcelableByteBuffer, ParcelableByteBuffer> channel =
-        JRoutineCore.<ParcelableByteBuffer>ofInputs().buildChannel();
-    final Channel<?, ParcelableByteBuffer> result = JRoutineService.on(serviceFrom(getActivity()))
-                                                                   .with(factoryOf(
-                                                                       PassingInvocation.class))
-                                                                   .call(channel);
-    final BufferOutputStream stream = ParcelableByteChannel.from(channel).buildOutputStream();
+    final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
+        JRoutineCore.<ParcelableByteChunk>ofInputs().buildChannel();
+    final Channel<?, ParcelableByteChunk> result = JRoutineService.on(serviceFrom(getActivity()))
+                                                                  .with(factoryOf(
+                                                                      PassingInvocation.class))
+                                                                  .call(channel);
+    final ChunkOutputStream stream = ParcelableByteChannel.withOutput(channel).buildOutputStream();
     stream.write(77);
     stream.flush();
-    BufferInputStream inputStream =
+    ChunkInputStream inputStream =
         ParcelableByteChannel.getInputStream(result.in(seconds(10)).next());
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     assertThat(inputStream.read(outputStream)).isEqualTo(1);
@@ -880,21 +875,20 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
 
   public void testSkip() throws IOException {
 
-    final Channel<ParcelableByteBuffer, ParcelableByteBuffer> channel =
+    final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
         JRoutineService.on(serviceFrom(getActivity()))
                        .with(factoryOf(PassingInvocation.class))
                        .call();
-    final BufferOutputStream stream = ParcelableByteChannel.from(channel)
-                                                           .applyBufferStreamConfiguration()
-                                                           .withOnClose(
-                                                               CloseActionType.CLOSE_STREAM)
-                                                           .configured()
-                                                           .buildOutputStream();
+    final ChunkOutputStream stream = ParcelableByteChannel.withOutput(channel)
+                                                          .applyChunkStreamConfiguration()
+                                                          .withOnClose(CloseActionType.CLOSE_STREAM)
+                                                          .configured()
+                                                          .buildOutputStream();
     final byte[] b =
         new byte[]{(byte) 1, (byte) 2, (byte) 3, (byte) 4, (byte) 5, (byte) 6, (byte) 7, (byte) 8};
     stream.write(b);
     stream.close();
-    final BufferInputStream inputStream =
+    final ChunkInputStream inputStream =
         ParcelableByteChannel.getInputStream(channel.close().in(seconds(10)).next());
     assertThat(inputStream.available()).isEqualTo(8);
     assertThat(inputStream.skip(2)).isEqualTo(2);
@@ -913,22 +907,22 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
 
   public void testStream() throws IOException {
 
-    final Channel<ParcelableByteBuffer, ParcelableByteBuffer> channel =
+    final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
         JRoutineService.on(serviceFrom(getActivity()))
                        .with(factoryOf(PassingInvocation.class))
                        .call();
-    final BufferOutputStream stream = ParcelableByteChannel.from(channel)
-                                                           .applyBufferStreamConfiguration()
-                                                           .withBufferSize(2)
-                                                           .configured()
-                                                           .buildOutputStream();
+    final ChunkOutputStream stream = ParcelableByteChannel.withOutput(channel)
+                                                          .applyChunkStreamConfiguration()
+                                                          .withChunkSize(2)
+                                                          .configured()
+                                                          .buildOutputStream();
     stream.write(1);
     stream.write(2);
     stream.write(new byte[]{3, 4, 5});
     stream.write(new byte[]{4, 5, 6, 7, 8, 9}, 2, 3);
     stream.write(new ByteArrayInputStream(new byte[]{9, 10}));
     stream.close();
-    final List<ParcelableByteBuffer> inputStreams = channel.close().in(seconds(10)).all();
+    final List<ParcelableByteChunk> inputStreams = channel.close().in(seconds(10)).all();
     assertThat(inputStreams).hasSize(5);
     final byte[] b = new byte[10];
     assertThat(ParcelableByteChannel.getInputStream(inputStreams).read(b)).isEqualTo(10);
@@ -938,16 +932,16 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
 
   public void testTransferFrom() throws IOException {
 
-    final Channel<ParcelableByteBuffer, ParcelableByteBuffer> channel =
-        JRoutineCore.<ParcelableByteBuffer>ofInputs().buildChannel();
-    final BufferOutputStream stream = ParcelableByteChannel.from(channel)
-                                                           .applyBufferStreamConfiguration()
-                                                           .withBufferSize(4)
-                                                           .configured()
-                                                           .buildOutputStream();
+    final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
+        JRoutineCore.<ParcelableByteChunk>ofInputs().buildChannel();
+    final ChunkOutputStream stream = ParcelableByteChannel.withOutput(channel)
+                                                          .applyChunkStreamConfiguration()
+                                                          .withChunkSize(4)
+                                                          .configured()
+                                                          .buildOutputStream();
     stream.transferFrom(new ByteArrayInputStream(new byte[]{77, 33, (byte) 155, 13}));
     stream.flush();
-    final BufferInputStream inputStream = ParcelableByteChannel.getInputStream(channel.next());
+    final ChunkInputStream inputStream = ParcelableByteChannel.getInputStream(channel.next());
     assertThat(inputStream.read()).isEqualTo(77);
     assertThat(inputStream.read()).isEqualTo(33);
     assertThat(inputStream.read()).isEqualTo((byte) 155);
@@ -957,12 +951,12 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
 
   public void testTransferTo() throws IOException {
 
-    final Channel<ParcelableByteBuffer, ParcelableByteBuffer> channel =
-        JRoutineCore.<ParcelableByteBuffer>ofInputs().buildChannel();
-    final BufferOutputStream stream = ParcelableByteChannel.from(channel).buildOutputStream();
+    final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
+        JRoutineCore.<ParcelableByteChunk>ofInputs().buildChannel();
+    final ChunkOutputStream stream = ParcelableByteChannel.withOutput(channel).buildOutputStream();
     stream.write(new byte[]{31, 17, (byte) 155, 13});
     stream.flush();
-    final BufferInputStream inputStream = ParcelableByteChannel.getInputStream(channel.next());
+    final ChunkInputStream inputStream = ParcelableByteChannel.getInputStream(channel.next());
     final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     assertThat(inputStream.transferTo(outputStream)).isEqualTo(4);
     assertThat(outputStream.size()).isEqualTo(4);
@@ -976,16 +970,16 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
 
   public void testWriteAll() throws IOException {
 
-    final Channel<ParcelableByteBuffer, ParcelableByteBuffer> channel =
-        JRoutineCore.<ParcelableByteBuffer>ofInputs().buildChannel();
-    final BufferOutputStream stream = ParcelableByteChannel.from(channel)
-                                                           .applyBufferStreamConfiguration()
-                                                           .withBufferSize(4)
-                                                           .configured()
-                                                           .buildOutputStream();
+    final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
+        JRoutineCore.<ParcelableByteChunk>ofInputs().buildChannel();
+    final ChunkOutputStream stream = ParcelableByteChannel.withOutput(channel)
+                                                          .applyChunkStreamConfiguration()
+                                                          .withChunkSize(4)
+                                                          .configured()
+                                                          .buildOutputStream();
     stream.writeAll(new ByteArrayInputStream(new byte[]{77, 33, (byte) 155, 13}));
     stream.flush();
-    final BufferInputStream inputStream = ParcelableByteChannel.getInputStream(channel.next());
+    final ChunkInputStream inputStream = ParcelableByteChannel.getInputStream(channel.next());
     assertThat(inputStream.read()).isEqualTo(77);
     assertThat(inputStream.read()).isEqualTo(33);
     assertThat(inputStream.read()).isEqualTo((byte) 155);
@@ -995,20 +989,20 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
 
   public void testWriteByte() throws IOException {
 
-    final Channel<ParcelableByteBuffer, ParcelableByteBuffer> channel =
-        JRoutineCore.<ParcelableByteBuffer>ofInputs().buildChannel();
-    final Channel<?, ParcelableByteBuffer> result = JRoutineService.on(serviceFrom(getActivity()))
-                                                                   .with(factoryOf(
-                                                                       PassingInvocation.class))
-                                                                   .call(channel);
-    final BufferOutputStream stream = ParcelableByteChannel.from(channel).buildOutputStream();
+    final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
+        JRoutineCore.<ParcelableByteChunk>ofInputs().buildChannel();
+    final Channel<?, ParcelableByteChunk> result = JRoutineService.on(serviceFrom(getActivity()))
+                                                                  .with(factoryOf(
+                                                                      PassingInvocation.class))
+                                                                  .call(channel);
+    final ChunkOutputStream stream = ParcelableByteChannel.withOutput(channel).buildOutputStream();
     stream.write(77);
     stream.flush();
     assertThat(
         ParcelableByteChannel.getInputStream(result.in(seconds(10)).next()).read()).isEqualTo(77);
     stream.write(31);
     stream.flush();
-    BufferInputStream inputStream =
+    ChunkInputStream inputStream =
         ParcelableByteChannel.getInputStream(result.in(seconds(10)).next());
     final byte[] b = new byte[16];
     assertThat(inputStream.read(b)).isEqualTo(1);
@@ -1030,16 +1024,16 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
 
   public void testWriteByteArray() throws IOException {
 
-    final Channel<ParcelableByteBuffer, ParcelableByteBuffer> channel =
-        JRoutineCore.<ParcelableByteBuffer>ofInputs().buildChannel();
-    final Channel<?, ParcelableByteBuffer> result = JRoutineService.on(serviceFrom(getActivity()))
-                                                                   .with(factoryOf(
-                                                                       PassingInvocation.class))
-                                                                   .call(channel);
-    final BufferOutputStream stream = ParcelableByteChannel.from(channel).buildOutputStream();
+    final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
+        JRoutineCore.<ParcelableByteChunk>ofInputs().buildChannel();
+    final Channel<?, ParcelableByteChunk> result = JRoutineService.on(serviceFrom(getActivity()))
+                                                                  .with(factoryOf(
+                                                                      PassingInvocation.class))
+                                                                  .call(channel);
+    final ChunkOutputStream stream = ParcelableByteChannel.withOutput(channel).buildOutputStream();
     stream.write(new byte[]{77, 33});
     stream.flush();
-    BufferInputStream inputStream =
+    ChunkInputStream inputStream =
         ParcelableByteChannel.getInputStream(result.in(seconds(10)).next());
     assertThat(inputStream.read()).isEqualTo(77);
     assertThat(inputStream.read()).isEqualTo(33);
@@ -1069,16 +1063,16 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
 
   public void testWriteBytes() throws IOException {
 
-    final Channel<ParcelableByteBuffer, ParcelableByteBuffer> channel =
-        JRoutineCore.<ParcelableByteBuffer>ofInputs().buildChannel();
-    final Channel<?, ParcelableByteBuffer> result = JRoutineService.on(serviceFrom(getActivity()))
-                                                                   .with(factoryOf(
-                                                                       PassingInvocation.class))
-                                                                   .call(channel);
-    final BufferOutputStream stream = ParcelableByteChannel.from(channel).buildOutputStream();
+    final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
+        JRoutineCore.<ParcelableByteChunk>ofInputs().buildChannel();
+    final Channel<?, ParcelableByteChunk> result = JRoutineService.on(serviceFrom(getActivity()))
+                                                                  .with(factoryOf(
+                                                                      PassingInvocation.class))
+                                                                  .call(channel);
+    final ChunkOutputStream stream = ParcelableByteChannel.withOutput(channel).buildOutputStream();
     stream.write(new byte[]{1, 77, 33}, 1, 1);
     stream.flush();
-    BufferInputStream inputStream =
+    ChunkInputStream inputStream =
         ParcelableByteChannel.getInputStream(result.in(seconds(10)).next());
     assertThat(inputStream.read()).isEqualTo(77);
     assertThat(inputStream.read()).isEqualTo(-1);
@@ -1108,18 +1102,18 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
   @SuppressWarnings({"ConstantConditions", "ResultOfMethodCallIgnored"})
   public void testWriteError() throws IOException {
     try {
-      ParcelableByteChannel.from(null);
+      ParcelableByteChannel.withOutput(null);
       fail();
 
     } catch (final NullPointerException ignored) {
 
     }
 
-    final Channel<ParcelableByteBuffer, ParcelableByteBuffer> channel =
+    final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
         JRoutineService.on(serviceFrom(getActivity()))
                        .with(factoryOf(PassingInvocation.class))
                        .call();
-    final BufferOutputStream stream = ParcelableByteChannel.from(channel).buildOutputStream();
+    final ChunkOutputStream stream = ParcelableByteChannel.withOutput(channel).buildOutputStream();
     final byte[] b = new byte[16];
     try {
       stream.write(null, 0, 2);
@@ -1172,7 +1166,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
 
     stream.write(new byte[0]);
     stream.flush();
-    final Channel<?, ParcelableByteBuffer> result = channel.close();
+    final Channel<?, ParcelableByteChunk> result = channel.close();
     assertThat(result.in(seconds(10)).eventuallyContinue().all()).isEmpty();
     stream.write(b, 8, 0);
     stream.flush();
@@ -1181,20 +1175,20 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
 
   public void testWriteInput() throws IOException {
 
-    final Channel<ParcelableByteBuffer, ParcelableByteBuffer> channel =
-        JRoutineCore.<ParcelableByteBuffer>ofInputs().buildChannel();
-    final Channel<?, ParcelableByteBuffer> result = JRoutineService.on(serviceFrom(getActivity()))
-                                                                   .with(factoryOf(
-                                                                       PassingInvocation.class))
-                                                                   .call(channel);
-    final BufferOutputStream stream = ParcelableByteChannel.from(channel)
-                                                           .applyBufferStreamConfiguration()
-                                                           .withBufferSize(4)
-                                                           .configured()
-                                                           .buildOutputStream();
+    final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
+        JRoutineCore.<ParcelableByteChunk>ofInputs().buildChannel();
+    final Channel<?, ParcelableByteChunk> result = JRoutineService.on(serviceFrom(getActivity()))
+                                                                  .with(factoryOf(
+                                                                      PassingInvocation.class))
+                                                                  .call(channel);
+    final ChunkOutputStream stream = ParcelableByteChannel.withOutput(channel)
+                                                          .applyChunkStreamConfiguration()
+                                                          .withChunkSize(4)
+                                                          .configured()
+                                                          .buildOutputStream();
     stream.write(new ByteArrayInputStream(new byte[]{77, 33}));
     stream.flush();
-    BufferInputStream inputStream =
+    ChunkInputStream inputStream =
         ParcelableByteChannel.getInputStream(result.in(seconds(10)).next());
     assertThat(inputStream.read()).isEqualTo(77);
     assertThat(inputStream.read()).isEqualTo(33);
@@ -1223,10 +1217,10 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
   }
 
   private static class PassingInvocation
-      extends TemplateContextInvocation<ParcelableByteBuffer, ParcelableByteBuffer> {
+      extends TemplateContextInvocation<ParcelableByteChunk, ParcelableByteChunk> {
 
-    public void onInput(final ParcelableByteBuffer input,
-        @NotNull final Channel<ParcelableByteBuffer, ?> result) {
+    public void onInput(final ParcelableByteChunk input,
+        @NotNull final Channel<ParcelableByteChunk, ?> result) {
       result.pass(input);
     }
   }

@@ -17,10 +17,10 @@
 package com.github.dm.jrt;
 
 import com.github.dm.jrt.channel.Channels;
-import com.github.dm.jrt.channel.io.BufferStreamBuilder;
 import com.github.dm.jrt.channel.io.ByteChannel;
-import com.github.dm.jrt.channel.io.ByteChannel.BufferInputStream;
-import com.github.dm.jrt.channel.io.ByteChannel.ByteBuffer;
+import com.github.dm.jrt.channel.io.ByteChannel.ByteChunk;
+import com.github.dm.jrt.channel.io.ByteChannel.ChunkInputStream;
+import com.github.dm.jrt.channel.io.ChunkOutputStreamBuilder;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.ChannelBuilder;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
@@ -73,19 +73,6 @@ public class JRoutine extends Channels {
   }
 
   /**
-   * Returns a builder of buffer output streams.
-   * <p>
-   * The built streams will not close the underlying channel by default.
-   *
-   * @param channel the output channel to feed with data.
-   * @return the output stream builder.
-   */
-  @NotNull
-  public static BufferStreamBuilder from(@NotNull final Channel<? super ByteBuffer, ?> channel) {
-    return ByteChannel.from(channel);
-  }
-
-  /**
    * Gets an input stream returning the concatenation of the data contained in the specified
    * buffers.
    * <p>
@@ -97,7 +84,7 @@ public class JRoutine extends Channels {
    *                                         of the specified buffers.
    */
   @NotNull
-  public static BufferInputStream getInputStream(@NotNull final ByteBuffer... buffers) {
+  public static ChunkInputStream getInputStream(@NotNull final ByteChunk... buffers) {
     return ByteChannel.getInputStream(buffers);
   }
 
@@ -113,8 +100,8 @@ public class JRoutine extends Channels {
    *                                         of the specified buffers.
    */
   @NotNull
-  public static BufferInputStream getInputStream(
-      @NotNull final Iterable<? extends ByteBuffer> buffers) {
+  public static ChunkInputStream getInputStream(
+      @NotNull final Iterable<? extends ByteChunk> buffers) {
     return ByteChannel.getInputStream(buffers);
   }
 
@@ -129,7 +116,7 @@ public class JRoutine extends Channels {
    *                                         specified buffer.
    */
   @NotNull
-  public static BufferInputStream getInputStream(@NotNull final ByteBuffer buffer) {
+  public static ChunkInputStream getInputStream(@NotNull final ByteChunk buffer) {
     return ByteChannel.getInputStream(buffer);
   }
 
@@ -552,6 +539,20 @@ public class JRoutine extends Channels {
   public static <IN, OUT> RoutineBuilder<IN, OUT> withMappingConsumer(
       @NotNull final BiConsumer<? super IN, ? super Channel<OUT, ?>> consumer) {
     return with(consumerMapping(consumer));
+  }
+
+  /**
+   * Returns a builder of buffer output streams.
+   * <p>
+   * The built streams will not close the underlying channel by default.
+   *
+   * @param channel the output channel to feed with data.
+   * @return the output stream builder.
+   */
+  @NotNull
+  public static ChunkOutputStreamBuilder withOutput(
+      @NotNull final Channel<? super ByteChunk, ?> channel) {
+    return ByteChannel.withOutput(channel);
   }
 
   /**

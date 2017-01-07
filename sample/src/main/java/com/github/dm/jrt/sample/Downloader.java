@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.sample;
 
-import com.github.dm.jrt.channel.io.ByteChannel.ByteBuffer;
+import com.github.dm.jrt.channel.io.ByteChannel.ByteChunk;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.InvocationException;
@@ -54,7 +54,7 @@ public class Downloader {
   private final HashMap<URI, Channel<?, Boolean>> mDownloads =
       new HashMap<URI, Channel<?, Boolean>>();
 
-  private final Routine<URI, ByteBuffer> mReadConnection;
+  private final Routine<URI, ByteChunk> mReadConnection;
 
   /**
    * Constructor.
@@ -153,7 +153,7 @@ public class Downloader {
       // In such way we can abort the download between two chunks, while they are passed to the
       // specific routine
       // That's why we store the routine channel in an internal map
-      final Routine<ByteBuffer, Boolean> writeFile =
+      final Routine<ByteChunk, Boolean> writeFile =
           JRoutineCore.with(factoryOf(WriteFile.class, dstFile))
                       .applyInvocationConfiguration()
                       // Since we want to limit the number of allocated chunks, we have to make the

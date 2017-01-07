@@ -16,13 +16,13 @@
 
 package com.github.dm.jrt.channel.builder;
 
-import com.github.dm.jrt.channel.builder.BufferStreamConfiguration.Builder;
-import com.github.dm.jrt.channel.builder.BufferStreamConfiguration.CloseActionType;
+import com.github.dm.jrt.channel.builder.ChunkStreamConfiguration.Builder;
+import com.github.dm.jrt.channel.builder.ChunkStreamConfiguration.CloseActionType;
 
 import org.junit.Test;
 
-import static com.github.dm.jrt.channel.builder.BufferStreamConfiguration.builder;
-import static com.github.dm.jrt.channel.builder.BufferStreamConfiguration.builderFrom;
+import static com.github.dm.jrt.channel.builder.ChunkStreamConfiguration.builder;
+import static com.github.dm.jrt.channel.builder.ChunkStreamConfiguration.builderFrom;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -31,31 +31,31 @@ import static org.junit.Assert.fail;
  * <p>
  * Created by davide-maestroni on 01/02/2017.
  */
-public class BufferStreamConfigurationTest {
+public class ChunkStreamConfigurationTest {
 
   @Test
   public void testBufferSizeEquals() {
-    final BufferStreamConfiguration configuration = builder().withBufferSize(11)
-                                                             .withCorePoolSize(17)
-                                                             .withOnClose(
+    final ChunkStreamConfiguration configuration = builder().withChunkSize(11)
+                                                            .withCorePoolSize(17)
+                                                            .withOnClose(
                                                                  CloseActionType.CLOSE_CHANNEL)
-                                                             .configured();
-    assertThat(configuration).isNotEqualTo(builder().withBufferSize(3).configured());
-    assertThat(configuration.builderFrom().withBufferSize(27).configured()).isNotEqualTo(
-        builder().withBufferSize(27).configured());
+                                                            .configured();
+    assertThat(configuration).isNotEqualTo(builder().withChunkSize(3).configured());
+    assertThat(configuration.builderFrom().withChunkSize(27).configured()).isNotEqualTo(
+        builder().withChunkSize(27).configured());
   }
 
   @Test
   public void testBufferSizeError() {
     try {
-      builder().withBufferSize(0);
+      builder().withChunkSize(0);
       fail();
 
     } catch (final IllegalArgumentException ignored) {
     }
 
     try {
-      builder().withBufferSize(-1);
+      builder().withChunkSize(-1);
       fail();
 
     } catch (final IllegalArgumentException ignored) {
@@ -64,18 +64,18 @@ public class BufferStreamConfigurationTest {
 
   @Test
   public void testBuildFrom() {
-    final BufferStreamConfiguration configuration = builder().withBufferSize(11)
-                                                             .withCorePoolSize(17)
-                                                             .withOnClose(
+    final ChunkStreamConfiguration configuration = builder().withChunkSize(11)
+                                                            .withCorePoolSize(17)
+                                                            .withOnClose(
                                                                  CloseActionType.CLOSE_CHANNEL)
-                                                             .configured();
+                                                            .configured();
     assertThat(builderFrom(configuration).configured().hashCode()).isEqualTo(
         configuration.hashCode());
     assertThat(builderFrom(configuration).configured()).isEqualTo(configuration);
     assertThat(builderFrom(null).configured().hashCode()).isEqualTo(
-        BufferStreamConfiguration.defaultConfiguration().hashCode());
+        ChunkStreamConfiguration.defaultConfiguration().hashCode());
     assertThat(builderFrom(null).configured()).isEqualTo(
-        BufferStreamConfiguration.defaultConfiguration());
+        ChunkStreamConfiguration.defaultConfiguration());
   }
 
   @Test
@@ -89,7 +89,7 @@ public class BufferStreamConfigurationTest {
     }
 
     try {
-      new Builder<Object>(null, BufferStreamConfiguration.defaultConfiguration());
+      new Builder<Object>(null, ChunkStreamConfiguration.defaultConfiguration());
       fail();
 
     } catch (final NullPointerException ignored) {
@@ -98,24 +98,24 @@ public class BufferStreamConfigurationTest {
 
   @Test
   public void testBuilderFromEquals() {
-    final BufferStreamConfiguration configuration = builder().withBufferSize(11)
-                                                             .withCorePoolSize(17)
-                                                             .withOnClose(
+    final ChunkStreamConfiguration configuration = builder().withChunkSize(11)
+                                                            .withCorePoolSize(17)
+                                                            .withOnClose(
                                                                  CloseActionType.CLOSE_CHANNEL)
-                                                             .configured();
+                                                            .configured();
     assertThat(builder().with(configuration).configured()).isEqualTo(configuration);
     assertThat(configuration.builderFrom().configured()).isEqualTo(configuration);
     assertThat(configuration.builderFrom().with(null).configured()).isEqualTo(
-        BufferStreamConfiguration.defaultConfiguration());
+        ChunkStreamConfiguration.defaultConfiguration());
   }
 
   @Test
   public void testCloseActionEquals() {
-    final BufferStreamConfiguration configuration = builder().withBufferSize(11)
-                                                             .withCorePoolSize(17)
-                                                             .withOnClose(
+    final ChunkStreamConfiguration configuration = builder().withChunkSize(11)
+                                                            .withCorePoolSize(17)
+                                                            .withOnClose(
                                                                  CloseActionType.CLOSE_CHANNEL)
-                                                             .configured();
+                                                            .configured();
     assertThat(configuration).isNotEqualTo(
         builder().withOnClose(CloseActionType.FLUSH_STREAM).configured());
     assertThat(configuration.builderFrom()
@@ -126,11 +126,11 @@ public class BufferStreamConfigurationTest {
 
   @Test
   public void testPoolSizeEquals() {
-    final BufferStreamConfiguration configuration = builder().withBufferSize(11)
-                                                             .withCorePoolSize(17)
-                                                             .withOnClose(
+    final ChunkStreamConfiguration configuration = builder().withChunkSize(11)
+                                                            .withCorePoolSize(17)
+                                                            .withOnClose(
                                                                  CloseActionType.CLOSE_CHANNEL)
-                                                             .configured();
+                                                            .configured();
     assertThat(configuration).isNotEqualTo(builder().withCorePoolSize(0).configured());
     assertThat(configuration.builderFrom().withCorePoolSize(0).configured()).isNotEqualTo(
         builder().withCorePoolSize(0).configured());

@@ -32,15 +32,15 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * <p>
  * The configuration allows to set:
  * <ul>
- * <li>The size of each byte buffer used to transfer data.</li>
- * <li>The maximum number of recycled buffers.</li>
+ * <li>The size of each byte chunk used to transfer data.</li>
+ * <li>The maximum number of recycled chunks.</li>
  * <li>The type of action to be taken when the output stream is closed.</li>
  * </ul>
  * <p>
  * Created by davide-maestroni on 01/01/2017.
  */
 @SuppressWarnings("WeakerAccess")
-public class BufferStreamConfiguration extends DeepEqualObject {
+public class ChunkStreamConfiguration extends DeepEqualObject {
 
   /**
    * Constant indicating the default value of an integer attribute.
@@ -49,10 +49,10 @@ public class BufferStreamConfiguration extends DeepEqualObject {
 
   private static final DefaultConfigurable sDefaultConfigurable = new DefaultConfigurable();
 
-  private static final BufferStreamConfiguration sDefaultConfiguration =
+  private static final ChunkStreamConfiguration sDefaultConfiguration =
       builder().buildConfiguration();
 
-  private final int mBufferSize;
+  private final int mChunkSize;
 
   private final CloseActionType mCloseAction;
 
@@ -61,14 +61,14 @@ public class BufferStreamConfiguration extends DeepEqualObject {
   /**
    * Constructor.
    *
-   * @param bufferSize   the buffer size in bytes.
+   * @param chunkSize    the chunk size in bytes.
    * @param corePoolSize the core pool size.
    * @param closeAction  the close action.
    */
-  private BufferStreamConfiguration(final int bufferSize, final int corePoolSize,
+  private ChunkStreamConfiguration(final int chunkSize, final int corePoolSize,
       @Nullable final CloseActionType closeAction) {
-    super(asArgs(bufferSize, corePoolSize, closeAction));
-    mBufferSize = bufferSize;
+    super(asArgs(chunkSize, corePoolSize, closeAction));
+    mChunkSize = chunkSize;
     mCorePoolSize = corePoolSize;
     mCloseAction = closeAction;
   }
@@ -79,8 +79,8 @@ public class BufferStreamConfiguration extends DeepEqualObject {
    * @return the builder.
    */
   @NotNull
-  public static Builder<BufferStreamConfiguration> builder() {
-    return new Builder<BufferStreamConfiguration>(sDefaultConfigurable);
+  public static Builder<ChunkStreamConfiguration> builder() {
+    return new Builder<ChunkStreamConfiguration>(sDefaultConfigurable);
   }
 
   /**
@@ -90,10 +90,10 @@ public class BufferStreamConfiguration extends DeepEqualObject {
    * @return the builder.
    */
   @NotNull
-  public static Builder<BufferStreamConfiguration> builderFrom(
-      @Nullable final BufferStreamConfiguration initialConfiguration) {
+  public static Builder<ChunkStreamConfiguration> builderFrom(
+      @Nullable final ChunkStreamConfiguration initialConfiguration) {
     return (initialConfiguration == null) ? builder()
-        : new Builder<BufferStreamConfiguration>(sDefaultConfigurable, initialConfiguration);
+        : new Builder<ChunkStreamConfiguration>(sDefaultConfigurable, initialConfiguration);
   }
 
   /**
@@ -102,7 +102,7 @@ public class BufferStreamConfiguration extends DeepEqualObject {
    * @return the configuration instance.
    */
   @NotNull
-  public static BufferStreamConfiguration defaultConfiguration() {
+  public static ChunkStreamConfiguration defaultConfiguration() {
     return sDefaultConfiguration;
   }
 
@@ -112,19 +112,19 @@ public class BufferStreamConfiguration extends DeepEqualObject {
    * @return the builder.
    */
   @NotNull
-  public Builder<BufferStreamConfiguration> builderFrom() {
+  public Builder<ChunkStreamConfiguration> builderFrom() {
     return builderFrom(this);
   }
 
   /**
-   * Returns the size of the data buffers (DEFAULT by default).
+   * Returns the size of the data chunks (DEFAULT by default).
    *
    * @param valueIfNotSet the default value if none was set.
-   * @return the buffer size.
+   * @return the chunk size.
    */
-  public int getBufferSizeOrElse(final int valueIfNotSet) {
-    final int bufferSize = mBufferSize;
-    return (bufferSize != DEFAULT) ? bufferSize : valueIfNotSet;
+  public int getChunkSizeOrElse(final int valueIfNotSet) {
+    final int chunkSize = mChunkSize;
+    return (chunkSize != DEFAULT) ? chunkSize : valueIfNotSet;
   }
 
   /**
@@ -139,7 +139,7 @@ public class BufferStreamConfiguration extends DeepEqualObject {
   }
 
   /**
-   * Returns the maximum number of buffers retained in the pool (DEFAULT by default).
+   * Returns the maximum number of chunks retained in the pool (DEFAULT by default).
    *
    * @param valueIfNotSet the default value if none was set.
    * @return the core size.
@@ -195,7 +195,7 @@ public class BufferStreamConfiguration extends DeepEqualObject {
      * @return the configurable instance.
      */
     @NotNull
-    TYPE apply(@NotNull BufferStreamConfiguration configuration);
+    TYPE apply(@NotNull ChunkStreamConfiguration configuration);
   }
 
   /**
@@ -207,7 +207,7 @@ public class BufferStreamConfiguration extends DeepEqualObject {
 
     private final Configurable<? extends TYPE> mConfigurable;
 
-    private int mBufferSize;
+    private int mChunkSize;
 
     private CloseActionType mCloseAction;
 
@@ -220,7 +220,7 @@ public class BufferStreamConfiguration extends DeepEqualObject {
      */
     public Builder(@NotNull final Configurable<? extends TYPE> configurable) {
       mConfigurable = ConstantConditions.notNull("configurable instance", configurable);
-      mBufferSize = DEFAULT;
+      mChunkSize = DEFAULT;
       mCorePoolSize = DEFAULT;
     }
 
@@ -231,7 +231,7 @@ public class BufferStreamConfiguration extends DeepEqualObject {
      * @param initialConfiguration the initial object configuration.
      */
     public Builder(@NotNull final Configurable<? extends TYPE> configurable,
-        @NotNull final BufferStreamConfiguration initialConfiguration) {
+        @NotNull final ChunkStreamConfiguration initialConfiguration) {
       mConfigurable = ConstantConditions.notNull("configurable instance", configurable);
       setConfiguration(initialConfiguration);
     }
@@ -255,15 +255,15 @@ public class BufferStreamConfiguration extends DeepEqualObject {
      * @return this builder.
      */
     @NotNull
-    public Builder<TYPE> with(@Nullable final BufferStreamConfiguration configuration) {
+    public Builder<TYPE> with(@Nullable final ChunkStreamConfiguration configuration) {
       if (configuration == null) {
         setConfiguration(defaultConfiguration());
         return this;
       }
 
-      final int bufferSize = configuration.mBufferSize;
-      if (bufferSize != DEFAULT) {
-        withBufferSize(bufferSize);
+      final int chunkSize = configuration.mChunkSize;
+      if (chunkSize != DEFAULT) {
+        withChunkSize(chunkSize);
       }
 
       final int poolSize = configuration.mCorePoolSize;
@@ -280,25 +280,25 @@ public class BufferStreamConfiguration extends DeepEqualObject {
     }
 
     /**
-     * Sets the size of the data buffers used to transfer bytes through the routine channels.
+     * Sets the size of the data chunks used to transfer bytes through the routine channels.
      *
-     * @param bufferSize the buffer size.
+     * @param chunkSize the chunk size.
      * @return this builder.
      * @throws java.lang.IllegalArgumentException if the number is less than 1.
      */
     @NotNull
-    public Builder<TYPE> withBufferSize(final int bufferSize) {
-      if (bufferSize != DEFAULT) {
-        ConstantConditions.positive("buffer size", bufferSize);
+    public Builder<TYPE> withChunkSize(final int chunkSize) {
+      if (chunkSize != DEFAULT) {
+        ConstantConditions.positive("chunk size", chunkSize);
       }
 
-      mBufferSize = bufferSize;
+      mChunkSize = chunkSize;
       return this;
     }
 
     /**
-     * Sets the maximum number of buffers retained in the pool.  Additional buffers created to
-     * fulfill the bytes requirement will be discarded.
+     * Sets the maximum number of chunks retained in the pool. Additional chunks created to fulfill
+     * the bytes requirement will be discarded.
      *
      * @param poolSize the pool size.
      * @return this builder.
@@ -328,12 +328,12 @@ public class BufferStreamConfiguration extends DeepEqualObject {
     }
 
     @NotNull
-    private BufferStreamConfiguration buildConfiguration() {
-      return new BufferStreamConfiguration(mBufferSize, mCorePoolSize, mCloseAction);
+    private ChunkStreamConfiguration buildConfiguration() {
+      return new ChunkStreamConfiguration(mChunkSize, mCorePoolSize, mCloseAction);
     }
 
-    private void setConfiguration(@NotNull final BufferStreamConfiguration configuration) {
-      mBufferSize = configuration.mBufferSize;
+    private void setConfiguration(@NotNull final ChunkStreamConfiguration configuration) {
+      mChunkSize = configuration.mChunkSize;
       mCorePoolSize = configuration.mCorePoolSize;
       mCloseAction = configuration.mCloseAction;
     }
@@ -342,10 +342,10 @@ public class BufferStreamConfiguration extends DeepEqualObject {
   /**
    * Default configurable implementation.
    */
-  private static class DefaultConfigurable implements Configurable<BufferStreamConfiguration> {
+  private static class DefaultConfigurable implements Configurable<ChunkStreamConfiguration> {
 
     @NotNull
-    public BufferStreamConfiguration apply(@NotNull final BufferStreamConfiguration configuration) {
+    public ChunkStreamConfiguration apply(@NotNull final ChunkStreamConfiguration configuration) {
       return configuration;
     }
   }

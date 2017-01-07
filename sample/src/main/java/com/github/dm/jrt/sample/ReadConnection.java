@@ -17,8 +17,8 @@
 package com.github.dm.jrt.sample;
 
 import com.github.dm.jrt.channel.io.ByteChannel;
-import com.github.dm.jrt.channel.io.ByteChannel.BufferOutputStream;
-import com.github.dm.jrt.channel.io.ByteChannel.ByteBuffer;
+import com.github.dm.jrt.channel.io.ByteChannel.ByteChunk;
+import com.github.dm.jrt.channel.io.ByteChannel.ChunkOutputStream;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
 
@@ -35,7 +35,7 @@ import java.net.URLConnection;
  * Created by davide-maestroni on 10/17/2014.
  */
 @SuppressWarnings("WeakerAccess")
-public class ReadConnection extends MappingInvocation<URI, ByteBuffer> {
+public class ReadConnection extends MappingInvocation<URI, ByteChunk> {
 
   private static final int MAX_CHUNK_SIZE = 2048;
 
@@ -46,7 +46,7 @@ public class ReadConnection extends MappingInvocation<URI, ByteBuffer> {
     super(null);
   }
 
-  public void onInput(final URI uri, @NotNull final Channel<ByteBuffer, ?> result) throws
+  public void onInput(final URI uri, @NotNull final Channel<ByteChunk, ?> result) throws
       IOException {
     final URLConnection connection = uri.toURL().openConnection();
     connection.setConnectTimeout(3000);
@@ -59,11 +59,11 @@ public class ReadConnection extends MappingInvocation<URI, ByteBuffer> {
 
     // We employ the utility class dedicated to the optimized transfer of bytes through a routine
     // channel
-    final BufferOutputStream outputStream = ByteChannel.from(result)
-                                                       .applyBufferStreamConfiguration()
-                                                       .withBufferSize(MAX_CHUNK_SIZE)
-                                                       .configured()
-                                                       .buildOutputStream();
+    final ChunkOutputStream outputStream = ByteChannel.withOutput(result)
+                                                      .applyChunkStreamConfiguration()
+                                                      .withChunkSize(MAX_CHUNK_SIZE)
+                                                      .configured()
+                                                      .buildOutputStream();
     try {
       outputStream.transferFrom(connection.getInputStream());
 

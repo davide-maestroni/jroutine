@@ -16,9 +16,9 @@
 
 package com.github.dm.jrt.channel.io;
 
-import com.github.dm.jrt.channel.builder.BufferStreamConfiguration;
-import com.github.dm.jrt.channel.builder.BufferStreamConfiguration.Builder;
-import com.github.dm.jrt.channel.builder.BufferStreamConfiguration.CloseActionType;
+import com.github.dm.jrt.channel.builder.ChunkStreamConfiguration;
+import com.github.dm.jrt.channel.builder.ChunkStreamConfiguration.Builder;
+import com.github.dm.jrt.channel.builder.ChunkStreamConfiguration.CloseActionType;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.SimpleQueue;
@@ -36,28 +36,28 @@ import java.util.ArrayList;
  * <p>
  * For example, an invocation writing bytes can be implemented as:
  * <pre><code>
- * public void onInput(final IN in, final Channel&lt;ByteBuffer, ?&gt; result) {
+ * public void onInput(final IN in, final Channel&lt;ByteChunk, ?&gt; result) {
  *   ...
- *   final BufferOutputStream outputStream = ByteChannel.from(result).buildOutputStream();
+ *   final ChunkOutputStream outputStream = ByteChannel.withOutput(result).buildOutputStream();
  *   ...
  * }
  * </code></pre>
  * <p>
  * While an invocation reading them:
  * <pre><code>
- * public void onInput(final ByteBuffer buffer, final Channel&lt;OUT, ?&gt; result) {
+ * public void onInput(final ByteChunk chunk, final Channel&lt;OUT, ?&gt; result) {
  *   ...
- *   final BufferInputStream inputStream = ByteChannel.getInputStream(buffer);
+ *   final ChunkInputStream inputStream = ByteChannel.getInputStream(chunk);
  *   ...
  * }
  * </code></pre>
  * <p>
- * Each instance maintains a pool of byte buffers which are re-used to minimize memory consumption.
- * When the pool is empty, additional buffers are created in order to avoid blocking the caller
- * thread. Though, the pool will retain its maximum capacity and every buffer exceeding it will be
+ * Each instance maintains a pool of byte chunks which are re-used to minimize memory consumption.
+ * When the pool is empty, additional chunks are created in order to avoid blocking the caller
+ * thread. Though, the pool will retain its maximum capacity and every chunk exceeding it will be
  * discarded.
  * <br>
- * Note that the streams used to write into and read from buffers should be properly closed as the
+ * Note that the streams used to write into and read from chunks should be properly closed as the
  * Java best practices suggest.
  * <p>
  * Created by davide-maestroni on 08/26/2015.
@@ -65,36 +65,81 @@ import java.util.ArrayList;
 @SuppressWarnings("WeakerAccess")
 public class ByteChannel {
 
-  private static final int DEFAULT_BUFFER_SIZE = 16 << 10;
+  private static final int DEFAULT_CHUNK_SIZE = 16 << 10;
 
   private static final int DEFAULT_POOL_SIZE = 16;
 
-  private static final int DEFAULT_MEM_SIZE = DEFAULT_POOL_SIZE * DEFAULT_BUFFER_SIZE;
+  private static final int DEFAULT_MEM_SIZE = DEFAULT_POOL_SIZE * DEFAULT_CHUNK_SIZE;
 
-  private final SimpleQueue<ByteBuffer> mBufferPool;
+  private final SimpleQueue<ByteChunk> mChunkPool;
 
-  private final BufferStreamConfiguration mConfiguration;
+  private final ChunkStreamConfiguration mConfiguration;
 
   private final int mCorePoolSize;
 
-  private final int mDataBufferSize;
+  private final int mDataChunkSize;
 
   /**
    * Constructor.
    *
    * @param configuration the output stream configuration.
    */
-  private ByteChannel(@NotNull final BufferStreamConfiguration configuration) {
+  private ByteChannel(@NotNull final ChunkStreamConfiguration configuration) {
     mConfiguration = configuration;
-    final int bufferSize =
-        (mDataBufferSize = configuration.getBufferSizeOrElse(DEFAULT_BUFFER_SIZE));
+    final int chunkSize = (mDataChunkSize = configuration.getChunkSizeOrElse(DEFAULT_CHUNK_SIZE));
     final int poolSize =
-        (mCorePoolSize = configuration.getCorePoolSizeOrElse(DEFAULT_MEM_SIZE / bufferSize));
-    mBufferPool = new SimpleQueue<ByteBuffer>(Math.max(poolSize, 1));
+        (mCorePoolSize = configuration.getCorePoolSizeOrElse(DEFAULT_MEM_SIZE / chunkSize));
+    mChunkPool = new SimpleQueue<ByteChunk>(Math.max(poolSize, 1));
   }
 
   /**
-   * Returns a builder of buffer output streams.
+   * Gets an input stream returning the concatenation of the data contained in the specified chunks.
+   * <p>
+   * Note that only one input stream can be created for each chunk.
+   *
+   * @param chunks the byte chunks whose data have to be concatenated.
+   * @return the input stream.
+   * @throws java.lang.IllegalStateException if an input stream has been already created for one
+   *                                         of the specified chunks.
+   */
+  @NotNull
+  public static ChunkInputStream getInputStream(@NotNull final ByteChunk... chunks) {
+    return new MultiChunkInputStream(chunks);
+  }
+
+  /**
+   * Gets an input stream returning the concatenation of the data contained in the specified chunks.
+   * <p>
+   * Note that only one input stream can be created for each chunk.
+   *
+   * @param chunks the byte chunks whose data have to be concatenated.
+   * @return the input stream.
+   * @throws java.lang.IllegalStateException if an input stream has been already created for one
+   *                                         of the specified chunks.
+   */
+  @NotNull
+  public static ChunkInputStream getInputStream(
+      @NotNull final Iterable<? extends ByteChunk> chunks) {
+    return new MultiChunkInputStream(chunks);
+  }
+
+  /**
+   * Gets an input stream returning the data contained in the specified chunk.
+   * <p>
+   * Note that only one input stream can be created for each chunk.
+   *
+   * @param chunk the byte chunk.
+   * @return the input stream.
+   * @throws java.lang.IllegalStateException if an input stream has been already created for the
+   *                                         specified chunk.
+   */
+  @NotNull
+  public static ChunkInputStream getInputStream(@NotNull final ByteChunk chunk) {
+    return chunk.getStream();
+  }
+
+  /**
+   * Returns a builder of chunk output streams.
    * <p>
    * The built streams will not close the underlying channel by default.
    *
@@ -102,56 +147,9 @@ public class ByteChannel {
    * @return the output stream builder.
    */
   @NotNull
-  public static BufferStreamBuilder from(@NotNull final Channel<? super ByteBuffer, ?> channel) {
-    return new DefaultBufferStreamBuilder(channel);
-  }
-
-  /**
-   * Gets an input stream returning the concatenation of the data contained in the specified
-   * buffers.
-   * <p>
-   * Note that only one input stream can be created for each buffer.
-   *
-   * @param buffers the byte buffers whose data have to be concatenated.
-   * @return the input stream.
-   * @throws java.lang.IllegalStateException if an input stream has been already created for one
-   *                                         of the specified buffers.
-   */
-  @NotNull
-  public static BufferInputStream getInputStream(@NotNull final ByteBuffer... buffers) {
-    return new MultiBufferInputStream(buffers);
-  }
-
-  /**
-   * Gets an input stream returning the concatenation of the data contained in the specified
-   * buffers.
-   * <p>
-   * Note that only one input stream can be created for each buffer.
-   *
-   * @param buffers the byte buffers whose data have to be concatenated.
-   * @return the input stream.
-   * @throws java.lang.IllegalStateException if an input stream has been already created for one
-   *                                         of the specified buffers.
-   */
-  @NotNull
-  public static BufferInputStream getInputStream(
-      @NotNull final Iterable<? extends ByteBuffer> buffers) {
-    return new MultiBufferInputStream(buffers);
-  }
-
-  /**
-   * Gets an input stream returning the data contained in the specified buffer.
-   * <p>
-   * Note that only one input stream can be created for each buffer.
-   *
-   * @param buffer the byte buffer.
-   * @return the input stream.
-   * @throws java.lang.IllegalStateException if an input stream has been already created for the
-   *                                         specified buffer.
-   */
-  @NotNull
-  public static BufferInputStream getInputStream(@NotNull final ByteBuffer buffer) {
-    return buffer.getStream();
+  public static ChunkOutputStreamBuilder withOutput(
+      @NotNull final Channel<? super ByteChunk, ?> channel) {
+    return new DefaultChunkOutputStreamBuilder(channel);
   }
 
   private static boolean outOfBound(final int off, final int len, final int bytes) {
@@ -159,63 +157,64 @@ public class ByteChannel {
   }
 
   @NotNull
-  private ByteBuffer acquire() {
-    ByteBuffer buffer = null;
-    synchronized (mBufferPool) {
-      final SimpleQueue<ByteBuffer> bufferPool = mBufferPool;
-      if (!bufferPool.isEmpty()) {
-        buffer = bufferPool.removeFirst();
+  private ByteChunk acquire() {
+    ByteChunk chunk = null;
+    synchronized (mChunkPool) {
+      final SimpleQueue<ByteChunk> chunkPool = mChunkPool;
+      if (!chunkPool.isEmpty()) {
+        chunk = chunkPool.removeFirst();
       }
     }
 
-    if (buffer != null) {
-      return buffer;
+    if (chunk != null) {
+      return chunk;
     }
 
-    return new ByteBuffer(mDataBufferSize);
+    return new ByteChunk(mDataChunkSize);
   }
 
   @NotNull
-  private BufferOutputStream getOutputStream(
-      @NotNull final Channel<? super ByteBuffer, ?> channel) {
-    return new DefaultBufferOutputStream(mConfiguration, channel);
+  private ChunkOutputStream getOutputStream(@NotNull final Channel<? super ByteChunk, ?> channel) {
+    return new DefaultChunkOutputStream(mConfiguration, channel);
   }
 
-  private void release(@NotNull final ByteBuffer buffer) {
-    synchronized (mBufferPool) {
-      final SimpleQueue<ByteBuffer> bufferPool = mBufferPool;
-      if (bufferPool.size() < mCorePoolSize) {
-        bufferPool.add(buffer);
+  private void release(@NotNull final ByteChunk chunk) {
+    synchronized (mChunkPool) {
+      final SimpleQueue<ByteChunk> chunkPool = mChunkPool;
+      if (chunkPool.size() < mCorePoolSize) {
+        chunkPool.add(chunk);
       }
     }
   }
 
   /**
-   * Internal buffer state enumeration.
+   * Internal chunk state enumeration.
    */
-  private enum BufferState {
+  private enum ChunkState {
 
-    WRITE,      // can write data into the buffer
-    TRANSFER,   // the buffer is being transferred through the channel
-    READ,       // can read data from the buffer
-    RECYCLED    // the buffer is not usable
+    WRITE,      // can write data into the chunk
+    TRANSFER,   // the chunk is being transferred through the channel
+    READ,       // can read data from the chunk
+    RECYCLED    // the chunk is not usable
   }
 
   /**
-   * Input stream used to read the data contained in a buffer instance.
+   * Input stream used to read the data contained in a chunk instance.
    */
-  public static abstract class BufferInputStream extends InputStream {
+  public static abstract class ChunkInputStream extends InputStream {
 
     /**
      * Reads some bytes from the input stream and writes them into the specified output stream.
      *
      * @param out the output stream.
-     * @return the total number of bytes read into the buffer, or {@code -1} if there is no more
+     * @return the total number of bytes read into the chunk, or {@code -1} if there is no more
      * data because the end of the stream has been reached.
      * @throws java.io.IOException if an I/O error occurs. In particular, an {@code IOException} may
      *                             be thrown if the output stream has been closed.
      */
     public abstract int read(@NotNull OutputStream out) throws IOException;
+
+    // TODO: 07/01/2017 read(@NotNull OutputStream out, long limit)
 
     @Override
     public abstract int read();
@@ -297,9 +296,9 @@ public class ByteChannel {
   }
 
   /**
-   * Output stream used to write data into the buffer channel.
+   * Output stream used to write data into the chunk channel.
    */
-  public static abstract class BufferOutputStream extends OutputStream {
+  public static abstract class ChunkOutputStream extends OutputStream {
 
     /**
      * Transfers all the bytes from the specified input stream and close it.
@@ -334,13 +333,15 @@ public class ByteChannel {
      * Writes some bytes into the output stream by reading them from the specified input stream.
      *
      * @param in the input stream.
-     * @return the total number of bytes written into the buffer, or {@code -1} if there is no more
+     * @return the total number of bytes written into the chunk, or {@code -1} if there is no more
      * data because the end of the stream has been reached.
      * @throws java.io.IOException If the first byte cannot be read for any reason other than end of
      *                             file, or if the input stream has been closed, or if some other
      *                             I/O error occurs.
      */
     public abstract int write(@NotNull InputStream in) throws IOException;
+
+    // TODO: 07/01/2017 write(@NotNull InputStream in, long limit)
 
     /**
      * Writes all the returned bytes into the output stream by reading them from the specified
@@ -380,47 +381,47 @@ public class ByteChannel {
   /**
    * Default implementation of an output stream builder.
    */
-  private static class DefaultBufferStreamBuilder implements BufferStreamBuilder {
+  private static class DefaultChunkOutputStreamBuilder implements ChunkOutputStreamBuilder {
 
-    private final Channel<? super ByteBuffer, ?> mChannel;
+    private final Channel<? super ByteChunk, ?> mChannel;
 
-    private BufferStreamConfiguration mConfiguration =
-        BufferStreamConfiguration.defaultConfiguration();
+    private ChunkStreamConfiguration mConfiguration =
+        ChunkStreamConfiguration.defaultConfiguration();
 
     /**
      * Constructor.
      *
      * @param channel the output channel to feed with data.
      */
-    private DefaultBufferStreamBuilder(@NotNull final Channel<? super ByteBuffer, ?> channel) {
+    private DefaultChunkOutputStreamBuilder(@NotNull final Channel<? super ByteChunk, ?> channel) {
       mChannel = ConstantConditions.notNull("channel instance", channel);
     }
 
     @NotNull
-    public BufferStreamBuilder apply(@NotNull final BufferStreamConfiguration configuration) {
+    public ChunkOutputStreamBuilder apply(@NotNull final ChunkStreamConfiguration configuration) {
       mConfiguration = ConstantConditions.notNull("output stream configuration", configuration);
       return this;
     }
 
     @NotNull
-    public Builder<? extends BufferStreamBuilder> applyBufferStreamConfiguration() {
-      return new Builder<BufferStreamBuilder>(this, mConfiguration);
+    public Builder<? extends ChunkOutputStreamBuilder> applyChunkStreamConfiguration() {
+      return new Builder<ChunkOutputStreamBuilder>(this, mConfiguration);
     }
 
     @NotNull
-    public BufferOutputStream buildOutputStream() {
+    public ChunkOutputStream buildOutputStream() {
       return new ByteChannel(mConfiguration).getOutputStream(mChannel);
     }
   }
 
   /**
-   * Input stream returning the concatenation of a collection of byte buffer data.
+   * Input stream returning the concatenation of a collection of byte chunk data.
    */
-  private static class MultiBufferInputStream extends BufferInputStream {
+  private static class MultiChunkInputStream extends ChunkInputStream {
 
     private final Object mMutex = new Object();
 
-    private final ArrayList<BufferInputStream> mStreams;
+    private final ArrayList<ChunkInputStream> mStreams;
 
     private int mIndex;
 
@@ -429,25 +430,25 @@ public class ByteChannel {
     /**
      * Constructor.
      *
-     * @param buffers the array of input streams whose data have to be concatenated.
+     * @param chunks the array of byte chunks whose data have to be concatenated.
      */
-    private MultiBufferInputStream(@NotNull final ByteBuffer[] buffers) {
-      final ArrayList<BufferInputStream> streams =
-          (mStreams = new ArrayList<BufferInputStream>(buffers.length));
-      for (final ByteBuffer buffer : buffers) {
-        streams.add(buffer.getStream());
+    private MultiChunkInputStream(@NotNull final ByteChunk[] chunks) {
+      final ArrayList<ChunkInputStream> streams =
+          (mStreams = new ArrayList<ChunkInputStream>(chunks.length));
+      for (final ByteChunk chunk : chunks) {
+        streams.add(chunk.getStream());
       }
     }
 
     /**
      * Constructor.
      *
-     * @param buffers the list of input streams whose data have to be concatenated.
+     * @param chunks the list of byte chunks whose data have to be concatenated.
      */
-    private MultiBufferInputStream(@NotNull final Iterable<? extends ByteBuffer> buffers) {
-      final ArrayList<BufferInputStream> streams = (mStreams = new ArrayList<BufferInputStream>());
-      for (final ByteBuffer buffer : buffers) {
-        streams.add(buffer.getStream());
+    private MultiChunkInputStream(@NotNull final Iterable<? extends ByteChunk> chunks) {
+      final ArrayList<ChunkInputStream> streams = (mStreams = new ArrayList<ChunkInputStream>());
+      for (final ByteChunk chunk : chunks) {
+        streams.add(chunk.getStream());
       }
     }
 
@@ -455,14 +456,14 @@ public class ByteChannel {
      * Reads some bytes from the input stream and writes them into the specified output stream.
      *
      * @param out the output stream.
-     * @return the total number of bytes read into the buffer, or {@code -1} if there is no more
+     * @return the total number of bytes read into the chunk, or {@code -1} if there is no more
      * data because the end of the stream has been reached.
      * @throws java.io.IOException if an I/O error occurs. In particular, an {@code IOException} may
      *                             be thrown if the output stream has been closed.
      */
     public int read(@NotNull final OutputStream out) throws IOException {
       synchronized (mMutex) {
-        final ArrayList<BufferInputStream> streams = mStreams;
+        final ArrayList<ChunkInputStream> streams = mStreams;
         final int size = streams.size();
         if (mIndex >= size) {
           return -1;
@@ -484,7 +485,7 @@ public class ByteChannel {
     @Override
     public int read() {
       synchronized (mMutex) {
-        final ArrayList<BufferInputStream> streams = mStreams;
+        final ArrayList<ChunkInputStream> streams = mStreams;
         final int size = streams.size();
         if (mIndex >= size) {
           return -1;
@@ -511,7 +512,7 @@ public class ByteChannel {
       }
 
       synchronized (mMutex) {
-        final ArrayList<BufferInputStream> streams = mStreams;
+        final ArrayList<ChunkInputStream> streams = mStreams;
         final int size = streams.size();
         if (mIndex >= size) {
           return -1;
@@ -548,7 +549,7 @@ public class ByteChannel {
       }
 
       synchronized (mMutex) {
-        final ArrayList<BufferInputStream> streams = mStreams;
+        final ArrayList<ChunkInputStream> streams = mStreams;
         final int size = streams.size();
         if (mIndex >= size) {
           return -1;
@@ -578,7 +579,7 @@ public class ByteChannel {
     @Override
     public long skip(final long n) {
       synchronized (mMutex) {
-        final ArrayList<BufferInputStream> streams = mStreams;
+        final ArrayList<ChunkInputStream> streams = mStreams;
         final int size = streams.size();
         if (mIndex >= size) {
           return 0;
@@ -609,7 +610,7 @@ public class ByteChannel {
     public int available() {
       int available = 0;
       synchronized (mMutex) {
-        final ArrayList<BufferInputStream> streams = mStreams;
+        final ArrayList<ChunkInputStream> streams = mStreams;
         final int size = streams.size();
         for (int i = mIndex; i < size; ++i) {
           available += streams.get(i).available();
@@ -622,7 +623,7 @@ public class ByteChannel {
     @Override
     public void close() {
       synchronized (mMutex) {
-        for (final BufferInputStream stream : mStreams) {
+        for (final ChunkInputStream stream : mStreams) {
           stream.close();
         }
       }
@@ -640,7 +641,7 @@ public class ByteChannel {
     public void reset() {
       synchronized (mMutex) {
         final int index = (mIndex = mMarkIndex);
-        final ArrayList<BufferInputStream> streams = mStreams;
+        final ArrayList<ChunkInputStream> streams = mStreams;
         streams.get(index).reset();
         final int size = streams.size();
         for (int i = index + 1; i < size; ++i) {
@@ -656,40 +657,40 @@ public class ByteChannel {
   }
 
   /**
-   * Object acting as a buffer of bytes.
+   * Object acting as a chunk of bytes.
    * <p>
-   * Buffer instances are managed by the owning byte channel and recycled when released, in order
-   * to minimize memory consumption. Byte buffers are automatically acquired by
-   * {@code BufferOutputStream}s and passed to the underlying channel.
+   * Chunk instances are managed by the owning byte channel and recycled when released, in order
+   * to minimize memory consumption. Byte chunks are automatically acquired by
+   * {@code ChunkOutputStream}s and passed to the underlying channel.
    * <br>
-   * The data contained in a buffer can be read through the dedicated {@code BufferInputStream}
+   * The data contained in a chunk can be read through the dedicated {@code ChunkInputStream}
    * returned by one of the {@code ByteChannel.getInputStream()} methods. Note that only one input
-   * stream can be created for each buffer, any further attempt will generate an exception.
+   * stream can be created for each chunk, any further attempt will generate an exception.
    * <br>
-   * Used buffers will be released as soon as the corresponding input stream is closed.
+   * Used chunks will be released as soon as the corresponding input stream is closed.
    *
-   * @see ByteChannel#getInputStream(ByteBuffer)
-   * @see ByteChannel#getInputStream(ByteBuffer...)
+   * @see ByteChannel#getInputStream(ByteChunk)
+   * @see ByteChannel#getInputStream(ByteChunk...)
    * @see ByteChannel#getInputStream(Iterable)
    */
-  public class ByteBuffer {
+  public class ByteChunk {
 
     private final byte[] mBuffer;
 
     private final Object mMutex = new Object();
 
-    private final DefaultBufferInputStream mStream;
+    private final DefaultChunkInputStream mStream;
 
     private int mSize;
 
-    private BufferState mState = BufferState.WRITE;
+    private ChunkState mState = ChunkState.WRITE;
 
     /**
      * Constructor.
      *
      * @param bufferSize the internal buffer size.
      */
-    private ByteBuffer(final int bufferSize) {
+    private ByteChunk(final int bufferSize) {
       this(new byte[bufferSize]);
     }
 
@@ -698,9 +699,9 @@ public class ByteChannel {
      *
      * @param buffer the internal buffer.
      */
-    private ByteBuffer(final byte[] buffer) {
+    private ByteChunk(final byte[] buffer) {
       mBuffer = buffer;
-      mStream = new DefaultBufferInputStream(this);
+      mStream = new DefaultChunkInputStream(this);
     }
 
     @Override
@@ -721,11 +722,11 @@ public class ByteChannel {
         return true;
       }
 
-      if (!(o instanceof ByteBuffer)) {
+      if (!(o instanceof ByteChunk)) {
         return false;
       }
 
-      final ByteBuffer that = (ByteBuffer) o;
+      final ByteChunk that = (ByteChunk) o;
       final int size = size();
       if (size != that.size()) {
         return false;
@@ -743,9 +744,9 @@ public class ByteChannel {
     }
 
     /**
-     * Returns the size in number of bytes of this buffer.
+     * Returns the size in number of bytes of this chunk.
      *
-     * @return the buffer size.
+     * @return the chunk size.
      */
     public int size() {
       synchronized (mMutex) {
@@ -753,8 +754,8 @@ public class ByteChannel {
       }
     }
 
-    private void changeState(@NotNull final BufferState expected,
-        @NotNull final BufferState updated, @NotNull final String errorMessage) {
+    private void changeState(@NotNull final ChunkState expected, @NotNull final ChunkState updated,
+        @NotNull final String errorMessage) {
       if (mState != expected) {
         throw new IllegalStateException(errorMessage + ": " + mState);
       }
@@ -777,10 +778,10 @@ public class ByteChannel {
     }
 
     @NotNull
-    private BufferInputStream getStream() {
+    private ChunkInputStream getStream() {
       synchronized (mMutex) {
-        changeState(BufferState.TRANSFER, BufferState.READ,
-            "attempting to get buffer stream while in illegal state");
+        changeState(ChunkState.TRANSFER, ChunkState.READ,
+            "attempting to get chunk stream while in illegal state");
         return mStream;
       }
     }
@@ -790,9 +791,9 @@ public class ByteChannel {
     }
 
     @NotNull
-    private ByteBuffer lock(final int size) {
+    private ByteChunk lock(final int size) {
       synchronized (mMutex) {
-        changeState(BufferState.WRITE, BufferState.TRANSFER,
+        changeState(ChunkState.WRITE, ChunkState.TRANSFER,
             "attempting to write to output while in illegal state");
         mSize = size;
       }
@@ -807,12 +808,12 @@ public class ByteChannel {
 
     private void recycle() {
       synchronized (mMutex) {
-        changeState(BufferState.READ, BufferState.RECYCLED,
-            "attempting to read from buffer while in illegal state");
+        changeState(ChunkState.READ, ChunkState.RECYCLED,
+            "attempting to read from chunk while in illegal state");
         mSize = 0;
       }
 
-      release(new ByteBuffer(mBuffer));
+      release(new ByteChunk(mBuffer));
     }
 
     private void setByte(final int pos, final byte b) {
@@ -826,11 +827,11 @@ public class ByteChannel {
   }
 
   /**
-   * Default buffer input stream implementation.
+   * Default chunk input stream implementation.
    */
-  private class DefaultBufferInputStream extends BufferInputStream {
+  private class DefaultChunkInputStream extends ChunkInputStream {
 
-    private final ByteBuffer mBuffer;
+    private final ByteChunk mChunk;
 
     private final Object mMutex = new Object();
 
@@ -843,24 +844,24 @@ public class ByteChannel {
     /**
      * Constructor.
      *
-     * @param buffer the internal buffer.
+     * @param chunk the internal chunk.
      */
-    private DefaultBufferInputStream(@NotNull final ByteBuffer buffer) {
-      mBuffer = buffer;
+    private DefaultChunkInputStream(@NotNull final ByteChunk chunk) {
+      mChunk = chunk;
     }
 
     @Override
     public int read(@NotNull final OutputStream out) throws IOException {
       synchronized (mMutex) {
-        final ByteBuffer buffer = mBuffer;
-        final int size = buffer.size();
+        final ByteChunk chunk = mChunk;
+        final int size = chunk.size();
         final int offset = mOffset;
         if (offset >= size) {
           return -1;
         }
 
         final int count = size - offset;
-        buffer.writeTo(out, offset, count);
+        chunk.writeTo(out, offset, count);
         mOffset = size;
         return count;
       }
@@ -874,15 +875,15 @@ public class ByteChannel {
       }
 
       synchronized (mMutex) {
-        final ByteBuffer buffer = mBuffer;
-        final int size = buffer.size();
+        final ByteChunk chunk = mChunk;
+        final int size = chunk.size();
         final int offset = mOffset;
         if (offset >= size) {
           return -1;
         }
 
         final int count = Math.min(len, size - offset);
-        buffer.copyTo(offset, b, 0, count);
+        chunk.copyTo(offset, b, 0, count);
         mOffset += count;
         return count;
       }
@@ -898,15 +899,15 @@ public class ByteChannel {
       }
 
       synchronized (mMutex) {
-        final ByteBuffer buffer = mBuffer;
-        final int size = buffer.size();
+        final ByteChunk chunk = mChunk;
+        final int size = chunk.size();
         final int offset = mOffset;
         if (offset >= size) {
           return -1;
         }
 
         final int count = Math.min(len, size - offset);
-        buffer.copyTo(offset, b, off, count);
+        chunk.copyTo(offset, b, off, count);
         mOffset += count;
         return count;
       }
@@ -915,7 +916,7 @@ public class ByteChannel {
     @Override
     public long skip(final long n) {
       synchronized (mMutex) {
-        final long skipped = Math.min(mBuffer.size() - mOffset, n);
+        final long skipped = Math.min(mChunk.size() - mOffset, n);
         if (skipped > 0) {
           mOffset += skipped;
           return skipped;
@@ -928,7 +929,7 @@ public class ByteChannel {
     @Override
     public int available() {
       synchronized (mMutex) {
-        return Math.max(0, mBuffer.size() - mOffset);
+        return Math.max(0, mChunk.size() - mOffset);
       }
     }
 
@@ -941,7 +942,7 @@ public class ByteChannel {
 
         mIsClosed = true;
         mMark = 0;
-        mBuffer.recycle();
+        mChunk.recycle();
       }
     }
 
@@ -955,13 +956,13 @@ public class ByteChannel {
     @Override
     public int read() {
       synchronized (mMutex) {
-        final ByteBuffer buffer = mBuffer;
-        final int size = buffer.size();
+        final ByteChunk chunk = mChunk;
+        final int size = chunk.size();
         if (mOffset >= size) {
           return -1;
         }
 
-        return buffer.getByte(mOffset++);
+        return chunk.getByte(mOffset++);
       }
     }
 
@@ -979,17 +980,17 @@ public class ByteChannel {
   }
 
   /**
-   * Default buffer output stream implementation.
+   * Default chunk output stream implementation.
    */
-  private class DefaultBufferOutputStream extends BufferOutputStream {
+  private class DefaultChunkOutputStream extends ChunkOutputStream {
 
-    private final Channel<? super ByteBuffer, ?> mChannel;
+    private final Channel<? super ByteChunk, ?> mChannel;
 
     private final CloseActionType mCloseAction;
 
     private final Object mMutex = new Object();
 
-    private ByteBuffer mBuffer;
+    private ByteChunk mChunk;
 
     private boolean mIsClosed;
 
@@ -1001,8 +1002,8 @@ public class ByteChannel {
      * @param configuration the output stream configuration.
      * @param channel       the channel to which pass the data.
      */
-    private DefaultBufferOutputStream(@NotNull final BufferStreamConfiguration configuration,
-        @NotNull final Channel<? super ByteBuffer, ?> channel) {
+    private DefaultChunkOutputStream(@NotNull final ChunkStreamConfiguration configuration,
+        @NotNull final Channel<? super ByteChunk, ?> channel) {
       mChannel = channel;
       mCloseAction = configuration.getCloseActionTypeOrElse(CloseActionType.CLOSE_STREAM);
     }
@@ -1011,24 +1012,24 @@ public class ByteChannel {
     public int write(@NotNull final InputStream in) throws IOException {
       final int read;
       final boolean isPass;
-      final ByteBuffer byteBuffer;
+      final ByteChunk byteChunk;
       final int size;
       synchronized (mMutex) {
         if (mIsClosed) {
           throw new IOException("cannot write into a closed output stream");
         }
 
-        byteBuffer = getBuffer();
-        final int length = byteBuffer.length();
+        byteChunk = getChunk();
+        final int length = byteChunk.length();
         final int offset = mOffset;
-        read = byteBuffer.readFrom(in, offset, length - offset);
+        read = byteChunk.readFrom(in, offset, length - offset);
         if (read > 0) {
           mOffset += read;
           size = mOffset;
           isPass = (size >= length);
           if (isPass) {
             mOffset = 0;
-            mBuffer = null;
+            mChunk = null;
           }
 
         } else {
@@ -1038,7 +1039,7 @@ public class ByteChannel {
       }
 
       if (isPass) {
-        mChannel.pass(byteBuffer.lock(size));
+        mChannel.pass(byteChunk.lock(size));
       }
 
       return read;
@@ -1046,7 +1047,7 @@ public class ByteChannel {
 
     @Override
     public void flush() {
-      final ByteBuffer byteBuffer;
+      final ByteChunk byteChunk;
       final int size;
       synchronized (mMutex) {
         size = mOffset;
@@ -1054,12 +1055,12 @@ public class ByteChannel {
           return;
         }
 
-        byteBuffer = getBuffer();
+        byteChunk = getChunk();
         mOffset = 0;
-        mBuffer = null;
+        mChunk = null;
       }
 
-      mChannel.pass(byteBuffer.lock(size));
+      mChannel.pass(byteChunk.lock(size));
     }
 
     @Override
@@ -1089,25 +1090,25 @@ public class ByteChannel {
     @Override
     public void write(final int b) throws IOException {
       final boolean isPass;
-      final ByteBuffer byteBuffer;
+      final ByteChunk byteChunk;
       final int size;
       synchronized (mMutex) {
         if (mIsClosed) {
           throw new IOException("cannot write into a closed output stream");
         }
 
-        byteBuffer = getBuffer();
-        byteBuffer.setByte(mOffset++, (byte) b);
+        byteChunk = getChunk();
+        byteChunk.setByte(mOffset++, (byte) b);
         size = mOffset;
-        isPass = (size >= byteBuffer.length());
+        isPass = (size >= byteChunk.length());
         if (isPass) {
           mOffset = 0;
-          mBuffer = null;
+          mChunk = null;
         }
       }
 
       if (isPass) {
-        mChannel.pass(byteBuffer.lock(size));
+        mChannel.pass(byteChunk.lock(size));
       }
     }
 
@@ -1121,30 +1122,30 @@ public class ByteChannel {
       int written = 0;
       do {
         final boolean isPass;
-        final ByteBuffer byteBuffer;
+        final ByteChunk byteChunk;
         final int size;
         synchronized (mMutex) {
           if (mIsClosed) {
             throw new IOException("cannot write into a closed output stream");
           }
 
-          byteBuffer = getBuffer();
-          final int length = byteBuffer.length();
+          byteChunk = getChunk();
+          final int length = byteChunk.length();
           final int offset = mOffset;
           final int count = Math.min(len - written, length - offset);
-          byteBuffer.copyFrom(b, written, offset, count);
+          byteChunk.copyFrom(b, written, offset, count);
           written += count;
           mOffset += count;
           size = mOffset;
           isPass = (size >= length);
           if (isPass) {
             mOffset = 0;
-            mBuffer = null;
+            mChunk = null;
           }
         }
 
         if (isPass) {
-          mChannel.pass(byteBuffer.lock(size));
+          mChannel.pass(byteChunk.lock(size));
         }
 
       } while (written < len);
@@ -1162,43 +1163,43 @@ public class ByteChannel {
       int written = 0;
       do {
         final boolean isPass;
-        final ByteBuffer byteBuffer;
+        final ByteChunk byteChunk;
         final int size;
         synchronized (mMutex) {
           if (mIsClosed) {
             throw new IOException("cannot write into a closed output stream");
           }
 
-          byteBuffer = getBuffer();
-          final int length = byteBuffer.length();
+          byteChunk = getChunk();
+          final int length = byteChunk.length();
           final int offset = mOffset;
           final int count = Math.min(len - written, length - offset);
-          byteBuffer.copyFrom(b, off + written, offset, count);
+          byteChunk.copyFrom(b, off + written, offset, count);
           written += count;
           mOffset += count;
           size = mOffset;
           isPass = (size >= length);
           if (isPass) {
             mOffset = 0;
-            mBuffer = null;
+            mChunk = null;
           }
         }
 
         if (isPass) {
-          mChannel.pass(byteBuffer.lock(size));
+          mChannel.pass(byteChunk.lock(size));
         }
 
       } while (written < len);
     }
 
     @NotNull
-    private ByteBuffer getBuffer() {
-      final ByteBuffer byteBuffer = mBuffer;
-      if (byteBuffer != null) {
-        return byteBuffer;
+    private ByteChunk getChunk() {
+      final ByteChunk byteChunk = mChunk;
+      if (byteChunk != null) {
+        return byteChunk;
       }
 
-      return (mBuffer = acquire());
+      return (mChunk = acquire());
     }
   }
 }

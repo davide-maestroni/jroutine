@@ -41,7 +41,7 @@ import okio.Source;
 import okio.Timeout;
 import retrofit2.Converter;
 
-import static com.github.dm.jrt.core.util.DurationMeasure.infinity;
+import static com.github.dm.jrt.core.util.DurationMeasure.indefiniteTime;
 
 /**
  * Channel consumer implementation converting the request response body into and instance of the
@@ -72,14 +72,15 @@ class ConverterChannelConsumer implements ChannelConsumer<ParcelableFlow<Object>
 
   private final Channel<Object, ?> mOutputChannel;
 
-  private Channel<ParcelableByteChunk, ParcelableByteChunk> mChunkChannel =
-      JRoutineCore.<ParcelableByteChunk>ofInputs().buildChannel();
+  private Channel<ParcelableByteChunk, ParcelableByteChunk> mChunkChannel;
 
   private long mContentLength;
 
   private boolean mHasContentLength;
 
   private boolean mHasMediaType;
+
+  private boolean mHasResponse;
 
   private MediaType mMediaType;
 
@@ -97,8 +98,18 @@ class ConverterChannelConsumer implements ChannelConsumer<ParcelableFlow<Object>
 
   @Override
   public void onComplete() {
-    mChunkChannel.close();
-    if (!mHasMediaType || !mHasContentLength) {
+    final Channel<ParcelableByteChunk, ParcelableByteChunk> channel = mChunkChannel;
+    if (channel != null) {
+      channel.close();
+
+    } else if (mHasMediaType && mHasContentLength) {
+      mHasResponse = true;
+      final ResponseBody responseBody =
+          ResponseBody.create(mMediaType, mContentLength, new Buffer());
+      publishResult(responseBody);
+    }
+
+    if (!mHasResponse) {
       mOutputChannel.close();
     }
   }
@@ -126,6 +137,10 @@ class ConverterChannelConsumer implements ChannelConsumer<ParcelableFlow<Object>
 
       case BYTES_ID:
         final ParcelableByteChunk chunk = output.data();
+        if (mChunkChannel == null) {
+          mChunkChannel = JRoutineCore.<ParcelableByteChunk>ofInputs().buildChannel();
+        }
+
         mChunkChannel.pass(chunk);
         break;
 
@@ -133,22 +148,27 @@ class ConverterChannelConsumer implements ChannelConsumer<ParcelableFlow<Object>
         throw new IllegalArgumentException("unknown flow ID: " + output.id);
     }
 
-    if (mHasMediaType && mHasContentLength) {
+    if (!mHasResponse && mHasMediaType && mHasContentLength && (mChunkChannel != null)) {
+      mHasResponse = true;
       sService.execute(new Runnable() {
 
         @Override
         public void run() {
           final ResponseBody responseBody = ResponseBody.create(mMediaType, mContentLength,
               Okio.buffer(new BlockingSource(mChunkChannel)));
-          final Channel<Object, ?> outputChannel = mOutputChannel;
-          try {
-            outputChannel.pass(mConverter.convert(responseBody)).close();
-
-          } catch (final Throwable t) {
-            outputChannel.abort(InvocationException.wrapIfNeeded(t));
-          }
+          publishResult(responseBody);
         }
       });
+    }
+  }
+
+  private void publishResult(@NotNull final ResponseBody responseBody) {
+    final Channel<Object, ?> outputChannel = mOutputChannel;
+    try {
+      outputChannel.pass(mConverter.convert(responseBody)).close();
+
+    } catch (final Throwable t) {
+      outputChannel.abort(InvocationException.wrapIfNeeded(t));
     }
   }
 
@@ -177,21 +197,25 @@ class ConverterChannelConsumer implements ChannelConsumer<ParcelableFlow<Object>
         return 0;
       }
 
-      if (mInputStream == null) {
-        final Channel<ParcelableByteChunk, ParcelableByteChunk> channel = mChannel;
-        if (channel.in(infinity()).hasNext()) {
-          mInputStream = ParcelableByteChannel.getInputStream(channel.next());
+      long count = 0;
+      while (count < 1) {
+        if (mInputStream == null) {
+          final Channel<ParcelableByteChunk, ParcelableByteChunk> channel = mChannel;
+          if (channel.in(indefiniteTime()).hasNext()) {
+            mInputStream = ParcelableByteChannel.getInputStream(channel.next());
 
-        } else {
-          return -1;
+          } else {
+            return -1;
+          }
         }
-      }
 
-      final ChunkInputStream inputStream = mInputStream;
-      final long count = Math.min(byteCount, inputStream.available());
-      sink.readFrom(inputStream, count);
-      if (inputStream.available() == 0) {
-        mInputStream = null;
+        final ChunkInputStream inputStream = mInputStream;
+        count = Math.min(byteCount, inputStream.available());
+        sink.readFrom(inputStream, count);
+        if (inputStream.available() == 0) {
+          inputStream.close();
+          mInputStream = null;
+        }
       }
 
       return count;

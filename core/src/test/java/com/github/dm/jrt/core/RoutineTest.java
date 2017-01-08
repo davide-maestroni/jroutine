@@ -73,7 +73,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import static com.github.dm.jrt.core.common.BackoffBuilder.afterCount;
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builder;
 import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
-import static com.github.dm.jrt.core.util.DurationMeasure.infinity;
+import static com.github.dm.jrt.core.util.DurationMeasure.indefiniteTime;
 import static com.github.dm.jrt.core.util.DurationMeasure.millis;
 import static com.github.dm.jrt.core.util.DurationMeasure.noTime;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
@@ -1377,7 +1377,7 @@ public class RoutineTest {
         JRoutineCore.with(factoryOf(TestLifecycle.class)).call("test");
     Thread.sleep(500);
     outputChannel.abort();
-    outputChannel.in(infinity()).getComplete();
+    outputChannel.in(indefiniteTime()).getComplete();
     assertThat(TestLifecycle.sIsError).isFalse();
   }
 
@@ -2805,7 +2805,7 @@ public class RoutineTest {
       JRoutineCore.with(IdentityInvocation.<String>factoryOf())
                   .applyInvocationConfiguration()
                   .withInputMaxSize(1)
-                  .withInputBackoff(afterCount(1).constantDelay(infinity()))
+                  .withInputBackoff(afterCount(1).constantDelay(indefiniteTime()))
                   .configured()
                   .call()
                   .after(millis(500))
@@ -2831,7 +2831,7 @@ public class RoutineTest {
       result.pass(JRoutineCore.with(IdentityInvocation.<String>factoryOf())
                               .applyInvocationConfiguration()
                               .withInputMaxSize(1)
-                              .withInputBackoff(afterCount(1).constantDelay(infinity()))
+                              .withInputBackoff(afterCount(1).constantDelay(indefiniteTime()))
                               .configured()
                               .call()
                               .after(millis(500))
@@ -2855,7 +2855,7 @@ public class RoutineTest {
       JRoutineCore.with(IdentityInvocation.<String>factoryOf())
                   .applyInvocationConfiguration()
                   .withInputMaxSize(1)
-                  .withInputBackoff(afterCount(1).constantDelay(infinity()))
+                  .withInputBackoff(afterCount(1).constantDelay(indefiniteTime()))
                   .configured()
                   .call()
                   .after(millis(500))
@@ -2881,7 +2881,7 @@ public class RoutineTest {
       JRoutineCore.with(IdentityInvocation.<String>factoryOf())
                   .applyInvocationConfiguration()
                   .withInputMaxSize(1)
-                  .withInputBackoff(afterCount(1).constantDelay(infinity()))
+                  .withInputBackoff(afterCount(1).constantDelay(indefiniteTime()))
                   .configured()
                   .call()
                   .after(millis(500))

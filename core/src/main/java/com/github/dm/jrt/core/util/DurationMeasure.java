@@ -45,7 +45,7 @@ public class DurationMeasure extends TimeMeasure {
   private static final DurationMeasure[][] sCaches =
       new DurationMeasure[CACHE_UNIT_SIZE][CACHE_TIME_SIZE];
 
-  private static final DurationMeasure sInfinity =
+  private static final DurationMeasure sIndefinite =
       new DurationMeasure(Long.MAX_VALUE, TimeUnit.SECONDS);
 
   private static final DurationMeasure[] sZeroes = new DurationMeasure[TimeUnit.values().length];
@@ -173,13 +173,13 @@ public class DurationMeasure extends TimeMeasure {
   }
 
   /**
-   * Returns the time duration instance representing the infinity.
+   * Returns the time duration instance representing an indefinite duration.
    *
-   * @return the infinity instance.
+   * @return the indefinite duration.
    */
   @NotNull
-  public static DurationMeasure infinity() {
-    return sInfinity;
+  public static DurationMeasure indefiniteTime() {
+    return sIndefinite;
   }
 
   /**
@@ -742,12 +742,12 @@ public class DurationMeasure extends TimeMeasure {
   }
 
   /**
-   * Checks if this duration represents the infinity.
+   * Checks if this duration represents an indefinite time.
    *
-   * @return whether this duration is infinite.
+   * @return whether this duration is indefinite.
    */
-  public boolean isInfinite() {
-    return (this == sInfinity);
+  public boolean isIndefinite() {
+    return (this == sIndefinite);
   }
 
   /**
@@ -814,7 +814,7 @@ public class DurationMeasure extends TimeMeasure {
    * @throws java.lang.InterruptedException if the current thread is interrupted.
    */
   public void wait(@NotNull final Object target) throws InterruptedException {
-    wait(target, isInfinite() ? -1 : value, unit);
+    wait(target, isIndefinite() ? -1 : value, unit);
   }
 
   /**
@@ -829,7 +829,7 @@ public class DurationMeasure extends TimeMeasure {
    */
   public boolean waitSinceMillis(@NotNull final Object target, final long milliTime) throws
       InterruptedException {
-    return waitSinceMillis(target, milliTime, isInfinite() ? -1 : value, unit);
+    return waitSinceMillis(target, milliTime, isIndefinite() ? -1 : value, unit);
   }
 
   /**
@@ -844,7 +844,7 @@ public class DurationMeasure extends TimeMeasure {
    */
   public boolean waitSinceNanos(@NotNull final Object target, final long nanoTime) throws
       InterruptedException {
-    return waitSinceNanos(target, nanoTime, isInfinite() ? -1 : value, unit);
+    return waitSinceNanos(target, nanoTime, isIndefinite() ? -1 : value, unit);
   }
 
   /**
@@ -858,7 +858,7 @@ public class DurationMeasure extends TimeMeasure {
    */
   public boolean waitUntil(@NotNull final Object target, @NotNull final Condition condition) throws
       InterruptedException {
-    return waitUntil(target, condition, isInfinite() ? -1 : value, unit);
+    return waitUntil(target, condition, isIndefinite() ? -1 : value, unit);
   }
 
   /**

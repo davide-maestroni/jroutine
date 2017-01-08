@@ -62,7 +62,7 @@ import static com.github.dm.jrt.android.core.ServiceContext.serviceFrom;
 import static com.github.dm.jrt.android.object.ContextInvocationTarget.classOfType;
 import static com.github.dm.jrt.android.object.ContextInvocationTarget.instanceOf;
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builder;
-import static com.github.dm.jrt.core.util.DurationMeasure.infinity;
+import static com.github.dm.jrt.core.util.DurationMeasure.indefiniteTime;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -378,7 +378,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
     final Itf itf = JRoutineServiceProxy.on(serviceFrom(getActivity(), TestService.class))
                                         .with(instanceOf(Impl.class))
                                         .applyInvocationConfiguration()
-                                        .withOutputTimeout(infinity())
+                                        .withOutputTimeout(indefiniteTime())
                                         .configured()
                                         .buildProxy(Itf.class);
 

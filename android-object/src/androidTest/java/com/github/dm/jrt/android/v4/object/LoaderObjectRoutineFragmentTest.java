@@ -72,7 +72,7 @@ import static com.github.dm.jrt.android.object.ContextInvocationTarget.instanceO
 import static com.github.dm.jrt.android.v4.core.LoaderContextCompat.loaderFrom;
 import static com.github.dm.jrt.core.common.BackoffBuilder.afterCount;
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builder;
-import static com.github.dm.jrt.core.util.DurationMeasure.infinity;
+import static com.github.dm.jrt.core.util.DurationMeasure.indefiniteTime;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -532,7 +532,7 @@ public class LoaderObjectRoutineFragmentTest
       JRoutineLoaderObjectCompat.on(loaderFrom(fragment))
                                 .with(instanceOf(TestClass.class))
                                 .applyInvocationConfiguration()
-                                .withOutputTimeout(infinity())
+                                .withOutputTimeout(indefiniteTime())
                                 .configured()
                                 .buildProxy(TestItf.class)
                                 .throwException(null);
@@ -548,7 +548,7 @@ public class LoaderObjectRoutineFragmentTest
       JRoutineLoaderObjectCompat.on(loaderFrom(fragment))
                                 .with(instanceOf(TestClass.class))
                                 .applyInvocationConfiguration()
-                                .withOutputTimeout(infinity())
+                                .withOutputTimeout(indefiniteTime())
                                 .configured()
                                 .buildProxy(TestItf.class)
                                 .throwException1(null);
@@ -564,7 +564,7 @@ public class LoaderObjectRoutineFragmentTest
       JRoutineLoaderObjectCompat.on(loaderFrom(fragment))
                                 .with(instanceOf(TestClass.class))
                                 .applyInvocationConfiguration()
-                                .withOutputTimeout(infinity())
+                                .withOutputTimeout(indefiniteTime())
                                 .configured()
                                 .buildProxy(TestItf.class)
                                 .throwException2(null);

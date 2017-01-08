@@ -56,7 +56,7 @@ import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.fromFactory;
 import static com.github.dm.jrt.android.core.runner.AndroidRunners.mainRunner;
-import static com.github.dm.jrt.core.util.DurationMeasure.infinity;
+import static com.github.dm.jrt.core.util.DurationMeasure.indefiniteTime;
 
 /**
  * Invocation implementation employing Loaders to perform background operations.
@@ -114,7 +114,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
         configuration.getClashResolutionTypeOrElse(ClashResolutionType.ABORT_OTHER);
     mMatchResolutionType = configuration.getMatchResolutionTypeOrElse(ClashResolutionType.JOIN);
     mCacheStrategyType = configuration.getCacheStrategyTypeOrElse(CacheStrategyType.CLEAR);
-    mResultStaleTimeMillis = configuration.getResultStaleTimeOrElse(infinity()).toMillis();
+    mResultStaleTimeMillis = configuration.getResultStaleTimeOrElse(indefiniteTime()).toMillis();
     mOrderType = order;
     mLogger = logger.subContextLogger(this);
   }

@@ -26,7 +26,7 @@ import java.lang.reflect.Method;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-import static com.github.dm.jrt.core.util.DurationMeasure.infinity;
+import static com.github.dm.jrt.core.util.DurationMeasure.indefiniteTime;
 import static com.github.dm.jrt.core.util.DurationMeasure.noTime;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
@@ -283,10 +283,10 @@ public class DurationMeasureTest {
   }
 
   @Test
-  public void testInfinite() {
+  public void testIndefinite() {
 
-    assertThat(infinity().isZero()).isFalse();
-    assertThat(infinity().isInfinite()).isTrue();
+    assertThat(indefiniteTime().isZero()).isFalse();
+    assertThat(indefiniteTime().isIndefinite()).isTrue();
   }
 
   @Test
@@ -713,7 +713,7 @@ public class DurationMeasureTest {
     };
     thread.start();
     synchronized (thread) {
-      infinity().wait(thread);
+      indefiniteTime().wait(thread);
     }
 
     startTime = System.currentTimeMillis() - 1000;
@@ -746,7 +746,7 @@ public class DurationMeasureTest {
     };
     thread.start();
     synchronized (thread) {
-      infinity().waitSinceMillis(thread, System.currentTimeMillis());
+      indefiniteTime().waitSinceMillis(thread, System.currentTimeMillis());
     }
   }
 
@@ -784,7 +784,7 @@ public class DurationMeasureTest {
     };
     thread.start();
     synchronized (thread) {
-      infinity().waitSinceNanos(thread, System.nanoTime());
+      indefiniteTime().waitSinceNanos(thread, System.nanoTime());
     }
   }
 
@@ -864,7 +864,7 @@ public class DurationMeasureTest {
     };
     thread.start();
     synchronized (thread) {
-      assertThat(infinity().waitUntil(thread, new Condition() {
+      assertThat(indefiniteTime().waitUntil(thread, new Condition() {
 
         private boolean mToggle = true;
 

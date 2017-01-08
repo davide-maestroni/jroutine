@@ -46,7 +46,7 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 import okio.BufferedSink;
 
-import static com.github.dm.jrt.core.util.DurationMeasure.infinity;
+import static com.github.dm.jrt.core.util.DurationMeasure.indefiniteTime;
 
 /**
  * Implementation of a Context invocation handling OkHttp requests.
@@ -74,9 +74,9 @@ public class ServiceCallInvocation
 
   private boolean mHasMediaType;
 
-  private Channel<ParcelableByteChunk, ParcelableByteChunk> mInputChannel;
+  private boolean mHasRequest;
 
-  private boolean mIsAsyncRequest;
+  private Channel<ParcelableByteChunk, ParcelableByteChunk> mInputChannel;
 
   private MediaType mMediaType;
 
@@ -88,7 +88,7 @@ public class ServiceCallInvocation
     final Channel<ParcelableByteChunk, ParcelableByteChunk> inputChannel = mInputChannel;
     if (inputChannel != null) {
       inputChannel.close();
-      if (!mIsAsyncRequest) {
+      if (!mHasRequest) {
         asyncRequest(result);
       }
 
@@ -106,9 +106,9 @@ public class ServiceCallInvocation
         break;
 
       case MEDIA_TYPE_ID:
-        mHasMediaType = true;
         final String mediaType = input.data();
         mMediaType = (mediaType != null) ? MediaType.parse(mediaType) : null;
+        mHasMediaType = true;
         break;
 
       case BYTES_ID:
@@ -124,8 +124,8 @@ public class ServiceCallInvocation
         throw new IllegalArgumentException("unknown flow ID: " + input.id);
     }
 
-    if (!mIsAsyncRequest && mHasMediaType && (mRequestData != null) && (mInputChannel != null)) {
-      mIsAsyncRequest = true;
+    if (!mHasRequest && mHasMediaType && (mRequestData != null) && (mInputChannel != null)) {
+      mHasRequest = true;
       asyncRequest(result);
     }
   }
@@ -136,6 +136,7 @@ public class ServiceCallInvocation
     mMediaType = null;
     mInputChannel = null;
     mHasMediaType = false;
+    mHasRequest = false;
   }
 
   private void asyncRequest(@NotNull final Channel<ParcelableFlow<Object>, ?> result) throws
@@ -244,7 +245,7 @@ public class ServiceCallInvocation
     public void writeTo(final BufferedSink sink) throws IOException {
       final OutputStream outputStream = sink.outputStream();
       try {
-        for (final ParcelableByteChunk chunk : mInputChannel.in(infinity())) {
+        for (final ParcelableByteChunk chunk : mInputChannel.in(indefiniteTime())) {
           ParcelableByteChannel.getInputStream(chunk).transferTo(outputStream);
         }
 

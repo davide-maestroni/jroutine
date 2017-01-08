@@ -214,7 +214,20 @@ public class ByteChannel {
      */
     public abstract int read(@NotNull OutputStream out) throws IOException;
 
-    // TODO: 07/01/2017 read(@NotNull OutputStream out, long limit)
+    /**
+     * Reads up to {@code limit} bytes from the input stream and writes them into the specified
+     * output stream.
+     *
+     * @param out   the output stream.
+     * @param limit the maximum number of bytes to read.
+     * @return the total number of bytes read into the chunk, or {@code -1} if there is no more
+     * data because the end of the stream has been reached.
+     * @throws java.lang.IllegalArgumentException if the limit is negative.
+     * @throws java.io.IOException                if an I/O error occurs. In particular, an
+     *                                            {@code IOException} may be thrown if the output
+     *                                            stream has been closed.
+     */
+    public abstract int read(@NotNull OutputStream out, int limit) throws IOException;
 
     @Override
     public abstract int read();
@@ -341,7 +354,20 @@ public class ByteChannel {
      */
     public abstract int write(@NotNull InputStream in) throws IOException;
 
-    // TODO: 07/01/2017 write(@NotNull InputStream in, long limit)
+    /**
+     * Writes up to {@code limit} bytes into the output stream by reading them from the specified
+     * \input stream.
+     *
+     * @param in    the input stream.
+     * @param limit the maximum number of bytes to write.
+     * @return the total number of bytes written into the chunk, or {@code -1} if there is no more
+     * data because the end of the stream has been reached.
+     * @throws java.lang.IllegalArgumentException if the limit is negative.
+     * @throws java.io.IOException                If the first byte cannot be read for any reason
+     *                                            other than end of file, or if the input stream has
+     *                                            been closed, or if some other I/O error occurs.
+     */
+    public abstract int write(@NotNull InputStream in, int limit) throws IOException;
 
     /**
      * Writes all the returned bytes into the output stream by reading them from the specified
@@ -452,15 +478,7 @@ public class ByteChannel {
       }
     }
 
-    /**
-     * Reads some bytes from the input stream and writes them into the specified output stream.
-     *
-     * @param out the output stream.
-     * @return the total number of bytes read into the chunk, or {@code -1} if there is no more
-     * data because the end of the stream has been reached.
-     * @throws java.io.IOException if an I/O error occurs. In particular, an {@code IOException} may
-     *                             be thrown if the output stream has been closed.
-     */
+    @Override
     public int read(@NotNull final OutputStream out) throws IOException {
       synchronized (mMutex) {
         final ArrayList<ChunkInputStream> streams = mStreams;
@@ -479,6 +497,37 @@ public class ByteChannel {
         }
 
         return read;
+      }
+    }
+
+    @Override
+    public int read(@NotNull final OutputStream out, final int limit) throws IOException {
+      if (ConstantConditions.notNegative("byte limit", limit) == 0) {
+        return 0;
+      }
+
+      synchronized (mMutex) {
+        int count = 0;
+        while (count < limit) {
+          final ArrayList<ChunkInputStream> streams = mStreams;
+          final int size = streams.size();
+          if (mIndex >= size) {
+            return (count > 0) ? count : -1;
+          }
+
+          int read = streams.get(mIndex).read(out, limit - count);
+          while (read < 0) {
+            if (++mIndex >= size) {
+              return (count > 0) ? count : -1;
+            }
+
+            read = streams.get(mIndex).read(out, limit - count);
+          }
+
+          count += read;
+        }
+
+        return count;
       }
     }
 
@@ -852,6 +901,15 @@ public class ByteChannel {
 
     @Override
     public int read(@NotNull final OutputStream out) throws IOException {
+      return read(out, Integer.MAX_VALUE);
+    }
+
+    @Override
+    public int read(@NotNull final OutputStream out, final int limit) throws IOException {
+      if (ConstantConditions.notNegative("byte limit", limit) == 0) {
+        return 0;
+      }
+
       synchronized (mMutex) {
         final ByteChunk chunk = mChunk;
         final int size = chunk.size();
@@ -860,7 +918,7 @@ public class ByteChannel {
           return -1;
         }
 
-        final int count = size - offset;
+        final int count = Math.min(size - offset, limit);
         chunk.writeTo(out, offset, count);
         mOffset = size;
         return count;
@@ -1010,6 +1068,15 @@ public class ByteChannel {
 
     @Override
     public int write(@NotNull final InputStream in) throws IOException {
+      return write(in, Integer.MAX_VALUE);
+    }
+
+    @Override
+    public int write(@NotNull final InputStream in, final int limit) throws IOException {
+      if (ConstantConditions.notNegative("byte limit", limit) == 0) {
+        return 0;
+      }
+
       final int read;
       final boolean isPass;
       final ByteChunk byteChunk;
@@ -1022,7 +1089,7 @@ public class ByteChannel {
         byteChunk = getChunk();
         final int length = byteChunk.length();
         final int offset = mOffset;
-        read = byteChunk.readFrom(in, offset, length - offset);
+        read = byteChunk.readFrom(in, offset, Math.min(length - offset, limit));
         if (read > 0) {
           mOffset += read;
           size = mOffset;

@@ -335,7 +335,7 @@ public class ByteChannelTest {
     assertThat(inputStream.read(outputStream)).isEqualTo(3);
     assertThat(outputStream.size()).isEqualTo(3);
     assertThat(outputStream.toByteArray()).containsExactly((byte) 31, (byte) 17, (byte) 155);
-    assertThat(inputStream.read(outputStream)).isEqualTo(1);
+    assertThat(inputStream.read(outputStream, 3)).isEqualTo(1);
     assertThat(outputStream.size()).isEqualTo(4);
     assertThat(outputStream.toByteArray()).containsExactly((byte) 31, (byte) 17, (byte) 155,
         (byte) 13);
@@ -343,7 +343,26 @@ public class ByteChannelTest {
     assertThat(outputStream.size()).isEqualTo(4);
     assertThat(outputStream.toByteArray()).containsExactly((byte) 31, (byte) 17, (byte) 155,
         (byte) 13);
-    assertThat(inputStream.read(outputStream)).isEqualTo(-1);
+    assertThat(inputStream.read(outputStream, 3)).isEqualTo(-1);
+  }
+
+  @Test
+  public void testConcatReadOutput2() throws IOException {
+    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofInputs().buildChannel();
+    final ChunkOutputStream stream = ByteChannel.withOutput(channel)
+                                                .applyChunkStreamConfiguration()
+                                                .withChunkSize(3)
+                                                .configured()
+                                                .buildOutputStream();
+    stream.write(new byte[]{31, 17, (byte) 155, 13});
+    stream.flush();
+    final ChunkInputStream inputStream = ByteChannel.getInputStream(channel.next(), channel.next());
+    final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    assertThat(inputStream.read(outputStream, 5)).isEqualTo(4);
+    assertThat(outputStream.size()).isEqualTo(4);
+    assertThat(outputStream.toByteArray()).containsExactly((byte) 31, (byte) 17, (byte) 155,
+        (byte) 13);
+    assertThat(inputStream.read(outputStream, 3)).isEqualTo(-1);
   }
 
   @Test
@@ -1118,5 +1137,30 @@ public class ByteChannelTest {
     assertThat(inputStream.read()).isEqualTo(-1);
     assertThat(inputStream.read(b)).isEqualTo(-1);
     assertThat(inputStream.read(b, 3, 3)).isEqualTo(-1);
+  }
+
+  @Test
+  public void testWriteInput2() throws IOException {
+    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofInputs().buildChannel();
+    final ChunkOutputStream stream = ByteChannel.withOutput(channel)
+                                                .applyChunkStreamConfiguration()
+                                                .withChunkSize(4)
+                                                .configured()
+                                                .buildOutputStream();
+    stream.write(new ByteArrayInputStream(new byte[]{77, 33}));
+    stream.flush();
+    ChunkInputStream inputStream = ByteChannel.getInputStream(channel.next());
+    assertThat(inputStream.read()).isEqualTo(77);
+    assertThat(inputStream.read()).isEqualTo(33);
+    assertThat(inputStream.read()).isEqualTo(-1);
+    stream.write(new ByteArrayInputStream(new byte[]{31, 17, (byte) 155, 13}), 3);
+    stream.flush();
+    inputStream = ByteChannel.getInputStream(channel.next());
+    final byte[] b = new byte[16];
+    assertThat(inputStream.read(b)).isEqualTo(3);
+    assertThat(b[0]).isEqualTo((byte) 31);
+    assertThat(b[1]).isEqualTo((byte) 17);
+    assertThat(b[2]).isEqualTo((byte) 155);
+    assertThat(inputStream.read()).isEqualTo(-1);
   }
 }

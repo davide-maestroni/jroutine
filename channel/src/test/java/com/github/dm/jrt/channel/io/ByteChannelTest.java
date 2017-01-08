@@ -233,7 +233,6 @@ public class ByteChannelTest {
   @Test
   @SuppressWarnings({"ConstantConditions", "ResultOfMethodCallIgnored"})
   public void testConcatReadError() throws IOException {
-
     final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofInputs().buildChannel();
     final ChunkOutputStream stream = ByteChannel.withOutput(channel)
                                                 .applyChunkStreamConfiguration()
@@ -246,77 +245,64 @@ public class ByteChannelTest {
     final byte[] b = new byte[16];
 
     try {
-
       inputStream.read(null, 0, 1);
-
       fail();
 
     } catch (final NullPointerException ignored) {
-
     }
 
     try {
-
       inputStream.read(b, -1, 1);
-
       fail();
 
     } catch (final IndexOutOfBoundsException ignored) {
-
     }
 
     try {
-
       inputStream.read(b, 0, -1);
-
       fail();
 
     } catch (final IndexOutOfBoundsException ignored) {
-
     }
 
     try {
-
       inputStream.read(b, 8, 16);
-
       fail();
 
     } catch (final IndexOutOfBoundsException ignored) {
-
     }
 
     try {
-
       inputStream.read((byte[]) null);
-
       fail();
 
     } catch (final NullPointerException ignored) {
-
     }
 
     try {
-
       inputStream.read((OutputStream) null);
-
       fail();
 
     } catch (final NullPointerException ignored) {
-
     }
 
     try {
+      inputStream.read(new ByteArrayOutputStream(), -1);
+      fail();
 
+    } catch (final IllegalArgumentException ignored) {
+    }
+
+    try {
       inputStream.readAll(null);
-
       fail();
 
     } catch (final NullPointerException ignored) {
-
     }
 
     assertThat(inputStream.read(new byte[0])).isEqualTo(0);
     assertThat(inputStream.read(b, 8, 0)).isEqualTo(0);
+    assertThat(inputStream.read(new ByteArrayOutputStream(), 0)).isEqualTo(0);
   }
 
   @Test
@@ -679,7 +665,6 @@ public class ByteChannelTest {
   @Test
   @SuppressWarnings({"ConstantConditions", "ResultOfMethodCallIgnored"})
   public void testReadError() throws IOException {
-
     final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofInputs().buildChannel();
     final ChunkOutputStream stream = ByteChannel.withOutput(channel).buildOutputStream();
     stream.write(77);
@@ -688,77 +673,64 @@ public class ByteChannelTest {
     final byte[] b = new byte[16];
 
     try {
-
       inputStream.read(null, 0, 1);
-
       fail();
 
     } catch (final NullPointerException ignored) {
-
     }
 
     try {
-
       inputStream.read(b, -1, 1);
-
       fail();
 
     } catch (final IndexOutOfBoundsException ignored) {
-
     }
 
     try {
-
       inputStream.read(b, 0, -1);
-
       fail();
 
     } catch (final IndexOutOfBoundsException ignored) {
-
     }
 
     try {
-
       inputStream.read(b, 8, 16);
-
       fail();
 
     } catch (final IndexOutOfBoundsException ignored) {
-
     }
 
     try {
-
       inputStream.read((byte[]) null);
-
       fail();
 
     } catch (final NullPointerException ignored) {
-
     }
 
     try {
-
       inputStream.read((OutputStream) null);
-
       fail();
 
     } catch (final NullPointerException ignored) {
-
     }
 
     try {
+      inputStream.read(new ByteArrayOutputStream(), -1);
+      fail();
 
+    } catch (final IllegalArgumentException ignored) {
+    }
+
+    try {
       inputStream.readAll(null);
-
       fail();
 
     } catch (final NullPointerException ignored) {
-
     }
 
     assertThat(inputStream.read(new byte[0])).isEqualTo(0);
     assertThat(inputStream.read(b, 8, 0)).isEqualTo(0);
+    assertThat(inputStream.read(new ByteArrayOutputStream(), 0)).isEqualTo(0);
   }
 
   @Test
@@ -1104,7 +1076,6 @@ public class ByteChannelTest {
 
   @Test
   public void testWriteInput() throws IOException {
-
     final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofInputs().buildChannel();
     final ChunkOutputStream stream = ByteChannel.withOutput(channel)
                                                 .applyChunkStreamConfiguration()
@@ -1147,6 +1118,7 @@ public class ByteChannelTest {
                                                 .withChunkSize(4)
                                                 .configured()
                                                 .buildOutputStream();
+    stream.write(new ByteArrayInputStream(new byte[]{77, 33}), 0);
     stream.write(new ByteArrayInputStream(new byte[]{77, 33}));
     stream.flush();
     ChunkInputStream inputStream = ByteChannel.getInputStream(channel.next());

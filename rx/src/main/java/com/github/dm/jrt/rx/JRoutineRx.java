@@ -150,7 +150,6 @@ public class JRoutineRx {
     public Channel<OUT, OUT> buildChannel() {
       final Channel<OUT, OUT> channel = JRoutineCore.<OUT>ofInputs().buildChannel();
       mObservable.subscribe(new ChannelObserver<OUT>(channel));
-      // TODO: 09/01/2017 bind channel?
       return channel;
     }
   }

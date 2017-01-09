@@ -29,6 +29,7 @@ import io.swagger.codegen.CliOption;
 import io.swagger.codegen.CodegenOperation;
 import io.swagger.codegen.SupportingFile;
 import io.swagger.codegen.languages.JavaClientCodegen;
+import io.swagger.models.Info;
 import io.swagger.models.Model;
 import io.swagger.models.Operation;
 import io.swagger.models.Swagger;
@@ -40,9 +41,13 @@ import io.swagger.models.Swagger;
  */
 public class JRoutineCodegen extends JavaClientCodegen {
 
+  private static final String API_VERSION = "apiVersion";
+
   private static final String BASE_URL = "baseUrl";
 
   private static final String ENABLE_LOADERS = "enableLoaders";
+
+  private static final String ENABLE_SERVICES = "enableServices";
 
   private static final String JROUTINE_CODEGEN_VERSION = "jroutineCodegenVersion";
 
@@ -71,8 +76,12 @@ public class JRoutineCodegen extends JavaClientCodegen {
         "The name of the project to prepend to the API classes."));
     cliOptions.add(CliOption.newBoolean(ENABLE_LOADERS,
         "Whether to enable requests made through Android Loaders."));
+    cliOptions.add(CliOption.newBoolean(ENABLE_SERVICES,
+        "Whether to enable requests made through Android Services."));
     cliOptions.add(CliOption.newBoolean(USE_SUPPORT_LIBRARY,
         "Whether to use the Android Support Library to generate the source code."));
+    cliOptions.add(
+        CliOption.newString(API_VERSION, "The API version overwriting the spec file one."));
     super.setLibrary(RETROFIT_2);
     final Map<String, Object> additionalProperties = this.additionalProperties;
     additionalProperties.put(JROUTINE_CODEGEN_VERSION, projectProperties.getProjectVersion());
@@ -102,6 +111,14 @@ public class JRoutineCodegen extends JavaClientCodegen {
   public void preprocessSwagger(final Swagger swagger) {
     super.preprocessSwagger(swagger);
     final Map<String, Object> additionalProperties = this.additionalProperties;
+    final String apiVersion = (String) additionalProperties.get(API_VERSION);
+    if (StringUtils.isNotEmpty(apiVersion)) {
+      final Info swaggerInfo = swagger.getInfo();
+      if (swaggerInfo != null) {
+        swaggerInfo.setVersion(apiVersion);
+      }
+    }
+
     final Object projectName = additionalProperties.get(PROJECT_NAME);
     final String projectPrefix;
     if (projectName != null) {

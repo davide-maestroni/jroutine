@@ -33,6 +33,7 @@ import com.github.dm.jrt.object.annotation.CoreInstances;
 import com.github.dm.jrt.object.annotation.InputBackoff;
 import com.github.dm.jrt.object.annotation.InputMaxSize;
 import com.github.dm.jrt.object.annotation.InputOrder;
+import com.github.dm.jrt.object.annotation.InvocationRunner;
 import com.github.dm.jrt.object.annotation.Invoke;
 import com.github.dm.jrt.object.annotation.LogLevel;
 import com.github.dm.jrt.object.annotation.LogType;
@@ -43,7 +44,6 @@ import com.github.dm.jrt.object.annotation.OutputOrder;
 import com.github.dm.jrt.object.annotation.OutputTimeout;
 import com.github.dm.jrt.object.annotation.OutputTimeoutAction;
 import com.github.dm.jrt.object.annotation.Priority;
-import com.github.dm.jrt.object.annotation.RunnerType;
 import com.github.dm.jrt.object.annotation.SharedFields;
 
 import org.jetbrains.annotations.NotNull;
@@ -508,6 +508,17 @@ public class RoutineProcessor extends AbstractProcessor {
              .append(")");
     }
 
+    final InvocationRunner invocationRunnerAnnotation =
+        methodElement.getAnnotation(InvocationRunner.class);
+    if (invocationRunnerAnnotation != null) {
+      builder.append(".withRunner(")
+             .append(Reflection.class.getCanonicalName())
+             .append(".newInstanceOf(")
+             .append(getAnnotationValue(methodElement,
+                 getMirrorFromName(InvocationRunner.class.getCanonicalName()), "value"))
+             .append(".class))");
+    }
+
     final LogType logTypeAnnotation = methodElement.getAnnotation(LogType.class);
     if (logTypeAnnotation != null) {
       builder.append(".withLog(")
@@ -580,16 +591,6 @@ public class RoutineProcessor extends AbstractProcessor {
     final Priority priorityAnnotation = methodElement.getAnnotation(Priority.class);
     if (priorityAnnotation != null) {
       builder.append(".withPriority(").append(priorityAnnotation.value()).append(")");
-    }
-
-    final RunnerType runnerTypeAnnotation = methodElement.getAnnotation(RunnerType.class);
-    if (runnerTypeAnnotation != null) {
-      builder.append(".withRunner(")
-             .append(Reflection.class.getCanonicalName())
-             .append(".newInstanceOf(")
-             .append(getAnnotationValue(methodElement,
-                 getMirrorFromName(RunnerType.class.getCanonicalName()), "value"))
-             .append(".class))");
     }
 
     return builder.toString();

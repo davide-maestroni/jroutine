@@ -30,7 +30,6 @@ import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.InvocationConfigurable;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.rx.JRoutineRx;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -58,7 +57,7 @@ import rx.Subscriber;
  * Created by davide-maestroni on 12/02/2016.
  */
 @SuppressWarnings("WeakerAccess")
-public class JRoutineLoaderRxCompat extends JRoutineRx {
+public class JRoutineLoaderRxCompat {
 
   /**
    * Returns a Loader observable instance wrapping the specified one.

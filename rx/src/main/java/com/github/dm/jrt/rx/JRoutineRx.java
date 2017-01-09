@@ -43,7 +43,7 @@ import rx.Subscriber;
  * <p>
  * In a dual way, a channel can be created from an Observable:
  * <pre><code>
- * JRoutineRx.from(myObservable).buildChannel().bind(getConsumer());
+ * JRoutineRx.with(myObservable).buildChannel().bind(getConsumer());
  * </code></pre>
  * <p>
  * Created by davide-maestroni on 12/09/2016.
@@ -59,18 +59,6 @@ public class JRoutineRx {
   }
 
   /**
-   * Returns a builder of channels fed by the specified observable.
-   *
-   * @param observable the observable instance.
-   * @param <OUT>      the output data type.
-   * @return the channel builder.
-   */
-  @NotNull
-  public static <OUT> ChannelBuilder<?, OUT> from(@NotNull final Observable<OUT> observable) {
-    return new ObservableChannelBuilder<OUT>(observable);
-  }
-
-  /**
    * Creates a new observable from the specified channel.
    * <br>
    * Note that the channel will be bound only when an observer subscribes to the observable.
@@ -82,6 +70,18 @@ public class JRoutineRx {
   @NotNull
   public static <OUT> Observable<OUT> observableFrom(@NotNull final Channel<?, OUT> channel) {
     return Observable.create(new OnSubscribeChannel<OUT>(channel));
+  }
+
+  /**
+   * Returns a builder of channels fed by the specified observable.
+   *
+   * @param observable the observable instance.
+   * @param <OUT>      the output data type.
+   * @return the channel builder.
+   */
+  @NotNull
+  public static <OUT> ChannelBuilder<?, OUT> with(@NotNull final Observable<OUT> observable) {
+    return new ObservableChannelBuilder<OUT>(observable);
   }
 
   /**
@@ -150,6 +150,7 @@ public class JRoutineRx {
     public Channel<OUT, OUT> buildChannel() {
       final Channel<OUT, OUT> channel = JRoutineCore.<OUT>ofInputs().buildChannel();
       mObservable.subscribe(new ChannelObserver<OUT>(channel));
+      // TODO: 09/01/2017 bind channel?
       return channel;
     }
   }

@@ -76,7 +76,6 @@ dependencies {
 conditionalDependencies {
   compile name: 'android-core', version: '6.1.0'
   compile name: 'core', version: '6.1.0'
-  compile name: 'rx', version: '6.1.0'
 }
 
 jacoco {

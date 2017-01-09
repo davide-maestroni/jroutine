@@ -48,6 +48,7 @@ import com.github.dm.jrt.object.annotation.CoreInstances;
 import com.github.dm.jrt.object.annotation.InputBackoff;
 import com.github.dm.jrt.object.annotation.InputMaxSize;
 import com.github.dm.jrt.object.annotation.InputOrder;
+import com.github.dm.jrt.object.annotation.InvocationRunner;
 import com.github.dm.jrt.object.annotation.Invoke;
 import com.github.dm.jrt.object.annotation.LogLevel;
 import com.github.dm.jrt.object.annotation.LogType;
@@ -58,7 +59,6 @@ import com.github.dm.jrt.object.annotation.OutputOrder;
 import com.github.dm.jrt.object.annotation.OutputTimeout;
 import com.github.dm.jrt.object.annotation.OutputTimeoutAction;
 import com.github.dm.jrt.object.annotation.Priority;
-import com.github.dm.jrt.object.annotation.RunnerType;
 import com.github.dm.jrt.object.annotation.SharedFields;
 import com.github.dm.jrt.object.builder.ObjectRoutineBuilder;
 import com.github.dm.jrt.object.config.ObjectConfiguration;
@@ -1607,6 +1607,7 @@ public class ObjectRoutineTest {
     @InputBackoff(InBackoff.class)
     @InputMaxSize(33)
     @InputOrder(OrderType.UNSORTED)
+    @InvocationRunner(MyRunner.class)
     @LogLevel(Level.WARNING)
     @LogType(MyLog.class)
     @MaxInstances(17)
@@ -1616,7 +1617,6 @@ public class ObjectRoutineTest {
     @OutputTimeout(value = 1111, unit = TimeUnit.MICROSECONDS)
     @OutputTimeoutAction(TimeoutActionType.ABORT)
     @Priority(41)
-    @RunnerType(MyRunner.class)
     String toString();
   }
 

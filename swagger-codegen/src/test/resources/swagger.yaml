@@ -10,6 +10,8 @@ basePath: /users
 paths:
   /{user}/repos:
     get:
+      x-jroutine-output-timeout: 20
+      x-jroutine-output-timeout-unit: java.util.concurrent.TimeUnit.SECONDS
       operationId: getRepos
       summary: Gets the user public repositories.
       description: |
@@ -24,16 +26,19 @@ paths:
         - name: type
           in: query
           description: The type of ownership.
+          type: string
           enum: [all, owner, member]
           default: owner
         - name: sort
           in: query
           description: The type of sorting.
+          type: string
           enum: [created, updated, pushed, full_name]
           default: full_name
         - name: direction
           in: query
           description: The direction of sorting. When using full_name default to asc, otherwise desc.
+          type: string
           enum: [asc, desc]
           default: desc
       tags:

@@ -54,6 +54,7 @@ public class {{projectPrefix}}ApiClient {
     private Map<String, Interceptor> apiAuthorizations;
     private OkHttpClient.Builder okBuilder = new OkHttpClient.Builder();
     private Retrofit.Builder adapterBuilder;
+    private CallAdapter.Factory factory;
     private String baseUrl = "{{{baseUrl}}}";
 
     public {{projectPrefix}}ApiClient() {
@@ -128,6 +129,22 @@ public class {{projectPrefix}}ApiClient {
     }
 
     public {{projectPrefix}}ApiClient withAdapterFactory(CallAdapter.Factory factory) {
+        if (factory == null) {
+            return withDefaultAdapterFactory();
+        }
+
+        this.factory = factory;
+        return this;
+    }
+
+    public <S> S createService(Class<S> serviceClass) {
+        return setupBuilder()
+            .client(okBuilder.build())
+            .build()
+            .create(serviceClass);
+    }
+
+    private Retrofit.Builder setupBuilder() {
         Gson gson = new GsonBuilder()
                 .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
                 {{^java8}}
@@ -141,22 +158,17 @@ public class {{projectPrefix}}ApiClient {
 
         String baseUrl = this.baseUrl;
         if(!baseUrl.endsWith("/"))
-        	baseUrl = baseUrl + "/";
+            baseUrl = baseUrl + "/";
 
-        adapterBuilder = new Retrofit
-                .Builder()
-                .baseUrl(baseUrl)
+        Retrofit.Builder adapterBuilder = this.adapterBuilder;
+        if (adapterBuilder == null) {
+            adapterBuilder = new Retrofit.Builder();
+        }
+
+        return adapterBuilder.baseUrl(baseUrl)
                 .addCallAdapterFactory(factory)
                 .addConverterFactory(ScalarsConverterFactory.create())
                 .addConverterFactory(new GsonCustomConverterFactory(gson));
-        return this;
-    }
-
-    public <S> S createService(Class<S> serviceClass) {
-        return adapterBuilder
-            .client(okBuilder.build())
-            .build()
-            .create(serviceClass);
     }
 
     /**

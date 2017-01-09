@@ -45,13 +45,13 @@ import com.github.dm.jrt.object.annotation.AsyncMethod;
 import com.github.dm.jrt.object.annotation.AsyncOutput;
 import com.github.dm.jrt.object.annotation.AsyncOutput.OutputMode;
 import com.github.dm.jrt.object.annotation.InputBackoff;
+import com.github.dm.jrt.object.annotation.InvocationRunner;
 import com.github.dm.jrt.object.annotation.Invoke;
 import com.github.dm.jrt.object.annotation.LogType;
 import com.github.dm.jrt.object.annotation.OutputBackoff;
 import com.github.dm.jrt.object.annotation.OutputTimeout;
 import com.github.dm.jrt.object.annotation.OutputTimeoutAction;
 import com.github.dm.jrt.object.annotation.Priority;
-import com.github.dm.jrt.object.annotation.RunnerType;
 import com.github.dm.jrt.proxy.annotation.Proxy;
 import com.github.dm.jrt.proxy.builder.ProxyObjectBuilder;
 import com.github.dm.jrt.proxy.builder.ProxyRoutineBuilder;
@@ -1028,7 +1028,7 @@ public class ProxyRoutineTest {
     @LogType(NullLog.class)
     @InputBackoff(MyBackoff.class)
     @OutputBackoff(MyBackoff.class)
-    @RunnerType(MyRunner.class)
+    @InvocationRunner(MyRunner.class)
     @AsyncOutput
     Channel<?, Integer> getSize(String[] a);
   }

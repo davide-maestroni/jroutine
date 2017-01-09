@@ -62,15 +62,8 @@ public class JRoutineCodegenTest {
     server.start();
     try {
       {
-        final RoutineAdapterFactory adapterFactory = //
-            RoutineAdapterFactory.builder()
-                                 .applyInvocationConfiguration()
-                                 .withOutputTimeout(seconds(3))
-                                 .configured()
-                                 .buildFactory();
         final UsersApi service =
             new UsersApiClient().withBaseUrl("http://localhost:" + server.getPort())
-                                .withAdapterFactory(adapterFactory)
                                 .createService(UsersApi.class);
         final Repos repos = service.getRepos("octocat", null, null, null).next();
         assertThat(repos).hasSize(3);
@@ -151,10 +144,8 @@ public class JRoutineCodegenTest {
     server.start();
     try {
       {
-        final RoutineAdapterFactory adapterFactory = RoutineAdapterFactory.buildFactory();
         final UsersApi service =
             new UsersApiClient().withBaseUrl("http://localhost:" + server.getPort())
-                                .withAdapterFactory(adapterFactory)
                                 .createService(UsersApi.class);
         assertThat(service.getReposStream("octocat", null, null, null)
                           .map(Operators.<Repo>unfold())

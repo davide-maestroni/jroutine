@@ -40,7 +40,7 @@ public class JRoutineRxTest {
 
   @Test
   public void testChannel() {
-    final Channel<?, String> channel = JRoutineRx.from(Observable.just("test1", "test2"))
+    final Channel<?, String> channel = JRoutineRx.with(Observable.just("test1", "test2"))
                                                  .applyChannelConfiguration()
                                                  .withMaxSize(2)
                                                  .configured()
@@ -52,7 +52,7 @@ public class JRoutineRxTest {
   @SuppressWarnings({"ThrowableResultOfMethodCallIgnored", "ConstantConditions"})
   public void testChannelError() {
     final Channel<?, String> channel =
-        JRoutineRx.from(Observable.just("test").map(new Func1<String, String>() {
+        JRoutineRx.with(Observable.just("test").map(new Func1<String, String>() {
 
           public String call(final String s) {
             throw new IllegalStateException(s);

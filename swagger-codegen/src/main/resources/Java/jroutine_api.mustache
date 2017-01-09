@@ -30,7 +30,7 @@ public interface {{classname}} {
 {{#allParams}}   * @param {{paramName}} {{description}}{{#required}} (required){{/required}}{{^required}} (optional{{#defaultValue}}, default to {{{.}}}{{/defaultValue}}){{/required}}
 {{/allParams}}   * @return Channel&lt;Object, {{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Void{{/returnType}}&gt;
    */
-  {{#formParams}}{{#-first}}
+{{>jroutine_annotations}}  {{#formParams}}{{#-first}}
   {{#isMultipart}}@retrofit2.http.Multipart{{/isMultipart}}{{^isMultipart}}@retrofit2.http.FormUrlEncoded{{/isMultipart}}{{/-first}}{{/formParams}}
   {{^formParams}}
   {{#prioritizedContentTypes}}
@@ -52,7 +52,7 @@ public interface {{classname}} {
 {{#allParams}}   * @param {{paramName}} {{description}}{{#required}} (required){{/required}}{{^required}} (optional{{#defaultValue}}, default to {{{.}}}{{/defaultValue}}){{/required}}
 {{/allParams}}   * @return StreamBuilder&lt;Object, {{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Void{{/returnType}}&gt;
    */
-  {{#formParams}}{{#-first}}
+{{>jroutine_annotations}}  {{#formParams}}{{#-first}}
   {{#isMultipart}}@retrofit2.http.Multipart{{/isMultipart}}{{^isMultipart}}@retrofit2.http.FormUrlEncoded{{/isMultipart}}{{/-first}}{{/formParams}}
   {{^formParams}}
   {{#prioritizedContentTypes}}
@@ -74,6 +74,7 @@ public interface {{classname}} {
 {{#allParams}}   * @param {{paramName}} {{description}}{{#required}} (required){{/required}}{{^required}} (optional{{#defaultValue}}, default to {{{.}}}{{/defaultValue}}){{/required}}
 {{/allParams}}   * @return StreamBuilder&lt;Object, {{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Void{{/returnType}}&gt;
    */
+  {{>jroutine_invocation_annotations}}
   {{#formParams}}{{#-first}}
   {{#isMultipart}}@retrofit2.http.Multipart{{/isMultipart}}{{^isMultipart}}@retrofit2.http.FormUrlEncoded{{/isMultipart}}{{/-first}}{{/formParams}}
   {{^formParams}}

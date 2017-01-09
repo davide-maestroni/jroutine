@@ -45,7 +45,7 @@ import java.lang.annotation.Target;
  * <pre><code>
  * -keepattributes RuntimeVisibleAnnotations
  * -keepclassmembers class ** {
- *   &#64;com.github.dm.jrt.object.annotation.RunnerType *;
+ *   &#64;com.github.dm.jrt.object.annotation.InvocationRunner *;
  * }
  * </code></pre>
  * <p>
@@ -55,7 +55,7 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface RunnerType {
+public @interface InvocationRunner {
 
   /**
    * The runner type.

@@ -45,9 +45,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Created by davide-maestroni on 12/02/2016.
  */
 @TargetApi(VERSION_CODES.FROYO)
-public class RoutineLoaderRxTest extends ActivityInstrumentationTestCase2<TestActivity> {
+public class JRoutineLoaderObservableTest extends ActivityInstrumentationTestCase2<TestActivity> {
 
-  public RoutineLoaderRxTest() {
+  public JRoutineLoaderObservableTest() {
     super(TestActivity.class);
   }
 
@@ -59,33 +59,33 @@ public class RoutineLoaderRxTest extends ActivityInstrumentationTestCase2<TestAc
     final CountDownLatch latch = new CountDownLatch(3);
     final List<String> expected = Arrays.asList("TEST1", "TEST2", "TEST3");
     final AtomicBoolean isSuccess = new AtomicBoolean(true);
-    JRoutineLoaderRx.with(Observable.just("test1", "test2", "test3"))
-                    .applyInvocationConfiguration()
-                    .withLog(AndroidLogs.androidLog())
-                    .configured()
-                    .applyLoaderConfiguration()
-                    .withResultStaleTime(seconds(10))
-                    .configured()
-                    .subscribeOn(loaderFrom(getActivity()))
-                    .map(new Func1<String, String>() {
+    JRoutineLoaderObservable.with(Observable.just("test1", "test2", "test3"))
+                            .applyInvocationConfiguration()
+                            .withLog(AndroidLogs.androidLog())
+                            .configured()
+                            .applyLoaderConfiguration()
+                            .withResultStaleTime(seconds(10))
+                            .configured()
+                            .subscribeOn(loaderFrom(getActivity()))
+                            .map(new Func1<String, String>() {
 
-                      @Override
-                      public String call(final String s) {
-                        return s.toUpperCase();
-                      }
-                    })
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Action1<String>() {
+                              @Override
+                              public String call(final String s) {
+                                return s.toUpperCase();
+                              }
+                            })
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(new Action1<String>() {
 
-                      @Override
-                      public void call(final String s) {
-                        if (!expected.contains(s)) {
-                          isSuccess.set(false);
-                        }
+                              @Override
+                              public void call(final String s) {
+                                if (!expected.contains(s)) {
+                                  isSuccess.set(false);
+                                }
 
-                        latch.countDown();
-                      }
-                    });
+                                latch.countDown();
+                              }
+                            });
     latch.await(10, TimeUnit.SECONDS);
     assertThat(isSuccess.get()).isTrue();
   }
@@ -100,27 +100,27 @@ public class RoutineLoaderRxTest extends ActivityInstrumentationTestCase2<TestAc
     final CountDownLatch latch = new CountDownLatch(3);
     final List<String> expected = Arrays.asList("TEST1", "TEST2", "TEST3");
     final AtomicBoolean isSuccess = new AtomicBoolean(true);
-    JRoutineLoaderRx.with(Observable.just("test1", "test2", "test3"))
-                    .subscribeOn(loaderFrom(fragment))
-                    .map(new Func1<String, String>() {
+    JRoutineLoaderObservable.with(Observable.just("test1", "test2", "test3"))
+                            .subscribeOn(loaderFrom(fragment))
+                            .map(new Func1<String, String>() {
 
-                      @Override
-                      public String call(final String s) {
-                        return s.toUpperCase();
-                      }
-                    })
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Action1<String>() {
+                              @Override
+                              public String call(final String s) {
+                                return s.toUpperCase();
+                              }
+                            })
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(new Action1<String>() {
 
-                      @Override
-                      public void call(final String s) {
-                        if (!expected.contains(s)) {
-                          isSuccess.set(false);
-                        }
+                              @Override
+                              public void call(final String s) {
+                                if (!expected.contains(s)) {
+                                  isSuccess.set(false);
+                                }
 
-                        latch.countDown();
-                      }
-                    });
+                                latch.countDown();
+                              }
+                            });
     latch.await(10, TimeUnit.SECONDS);
     assertThat(isSuccess.get()).isTrue();
   }

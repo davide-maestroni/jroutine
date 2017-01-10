@@ -36,15 +36,15 @@ import static org.assertj.core.api.Assertions.assertThat;
  * <p>
  * Created by davide-maestroni on 12/09/2016.
  */
-public class JRoutineRxTest {
+public class JRoutineObservableTest {
 
   @Test
   public void testChannel() {
-    final Channel<?, String> channel = JRoutineRx.with(Observable.just("test1", "test2"))
-                                                 .applyChannelConfiguration()
-                                                 .withMaxSize(2)
-                                                 .configured()
-                                                 .buildChannel();
+    final Channel<?, String> channel = JRoutineObservable.with(Observable.just("test1", "test2"))
+                                                         .applyChannelConfiguration()
+                                                         .withMaxSize(2)
+                                                         .configured()
+                                                         .buildChannel();
     assertThat(channel.all()).containsExactly("test1", "test2");
   }
 
@@ -52,7 +52,7 @@ public class JRoutineRxTest {
   @SuppressWarnings({"ThrowableResultOfMethodCallIgnored", "ConstantConditions"})
   public void testChannelError() {
     final Channel<?, String> channel =
-        JRoutineRx.with(Observable.just("test").map(new Func1<String, String>() {
+        JRoutineObservable.with(Observable.just("test").map(new Func1<String, String>() {
 
           public String call(final String s) {
             throw new IllegalStateException(s);
@@ -66,19 +66,19 @@ public class JRoutineRxTest {
   @Test
   public void testObservable() {
     final AtomicReference<String> reference = new AtomicReference<String>();
-    JRoutineRx.observableFrom(JRoutineCore.of("test").buildChannel())
-              .map(new Func1<String, String>() {
+    JRoutineObservable.create(JRoutineCore.of("test").buildChannel())
+                      .map(new Func1<String, String>() {
 
-                public String call(final String s) {
-                  return s.toUpperCase();
-                }
-              })
-              .subscribe(new Action1<String>() {
+                        public String call(final String s) {
+                          return s.toUpperCase();
+                        }
+                      })
+                      .subscribe(new Action1<String>() {
 
-                public void call(final String s) {
-                  reference.set(s);
-                }
-              });
+                        public void call(final String s) {
+                          reference.set(s);
+                        }
+                      });
     assertThat(reference.get()).isEqualTo("TEST");
   }
 
@@ -87,26 +87,26 @@ public class JRoutineRxTest {
   public void testObservableError() {
     final AtomicReference<String> reference = new AtomicReference<String>();
     final AtomicReference<Throwable> errorReference = new AtomicReference<Throwable>();
-    JRoutineRx.observableFrom(JRoutineCore.of("test").buildChannel())
-              .map(new Func1<String, String>() {
+    JRoutineObservable.create(JRoutineCore.of("test").buildChannel())
+                      .map(new Func1<String, String>() {
 
-                public String call(final String s) {
-                  throw new IllegalStateException(s);
-                }
-              })
-              .subscribe(new Observer<String>() {
+                        public String call(final String s) {
+                          throw new IllegalStateException(s);
+                        }
+                      })
+                      .subscribe(new Observer<String>() {
 
-                public void onCompleted() {
-                }
+                        public void onCompleted() {
+                        }
 
-                public void onError(final Throwable e) {
-                  errorReference.set(e);
-                }
+                        public void onError(final Throwable e) {
+                          errorReference.set(e);
+                        }
 
-                public void onNext(final String s) {
-                  reference.set(s);
-                }
-              });
+                        public void onNext(final String s) {
+                          reference.set(s);
+                        }
+                      });
     assertThat(reference.get()).isNull();
     assertThat(errorReference.get()).isExactlyInstanceOf(IllegalStateException.class);
     assertThat(errorReference.get().getMessage()).isEqualTo("test");

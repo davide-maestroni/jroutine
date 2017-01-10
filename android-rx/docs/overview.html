@@ -30,13 +30,13 @@
 <h2>Main classes</h2>
 <ul>
     <li>
-        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-rx/com/github/dm/jrt/android/v11/rx/JRoutineLoaderRx.html">JRoutineLoaderRx</a>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-rx/com/github/dm/jrt/android/v11/rx/JRoutineLoaderObservable.html">JRoutineLoaderObservable</a>
         <p>
             Utility class enabling an Observable to dispatch data to a dedicated Loader.
         </p>
     </li>
     <li>
-        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-rx/com/github/dm/jrt/android/v4/rx/JRoutineLoaderRxCompat.html">JRoutineLoaderRxCompat</a>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-rx/com/github/dm/jrt/android/v4/rx/JRoutineLoaderObservableCompat.html">JRoutineLoaderObservableCompat</a>
         <p>
             Utility class enabling an Observable to dispatch data to a dedicated Loader.<br>
             This class is specifically meant to employ the Android Support library for retro-compatibility.
@@ -87,14 +87,14 @@
             protected void onCreate(final Bundle savedInstanceState) {
                 super.onCreate(savedInstanceState);
                 setContentView(R.layout.main_layout);
-                JRoutineLoaderRx.with(Observable.just("Hello RxJava"))
-                                .applyLoaderConfiguration()
-                                .withInvocationId(R.id.hello_invocation)
-                                .configured()
-                                .subscribeOn(loaderFrom(this))
-                                .map(getMappingFunction())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe(getAction(this));
+                JRoutineLoaderObservable.with(Observable.just("Hello RxJava"))
+                                        .applyLoaderConfiguration()
+                                        .withInvocationId(R.id.hello_invocation)
+                                        .configured()
+                                        .subscribeOn(loaderFrom(this))
+                                        .map(getMappingFunction())
+                                        .observeOn(AndroidSchedulers.mainThread())
+                                        .subscribe(getAction(this));
             }
         }
     </code>
@@ -131,14 +131,14 @@
             protected void onCreate(final Bundle savedInstanceState) {
                 super.onCreate(savedInstanceState);
                 setContentView(R.layout.main_layout);
-                JRoutineLoaderRxCompat.with(Observable.just("Hello RxJava"))
-                                      .applyLoaderConfiguration()
-                                      .withInvocationId(R.id.hello_invocation)
-                                      .configured()
-                                      .subscribeOn(loaderFrom(this))
-                                      .map(getMappingFunction())
-                                      .observeOn(AndroidSchedulers.mainThread())
-                                      .subscribe(getAction(this));
+                JRoutineLoaderObservableCompat.with(Observable.just("Hello RxJava"))
+                                              .applyLoaderConfiguration()
+                                              .withInvocationId(R.id.hello_invocation)
+                                              .configured()
+                                              .subscribeOn(loaderFrom(this))
+                                              .map(getMappingFunction())
+                                              .observeOn(AndroidSchedulers.mainThread())
+                                              .subscribe(getAction(this));
             }
         }
     </code>

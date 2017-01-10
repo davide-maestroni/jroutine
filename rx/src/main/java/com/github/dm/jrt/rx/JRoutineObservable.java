@@ -38,23 +38,23 @@ import rx.Subscriber;
  * <p>
  * The example below shows how it's possible to create an Observable instance from a channel:
  * <pre><code>
- * JRoutineRx.observableFrom(myChannel).subscribe(getAction());
+ * JRoutineObservable.create(myChannel).subscribe(getAction());
  * </code></pre>
  * <p>
  * In a dual way, a channel can be created from an Observable:
  * <pre><code>
- * JRoutineRx.with(myObservable).buildChannel().bind(getConsumer());
+ * JRoutineObservable.with(myObservable).buildChannel().bind(getConsumer());
  * </code></pre>
  * <p>
  * Created by davide-maestroni on 12/09/2016.
  */
 @SuppressWarnings("WeakerAccess")
-public class JRoutineRx {
+public class JRoutineObservable {
 
   /**
    * Avoid explicit instantiation.
    */
-  protected JRoutineRx() {
+  protected JRoutineObservable() {
     ConstantConditions.avoid();
   }
 
@@ -68,7 +68,7 @@ public class JRoutineRx {
    * @return the observable instance.
    */
   @NotNull
-  public static <OUT> Observable<OUT> observableFrom(@NotNull final Channel<?, OUT> channel) {
+  public static <OUT> Observable<OUT> create(@NotNull final Channel<?, OUT> channel) {
     return Observable.create(new OnSubscribeChannel<OUT>(channel));
   }
 

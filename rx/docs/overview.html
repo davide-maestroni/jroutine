@@ -30,9 +30,9 @@
 <h2>Main classes</h2>
 <ul>
     <li>
-        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/rx/com/github/dm/jrt/rx/JRoutineRx.html">JRoutineRx</a>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/rx/com/github/dm/jrt/rx/JRoutineObservable.html">JRoutineObservable</a>
         <p>
-            Utility class creating an Observable from a channel instance.
+            Utility class mapping Observable and channel instances.
         </p>
     </li>
 </ul>
@@ -50,13 +50,13 @@
 <b>Example 1:</b> Observable from channel.
 <pre>
     <code>
-        JRoutineRx.observableFrom(myChannel).subscribe(getAction());
+        JRoutineObservable.create(myChannel).subscribe(getAction());
     </code>
 </pre>
 <b>Example 2:</b> channel from Observable.
 <pre>
     <code>
-        JRoutineRx.with(myObservable).buildChannel().bind(getConsumer());
+        JRoutineObservable.with(myObservable).buildChannel().bind(getConsumer());
     </code>
 </pre>
 </body>

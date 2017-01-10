@@ -26,8 +26,9 @@ env:
   global:
     - ADB_INSTALL_TIMEOUT=10
   matrix:
-    - ANDROID_SDKS=android-10            ANDROID_TARGET=android-10  ANDROID_ABI=armeabi
-    - ANDROID_SDKS=android-19,sysimg-19  ANDROID_TARGET=android-19  ANDROID_ABI=armeabi-v7a
+    - ANDROID_SDKS=android-10            ANDROID_TARGET=android-10  ANDROID_ABI=armeabi      MODULE=android-core
+    - ANDROID_SDKS=android-19,sysimg-19  ANDROID_TARGET=android-19  ANDROID_ABI=armeabi-v7a  MODULE=android-core
+    - ANDROID_SDKS=android-21,sysimg-21  ANDROID_TARGET=android-21  ANDROID_ABI=armeabi-v7a  MODULE=android-core
     # The following configuration causes the Travis job to exceed the time limit...
     #- ANDROID_SDKS=android-21,sysimg-21  ANDROID_TARGET=android-21  ANDROID_ABI=armeabi-v7a
 
@@ -40,7 +41,7 @@ before_script:
   - adb shell input keyevent 82 &
 
 # The prepare step is needed to work around an issue with the support library dependencies in the gradle plugin
-script: travis_wait 50 ./gradlew --stacktrace :android-core:connectedCheck
+script: travis_wait 50 ./gradlew --stacktrace :$MODULE:connectedCheck
 
 # Print reports
 after_failure: find . -name TEST-\*.xml -print -exec cat {} \;

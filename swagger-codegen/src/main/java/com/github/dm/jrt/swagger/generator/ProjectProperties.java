@@ -24,6 +24,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 /**
@@ -42,7 +43,20 @@ class ProjectProperties {
   public static ProjectProperties readProjectProperties(@NotNull final String path) throws
       IOException {
     final Properties properties = new Properties();
-    properties.load(ProjectProperties.class.getResourceAsStream(path));
+    InputStream inputStream = null;
+    try {
+      inputStream = ProjectProperties.class.getResourceAsStream(path);
+      properties.load(inputStream);
+      inputStream.close();
+
+    } catch (final IOException e) {
+      if (inputStream != null) {
+        inputStream.close();
+      }
+
+      throw e;
+    }
+
     return sMapper.convertValue(properties, ProjectProperties.class);
   }
 

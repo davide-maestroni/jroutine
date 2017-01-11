@@ -69,7 +69,7 @@ env:
 #    - ANDROID_SDKS=android-21,sysimg-21  ANDROID_TARGET=android-21  ANDROID_ABI=armeabi-v7a  MODULE=sample
 #    - ANDROID_SDKS=android-21,sysimg-21  ANDROID_TARGET=android-21  ANDROID_ABI=armeabi-v7a  MODULE=stream
 #    - ANDROID_SDKS=android-21,sysimg-21  ANDROID_TARGET=android-21  ANDROID_ABI=armeabi-v7a  MODULE=swagger-codegen
-    - ANDROID_SDKS=android-21,sysimg-21  ANDROID_TARGET=android-21  ANDROID_ABI=armeabi-v7a  COMMAND=":android:connectedCheck :android-channel:connectedCheck :android-core:connectedCheck :android-method:connectedCheck :android-object:connectedCheck :android-proxy:connectedCheck :android-retrofit:connectedCheck :android-rx:connectedCheck :android-sample:connectedCheck :android-stream:connectedCheck"
+    - ANDROID_SDKS=android-21,sysimg-21  ANDROID_TARGET=android-21  ANDROID_ABI=armeabi-v7a  COMMAND=":android:connectedCheck :android-channel:connectedCheck :android-core:connectedCheck :android-method:connectedCheck :android-object:connectedCheck :android-proxy:connectedCheck :android-retrofit:connectedCheck :android-stream:connectedCheck"
     # The following configuration causes the Travis job to exceed the time limit...
     #- ANDROID_SDKS=android-21,sysimg-21  ANDROID_TARGET=android-21  ANDROID_ABI=armeabi-v7a
 

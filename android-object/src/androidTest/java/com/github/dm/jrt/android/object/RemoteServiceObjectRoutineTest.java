@@ -1513,6 +1513,10 @@ public class RemoteServiceObjectRoutineTest extends ActivityInstrumentationTestC
     public SharedFieldRunner() {
       super(sRunner);
     }
+
+    @Override
+    public void stop() {
+    }
   }
 
   @SuppressWarnings("unused")

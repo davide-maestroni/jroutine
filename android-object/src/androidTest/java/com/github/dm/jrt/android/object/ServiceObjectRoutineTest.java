@@ -1516,6 +1516,10 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
     public SharedFieldRunner() {
       super(sRunner);
     }
+
+    @Override
+    public void stop() {
+    }
   }
 
   @SuppressWarnings("unused")

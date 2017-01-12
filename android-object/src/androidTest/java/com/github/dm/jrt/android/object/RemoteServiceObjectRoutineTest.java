@@ -33,6 +33,7 @@ import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.NullLog;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
+import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.RunnerDecorator;
 import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ClassToken;
@@ -1507,9 +1508,10 @@ public class RemoteServiceObjectRoutineTest extends ActivityInstrumentationTestC
 
   public static class SharedFieldRunner extends RunnerDecorator {
 
-    public SharedFieldRunner() {
+    private static final Runner sRunner = Runners.poolRunner(2);
 
-      super(Runners.poolRunner(2));
+    public SharedFieldRunner() {
+      super(sRunner);
     }
   }
 

@@ -33,6 +33,7 @@ import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.NullLog;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
+import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.RunnerDecorator;
 import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ClassToken;
@@ -1510,8 +1511,14 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
 
   public static class SharedFieldRunner extends RunnerDecorator {
 
+    private static final Runner sRunner = Runners.poolRunner(2);
+
     public SharedFieldRunner() {
-      super(Runners.poolRunner(2));
+      super(sRunner);
+    }
+
+    @Override
+    public void stop() {
     }
   }
 

@@ -137,8 +137,9 @@ afterEvaluate { project ->
       project.task('installSnapshot') {
         description "Installs a SNAPSHOT version of the 'archives' artifacts into the local Maven repository."
         project.version = "${project.version}-SNAPSHOT"
-      } << {
-        tasks.install.execute()
+        doLast {
+          tasks.install.execute()
+        }
       }
     }
 
@@ -162,14 +163,16 @@ afterEvaluate { project ->
     if (project.plugins.hasPlugin('jacoco')) {
       project.task('jacocoTest', dependsOn: 'connectedCheck') {
         description = 'Runs the tests and generates the JaCoCo report files.'
-      } << {
-        tasks.createDebugAndroidTestCoverageReport.execute()
+        doLast {
+          tasks.createDebugAndroidTestCoverageReport.execute()
+        }
       }
 
       project.task('jacocoTestReport', dependsOn: 'assemble') {
         description = 'Generates the JaCoCo report files.'
-      } << {
-        tasks.createDebugAndroidTestCoverageReport.execute()
+        doLast {
+          tasks.createDebugAndroidTestCoverageReport.execute()
+        }
       }
     }
 

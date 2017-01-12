@@ -24,9 +24,12 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 /**
+ * Utility class used to read injected properties.
+ * <p>
  * Created by davide-maestroni on 12/24/2016.
  */
 class ProjectProperties {
@@ -38,31 +41,77 @@ class ProjectProperties {
 
   private String mSwaggerVersion;
 
+  /**
+   * Reads the properties stored in a file with the specified path.
+   *
+   * @param path the file path.
+   * @return the properties instance.
+   * @throws java.io.IOException if an I/O error occurs.
+   */
   @NotNull
   public static ProjectProperties readProjectProperties(@NotNull final String path) throws
       IOException {
     final Properties properties = new Properties();
-    properties.load(ProjectProperties.class.getResourceAsStream(path));
+    InputStream inputStream = null;
+    try {
+      inputStream = ProjectProperties.class.getResourceAsStream(path);
+      properties.load(inputStream);
+      inputStream.close();
+
+    } catch (final IOException e) {
+      if (inputStream != null) {
+        inputStream.close();
+      }
+
+      throw e;
+    }
+
     return sMapper.convertValue(properties, ProjectProperties.class);
   }
 
+  /**
+   * Reads the properties stored in the default file.
+   *
+   * @return the properties instance.
+   * @throws java.io.IOException if an I/O error occurs.
+   */
   @NotNull
   public static ProjectProperties readProjectProperties() throws IOException {
     return readProjectProperties("/project.properties");
   }
 
+  /**
+   * Gets the project version.
+   *
+   * @return the project version.
+   */
   public String getProjectVersion() {
     return mProjectVersion;
   }
 
+  /**
+   * Sets the project version.
+   *
+   * @param projectVersion the project version.
+   */
   public void setProjectVersion(final String projectVersion) {
     this.mProjectVersion = projectVersion;
   }
 
+  /**
+   * Gets the Swagger version.
+   *
+   * @return the Swagger version.
+   */
   public String getSwaggerVersion() {
     return mSwaggerVersion;
   }
 
+  /**
+   * Sets the Swagger version.
+   *
+   * @param swaggerVersion the Swagger version.
+   */
   public void setSwaggerVersion(final String swaggerVersion) {
     this.mSwaggerVersion = swaggerVersion;
   }

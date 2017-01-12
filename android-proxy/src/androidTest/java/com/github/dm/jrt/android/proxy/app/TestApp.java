@@ -37,14 +37,15 @@ import static com.github.dm.jrt.core.util.Reflection.newInstanceOf;
 @SuppressWarnings("unused")
 public class TestApp extends Application implements FactoryContext {
 
-  private final HashMap<InstanceInfo, Object> mInstances = new HashMap<InstanceInfo, Object>();
+  private static final HashMap<InstanceInfo, Object> sInstances =
+      new HashMap<InstanceInfo, Object>();
 
   @Nullable
   @SuppressWarnings("unchecked")
   public <TYPE> TYPE geInstance(@NotNull final Class<? extends TYPE> type,
       @NotNull final Object[] args) {
-    synchronized (mInstances) {
-      final HashMap<InstanceInfo, Object> instances = mInstances;
+    synchronized (sInstances) {
+      final HashMap<InstanceInfo, Object> instances = sInstances;
       final InstanceInfo instanceInfo = new InstanceInfo(type, args);
       Object instance = instances.get(instanceInfo);
       if (instance == null) {

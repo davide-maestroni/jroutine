@@ -38,7 +38,7 @@ public class ChunkStreamConfigurationTest {
     final ChunkStreamConfiguration configuration = builder().withChunkSize(11)
                                                             .withCorePoolSize(17)
                                                             .withOnClose(
-                                                                 CloseActionType.CLOSE_CHANNEL)
+                                                                CloseActionType.CLOSE_CHANNEL)
                                                             .configured();
     assertThat(configuration).isNotEqualTo(builder().withChunkSize(3).configured());
     assertThat(configuration.builderFrom().withChunkSize(27).configured()).isNotEqualTo(
@@ -67,7 +67,7 @@ public class ChunkStreamConfigurationTest {
     final ChunkStreamConfiguration configuration = builder().withChunkSize(11)
                                                             .withCorePoolSize(17)
                                                             .withOnClose(
-                                                                 CloseActionType.CLOSE_CHANNEL)
+                                                                CloseActionType.CLOSE_CHANNEL)
                                                             .configured();
     assertThat(builderFrom(configuration).configured().hashCode()).isEqualTo(
         configuration.hashCode());
@@ -101,7 +101,7 @@ public class ChunkStreamConfigurationTest {
     final ChunkStreamConfiguration configuration = builder().withChunkSize(11)
                                                             .withCorePoolSize(17)
                                                             .withOnClose(
-                                                                 CloseActionType.CLOSE_CHANNEL)
+                                                                CloseActionType.CLOSE_CHANNEL)
                                                             .configured();
     assertThat(builder().with(configuration).configured()).isEqualTo(configuration);
     assertThat(configuration.builderFrom().configured()).isEqualTo(configuration);
@@ -114,7 +114,7 @@ public class ChunkStreamConfigurationTest {
     final ChunkStreamConfiguration configuration = builder().withChunkSize(11)
                                                             .withCorePoolSize(17)
                                                             .withOnClose(
-                                                                 CloseActionType.CLOSE_CHANNEL)
+                                                                CloseActionType.CLOSE_CHANNEL)
                                                             .configured();
     assertThat(configuration).isNotEqualTo(
         builder().withOnClose(CloseActionType.FLUSH_STREAM).configured());
@@ -129,7 +129,7 @@ public class ChunkStreamConfigurationTest {
     final ChunkStreamConfiguration configuration = builder().withChunkSize(11)
                                                             .withCorePoolSize(17)
                                                             .withOnClose(
-                                                                 CloseActionType.CLOSE_CHANNEL)
+                                                                CloseActionType.CLOSE_CHANNEL)
                                                             .configured();
     assertThat(configuration).isNotEqualTo(builder().withCorePoolSize(0).configured());
     assertThat(configuration.builderFrom().withCorePoolSize(0).configured()).isNotEqualTo(

@@ -35,29 +35,28 @@ import static com.github.dm.jrt.core.util.Reflection.newInstanceOf;
  */
 public class TestService extends InvocationService implements FactoryContext {
 
-  private static final HashMap<InstanceInfo, Object> sInstances =
-      new HashMap<InstanceInfo, Object>();
+  private final HashMap<InstanceInfo, Object> mInstances = new HashMap<InstanceInfo, Object>();
 
   @Nullable
   @SuppressWarnings("unchecked")
   public <TYPE> TYPE geInstance(@NotNull final Class<? extends TYPE> type,
       @NotNull final Object[] args) {
+    synchronized (mInstances) {
+      final HashMap<InstanceInfo, Object> instances = mInstances;
+      final InstanceInfo instanceInfo = new InstanceInfo(type, args);
+      Object instance = instances.get(instanceInfo);
+      if (instance == null) {
+        instance = newInstanceOf(type, args);
+        instances.put(instanceInfo, instance);
+      }
 
-    final HashMap<InstanceInfo, Object> instances = sInstances;
-    final InstanceInfo instanceInfo = new InstanceInfo(type, args);
-    Object instance = instances.get(instanceInfo);
-    if (instance == null) {
-      instance = newInstanceOf(type, args);
-      instances.put(instanceInfo, instance);
+      return (TYPE) instance;
     }
-
-    return (TYPE) instance;
   }
 
   private static class InstanceInfo extends DeepEqualObject {
 
     private InstanceInfo(@NotNull final Class<?> type, @NotNull final Object[] args) {
-
       super(asArgs(type, args));
     }
   }

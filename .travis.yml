@@ -25,22 +25,33 @@ android:
 env:
   global:
     - ADB_INSTALL_TIMEOUT=10
-  matrix:
-    - ANDROID_SDKS=android-10            ANDROID_TARGET=android-10  ANDROID_ABI=armeabi      TASKS=":android:connectedCheck :android-channel:connectedCheck :android-core:connectedCheck :android-method:connectedCheck :android-object:connectedCheck :android-proxy:connectedCheck :android-retrofit:connectedCheck :android-rx:connectedCheck :android-sample:connectedCheck :android-stream:connectedCheck"
-    - ANDROID_SDKS=android-10            ANDROID_TARGET=android-10  ANDROID_ABI=armeabi      TASKS=":channel:check :core:check :function:check :lib:check :method:check :object:check :operator:check :proxy:check :retrofit:check :rx:check :sample:check :stream:check :swagger-codegen:check"
-    - ANDROID_SDKS=android-19,sysimg-19  ANDROID_TARGET=android-19  ANDROID_ABI=armeabi-v7a  TASKS=":android:connectedCheck :android-channel:connectedCheck :android-core:connectedCheck :android-method:connectedCheck :android-object:connectedCheck :android-proxy:connectedCheck :android-retrofit:connectedCheck :android-rx:connectedCheck :android-sample:connectedCheck :android-stream:connectedCheck"
-    - ANDROID_SDKS=android-19,sysimg-19  ANDROID_TARGET=android-19  ANDROID_ABI=armeabi-v7a  TASKS=":channel:check :core:check :function:check :lib:check :method:check :object:check :operator:check :proxy:check :retrofit:check :rx:check :sample:check :stream:check :swagger-codegen:check"
-    - ANDROID_SDKS=android-21,sysimg-21  ANDROID_TARGET=android-21  ANDROID_ABI=armeabi-v7a  TASKS=":android:connectedCheck"
-    - ANDROID_SDKS=android-21,sysimg-21  ANDROID_TARGET=android-21  ANDROID_ABI=armeabi-v7a  TASKS=":android-channel:connectedCheck"
-    - ANDROID_SDKS=android-21,sysimg-21  ANDROID_TARGET=android-21  ANDROID_ABI=armeabi-v7a  TASKS=":android-core:connectedCheck"
-    - ANDROID_SDKS=android-21,sysimg-21  ANDROID_TARGET=android-21  ANDROID_ABI=armeabi-v7a  TASKS=":android-method:connectedCheck"
-    - ANDROID_SDKS=android-21,sysimg-21  ANDROID_TARGET=android-21  ANDROID_ABI=armeabi-v7a  TASKS=":android-object:connectedCheck"
-    - ANDROID_SDKS=android-21,sysimg-21  ANDROID_TARGET=android-21  ANDROID_ABI=armeabi-v7a  TASKS=":android-proxy:connectedCheck"
-    - ANDROID_SDKS=android-21,sysimg-21  ANDROID_TARGET=android-21  ANDROID_ABI=armeabi-v7a  TASKS=":android-retrofit:connectedCheck"
-    - ANDROID_SDKS=android-21,sysimg-21  ANDROID_TARGET=android-21  ANDROID_ABI=armeabi-v7a  TASKS=":android-rx:connectedCheck"
-    - ANDROID_SDKS=android-21,sysimg-21  ANDROID_TARGET=android-21  ANDROID_ABI=armeabi-v7a  TASKS=":android-sample:connectedCheck"
-    - ANDROID_SDKS=android-21,sysimg-21  ANDROID_TARGET=android-21  ANDROID_ABI=armeabi-v7a  TASKS=":android-stream:connectedCheck"
-    - ANDROID_SDKS=android-21,sysimg-21  ANDROID_TARGET=android-21  ANDROID_ABI=armeabi-v7a  TASKS=":channel:check :core:check :function:check :lib:check :method:check :object:check :operator:check :proxy:check :retrofit:check :rx:check :sample:check :stream:check :swagger-codegen:check"
+#  matrix:
+#    - ANDROID_SDKS=android-10            ANDROID_TARGET=android-10  ANDROID_ABI=armeabi      TASKS=":android:connectedCheck :android-channel:connectedCheck :android-core:connectedCheck :android-method:connectedCheck :android-object:connectedCheck :android-proxy:connectedCheck :android-retrofit:connectedCheck :android-rx:connectedCheck :android-sample:connectedCheck :android-stream:connectedCheck"
+#    - ANDROID_SDKS=android-10            ANDROID_TARGET=android-10  ANDROID_ABI=armeabi      TASKS=":channel:check :core:check :function:check :lib:check :method:check :object:check :operator:check :proxy:check :retrofit:check :rx:check :sample:check :stream:check :swagger-codegen:check"
+#    - ANDROID_SDKS=android-19,sysimg-19  ANDROID_TARGET=android-19  ANDROID_ABI=armeabi-v7a  TASKS=":android:connectedCheck :android-channel:connectedCheck :android-core:connectedCheck :android-method:connectedCheck :android-object:connectedCheck :android-proxy:connectedCheck :android-retrofit:connectedCheck :android-rx:connectedCheck :android-sample:connectedCheck :android-stream:connectedCheck"
+#    - ANDROID_SDKS=android-19,sysimg-19  ANDROID_TARGET=android-19  ANDROID_ABI=armeabi-v7a  TASKS=":channel:check :core:check :function:check :lib:check :method:check :object:check :operator:check :proxy:check :retrofit:check :rx:check :sample:check :stream:check :swagger-codegen:check"
+#    - ANDROID_SDKS=android-21,sysimg-21  ANDROID_TARGET=android-21  ANDROID_ABI=armeabi-v7a  TASKS=":android:connectedCheck"
+#    - ANDROID_SDKS=android-21,sysimg-21  ANDROID_TARGET=android-21  ANDROID_ABI=armeabi-v7a  TASKS=":android-channel:connectedCheck"
+#    - ANDROID_SDKS=android-21,sysimg-21  ANDROID_TARGET=android-21  ANDROID_ABI=armeabi-v7a  TASKS=":android-core:connectedCheck"
+#    - ANDROID_SDKS=android-21,sysimg-21  ANDROID_TARGET=android-21  ANDROID_ABI=armeabi-v7a  TASKS=":android-method:connectedCheck"
+#    - ANDROID_SDKS=android-21,sysimg-21  ANDROID_TARGET=android-21  ANDROID_ABI=armeabi-v7a  TASKS=":android-object:connectedCheck"
+#    - ANDROID_SDKS=android-21,sysimg-21  ANDROID_TARGET=android-21  ANDROID_ABI=armeabi-v7a  TASKS=":android-proxy:connectedCheck"
+#    - ANDROID_SDKS=android-21,sysimg-21  ANDROID_TARGET=android-21  ANDROID_ABI=armeabi-v7a  TASKS=":android-retrofit:connectedCheck"
+#    - ANDROID_SDKS=android-21,sysimg-21  ANDROID_TARGET=android-21  ANDROID_ABI=armeabi-v7a  TASKS=":android-rx:connectedCheck"
+#    - ANDROID_SDKS=android-21,sysimg-21  ANDROID_TARGET=android-21  ANDROID_ABI=armeabi-v7a  TASKS=":android-sample:connectedCheck"
+#    - ANDROID_SDKS=android-21,sysimg-21  ANDROID_TARGET=android-21  ANDROID_ABI=armeabi-v7a  TASKS=":android-stream:connectedCheck"
+#    - ANDROID_SDKS=android-21,sysimg-21  ANDROID_TARGET=android-21  ANDROID_ABI=armeabi-v7a  TASKS=":channel:check :core:check :function:check :lib:check :method:check :object:check :operator:check :proxy:check :retrofit:check :rx:check :sample:check :stream:check :swagger-codegen:check"
+
+matrix:
+  include:
+    - env: ANDROID_SDKS=android-10            ANDROID_TARGET=android-10  ANDROID_ABI=armeabi      TASKS=":android:connectedCheck :android-channel:connectedCheck :android-core:connectedCheck :android-method:connectedCheck :android-object:connectedCheck :android-proxy:connectedCheck :android-retrofit:connectedCheck :android-rx:connectedCheck :android-sample:connectedCheck :android-stream:connectedCheck"
+      jdk: openjdk6
+    - env: ANDROID_SDKS=android-10            ANDROID_TARGET=android-10  ANDROID_ABI=armeabi      TASKS=":channel:check :core:check :function:check :lib:check :method:check :object:check :operator:check :proxy:check :retrofit:check :rx:check :sample:check :stream:check :swagger-codegen:check"
+      jdk: openjdk6
+    - env: ANDROID_SDKS=android-19,sysimg-19  ANDROID_TARGET=android-19  ANDROID_ABI=armeabi-v7a  TASKS=":android:connectedCheck :android-channel:connectedCheck :android-core:connectedCheck :android-method:connectedCheck :android-object:connectedCheck :android-proxy:connectedCheck :android-retrofit:connectedCheck :android-rx:connectedCheck :android-sample:connectedCheck :android-stream:connectedCheck"
+      jdk: oraclejdk7
+    - env: ANDROID_SDKS=android-19,sysimg-19  ANDROID_TARGET=android-19  ANDROID_ABI=armeabi-v7a  TASKS=":channel:check :core:check :function:check :lib:check :method:check :object:check :operator:check :proxy:check :retrofit:check :rx:check :sample:check :stream:check :swagger-codegen:check"
+      jdk: oraclejdk7
 
 # Emulator Management: Create, Start and Wait
 before_install:
@@ -50,7 +61,7 @@ before_script:
   - android-wait-for-emulator
   - adb shell input keyevent 82 &
 
-# The prepare step is needed to work around an issue with the support library dependencies in the gradle plugin
+# Build and run tests
 script: travis_wait 50 ./gradlew --stacktrace $TASKS
 
 # Print reports

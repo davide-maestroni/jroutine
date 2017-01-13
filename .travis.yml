@@ -3,8 +3,8 @@ sudo: false
 
 # Android environment setup
 language: android
-jdk:
-  - oraclejdk8
+#jdk:
+#  - oraclejdk8
 android:
   components:
     # Platform tools
@@ -45,9 +45,9 @@ env:
 matrix:
   include:
     - env: ANDROID_SDKS=android-10            ANDROID_TARGET=android-10  ANDROID_ABI=armeabi      TASKS=":android:connectedCheck :android-channel:connectedCheck :android-core:connectedCheck :android-method:connectedCheck :android-object:connectedCheck :android-proxy:connectedCheck :android-retrofit:connectedCheck :android-rx:connectedCheck :android-sample:connectedCheck :android-stream:connectedCheck"
-      jdk: openjdk6
+      jdk: oraclejdk7
     - env: ANDROID_SDKS=android-10            ANDROID_TARGET=android-10  ANDROID_ABI=armeabi      TASKS=":channel:check :core:check :function:check :lib:check :method:check :object:check :operator:check :proxy:check :retrofit:check :rx:check :sample:check :stream:check :swagger-codegen:check"
-      jdk: openjdk6
+      jdk: oraclejdk7
     - env: ANDROID_SDKS=android-19,sysimg-19  ANDROID_TARGET=android-19  ANDROID_ABI=armeabi-v7a  TASKS=":android:connectedCheck :android-channel:connectedCheck :android-core:connectedCheck :android-method:connectedCheck :android-object:connectedCheck :android-proxy:connectedCheck :android-retrofit:connectedCheck :android-rx:connectedCheck :android-sample:connectedCheck :android-stream:connectedCheck"
       jdk: oraclejdk7
     - env: ANDROID_SDKS=android-19,sysimg-19  ANDROID_TARGET=android-19  ANDROID_ABI=armeabi-v7a  TASKS=":channel:check :core:check :function:check :lib:check :method:check :object:check :operator:check :proxy:check :retrofit:check :rx:check :sample:check :stream:check :swagger-codegen:check"

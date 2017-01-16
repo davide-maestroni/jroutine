@@ -181,9 +181,8 @@ public class Sequences {
     }
 
     throw new IllegalArgumentException(
-        "unsupported Number class: [" + start.getClass().getCanonicalName() + ", " + end.getClass()
-                                                                                        .getCanonicalName()
-            + "]");
+        "unsupported Number classes: [" + start.getClass().getCanonicalName() + ", "
+            + end.getClass().getCanonicalName() + "]");
   }
 
   @NotNull
@@ -251,9 +250,9 @@ public class Sequences {
     }
 
     throw new IllegalArgumentException(
-        "unsupported Number class: [" + start.getClass().getCanonicalName() + ", " + end.getClass()
-                                                                                        .getCanonicalName()
-            + ", " + increment.getClass().getCanonicalName() + "]");
+        "unsupported Number classes: [" + start.getClass().getCanonicalName() + ", "
+            + end.getClass().getCanonicalName() + ", " + increment.getClass().getCanonicalName()
+            + "]");
   }
 
   /**

@@ -26,7 +26,6 @@ buildscript {
     classpath 'com.android.tools.build:gradle:2.2.3'
     classpath 'com.github.ben-manes:gradle-versions-plugin:0.13.0'
     classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
-    classpath 'gradle.plugin.org.hidetake:gradle-swagger-generator-plugin:1.6.1'
     classpath "org.jacoco:org.jacoco.core:${project.getProperty('jacocoVersion')}"
     classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.6.3'
   }

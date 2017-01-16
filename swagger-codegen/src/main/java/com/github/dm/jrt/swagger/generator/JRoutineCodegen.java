@@ -22,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -44,6 +45,17 @@ public class JRoutineCodegen extends JavaClientCodegen {
   private static final String API_VERSION = "apiVersion";
 
   private static final String BASE_URL = "baseUrl";
+
+  private static final String CONVERTER_GSON = "gson";
+
+  private static final String CONVERTER_JACKSON = "jackson";
+
+  private static final String CONVERTER_LIBRARY = "converterLibrary";
+
+  private static final HashMap<String, String> CONVERTER_OPTIONS = new HashMap<String, String>() {{
+    put(CONVERTER_GSON, "Gson library (default)");
+    put(CONVERTER_JACKSON, "Jackson library");
+  }};
 
   private static final String ENABLE_LOADERS = "enableLoaders";
 
@@ -82,10 +94,26 @@ public class JRoutineCodegen extends JavaClientCodegen {
         "Whether to use the Android Support Library to generate the source code."));
     cliOptions.add(
         CliOption.newString(API_VERSION, "The API version overwriting the spec file one."));
+    final CliOption converterLibrary = new CliOption(CONVERTER_LIBRARY,
+        "The library to use to convert data from POJO to bytes and back.");
+    converterLibrary.setEnum(CONVERTER_OPTIONS);
+    cliOptions.add(converterLibrary);
     super.setLibrary(RETROFIT_2);
     final Map<String, Object> additionalProperties = this.additionalProperties;
     additionalProperties.put(JROUTINE_CODEGEN_VERSION, projectProperties.getProjectVersion());
     additionalProperties.put(SWAGGER_CODEGEN_VERSION, projectProperties.getSwaggerVersion());
+  }
+
+  private static void setupConverterOption(final Map<String, Object> additionalProperties) {
+    final Object converterLibrary = additionalProperties.get(CONVERTER_LIBRARY);
+    if (CONVERTER_JACKSON.equals(converterLibrary)) {
+      additionalProperties.remove(CONVERTER_GSON);
+      additionalProperties.put(CONVERTER_JACKSON, "true");
+
+    } else {
+      additionalProperties.remove(CONVERTER_JACKSON);
+      additionalProperties.put(CONVERTER_GSON, "true");
+    }
   }
 
   @Override
@@ -98,7 +126,9 @@ public class JRoutineCodegen extends JavaClientCodegen {
     final Map<String, Object> additionalProperties = this.additionalProperties;
     additionalProperties.remove(USE_RX_JAVA);
     additionalProperties.remove("usePlay24WS");
+    setupConverterOption(additionalProperties);
     super.processOpts();
+    setupConverterOption(additionalProperties);
     final Map<String, String> apiTemplateFiles = this.apiTemplateFiles;
     apiTemplateFiles.remove("api.mustache");
     apiTemplateFiles.put("jroutine_api.mustache", ".java");

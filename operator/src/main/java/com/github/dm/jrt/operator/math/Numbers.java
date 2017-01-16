@@ -132,11 +132,21 @@ public class Numbers {
   @NotNull
   @SuppressWarnings("ConstantConditions")
   public static Number addSafe(@NotNull final Number n1, @NotNull final Number n2) {
-    if (!isSupported(n1.getClass()) || !isSupported(n2.getClass())) {
+    final Number number = add(n1, n2);
+    if (number == null) {
+      if (!isSupported(n1.getClass())) {
+        if (!isSupported(n2.getClass())) {
+          throw new IllegalArgumentException(
+              "unsupported Number classes: [" + n1.getClass().getCanonicalName() + ", "
+                  + n2.getClass().getCanonicalName() + "]");
+        }
+
+        throw new IllegalArgumentException(
+            "unsupported Number class: [" + n1.getClass().getCanonicalName() + "]");
+      }
+
       throw new IllegalArgumentException(
-          "unsupported Number class: [" + n1.getClass().getCanonicalName() + ", " + n1.getClass()
-                                                                                      .getCanonicalName()
-              + "]");
+          "unsupported Number class: [" + n2.getClass().getCanonicalName() + "]");
     }
 
     return add(n1, n2);

@@ -34,6 +34,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonSerializer;
@@ -172,6 +173,7 @@ public class {{projectPrefix}}ApiClient {
         .registerTypeAdapter(LocalDate.class, new LocalDateTypeAdapter())
         .create();{{/gson}}
     {{#jackson}}ObjectMapper mapper = new ObjectMapper()
+        .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
         .setDateFormat(new RFC3339DateFormat())
         .registerModule(new SimpleModule()
         {{^java8}}

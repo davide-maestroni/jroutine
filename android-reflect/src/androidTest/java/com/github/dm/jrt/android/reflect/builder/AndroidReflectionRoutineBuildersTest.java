@@ -35,7 +35,8 @@ import com.github.dm.jrt.core.runner.RunnerDecorator;
 import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.DurationMeasure;
 
-import static com.github.dm.jrt.android.reflect.builder.AndroidBuilders.withAnnotations;
+import static com.github.dm.jrt.android.reflect.builder.AndroidReflectionRoutineBuilders
+    .withAnnotations;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -43,7 +44,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * <p>
  * Created by davide-maestroni on 03/08/2016.
  */
-public class AndroidBuildersTest extends AndroidTestCase {
+public class AndroidReflectionRoutineBuildersTest extends AndroidTestCase {
 
   public void testBuilderConfigurationThroughAnnotations() throws NoSuchMethodException {
 
@@ -70,7 +71,7 @@ public class AndroidBuildersTest extends AndroidTestCase {
 
     boolean failed = false;
     try {
-      new AndroidBuilders();
+      new AndroidReflectionRoutineBuilders();
       failed = true;
 
     } catch (final Throwable ignored) {

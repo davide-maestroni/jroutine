@@ -21,7 +21,7 @@ import com.github.dm.jrt.android.core.JRoutineService;
 import com.github.dm.jrt.android.core.ServiceContext;
 import com.github.dm.jrt.android.core.config.ServiceConfigurable;
 import com.github.dm.jrt.android.core.config.ServiceConfiguration;
-import com.github.dm.jrt.android.reflect.builder.AndroidBuilders;
+import com.github.dm.jrt.android.reflect.builder.AndroidReflectionRoutineBuilders;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
@@ -31,7 +31,7 @@ import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.Function;
-import com.github.dm.jrt.reflect.builder.Builders;
+import com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilders;
 import com.github.dm.jrt.stream.JRoutineStream;
 import com.github.dm.jrt.stream.builder.StreamBuilder;
 import com.github.dm.jrt.stream.builder.StreamBuilder.StreamConfiguration;
@@ -142,9 +142,9 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
     if (rawType != null) {
       // Use annotations to configure the routine
       final InvocationConfiguration invocationConfiguration =
-          Builders.withAnnotations(mInvocationConfiguration, annotations);
+          ReflectionRoutineBuilders.withAnnotations(mInvocationConfiguration, annotations);
       final ServiceConfiguration serviceConfiguration =
-          AndroidBuilders.withAnnotations(mServiceConfiguration, annotations);
+          AndroidReflectionRoutineBuilders.withAnnotations(mServiceConfiguration, annotations);
       if (Channel.class == rawType) {
         return new OutputChannelAdapter(invocationConfiguration,
             retrofit.responseBodyConverter(responseType, annotations),
@@ -177,8 +177,8 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
    * The options set through the builder configuration will be applied to all the routine handling
    * the Retrofit calls, unless they are overwritten by specific annotations.
    *
-   * @see Builders#withAnnotations(InvocationConfiguration, Annotation...)
-   * @see AndroidBuilders#withAnnotations(ServiceConfiguration, Annotation...)
+   * @see ReflectionRoutineBuilders#withAnnotations(InvocationConfiguration, Annotation...)
+   * @see AndroidReflectionRoutineBuilders#withAnnotations(ServiceConfiguration, Annotation...)
    */
   public static class Builder
       implements ServiceConfigurable<Builder>, InvocationConfigurable<Builder> {

@@ -26,7 +26,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Routine builder acting both as proxy and reflection builder.
  * <p>
- * The builder will automatically decide whether to employ reflection or code generation to build
+ * The builder will automatically choose whether to employ reflection or code generation to build
  * the proxy instance, based on the presence of the proper annotation and target value. So, if the
  * pre-processor annotation is present in the proxy interface and the target object is assignable to
  * the annotation target class, then code generation will be employed, reflection otherwise.
@@ -64,30 +64,31 @@ public interface ReflectionProxyRoutineBuilder extends ReflectionRoutineBuilder 
   applyReflectionConfiguration();
 
   /**
-   * Force the type of builder to be employed to create the proxy instance.
+   * Force the type of strategy to be employed to create the proxy instance.
    * <br>
-   * A null value means default algorithm will be applied, that is, the builder type will be
-   * automatically chosen based on the proxy interface definition.
+   * A null value means default algorithm will be applied, that is, the type will be automatically
+   * chosen based on the presence of the specific annotation.
    *
-   * @param builderType the builder type.
+   * @param strategyType the strategy type.
    * @return this builder.
+   * @see com.github.dm.jrt.proxy.JRoutineProxy JRoutineProxy
    */
   @NotNull
-  ReflectionProxyRoutineBuilder withType(@Nullable BuilderType builderType);
+  ReflectionProxyRoutineBuilder withStrategy(@Nullable ProxyStrategyType strategyType);
 
   /**
-   * Builder type enumeration.
+   * Proxy instantiation strategy type enumeration.
    */
-  enum BuilderType { // TODO: 18/01/2017 rename?
+  enum ProxyStrategyType {
 
     /**
-     * Reflection routine builder.
+     * Reflection strategy.
      * <br>
      * The proxy instance will be created through reflection.
      */
     REFLECTION,
     /**
-     * Proxy routine builder.
+     * Code generation strategy.
      * <br>
      * The proxy instance will be created through code generation.
      */

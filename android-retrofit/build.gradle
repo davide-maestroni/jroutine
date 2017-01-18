@@ -76,14 +76,14 @@ dependencies {
 }
 
 conditionalDependencies {
-  compile name: 'android-channel', version: '6.1.0'
-  compile name: 'android-core', version: '6.1.0'
-  compile name: 'android-reflect', version: '6.1.0'
-  compile name: 'android-stream', version: '6.1.0'
-  compile name: 'core', version: '6.1.0'
-  compile name: 'reflect', version: '6.1.0'
-  compile name: 'retrofit', version: '6.1.0'
-  compile name: 'stream', version: '6.1.0'
+  compile name: 'android-channel', version: '7.0.0'
+  compile name: 'android-core', version: '7.0.0'
+  compile name: 'android-reflect', version: '7.0.0'
+  compile name: 'android-stream', version: '7.0.0'
+  compile name: 'core', version: '7.0.0'
+  compile name: 'reflect', version: '7.0.0'
+  compile name: 'retrofit', version: '7.0.0'
+  compile name: 'stream', version: '7.0.0'
 }
 
 jacoco {

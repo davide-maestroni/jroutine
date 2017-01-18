@@ -40,7 +40,7 @@
     public void onContext(@org.jetbrains.annotations.NotNull final android.content.Context context) throws Exception {
       super.onContext(context);
       final com.github.dm.jrt.reflect.InvocationTarget<?> target = mContextTarget.getInvocationTarget(context);
-      mMutex = com.github.dm.jrt.reflect.builder.Builders.getSharedMutex(${mutexTarget}, mSharedFields);
+      mMutex = com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilders.getSharedMutex(${mutexTarget}, mSharedFields);
       mTarget = target;
       mInstance = target.getTarget();
     }

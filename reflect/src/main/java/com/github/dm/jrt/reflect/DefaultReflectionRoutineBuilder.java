@@ -30,8 +30,8 @@ import com.github.dm.jrt.core.util.Reflection;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 import com.github.dm.jrt.reflect.annotation.AsyncInput.InputMode;
 import com.github.dm.jrt.reflect.annotation.AsyncOutput.OutputMode;
-import com.github.dm.jrt.reflect.builder.Builders.MethodInfo;
 import com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilder;
+import com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilders.MethodInfo;
 import com.github.dm.jrt.reflect.common.Mutex;
 import com.github.dm.jrt.reflect.config.ReflectionConfiguration;
 
@@ -46,12 +46,12 @@ import java.util.HashMap;
 import java.util.List;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
-import static com.github.dm.jrt.reflect.builder.Builders.callFromInvocation;
-import static com.github.dm.jrt.reflect.builder.Builders.getAnnotatedMethod;
-import static com.github.dm.jrt.reflect.builder.Builders.getSharedMutex;
-import static com.github.dm.jrt.reflect.builder.Builders.getTargetMethodInfo;
-import static com.github.dm.jrt.reflect.builder.Builders.invokeRoutine;
-import static com.github.dm.jrt.reflect.builder.Builders.withAnnotations;
+import static com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilders.callFromInvocation;
+import static com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilders.getAnnotatedMethod;
+import static com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilders.getSharedMutex;
+import static com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilders.getTargetMethodInfo;
+import static com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilders.invokeRoutine;
+import static com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilders.withAnnotations;
 
 /**
  * Class implementing a builder of routines wrapping an object methods.

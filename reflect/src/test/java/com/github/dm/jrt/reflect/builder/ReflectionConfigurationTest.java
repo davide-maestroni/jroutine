@@ -84,7 +84,7 @@ public class ReflectionConfigurationTest {
 
     boolean failed = false;
     try {
-      new Builders();
+      new ReflectionRoutineBuilders();
       failed = true;
 
     } catch (final Throwable ignored) {

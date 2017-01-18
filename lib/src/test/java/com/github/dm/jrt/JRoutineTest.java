@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt;
 
-import com.github.dm.jrt.ReflectionProxyRoutineBuilder.BuilderType;
+import com.github.dm.jrt.ReflectionProxyRoutineBuilder.ProxyStrategyType;
 import com.github.dm.jrt.channel.io.ByteChannel.ByteChunk;
 import com.github.dm.jrt.channel.io.ByteChannel.ChunkInputStream;
 import com.github.dm.jrt.channel.io.ByteChannel.ChunkOutputStream;
@@ -380,7 +380,7 @@ public class JRoutineTest {
 
     final TestClass test = new TestClass();
     final TestStatic testStatic = JRoutine.with(instance(test))
-                                          .withType(BuilderType.REFLECTION)
+                                          .withStrategy(ProxyStrategyType.REFLECTION)
                                           .applyInvocationConfiguration()
                                           .withRunner(Runners.poolRunner())
                                           .withLogLevel(Level.DEBUG)
@@ -410,7 +410,7 @@ public class JRoutineTest {
 
     final TestClass test = new TestClass();
     final TestStatic proxy = JRoutine.with(test)
-                                     .withType(BuilderType.CODE_GENERATION)
+                                     .withStrategy(ProxyStrategyType.CODE_GENERATION)
                                      .applyInvocationConfiguration()
                                      .withRunner(Runners.poolRunner())
                                      .withLogLevel(Level.DEBUG)

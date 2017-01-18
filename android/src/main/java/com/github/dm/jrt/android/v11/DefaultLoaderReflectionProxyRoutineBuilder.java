@@ -48,12 +48,12 @@ class DefaultLoaderReflectionProxyRoutineBuilder implements LoaderReflectionProx
 
   private final ContextInvocationTarget<?> mTarget;
 
-  private BuilderType mBuilderType;
-
   private InvocationConfiguration mInvocationConfiguration =
       InvocationConfiguration.defaultConfiguration();
 
   private LoaderConfiguration mLoaderConfiguration = LoaderConfiguration.defaultConfiguration();
+
+  private ProxyStrategyType mProxyStrategyType;
 
   private ReflectionConfiguration mReflectionConfiguration =
       ReflectionConfiguration.defaultConfiguration();
@@ -121,8 +121,9 @@ class DefaultLoaderReflectionProxyRoutineBuilder implements LoaderReflectionProx
 
   @NotNull
   @Override
-  public LoaderReflectionProxyRoutineBuilder withType(@Nullable final BuilderType builderType) {
-    mBuilderType = builderType;
+  public LoaderReflectionProxyRoutineBuilder withStrategy(
+      @Nullable final ProxyStrategyType strategyType) {
+    mProxyStrategyType = strategyType;
     return this;
   }
 
@@ -153,8 +154,8 @@ class DefaultLoaderReflectionProxyRoutineBuilder implements LoaderReflectionProx
   @NotNull
   @Override
   public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
-    final BuilderType builderType = mBuilderType;
-    if (builderType == null) {
+    final ProxyStrategyType proxyStrategyType = mProxyStrategyType;
+    if (proxyStrategyType == null) {
       final LoaderProxy proxyAnnotation = itf.getAnnotation(LoaderProxy.class);
       if ((proxyAnnotation != null) && mTarget.isAssignableTo(proxyAnnotation.value())) {
         return newProxyBuilder().buildProxy(itf);
@@ -162,7 +163,7 @@ class DefaultLoaderReflectionProxyRoutineBuilder implements LoaderReflectionProx
 
       return newReflectionBuilder().buildProxy(itf);
 
-    } else if (builderType == BuilderType.CODE_GENERATION) {
+    } else if (proxyStrategyType == ProxyStrategyType.CODE_GENERATION) {
       return newProxyBuilder().buildProxy(itf);
     }
 

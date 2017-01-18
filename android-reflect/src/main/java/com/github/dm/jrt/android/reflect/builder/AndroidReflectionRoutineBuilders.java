@@ -43,12 +43,12 @@ import java.lang.reflect.Method;
  * Created by davide-maestroni on 01/29/2016.
  */
 @SuppressWarnings("WeakerAccess")
-public class AndroidBuilders {
+public class AndroidReflectionRoutineBuilders {
 
   /**
    * Avoid explicit instantiation.
    */
-  protected AndroidBuilders() {
+  protected AndroidReflectionRoutineBuilders() {
     ConstantConditions.avoid();
   }
 

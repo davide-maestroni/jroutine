@@ -46,10 +46,10 @@ class DefaultServiceReflectionProxyRoutineBuilder implements ServiceReflectionPr
 
   private final ContextInvocationTarget<?> mTarget;
 
-  private BuilderType mBuilderType;
-
   private InvocationConfiguration mInvocationConfiguration =
       InvocationConfiguration.defaultConfiguration();
+
+  private ProxyStrategyType mProxyStrategyType;
 
   private ReflectionConfiguration mReflectionConfiguration =
       ReflectionConfiguration.defaultConfiguration();
@@ -120,8 +120,9 @@ class DefaultServiceReflectionProxyRoutineBuilder implements ServiceReflectionPr
 
   @NotNull
   @Override
-  public ServiceReflectionProxyRoutineBuilder withType(@Nullable final BuilderType builderType) {
-    mBuilderType = builderType;
+  public ServiceReflectionProxyRoutineBuilder withStrategy(
+      @Nullable final ProxyStrategyType strategyType) {
+    mProxyStrategyType = strategyType;
     return this;
   }
 
@@ -152,8 +153,8 @@ class DefaultServiceReflectionProxyRoutineBuilder implements ServiceReflectionPr
   @NotNull
   @Override
   public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
-    final BuilderType builderType = mBuilderType;
-    if (builderType == null) {
+    final ProxyStrategyType proxyStrategyType = mProxyStrategyType;
+    if (proxyStrategyType == null) {
       final ServiceProxy proxyAnnotation = itf.getAnnotation(ServiceProxy.class);
       if ((proxyAnnotation != null) && mTarget.isAssignableTo(proxyAnnotation.value())) {
         return newProxyBuilder().buildProxy(itf);
@@ -161,7 +162,7 @@ class DefaultServiceReflectionProxyRoutineBuilder implements ServiceReflectionPr
 
       return newReflectionBuilder().buildProxy(itf);
 
-    } else if (builderType == BuilderType.CODE_GENERATION) {
+    } else if (proxyStrategyType == ProxyStrategyType.CODE_GENERATION) {
       return newProxyBuilder().buildProxy(itf);
     }
 

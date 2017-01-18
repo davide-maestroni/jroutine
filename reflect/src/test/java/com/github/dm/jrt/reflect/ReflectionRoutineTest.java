@@ -79,7 +79,7 @@ import static com.github.dm.jrt.core.util.DurationMeasure.indefiniteTime;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static com.github.dm.jrt.reflect.InvocationTarget.classOfType;
 import static com.github.dm.jrt.reflect.InvocationTarget.instance;
-import static com.github.dm.jrt.reflect.builder.Builders.withAnnotations;
+import static com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilders.withAnnotations;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 

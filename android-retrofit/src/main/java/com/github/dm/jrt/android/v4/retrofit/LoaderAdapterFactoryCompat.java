@@ -19,7 +19,7 @@ package com.github.dm.jrt.android.v4.retrofit;
 import com.github.dm.jrt.android.core.config.LoaderConfigurable;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
-import com.github.dm.jrt.android.reflect.builder.AndroidBuilders;
+import com.github.dm.jrt.android.reflect.builder.AndroidReflectionRoutineBuilders;
 import com.github.dm.jrt.android.retrofit.ComparableCall;
 import com.github.dm.jrt.android.retrofit.ContextAdapterFactory;
 import com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat;
@@ -30,7 +30,7 @@ import com.github.dm.jrt.core.config.InvocationConfigurable;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.reflect.builder.Builders;
+import com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilders;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -97,9 +97,9 @@ public class LoaderAdapterFactoryCompat extends ContextAdapterFactory {
       @NotNull final Retrofit retrofit) {
     // Use annotations to configure the routine
     final InvocationConfiguration invocationConfiguration =
-        Builders.withAnnotations(configuration, annotations);
+        ReflectionRoutineBuilders.withAnnotations(configuration, annotations);
     final LoaderConfiguration loaderConfiguration =
-        AndroidBuilders.withAnnotations(mLoaderConfiguration, annotations);
+        AndroidReflectionRoutineBuilders.withAnnotations(mLoaderConfiguration, annotations);
     final ContextInvocationFactory<Call<Object>, Object> factory =
         getFactory(configuration, responseType, annotations, retrofit);
     return JRoutineLoaderCompat.on(mLoaderContext)
@@ -141,8 +141,8 @@ public class LoaderAdapterFactoryCompat extends ContextAdapterFactory {
    * The options set through the builder configuration will be applied to all the routine handling
    * the Retrofit calls, unless they are overwritten by specific annotations.
    *
-   * @see Builders#withAnnotations(InvocationConfiguration, Annotation...)
-   * @see AndroidBuilders#withAnnotations(LoaderConfiguration, Annotation...)
+   * @see ReflectionRoutineBuilders#withAnnotations(InvocationConfiguration, Annotation...)
+   * @see AndroidReflectionRoutineBuilders#withAnnotations(LoaderConfiguration, Annotation...)
    */
   public static class Builder
       implements InvocationConfigurable<Builder>, LoaderConfigurable<Builder> {

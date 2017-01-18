@@ -28,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Loader routine builder acting both as proxy and reflection builder.
  * <p>
- * The builder will automatically decide whether to employ reflection or code generation to build
+ * The builder will automatically choose whether to employ reflection or code generation to build
  * the proxy instance, based on the presence of the proper annotation and target value. So, if the
  * pre-processor annotation is present in the proxy interface and the target object is assignable to
  * the annotation target class, then code generation will be employed, reflection otherwise.
@@ -72,10 +72,13 @@ public interface LoaderReflectionProxyRoutineBuilder
 
   /**
    * {@inheritDoc}
+   *
+   * @see com.github.dm.jrt.android.v11.proxy.JRoutineLoaderProxy JRoutineLoaderProxy
+   * @see com.github.dm.jrt.android.v4.proxy.JRoutineLoaderProxyCompat JRoutineLoaderProxyCompat
    */
   @NotNull
   @Override
-  LoaderReflectionProxyRoutineBuilder withType(@Nullable BuilderType builderType);
+  LoaderReflectionProxyRoutineBuilder withStrategy(@Nullable ProxyStrategyType strategyType);
 
   /**
    * {@inheritDoc}

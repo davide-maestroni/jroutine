@@ -24,7 +24,7 @@ import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
-import com.github.dm.jrt.ReflectionProxyRoutineBuilder.BuilderType;
+import com.github.dm.jrt.ReflectionProxyRoutineBuilder.ProxyStrategyType;
 import com.github.dm.jrt.android.R;
 import com.github.dm.jrt.android.channel.io.ParcelableByteChannel.ParcelableByteChunk;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.CacheStrategyType;
@@ -504,25 +504,25 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
                               .all()).containsExactly("test");
     assertThat(JRoutineAndroid.on(getActivity())
                               .withInstanceOf(TestClass.class)
-                              .withType(BuilderType.REFLECTION)
+                              .withStrategy(ProxyStrategyType.REFLECTION)
                               .buildProxy(TestProxy.class)
                               .getStringLow()
                               .all()).containsExactly("test");
     assertThat(JRoutineAndroid.on(getActivity())
                               .withInstanceOf(TestClass.class)
-                              .withType(BuilderType.REFLECTION)
+                              .withStrategy(ProxyStrategyType.REFLECTION)
                               .buildProxy(tokenOf(TestProxy.class))
                               .getStringLow()
                               .all()).containsExactly("test");
     assertThat(JRoutineAndroid.on(getActivity())
                               .withInstanceOf(TestClass.class)
-                              .withType(BuilderType.CODE_GENERATION)
+                              .withStrategy(ProxyStrategyType.CODE_GENERATION)
                               .buildProxy(TestAnnotatedProxy.class)
                               .getStringLow()
                               .all()).containsExactly("test");
     assertThat(JRoutineAndroid.on(getActivity())
                               .withInstanceOf(TestClass.class)
-                              .withType(BuilderType.CODE_GENERATION)
+                              .withStrategy(ProxyStrategyType.CODE_GENERATION)
                               .buildProxy(tokenOf(TestAnnotatedProxy.class))
                               .getStringLow()
                               .all()).containsExactly("test");
@@ -748,25 +748,25 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
                               .all()).containsExactly("test");
     assertThat(JRoutineAndroid.on((Context) getActivity())
                               .withInstanceOf(TestClass.class)
-                              .withType(BuilderType.REFLECTION)
+                              .withStrategy(ProxyStrategyType.REFLECTION)
                               .buildProxy(TestProxy.class)
                               .getStringLow()
                               .all()).containsExactly("test");
     assertThat(JRoutineAndroid.on((Context) getActivity())
                               .withInstanceOf(TestClass.class)
-                              .withType(BuilderType.REFLECTION)
+                              .withStrategy(ProxyStrategyType.REFLECTION)
                               .buildProxy(tokenOf(TestProxy.class))
                               .getStringLow()
                               .all()).containsExactly("test");
     assertThat(JRoutineAndroid.on((Context) getActivity())
                               .withInstanceOf(TestClass.class)
-                              .withType(BuilderType.CODE_GENERATION)
+                              .withStrategy(ProxyStrategyType.CODE_GENERATION)
                               .buildProxy(TestAnnotatedProxy.class)
                               .getStringLow()
                               .all()).containsExactly("test");
     assertThat(JRoutineAndroid.on((Context) getActivity())
                               .withInstanceOf(TestClass.class)
-                              .withType(BuilderType.CODE_GENERATION)
+                              .withStrategy(ProxyStrategyType.CODE_GENERATION)
                               .buildProxy(tokenOf(TestAnnotatedProxy.class))
                               .getStringLow()
                               .all()).containsExactly("test");

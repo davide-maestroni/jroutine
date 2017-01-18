@@ -77,8 +77,7 @@ import static com.github.dm.jrt.core.util.Reflection.newInstanceOf;
  * Created by davide-maestroni on 03/23/2015.
  */
 @SuppressWarnings("WeakerAccess")
-public class Builders {
-  // TODO: 17/01/2017 rename?
+public class ReflectionRoutineBuilders {
 
   private static final int DEFAULT_CAPACITY = 16;
 
@@ -99,7 +98,7 @@ public class Builders {
   /**
    * Avoid explicit instantiation.
    */
-  protected Builders() {
+  protected ReflectionRoutineBuilders() {
     ConstantConditions.avoid();
   }
 

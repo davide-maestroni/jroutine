@@ -18,7 +18,7 @@ package com.github.dm.jrt.proxy.builder;
 
 import com.github.dm.jrt.core.config.InvocationConfigurable;
 import com.github.dm.jrt.core.util.ClassToken;
-import com.github.dm.jrt.object.config.ObjectConfigurable;
+import com.github.dm.jrt.reflect.config.ReflectionConfigurable;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -27,8 +27,8 @@ import org.jetbrains.annotations.NotNull;
  * <p>
  * Created by davide-maestroni on 03/07/2015.
  */
-public interface ProxyRoutineBuilder
-    extends InvocationConfigurable<ProxyRoutineBuilder>, ObjectConfigurable<ProxyRoutineBuilder> {
+public interface ProxyRoutineBuilder extends InvocationConfigurable<ProxyRoutineBuilder>,
+    ReflectionConfigurable<ProxyRoutineBuilder> {
 
   /**
    * Returns a proxy object enabling asynchronous call of the target instance methods.
@@ -53,7 +53,7 @@ public interface ProxyRoutineBuilder
    * @return the proxy object.
    * @throws java.lang.IllegalArgumentException if the specified class does not represent an
    *                                            interface.
-   * @see com.github.dm.jrt.object.annotation Annotations
+   * @see com.github.dm.jrt.reflect.annotation Annotations
    */
   @NotNull
   <TYPE> TYPE buildProxy(@NotNull Class<TYPE> itf);
@@ -81,7 +81,7 @@ public interface ProxyRoutineBuilder
    * @return the proxy object.
    * @throws java.lang.IllegalArgumentException if the specified class does not represent an
    *                                            interface.
-   * @see com.github.dm.jrt.object.annotation Annotations
+   * @see com.github.dm.jrt.reflect.annotation Annotations
    */
   @NotNull
   <TYPE> TYPE buildProxy(@NotNull ClassToken<TYPE> itf);

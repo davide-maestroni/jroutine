@@ -1,0 +1,187 @@
+<!--
+  ~ Copyright 2016 Davide Maestroni
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<html>
+<head>
+    <title>jroutine-reflect</title>
+</head>
+<body>
+<a href="https://github.com/davide-maestroni/jroutine" target="_blank">Parallel programming on the go.</a>
+<h1>Overview</h1>
+<p>
+    Asynchronous calling of object or class methods based on the <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/core" target="_blank">jroutine-core</a> library.
+</p>
+<p>
+    This module provides classes enabling asynchronous invocations of object or class methods via reflection.
+</p>
+<h2>Main concepts</h2>
+<ul>
+    <li>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/reflect/com/github/dm/jrt/reflect/InvocationTarget.html">InvocationTarget</a>
+        <p>
+            An invocation target represents the class or the instance whose methods are to be invoked asynchronously.
+        </p>
+    </li>
+    <li>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/reflect/com/github/dm/jrt/reflect/builder/ReflectionRoutineBuilder.html">ReflectionRoutineBuilder</a>
+        <p>
+            Each reflection routine instance needs an invocation target and a specific configuration, so reflection routine builders provide a convenient way to set the required options.
+            Object routine builders can be also used to build objects proxying the invocation target through an interface.
+            By design builders are not synchronized since the same instance is not meant to be used from different threads.
+        </p>
+    </li>
+</ul>
+<h2>Main classes</h2>
+<ul>
+    <li>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/reflect/com/github/dm/jrt/reflect/JRoutineReflection.html">JRoutineReflection</a>
+        <p>
+            Utility class acting as a factory of reflection routine builders.
+        </p>
+    </li>
+</ul>
+<h2>Dependencies</h2>
+<p>
+    Below a full list of the included modules:
+</p>
+<ul>
+    <li><a href="http://davide-maestroni.github.io/jroutine/javadoc/6/core" target="_blank">jroutine-core</a> &mdash; core routine and channel classes</li>
+</ul>
+<h2>Usage examples</h2>
+<p>
+    The code below shows how it is possible to implement the computation of the root mean square of some input data, by distributing it in a number of background threads.
+</p>
+<b>Example 1:</b> via reflection.
+<p>
+    This approach allows the asynchronous invocation of an object methods by creating routines which wrap the methods to call.<br>
+    In this case, the mean computation must actually wait for all the input data to be available before being invoked. Thus, it cannot really happen in a parallel way.
+</p>
+<pre>
+    <code>
+        public class Main {
+
+            private static final String MEAN = "mean";
+
+            private static final String PARSE = "parse";
+
+            private static final String SQUARE = "square";
+
+            public static void main(final String[] args) {
+                final ReflectionRoutineBuilder builder = JRoutineReflection.with(classOfType(Main.class))
+                                                                           .applyReflectionConfiguration()
+                                                                           .withSharedFields()
+                                                                           .configured()
+                                                                           .applyInvocationConfiguration()
+                                                                           .withOutputTimeout(seconds(3))
+                                                                           .configured();
+                final Routine&lt;String, Integer&gt; parseRoutine = builder.method(PARSE);
+                final Routine&lt;Integer, Integer&gt; squareRoutine = builder.method(SQUARE);
+                final Routine&lt;List&lt;Integer&gt;, Double&gt; meanRoutine = builder.method(MEAN);
+                final Double rms = meanRoutine.call(
+                        squareRoutine.callParallel(parseRoutine.callParallel(args)).all()).next();
+                System.out.println(rms);
+                System.exit(0);
+            }
+
+            &commat;Alias(PARSE)
+            private static int parseArg(final String arg) {
+                return Integer.parseInt(arg);
+            }
+
+            &commat;Alias(SQUARE)
+            private static int square(final int value) {
+                return value * value;
+            }
+
+            &commat;Alias(MEAN)
+            private static double squareRootMean(final List&lt;Integer&gt; values) {
+                if (values.isEmpty()) {
+                    return 0d;
+                }
+
+                int sum = 0;
+                for (final int value : values) {
+                    sum += value;
+                }
+
+                return Math.sqrt((double) sum / values.size());
+            }
+        }
+    </code>
+</pre>
+<b>Example 2:</b> via proxy.
+<p>
+    Using a proxy object is just a convenient way to wrap several methods at once.<br>
+    Note that the same annotations of the previous example could have been used to bind the methods with the proxy interface.
+</p>
+<pre>
+    <code>
+        public class Main {
+
+            public static void main(final String[] args) {
+                final Main main = new Main();
+                final AsyncMain proxy = JRoutineReflection.with(instance(main))
+                                                          .applyReflectionConfiguration()
+                                                          .withSharedFields()
+                                                          .configured()
+                                                          .applyInvocationConfiguration()
+                                                          .withOutputTimeout(seconds(3))
+                                                          .configured()
+                                                          .buildProxy(AsyncMain.class);
+                final double rms = proxy.squareRootMean(proxy.square(proxy.parseArg(JRoutineCore.of(args).buildChannel())));
+                System.out.println(rms);
+                System.exit(0);
+            }
+
+            private int parseArg(final String arg) {
+                return Integer.parseInt(arg);
+            }
+
+            private int square(final int value) {
+                return value * value;
+            }
+
+            private double squareRootMean(final List&lt;Integer&gt; values) {
+                if (values.isEmpty()) {
+                    return 0d;
+                }
+
+                int sum = 0;
+                for (final int value : values) {
+                    sum += value;
+                }
+
+                return Math.sqrt((double) sum / values.size());
+            }
+
+            private interface AsyncMain {
+
+                &commat;Invoke(InvocationMode.PARALLEL)
+                &commat;AsyncOutput
+                Channel&lt;?, Integer&gt; parseArg(&commat;AsyncInput(String.class) Channel&lt;?, String&gt; args);
+
+                &commat;Invoke(InvocationMode.PARALLEL)
+                &commat;AsyncOutput
+                Channel&lt;?, Integer&gt; square(&commat;AsyncInput(int.class) Channel&lt;?, Integer&gt; value);
+
+                double squareRootMean(
+                        &commat;AsyncInput(value = List.class, mode = InputMode.COLLECTION) Channel&lt;?, Integer&gt; values);
+            }
+        }
+    </code>
+</pre>
+</body>
+</html>

@@ -17,7 +17,7 @@
 package com.github.dm.jrt.android.proxy;
 
 import com.github.dm.jrt.android.core.service.InvocationService;
-import com.github.dm.jrt.android.object.builder.FactoryContext;
+import com.github.dm.jrt.android.reflect.builder.FactoryContext;
 import com.github.dm.jrt.core.util.DeepEqualObject;
 
 import org.jetbrains.annotations.NotNull;

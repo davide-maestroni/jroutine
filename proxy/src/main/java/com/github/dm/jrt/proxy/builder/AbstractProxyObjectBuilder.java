@@ -21,7 +21,7 @@ import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;
-import com.github.dm.jrt.object.config.ObjectConfiguration;
+import com.github.dm.jrt.reflect.config.ReflectionConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -45,7 +45,8 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
   private InvocationConfiguration mInvocationConfiguration =
       InvocationConfiguration.defaultConfiguration();
 
-  private ObjectConfiguration mObjectConfiguration = ObjectConfiguration.defaultConfiguration();
+  private ReflectionConfiguration mReflectionConfiguration =
+      ReflectionConfiguration.defaultConfiguration();
 
   @NotNull
   public ProxyObjectBuilder<TYPE> apply(@NotNull final InvocationConfiguration configuration) {
@@ -55,8 +56,9 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
   }
 
   @NotNull
-  public ProxyObjectBuilder<TYPE> apply(@NotNull final ObjectConfiguration configuration) {
-    mObjectConfiguration = ConstantConditions.notNull("object configuration", configuration);
+  public ProxyObjectBuilder<TYPE> apply(@NotNull final ReflectionConfiguration configuration) {
+    mReflectionConfiguration =
+        ConstantConditions.notNull("reflection configuration", configuration);
     return this;
   }
 
@@ -68,10 +70,10 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
   }
 
   @NotNull
-  public ObjectConfiguration.Builder<? extends ProxyObjectBuilder<TYPE>> applyObjectConfiguration
-      () {
-    final ObjectConfiguration config = mObjectConfiguration;
-    return new ObjectConfiguration.Builder<ProxyObjectBuilder<TYPE>>(this, config);
+  public ReflectionConfiguration.Builder<? extends ProxyObjectBuilder<TYPE>>
+  applyReflectionConfiguration() {
+    final ReflectionConfiguration config = mReflectionConfiguration;
+    return new ReflectionConfiguration.Builder<ProxyObjectBuilder<TYPE>>(this, config);
   }
 
   @NotNull
@@ -87,16 +89,16 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
       }
 
       final InvocationConfiguration invocationConfiguration = mInvocationConfiguration;
-      final ObjectConfiguration objectConfiguration = mObjectConfiguration;
+      final ReflectionConfiguration reflectionConfiguration = mReflectionConfiguration;
       final ClassInfo classInfo =
-          new ClassInfo(getInterfaceClass(), invocationConfiguration, objectConfiguration);
+          new ClassInfo(getInterfaceClass(), invocationConfiguration, reflectionConfiguration);
       final Object instance = proxyMap.get(classInfo);
       if (instance != null) {
         return (TYPE) instance;
       }
 
       try {
-        final TYPE newInstance = newProxy(invocationConfiguration, objectConfiguration);
+        final TYPE newInstance = newProxy(invocationConfiguration, reflectionConfiguration);
         proxyMap.put(classInfo, newInstance);
         return newInstance;
 
@@ -127,13 +129,13 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
    * Creates and return a new proxy instance.
    *
    * @param invocationConfiguration the invocation configuration.
-   * @param objectConfiguration     the object configuration.
+   * @param reflectionConfiguration the reflection configuration.
    * @return the proxy instance.
    * @throws java.lang.Exception if an unexpected error occurs.
    */
   @NotNull
   protected abstract TYPE newProxy(@NotNull InvocationConfiguration invocationConfiguration,
-      @NotNull ObjectConfiguration objectConfiguration) throws Exception;
+      @NotNull ReflectionConfiguration reflectionConfiguration) throws Exception;
 
   /**
    * Class used as key to identify a specific proxy instance.
@@ -145,12 +147,12 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
      *
      * @param itf                     the proxy interface class.
      * @param invocationConfiguration the invocation configuration.
-     * @param objectConfiguration     the object configuration.
+     * @param reflectionConfiguration the reflection configuration.
      */
     private ClassInfo(@NotNull final Class<?> itf,
         @NotNull final InvocationConfiguration invocationConfiguration,
-        @NotNull final ObjectConfiguration objectConfiguration) {
-      super(asArgs(itf, invocationConfiguration, objectConfiguration));
+        @NotNull final ReflectionConfiguration reflectionConfiguration) {
+      super(asArgs(itf, invocationConfiguration, reflectionConfiguration));
     }
   }
 }

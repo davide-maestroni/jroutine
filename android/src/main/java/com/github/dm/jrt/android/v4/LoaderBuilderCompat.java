@@ -16,12 +16,12 @@
 
 package com.github.dm.jrt.android.v4;
 
-import com.github.dm.jrt.android.LoaderObjectProxyRoutineBuilder;
+import com.github.dm.jrt.android.LoaderReflectionProxyRoutineBuilder;
 import com.github.dm.jrt.android.core.builder.LoaderChannelBuilder;
 import com.github.dm.jrt.android.core.builder.LoaderRoutineBuilder;
 import com.github.dm.jrt.android.core.invocation.ContextInvocation;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
-import com.github.dm.jrt.android.object.ContextInvocationTarget;
+import com.github.dm.jrt.android.reflect.ContextInvocationTarget;
 import com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
 import com.github.dm.jrt.core.channel.Channel;
@@ -46,8 +46,8 @@ import java.util.List;
 
 import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.factoryFrom;
 import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.factoryOf;
-import static com.github.dm.jrt.android.object.ContextInvocationTarget.classOfType;
-import static com.github.dm.jrt.android.object.ContextInvocationTarget.instanceOf;
+import static com.github.dm.jrt.android.reflect.ContextInvocationTarget.classOfType;
+import static com.github.dm.jrt.android.reflect.ContextInvocationTarget.instanceOf;
 import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
 import static com.github.dm.jrt.function.Functions.consumerCall;
 import static com.github.dm.jrt.function.Functions.consumerCommand;
@@ -299,7 +299,7 @@ public class LoaderBuilderCompat {
    * object.
    * <br>
    * In order to customize the object creation, the caller must employ an implementation of a
-   * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
+   * {@link com.github.dm.jrt.android.reflect.builder.FactoryContext FactoryContext} as the
    * application Context.
    * <p>
    * Note that the built routine results will be always dispatched on the configured Looper thread,
@@ -309,8 +309,9 @@ public class LoaderBuilderCompat {
    * @return the routine builder instance.
    */
   @NotNull
-  public LoaderObjectProxyRoutineBuilder with(@NotNull final ContextInvocationTarget<?> target) {
-    return new DefaultLoaderObjectProxyRoutineBuilderCompat(mContext, target);
+  public LoaderReflectionProxyRoutineBuilder with(
+      @NotNull final ContextInvocationTarget<?> target) {
+    return new DefaultLoaderReflectionProxyRoutineBuilderCompat(mContext, target);
   }
 
   /**
@@ -378,7 +379,7 @@ public class LoaderBuilderCompat {
    * class.
    * <br>
    * In order to customize the object creation, the caller must employ an implementation of a
-   * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
+   * {@link com.github.dm.jrt.android.reflect.builder.FactoryContext FactoryContext} as the
    * application Context.
    * <p>
    * Note that the built routine results will be always dispatched on the configured Looper thread,
@@ -388,7 +389,7 @@ public class LoaderBuilderCompat {
    * @return the routine builder instance.
    */
   @NotNull
-  public LoaderObjectProxyRoutineBuilder withClassOfType(@NotNull final Class<?> targetClass) {
+  public LoaderReflectionProxyRoutineBuilder withClassOfType(@NotNull final Class<?> targetClass) {
     return with(classOfType(targetClass));
   }
 
@@ -500,7 +501,7 @@ public class LoaderBuilderCompat {
    * object.
    * <br>
    * In order to customize the object creation, the caller must employ an implementation of a
-   * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
+   * {@link com.github.dm.jrt.android.reflect.builder.FactoryContext FactoryContext} as the
    * application Context.
    * <p>
    * Note that the built routine results will be always dispatched on the configured Looper thread,
@@ -510,7 +511,7 @@ public class LoaderBuilderCompat {
    * @return the routine builder instance.
    */
   @NotNull
-  public LoaderObjectProxyRoutineBuilder withInstanceOf(@NotNull final Class<?> targetClass) {
+  public LoaderReflectionProxyRoutineBuilder withInstanceOf(@NotNull final Class<?> targetClass) {
     return with(instanceOf(targetClass));
   }
 
@@ -519,7 +520,7 @@ public class LoaderBuilderCompat {
    * object.
    * <br>
    * In order to customize the object creation, the caller must employ an implementation of a
-   * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
+   * {@link com.github.dm.jrt.android.reflect.builder.FactoryContext FactoryContext} as the
    * application Context.
    * <p>
    * Note that the built routine results will be always dispatched on the configured Looper thread,
@@ -530,7 +531,7 @@ public class LoaderBuilderCompat {
    * @return the routine builder instance.
    */
   @NotNull
-  public LoaderObjectProxyRoutineBuilder withInstanceOf(@NotNull final Class<?> targetClass,
+  public LoaderReflectionProxyRoutineBuilder withInstanceOf(@NotNull final Class<?> targetClass,
       @Nullable final Object... factoryArgs) {
     return with(instanceOf(targetClass, factoryArgs));
   }

@@ -31,8 +31,8 @@ import java.util.Arrays;
 import java.util.Locale;
 
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
-import static com.github.dm.jrt.object.InvocationTarget.classOfType;
-import static com.github.dm.jrt.object.InvocationTarget.instance;
+import static com.github.dm.jrt.reflect.InvocationTarget.classOfType;
+import static com.github.dm.jrt.reflect.InvocationTarget.instance;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -281,7 +281,7 @@ public class RoutineMethodTest {
                             .applyInvocationConfiguration()
                             .withRunner(Runners.syncRunner())
                             .configured()
-                            .applyObjectConfiguration()
+                            .applyReflectionConfiguration()
                             .withSharedFields()
                             .configured()
                             .call()
@@ -298,7 +298,7 @@ public class RoutineMethodTest {
                             .applyInvocationConfiguration()
                             .withRunner(Runners.syncRunner())
                             .configured()
-                            .applyObjectConfiguration()
+                            .applyReflectionConfiguration()
                             .withSharedFields()
                             .configured()
                             .call()

@@ -36,7 +36,7 @@ import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Predicate;
 import com.github.dm.jrt.function.Supplier;
-import com.github.dm.jrt.object.InvocationTarget;
+import com.github.dm.jrt.reflect.InvocationTarget;
 import com.github.dm.jrt.stream.JRoutineStream;
 import com.github.dm.jrt.stream.builder.StreamBuilder;
 
@@ -54,8 +54,8 @@ import static com.github.dm.jrt.function.Functions.functionMapping;
 import static com.github.dm.jrt.function.Functions.predicateFilter;
 import static com.github.dm.jrt.function.Functions.supplierCommand;
 import static com.github.dm.jrt.function.Functions.supplierFactory;
-import static com.github.dm.jrt.object.InvocationTarget.classOfType;
-import static com.github.dm.jrt.object.InvocationTarget.instance;
+import static com.github.dm.jrt.reflect.InvocationTarget.classOfType;
+import static com.github.dm.jrt.reflect.InvocationTarget.instance;
 
 /**
  * Class acting as a fa&ccedil;ade of all the JRoutine library features.
@@ -354,8 +354,8 @@ public class JRoutine extends Channels {
    *                                            interface.
    */
   @NotNull
-  public static ObjectProxyRoutineBuilder with(@NotNull final InvocationTarget<?> target) {
-    return new DefaultObjectProxyRoutineBuilder(target);
+  public static ReflectionProxyRoutineBuilder with(@NotNull final InvocationTarget<?> target) {
+    return new DefaultReflectionProxyRoutineBuilder(target);
   }
 
   /**
@@ -391,7 +391,7 @@ public class JRoutine extends Channels {
    *                                            interface.
    */
   @NotNull
-  public static ObjectProxyRoutineBuilder with(@NotNull final Object object) {
+  public static ReflectionProxyRoutineBuilder with(@NotNull final Object object) {
     return (object instanceof Class) ? withClassOfType((Class<?>) object) : withInstance(object);
   }
 
@@ -438,7 +438,7 @@ public class JRoutine extends Channels {
    * @throws java.lang.IllegalArgumentException if the specified class represents an interface.
    */
   @NotNull
-  public static ObjectProxyRoutineBuilder withClassOfType(@NotNull final Class<?> targetClass) {
+  public static ReflectionProxyRoutineBuilder withClassOfType(@NotNull final Class<?> targetClass) {
     return with(classOfType(targetClass));
   }
 
@@ -509,7 +509,7 @@ public class JRoutine extends Channels {
    * @return the routine builder instance.
    */
   @NotNull
-  public static ObjectProxyRoutineBuilder withInstance(@NotNull final Object object) {
+  public static ReflectionProxyRoutineBuilder withInstance(@NotNull final Object object) {
     return with(instance(object));
   }
 

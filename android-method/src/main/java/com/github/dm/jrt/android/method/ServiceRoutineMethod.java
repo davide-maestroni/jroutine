@@ -26,8 +26,8 @@ import com.github.dm.jrt.android.core.config.ServiceConfigurable;
 import com.github.dm.jrt.android.core.config.ServiceConfiguration;
 import com.github.dm.jrt.android.core.config.ServiceConfiguration.Builder;
 import com.github.dm.jrt.android.core.invocation.ContextInvocation;
-import com.github.dm.jrt.android.object.ContextInvocationTarget;
-import com.github.dm.jrt.android.object.JRoutineServiceObject;
+import com.github.dm.jrt.android.reflect.ContextInvocationTarget;
+import com.github.dm.jrt.android.reflect.JRoutineServiceReflection;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.ChannelBuilder;
 import com.github.dm.jrt.core.channel.Channel;
@@ -41,8 +41,8 @@ import com.github.dm.jrt.core.util.Reflection;
 import com.github.dm.jrt.method.RoutineMethod;
 import com.github.dm.jrt.method.annotation.Input;
 import com.github.dm.jrt.method.annotation.Output;
-import com.github.dm.jrt.object.config.ObjectConfigurable;
-import com.github.dm.jrt.object.config.ObjectConfiguration;
+import com.github.dm.jrt.reflect.config.ReflectionConfigurable;
+import com.github.dm.jrt.reflect.config.ReflectionConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -164,7 +164,7 @@ public class ServiceRoutineMethod extends RoutineMethod
   }
 
   /**
-   * Builds a Service object routine method by wrapping the specified static method.
+   * Builds a Service reflection routine method by wrapping the specified static method.
    *
    * @param context the Service context.
    * @param method  the method.
@@ -172,7 +172,7 @@ public class ServiceRoutineMethod extends RoutineMethod
    * @throws java.lang.IllegalArgumentException if the specified method is not static.
    */
   @NotNull
-  public static ObjectServiceRoutineMethod from(@NotNull final ServiceContext context,
+  public static ReflectionServiceRoutineMethod from(@NotNull final ServiceContext context,
       @NotNull final Method method) {
     if (!Modifier.isStatic(method.getModifiers())) {
       throw new IllegalArgumentException("the method is not static: " + method);
@@ -182,7 +182,7 @@ public class ServiceRoutineMethod extends RoutineMethod
   }
 
   /**
-   * Builds a Service object routine method by wrapping a method of the specified target.
+   * Builds a Service reflection routine method by wrapping a method of the specified target.
    *
    * @param context the Service context.
    * @param target  the invocation target.
@@ -192,18 +192,18 @@ public class ServiceRoutineMethod extends RoutineMethod
    *                                            target instance.
    */
   @NotNull
-  public static ObjectServiceRoutineMethod from(@NotNull final ServiceContext context,
+  public static ReflectionServiceRoutineMethod from(@NotNull final ServiceContext context,
       @NotNull final ContextInvocationTarget<?> target, @NotNull final Method method) {
     if (!method.getDeclaringClass().isAssignableFrom(target.getTargetClass())) {
       throw new IllegalArgumentException(
           "the method is not applicable to the specified target class: " + target.getTargetClass());
     }
 
-    return new ObjectServiceRoutineMethod(context, target, method);
+    return new ReflectionServiceRoutineMethod(context, target, method);
   }
 
   /**
-   * Builds a Service object routine method by wrapping a method of the specified target.
+   * Builds a Service reflection routine method by wrapping a method of the specified target.
    *
    * @param context        the Service context.
    * @param target         the invocation target.
@@ -213,7 +213,7 @@ public class ServiceRoutineMethod extends RoutineMethod
    * @throws java.lang.NoSuchMethodException if no method with the specified signature is found.
    */
   @NotNull
-  public static ObjectServiceRoutineMethod from(@NotNull final ServiceContext context,
+  public static ReflectionServiceRoutineMethod from(@NotNull final ServiceContext context,
       @NotNull final ContextInvocationTarget<?> target, @NotNull final String name,
       @Nullable final Class<?>... parameterTypes) throws NoSuchMethodException {
     return from(context, target, target.getTargetClass().getMethod(name, parameterTypes));
@@ -402,8 +402,8 @@ public class ServiceRoutineMethod extends RoutineMethod
   /**
    * Implementation of a Service routine method wrapping an object method.
    */
-  public static class ObjectServiceRoutineMethod extends ServiceRoutineMethod
-      implements ObjectConfigurable<ObjectServiceRoutineMethod> {
+  public static class ReflectionServiceRoutineMethod extends ServiceRoutineMethod
+      implements ReflectionConfigurable<ReflectionServiceRoutineMethod> {
 
     private final ServiceContext mContext;
 
@@ -411,7 +411,7 @@ public class ServiceRoutineMethod extends RoutineMethod
 
     private final ContextInvocationTarget<?> mTarget;
 
-    private ObjectConfiguration mConfiguration = ObjectConfiguration.defaultConfiguration();
+    private ReflectionConfiguration mConfiguration = ReflectionConfiguration.defaultConfiguration();
 
     /**
      * Constructor.
@@ -420,7 +420,7 @@ public class ServiceRoutineMethod extends RoutineMethod
      * @param target  the invocation target.
      * @param method  the method instance.
      */
-    private ObjectServiceRoutineMethod(@NotNull final ServiceContext context,
+    private ReflectionServiceRoutineMethod(@NotNull final ServiceContext context,
         @NotNull final ContextInvocationTarget<?> target, @NotNull final Method method) {
       super(context, target, method);
       mContext = context;
@@ -430,16 +430,17 @@ public class ServiceRoutineMethod extends RoutineMethod
 
     @NotNull
     @Override
-    public ObjectServiceRoutineMethod apply(@NotNull final InvocationConfiguration configuration) {
-      return (ObjectServiceRoutineMethod) super.apply(configuration);
+    public ReflectionServiceRoutineMethod apply(
+        @NotNull final InvocationConfiguration configuration) {
+      return (ReflectionServiceRoutineMethod) super.apply(configuration);
     }
 
     @NotNull
     @Override
     @SuppressWarnings("unchecked")
-    public InvocationConfiguration.Builder<? extends ObjectServiceRoutineMethod>
+    public InvocationConfiguration.Builder<? extends ReflectionServiceRoutineMethod>
     applyInvocationConfiguration() {
-      return (InvocationConfiguration.Builder<? extends ObjectServiceRoutineMethod>) super
+      return (InvocationConfiguration.Builder<? extends ReflectionServiceRoutineMethod>) super
           .applyInvocationConfiguration();
     }
 
@@ -457,29 +458,32 @@ public class ServiceRoutineMethod extends RoutineMethod
 
     @NotNull
     @Override
-    public ObjectServiceRoutineMethod apply(@NotNull final ServiceConfiguration configuration) {
-      return (ObjectServiceRoutineMethod) super.apply(configuration);
+    public ReflectionServiceRoutineMethod apply(@NotNull final ServiceConfiguration configuration) {
+      return (ReflectionServiceRoutineMethod) super.apply(configuration);
     }
 
     @NotNull
     @Override
     @SuppressWarnings("unchecked")
-    public Builder<? extends ObjectServiceRoutineMethod> applyServiceConfiguration() {
-      return (Builder<? extends ObjectServiceRoutineMethod>) super.applyServiceConfiguration();
+    public Builder<? extends ReflectionServiceRoutineMethod> applyServiceConfiguration() {
+      return (Builder<? extends ReflectionServiceRoutineMethod>) super.applyServiceConfiguration();
     }
 
     @NotNull
     @Override
-    public ObjectServiceRoutineMethod apply(@NotNull final ObjectConfiguration configuration) {
-      mConfiguration = ConstantConditions.notNull("object configuration", configuration);
+    public ReflectionServiceRoutineMethod apply(
+        @NotNull final ReflectionConfiguration configuration) {
+      mConfiguration = ConstantConditions.notNull("reflection configuration", configuration);
       return this;
     }
 
     @NotNull
     @Override
-    public ObjectConfiguration.Builder<? extends ObjectServiceRoutineMethod>
-    applyObjectConfiguration() {
-      return new ObjectConfiguration.Builder<ObjectServiceRoutineMethod>(this, mConfiguration);
+    public ReflectionConfiguration.Builder<? extends ReflectionServiceRoutineMethod>
+    applyReflectionConfiguration() {
+
+      return new ReflectionConfiguration.Builder<ReflectionServiceRoutineMethod>(this,
+          mConfiguration);
     }
 
     @NotNull
@@ -493,12 +497,13 @@ public class ServiceRoutineMethod extends RoutineMethod
             method.getParameterTypes().length + "> but was <" + safeParams.length + ">");
       }
 
-      final Routine<Object, Object> routine = JRoutineServiceObject.on(mContext)
-                                                                   .with(mTarget)
-                                                                   .apply(getConfiguration())
-                                                                   .apply(getServiceConfiguration())
-                                                                   .apply(mConfiguration)
-                                                                   .method(method);
+      final Routine<Object, Object> routine = JRoutineServiceReflection.on(mContext)
+                                                                       .with(mTarget)
+                                                                       .apply(getConfiguration())
+                                                                       .apply(
+                                                                           getServiceConfiguration())
+                                                                       .apply(mConfiguration)
+                                                                       .method(method);
       final Channel<Object, Object> channel = mode.invoke(routine).sorted();
       for (final Object param : safeParams) {
         if (param instanceof Channel) {

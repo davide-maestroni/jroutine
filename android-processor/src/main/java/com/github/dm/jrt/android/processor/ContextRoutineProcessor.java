@@ -87,21 +87,21 @@ public class ContextRoutineProcessor extends RoutineProcessor {
   public synchronized void init(final ProcessingEnvironment processingEnv) {
     super.init(processingEnv);
     mCacheAnnotationType =
-        getMirrorFromName("com.github.dm.jrt.android.object.annotation.CacheStrategy");
+        getMirrorFromName("com.github.dm.jrt.android.reflect.annotation.CacheStrategy");
     mClashAnnotationType =
-        getMirrorFromName("com.github.dm.jrt.android.object.annotation.ClashResolution");
+        getMirrorFromName("com.github.dm.jrt.android.reflect.annotation.ClashResolution");
     mInvocationIdAnnotationType =
-        getMirrorFromName("com.github.dm.jrt.android.object.annotation.InvocationId");
+        getMirrorFromName("com.github.dm.jrt.android.reflect.annotation.InvocationId");
     mLoaderIdAnnotationType =
-        getMirrorFromName("com.github.dm.jrt.android.object.annotation.LoaderId");
+        getMirrorFromName("com.github.dm.jrt.android.reflect.annotation.LoaderId");
     mInputClashAnnotationType =
-        getMirrorFromName("com.github.dm.jrt.android.object.annotation.MatchResolution");
+        getMirrorFromName("com.github.dm.jrt.android.reflect.annotation.MatchResolution");
     mStaleTimeAnnotationType =
-        getMirrorFromName("com.github.dm.jrt.android.object.annotation.ResultStaleTime");
+        getMirrorFromName("com.github.dm.jrt.android.reflect.annotation.ResultStaleTime");
     mLogClassAnnotationType =
-        getMirrorFromName("com.github.dm.jrt.android.object.annotation.ServiceLog");
+        getMirrorFromName("com.github.dm.jrt.android.reflect.annotation.ServiceLog");
     mRunnerClassAnnotationType =
-        getMirrorFromName("com.github.dm.jrt.android.object.annotation.ServiceRunner");
+        getMirrorFromName("com.github.dm.jrt.android.reflect.annotation.ServiceRunner");
     final Types typeUtils = processingEnv.getTypeUtils();
     mServiceProxyElement = (TypeElement) typeUtils.asElement(
         getMirrorFromName("com.github.dm.jrt.android.proxy.annotation.ServiceProxy"));
@@ -121,11 +121,11 @@ public class ContextRoutineProcessor extends RoutineProcessor {
       builder.append("mRoutine").append(i).append(" = ").append("initRoutine").append(i);
       if (annotationElement == serviceProxyElement) {
         builder.append(
-            "(target, invocationConfiguration, objectConfiguration, serviceConfiguration);");
+            "(target, invocationConfiguration, reflectionConfiguration, serviceConfiguration);");
 
       } else {
         builder.append(
-            "(target, invocationConfiguration, objectConfiguration, loaderConfiguration);");
+            "(target, invocationConfiguration, reflectionConfiguration, loaderConfiguration);");
       }
 
       builder.append(NEW_LINE);

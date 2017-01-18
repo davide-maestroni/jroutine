@@ -31,8 +31,8 @@ import java.lang.annotation.Target;
  * interface will be generated according to the specific annotation attributes.
  * <p>
  * The routines used for calling the methods will honor the attributes specified in any optional
- * <i>{@code com.github.dm.jrt.object.annotation.*}</i> as well as
- * <i>{@code com.github.dm.jrt.android.object.annotation.*}</i> annotations defined for each
+ * <i>{@code com.github.dm.jrt.reflect.annotation.*}</i> as well as
+ * <i>{@code com.github.dm.jrt.android.reflect.annotation.*}</i> annotations defined for each
  * interface method.
  * <p>
  * See {@link com.github.dm.jrt.android.proxy.annotation.LoaderProxyCompat LoaderProxyCompat} for
@@ -57,9 +57,9 @@ import java.lang.annotation.Target;
  * <p>
  * Created by davide-maestroni on 05/06/2015.
  *
- * @see com.github.dm.jrt.android.object.annotation Android Annotations
- * @see com.github.dm.jrt.object.annotation Annotations
+ * @see com.github.dm.jrt.android.reflect.annotation Android Annotations
  * @see com.github.dm.jrt.proxy.annotation.Proxy Proxy
+ * @see com.github.dm.jrt.reflect.annotation Annotations
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

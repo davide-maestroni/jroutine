@@ -18,8 +18,8 @@ package com.github.dm.jrt.android.proxy.builder;
 
 import com.github.dm.jrt.android.core.config.ServiceConfigurable;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
-import com.github.dm.jrt.object.config.ObjectConfiguration;
 import com.github.dm.jrt.proxy.builder.ProxyObjectBuilder;
+import com.github.dm.jrt.reflect.config.ReflectionConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -46,7 +46,7 @@ public interface ServiceProxyObjectBuilder<TYPE>
    */
   @NotNull
   @Override
-  ServiceProxyObjectBuilder<TYPE> apply(@NotNull ObjectConfiguration configuration);
+  ServiceProxyObjectBuilder<TYPE> apply(@NotNull ReflectionConfiguration configuration);
 
   /**
    * {@inheritDoc}
@@ -61,13 +61,14 @@ public interface ServiceProxyObjectBuilder<TYPE>
    */
   @NotNull
   @Override
-  ObjectConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>> applyObjectConfiguration();
+  ReflectionConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>>
+  applyReflectionConfiguration();
 
   /**
    * Returns a proxy object enabling asynchronous call of the target instance methods.
    * <p>
    * The routines used for calling the methods will honor the attributes specified in any optional
-   * <i>{@code com.github.dm.jrt.object.annotation.*}</i> annotations.
+   * <i>{@code com.github.dm.jrt.reflect.annotation.*}</i> annotations.
    * <br>
    * Note that such annotations will override any configuration set through the builder.
    * <p>
@@ -78,7 +79,7 @@ public interface ServiceProxyObjectBuilder<TYPE>
    * to the specific project dependencies.
    *
    * @return the proxy object.
-   * @see com.github.dm.jrt.object.annotation Annotations
+   * @see com.github.dm.jrt.reflect.annotation Annotations
    */
   @NotNull
   @Override

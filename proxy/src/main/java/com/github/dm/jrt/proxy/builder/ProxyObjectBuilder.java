@@ -17,7 +17,7 @@
 package com.github.dm.jrt.proxy.builder;
 
 import com.github.dm.jrt.core.config.InvocationConfigurable;
-import com.github.dm.jrt.object.config.ObjectConfigurable;
+import com.github.dm.jrt.reflect.config.ReflectionConfigurable;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -29,7 +29,7 @@ import org.jetbrains.annotations.NotNull;
  * @param <TYPE> the interface type.
  */
 public interface ProxyObjectBuilder<TYPE> extends InvocationConfigurable<ProxyObjectBuilder<TYPE>>,
-    ObjectConfigurable<ProxyObjectBuilder<TYPE>> {
+    ReflectionConfigurable<ProxyObjectBuilder<TYPE>> {
 
   /**
    * Returns a proxy object enabling asynchronous call of the target instance methods.
@@ -43,7 +43,7 @@ public interface ProxyObjectBuilder<TYPE> extends InvocationConfigurable<ProxyOb
    * {@link com.github.dm.jrt.proxy.annotation.Proxy Proxy}.
    *
    * @return the proxy object.
-   * @see com.github.dm.jrt.object.annotation Annotations
+   * @see com.github.dm.jrt.reflect.annotation Annotations
    */
   @NotNull
   TYPE buildProxy();

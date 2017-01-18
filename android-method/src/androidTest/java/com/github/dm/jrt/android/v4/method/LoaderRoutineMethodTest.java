@@ -34,8 +34,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
 
-import static com.github.dm.jrt.android.object.ContextInvocationTarget.classOfType;
-import static com.github.dm.jrt.android.object.ContextInvocationTarget.instanceOf;
+import static com.github.dm.jrt.android.reflect.ContextInvocationTarget.classOfType;
+import static com.github.dm.jrt.android.reflect.ContextInvocationTarget.instanceOf;
 import static com.github.dm.jrt.android.v4.core.LoaderContextCompat.loaderFrom;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -337,7 +337,7 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
     assertThat(
         LoaderRoutineMethodCompat.from(loaderFrom(getActivity()), instanceOf(String.class, test),
             String.class.getMethod("toString"))
-                                 .applyObjectConfiguration()
+                                 .applyReflectionConfiguration()
                                  .withSharedFields()
                                  .configured()
                                  .call()
@@ -353,7 +353,7 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
     assertThat(
         LoaderRoutineMethodCompat.from(loaderFrom(getActivity()), instanceOf(String.class, test),
             "toString")
-                                 .applyObjectConfiguration()
+                                 .applyReflectionConfiguration()
                                  .withSharedFields()
                                  .configured()
                                  .call()

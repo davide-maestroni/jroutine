@@ -37,24 +37,24 @@ import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.runner.SyncRunner;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.DurationMeasure;
-import com.github.dm.jrt.object.JRoutineObject;
-import com.github.dm.jrt.object.annotation.Alias;
-import com.github.dm.jrt.object.annotation.AsyncInput;
-import com.github.dm.jrt.object.annotation.AsyncInput.InputMode;
-import com.github.dm.jrt.object.annotation.AsyncMethod;
-import com.github.dm.jrt.object.annotation.AsyncOutput;
-import com.github.dm.jrt.object.annotation.AsyncOutput.OutputMode;
-import com.github.dm.jrt.object.annotation.InputBackoff;
-import com.github.dm.jrt.object.annotation.InvocationRunner;
-import com.github.dm.jrt.object.annotation.Invoke;
-import com.github.dm.jrt.object.annotation.LogType;
-import com.github.dm.jrt.object.annotation.OutputBackoff;
-import com.github.dm.jrt.object.annotation.OutputTimeout;
-import com.github.dm.jrt.object.annotation.OutputTimeoutAction;
-import com.github.dm.jrt.object.annotation.Priority;
 import com.github.dm.jrt.proxy.annotation.Proxy;
 import com.github.dm.jrt.proxy.builder.ProxyObjectBuilder;
 import com.github.dm.jrt.proxy.builder.ProxyRoutineBuilder;
+import com.github.dm.jrt.reflect.JRoutineReflection;
+import com.github.dm.jrt.reflect.annotation.Alias;
+import com.github.dm.jrt.reflect.annotation.AsyncInput;
+import com.github.dm.jrt.reflect.annotation.AsyncInput.InputMode;
+import com.github.dm.jrt.reflect.annotation.AsyncMethod;
+import com.github.dm.jrt.reflect.annotation.AsyncOutput;
+import com.github.dm.jrt.reflect.annotation.AsyncOutput.OutputMode;
+import com.github.dm.jrt.reflect.annotation.InputBackoff;
+import com.github.dm.jrt.reflect.annotation.InvocationRunner;
+import com.github.dm.jrt.reflect.annotation.Invoke;
+import com.github.dm.jrt.reflect.annotation.LogType;
+import com.github.dm.jrt.reflect.annotation.OutputBackoff;
+import com.github.dm.jrt.reflect.annotation.OutputTimeout;
+import com.github.dm.jrt.reflect.annotation.OutputTimeoutAction;
+import com.github.dm.jrt.reflect.annotation.Priority;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -69,8 +69,8 @@ import java.util.concurrent.TimeUnit;
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builder;
 import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
-import static com.github.dm.jrt.object.InvocationTarget.classOfType;
-import static com.github.dm.jrt.object.InvocationTarget.instance;
+import static com.github.dm.jrt.reflect.InvocationTarget.classOfType;
+import static com.github.dm.jrt.reflect.InvocationTarget.instance;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -111,7 +111,7 @@ public class ProxyRoutineTest {
   public void testAnnotationGenerics() {
 
     final Size size = new Size();
-    final SizeItf proxy = JRoutineObject.with(instance(size)).buildProxy(SizeItf.class);
+    final SizeItf proxy = JRoutineReflection.with(instance(size)).buildProxy(SizeItf.class);
     assertThat(
         proxy.getSize(Arrays.asList("test1", "test2", "test3")).in(seconds(3)).next()).isEqualTo(3);
     assertThat(proxy.getSize()
@@ -285,7 +285,7 @@ public class ProxyRoutineTest {
     final TestProxy testProxy = builder.applyInvocationConfiguration()
                                        .with(configuration)
                                        .configured()
-                                       .applyObjectConfiguration()
+                                       .applyReflectionConfiguration()
                                        .withSharedFields()
                                        .configured()
                                        .buildProxy();
@@ -308,7 +308,7 @@ public class ProxyRoutineTest {
                             .applyInvocationConfiguration()
                             .with(configuration)
                             .configured()
-                            .applyObjectConfiguration()
+                            .applyReflectionConfiguration()
                             .withSharedFields()
                             .configured()
                             .buildProxy(tokenOf(TestProxy.class))).isSameAs(testProxy);
@@ -372,12 +372,12 @@ public class ProxyRoutineTest {
 
     long startTime = System.currentTimeMillis();
 
-    Channel<?, Integer> getOne = builder.applyObjectConfiguration()
+    Channel<?, Integer> getOne = builder.applyReflectionConfiguration()
                                         .withSharedFields("1")
                                         .configured()
                                         .buildProxy(TestClassAsync.class)
                                         .getOne();
-    Channel<?, Integer> getTwo = builder.applyObjectConfiguration()
+    Channel<?, Integer> getTwo = builder.applyReflectionConfiguration()
                                         .withSharedFields("2")
                                         .configured()
                                         .buildProxy(TestClassAsync.class)

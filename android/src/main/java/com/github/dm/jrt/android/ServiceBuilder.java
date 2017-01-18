@@ -20,7 +20,7 @@ import com.github.dm.jrt.android.core.JRoutineService;
 import com.github.dm.jrt.android.core.ServiceContext;
 import com.github.dm.jrt.android.core.builder.ServiceRoutineBuilder;
 import com.github.dm.jrt.android.core.invocation.TargetInvocationFactory;
-import com.github.dm.jrt.android.object.ContextInvocationTarget;
+import com.github.dm.jrt.android.reflect.ContextInvocationTarget;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.util.ClassToken;
@@ -30,8 +30,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static com.github.dm.jrt.android.core.invocation.TargetInvocationFactory.factoryOf;
-import static com.github.dm.jrt.android.object.ContextInvocationTarget.classOfType;
-import static com.github.dm.jrt.android.object.ContextInvocationTarget.instanceOf;
+import static com.github.dm.jrt.android.reflect.ContextInvocationTarget.classOfType;
+import static com.github.dm.jrt.android.reflect.ContextInvocationTarget.instanceOf;
 import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
 
 /**
@@ -181,7 +181,7 @@ public class ServiceBuilder {
    * specified target object.
    * <br>
    * In order to customize the object creation, the caller must employ an implementation of a
-   * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the routine
+   * {@link com.github.dm.jrt.android.reflect.builder.FactoryContext FactoryContext} as the routine
    * Service.
    * <p>
    * Note that the built routine results will be dispatched into the configured Looper, thus,
@@ -196,8 +196,9 @@ public class ServiceBuilder {
    * @return the routine builder instance.
    */
   @NotNull
-  public ServiceObjectProxyRoutineBuilder with(@NotNull final ContextInvocationTarget<?> target) {
-    return new DefaultServiceObjectProxyRoutineBuilder(mContext, target);
+  public ServiceReflectionProxyRoutineBuilder with(
+      @NotNull final ContextInvocationTarget<?> target) {
+    return new DefaultServiceReflectionProxyRoutineBuilder(mContext, target);
   }
 
   /**
@@ -226,7 +227,7 @@ public class ServiceBuilder {
    * Returns a builder of routines running in a Service, wrapping the specified target class.
    * <br>
    * In order to customize the object creation, the caller must employ an implementation of a
-   * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the routine
+   * {@link com.github.dm.jrt.android.reflect.builder.FactoryContext FactoryContext} as the routine
    * Service.
    * <p>
    * Note that the built routine results will be always dispatched on the configured Looper thread,
@@ -236,7 +237,7 @@ public class ServiceBuilder {
    * @return the routine builder instance.
    */
   @NotNull
-  public ServiceObjectProxyRoutineBuilder withClassOfType(@NotNull final Class<?> targetClass) {
+  public ServiceReflectionProxyRoutineBuilder withClassOfType(@NotNull final Class<?> targetClass) {
     return with(classOfType(targetClass));
   }
 
@@ -244,7 +245,7 @@ public class ServiceBuilder {
    * Returns a builder of routines running in a Service, wrapping the specified target object.
    * <br>
    * In order to customize the object creation, the caller must employ an implementation of a
-   * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the routine
+   * {@link com.github.dm.jrt.android.reflect.builder.FactoryContext FactoryContext} as the routine
    * Service.
    * <p>
    * Note that the built routine results will be always dispatched on the configured Looper thread,
@@ -254,7 +255,7 @@ public class ServiceBuilder {
    * @return the routine builder instance.
    */
   @NotNull
-  public ServiceObjectProxyRoutineBuilder withInstanceOf(@NotNull final Class<?> targetClass) {
+  public ServiceReflectionProxyRoutineBuilder withInstanceOf(@NotNull final Class<?> targetClass) {
     return with(instanceOf(targetClass));
   }
 
@@ -262,7 +263,7 @@ public class ServiceBuilder {
    * Returns a builder of routines running in a Service, wrapping the specified target object.
    * <br>
    * In order to customize the object creation, the caller must employ an implementation of a
-   * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the routine
+   * {@link com.github.dm.jrt.android.reflect.builder.FactoryContext FactoryContext} as the routine
    * Service.
    * <p>
    * Note that the built routine results will be always dispatched on the configured Looper thread,
@@ -273,7 +274,7 @@ public class ServiceBuilder {
    * @return the routine builder instance.
    */
   @NotNull
-  public ServiceObjectProxyRoutineBuilder withInstanceOf(@NotNull final Class<?> targetClass,
+  public ServiceReflectionProxyRoutineBuilder withInstanceOf(@NotNull final Class<?> targetClass,
       @Nullable final Object... factoryArgs) {
     return with(instanceOf(targetClass, factoryArgs));
   }

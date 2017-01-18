@@ -24,7 +24,7 @@ import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;
-import com.github.dm.jrt.object.config.ObjectConfiguration;
+import com.github.dm.jrt.reflect.config.ReflectionConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -51,7 +51,8 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
   private InvocationConfiguration mInvocationConfiguration =
       InvocationConfiguration.defaultConfiguration();
 
-  private ObjectConfiguration mObjectConfiguration = ObjectConfiguration.defaultConfiguration();
+  private ReflectionConfiguration mReflectionConfiguration =
+      ReflectionConfiguration.defaultConfiguration();
 
   private ServiceConfiguration mServiceConfiguration = ServiceConfiguration.defaultConfiguration();
 
@@ -73,8 +74,10 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
 
   @NotNull
   @Override
-  public ServiceProxyObjectBuilder<TYPE> apply(@NotNull final ObjectConfiguration configuration) {
-    mObjectConfiguration = ConstantConditions.notNull("object configuration", configuration);
+  public ServiceProxyObjectBuilder<TYPE> apply(
+      @NotNull final ReflectionConfiguration configuration) {
+    mReflectionConfiguration =
+        ConstantConditions.notNull("reflection configuration", configuration);
     return this;
   }
 
@@ -97,16 +100,16 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
 
   @NotNull
   @Override
-  public ObjectConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>>
-  applyObjectConfiguration() {
-    final ObjectConfiguration config = mObjectConfiguration;
-    return new ObjectConfiguration.Builder<ServiceProxyObjectBuilder<TYPE>>(
-        new ObjectConfiguration.Configurable<ServiceProxyObjectBuilder<TYPE>>() {
+  public ReflectionConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>>
+  applyReflectionConfiguration() {
+    final ReflectionConfiguration config = mReflectionConfiguration;
+    return new ReflectionConfiguration.Builder<ServiceProxyObjectBuilder<TYPE>>(
+        new ReflectionConfiguration.Configurable<ServiceProxyObjectBuilder<TYPE>>() {
 
           @NotNull
           @Override
           public ServiceProxyObjectBuilder<TYPE> apply(
-              @NotNull final ObjectConfiguration configuration) {
+              @NotNull final ReflectionConfiguration configuration) {
             return AbstractServiceProxyObjectBuilder.this.apply(configuration);
           }
         }, config);
@@ -138,10 +141,10 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
       }
 
       final InvocationConfiguration invocationConfiguration = mInvocationConfiguration;
-      final ObjectConfiguration objectConfiguration = mObjectConfiguration;
+      final ReflectionConfiguration reflectionConfiguration = mReflectionConfiguration;
       final ServiceConfiguration serviceConfiguration = mServiceConfiguration;
       final ProxyInfo proxyInfo =
-          new ProxyInfo(getInterfaceClass(), invocationConfiguration, objectConfiguration,
+          new ProxyInfo(getInterfaceClass(), invocationConfiguration, reflectionConfiguration,
               serviceConfiguration);
       final Object instance = proxies.get(proxyInfo);
       if (instance != null) {
@@ -150,7 +153,7 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
 
       try {
         final TYPE newInstance =
-            newProxy(invocationConfiguration, objectConfiguration, serviceConfiguration);
+            newProxy(invocationConfiguration, reflectionConfiguration, serviceConfiguration);
         proxies.put(proxyInfo, newInstance);
         return newInstance;
 
@@ -199,14 +202,14 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
    * Creates and return a new proxy instance.
    *
    * @param invocationConfiguration the invocation configuration.
-   * @param objectConfiguration     the object configuration.
+   * @param reflectionConfiguration the reflection configuration.
    * @param serviceConfiguration    the Service configuration.
    * @return the proxy instance.
    * @throws java.lang.Exception if an unexpected error occurs.
    */
   @NotNull
   protected abstract TYPE newProxy(@NotNull InvocationConfiguration invocationConfiguration,
-      @NotNull ObjectConfiguration objectConfiguration,
+      @NotNull ReflectionConfiguration reflectionConfiguration,
       @NotNull ServiceConfiguration serviceConfiguration) throws Exception;
 
   /**
@@ -219,14 +222,14 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
      *
      * @param itf                     the proxy interface class.
      * @param invocationConfiguration the invocation configuration.
-     * @param objectConfiguration     the object configuration.
+     * @param reflectionConfiguration the reflection configuration.
      * @param serviceConfiguration    the Service configuration.
      */
     private ProxyInfo(@NotNull final Class<?> itf,
         @NotNull final InvocationConfiguration invocationConfiguration,
-        @NotNull final ObjectConfiguration objectConfiguration,
+        @NotNull final ReflectionConfiguration reflectionConfiguration,
         @NotNull final ServiceConfiguration serviceConfiguration) {
-      super(asArgs(itf, invocationConfiguration, objectConfiguration, serviceConfiguration));
+      super(asArgs(itf, invocationConfiguration, reflectionConfiguration, serviceConfiguration));
     }
   }
 }

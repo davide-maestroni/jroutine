@@ -33,8 +33,8 @@ dependencies {
 
 conditionalDependencies {
   compile name: 'core', version: '6.1.0'
-  compile name: 'object', version: '6.1.0'
   compile name: 'processor', version: '6.1.0'
+  compile name: 'reflect', version: '6.1.0'
 }
 
 jacocoTestReport {
@@ -56,6 +56,6 @@ javadoc {
   def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/6'
   options.overview("${project.projectDir}/docs/overview.html")
   options.links("${prefix}/core/",
-      "${prefix}/object/",
-      "${prefix}/processor/")
+      "${prefix}/processor/",
+      "${prefix}/reflect/")
 }

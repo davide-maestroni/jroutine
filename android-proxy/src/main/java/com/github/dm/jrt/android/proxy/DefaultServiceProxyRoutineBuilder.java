@@ -20,15 +20,15 @@ import android.content.Context;
 
 import com.github.dm.jrt.android.core.ServiceContext;
 import com.github.dm.jrt.android.core.config.ServiceConfiguration;
-import com.github.dm.jrt.android.object.ContextInvocationTarget;
 import com.github.dm.jrt.android.proxy.annotation.ServiceProxy;
 import com.github.dm.jrt.android.proxy.builder.AbstractServiceProxyObjectBuilder;
 import com.github.dm.jrt.android.proxy.builder.ServiceProxyRoutineBuilder;
+import com.github.dm.jrt.android.reflect.ContextInvocationTarget;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.object.config.ObjectConfiguration;
 import com.github.dm.jrt.proxy.annotation.Proxy;
+import com.github.dm.jrt.reflect.config.ReflectionConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -51,7 +51,8 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder {
   private InvocationConfiguration mInvocationConfiguration =
       InvocationConfiguration.defaultConfiguration();
 
-  private ObjectConfiguration mObjectConfiguration = ObjectConfiguration.defaultConfiguration();
+  private ReflectionConfiguration mReflectionConfiguration =
+      ReflectionConfiguration.defaultConfiguration();
 
   private ServiceConfiguration mServiceConfiguration = ServiceConfiguration.defaultConfiguration();
 
@@ -84,8 +85,9 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder {
 
   @NotNull
   @Override
-  public ServiceProxyRoutineBuilder apply(@NotNull final ObjectConfiguration configuration) {
-    mObjectConfiguration = ConstantConditions.notNull("object configuration", configuration);
+  public ServiceProxyRoutineBuilder apply(@NotNull final ReflectionConfiguration configuration) {
+    mReflectionConfiguration =
+        ConstantConditions.notNull("reflection configuration", configuration);
     return this;
   }
 
@@ -108,16 +110,16 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder {
 
   @NotNull
   @Override
-  public ObjectConfiguration.Builder<? extends ServiceProxyRoutineBuilder>
-  applyObjectConfiguration() {
-    final ObjectConfiguration config = mObjectConfiguration;
-    return new ObjectConfiguration.Builder<ServiceProxyRoutineBuilder>(
-        new ObjectConfiguration.Configurable<ServiceProxyRoutineBuilder>() {
+  public ReflectionConfiguration.Builder<? extends ServiceProxyRoutineBuilder>
+  applyReflectionConfiguration() {
+    final ReflectionConfiguration config = mReflectionConfiguration;
+    return new ReflectionConfiguration.Builder<ServiceProxyRoutineBuilder>(
+        new ReflectionConfiguration.Configurable<ServiceProxyRoutineBuilder>() {
 
           @NotNull
           @Override
           public ServiceProxyRoutineBuilder apply(
-              @NotNull final ObjectConfiguration configuration) {
+              @NotNull final ReflectionConfiguration configuration) {
             return DefaultServiceProxyRoutineBuilder.this.apply(configuration);
           }
         }, config);
@@ -140,7 +142,7 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder {
     final TargetServiceProxyObjectBuilder<TYPE> builder =
         new TargetServiceProxyObjectBuilder<TYPE>(mContext, mTarget, itf);
     return builder.apply(mInvocationConfiguration)
-                  .apply(mObjectConfiguration)
+                  .apply(mReflectionConfiguration)
                   .apply(mServiceConfiguration)
                   .buildProxy();
   }
@@ -210,7 +212,7 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder {
     @Override
     @SuppressWarnings("unchecked")
     protected TYPE newProxy(@NotNull final InvocationConfiguration invocationConfiguration,
-        @NotNull final ObjectConfiguration objectConfiguration,
+        @NotNull final ReflectionConfiguration reflectionConfiguration,
         @NotNull final ServiceConfiguration serviceConfiguration) throws Exception {
       final ServiceContext context = mContext;
       final ContextInvocationTarget<?> target = mTarget;
@@ -239,9 +241,9 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder {
           packageName + annotation.classPrefix() + className + annotation.classSuffix();
       final Constructor<?> constructor =
           findBestMatchingConstructor(Class.forName(fullClassName), context, target,
-              invocationConfiguration, objectConfiguration, serviceConfiguration);
+              invocationConfiguration, reflectionConfiguration, serviceConfiguration);
       return (TYPE) constructor.newInstance(context, target, invocationConfiguration,
-          objectConfiguration, serviceConfiguration);
+          reflectionConfiguration, serviceConfiguration);
     }
   }
 }

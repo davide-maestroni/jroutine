@@ -23,7 +23,7 @@ import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;
-import com.github.dm.jrt.object.config.ObjectConfiguration;
+import com.github.dm.jrt.reflect.config.ReflectionConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -51,7 +51,8 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
 
   private LoaderConfiguration mLoaderConfiguration = LoaderConfiguration.defaultConfiguration();
 
-  private ObjectConfiguration mObjectConfiguration = ObjectConfiguration.defaultConfiguration();
+  private ReflectionConfiguration mReflectionConfiguration =
+      ReflectionConfiguration.defaultConfiguration();
 
   @NotNull
   @Override
@@ -71,8 +72,10 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
 
   @NotNull
   @Override
-  public LoaderProxyObjectBuilder<TYPE> apply(@NotNull final ObjectConfiguration configuration) {
-    mObjectConfiguration = ConstantConditions.notNull("object configuration", configuration);
+  public LoaderProxyObjectBuilder<TYPE> apply(
+      @NotNull final ReflectionConfiguration configuration) {
+    mReflectionConfiguration =
+        ConstantConditions.notNull("reflection configuration", configuration);
     return this;
   }
 
@@ -95,16 +98,16 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
 
   @NotNull
   @Override
-  public ObjectConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>>
-  applyObjectConfiguration() {
-    final ObjectConfiguration config = mObjectConfiguration;
-    return new ObjectConfiguration.Builder<LoaderProxyObjectBuilder<TYPE>>(
-        new ObjectConfiguration.Configurable<LoaderProxyObjectBuilder<TYPE>>() {
+  public ReflectionConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>>
+  applyReflectionConfiguration() {
+    final ReflectionConfiguration config = mReflectionConfiguration;
+    return new ReflectionConfiguration.Builder<LoaderProxyObjectBuilder<TYPE>>(
+        new ReflectionConfiguration.Configurable<LoaderProxyObjectBuilder<TYPE>>() {
 
           @NotNull
           @Override
           public LoaderProxyObjectBuilder<TYPE> apply(
-              @NotNull final ObjectConfiguration configuration) {
+              @NotNull final ReflectionConfiguration configuration) {
             return AbstractLoaderProxyObjectBuilder.this.apply(configuration);
           }
         }, config);
@@ -136,10 +139,10 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
       }
 
       final InvocationConfiguration invocationConfiguration = mInvocationConfiguration;
-      final ObjectConfiguration objectConfiguration = mObjectConfiguration;
+      final ReflectionConfiguration reflectionConfiguration = mReflectionConfiguration;
       final LoaderConfiguration loaderConfiguration = mLoaderConfiguration;
       final ProxyInfo proxyInfo =
-          new ProxyInfo(getInterfaceClass(), invocationConfiguration, objectConfiguration,
+          new ProxyInfo(getInterfaceClass(), invocationConfiguration, reflectionConfiguration,
               loaderConfiguration);
       final Object instance = proxies.get(proxyInfo);
       if (instance != null) {
@@ -154,7 +157,7 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
 
       try {
         final TYPE newInstance =
-            newProxy(invocationConfiguration, objectConfiguration, loaderConfiguration);
+            newProxy(invocationConfiguration, reflectionConfiguration, loaderConfiguration);
         proxies.put(proxyInfo, newInstance);
         return newInstance;
 
@@ -203,14 +206,14 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
    * Creates and return a new proxy instance.
    *
    * @param invocationConfiguration the invocation configuration.
-   * @param objectConfiguration     the object configuration.
+   * @param reflectionConfiguration the reflection configuration.
    * @param loaderConfiguration     the Loader configuration.
    * @return the proxy instance.
    * @throws java.lang.Exception if an unexpected error occurs.
    */
   @NotNull
   protected abstract TYPE newProxy(@NotNull InvocationConfiguration invocationConfiguration,
-      @NotNull ObjectConfiguration objectConfiguration,
+      @NotNull ReflectionConfiguration reflectionConfiguration,
       @NotNull LoaderConfiguration loaderConfiguration) throws Exception;
 
   /**
@@ -223,14 +226,14 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
      *
      * @param itf                     the proxy interface class.
      * @param invocationConfiguration the invocation configuration.
-     * @param objectConfiguration     the object configuration.
+     * @param reflectionConfiguration the reflection configuration.
      * @param loaderConfiguration     the Loader configuration.
      */
     private ProxyInfo(@NotNull final Class<?> itf,
         @NotNull final InvocationConfiguration invocationConfiguration,
-        @NotNull final ObjectConfiguration objectConfiguration,
+        @NotNull final ReflectionConfiguration reflectionConfiguration,
         @NotNull final LoaderConfiguration loaderConfiguration) {
-      super(asArgs(itf, invocationConfiguration, objectConfiguration, loaderConfiguration));
+      super(asArgs(itf, invocationConfiguration, reflectionConfiguration, loaderConfiguration));
     }
   }
 }

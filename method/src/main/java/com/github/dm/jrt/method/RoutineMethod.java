@@ -34,10 +34,10 @@ import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.Reflection;
 import com.github.dm.jrt.method.annotation.Input;
 import com.github.dm.jrt.method.annotation.Output;
-import com.github.dm.jrt.object.InvocationTarget;
-import com.github.dm.jrt.object.JRoutineObject;
-import com.github.dm.jrt.object.config.ObjectConfigurable;
-import com.github.dm.jrt.object.config.ObjectConfiguration;
+import com.github.dm.jrt.reflect.InvocationTarget;
+import com.github.dm.jrt.reflect.JRoutineReflection;
+import com.github.dm.jrt.reflect.config.ReflectionConfigurable;
+import com.github.dm.jrt.reflect.config.ReflectionConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -464,14 +464,14 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
   }
 
   /**
-   * Builds an object routine method by wrapping the specified static method.
+   * Builds a reflection routine method by wrapping the specified static method.
    *
    * @param method the method.
    * @return the routine method instance.
    * @throws java.lang.IllegalArgumentException if the specified method is not static.
    */
   @NotNull
-  public static ObjectRoutineMethod from(@NotNull final Method method) {
+  public static ReflectionRoutineMethod from(@NotNull final Method method) {
     if (!Modifier.isStatic(method.getModifiers())) {
       throw new IllegalArgumentException("the method is not static: " + method);
     }
@@ -480,7 +480,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
   }
 
   /**
-   * Builds an object routine method by wrapping a method of the specified target.
+   * Builds a reflection routine method by wrapping a method of the specified target.
    *
    * @param target the invocation target.
    * @param method the method.
@@ -489,18 +489,18 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
    *                                            target instance.
    */
   @NotNull
-  public static ObjectRoutineMethod from(@NotNull final InvocationTarget<?> target,
+  public static ReflectionRoutineMethod from(@NotNull final InvocationTarget<?> target,
       @NotNull final Method method) {
     if (!method.getDeclaringClass().isAssignableFrom(target.getTargetClass())) {
       throw new IllegalArgumentException(
           "the method is not applicable to the specified target class: " + target.getTargetClass());
     }
 
-    return new ObjectRoutineMethod(target, method);
+    return new ReflectionRoutineMethod(target, method);
   }
 
   /**
-   * Builds an object routine method by wrapping a method of the specified target.
+   * Builds a reflection routine method by wrapping a method of the specified target.
    *
    * @param target         the invocation target.
    * @param name           the method name.
@@ -509,7 +509,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
    * @throws java.lang.NoSuchMethodException if no method with the specified signature is found.
    */
   @NotNull
-  public static ObjectRoutineMethod from(@NotNull final InvocationTarget<?> target,
+  public static ReflectionRoutineMethod from(@NotNull final InvocationTarget<?> target,
       @NotNull final String name, @Nullable final Class<?>... parameterTypes) throws
       NoSuchMethodException {
     return from(target, target.getTargetClass().getMethod(name, parameterTypes));
@@ -769,14 +769,14 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
   /**
    * Implementation of a routine method wrapping an object method.
    */
-  public static class ObjectRoutineMethod extends RoutineMethod
-      implements ObjectConfigurable<ObjectRoutineMethod> {
+  public static class ReflectionRoutineMethod extends RoutineMethod
+      implements ReflectionConfigurable<ReflectionRoutineMethod> {
 
     private final Method mMethod;
 
     private final InvocationTarget<?> mTarget;
 
-    private ObjectConfiguration mConfiguration = ObjectConfiguration.defaultConfiguration();
+    private ReflectionConfiguration mConfiguration = ReflectionConfiguration.defaultConfiguration();
 
     /**
      * Constructor.
@@ -784,29 +784,29 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
      * @param target the invocation target.
      * @param method the method instance.
      */
-    private ObjectRoutineMethod(@NotNull final InvocationTarget<?> target,
+    private ReflectionRoutineMethod(@NotNull final InvocationTarget<?> target,
         @NotNull final Method method) {
       mTarget = target;
       mMethod = method;
     }
 
     @NotNull
-    public ObjectRoutineMethod apply(@NotNull final ObjectConfiguration configuration) {
-      mConfiguration = ConstantConditions.notNull("object configuration", configuration);
+    public ReflectionRoutineMethod apply(@NotNull final ReflectionConfiguration configuration) {
+      mConfiguration = ConstantConditions.notNull("reflection configuration", configuration);
       return this;
     }
 
     @NotNull
     @Override
-    public ObjectRoutineMethod apply(@NotNull final InvocationConfiguration configuration) {
-      return (ObjectRoutineMethod) super.apply(configuration);
+    public ReflectionRoutineMethod apply(@NotNull final InvocationConfiguration configuration) {
+      return (ReflectionRoutineMethod) super.apply(configuration);
     }
 
     @NotNull
     @Override
     @SuppressWarnings("unchecked")
-    public Builder<? extends ObjectRoutineMethod> applyInvocationConfiguration() {
-      return (Builder<? extends ObjectRoutineMethod>) super.applyInvocationConfiguration();
+    public Builder<? extends ReflectionRoutineMethod> applyInvocationConfiguration() {
+      return (Builder<? extends ReflectionRoutineMethod>) super.applyInvocationConfiguration();
     }
 
     @NotNull
@@ -822,8 +822,9 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
     }
 
     @NotNull
-    public ObjectConfiguration.Builder<? extends ObjectRoutineMethod> applyObjectConfiguration() {
-      return new ObjectConfiguration.Builder<ObjectRoutineMethod>(this, mConfiguration);
+    public ReflectionConfiguration.Builder<? extends ReflectionRoutineMethod>
+    applyReflectionConfiguration() {
+      return new ReflectionConfiguration.Builder<ReflectionRoutineMethod>(this, mConfiguration);
     }
 
     @NotNull
@@ -837,10 +838,10 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
             method.getParameterTypes().length + "> but was <" + safeParams.length + ">");
       }
 
-      final Routine<Object, Object> routine = JRoutineObject.with(mTarget)
-                                                            .apply(getConfiguration())
-                                                            .apply(mConfiguration)
-                                                            .method(method);
+      final Routine<Object, Object> routine = JRoutineReflection.with(mTarget)
+                                                                .apply(getConfiguration())
+                                                                .apply(mConfiguration)
+                                                                .method(method);
       final Channel<Object, Object> channel = mode.invoke(routine).sorted();
       for (final Object param : safeParams) {
         if (param instanceof Channel) {

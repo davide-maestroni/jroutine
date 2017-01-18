@@ -17,8 +17,8 @@
 package com.github.dm.jrt.proxy;
 
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.object.InvocationTarget;
 import com.github.dm.jrt.proxy.builder.ProxyRoutineBuilder;
+import com.github.dm.jrt.reflect.InvocationTarget;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -34,8 +34,8 @@ import org.jetbrains.annotations.NotNull;
  * <p>
  * Created by davide-maestroni on 03/23/2015.
  *
- * @see com.github.dm.jrt.object.annotation Annotations
  * @see com.github.dm.jrt.proxy.annotation.Proxy Proxy
+ * @see com.github.dm.jrt.reflect.annotation Annotations
  */
 public class JRoutineProxy {
 

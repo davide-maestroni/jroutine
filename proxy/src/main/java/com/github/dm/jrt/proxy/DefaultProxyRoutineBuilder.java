@@ -19,11 +19,11 @@ package com.github.dm.jrt.proxy;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.object.InvocationTarget;
-import com.github.dm.jrt.object.config.ObjectConfiguration;
 import com.github.dm.jrt.proxy.annotation.Proxy;
 import com.github.dm.jrt.proxy.builder.AbstractProxyObjectBuilder;
 import com.github.dm.jrt.proxy.builder.ProxyRoutineBuilder;
+import com.github.dm.jrt.reflect.InvocationTarget;
+import com.github.dm.jrt.reflect.config.ReflectionConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -44,7 +44,8 @@ class DefaultProxyRoutineBuilder implements ProxyRoutineBuilder {
   private InvocationConfiguration mInvocationConfiguration =
       InvocationConfiguration.defaultConfiguration();
 
-  private ObjectConfiguration mObjectConfiguration = ObjectConfiguration.defaultConfiguration();
+  private ReflectionConfiguration mReflectionConfiguration =
+      ReflectionConfiguration.defaultConfiguration();
 
   /**
    * Constructor.
@@ -71,8 +72,9 @@ class DefaultProxyRoutineBuilder implements ProxyRoutineBuilder {
   }
 
   @NotNull
-  public ProxyRoutineBuilder apply(@NotNull final ObjectConfiguration configuration) {
-    mObjectConfiguration = ConstantConditions.notNull("object configuration", configuration);
+  public ProxyRoutineBuilder apply(@NotNull final ReflectionConfiguration configuration) {
+    mReflectionConfiguration =
+        ConstantConditions.notNull("reflection configuration", configuration);
     return this;
   }
 
@@ -84,9 +86,10 @@ class DefaultProxyRoutineBuilder implements ProxyRoutineBuilder {
   }
 
   @NotNull
-  public ObjectConfiguration.Builder<? extends ProxyRoutineBuilder> applyObjectConfiguration() {
-    final ObjectConfiguration config = mObjectConfiguration;
-    return new ObjectConfiguration.Builder<ProxyRoutineBuilder>(this, config);
+  public ReflectionConfiguration.Builder<? extends ProxyRoutineBuilder>
+  applyReflectionConfiguration() {
+    final ReflectionConfiguration config = mReflectionConfiguration;
+    return new ReflectionConfiguration.Builder<ProxyRoutineBuilder>(this, config);
   }
 
   @NotNull
@@ -103,7 +106,7 @@ class DefaultProxyRoutineBuilder implements ProxyRoutineBuilder {
     }
 
     final TargetProxyObjectBuilder<TYPE> builder = new TargetProxyObjectBuilder<TYPE>(mTarget, itf);
-    return builder.apply(mInvocationConfiguration).apply(mObjectConfiguration).buildProxy();
+    return builder.apply(mInvocationConfiguration).apply(mReflectionConfiguration).buildProxy();
   }
 
   @NotNull
@@ -150,7 +153,7 @@ class DefaultProxyRoutineBuilder implements ProxyRoutineBuilder {
     @Override
     @SuppressWarnings("unchecked")
     protected TYPE newProxy(@NotNull final InvocationConfiguration invocationConfiguration,
-        @NotNull final ObjectConfiguration objectConfiguration) throws Exception {
+        @NotNull final ReflectionConfiguration reflectionConfiguration) throws Exception {
       final Object target = mTarget;
       final Class<? super TYPE> interfaceClass = mInterfaceClass;
       final Proxy annotation = interfaceClass.getAnnotation(Proxy.class);
@@ -177,8 +180,9 @@ class DefaultProxyRoutineBuilder implements ProxyRoutineBuilder {
           packageName + annotation.classPrefix() + className + annotation.classSuffix();
       final Constructor<?> constructor =
           findBestMatchingConstructor(Class.forName(fullClassName), target, invocationConfiguration,
-              objectConfiguration);
-      return (TYPE) constructor.newInstance(target, invocationConfiguration, objectConfiguration);
+              reflectionConfiguration);
+      return (TYPE) constructor.newInstance(target, invocationConfiguration,
+          reflectionConfiguration);
     }
   }
 }

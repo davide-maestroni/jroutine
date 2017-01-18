@@ -19,7 +19,7 @@ package com.github.dm.jrt.retrofit;
 import com.github.dm.jrt.core.config.InvocationConfigurable;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.object.builder.Builders;
+import com.github.dm.jrt.reflect.builder.Builders;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

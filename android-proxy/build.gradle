@@ -74,11 +74,11 @@ dependencies {
 
 conditionalDependencies {
   compile name: 'android-core', version: '6.1.0'
-  compile name: 'android-object', version: '6.1.0'
   compile name: 'android-processor', version: '6.1.0'
+  compile name: 'android-reflect', version: '6.1.0'
   compile name: 'core', version: '6.1.0'
-  compile name: 'object', version: '6.1.0'
   compile name: 'proxy', version: '6.1.0'
+  compile name: 'reflect', version: '6.1.0'
 }
 
 jacoco {
@@ -93,10 +93,10 @@ tasks.withType(Javadoc) {
   def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/6'
   options.overview("${project.projectDir}/docs/overview.html")
   options.links("${prefix}/android-core/",
-      "${prefix}/android-object/",
       "${prefix}/android-processor/",
+      "${prefix}/android-reflect/",
       "${prefix}/core/",
-      "${prefix}/object/",
       "${prefix}/processor/",
-      "${prefix}/proxy/")
+      "${prefix}/proxy/",
+      "${prefix}/reflect/")
 }

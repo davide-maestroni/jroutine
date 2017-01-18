@@ -78,10 +78,10 @@ dependencies {
 conditionalDependencies {
   compile name: 'android-channel', version: '6.1.0'
   compile name: 'android-core', version: '6.1.0'
-  compile name: 'android-object', version: '6.1.0'
+  compile name: 'android-reflect', version: '6.1.0'
   compile name: 'android-stream', version: '6.1.0'
   compile name: 'core', version: '6.1.0'
-  compile name: 'object', version: '6.1.0'
+  compile name: 'reflect', version: '6.1.0'
   compile name: 'retrofit', version: '6.1.0'
   compile name: 'stream', version: '6.1.0'
 }
@@ -105,11 +105,11 @@ tasks.withType(Javadoc) {
       'https://square.github.io/retrofit/2.x/retrofit/',
       "${prefix}/android-channel/",
       "${prefix}/android-core/",
-      "${prefix}/android-object/",
+      "${prefix}/android-reflect/",
       "${prefix}/android-stream/",
       "${prefix}/core/",
       "${prefix}/function/",
-      "${prefix}/object/",
+      "${prefix}/reflect/",
       "${prefix}/retrofit/",
       "${prefix}/stream/")
 }

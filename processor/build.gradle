@@ -27,7 +27,7 @@ compileTestJavaCompatibility = JavaVersion.VERSION_1_7
 
 conditionalDependencies {
   compile name: 'core', version: '6.1.0'
-  compile name: 'object', version: '6.1.0'
+  compile name: 'reflect', version: '6.1.0'
 }
 
 findbugs {
@@ -37,7 +37,7 @@ findbugs {
 javadoc {
   def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/6'
   options.overview("${project.projectDir}/docs/overview.html")
-  options.links("${prefix}/core/", "${prefix}/object/")
+  options.links("${prefix}/core/", "${prefix}/reflect/")
 }
 
 tasks.withType(FindBugs) {

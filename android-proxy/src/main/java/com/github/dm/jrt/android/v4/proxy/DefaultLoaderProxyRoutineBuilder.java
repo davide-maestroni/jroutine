@@ -17,16 +17,16 @@
 package com.github.dm.jrt.android.v4.proxy;
 
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
-import com.github.dm.jrt.android.object.ContextInvocationTarget;
 import com.github.dm.jrt.android.proxy.annotation.LoaderProxyCompat;
 import com.github.dm.jrt.android.proxy.builder.AbstractLoaderProxyObjectBuilder;
 import com.github.dm.jrt.android.proxy.builder.LoaderProxyRoutineBuilder;
+import com.github.dm.jrt.android.reflect.ContextInvocationTarget;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.object.config.ObjectConfiguration;
 import com.github.dm.jrt.proxy.annotation.Proxy;
+import com.github.dm.jrt.reflect.config.ReflectionConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -51,7 +51,8 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder {
 
   private LoaderConfiguration mLoaderConfiguration = LoaderConfiguration.defaultConfiguration();
 
-  private ObjectConfiguration mObjectConfiguration = ObjectConfiguration.defaultConfiguration();
+  private ReflectionConfiguration mReflectionConfiguration =
+      ReflectionConfiguration.defaultConfiguration();
 
   /**
    * Constructor.
@@ -82,8 +83,9 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder {
 
   @NotNull
   @Override
-  public LoaderProxyRoutineBuilder apply(@NotNull final ObjectConfiguration configuration) {
-    mObjectConfiguration = ConstantConditions.notNull("object configuration", configuration);
+  public LoaderProxyRoutineBuilder apply(@NotNull final ReflectionConfiguration configuration) {
+    mReflectionConfiguration =
+        ConstantConditions.notNull("reflection configuration", configuration);
     return this;
   }
 
@@ -106,15 +108,16 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder {
 
   @NotNull
   @Override
-  public ObjectConfiguration.Builder<? extends LoaderProxyRoutineBuilder>
-  applyObjectConfiguration() {
-    final ObjectConfiguration config = mObjectConfiguration;
-    return new ObjectConfiguration.Builder<LoaderProxyRoutineBuilder>(
-        new ObjectConfiguration.Configurable<LoaderProxyRoutineBuilder>() {
+  public ReflectionConfiguration.Builder<? extends LoaderProxyRoutineBuilder>
+  applyReflectionConfiguration() {
+    final ReflectionConfiguration config = mReflectionConfiguration;
+    return new ReflectionConfiguration.Builder<LoaderProxyRoutineBuilder>(
+        new ReflectionConfiguration.Configurable<LoaderProxyRoutineBuilder>() {
 
           @NotNull
           @Override
-          public LoaderProxyRoutineBuilder apply(@NotNull final ObjectConfiguration configuration) {
+          public LoaderProxyRoutineBuilder apply(
+              @NotNull final ReflectionConfiguration configuration) {
             return DefaultLoaderProxyRoutineBuilder.this.apply(configuration);
           }
         }, config);
@@ -137,7 +140,7 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder {
     final TargetLoaderProxyObjectBuilder<TYPE> builder =
         new TargetLoaderProxyObjectBuilder<TYPE>(mContext, mTarget, itf);
     return builder.apply(mInvocationConfiguration)
-                  .apply(mObjectConfiguration)
+                  .apply(mReflectionConfiguration)
                   .apply(mLoaderConfiguration)
                   .buildProxy();
   }
@@ -207,7 +210,7 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder {
     @Override
     @SuppressWarnings("unchecked")
     protected TYPE newProxy(@NotNull final InvocationConfiguration invocationConfiguration,
-        @NotNull final ObjectConfiguration objectConfiguration,
+        @NotNull final ReflectionConfiguration reflectionConfiguration,
         @NotNull final LoaderConfiguration loaderConfiguration) throws Exception {
       final LoaderContextCompat context = mContext;
       final ContextInvocationTarget<?> target = mTarget;
@@ -236,9 +239,9 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder {
           packageName + annotation.classPrefix() + className + annotation.classSuffix();
       final Constructor<?> constructor =
           findBestMatchingConstructor(Class.forName(fullClassName), context, target,
-              invocationConfiguration, objectConfiguration, loaderConfiguration);
+              invocationConfiguration, reflectionConfiguration, loaderConfiguration);
       return (TYPE) constructor.newInstance(context, target, invocationConfiguration,
-          objectConfiguration, loaderConfiguration);
+          reflectionConfiguration, loaderConfiguration);
     }
   }
 }

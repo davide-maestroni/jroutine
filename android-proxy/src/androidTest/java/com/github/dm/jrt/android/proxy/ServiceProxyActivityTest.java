@@ -40,15 +40,15 @@ import com.github.dm.jrt.core.runner.RunnerDecorator;
 import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.DurationMeasure;
-import com.github.dm.jrt.object.annotation.Alias;
-import com.github.dm.jrt.object.annotation.AsyncInput;
-import com.github.dm.jrt.object.annotation.AsyncInput.InputMode;
-import com.github.dm.jrt.object.annotation.AsyncMethod;
-import com.github.dm.jrt.object.annotation.AsyncOutput;
-import com.github.dm.jrt.object.annotation.AsyncOutput.OutputMode;
-import com.github.dm.jrt.object.annotation.Invoke;
-import com.github.dm.jrt.object.annotation.OutputTimeout;
-import com.github.dm.jrt.object.annotation.OutputTimeoutAction;
+import com.github.dm.jrt.reflect.annotation.Alias;
+import com.github.dm.jrt.reflect.annotation.AsyncInput;
+import com.github.dm.jrt.reflect.annotation.AsyncInput.InputMode;
+import com.github.dm.jrt.reflect.annotation.AsyncMethod;
+import com.github.dm.jrt.reflect.annotation.AsyncOutput;
+import com.github.dm.jrt.reflect.annotation.AsyncOutput.OutputMode;
+import com.github.dm.jrt.reflect.annotation.Invoke;
+import com.github.dm.jrt.reflect.annotation.OutputTimeout;
+import com.github.dm.jrt.reflect.annotation.OutputTimeoutAction;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -59,8 +59,8 @@ import java.util.HashSet;
 import java.util.List;
 
 import static com.github.dm.jrt.android.core.ServiceContext.serviceFrom;
-import static com.github.dm.jrt.android.object.ContextInvocationTarget.classOfType;
-import static com.github.dm.jrt.android.object.ContextInvocationTarget.instanceOf;
+import static com.github.dm.jrt.android.reflect.ContextInvocationTarget.classOfType;
+import static com.github.dm.jrt.android.reflect.ContextInvocationTarget.instanceOf;
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builder;
 import static com.github.dm.jrt.core.util.DurationMeasure.indefiniteTime;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
@@ -248,7 +248,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
                                        .applyServiceConfiguration()
                                        .withRunnerClass(MyRunner.class)
                                        .configured()
-                                       .applyObjectConfiguration()
+                                       .applyReflectionConfiguration()
                                        .withSharedFields()
                                        .configured()
                                        .buildProxy();
@@ -275,7 +275,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
                                    .applyServiceConfiguration()
                                    .withRunnerClass(MyRunner.class)
                                    .configured()
-                                   .applyObjectConfiguration()
+                                   .applyReflectionConfiguration()
                                    .withSharedFields()
                                    .configured()
                                    .buildProxy(ClassToken.tokenOf(TestProxy.class))).isSameAs(
@@ -346,12 +346,12 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
 
     long startTime = System.currentTimeMillis();
 
-    Channel<?, Integer> getOne = builder.applyObjectConfiguration()
+    Channel<?, Integer> getOne = builder.applyReflectionConfiguration()
                                         .withSharedFields("1")
                                         .configured()
                                         .buildProxy(TestClassAsync.class)
                                         .getOne();
-    Channel<?, Integer> getTwo = builder.applyObjectConfiguration()
+    Channel<?, Integer> getTwo = builder.applyReflectionConfiguration()
                                         .withSharedFields("2")
                                         .configured()
                                         .buildProxy(TestClassAsync.class)

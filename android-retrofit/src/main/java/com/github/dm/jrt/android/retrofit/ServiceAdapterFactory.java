@@ -21,7 +21,7 @@ import com.github.dm.jrt.android.core.JRoutineService;
 import com.github.dm.jrt.android.core.ServiceContext;
 import com.github.dm.jrt.android.core.config.ServiceConfigurable;
 import com.github.dm.jrt.android.core.config.ServiceConfiguration;
-import com.github.dm.jrt.android.object.builder.AndroidBuilders;
+import com.github.dm.jrt.android.reflect.builder.AndroidBuilders;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
@@ -31,7 +31,7 @@ import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.Function;
-import com.github.dm.jrt.object.builder.Builders;
+import com.github.dm.jrt.reflect.builder.Builders;
 import com.github.dm.jrt.stream.JRoutineStream;
 import com.github.dm.jrt.stream.builder.StreamBuilder;
 import com.github.dm.jrt.stream.builder.StreamBuilder.StreamConfiguration;
@@ -62,7 +62,7 @@ import static com.github.dm.jrt.function.Functions.decorate;
  * <p>
  * Note, however, that a different {@code OkHttpClient} instance will be created by the Service. In
  * order to properly configure it, the target Service class should implement
- * {@link com.github.dm.jrt.android.object.builder.FactoryContext}, and return the configured
+ * {@link com.github.dm.jrt.android.reflect.builder.FactoryContext}, and return the configured
  * instance when requested. Like, for example:
  * <pre><code>
  * public RetrofitService extends InvocationService implements FactoryContext {

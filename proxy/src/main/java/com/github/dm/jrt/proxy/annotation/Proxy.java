@@ -29,7 +29,7 @@ import java.lang.annotation.Target;
  * interface will be generated according to the specific annotation attributes.
  * <p>
  * The routines used for calling the methods will honor the attributes specified in any optional
- * <i>{@code com.github.dm.jrt.object.annotation.*}</i> annotations defined for each interface
+ * <i>{@code com.github.dm.jrt.reflect.annotation.*}</i> annotations defined for each interface
  * method.
  * <p>
  * Special care must be taken when dealing with proxies of generic classes. First of all, the
@@ -90,7 +90,7 @@ import java.lang.annotation.Target;
  * <p>
  * Created by davide-maestroni on 11/03/2014.
  *
- * @see com.github.dm.jrt.object.annotation Annotations
+ * @see com.github.dm.jrt.reflect.annotation Annotations
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

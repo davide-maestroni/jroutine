@@ -37,8 +37,8 @@ javadoc {
   def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/6'
   options.overview("${project.projectDir}/docs/overview.html")
   options.links("${prefix}/android-core/",
-      "${prefix}/android-object/",
+      "${prefix}/android-reflect/",
       "${prefix}/core/",
-      "${prefix}/object/",
-      "${prefix}/processor/")
+      "${prefix}/processor/",
+      "${prefix}/reflect/")
 }

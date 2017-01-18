@@ -37,9 +37,9 @@ conditionalDependencies {
   compile name: 'core', version: '6.1.0'
   compile name: 'function', version: '6.1.0'
   compile name: 'method', version: '6.1.0'
-  compile name: 'object', version: '6.1.0'
   compile name: 'operator', version: '6.1.0'
   compile name: 'proxy', version: '6.1.0'
+  compile name: 'reflect', version: '6.1.0'
   compile name: 'stream', version: '6.1.0'
 }
 
@@ -65,8 +65,8 @@ javadoc {
       "${prefix}/core/",
       "${prefix}/function/",
       "${prefix}/method/",
-      "${prefix}/object/",
       "${prefix}/operator/",
       "${prefix}/proxy/",
+      "${prefix}/reflect/",
       "${prefix}/stream/")
 }

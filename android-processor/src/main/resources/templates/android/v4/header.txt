@@ -23,13 +23,13 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
   private final com.github.dm.jrt.android.v4.core.LoaderContextCompat mContext;
 
   public ${generatedClassName}(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.v4.core.LoaderContextCompat context,
-      @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.object.ContextInvocationTarget<?> target,
+      @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.reflect.ContextInvocationTarget<?> target,
       @org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.config.InvocationConfiguration invocationConfiguration,
-      @org.jetbrains.annotations.NotNull final com.github.dm.jrt.object.config.ObjectConfiguration objectConfiguration,
+      @org.jetbrains.annotations.NotNull final com.github.dm.jrt.reflect.config.ReflectionConfiguration reflectionConfiguration,
       @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.config.LoaderConfiguration loaderConfiguration) {
     com.github.dm.jrt.core.util.ConstantConditions.notNull("Loader context", context);
     com.github.dm.jrt.core.util.ConstantConditions.notNull("invocation configuration", invocationConfiguration);
-    com.github.dm.jrt.core.util.ConstantConditions.notNull("object configuration", objectConfiguration);
+    com.github.dm.jrt.core.util.ConstantConditions.notNull("reflection configuration", reflectionConfiguration);
     com.github.dm.jrt.core.util.ConstantConditions.notNull("Loader configuration", loaderConfiguration);
     if (!target.isOfType(${classErasure}.class)) {
       throw new IllegalArgumentException("the invocation target must be the class or an instance of ${classFullName}");
@@ -60,7 +60,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
     }
 
     @org.jetbrains.annotations.NotNull
-    public ${genericTypes} com.github.dm.jrt.android.proxy.builder.LoaderProxyObjectBuilder<${interfaceFullName}> with(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.object.ContextInvocationTarget<? extends ${classFullName}> target) {
+    public ${genericTypes} com.github.dm.jrt.android.proxy.builder.LoaderProxyObjectBuilder<${interfaceFullName}> with(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.reflect.ContextInvocationTarget<? extends ${classFullName}> target) {
       if (!target.isOfType(${classErasure}.class)) {
         throw new IllegalArgumentException("the invocation target must be the class or an instance of ${classFullName}");
       }
@@ -73,10 +73,10 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
 
     private final com.github.dm.jrt.android.v4.core.LoaderContextCompat mContext;
 
-    private final com.github.dm.jrt.android.object.ContextInvocationTarget<?> mTarget;
+    private final com.github.dm.jrt.android.reflect.ContextInvocationTarget<?> mTarget;
 
     private LoaderProxyObjectBuilder(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.v4.core.LoaderContextCompat context,
-        @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.object.ContextInvocationTarget<?> target) {
+        @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.reflect.ContextInvocationTarget<?> target) {
       mContext = com.github.dm.jrt.core.util.ConstantConditions.notNull("Loader context", context);
       mTarget = com.github.dm.jrt.core.util.ConstantConditions.notNull("invocation target", target);
     }
@@ -103,8 +103,8 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
     @org.jetbrains.annotations.NotNull
     protected ${interfaceFullName} newProxy(
         @org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.config.InvocationConfiguration invocationConfiguration,
-        @org.jetbrains.annotations.NotNull final com.github.dm.jrt.object.config.ObjectConfiguration objectConfiguration,
+        @org.jetbrains.annotations.NotNull final com.github.dm.jrt.reflect.config.ReflectionConfiguration reflectionConfiguration,
         @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.config.LoaderConfiguration loaderConfiguration) {
-      return new ${generatedClassName}${genericTypes}(mContext, mTarget, invocationConfiguration, objectConfiguration, loaderConfiguration);
+      return new ${generatedClassName}${genericTypes}(mContext, mTarget, invocationConfiguration, reflectionConfiguration, loaderConfiguration);
     }
   }

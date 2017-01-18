@@ -23,7 +23,7 @@ import android.os.Build.VERSION_CODES;
 import android.support.v4.app.FragmentActivity;
 import android.test.ActivityInstrumentationTestCase2;
 
-import com.github.dm.jrt.ObjectProxyRoutineBuilder.BuilderType;
+import com.github.dm.jrt.ReflectionProxyRoutineBuilder.BuilderType;
 import com.github.dm.jrt.android.R;
 import com.github.dm.jrt.android.channel.io.ParcelableByteChannel.ParcelableByteChunk;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.CacheStrategyType;
@@ -33,9 +33,9 @@ import com.github.dm.jrt.android.core.invocation.TemplateContextInvocation;
 import com.github.dm.jrt.android.core.log.AndroidLog;
 import com.github.dm.jrt.android.core.log.AndroidLogs;
 import com.github.dm.jrt.android.core.service.InvocationService;
-import com.github.dm.jrt.android.object.ContextInvocationTarget;
 import com.github.dm.jrt.android.proxy.annotation.LoaderProxyCompat;
 import com.github.dm.jrt.android.proxy.annotation.ServiceProxy;
+import com.github.dm.jrt.android.reflect.ContextInvocationTarget;
 import com.github.dm.jrt.channel.io.ByteChannel.ChunkInputStream;
 import com.github.dm.jrt.channel.io.ByteChannel.ChunkOutputStream;
 import com.github.dm.jrt.core.channel.AbortException;
@@ -48,10 +48,10 @@ import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Predicate;
 import com.github.dm.jrt.function.Supplier;
-import com.github.dm.jrt.object.annotation.Alias;
-import com.github.dm.jrt.object.annotation.AsyncOutput;
-import com.github.dm.jrt.object.annotation.OutputTimeout;
 import com.github.dm.jrt.operator.Operators;
+import com.github.dm.jrt.reflect.annotation.Alias;
+import com.github.dm.jrt.reflect.annotation.AsyncOutput;
+import com.github.dm.jrt.reflect.annotation.OutputTimeout;
 
 import org.assertj.core.data.Offset;
 import org.jetbrains.annotations.NotNull;
@@ -64,8 +64,8 @@ import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.android.core.ServiceContext.serviceFrom;
 import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.factoryOf;
-import static com.github.dm.jrt.android.object.ContextInvocationTarget.classOfType;
-import static com.github.dm.jrt.android.object.ContextInvocationTarget.instanceOf;
+import static com.github.dm.jrt.android.reflect.ContextInvocationTarget.classOfType;
+import static com.github.dm.jrt.android.reflect.ContextInvocationTarget.instanceOf;
 import static com.github.dm.jrt.android.v4.core.LoaderContextCompat.loaderFrom;
 import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
@@ -460,25 +460,25 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
                                     .all()).containsExactly("test");
     assertThat(JRoutineAndroidCompat.on(getActivity())
                                     .withInstanceOf(TestClass.class)
-                                    .withType(BuilderType.OBJECT)
+                                    .withType(BuilderType.REFLECTION)
                                     .buildProxy(TestProxy.class)
                                     .getStringLow()
                                     .all()).containsExactly("test");
     assertThat(JRoutineAndroidCompat.on(getActivity())
                                     .withInstanceOf(TestClass.class)
-                                    .withType(BuilderType.OBJECT)
+                                    .withType(BuilderType.REFLECTION)
                                     .buildProxy(tokenOf(TestProxy.class))
                                     .getStringLow()
                                     .all()).containsExactly("test");
     assertThat(JRoutineAndroidCompat.on(getActivity())
                                     .withInstanceOf(TestClass.class)
-                                    .withType(BuilderType.PROXY)
+                                    .withType(BuilderType.CODE_GENERATION)
                                     .buildProxy(TestAnnotatedProxy.class)
                                     .getStringLow()
                                     .all()).containsExactly("test");
     assertThat(JRoutineAndroidCompat.on(getActivity())
                                     .withInstanceOf(TestClass.class)
-                                    .withType(BuilderType.PROXY)
+                                    .withType(BuilderType.CODE_GENERATION)
                                     .buildProxy(tokenOf(TestAnnotatedProxy.class))
                                     .getStringLow()
                                     .all()).containsExactly("test");
@@ -491,7 +491,7 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
                                     .applyInvocationConfiguration()
                                     .withLog(AndroidLogs.androidLog())
                                     .configured()
-                                    .applyObjectConfiguration()
+                                    .applyReflectionConfiguration()
                                     .withSharedFields()
                                     .configured()
                                     .applyLoaderConfiguration()
@@ -666,25 +666,25 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
                                     .all()).containsExactly("test");
     assertThat(JRoutineAndroidCompat.on((Context) getActivity())
                                     .withInstanceOf(TestClass.class)
-                                    .withType(BuilderType.OBJECT)
+                                    .withType(BuilderType.REFLECTION)
                                     .buildProxy(TestProxy.class)
                                     .getStringLow()
                                     .all()).containsExactly("test");
     assertThat(JRoutineAndroidCompat.on((Context) getActivity())
                                     .withInstanceOf(TestClass.class)
-                                    .withType(BuilderType.OBJECT)
+                                    .withType(BuilderType.REFLECTION)
                                     .buildProxy(tokenOf(TestProxy.class))
                                     .getStringLow()
                                     .all()).containsExactly("test");
     assertThat(JRoutineAndroidCompat.on((Context) getActivity())
                                     .withInstanceOf(TestClass.class)
-                                    .withType(BuilderType.PROXY)
+                                    .withType(BuilderType.CODE_GENERATION)
                                     .buildProxy(TestAnnotatedProxy.class)
                                     .getStringLow()
                                     .all()).containsExactly("test");
     assertThat(JRoutineAndroidCompat.on((Context) getActivity())
                                     .withInstanceOf(TestClass.class)
-                                    .withType(BuilderType.PROXY)
+                                    .withType(BuilderType.CODE_GENERATION)
                                     .buildProxy(tokenOf(TestAnnotatedProxy.class))
                                     .getStringLow()
                                     .all()).containsExactly("test");
@@ -697,7 +697,7 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
                                     .applyInvocationConfiguration()
                                     .withLog(AndroidLogs.androidLog())
                                     .configured()
-                                    .applyObjectConfiguration()
+                                    .applyReflectionConfiguration()
                                     .withSharedFields()
                                     .configured()
                                     .applyServiceConfiguration()

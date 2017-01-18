@@ -36,8 +36,8 @@ javadoc {
       "${prefix}/core/",
       "${prefix}/function/",
       "${prefix}/lib/",
-      "${prefix}/object/",
       "${prefix}/operator/",
       "${prefix}/proxy/",
+      "${prefix}/reflect/",
       "${prefix}/stream/")
 }

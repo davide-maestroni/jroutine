@@ -35,7 +35,7 @@ dependencies {
 conditionalDependencies {
   compile name: 'channel', version: '6.1.0'
   compile name: 'core', version: '6.1.0'
-  compile name: 'object', version: '6.1.0'
+  compile name: 'reflect', version: '6.1.0'
 }
 
 jacocoTestReport {
@@ -58,7 +58,7 @@ javadoc {
   options.overview("${project.projectDir}/docs/overview.html")
   options.links("${prefix}/channel/",
       "${prefix}/core/",
-      "${prefix}/object/")
+      "${prefix}/reflect/")
 }
 
 tasks.withType(FindBugs) {

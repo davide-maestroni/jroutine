@@ -17,7 +17,7 @@
 package com.github.dm.jrt.android.retrofit;
 
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.CacheStrategyType;
-import com.github.dm.jrt.android.object.annotation.CacheStrategy;
+import com.github.dm.jrt.android.reflect.annotation.CacheStrategy;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.stream.builder.StreamBuilder;
 

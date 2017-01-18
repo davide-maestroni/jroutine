@@ -38,7 +38,7 @@ dependencies {
 
 conditionalDependencies {
   compile name: 'core', version: '6.1.0'
-  compile name: 'object', version: '6.1.0'
+  compile name: 'reflect', version: '6.1.0'
   compile name: 'stream', version: '6.1.0'
 }
 
@@ -64,6 +64,6 @@ javadoc {
       "${prefix}/channel/",
       "${prefix}/core/",
       "${prefix}/function/",
-      "${prefix}/object/",
+      "${prefix}/reflect/",
       "${prefix}/stream/")
 }

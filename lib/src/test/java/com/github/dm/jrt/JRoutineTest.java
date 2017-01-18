@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt;
 
-import com.github.dm.jrt.ObjectProxyRoutineBuilder.BuilderType;
+import com.github.dm.jrt.ReflectionProxyRoutineBuilder.BuilderType;
 import com.github.dm.jrt.channel.io.ByteChannel.ByteChunk;
 import com.github.dm.jrt.channel.io.ByteChannel.ChunkInputStream;
 import com.github.dm.jrt.channel.io.ByteChannel.ChunkOutputStream;
@@ -41,11 +41,11 @@ import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Predicate;
 import com.github.dm.jrt.function.Supplier;
-import com.github.dm.jrt.object.annotation.Alias;
-import com.github.dm.jrt.object.annotation.AsyncOutput;
-import com.github.dm.jrt.object.annotation.OutputTimeout;
 import com.github.dm.jrt.operator.Operators;
 import com.github.dm.jrt.proxy.annotation.Proxy;
+import com.github.dm.jrt.reflect.annotation.Alias;
+import com.github.dm.jrt.reflect.annotation.AsyncOutput;
+import com.github.dm.jrt.reflect.annotation.OutputTimeout;
 
 import org.assertj.core.data.Offset;
 import org.jetbrains.annotations.NotNull;
@@ -63,9 +63,9 @@ import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.function.Functions.constant;
 import static com.github.dm.jrt.function.Functions.functionMapping;
-import static com.github.dm.jrt.object.InvocationTarget.instance;
 import static com.github.dm.jrt.operator.Operators.appendAccept;
 import static com.github.dm.jrt.operator.sequence.Sequences.range;
+import static com.github.dm.jrt.reflect.InvocationTarget.instance;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -380,7 +380,7 @@ public class JRoutineTest {
 
     final TestClass test = new TestClass();
     final TestStatic testStatic = JRoutine.with(instance(test))
-                                          .withType(BuilderType.OBJECT)
+                                          .withType(BuilderType.REFLECTION)
                                           .applyInvocationConfiguration()
                                           .withRunner(Runners.poolRunner())
                                           .withLogLevel(Level.DEBUG)
@@ -410,7 +410,7 @@ public class JRoutineTest {
 
     final TestClass test = new TestClass();
     final TestStatic proxy = JRoutine.with(test)
-                                     .withType(BuilderType.PROXY)
+                                     .withType(BuilderType.CODE_GENERATION)
                                      .applyInvocationConfiguration()
                                      .withRunner(Runners.poolRunner())
                                      .withLogLevel(Level.DEBUG)
@@ -442,7 +442,7 @@ public class JRoutineTest {
                                                     .applyInvocationConfiguration()
                                                     .withRunner(Runners.syncRunner())
                                                     .configured()
-                                                    .applyObjectConfiguration()
+                                                    .applyReflectionConfiguration()
                                                     .withSharedFields()
                                                     .configured()
                                                     .method(TestClass.class.getMethod("getLong"));
@@ -546,7 +546,7 @@ public class JRoutineTest {
                                   .withLogLevel(Level.DEBUG)
                                   .withLog(new NullLog())
                                   .configured()
-                                  .applyObjectConfiguration()
+                                  .applyReflectionConfiguration()
                                   .withSharedFields()
                                   .configured()
                                   .buildProxy(TestItf.class);

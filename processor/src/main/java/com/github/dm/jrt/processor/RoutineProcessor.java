@@ -23,28 +23,28 @@ import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.Reflection;
-import com.github.dm.jrt.object.annotation.Alias;
-import com.github.dm.jrt.object.annotation.AsyncInput;
-import com.github.dm.jrt.object.annotation.AsyncInput.InputMode;
-import com.github.dm.jrt.object.annotation.AsyncMethod;
-import com.github.dm.jrt.object.annotation.AsyncOutput;
-import com.github.dm.jrt.object.annotation.AsyncOutput.OutputMode;
-import com.github.dm.jrt.object.annotation.CoreInstances;
-import com.github.dm.jrt.object.annotation.InputBackoff;
-import com.github.dm.jrt.object.annotation.InputMaxSize;
-import com.github.dm.jrt.object.annotation.InputOrder;
-import com.github.dm.jrt.object.annotation.InvocationRunner;
-import com.github.dm.jrt.object.annotation.Invoke;
-import com.github.dm.jrt.object.annotation.LogLevel;
-import com.github.dm.jrt.object.annotation.LogType;
-import com.github.dm.jrt.object.annotation.MaxInstances;
-import com.github.dm.jrt.object.annotation.OutputBackoff;
-import com.github.dm.jrt.object.annotation.OutputMaxSize;
-import com.github.dm.jrt.object.annotation.OutputOrder;
-import com.github.dm.jrt.object.annotation.OutputTimeout;
-import com.github.dm.jrt.object.annotation.OutputTimeoutAction;
-import com.github.dm.jrt.object.annotation.Priority;
-import com.github.dm.jrt.object.annotation.SharedFields;
+import com.github.dm.jrt.reflect.annotation.Alias;
+import com.github.dm.jrt.reflect.annotation.AsyncInput;
+import com.github.dm.jrt.reflect.annotation.AsyncInput.InputMode;
+import com.github.dm.jrt.reflect.annotation.AsyncMethod;
+import com.github.dm.jrt.reflect.annotation.AsyncOutput;
+import com.github.dm.jrt.reflect.annotation.AsyncOutput.OutputMode;
+import com.github.dm.jrt.reflect.annotation.CoreInstances;
+import com.github.dm.jrt.reflect.annotation.InputBackoff;
+import com.github.dm.jrt.reflect.annotation.InputMaxSize;
+import com.github.dm.jrt.reflect.annotation.InputOrder;
+import com.github.dm.jrt.reflect.annotation.InvocationRunner;
+import com.github.dm.jrt.reflect.annotation.Invoke;
+import com.github.dm.jrt.reflect.annotation.LogLevel;
+import com.github.dm.jrt.reflect.annotation.LogType;
+import com.github.dm.jrt.reflect.annotation.MaxInstances;
+import com.github.dm.jrt.reflect.annotation.OutputBackoff;
+import com.github.dm.jrt.reflect.annotation.OutputMaxSize;
+import com.github.dm.jrt.reflect.annotation.OutputOrder;
+import com.github.dm.jrt.reflect.annotation.OutputTimeout;
+import com.github.dm.jrt.reflect.annotation.OutputTimeoutAction;
+import com.github.dm.jrt.reflect.annotation.Priority;
+import com.github.dm.jrt.reflect.annotation.SharedFields;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -457,7 +457,7 @@ public class RoutineProcessor extends AbstractProcessor {
              .append(" = ")
              .append("initRoutine")
              .append(i)
-             .append("(target, invocationConfiguration, objectConfiguration);")
+             .append("(target, invocationConfiguration, reflectionConfiguration);")
              .append(NEW_LINE);
     }
 
@@ -1832,7 +1832,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
     } else {
       methodHeader = methodHeader.replace("${sharedFields}",
-          "objectConfiguration.getSharedFieldsOrElse(null)");
+          "reflectionConfiguration.getSharedFieldsOrElse(null)");
     }
 
     writer.append(methodHeader);
@@ -1884,7 +1884,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
     } else {
       methodInvocationHeader = methodInvocationHeader.replace("${sharedFields}",
-          "objectConfiguration.getSharedFieldsOrElse(null)");
+          "reflectionConfiguration.getSharedFieldsOrElse(null)");
     }
 
     final boolean isStatic = targetMethod.getModifiers().contains(Modifier.STATIC);

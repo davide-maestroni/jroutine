@@ -22,7 +22,7 @@
 <a href="https://github.com/davide-maestroni/jroutine" target="_blank">Parallel programming on the go.</a>
 <h1>Overview</h1>
 <p>
-    Java annotation pre-processor based on the <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/object" target="_blank">jroutine-object</a> library.
+    Java annotation pre-processor based on the <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/reflect" target="_blank">jroutine-reflect</a> library.
 </p>
 <p>
     This module provides classes to enable asynchronous invocations of object or class methods, by wrapping them in compile time generated routines.
@@ -58,8 +58,8 @@
 </p>
 <ul>
     <li><a href="http://davide-maestroni.github.io/jroutine/javadoc/6/core" target="_blank">jroutine-core</a> &mdash; core routine and channel classes</li>
-    <li><a href="http://davide-maestroni.github.io/jroutine/javadoc/6/object" target="_blank">jroutine-object</a> &mdash; routines wrapping object and class methods</li>
     <li><a href="http://davide-maestroni.github.io/jroutine/javadoc/6/processor" target="_blank">jroutine-processor</a> &mdash; routine annotation pre-processor</li>
+    <li><a href="http://davide-maestroni.github.io/jroutine/javadoc/6/reflect" target="_blank">jroutine-reflect</a> &mdash; routines wrapping object and class methods</li>
 </ul>
 <h2>Usage examples</h2>
 <p>
@@ -78,7 +78,7 @@
             public static void main(final String[] args) {
                 final Main main = new Main();
                 final AsyncMain proxy = JRoutineProxy.with(instance(main))
-                                                     .applyObjectConfiguration()
+                                                     .applyReflectionConfiguration()
                                                      .withSharedFields()
                                                      .configured()
                                                      .applyInvocationConfiguration()
@@ -140,7 +140,7 @@
             public static void main(final String[] args) {
                 final Main main = new Main();
                 final AsyncMain proxy = Proxy_Main_AsyncMain.with(instance(main))
-                                                            .applyObjectConfiguration()
+                                                            .applyReflectionConfiguration()
                                                             .withSharedFields()
                                                             .configured()
                                                             .applyInvocationConfiguration()

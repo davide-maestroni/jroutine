@@ -18,20 +18,20 @@
 
   private static class ContextInvocation${methodCount}${genericTypes} extends com.github.dm.jrt.android.core.invocation.CallContextInvocation<Object, ${resultClassName}> {
 
-    private final  com.github.dm.jrt.android.object.ContextInvocationTarget<?> mContextTarget;
+    private final  com.github.dm.jrt.android.reflect.ContextInvocationTarget<?> mContextTarget;
 
     private final java.util.Set<String> mSharedFields;
 
     @SuppressWarnings("unused")
     private Object mInstance;
 
-    private com.github.dm.jrt.object.common.Mutex mMutex = com.github.dm.jrt.object.common.Mutex.NO_MUTEX;
+    private com.github.dm.jrt.reflect.common.Mutex mMutex = com.github.dm.jrt.reflect.common.Mutex.NO_MUTEX;
 
     @SuppressWarnings("unused")
-    private com.github.dm.jrt.object.InvocationTarget mTarget;
+    private com.github.dm.jrt.reflect.InvocationTarget mTarget;
 
     private ContextInvocation${methodCount}(@org.jetbrains.annotations.Nullable final java.util.Set<String> sharedFields,
-        @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.object.ContextInvocationTarget<?> target) {
+        @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.reflect.ContextInvocationTarget<?> target) {
       mSharedFields = sharedFields;
       mContextTarget = target;
     }
@@ -39,8 +39,8 @@
     @Override
     public void onContext(@org.jetbrains.annotations.NotNull final android.content.Context context) throws Exception {
       super.onContext(context);
-      final com.github.dm.jrt.object.InvocationTarget<?> target = mContextTarget.getInvocationTarget(context);
-      mMutex = com.github.dm.jrt.object.builder.Builders.getSharedMutex(${mutexTarget}, mSharedFields);
+      final com.github.dm.jrt.reflect.InvocationTarget<?> target = mContextTarget.getInvocationTarget(context);
+      mMutex = com.github.dm.jrt.reflect.builder.Builders.getSharedMutex(${mutexTarget}, mSharedFields);
       mTarget = target;
       mInstance = target.getTarget();
     }

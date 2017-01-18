@@ -16,8 +16,8 @@
 
 package com.github.dm.jrt.android.v4.proxy;
 
-import com.github.dm.jrt.android.object.ContextInvocationTarget;
 import com.github.dm.jrt.android.proxy.builder.LoaderProxyRoutineBuilder;
+import com.github.dm.jrt.android.reflect.ContextInvocationTarget;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
@@ -35,9 +35,9 @@ import org.jetbrains.annotations.NotNull;
  * <p>
  * Created by davide-maestroni on 05/06/2015.
  *
- * @see com.github.dm.jrt.android.object.annotation Android Annotations
  * @see com.github.dm.jrt.android.proxy.annotation.LoaderProxyCompat LoaderProxyCompat
- * @see com.github.dm.jrt.object.annotation Annotations
+ * @see com.github.dm.jrt.android.reflect.annotation Android Annotations
+ * @see com.github.dm.jrt.reflect.annotation Annotations
  */
 public class JRoutineLoaderProxyCompat {
 
@@ -81,7 +81,7 @@ public class JRoutineLoaderProxyCompat {
      * object.
      * <br>
      * In order to customize the object creation, the caller must employ an implementation of a
-     * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
+     * {@link com.github.dm.jrt.android.reflect.builder.FactoryContext FactoryContext} as the
      * application Context.
      * <p>
      * Note that it is responsibility of the caller to retain a strong reference to the target

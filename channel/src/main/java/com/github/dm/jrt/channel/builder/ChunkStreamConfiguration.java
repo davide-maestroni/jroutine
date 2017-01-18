@@ -86,7 +86,7 @@ public class ChunkStreamConfiguration extends DeepEqualObject {
   /**
    * Returns an output stream configuration builder initialized with the specified configuration.
    *
-   * @param initialConfiguration the initial object configuration.
+   * @param initialConfiguration the initial output stream configuration.
    * @return the builder.
    */
   @NotNull
@@ -228,7 +228,7 @@ public class ChunkStreamConfiguration extends DeepEqualObject {
      * Constructor.
      *
      * @param configurable         the configurable instance.
-     * @param initialConfiguration the initial object configuration.
+     * @param initialConfiguration the initial output stream configuration.
      */
     public Builder(@NotNull final Configurable<? extends TYPE> configurable,
         @NotNull final ChunkStreamConfiguration initialConfiguration) {
@@ -251,7 +251,7 @@ public class ChunkStreamConfiguration extends DeepEqualObject {
      * configuration options will be reset to their default, otherwise only the non-default
      * options will be applied.
      *
-     * @param configuration the object configuration.
+     * @param configuration the output stream configuration.
      * @return this builder.
      */
     @NotNull

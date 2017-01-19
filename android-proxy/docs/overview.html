@@ -22,7 +22,7 @@
 <a href="https://github.com/davide-maestroni/jroutine" target="_blank">Parallel programming on the go.</a>
 <h1>Overview</h1>
 <p>
-    Java annotation proxy code generator based on the <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android" target="_blank">jroutine-android</a> libraries.
+    Java annotation proxy code generator based on the <a href="http://davide-maestroni.github.io/jroutine/javadoc/7/android" target="_blank">jroutine-android</a> libraries.
 </p>
 <p>
     This module provides classes to enable asynchronous invocations of object or class methods, by wrapping them in compile time generated routines.<br>
@@ -31,38 +31,38 @@
 <h2>Main concepts</h2>
 <ul>
     <li>
-        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-proxy/com/github/dm/jrt/android/proxy/annotation/LoaderProxy.html">LoaderProxy</a>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7/android-proxy/com/github/dm/jrt/android/proxy/annotation/LoaderProxy.html">LoaderProxy</a>
         <p>
             A LoaderProxy annotation will indicate which interface has to be implemented by the generated code to proxy the target class or instance, so that its methods are executed inside a Loader instance.
         </p>
     </li>
     <li>
-        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-proxy/com/github/dm/jrt/android/proxy/annotation/LoaderProxyCompat.html">LoaderProxyCompat</a>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7/android-proxy/com/github/dm/jrt/android/proxy/annotation/LoaderProxyCompat.html">LoaderProxyCompat</a>
         <p>
             A LoaderProxyCompat annotation will indicate which interface has to be implemented by the generated code to proxy the target class or instance, so that its methods are executed inside a Loader instance.<br>
             This class is specifically meant to employ the Android Support library for retro-compatibility.
         </p>
     </li>
     <li>
-        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-proxy/com/github/dm/jrt/android/proxy/annotation/ServiceProxy.html">ServiceProxy</a>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7/android-proxy/com/github/dm/jrt/android/proxy/annotation/ServiceProxy.html">ServiceProxy</a>
         <p>
             A ServiceProxy annotation will indicate which interface has to be implemented by the generated code to proxy the target class or instance, so that its methods are executed inside a dedicated Service.
         </p>
     </li>
     <li>
-        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-proxy/com/github/dm/jrt/android/proxy/builder/LoaderProxyRoutineBuilder.html">LoaderProxyRoutineBuilder</a>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7/android-proxy/com/github/dm/jrt/android/proxy/builder/LoaderProxyRoutineBuilder.html">LoaderProxyRoutineBuilder</a>
         <p>
             Each generated proxy instance needs an invocation target and a specific configuration, so proxy routine builders provide a convenient way to set the required options.
-            Instances of this builder will handle only interfaces annotated with <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-proxy/com/github/dm/jrt/android/proxy/annotation/LoaderProxy.html">LoaderProxy</a> or
-            <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-proxy/com/github/dm/jrt/android/proxy/annotation/LoaderProxyCompat.html">LoaderProxyCompat</a> annotations.
+            Instances of this builder will handle only interfaces annotated with <a href="http://davide-maestroni.github.io/jroutine/javadoc/7/android-proxy/com/github/dm/jrt/android/proxy/annotation/LoaderProxy.html">LoaderProxy</a> or
+            <a href="http://davide-maestroni.github.io/jroutine/javadoc/7/android-proxy/com/github/dm/jrt/android/proxy/annotation/LoaderProxyCompat.html">LoaderProxyCompat</a> annotations.
             By design builders are not synchronized since the same instance is not meant to be used from different threads.
         </p>
     </li>
     <li>
-        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-proxy/com/github/dm/jrt/android/proxy/builder/ServiceProxyRoutineBuilder.html">ServiceProxyRoutineBuilder</a>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7/android-proxy/com/github/dm/jrt/android/proxy/builder/ServiceProxyRoutineBuilder.html">ServiceProxyRoutineBuilder</a>
         <p>
             Each generated proxy instance needs an invocation target and a specific configuration, so proxy routine builders provide a convenient way to set the required options.
-            Instances of this builder will handle only interfaces annotated with <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-proxy/com/github/dm/jrt/android/proxy/annotation/ServiceProxy.html">ServiceProxy</a> annotations.
+            Instances of this builder will handle only interfaces annotated with <a href="http://davide-maestroni.github.io/jroutine/javadoc/7/android-proxy/com/github/dm/jrt/android/proxy/annotation/ServiceProxy.html">ServiceProxy</a> annotations.
             By design builders are not synchronized since the same instance is not meant to be used from different threads.
         </p>
     </li>
@@ -70,19 +70,19 @@
 <h2>Main classes</h2>
 <ul>
     <li>
-        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-proxy/com/github/dm/jrt/android/v11/proxy/JRoutineLoaderProxy.html">JRoutineLoaderProxy</a>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7/android-proxy/com/github/dm/jrt/android/v11/proxy/JRoutineLoaderProxy.html">JRoutineLoaderProxy</a>
         <p>
             Utility class acting as a factory of Loader proxy routine builders.
         </p>
     </li>
     <li>
-        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-proxy/com/github/dm/jrt/android/v4/proxy/JRoutineLoaderProxyCompat.html">JRoutineLoaderProxyCompat</a>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7/android-proxy/com/github/dm/jrt/android/v4/proxy/JRoutineLoaderProxyCompat.html">JRoutineLoaderProxyCompat</a>
         <p>
             Utility class acting as a factory of Loader proxy routine builders.
         </p>
     </li>
     <li>
-        <a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-proxy/com/github/dm/jrt/android/proxy/JRoutineServiceProxy.html">JRoutineServiceProxy</a>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7/android-proxy/com/github/dm/jrt/android/proxy/JRoutineServiceProxy.html">JRoutineServiceProxy</a>
         <p>
             Utility class acting as a factory of Service proxy routine builders.
         </p>
@@ -93,13 +93,13 @@
     Below a full list of the included modules:
 </p>
 <ul>
-    <li><a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-core" target="_blank">jroutine-android-core</a> &mdash; core routine and channel classes</li>
-    <li><a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-processor" target="_blank">jroutine-android-processor</a> &mdash; routine annotation pre-processor</li>
-    <li><a href="http://davide-maestroni.github.io/jroutine/javadoc/6/android-reflect" target="_blank">jroutine-android-reflect</a> &mdash; routine wrapping object and class methods</li>
-    <li><a href="http://davide-maestroni.github.io/jroutine/javadoc/6/core" target="_blank">jroutine-core</a> &mdash; core routine and channel classes</li>
-    <li><a href="http://davide-maestroni.github.io/jroutine/javadoc/6/processor" target="_blank">jroutine-processor</a> &mdash; routine annotation pre-processor</li>
-    <li><a href="http://davide-maestroni.github.io/jroutine/javadoc/6/proxy" target="_blank">jroutine-proxy</a> &mdash; code generation of routines wrapping object and class methods</li>
-    <li><a href="http://davide-maestroni.github.io/jroutine/javadoc/6/reflect" target="_blank">jroutine-reflect</a> &mdash; routines wrapping object and class methods</li>
+    <li><a href="http://davide-maestroni.github.io/jroutine/javadoc/7/android-core" target="_blank">jroutine-android-core</a> &mdash; core routine and channel classes</li>
+    <li><a href="http://davide-maestroni.github.io/jroutine/javadoc/7/android-processor" target="_blank">jroutine-android-processor</a> &mdash; routine annotation pre-processor</li>
+    <li><a href="http://davide-maestroni.github.io/jroutine/javadoc/7/android-reflect" target="_blank">jroutine-android-reflect</a> &mdash; routine wrapping object and class methods</li>
+    <li><a href="http://davide-maestroni.github.io/jroutine/javadoc/7/core" target="_blank">jroutine-core</a> &mdash; core routine and channel classes</li>
+    <li><a href="http://davide-maestroni.github.io/jroutine/javadoc/7/processor" target="_blank">jroutine-processor</a> &mdash; routine annotation pre-processor</li>
+    <li><a href="http://davide-maestroni.github.io/jroutine/javadoc/7/proxy" target="_blank">jroutine-proxy</a> &mdash; code generation of routines wrapping object and class methods</li>
+    <li><a href="http://davide-maestroni.github.io/jroutine/javadoc/7/reflect" target="_blank">jroutine-reflect</a> &mdash; routines wrapping object and class methods</li>
 </ul>
 <h2>Usage examples</h2>
 <p>

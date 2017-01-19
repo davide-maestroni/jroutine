@@ -70,7 +70,7 @@ dependencies {
   androidTestCompile 'com.squareup.assertj:assertj-android:1.1.1'
   androidTestCompile 'io.reactivex:rxandroid:1.2.1'
   compile 'com.android.support:support-v4:23.2.1'
-  compile 'io.reactivex:rxjava:1.2.3'
+  compile 'io.reactivex:rxjava:1.2.5'
 }
 
 conditionalDependencies {
@@ -87,7 +87,7 @@ findbugs {
 }
 
 tasks.withType(Javadoc) {
-  def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/6'
+  def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/7'
   options.overview("${project.projectDir}/docs/overview.html")
   options.links('http://reactivex.io/RxJava/javadoc/',
       "${prefix}/android-core/",

@@ -34,7 +34,7 @@ findbugs {
 }
 
 javadoc {
-  def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/6'
+  def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/7'
   options.overview("${project.projectDir}/docs/overview.html")
   options.links("${prefix}/android-core/",
       "${prefix}/android-reflect/",

@@ -258,12 +258,12 @@ Unless required by applicable law or agreed to in writing, software distributed 
 [wiki proguard]:https://github.com/davide-maestroni/jroutine/wiki/Proguard
 [sample]:https://github.com/davide-maestroni/jroutine/tree/master/sample
 [android sample]:https://github.com/davide-maestroni/jroutine/tree/master/android-sample
-[javadoc lib]:http://davide-maestroni.github.io/jroutine/javadoc/6/lib
-[javadoc retrofit]:http://davide-maestroni.github.io/jroutine/javadoc/6/retrofit
-[javadoc rx]:http://davide-maestroni.github.io/jroutine/javadoc/6/rx
-[javadoc swagger codegen]:http://davide-maestroni.github.io/jroutine/javadoc/6/swagger-codegen
-[javadoc android]:http://davide-maestroni.github.io/jroutine/javadoc/6/android
-[javadoc android retrofit]:http://davide-maestroni.github.io/jroutine/javadoc/6/android-retrofit
-[javadoc android rx]:http://davide-maestroni.github.io/jroutine/javadoc/6/android-rx
-[javadoc routine]:http://davide-maestroni.github.io/jroutine/javadoc/6/core/com/github/dm/jrt/core/routine/Routine.html
-[javadoc runner]:http://davide-maestroni.github.io/jroutine/javadoc/6/core/com/github/dm/jrt/core/runner/Runner.html
+[javadoc lib]:http://davide-maestroni.github.io/jroutine/javadoc/7/lib
+[javadoc retrofit]:http://davide-maestroni.github.io/jroutine/javadoc/7/retrofit
+[javadoc rx]:http://davide-maestroni.github.io/jroutine/javadoc/7/rx
+[javadoc swagger codegen]:http://davide-maestroni.github.io/jroutine/javadoc/7/swagger-codegen
+[javadoc android]:http://davide-maestroni.github.io/jroutine/javadoc/7/android
+[javadoc android retrofit]:http://davide-maestroni.github.io/jroutine/javadoc/7/android-retrofit
+[javadoc android rx]:http://davide-maestroni.github.io/jroutine/javadoc/7/android-rx
+[javadoc routine]:http://davide-maestroni.github.io/jroutine/javadoc/7/core/com/github/dm/jrt/core/routine/Routine.html
+[javadoc runner]:http://davide-maestroni.github.io/jroutine/javadoc/7/core/com/github/dm/jrt/core/runner/Runner.html

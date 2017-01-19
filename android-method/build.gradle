@@ -86,7 +86,7 @@ tasks.withType(FindBugs) {
 }
 
 tasks.withType(Javadoc) {
-  def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/6'
+  def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/7'
   options.overview("${project.projectDir}/docs/overview.html")
   options.links("${prefix}/android-channel/",
       "${prefix}/android-core/",

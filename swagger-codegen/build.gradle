@@ -43,7 +43,7 @@ dependencies {
   swaggerCompile project
   testCompile project(':operator')
   testCompile project(':retrofit')
-  testCompile 'com.squareup.okhttp3:mockwebserver:3.4.1'
+  testCompile 'com.squareup.okhttp3:mockwebserver:3.5.0'
   testCompile 'com.squareup.retrofit2:converter-gson:2.1.0'
   testCompile 'com.squareup.retrofit2:converter-scalars:2.1.0'
   testCompile 'com.squareup.retrofit2:converter-jackson:2.1.0'
@@ -83,7 +83,9 @@ task generateProperties {
 task generateSwaggerCode(type: JavaExec, dependsOn: 'jar') {
   main = 'io.swagger.codegen.SwaggerCodegen'
   classpath = project.configurations.swaggerCompile
-  args 'generate', '-l', 'jroutine', '-i', 'src/test/resources/swagger.yaml', '-o', "$buildDir/swagger",
+  args 'generate', '-l', 'jroutine',
+      '-i', 'src/test/resources/swagger.yaml',
+      '-o', "$buildDir/swagger",
       '--invoker-package', 'com.github.dm.jrt.swagger.client',
       '--model-package', 'com.github.dm.jrt.swagger.client.model',
       '--api-package', 'com.github.dm.jrt.swagger.client.api',

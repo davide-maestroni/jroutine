@@ -33,220 +33,89 @@ public class NumbersTest {
 
   @Test
   public void testAdd() {
-
     assertThat(Numbers.add(1, 2)).isEqualTo(3);
     assertThat(Numbers.add(1, (byte) 2)).isEqualTo(3);
     assertThat(Numbers.add((short) -1, 2.5f)).isEqualTo(1.5f);
     assertThat(Numbers.add(-1L, 2.5)).isEqualTo(1.5);
     assertThat(Numbers.add(BigDecimal.ZERO, 2.5)).isEqualTo(new BigDecimal(2.5));
+    assertThat(Numbers.add(BigDecimal.ONE, new MyNumber())).isNull();
+    assertThat(Numbers.add(new MyNumber(), BigDecimal.ONE)).isNull();
     assertThat(Numbers.add(BigInteger.ONE, 2.5)).isEqualTo(new BigDecimal(3.5));
     assertThat(Numbers.add(BigInteger.ONE, -1)).isEqualTo(BigInteger.ZERO);
-    assertThat(Numbers.add(BigInteger.ONE, new Number() {
-
-      @Override
-      public int intValue() {
-
-        return 0;
-      }
-
-      @Override
-      public long longValue() {
-
-        return 0;
-      }
-
-      @Override
-      public float floatValue() {
-
-        return 0;
-      }
-
-      @Override
-      public double doubleValue() {
-
-        return 0;
-      }
-    })).isNull();
-    assertThat(Numbers.add(new Number() {
-
-      @Override
-      public int intValue() {
-
-        return 0;
-      }
-
-      @Override
-      public long longValue() {
-
-        return 0;
-      }
-
-      @Override
-      public float floatValue() {
-
-        return 0;
-      }
-
-      @Override
-      public double doubleValue() {
-
-        return 0;
-      }
-    }, BigInteger.ONE)).isNull();
+    assertThat(Numbers.add(BigInteger.ONE, new MyNumber())).isNull();
+    assertThat(Numbers.add(new MyNumber(), BigInteger.ONE)).isNull();
+    assertThat(Numbers.add(new MyNumber(), new MyNumber())).isNull();
   }
 
   @Test
   public void testAddOptimistic() {
-
     assertThat(Numbers.addOptimistic(1, 2)).isEqualTo(3);
     assertThat(Numbers.addOptimistic(1, (byte) 2)).isEqualTo(3);
     assertThat(Numbers.addOptimistic((short) -1, 2.5f)).isEqualTo(1.5f);
     assertThat(Numbers.addOptimistic(-1L, 2.5)).isEqualTo(1.5);
     assertThat(Numbers.addOptimistic(BigDecimal.ZERO, 2.5)).isEqualTo(new BigDecimal(2.5));
+    assertThat(Numbers.addOptimistic(BigDecimal.ONE, new MyNumber())).isEqualTo(BigDecimal.ONE);
+    assertThat(Numbers.addOptimistic(new MyNumber(), BigDecimal.ONE)).isEqualTo(BigDecimal.ONE);
     assertThat(Numbers.addOptimistic(BigInteger.ONE, 2.5)).isEqualTo(new BigDecimal(3.5));
     assertThat(Numbers.addOptimistic(BigInteger.ONE, -1)).isEqualTo(BigInteger.ZERO);
-    assertThat(Numbers.addOptimistic(BigInteger.ONE, new Number() {
-
-      @Override
-      public int intValue() {
-
-        return 0;
-      }
-
-      @Override
-      public long longValue() {
-
-        return 0;
-      }
-
-      @Override
-      public float floatValue() {
-
-        return 0;
-      }
-
-      @Override
-      public double doubleValue() {
-
-        return 0;
-      }
-    })).isEqualTo(BigInteger.ONE);
-    assertThat(Numbers.addOptimistic(new Number() {
-
-      @Override
-      public int intValue() {
-
-        return 0;
-      }
-
-      @Override
-      public long longValue() {
-
-        return 0;
-      }
-
-      @Override
-      public float floatValue() {
-
-        return 0;
-      }
-
-      @Override
-      public double doubleValue() {
-
-        return 0;
-      }
-    }, BigInteger.ONE)).isEqualTo(BigInteger.ONE);
+    assertThat(Numbers.addOptimistic(BigInteger.ONE, new MyNumber())).isEqualTo(BigInteger.ONE);
+    assertThat(Numbers.addOptimistic(new MyNumber(), BigInteger.ONE)).isEqualTo(BigInteger.ONE);
+    assertThat(Numbers.addOptimistic(new MyNumber(), new MyNumber())).isEqualTo(0d);
   }
 
   @Test
   public void testAddSafe() {
-
     assertThat(Numbers.addSafe(1, 2)).isEqualTo(3);
     assertThat(Numbers.addSafe(1, (byte) 2)).isEqualTo(3);
     assertThat(Numbers.addSafe((short) -1, 2.5f)).isEqualTo(1.5f);
     assertThat(Numbers.addSafe(-1L, 2.5)).isEqualTo(1.5);
     assertThat(Numbers.addSafe(BigDecimal.ZERO, 2.5)).isEqualTo(new BigDecimal(2.5));
-    assertThat(Numbers.addSafe(BigInteger.ONE, 2.5)).isEqualTo(new BigDecimal(3.5));
-    assertThat(Numbers.addSafe(BigInteger.ONE, -1)).isEqualTo(BigInteger.ZERO);
-
     try {
-      Numbers.addSafe(BigInteger.ONE, new Number() {
-
-        @Override
-        public int intValue() {
-
-          return 0;
-        }
-
-        @Override
-        public long longValue() {
-
-          return 0;
-        }
-
-        @Override
-        public float floatValue() {
-
-          return 0;
-        }
-
-        @Override
-        public double doubleValue() {
-
-          return 0;
-        }
-      });
+      Numbers.addSafe(BigDecimal.ONE, new MyNumber());
       fail();
 
     } catch (final IllegalArgumentException ignored) {
-
     }
 
     try {
-      Numbers.addSafe(new Number() {
-
-        @Override
-        public int intValue() {
-
-          return 0;
-        }
-
-        @Override
-        public long longValue() {
-
-          return 0;
-        }
-
-        @Override
-        public float floatValue() {
-
-          return 0;
-        }
-
-        @Override
-        public double doubleValue() {
-
-          return 0;
-        }
-      }, BigInteger.ONE);
+      Numbers.addSafe(new MyNumber(), BigDecimal.ONE);
       fail();
 
     } catch (final IllegalArgumentException ignored) {
+    }
 
+    assertThat(Numbers.addSafe(BigInteger.ONE, 2.5)).isEqualTo(new BigDecimal(3.5));
+    assertThat(Numbers.addSafe(BigInteger.ONE, -1)).isEqualTo(BigInteger.ZERO);
+    try {
+      Numbers.addSafe(BigInteger.ONE, new MyNumber());
+      fail();
+
+    } catch (final IllegalArgumentException ignored) {
+    }
+
+    try {
+      Numbers.addSafe(new MyNumber(), BigInteger.ONE);
+      fail();
+
+    } catch (final IllegalArgumentException ignored) {
+    }
+
+    try {
+      Numbers.addSafe(new MyNumber(), new MyNumber());
+      fail();
+
+    } catch (final IllegalArgumentException ignored) {
     }
   }
 
   @Test
   public void testConstructor() {
-
     boolean failed = false;
     try {
       new Numbers();
       failed = true;
 
     } catch (final Throwable ignored) {
-
     }
 
     assertThat(failed).isFalse();
@@ -254,7 +123,6 @@ public class NumbersTest {
 
   @Test
   public void testToBig() {
-
     assertThat(Numbers.toBigDecimal(3)).isEqualTo(new BigDecimal(3));
     assertThat(Numbers.toBigDecimal((byte) 2)).isEqualTo(new BigDecimal(2));
     assertThat(Numbers.toBigDecimal((short) -1)).isEqualTo(new BigDecimal(-1));
@@ -263,37 +131,11 @@ public class NumbersTest {
     assertThat(Numbers.toBigDecimal(2.5)).isEqualTo(new BigDecimal(2.5));
     assertThat(Numbers.toBigDecimal(BigDecimal.ZERO)).isEqualTo(new BigDecimal(0));
     assertThat(Numbers.toBigDecimal(BigInteger.ONE)).isEqualTo(new BigDecimal(1));
-    assertThat(Numbers.toBigDecimal(new Number() {
-
-      @Override
-      public int intValue() {
-
-        return 0;
-      }
-
-      @Override
-      public long longValue() {
-
-        return 0;
-      }
-
-      @Override
-      public float floatValue() {
-
-        return 0;
-      }
-
-      @Override
-      public double doubleValue() {
-
-        return 0;
-      }
-    })).isNull();
+    assertThat(Numbers.toBigDecimal(new MyNumber())).isNull();
   }
 
   @Test
   public void testToBigOptimistic() {
-
     assertThat(Numbers.toBigDecimalOptimistic(3)).isEqualTo(new BigDecimal(3));
     assertThat(Numbers.toBigDecimalOptimistic((byte) 2)).isEqualTo(new BigDecimal(2));
     assertThat(Numbers.toBigDecimalOptimistic((short) -1)).isEqualTo(new BigDecimal(-1));
@@ -302,37 +144,11 @@ public class NumbersTest {
     assertThat(Numbers.toBigDecimalOptimistic(2.5)).isEqualTo(new BigDecimal(2.5));
     assertThat(Numbers.toBigDecimalOptimistic(BigDecimal.ZERO)).isEqualTo(new BigDecimal(0));
     assertThat(Numbers.toBigDecimalOptimistic(BigInteger.ONE)).isEqualTo(new BigDecimal(1));
-    assertThat(Numbers.toBigDecimalOptimistic(new Number() {
-
-      @Override
-      public int intValue() {
-
-        return 0;
-      }
-
-      @Override
-      public long longValue() {
-
-        return 0;
-      }
-
-      @Override
-      public float floatValue() {
-
-        return 0;
-      }
-
-      @Override
-      public double doubleValue() {
-
-        return 0;
-      }
-    })).isEqualTo(new BigDecimal(0.0));
+    assertThat(Numbers.toBigDecimalOptimistic(new MyNumber())).isEqualTo(new BigDecimal(0.0));
   }
 
   @Test
   public void testToBigSafe() {
-
     assertThat(Numbers.toBigDecimalSafe(3)).isEqualTo(new BigDecimal(3));
     assertThat(Numbers.toBigDecimalSafe((byte) 2)).isEqualTo(new BigDecimal(2));
     assertThat(Numbers.toBigDecimalSafe((short) -1)).isEqualTo(new BigDecimal(-1));
@@ -341,38 +157,30 @@ public class NumbersTest {
     assertThat(Numbers.toBigDecimalSafe(2.5)).isEqualTo(new BigDecimal(2.5));
     assertThat(Numbers.toBigDecimalSafe(BigDecimal.ZERO)).isEqualTo(new BigDecimal(0));
     assertThat(Numbers.toBigDecimalSafe(BigInteger.ONE)).isEqualTo(new BigDecimal(1));
-
     try {
-      assertThat(Numbers.toBigDecimalSafe(new Number() {
-
-        @Override
-        public int intValue() {
-
-          return 0;
-        }
-
-        @Override
-        public long longValue() {
-
-          return 0;
-        }
-
-        @Override
-        public float floatValue() {
-
-          return 0;
-        }
-
-        @Override
-        public double doubleValue() {
-
-          return 0;
-        }
-      })).isEqualTo(new BigDecimal(0.0));
+      assertThat(Numbers.toBigDecimalSafe(new MyNumber())).isEqualTo(new BigDecimal(0.0));
       fail();
 
     } catch (final IllegalArgumentException ignored) {
+    }
+  }
 
+  private static class MyNumber extends Number {
+
+    public int intValue() {
+      return 0;
+    }
+
+    public long longValue() {
+      return 0;
+    }
+
+    public float floatValue() {
+      return 0;
+    }
+
+    public double doubleValue() {
+      return 0;
     }
   }
 }

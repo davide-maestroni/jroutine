@@ -69,7 +69,7 @@ android {
 dependencies {
   androidTestCompile project(':operator')
   androidTestCompile 'com.squareup.assertj:assertj-android:1.1.1'
-  androidTestCompile 'com.squareup.okhttp3:mockwebserver:3.4.1'
+  androidTestCompile 'com.squareup.okhttp3:mockwebserver:3.5.0'
   androidTestCompile 'com.squareup.retrofit2:converter-gson:2.1.0'
   compile 'com.android.support:support-v4:23.2.1'
   compile 'com.squareup.retrofit2:retrofit:2.1.0'
@@ -99,7 +99,7 @@ tasks.withType(FindBugs) {
 }
 
 tasks.withType(Javadoc) {
-  def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/6'
+  def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/7'
   options.overview("${project.projectDir}/docs/overview.html")
   options.links('https://square.github.io/okhttp/3.x/okhttp/',
       'https://square.github.io/retrofit/2.x/retrofit/',

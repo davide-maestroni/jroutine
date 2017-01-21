@@ -160,7 +160,8 @@ public abstract class ClassToken<TYPE> {
     }
 
     final ClassToken<?> that = (ClassToken) o;
-    return getRawClass().equals(that.getRawClass());
+    return getGenericType().equals(that.getGenericType()) && getRawClass().equals(
+        that.getRawClass());
   }
 
   /**

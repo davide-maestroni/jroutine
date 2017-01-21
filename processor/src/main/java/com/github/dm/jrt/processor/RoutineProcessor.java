@@ -881,7 +881,7 @@ public class RoutineProcessor extends AbstractProcessor {
       @NotNull final AsyncInput annotation, @NotNull final VariableElement targetParameter,
       final int length) {
     final Types typeUtils = processingEnv.getTypeUtils();
-    final TypeMirror outputChannelType = this.channelType;
+    final TypeMirror channelType = this.channelType;
     final TypeMirror targetType = targetParameter.asType();
     final TypeMirror targetTypeErasure = typeUtils.erasure(targetType);
     final Element annotationElement =
@@ -891,19 +891,19 @@ public class RoutineProcessor extends AbstractProcessor {
         (TypeMirror) getAnnotationValue(targetParameter, annotationType, "value");
     InputMode inputMode = annotation.mode();
     if (inputMode == InputMode.VALUE) {
-      if (!typeUtils.isAssignable(targetTypeErasure, outputChannelType)) {
+      if (!typeUtils.isAssignable(targetTypeErasure, channelType)) {
         throw new IllegalArgumentException(
             "[" + methodElement.getEnclosingElement() + "." + methodElement
-                + "] an async input with mode " + InputMode.VALUE + " must implement an "
-                + outputChannelType);
+                + "] an async input with mode " + InputMode.VALUE + " must implement a "
+                + channelType);
       }
 
     } else { // InputMode.COLLECTION
-      if (!typeUtils.isAssignable(targetTypeErasure, outputChannelType)) {
+      if (!typeUtils.isAssignable(targetTypeErasure, channelType)) {
         throw new IllegalArgumentException(
             "[" + methodElement.getEnclosingElement() + "." + methodElement
-                + "] an async input with mode " + InputMode.COLLECTION + " must implement an "
-                + outputChannelType);
+                + "] an async input with mode " + InputMode.COLLECTION + " must implement a "
+                + channelType);
       }
 
       if ((targetMirror != null) && (targetMirror.getKind() != TypeKind.ARRAY)

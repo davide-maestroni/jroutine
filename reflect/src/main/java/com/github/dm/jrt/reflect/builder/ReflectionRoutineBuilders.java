@@ -241,7 +241,7 @@ public class ReflectionRoutineBuilders {
     if (inputMode == InputMode.VALUE) {
       if (!Channel.class.isAssignableFrom(parameterType)) {
         throw new IllegalArgumentException(
-            "[" + method + "] an async input with mode " + InputMode.VALUE + " must extends an "
+            "[" + method + "] an async input with mode " + InputMode.VALUE + " must implement a "
                 + Channel.class.getCanonicalName());
       }
 
@@ -249,7 +249,7 @@ public class ReflectionRoutineBuilders {
       if (!Channel.class.isAssignableFrom(parameterType)) {
         throw new IllegalArgumentException(
             "[" + method + "] an async input with mode " + InputMode.COLLECTION
-                + " must extends an " + Channel.class.getCanonicalName());
+                + " must implement a " + Channel.class.getCanonicalName());
       }
 
       final Class<?> paramClass = asyncInputAnnotation.value();
@@ -342,7 +342,7 @@ public class ReflectionRoutineBuilders {
    * <br>
    * If the cache was empty, it is filled with a new object automatically created.
    * <br>
-   * If the target is null {@link com.github.dm.jrt.reflect.common.Mutex#NO_MUTEX} will be returned.
+   * If the target is null {@link com.github.dm.jrt.reflect.common.Mutex#NONE} will be returned.
    *
    * @param target       the target object instance.
    * @param sharedFields the shared field names.
@@ -352,7 +352,7 @@ public class ReflectionRoutineBuilders {
   public static Mutex getSharedMutex(@Nullable final Object target,
       @Nullable final Collection<String> sharedFields) {
     if ((target == null) || ((sharedFields != null) && sharedFields.isEmpty())) {
-      return Mutex.NO_MUTEX;
+      return Mutex.NONE;
     }
 
     ExchangeMutex exchangeMutex;
@@ -391,7 +391,7 @@ public class ReflectionRoutineBuilders {
         locks[i++] = lock;
       }
 
-      return new BuilderMutex(exchangeMutex, locks);
+      return new SharedMutex(exchangeMutex, locks);
     }
   }
 
@@ -539,24 +539,7 @@ public class ReflectionRoutineBuilders {
 
     if (!Void.class.equals(Reflection.boxingClass(returnType))) {
       if (outputMode != null) {
-        if (Channel.class.isAssignableFrom(returnType)) {
-          return outputChannel;
-        }
-
-        if (returnType.isAssignableFrom(List.class)) {
-          return outputChannel.all();
-        }
-
-        if (returnType.isArray()) {
-          final List<Object> results = outputChannel.all();
-          final int size = results.size();
-          final Object array = Array.newInstance(returnType.getComponentType(), size);
-          for (int i = 0; i < size; ++i) {
-            Array.set(array, i, results.get(i));
-          }
-
-          return array;
-        }
+        return outputChannel;
       }
 
       return outputChannel.all().iterator().next();
@@ -812,44 +795,6 @@ public class ReflectionRoutineBuilders {
   }
 
   /**
-   * Mutex implementation.
-   */
-  private static class BuilderMutex implements Mutex {
-
-    private final ReentrantLock[] mLocks;
-
-    private final ExchangeMutex mMutex;
-
-    /**
-     * Constructor.
-     *
-     * @param mutex the exchange mutex.
-     * @param locks the locks.
-     */
-    private BuilderMutex(@NotNull final ExchangeMutex mutex, @NotNull final ReentrantLock[] locks) {
-      mMutex = mutex;
-      mLocks = locks;
-    }
-
-    public void acquire() throws InterruptedException {
-      mMutex.acquirePartialMutex();
-      for (final ReentrantLock lock : mLocks) {
-        lock.lock();
-      }
-    }
-
-    public void release() {
-      final ReentrantLock[] locks = mLocks;
-      final int length = locks.length;
-      for (int i = length - 1; i >= 0; --i) {
-        locks[i].unlock();
-      }
-
-      mMutex.releasePartialMutex();
-    }
-  }
-
-  /**
    * Class used to synchronize between partial and full mutexes.
    */
   private static class ExchangeMutex implements Mutex {
@@ -861,6 +806,18 @@ public class ReflectionRoutineBuilders {
     private int mFullMutexCount;
 
     private int mPartialMutexCount;
+
+    public void acquire() throws InterruptedException {
+      synchronized (mMutex) {
+        while (mPartialMutexCount > 0) {
+          mMutex.wait();
+        }
+
+        ++mFullMutexCount;
+      }
+
+      mLock.lock();
+    }
 
     /**
      * Acquires a partial mutex making sure that no full one is already taken.
@@ -888,18 +845,6 @@ public class ReflectionRoutineBuilders {
       }
     }
 
-    public void acquire() throws InterruptedException {
-      synchronized (mMutex) {
-        while (mPartialMutexCount > 0) {
-          mMutex.wait();
-        }
-
-        ++mFullMutexCount;
-      }
-
-      mLock.lock();
-    }
-
     public void release() {
       mLock.unlock();
       synchronized (mMutex) {
@@ -907,6 +852,44 @@ public class ReflectionRoutineBuilders {
           mMutex.notifyAll();
         }
       }
+    }
+  }
+
+  /**
+   * Mutex implementation.
+   */
+  private static class SharedMutex implements Mutex {
+
+    private final ReentrantLock[] mLocks;
+
+    private final ExchangeMutex mMutex;
+
+    /**
+     * Constructor.
+     *
+     * @param mutex the exchange mutex.
+     * @param locks the locks.
+     */
+    private SharedMutex(@NotNull final ExchangeMutex mutex, @NotNull final ReentrantLock[] locks) {
+      mMutex = mutex;
+      mLocks = locks;
+    }
+
+    public void acquire() throws InterruptedException {
+      mMutex.acquirePartialMutex();
+      for (final ReentrantLock lock : mLocks) {
+        lock.lock();
+      }
+    }
+
+    public void release() {
+      final ReentrantLock[] locks = mLocks;
+      final int length = locks.length;
+      for (int i = length - 1; i >= 0; --i) {
+        locks[i].unlock();
+      }
+
+      mMutex.releasePartialMutex();
     }
   }
 }

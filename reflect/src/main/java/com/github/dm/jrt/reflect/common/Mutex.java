@@ -28,7 +28,7 @@ public interface Mutex {
    * <br>
    * This mutex does not implement any kind of synchronization.
    */
-  Mutex NO_MUTEX = new Mutex() {
+  Mutex NONE = new Mutex() {
 
     public void acquire() {}
 

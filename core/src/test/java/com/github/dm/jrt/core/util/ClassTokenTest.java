@@ -100,7 +100,7 @@ public class ClassTokenTest {
 
     assertThat(ClassToken.tokenOf(List.class)).isEqualTo(new ClassToken<List>() {});
     assertThat(ClassToken.tokenOf(new ArrayList())).isEqualTo(new ClassToken<ArrayList>() {});
-    assertThat(ClassToken.tokenOf(new ArrayList<String>())).isEqualTo(
+    assertThat(ClassToken.tokenOf(new ArrayList<String>())).isNotEqualTo(
         new ClassToken<ArrayList<String>>() {});
   }
 

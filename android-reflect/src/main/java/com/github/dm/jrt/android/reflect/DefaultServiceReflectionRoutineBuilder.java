@@ -472,7 +472,7 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
 
     private Object mInstance;
 
-    private Mutex mMutex = Mutex.NO_MUTEX;
+    private Mutex mMutex = Mutex.NONE;
 
     /**
      * Constructor.

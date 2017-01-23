@@ -99,7 +99,7 @@ public class Numbers {
           }
 
           public Number apply(final Number n1, final Number n2) {
-            return n1.byteValue() + n2.byteValue();
+            return (byte) (n1.byteValue() + n2.byteValue());
           }
         });
         put(Short.class, new PrecisionFunction() {
@@ -111,7 +111,7 @@ public class Numbers {
           }
 
           public Number apply(final Number n1, final Number n2) {
-            return n1.shortValue() + n2.shortValue();
+            return (short) (n1.shortValue() + n2.shortValue());
           }
         });
         put(Integer.class, new PrecisionFunction() {
@@ -213,7 +213,7 @@ public class Numbers {
           }
 
           public Number apply(final Number n1, final Number n2) {
-            return n1.byteValue() - n2.byteValue();
+            return (byte) (n1.byteValue() - n2.byteValue());
           }
         });
         put(Short.class, new PrecisionFunction() {
@@ -225,7 +225,7 @@ public class Numbers {
           }
 
           public Number apply(final Number n1, final Number n2) {
-            return n1.shortValue() - n2.shortValue();
+            return (short) (n1.shortValue() - n2.shortValue());
           }
         });
         put(Integer.class, new PrecisionFunction() {

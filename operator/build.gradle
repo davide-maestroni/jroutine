@@ -60,3 +60,7 @@ javadoc {
       "${prefix}/core/",
       "${prefix}/function/")
 }
+
+tasks.withType(FindBugs) {
+  excludeFilter = file('findbugs.xml')
+}

@@ -119,29 +119,29 @@ public class ReflectionRoutineBuilders {
       @NotNull final Channel<Object, ?> result, @Nullable final InputMode inputMode,
       @Nullable final OutputMode outputMode) throws Exception {
     Reflection.makeAccessible(targetMethod);
+    final Object[] args;
+    if (inputMode == InputMode.COLLECTION) {
+      final Class<?> paramClass = targetMethod.getParameterTypes()[0];
+      if (paramClass.isArray()) {
+        final int size = objects.size();
+        final Object array = Array.newInstance(paramClass.getComponentType(), size);
+        for (int i = 0; i < size; ++i) {
+          Array.set(array, i, objects.get(i));
+        }
+
+        args = asArgs(array);
+
+      } else {
+        args = asArgs(objects);
+      }
+
+    } else {
+      args = objects.toArray(new Object[objects.size()]);
+    }
+
     final Object methodResult;
     mutex.acquire();
     try {
-      final Object[] args;
-      if (inputMode == InputMode.COLLECTION) {
-        final Class<?> paramClass = targetMethod.getParameterTypes()[0];
-        if (paramClass.isArray()) {
-          final int size = objects.size();
-          final Object array = Array.newInstance(paramClass.getComponentType(), size);
-          for (int i = 0; i < size; ++i) {
-            Array.set(array, i, objects.get(i));
-          }
-
-          args = asArgs(array);
-
-        } else {
-          args = asArgs(objects);
-        }
-
-      } else {
-        args = objects.toArray(new Object[objects.size()]);
-      }
-
       methodResult = targetMethod.invoke(target, args);
 
     } catch (final InvocationTargetException e) {

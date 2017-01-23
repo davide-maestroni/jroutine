@@ -165,27 +165,6 @@ public abstract class ClassToken<TYPE> {
   }
 
   /**
-   * Checks if this token raw class is equal to or is a superclass of the specified one.
-   *
-   * @param other the class token to compare.
-   * @return whether this token raw class is equal to or is a superclass.
-   * @throws java.lang.IllegalStateException if this class does not correctly extend a class token.
-   */
-  public final boolean isAssignableFrom(@NotNull final ClassToken<?> other) {
-    return getRawClass().isAssignableFrom(other.getRawClass());
-  }
-
-  /**
-   * Checks if this token raw class represents an interface.
-   *
-   * @return whether this token raw class is an interface.
-   * @throws java.lang.IllegalStateException if this class does not correctly extend a class token.
-   */
-  public final boolean isInterface() {
-    return getRawClass().isInterface();
-  }
-
-  /**
    * Default class token implementation.
    *
    * @param <TYPE> the class type.

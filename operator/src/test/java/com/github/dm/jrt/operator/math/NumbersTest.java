@@ -122,6 +122,87 @@ public class NumbersTest {
   }
 
   @Test
+  public void testSubtract() {
+    assertThat(Numbers.subtract(1, 2)).isEqualTo(-1);
+    assertThat(Numbers.subtract(1, (byte) 2)).isEqualTo(-1);
+    assertThat(Numbers.subtract((short) -1, 2.5f)).isEqualTo(-3.5f);
+    assertThat(Numbers.subtract(-1L, 2.5)).isEqualTo(-3.5);
+    assertThat(Numbers.subtract(BigDecimal.ZERO, 2.5)).isEqualTo(new BigDecimal(-2.5));
+    assertThat(Numbers.subtract(BigDecimal.ONE, new MyNumber())).isNull();
+    assertThat(Numbers.subtract(new MyNumber(), BigDecimal.ONE)).isNull();
+    assertThat(Numbers.subtract(BigInteger.ONE, 2.5)).isEqualTo(new BigDecimal(-1.5));
+    assertThat(Numbers.subtract(BigInteger.ONE, 1)).isEqualTo(BigInteger.ZERO);
+    assertThat(Numbers.subtract(BigInteger.ONE, new MyNumber())).isNull();
+    assertThat(Numbers.subtract(new MyNumber(), BigInteger.ONE)).isNull();
+    assertThat(Numbers.subtract(new MyNumber(), new MyNumber())).isNull();
+  }
+
+  @Test
+  public void testSubtractOptimistic() {
+    assertThat(Numbers.subtractOptimistic(1, 2)).isEqualTo(-1);
+    assertThat(Numbers.subtractOptimistic(1, (byte) 2)).isEqualTo(-1);
+    assertThat(Numbers.subtractOptimistic((short) -1, 2.5f)).isEqualTo(-3.5f);
+    assertThat(Numbers.subtractOptimistic(-1L, 2.5)).isEqualTo(-3.5);
+    assertThat(Numbers.subtractOptimistic(BigDecimal.ZERO, 2.5)).isEqualTo(new BigDecimal(-2.5));
+    assertThat(Numbers.subtractOptimistic(BigDecimal.ONE, new MyNumber())).isEqualTo(
+        BigDecimal.ONE);
+    assertThat(Numbers.subtractOptimistic(new MyNumber(), BigDecimal.ONE)).isEqualTo(
+        new BigDecimal(-1));
+    assertThat(Numbers.subtractOptimistic(BigInteger.ONE, 2.5)).isEqualTo(new BigDecimal(-1.5));
+    assertThat(Numbers.subtractOptimistic(BigInteger.ONE, 1)).isEqualTo(BigInteger.ZERO);
+    assertThat(Numbers.subtractOptimistic(BigInteger.ONE, new MyNumber())).isEqualTo(
+        BigInteger.ONE);
+    assertThat(Numbers.subtractOptimistic(new MyNumber(), BigInteger.ONE)).isEqualTo(
+        BigInteger.valueOf(-1));
+    assertThat(Numbers.subtractOptimistic(new MyNumber(), new MyNumber())).isEqualTo(0d);
+  }
+
+  @Test
+  public void testSubtractSafe() {
+    assertThat(Numbers.subtractSafe(1, 2)).isEqualTo(-1);
+    assertThat(Numbers.subtractSafe(1, (byte) 2)).isEqualTo(-1);
+    assertThat(Numbers.subtractSafe((short) -1, 2.5f)).isEqualTo(-3.5f);
+    assertThat(Numbers.subtractSafe(-1L, 2.5)).isEqualTo(-3.5);
+    assertThat(Numbers.subtractSafe(BigDecimal.ZERO, 2.5)).isEqualTo(new BigDecimal(-2.5));
+    try {
+      Numbers.subtractSafe(BigDecimal.ONE, new MyNumber());
+      fail();
+
+    } catch (final IllegalArgumentException ignored) {
+    }
+
+    try {
+      Numbers.subtractSafe(new MyNumber(), BigDecimal.ONE);
+      fail();
+
+    } catch (final IllegalArgumentException ignored) {
+    }
+
+    assertThat(Numbers.subtractSafe(BigInteger.ONE, 2.5)).isEqualTo(new BigDecimal(-1.5));
+    assertThat(Numbers.subtractSafe(BigInteger.ONE, 1)).isEqualTo(BigInteger.ZERO);
+    try {
+      Numbers.subtractSafe(BigInteger.ONE, new MyNumber());
+      fail();
+
+    } catch (final IllegalArgumentException ignored) {
+    }
+
+    try {
+      Numbers.subtractSafe(new MyNumber(), BigInteger.ONE);
+      fail();
+
+    } catch (final IllegalArgumentException ignored) {
+    }
+
+    try {
+      Numbers.subtractSafe(new MyNumber(), new MyNumber());
+      fail();
+
+    } catch (final IllegalArgumentException ignored) {
+    }
+  }
+
+  @Test
   public void testToBig() {
     assertThat(Numbers.toBigDecimal(3)).isEqualTo(new BigDecimal(3));
     assertThat(Numbers.toBigDecimal((byte) 2)).isEqualTo(new BigDecimal(2));

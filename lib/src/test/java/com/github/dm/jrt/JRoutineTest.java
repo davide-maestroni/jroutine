@@ -594,7 +594,7 @@ public class JRoutineTest {
                                                }
                                              })
                                              .sync()
-                                             .map(Operators.<Double>averageDouble())
+                                             .map(Operators.average(Double.class))
                                              .close()
                                              .in(seconds(3))
                                              .next()).isCloseTo(21, Offset.offset(0.1));

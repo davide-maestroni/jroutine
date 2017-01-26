@@ -23,11 +23,9 @@ import com.github.dm.jrt.core.invocation.TemplateInvocation;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.math.RoundingMode;
-
-import static com.github.dm.jrt.operator.math.Numbers.addOptimistic;
+import static com.github.dm.jrt.operator.math.Numbers.addSafe;
+import static com.github.dm.jrt.operator.math.Numbers.convertToSafe;
+import static com.github.dm.jrt.operator.math.Numbers.divideSafe;
 
 /**
  * Invocation computing the average of the input numbers.
@@ -70,47 +68,19 @@ class AverageInvocation extends TemplateInvocation<Number, Number> {
 
   @Override
   public void onComplete(@NotNull final Channel<Number, ?> result) {
-    if (mCount == 0) {
+    final int count = mCount;
+    if (count == 0) {
       result.pass(0);
 
     } else {
-      final Number mean;
       final Number sum = mSum;
-      if (sum instanceof BigDecimal) {
-        mean = ((BigDecimal) sum).divide(new BigDecimal(mCount), 15, RoundingMode.HALF_UP);
-
-      } else if (sum instanceof BigInteger) {
-        mean = ((BigInteger) sum).divide(BigInteger.valueOf(mCount));
-
-      } else if (sum instanceof Double) {
-        mean = sum.doubleValue() / mCount;
-
-      } else if (sum instanceof Float) {
-        mean = sum.floatValue() / mCount;
-
-      } else if (sum instanceof Long) {
-        mean = sum.longValue() / mCount;
-
-      } else if (sum instanceof Integer) {
-        mean = sum.intValue() / mCount;
-
-      } else if (sum instanceof Short) {
-        mean = (short) (sum.shortValue() / mCount);
-
-      } else if (sum instanceof Byte) {
-        mean = (byte) (sum.byteValue() / mCount);
-
-      } else {
-        mean = sum.doubleValue() / mCount;
-      }
-
-      result.pass(mean);
+      result.pass(convertToSafe(sum.getClass(), divideSafe(sum, count)));
     }
   }
 
   @Override
   public void onInput(final Number input, @NotNull final Channel<Number, ?> result) {
-    mSum = addOptimistic(mSum, input);
+    mSum = addSafe(mSum, input);
     ++mCount;
   }
 

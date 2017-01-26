@@ -36,7 +36,6 @@ import org.junit.Test;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -282,57 +281,64 @@ public class OperatorsTest {
                            .call(new BigDecimal(1), new BigDecimal(2), new BigDecimal(3),
                                new BigDecimal(4))
                            .in(seconds(3))
-                           .next()).isEqualTo(
-        new BigDecimal(2.5).setScale(15, RoundingMode.HALF_EVEN));
+                           .next()).isEqualTo(new BigDecimal(2.5));
   }
 
   @Test
   public void testAverageBig() {
-    assertThat(JRoutineCore.with(Operators.<Integer>averageBig())
+    assertThat(JRoutineCore.with(Operators.average(BigDecimal.class))
                            .call(1, 2, 3, 4)
                            .in(seconds(3))
                            .next()).isEqualTo(new BigDecimal(2.5));
-    assertThat(
-        JRoutineCore.with(Operators.<Float>averageBig()).call(1f, 2f, 3f, 4f).in(seconds(3)).next())
-        .isEqualTo(new BigDecimal(2.5));
+    assertThat(JRoutineCore.with(Operators.average(BigDecimal.class))
+                           .call(1f, 2f, 3f, 4f)
+                           .in(seconds(3))
+                           .next()).isEqualTo(new BigDecimal(2.5));
   }
 
   @Test
   public void testAverageByte() {
-    assertThat(JRoutineCore.with(Operators.averageByte()).close().in(seconds(3)).next()).isEqualTo(
+    assertThat(
+        JRoutineCore.with(Operators.average(Byte.class)).close().in(seconds(3)).next()).isEqualTo(
         (byte) 0);
-    assertThat(JRoutineCore.with(Operators.averageByte())
-                           .call(1L, 2L, 3L, 4L)
-                           .in(seconds(3))
-                           .next()).isEqualTo((byte) 2);
-    assertThat(JRoutineCore.with(Operators.averageByte())
+    assertThat(
+        JRoutineCore.with(Operators.average(Byte.class)).call(1L, 2L, 3L, 4L).in(seconds(3)).next())
+        .isEqualTo((byte) 2);
+    assertThat(JRoutineCore.with(Operators.average(Byte.class))
                            .call(1, 2, 3, 4)
                            .in(seconds(3))
                            .next()).isEqualTo((byte) 2);
-    assertThat(JRoutineCore.with(Operators.averageByte())
+    assertThat(JRoutineCore.with(Operators.average(Byte.class))
                            .call((short) 1, (short) 2, (short) 3, (short) 4)
                            .in(seconds(3))
                            .next()).isEqualTo((byte) 2);
-    assertThat(JRoutineCore.with(Operators.averageByte())
+    assertThat(JRoutineCore.with(Operators.average(Byte.class))
                            .call((byte) 1, (byte) 2, (byte) 3, (byte) 4)
                            .in(seconds(3))
                            .next()).isEqualTo((byte) 2);
-    assertThat(JRoutineCore.with(Operators.averageByte())
+    assertThat(JRoutineCore.with(Operators.average(Byte.class))
                            .call(1.0, 2.0, 3.0, 4.0)
                            .in(seconds(3))
                            .next()).isEqualTo((byte) 2);
-    assertThat(JRoutineCore.with(Operators.averageByte())
-                           .call(1f, 2f, 3f, 4f)
-                           .in(seconds(3))
-                           .next()).isEqualTo((byte) 2);
-    assertThat(JRoutineCore.with(Operators.averageByte())
+    assertThat(
+        JRoutineCore.with(Operators.average(Byte.class)).call(1f, 2f, 3f, 4f).in(seconds(3)).next())
+        .isEqualTo((byte) 2);
+    assertThat(JRoutineCore.with(Operators.average(Byte.class))
                            .call(BigInteger.valueOf(1), BigInteger.valueOf(2),
                                BigInteger.valueOf(3), BigInteger.valueOf(4))
                            .in(seconds(3))
                            .next()).isEqualTo((byte) 2);
-    assertThat(JRoutineCore.with(Operators.averageByte())
+    assertThat(JRoutineCore.with(Operators.average(Byte.class))
                            .call(new BigDecimal(1), new BigDecimal(2), new BigDecimal(3),
                                new BigDecimal(4))
+                           .in(seconds(3))
+                           .next()).isEqualTo((byte) 2);
+    assertThat(JRoutineCore.with(Operators.average(Integer.class, Byte.class))
+                           .close()
+                           .in(seconds(3))
+                           .next()).isEqualTo((byte) 0);
+    assertThat(JRoutineCore.with(Operators.average(Float.class, Byte.class))
+                           .call(1L, 2L, 3L, 4L)
                            .in(seconds(3))
                            .next()).isEqualTo((byte) 2);
   }
@@ -340,196 +346,243 @@ public class OperatorsTest {
   @Test
   public void testAverageDouble() {
     assertThat(
-        JRoutineCore.with(Operators.averageDouble()).close().in(seconds(3)).next()).isEqualTo(0d);
-    assertThat(JRoutineCore.with(Operators.averageDouble())
+        JRoutineCore.with(Operators.average(Double.class)).close().in(seconds(3)).next()).isEqualTo(
+        0d);
+    assertThat(JRoutineCore.with(Operators.average(Double.class))
                            .call(1L, 2L, 3L, 4L)
                            .in(seconds(3))
                            .next()).isEqualTo(2.5);
-    assertThat(JRoutineCore.with(Operators.averageDouble())
+    assertThat(JRoutineCore.with(Operators.average(Double.class))
                            .call(1, 2, 3, 4)
                            .in(seconds(3))
                            .next()).isEqualTo(2.5);
-    assertThat(JRoutineCore.with(Operators.averageDouble())
+    assertThat(JRoutineCore.with(Operators.average(Double.class))
                            .call((short) 1, (short) 2, (short) 3, (short) 4)
                            .in(seconds(3))
                            .next()).isEqualTo(2.5);
-    assertThat(JRoutineCore.with(Operators.averageDouble())
+    assertThat(JRoutineCore.with(Operators.average(Double.class))
                            .call((byte) 1, (byte) 2, (byte) 3, (byte) 4)
                            .in(seconds(3))
                            .next()).isEqualTo(2.5);
-    assertThat(
-        JRoutineCore.with(Operators.averageDouble()).call(1.0, 2.0, 3.0, 4.0).in(seconds(3)).next())
-        .isEqualTo(2.5);
-    assertThat(JRoutineCore.with(Operators.averageDouble())
+    assertThat(JRoutineCore.with(Operators.average(Double.class))
+                           .call(1.0, 2.0, 3.0, 4.0)
+                           .in(seconds(3))
+                           .next()).isEqualTo(2.5);
+    assertThat(JRoutineCore.with(Operators.average(Double.class))
                            .call(1f, 2f, 3f, 4f)
                            .in(seconds(3))
                            .next()).isEqualTo(2.5);
-    assertThat(JRoutineCore.with(Operators.averageDouble())
+    assertThat(JRoutineCore.with(Operators.average(Double.class))
                            .call(BigInteger.valueOf(1), BigInteger.valueOf(2),
                                BigInteger.valueOf(3), BigInteger.valueOf(4))
                            .in(seconds(3))
                            .next()).isEqualTo(2.5);
-    assertThat(JRoutineCore.with(Operators.averageDouble())
+    assertThat(JRoutineCore.with(Operators.average(Double.class))
                            .call(new BigDecimal(1), new BigDecimal(2), new BigDecimal(3),
                                new BigDecimal(4))
+                           .in(seconds(3))
+                           .next()).isEqualTo(2.5);
+    assertThat(JRoutineCore.with(Operators.average(Integer.class, Double.class))
+                           .close()
+                           .in(seconds(3))
+                           .next()).isEqualTo(0d);
+    assertThat(JRoutineCore.with(Operators.average(Long.class, Double.class))
+                           .call(1L, 2L, 3L, 4L)
                            .in(seconds(3))
                            .next()).isEqualTo(2.5);
   }
 
   @Test
   public void testAverageFloat() {
-    assertThat(JRoutineCore.with(Operators.averageFloat()).close().in(seconds(3)).next()).isEqualTo(
+    assertThat(
+        JRoutineCore.with(Operators.average(Float.class)).close().in(seconds(3)).next()).isEqualTo(
         0f);
-    assertThat(JRoutineCore.with(Operators.averageFloat())
+    assertThat(JRoutineCore.with(Operators.average(Float.class))
                            .call(1L, 2L, 3L, 4L)
                            .in(seconds(3))
                            .next()).isEqualTo(2.5f);
-    assertThat(JRoutineCore.with(Operators.averageFloat())
+    assertThat(JRoutineCore.with(Operators.average(Float.class))
                            .call(1, 2, 3, 4)
                            .in(seconds(3))
                            .next()).isEqualTo(2.5f);
-    assertThat(JRoutineCore.with(Operators.averageFloat())
+    assertThat(JRoutineCore.with(Operators.average(Float.class))
                            .call((short) 1, (short) 2, (short) 3, (short) 4)
                            .in(seconds(3))
                            .next()).isEqualTo(2.5f);
-    assertThat(JRoutineCore.with(Operators.averageFloat())
+    assertThat(JRoutineCore.with(Operators.average(Float.class))
                            .call((byte) 1, (byte) 2, (byte) 3, (byte) 4)
                            .in(seconds(3))
                            .next()).isEqualTo(2.5f);
-    assertThat(JRoutineCore.with(Operators.averageFloat())
+    assertThat(JRoutineCore.with(Operators.average(Float.class))
                            .call(1.0, 2.0, 3.0, 4.0)
                            .in(seconds(3))
                            .next()).isEqualTo(2.5f);
-    assertThat(JRoutineCore.with(Operators.averageFloat())
+    assertThat(JRoutineCore.with(Operators.average(Float.class))
                            .call(1f, 2f, 3f, 4f)
                            .in(seconds(3))
                            .next()).isEqualTo(2.5f);
-    assertThat(JRoutineCore.with(Operators.averageFloat())
+    assertThat(JRoutineCore.with(Operators.average(Float.class))
                            .call(BigInteger.valueOf(1), BigInteger.valueOf(2),
                                BigInteger.valueOf(3), BigInteger.valueOf(4))
                            .in(seconds(3))
                            .next()).isEqualTo(2.5f);
-    assertThat(JRoutineCore.with(Operators.averageFloat())
+    assertThat(JRoutineCore.with(Operators.average(Float.class))
                            .call(new BigDecimal(1), new BigDecimal(2), new BigDecimal(3),
                                new BigDecimal(4))
+                           .in(seconds(3))
+                           .next()).isEqualTo(2.5f);
+    assertThat(JRoutineCore.with(Operators.average(Short.class, Float.class))
+                           .close()
+                           .in(seconds(3))
+                           .next()).isEqualTo(0f);
+    assertThat(JRoutineCore.with(Operators.average(Double.class, Float.class))
+                           .call(1L, 2L, 3L, 4L)
                            .in(seconds(3))
                            .next()).isEqualTo(2.5f);
   }
 
   @Test
   public void testAverageInteger() {
-    assertThat(
-        JRoutineCore.with(Operators.averageInteger()).close().in(seconds(3)).next()).isEqualTo(0);
-    assertThat(JRoutineCore.with(Operators.averageInteger())
+    assertThat(JRoutineCore.with(Operators.average(Integer.class))
+                           .close()
+                           .in(seconds(3))
+                           .next()).isEqualTo(0);
+    assertThat(JRoutineCore.with(Operators.average(Integer.class))
                            .call(1L, 2L, 3L, 4L)
                            .in(seconds(3))
                            .next()).isEqualTo(2);
-    assertThat(JRoutineCore.with(Operators.averageInteger()).call(1, 2, 3, 4).in(seconds(3)).next())
-        .isEqualTo(2);
-    assertThat(JRoutineCore.with(Operators.averageInteger())
+    assertThat(JRoutineCore.with(Operators.average(Integer.class))
+                           .call(1, 2, 3, 4)
+                           .in(seconds(3))
+                           .next()).isEqualTo(2);
+    assertThat(JRoutineCore.with(Operators.average(Integer.class))
                            .call((short) 1, (short) 2, (short) 3, (short) 4)
                            .in(seconds(3))
                            .next()).isEqualTo(2);
-    assertThat(JRoutineCore.with(Operators.averageInteger())
+    assertThat(JRoutineCore.with(Operators.average(Integer.class))
                            .call((byte) 1, 2, (byte) 3, (byte) 4)
                            .in(seconds(3))
                            .next()).isEqualTo(2);
-    assertThat(JRoutineCore.with(Operators.averageInteger())
+    assertThat(JRoutineCore.with(Operators.average(Integer.class))
                            .call(1.0, 2.0, 3.0, 4.0)
                            .in(seconds(3))
                            .next()).isEqualTo(2);
-    assertThat(JRoutineCore.with(Operators.averageInteger())
+    assertThat(JRoutineCore.with(Operators.average(Integer.class))
                            .call(1f, 2f, 3f, 4f)
                            .in(seconds(3))
                            .next()).isEqualTo(2);
-    assertThat(JRoutineCore.with(Operators.averageInteger())
+    assertThat(JRoutineCore.with(Operators.average(Integer.class))
                            .call(BigInteger.valueOf(1), BigInteger.valueOf(2),
                                BigInteger.valueOf(3), BigInteger.valueOf(4))
                            .in(seconds(3))
                            .next()).isEqualTo(2);
-    assertThat(JRoutineCore.with(Operators.averageInteger())
+    assertThat(JRoutineCore.with(Operators.average(Integer.class))
                            .call(new BigDecimal(1), new BigDecimal(2), new BigDecimal(3),
                                new BigDecimal(4))
+                           .in(seconds(3))
+                           .next()).isEqualTo(2);
+    assertThat(JRoutineCore.with(Operators.average(Float.class, Integer.class))
+                           .close()
+                           .in(seconds(3))
+                           .next()).isEqualTo(0);
+    assertThat(JRoutineCore.with(Operators.average(Byte.class, Integer.class))
+                           .call(1L, 2L, 3L, 4L)
                            .in(seconds(3))
                            .next()).isEqualTo(2);
   }
 
   @Test
   public void testAverageLong() {
-    assertThat(JRoutineCore.with(Operators.averageLong()).close().in(seconds(3)).next()).isEqualTo(
+    assertThat(
+        JRoutineCore.with(Operators.average(Long.class)).close().in(seconds(3)).next()).isEqualTo(
         0L);
-    assertThat(JRoutineCore.with(Operators.averageLong())
-                           .call(1L, 2L, 3L, 4L)
-                           .in(seconds(3))
-                           .next()).isEqualTo(2L);
-    assertThat(JRoutineCore.with(Operators.averageLong())
+    assertThat(
+        JRoutineCore.with(Operators.average(Long.class)).call(1L, 2L, 3L, 4L).in(seconds(3)).next())
+        .isEqualTo(2L);
+    assertThat(JRoutineCore.with(Operators.average(Long.class))
                            .call(1, 2, 3, 4)
                            .in(seconds(3))
                            .next()).isEqualTo(2L);
-    assertThat(JRoutineCore.with(Operators.averageLong())
+    assertThat(JRoutineCore.with(Operators.average(Long.class))
                            .call((short) 1, (short) 2, (short) 3, (short) 4)
                            .in(seconds(3))
                            .next()).isEqualTo(2L);
-    assertThat(JRoutineCore.with(Operators.averageLong())
+    assertThat(JRoutineCore.with(Operators.average(Long.class))
                            .call((byte) 1, 2L, (byte) 3, (byte) 4)
                            .in(seconds(3))
                            .next()).isEqualTo(2L);
-    assertThat(JRoutineCore.with(Operators.averageLong())
+    assertThat(JRoutineCore.with(Operators.average(Long.class))
                            .call(1.0, 2.0, 3.0, 4.0)
                            .in(seconds(3))
                            .next()).isEqualTo(2L);
-    assertThat(JRoutineCore.with(Operators.averageLong())
-                           .call(1f, 2f, 3f, 4f)
-                           .in(seconds(3))
-                           .next()).isEqualTo(2L);
-    assertThat(JRoutineCore.with(Operators.averageLong())
+    assertThat(
+        JRoutineCore.with(Operators.average(Long.class)).call(1f, 2f, 3f, 4f).in(seconds(3)).next())
+        .isEqualTo(2L);
+    assertThat(JRoutineCore.with(Operators.average(Long.class))
                            .call(BigInteger.valueOf(1), BigInteger.valueOf(2),
                                BigInteger.valueOf(3), BigInteger.valueOf(4))
                            .in(seconds(3))
                            .next()).isEqualTo(2L);
-    assertThat(JRoutineCore.with(Operators.averageLong())
+    assertThat(JRoutineCore.with(Operators.average(Long.class))
                            .call(new BigDecimal(1), new BigDecimal(2), new BigDecimal(3),
                                new BigDecimal(4))
+                           .in(seconds(3))
+                           .next()).isEqualTo(2L);
+    assertThat(JRoutineCore.with(Operators.average(BigDecimal.class, Long.class))
+                           .close()
+                           .in(seconds(3))
+                           .next()).isEqualTo(0L);
+    assertThat(JRoutineCore.with(Operators.average(BigInteger.class, Long.class))
+                           .call(1L, 2L, 3L, 4L)
                            .in(seconds(3))
                            .next()).isEqualTo(2L);
   }
 
   @Test
   public void testAverageShort() {
-    assertThat(JRoutineCore.with(Operators.averageShort()).close().in(seconds(3)).next()).isEqualTo(
+    assertThat(
+        JRoutineCore.with(Operators.average(Short.class)).close().in(seconds(3)).next()).isEqualTo(
         (short) 0);
-    assertThat(JRoutineCore.with(Operators.averageShort())
+    assertThat(JRoutineCore.with(Operators.average(Short.class))
                            .call(1L, 2L, 3L, 4L)
                            .in(seconds(3))
                            .next()).isEqualTo((short) 2);
-    assertThat(JRoutineCore.with(Operators.averageShort())
+    assertThat(JRoutineCore.with(Operators.average(Short.class))
                            .call(1, 2, 3, 4)
                            .in(seconds(3))
                            .next()).isEqualTo((short) 2);
-    assertThat(JRoutineCore.with(Operators.averageShort())
+    assertThat(JRoutineCore.with(Operators.average(Short.class))
                            .call((short) 1, (short) 2, (short) 3, (short) 4)
                            .in(seconds(3))
                            .next()).isEqualTo((short) 2);
-    assertThat(JRoutineCore.with(Operators.averageShort())
+    assertThat(JRoutineCore.with(Operators.average(Short.class))
                            .call((byte) 1, (short) 2, (byte) 3, (byte) 4)
                            .in(seconds(3))
                            .next()).isEqualTo((short) 2);
-    assertThat(JRoutineCore.with(Operators.averageShort())
+    assertThat(JRoutineCore.with(Operators.average(Short.class))
                            .call(1.0, 2.0, 3.0, 4.0)
                            .in(seconds(3))
                            .next()).isEqualTo((short) 2);
-    assertThat(JRoutineCore.with(Operators.averageShort())
+    assertThat(JRoutineCore.with(Operators.average(Short.class))
                            .call(1f, 2f, 3f, 4f)
                            .in(seconds(3))
                            .next()).isEqualTo((short) 2);
-    assertThat(JRoutineCore.with(Operators.averageShort())
+    assertThat(JRoutineCore.with(Operators.average(Short.class))
                            .call(BigInteger.valueOf(1), BigInteger.valueOf(2),
                                BigInteger.valueOf(3), BigInteger.valueOf(4))
                            .in(seconds(3))
                            .next()).isEqualTo((short) 2);
-    assertThat(JRoutineCore.with(Operators.averageShort())
+    assertThat(JRoutineCore.with(Operators.average(Short.class))
                            .call(new BigDecimal(1), new BigDecimal(2), new BigDecimal(3),
                                new BigDecimal(4))
+                           .in(seconds(3))
+                           .next()).isEqualTo((short) 2);
+    assertThat(JRoutineCore.with(Operators.average(Short.class, Short.class))
+                           .close()
+                           .in(seconds(3))
+                           .next()).isEqualTo((short) 0);
+    assertThat(JRoutineCore.with(Operators.average(Short.class, Short.class))
+                           .call(1L, 2L, 3L, 4L)
                            .in(seconds(3))
                            .next()).isEqualTo((short) 2);
   }
@@ -1848,61 +1901,68 @@ public class OperatorsTest {
 
   @Test
   public void testSumBig() {
-    assertThat(
-        JRoutineCore.with(Operators.sumBig()).call(1, 2, 3, 4).in(seconds(3)).next()).isEqualTo(
-        new BigDecimal(10));
+    assertThat(JRoutineCore.with(Operators.sum(BigDecimal.class))
+                           .call(1, 2, 3, 4)
+                           .in(seconds(3))
+                           .next()).isEqualTo(new BigDecimal(10));
   }
 
   @Test
   public void testSumByte() {
-    assertThat(JRoutineCore.with(Operators.sumByte()).close().in(seconds(3)).next()).isEqualTo(
-        (byte) 0);
     assertThat(
-        JRoutineCore.with(Operators.sumByte()).call(1, 2, 3, 4).in(seconds(3)).next()).isEqualTo(
-        (byte) 10);
+        JRoutineCore.with(Operators.sum(Byte.class)).close().in(seconds(3)).next()).isEqualTo(
+        (byte) 0);
+    assertThat(JRoutineCore.with(Operators.sum(Byte.class))
+                           .call(1, 2, 3, 4)
+                           .in(seconds(3))
+                           .next()).isEqualTo((byte) 10);
   }
 
   @Test
   public void testSumDouble() {
-    assertThat(JRoutineCore.with(Operators.sumDouble()).close().in(seconds(3)).next()).isEqualTo(
-        0d);
     assertThat(
-        JRoutineCore.with(Operators.sumDouble()).call(1, 2, 3, 4).in(seconds(3)).next()).isEqualTo(
-        10d);
+        JRoutineCore.with(Operators.sum(Double.class)).close().in(seconds(3)).next()).isEqualTo(0d);
+    assertThat(JRoutineCore.with(Operators.sum(Double.class))
+                           .call(1, 2, 3, 4)
+                           .in(seconds(3))
+                           .next()).isEqualTo(10d);
   }
 
   @Test
   public void testSumFloat() {
-    assertThat(JRoutineCore.with(Operators.sumFloat()).close().in(seconds(3)).next()).isEqualTo(0f);
     assertThat(
-        JRoutineCore.with(Operators.sumFloat()).call(1, 2, 3, 4).in(seconds(3)).next()).isEqualTo(
-        10f);
+        JRoutineCore.with(Operators.sum(Float.class)).close().in(seconds(3)).next()).isEqualTo(0f);
+    assertThat(JRoutineCore.with(Operators.sum(Float.class)).call(1, 2, 3, 4).in(seconds(3)).next())
+        .isEqualTo(10f);
   }
 
   @Test
   public void testSumInteger() {
-    assertThat(JRoutineCore.with(Operators.sumInteger()).close().in(seconds(3)).next()).isEqualTo(
-        0);
     assertThat(
-        JRoutineCore.with(Operators.sumInteger()).call(1, 2, 3, 4).in(seconds(3)).next()).isEqualTo(
-        10);
+        JRoutineCore.with(Operators.sum(Integer.class)).close().in(seconds(3)).next()).isEqualTo(0);
+    assertThat(JRoutineCore.with(Operators.sum(Integer.class))
+                           .call(1, 2, 3, 4)
+                           .in(seconds(3))
+                           .next()).isEqualTo(10);
   }
 
   @Test
   public void testSumLong() {
-    assertThat(JRoutineCore.with(Operators.sumLong()).close().in(seconds(3)).next()).isEqualTo(0L);
     assertThat(
-        JRoutineCore.with(Operators.sumLong()).call(1, 2, 3, 4).in(seconds(3)).next()).isEqualTo(
-        10L);
+        JRoutineCore.with(Operators.sum(Long.class)).close().in(seconds(3)).next()).isEqualTo(0L);
+    assertThat(JRoutineCore.with(Operators.sum(Long.class))
+                           .call(1, 2, 3, 4)
+                           .in(seconds(3))
+                           .next()).isEqualTo(10L);
   }
 
   @Test
   public void testSumShort() {
-    assertThat(JRoutineCore.with(Operators.sumShort()).close().in(seconds(3)).next()).isEqualTo(
-        (short) 0);
     assertThat(
-        JRoutineCore.with(Operators.sumShort()).call(1, 2, 3, 4).in(seconds(3)).next()).isEqualTo(
-        (short) 10);
+        JRoutineCore.with(Operators.sum(Short.class)).close().in(seconds(3)).next()).isEqualTo(
+        (short) 0);
+    assertThat(JRoutineCore.with(Operators.sum(Short.class)).call(1, 2, 3, 4).in(seconds(3)).next())
+        .isEqualTo((short) 10);
   }
 
   @Test

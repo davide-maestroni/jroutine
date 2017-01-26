@@ -609,7 +609,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                               .withOutputMaxSize(1)
                               .configured()
                               .map(sqrt())
-                              .map(Operators.<Double>averageDouble())
+                              .map(Operators.average(Double.class))
                               .close()
                               .next()).isCloseTo(21, Offset.offset(0.1));
     assertThat(JRoutineLoaderStreamCompat //
@@ -621,7 +621,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                               .configured()
                               .map(sqrt())
                               .immediate()
-                              .map(Operators.averageDouble())
+                              .map(Operators.average(Double.class))
                               .close()
                               .next()).isCloseTo(21, Offset.offset(0.1));
   }

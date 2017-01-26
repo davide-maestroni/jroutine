@@ -42,11 +42,21 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#parcela
     this.{{name}}.add({{name}}Item);
     return this;
   }
+
+  public {{classname}} addAll{{nameInCamelCase}}Items(java.util.Collection<{{{items.datatypeWithEnum}}}> {{name}}Items) {
+    this.{{name}}.addAll({{name}}Items);
+    return this;
+  }
   {{/isListContainer}}
   {{#isMapContainer}}
 
   public {{classname}} put{{nameInCamelCase}}Item(String key, {{{items.datatypeWithEnum}}} {{name}}Item) {
     this.{{name}}.put(key, {{name}}Item);
+    return this;
+  }
+
+  public {{classname}} putAll{{nameInCamelCase}}Items(java.util.Map<String, {{{items.datatypeWithEnum}}}> {{name}}Items) {
+    this.{{name}}.putAll({{name}}Items);
     return this;
   }
   {{/isMapContainer}}

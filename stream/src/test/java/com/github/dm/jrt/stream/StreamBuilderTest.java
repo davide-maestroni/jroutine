@@ -503,7 +503,7 @@ public class StreamBuilderTest {
                                                        return Math.sqrt(number.doubleValue());
                                                      }
                                                    })
-                                                   .map(Operators.averageDouble())
+                                                   .map(Operators.average(Double.class))
                                                    .close()
                                                    .next()).isCloseTo(21, Offset.offset(0.1));
     assertThat(JRoutineStream.<Integer>withStream().immediateParallel()
@@ -519,7 +519,7 @@ public class StreamBuilderTest {
                                                      }
                                                    })
                                                    .immediate()
-                                                   .map(Operators.averageDouble())
+                                                   .map(Operators.average(Double.class))
                                                    .close()
                                                    .next()).isCloseTo(21, Offset.offset(0.1));
   }

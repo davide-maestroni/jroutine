@@ -186,7 +186,7 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
                                                             }
                                                           })
                                                           .sync()
-                                                          .map(Operators.<Double>averageDouble())
+                                                          .map(Operators.average(Double.class))
                                                           .close()
                                                           .in(seconds(10))
                                                           .next()).isCloseTo(21,

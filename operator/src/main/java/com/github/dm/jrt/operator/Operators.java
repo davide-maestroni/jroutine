@@ -47,7 +47,6 @@ import com.github.dm.jrt.function.SupplierDecorator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -72,12 +71,10 @@ public class Operators {
       };
 
   @SuppressWarnings("unchecked")
-  private static final InvocationFactory<?, ?> sMax =
-      BinaryOperatorInvocation.functionFactory(BiFunctionDecorator.max());
+  private static final InvocationFactory<?, ?> sMax = binary(BiFunctionDecorator.max());
 
   @SuppressWarnings("unchecked")
-  private static final InvocationFactory<?, ?> sMin =
-      BinaryOperatorInvocation.functionFactory(BiFunctionDecorator.min());
+  private static final InvocationFactory<?, ?> sMin = binary(BiFunctionDecorator.min());
 
   private static final InvocationFactory<?, ?> sNone =
       Functions.predicateFilter(PredicateDecorator.negative());
@@ -93,7 +90,7 @@ public class Operators {
 
         @SuppressWarnings("unchecked")
         public void onInput(final Iterable<?> input, @NotNull final Channel<Object, ?> result) {
-          result.pass((Iterable) input);
+          result.pass((Iterable<Object>) input);
         }
       };
 
@@ -280,94 +277,53 @@ public class Operators {
   }
 
   /**
-   * Returns a factory of invocations computing the average value of the input numbers by employing
-   * a {@code BigDecimal}.
+   * Returns a factory of invocations computing the average value of the input numbers, producing
+   * an output of the specified type.
    *
-   * @param <N> the number type.
+   * @param type  the output type.
+   * @param <N>   the number type.
+   * @param <OUT> the output data type.
    * @return the invocation factory instance.
    */
   @NotNull
   @SuppressWarnings("unchecked")
-  public static <N extends Number> InvocationFactory<N, BigDecimal> averageBig() {
-    return (InvocationFactory<N, BigDecimal>) AverageBigInvocation.factoryOf();
+  public static <N extends Number, OUT extends Number> InvocationFactory<N, OUT> average(
+      @NotNull final Class<OUT> type) {
+    return (InvocationFactory<N, OUT>) new AverageOutputPrecisionInvocationFactory<OUT>(type);
   }
 
   /**
-   * Returns a factory of invocations computing the average value of the input numbers in byte
-   * precision.
+   * Returns a factory of invocations computing the average value of the input numbers, employing
+   * a sum value and producing an output of the specified types.
    *
-   * @param <N> the number type.
+   * @param sumType the sum type.
+   * @param outType the output type.
+   * @param <N>     the number type.
+   * @param <IN>    the input data type.
+   * @param <OUT>   the output data type.
    * @return the invocation factory instance.
    */
   @NotNull
   @SuppressWarnings("unchecked")
-  public static <N extends Number> InvocationFactory<N, Byte> averageByte() {
-    return (InvocationFactory<N, Byte>) AverageByteInvocation.factoryOf();
+  public static <N extends Number, IN extends Number, OUT extends Number> InvocationFactory<N,
+      OUT> average(
+      @NotNull final Class<IN> sumType, @NotNull final Class<OUT> outType) {
+    return (InvocationFactory<N, OUT>) new AverageInputPrecisionInvocationFactory<IN, OUT>(sumType,
+        outType);
   }
 
   /**
-   * Returns a factory of invocations computing the average value of the input numbers in double
-   * precision.
+   * Returns a factory of invocations accumulating a value by applying the specified function
+   * instance.
    *
-   * @param <N> the number type.
+   * @param binaryFunction the binary function.
+   * @param <DATA>         the data type.
    * @return the invocation factory instance.
    */
   @NotNull
-  @SuppressWarnings("unchecked")
-  public static <N extends Number> InvocationFactory<N, Double> averageDouble() {
-    return (InvocationFactory<N, Double>) AverageDoubleInvocation.factoryOf();
-  }
-
-  /**
-   * Returns a factory of invocations computing the average value of the input numbers in floating
-   * precision.
-   *
-   * @param <N> the number type.
-   * @return the invocation factory instance.
-   */
-  @NotNull
-  @SuppressWarnings("unchecked")
-  public static <N extends Number> InvocationFactory<N, Float> averageFloat() {
-    return (InvocationFactory<N, Float>) AverageFloatInvocation.factoryOf();
-  }
-
-  /**
-   * Returns a factory of invocations computing the average value of the input numbers in integer
-   * precision.
-   *
-   * @param <N> the number type.
-   * @return the invocation factory instance.
-   */
-  @NotNull
-  @SuppressWarnings("unchecked")
-  public static <N extends Number> InvocationFactory<N, Integer> averageInteger() {
-    return (InvocationFactory<N, Integer>) AverageIntegerInvocation.factoryOf();
-  }
-
-  /**
-   * Returns a factory of invocations computing the average value of the input numbers in long
-   * precision.
-   *
-   * @param <N> the number type.
-   * @return the invocation factory instance.
-   */
-  @NotNull
-  @SuppressWarnings("unchecked")
-  public static <N extends Number> InvocationFactory<N, Long> averageLong() {
-    return (InvocationFactory<N, Long>) AverageLongInvocation.factoryOf();
-  }
-
-  /**
-   * Returns a factory of invocations computing the average value of the input numbers in short
-   * precision.
-   *
-   * @param <N> the number type.
-   * @return the invocation factory instance.
-   */
-  @NotNull
-  @SuppressWarnings("unchecked")
-  public static <N extends Number> InvocationFactory<N, Short> averageShort() {
-    return (InvocationFactory<N, Short>) AverageShortInvocation.factoryOf();
+  public static <DATA> InvocationFactory<DATA, DATA> binary(
+      @NotNull final BiFunction<DATA, DATA, DATA> binaryFunction) {
+    return BinaryOperatorInvocation.functionFactory(binaryFunction);
   }
 
   /**
@@ -818,7 +774,7 @@ public class Operators {
   @NotNull
   public static <DATA> InvocationFactory<DATA, DATA> maxBy(
       @NotNull final Comparator<? super DATA> comparator) {
-    return BinaryOperatorInvocation.functionFactory(BiFunctionDecorator.maxBy(comparator));
+    return binary(BiFunctionDecorator.maxBy(comparator));
   }
 
   /**
@@ -844,7 +800,7 @@ public class Operators {
   @NotNull
   public static <DATA> InvocationFactory<DATA, DATA> minBy(
       @NotNull final Comparator<? super DATA> comparator) {
-    return BinaryOperatorInvocation.functionFactory(BiFunctionDecorator.minBy(comparator));
+    return binary(BiFunctionDecorator.minBy(comparator));
   }
 
   /**
@@ -1517,87 +1473,18 @@ public class Operators {
   }
 
   /**
-   * Returns a factory of invocations computing the sum of the input numbers by employing a
-   * {@code BigDecimal}.
+   * Returns a factory of invocations computing the sum of the input numbers as an instance of the
+   * specified output type.
    *
-   * @param <N> the number type.
+   * @param type  the sum type.
+   * @param <N>   the number type.
+   * @param <OUT> the output data type.
    * @return the invocation factory instance.
    */
   @SuppressWarnings("unchecked")
-  public static <N extends Number> InvocationFactory<N, BigDecimal> sumBig() {
-    return (InvocationFactory<N, BigDecimal>) SumBigInvocation.factoryOf();
-  }
-
-  /**
-   * Returns a factory of invocations computing the sum of the input numbers as a {@code byte}.
-   *
-   * @param <N> the number type.
-   * @return the invocation factory instance.
-   */
-  @NotNull
-  @SuppressWarnings("unchecked")
-  public static <N extends Number> InvocationFactory<N, Byte> sumByte() {
-    return (InvocationFactory<N, Byte>) SumByteInvocation.factoryOf();
-  }
-
-  /**
-   * Returns a factory of invocations computing the sum of the input numbers as a {@code double}.
-   *
-   * @param <N> the number type.
-   * @return the invocation factory instance.
-   */
-  @NotNull
-  @SuppressWarnings("unchecked")
-  public static <N extends Number> InvocationFactory<N, Double> sumDouble() {
-    return (InvocationFactory<N, Double>) SumDoubleInvocation.factoryOf();
-  }
-
-  /**
-   * Returns a factory of invocations computing the sum of the input numbers as a {@code float}.
-   *
-   * @param <N> the number type.
-   * @return the invocation factory instance.
-   */
-  @NotNull
-  @SuppressWarnings("unchecked")
-  public static <N extends Number> InvocationFactory<N, Float> sumFloat() {
-    return (InvocationFactory<N, Float>) SumFloatInvocation.factoryOf();
-  }
-
-  /**
-   * Returns a factory of invocations computing the sum of the input numbers as an {@code int}.
-   *
-   * @param <N> the number type.
-   * @return the invocation factory instance.
-   */
-  @NotNull
-  @SuppressWarnings("unchecked")
-  public static <N extends Number> InvocationFactory<N, Integer> sumInteger() {
-    return (InvocationFactory<N, Integer>) SumIntegerInvocation.factoryOf();
-  }
-
-  /**
-   * Returns a factory of invocations computing the sum of the input numbers as a {@code long}.
-   *
-   * @param <N> the number type.
-   * @return the invocation factory instance.
-   */
-  @NotNull
-  @SuppressWarnings("unchecked")
-  public static <N extends Number> InvocationFactory<N, Long> sumLong() {
-    return (InvocationFactory<N, Long>) SumLongInvocation.factoryOf();
-  }
-
-  /**
-   * Returns a factory of invocations computing the sum of the input numbers as a {@code short}.
-   *
-   * @param <N> the number type.
-   * @return the invocation factory instance.
-   */
-  @NotNull
-  @SuppressWarnings("unchecked")
-  public static <N extends Number> InvocationFactory<N, Short> sumShort() {
-    return (InvocationFactory<N, Short>) SumShortInvocation.factoryOf();
+  public static <N extends Number, OUT extends Number> InvocationFactory<N, OUT> sum(
+      @NotNull final Class<OUT> type) {
+    return (InvocationFactory<N, OUT>) new SumPrecisionInvocationFactory<OUT>(type);
   }
 
   /**

@@ -82,7 +82,7 @@
                                                  .immediate()
                                                  .map(Integer::parseInt)
                                                  .map(i -&gt; i * i)
-                                                 .map(Operators.averageFloat())
+                                                 .map(Operators.average(Float.class))
                                                  .map(Math::sqrt)
                                                  .async()
                                                  .call(args)

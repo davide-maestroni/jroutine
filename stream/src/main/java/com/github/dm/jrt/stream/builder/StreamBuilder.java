@@ -221,6 +221,8 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
       @NotNull Function<? super StreamBuilder<IN, OUT>, ? extends
           StreamBuilder<BEFORE, AFTER>> transformingFunction);
 
+  // TODO: 26/01/2017 rename?
+
   /**
    * Transforms this stream by applying the specified function.
    * <br>

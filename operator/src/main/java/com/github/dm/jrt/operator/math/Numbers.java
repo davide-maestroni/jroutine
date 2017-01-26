@@ -17,14 +17,13 @@
 package com.github.dm.jrt.operator.math;
 
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.BiFunction;
-import com.github.dm.jrt.function.Function;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.MathContext;
 import java.util.HashMap;
 
 /**
@@ -35,285 +34,663 @@ import java.util.HashMap;
 @SuppressWarnings("WeakerAccess")
 public class Numbers {
 
-  private static final HashMap<Class<? extends Number>, ToBigDecimalFunction> sBigDecimalFunctions =
-      new HashMap<Class<? extends Number>, ToBigDecimalFunction>() {{
-        put(Byte.class, new ToBigDecimalFunction() {
+  private static final HashMap<Class<? extends Number>, ExtendedOperation<?>> sOperations =
+      new HashMap<Class<? extends Number>, ExtendedOperation<?>>() {{
+        put(Byte.class, new ExtendedOperation<Byte>() {
 
-          public BigDecimal apply(final Number n) {
-            return new BigDecimal(n.byteValue());
-          }
-        });
-        put(Short.class, new ToBigDecimalFunction() {
-
-          public BigDecimal apply(final Number n) {
-            return new BigDecimal(n.shortValue());
-          }
-        });
-        put(Integer.class, new ToBigDecimalFunction() {
-
-          public BigDecimal apply(final Number n) {
-            return new BigDecimal(n.intValue());
-          }
-        });
-        put(Long.class, new ToBigDecimalFunction() {
-
-          public BigDecimal apply(final Number n) {
-            return new BigDecimal(n.longValue());
-          }
-        });
-        put(Float.class, new ToBigDecimalFunction() {
-
-          public BigDecimal apply(final Number n) {
-            return new BigDecimal(n.floatValue());
-          }
-        });
-        put(Double.class, new ToBigDecimalFunction() {
-
-          public BigDecimal apply(final Number n) {
-            return new BigDecimal(n.doubleValue());
-          }
-        });
-        put(BigInteger.class, new ToBigDecimalFunction() {
-
-          public BigDecimal apply(final Number n) {
-            return new BigDecimal((BigInteger) n);
-          }
-        });
-        put(BigDecimal.class, new ToBigDecimalFunction() {
-
-          public BigDecimal apply(final Number n) {
-            return (BigDecimal) n;
-          }
-        });
-      }};
-
-  private static final HashMap<Class<? extends Number>, PrecisionFunction> sAddFunctions =
-      new HashMap<Class<? extends Number>, PrecisionFunction>() {{
-        final int[] precision = new int[1];
-        put(Byte.class, new PrecisionFunction() {
-
-          private int mPrecision = precision[0]++;
-
-          public int getPrecision() {
-            return mPrecision;
+          public boolean replaceWithBigDecimal(@NotNull final ExtendedOperation<?> op) {
+            return false;
           }
 
-          public Number apply(final Number n1, final Number n2) {
+          @Nullable
+          public Byte abs(@NotNull final Number n) {
+            return (byte) Math.abs(n.byteValue());
+          }
+
+          @Nullable
+          public Byte add(@NotNull final Number n1, @NotNull final Number n2) {
             return (byte) (n1.byteValue() + n2.byteValue());
           }
-        });
-        put(Short.class, new PrecisionFunction() {
 
-          private int mPrecision = precision[0]++;
-
-          public int getPrecision() {
-            return mPrecision;
+          public int compare(@NotNull final Number n1, @NotNull final Number n2) {
+            return n1.byteValue() - n2.byteValue();
           }
 
-          public Number apply(final Number n1, final Number n2) {
+          @Nullable
+          public Byte convert(@NotNull final Number n) {
+            return n.byteValue();
+          }
+
+          @Nullable
+          public Byte divide(@NotNull final Number n1, @NotNull final Number n2) {
+            return (byte) (n1.byteValue() / n2.byteValue());
+          }
+
+          @NotNull
+          public Precision getPrecision() {
+            return Precision.BYTE;
+          }
+
+          @Nullable
+          public Byte multiply(@NotNull final Number n1, @NotNull final Number n2) {
+            return (byte) (n1.byteValue() * n2.byteValue());
+          }
+
+          @Nullable
+          public Byte negate(@NotNull final Number n) {
+            return (byte) -n.byteValue();
+          }
+
+          @Nullable
+          public Byte remainder(@NotNull final Number n1, @NotNull final Number n2) {
+            return (byte) (n1.byteValue() % n2.byteValue());
+          }
+
+          @Nullable
+          public Byte subtract(@NotNull final Number n1, @NotNull final Number n2) {
+            return (byte) (n1.byteValue() - n2.byteValue());
+          }
+
+          @NotNull
+          public BigDecimal toBigDecimal(@NotNull final Byte n) {
+            return new BigDecimal(n);
+          }
+
+          @NotNull
+          public BigInteger toBigInteger(@NotNull final Byte n) {
+            return BigInteger.valueOf(n);
+          }
+        });
+        put(Short.class, new ExtendedOperation<Short>() {
+
+          public boolean replaceWithBigDecimal(@NotNull final ExtendedOperation<?> op) {
+            return false;
+          }
+
+          @Nullable
+          public Short abs(@NotNull final Number n) {
+            return (short) Math.abs(n.shortValue());
+          }
+
+          @Nullable
+          public Short add(@NotNull final Number n1, @NotNull final Number n2) {
             return (short) (n1.shortValue() + n2.shortValue());
           }
-        });
-        put(Integer.class, new PrecisionFunction() {
 
-          private int mPrecision = precision[0]++;
-
-          public int getPrecision() {
-            return mPrecision;
+          public int compare(@NotNull final Number n1, @NotNull final Number n2) {
+            return n1.shortValue() - n2.shortValue();
           }
 
-          public Number apply(final Number n1, final Number n2) {
+          @Nullable
+          public Short convert(@NotNull final Number n) {
+            return n.shortValue();
+          }
+
+          @Nullable
+          public Short divide(@NotNull final Number n1, @NotNull final Number n2) {
+            return (short) (n1.shortValue() / n2.shortValue());
+          }
+
+          @NotNull
+          public Precision getPrecision() {
+            return Precision.SHORT;
+          }
+
+          @Nullable
+          public Short multiply(@NotNull final Number n1, @NotNull final Number n2) {
+            return (short) (n1.shortValue() * n2.shortValue());
+          }
+
+          @Nullable
+          public Short negate(@NotNull final Number n) {
+            return (short) -n.shortValue();
+          }
+
+          @Nullable
+          public Short remainder(@NotNull final Number n1, @NotNull final Number n2) {
+            return (short) (n1.shortValue() % n2.shortValue());
+          }
+
+          @Nullable
+          public Short subtract(@NotNull final Number n1, @NotNull final Number n2) {
+            return (short) (n1.shortValue() - n2.shortValue());
+          }
+
+          @NotNull
+          public BigDecimal toBigDecimal(@NotNull final Short n) {
+            return new BigDecimal(n);
+          }
+
+          @NotNull
+          public BigInteger toBigInteger(@NotNull final Short n) {
+            return BigInteger.valueOf(n);
+          }
+        });
+        put(Integer.class, new ExtendedOperation<Integer>() {
+
+          public boolean replaceWithBigDecimal(@NotNull final ExtendedOperation<?> op) {
+            return false;
+          }
+
+          @Nullable
+          public Integer abs(@NotNull final Number n) {
+            return Math.abs(n.intValue());
+          }
+
+          @Nullable
+          public Integer add(@NotNull final Number n1, @NotNull final Number n2) {
             return n1.intValue() + n2.intValue();
           }
-        });
-        put(Long.class, new PrecisionFunction() {
 
-          private int mPrecision = precision[0]++;
-
-          public int getPrecision() {
-            return mPrecision;
+          public int compare(@NotNull final Number n1, @NotNull final Number n2) {
+            final int v1 = n1.intValue();
+            final int v2 = n2.intValue();
+            return (v1 < v2) ? -1 : ((v1 == v2) ? 0 : 1);
           }
 
-          public Number apply(final Number n1, final Number n2) {
+          @Nullable
+          public Integer convert(@NotNull final Number n) {
+            return n.intValue();
+          }
+
+          @Nullable
+          public Integer divide(@NotNull final Number n1, @NotNull final Number n2) {
+            return n1.intValue() / n2.intValue();
+          }
+
+          @NotNull
+          public Precision getPrecision() {
+            return Precision.INTEGER;
+          }
+
+          @Nullable
+          public Integer multiply(@NotNull final Number n1, @NotNull final Number n2) {
+            return n1.intValue() * n2.intValue();
+          }
+
+          @Nullable
+          public Integer negate(@NotNull final Number n) {
+            return -n.intValue();
+          }
+
+          @Nullable
+          public Integer remainder(@NotNull final Number n1, @NotNull final Number n2) {
+            return n1.intValue() % n2.intValue();
+          }
+
+          @Nullable
+          public Integer subtract(@NotNull final Number n1, @NotNull final Number n2) {
+            return n1.intValue() - n2.intValue();
+          }
+
+          @NotNull
+          public BigDecimal toBigDecimal(@NotNull final Integer n) {
+            return new BigDecimal(n);
+          }
+
+          @NotNull
+          public BigInteger toBigInteger(@NotNull final Integer n) {
+            return BigInteger.valueOf(n);
+          }
+        });
+        put(Long.class, new ExtendedOperation<Long>() {
+
+          public boolean replaceWithBigDecimal(@NotNull final ExtendedOperation<?> op) {
+            return false;
+          }
+
+          @Nullable
+          public Long abs(@NotNull final Number n) {
+            return Math.abs(n.longValue());
+          }
+
+          @Nullable
+          public Long add(@NotNull final Number n1, @NotNull final Number n2) {
             return n1.longValue() + n2.longValue();
           }
-        });
-        put(Float.class, new PrecisionFunction() {
 
-          private int mPrecision = precision[0]++;
-
-          public int getPrecision() {
-            return mPrecision;
+          public int compare(@NotNull final Number n1, @NotNull final Number n2) {
+            final long v1 = n1.longValue();
+            final long v2 = n2.longValue();
+            return (v1 < v2) ? -1 : ((v1 == v2) ? 0 : 1);
           }
 
-          public Number apply(final Number n1, final Number n2) {
+          @Nullable
+          public Long convert(@NotNull final Number n) {
+            return n.longValue();
+          }
+
+          @Nullable
+          public Long divide(@NotNull final Number n1, @NotNull final Number n2) {
+            return n1.longValue() / n2.longValue();
+          }
+
+          @NotNull
+          public Precision getPrecision() {
+            return Precision.LONG;
+          }
+
+          @Nullable
+          public Long multiply(@NotNull final Number n1, @NotNull final Number n2) {
+            return n1.longValue() * n2.longValue();
+          }
+
+          @Nullable
+          public Long negate(@NotNull final Number n) {
+            return -n.longValue();
+          }
+
+          @Nullable
+          public Long remainder(@NotNull final Number n1, @NotNull final Number n2) {
+            return n1.longValue() % n2.longValue();
+          }
+
+          @Nullable
+          public Long subtract(@NotNull final Number n1, @NotNull final Number n2) {
+            return n1.longValue() - n2.longValue();
+          }
+
+          @NotNull
+          public BigDecimal toBigDecimal(@NotNull final Long n) {
+            return new BigDecimal(n);
+          }
+
+          @NotNull
+          public BigInteger toBigInteger(@NotNull final Long n) {
+            return BigInteger.valueOf(n);
+          }
+        });
+        put(Float.class, new ExtendedOperation<Float>() {
+
+          public boolean replaceWithBigDecimal(@NotNull final ExtendedOperation<?> op) {
+            return false;
+          }
+
+          @Nullable
+          public Float abs(@NotNull final Number n) {
+            return Math.abs(n.floatValue());
+          }
+
+          @Nullable
+          public Float add(@NotNull final Number n1, @NotNull final Number n2) {
             return n1.floatValue() + n2.floatValue();
           }
-        });
-        put(Double.class, new PrecisionFunction() {
 
-          private int mPrecision = precision[0]++;
-
-          public int getPrecision() {
-            return mPrecision;
+          public int compare(@NotNull final Number n1, @NotNull final Number n2) {
+            final float v1 = n1.floatValue();
+            final float v2 = n2.floatValue();
+            return (v1 < v2) ? -1 : ((v1 == v2) ? 0 : 1);
           }
 
-          public Number apply(final Number n1, final Number n2) {
+          @Nullable
+          public Float convert(@NotNull final Number n) {
+            return n.floatValue();
+          }
+
+          @Nullable
+          public Float divide(@NotNull final Number n1, @NotNull final Number n2) {
+            return n1.floatValue() / n2.floatValue();
+          }
+
+          @NotNull
+          public Precision getPrecision() {
+            return Precision.FLOAT;
+          }
+
+          @Nullable
+          public Float multiply(@NotNull final Number n1, @NotNull final Number n2) {
+            return n1.floatValue() * n2.floatValue();
+          }
+
+          @Nullable
+          public Float negate(@NotNull final Number n) {
+            return -n.floatValue();
+          }
+
+          @Nullable
+          public Float remainder(@NotNull final Number n1, @NotNull final Number n2) {
+            return n1.floatValue() % n2.floatValue();
+          }
+
+          @Nullable
+          public Float subtract(@NotNull final Number n1, @NotNull final Number n2) {
+            return n1.floatValue() - n2.floatValue();
+          }
+
+          @NotNull
+          public BigDecimal toBigDecimal(@NotNull final Float n) {
+            return new BigDecimal(n);
+          }
+
+          @NotNull
+          public BigInteger toBigInteger(@NotNull final Float n) {
+            return BigInteger.valueOf(n.longValue());
+          }
+        });
+        put(Double.class, new ExtendedOperation<Double>() {
+
+          public boolean replaceWithBigDecimal(@NotNull final ExtendedOperation<?> op) {
+            return false;
+          }
+
+          @Nullable
+          public Double abs(@NotNull final Number n) {
+            return Math.abs(n.doubleValue());
+          }
+
+          @Nullable
+          public Double add(@NotNull final Number n1, @NotNull final Number n2) {
             return n1.doubleValue() + n2.doubleValue();
           }
-        });
-        put(BigInteger.class, new PrecisionFunction() {
 
-          private int mPrecision = precision[0]++;
-
-          public int getPrecision() {
-            return mPrecision;
+          public int compare(@NotNull final Number n1, @NotNull final Number n2) {
+            final double v1 = n1.doubleValue();
+            final double v2 = n2.doubleValue();
+            return (v1 < v2) ? -1 : ((v1 == v2) ? 0 : 1);
           }
 
-          public Number apply(final Number n1, final Number n2) {
-            final BigDecimal big1 = toBigDecimal(n1);
-            final BigDecimal big2 = toBigDecimal(n2);
-            if ((big1 == null) || (big2 == null)) {
+          @Nullable
+          public Double convert(@NotNull final Number n) {
+            return n.doubleValue();
+          }
+
+          @Nullable
+          public Double divide(@NotNull final Number n1, @NotNull final Number n2) {
+            return n1.doubleValue() / n2.doubleValue();
+          }
+
+          @NotNull
+          public Precision getPrecision() {
+            return Precision.DOUBLE;
+          }
+
+          @Nullable
+          public Double multiply(@NotNull final Number n1, @NotNull final Number n2) {
+            return n1.doubleValue() * n2.doubleValue();
+          }
+
+          @Nullable
+          public Double negate(@NotNull final Number n) {
+            return -n.doubleValue();
+          }
+
+          @Nullable
+          public Double remainder(@NotNull final Number n1, @NotNull final Number n2) {
+            return n1.doubleValue() % n2.doubleValue();
+          }
+
+          @Nullable
+          public Double subtract(@NotNull final Number n1, @NotNull final Number n2) {
+            return n1.doubleValue() - n2.doubleValue();
+          }
+
+          @NotNull
+          public BigDecimal toBigDecimal(@NotNull final Double n) {
+            return new BigDecimal(n);
+          }
+
+          @NotNull
+          public BigInteger toBigInteger(@NotNull final Double n) {
+            return BigInteger.valueOf(n.longValue());
+          }
+        });
+        put(BigInteger.class, new ExtendedOperation<BigInteger>() {
+
+          public boolean replaceWithBigDecimal(@NotNull final ExtendedOperation<?> op) {
+            return op.getPrecision().isFloatingPoint();
+          }
+
+          @Nullable
+          public BigInteger abs(@NotNull final Number n) {
+            final BigInteger big = convert(n);
+            if (big == null) {
               return null;
             }
 
-            final BigDecimal decimal = big1.add(big2);
-            return (decimal.scale() > 0) ? decimal : decimal.toBigInteger();
-          }
-        });
-        put(BigDecimal.class, new PrecisionFunction() {
-
-          private int mPrecision = precision[0]++;
-
-          public int getPrecision() {
-            return mPrecision;
+            return big.abs();
           }
 
-          public Number apply(final Number n1, final Number n2) {
-            final BigDecimal big1 = toBigDecimal(n1);
-            final BigDecimal big2 = toBigDecimal(n2);
+          @Nullable
+          public BigInteger add(@NotNull final Number n1, @NotNull final Number n2) {
+            final BigInteger big1 = convert(n1);
+            final BigInteger big2 = convert(n2);
             if ((big1 == null) || (big2 == null)) {
               return null;
             }
 
             return big1.add(big2);
           }
-        });
-      }};
 
-  private static final HashMap<Class<? extends Number>, PrecisionFunction> sSubtractFunctions =
-      new HashMap<Class<? extends Number>, PrecisionFunction>() {{
-        final int[] precision = new int[1];
-        put(Byte.class, new PrecisionFunction() {
+          public int compare(@NotNull final Number n1, @NotNull final Number n2) {
+            final BigInteger big1 = convert(n1);
+            final BigInteger big2 = convert(n2);
+            if (big1 == null) {
+              if (big2 == null) {
+                throw new IllegalArgumentException(
+                    "unsupported Number classes: [" + n1.getClass().getCanonicalName() + ", "
+                        + n2.getClass().getCanonicalName() + "]");
+              }
 
-          private int mPrecision = precision[0]++;
+              throw new IllegalArgumentException(
+                  "unsupported Number class: [" + n1.getClass().getCanonicalName() + "]");
+            }
 
-          public int getPrecision() {
-            return mPrecision;
+            if (big2 == null) {
+              throw new IllegalArgumentException(
+                  "unsupported Number class: [" + n2.getClass().getCanonicalName() + "]");
+            }
+
+            return big1.compareTo(big2);
           }
 
-          public Number apply(final Number n1, final Number n2) {
-            return (byte) (n1.byteValue() - n2.byteValue());
-          }
-        });
-        put(Short.class, new PrecisionFunction() {
+          @Nullable
+          @SuppressWarnings("unchecked")
+          public BigInteger convert(@NotNull final Number n) {
+            final ExtendedOperation<?> operation = getExtendedOperation(n.getClass());
+            if (operation != null) {
+              return ((ExtendedOperation<Number>) operation).toBigInteger(n);
+            }
 
-          private int mPrecision = precision[0]++;
-
-          public int getPrecision() {
-            return mPrecision;
-          }
-
-          public Number apply(final Number n1, final Number n2) {
-            return (short) (n1.shortValue() - n2.shortValue());
-          }
-        });
-        put(Integer.class, new PrecisionFunction() {
-
-          private int mPrecision = precision[0]++;
-
-          public int getPrecision() {
-            return mPrecision;
+            return null;
           }
 
-          public Number apply(final Number n1, final Number n2) {
-            return n1.intValue() - n2.intValue();
-          }
-        });
-        put(Long.class, new PrecisionFunction() {
-
-          private int mPrecision = precision[0]++;
-
-          public int getPrecision() {
-            return mPrecision;
-          }
-
-          public Number apply(final Number n1, final Number n2) {
-            return n1.longValue() - n2.longValue();
-          }
-        });
-        put(Float.class, new PrecisionFunction() {
-
-          private int mPrecision = precision[0]++;
-
-          public int getPrecision() {
-            return mPrecision;
-          }
-
-          public Number apply(final Number n1, final Number n2) {
-            return n1.floatValue() - n2.floatValue();
-          }
-        });
-        put(Double.class, new PrecisionFunction() {
-
-          private int mPrecision = precision[0]++;
-
-          public int getPrecision() {
-            return mPrecision;
-          }
-
-          public Number apply(final Number n1, final Number n2) {
-            return n1.doubleValue() - n2.doubleValue();
-          }
-        });
-        put(BigInteger.class, new PrecisionFunction() {
-
-          private int mPrecision = precision[0]++;
-
-          public int getPrecision() {
-            return mPrecision;
-          }
-
-          public Number apply(final Number n1, final Number n2) {
-            final BigDecimal big1 = toBigDecimal(n1);
-            final BigDecimal big2 = toBigDecimal(n2);
+          @Nullable
+          public BigInteger divide(@NotNull final Number n1, @NotNull final Number n2) {
+            final BigInteger big1 = convert(n1);
+            final BigInteger big2 = convert(n2);
             if ((big1 == null) || (big2 == null)) {
               return null;
             }
 
-            final BigDecimal decimal = big1.subtract(big2);
-            return (decimal.scale() > 0) ? decimal : decimal.toBigInteger();
-          }
-        });
-        put(BigDecimal.class, new PrecisionFunction() {
-
-          private int mPrecision = precision[0]++;
-
-          public int getPrecision() {
-            return mPrecision;
+            return big1.divide(big2);
           }
 
-          public Number apply(final Number n1, final Number n2) {
-            final BigDecimal big1 = toBigDecimal(n1);
-            final BigDecimal big2 = toBigDecimal(n2);
+          @NotNull
+          public Precision getPrecision() {
+            return Precision.BIG_INTEGER;
+          }
+
+          @Nullable
+          public BigInteger multiply(@NotNull final Number n1, @NotNull final Number n2) {
+            final BigInteger big1 = convert(n1);
+            final BigInteger big2 = convert(n2);
+            if ((big1 == null) || (big2 == null)) {
+              return null;
+            }
+
+            return big1.multiply(big2);
+          }
+
+          @Nullable
+          public BigInteger negate(@NotNull final Number n) {
+            final BigInteger big = convert(n);
+            if (big == null) {
+              return null;
+            }
+
+            return big.negate();
+          }
+
+          @Nullable
+          public BigInteger remainder(@NotNull final Number n1, @NotNull final Number n2) {
+            final BigInteger big1 = convert(n1);
+            final BigInteger big2 = convert(n2);
+            if ((big1 == null) || (big2 == null)) {
+              return null;
+            }
+
+            return big1.remainder(big2);
+          }
+
+          @Nullable
+          public BigInteger subtract(@NotNull final Number n1, @NotNull final Number n2) {
+            final BigInteger big1 = convert(n1);
+            final BigInteger big2 = convert(n2);
             if ((big1 == null) || (big2 == null)) {
               return null;
             }
 
             return big1.subtract(big2);
           }
+
+          @NotNull
+          public BigDecimal toBigDecimal(@NotNull final BigInteger n) {
+            return new BigDecimal(n);
+          }
+
+          @NotNull
+          public BigInteger toBigInteger(@NotNull final BigInteger n) {
+            return n;
+          }
+        });
+        put(BigDecimal.class, new ExtendedOperation<BigDecimal>() {
+
+          public boolean replaceWithBigDecimal(@NotNull final ExtendedOperation<?> op) {
+            return false;
+          }
+
+          @Nullable
+          public BigDecimal abs(@NotNull final Number n) {
+            final BigDecimal big = convert(n);
+            return (big != null) ? big.abs() : null;
+          }
+
+          @Nullable
+          public BigDecimal add(@NotNull final Number n1, @NotNull final Number n2) {
+            final BigDecimal big1 = convert(n1);
+            final BigDecimal big2 = convert(n2);
+            if ((big1 == null) || (big2 == null)) {
+              return null;
+            }
+
+            return big1.add(big2);
+          }
+
+          public int compare(@NotNull final Number n1, @NotNull final Number n2) {
+            final BigDecimal big1 = convert(n1);
+            final BigDecimal big2 = convert(n2);
+            if (big1 == null) {
+              if (big2 == null) {
+                throw new IllegalArgumentException(
+                    "unsupported Number classes: [" + n1.getClass().getCanonicalName() + ", "
+                        + n2.getClass().getCanonicalName() + "]");
+              }
+
+              throw new IllegalArgumentException(
+                  "unsupported Number class: [" + n1.getClass().getCanonicalName() + "]");
+            }
+
+            if (big2 == null) {
+              throw new IllegalArgumentException(
+                  "unsupported Number class: [" + n2.getClass().getCanonicalName() + "]");
+            }
+
+            return big1.compareTo(big2);
+          }
+
+          @Nullable
+          @SuppressWarnings("unchecked")
+          public BigDecimal convert(@NotNull final Number n) {
+            final ExtendedOperation<?> operation = getExtendedOperation(n.getClass());
+            if (operation != null) {
+              return ((ExtendedOperation<Number>) operation).toBigDecimal(n);
+            }
+
+            return null;
+          }
+
+          @Nullable
+          public BigDecimal divide(@NotNull final Number n1, @NotNull final Number n2) {
+            final BigDecimal big1 = convert(n1);
+            final BigDecimal big2 = convert(n2);
+            if ((big1 == null) || (big2 == null)) {
+              return null;
+            }
+
+            return big1.divide(big2, MathContext.UNLIMITED);
+          }
+
+          @NotNull
+          public Precision getPrecision() {
+            return Precision.BIG_DECIMAL;
+          }
+
+          @Nullable
+          public BigDecimal multiply(@NotNull final Number n1, @NotNull final Number n2) {
+            final BigDecimal big1 = convert(n1);
+            final BigDecimal big2 = convert(n2);
+            if ((big1 == null) || (big2 == null)) {
+              return null;
+            }
+
+            return big1.multiply(big2);
+          }
+
+          @Nullable
+          public BigDecimal negate(@NotNull final Number n) {
+            final BigDecimal big = convert(n);
+            return (big != null) ? big.negate() : null;
+          }
+
+          @Nullable
+          public BigDecimal remainder(@NotNull final Number n1, @NotNull final Number n2) {
+            final BigDecimal big1 = convert(n1);
+            final BigDecimal big2 = convert(n2);
+            if ((big1 == null) || (big2 == null)) {
+              return null;
+            }
+
+            return big1.remainder(big2);
+          }
+
+          @Nullable
+          public BigDecimal subtract(@NotNull final Number n1, @NotNull final Number n2) {
+            final BigDecimal big1 = convert(n1);
+            final BigDecimal big2 = convert(n2);
+            if ((big1 == null) || (big2 == null)) {
+              return null;
+            }
+
+            return big1.subtract(big2);
+          }
+
+          @NotNull
+          public BigDecimal toBigDecimal(@NotNull final BigDecimal n) {
+            return n;
+          }
+
+          @NotNull
+          public BigInteger toBigInteger(@NotNull final BigDecimal n) {
+            return n.toBigInteger();
+          }
         });
       }};
+
+  private static final ExtendedOperation<?> sBigIntegerOperation =
+      sOperations.get(BigInteger.class);
+
+  private static final ExtendedOperation<?> sBigDecimalOperation =
+      sOperations.get(BigDecimal.class);
 
   /**
    * Avoid explicit instantiation.
@@ -323,11 +700,47 @@ public class Numbers {
   }
 
   /**
-   * Adds the specified number objects.
+   * Computes the absolute value of the specified number.
+   * <br>
+   * If the number instance is of an unsupported type, the result will be null.
+   *
+   * @param n the number.
+   * @return the absolute value or null.
+   */
+  @Nullable
+  public static Number abs(@NotNull final Number n) {
+    final Operation<?> operation = getOperation(n.getClass());
+    if (operation != null) {
+      return operation.abs(n);
+    }
+
+    return null;
+  }
+
+  /**
+   * Computes the absolute value of the specified number.
+   *
+   * @param n the number.
+   * @return the absolute value.
+   * @throws java.lang.IllegalArgumentException if the number instance is of an unsupported type.
+   */
+  @NotNull
+  public static Number absSafe(@NotNull final Number n) {
+    final Number number = abs(n);
+    if (number == null) {
+      throw new IllegalArgumentException(
+          "unsupported Number class: [" + n.getClass().getCanonicalName() + "]");
+    }
+
+    return number;
+  }
+
+  /**
+   * Adds the specified numbers.
    * <br>
    * The result type will match the input with the highest precision.
    * <br>
-   * If one of the two instance is of an unsupported type, the result will be null.
+   * If one of the two instances is of an unsupported type, the result will be null.
    *
    * @param n1 the first number.
    * @param n2 the second number.
@@ -335,49 +748,16 @@ public class Numbers {
    */
   @Nullable
   public static Number add(@NotNull final Number n1, @NotNull final Number n2) {
-    final HashMap<Class<? extends Number>, PrecisionFunction> addFunctions = sAddFunctions;
-    final PrecisionFunction add = getFunction(addFunctions, n1, n2);
-    if (add != null) {
-      return add.apply(n1, n2);
-    }
-
-    if ((n1 instanceof BigDecimal) || (n2 instanceof BigDecimal)) {
-      return addFunctions.get(BigDecimal.class).apply(n1, n2);
-
-    } else if ((n1 instanceof BigInteger) || (n2 instanceof BigInteger)) {
-      return addFunctions.get(BigInteger.class).apply(n1, n2);
+    final Operation<?> operation = getHigherPrecisionOperation(n1.getClass(), n2.getClass());
+    if (operation != null) {
+      return operation.add(n1, n2);
     }
 
     return null;
   }
 
   /**
-   * Adds the specified number objects.
-   * <br>
-   * The result type will match the input with the highest precision.
-   * <br>
-   * If one of the two instance is of an unsupported type, the double value will be employed in
-   * the computation.
-   *
-   * @param n1 the first number.
-   * @param n2 the second number.
-   * @return the sum.
-   */
-  @NotNull
-  @SuppressWarnings("ConstantConditions")
-  public static Number addOptimistic(@NotNull final Number n1, @NotNull final Number n2) {
-    final Number number = add(n1, n2);
-    if (number == null) {
-      final Number number1 = isSupported(n1.getClass()) ? n1 : n1.doubleValue();
-      final Number number2 = isSupported(n2.getClass()) ? n2 : n2.doubleValue();
-      return add(number1, number2);
-    }
-
-    return number;
-  }
-
-  /**
-   * Adds the specified number objects.
+   * Adds the specified numbers.
    * <br>
    * The result type will match the input with the highest precision.
    *
@@ -388,26 +768,279 @@ public class Numbers {
    *                                            type.
    */
   @NotNull
-  @SuppressWarnings("ConstantConditions")
   public static Number addSafe(@NotNull final Number n1, @NotNull final Number n2) {
     final Number number = add(n1, n2);
     if (number == null) {
-      if (!isSupported(n1.getClass())) {
-        if (!isSupported(n2.getClass())) {
-          throw new IllegalArgumentException(
-              "unsupported Number classes: [" + n1.getClass().getCanonicalName() + ", "
-                  + n2.getClass().getCanonicalName() + "]");
-        }
-
-        throw new IllegalArgumentException(
-            "unsupported Number class: [" + n1.getClass().getCanonicalName() + "]");
-      }
-
-      throw new IllegalArgumentException(
-          "unsupported Number class: [" + n2.getClass().getCanonicalName() + "]");
+      throw unsupportedException(n1.getClass(), n2.getClass());
     }
 
     return number;
+  }
+
+  /**
+   * Compares the specified numbers.
+   * <br>
+   * The result type will match the input with the highest precision.
+   * <br>
+   * If one of the two instances is of an unsupported type, the result will be null.
+   *
+   * @param n1 the first number.
+   * @param n2 the second number.
+   * @return the comparison result or null.
+   */
+  @Nullable
+  public static Integer compare(@NotNull final Number n1, @NotNull final Number n2) {
+    if (!isSupported(n1.getClass()) || !isSupported(n2.getClass())) {
+      return null;
+    }
+
+    final Operation<?> operation = getHigherPrecisionOperation(n1.getClass(), n2.getClass());
+    if (operation != null) {
+      return operation.compare(n1, n2);
+    }
+
+    return null;
+  }
+
+  /**
+   * Compares the specified numbers.
+   * <br>
+   * The result type will match the input with the highest precision.
+   *
+   * @param n1 the first number.
+   * @param n2 the second number.
+   * @return the comparison result.
+   * @throws java.lang.IllegalArgumentException if one of the two instances is of an unsupported
+   *                                            type.
+   */
+  @NotNull
+  public static Integer compareSafe(@NotNull final Number n1, @NotNull final Number n2) {
+    final Integer comparison = compare(n1, n2);
+    if (comparison == null) {
+      throw unsupportedException(n1.getClass(), n2.getClass());
+    }
+
+    return comparison;
+  }
+
+  /**
+   * Converts a number into the specified type.
+   * <br>
+   * If the number instance is of an unsupported type, the result will be null.
+   *
+   * @param type the type.
+   * @param n    the number to convert.
+   * @param <N>  the number type.
+   * @return the converted number or null.
+   */
+  @Nullable
+  public static <N extends Number> N convertTo(@NotNull final Class<N> type,
+      @NotNull final Number n) {
+    final Operation<?> operation = sOperations.get(type);
+    if (operation != null) {
+      return (N) operation.convert(n);
+    }
+
+    return null;
+  }
+
+  /**
+   * Converts a number into the specified type.
+   *
+   * @param type the type.
+   * @param n    the number to convert.
+   * @param <N>  the number type.
+   * @return the converted number.
+   * @throws java.lang.IllegalArgumentException if the specified type or the number instance is is
+   *                                            not supported.
+   */
+  @NotNull
+  public static <N extends Number> N convertToSafe(@NotNull final Class<N> type,
+      @NotNull final Number n) {
+    final N number = convertTo(type, n);
+    if (number == null) {
+      if (!isSupported(type)) {
+        throw new IllegalArgumentException(
+            "unsupported Number class: [" + type.getCanonicalName() + "]");
+      }
+
+      throw new IllegalArgumentException(
+          "unsupported Number class: [" + n.getClass().getCanonicalName() + "]");
+    }
+
+    return number;
+  }
+
+  /**
+   * Divides the specified numbers.
+   * <br>
+   * The result type will match the input with the highest precision.
+   * <br>
+   * If one of the two instances is of an unsupported type, the result will be null.
+   *
+   * @param n1 the first number.
+   * @param n2 the second number.
+   * @return the quotient or null.
+   */
+  @Nullable
+  public static Number divide(@NotNull final Number n1, @NotNull final Number n2) {
+    final Operation<?> operation = getHigherPrecisionOperation(n1.getClass(), n2.getClass());
+    if (operation != null) {
+      return operation.divide(n1, n2);
+    }
+
+    return null;
+  }
+
+  /**
+   * Divides the specified numbers.
+   * <br>
+   * The result type will match the input with the highest precision.
+   *
+   * @param n1 the first number.
+   * @param n2 the second number.
+   * @return the quotient.
+   * @throws java.lang.IllegalArgumentException if one of the two instances is of an unsupported
+   *                                            type.
+   */
+  @NotNull
+  @SuppressWarnings("ConstantConditions")
+  public static Number divideSafe(@NotNull final Number n1, @NotNull final Number n2) {
+    final Number number = divide(n1, n2);
+    if (number == null) {
+      throw unsupportedException(n1.getClass(), n2.getClass());
+    }
+
+    return number;
+  }
+
+  /**
+   * Gets the operation with the higher precision, choosing between the specified number types.
+   * <br>
+   * If one of the two types is not supported, the result will be null.
+   *
+   * @param type1 the first number type.
+   * @param type2 the second number type.
+   * @return the operation or null.
+   */
+  @Nullable
+  public static Operation<?> getHigherPrecisionOperation(
+      @NotNull final Class<? extends Number> type1, @NotNull final Class<? extends Number> type2) {
+    ExtendedOperation<?> op1 = getExtendedOperation(type1);
+    if (op1 != null) {
+      ExtendedOperation<?> op2 = getExtendedOperation(type2);
+      if (op2 != null) {
+        if (op1.replaceWithBigDecimal(op2)) {
+          op1 = sBigDecimalOperation;
+
+        } else if (op2.replaceWithBigDecimal(op1)) {
+          op2 = sBigDecimalOperation;
+        }
+
+        return (op1.getPrecision().ordinal() > op2.getPrecision().ordinal()) ? op1 : op2;
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Gets the operation with the higher precision, choosing between the specified number types.
+   *
+   * @param type1 the first number type.
+   * @param type2 the second number type.
+   * @return the operation.
+   * @throws java.lang.IllegalArgumentException if one of the two types is not supported.
+   */
+  @NotNull
+  public static Operation<?> getHigherPrecisionOperationSafe(
+      @NotNull final Class<? extends Number> type1, @NotNull final Class<? extends Number> type2) {
+    final Operation<?> operation = getHigherPrecisionOperation(type1, type2);
+    if (operation == null) {
+      throw unsupportedException(type1, type2);
+    }
+
+    return operation;
+  }
+
+  /**
+   * Gets the operation with the lower precision, choosing between the specified number types.
+   * <br>
+   * If one of the two types is not supported, the result will be null.
+   *
+   * @param type1 the first number type.
+   * @param type2 the second number type.
+   * @return the operation or null.
+   */
+  @Nullable
+  public static Operation<?> getLowerPrecisionOperation(
+      @NotNull final Class<? extends Number> type1, @NotNull final Class<? extends Number> type2) {
+    ExtendedOperation<?> op1 = getExtendedOperation(type1);
+    if (op1 != null) {
+      ExtendedOperation<?> op2 = getExtendedOperation(type2);
+      if (op2 != null) {
+        if (op1.replaceWithBigDecimal(op2)) {
+          op1 = sBigDecimalOperation;
+
+        } else if (op2.replaceWithBigDecimal(op1)) {
+          op2 = sBigDecimalOperation;
+        }
+
+        return (op1.getPrecision().ordinal() < op2.getPrecision().ordinal()) ? op1 : op2;
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Gets the operation with the lower precision, choosing between the specified number types.
+   *
+   * @param type1 the first number type.
+   * @param type2 the second number type.
+   * @return the operation.
+   * @throws java.lang.IllegalArgumentException if one of the two types is not supported.
+   */
+  @NotNull
+  public static Operation<?> getLowerPrecisionOperationSafe(
+      @NotNull final Class<? extends Number> type1, @NotNull final Class<? extends Number> type2) {
+    final Operation<?> operation = getLowerPrecisionOperation(type1, type2);
+    if (operation == null) {
+      throw unsupportedException(type1, type2);
+    }
+
+    return operation;
+  }
+
+  /**
+   * Gets the operation relative to the specified number type.
+   * <br>
+   * If the the type is not supported, the result will be null.
+   *
+   * @param type the number type.
+   * @return the operation or null.
+   */
+  @Nullable
+  public static Operation<?> getOperation(@NotNull final Class<? extends Number> type) {
+    return getExtendedOperation(type);
+  }
+
+  /**
+   * Gets the operation relative to the specified number type.
+   *
+   * @param type the number type.
+   * @return the operation.
+   * @throws java.lang.IllegalArgumentException if the type is not supported.
+   */
+  @NotNull
+  public static Operation<?> getOperationSafe(@NotNull final Class<? extends Number> type) {
+    final Operation<?> operation = getOperation(type);
+    if (operation == null) {
+      throw new IllegalArgumentException(
+          "unsupported Number class: [" + type.getCanonicalName() + "]");
+    }
+
+    return operation;
   }
 
   /**
@@ -417,16 +1050,137 @@ public class Numbers {
    * @return whether the type is supported.
    */
   public static boolean isSupported(@NotNull final Class<? extends Number> type) {
-    return (sAddFunctions.get(type) != null) || BigInteger.class.isAssignableFrom(type)
-        || BigDecimal.class.isAssignableFrom(type);
+    return (getExtendedOperation(type) != null);
   }
 
   /**
-   * Subtracts the specified number objects.
+   * Multiplies the specified numbers.
    * <br>
    * The result type will match the input with the highest precision.
    * <br>
-   * If one of the two instance is of an unsupported type, the result will be null.
+   * If one of the two instances is of an unsupported type, the result will be null.
+   *
+   * @param n1 the first number.
+   * @param n2 the second number.
+   * @return the product or null.
+   */
+  @Nullable
+  public static Number multiply(@NotNull final Number n1, @NotNull final Number n2) {
+    final Operation<?> operation = getHigherPrecisionOperation(n1.getClass(), n2.getClass());
+    if (operation != null) {
+      return operation.multiply(n1, n2);
+    }
+
+    return null;
+  }
+
+  /**
+   * Multiplies the specified numbers.
+   * <br>
+   * The result type will match the input with the highest precision.
+   *
+   * @param n1 the first number.
+   * @param n2 the second number.
+   * @return the product.
+   * @throws java.lang.IllegalArgumentException if one of the two instances is of an unsupported
+   *                                            type.
+   */
+  @NotNull
+  public static Number multiplySafe(@NotNull final Number n1, @NotNull final Number n2) {
+    final Number number = multiply(n1, n2);
+    if (number == null) {
+      throw unsupportedException(n1.getClass(), n2.getClass());
+    }
+
+    return number;
+  }
+
+  /**
+   * Negates the specified number.
+   * <br>
+   * If the number instance is of an unsupported type, the result will be null.
+   *
+   * @param n the number.
+   * @return the negated value or null.
+   */
+  @Nullable
+  public static Number negate(@NotNull final Number n) {
+    final Operation<?> operation = getOperation(n.getClass());
+    if (operation != null) {
+      return operation.negate(n);
+    }
+
+    return null;
+  }
+
+  /**
+   * Negates the specified number.
+   *
+   * @param n the number.
+   * @return the negated value.
+   * @throws java.lang.IllegalArgumentException if the number instance is of an unsupported type.
+   */
+  @NotNull
+  public static Number negateSafe(@NotNull final Number n) {
+    final Number number = negate(n);
+    if (number == null) {
+      throw new IllegalArgumentException(
+          "unsupported Number class: [" + n.getClass().getCanonicalName() + "]");
+    }
+
+    return number;
+  }
+
+  /**
+   * Computes the remainder of the division of the specified numbers. Note that the remainder is not
+   * the same as the modulo, since the result can be negative.
+   * <br>
+   * The result type will match the input with the highest precision.
+   * <br>
+   * If one of the two instances is of an unsupported type, the result will be null.
+   *
+   * @param n1 the first number.
+   * @param n2 the second number.
+   * @return the remainder or null.
+   */
+  @Nullable
+  public static Number remainder(@NotNull final Number n1, @NotNull final Number n2) {
+    final Operation<?> operation = getHigherPrecisionOperation(n1.getClass(), n2.getClass());
+    if (operation != null) {
+      return operation.remainder(n1, n2);
+    }
+
+    return null;
+  }
+
+  /**
+   * Computes the remainder of the division of the specified numbers. Note that the remainder is not
+   * the same as the modulo, since the result can be negative.
+   * <br>
+   * The result type will match the input with the highest precision.
+   *
+   * @param n1 the first number.
+   * @param n2 the second number.
+   * @return the remainder.
+   * @throws java.lang.IllegalArgumentException if one of the two instances is of an unsupported
+   *                                            type.
+   */
+  @NotNull
+  public static Number remainderSafe(@NotNull final Number n1, @NotNull final Number n2) {
+    final Number number = remainder(n1, n2);
+    if (number == null) {
+      throw unsupportedException(n1.getClass(), n2.getClass());
+    }
+
+    return number;
+  }
+
+  /**
+   * Subtracts the specified numbers.
+   * <br>
+   * The result type will match the input with the highest precision.
+   * <br>
+   * If one of the two instances is of an unsupported type, the result will be null.
    *
    * @param n1 the first number.
    * @param n2 the second number.
@@ -434,50 +1188,16 @@ public class Numbers {
    */
   @Nullable
   public static Number subtract(@NotNull final Number n1, @NotNull final Number n2) {
-    final HashMap<Class<? extends Number>, PrecisionFunction> subtractFunctions =
-        sSubtractFunctions;
-    final PrecisionFunction add = getFunction(subtractFunctions, n1, n2);
-    if (add != null) {
-      return add.apply(n1, n2);
-    }
-
-    if ((n1 instanceof BigDecimal) || (n2 instanceof BigDecimal)) {
-      return subtractFunctions.get(BigDecimal.class).apply(n1, n2);
-
-    } else if ((n1 instanceof BigInteger) || (n2 instanceof BigInteger)) {
-      return subtractFunctions.get(BigInteger.class).apply(n1, n2);
+    final Operation<?> operation = getHigherPrecisionOperation(n1.getClass(), n2.getClass());
+    if (operation != null) {
+      return operation.subtract(n1, n2);
     }
 
     return null;
   }
 
   /**
-   * Subtracts the specified number objects.
-   * <br>
-   * The result type will match the input with the highest precision.
-   * <br>
-   * If one of the two instance is of an unsupported type, the double value will be employed in
-   * the computation.
-   *
-   * @param n1 the first number.
-   * @param n2 the second number.
-   * @return the difference.
-   */
-  @NotNull
-  @SuppressWarnings("ConstantConditions")
-  public static Number subtractOptimistic(@NotNull final Number n1, @NotNull final Number n2) {
-    final Number number = subtract(n1, n2);
-    if (number == null) {
-      final Number number1 = isSupported(n1.getClass()) ? n1 : n1.doubleValue();
-      final Number number2 = isSupported(n2.getClass()) ? n2 : n2.doubleValue();
-      return subtract(number1, number2);
-    }
-
-    return number;
-  }
-
-  /**
-   * Subtracts the specified number objects.
+   * Subtracts the specified numbers.
    * <br>
    * The result type will match the input with the highest precision.
    *
@@ -488,129 +1208,126 @@ public class Numbers {
    *                                            type.
    */
   @NotNull
-  @SuppressWarnings("ConstantConditions")
   public static Number subtractSafe(@NotNull final Number n1, @NotNull final Number n2) {
     final Number number = subtract(n1, n2);
     if (number == null) {
-      if (!isSupported(n1.getClass())) {
-        if (!isSupported(n2.getClass())) {
-          throw new IllegalArgumentException(
-              "unsupported Number classes: [" + n1.getClass().getCanonicalName() + ", "
-                  + n2.getClass().getCanonicalName() + "]");
-        }
-
-        throw new IllegalArgumentException(
-            "unsupported Number class: [" + n1.getClass().getCanonicalName() + "]");
-      }
-
-      throw new IllegalArgumentException(
-          "unsupported Number class: [" + n2.getClass().getCanonicalName() + "]");
+      throw unsupportedException(n1.getClass(), n2.getClass());
     }
 
     return number;
   }
 
-  /**
-   * Converts the specified number into a {@code BigDecimal}.
-   * <br>
-   * If the number instance is of an unsupported type, the result will be null.
-   *
-   * @param n the number to convert.
-   * @return the {@code BigDecimal} instance or null.
-   */
   @Nullable
-  public static BigDecimal toBigDecimal(@NotNull final Number n) {
-    final HashMap<Class<? extends Number>, ToBigDecimalFunction> bigDecimalFunctions =
-        sBigDecimalFunctions;
-    final ToBigDecimalFunction function = bigDecimalFunctions.get(n.getClass());
-    if (function != null) {
-      return function.apply(n);
+  private static ExtendedOperation<?> getExtendedOperation(
+      @NotNull final Class<? extends Number> type) {
+    final ExtendedOperation<?> operation = sOperations.get(type);
+    if (operation != null) {
+      return operation;
     }
 
-    if (n instanceof BigInteger) {
-      return bigDecimalFunctions.get(BigInteger.class).apply(n);
+    if (BigInteger.class.isAssignableFrom(type)) {
+      return sBigIntegerOperation;
 
-    } else if (n instanceof BigDecimal) {
-      return bigDecimalFunctions.get(BigDecimal.class).apply(n);
+    } else if (BigDecimal.class.isAssignableFrom(type)) {
+      return sBigDecimalOperation;
     }
 
     return null;
   }
 
-  /**
-   * Converts the specified number into a {@code BigDecimal}.
-   * <br>
-   * If the number instance is of an unsupported type, the double value will be employed in the
-   * conversion.
-   *
-   * @param n the number to convert.
-   * @return the {@code BigDecimal} instance.
-   */
   @NotNull
-  public static BigDecimal toBigDecimalOptimistic(@NotNull final Number n) {
-    final BigDecimal bigDecimal = toBigDecimal(n);
-    return (bigDecimal == null) ? new BigDecimal(n.doubleValue()) : bigDecimal;
-  }
-
-  /**
-   * Converts the specified number into a {@code BigDecimal}.
-   *
-   * @param n the number to convert.
-   * @return the {@code BigDecimal} instance.
-   * @throws java.lang.IllegalArgumentException if the number instance is of an unsupported type.
-   */
-  @NotNull
-  public static BigDecimal toBigDecimalSafe(@NotNull final Number n) {
-    final BigDecimal bigDecimal = toBigDecimal(n);
-    if (bigDecimal == null) {
-      throw new IllegalArgumentException(
-          "unsupported Number class: [" + n.getClass().getCanonicalName() + "]");
-    }
-
-    return bigDecimal;
-  }
-
-  @Nullable
-  private static PrecisionFunction getFunction(
-      @NotNull final HashMap<Class<? extends Number>, PrecisionFunction> functions,
-      @NotNull final Number n1, @NotNull final Number n2) {
-    final PrecisionFunction f1 = functions.get(n1.getClass());
-    if (f1 != null) {
-      final PrecisionFunction f2 = functions.get(n2.getClass());
-      if (f2 != null) {
-        return (f1.getPrecision() > f2.getPrecision()) ? f1 : f2;
+  private static IllegalArgumentException unsupportedException(
+      @NotNull final Class<? extends Number> type1, @NotNull final Class<? extends Number> type2) {
+    if (!isSupported(type1)) {
+      if (!isSupported(type2)) {
+        return new IllegalArgumentException(
+            "unsupported Number classes: [" + type1.getCanonicalName() + ", "
+                + type2.getCanonicalName() + "]");
       }
+
+      return new IllegalArgumentException(
+          "unsupported Number class: [" + type1.getCanonicalName() + "]");
     }
 
-    return null;
+    return new IllegalArgumentException(
+        "unsupported Number class: [" + type2.getCanonicalName() + "]");
   }
 
   /**
-   * Function storing also the operand precision.
+   * Enumeration used to order number precisions.
    */
-  private interface PrecisionFunction extends BiFunction<Number, Number, Number> {
+  private enum Precision {
+
+    BYTE(false),
+    SHORT(false),
+    INTEGER(false),
+    LONG(false),
+    FLOAT(true),
+    DOUBLE(true),
+    BIG_INTEGER(false),
+    BIG_DECIMAL(true);
+
+    private final boolean mIsFloating;
 
     /**
-     * {@inheritDoc}
+     * Constructor.
+     *
+     * @param isFloating whether this is a floating point operation.
      */
-    Number apply(Number n1, Number n2);
+    Precision(final boolean isFloating) {
+      mIsFloating = isFloating;
+    }
 
     /**
-     * Returns the operand precision.
+     * Checks if this is a floating point operation.
+     *
+     * @return whether this is a floating point operation.
+     */
+    boolean isFloatingPoint() {
+      return mIsFloating;
+    }
+  }
+
+  /**
+   * Extended operation interface.
+   *
+   * @param <N> the number type.
+   */
+  private interface ExtendedOperation<N extends Number> extends Operation<N> {
+
+    /**
+     * Returns the result precision.
      *
      * @return the precision.
      */
-    int getPrecision();
-  }
-
-  /**
-   * Function converting a number into a BigDecimal object.
-   */
-  private interface ToBigDecimalFunction extends Function<Number, BigDecimal> {
+    @NotNull
+    Precision getPrecision();
 
     /**
-     * {@inheritDoc}
+     * Checks if this operation needs to be replaced with the BigDecimal one when compared to the
+     * specified one.
+     *
+     * @param op the other operation.
+     * @return whether this operation needs to be replaced with the BigDecimal one.
      */
-    BigDecimal apply(Number number);
+    boolean replaceWithBigDecimal(@NotNull ExtendedOperation<?> op);
+
+    /**
+     * Converts the specified number into a {@code BigDecimal}.
+     *
+     * @param n the number to convert.
+     * @return the {@code BigDecimal} instance or null.
+     */
+    @NotNull
+    BigDecimal toBigDecimal(@NotNull N n);
+
+    /**
+     * Converts the specified number into a {@code BigInteger}.
+     *
+     * @param n the number to convert.
+     * @return the {@code BigInteger} instance or null.
+     */
+    @NotNull
+    BigInteger toBigInteger(@NotNull N n);
   }
 }

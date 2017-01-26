@@ -29,7 +29,8 @@ import com.github.dm.jrt.operator.math.Operation;
 import org.jetbrains.annotations.NotNull;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
-import static com.github.dm.jrt.operator.math.Numbers.getHigherPrecisionOperation;
+import static com.github.dm.jrt.operator.math.Numbers.getHigherPrecisionOperationSafe;
+import static com.github.dm.jrt.operator.math.Numbers.getLowerPrecisionOperationSafe;
 
 /**
  * Utility class providing functions that produce sequences of data.
@@ -69,11 +70,14 @@ public class Sequences {
   /**
    * Returns a consumer generating the specified range of numbers.
    * <br>
-   * The stream will generate a range of numbers up to and including the {@code end} element, by
+   * The stream will generate a range of numbers up to and including the {@code end} number, by
    * applying a default increment of {@code +1} or {@code -1} depending on the comparison between
-   * the first and the last element. That is, if the first element is less than the last, the
+   * the first and the last number. That is, if the first number is less than the last, the
    * increment will be {@code +1}. On the contrary, if the former is greater than the latter, the
    * increment will be {@code -1}.
+   * <br>
+   * Note that the {@code end} number will be returned only if the incremented value will exactly
+   * match it.
    *
    * @param start the first number in the range.
    * @param end   the last number in the range.
@@ -84,26 +88,25 @@ public class Sequences {
   @SuppressWarnings("unchecked")
   public static <N extends Number> Consumer<Channel<N, ?>> range(@NotNull final N start,
       @NotNull final N end) {
-    final Operation<?> operation = getHigherPrecisionOperation(start.getClass(), end.getClass());
-    if (operation == null) {
-      throw new IllegalArgumentException(
-          "one of the type is unsupported: [" + start.getClass().getCanonicalName() + "] [" +
-              end.getClass().getCanonicalName() + "]");
-    }
-
+    final Operation<?> operation =
+        getHigherPrecisionOperationSafe(start.getClass(), end.getClass());
     return range(start, end, ConstantConditions.notNull(
-        (N) operation.convert((operation.compare(start, end) <= 0) ? 1 : -1)));
+        (N) getLowerPrecisionOperationSafe(start.getClass(), end.getClass()).convert(
+            (operation.compare(start, end) <= 0) ? 1 : -1)));
   }
 
   /**
    * Returns a consumer generating the specified range of numbers.
    * <br>
    * The stream will generate a range of numbers by applying the specified increment up to and
-   * including the {@code end} element.
+   * including the {@code end} number.
+   * <br>
+   * Note that the {@code end} number will be returned only if the incremented value will exactly
+   * match it.
    *
    * @param start     the first number in the range.
    * @param end       the last number in the range.
-   * @param increment the increment to apply to the current element.
+   * @param increment the increment to apply to the current number.
    * @param <N>       the number type.
    * @return the consumer instance.
    */
@@ -167,22 +170,9 @@ public class Sequences {
       mEnd = end;
       mIncrement = increment;
       final Operation<?> addOperation =
-          getHigherPrecisionOperation(start.getClass(), increment.getClass());
-      if (addOperation == null) {
-        throw new IllegalArgumentException(
-            "one of the type is unsupported: [" + start.getClass().getCanonicalName() + "] [" +
-                increment.getClass().getCanonicalName() + "]");
-      }
-
-      final Operation<?> compareOperation = getHigherPrecisionOperation(
+          (mAddOperation = getHigherPrecisionOperationSafe(start.getClass(), increment.getClass()));
+      mCompareOperation = getHigherPrecisionOperationSafe(
           ConstantConditions.notNull((Number) addOperation.convert(0)).getClass(), end.getClass());
-      if (compareOperation == null) {
-        throw new IllegalArgumentException(
-            "the number type is unsupported: [" + end.getClass().getCanonicalName() + "]");
-      }
-
-      mAddOperation = addOperation;
-      mCompareOperation = compareOperation;
     }
 
     public void accept(final Channel<N, ?> result) throws Exception {

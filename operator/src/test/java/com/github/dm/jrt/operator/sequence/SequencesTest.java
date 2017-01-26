@@ -102,27 +102,24 @@ public class SequencesTest {
     assertThat(JRoutineCore.with(consumerCommand(range(0, new BigDecimal(2))))
                            .close()
                            .in(seconds(3))
-                           .all()).isEqualTo(
-        Arrays.asList(0, new BigDecimal(1), new BigDecimal(2)));
+                           .all()).isEqualTo(Arrays.asList(0, 1, new BigDecimal(2)));
     assertThat(JRoutineCore.with(consumerCommand(range(0, BigInteger.valueOf(-2))))
                            .close()
                            .in(seconds(3))
-                           .all()).isEqualTo(
-        Arrays.asList(0, BigInteger.valueOf(-1), BigInteger.valueOf(-2)));
+                           .all()).isEqualTo(Arrays.asList(0, -1, BigInteger.valueOf(-2)));
     assertThat(JRoutineCore.with(consumerCommand(range(0.1, BigInteger.valueOf(2))))
                            .close()
                            .in(seconds(3))
-                           .all()).isEqualTo(
-        Arrays.asList(0.1, new BigDecimal(0.1).add(BigDecimal.ONE)));
+                           .all()).isEqualTo(Arrays.asList(0.1, 1.1));
     assertThat(
         JRoutineCore.with(consumerCommand(range(0, -5))).close().in(seconds(3)).all()).isEqualTo(
         Arrays.asList(0, -1, -2, -3, -4, -5));
     assertThat(
         JRoutineCore.with(consumerCommand(range(0, 2.1))).close().in(seconds(3)).all()).isEqualTo(
-        Arrays.asList(0, 1d, 2d));
+        Arrays.asList(0, 1, 2));
     assertThat(
         JRoutineCore.with(consumerCommand(range(0, 1.9f))).close().in(seconds(3)).all()).isEqualTo(
-        Arrays.asList(0, 1f));
+        Arrays.asList(0, 1));
     assertThat(
         JRoutineCore.with(consumerCommand(range(0L, -4))).close().in(seconds(3)).all()).isEqualTo(
         Arrays.asList(0L, -1L, -2L, -3L, -4));
@@ -130,7 +127,7 @@ public class SequencesTest {
         .isEqualTo(Arrays.asList(0, 1, 2, 3, (short) 4));
     assertThat(
         JRoutineCore.with(consumerCommand(range((byte) 0, (short) 4))).close().in(seconds(3)).all())
-        .isEqualTo(Arrays.asList((byte) 0, (short) 1, (short) 2, (short) 3, (short) 4));
+        .isEqualTo(Arrays.asList((byte) 0, (byte) 1, (byte) 2, (byte) 3, (short) 4));
     assertThat(JRoutineCore.with(consumerCommand(range((byte) 0, (byte) 5)))
                            .close()
                            .in(seconds(3))

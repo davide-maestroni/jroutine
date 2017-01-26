@@ -397,7 +397,7 @@ public class StreamBuilderTest {
             final int[] count = {0};
             return JRoutineStream.withStream()
                                  .map(routine)
-                                 .let(tryCatchAccept(
+                                 .with(tryCatchAccept(
                                      new BiConsumer<RoutineException, Channel<String, ?>>() {
 
                                        public void accept(final RoutineException e,
@@ -405,7 +405,7 @@ public class StreamBuilderTest {
                                          if (++count[0] < 3) {
                                            JRoutineStream.withStream()
                                                          .map(routine)
-                                                         .let(tryCatchAccept(this))
+                                                         .with(tryCatchAccept(this))
                                                          .call(o)
                                                          .bind(channel);
 
@@ -435,7 +435,7 @@ public class StreamBuilderTest {
 
   @Test
   public void testFlatTransform() {
-    assertThat(JRoutineStream.<String>withStream().let(
+    assertThat(JRoutineStream.<String>withStream().with(
         new Function<StreamBuilder<String, String>, StreamBuilder<String, String>>() {
 
           public StreamBuilder<String, String> apply(final StreamBuilder<String, String> builder) {
@@ -445,7 +445,7 @@ public class StreamBuilderTest {
 
     try {
       JRoutineStream.withStream()
-                    .let(
+                    .with(
                         new Function<StreamBuilder<Object, Object>, StreamBuilder<Object,
                             Object>>() {
 
@@ -460,7 +460,7 @@ public class StreamBuilderTest {
       assertThat(e.getCause()).isExactlyInstanceOf(NullPointerException.class);
     }
 
-    assertThat(JRoutineStream.<String>withStream().letWithConfig(
+    assertThat(JRoutineStream.<String>withStream().withConfig(
         new BiFunction<StreamConfiguration, StreamBuilder<String, String>, StreamBuilder<String,
             String>>() {
 
@@ -472,7 +472,7 @@ public class StreamBuilderTest {
 
     try {
       JRoutineStream.withStream()
-                    .letWithConfig(
+                    .withConfig(
                         new BiFunction<StreamConfiguration, StreamBuilder<Object, Object>,
                             StreamBuilder<Object, Object>>() {
 
@@ -779,7 +779,7 @@ public class StreamBuilderTest {
   @Test
   public void testLag() {
     long startTime = System.currentTimeMillis();
-    assertThat(JRoutineStream.<String>withStream().let(
+    assertThat(JRoutineStream.<String>withStream().with(
         Transformations.<String, String>lag(1, TimeUnit.SECONDS))
                                                   .call("test")
                                                   .in(seconds(3))
@@ -787,13 +787,13 @@ public class StreamBuilderTest {
     assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
     startTime = System.currentTimeMillis();
     assertThat(
-        JRoutineStream.<String>withStream().let(Transformations.<String, String>lag(seconds(1)))
+        JRoutineStream.<String>withStream().with(Transformations.<String, String>lag(seconds(1)))
                                            .call("test")
                                            .in(seconds(3))
                                            .next()).isEqualTo("test");
     assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
     startTime = System.currentTimeMillis();
-    assertThat(JRoutineStream.<String>withStream().let(
+    assertThat(JRoutineStream.<String>withStream().with(
         Transformations.<String, String>lag(1, TimeUnit.SECONDS))
                                                   .close()
                                                   .in(seconds(3))
@@ -801,7 +801,7 @@ public class StreamBuilderTest {
     assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
     startTime = System.currentTimeMillis();
     assertThat(
-        JRoutineStream.<String>withStream().let(Transformations.<String, String>lag(seconds(1)))
+        JRoutineStream.<String>withStream().with(Transformations.<String, String>lag(seconds(1)))
                                            .close()
                                            .in(seconds(3))
                                            .all()).isEmpty();

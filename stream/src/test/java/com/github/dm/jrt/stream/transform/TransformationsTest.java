@@ -173,28 +173,28 @@ public class TransformationsTest {
   public void testDelay() {
     long startTime = System.currentTimeMillis();
     assertThat(JRoutineStream.withStream()
-                             .let(Transformations.delay(1, TimeUnit.SECONDS))
+                             .with(Transformations.delay(1, TimeUnit.SECONDS))
                              .call("test")
                              .in(seconds(3))
                              .next()).isEqualTo("test");
     assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
     startTime = System.currentTimeMillis();
     assertThat(JRoutineStream.withStream()
-                             .let(Transformations.delay(seconds(1)))
+                             .with(Transformations.delay(seconds(1)))
                              .call("test")
                              .in(seconds(3))
                              .next()).isEqualTo("test");
     assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
     startTime = System.currentTimeMillis();
     assertThat(JRoutineStream.withStream()
-                             .let(Transformations.delay(1, TimeUnit.SECONDS))
+                             .with(Transformations.delay(1, TimeUnit.SECONDS))
                              .close()
                              .in(seconds(3))
                              .all()).isEmpty();
     assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
     startTime = System.currentTimeMillis();
     assertThat(JRoutineStream.withStream()
-                             .let(Transformations.delay(seconds(1)))
+                             .with(Transformations.delay(seconds(1)))
                              .close()
                              .in(seconds(3))
                              .all()).isEmpty();
@@ -216,28 +216,28 @@ public class TransformationsTest {
   public void testLag() {
     long startTime = System.currentTimeMillis();
     assertThat(JRoutineStream.withStream()
-                             .let(Transformations.lag(1, TimeUnit.SECONDS))
+                             .with(Transformations.lag(1, TimeUnit.SECONDS))
                              .call("test")
                              .in(seconds(3))
                              .next()).isEqualTo("test");
     assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
     startTime = System.currentTimeMillis();
     assertThat(JRoutineStream.withStream()
-                             .let(Transformations.lag(seconds(1)))
+                             .with(Transformations.lag(seconds(1)))
                              .call("test")
                              .in(seconds(3))
                              .next()).isEqualTo("test");
     assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
     startTime = System.currentTimeMillis();
     assertThat(JRoutineStream.withStream()
-                             .let(Transformations.lag(1, TimeUnit.SECONDS))
+                             .with(Transformations.lag(1, TimeUnit.SECONDS))
                              .close()
                              .in(seconds(3))
                              .all()).isEmpty();
     assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
     startTime = System.currentTimeMillis();
     assertThat(JRoutineStream.withStream()
-                             .let(Transformations.lag(seconds(1)))
+                             .with(Transformations.lag(seconds(1)))
                              .close()
                              .in(seconds(3))
                              .all()).isEmpty();
@@ -267,41 +267,41 @@ public class TransformationsTest {
         });
     assertThat(JRoutineStream //
         .<Integer>withStream().map(appendAccept(range(1, 3)))
-                              .let(Transformations.<Integer, Integer, Long>parallel(2,
+                              .with(Transformations.<Integer, Integer, Long>parallel(2,
                                   sqr.buildFactory()))
                               .close()
                               .in(seconds(3))
                               .all()).containsOnly(1L, 4L, 9L);
     assertThat(JRoutineStream //
         .<Integer>withStream().map(appendAccept(range(1, 3)))
-                              .let(Transformations.<Integer, Integer, Long>parallel(2, sqr))
+                              .with(Transformations.<Integer, Integer, Long>parallel(2, sqr))
                               .close()
                               .in(seconds(3))
                               .all()).containsOnly(1L, 4L, 9L);
     assertThat(JRoutineStream //
         .<Integer>withStream().map(appendAccept(range(1, 3)))
-                              .let(Transformations.<Integer, Integer, Integer>parallel(2,
+                              .with(Transformations.<Integer, Integer, Integer>parallel(2,
                                   JRoutineCore.with(IdentityInvocation.<Integer>factoryOf())))
                               .close()
                               .in(seconds(3))
                               .all()).containsOnly(1, 2, 3);
     assertThat(JRoutineStream //
         .<Integer>withStream().map(appendAccept(range(1, 3)))
-                              .let(Transformations.<Integer, Integer, Long>parallelBy(
+                              .with(Transformations.<Integer, Integer, Long>parallelBy(
                                   Functions.<Integer>identity(), sqr.buildFactory()))
                               .close()
                               .in(seconds(3))
                               .all()).containsOnly(1L, 4L, 9L);
     assertThat(JRoutineStream //
         .<Integer>withStream().map(appendAccept(range(1, 3)))
-                              .let(Transformations.<Integer, Integer, Long>parallelBy(
+                              .with(Transformations.<Integer, Integer, Long>parallelBy(
                                   Functions.<Integer>identity(), sqr))
                               .close()
                               .in(seconds(3))
                               .all()).containsOnly(1L, 4L, 9L);
     assertThat(JRoutineStream //
         .<Integer>withStream().map(appendAccept(range(1, 3)))
-                              .let(Transformations.<Integer, Integer, Integer>parallelBy(
+                              .with(Transformations.<Integer, Integer, Integer>parallelBy(
                                   Functions.<Integer>identity(),
                                   JRoutineCore.with(IdentityInvocation.<Integer>factoryOf())))
                               .close()
@@ -375,7 +375,7 @@ public class TransformationsTest {
     try {
       JRoutineStream.<String>withStream().map(new UpperCase())
                                          .map(factoryOf(ThrowException.class, count1))
-                                         .let(Transformations.<String, Object>retry(2))
+                                         .with(Transformations.<String, Object>retry(2))
                                          .call("test")
                                          .in(seconds(3))
                                          .throwError();
@@ -388,7 +388,7 @@ public class TransformationsTest {
     final AtomicInteger count2 = new AtomicInteger();
     assertThat(JRoutineStream.<String>withStream().map(new UpperCase())
                                                   .map(factoryOf(ThrowException.class, count2, 1))
-                                                  .let(Transformations.<String, Object>retry(1))
+                                                  .with(Transformations.<String, Object>retry(1))
                                                   .call("test")
                                                   .in(seconds(3))
                                                   .all()).containsExactly("TEST");
@@ -397,7 +397,7 @@ public class TransformationsTest {
     try {
       JRoutineStream.<String>withStream().map(new AbortInvocation())
                                          .map(factoryOf(ThrowException.class, count3))
-                                         .let(Transformations.<String, Object>retry(2))
+                                         .with(Transformations.<String, Object>retry(2))
                                          .call("test")
                                          .in(seconds(3))
                                          .throwError();
@@ -470,7 +470,7 @@ public class TransformationsTest {
   @Test
   public void testThrottle() throws InterruptedException {
     final Routine<Object, Object> routine = JRoutineStream.withStream()
-                                                          .let(throttle(1))
+                                                          .with(throttle(1))
                                                           .applyInvocationConfiguration()
                                                           .withRunner(Runners.poolRunner(1))
                                                           .configured()
@@ -485,7 +485,7 @@ public class TransformationsTest {
   @Test
   public void testThrottleAbort() throws InterruptedException {
     final Routine<Object, Object> routine = JRoutineStream.withStream()
-                                                          .let(throttle(1))
+                                                          .with(throttle(1))
                                                           .applyInvocationConfiguration()
                                                           .withRunner(Runners.poolRunner(1))
                                                           .configured()
@@ -500,7 +500,7 @@ public class TransformationsTest {
   @Test
   public void testTimeThrottle() {
     final Routine<Object, Object> routine =
-        JRoutineStream.withStream().let(throttle(1, seconds(1))).buildRoutine();
+        JRoutineStream.withStream().with(throttle(1, seconds(1))).buildRoutine();
     final Channel<Object, Object> channel1 = routine.call("test1");
     final Channel<Object, Object> channel2 = routine.call("test2");
     assertThat(channel1.in(seconds(1.5)).next()).isEqualTo("test1");
@@ -509,11 +509,13 @@ public class TransformationsTest {
 
   @Test
   public void testTimeout() {
-    assertThat(
-        JRoutineStream.withStream().let(timeoutAfter(seconds(1))).call("test").in(seconds(1)).all())
-        .containsExactly("test");
+    assertThat(JRoutineStream.withStream()
+                             .with(timeoutAfter(seconds(1)))
+                             .call("test")
+                             .in(seconds(1))
+                             .all()).containsExactly("test");
     final Channel<Object, Object> channel =
-        JRoutineStream.withStream().let(timeoutAfter(millis(1))).call().pass("test");
+        JRoutineStream.withStream().with(timeoutAfter(millis(1))).call().pass("test");
     assertThat(channel.in(seconds(1)).getError()).isExactlyInstanceOf(ResultTimeoutException.class);
   }
 
@@ -526,7 +528,7 @@ public class TransformationsTest {
                                                       throw new NullPointerException();
                                                     }
                                                   })
-                                                  .let(
+                                                  .with(
                                                       Transformations.<String,
                                                           Object>tryCatchAccept(
                                                           new BiConsumer<RoutineException,
@@ -547,7 +549,7 @@ public class TransformationsTest {
                                                       return o;
                                                     }
                                                   })
-                                                  .let(
+                                                  .with(
                                                       Transformations.<String,
                                                           Object>tryCatchAccept(
                                                           new BiConsumer<RoutineException,
@@ -566,7 +568,7 @@ public class TransformationsTest {
       public Object apply(final Object o) {
         throw new NullPointerException();
       }
-    }).let(Transformations.<String, Object>tryCatch(new Function<RoutineException, Object>() {
+    }).with(Transformations.<String, Object>tryCatch(new Function<RoutineException, Object>() {
 
       public Object apply(final RoutineException e) {
         return "exception";
@@ -601,7 +603,7 @@ public class TransformationsTest {
         public Object apply(final Object o) {
           throw new NullPointerException();
         }
-      }).let(Transformations.<String, Object>tryFinally(new Action() {
+      }).with(Transformations.<String, Object>tryFinally(new Action() {
 
         public void perform() {
           isRun.set(true);
@@ -617,7 +619,7 @@ public class TransformationsTest {
       public Object apply(final Object o) {
         return o;
       }
-    }).let(Transformations.<String, Object>tryFinally(new Action() {
+    }).with(Transformations.<String, Object>tryFinally(new Action() {
 
       public void perform() {
         isRun.set(true);

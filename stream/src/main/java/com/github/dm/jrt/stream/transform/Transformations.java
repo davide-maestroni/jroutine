@@ -65,7 +65,7 @@ public class Transformations {
    * @param <OUT>    the output data type.
    * @return the transformation function.
    * @throws java.lang.IllegalArgumentException if the specified delay is negative.
-   * @see StreamBuilder#let(Function)
+   * @see StreamBuilder#with(Function)
    */
   @NotNull
   public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> delay(
@@ -95,7 +95,7 @@ public class Transformations {
    * @param <IN>  the input data type.
    * @param <OUT> the output data type.
    * @return the transformation function.
-   * @see StreamBuilder#let(Function)
+   * @see StreamBuilder#with(Function)
    */
   @NotNull
   public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> delay(
@@ -114,7 +114,7 @@ public class Transformations {
    * @param <OUT>    the output data type.
    * @return the transformation function.
    * @throws java.lang.IllegalArgumentException if the specified delay is negative.
-   * @see StreamBuilder#let(Function)
+   * @see StreamBuilder#with(Function)
    */
   @NotNull
   public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> lag(
@@ -144,7 +144,7 @@ public class Transformations {
    * @param <IN>  the input data type.
    * @param <OUT> the output data type.
    * @return the transformation function.
-   * @see StreamBuilder#let(Function)
+   * @see StreamBuilder#with(Function)
    */
   @NotNull
   public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> lag(
@@ -166,7 +166,7 @@ public class Transformations {
    * @param <AFTER>    the new output type.
    * @return the transformation function.
    * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
-   * @see StreamBuilder#let(Function)
+   * @see StreamBuilder#with(Function)
    */
   @NotNull
   public static <IN, OUT, AFTER> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, AFTER>>
@@ -205,7 +205,7 @@ public class Transformations {
    * @param <AFTER>    the new output type.
    * @return the transformation function.
    * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
-   * @see StreamBuilder#let(Function)
+   * @see StreamBuilder#with(Function)
    */
   @NotNull
   public static <IN, OUT, AFTER> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, AFTER>>
@@ -241,7 +241,7 @@ public class Transformations {
    * @param <AFTER>    the new output type.
    * @return the transformation function.
    * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
-   * @see StreamBuilder#let(Function)
+   * @see StreamBuilder#with(Function)
    */
   @NotNull
   public static <IN, OUT, AFTER> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, AFTER>>
@@ -263,7 +263,7 @@ public class Transformations {
    * @param <OUT>       the output data type.
    * @param <AFTER>     the new output type.
    * @return the transformation function.
-   * @see StreamBuilder#let(Function)
+   * @see StreamBuilder#with(Function)
    */
   @NotNull
   public static <IN, OUT, AFTER> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, AFTER>>
@@ -303,7 +303,7 @@ public class Transformations {
    * @param <OUT>       the output data type.
    * @param <AFTER>     the new output type.
    * @return the transformation function.
-   * @see StreamBuilder#let(Function)
+   * @see StreamBuilder#with(Function)
    */
   @NotNull
   public static <IN, OUT, AFTER> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, AFTER>>
@@ -340,7 +340,7 @@ public class Transformations {
    * @param <OUT>       the output data type.
    * @param <AFTER>     the new output type.
    * @return the transformation function.
-   * @see StreamBuilder#let(Function)
+   * @see StreamBuilder#with(Function)
    */
   @NotNull
   public static <IN, OUT, AFTER> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, AFTER>>
@@ -359,7 +359,7 @@ public class Transformations {
    * @param <OUT>    the output data type.
    * @return the transformation function.
    * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
-   * @see StreamBuilder#let(Function)
+   * @see StreamBuilder#with(Function)
    */
   @NotNull
   public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> retry(
@@ -379,7 +379,7 @@ public class Transformations {
    * @param <OUT>    the output data type.
    * @return the transformation function.
    * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
-   * @see StreamBuilder#let(Function)
+   * @see StreamBuilder#with(Function)
    */
   @NotNull
   public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> retry(
@@ -403,7 +403,7 @@ public class Transformations {
    * @param <IN>            the input data type.
    * @param <OUT>           the output data type.
    * @return the transformation function.
-   * @see StreamBuilder#let(Function)
+   * @see StreamBuilder#with(Function)
    */
   @NotNull
   public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> retry(
@@ -436,7 +436,7 @@ public class Transformations {
    * @param <IN>           the input data type.
    * @param <OUT>          the output data type.
    * @return the transformation function.
-   * @see StreamBuilder#let(Function)
+   * @see StreamBuilder#with(Function)
    */
   @NotNull
   public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> throttle(
@@ -462,7 +462,7 @@ public class Transformations {
    * @param <IN>           the input data type.
    * @param <OUT>          the output data type.
    * @return the transformation function.
-   * @see StreamBuilder#let(Function)
+   * @see StreamBuilder#with(Function)
    */
   @NotNull
   public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> throttle(
@@ -483,7 +483,7 @@ public class Transformations {
    * @param <IN>           the input data type.
    * @param <OUT>          the output data type.
    * @return the transformation function.
-   * @see StreamBuilder#let(Function)
+   * @see StreamBuilder#with(Function)
    */
   @NotNull
   public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> throttle(
@@ -509,7 +509,7 @@ public class Transformations {
    * @param <IN>    the input data type.
    * @param <OUT>   the output data type.
    * @return the transformation function.
-   * @see StreamBuilder#let(Function)
+   * @see StreamBuilder#with(Function)
    */
   @NotNull
   public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> timeoutAfter(
@@ -529,7 +529,7 @@ public class Transformations {
    * @param <IN>     the input data type.
    * @param <OUT>    the output data type.
    * @return the transformation function.
-   * @see StreamBuilder#let(Function)
+   * @see StreamBuilder#with(Function)
    */
   @NotNull
   public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> timeoutAfter(
@@ -560,7 +560,7 @@ public class Transformations {
    * @param <IN>          the input data type.
    * @param <OUT>         the output data type.
    * @return the transformation function.
-   * @see StreamBuilder#let(Function)
+   * @see StreamBuilder#with(Function)
    */
   @NotNull
   public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> tryCatch(
@@ -580,7 +580,7 @@ public class Transformations {
    * @param <IN>          the input data type.
    * @param <OUT>         the output data type.
    * @return the transformation function.
-   * @see StreamBuilder#let(Function)
+   * @see StreamBuilder#with(Function)
    */
   @NotNull
   public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> tryCatchAccept(
@@ -611,7 +611,7 @@ public class Transformations {
    * @param <IN>          the input data type.
    * @param <OUT>         the output data type.
    * @return the transformation function.
-   * @see StreamBuilder#let(Function)
+   * @see StreamBuilder#with(Function)
    */
   @NotNull
   public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> tryFinally(

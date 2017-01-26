@@ -163,35 +163,6 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends AbstractRoutineBuil
   }
 
   @NotNull
-  public <BEFORE, AFTER> StreamBuilder<BEFORE, AFTER> let(
-      @NotNull final Function<? super StreamBuilder<IN, OUT>, ? extends
-          StreamBuilder<BEFORE, AFTER>> transformingFunction) {
-    try {
-      return ConstantConditions.notNull("transformed stream builder",
-          transformingFunction.apply(this));
-
-    } catch (final Exception e) {
-      throw StreamBuildingException.wrapIfNeeded(e);
-    }
-  }
-
-  @NotNull
-  @SuppressWarnings("unchecked")
-  public <BEFORE, AFTER> StreamBuilder<BEFORE, AFTER> letWithConfig(
-      @NotNull final BiFunction<? extends StreamConfiguration, ? super StreamBuilder<IN, OUT>, ?
-          extends StreamBuilder<BEFORE, AFTER>> transformingFunction) {
-    try {
-      return ConstantConditions.notNull("transformed stream builder",
-          ((BiFunction<StreamConfiguration, ? super StreamBuilder<IN, OUT>, ? extends
-              StreamBuilder<BEFORE, AFTER>>) transformingFunction).apply(mStreamConfiguration,
-              this));
-
-    } catch (final Exception e) {
-      throw StreamBuildingException.wrapIfNeeded(e);
-    }
-  }
-
-  @NotNull
   @SuppressWarnings("unchecked")
   public <BEFORE, AFTER> StreamBuilder<BEFORE, AFTER> lift(
       @NotNull final Function<? extends Function<? super Channel<?, IN>, ? extends
@@ -337,6 +308,35 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends AbstractRoutineBuil
   @NotNull
   public StreamBuilder<IN, OUT> unsorted() {
     return applyStreamInvocationConfiguration().withOutputOrder(OrderType.UNSORTED).configured();
+  }
+
+  @NotNull
+  public <BEFORE, AFTER> StreamBuilder<BEFORE, AFTER> with(
+      @NotNull final Function<? super StreamBuilder<IN, OUT>, ? extends
+          StreamBuilder<BEFORE, AFTER>> transformingFunction) {
+    try {
+      return ConstantConditions.notNull("transformed stream builder",
+          transformingFunction.apply(this));
+
+    } catch (final Exception e) {
+      throw StreamBuildingException.wrapIfNeeded(e);
+    }
+  }
+
+  @NotNull
+  @SuppressWarnings("unchecked")
+  public <BEFORE, AFTER> StreamBuilder<BEFORE, AFTER> withConfig(
+      @NotNull final BiFunction<? extends StreamConfiguration, ? super StreamBuilder<IN, OUT>, ?
+          extends StreamBuilder<BEFORE, AFTER>> transformingFunction) {
+    try {
+      return ConstantConditions.notNull("transformed stream builder",
+          ((BiFunction<StreamConfiguration, ? super StreamBuilder<IN, OUT>, ? extends
+              StreamBuilder<BEFORE, AFTER>>) transformingFunction).apply(mStreamConfiguration,
+              this));
+
+    } catch (final Exception e) {
+      throw StreamBuildingException.wrapIfNeeded(e);
+    }
   }
 
   @NotNull

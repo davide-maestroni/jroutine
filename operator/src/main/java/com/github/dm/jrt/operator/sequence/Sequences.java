@@ -91,7 +91,8 @@ public class Sequences {
               end.getClass().getCanonicalName() + "]");
     }
 
-    return range(start, end, (N) operation.convert((operation.compare(start, end) <= 0) ? 1 : -1));
+    return range(start, end, ConstantConditions.notNull(
+        (N) operation.convert((operation.compare(start, end) <= 0) ? 1 : -1)));
   }
 
   /**
@@ -173,8 +174,8 @@ public class Sequences {
                 increment.getClass().getCanonicalName() + "]");
       }
 
-      final Operation<?> compareOperation =
-          getHigherPrecisionOperation(addOperation.convert(0).getClass(), end.getClass());
+      final Operation<?> compareOperation = getHigherPrecisionOperation(
+          ConstantConditions.notNull((Number) addOperation.convert(0)).getClass(), end.getClass());
       if (compareOperation == null) {
         throw new IllegalArgumentException(
             "the number type is unsupported: [" + end.getClass().getCanonicalName() + "]");

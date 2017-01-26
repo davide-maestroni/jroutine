@@ -319,7 +319,16 @@ public class Numbers {
           public int compare(@NotNull final Number n1, @NotNull final Number n2) {
             final float v1 = n1.floatValue();
             final float v2 = n2.floatValue();
-            return (v1 < v2) ? -1 : ((v1 == v2) ? 0 : 1);
+            if (v1 < v2) {
+              return -1;
+
+            } else if (v1 > v2) {
+              return 1;
+            }
+
+            final int i1 = Float.floatToIntBits(v1);
+            final int i2 = Float.floatToIntBits(v2);
+            return (i1 < i2) ? -1 : ((i1 == i2) ? 0 : 1);
           }
 
           @Nullable
@@ -386,7 +395,16 @@ public class Numbers {
           public int compare(@NotNull final Number n1, @NotNull final Number n2) {
             final double v1 = n1.doubleValue();
             final double v2 = n2.doubleValue();
-            return (v1 < v2) ? -1 : ((v1 == v2) ? 0 : 1);
+            if (v1 < v2) {
+              return -1;
+
+            } else if (v1 > v2) {
+              return 1;
+            }
+
+            final long l1 = Double.doubleToLongBits(v1);
+            final long l2 = Double.doubleToLongBits(v2);
+            return (l1 < l2) ? -1 : ((l1 == l2) ? 0 : 1);
           }
 
           @Nullable

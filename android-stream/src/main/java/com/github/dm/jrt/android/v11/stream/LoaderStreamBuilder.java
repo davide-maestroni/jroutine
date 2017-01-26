@@ -165,32 +165,6 @@ public interface LoaderStreamBuilder<IN, OUT>
 
   /**
    * {@inheritDoc}
-   * <p>
-   * Note that the passed builder will be this one.
-   * <br>
-   * A {@code LoaderStreamBuilder} is expected as the function result.
-   */
-  @NotNull
-  <BEFORE, AFTER> LoaderStreamBuilder<BEFORE, AFTER> let(
-      @NotNull Function<? super StreamBuilder<IN, OUT>, ? extends
-          StreamBuilder<BEFORE, AFTER>> transformingFunction);
-
-  /**
-   * {@inheritDoc}
-   * <p>
-   * Note that the passed configuration will be an instance of {@code LoaderStreamConfiguration}
-   * and the passed builder will be this one.
-   * <br>
-   * A {@code LoaderStreamBuilder} is expected as the function result.
-   */
-  @NotNull
-  @Override
-  <BEFORE, AFTER> LoaderStreamBuilder<BEFORE, AFTER> letWithConfig(
-      @NotNull BiFunction<? extends StreamConfiguration, ? super StreamBuilder<IN, OUT>, ?
-          extends StreamBuilder<BEFORE, AFTER>> transformingFunction);
-
-  /**
-   * {@inheritDoc}
    */
   @NotNull
   @Override
@@ -307,6 +281,32 @@ public interface LoaderStreamBuilder<IN, OUT>
   @NotNull
   @Override
   LoaderStreamBuilder<IN, OUT> unsorted();
+
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Note that the passed builder will be this one.
+   * <br>
+   * A {@code LoaderStreamBuilder} is expected as the function result.
+   */
+  @NotNull
+  <BEFORE, AFTER> LoaderStreamBuilder<BEFORE, AFTER> with(
+      @NotNull Function<? super StreamBuilder<IN, OUT>, ? extends
+          StreamBuilder<BEFORE, AFTER>> transformingFunction);
+
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Note that the passed configuration will be an instance of {@code LoaderStreamConfiguration}
+   * and the passed builder will be this one.
+   * <br>
+   * A {@code LoaderStreamBuilder} is expected as the function result.
+   */
+  @NotNull
+  @Override
+  <BEFORE, AFTER> LoaderStreamBuilder<BEFORE, AFTER> withConfig(
+      @NotNull BiFunction<? extends StreamConfiguration, ? super StreamBuilder<IN, OUT>, ?
+          extends StreamBuilder<BEFORE, AFTER>> transformingFunction);
 
   /**
    * {@inheritDoc}

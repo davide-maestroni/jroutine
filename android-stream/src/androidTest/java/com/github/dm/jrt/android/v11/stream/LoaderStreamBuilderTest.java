@@ -151,7 +151,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
   private static void testFlatTransform(@NotNull final Activity activity) {
     assertThat(JRoutineLoaderStream //
         .<String>withStream().on(loaderFrom(activity))
-                             .let(
+                             .with(
                                  new Function<StreamBuilder<String, String>,
                                      StreamBuilder<String, String>>() {
 
@@ -165,7 +165,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                              .all()).containsExactly("test1", "test2");
     assertThat(JRoutineLoaderStream //
         .<String>withStream().on(loaderFrom(activity))
-                             .let(
+                             .with(
                                  new Function<StreamBuilder<String, String>,
                                      LoaderStreamBuilder<String, String>>() {
 
@@ -180,7 +180,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                              .all()).containsExactly("test1", "test2");
     assertThat(JRoutineLoaderStream //
         .<String>withStream().on(loaderFrom(activity))
-                             .letWithConfig(
+                             .withConfig(
                                  new BiFunction<LoaderStreamConfiguration, StreamBuilder<String,
                                      String>, StreamBuilder<String, String>>() {
 
@@ -195,7 +195,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                              .all()).containsExactly("test1", "test2");
     assertThat(JRoutineLoaderStream //
         .<String>withStream().on(loaderFrom(activity))
-                             .letWithConfig(
+                             .withConfig(
                                  new BiFunction<LoaderStreamConfiguration, StreamBuilder<String,
                                      String>, LoaderStreamBuilder<String, String>>() {
 
@@ -1446,7 +1446,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
       return JRoutineLoaderStream.withStream()
                                  .on(loaderFrom(activity))
                                  .map(routine)
-                                 .let(tryCatchAccept(
+                                 .with(tryCatchAccept(
                                      new BiConsumer<RoutineException, Channel<String, ?>>() {
 
                                        public void accept(final RoutineException e,
@@ -1455,7 +1455,7 @@ public class LoaderStreamBuilderTest extends ActivityInstrumentationTestCase2<Te
                                            JRoutineLoaderStream.withStream()
                                                                .on(loaderFrom(activity))
                                                                .map(routine)
-                                                               .let(tryCatchAccept(this))
+                                                               .with(tryCatchAccept(this))
                                                                .call(o)
                                                                .bind(channel);
 

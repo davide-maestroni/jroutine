@@ -204,46 +204,6 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
   StreamBuilder<IN, OUT> immediateParallel();
 
   /**
-   * Transforms this stream by applying the specified function.
-   * <p>
-   * This method provides a convenient way to apply a set of configurations and concatenations
-   * without breaking the fluent chain.
-   *
-   * @param transformingFunction the function modifying the stream.
-   * @param <BEFORE>             the concatenation input type.
-   * @param <AFTER>              the concatenation output type.
-   * @return the lifted builder.
-   * @throws com.github.dm.jrt.stream.builder.StreamBuildingException if an unexpected error
-   *                                                                  occurred.
-   */
-  @NotNull
-  <BEFORE, AFTER> StreamBuilder<BEFORE, AFTER> let(
-      @NotNull Function<? super StreamBuilder<IN, OUT>, ? extends
-          StreamBuilder<BEFORE, AFTER>> transformingFunction);
-
-  // TODO: 26/01/2017 rename?
-
-  /**
-   * Transforms this stream by applying the specified function.
-   * <br>
-   * The current configuration of the stream will be passed as the first parameter.
-   * <p>
-   * This method provides a convenient way to apply a set of configurations and concatenations
-   * without breaking the fluent chain.
-   *
-   * @param transformingFunction the function modifying the stream.
-   * @param <BEFORE>             the concatenation input type.
-   * @param <AFTER>              the concatenation output type.
-   * @return the lifted builder.
-   * @throws com.github.dm.jrt.stream.builder.StreamBuildingException if an unexpected error
-   *                                                                  occurred.
-   */
-  @NotNull
-  <BEFORE, AFTER> StreamBuilder<BEFORE, AFTER> letWithConfig(
-      @NotNull BiFunction<? extends StreamConfiguration, ? super StreamBuilder<IN, OUT>, ?
-          extends StreamBuilder<BEFORE, AFTER>> transformingFunction);
-
-  /**
    * Transforms the stream by modifying the chain building function.
    * <br>
    * The returned function will be employed when the routine instance is built (see
@@ -439,6 +399,44 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
    */
   @NotNull
   StreamBuilder<IN, OUT> unsorted();
+
+  /**
+   * Transforms this stream by applying the specified function.
+   * <p>
+   * This method provides a convenient way to apply a set of configurations and concatenations
+   * without breaking the fluent chain.
+   *
+   * @param transformingFunction the function modifying the stream.
+   * @param <BEFORE>             the concatenation input type.
+   * @param <AFTER>              the concatenation output type.
+   * @return the lifted builder.
+   * @throws com.github.dm.jrt.stream.builder.StreamBuildingException if an unexpected error
+   *                                                                  occurred.
+   */
+  @NotNull
+  <BEFORE, AFTER> StreamBuilder<BEFORE, AFTER> with(
+      @NotNull Function<? super StreamBuilder<IN, OUT>, ? extends
+          StreamBuilder<BEFORE, AFTER>> transformingFunction);
+
+  /**
+   * Transforms this stream by applying the specified function.
+   * <br>
+   * The current configuration of the stream will be passed as the first parameter.
+   * <p>
+   * This method provides a convenient way to apply a set of configurations and concatenations
+   * without breaking the fluent chain.
+   *
+   * @param transformingFunction the function modifying the stream.
+   * @param <BEFORE>             the concatenation input type.
+   * @param <AFTER>              the concatenation output type.
+   * @return the lifted builder.
+   * @throws com.github.dm.jrt.stream.builder.StreamBuildingException if an unexpected error
+   *                                                                  occurred.
+   */
+  @NotNull
+  <BEFORE, AFTER> StreamBuilder<BEFORE, AFTER> withConfig(
+      @NotNull BiFunction<? extends StreamConfiguration, ? super StreamBuilder<IN, OUT>, ?
+          extends StreamBuilder<BEFORE, AFTER>> transformingFunction);
 
   /**
    * Interface defining a stream configuration.

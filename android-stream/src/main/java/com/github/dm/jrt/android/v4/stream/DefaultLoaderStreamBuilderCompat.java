@@ -191,24 +191,6 @@ class DefaultLoaderStreamBuilderCompat<IN, OUT> extends AbstractStreamBuilder<IN
 
   @NotNull
   @Override
-  public <BEFORE, AFTER> LoaderStreamBuilderCompat<BEFORE, AFTER> let(
-      @NotNull final Function<? super StreamBuilder<IN, OUT>, ? extends
-          StreamBuilder<BEFORE, AFTER>> transformingFunction) {
-    checkStatic(decorate(transformingFunction), transformingFunction);
-    return (LoaderStreamBuilderCompat<BEFORE, AFTER>) super.let(transformingFunction);
-  }
-
-  @NotNull
-  @Override
-  public <BEFORE, AFTER> LoaderStreamBuilderCompat<BEFORE, AFTER> letWithConfig(
-      @NotNull final BiFunction<? extends StreamConfiguration, ? super StreamBuilder<IN, OUT>, ?
-          extends StreamBuilder<BEFORE, AFTER>> transformingFunction) {
-    checkStatic(decorate(transformingFunction), transformingFunction);
-    return (LoaderStreamBuilderCompat<BEFORE, AFTER>) super.letWithConfig(transformingFunction);
-  }
-
-  @NotNull
-  @Override
   public <BEFORE, AFTER> LoaderStreamBuilderCompat<BEFORE, AFTER> lift(
       @NotNull final Function<? extends Function<? super Channel<?, IN>, ? extends
           Channel<?, OUT>>, ? extends Function<? super Channel<?, BEFORE>, ? extends
@@ -310,6 +292,24 @@ class DefaultLoaderStreamBuilderCompat<IN, OUT> extends AbstractStreamBuilder<IN
   @Override
   public LoaderStreamBuilderCompat<IN, OUT> unsorted() {
     return (LoaderStreamBuilderCompat<IN, OUT>) super.unsorted();
+  }
+
+  @NotNull
+  @Override
+  public <BEFORE, AFTER> LoaderStreamBuilderCompat<BEFORE, AFTER> with(
+      @NotNull final Function<? super StreamBuilder<IN, OUT>, ? extends
+          StreamBuilder<BEFORE, AFTER>> transformingFunction) {
+    checkStatic(decorate(transformingFunction), transformingFunction);
+    return (LoaderStreamBuilderCompat<BEFORE, AFTER>) super.with(transformingFunction);
+  }
+
+  @NotNull
+  @Override
+  public <BEFORE, AFTER> LoaderStreamBuilderCompat<BEFORE, AFTER> withConfig(
+      @NotNull final BiFunction<? extends StreamConfiguration, ? super StreamBuilder<IN, OUT>, ?
+          extends StreamBuilder<BEFORE, AFTER>> transformingFunction) {
+    checkStatic(decorate(transformingFunction), transformingFunction);
+    return (LoaderStreamBuilderCompat<BEFORE, AFTER>) super.withConfig(transformingFunction);
   }
 
   @NotNull

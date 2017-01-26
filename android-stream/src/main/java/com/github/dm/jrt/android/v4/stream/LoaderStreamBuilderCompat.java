@@ -165,33 +165,6 @@ public interface LoaderStreamBuilderCompat<IN, OUT>
 
   /**
    * {@inheritDoc}
-   * <p>
-   * Note that the passed builder will be this one.
-   * <br>
-   * A {@code LoaderStreamBuilderCompat} is expected as the function result.
-   */
-  @NotNull
-  <BEFORE, AFTER> LoaderStreamBuilderCompat<BEFORE, AFTER> let(
-      @NotNull Function<? super StreamBuilder<IN, OUT>, ? extends
-          StreamBuilder<BEFORE, AFTER>> transformingFunction);
-
-  /**
-   * {@inheritDoc}
-   * <p>
-   * Note that the passed configuration will be an instance of
-   * {@code LoaderStreamConfigurationCompat} and the passed builder will be this one.
-   * <br>
-   * A {@code LoaderStreamBuilderCompat} is expected as the function result.
-   */
-  @NotNull
-
-  @Override
-  <BEFORE, AFTER> LoaderStreamBuilderCompat<BEFORE, AFTER> letWithConfig(
-      @NotNull BiFunction<? extends StreamConfiguration, ? super StreamBuilder<IN, OUT>, ?
-          extends StreamBuilder<BEFORE, AFTER>> transformingFunction);
-
-  /**
-   * {@inheritDoc}
    */
   @NotNull
   @Override
@@ -309,6 +282,33 @@ public interface LoaderStreamBuilderCompat<IN, OUT>
   @NotNull
   @Override
   LoaderStreamBuilderCompat<IN, OUT> unsorted();
+
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Note that the passed builder will be this one.
+   * <br>
+   * A {@code LoaderStreamBuilderCompat} is expected as the function result.
+   */
+  @NotNull
+  <BEFORE, AFTER> LoaderStreamBuilderCompat<BEFORE, AFTER> with(
+      @NotNull Function<? super StreamBuilder<IN, OUT>, ? extends
+          StreamBuilder<BEFORE, AFTER>> transformingFunction);
+
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Note that the passed configuration will be an instance of
+   * {@code LoaderStreamConfigurationCompat} and the passed builder will be this one.
+   * <br>
+   * A {@code LoaderStreamBuilderCompat} is expected as the function result.
+   */
+  @NotNull
+
+  @Override
+  <BEFORE, AFTER> LoaderStreamBuilderCompat<BEFORE, AFTER> withConfig(
+      @NotNull BiFunction<? extends StreamConfiguration, ? super StreamBuilder<IN, OUT>, ?
+          extends StreamBuilder<BEFORE, AFTER>> transformingFunction);
 
   /**
    * {@inheritDoc}

@@ -79,5 +79,3 @@ definitions:
         type: boolean
         default: false
         example: false
-
-

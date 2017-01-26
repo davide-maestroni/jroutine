@@ -481,7 +481,6 @@ public class ServiceRoutineMethod extends RoutineMethod
     @Override
     public ReflectionConfiguration.Builder<? extends ReflectionServiceRoutineMethod>
     applyReflectionConfiguration() {
-
       return new ReflectionConfiguration.Builder<ReflectionServiceRoutineMethod>(this,
           mConfiguration);
     }

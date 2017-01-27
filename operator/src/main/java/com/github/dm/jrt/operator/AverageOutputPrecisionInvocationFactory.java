@@ -25,7 +25,7 @@ import com.github.dm.jrt.operator.math.Operation;
 import org.jetbrains.annotations.NotNull;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
-import static com.github.dm.jrt.operator.math.Numbers.addSafe;
+import static com.github.dm.jrt.operator.math.Numbers.divideSafe;
 import static com.github.dm.jrt.operator.math.Numbers.getOperationSafe;
 
 /**
@@ -85,13 +85,13 @@ class AverageOutputPrecisionInvocationFactory<N extends Number>
         result.pass((N) mOperation.convert(0));
 
       } else {
-        result.pass((N) mOperation.divide(mSum, count));
+        result.pass((N) mOperation.convert(divideSafe(mSum, count)));
       }
     }
 
     @Override
     public void onInput(final Number input, @NotNull final Channel<N, ?> result) {
-      mSum = mOperation.convert(addSafe(mSum, input));
+      mSum = mOperation.add(mSum, input);
       ++mCount;
     }
 

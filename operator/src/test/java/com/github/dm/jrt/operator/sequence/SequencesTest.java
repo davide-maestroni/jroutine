@@ -54,6 +54,13 @@ public class SequencesTest {
             return (char) (character + 1);
           }
         }))).close().in(seconds(3)).all()).containsExactly('a', 'b', 'c', 'd', 'e');
+    assertThat(
+        JRoutineCore.with(consumerCommand(range('e', 'a', new Function<Character, Character>() {
+
+          public Character apply(final Character character) {
+            return (char) (character - 1);
+          }
+        }))).close().in(seconds(3)).all()).containsExactly('e', 'd', 'c', 'b', 'a');
     assertThat(JRoutineCore.with(consumerCommand(range(0, 2, new BigDecimal(0.7))))
                            .close()
                            .in(seconds(3))

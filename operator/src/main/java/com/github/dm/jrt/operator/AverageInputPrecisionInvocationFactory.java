@@ -20,7 +20,6 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
-import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.operator.math.Operation;
 
 import org.jetbrains.annotations.NotNull;
@@ -98,8 +97,7 @@ class AverageInputPrecisionInvocationFactory<IN extends Number, OUT extends Numb
         result.pass((N) outputOperation.convert(0));
 
       } else {
-        result.pass((N) outputOperation.convert(
-            divideSafe(ConstantConditions.notNull((Number) outputOperation.convert(mSum)), count)));
+        result.pass((N) outputOperation.convert(divideSafe(outputOperation.convert(mSum), count)));
       }
     }
 

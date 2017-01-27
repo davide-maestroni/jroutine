@@ -129,6 +129,7 @@ public class NumbersTest {
     assertThat(Numbers.compare((short) -1, 2.5f)).isEqualTo(-1);
     assertThat(Numbers.compare(-1L, 2.5)).isEqualTo(-1);
     assertThat(Numbers.compare(-1.5, -1.5f)).isEqualTo(0);
+    assertThat(Numbers.compare(3.5f, 3.5f)).isEqualTo(0);
     assertThat(Numbers.compare(BigDecimal.ZERO, 2.5)).isEqualTo(-1);
     assertThat(Numbers.compare(BigDecimal.ONE, BigDecimal.ONE)).isEqualTo(0);
     assertThat(Numbers.compare(BigDecimal.ONE, new MyNumber())).isNull();
@@ -206,12 +207,15 @@ public class NumbersTest {
     assertThat(Numbers.convertTo(Float.class, (byte) 2)).isEqualTo(2f);
     assertThat(Numbers.convertTo(Double.class, (short) -1)).isEqualTo(-1d);
     assertThat(Numbers.convertTo(Short.class, -1L)).isEqualTo((short) -1);
+    assertThat(Numbers.convertTo(BigDecimal.class, (short) 3)).isEqualTo(new BigDecimal(3));
     assertThat(Numbers.convertTo(BigDecimal.class, 2.5f)).isEqualTo(new BigDecimal(2.5f));
+    assertThat(Numbers.convertTo(BigDecimal.class, -7L)).isEqualTo(new BigDecimal(-7));
     assertThat(Numbers.convertTo(BigInteger.class, 2.5)).isEqualTo(BigInteger.valueOf(2));
+    assertThat(Numbers.convertTo(BigInteger.class, (short) 3)).isEqualTo(BigInteger.valueOf(3));
+    assertThat(Numbers.convertTo(BigInteger.class, 2.5f)).isEqualTo(BigInteger.valueOf(2));
     assertThat(Numbers.convertTo(Long.class, BigDecimal.ZERO)).isEqualTo(0L);
     assertThat(Numbers.convertTo(Integer.class, BigInteger.ONE)).isEqualTo(1);
     assertThat(Numbers.convertTo(Integer.class, new MyNumber())).isEqualTo(0);
-    assertThat(Numbers.convertTo(BigDecimal.class, new MyNumber())).isNull();
     assertThat(Numbers.convertTo(MyNumber.class, 0)).isNull();
   }
 
@@ -249,7 +253,9 @@ public class NumbersTest {
   public void testDivide() {
     assertThat(Numbers.divide(1, 2)).isEqualTo(0);
     assertThat(Numbers.divide(1, (byte) 2)).isEqualTo(0);
+    assertThat(Numbers.divide((byte) 2, (byte) 2)).isEqualTo((byte) 1);
     assertThat(Numbers.divide((short) -1, 2.5f)).isEqualTo(-0.4f);
+    assertThat(Numbers.divide((short) 5, (byte) 2)).isEqualTo((short) 2);
     assertThat(Numbers.divide(-1L, 2.5)).isEqualTo(-0.4);
     assertThat(Numbers.divide(BigDecimal.ZERO, 2.5)).isEqualTo(
         BigDecimal.ZERO.setScale(-1, BigDecimal.ROUND_UNNECESSARY));
@@ -332,8 +338,11 @@ public class NumbersTest {
   public void testMultiply() {
     assertThat(Numbers.multiply(1, 2)).isEqualTo(2);
     assertThat(Numbers.multiply(1, (byte) 2)).isEqualTo(2);
+    assertThat(Numbers.multiply((byte) 2, (byte) 2)).isEqualTo((byte) 4);
     assertThat(Numbers.multiply((short) -1, 2.5f)).isEqualTo(-2.5f);
+    assertThat(Numbers.multiply((short) 2, (byte) 2)).isEqualTo((short) 4);
     assertThat(Numbers.multiply(-1L, 2.5)).isEqualTo(-2.5);
+    assertThat(Numbers.multiply(-1L, 2)).isEqualTo(-2L);
     assertThat(Numbers.multiply(BigDecimal.ZERO, 2.5)).isEqualTo(
         BigDecimal.ZERO.setScale(1, BigDecimal.ROUND_HALF_UP));
     assertThat(Numbers.multiply(BigDecimal.ONE, new MyNumber())).isNull();
@@ -463,8 +472,11 @@ public class NumbersTest {
   public void testRemainder() {
     assertThat(Numbers.remainder(1, 2)).isEqualTo(1);
     assertThat(Numbers.remainder(1, (byte) 2)).isEqualTo(1);
+    assertThat(Numbers.remainder((byte) 5, (byte) 2)).isEqualTo((byte) 1);
     assertThat(Numbers.remainder((short) -1, 2.5f)).isEqualTo(-1f);
+    assertThat(Numbers.remainder((byte) 5, (short) 2)).isEqualTo((short) 1);
     assertThat(Numbers.remainder(-1L, 2.5)).isEqualTo(-1d);
+    assertThat(Numbers.remainder(-1, 2L)).isEqualTo(-1L);
     assertThat(Numbers.remainder(BigDecimal.ZERO, 2.5)).isEqualTo(BigDecimal.ZERO);
     assertThat(Numbers.remainder(BigDecimal.ONE, new MyNumber())).isNull();
     assertThat(Numbers.remainder(new MyNumber(), BigDecimal.ONE)).isNull();
@@ -524,8 +536,11 @@ public class NumbersTest {
   public void testSubtract() {
     assertThat(Numbers.subtract(1, 2)).isEqualTo(-1);
     assertThat(Numbers.subtract(1, (byte) 2)).isEqualTo(-1);
+    assertThat(Numbers.subtract((byte) 1, (byte) 2)).isEqualTo((byte) -1);
     assertThat(Numbers.subtract((short) -1, 2.5f)).isEqualTo(-3.5f);
+    assertThat(Numbers.subtract((byte) 1, (short) 2)).isEqualTo((short) -1);
     assertThat(Numbers.subtract(-1L, 2.5)).isEqualTo(-3.5);
+    assertThat(Numbers.subtract(-1L, -2)).isEqualTo(1L);
     assertThat(Numbers.subtract(BigDecimal.ZERO, 2.5)).isEqualTo(new BigDecimal(-2.5));
     assertThat(Numbers.subtract(BigDecimal.ONE, new MyNumber())).isNull();
     assertThat(Numbers.subtract(new MyNumber(), BigDecimal.ONE)).isNull();

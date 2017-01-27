@@ -42,12 +42,12 @@ public class Numbers {
             return false;
           }
 
-          @Nullable
+          @NotNull
           public Byte abs(@NotNull final Number n) {
             return (byte) Math.abs(n.byteValue());
           }
 
-          @Nullable
+          @NotNull
           public Byte add(@NotNull final Number n1, @NotNull final Number n2) {
             return (byte) (n1.byteValue() + n2.byteValue());
           }
@@ -56,12 +56,12 @@ public class Numbers {
             return n1.byteValue() - n2.byteValue();
           }
 
-          @Nullable
+          @NotNull
           public Byte convert(@NotNull final Number n) {
             return n.byteValue();
           }
 
-          @Nullable
+          @NotNull
           public Byte divide(@NotNull final Number n1, @NotNull final Number n2) {
             return (byte) (n1.byteValue() / n2.byteValue());
           }
@@ -71,22 +71,22 @@ public class Numbers {
             return Precision.BYTE;
           }
 
-          @Nullable
+          @NotNull
           public Byte multiply(@NotNull final Number n1, @NotNull final Number n2) {
             return (byte) (n1.byteValue() * n2.byteValue());
           }
 
-          @Nullable
+          @NotNull
           public Byte negate(@NotNull final Number n) {
             return (byte) -n.byteValue();
           }
 
-          @Nullable
+          @NotNull
           public Byte remainder(@NotNull final Number n1, @NotNull final Number n2) {
             return (byte) (n1.byteValue() % n2.byteValue());
           }
 
-          @Nullable
+          @NotNull
           public Byte subtract(@NotNull final Number n1, @NotNull final Number n2) {
             return (byte) (n1.byteValue() - n2.byteValue());
           }
@@ -107,12 +107,12 @@ public class Numbers {
             return false;
           }
 
-          @Nullable
+          @NotNull
           public Short abs(@NotNull final Number n) {
             return (short) Math.abs(n.shortValue());
           }
 
-          @Nullable
+          @NotNull
           public Short add(@NotNull final Number n1, @NotNull final Number n2) {
             return (short) (n1.shortValue() + n2.shortValue());
           }
@@ -121,12 +121,12 @@ public class Numbers {
             return n1.shortValue() - n2.shortValue();
           }
 
-          @Nullable
+          @NotNull
           public Short convert(@NotNull final Number n) {
             return n.shortValue();
           }
 
-          @Nullable
+          @NotNull
           public Short divide(@NotNull final Number n1, @NotNull final Number n2) {
             return (short) (n1.shortValue() / n2.shortValue());
           }
@@ -136,22 +136,22 @@ public class Numbers {
             return Precision.SHORT;
           }
 
-          @Nullable
+          @NotNull
           public Short multiply(@NotNull final Number n1, @NotNull final Number n2) {
             return (short) (n1.shortValue() * n2.shortValue());
           }
 
-          @Nullable
+          @NotNull
           public Short negate(@NotNull final Number n) {
             return (short) -n.shortValue();
           }
 
-          @Nullable
+          @NotNull
           public Short remainder(@NotNull final Number n1, @NotNull final Number n2) {
             return (short) (n1.shortValue() % n2.shortValue());
           }
 
-          @Nullable
+          @NotNull
           public Short subtract(@NotNull final Number n1, @NotNull final Number n2) {
             return (short) (n1.shortValue() - n2.shortValue());
           }
@@ -172,12 +172,12 @@ public class Numbers {
             return false;
           }
 
-          @Nullable
+          @NotNull
           public Integer abs(@NotNull final Number n) {
             return Math.abs(n.intValue());
           }
 
-          @Nullable
+          @NotNull
           public Integer add(@NotNull final Number n1, @NotNull final Number n2) {
             return n1.intValue() + n2.intValue();
           }
@@ -188,12 +188,12 @@ public class Numbers {
             return (v1 < v2) ? -1 : ((v1 == v2) ? 0 : 1);
           }
 
-          @Nullable
+          @NotNull
           public Integer convert(@NotNull final Number n) {
             return n.intValue();
           }
 
-          @Nullable
+          @NotNull
           public Integer divide(@NotNull final Number n1, @NotNull final Number n2) {
             return n1.intValue() / n2.intValue();
           }
@@ -203,22 +203,22 @@ public class Numbers {
             return Precision.INTEGER;
           }
 
-          @Nullable
+          @NotNull
           public Integer multiply(@NotNull final Number n1, @NotNull final Number n2) {
             return n1.intValue() * n2.intValue();
           }
 
-          @Nullable
+          @NotNull
           public Integer negate(@NotNull final Number n) {
             return -n.intValue();
           }
 
-          @Nullable
+          @NotNull
           public Integer remainder(@NotNull final Number n1, @NotNull final Number n2) {
             return n1.intValue() % n2.intValue();
           }
 
-          @Nullable
+          @NotNull
           public Integer subtract(@NotNull final Number n1, @NotNull final Number n2) {
             return n1.intValue() - n2.intValue();
           }
@@ -239,12 +239,12 @@ public class Numbers {
             return false;
           }
 
-          @Nullable
+          @NotNull
           public Long abs(@NotNull final Number n) {
             return Math.abs(n.longValue());
           }
 
-          @Nullable
+          @NotNull
           public Long add(@NotNull final Number n1, @NotNull final Number n2) {
             return n1.longValue() + n2.longValue();
           }
@@ -255,12 +255,12 @@ public class Numbers {
             return (v1 < v2) ? -1 : ((v1 == v2) ? 0 : 1);
           }
 
-          @Nullable
+          @NotNull
           public Long convert(@NotNull final Number n) {
             return n.longValue();
           }
 
-          @Nullable
+          @NotNull
           public Long divide(@NotNull final Number n1, @NotNull final Number n2) {
             return n1.longValue() / n2.longValue();
           }
@@ -270,22 +270,22 @@ public class Numbers {
             return Precision.LONG;
           }
 
-          @Nullable
+          @NotNull
           public Long multiply(@NotNull final Number n1, @NotNull final Number n2) {
             return n1.longValue() * n2.longValue();
           }
 
-          @Nullable
+          @NotNull
           public Long negate(@NotNull final Number n) {
             return -n.longValue();
           }
 
-          @Nullable
+          @NotNull
           public Long remainder(@NotNull final Number n1, @NotNull final Number n2) {
             return n1.longValue() % n2.longValue();
           }
 
-          @Nullable
+          @NotNull
           public Long subtract(@NotNull final Number n1, @NotNull final Number n2) {
             return n1.longValue() - n2.longValue();
           }
@@ -306,12 +306,12 @@ public class Numbers {
             return false;
           }
 
-          @Nullable
+          @NotNull
           public Float abs(@NotNull final Number n) {
             return Math.abs(n.floatValue());
           }
 
-          @Nullable
+          @NotNull
           public Float add(@NotNull final Number n1, @NotNull final Number n2) {
             return n1.floatValue() + n2.floatValue();
           }
@@ -331,12 +331,12 @@ public class Numbers {
             return (i1 < i2) ? -1 : ((i1 == i2) ? 0 : 1);
           }
 
-          @Nullable
+          @NotNull
           public Float convert(@NotNull final Number n) {
             return n.floatValue();
           }
 
-          @Nullable
+          @NotNull
           public Float divide(@NotNull final Number n1, @NotNull final Number n2) {
             return n1.floatValue() / n2.floatValue();
           }
@@ -346,22 +346,22 @@ public class Numbers {
             return Precision.FLOAT;
           }
 
-          @Nullable
+          @NotNull
           public Float multiply(@NotNull final Number n1, @NotNull final Number n2) {
             return n1.floatValue() * n2.floatValue();
           }
 
-          @Nullable
+          @NotNull
           public Float negate(@NotNull final Number n) {
             return -n.floatValue();
           }
 
-          @Nullable
+          @NotNull
           public Float remainder(@NotNull final Number n1, @NotNull final Number n2) {
             return n1.floatValue() % n2.floatValue();
           }
 
-          @Nullable
+          @NotNull
           public Float subtract(@NotNull final Number n1, @NotNull final Number n2) {
             return n1.floatValue() - n2.floatValue();
           }
@@ -382,12 +382,12 @@ public class Numbers {
             return false;
           }
 
-          @Nullable
+          @NotNull
           public Double abs(@NotNull final Number n) {
             return Math.abs(n.doubleValue());
           }
 
-          @Nullable
+          @NotNull
           public Double add(@NotNull final Number n1, @NotNull final Number n2) {
             return n1.doubleValue() + n2.doubleValue();
           }
@@ -407,12 +407,12 @@ public class Numbers {
             return (l1 < l2) ? -1 : ((l1 == l2) ? 0 : 1);
           }
 
-          @Nullable
+          @NotNull
           public Double convert(@NotNull final Number n) {
             return n.doubleValue();
           }
 
-          @Nullable
+          @NotNull
           public Double divide(@NotNull final Number n1, @NotNull final Number n2) {
             return n1.doubleValue() / n2.doubleValue();
           }
@@ -422,22 +422,22 @@ public class Numbers {
             return Precision.DOUBLE;
           }
 
-          @Nullable
+          @NotNull
           public Double multiply(@NotNull final Number n1, @NotNull final Number n2) {
             return n1.doubleValue() * n2.doubleValue();
           }
 
-          @Nullable
+          @NotNull
           public Double negate(@NotNull final Number n) {
             return -n.doubleValue();
           }
 
-          @Nullable
+          @NotNull
           public Double remainder(@NotNull final Number n1, @NotNull final Number n2) {
             return n1.doubleValue() % n2.doubleValue();
           }
 
-          @Nullable
+          @NotNull
           public Double subtract(@NotNull final Number n1, @NotNull final Number n2) {
             return n1.doubleValue() - n2.doubleValue();
           }
@@ -458,69 +458,34 @@ public class Numbers {
             return op.getPrecision().isFloatingPoint();
           }
 
-          @Nullable
+          @NotNull
           public BigInteger abs(@NotNull final Number n) {
-            final BigInteger big = convert(n);
-            if (big == null) {
-              return null;
-            }
-
-            return big.abs();
+            return convert(n).abs();
           }
 
-          @Nullable
+          @NotNull
           public BigInteger add(@NotNull final Number n1, @NotNull final Number n2) {
-            final BigInteger big1 = convert(n1);
-            final BigInteger big2 = convert(n2);
-            if ((big1 == null) || (big2 == null)) {
-              return null;
-            }
-
-            return big1.add(big2);
+            return convert(n1).add(convert(n2));
           }
 
           public int compare(@NotNull final Number n1, @NotNull final Number n2) {
-            final BigInteger big1 = convert(n1);
-            final BigInteger big2 = convert(n2);
-            if (big1 == null) {
-              if (big2 == null) {
-                throw new IllegalArgumentException(
-                    "unsupported Number classes: [" + n1.getClass().getCanonicalName() + ", "
-                        + n2.getClass().getCanonicalName() + "]");
-              }
-
-              throw new IllegalArgumentException(
-                  "unsupported Number class: [" + n1.getClass().getCanonicalName() + "]");
-            }
-
-            if (big2 == null) {
-              throw new IllegalArgumentException(
-                  "unsupported Number class: [" + n2.getClass().getCanonicalName() + "]");
-            }
-
-            return big1.compareTo(big2);
+            return convert(n1).compareTo(convert(n2));
           }
 
-          @Nullable
+          @NotNull
           @SuppressWarnings("unchecked")
           public BigInteger convert(@NotNull final Number n) {
             final ExtendedOperation<?> operation = getExtendedOperation(n.getClass());
-            if (operation != null) {
-              return ((ExtendedOperation<Number>) operation).toBigInteger(n);
+            if (operation == null) {
+              throw unsupportedException(n.getClass());
             }
 
-            return null;
+            return ((ExtendedOperation<Number>) operation).toBigInteger(n);
           }
 
-          @Nullable
+          @NotNull
           public BigInteger divide(@NotNull final Number n1, @NotNull final Number n2) {
-            final BigInteger big1 = convert(n1);
-            final BigInteger big2 = convert(n2);
-            if ((big1 == null) || (big2 == null)) {
-              return null;
-            }
-
-            return big1.divide(big2);
+            return convert(n1).divide(convert(n2));
           }
 
           @NotNull
@@ -528,47 +493,24 @@ public class Numbers {
             return Precision.BIG_INTEGER;
           }
 
-          @Nullable
+          @NotNull
           public BigInteger multiply(@NotNull final Number n1, @NotNull final Number n2) {
-            final BigInteger big1 = convert(n1);
-            final BigInteger big2 = convert(n2);
-            if ((big1 == null) || (big2 == null)) {
-              return null;
-            }
-
-            return big1.multiply(big2);
+            return convert(n1).multiply(convert(n2));
           }
 
-          @Nullable
+          @NotNull
           public BigInteger negate(@NotNull final Number n) {
-            final BigInteger big = convert(n);
-            if (big == null) {
-              return null;
-            }
-
-            return big.negate();
+            return convert(n).negate();
           }
 
-          @Nullable
+          @NotNull
           public BigInteger remainder(@NotNull final Number n1, @NotNull final Number n2) {
-            final BigInteger big1 = convert(n1);
-            final BigInteger big2 = convert(n2);
-            if ((big1 == null) || (big2 == null)) {
-              return null;
-            }
-
-            return big1.remainder(big2);
+            return convert(n1).remainder(convert(n2));
           }
 
-          @Nullable
+          @NotNull
           public BigInteger subtract(@NotNull final Number n1, @NotNull final Number n2) {
-            final BigInteger big1 = convert(n1);
-            final BigInteger big2 = convert(n2);
-            if ((big1 == null) || (big2 == null)) {
-              return null;
-            }
-
-            return big1.subtract(big2);
+            return convert(n1).subtract(convert(n2));
           }
 
           @NotNull
@@ -587,65 +529,34 @@ public class Numbers {
             return false;
           }
 
-          @Nullable
+          @NotNull
           public BigDecimal abs(@NotNull final Number n) {
-            final BigDecimal big = convert(n);
-            return (big != null) ? big.abs() : null;
+            return convert(n).abs();
           }
 
-          @Nullable
+          @NotNull
           public BigDecimal add(@NotNull final Number n1, @NotNull final Number n2) {
-            final BigDecimal big1 = convert(n1);
-            final BigDecimal big2 = convert(n2);
-            if ((big1 == null) || (big2 == null)) {
-              return null;
-            }
-
-            return big1.add(big2);
+            return convert(n1).add(convert(n2));
           }
 
           public int compare(@NotNull final Number n1, @NotNull final Number n2) {
-            final BigDecimal big1 = convert(n1);
-            final BigDecimal big2 = convert(n2);
-            if (big1 == null) {
-              if (big2 == null) {
-                throw new IllegalArgumentException(
-                    "unsupported Number classes: [" + n1.getClass().getCanonicalName() + ", "
-                        + n2.getClass().getCanonicalName() + "]");
-              }
-
-              throw new IllegalArgumentException(
-                  "unsupported Number class: [" + n1.getClass().getCanonicalName() + "]");
-            }
-
-            if (big2 == null) {
-              throw new IllegalArgumentException(
-                  "unsupported Number class: [" + n2.getClass().getCanonicalName() + "]");
-            }
-
-            return big1.compareTo(big2);
+            return convert(n1).compareTo(convert(n2));
           }
 
-          @Nullable
+          @NotNull
           @SuppressWarnings("unchecked")
           public BigDecimal convert(@NotNull final Number n) {
             final ExtendedOperation<?> operation = getExtendedOperation(n.getClass());
-            if (operation != null) {
-              return ((ExtendedOperation<Number>) operation).toBigDecimal(n);
+            if (operation == null) {
+              throw unsupportedException(n.getClass());
             }
 
-            return null;
+            return ((ExtendedOperation<Number>) operation).toBigDecimal(n);
           }
 
-          @Nullable
+          @NotNull
           public BigDecimal divide(@NotNull final Number n1, @NotNull final Number n2) {
-            final BigDecimal big1 = convert(n1);
-            final BigDecimal big2 = convert(n2);
-            if ((big1 == null) || (big2 == null)) {
-              return null;
-            }
-
-            return big1.divide(big2, MathContext.UNLIMITED);
+            return convert(n1).divide(convert(n2), MathContext.UNLIMITED);
           }
 
           @NotNull
@@ -653,43 +564,24 @@ public class Numbers {
             return Precision.BIG_DECIMAL;
           }
 
-          @Nullable
+          @NotNull
           public BigDecimal multiply(@NotNull final Number n1, @NotNull final Number n2) {
-            final BigDecimal big1 = convert(n1);
-            final BigDecimal big2 = convert(n2);
-            if ((big1 == null) || (big2 == null)) {
-              return null;
-            }
-
-            return big1.multiply(big2);
+            return convert(n1).multiply(convert(n2));
           }
 
-          @Nullable
+          @NotNull
           public BigDecimal negate(@NotNull final Number n) {
-            final BigDecimal big = convert(n);
-            return (big != null) ? big.negate() : null;
+            return convert(n).negate();
           }
 
-          @Nullable
+          @NotNull
           public BigDecimal remainder(@NotNull final Number n1, @NotNull final Number n2) {
-            final BigDecimal big1 = convert(n1);
-            final BigDecimal big2 = convert(n2);
-            if ((big1 == null) || (big2 == null)) {
-              return null;
-            }
-
-            return big1.remainder(big2);
+            return convert(n1).remainder(convert(n2));
           }
 
-          @Nullable
+          @NotNull
           public BigDecimal subtract(@NotNull final Number n1, @NotNull final Number n2) {
-            final BigDecimal big1 = convert(n1);
-            final BigDecimal big2 = convert(n2);
-            if ((big1 == null) || (big2 == null)) {
-              return null;
-            }
-
-            return big1.subtract(big2);
+            return convert(n1).subtract(convert(n2));
           }
 
           @NotNull
@@ -743,8 +635,7 @@ public class Numbers {
   public static Number absSafe(@NotNull final Number n) {
     final Number number = abs(n);
     if (number == null) {
-      throw new IllegalArgumentException(
-          "unsupported Number class: [" + n.getClass().getCanonicalName() + "]");
+      throw unsupportedException(n.getClass());
     }
 
     return number;
@@ -809,12 +700,7 @@ public class Numbers {
       return null;
     }
 
-    final Operation<?> operation = getHigherPrecisionOperation(n1.getClass(), n2.getClass());
-    if (operation != null) {
-      return operation.compare(n1, n2);
-    }
-
-    return null;
+    return getHigherPrecisionOperationSafe(n1.getClass(), n2.getClass()).compare(n1, n2);
   }
 
   /**
@@ -875,12 +761,10 @@ public class Numbers {
     final N number = convertTo(type, n);
     if (number == null) {
       if (!isSupported(type)) {
-        throw new IllegalArgumentException(
-            "unsupported Number class: [" + type.getCanonicalName() + "]");
+        throw unsupportedException(type);
       }
 
-      throw new IllegalArgumentException(
-          "unsupported Number class: [" + n.getClass().getCanonicalName() + "]");
+      throw unsupportedException(n.getClass());
     }
 
     return number;
@@ -1051,8 +935,7 @@ public class Numbers {
   public static Operation<?> getOperationSafe(@NotNull final Class<? extends Number> type) {
     final Operation<?> operation = getOperation(type);
     if (operation == null) {
-      throw new IllegalArgumentException(
-          "unsupported Number class: [" + type.getCanonicalName() + "]");
+      throw unsupportedException(type);
     }
 
     return operation;
@@ -1139,8 +1022,7 @@ public class Numbers {
   public static Number negateSafe(@NotNull final Number n) {
     final Number number = negate(n);
     if (number == null) {
-      throw new IllegalArgumentException(
-          "unsupported Number class: [" + n.getClass().getCanonicalName() + "]");
+      throw unsupportedException(n.getClass());
     }
 
     return number;
@@ -1240,6 +1122,13 @@ public class Numbers {
 
   @NotNull
   private static IllegalArgumentException unsupportedException(
+      @NotNull final Class<? extends Number> type) {
+    return new IllegalArgumentException(
+        "unsupported Number class: [" + type.getCanonicalName() + "]");
+  }
+
+  @NotNull
+  private static IllegalArgumentException unsupportedException(
       @NotNull final Class<? extends Number> type1, @NotNull final Class<? extends Number> type2) {
     if (!isSupported(type1)) {
       if (!isSupported(type2)) {
@@ -1248,12 +1137,10 @@ public class Numbers {
                 + type2.getCanonicalName() + "]");
       }
 
-      return new IllegalArgumentException(
-          "unsupported Number class: [" + type1.getCanonicalName() + "]");
+      return unsupportedException(type1);
     }
 
-    return new IllegalArgumentException(
-        "unsupported Number class: [" + type2.getCanonicalName() + "]");
+    return unsupportedException(type2);
   }
 
   /**

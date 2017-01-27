@@ -17,7 +17,6 @@
 package com.github.dm.jrt.operator.math;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Interface defining the operations applicable to a number object.
@@ -34,7 +33,7 @@ public interface Operation<N extends Number> {
    * @param n the number.
    * @return the absolute value or null.
    */
-  @Nullable
+  @NotNull
   N abs(@NotNull Number n);
 
   /**
@@ -44,7 +43,7 @@ public interface Operation<N extends Number> {
    * @param n2 the second number.
    * @return the sum or null.
    */
-  @Nullable
+  @NotNull
   N add(@NotNull Number n1, @NotNull Number n2);
 
   /**
@@ -64,7 +63,7 @@ public interface Operation<N extends Number> {
    * @param n the number to convert.
    * @return the converted number or null.
    */
-  @Nullable
+  @NotNull
   N convert(@NotNull Number n);
 
   /**
@@ -74,7 +73,7 @@ public interface Operation<N extends Number> {
    * @param n2 the second number.
    * @return the quotient or null.
    */
-  @Nullable
+  @NotNull
   N divide(@NotNull Number n1, @NotNull Number n2);
 
   /**
@@ -84,7 +83,7 @@ public interface Operation<N extends Number> {
    * @param n2 the second number.
    * @return the product or null.
    */
-  @Nullable
+  @NotNull
   N multiply(@NotNull Number n1, @NotNull Number n2);
 
   /**
@@ -93,7 +92,7 @@ public interface Operation<N extends Number> {
    * @param n the number.
    * @return the negated value or null.
    */
-  @Nullable
+  @NotNull
   N negate(@NotNull Number n);
 
   /**
@@ -104,7 +103,7 @@ public interface Operation<N extends Number> {
    * @param n2 the second number.
    * @return the remainder or null.
    */
-  @Nullable
+  @NotNull
   N remainder(@NotNull Number n1, @NotNull Number n2);
 
   /**
@@ -114,6 +113,6 @@ public interface Operation<N extends Number> {
    * @param n2 the second number.
    * @return the difference or null.
    */
-  @Nullable
+  @NotNull
   N subtract(@NotNull Number n1, @NotNull Number n2);
 }

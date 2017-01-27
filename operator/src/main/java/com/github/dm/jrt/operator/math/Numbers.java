@@ -704,9 +704,6 @@ public class Numbers {
         });
       }};
 
-  private static final ExtendedOperation<?> sBigIntegerOperation =
-      sOperations.get(BigInteger.class);
-
   private static final ExtendedOperation<?> sBigDecimalOperation =
       sOperations.get(BigDecimal.class);
 
@@ -1238,19 +1235,7 @@ public class Numbers {
   @Nullable
   private static ExtendedOperation<?> getExtendedOperation(
       @NotNull final Class<? extends Number> type) {
-    final ExtendedOperation<?> operation = sOperations.get(type);
-    if (operation != null) {
-      return operation;
-    }
-
-    if (BigInteger.class.isAssignableFrom(type)) {
-      return sBigIntegerOperation;
-
-    } else if (BigDecimal.class.isAssignableFrom(type)) {
-      return sBigDecimalOperation;
-    }
-
-    return null;
+    return sOperations.get(type);
   }
 
   @NotNull

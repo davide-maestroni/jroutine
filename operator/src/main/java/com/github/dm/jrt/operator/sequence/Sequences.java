@@ -30,7 +30,7 @@ import org.jetbrains.annotations.NotNull;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.operator.math.Numbers.getHigherPrecisionOperationSafe;
-import static com.github.dm.jrt.operator.math.Numbers.getLowerPrecisionOperationSafe;
+import static com.github.dm.jrt.operator.math.Numbers.getOperationSafe;
 
 /**
  * Utility class providing functions that produce sequences of data.
@@ -91,7 +91,7 @@ public class Sequences {
     final Operation<?> operation =
         getHigherPrecisionOperationSafe(start.getClass(), end.getClass());
     return range(start, end, ConstantConditions.notNull(
-        (N) getLowerPrecisionOperationSafe(start.getClass(), end.getClass()).convert(
+        (N) getOperationSafe(start.getClass()).convert(
             (operation.compare(start, end) <= 0) ? 1 : -1)));
   }
 

@@ -43,7 +43,7 @@ import static com.github.dm.jrt.function.FunctionDecorator.decorate;
  * <pre><code>
  * final Routine&lt;Integer, Double&gt; rms = JRoutineStream.&lt;Integer&gt;withStream()
  *                                                          .map(i -&gt; i * i)
- *                                                          .map(averageFloat())
+ *                                                          .map(average(Float.class))
  *                                                          .map(Math::sqrt)
  *                                                          .buildRoutine();
  * </code></pre>

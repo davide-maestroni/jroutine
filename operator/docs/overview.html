@@ -69,7 +69,7 @@
                                 return (input * input);
                         })).buildRoutine();
                 final Routine&lt;Integer, Double&gt; meanRoutine =
-                        JRoutineCore.with(Operators.&lt;Integer&gt;averageDouble())).buildRoutine();
+                        JRoutineCore.with(Operators.&lt;Integer, Double&gt;average(Double.class))).buildRoutine();
                 final Routine&lt;Double, Double&gt; sqrtRoutine =
                         JRoutineCore.with(Functions.&lt;Double, Double&gt;functionMapping(Math::sqrt))
                                     .applyInvocationConfiguration()

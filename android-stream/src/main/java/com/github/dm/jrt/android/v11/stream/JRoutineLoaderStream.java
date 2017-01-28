@@ -46,7 +46,7 @@ import static com.github.dm.jrt.function.FunctionDecorator.decorate;
  *     JRoutineLoaderStream.&lt;Integer&gt;withStream()
  *                         .immediate()
  *                         .map(i -&gt; i * i)
- *                         .map(averageFloat())
+ *                         .map(average(Float.class))
  *                         .map(Math::sqrt)
  *                         .on(loaderFrom(activity))
  *                         .buildRoutine();

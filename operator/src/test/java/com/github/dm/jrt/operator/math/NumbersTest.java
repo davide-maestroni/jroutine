@@ -213,6 +213,8 @@ public class NumbersTest {
     assertThat(Numbers.convertTo(BigInteger.class, 2.5)).isEqualTo(BigInteger.valueOf(2));
     assertThat(Numbers.convertTo(BigInteger.class, (short) 3)).isEqualTo(BigInteger.valueOf(3));
     assertThat(Numbers.convertTo(BigInteger.class, 2.5f)).isEqualTo(BigInteger.valueOf(2));
+    assertThat(Numbers.convertTo(BigInteger.class, new BigDecimal(2.5))).isEqualTo(
+        BigInteger.valueOf(2));
     assertThat(Numbers.convertTo(Long.class, BigDecimal.ZERO)).isEqualTo(0L);
     assertThat(Numbers.convertTo(Integer.class, BigInteger.ONE)).isEqualTo(1);
     assertThat(Numbers.convertTo(Integer.class, new MyNumber())).isEqualTo(0);
@@ -229,14 +231,18 @@ public class NumbersTest {
     assertThat(Numbers.convertToSafe(BigInteger.class, 2.5)).isEqualTo(BigInteger.valueOf(2));
     assertThat(Numbers.convertToSafe(Long.class, BigDecimal.ZERO)).isEqualTo(0L);
     assertThat(Numbers.convertToSafe(Integer.class, BigInteger.ONE)).isEqualTo(1);
+    assertThat(Numbers.convertToSafe(Integer.class, new MyNumber())).isEqualTo(0);
+
     try {
-      assertThat(Numbers.convertToSafe(Integer.class, new MyNumber()));
+      assertThat(Numbers.convertToSafe(BigInteger.class, new MyNumber()));
+      fail();
 
     } catch (final IllegalArgumentException ignored) {
     }
 
     try {
       assertThat(Numbers.convertToSafe(BigDecimal.class, new MyNumber()));
+      fail();
 
     } catch (final IllegalArgumentException ignored) {
     }
@@ -459,6 +465,13 @@ public class NumbersTest {
 
     assertThat(
         Numbers.getLowerPrecisionOperationSafe(Float.class, Long.class).convert(0)).isEqualTo(0L);
+    assertThat(
+        Numbers.getLowerPrecisionOperationSafe(Float.class, BigInteger.class).convert(0)).isEqualTo(
+        0f);
+    assertThat(Numbers.getLowerPrecisionOperationSafe(BigDecimal.class, BigInteger.class)
+                      .convert(0)).isEqualTo(BigDecimal.ZERO);
+    assertThat(Numbers.getLowerPrecisionOperationSafe(BigInteger.class, BigDecimal.class)
+                      .convert(0)).isEqualTo(BigDecimal.ZERO);
     assertThat(Numbers.getLowerPrecisionOperation(MyNumber.class, Long.class)).isNull();
     try {
       Numbers.getLowerPrecisionOperationSafe(MyNumber.class, BigDecimal.class);

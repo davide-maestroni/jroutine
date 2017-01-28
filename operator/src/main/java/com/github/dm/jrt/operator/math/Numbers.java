@@ -760,11 +760,7 @@ public class Numbers {
       @NotNull final Number n) {
     final N number = convertTo(type, n);
     if (number == null) {
-      if (!isSupported(type)) {
-        throw unsupportedException(type);
-      }
-
-      throw unsupportedException(n.getClass());
+      throw unsupportedException(type);
     }
 
     return number;

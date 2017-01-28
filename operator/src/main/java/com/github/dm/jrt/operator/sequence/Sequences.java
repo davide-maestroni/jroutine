@@ -29,8 +29,8 @@ import com.github.dm.jrt.operator.math.Operation;
 import org.jetbrains.annotations.NotNull;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
-import static com.github.dm.jrt.operator.math.Numbers.getHigherPrecisionOperationSafe;
-import static com.github.dm.jrt.operator.math.Numbers.getOperationSafe;
+import static com.github.dm.jrt.operator.math.Numbers.getHigherPrecisionOperation;
+import static com.github.dm.jrt.operator.math.Numbers.getOperation;
 
 /**
  * Utility class providing functions that produce sequences of data.
@@ -89,8 +89,8 @@ public class Sequences {
   public static <N extends Number> Consumer<Channel<N, ?>> range(@NotNull final N start,
       @NotNull final N end) {
     final Operation<?> operation =
-        getHigherPrecisionOperationSafe(start.getClass(), end.getClass());
-    return range(start, end, (N) getOperationSafe(start.getClass()).convert(
+        getHigherPrecisionOperation(start.getClass(), end.getClass());
+    return range(start, end, (N) getOperation(start.getClass()).convert(
         (operation.compare(start, end) <= 0) ? 1 : -1));
   }
 
@@ -169,9 +169,9 @@ public class Sequences {
       mEnd = end;
       mIncrement = increment;
       final Operation<?> addOperation =
-          (mAddOperation = getHigherPrecisionOperationSafe(start.getClass(), increment.getClass()));
+          (mAddOperation = getHigherPrecisionOperation(start.getClass(), increment.getClass()));
       mCompareOperation =
-          getHigherPrecisionOperationSafe(addOperation.convert(0).getClass(), end.getClass());
+          getHigherPrecisionOperation(addOperation.convert(0).getClass(), end.getClass());
     }
 
     public void accept(final Channel<N, ?> result) throws Exception {

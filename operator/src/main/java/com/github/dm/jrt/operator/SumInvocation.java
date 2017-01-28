@@ -23,7 +23,7 @@ import com.github.dm.jrt.core.invocation.TemplateInvocation;
 
 import org.jetbrains.annotations.NotNull;
 
-import static com.github.dm.jrt.operator.math.Numbers.addSafe;
+import static com.github.dm.jrt.operator.math.Numbers.add;
 
 /**
  * Invocation computing the sum of the input numbers.
@@ -69,7 +69,7 @@ class SumInvocation extends TemplateInvocation<Number, Number> {
 
   @Override
   public void onInput(final Number input, @NotNull final Channel<Number, ?> result) {
-    mSum = addSafe(mSum, input);
+    mSum = add(mSum, input);
   }
 
   @Override

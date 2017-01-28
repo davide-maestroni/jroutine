@@ -475,7 +475,7 @@ public class Numbers {
           @NotNull
           @SuppressWarnings("unchecked")
           public BigInteger convert(@NotNull final Number n) {
-            final ExtendedOperation<?> operation = getExtendedOperation(n.getClass());
+            final ExtendedOperation<?> operation = sOperations.get(n.getClass());
             if (operation == null) {
               throw unsupportedException(n.getClass());
             }
@@ -546,7 +546,7 @@ public class Numbers {
           @NotNull
           @SuppressWarnings("unchecked")
           public BigDecimal convert(@NotNull final Number n) {
-            final ExtendedOperation<?> operation = getExtendedOperation(n.getClass());
+            final ExtendedOperation<?> operation = sOperations.get(n.getClass());
             if (operation == null) {
               throw unsupportedException(n.getClass());
             }
@@ -608,6 +608,18 @@ public class Numbers {
 
   /**
    * Computes the absolute value of the specified number.
+   *
+   * @param n the number.
+   * @return the absolute value.
+   * @throws java.lang.IllegalArgumentException if the number instance is of an unsupported type.
+   */
+  @NotNull
+  public static Number abs(@NotNull final Number n) {
+    return getOperation(n.getClass()).abs(n);
+  }
+
+  /**
+   * Computes the absolute value of the specified number.
    * <br>
    * If the number instance is of an unsupported type, the result will be null.
    *
@@ -615,48 +627,14 @@ public class Numbers {
    * @return the absolute value or null.
    */
   @Nullable
-  public static Number abs(@NotNull final Number n) {
-    final Operation<?> operation = getOperation(n.getClass());
+  public static Number absSafe(@Nullable final Number n) {
+    if (n == null) {
+      return null;
+    }
+
+    final ExtendedOperation<?> operation = sOperations.get(n.getClass());
     if (operation != null) {
       return operation.abs(n);
-    }
-
-    return null;
-  }
-
-  /**
-   * Computes the absolute value of the specified number.
-   *
-   * @param n the number.
-   * @return the absolute value.
-   * @throws java.lang.IllegalArgumentException if the number instance is of an unsupported type.
-   */
-  @NotNull
-  public static Number absSafe(@NotNull final Number n) {
-    final Number number = abs(n);
-    if (number == null) {
-      throw unsupportedException(n.getClass());
-    }
-
-    return number;
-  }
-
-  /**
-   * Adds the specified numbers.
-   * <br>
-   * The result type will match the input with the highest precision.
-   * <br>
-   * If one of the two instances is of an unsupported type, the result will be null.
-   *
-   * @param n1 the first number.
-   * @param n2 the second number.
-   * @return the sum or null.
-   */
-  @Nullable
-  public static Number add(@NotNull final Number n1, @NotNull final Number n2) {
-    final Operation<?> operation = getHigherPrecisionOperation(n1.getClass(), n2.getClass());
-    if (operation != null) {
-      return operation.add(n1, n2);
     }
 
     return null;
@@ -674,17 +652,12 @@ public class Numbers {
    *                                            type.
    */
   @NotNull
-  public static Number addSafe(@NotNull final Number n1, @NotNull final Number n2) {
-    final Number number = add(n1, n2);
-    if (number == null) {
-      throw unsupportedException(n1.getClass(), n2.getClass());
-    }
-
-    return number;
+  public static Number add(@NotNull final Number n1, @NotNull final Number n2) {
+    return getHigherPrecisionOperation(n1.getClass(), n2.getClass()).add(n1, n2);
   }
 
   /**
-   * Compares the specified numbers.
+   * Adds the specified numbers.
    * <br>
    * The result type will match the input with the highest precision.
    * <br>
@@ -692,15 +665,20 @@ public class Numbers {
    *
    * @param n1 the first number.
    * @param n2 the second number.
-   * @return the comparison result or null.
+   * @return the sum or null.
    */
   @Nullable
-  public static Integer compare(@NotNull final Number n1, @NotNull final Number n2) {
-    if (!isSupported(n1.getClass()) || !isSupported(n2.getClass())) {
+  public static Number addSafe(@Nullable final Number n1, @Nullable final Number n2) {
+    if ((n1 == null) || (n2 == null)) {
       return null;
     }
 
-    return getHigherPrecisionOperationSafe(n1.getClass(), n2.getClass()).compare(n1, n2);
+    final Operation<?> operation = getHigherPrecisionOperationSafe(n1.getClass(), n2.getClass());
+    if (operation != null) {
+      return operation.add(n1, n2);
+    }
+
+    return null;
   }
 
   /**
@@ -715,34 +693,29 @@ public class Numbers {
    *                                            type.
    */
   @NotNull
-  public static Integer compareSafe(@NotNull final Number n1, @NotNull final Number n2) {
-    final Integer comparison = compare(n1, n2);
-    if (comparison == null) {
-      throw unsupportedException(n1.getClass(), n2.getClass());
-    }
-
-    return comparison;
+  public static Integer compare(@NotNull final Number n1, @NotNull final Number n2) {
+    return getHigherPrecisionOperation(n1.getClass(), n2.getClass()).compare(n1, n2);
   }
 
   /**
-   * Converts a number into the specified type.
+   * Compares the specified numbers.
    * <br>
-   * If the number instance is of an unsupported type, the result will be null.
+   * The result type will match the input with the highest precision.
+   * <br>
+   * If one of the two instances is of an unsupported type, the result will be null.
    *
-   * @param type the type.
-   * @param n    the number to convert.
-   * @param <N>  the number type.
-   * @return the converted number or null.
+   * @param n1 the first number.
+   * @param n2 the second number.
+   * @return the comparison result or null.
    */
   @Nullable
-  public static <N extends Number> N convertTo(@NotNull final Class<N> type,
-      @NotNull final Number n) {
-    final Operation<?> operation = sOperations.get(type);
-    if (operation != null) {
-      return (N) operation.convert(n);
+  public static Integer compareSafe(@Nullable final Number n1, @Nullable final Number n2) {
+    if ((n1 == null) || (n2 == null) || !isSupported(n1.getClass()) || !isSupported(
+        n2.getClass())) {
+      return null;
     }
 
-    return null;
+    return compare(n1, n2);
   }
 
   /**
@@ -756,32 +729,31 @@ public class Numbers {
    *                                            not supported.
    */
   @NotNull
-  public static <N extends Number> N convertToSafe(@NotNull final Class<N> type,
+  public static <N extends Number> N convertTo(@NotNull final Class<N> type,
       @NotNull final Number n) {
-    final N number = convertTo(type, n);
-    if (number == null) {
-      throw unsupportedException(type);
-    }
-
-    return number;
+    return (N) getOperation(type).convert(n);
   }
 
   /**
-   * Divides the specified numbers.
+   * Converts a number into the specified type.
    * <br>
-   * The result type will match the input with the highest precision.
-   * <br>
-   * If one of the two instances is of an unsupported type, the result will be null.
+   * If the number instance is of an unsupported type, the result will be null.
    *
-   * @param n1 the first number.
-   * @param n2 the second number.
-   * @return the quotient or null.
+   * @param type the type.
+   * @param n    the number to convert.
+   * @param <N>  the number type.
+   * @return the converted number or null.
    */
   @Nullable
-  public static Number divide(@NotNull final Number n1, @NotNull final Number n2) {
-    final Operation<?> operation = getHigherPrecisionOperation(n1.getClass(), n2.getClass());
+  public static <N extends Number> N convertToSafe(@Nullable final Class<N> type,
+      @Nullable final Number n) {
+    if (n == null) {
+      return null;
+    }
+
+    final Operation<?> operation = sOperations.get(type);
     if (operation != null) {
-      return operation.divide(n1, n2);
+      return (N) operation.convert(n);
     }
 
     return null;
@@ -799,14 +771,52 @@ public class Numbers {
    *                                            type.
    */
   @NotNull
-  @SuppressWarnings("ConstantConditions")
-  public static Number divideSafe(@NotNull final Number n1, @NotNull final Number n2) {
-    final Number number = divide(n1, n2);
-    if (number == null) {
-      throw unsupportedException(n1.getClass(), n2.getClass());
+  public static Number divide(@NotNull final Number n1, @NotNull final Number n2) {
+    return getHigherPrecisionOperation(n1.getClass(), n2.getClass()).divide(n1, n2);
+  }
+
+  /**
+   * Divides the specified numbers.
+   * <br>
+   * The result type will match the input with the highest precision.
+   * <br>
+   * If one of the two instances is of an unsupported type, the result will be null.
+   *
+   * @param n1 the first number.
+   * @param n2 the second number.
+   * @return the quotient or null.
+   */
+  @Nullable
+  public static Number divideSafe(@Nullable final Number n1, @Nullable final Number n2) {
+    if ((n1 == null) || (n2 == null)) {
+      return null;
     }
 
-    return number;
+    final Operation<?> operation = getHigherPrecisionOperationSafe(n1.getClass(), n2.getClass());
+    if (operation != null) {
+      return operation.divide(n1, n2);
+    }
+
+    return null;
+  }
+
+  /**
+   * Gets the operation with the higher precision, choosing between the specified number types.
+   *
+   * @param type1 the first number type.
+   * @param type2 the second number type.
+   * @return the operation.
+   * @throws java.lang.IllegalArgumentException if one of the two types is not supported.
+   */
+  @NotNull
+  public static Operation<?> getHigherPrecisionOperation(
+      @NotNull final Class<? extends Number> type1, @NotNull final Class<? extends Number> type2) {
+    final Operation<?> operation = getHigherPrecisionOperationSafe(type1, type2);
+    if (operation == null) {
+      throw unsupportedException(type1, type2);
+    }
+
+    return operation;
   }
 
   /**
@@ -819,11 +829,13 @@ public class Numbers {
    * @return the operation or null.
    */
   @Nullable
-  public static Operation<?> getHigherPrecisionOperation(
-      @NotNull final Class<? extends Number> type1, @NotNull final Class<? extends Number> type2) {
-    ExtendedOperation<?> op1 = getExtendedOperation(type1);
+  public static Operation<?> getHigherPrecisionOperationSafe(
+      @Nullable final Class<? extends Number> type1,
+      @Nullable final Class<? extends Number> type2) {
+    final HashMap<Class<? extends Number>, ExtendedOperation<?>> operations = sOperations;
+    ExtendedOperation<?> op1 = operations.get(type1);
     if (op1 != null) {
-      ExtendedOperation<?> op2 = getExtendedOperation(type2);
+      ExtendedOperation<?> op2 = operations.get(type2);
       if (op2 != null) {
         if (op1.replaceWithBigDecimal(op2)) {
           op1 = sBigDecimalOperation;
@@ -840,7 +852,7 @@ public class Numbers {
   }
 
   /**
-   * Gets the operation with the higher precision, choosing between the specified number types.
+   * Gets the operation with the lower precision, choosing between the specified number types.
    *
    * @param type1 the first number type.
    * @param type2 the second number type.
@@ -848,9 +860,9 @@ public class Numbers {
    * @throws java.lang.IllegalArgumentException if one of the two types is not supported.
    */
   @NotNull
-  public static Operation<?> getHigherPrecisionOperationSafe(
+  public static Operation<?> getLowerPrecisionOperation(
       @NotNull final Class<? extends Number> type1, @NotNull final Class<? extends Number> type2) {
-    final Operation<?> operation = getHigherPrecisionOperation(type1, type2);
+    final Operation<?> operation = getLowerPrecisionOperationSafe(type1, type2);
     if (operation == null) {
       throw unsupportedException(type1, type2);
     }
@@ -868,11 +880,13 @@ public class Numbers {
    * @return the operation or null.
    */
   @Nullable
-  public static Operation<?> getLowerPrecisionOperation(
-      @NotNull final Class<? extends Number> type1, @NotNull final Class<? extends Number> type2) {
-    ExtendedOperation<?> op1 = getExtendedOperation(type1);
+  public static Operation<?> getLowerPrecisionOperationSafe(
+      @Nullable final Class<? extends Number> type1,
+      @Nullable final Class<? extends Number> type2) {
+    final HashMap<Class<? extends Number>, ExtendedOperation<?>> operations = sOperations;
+    ExtendedOperation<?> op1 = operations.get(type1);
     if (op1 != null) {
-      ExtendedOperation<?> op2 = getExtendedOperation(type2);
+      ExtendedOperation<?> op2 = operations.get(type2);
       if (op2 != null) {
         if (op1.replaceWithBigDecimal(op2)) {
           op1 = sBigDecimalOperation;
@@ -889,19 +903,17 @@ public class Numbers {
   }
 
   /**
-   * Gets the operation with the lower precision, choosing between the specified number types.
+   * Gets the operation relative to the specified number type.
    *
-   * @param type1 the first number type.
-   * @param type2 the second number type.
+   * @param type the number type.
    * @return the operation.
-   * @throws java.lang.IllegalArgumentException if one of the two types is not supported.
+   * @throws java.lang.IllegalArgumentException if the type is not supported.
    */
   @NotNull
-  public static Operation<?> getLowerPrecisionOperationSafe(
-      @NotNull final Class<? extends Number> type1, @NotNull final Class<? extends Number> type2) {
-    final Operation<?> operation = getLowerPrecisionOperation(type1, type2);
+  public static Operation<?> getOperation(@NotNull final Class<? extends Number> type) {
+    final ExtendedOperation<?> operation = sOperations.get(type);
     if (operation == null) {
-      throw unsupportedException(type1, type2);
+      throw unsupportedException(type);
     }
 
     return operation;
@@ -916,25 +928,8 @@ public class Numbers {
    * @return the operation or null.
    */
   @Nullable
-  public static Operation<?> getOperation(@NotNull final Class<? extends Number> type) {
-    return getExtendedOperation(type);
-  }
-
-  /**
-   * Gets the operation relative to the specified number type.
-   *
-   * @param type the number type.
-   * @return the operation.
-   * @throws java.lang.IllegalArgumentException if the type is not supported.
-   */
-  @NotNull
-  public static Operation<?> getOperationSafe(@NotNull final Class<? extends Number> type) {
-    final Operation<?> operation = getOperation(type);
-    if (operation == null) {
-      throw unsupportedException(type);
-    }
-
-    return operation;
+  public static Operation<?> getOperationSafe(@Nullable final Class<? extends Number> type) {
+    return sOperations.get(type);
   }
 
   /**
@@ -943,29 +938,8 @@ public class Numbers {
    * @param type the number type.
    * @return whether the type is supported.
    */
-  public static boolean isSupported(@NotNull final Class<? extends Number> type) {
-    return (getExtendedOperation(type) != null);
-  }
-
-  /**
-   * Multiplies the specified numbers.
-   * <br>
-   * The result type will match the input with the highest precision.
-   * <br>
-   * If one of the two instances is of an unsupported type, the result will be null.
-   *
-   * @param n1 the first number.
-   * @param n2 the second number.
-   * @return the product or null.
-   */
-  @Nullable
-  public static Number multiply(@NotNull final Number n1, @NotNull final Number n2) {
-    final Operation<?> operation = getHigherPrecisionOperation(n1.getClass(), n2.getClass());
-    if (operation != null) {
-      return operation.multiply(n1, n2);
-    }
-
-    return null;
+  public static boolean isSupported(@Nullable final Class<? extends Number> type) {
+    return (sOperations.get(type) != null);
   }
 
   /**
@@ -980,28 +954,30 @@ public class Numbers {
    *                                            type.
    */
   @NotNull
-  public static Number multiplySafe(@NotNull final Number n1, @NotNull final Number n2) {
-    final Number number = multiply(n1, n2);
-    if (number == null) {
-      throw unsupportedException(n1.getClass(), n2.getClass());
-    }
-
-    return number;
+  public static Number multiply(@NotNull final Number n1, @NotNull final Number n2) {
+    return getHigherPrecisionOperation(n1.getClass(), n2.getClass()).multiply(n1, n2);
   }
 
   /**
-   * Negates the specified number.
+   * Multiplies the specified numbers.
    * <br>
-   * If the number instance is of an unsupported type, the result will be null.
+   * The result type will match the input with the highest precision.
+   * <br>
+   * If one of the two instances is of an unsupported type, the result will be null.
    *
-   * @param n the number.
-   * @return the negated value or null.
+   * @param n1 the first number.
+   * @param n2 the second number.
+   * @return the product or null.
    */
   @Nullable
-  public static Number negate(@NotNull final Number n) {
-    final Operation<?> operation = getOperation(n.getClass());
+  public static Number multiplySafe(@Nullable final Number n1, @Nullable final Number n2) {
+    if ((n1 == null) || (n2 == null)) {
+      return null;
+    }
+
+    final Operation<?> operation = getHigherPrecisionOperationSafe(n1.getClass(), n2.getClass());
     if (operation != null) {
-      return operation.negate(n);
+      return operation.multiply(n1, n2);
     }
 
     return null;
@@ -1015,32 +991,27 @@ public class Numbers {
    * @throws java.lang.IllegalArgumentException if the number instance is of an unsupported type.
    */
   @NotNull
-  public static Number negateSafe(@NotNull final Number n) {
-    final Number number = negate(n);
-    if (number == null) {
-      throw unsupportedException(n.getClass());
-    }
-
-    return number;
+  public static Number negate(@NotNull final Number n) {
+    return getOperation(n.getClass()).negate(n);
   }
 
   /**
-   * Computes the remainder of the division of the specified numbers. Note that the remainder is not
-   * the same as the modulo, since the result can be negative.
+   * Negates the specified number.
    * <br>
-   * The result type will match the input with the highest precision.
-   * <br>
-   * If one of the two instances is of an unsupported type, the result will be null.
+   * If the number instance is of an unsupported type, the result will be null.
    *
-   * @param n1 the first number.
-   * @param n2 the second number.
-   * @return the remainder or null.
+   * @param n the number.
+   * @return the negated value or null.
    */
   @Nullable
-  public static Number remainder(@NotNull final Number n1, @NotNull final Number n2) {
-    final Operation<?> operation = getHigherPrecisionOperation(n1.getClass(), n2.getClass());
+  public static Number negateSafe(@Nullable final Number n) {
+    if (n == null) {
+      return null;
+    }
+
+    final ExtendedOperation<?> operation = sOperations.get(n.getClass());
     if (operation != null) {
-      return operation.remainder(n1, n2);
+      return operation.negate(n);
     }
 
     return null;
@@ -1059,17 +1030,13 @@ public class Numbers {
    *                                            type.
    */
   @NotNull
-  public static Number remainderSafe(@NotNull final Number n1, @NotNull final Number n2) {
-    final Number number = remainder(n1, n2);
-    if (number == null) {
-      throw unsupportedException(n1.getClass(), n2.getClass());
-    }
-
-    return number;
+  public static Number remainder(@NotNull final Number n1, @NotNull final Number n2) {
+    return getHigherPrecisionOperation(n1.getClass(), n2.getClass()).remainder(n1, n2);
   }
 
   /**
-   * Subtracts the specified numbers.
+   * Computes the remainder of the division of the specified numbers. Note that the remainder is not
+   * the same as the modulo, since the result can be negative.
    * <br>
    * The result type will match the input with the highest precision.
    * <br>
@@ -1077,13 +1044,17 @@ public class Numbers {
    *
    * @param n1 the first number.
    * @param n2 the second number.
-   * @return the difference or null.
+   * @return the remainder or null.
    */
   @Nullable
-  public static Number subtract(@NotNull final Number n1, @NotNull final Number n2) {
-    final Operation<?> operation = getHigherPrecisionOperation(n1.getClass(), n2.getClass());
+  public static Number remainderSafe(@Nullable final Number n1, @Nullable final Number n2) {
+    if ((n1 == null) || (n2 == null)) {
+      return null;
+    }
+
+    final Operation<?> operation = getHigherPrecisionOperationSafe(n1.getClass(), n2.getClass());
     if (operation != null) {
-      return operation.subtract(n1, n2);
+      return operation.remainder(n1, n2);
     }
 
     return null;
@@ -1101,36 +1072,51 @@ public class Numbers {
    *                                            type.
    */
   @NotNull
-  public static Number subtractSafe(@NotNull final Number n1, @NotNull final Number n2) {
-    final Number number = subtract(n1, n2);
-    if (number == null) {
-      throw unsupportedException(n1.getClass(), n2.getClass());
+  public static Number subtract(@NotNull final Number n1, @NotNull final Number n2) {
+    return getHigherPrecisionOperation(n1.getClass(), n2.getClass()).subtract(n1, n2);
+  }
+
+  /**
+   * Subtracts the specified numbers.
+   * <br>
+   * The result type will match the input with the highest precision.
+   * <br>
+   * If one of the two instances is of an unsupported type, the result will be null.
+   *
+   * @param n1 the first number.
+   * @param n2 the second number.
+   * @return the difference or null.
+   */
+  @Nullable
+  public static Number subtractSafe(@Nullable final Number n1, @Nullable final Number n2) {
+    if ((n1 == null) || (n2 == null)) {
+      return null;
     }
 
-    return number;
-  }
+    final Operation<?> operation = getHigherPrecisionOperationSafe(n1.getClass(), n2.getClass());
+    if (operation != null) {
+      return operation.subtract(n1, n2);
+    }
 
-  @Nullable
-  private static ExtendedOperation<?> getExtendedOperation(
-      @NotNull final Class<? extends Number> type) {
-    return sOperations.get(type);
+    return null;
   }
 
   @NotNull
   private static IllegalArgumentException unsupportedException(
-      @NotNull final Class<? extends Number> type) {
+      @Nullable final Class<? extends Number> type) {
     return new IllegalArgumentException(
-        "unsupported Number class: [" + type.getCanonicalName() + "]");
+        "unsupported Number class: [" + ((type != null) ? type.getCanonicalName() : null) + "]");
   }
 
   @NotNull
   private static IllegalArgumentException unsupportedException(
-      @NotNull final Class<? extends Number> type1, @NotNull final Class<? extends Number> type2) {
-    if (!isSupported(type1)) {
-      if (!isSupported(type2)) {
+      @Nullable final Class<? extends Number> type1,
+      @Nullable final Class<? extends Number> type2) {
+    if ((type1 == null) || !isSupported(type1)) {
+      if ((type2 == null) || !isSupported(type2)) {
         return new IllegalArgumentException(
-            "unsupported Number classes: [" + type1.getCanonicalName() + ", "
-                + type2.getCanonicalName() + "]");
+            "unsupported Number classes: [" + ((type1 != null) ? type1.getCanonicalName() : null)
+                + ", " + ((type2 != null) ? type2.getCanonicalName() : null) + "]");
       }
 
       return unsupportedException(type1);

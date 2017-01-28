@@ -25,8 +25,8 @@ import com.github.dm.jrt.operator.math.Operation;
 import org.jetbrains.annotations.NotNull;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
-import static com.github.dm.jrt.operator.math.Numbers.divideSafe;
-import static com.github.dm.jrt.operator.math.Numbers.getOperationSafe;
+import static com.github.dm.jrt.operator.math.Numbers.divide;
+import static com.github.dm.jrt.operator.math.Numbers.getOperation;
 
 /**
  * Factory of invocations computing the average of the input numbers in the specified class
@@ -48,7 +48,7 @@ class AverageOutputPrecisionInvocationFactory<N extends Number>
    */
   AverageOutputPrecisionInvocationFactory(@NotNull final Class<N> type) {
     super(asArgs(type));
-    mOperation = getOperationSafe(type);
+    mOperation = getOperation(type);
   }
 
   @NotNull
@@ -85,7 +85,7 @@ class AverageOutputPrecisionInvocationFactory<N extends Number>
         result.pass((N) mOperation.convert(0));
 
       } else {
-        result.pass((N) mOperation.convert(divideSafe(mSum, count)));
+        result.pass((N) mOperation.convert(divide(mSum, count)));
       }
     }
 

@@ -23,9 +23,9 @@ import com.github.dm.jrt.core.invocation.TemplateInvocation;
 
 import org.jetbrains.annotations.NotNull;
 
-import static com.github.dm.jrt.operator.math.Numbers.addSafe;
-import static com.github.dm.jrt.operator.math.Numbers.convertToSafe;
-import static com.github.dm.jrt.operator.math.Numbers.divideSafe;
+import static com.github.dm.jrt.operator.math.Numbers.add;
+import static com.github.dm.jrt.operator.math.Numbers.convertTo;
+import static com.github.dm.jrt.operator.math.Numbers.divide;
 
 /**
  * Invocation computing the average of the input numbers.
@@ -74,13 +74,13 @@ class AverageInvocation extends TemplateInvocation<Number, Number> {
 
     } else {
       final Number sum = mSum;
-      result.pass(convertToSafe(sum.getClass(), divideSafe(sum, count)));
+      result.pass(convertTo(sum.getClass(), divide(sum, count)));
     }
   }
 
   @Override
   public void onInput(final Number input, @NotNull final Channel<Number, ?> result) {
-    mSum = addSafe(mSum, input);
+    mSum = add(mSum, input);
     ++mCount;
   }
 

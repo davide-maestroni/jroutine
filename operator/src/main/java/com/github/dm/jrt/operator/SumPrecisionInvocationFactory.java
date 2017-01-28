@@ -25,8 +25,8 @@ import com.github.dm.jrt.operator.math.Operation;
 import org.jetbrains.annotations.NotNull;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
-import static com.github.dm.jrt.operator.math.Numbers.addSafe;
-import static com.github.dm.jrt.operator.math.Numbers.getOperationSafe;
+import static com.github.dm.jrt.operator.math.Numbers.add;
+import static com.github.dm.jrt.operator.math.Numbers.getOperation;
 
 /**
  * Factory of invocations computing the sum of the input numbers in the specified class precision.
@@ -46,7 +46,7 @@ class SumPrecisionInvocationFactory<N extends Number> extends InvocationFactory<
    */
   SumPrecisionInvocationFactory(@NotNull final Class<N> type) {
     super(asArgs(type));
-    mOperation = getOperationSafe(type);
+    mOperation = getOperation(type);
   }
 
   @NotNull
@@ -83,7 +83,7 @@ class SumPrecisionInvocationFactory<N extends Number> extends InvocationFactory<
 
     @Override
     public void onInput(final Number input, @NotNull final Channel<N, ?> result) {
-      mSum = mOperation.convert(addSafe(mSum, input));
+      mSum = mOperation.convert(add(mSum, input));
     }
 
     @Override

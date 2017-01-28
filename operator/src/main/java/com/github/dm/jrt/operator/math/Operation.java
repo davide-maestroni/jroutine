@@ -31,7 +31,7 @@ public interface Operation<N extends Number> {
    * Computes the absolute value of the specified number.
    *
    * @param n the number.
-   * @return the absolute value or null.
+   * @return the absolute value.
    */
   @NotNull
   N abs(@NotNull Number n);
@@ -41,7 +41,7 @@ public interface Operation<N extends Number> {
    *
    * @param n1 the first number.
    * @param n2 the second number.
-   * @return the sum or null.
+   * @return the sum.
    */
   @NotNull
   N add(@NotNull Number n1, @NotNull Number n2);
@@ -61,7 +61,7 @@ public interface Operation<N extends Number> {
    * Converts the specified number.
    *
    * @param n the number to convert.
-   * @return the converted number or null.
+   * @return the converted number.
    */
   @NotNull
   N convert(@NotNull Number n);
@@ -71,7 +71,7 @@ public interface Operation<N extends Number> {
    *
    * @param n1 the first number.
    * @param n2 the second number.
-   * @return the quotient or null.
+   * @return the quotient.
    */
   @NotNull
   N divide(@NotNull Number n1, @NotNull Number n2);
@@ -81,7 +81,7 @@ public interface Operation<N extends Number> {
    *
    * @param n1 the first number.
    * @param n2 the second number.
-   * @return the product or null.
+   * @return the product.
    */
   @NotNull
   N multiply(@NotNull Number n1, @NotNull Number n2);
@@ -90,7 +90,7 @@ public interface Operation<N extends Number> {
    * Negates the specified number.
    *
    * @param n the number.
-   * @return the negated value or null.
+   * @return the negated value.
    */
   @NotNull
   N negate(@NotNull Number n);
@@ -101,7 +101,7 @@ public interface Operation<N extends Number> {
    *
    * @param n1 the first number.
    * @param n2 the second number.
-   * @return the remainder or null.
+   * @return the remainder.
    */
   @NotNull
   N remainder(@NotNull Number n1, @NotNull Number n2);
@@ -111,7 +111,7 @@ public interface Operation<N extends Number> {
    *
    * @param n1 the first number.
    * @param n2 the second number.
-   * @return the difference or null.
+   * @return the difference.
    */
   @NotNull
   N subtract(@NotNull Number n1, @NotNull Number n2);

@@ -32,6 +32,7 @@ public interface Operation<N extends Number> {
    *
    * @param n the number.
    * @return the absolute value.
+   * @throws java.lang.IllegalArgumentException if the number instance is of an unsupported type.
    */
   @NotNull
   N abs(@NotNull Number n);
@@ -42,6 +43,8 @@ public interface Operation<N extends Number> {
    * @param n1 the first number.
    * @param n2 the second number.
    * @return the sum.
+   * @throws java.lang.IllegalArgumentException if one of the two instances is of an unsupported
+   *                                            type.
    */
   @NotNull
   N add(@NotNull Number n1, @NotNull Number n2);
@@ -62,6 +65,7 @@ public interface Operation<N extends Number> {
    *
    * @param n the number to convert.
    * @return the converted number.
+   * @throws java.lang.IllegalArgumentException if the number instance is of an unsupported type.
    */
   @NotNull
   N convert(@NotNull Number n);
@@ -72,6 +76,8 @@ public interface Operation<N extends Number> {
    * @param n1 the first number.
    * @param n2 the second number.
    * @return the quotient.
+   * @throws java.lang.IllegalArgumentException if one of the two instances is of an unsupported
+   *                                            type.
    */
   @NotNull
   N divide(@NotNull Number n1, @NotNull Number n2);
@@ -82,6 +88,8 @@ public interface Operation<N extends Number> {
    * @param n1 the first number.
    * @param n2 the second number.
    * @return the product.
+   * @throws java.lang.IllegalArgumentException if one of the two instances is of an unsupported
+   *                                            type.
    */
   @NotNull
   N multiply(@NotNull Number n1, @NotNull Number n2);
@@ -91,6 +99,7 @@ public interface Operation<N extends Number> {
    *
    * @param n the number.
    * @return the negated value.
+   * @throws java.lang.IllegalArgumentException if the number instance is of an unsupported type.
    */
   @NotNull
   N negate(@NotNull Number n);
@@ -102,6 +111,8 @@ public interface Operation<N extends Number> {
    * @param n1 the first number.
    * @param n2 the second number.
    * @return the remainder.
+   * @throws java.lang.IllegalArgumentException if one of the two instances is of an unsupported
+   *                                            type.
    */
   @NotNull
   N remainder(@NotNull Number n1, @NotNull Number n2);
@@ -112,6 +123,8 @@ public interface Operation<N extends Number> {
    * @param n1 the first number.
    * @param n2 the second number.
    * @return the difference.
+   * @throws java.lang.IllegalArgumentException if one of the two instances is of an unsupported
+   *                                            type.
    */
   @NotNull
   N subtract(@NotNull Number n1, @NotNull Number n2);

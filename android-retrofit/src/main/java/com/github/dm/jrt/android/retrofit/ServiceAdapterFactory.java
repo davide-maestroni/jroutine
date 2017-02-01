@@ -34,7 +34,7 @@ import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilders;
 import com.github.dm.jrt.stream.JRoutineStream;
 import com.github.dm.jrt.stream.builder.StreamBuilder;
-import com.github.dm.jrt.stream.builder.StreamBuilder.StreamConfiguration;
+import com.github.dm.jrt.stream.builder.StreamConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -398,7 +398,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
     public <OUT> StreamBuilder adapt(final Call<OUT> call) {
       return JRoutineStream.<Call<?>>withStreamOf(call).apply(mInvocationConfiguration)
                                                        .map(sInvocation)
-                                                       .liftWithConfig(this);
+                                                       .lift(this);
     }
   }
 }

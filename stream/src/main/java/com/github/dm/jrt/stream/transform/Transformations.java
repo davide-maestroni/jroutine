@@ -31,7 +31,7 @@ import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.stream.builder.StreamBuilder;
-import com.github.dm.jrt.stream.builder.StreamBuilder.StreamConfiguration;
+import com.github.dm.jrt.stream.builder.StreamConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -63,27 +63,24 @@ public class Transformations {
    * @param timeUnit the delay time unit.
    * @param <IN>     the input data type.
    * @param <OUT>    the output data type.
-   * @return the transformation function.
+   * @return the lifting function.
    * @throws java.lang.IllegalArgumentException if the specified delay is negative.
-   * @see StreamBuilder#with(Function)
+   * @see StreamBuilder#lift(BiFunction)
    */
   @NotNull
-  public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> delay(
-      final long delay, @NotNull final TimeUnit timeUnit) {
+  public static <IN, OUT> LiftFunction<IN, OUT, IN, OUT> delay(final long delay,
+      @NotNull final TimeUnit timeUnit) {
     ConstantConditions.notNull("time unit", timeUnit);
     ConstantConditions.notNegative("delay value", delay);
-    return new TransformationFunction<IN, OUT, OUT>(
-        new BiFunction<StreamConfiguration, Function<? super Channel<?, IN>, ?
-            extends Channel<?, OUT>>, Function<? super Channel<?, IN>, ?
-            extends Channel<?, OUT>>>() {
+    return new LiftFunction<IN, OUT, IN, OUT>() {
 
-          public Function<? super Channel<?, IN>, ? extends Channel<?, OUT>> apply(
-              final StreamConfiguration streamConfiguration,
-              final Function<? super Channel<?, IN>, ? extends Channel<?, OUT>> function) {
-            return decorate(function).andThen(
-                new BindDelay<OUT>(streamConfiguration.toChannelConfiguration(), delay, timeUnit));
-          }
-        });
+      public Function<Channel<?, IN>, Channel<?, OUT>> apply(
+          final StreamConfiguration streamConfiguration,
+          final Function<Channel<?, IN>, Channel<?, OUT>> function) {
+        return decorate(function).andThen(
+            new BindDelay<OUT>(streamConfiguration.toChannelConfiguration(), delay, timeUnit));
+      }
+    };
   }
 
   /**
@@ -94,11 +91,11 @@ public class Transformations {
    * @param delay the delay.
    * @param <IN>  the input data type.
    * @param <OUT> the output data type.
-   * @return the transformation function.
-   * @see StreamBuilder#with(Function)
+   * @return the lifting function.
+   * @see StreamBuilder#lift(BiFunction)
    */
   @NotNull
-  public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> delay(
+  public static <IN, OUT> LiftFunction<IN, OUT, IN, OUT> delay(
       @NotNull final DurationMeasure delay) {
     return delay(delay.value, delay.unit);
   }
@@ -112,27 +109,24 @@ public class Transformations {
    * @param timeUnit the delay time unit.
    * @param <IN>     the input data type.
    * @param <OUT>    the output data type.
-   * @return the transformation function.
+   * @return the lifting function.
    * @throws java.lang.IllegalArgumentException if the specified delay is negative.
-   * @see StreamBuilder#with(Function)
+   * @see StreamBuilder#lift(BiFunction)
    */
   @NotNull
-  public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> lag(
-      final long delay, @NotNull final TimeUnit timeUnit) {
+  public static <IN, OUT> LiftFunction<IN, OUT, IN, OUT> lag(final long delay,
+      @NotNull final TimeUnit timeUnit) {
     ConstantConditions.notNull("time unit", timeUnit);
     ConstantConditions.notNegative("delay value", delay);
-    return new TransformationFunction<IN, OUT, OUT>(
-        new BiFunction<StreamConfiguration, Function<? super Channel<?, IN>, ?
-            extends Channel<?, OUT>>, Function<? super Channel<?, IN>, ?
-            extends Channel<?, OUT>>>() {
+    return new LiftFunction<IN, OUT, IN, OUT>() {
 
-          public Function<? super Channel<?, IN>, ? extends Channel<?, OUT>> apply(
-              final StreamConfiguration streamConfiguration,
-              final Function<? super Channel<?, IN>, ? extends Channel<?, OUT>> function) {
-            return decorate(function).<Channel<?, IN>>compose(
-                new BindDelay<IN>(streamConfiguration.toChannelConfiguration(), delay, timeUnit));
-          }
-        });
+      public Function<Channel<?, IN>, Channel<?, OUT>> apply(
+          final StreamConfiguration streamConfiguration,
+          final Function<Channel<?, IN>, Channel<?, OUT>> function) {
+        return decorate(function).compose(
+            new BindDelay<IN>(streamConfiguration.toChannelConfiguration(), delay, timeUnit));
+      }
+    };
   }
 
   /**
@@ -143,12 +137,11 @@ public class Transformations {
    * @param delay the delay.
    * @param <IN>  the input data type.
    * @param <OUT> the output data type.
-   * @return the transformation function.
-   * @see StreamBuilder#with(Function)
+   * @return the lifting function.
+   * @see StreamBuilder#lift(BiFunction)
    */
   @NotNull
-  public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> lag(
-      @NotNull final DurationMeasure delay) {
+  public static <IN, OUT> LiftFunction<IN, OUT, IN, OUT> lag(@NotNull final DurationMeasure delay) {
     return lag(delay.value, delay.unit);
   }
 
@@ -164,31 +157,26 @@ public class Transformations {
    * @param <IN>       the input data type.
    * @param <OUT>      the output data type.
    * @param <AFTER>    the new output type.
-   * @return the transformation function.
+   * @return the lifting function.
    * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
-   * @see StreamBuilder#with(Function)
+   * @see StreamBuilder#lift(BiFunction)
    */
   @NotNull
-  public static <IN, OUT, AFTER> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, AFTER>>
-  parallel(
-      final int groupCount,
+  public static <IN, OUT, AFTER> LiftFunction<IN, OUT, IN, AFTER> parallel(final int groupCount,
       @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
     ConstantConditions.notNull("invocation factory", factory);
-    return new TransformationFunction<IN, OUT, AFTER>(
-        new BiFunction<StreamConfiguration, Function<? super Channel<?, IN>, ?
-            extends Channel<?, OUT>>, Function<? super Channel<?, IN>, ?
-            extends Channel<?, AFTER>>>() {
+    return new LiftFunction<IN, OUT, IN, AFTER>() {
 
-          public Function<? super Channel<?, IN>, ? extends Channel<?, AFTER>> apply(
-              final StreamConfiguration streamConfiguration,
-              final Function<? super Channel<?, IN>, ? extends Channel<?, OUT>> function) {
-            return decorate(function).andThen(
-                new BindParallelCount<OUT, AFTER>(streamConfiguration.toChannelConfiguration(),
-                    groupCount, JRoutineCore.with(factory)
-                                            .apply(streamConfiguration.toInvocationConfiguration()),
-                    streamConfiguration.getInvocationMode()));
-          }
-        });
+      public Function<Channel<?, IN>, Channel<?, AFTER>> apply(
+          final StreamConfiguration streamConfiguration,
+          final Function<Channel<?, IN>, Channel<?, OUT>> function) {
+        return decorate(function).andThen(
+            new BindParallelCount<OUT, AFTER>(streamConfiguration.toChannelConfiguration(),
+                groupCount,
+                JRoutineCore.with(factory).apply(streamConfiguration.toInvocationConfiguration()),
+                streamConfiguration.getInvocationMode()));
+      }
+    };
   }
 
   /**
@@ -203,28 +191,24 @@ public class Transformations {
    * @param <IN>       the input data type.
    * @param <OUT>      the output data type.
    * @param <AFTER>    the new output type.
-   * @return the transformation function.
+   * @return the lifting function.
    * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
-   * @see StreamBuilder#with(Function)
+   * @see StreamBuilder#lift(BiFunction)
    */
   @NotNull
-  public static <IN, OUT, AFTER> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, AFTER>>
-  parallel(
-      final int groupCount, @NotNull final Routine<? super OUT, ? extends AFTER> routine) {
+  public static <IN, OUT, AFTER> LiftFunction<IN, OUT, IN, AFTER> parallel(final int groupCount,
+      @NotNull final Routine<? super OUT, ? extends AFTER> routine) {
     ConstantConditions.notNull("routine instance", routine);
-    return new TransformationFunction<IN, OUT, AFTER>(
-        new BiFunction<StreamConfiguration, Function<? super Channel<?, IN>, ?
-            extends Channel<?, OUT>>, Function<? super Channel<?, IN>, ?
-            extends Channel<?, AFTER>>>() {
+    return new LiftFunction<IN, OUT, IN, AFTER>() {
 
-          public Function<? super Channel<?, IN>, ? extends Channel<?, AFTER>> apply(
-              final StreamConfiguration streamConfiguration,
-              final Function<? super Channel<?, IN>, ? extends Channel<?, OUT>> function) {
-            return decorate(function).andThen(
-                new BindParallelCount<OUT, AFTER>(streamConfiguration.toChannelConfiguration(),
-                    groupCount, routine, streamConfiguration.getInvocationMode()));
-          }
-        });
+      public Function<Channel<?, IN>, Channel<?, AFTER>> apply(
+          final StreamConfiguration streamConfiguration,
+          final Function<Channel<?, IN>, Channel<?, OUT>> function) {
+        return decorate(function).andThen(
+            new BindParallelCount<OUT, AFTER>(streamConfiguration.toChannelConfiguration(),
+                groupCount, routine, streamConfiguration.getInvocationMode()));
+      }
+    };
   }
 
   /**
@@ -239,14 +223,13 @@ public class Transformations {
    * @param <IN>       the input data type.
    * @param <OUT>      the output data type.
    * @param <AFTER>    the new output type.
-   * @return the transformation function.
+   * @return the lifting function.
    * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
-   * @see StreamBuilder#with(Function)
+   * @see StreamBuilder#lift(BiFunction)
    */
   @NotNull
-  public static <IN, OUT, AFTER> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, AFTER>>
-  parallel(
-      final int groupCount, @NotNull final RoutineBuilder<? super OUT, ? extends AFTER> builder) {
+  public static <IN, OUT, AFTER> LiftFunction<IN, OUT, IN, AFTER> parallel(final int groupCount,
+      @NotNull final RoutineBuilder<? super OUT, ? extends AFTER> builder) {
     return parallel(groupCount, builder.buildRoutine());
   }
 
@@ -262,32 +245,27 @@ public class Transformations {
    * @param <IN>        the input data type.
    * @param <OUT>       the output data type.
    * @param <AFTER>     the new output type.
-   * @return the transformation function.
-   * @see StreamBuilder#with(Function)
+   * @return the lifting function.
+   * @see StreamBuilder#lift(BiFunction)
    */
   @NotNull
-  public static <IN, OUT, AFTER> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, AFTER>>
-  parallelBy(
+  public static <IN, OUT, AFTER> LiftFunction<IN, OUT, IN, AFTER> parallelBy(
       @NotNull final Function<? super OUT, ?> keyFunction,
       @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
     ConstantConditions.notNull("function instance", keyFunction);
     ConstantConditions.notNull("invocation factory", factory);
-    return new TransformationFunction<IN, OUT, AFTER>(
-        new BiFunction<StreamConfiguration, Function<? super Channel<?, IN>, ?
-            extends Channel<?, OUT>>, Function<? super Channel<?, IN>, ?
-            extends Channel<?, AFTER>>>() {
+    return new LiftFunction<IN, OUT, IN, AFTER>() {
 
-          public Function<? super Channel<?, IN>, ? extends Channel<?, AFTER>> apply(
-              final StreamConfiguration streamConfiguration,
-              final Function<? super Channel<?, IN>, ? extends Channel<?, OUT>> function) {
-            return decorate(function).andThen(
-                new BindParallelKey<OUT, AFTER>(streamConfiguration.toChannelConfiguration(),
-                    keyFunction, JRoutineCore.with(factory)
-                                             .apply(
-                                                 streamConfiguration.toInvocationConfiguration()),
-                    streamConfiguration.getInvocationMode()));
-          }
-        });
+      public Function<Channel<?, IN>, Channel<?, AFTER>> apply(
+          final StreamConfiguration streamConfiguration,
+          final Function<Channel<?, IN>, Channel<?, OUT>> function) {
+        return decorate(function).andThen(
+            new BindParallelKey<OUT, AFTER>(streamConfiguration.toChannelConfiguration(),
+                keyFunction,
+                JRoutineCore.with(factory).apply(streamConfiguration.toInvocationConfiguration()),
+                streamConfiguration.getInvocationMode()));
+      }
+    };
   }
 
   /**
@@ -302,29 +280,25 @@ public class Transformations {
    * @param <IN>        the input data type.
    * @param <OUT>       the output data type.
    * @param <AFTER>     the new output type.
-   * @return the transformation function.
-   * @see StreamBuilder#with(Function)
+   * @return the lifting function.
+   * @see StreamBuilder#lift(BiFunction)
    */
   @NotNull
-  public static <IN, OUT, AFTER> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, AFTER>>
-  parallelBy(
+  public static <IN, OUT, AFTER> LiftFunction<IN, OUT, IN, AFTER> parallelBy(
       @NotNull final Function<? super OUT, ?> keyFunction,
       @NotNull final Routine<? super OUT, ? extends AFTER> routine) {
     ConstantConditions.notNull("function instance", keyFunction);
     ConstantConditions.notNull("routine instance", routine);
-    return new TransformationFunction<IN, OUT, AFTER>(
-        new BiFunction<StreamConfiguration, Function<? super Channel<?, IN>, ?
-            extends Channel<?, OUT>>, Function<? super Channel<?, IN>, ?
-            extends Channel<?, AFTER>>>() {
+    return new LiftFunction<IN, OUT, IN, AFTER>() {
 
-          public Function<? super Channel<?, IN>, ? extends Channel<?, AFTER>> apply(
-              final StreamConfiguration streamConfiguration,
-              final Function<? super Channel<?, IN>, ? extends Channel<?, OUT>> function) {
-            return decorate(function).andThen(
-                new BindParallelKey<OUT, AFTER>(streamConfiguration.toChannelConfiguration(),
-                    keyFunction, routine, streamConfiguration.getInvocationMode()));
-          }
-        });
+      public Function<Channel<?, IN>, Channel<?, AFTER>> apply(
+          final StreamConfiguration streamConfiguration,
+          final Function<Channel<?, IN>, Channel<?, OUT>> function) {
+        return decorate(function).andThen(
+            new BindParallelKey<OUT, AFTER>(streamConfiguration.toChannelConfiguration(),
+                keyFunction, routine, streamConfiguration.getInvocationMode()));
+      }
+    };
   }
 
   /**
@@ -339,12 +313,11 @@ public class Transformations {
    * @param <IN>        the input data type.
    * @param <OUT>       the output data type.
    * @param <AFTER>     the new output type.
-   * @return the transformation function.
-   * @see StreamBuilder#with(Function)
+   * @return the lifting function.
+   * @see StreamBuilder#lift(BiFunction)
    */
   @NotNull
-  public static <IN, OUT, AFTER> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, AFTER>>
-  parallelBy(
+  public static <IN, OUT, AFTER> LiftFunction<IN, OUT, IN, AFTER> parallelBy(
       @NotNull final Function<? super OUT, ?> keyFunction,
       @NotNull final RoutineBuilder<? super OUT, ? extends AFTER> builder) {
     return parallelBy(keyFunction, builder.buildRoutine());
@@ -357,13 +330,12 @@ public class Transformations {
    * @param maxCount the maximum number of retries.
    * @param <IN>     the input data type.
    * @param <OUT>    the output data type.
-   * @return the transformation function.
+   * @return the lifting function.
    * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
-   * @see StreamBuilder#with(Function)
+   * @see StreamBuilder#lift(BiFunction)
    */
   @NotNull
-  public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> retry(
-      final int maxCount) {
+  public static <IN, OUT> LiftFunction<IN, OUT, IN, OUT> retry(final int maxCount) {
     return retry(maxCount, BackoffBuilder.noDelay());
   }
 
@@ -377,13 +349,13 @@ public class Transformations {
    * @param backoff  the backoff policy.
    * @param <IN>     the input data type.
    * @param <OUT>    the output data type.
-   * @return the transformation function.
+   * @return the lifting function.
    * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
-   * @see StreamBuilder#with(Function)
+   * @see StreamBuilder#lift(BiFunction)
    */
   @NotNull
-  public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> retry(
-      final int maxCount, @NotNull final Backoff backoff) {
+  public static <IN, OUT> LiftFunction<IN, OUT, IN, OUT> retry(final int maxCount,
+      @NotNull final Backoff backoff) {
     return retry(new RetryBackoff(maxCount, backoff));
   }
 
@@ -402,27 +374,23 @@ public class Transformations {
    * @param backoffFunction the retry function.
    * @param <IN>            the input data type.
    * @param <OUT>           the output data type.
-   * @return the transformation function.
-   * @see StreamBuilder#with(Function)
+   * @return the lifting function.
+   * @see StreamBuilder#lift(BiFunction)
    */
   @NotNull
-  public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> retry(
+  public static <IN, OUT> LiftFunction<IN, OUT, IN, OUT> retry(
       @NotNull final BiFunction<? super Integer, ? super RoutineException, ? extends Long>
           backoffFunction) {
     ConstantConditions.notNull("function instance", backoffFunction);
-    return new TransformationFunction<IN, OUT, OUT>(
-        new BiFunction<StreamConfiguration, Function<? super Channel<?, IN>, ?
-            extends Channel<?, OUT>>, Function<? super Channel<?, IN>, ?
-            extends Channel<?, OUT>>>() {
+    return new LiftFunction<IN, OUT, IN, OUT>() {
 
-          @SuppressWarnings("unchecked")
-          public Function<? super Channel<?, IN>, ? extends Channel<?, OUT>> apply(
-              final StreamConfiguration streamConfiguration,
-              final Function<? super Channel<?, IN>, ? extends Channel<?, OUT>> function) {
-            return new BindRetry<IN, OUT>(streamConfiguration.toChannelConfiguration(),
-                (Function<Channel<?, IN>, Channel<?, OUT>>) function, backoffFunction);
-          }
-        });
+      public Function<Channel<?, IN>, Channel<?, OUT>> apply(
+          final StreamConfiguration streamConfiguration,
+          final Function<Channel<?, IN>, Channel<?, OUT>> function) {
+        return new BindRetry<IN, OUT>(streamConfiguration.toChannelConfiguration(), function,
+            backoffFunction);
+      }
+    };
   }
 
   /**
@@ -435,19 +403,12 @@ public class Transformations {
    * @param maxInvocations the maximum number of invocations.
    * @param <IN>           the input data type.
    * @param <OUT>          the output data type.
-   * @return the transformation function.
-   * @see StreamBuilder#with(Function)
+   * @return the lifting function.
+   * @see StreamBuilder#lift(BiFunction)
    */
   @NotNull
-  public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> throttle(
-      final int maxInvocations) {
-    final BindThrottle<IN, OUT> throttle = new BindThrottle<IN, OUT>(maxInvocations);
-    return new Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>>() {
-
-      public StreamBuilder<IN, OUT> apply(final StreamBuilder<IN, OUT> builder) {
-        return builder.liftWithConfig(throttle);
-      }
-    };
+  public static <IN, OUT> LiftFunction<IN, OUT, IN, OUT> throttle(final int maxInvocations) {
+    return new Throttle<IN, OUT>(maxInvocations);
   }
 
   /**
@@ -461,12 +422,12 @@ public class Transformations {
    * @param range          the time range.
    * @param <IN>           the input data type.
    * @param <OUT>          the output data type.
-   * @return the transformation function.
-   * @see StreamBuilder#with(Function)
+   * @return the lifting function.
+   * @see StreamBuilder#lift(BiFunction)
    */
   @NotNull
-  public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> throttle(
-      final int maxInvocations, @NotNull final DurationMeasure range) {
+  public static <IN, OUT> LiftFunction<IN, OUT, IN, OUT> throttle(final int maxInvocations,
+      @NotNull final DurationMeasure range) {
     return throttle(maxInvocations, range.value, range.unit);
   }
 
@@ -482,20 +443,13 @@ public class Transformations {
    * @param timeUnit       the time range unit.
    * @param <IN>           the input data type.
    * @param <OUT>          the output data type.
-   * @return the transformation function.
-   * @see StreamBuilder#with(Function)
+   * @return the lifting function.
+   * @see StreamBuilder#lift(BiFunction)
    */
   @NotNull
-  public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> throttle(
-      final int maxInvocations, final long range, @NotNull final TimeUnit timeUnit) {
-    final BindTimeThrottle<IN, OUT> throttle =
-        new BindTimeThrottle<IN, OUT>(maxInvocations, range, timeUnit);
-    return new Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>>() {
-
-      public StreamBuilder<IN, OUT> apply(final StreamBuilder<IN, OUT> builder) {
-        return builder.liftWithConfig(throttle);
-      }
-    };
+  public static <IN, OUT> LiftFunction<IN, OUT, IN, OUT> throttle(final int maxInvocations,
+      final long range, @NotNull final TimeUnit timeUnit) {
+    return new TimeThrottle<IN, OUT>(maxInvocations, range, timeUnit);
   }
 
   /**
@@ -508,11 +462,11 @@ public class Transformations {
    * @param timeout the timeout.
    * @param <IN>    the input data type.
    * @param <OUT>   the output data type.
-   * @return the transformation function.
-   * @see StreamBuilder#with(Function)
+   * @return the lifting function.
+   * @see StreamBuilder#lift(BiFunction)
    */
   @NotNull
-  public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> timeoutAfter(
+  public static <IN, OUT> LiftFunction<IN, OUT, IN, OUT> timeoutAfter(
       @NotNull final DurationMeasure timeout) {
     return timeoutAfter(timeout.value, timeout.unit);
   }
@@ -528,27 +482,23 @@ public class Transformations {
    * @param timeUnit the timeout unit.
    * @param <IN>     the input data type.
    * @param <OUT>    the output data type.
-   * @return the transformation function.
-   * @see StreamBuilder#with(Function)
+   * @return the lifting function.
+   * @see StreamBuilder#lift(BiFunction)
    */
   @NotNull
-  public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> timeoutAfter(
-      final long timeout, @NotNull final TimeUnit timeUnit) {
+  public static <IN, OUT> LiftFunction<IN, OUT, IN, OUT> timeoutAfter(final long timeout,
+      @NotNull final TimeUnit timeUnit) {
     ConstantConditions.notNull("time unit", timeUnit);
     ConstantConditions.notNegative("timeout value", timeout);
-    return new TransformationFunction<IN, OUT, OUT>(
-        new BiFunction<StreamConfiguration, Function<? super Channel<?, IN>, ?
-            extends Channel<?, OUT>>, Function<? super Channel<?, IN>, ?
-            extends Channel<?, OUT>>>() {
+    return new LiftFunction<IN, OUT, IN, OUT>() {
 
-          public Function<? super Channel<?, IN>, ? extends Channel<?, OUT>> apply(
-              final StreamConfiguration streamConfiguration,
-              final Function<? super Channel<?, IN>, ? extends Channel<?, OUT>> function) {
-            return decorate(function).andThen(
-                new BindTimeout<OUT>(streamConfiguration.toChannelConfiguration(), timeout,
-                    timeUnit));
-          }
-        });
+      public Function<Channel<?, IN>, Channel<?, OUT>> apply(
+          final StreamConfiguration streamConfiguration,
+          final Function<Channel<?, IN>, Channel<?, OUT>> function) {
+        return decorate(function).andThen(
+            new BindTimeout<OUT>(streamConfiguration.toChannelConfiguration(), timeout, timeUnit));
+      }
+    };
   }
 
   /**
@@ -559,11 +509,11 @@ public class Transformations {
    * @param catchFunction the function instance.
    * @param <IN>          the input data type.
    * @param <OUT>         the output data type.
-   * @return the transformation function.
-   * @see StreamBuilder#with(Function)
+   * @return the lifting function.
+   * @see StreamBuilder#lift(BiFunction)
    */
   @NotNull
-  public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> tryCatch(
+  public static <IN, OUT> LiftFunction<IN, OUT, IN, OUT> tryCatch(
       @NotNull final Function<? super RoutineException, ? extends OUT> catchFunction) {
     return tryCatchAccept(new TryCatchBiConsumerFunction<OUT>(catchFunction));
   }
@@ -579,26 +529,22 @@ public class Transformations {
    * @param catchConsumer the bi-consumer instance.
    * @param <IN>          the input data type.
    * @param <OUT>         the output data type.
-   * @return the transformation function.
-   * @see StreamBuilder#with(Function)
+   * @return the lifting function.
+   * @see StreamBuilder#lift(BiFunction)
    */
   @NotNull
-  public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> tryCatchAccept(
+  public static <IN, OUT> LiftFunction<IN, OUT, IN, OUT> tryCatchAccept(
       @NotNull final BiConsumer<? super RoutineException, ? super Channel<OUT, ?>> catchConsumer) {
     ConstantConditions.notNull("consumer instance", catchConsumer);
-    return new TransformationFunction<IN, OUT, OUT>(
-        new BiFunction<StreamConfiguration, Function<? super Channel<?, IN>, ?
-            extends Channel<?, OUT>>, Function<? super Channel<?, IN>, ?
-            extends Channel<?, OUT>>>() {
+    return new LiftFunction<IN, OUT, IN, OUT>() {
 
-          @SuppressWarnings("unchecked")
-          public Function<? super Channel<?, IN>, ? extends Channel<?, OUT>> apply(
-              final StreamConfiguration streamConfiguration,
-              final Function<? super Channel<?, IN>, ? extends Channel<?, OUT>> function) {
-            return decorate(function).andThen(
-                new BindTryCatch<OUT>(streamConfiguration.toChannelConfiguration(), catchConsumer));
-          }
-        });
+      public Function<Channel<?, IN>, Channel<?, OUT>> apply(
+          final StreamConfiguration streamConfiguration,
+          final Function<Channel<?, IN>, Channel<?, OUT>> function) {
+        return decorate(function).andThen(
+            new BindTryCatch<OUT>(streamConfiguration.toChannelConfiguration(), catchConsumer));
+      }
+    };
   }
 
   /**
@@ -610,57 +556,21 @@ public class Transformations {
    * @param finallyAction the action instance.
    * @param <IN>          the input data type.
    * @param <OUT>         the output data type.
-   * @return the transformation function.
-   * @see StreamBuilder#with(Function)
+   * @return the lifting function.
+   * @see StreamBuilder#lift(BiFunction)
    */
   @NotNull
-  public static <IN, OUT> Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, OUT>> tryFinally(
+  public static <IN, OUT> LiftFunction<IN, OUT, IN, OUT> tryFinally(
       @NotNull final Action finallyAction) {
     ConstantConditions.notNull("action instance", finallyAction);
-    return new TransformationFunction<IN, OUT, OUT>(
-        new BiFunction<StreamConfiguration, Function<? super Channel<?, IN>, ?
-            extends Channel<?, OUT>>, Function<? super Channel<?, IN>, ?
-            extends Channel<?, OUT>>>() {
+    return new LiftFunction<IN, OUT, IN, OUT>() {
 
-          @SuppressWarnings("unchecked")
-          public Function<? super Channel<?, IN>, ? extends Channel<?, OUT>> apply(
-              final StreamConfiguration streamConfiguration,
-              final Function<? super Channel<?, IN>, ? extends Channel<?, OUT>> function) {
-            return decorate(function).andThen(
-                new BindTryFinally<OUT>(streamConfiguration.toChannelConfiguration(),
-                    finallyAction));
-          }
-        });
-  }
-
-  /**
-   * Transformation function implementation.
-   *
-   * @param <IN>    the input data type.
-   * @param <OUT>   the output data type.
-   * @param <AFTER> the new output type.
-   */
-  private static class TransformationFunction<IN, OUT, AFTER>
-      implements Function<StreamBuilder<IN, OUT>, StreamBuilder<IN, AFTER>> {
-
-    private final BiFunction<StreamConfiguration, Function<? super Channel<?, IN>, ? extends
-        Channel<?, OUT>>, Function<? super Channel<?, IN>, ? extends Channel<?, AFTER>>>
-        mLiftFunction;
-
-    /**
-     * Constructor.
-     *
-     * @param liftFunction the lifting function instance.
-     */
-    private TransformationFunction(
-        @NotNull final BiFunction<StreamConfiguration, Function<? super Channel<?, IN>, ?
-            extends Channel<?, OUT>>, Function<? super Channel<?, IN>, ?
-            extends Channel<?, AFTER>>> liftFunction) {
-      mLiftFunction = liftFunction;
-    }
-
-    public StreamBuilder<IN, AFTER> apply(final StreamBuilder<IN, OUT> builder) {
-      return builder.liftWithConfig(mLiftFunction);
-    }
+      public Function<Channel<?, IN>, Channel<?, OUT>> apply(
+          final StreamConfiguration streamConfiguration,
+          final Function<Channel<?, IN>, Channel<?, OUT>> function) {
+        return decorate(function).andThen(
+            new BindTryFinally<OUT>(streamConfiguration.toChannelConfiguration(), finallyAction));
+      }
+    };
   }
 }

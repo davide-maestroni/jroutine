@@ -152,7 +152,7 @@ public interface Invocation<IN, OUT> {
    * @param isReused whether the invocation is going to be reused.
    * @throws java.lang.Exception if an unexpected error occurs.
    */
-  void onRecycle(boolean isReused) throws Exception;
+  void onRecycle(boolean isReused) throws Exception; // TODO: 01/02/2017 return false?
 
   /**
    * Called when the routine invocation is initialized.

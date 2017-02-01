@@ -29,8 +29,6 @@ import com.github.dm.jrt.android.core.ServiceContext;
 import com.github.dm.jrt.android.core.service.InvocationService;
 import com.github.dm.jrt.android.v11.channel.SparseChannels;
 import com.github.dm.jrt.android.v11.core.LoaderContext;
-import com.github.dm.jrt.android.v11.stream.JRoutineLoaderStream;
-import com.github.dm.jrt.android.v11.stream.LoaderStreamBuilder;
 import com.github.dm.jrt.channel.Channels;
 import com.github.dm.jrt.channel.io.ByteChannel.ChunkInputStream;
 import com.github.dm.jrt.channel.io.ChunkOutputStreamBuilder;
@@ -39,6 +37,8 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Supplier;
+import com.github.dm.jrt.stream.JRoutineStream;
+import com.github.dm.jrt.stream.builder.StreamBuilder;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -308,8 +308,8 @@ public class JRoutineAndroid extends SparseChannels {
    * @return the routine builder instance.
    */
   @NotNull
-  public static <IN> LoaderStreamBuilder<IN, IN> withStream() {
-    return JRoutineLoaderStream.withStream();
+  public static <IN> StreamBuilder<IN, IN> withStream() {
+    return JRoutineStream.withStream();
   }
 
   /**
@@ -327,9 +327,9 @@ public class JRoutineAndroid extends SparseChannels {
    *                                            static scope.
    */
   @NotNull
-  public static <IN> LoaderStreamBuilder<IN, IN> withStreamAccept(
+  public static <IN> StreamBuilder<IN, IN> withStreamAccept(
       @NotNull final Consumer<Channel<IN, ?>> consumer) {
-    return JRoutineLoaderStream.withStreamAccept(consumer);
+    return JRoutineStream.withStreamAccept(consumer);
   }
 
   /**
@@ -350,9 +350,9 @@ public class JRoutineAndroid extends SparseChannels {
    *                                            negative.
    */
   @NotNull
-  public static <IN> LoaderStreamBuilder<IN, IN> withStreamAccept(final int count,
+  public static <IN> StreamBuilder<IN, IN> withStreamAccept(final int count,
       @NotNull final Consumer<Channel<IN, ?>> consumer) {
-    return JRoutineLoaderStream.withStreamAccept(count, consumer);
+    return JRoutineStream.withStreamAccept(count, consumer);
   }
 
   /**
@@ -370,9 +370,8 @@ public class JRoutineAndroid extends SparseChannels {
    *                                            static scope.
    */
   @NotNull
-  public static <IN> LoaderStreamBuilder<IN, IN> withStreamGet(
-      @NotNull final Supplier<IN> supplier) {
-    return JRoutineLoaderStream.withStreamGet(supplier);
+  public static <IN> StreamBuilder<IN, IN> withStreamGet(@NotNull final Supplier<IN> supplier) {
+    return JRoutineStream.withStreamGet(supplier);
   }
 
   /**
@@ -393,9 +392,9 @@ public class JRoutineAndroid extends SparseChannels {
    *                                            negative.
    */
   @NotNull
-  public static <IN> LoaderStreamBuilder<IN, IN> withStreamGet(final int count,
+  public static <IN> StreamBuilder<IN, IN> withStreamGet(final int count,
       @NotNull final Supplier<IN> supplier) {
-    return JRoutineLoaderStream.withStreamGet(count, supplier);
+    return JRoutineStream.withStreamGet(count, supplier);
   }
 
   /**
@@ -411,8 +410,8 @@ public class JRoutineAndroid extends SparseChannels {
    * @return the routine builder instance.
    */
   @NotNull
-  public static <IN> LoaderStreamBuilder<IN, IN> withStreamOf(@Nullable final IN input) {
-    return JRoutineLoaderStream.withStreamOf(input);
+  public static <IN> StreamBuilder<IN, IN> withStreamOf(@Nullable final IN input) {
+    return JRoutineStream.withStreamOf(input);
   }
 
   /**
@@ -428,8 +427,8 @@ public class JRoutineAndroid extends SparseChannels {
    * @return the routine builder instance.
    */
   @NotNull
-  public static <IN> LoaderStreamBuilder<IN, IN> withStreamOf(@Nullable final IN... inputs) {
-    return JRoutineLoaderStream.withStreamOf(inputs);
+  public static <IN> StreamBuilder<IN, IN> withStreamOf(@Nullable final IN... inputs) {
+    return JRoutineStream.withStreamOf(inputs);
   }
 
   /**
@@ -445,9 +444,9 @@ public class JRoutineAndroid extends SparseChannels {
    * @return the routine builder instance.
    */
   @NotNull
-  public static <IN> LoaderStreamBuilder<IN, IN> withStreamOf(
+  public static <IN> StreamBuilder<IN, IN> withStreamOf(
       @Nullable final Iterable<? extends IN> inputs) {
-    return JRoutineLoaderStream.withStreamOf(inputs);
+    return JRoutineStream.withStreamOf(inputs);
   }
 
   /**
@@ -467,8 +466,8 @@ public class JRoutineAndroid extends SparseChannels {
    * @return the routine builder instance.
    */
   @NotNull
-  public static <IN> LoaderStreamBuilder<IN, IN> withStreamOf(
+  public static <IN> StreamBuilder<IN, IN> withStreamOf(
       @Nullable final Channel<?, ? extends IN> channel) {
-    return JRoutineLoaderStream.withStreamOf(channel);
+    return JRoutineStream.withStreamOf(channel);
   }
 }

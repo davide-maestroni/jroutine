@@ -22,24 +22,21 @@ import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.SimpleQueue;
-import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.Function;
-import com.github.dm.jrt.stream.builder.StreamBuilder.StreamConfiguration;
+import com.github.dm.jrt.stream.builder.StreamConfiguration;
 import com.github.dm.jrt.stream.transform.ThrottleChannelConsumer.CompletionHandler;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Invocation throttle binding function.
+ * Invocation throttle lift function.
  * <p>
  * Created by davide-maestroni on 07/29/2016.
  *
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class BindThrottle<IN, OUT>
-    implements BiFunction<StreamConfiguration, Function<Channel<?, IN>, Channel<?, OUT>>, Function<?
-    super Channel<?, IN>, ? extends Channel<?, OUT>>> {
+class Throttle<IN, OUT> implements LiftFunction<IN, OUT, IN, OUT> {
 
   private final int mMaxCount;
 
@@ -54,11 +51,11 @@ class BindThrottle<IN, OUT>
    *
    * @param count the maximum invocation count.
    */
-  BindThrottle(final int count) {
+  Throttle(final int count) {
     mMaxCount = ConstantConditions.positive("max count", count);
   }
 
-  public Function<? super Channel<?, IN>, ? extends Channel<?, OUT>> apply(
+  public Function<Channel<?, IN>, Channel<?, OUT>> apply(
       final StreamConfiguration streamConfiguration,
       final Function<Channel<?, IN>, Channel<?, OUT>> function) {
     return new BindingFunction(streamConfiguration.toChannelConfiguration(), function);

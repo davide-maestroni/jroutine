@@ -37,6 +37,7 @@ import com.github.dm.jrt.android.core.service.InvocationService;
 import com.github.dm.jrt.android.proxy.annotation.LoaderProxy;
 import com.github.dm.jrt.android.proxy.annotation.ServiceProxy;
 import com.github.dm.jrt.android.reflect.ContextInvocationTarget;
+import com.github.dm.jrt.android.v11.stream.transform.LoaderTransformations;
 import com.github.dm.jrt.channel.io.ByteChannel.ChunkInputStream;
 import com.github.dm.jrt.channel.io.ByteChannel.ChunkOutputStream;
 import com.github.dm.jrt.core.channel.AbortException;
@@ -171,8 +172,7 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
   }
 
   private static void testStream(@NotNull final Activity activity) {
-    assertThat(JRoutineAndroid.<Integer>withStream().on(loaderFrom(activity))
-                                                    .map(appendAccept(range(1, 1000)))
+    assertThat(JRoutineAndroid.<Integer>withStream().map(appendAccept(range(1, 1000)))
                                                     .map(new Function<Number, Double>() {
 
                                                       public Double apply(final Number number) {
@@ -182,6 +182,10 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
                                                     })
                                                     .sync()
                                                     .map(Operators.average(Double.class))
+                                                    .lift(
+                                                        LoaderTransformations.<Integer,
+                                                            Double>runOn(
+                                                            loaderFrom(activity)).buildFunction())
                                                     .close()
                                                     .in(seconds(10))
                                                     .next()).isCloseTo(21, Offset.offset(0.1));
@@ -913,23 +917,27 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
     }
 
     assertThat(JRoutineAndroid.withStreamOf("test")
-                              .on(loaderFrom(getActivity()))
+                              .lift(LoaderTransformations.<String, String>runOn(
+                                  loaderFrom(getActivity())).buildFunction())
                               .close()
                               .in(seconds(10))
                               .all()).containsExactly("test");
     assertThat(JRoutineAndroid.withStreamOf("test1", "test2", "test3")
-                              .on(loaderFrom(getActivity()))
+                              .lift(LoaderTransformations.<String, String>runOn(
+                                  loaderFrom(getActivity())).buildFunction())
                               .close()
                               .in(seconds(10))
                               .all()).containsExactly("test1", "test2", "test3");
     assertThat(JRoutineAndroid.withStreamOf(Arrays.asList("test1", "test2", "test3"))
-                              .on(loaderFrom(getActivity()))
+                              .lift(LoaderTransformations.<String, String>runOn(
+                                  loaderFrom(getActivity())).buildFunction())
                               .close()
                               .in(seconds(10))
                               .all()).containsExactly("test1", "test2", "test3");
     assertThat(
         JRoutineAndroid.withStreamOf(JRoutineAndroid.of("test1", "test2", "test3").buildChannel())
-                       .on(loaderFrom(getActivity()))
+                       .lift(LoaderTransformations.<String, String>runOn(
+                           loaderFrom(getActivity())).buildFunction())
                        .close()
                        .in(seconds(10))
                        .all()).containsExactly("test1", "test2", "test3");
@@ -940,23 +948,31 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
       return;
     }
 
-    Channel<String, String> channel =
-        JRoutineAndroid.withStreamOf("test").on(loaderFrom(getActivity())).call();
+    Channel<String, String> channel = JRoutineAndroid.withStreamOf("test")
+                                                     .lift(
+                                                         LoaderTransformations.<String,
+                                                             String>runOn(
+                                                             loaderFrom(
+                                                                 getActivity())).buildFunction())
+                                                     .call();
     assertThat(channel.abort()).isTrue();
     assertThat(channel.in(seconds(10)).getError()).isInstanceOf(AbortException.class);
     channel = JRoutineAndroid.withStreamOf("test1", "test2", "test3")
-                             .on(loaderFrom(getActivity()))
+                             .lift(LoaderTransformations.<String, String>runOn(
+                                 loaderFrom(getActivity())).buildFunction())
                              .call();
     assertThat(channel.abort()).isTrue();
     assertThat(channel.in(seconds(10)).getError()).isInstanceOf(AbortException.class);
     channel = JRoutineAndroid.withStreamOf(Arrays.asList("test1", "test2", "test3"))
-                             .on(loaderFrom(getActivity()))
+                             .lift(LoaderTransformations.<String, String>runOn(
+                                 loaderFrom(getActivity())).buildFunction())
                              .call();
     assertThat(channel.abort()).isTrue();
     assertThat(channel.in(seconds(10)).getError()).isInstanceOf(AbortException.class);
     channel =
         JRoutineAndroid.withStreamOf(JRoutineAndroid.of("test1", "test2", "test3").buildChannel())
-                       .on(loaderFrom(getActivity()))
+                       .lift(LoaderTransformations.<String, String>runOn(
+                           loaderFrom(getActivity())).buildFunction())
                        .call();
     assertThat(channel.abort()).isTrue();
     assertThat(channel.in(seconds(10)).getError()).isInstanceOf(AbortException.class);
@@ -969,33 +985,38 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
     }
 
     assertThat(JRoutineAndroid.withStreamOf("test")
-                              .on(loaderFrom(getActivity()))
+                              .lift(LoaderTransformations.<String, String>runOn(
+                                  loaderFrom(getActivity())).buildFunction())
                               .call("test")
                               .in(seconds(10))
                               .getError()
                               .getCause()).isInstanceOf(IllegalStateException.class);
     assertThat(JRoutineAndroid.withStreamOf("test1", "test2", "test3")
-                              .on(loaderFrom(getActivity()))
+                              .lift(LoaderTransformations.<String, String>runOn(
+                                  loaderFrom(getActivity())).buildFunction())
                               .call("test")
                               .in(seconds(10))
                               .getError()
                               .getCause()).isInstanceOf(IllegalStateException.class);
     assertThat(JRoutineAndroid.withStreamOf(Arrays.asList("test1", "test2", "test3"))
-                              .on(loaderFrom(getActivity()))
+                              .lift(LoaderTransformations.<String, String>runOn(
+                                  loaderFrom(getActivity())).buildFunction())
                               .call("test")
                               .in(seconds(10))
                               .getError()
                               .getCause()).isInstanceOf(IllegalStateException.class);
     assertThat(
         JRoutineAndroid.withStreamOf(JRoutineAndroid.of("test1", "test2", "test3").buildChannel())
-                       .on(loaderFrom(getActivity()))
+                       .lift(LoaderTransformations.<String, String>runOn(
+                           loaderFrom(getActivity())).buildFunction())
                        .call("test")
                        .in(seconds(10))
                        .getError()
                        .getCause()).isInstanceOf(IllegalStateException.class);
     assertThat(JRoutineAndroid.withStreamOf(
         JRoutineAndroid.ofInputs().buildChannel().bind(new TemplateChannelConsumer<Object>() {}))
-                              .on(loaderFrom(getActivity()))
+                              .lift(LoaderTransformations.runOn(loaderFrom(getActivity()))
+                                                         .buildFunction())
                               .close()
                               .in(seconds(10))
                               .getError()

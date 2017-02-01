@@ -39,6 +39,7 @@ import com.github.dm.jrt.function.FunctionDecorator;
 import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.stream.builder.StreamBuilder;
 import com.github.dm.jrt.stream.builder.StreamBuildingException;
+import com.github.dm.jrt.stream.builder.StreamConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -87,9 +88,8 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends AbstractRoutineBuil
   @Override
   public StreamBuilder<IN, OUT> apply(@NotNull final InvocationConfiguration configuration) {
     final StreamConfiguration streamConfiguration = mStreamConfiguration;
-    return apply(
-        newConfiguration(streamConfiguration.getStreamInvocationConfiguration(), configuration,
-            streamConfiguration.getInvocationMode()));
+    return apply(streamConfiguration.getStreamInvocationConfiguration(), configuration,
+        streamConfiguration.getInvocationMode());
   }
 
   @NotNull
@@ -103,9 +103,8 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends AbstractRoutineBuil
   public StreamBuilder<IN, OUT> applyStream(@NotNull final InvocationConfiguration configuration) {
     mRunner = configuration.getRunnerOrElse(null);
     final StreamConfiguration streamConfiguration = mStreamConfiguration;
-    return apply(
-        newConfiguration(configuration, streamConfiguration.getCurrentInvocationConfiguration(),
-            streamConfiguration.getInvocationMode()));
+    return apply(configuration, streamConfiguration.getCurrentInvocationConfiguration(),
+        streamConfiguration.getInvocationMode());
   }
 
   @NotNull
@@ -147,6 +146,19 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends AbstractRoutineBuil
   }
 
   @NotNull
+  public <BEFORE, AFTER> StreamBuilder<BEFORE, AFTER> convert(
+      @NotNull final BiFunction<? super StreamConfiguration, ? super StreamBuilder<IN, OUT>, ?
+          extends StreamBuilder<BEFORE, AFTER>> transformingFunction) {
+    try {
+      return ConstantConditions.notNull("transformed stream builder",
+          transformingFunction.apply(mStreamConfiguration, this));
+
+    } catch (final Exception e) {
+      throw StreamBuildingException.wrapIfNeeded(e);
+    }
+  }
+
+  @NotNull
   public <AFTER> StreamBuilder<IN, AFTER> flatMap(
       @NotNull final Function<? super OUT, ? extends Channel<?, ? extends AFTER>> mappingFunction) {
     return map(new MapInvocation<OUT, AFTER>(decorate(mappingFunction)));
@@ -165,35 +177,13 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends AbstractRoutineBuil
   @NotNull
   @SuppressWarnings("unchecked")
   public <BEFORE, AFTER> StreamBuilder<BEFORE, AFTER> lift(
-      @NotNull final Function<? extends Function<? super Channel<?, IN>, ? extends
-          Channel<?, OUT>>, ? extends Function<? super Channel<?, BEFORE>, ? extends
-          Channel<?, AFTER>>> liftingFunction) {
+      @NotNull final BiFunction<? super StreamConfiguration, ? super Function<Channel<?, IN>,
+          Channel<?, OUT>>, ? extends Function<? super Channel<?, BEFORE>, ? extends Channel<?,
+          AFTER>>> liftingFunction) {
     try {
-      mBindingFunction = decorate(
-          ((Function<Function<Channel<?, IN>, Channel<?, OUT>>, Function<Channel<?, BEFORE>,
-              Channel<?, AFTER>>>) liftingFunction)
-              .apply(getBindingFunction()));
-      return (StreamBuilder<BEFORE, AFTER>) this;
-
-    } catch (final Exception e) {
-      throw StreamBuildingException.wrapIfNeeded(e);
-
-    } finally {
-      resetConfiguration();
-    }
-  }
-
-  @NotNull
-  @SuppressWarnings("unchecked")
-  public <BEFORE, AFTER> StreamBuilder<BEFORE, AFTER> liftWithConfig(
-      @NotNull final BiFunction<? extends StreamConfiguration, ? extends Function<? super
-          Channel<?, IN>, ? extends Channel<?, OUT>>, ? extends Function<? super
-          Channel<?, BEFORE>, ? extends Channel<?, AFTER>>> liftingFunction) {
-    try {
-      mBindingFunction = decorate(
-          ((BiFunction<StreamConfiguration, Function<Channel<?, IN>, Channel<?, OUT>>,
-              Function<Channel<?, BEFORE>, Channel<?, AFTER>>>) liftingFunction)
-              .apply(mStreamConfiguration, getBindingFunction()));
+      mBindingFunction =
+          (FunctionDecorator<? extends Channel<?, ?>, ? extends Channel<?, ?>>) decorate(
+              liftingFunction.apply(mStreamConfiguration, getBindingFunction()));
       return (StreamBuilder<BEFORE, AFTER>) this;
 
     } catch (final Exception e) {
@@ -311,53 +301,28 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends AbstractRoutineBuil
   }
 
   @NotNull
-  public <BEFORE, AFTER> StreamBuilder<BEFORE, AFTER> with(
-      @NotNull final Function<? super StreamBuilder<IN, OUT>, ? extends
-          StreamBuilder<BEFORE, AFTER>> transformingFunction) {
-    try {
-      return ConstantConditions.notNull("transformed stream builder",
-          transformingFunction.apply(this));
-
-    } catch (final Exception e) {
-      throw StreamBuildingException.wrapIfNeeded(e);
-    }
-  }
-
-  @NotNull
-  @SuppressWarnings("unchecked")
-  public <BEFORE, AFTER> StreamBuilder<BEFORE, AFTER> withConfig(
-      @NotNull final BiFunction<? extends StreamConfiguration, ? super StreamBuilder<IN, OUT>, ?
-          extends StreamBuilder<BEFORE, AFTER>> transformingFunction) {
-    try {
-      return ConstantConditions.notNull("transformed stream builder",
-          ((BiFunction<StreamConfiguration, ? super StreamBuilder<IN, OUT>, ? extends
-              StreamBuilder<BEFORE, AFTER>>) transformingFunction).apply(mStreamConfiguration,
-              this));
-
-    } catch (final Exception e) {
-      throw StreamBuildingException.wrapIfNeeded(e);
-    }
-  }
-
-  @NotNull
   @SuppressWarnings("unchecked")
   public Routine<IN, OUT> buildRoutine() {
     final Routine<? super IN, ? extends OUT> routine =
         ConstantConditions.notNull("routine instance",
             newRoutine(mStreamConfiguration, buildFactory()));
-    resetConfiguration();
     return (Routine<IN, OUT>) routine;
   }
 
   /**
    * Applies the specified stream configuration.
    *
-   * @param configuration the stream configuration.
+   * @param streamConfiguration  the stream invocation configuration.
+   * @param currentConfiguration the current invocation configuration.
+   * @param invocationMode       the invocation mode.
    * @return this builder.
    */
   @NotNull
-  protected StreamBuilder<IN, OUT> apply(@NotNull final StreamConfiguration configuration) {
-    mStreamConfiguration = ConstantConditions.notNull("stream configuration", configuration);
+  protected StreamBuilder<IN, OUT> apply(@NotNull final InvocationConfiguration streamConfiguration,
+      @NotNull final InvocationConfiguration currentConfiguration,
+      @NotNull final InvocationMode invocationMode) {
+    mStreamConfiguration =
+        new StreamConfiguration(streamConfiguration, currentConfiguration, invocationMode);
     return this;
   }
 
@@ -383,20 +348,6 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends AbstractRoutineBuil
   }
 
   /**
-   * Creates a new stream configuration instance.
-   *
-   * @param streamConfiguration  the stream invocation configuration.
-   * @param currentConfiguration the current invocation configuration.
-   * @param invocationMode       the invocation mode.
-   * @return the newly created configuration instance.
-   */
-  @NotNull
-  protected abstract StreamConfiguration newConfiguration(
-      @NotNull InvocationConfiguration streamConfiguration,
-      @NotNull InvocationConfiguration currentConfiguration,
-      @NotNull InvocationMode invocationMode);
-
-  /**
    * Creates a new routine instance based on the specified factory.
    *
    * @param streamConfiguration the stream configuration.
@@ -418,33 +369,22 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends AbstractRoutineBuil
    * @return the newly created routine instance.
    */
   @NotNull
+  @SuppressWarnings("WeakerAccess")
   protected <BEFORE, AFTER> Routine<? super BEFORE, ? extends AFTER> newRoutine(
-      @NotNull StreamConfiguration streamConfiguration,
-      @NotNull RoutineBuilder<? super BEFORE, ? extends AFTER> builder) {
+      @NotNull final StreamConfiguration streamConfiguration,
+      @NotNull final RoutineBuilder<? super BEFORE, ? extends AFTER> builder) {
     return builder.apply(streamConfiguration.toInvocationConfiguration()).buildRoutine();
   }
-
-  /**
-   * Creates a new stream configuration instance where the current one is reset to the its
-   * default options.
-   *
-   * @param streamConfiguration the stream invocation configuration.
-   * @param invocationMode      the invocation mode.
-   * @return the newly created configuration instance.
-   */
-  @NotNull
-  protected abstract StreamConfiguration resetConfiguration(
-      @NotNull InvocationConfiguration streamConfiguration, @NotNull InvocationMode invocationMode);
 
   @NotNull
   private StreamBuilder<IN, OUT> applyRunner(@Nullable final Runner runner,
       @NotNull final InvocationMode invocationMode) {
     final StreamConfiguration streamConfiguration = mStreamConfiguration;
-    return apply(newConfiguration(streamConfiguration.getStreamInvocationConfiguration()
-                                                     .builderFrom()
-                                                     .withRunner(runner)
-                                                     .configured(),
-        streamConfiguration.getCurrentInvocationConfiguration(), invocationMode));
+    return apply(streamConfiguration.getStreamInvocationConfiguration()
+                                    .builderFrom()
+                                    .withRunner(runner)
+                                    .configured(),
+        streamConfiguration.getCurrentInvocationConfiguration(), invocationMode);
   }
 
   @NotNull
@@ -453,6 +393,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends AbstractRoutineBuil
     return (FunctionDecorator<Channel<?, IN>, Channel<?, OUT>>) mBindingFunction;
   }
 
+  @NotNull
   @SuppressWarnings("unchecked")
   private <AFTER> StreamBuilder<IN, AFTER> map(
       @NotNull final Routine<? super OUT, ? extends AFTER> routine,
@@ -465,8 +406,8 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends AbstractRoutineBuil
 
   private void resetConfiguration() {
     final StreamConfiguration streamConfiguration = mStreamConfiguration;
-    apply(resetConfiguration(streamConfiguration.getStreamInvocationConfiguration(),
-        streamConfiguration.getInvocationMode()));
+    apply(streamConfiguration.getStreamInvocationConfiguration(),
+        InvocationConfiguration.defaultConfiguration(), streamConfiguration.getInvocationMode());
   }
 
   /**

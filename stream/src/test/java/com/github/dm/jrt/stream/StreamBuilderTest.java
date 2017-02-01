@@ -44,8 +44,9 @@ import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.operator.Operators;
 import com.github.dm.jrt.stream.builder.StreamBuilder;
-import com.github.dm.jrt.stream.builder.StreamBuilder.StreamConfiguration;
 import com.github.dm.jrt.stream.builder.StreamBuildingException;
+import com.github.dm.jrt.stream.builder.StreamConfiguration;
+import com.github.dm.jrt.stream.transform.ConvertFunction;
 import com.github.dm.jrt.stream.transform.Transformations;
 
 import org.assertj.core.data.Offset;
@@ -309,6 +310,55 @@ public class StreamBuilderTest {
   }
 
   @Test
+  public void testConvert() {
+    assertThat(JRoutineStream.<String>withStream().convert(
+        new ConvertFunction<String, String, String, String>() {
+
+          public StreamBuilder<String, String> apply(final StreamConfiguration streamConfiguration,
+              final StreamBuilder<String, String> builder) {
+            return builder.map(append("test2"));
+          }
+        }).call("test1").in(seconds(3)).all()).containsExactly("test1", "test2");
+
+    try {
+      JRoutineStream.withStream().convert(new ConvertFunction<Object, Object, Object, Object>() {
+
+        public StreamBuilder<Object, Object> apply(final StreamConfiguration streamConfiguration,
+            final StreamBuilder<Object, Object> builder) {
+          throw new NullPointerException();
+        }
+      });
+      fail();
+
+    } catch (final StreamBuildingException e) {
+      assertThat(e.getCause()).isExactlyInstanceOf(NullPointerException.class);
+    }
+
+    assertThat(JRoutineStream.<String>withStream().convert(
+        new ConvertFunction<String, String, String, String>() {
+
+          public StreamBuilder<String, String> apply(final StreamConfiguration streamConfiguration,
+              final StreamBuilder<String, String> builder) {
+            return builder.map(append("test2"));
+          }
+        }).call("test1").in(seconds(3)).all()).containsExactly("test1", "test2");
+
+    try {
+      JRoutineStream.withStream().convert(new ConvertFunction<Object, Object, Object, Object>() {
+
+        public StreamBuilder<Object, Object> apply(final StreamConfiguration streamConfiguration,
+            final StreamBuilder<Object, Object> builder) {
+          throw new NullPointerException();
+        }
+      });
+      fail();
+
+    } catch (final StreamBuildingException e) {
+      assertThat(e.getCause()).isExactlyInstanceOf(NullPointerException.class);
+    }
+  }
+
+  @Test
   public void testFlatMap() {
     assertThat(JRoutineStream //
         .<String>withStream().sync().flatMap(new Function<String, Channel<?, String>>() {
@@ -397,7 +447,7 @@ public class StreamBuilderTest {
             final int[] count = {0};
             return JRoutineStream.withStream()
                                  .map(routine)
-                                 .with(tryCatchAccept(
+                                 .lift(tryCatchAccept(
                                      new BiConsumer<RoutineException, Channel<String, ?>>() {
 
                                        public void accept(final RoutineException e,
@@ -405,7 +455,7 @@ public class StreamBuilderTest {
                                          if (++count[0] < 3) {
                                            JRoutineStream.withStream()
                                                          .map(routine)
-                                                         .with(tryCatchAccept(this))
+                                                         .lift(tryCatchAccept(this))
                                                          .call(o)
                                                          .bind(channel);
 
@@ -429,62 +479,6 @@ public class StreamBuilderTest {
       fail();
 
     } catch (final RoutineException e) {
-      assertThat(e.getCause()).isExactlyInstanceOf(NullPointerException.class);
-    }
-  }
-
-  @Test
-  public void testFlatTransform() {
-    assertThat(JRoutineStream.<String>withStream().with(
-        new Function<StreamBuilder<String, String>, StreamBuilder<String, String>>() {
-
-          public StreamBuilder<String, String> apply(final StreamBuilder<String, String> builder) {
-            return builder.map(append("test2"));
-          }
-        }).call("test1").in(seconds(3)).all()).containsExactly("test1", "test2");
-
-    try {
-      JRoutineStream.withStream()
-                    .with(
-                        new Function<StreamBuilder<Object, Object>, StreamBuilder<Object,
-                            Object>>() {
-
-                          public StreamBuilder<Object, Object> apply(
-                              final StreamBuilder<Object, Object> builder) {
-                            throw new NullPointerException();
-                          }
-                        });
-      fail();
-
-    } catch (final StreamBuildingException e) {
-      assertThat(e.getCause()).isExactlyInstanceOf(NullPointerException.class);
-    }
-
-    assertThat(JRoutineStream.<String>withStream().withConfig(
-        new BiFunction<StreamConfiguration, StreamBuilder<String, String>, StreamBuilder<String,
-            String>>() {
-
-          public StreamBuilder<String, String> apply(final StreamConfiguration streamConfiguration,
-              final StreamBuilder<String, String> builder) {
-            return builder.map(append("test2"));
-          }
-        }).call("test1").in(seconds(3)).all()).containsExactly("test1", "test2");
-
-    try {
-      JRoutineStream.withStream()
-                    .withConfig(
-                        new BiFunction<StreamConfiguration, StreamBuilder<Object, Object>,
-                            StreamBuilder<Object, Object>>() {
-
-                          public StreamBuilder<Object, Object> apply(
-                              final StreamConfiguration streamConfiguration,
-                              final StreamBuilder<Object, Object> builder) {
-                            throw new NullPointerException();
-                          }
-                        });
-      fail();
-
-    } catch (final StreamBuildingException e) {
       assertThat(e.getCause()).isExactlyInstanceOf(NullPointerException.class);
     }
   }
@@ -779,7 +773,7 @@ public class StreamBuilderTest {
   @Test
   public void testLag() {
     long startTime = System.currentTimeMillis();
-    assertThat(JRoutineStream.<String>withStream().with(
+    assertThat(JRoutineStream.<String>withStream().lift(
         Transformations.<String, String>lag(1, TimeUnit.SECONDS))
                                                   .call("test")
                                                   .in(seconds(3))
@@ -787,13 +781,13 @@ public class StreamBuilderTest {
     assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
     startTime = System.currentTimeMillis();
     assertThat(
-        JRoutineStream.<String>withStream().with(Transformations.<String, String>lag(seconds(1)))
+        JRoutineStream.<String>withStream().lift(Transformations.<String, String>lag(seconds(1)))
                                            .call("test")
                                            .in(seconds(3))
                                            .next()).isEqualTo("test");
     assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
     startTime = System.currentTimeMillis();
-    assertThat(JRoutineStream.<String>withStream().with(
+    assertThat(JRoutineStream.<String>withStream().lift(
         Transformations.<String, String>lag(1, TimeUnit.SECONDS))
                                                   .close()
                                                   .in(seconds(3))
@@ -801,7 +795,7 @@ public class StreamBuilderTest {
     assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
     startTime = System.currentTimeMillis();
     assertThat(
-        JRoutineStream.<String>withStream().with(Transformations.<String, String>lag(seconds(1)))
+        JRoutineStream.<String>withStream().lift(Transformations.<String, String>lag(seconds(1)))
                                            .close()
                                            .in(seconds(3))
                                            .all()).isEmpty();
@@ -810,7 +804,7 @@ public class StreamBuilderTest {
 
   @Test
   public void testLift() {
-    assertThat(JRoutineStream.<String>withStream().liftWithConfig(
+    assertThat(JRoutineStream.<String>withStream().lift(
         new BiFunction<StreamConfiguration, Function<Channel<?, String>, Channel<?, String>>,
             Function<Channel<?, String>, Channel<?, String>>>() {
 
@@ -832,10 +826,11 @@ public class StreamBuilderTest {
           }
         }).call("test").in(seconds(3)).next()).isEqualTo("TEST");
     assertThat(JRoutineStream.<String>withStream().lift(
-        new Function<Function<Channel<?, String>, Channel<?, String>>, Function<Channel<?,
-            String>, Channel<?, String>>>() {
+        new BiFunction<StreamConfiguration, Function<Channel<?, String>, Channel<?, String>>,
+            Function<Channel<?, String>, Channel<?, String>>>() {
 
           public Function<Channel<?, String>, Channel<?, String>> apply(
+              final StreamConfiguration streamConfiguration,
               final Function<Channel<?, String>, Channel<?, String>> function) {
             return Functions.decorate(function)
                             .andThen(new Function<Channel<?, String>, Channel<?, String>>() {
@@ -848,7 +843,7 @@ public class StreamBuilderTest {
         }).call("test").in(seconds(3)).next()).isEqualTo("TEST");
     try {
       JRoutineStream.withStream()
-                    .liftWithConfig(
+                    .lift(
                         new BiFunction<StreamConfiguration, Function<Channel<?, Object>,
                             Channel<?, Object>>, Function<Channel<?, Object>, Channel<?,
                             Object>>>() {
@@ -868,10 +863,12 @@ public class StreamBuilderTest {
     try {
       JRoutineStream.withStream()
                     .lift(
-                        new Function<Function<Channel<?, Object>, Channel<?, Object>>,
-                            Function<Channel<?, Object>, Channel<?, Object>>>() {
+                        new BiFunction<StreamConfiguration, Function<Channel<?, Object>,
+                            Channel<?, Object>>, Function<Channel<?, Object>, Channel<?,
+                            Object>>>() {
 
                           public Function<Channel<?, Object>, Channel<?, Object>> apply(
+                              final StreamConfiguration streamConfiguration,
                               final Function<Channel<?, Object>, Channel<?, Object>> function) {
                             throw new NullPointerException();
                           }
@@ -885,10 +882,12 @@ public class StreamBuilderTest {
     final StreamBuilder<Object, Object> builder = //
         JRoutineStream.withStream()
                       .lift(
-                          new Function<Function<Channel<?, Object>, Channel<?, Object>>,
-                              Function<Channel<?, Object>, Channel<?, Object>>>() {
+                          new BiFunction<StreamConfiguration, Function<Channel<?, Object>,
+                              Channel<?, Object>>, Function<Channel<?, Object>, Channel<?,
+                              Object>>>() {
 
                             public Function<Channel<?, Object>, Channel<?, Object>> apply(
+                                final StreamConfiguration streamConfiguration,
                                 final Function<Channel<?, Object>, Channel<?, Object>> function) {
                               return new Function<Channel<?, Object>, Channel<?, Object>>() {
 

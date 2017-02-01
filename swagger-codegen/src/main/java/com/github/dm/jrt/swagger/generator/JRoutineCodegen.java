@@ -86,6 +86,7 @@ public class JRoutineCodegen extends JavaClientCodegen {
     final List<CliOption> cliOptions = this.cliOptions;
     cliOptions.add(CliOption.newString(PROJECT_NAME,
         "The name of the project to prepend to the API classes."));
+    // TODO: 01/02/2017 enable streams
     cliOptions.add(CliOption.newBoolean(ENABLE_LOADERS,
         "Whether to enable requests made through Android Loaders."));
     cliOptions.add(CliOption.newBoolean(ENABLE_SERVICES,

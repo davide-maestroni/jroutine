@@ -24,8 +24,6 @@ import com.github.dm.jrt.android.retrofit.ComparableCall;
 import com.github.dm.jrt.android.retrofit.ContextAdapterFactory;
 import com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
-import com.github.dm.jrt.android.v4.stream.JRoutineLoaderStreamCompat;
-import com.github.dm.jrt.android.v4.stream.LoaderStreamBuilderCompat;
 import com.github.dm.jrt.core.config.InvocationConfigurable;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.routine.Routine;
@@ -36,7 +34,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
 import retrofit2.Call;
@@ -44,8 +41,8 @@ import retrofit2.CallAdapter;
 import retrofit2.Retrofit;
 
 /**
- * Implementation of a call adapter factory supporting {@code Channel}, {@code StreamBuilder} and
- * {@code LoaderStreamBuilderCompat} return types.
+ * Implementation of a call adapter factory supporting {@code Channel} and {@code StreamBuilder}
+ * return types.
  * <br>
  * The routine invocations will run in a dedicated Android Loader.
  * <br>
@@ -111,25 +108,9 @@ public class LoaderAdapterFactoryCompat extends ContextAdapterFactory {
 
   @Nullable
   @Override
-  protected Type extractResponseType(@NotNull final ParameterizedType returnType) {
-    if (LoaderStreamBuilderCompat.class == returnType.getRawType()) {
-      return returnType.getActualTypeArguments()[1];
-    }
-
-    return super.extractResponseType(returnType);
-  }
-
-  @Nullable
-  @Override
   protected CallAdapter<?> get(@NotNull final InvocationConfiguration configuration,
       @NotNull final Type returnRawType, @NotNull final Type responseType,
       @NotNull final Annotation[] annotations, @NotNull final Retrofit retrofit) {
-    if (LoaderStreamBuilderCompat.class == returnRawType) {
-      return new LoaderStreamBuilderCompatAdapter(
-          buildRoutine(configuration, returnRawType, responseType, annotations, retrofit),
-          responseType);
-    }
-
     final CallAdapter<?> callAdapter =
         super.get(configuration, returnRawType, responseType, annotations, retrofit);
     return (callAdapter != null) ? ComparableCall.wrap(callAdapter) : null;
@@ -213,30 +194,6 @@ public class LoaderAdapterFactoryCompat extends ContextAdapterFactory {
     public Builder delegateFactory(@Nullable final CallAdapter.Factory factory) {
       mDelegateFactory = factory;
       return this;
-    }
-  }
-
-  /**
-   * Loader stream builder adapter implementation.
-   */
-  private static class LoaderStreamBuilderCompatAdapter
-      extends BaseAdapter<LoaderStreamBuilderCompat> {
-
-    /**
-     * Constructor.
-     *
-     * @param routine      the routine instance.
-     * @param responseType the response type.
-     */
-    private LoaderStreamBuilderCompatAdapter(@NotNull final Routine<? extends Call<?>, ?> routine,
-        @NotNull final Type responseType) {
-      super(routine, responseType);
-    }
-
-    @Override
-    public <OUT> LoaderStreamBuilderCompat adapt(final Call<OUT> call) {
-      return JRoutineLoaderStreamCompat.<Call<?>>withStreamOf(ComparableCall.of(call)).map(
-          getRoutine());
     }
   }
 }

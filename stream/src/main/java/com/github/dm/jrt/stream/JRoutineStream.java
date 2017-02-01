@@ -27,6 +27,8 @@ import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.stream.builder.StreamBuilder;
+import com.github.dm.jrt.stream.builder.StreamConfiguration;
+import com.github.dm.jrt.stream.transform.LiftFunction;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -109,45 +111,44 @@ public class JRoutineStream {
       @NotNull final Consumer<Channel<IN, ?>> consumer) {
     ConstantConditions.notNull("consumer instance", consumer);
     ConstantConditions.positive("count", count);
-    return JRoutineStream.<IN>withStream().lift(
-        new Function<Function<? super Channel<?, IN>, ? extends Channel<?, IN>>, Function<? super
-            Channel<?, IN>, ? extends Channel<?, IN>>>() {
+    return JRoutineStream.<IN>withStream().lift(new LiftFunction<IN, IN, IN, IN>() {
 
-          public Function<? super Channel<?, IN>, ? extends Channel<?, IN>> apply(
-              final Function<? super Channel<?, IN>, ? extends Channel<?, IN>> function) {
-            return decorate(function).andThen(new Function<Channel<?, IN>, Channel<?, IN>>() {
+      public Function<Channel<?, IN>, Channel<?, IN>> apply(
+          final StreamConfiguration streamConfiguration,
+          final Function<Channel<?, IN>, Channel<?, IN>> function) {
+        return decorate(function).andThen(new Function<Channel<?, IN>, Channel<?, IN>>() {
 
-              public Channel<?, IN> apply(final Channel<?, IN> inputs) {
-                final Channel<IN, IN> outputChannel = JRoutineCore.<IN>ofInputs().buildChannel();
-                inputs.bind(new ChannelConsumer<IN>() {
+          public Channel<?, IN> apply(final Channel<?, IN> inputs) {
+            final Channel<IN, IN> outputChannel = JRoutineCore.<IN>ofInputs().buildChannel();
+            inputs.bind(new ChannelConsumer<IN>() {
 
-                  public void onComplete() {
-                    try {
-                      for (int i = 0; i < count; ++i) {
-                        consumer.accept(outputChannel);
-                      }
-
-                      outputChannel.close();
-
-                    } catch (final Throwable t) {
-                      outputChannel.abort(t);
-                      InvocationInterruptedException.throwIfInterrupt(t);
-                    }
+              public void onComplete() {
+                try {
+                  for (int i = 0; i < count; ++i) {
+                    consumer.accept(outputChannel);
                   }
 
-                  public void onError(@NotNull final RoutineException error) {
-                    outputChannel.abort(error);
-                  }
+                  outputChannel.close();
 
-                  public void onOutput(final IN output) {
-                    throw new IllegalStateException();
-                  }
-                });
-                return outputChannel;
+                } catch (final Throwable t) {
+                  outputChannel.abort(t);
+                  InvocationInterruptedException.throwIfInterrupt(t);
+                }
+              }
+
+              public void onError(@NotNull final RoutineException error) {
+                outputChannel.abort(error);
+              }
+
+              public void onOutput(final IN output) {
+                throw new IllegalStateException();
               }
             });
+            return outputChannel;
           }
         });
+      }
+    });
   }
 
   /**
@@ -187,45 +188,44 @@ public class JRoutineStream {
       @NotNull final Supplier<IN> supplier) {
     ConstantConditions.notNull("supplier instance", supplier);
     ConstantConditions.positive("count", count);
-    return JRoutineStream.<IN>withStream().lift(
-        new Function<Function<? super Channel<?, IN>, ? extends Channel<?, IN>>, Function<? super
-            Channel<?, IN>, ? extends Channel<?, IN>>>() {
+    return JRoutineStream.<IN>withStream().lift(new LiftFunction<IN, IN, IN, IN>() {
 
-          public Function<? super Channel<?, IN>, ? extends Channel<?, IN>> apply(
-              final Function<? super Channel<?, IN>, ? extends Channel<?, IN>> function) {
-            return decorate(function).andThen(new Function<Channel<?, IN>, Channel<?, IN>>() {
+      public Function<Channel<?, IN>, Channel<?, IN>> apply(
+          final StreamConfiguration streamConfiguration,
+          final Function<Channel<?, IN>, Channel<?, IN>> function) {
+        return decorate(function).andThen(new Function<Channel<?, IN>, Channel<?, IN>>() {
 
-              public Channel<?, IN> apply(final Channel<?, IN> inputs) {
-                final Channel<IN, IN> outputChannel = JRoutineCore.<IN>ofInputs().buildChannel();
-                inputs.bind(new ChannelConsumer<IN>() {
+          public Channel<?, IN> apply(final Channel<?, IN> inputs) {
+            final Channel<IN, IN> outputChannel = JRoutineCore.<IN>ofInputs().buildChannel();
+            inputs.bind(new ChannelConsumer<IN>() {
 
-                  public void onComplete() {
-                    try {
-                      for (int i = 0; i < count; ++i) {
-                        outputChannel.pass(supplier.get());
-                      }
-
-                      outputChannel.close();
-
-                    } catch (final Throwable t) {
-                      outputChannel.abort(t);
-                      InvocationInterruptedException.throwIfInterrupt(t);
-                    }
+              public void onComplete() {
+                try {
+                  for (int i = 0; i < count; ++i) {
+                    outputChannel.pass(supplier.get());
                   }
 
-                  public void onError(@NotNull final RoutineException error) {
-                    outputChannel.abort(error);
-                  }
+                  outputChannel.close();
 
-                  public void onOutput(final IN output) {
-                    throw new IllegalStateException();
-                  }
-                });
-                return outputChannel;
+                } catch (final Throwable t) {
+                  outputChannel.abort(t);
+                  InvocationInterruptedException.throwIfInterrupt(t);
+                }
+              }
+
+              public void onError(@NotNull final RoutineException error) {
+                outputChannel.abort(error);
+              }
+
+              public void onOutput(final IN output) {
+                throw new IllegalStateException();
               }
             });
+            return outputChannel;
           }
         });
+      }
+    });
   }
 
   /**
@@ -299,40 +299,39 @@ public class JRoutineStream {
   @NotNull
   public static <IN> StreamBuilder<IN, IN> withStreamOf(
       @Nullable final Channel<?, ? extends IN> channel) {
-    return JRoutineStream.<IN>withStream().lift(
-        new Function<Function<? super Channel<?, IN>, ? extends Channel<?, IN>>, Function<? super
-            Channel<?, IN>, ? extends Channel<?, IN>>>() {
+    return JRoutineStream.<IN>withStream().lift(new LiftFunction<IN, IN, IN, IN>() {
 
-          public Function<? super Channel<?, IN>, ? extends Channel<?, IN>> apply(
-              final Function<? super Channel<?, IN>, ? extends Channel<?, IN>> function) {
-            return decorate(function).andThen(new Function<Channel<?, IN>, Channel<?, IN>>() {
+      public Function<Channel<?, IN>, Channel<?, IN>> apply(
+          final StreamConfiguration streamConfiguration,
+          final Function<Channel<?, IN>, Channel<?, IN>> function) {
+        return decorate(function).andThen(new Function<Channel<?, IN>, Channel<?, IN>>() {
 
-              public Channel<?, IN> apply(final Channel<?, IN> inputs) {
-                final Channel<IN, IN> outputChannel = JRoutineCore.<IN>ofInputs().buildChannel();
-                inputs.bind(new ChannelConsumer<IN>() {
+          public Channel<?, IN> apply(final Channel<?, IN> inputs) {
+            final Channel<IN, IN> outputChannel = JRoutineCore.<IN>ofInputs().buildChannel();
+            inputs.bind(new ChannelConsumer<IN>() {
 
-                  public void onComplete() {
-                    try {
-                      outputChannel.pass(channel).close();
+              public void onComplete() {
+                try {
+                  outputChannel.pass(channel).close();
 
-                    } catch (final Throwable t) {
-                      outputChannel.abort(t);
-                      InvocationInterruptedException.throwIfInterrupt(t);
-                    }
-                  }
+                } catch (final Throwable t) {
+                  outputChannel.abort(t);
+                  InvocationInterruptedException.throwIfInterrupt(t);
+                }
+              }
 
-                  public void onError(@NotNull final RoutineException error) {
-                    outputChannel.abort(error);
-                  }
+              public void onError(@NotNull final RoutineException error) {
+                outputChannel.abort(error);
+              }
 
-                  public void onOutput(final IN output) {
-                    throw new IllegalStateException();
-                  }
-                });
-                return outputChannel;
+              public void onOutput(final IN output) {
+                throw new IllegalStateException();
               }
             });
+            return outputChannel;
           }
         });
+      }
+    });
   }
 }

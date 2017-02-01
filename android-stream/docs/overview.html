@@ -25,40 +25,20 @@
     Android customization of stream-like routine concatenation based on the <a href="http://davide-maestroni.github.io/jroutine/javadoc/7/stream" target="_blank">jroutine-stream</a> library.
 </p>
 <p>
-    This module provides routine builder implementations employing a Java stream-like paradigm to simply concatenate routines.<br>
-    The built routine encapsulate the whole chain so to be easily re-used.<br>
-    It is possible to build up the chain so to make routines run inside dedicated Android Services and Loaders.
+    This module provides utility classes so to make stream-based routines run inside dedicated Android Loaders.
 </p>
-<h2>Main concepts</h2>
-<ul>
-    <li>
-        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7/android-stream/com/github/dm/jrt/android/v11/stream/LoaderStreamBuilder.html">LoaderStreamBuilder</a>
-        <p>
-            A stream builder allows to concatenate routines and consumers so to create a processing chain backed by a routine.
-            Each routine in the chain may have its own configuration and invocation mode, and might be configured to run inside a Loader in a specific Android Context.
-        </p>
-    </li>
-    <li>
-        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7/android-stream/com/github/dm/jrt/android/v4/stream/LoaderStreamBuilderCompat.html">LoaderStreamBuilderCompat</a>
-        <p>
-            A stream builder allows to concatenate routines and consumers so to create a processing chain backed by a routine.
-            Each routine in the chain may have its own configuration and invocation mode, and might be configured to run inside a Loader in a specific Android Context.<br>
-            This class is specifically meant to employ the Android Support library for retro-compatibility.
-        </p>
-    </li>
-</ul>
 <h2>Main classes</h2>
 <ul>
     <li>
-        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7/android-stream/com/github/dm/jrt/android/v11/stream/JRoutineLoaderStream.html">JRoutineLoaderStream</a>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7/android-stream/com/github/dm/jrt/android/v11/stream/transform/LoaderTransformations.html">LoaderTransformations</a>
         <p>
-            Utility class acting as a factory of stream builders.
+            This utility provides methods to create functions making streams run inside dedicated Android Loaders.
         </p>
     </li>
     <li>
-        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7/android-stream/com/github/dm/jrt/android/v4/stream/JRoutineLoaderStreamCompat.html">JRoutineLoaderStreamCompat</a>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7/android-stream/com/github/dm/jrt/android/v4/stream/transform/LoaderTransformationsCompat.html">LoaderTransformationsCompat</a>
         <p>
-            Utility class acting as a factory of stream builders.<br>
+            This utility provides methods to create functions making streams run inside dedicated Android Loaders.<br>
             This class is specifically meant to employ the Android Support library for retro-compatibility.
         </p>
     </li>
@@ -78,7 +58,7 @@
 <h2>Usage examples</h2>
 <p>
     The code below shows how it is possible to load an image from the network in a background thread, by letting the library automatically handle any change in the configuration.
-    Note that the very same examples can be re-written using JRoutineLoaderCompat class and a FragmentActivity.
+    Note that the very same examples can be re-written using LoaderTransformationsCompat class and a FragmentActivity.
 </p>
 <b>Example 1:</b> via Loader stream.
 <p>
@@ -127,15 +107,16 @@
                 super.onCreate(savedInstanceState);
                 setContentView(R.layout.main_layout);
                 final ImageView imageView = (ImageView) findViewById(R.id.image);
-                JRoutineLoaderStream.&lt;URI&gt;withStream()
-                                    .immediate(()
-                                    .applyLoaderConfiguration()
-                                    .withInvocationId(11) // explicitly set the invocation ID so to make the invocation survive rotations
-                                    .configured()
-                                    .map(loadUri())
-                                    .on(loaderFrom(this))
-                                    .call(IMAGE_URI);
-                                    .bind(onError(showToast(this)).andOnOutput(showImage(imageView)));
+                JRoutineStream.&lt;URI&gt;withStream()
+                              .immediate()
+                              .map(loadUri())
+                              .lift(LoaderTransformations.&lt;URI, Bitmap&gt;runOn(loaderFrom(this))
+                                                         .applyLoaderConfiguration()
+                                                         .withInvocationId(11) // explicitly set the invocation ID so to make the invocation survive rotations
+                                                         .configured()
+                                                         .buildFunction())
+                              .call(IMAGE_URI);
+                              .bind(onError(showToast(this)).andOnOutput(showImage(imageView)));
             }
         }
     </code>

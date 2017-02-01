@@ -25,25 +25,22 @@ import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.SimpleQueue;
-import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.Function;
-import com.github.dm.jrt.stream.builder.StreamBuilder.StreamConfiguration;
+import com.github.dm.jrt.stream.builder.StreamConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.TimeUnit;
 
 /**
- * Invocation time range throttle binding function.
+ * Invocation time range throttle lift function.
  * <p>
  * Created by davide-maestroni on 07/30/2016.
  *
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class BindTimeThrottle<IN, OUT>
-    implements BiFunction<StreamConfiguration, Function<Channel<?, IN>, Channel<?, OUT>>, Function<?
-    super Channel<?, IN>, ? extends Channel<?, OUT>>> {
+class TimeThrottle<IN, OUT> implements LiftFunction<IN, OUT, IN, OUT> {
 
   private final int mMaxCount;
 
@@ -64,12 +61,12 @@ class BindTimeThrottle<IN, OUT>
    * @param range    the time range value.
    * @param timeUnit the time range unit.
    */
-  BindTimeThrottle(final int count, final long range, @NotNull final TimeUnit timeUnit) {
+  TimeThrottle(final int count, final long range, @NotNull final TimeUnit timeUnit) {
     mMaxCount = ConstantConditions.positive("max count", count);
     mRangeMillis = timeUnit.toMillis(range);
   }
 
-  public Function<? super Channel<?, IN>, ? extends Channel<?, OUT>> apply(
+  public Function<Channel<?, IN>, Channel<?, OUT>> apply(
       final StreamConfiguration streamConfiguration,
       final Function<Channel<?, IN>, Channel<?, OUT>> function) {
     return new BindingFunction(streamConfiguration.toChannelConfiguration(), function);

@@ -3,8 +3,7 @@ package {{package}};
 
 import {{invokerPackage}}.CollectionFormats.*;
 
-{{#enableLoaders}}import com.github.dm.jrt.android.{{^useSupportLibrary}}v11{{/useSupportLibrary}}{{#useSupportLibrary}}v4{{/useSupportLibrary}}.stream.LoaderStreamBuilder{{#useSupportLibrary}}Compat{{/useSupportLibrary}};
-{{/enableLoaders}}import com.github.dm.jrt.core.channel.Channel;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.stream.builder.StreamBuilder;
 
 import retrofit2.http.*;
@@ -67,29 +66,6 @@ public interface {{classname}} {
   StreamBuilder<Object, {{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Void{{/returnType}}> {{operationId}}Stream({{^allParams}});{{/allParams}}
     {{#allParams}}{{>libraries/retrofit2/queryParams}}{{>libraries/retrofit2/pathParams}}{{>libraries/retrofit2/headerParams}}{{>libraries/retrofit2/bodyParams}}{{>libraries/retrofit2/formParams}}{{#hasMore}}, {{/hasMore}}{{^hasMore}}
   );{{/hasMore}}{{/allParams}}
-{{#enableLoaders}}
-  /**
-   * {{summary}}
-   * {{notes}}
-{{#allParams}}   * @param {{paramName}} {{description}}{{#required}} (required){{/required}}{{^required}} (optional{{#defaultValue}}, default to {{{.}}}{{/defaultValue}}){{/required}}
-{{/allParams}}   * @return StreamBuilder&lt;Object, {{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Void{{/returnType}}&gt;
-   */
-  {{>jroutine_invocation_annotations}}
-  {{#formParams}}{{#-first}}
-  {{#isMultipart}}@retrofit2.http.Multipart{{/isMultipart}}{{^isMultipart}}@retrofit2.http.FormUrlEncoded{{/isMultipart}}{{/-first}}{{/formParams}}
-  {{^formParams}}
-  {{#prioritizedContentTypes}}
-  {{#-first}}
-  @Headers({
-  	"Content-Type:{{mediaType}}"
-  })
-  {{/-first}}
-  {{/prioritizedContentTypes}}
-  {{/formParams}}
-  @{{httpMethod}}("{{path}}")
-  LoaderStreamBuilder{{#useSupportLibrary}}Compat{{/useSupportLibrary}}<Object, {{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Void{{/returnType}}> {{operationId}}LoaderStream({{^allParams}});{{/allParams}}
-    {{#allParams}}{{>libraries/retrofit2/queryParams}}{{>libraries/retrofit2/pathParams}}{{>libraries/retrofit2/headerParams}}{{>libraries/retrofit2/bodyParams}}{{>libraries/retrofit2/formParams}}{{#hasMore}}, {{/hasMore}}{{^hasMore}}
-  );{{/hasMore}}{{/allParams}}{{/enableLoaders}}
 
   {{/operation}}
 }

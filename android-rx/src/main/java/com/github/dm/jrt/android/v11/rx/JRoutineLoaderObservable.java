@@ -40,20 +40,6 @@ import rx.Subscriber;
 /**
  * Utility class integrating the JRoutine Android classes with RxJava ones.
  * <p>
- * The example below shows how it's possible to make the computation happen in a dedicated Loader:
- * <pre><code>
- * JRoutineLoaderObservable.with(myObservable)
- *                         .applyLoaderConfiguration()
- *                         .withInvocationId(INVOCATION_ID)
- *                         .configured()
- *                         .subscribeOn(loaderFrom(activity))
- *                         .map(getMappingFunction())
- *                         .observeOn(AndroidSchedulers.mainThread())
- *                         .subscribe(getAction());
- * </code></pre>
- * Note that the Loader ID by default will only depend on the inputs, so that, in order to avoid
- * clashing, it is advisable to explicitly set the invocation ID like in the example above.
- * <p>
  * See {@link com.github.dm.jrt.android.v4.rx.JRoutineLoaderObservableCompat
  * JRoutineLoaderObservableCompat} for support of API levels lower than
  * {@link android.os.Build.VERSION_CODES#HONEYCOMB 11}.
@@ -65,6 +51,20 @@ public class JRoutineLoaderObservable {
 
   /**
    * Returns a Loader observable instance wrapping the specified one.
+   * <p>
+   * The example below shows how it's possible to make the computation happen in a dedicated Loader:
+   * <pre><code>
+   * JRoutineLoaderObservable.with(myObservable)
+   *                         .applyLoaderConfiguration()
+   *                         .withInvocationId(INVOCATION_ID)
+   *                         .configured()
+   *                         .subscribeOn(loaderFrom(activity))
+   *                         .map(getMappingFunction())
+   *                         .observeOn(AndroidSchedulers.mainThread())
+   *                         .subscribe(getAction());
+   * </code></pre>
+   * Note that the Loader ID, by default, will only depend on the inputs, so that, in order to avoid
+   * clashing, it is advisable to explicitly set the invocation ID like shown in the example.
    *
    * @param observable the observable.
    * @param <DATA>     the data type.

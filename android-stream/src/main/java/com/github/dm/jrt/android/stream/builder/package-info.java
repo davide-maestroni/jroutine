@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Davide Maestroni
+ * Copyright 2017 Davide Maestroni
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  */
 
 /**
- * Stream implementation classes specific to the Android platform.
+ * Stream builders interfaces and utility classes specific to the Android platform.
  * <p>
- * Created by davide-maestroni on 01/04/2016.
+ * Created by davide-maestroni on 01/31/2017.
  */
-package com.github.dm.jrt.android.v11.stream;
+package com.github.dm.jrt.android.stream.builder;

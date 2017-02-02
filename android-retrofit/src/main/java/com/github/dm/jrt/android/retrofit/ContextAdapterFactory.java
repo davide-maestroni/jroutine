@@ -33,7 +33,6 @@ import java.lang.reflect.Type;
 
 import retrofit2.Call;
 import retrofit2.CallAdapter;
-import retrofit2.CallAdapter.Factory;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
@@ -50,6 +49,7 @@ public abstract class ContextAdapterFactory extends AbstractAdapterFactory {
   private static final TemplateContextInvocation<Call<Object>, Object> sCallInvocation =
       new TemplateContextInvocation<Call<Object>, Object>() {
 
+        @Override
         public void onInput(final Call<Object> input,
             @NotNull final Channel<Object, ?> result) throws IOException {
           final Response<Object> response = input.execute();
@@ -59,6 +59,11 @@ public abstract class ContextAdapterFactory extends AbstractAdapterFactory {
           } else {
             result.abort(new ErrorResponseException(response));
           }
+        }
+
+        @Override
+        public boolean onRecycle(final boolean isReused) {
+          return true;
         }
       };
 
@@ -80,7 +85,7 @@ public abstract class ContextAdapterFactory extends AbstractAdapterFactory {
    * @param delegateFactory the delegate factory.
    * @param configuration   the invocation configuration.
    */
-  protected ContextAdapterFactory(@Nullable final Factory delegateFactory,
+  protected ContextAdapterFactory(@Nullable final CallAdapter.Factory delegateFactory,
       @NotNull final InvocationConfiguration configuration) {
     super(delegateFactory, configuration);
     mDelegateFactory = delegateFactory;

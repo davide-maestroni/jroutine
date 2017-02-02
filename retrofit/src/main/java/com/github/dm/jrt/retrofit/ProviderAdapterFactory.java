@@ -29,7 +29,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import retrofit2.CallAdapter;
-import retrofit2.CallAdapter.Factory;
 import retrofit2.Retrofit;
 
 /**
@@ -46,11 +45,11 @@ import retrofit2.Retrofit;
  */
 public class ProviderAdapterFactory extends CallAdapter.Factory {
 
-  private final Map<String, Factory> mFactories;
+  private final Map<String, CallAdapter.Factory> mFactories;
 
-  private final Factory mMissingAnnotationFactory;
+  private final CallAdapter.Factory mMissingAnnotationFactory;
 
-  private final Factory mMissingNameFactory;
+  private final CallAdapter.Factory mMissingNameFactory;
 
   /**
    * Constructor.
@@ -61,7 +60,7 @@ public class ProviderAdapterFactory extends CallAdapter.Factory {
    */
   private ProviderAdapterFactory(@Nullable final CallAdapter.Factory missingAnnotationFactory,
       @Nullable final CallAdapter.Factory missingNameFactory,
-      @NotNull final Map<String, Factory> factories) {
+      @NotNull final Map<String, CallAdapter.Factory> factories) {
     mMissingAnnotationFactory = missingAnnotationFactory;
     mMissingNameFactory = missingNameFactory;
     mFactories = factories;
@@ -102,7 +101,7 @@ public class ProviderAdapterFactory extends CallAdapter.Factory {
       }
     }
 
-    final Factory factory = mFactories.get(factoryName);
+    final CallAdapter.Factory factory = mFactories.get(factoryName);
     return (factory != null) ? factory.get(returnType, annotations, retrofit)
         : getDefault(factoryName != null, returnType, annotations, retrofit);
   }
@@ -110,7 +109,8 @@ public class ProviderAdapterFactory extends CallAdapter.Factory {
   @Nullable
   private CallAdapter<?> getDefault(final boolean hasAnnotation, final Type returnType,
       final Annotation[] annotations, final Retrofit retrofit) {
-    final Factory factory = (hasAnnotation) ? mMissingNameFactory : mMissingAnnotationFactory;
+    final CallAdapter.Factory factory =
+        (hasAnnotation) ? mMissingNameFactory : mMissingAnnotationFactory;
     return (factory != null) ? factory.get(returnType, annotations, retrofit) : null;
   }
 
@@ -119,11 +119,12 @@ public class ProviderAdapterFactory extends CallAdapter.Factory {
    */
   public static class Builder {
 
-    private final HashMap<String, Factory> mFactories = new HashMap<String, Factory>();
+    private final HashMap<String, CallAdapter.Factory> mFactories =
+        new HashMap<String, CallAdapter.Factory>();
 
-    private Factory mMissingAnnotationFactory;
+    private CallAdapter.Factory mMissingAnnotationFactory;
 
-    private Factory mMissingNameFactory;
+    private CallAdapter.Factory mMissingNameFactory;
 
     /**
      * Constructor.

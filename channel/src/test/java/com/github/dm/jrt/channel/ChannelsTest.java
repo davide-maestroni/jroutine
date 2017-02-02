@@ -2110,13 +2110,13 @@ public class ChannelsTest {
     }
 
     @Override
-    public void onRestart() {
-      mFirstIndex = NO_INDEX;
+    public boolean onRecycle(final boolean isReused) {
+      return true;
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
-      return true;
+    public void onRestart() {
+      mFirstIndex = NO_INDEX;
     }
   }
 

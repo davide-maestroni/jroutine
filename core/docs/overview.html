@@ -181,6 +181,11 @@
                         result.pass(0d);
                     }
                 }
+
+                &commat;Override
+                public boolean onRecycle(final boolean isReused) {
+                    return true;
+                }
             }
         }
     </code>
@@ -263,6 +268,11 @@
                     } else {
                         result.pass(0d);
                     }
+                }
+
+                &commat;Override
+                public boolean onRecycle(final boolean isReused) {
+                    return true;
                 }
             }
 

@@ -25,7 +25,7 @@ import com.github.dm.jrt.android.core.invocation.ContextInvocation;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
-import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
+import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
 import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -113,7 +113,7 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
       mInvocation.onRecycle(false);
 
     } catch (final Throwable t) {
-      InvocationInterruptedException.throwIfInterrupt(t);
+      InterruptedInvocationException.throwIfInterrupt(t);
       mLogger.wrn(t, "ignoring exception while discarding invocation instance");
     }
 

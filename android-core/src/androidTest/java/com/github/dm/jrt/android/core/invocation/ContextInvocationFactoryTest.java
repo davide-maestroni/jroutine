@@ -204,20 +204,21 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
     private final boolean mIsUpper;
 
     public Case() {
-
       this(false);
     }
 
     public Case(final boolean isUpper) {
-
       mIsUpper = isUpper;
     }
 
     @Override
-    public void onInput(final String input, @NotNull final Channel<String, ?> result) throws
-        Exception {
-
+    public void onInput(final String input, @NotNull final Channel<String, ?> result) {
       result.pass(mIsUpper ? input.toUpperCase() : input.toLowerCase());
+    }
+
+    @Override
+    public boolean onRecycle(final boolean isReused) {
+      return true;
     }
   }
 

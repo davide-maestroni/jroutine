@@ -352,17 +352,18 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
     }
 
     @Override
-    public void onRecycle(final boolean isReused) {
+    public boolean onRecycle(final boolean isReused) {
       mChannel = null;
       if (!isReused) {
         mRoutine = null;
         mInstance = null;
       }
+
+      return true;
     }
 
     @Override
-    public void onInput(final Object input, @NotNull final Channel<Object, ?> result) throws
-        Exception {
+    public void onInput(final Object input, @NotNull final Channel<Object, ?> result) {
       mChannel.pass(input);
     }
 
@@ -421,17 +422,18 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
     }
 
     @Override
-    public void onRecycle(final boolean isReused) {
+    public boolean onRecycle(final boolean isReused) {
       mChannel = null;
       if (!isReused) {
         mRoutine = null;
         mInstance = null;
       }
+
+      return true;
     }
 
     @Override
-    public void onInput(final Object input, @NotNull final Channel<Object, ?> result) throws
-        Exception {
+    public void onInput(final Object input, @NotNull final Channel<Object, ?> result) {
       mChannel.pass(input);
     }
 

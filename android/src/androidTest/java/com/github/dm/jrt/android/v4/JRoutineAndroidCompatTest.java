@@ -977,11 +977,16 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
     }
 
     @Override
-    public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) throws Exception {
+    public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) {
       final int count = mCount;
       for (int i = 0; i < count; i++) {
         result.pass(input);
       }
+    }
+
+    @Override
+    public boolean onRecycle(final boolean isReused) {
+      return true;
     }
   }
 

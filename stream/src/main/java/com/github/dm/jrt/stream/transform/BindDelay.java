@@ -55,7 +55,7 @@ class BindDelay<OUT> implements Function<Channel<?, OUT>, Channel<?, OUT>> {
     mDelayUnit = ConstantConditions.notNull("delay unit", timeUnit);
   }
 
-  public Channel<?, OUT> apply(final Channel<?, OUT> channel) throws Exception {
+  public Channel<?, OUT> apply(final Channel<?, OUT> channel) {
     final ChannelConfiguration configuration = mConfiguration;
     final Channel<OUT, OUT> outputChannel =
         JRoutineCore.<OUT>ofInputs().apply(configuration).buildChannel();

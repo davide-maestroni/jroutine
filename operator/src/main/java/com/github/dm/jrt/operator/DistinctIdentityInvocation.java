@@ -74,8 +74,9 @@ class DistinctIdentityInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
   }
 
   @Override
-  public void onRecycle(final boolean isReused) {
+  public boolean onRecycle(final boolean isReused) {
     mMap = null;
+    return true;
   }
 
   @Override

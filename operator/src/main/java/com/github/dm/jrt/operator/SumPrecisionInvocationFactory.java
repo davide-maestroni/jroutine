@@ -50,7 +50,7 @@ class SumPrecisionInvocationFactory<N extends Number> extends InvocationFactory<
   }
 
   @NotNull
-  public Invocation<Number, N> newInvocation() throws Exception {
+  public Invocation<Number, N> newInvocation() {
     return new SumPrecisionInvocation<N>(mOperation);
   }
 
@@ -84,6 +84,11 @@ class SumPrecisionInvocationFactory<N extends Number> extends InvocationFactory<
     @Override
     public void onInput(final Number input, @NotNull final Channel<N, ?> result) {
       mSum = mOperation.convert(add(mSum, input));
+    }
+
+    @Override
+    public boolean onRecycle(final boolean isReused) {
+      return true;
     }
 
     @Override

@@ -8,7 +8,7 @@ import com.github.dm.jrt.core.channel.OutputDeadlockException;
 import com.github.dm.jrt.core.common.Backoff;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
-import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
+import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
 import com.github.dm.jrt.core.util.DurationMeasure;
 import com.github.dm.jrt.core.util.SimpleQueue;
 
@@ -169,7 +169,7 @@ class JoinBuilder<OUT> extends AbstractChannelBuilder<List<OUT>, List<OUT>> {
 
         } catch (final Throwable t) {
           channel.abort(t);
-          InvocationInterruptedException.throwIfInterrupt(t);
+          InterruptedInvocationException.throwIfInterrupt(t);
         }
       }
     }

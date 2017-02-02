@@ -61,4 +61,9 @@ public class IdentityContextInvocation<DATA> extends TemplateContextInvocation<D
   public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) {
     result.pass(input);
   }
+
+  @Override
+  public boolean onRecycle(final boolean isReused) {
+    return true;
+  }
 }

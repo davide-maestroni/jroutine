@@ -73,7 +73,8 @@ class OrElseThrowInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
       mError = error;
     }
 
-    public void onComplete(@NotNull final Channel<DATA, ?> result) throws Exception {
+    @Override
+    public void onComplete(@NotNull final Channel<DATA, ?> result) {
       if (!mHasOutputs) {
         result.abort(mError);
       }
@@ -83,6 +84,11 @@ class OrElseThrowInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
     public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) {
       mHasOutputs = true;
       result.pass(input);
+    }
+
+    @Override
+    public boolean onRecycle(final boolean isReused) {
+      return true;
     }
 
     @Override

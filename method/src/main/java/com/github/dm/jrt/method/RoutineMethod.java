@@ -1064,9 +1064,10 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
       mParams = replaceChannels(method, mOrigParams, mInputChannels, mOutputChannels);
     }
 
-    public void onRecycle(final boolean isReused) throws Exception {
+    public boolean onRecycle(final boolean isReused) {
       mInputChannels.clear();
       mOutputChannels.clear();
+      return true;
     }
 
     @NotNull
@@ -1189,7 +1190,8 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
       }
     }
 
-    public void onRecycle(final boolean isReused) {
+    public boolean onRecycle(final boolean isReused) {
+      return true;
     }
 
     @NotNull

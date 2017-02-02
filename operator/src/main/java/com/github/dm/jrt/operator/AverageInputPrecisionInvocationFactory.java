@@ -108,6 +108,11 @@ class AverageInputPrecisionInvocationFactory<IN extends Number, OUT extends Numb
     }
 
     @Override
+    public boolean onRecycle(final boolean isReused) {
+      return true;
+    }
+
+    @Override
     public void onRestart() {
       mSum = mInputOperation.convert(0);
       mCount = 0;

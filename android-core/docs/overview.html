@@ -179,8 +179,7 @@
             public static class LoadBitmap extends TemplateContextInvocation&lt;URI, Bitmap&gt; {
 
                 &commat;Override
-                public void onInput(final URI uri, &commat;NotNull final Channel&lt;Bitmap, ?&gt; result) throws
-                        Exception {
+                public void onInput(final URI uri, &commat;NotNull final Channel&lt;Bitmap, ?&gt; result) throws Exception {
                     final URLConnection urlConnection = uri.toURL().openConnection();
                     final InputStream inputStream = urlConnection.getInputStream();
                     try {
@@ -242,8 +241,7 @@
             public static class LoadBitmap extends TemplateContextInvocation&lt;URI, Bitmap&gt; {
 
                 &commat;Override
-                public void onInput(final URI uri, &commat;NotNull final Channel&lt;Bitmap, ?&gt; result) throws
-                        Exception {
+                public void onInput(final URI uri, &commat;NotNull final Channel&lt;Bitmap, ?&gt; result) throws Exception {
                     final URLConnection urlConnection = uri.toURL().openConnection();
                     final InputStream inputStream = urlConnection.getInputStream();
                     try {

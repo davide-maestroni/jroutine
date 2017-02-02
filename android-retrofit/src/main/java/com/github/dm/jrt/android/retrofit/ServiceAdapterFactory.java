@@ -388,8 +388,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
     @Override
     public Function<Channel<?, Call<?>>, Channel<?, Object>> apply(
         final StreamConfiguration streamConfiguration,
-        final Function<Channel<?, Call<?>>, Channel<?, ParcelableFlow<Object>>> function) throws
-        Exception {
+        final Function<Channel<?, Call<?>>, Channel<?, ParcelableFlow<Object>>> function) {
       return decorate(function).andThen(
           new BindService(streamConfiguration.toChannelConfiguration(), mConverter, getRoutine()));
     }

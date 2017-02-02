@@ -28,8 +28,8 @@ import com.github.dm.jrt.core.common.BackoffBuilder;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
 import com.github.dm.jrt.core.invocation.InvocationException;
-import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;
@@ -498,7 +498,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
       }
 
     } catch (final InterruptedException e) {
-      throw new InvocationInterruptedException(e);
+      throw new InterruptedInvocationException(e);
 
     } finally {
       mIsWaitingInput = false;

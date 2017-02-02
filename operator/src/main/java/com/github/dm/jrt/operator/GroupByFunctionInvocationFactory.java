@@ -54,7 +54,7 @@ class GroupByFunctionInvocationFactory<DATA> extends InvocationFactory<DATA, Lis
 
   @NotNull
   @Override
-  public Invocation<DATA, List<DATA>> newInvocation() throws Exception {
+  public Invocation<DATA, List<DATA>> newInvocation() {
     return new GroupByFunctionInvocation<DATA>(mKeyFunction);
   }
 
@@ -101,8 +101,9 @@ class GroupByFunctionInvocationFactory<DATA> extends InvocationFactory<DATA, Lis
     }
 
     @Override
-    public void onRecycle(final boolean isReused) {
+    public boolean onRecycle(final boolean isReused) {
       mGroups = null;
+      return true;
     }
 
     @Override

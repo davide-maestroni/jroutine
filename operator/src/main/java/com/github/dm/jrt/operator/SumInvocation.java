@@ -73,6 +73,11 @@ class SumInvocation extends TemplateInvocation<Number, Number> {
   }
 
   @Override
+  public boolean onRecycle(final boolean isReused) {
+    return true;
+  }
+
+  @Override
   public void onRestart() {
     mSum = 0;
   }

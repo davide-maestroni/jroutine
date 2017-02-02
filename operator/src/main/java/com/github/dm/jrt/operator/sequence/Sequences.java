@@ -88,10 +88,9 @@ public class Sequences {
   @SuppressWarnings("unchecked")
   public static <N extends Number> Consumer<Channel<N, ?>> range(@NotNull final N start,
       @NotNull final N end) {
-    final Operation<?> operation =
-        getHigherPrecisionOperation(start.getClass(), end.getClass());
-    return range(start, end, (N) getOperation(start.getClass()).convert(
-        (operation.compare(start, end) <= 0) ? 1 : -1));
+    final Operation<?> operation = getHigherPrecisionOperation(start.getClass(), end.getClass());
+    return range(start, end,
+        (N) getOperation(start.getClass()).convert((operation.compare(start, end) <= 0) ? 1 : -1));
   }
 
   /**
@@ -174,7 +173,7 @@ public class Sequences {
           getHigherPrecisionOperation(addOperation.convert(0).getClass(), end.getClass());
     }
 
-    public void accept(final Channel<N, ?> result) throws Exception {
+    public void accept(final Channel<N, ?> result) {
       final N start = mStart;
       final N end = mEnd;
       final N increment = mIncrement;

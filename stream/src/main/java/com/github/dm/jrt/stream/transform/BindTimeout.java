@@ -56,7 +56,7 @@ class BindTimeout<OUT> implements Function<Channel<?, OUT>, Channel<?, OUT>> {
     mTimeoutUnit = ConstantConditions.notNull("timeout unit", timeUnit);
   }
 
-  public Channel<?, OUT> apply(final Channel<?, OUT> channel) throws Exception {
+  public Channel<?, OUT> apply(final Channel<?, OUT> channel) {
     final ChannelConfiguration configuration = mConfiguration;
     final Channel<OUT, OUT> outputChannel =
         JRoutineCore.<OUT>ofInputs().apply(configuration).buildChannel();

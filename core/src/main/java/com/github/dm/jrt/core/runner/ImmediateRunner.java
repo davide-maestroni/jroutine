@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.core.runner;
 
-import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
+import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
 import com.github.dm.jrt.core.util.DurationMeasure;
 
 import org.jetbrains.annotations.NotNull;
@@ -44,7 +44,7 @@ class ImmediateRunner extends SyncRunner {
         DurationMeasure.sleepAtLeast(delay, timeUnit);
 
       } catch (final InterruptedException e) {
-        throw new InvocationInterruptedException(e);
+        throw new InterruptedInvocationException(e);
       }
     }
 

@@ -105,8 +105,9 @@ class ToMapInvocationFactory<IN, KEY, VALUE> extends InvocationFactory<IN, Map<K
     }
 
     @Override
-    public void onRecycle(final boolean isReused) {
+    public boolean onRecycle(final boolean isReused) {
       mMap = null;
+      return true;
     }
 
     @Override

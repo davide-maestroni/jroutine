@@ -21,8 +21,8 @@ import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.common.RoutineException;
+import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
 import com.github.dm.jrt.core.invocation.InvocationException;
-import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -87,7 +87,7 @@ class RetryChannelConsumer<IN, OUT> implements Execution, ChannelConsumer<OUT> {
 
     } catch (final Throwable t) {
       outputChannel.abort(t);
-      InvocationInterruptedException.throwIfInterrupt(t);
+      InterruptedInvocationException.throwIfInterrupt(t);
     }
   }
 
@@ -99,7 +99,7 @@ class RetryChannelConsumer<IN, OUT> implements Execution, ChannelConsumer<OUT> {
 
     } catch (final Throwable t) {
       abort(t);
-      InvocationInterruptedException.throwIfInterrupt(t);
+      InterruptedInvocationException.throwIfInterrupt(t);
     }
   }
 
@@ -139,7 +139,7 @@ class RetryChannelConsumer<IN, OUT> implements Execution, ChannelConsumer<OUT> {
       try {
         mChannel.pass(output);
 
-      } catch (final InvocationInterruptedException e) {
+      } catch (final InterruptedInvocationException e) {
         throw e;
 
       } catch (final Throwable ignored) {
@@ -155,7 +155,7 @@ class RetryChannelConsumer<IN, OUT> implements Execution, ChannelConsumer<OUT> {
 
       } catch (final Throwable t) {
         abort(t);
-        InvocationInterruptedException.throwIfInterrupt(t);
+        InterruptedInvocationException.throwIfInterrupt(t);
       }
     }
 

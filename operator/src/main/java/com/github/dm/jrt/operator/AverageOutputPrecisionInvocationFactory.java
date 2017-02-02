@@ -96,6 +96,11 @@ class AverageOutputPrecisionInvocationFactory<N extends Number>
     }
 
     @Override
+    public boolean onRecycle(final boolean isReused) {
+      return true;
+    }
+
+    @Override
     public void onRestart() {
       mSum = mOperation.convert(0);
       mCount = 0;

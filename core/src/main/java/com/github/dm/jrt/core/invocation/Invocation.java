@@ -86,7 +86,8 @@ import org.jetbrains.annotations.NotNull;
  * its lifecycle, so any associated resource can be released. The input flag indicates if the same
  * instance is going to be re-used or not. Note, however, that this method may never get called
  * with {@code false} if the routine {@link com.github.dm.jrt.core.routine.Routine#clear() clear()}
- * method is not invoked.
+ * method is not invoked. Note also that, in case {@code false} is returned, the invocation will be
+ * immediately discarded.
  * <p>
  * Keep in mind, when implementing an invocation class, that the result channel passed to the
  * {@code onInput()} and {@code onComplete()} methods will be closed as soon as the latter exits.
@@ -148,11 +149,14 @@ public interface Invocation<IN, OUT> {
 
   /**
    * Called when the routine invocation is recycled.
+   * <br>
+   * In case {@code false} is returned, the invocation will be immediately discarded.
    *
    * @param isReused whether the invocation is going to be reused.
+   * @return whether the invocation can be recycled.
    * @throws java.lang.Exception if an unexpected error occurs.
    */
-  void onRecycle(boolean isReused) throws Exception; // TODO: 01/02/2017 return false?
+  boolean onRecycle(boolean isReused) throws Exception;
 
   /**
    * Called when the routine invocation is initialized.

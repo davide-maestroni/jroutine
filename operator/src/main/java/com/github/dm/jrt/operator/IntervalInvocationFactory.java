@@ -52,7 +52,7 @@ class IntervalInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
 
   @NotNull
   @Override
-  public Invocation<DATA, DATA> newInvocation() throws Exception {
+  public Invocation<DATA, DATA> newInvocation() {
     return new IntervalInvocation<DATA>(mBackoff);
   }
 
@@ -83,6 +83,11 @@ class IntervalInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
       result.after(
           Math.max(0, mStartTime + mBackoff.getDelay(++mCount) - System.currentTimeMillis()),
           TimeUnit.MILLISECONDS).pass(input);
+    }
+
+    @Override
+    public boolean onRecycle(final boolean isReused) {
+      return true;
     }
 
     @Override

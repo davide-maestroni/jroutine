@@ -56,7 +56,8 @@ public abstract class CommandInvocation<OUT> extends InvocationFactory<Void, OUT
   public final void onInput(final Void input, @NotNull final Channel<OUT, ?> result) {
   }
 
-  public final void onRecycle(final boolean isReused) {
+  public final boolean onRecycle(final boolean isReused) {
+    return true;
   }
 
   public final void onRestart() {

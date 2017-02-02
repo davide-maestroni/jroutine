@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.core.util;
 
-import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
+import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
 import com.github.dm.jrt.core.util.DurationMeasure.Condition;
 
 import org.junit.Test;
@@ -302,7 +302,7 @@ public class DurationMeasureTest {
           DurationMeasure.millis(100).sleep();
 
         } catch (final InterruptedException e) {
-          throw new InvocationInterruptedException(e);
+          throw new InterruptedInvocationException(e);
         }
       }
     };
@@ -707,7 +707,7 @@ public class DurationMeasureTest {
           }
 
         } catch (final InterruptedException e) {
-          throw new InvocationInterruptedException(e);
+          throw new InterruptedInvocationException(e);
         }
       }
     };
@@ -740,7 +740,7 @@ public class DurationMeasureTest {
           }
 
         } catch (final InterruptedException e) {
-          throw new InvocationInterruptedException(e);
+          throw new InterruptedInvocationException(e);
         }
       }
     };
@@ -778,7 +778,7 @@ public class DurationMeasureTest {
           }
 
         } catch (final InterruptedException e) {
-          throw new InvocationInterruptedException(e);
+          throw new InterruptedInvocationException(e);
         }
       }
     };
@@ -858,7 +858,7 @@ public class DurationMeasureTest {
 
         } catch (final InterruptedException e) {
 
-          throw new InvocationInterruptedException(e);
+          throw new InterruptedInvocationException(e);
         }
       }
     };

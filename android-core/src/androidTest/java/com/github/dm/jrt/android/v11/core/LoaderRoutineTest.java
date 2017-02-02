@@ -1856,19 +1856,18 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
     private static final Semaphore sSemaphore = new Semaphore(0);
 
-    public static boolean waitDestroy(final int count, final long timeoutMs) throws
-        InterruptedException {
-
+    static boolean waitDestroy(final int count, final long timeoutMs) throws InterruptedException {
       return sSemaphore.tryAcquire(count, timeoutMs, TimeUnit.MILLISECONDS);
     }
 
     @Override
-    public void onRecycle(final boolean isReused) throws Exception {
-
-      super.onRecycle(isReused);
+    public boolean onRecycle(final boolean isReused) throws Exception {
+      final boolean canRecycle = super.onRecycle(isReused);
       if (!isReused) {
         sSemaphore.release();
       }
+
+      return canRecycle;
     }
 
     @Override

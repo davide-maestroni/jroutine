@@ -37,7 +37,7 @@ import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.ChannelConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
-import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
+import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.log.Log;
 import com.github.dm.jrt.core.log.Log.Level;
@@ -416,17 +416,19 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
 
     @Override
     public void onComplete(@NotNull final Channel<Data, ?> result) {
-
       try {
-
         Thread.sleep(500);
 
       } catch (final InterruptedException e) {
-
-        throw new InvocationInterruptedException(e);
+        throw new InterruptedInvocationException(e);
       }
 
       result.abort(new IllegalStateException("test"));
+    }
+
+    @Override
+    public boolean onRecycle(final boolean isReused) {
+      return true;
     }
   }
 
@@ -502,8 +504,12 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
 
     @Override
     public void onInput(final Data d, @NotNull final Channel<Data, ?> result) {
-
       result.after(DurationMeasure.millis(500)).pass(d);
+    }
+
+    @Override
+    public boolean onRecycle(final boolean isReused) {
+      return true;
     }
   }
 
@@ -575,17 +581,21 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
   private static class MyParcelableInvocation
       extends TemplateContextInvocation<MyParcelable, MyParcelable> {
 
+    @Override
     public void onInput(final MyParcelable myParcelable,
         @NotNull final Channel<MyParcelable, ?> result) {
-
       result.pass(myParcelable);
+    }
+
+    @Override
+    public boolean onRecycle(final boolean isReused) {
+      return true;
     }
   }
 
   private static class PassingWrapper<DATA> extends ContextInvocationWrapper<DATA, DATA> {
 
     public PassingWrapper() {
-
       super(IdentityInvocation.<DATA>factoryOf().newInvocation());
     }
   }
@@ -604,16 +614,25 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
 
     @Override
     public void onInput(final String s, @NotNull final Channel<String, ?> result) {
-
       result.after(DurationMeasure.millis(100)).pass(s);
+    }
+
+    @Override
+    public boolean onRecycle(final boolean isReused) {
+      return true;
     }
   }
 
   private static class StringPassingInvocation extends TemplateContextInvocation<String, String> {
 
+    @Override
     public void onInput(final String s, @NotNull final Channel<String, ?> result) {
-
       result.pass(s);
+    }
+
+    @Override
+    public boolean onRecycle(final boolean isReused) {
+      return true;
     }
   }
 
@@ -631,8 +650,12 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
 
     @Override
     public void onComplete(@NotNull final Channel<String, ?> result) {
-
       result.pass("test1", "test2", "test3");
+    }
+
+    @Override
+    public boolean onRecycle(final boolean isReused) {
+      return true;
     }
   }
 

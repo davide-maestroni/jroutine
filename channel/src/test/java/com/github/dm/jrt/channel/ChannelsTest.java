@@ -2100,22 +2100,23 @@ public class ChannelsTest {
 
     @Override
     public void onInput(final Flow<DATA> input, @NotNull final Channel<DATA, ?> result) {
-
       if (mFirstIndex == NO_INDEX) {
-
         mFirstIndex = input.id;
         result.pass(input.data);
 
       } else if (mFirstIndex == input.id) {
-
         result.pass(input.data);
       }
     }
 
     @Override
     public void onRestart() {
-
       mFirstIndex = NO_INDEX;
+    }
+
+    @Override
+    public boolean onRecycle(final boolean isReused) {
+      return true;
     }
   }
 

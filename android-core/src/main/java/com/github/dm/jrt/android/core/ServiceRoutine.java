@@ -38,9 +38,9 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationException;
-import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.log.Log;
 import com.github.dm.jrt.core.log.Logger;
@@ -124,7 +124,7 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
 
   @NotNull
   @Override
-  protected Invocation<IN, OUT> newInvocation() throws Exception {
+  protected Invocation<IN, OUT> newInvocation() {
     return new ServiceInvocation<IN, OUT>(mContext, mTargetFactory, mInvocationConfiguration,
         mServiceConfiguration, getLogger());
   }
@@ -243,7 +243,7 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
         logger.wrn(t, "error while handling Service message");
         mOutputChannel.abort(t);
         unbindService();
-        InvocationInterruptedException.throwIfInterrupt(t);
+        InterruptedInvocationException.throwIfInterrupt(t);
       }
     }
 
@@ -269,7 +269,7 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
               serviceContext.unbindService(mConnection);
 
             } catch (final Throwable t) {
-              InvocationInterruptedException.throwIfInterrupt(t);
+              InterruptedInvocationException.throwIfInterrupt(t);
               mLogger.wrn(t, "unbinding failed (maybe the connection was leaked...)");
             }
           }
@@ -357,7 +357,7 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
         logger.err(t, "error while sending Service invocation message");
         mIncomingHandler.unbindService();
         mOutputChannel.abort(InvocationException.wrapIfNeeded(t));
-        InvocationInterruptedException.throwIfInterrupt(t);
+        InterruptedInvocationException.throwIfInterrupt(t);
       }
     }
 
@@ -428,9 +428,10 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
     }
 
     @Override
-    public void onRecycle(final boolean isReused) {
+    public boolean onRecycle(final boolean isReused) {
       mInputChannel = null;
       mOutputChannel = null;
+      return true;
     }
 
     @Override

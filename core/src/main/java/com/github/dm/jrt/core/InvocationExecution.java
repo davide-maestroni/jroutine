@@ -17,9 +17,9 @@
 package com.github.dm.jrt.core;
 
 import com.github.dm.jrt.core.common.RoutineException;
+import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationException;
-import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -128,13 +128,14 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
       if (mIsInitialized) {
         try {
           invocation.onAbort(InvocationException.wrapIfNeeded(reason));
-          invocation.onRecycle(true);
-          manager.recycle(invocation);
 
         } catch (final Throwable t) {
           manager.discard(invocation);
-          InvocationInterruptedException.throwIfInterrupt(t);
+          InterruptedInvocationException.throwIfInterrupt(t);
+          return;
         }
+
+        manager.recycle(invocation);
 
       } else {
         // Initialization failed, so just discard the invocation
@@ -174,14 +175,10 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
       if (isComplete) {
         invocation.onComplete(resultChannel);
         try {
-          mIsTerminated = true;
-          invocation.onRecycle(true);
-          manager.recycle(invocation);
-
-        } catch (final Throwable t) {
-          logger.wrn(t, "Discarding invocation since it failed to be recycled");
-          manager.discard(invocation);
-          InvocationInterruptedException.throwIfInterrupt(t);
+          if (!mIsTerminated) {
+            mIsTerminated = true;
+            manager.recycle(invocation);
+          }
 
         } finally {
           resultChannel.closeImmediately();
@@ -195,7 +192,7 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
         recycle(t);
       }
 
-      InvocationInterruptedException.throwIfInterrupt(t);
+      InterruptedInvocationException.throwIfInterrupt(t);
     }
   }
 
@@ -308,7 +305,6 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
               mIsTerminated = true;
               try {
                 invocation.onAbort(exception);
-                invocation.onRecycle(true);
 
               } catch (final Throwable t) {
                 manager.discard(invocation);
@@ -333,7 +329,7 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
           }
 
           resultChannel.close(t);
-          InvocationInterruptedException.throwIfInterrupt(t);
+          InterruptedInvocationException.throwIfInterrupt(t);
         }
 
       } finally {

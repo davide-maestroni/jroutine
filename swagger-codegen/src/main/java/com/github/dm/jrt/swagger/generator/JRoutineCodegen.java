@@ -61,6 +61,8 @@ public class JRoutineCodegen extends JavaClientCodegen {
 
   private static final String ENABLE_SERVICES = "enableServices";
 
+  private static final String ENABLE_STREAMS = "enableStreams";
+
   private static final String JROUTINE_CODEGEN_VERSION = "jroutineCodegenVersion";
 
   private static final String PROJECT_NAME = "projectName";
@@ -86,7 +88,8 @@ public class JRoutineCodegen extends JavaClientCodegen {
     final List<CliOption> cliOptions = this.cliOptions;
     cliOptions.add(CliOption.newString(PROJECT_NAME,
         "The name of the project to prepend to the API classes."));
-    // TODO: 01/02/2017 enable streams
+    cliOptions.add(CliOption.newString(ENABLE_STREAMS,
+        "Whether to enable the use of routine stream builders."));
     cliOptions.add(CliOption.newBoolean(ENABLE_LOADERS,
         "Whether to enable requests made through Android Loaders."));
     cliOptions.add(CliOption.newBoolean(ENABLE_SERVICES,
@@ -115,6 +118,47 @@ public class JRoutineCodegen extends JavaClientCodegen {
       additionalProperties.remove(CONVERTER_JACKSON);
       additionalProperties.put(CONVERTER_GSON, "true");
     }
+  }
+
+  @Override
+  public void addOperationToGroup(final String tag, final String resourcePath,
+      final Operation operation, final CodegenOperation co,
+      final Map<String, List<CodegenOperation>> operations) {
+    String basePath = co.path;
+    if (basePath.startsWith("/")) {
+      basePath = basePath.substring(1);
+    }
+
+    int pos = basePath.indexOf("/");
+    if (pos > 0) {
+      basePath = basePath.substring(0, pos);
+    }
+
+    if (basePath.length() == 0) {
+      basePath = "default";
+
+    } else {
+      final String prefix = "/" + basePath;
+      if (co.path.startsWith(prefix)) {
+        co.subresourceOperation = co.path.length() > prefix.length();
+
+      } else {
+        co.subresourceOperation = co.path.length() != 0;
+      }
+    }
+
+    List<CodegenOperation> opList = operations.get(basePath);
+    if (opList == null) {
+      opList = new ArrayList<CodegenOperation>();
+      operations.put(basePath, opList);
+    }
+
+    opList.add(co);
+    co.baseName = basePath;
+  }
+
+  @Override
+  public void setLibrary(final String library) {
   }
 
   @Override
@@ -180,62 +224,6 @@ public class JRoutineCodegen extends JavaClientCodegen {
         super.fromOperation(path, httpMethod, operation, definitions, swagger);
     codegenOperation.path = swagger.getBasePath() + codegenOperation.path;
     return codegenOperation;
-  }
-
-  @Override
-  public String toApiName(final String name) {
-    final Map<String, Object> additionalProperties = this.additionalProperties;
-    if (additionalProperties.containsKey(ENABLE_LOADERS)) {
-      if (additionalProperties.containsKey(USE_SUPPORT_LIBRARY)) {
-        return ((name.length() == 0) ? "Default" : this.initialCaps(name)) + "LoaderApiCompat";
-
-      } else {
-        return ((name.length() == 0) ? "Default" : this.initialCaps(name)) + "LoaderApi";
-      }
-    }
-
-    return super.toApiName(name);
-  }
-
-  @Override
-  public void addOperationToGroup(final String tag, final String resourcePath,
-      final Operation operation, final CodegenOperation co,
-      final Map<String, List<CodegenOperation>> operations) {
-    String basePath = co.path;
-    if (basePath.startsWith("/")) {
-      basePath = basePath.substring(1);
-    }
-
-    int pos = basePath.indexOf("/");
-    if (pos > 0) {
-      basePath = basePath.substring(0, pos);
-    }
-
-    if (basePath.length() == 0) {
-      basePath = "default";
-
-    } else {
-      final String prefix = "/" + basePath;
-      if (co.path.startsWith(prefix)) {
-        co.subresourceOperation = co.path.length() > prefix.length();
-
-      } else {
-        co.subresourceOperation = co.path.length() != 0;
-      }
-    }
-
-    List<CodegenOperation> opList = operations.get(basePath);
-    if (opList == null) {
-      opList = new ArrayList<CodegenOperation>();
-      operations.put(basePath, opList);
-    }
-
-    opList.add(co);
-    co.baseName = basePath;
-  }
-
-  @Override
-  public void setLibrary(final String library) {
   }
 
   @NotNull

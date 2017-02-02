@@ -24,6 +24,9 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Empty abstract implementation of a Context invocation.
+ * <br>
+ * Note that the {@code onRecycle()} method must be explicitly overridden in order to enable
+ * recycling of invocations.
  * <p>
  * This class is useful to avoid the need of implementing all the methods defined in the interface.
  * <p>

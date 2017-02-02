@@ -49,7 +49,7 @@ class PrependOutputInvocationFactory<OUT> extends InvocationFactory<OUT, OUT> {
 
   @NotNull
   @Override
-  public Invocation<OUT, OUT> newInvocation() throws Exception {
+  public Invocation<OUT, OUT> newInvocation() {
     return new PrependOutputInvocation<OUT>(mChannel);
   }
 
@@ -74,14 +74,19 @@ class PrependOutputInvocationFactory<OUT> extends InvocationFactory<OUT, OUT> {
     }
 
     @Override
-    public void onComplete(@NotNull final Channel<OUT, ?> result) throws Exception {
+    public void onComplete(@NotNull final Channel<OUT, ?> result) {
       onResult(result);
     }
 
     @Override
-    public void onInput(final OUT input, @NotNull final Channel<OUT, ?> result) throws Exception {
+    public void onInput(final OUT input, @NotNull final Channel<OUT, ?> result) {
       onResult(result);
       result.pass(input);
+    }
+
+    @Override
+    public boolean onRecycle(final boolean isReused) {
+      return true;
     }
 
     @Override

@@ -89,7 +89,7 @@ task generateSwaggerCode(type: JavaExec, dependsOn: 'jar') {
       '--invoker-package', 'com.github.dm.jrt.swagger.client',
       '--model-package', 'com.github.dm.jrt.swagger.client.model',
       '--api-package', 'com.github.dm.jrt.swagger.client.api',
-      '-DconverterLibrary=jackson'
+      '-DenableStreams=true,converterLibrary=jackson'
 }
 
 task copySwaggerCode(type: Copy, dependsOn: 'generateSwaggerCode') {

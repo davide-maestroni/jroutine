@@ -90,8 +90,9 @@ class SortByInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
     }
 
     @Override
-    public void onRecycle(final boolean isReused) {
+    public boolean onRecycle(final boolean isReused) {
       mList = null;
+      return true;
     }
 
     @Override

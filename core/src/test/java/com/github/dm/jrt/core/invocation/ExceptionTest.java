@@ -51,23 +51,23 @@ public class ExceptionTest {
   @Test
   public void testInvocationInterruptedException() {
 
-    assertThat(new InvocationInterruptedException(
+    assertThat(new InterruptedInvocationException(
         new InterruptedException()).getCause()).isExactlyInstanceOf(InterruptedException.class);
-    assertThat(new InvocationInterruptedException(null)).hasNoCause();
-    InvocationInterruptedException.throwIfInterrupt(new NullPointerException());
+    assertThat(new InterruptedInvocationException(null)).hasNoCause();
+    InterruptedInvocationException.throwIfInterrupt(new NullPointerException());
     try {
-      InvocationInterruptedException.throwIfInterrupt(new InterruptedException());
+      InterruptedInvocationException.throwIfInterrupt(new InterruptedException());
       fail();
 
-    } catch (final InvocationInterruptedException ignored) {
+    } catch (final InterruptedInvocationException ignored) {
     }
 
     try {
-      InvocationInterruptedException.throwIfInterrupt(
-          new InvocationInterruptedException(new InterruptedException()));
+      InterruptedInvocationException.throwIfInterrupt(
+          new InterruptedInvocationException(new InterruptedException()));
       fail();
 
-    } catch (final InvocationInterruptedException ignored) {
+    } catch (final InterruptedInvocationException ignored) {
     }
   }
 }

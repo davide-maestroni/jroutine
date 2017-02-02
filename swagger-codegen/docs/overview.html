@@ -22,7 +22,7 @@
 <a href="https://github.com/davide-maestroni/jroutine" target="_blank">Parallel programming on the go.</a>
 <h1>Overview</h1>
 <p>
-    Swagger generator based on the <a href="http://davide-maestroni.github.io/jroutine/javadoc/7/retrofit" target="_blank">jroutine-retrofit</a> library.
+    Swagger code generator based on the <a href="http://davide-maestroni.github.io/jroutine/javadoc/7/retrofit" target="_blank">jroutine-retrofit</a> library.
 </p>
 <p>
     This module provides classes generating client code employing routines to perform network requests.<br/>
@@ -33,7 +33,7 @@
     <li>
         <a href="http://davide-maestroni.github.io/jroutine/javadoc/7/swagger-codegen/com/github/dm/jrt/swagger/generator/JRoutineCodegen.html">JRoutineCodegen</a>
         <p>
-            The Swagger generator.<br/>
+            The Swagger code generator.<br/>
             The generated code will depend on the <a href="http://davide-maestroni.github.io/jroutine/javadoc/7/retrofit" target="_blank">jroutine-retrofit</a> library.
         </p>
     </li>
@@ -136,8 +136,8 @@
 
                 final LoaderAdapterFactory adapterFactory =
                         LoaderAdapterFactory.on(loaderFrom(this)).buildFactory();
-                final RepoLoaderApi service = new RepoApiClient().withAdapterFactory(adapterFactory)
-                                                                 .createService(RepoLoaderApi.class);
+                final RepoApi service = new RepoApiClient().withAdapterFactory(adapterFactory)
+                                                           .createService(RepoApi.class);
                 service.getReposLoaderBuilder(USER_NAME)
                        .map(Operators.&lt;Repo&gt;unfold())
                        .close()
@@ -179,8 +179,8 @@
 
                 final LoaderAdapterFactoryCompat adapterFactory =
                         LoaderAdapterFactoryCompat.on(loaderFrom(this)).buildFactory();
-                final RepoLoaderApiCompat service = new RepoApiClient().withAdapterFactory(adapterFactory)
-                                                                       .createService(RepoLoaderApiCompat.class);
+                final RepoApi service = new RepoApiClient().withAdapterFactory(adapterFactory)
+                                                           .createService(RepoApi.class);
                 service.getReposLoaderBuilderCompat(USER_NAME)
                        .map(Operators.&lt;Repo&gt;unfold())
                        .close()

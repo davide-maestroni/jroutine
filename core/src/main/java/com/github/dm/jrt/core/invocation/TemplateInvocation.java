@@ -23,6 +23,9 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Empty abstract implementation of a routine invocation.
+ * <br>
+ * Note that the {@code onRecycle()} method must be explicitly overridden in order to enable
+ * recycling of invocations.
  * <p>
  * This class is useful to avoid the need of implementing all the methods defined in the interface.
  * <p>
@@ -42,7 +45,8 @@ public abstract class TemplateInvocation<IN, OUT> implements Invocation<IN, OUT>
   public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) throws Exception {
   }
 
-  public void onRecycle(final boolean isReused) throws Exception {
+  public boolean onRecycle(final boolean isReused) throws Exception {
+    return false;
   }
 
   public void onRestart() throws Exception {

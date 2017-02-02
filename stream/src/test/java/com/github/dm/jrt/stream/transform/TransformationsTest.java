@@ -686,6 +686,11 @@ public class TransformationsTest {
 
       result.pass(input);
     }
+
+    @Override
+    public boolean onRecycle(final boolean isReused) {
+      return true;
+    }
   }
 
   private static class UpperCase extends MappingInvocation<String, String> {

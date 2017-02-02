@@ -65,7 +65,7 @@ class TimeoutChannelConsumer<OUT> implements ChannelConsumer<OUT> {
     mOutputChannel = ConstantConditions.notNull("output channel", outputChannel);
   }
 
-  public void onComplete() throws Exception {
+  public void onComplete() {
     mOutputChannel.close();
   }
 

@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.core.runner;
 
-import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
+import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
 import com.github.dm.jrt.core.util.DurationMeasure;
 
 import org.jetbrains.annotations.NotNull;
@@ -241,7 +241,7 @@ class LocalRunner {
             DurationMeasure.nanos(delayNs).sleepAtLeast();
 
           } catch (final InterruptedException e) {
-            throw new InvocationInterruptedException(e);
+            throw new InterruptedInvocationException(e);
           }
         }
 

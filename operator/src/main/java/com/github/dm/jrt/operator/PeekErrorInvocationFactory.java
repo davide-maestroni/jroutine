@@ -52,7 +52,7 @@ class PeekErrorInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
 
   @NotNull
   @Override
-  public Invocation<DATA, DATA> newInvocation() throws Exception {
+  public Invocation<DATA, DATA> newInvocation() {
     return new PeekErrorInvocation<DATA>(mErrorConsumer);
   }
 
@@ -83,6 +83,11 @@ class PeekErrorInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
     @Override
     public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) {
       result.pass(input);
+    }
+
+    @Override
+    public boolean onRecycle(final boolean isReused) {
+      return true;
     }
   }
 }

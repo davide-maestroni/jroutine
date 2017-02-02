@@ -1353,48 +1353,64 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     @Override
     public void onInput(final ParcelableFlow<DATA> input, @NotNull final Channel<DATA, ?> result) {
-
       if (mFirstIndex == NO_INDEX) {
-
         mFirstIndex = input.id;
         result.pass(input.data);
 
       } else if (mFirstIndex == input.id) {
-
         result.pass(input.data);
       }
     }
 
     @Override
-    public void onRestart() {
+    public boolean onRecycle(final boolean isReused) {
+      return true;
+    }
 
+    @Override
+    public void onRestart() {
       mFirstIndex = NO_INDEX;
     }
   }
 
   private static class CharAt extends TemplateContextInvocation<List<?>, Character> {
 
+    @Override
     public void onInput(final List<?> objects, @NotNull final Channel<Character, ?> result) {
-
       final String text = (String) objects.get(0);
       final int index = ((Integer) objects.get(1));
       result.pass(text.charAt(index));
+    }
+
+    @Override
+    public boolean onRecycle(final boolean isReused) {
+      return true;
     }
   }
 
   private static class PassingInteger extends TemplateContextInvocation<Integer, Integer> {
 
+    @Override
     public void onInput(final Integer i, @NotNull final Channel<Integer, ?> result) {
-
       result.pass(i);
+    }
+
+    @Override
+    public boolean onRecycle(final boolean isReused) {
+      return true;
     }
   }
 
   private static class PassingString extends TemplateContextInvocation<String, String> {
 
+    @Override
     public void onInput(final String s, @NotNull final Channel<String, ?> result) {
-
       result.pass(s);
+    }
+
+    @Override
+    public boolean onRecycle(final boolean isReused) {
+      return true;
     }
   }
 
@@ -1405,11 +1421,10 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     private static final int STRING = 0;
 
+    @Override
     public void onInput(final ParcelableFlow<Object> flow,
         @NotNull final Channel<ParcelableFlow<Object>, ?> result) {
-
       switch (flow.id) {
-
         case INTEGER:
           AndroidChannels.<Object, Integer>parcelableFlowInput(result, INTEGER).buildChannel()
                                                                                .pass(
@@ -1425,6 +1440,11 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
                                                                              .close();
           break;
       }
+    }
+
+    @Override
+    public boolean onRecycle(final boolean isReused) {
+      return true;
     }
   }
 

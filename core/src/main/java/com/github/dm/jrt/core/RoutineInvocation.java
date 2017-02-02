@@ -69,9 +69,10 @@ public class RoutineInvocation<IN, OUT> extends ChannelInvocation<IN, OUT> {
   }
 
   @Override
-  public void onRecycle(final boolean isReused) throws Exception {
-    super.onRecycle(isReused);
+  public boolean onRecycle(final boolean isReused) throws Exception {
+    final boolean canRecycle = super.onRecycle(isReused);
     mRoutine.clear();
+    return canRecycle;
   }
 
   @NotNull

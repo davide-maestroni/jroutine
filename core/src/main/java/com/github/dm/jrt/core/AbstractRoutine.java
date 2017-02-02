@@ -18,8 +18,8 @@ package com.github.dm.jrt.core;
 
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
 import com.github.dm.jrt.core.invocation.Invocation;
-import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.routine.InvocationMode;
@@ -172,7 +172,7 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
       invocation.onRecycle(false);
 
     } catch (final Throwable t) {
-      InvocationInterruptedException.throwIfInterrupt(t);
+      InterruptedInvocationException.throwIfInterrupt(t);
       mLogger.wrn(t, "ignoring exception while discarding invocation instance");
     }
   }
@@ -232,6 +232,11 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
     public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) {
       mHasInputs = true;
       result.pass(mRoutine.call(input));
+    }
+
+    @Override
+    public boolean onRecycle(final boolean isReused) {
+      return true;
     }
 
     @Override
@@ -300,9 +305,25 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
     }
 
     public void recycle(@NotNull final Invocation<IN, OUT> invocation) {
+      final Logger logger = mLogger;
+      final boolean canRecycle;
+      try {
+        canRecycle = invocation.onRecycle(true);
+
+      } catch (final Throwable t) {
+        logger.wrn(t, "Discarding invocation since it failed to be recycled");
+        discard(invocation);
+        InterruptedInvocationException.throwIfInterrupt(t);
+        return;
+      }
+
+      if (!canRecycle) {
+        discard(invocation);
+        return;
+      }
+
       final boolean hasDelayed;
       synchronized (mMutex) {
-        final Logger logger = mLogger;
         final int coreInvocations = mCoreInvocations;
         final SimpleQueue<Invocation<IN, OUT>> invocations = mInvocations;
         if (invocations.size() < coreInvocations) {
@@ -373,7 +394,7 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
           return false;
         }
 
-      } catch (final InvocationInterruptedException e) {
+      } catch (final InterruptedInvocationException e) {
         throw e;
 
       } catch (final Throwable t) {

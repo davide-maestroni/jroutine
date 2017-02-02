@@ -85,8 +85,9 @@ class BinaryOperatorInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
   }
 
   @Override
-  public void onRecycle(final boolean isReused) {
+  public boolean onRecycle(final boolean isReused) {
     mResult = null;
+    return true;
   }
 
   @Override

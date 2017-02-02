@@ -120,8 +120,9 @@ class AccumulateFunctionInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> 
   }
 
   @Override
-  public void onRecycle(final boolean isReused) {
+  public boolean onRecycle(final boolean isReused) {
     mAccumulated = null;
+    return true;
   }
 
   @Override

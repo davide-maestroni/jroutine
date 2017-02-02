@@ -56,7 +56,7 @@ class PrependSupplierInvocationFactory<OUT> extends InvocationFactory<OUT, OUT> 
 
   @NotNull
   @Override
-  public Invocation<OUT, OUT> newInvocation() throws Exception {
+  public Invocation<OUT, OUT> newInvocation() {
     return new PrependSupplierInvocation<OUT>(mCount, mOutputSupplier);
   }
 
@@ -94,6 +94,11 @@ class PrependSupplierInvocationFactory<OUT> extends InvocationFactory<OUT, OUT> 
     public void onInput(final OUT input, @NotNull final Channel<OUT, ?> result) throws Exception {
       onResult(result);
       result.pass(input);
+    }
+
+    @Override
+    public boolean onRecycle(final boolean isReused) {
+      return true;
     }
 
     @Override

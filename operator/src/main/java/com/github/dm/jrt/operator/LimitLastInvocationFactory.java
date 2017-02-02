@@ -76,7 +76,7 @@ class LimitLastInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
     }
 
     @Override
-    public void onComplete(@NotNull final Channel<DATA, ?> result) throws Exception {
+    public void onComplete(@NotNull final Channel<DATA, ?> result) {
       result.pass(mData);
     }
 
@@ -90,8 +90,9 @@ class LimitLastInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
     }
 
     @Override
-    public void onRecycle(final boolean isReused) throws Exception {
+    public boolean onRecycle(final boolean isReused) {
       mData.clear();
+      return true;
     }
   }
 }

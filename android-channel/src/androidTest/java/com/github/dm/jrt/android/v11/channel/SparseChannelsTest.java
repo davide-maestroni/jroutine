@@ -837,17 +837,27 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
 
   private static class PassingInteger extends TemplateContextInvocation<Integer, Integer> {
 
+    @Override
     public void onInput(final Integer i, @NotNull final Channel<Integer, ?> result) {
-
       result.pass(i);
+    }
+
+    @Override
+    public boolean onRecycle(final boolean isReused) {
+      return true;
     }
   }
 
   private static class PassingString extends TemplateContextInvocation<String, String> {
 
+    @Override
     public void onInput(final String s, @NotNull final Channel<String, ?> result) {
-
       result.pass(s);
+    }
+
+    @Override
+    public boolean onRecycle(final boolean isReused) {
+      return true;
     }
   }
 
@@ -858,11 +868,10 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
 
     private static final int STRING = 0;
 
+    @Override
     public void onInput(final ParcelableFlow<Object> flow,
         @NotNull final Channel<ParcelableFlow<Object>, ?> result) {
-
       switch (flow.id) {
-
         case INTEGER:
           SparseChannels.<Object, Integer>parcelableFlowInput(result, INTEGER).buildChannel()
                                                                               .pass(
@@ -878,6 +887,11 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
                                                                             .close();
           break;
       }
+    }
+
+    @Override
+    public boolean onRecycle(final boolean isReused) {
+      return true;
     }
   }
 

@@ -1223,5 +1223,10 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
         @NotNull final Channel<ParcelableByteChunk, ?> result) {
       result.pass(input);
     }
+
+    @Override
+    public boolean onRecycle(final boolean isReused) {
+      return true;
+    }
   }
 }

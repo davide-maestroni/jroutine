@@ -26,7 +26,7 @@ import com.github.dm.jrt.channel.builder.ChunkStreamConfiguration.CloseActionTyp
 import com.github.dm.jrt.channel.io.ByteChannel.ChunkOutputStream;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
+import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.retrofit.ErrorResponseException;
 
@@ -131,12 +131,13 @@ public class ServiceCallInvocation
   }
 
   @Override
-  public void onRecycle(final boolean isReused) {
+  public boolean onRecycle(final boolean isReused) {
     mRequestData = null;
     mMediaType = null;
     mInputChannel = null;
     mHasMediaType = false;
     mHasRequest = false;
+    return true;
   }
 
   private void asyncRequest(@NotNull final Channel<ParcelableFlow<Object>, ?> result) throws
@@ -160,7 +161,7 @@ public class ServiceCallInvocation
 
         } catch (final Throwable t) {
           outputChannel.abort(t);
-          InvocationInterruptedException.throwIfInterrupt(t);
+          InterruptedInvocationException.throwIfInterrupt(t);
 
         } finally {
           outputChannel.close();

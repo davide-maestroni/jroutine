@@ -21,7 +21,7 @@ import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.common.RoutineException;
-import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
+import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;
@@ -132,7 +132,7 @@ public class JRoutineStream {
 
                 } catch (final Throwable t) {
                   outputChannel.abort(t);
-                  InvocationInterruptedException.throwIfInterrupt(t);
+                  InterruptedInvocationException.throwIfInterrupt(t);
                 }
               }
 
@@ -209,7 +209,7 @@ public class JRoutineStream {
 
                 } catch (final Throwable t) {
                   outputChannel.abort(t);
-                  InvocationInterruptedException.throwIfInterrupt(t);
+                  InterruptedInvocationException.throwIfInterrupt(t);
                 }
               }
 
@@ -316,7 +316,7 @@ public class JRoutineStream {
 
                 } catch (final Throwable t) {
                   outputChannel.abort(t);
-                  InvocationInterruptedException.throwIfInterrupt(t);
+                  InterruptedInvocationException.throwIfInterrupt(t);
                 }
               }
 

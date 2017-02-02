@@ -52,7 +52,7 @@ class ToArrayInvocationFactory<IN> extends InvocationFactory<IN, IN[]> {
 
   @NotNull
   @Override
-  public Invocation<IN, IN[]> newInvocation() throws Exception {
+  public Invocation<IN, IN[]> newInvocation() {
     return new ToArrayInvocation<IN>(mComponentType);
   }
 

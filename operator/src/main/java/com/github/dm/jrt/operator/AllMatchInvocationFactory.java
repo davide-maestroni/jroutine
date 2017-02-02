@@ -91,6 +91,11 @@ class AllMatchInvocationFactory<IN> extends InvocationFactory<IN, Boolean> {
     }
 
     @Override
+    public boolean onRecycle(final boolean isReused) {
+      return true;
+    }
+
+    @Override
     public void onRestart() {
       mIsMatch = true;
     }

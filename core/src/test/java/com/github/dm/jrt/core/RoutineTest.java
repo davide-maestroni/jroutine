@@ -37,11 +37,11 @@ import com.github.dm.jrt.core.config.InvocationConfiguration.AgingPriority;
 import com.github.dm.jrt.core.invocation.CallInvocation;
 import com.github.dm.jrt.core.invocation.CommandInvocation;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
+import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationDeadlockException;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
-import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.log.Log.Level;
@@ -2664,6 +2664,11 @@ public class RoutineTest {
     public void onInput(final String s, @NotNull final Channel<String, ?> result) {
       result.afterNoDelay().pass(s).after(mDelay).abort();
     }
+
+    @Override
+    public boolean onRecycle(final boolean isReused) {
+      return true;
+    }
   }
 
   private static class DelayedChannelInvocation extends TemplateInvocation<String, String> {
@@ -2691,6 +2696,11 @@ public class RoutineTest {
       result.pass(mRoutine.call(s));
       mFlag = !mFlag;
     }
+
+    @Override
+    public boolean onRecycle(final boolean isReused) {
+      return true;
+    }
   }
 
   private static class DelayedInvocation extends TemplateInvocation<String, String> {
@@ -2714,6 +2724,11 @@ public class RoutineTest {
 
       result.pass(s);
       mFlag = !mFlag;
+    }
+
+    @Override
+    public boolean onRecycle(final boolean isReused) {
+      return true;
     }
   }
 
@@ -2758,6 +2773,11 @@ public class RoutineTest {
       final ArrayList<String> list = mList;
       result.after(mDelay).pass(list).afterNoDelay();
       list.clear();
+    }
+
+    @Override
+    public boolean onRecycle(final boolean isReused) {
+      return true;
     }
   }
 
@@ -2995,7 +3015,7 @@ public class RoutineTest {
         mSleepDuration.sleepAtLeast();
 
       } catch (final InterruptedException e) {
-        throw new InvocationInterruptedException(e);
+        throw new InterruptedInvocationException(e);
       }
 
       result.pass(input);
@@ -3064,17 +3084,19 @@ public class RoutineTest {
     }
 
     @Override
-    public void onRecycle(final boolean isReused) {
+    public boolean onRecycle(final boolean isReused) {
       if (!isReused) {
         sInstanceCount.decrementAndGet();
       }
+
+      return true;
     }
   }
 
   private static class TestDiscardException extends TestDiscard {
 
     @Override
-    public void onRecycle(final boolean isReused) {
+    public boolean onRecycle(final boolean isReused) {
       super.onRecycle(isReused);
       throw new IllegalArgumentException("test");
     }
@@ -3144,6 +3166,11 @@ public class RoutineTest {
       if (!sActive) {
         sIsError = true;
       }
+    }
+
+    @Override
+    public boolean onRecycle(final boolean isReused) {
+      return true;
     }
 
     @Override

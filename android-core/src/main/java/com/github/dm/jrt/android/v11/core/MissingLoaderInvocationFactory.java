@@ -75,5 +75,10 @@ final class MissingLoaderInvocationFactory<OUT> extends ContextInvocationFactory
     public void onComplete(@NotNull final Channel<OUT, ?> result) {
       result.abort(new MissingLoaderException(mId));
     }
+
+    @Override
+    public boolean onRecycle(final boolean isReused) {
+      return true;
+    }
   }
 }

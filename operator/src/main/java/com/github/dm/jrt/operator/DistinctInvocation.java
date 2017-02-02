@@ -73,8 +73,9 @@ class DistinctInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
   }
 
   @Override
-  public void onRecycle(final boolean isReused) {
+  public boolean onRecycle(final boolean isReused) {
     mSet = null;
+    return true;
   }
 
   @Override

@@ -668,9 +668,10 @@ public class ServiceRoutineMethod extends RoutineMethod
     }
 
     @Override
-    public void onRecycle(final boolean isReused) {
+    public boolean onRecycle(final boolean isReused) {
       mInputChannels.clear();
       mOutputChannels.clear();
+      return true;
     }
 
     @Override
@@ -685,7 +686,7 @@ public class ServiceRoutineMethod extends RoutineMethod
     }
 
     @Override
-    public void onContext(@NotNull final Context context) throws Exception {
+    public void onContext(@NotNull final Context context) {
       mContext = context;
       final Object[] additionalArgs = mArgs;
       final Object[] constructorArgs = (mConstructorArgs = new Object[additionalArgs.length + 1]);

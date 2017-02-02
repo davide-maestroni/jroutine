@@ -18,9 +18,9 @@ package com.github.dm.jrt.core;
 
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.RoutineException;
+import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationDecorator;
-import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -62,10 +62,21 @@ public class LifecycleInvocationDecorator<IN, OUT> extends InvocationDecorator<I
     super(wrapped);
   }
 
+  @NotNull
+  private static String getMethodName() {
+    return Thread.currentThread().getStackTrace()[2].getMethodName();
+  }
+
+  private static void throwInvalidState(final State state) {
+    throw new LifecycleInterruptedException(
+        "Cannot call " + Thread.currentThread().getStackTrace()[2].getMethodName() + "() in state: "
+            + state);
+  }
+
   @Override
   public void onAbort(@NotNull final RoutineException reason) throws Exception {
     if (!TO_ABORT_STATES.contains(mState)) {
-      throw new InvocationInterruptedException(null);
+      throwInvalidState(mState);
     }
 
     mState = State.ABORT;
@@ -75,7 +86,7 @@ public class LifecycleInvocationDecorator<IN, OUT> extends InvocationDecorator<I
   @Override
   public void onComplete(@NotNull final Channel<OUT, ?> result) throws Exception {
     if (!TO_RESULT_STATES.contains(mState)) {
-      throw new InvocationInterruptedException(null);
+      throwInvalidState(mState);
     }
 
     mState = State.COMPLETE;
@@ -85,7 +96,7 @@ public class LifecycleInvocationDecorator<IN, OUT> extends InvocationDecorator<I
   @Override
   public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) throws Exception {
     if (!TO_INPUT_STATES.contains(mState)) {
-      throw new InvocationInterruptedException(null);
+      throwInvalidState(mState);
     }
 
     mState = State.INPUT;
@@ -93,23 +104,23 @@ public class LifecycleInvocationDecorator<IN, OUT> extends InvocationDecorator<I
   }
 
   @Override
-  public void onRecycle(final boolean isReused) throws Exception {
+  public boolean onRecycle(final boolean isReused) throws Exception {
     if (!TO_RECYCLE_STATES.contains(mState)) {
-      throw new InvocationInterruptedException(null);
+      throwInvalidState(mState);
     }
 
     if (isReused && (mState == State.RECYCLE)) {
-      throw new InvocationInterruptedException(null);
+      throw new LifecycleInterruptedException(getMethodName() + "() called twice with true");
     }
 
     mState = State.RECYCLE;
-    super.onRecycle(isReused);
+    return super.onRecycle(isReused);
   }
 
   @Override
   public void onRestart() throws Exception {
     if (!TO_START_STATES.contains(mState)) {
-      throw new InvocationInterruptedException(null);
+      throwInvalidState(mState);
     }
 
     mState = State.START;
@@ -122,5 +133,28 @@ public class LifecycleInvocationDecorator<IN, OUT> extends InvocationDecorator<I
     COMPLETE,
     ABORT,
     RECYCLE,
+  }
+
+  /**
+   * Interrupted exception.
+   */
+  private static class LifecycleInterruptedException extends InterruptedInvocationException {
+
+    private final String mMessage;
+
+    /**
+     * Constructor.
+     *
+     * @param message the error message.
+     */
+    private LifecycleInterruptedException(final String message) {
+      super(null);
+      mMessage = message;
+    }
+
+    @Override
+    public String getMessage() {
+      return mMessage;
+    }
   }
 }

@@ -142,8 +142,10 @@ generateSwaggerCode {
 The generator will support all the command line options available in the Swagger Java client generator. Additionally, a few specific ones are available in the command line and configuration file. Namely:
 
 1. *"projectName"* - the string will be used as prefix of some of the generated classes (optional)
-2. *"enableLoaders"* - if present the generated classes will support routines running in dedicated Android Loaders (optional)
-3. *"useSupportLibrary"* - if present the generated classes will make use of the Android Support Library for retro-compatibility (optional)
+2. *"enableStreams"* - if present the generated classes will support routine stream builders (optional)
+3. *"enableLoaders"* - if present the generated classes will support routines running in dedicated Android Loaders (optional)
+4. *"enableServices"* - if present the generated classes will support routines running in dedicated Android Services (optional)
+5. *"useSupportLibrary"* - if present the generated classes will make use of the Android Support Library for retro-compatibility (optional)
 
 ## Documentation
 

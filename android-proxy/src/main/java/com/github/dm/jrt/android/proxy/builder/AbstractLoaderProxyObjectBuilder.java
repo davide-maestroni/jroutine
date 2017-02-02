@@ -18,7 +18,7 @@ package com.github.dm.jrt.android.proxy.builder;
 
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
-import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
+import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DeepEqualObject;
@@ -162,7 +162,7 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
         return newInstance;
 
       } catch (final Throwable t) {
-        InvocationInterruptedException.throwIfInterrupt(t);
+        InterruptedInvocationException.throwIfInterrupt(t);
         throw new IllegalArgumentException(t);
       }
     }

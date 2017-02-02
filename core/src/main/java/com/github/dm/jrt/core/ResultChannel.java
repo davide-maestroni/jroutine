@@ -29,9 +29,9 @@ import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.ChannelConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
 import com.github.dm.jrt.core.invocation.InvocationDeadlockException;
 import com.github.dm.jrt.core.invocation.InvocationException;
-import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;
@@ -402,7 +402,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         isDone = DurationMeasure.waitUntil(mMutex, mIsComplete, timeout, timeoutUnit);
 
       } catch (final InterruptedException e) {
-        throw new InvocationInterruptedException(e);
+        throw new InterruptedInvocationException(e);
       }
 
       if (isDone) {
@@ -446,7 +446,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         isDone = DurationMeasure.waitUntil(mMutex, mIsError, timeout, timeoutUnit);
 
       } catch (final InterruptedException e) {
-        throw new InvocationInterruptedException(e);
+        throw new InterruptedInvocationException(e);
       }
 
       if (isDone) {
@@ -887,7 +887,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
           isTimeout = !DurationMeasure.waitUntil(mMutex, mOutputHasNext, timeout, timeUnit);
 
         } catch (final InterruptedException e) {
-          throw new InvocationInterruptedException(e);
+          throw new InterruptedInvocationException(e);
         }
 
         if (!isTimeout) {
@@ -977,7 +977,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
           isTimeout = !DurationMeasure.waitUntil(mMutex, mOutputNotEmpty, timeout, timeUnit);
 
         } catch (final InterruptedException e) {
-          throw new InvocationInterruptedException(e);
+          throw new InterruptedInvocationException(e);
         }
 
         if (!isTimeout) {
@@ -1027,7 +1027,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
       }
 
     } catch (final InterruptedException e) {
-      throw new InvocationInterruptedException(e);
+      throw new InterruptedInvocationException(e);
 
     } finally {
       mIWaitingOutput = false;
@@ -1230,11 +1230,11 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
                 consumer.onError(((RoutineExceptionWrapper) output).raise());
 
               } catch (final RoutineException e) {
-                InvocationInterruptedException.throwIfInterrupt(e);
+                InterruptedInvocationException.throwIfInterrupt(e);
                 logger.wrn(e, "ignoring consumer exception (%s)", consumer);
 
               } catch (final Throwable t) {
-                InvocationInterruptedException.throwIfInterrupt(t);
+                InterruptedInvocationException.throwIfInterrupt(t);
                 logger.err(t, "ignoring consumer exception (%s)", consumer);
               }
 
@@ -1259,7 +1259,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
             abortException = mState.abortConsumer(t);
           }
 
-          InvocationInterruptedException.throwIfInterrupt(t);
+          InterruptedInvocationException.throwIfInterrupt(t);
         }
       }
 
@@ -1911,11 +1911,11 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         consumer.onComplete();
 
       } catch (final RoutineException e) {
-        InvocationInterruptedException.throwIfInterrupt(e);
+        InterruptedInvocationException.throwIfInterrupt(e);
         logger.wrn(e, "ignoring consumer exception (%s)", consumer);
 
       } catch (final Throwable t) {
-        InvocationInterruptedException.throwIfInterrupt(t);
+        InterruptedInvocationException.throwIfInterrupt(t);
         logger.err(t, "ignoring consumer exception (%s)", consumer);
       }
     }

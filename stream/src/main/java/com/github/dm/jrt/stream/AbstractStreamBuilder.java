@@ -64,6 +64,7 @@ import static com.github.dm.jrt.function.Functions.functionMapping;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
+@SuppressWarnings("WeakerAccess")
 public abstract class AbstractStreamBuilder<IN, OUT> extends AbstractRoutineBuilder<IN, OUT>
     implements StreamBuilder<IN, OUT> {
 
@@ -460,7 +461,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends AbstractRoutineBuil
 
     @NotNull
     @Override
-    public Invocation<IN, OUT> newInvocation() throws Exception {
+    public Invocation<IN, OUT> newInvocation() {
       return new StreamInvocation<IN, OUT>(mBindingFunction);
     }
   }

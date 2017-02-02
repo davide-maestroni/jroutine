@@ -146,6 +146,11 @@ public abstract class ContextAdapterFactory extends AbstractAdapterFactory {
     public void onInput(final Call<Object> input, @NotNull final Channel<Object, ?> result) {
       result.pass(mCallAdapter.adapt(input));
     }
+
+    @Override
+    public boolean onRecycle(final boolean isReused) {
+      return true;
+    }
   }
 
   /**
@@ -195,6 +200,11 @@ public abstract class ContextAdapterFactory extends AbstractAdapterFactory {
     @Override
     public void onInput(final Call<Object> input, @NotNull final Channel<Object, ?> result) {
       result.pass(mCallAdapter.adapt(input));
+    }
+
+    @Override
+    public boolean onRecycle(final boolean isReused) {
+      return true;
     }
   }
 

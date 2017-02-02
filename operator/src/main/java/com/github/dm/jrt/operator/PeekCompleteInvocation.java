@@ -49,7 +49,7 @@ class PeekCompleteInvocation<DATA> extends GenerateInvocation<DATA, DATA> {
     mCompleteAction.perform();
   }
 
-  public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) throws Exception {
+  public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) {
     result.pass(input);
   }
 }

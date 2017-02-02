@@ -85,6 +85,11 @@ class AverageInvocation extends TemplateInvocation<Number, Number> {
   }
 
   @Override
+  public boolean onRecycle(final boolean isReused) {
+    return true;
+  }
+
+  @Override
   public void onRestart() {
     mSum = (byte) 0;
     mCount = 0;

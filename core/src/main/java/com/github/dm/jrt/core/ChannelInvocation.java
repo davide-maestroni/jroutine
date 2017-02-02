@@ -59,9 +59,10 @@ public abstract class ChannelInvocation<IN, OUT> implements Invocation<IN, OUT> 
     mInputChannel.pass(input);
   }
 
-  public void onRecycle(final boolean isReused) throws Exception {
+  public boolean onRecycle(final boolean isReused) throws Exception {
     mInputChannel = null;
     mOutputChannel = null;
+    return true;
   }
 
   public final void onRestart() throws Exception {

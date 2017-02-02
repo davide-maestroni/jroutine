@@ -61,8 +61,8 @@ public class ContextInvocationDecorator<IN, OUT> implements ContextInvocation<IN
   }
 
   @Override
-  public void onRecycle(final boolean isReused) throws Exception {
-    mInvocation.onRecycle(isReused);
+  public boolean onRecycle(final boolean isReused) throws Exception {
+    return mInvocation.onRecycle(isReused);
   }
 
   @Override

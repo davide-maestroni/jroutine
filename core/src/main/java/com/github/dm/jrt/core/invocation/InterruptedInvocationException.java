@@ -23,14 +23,14 @@ import org.jetbrains.annotations.Nullable;
  * <p>
  * Created by davide-maestroni on 09/08/2014.
  */
-public class InvocationInterruptedException extends InvocationException {
+public class InterruptedInvocationException extends InvocationException {
 
   /**
    * Constructor.
    *
    * @param cause the wrapped exception.
    */
-  public InvocationInterruptedException(@Nullable final InterruptedException cause) {
+  public InterruptedInvocationException(@Nullable final InterruptedException cause) {
     super(cause);
     Thread.currentThread().interrupt();
   }
@@ -39,17 +39,17 @@ public class InvocationInterruptedException extends InvocationException {
    * Checks if the specified throwable is not an interrupted exception.
    *
    * @param t the throwable.
-   * @throws InvocationInterruptedException if the specified throwable is an instance of
-   *                                        {@code InvocationInterruptedException} or
+   * @throws InterruptedInvocationException if the specified throwable is an instance of
+   *                                        {@code InterruptedInvocationException} or
    *                                        {@code InterruptedException}.
    */
   public static void throwIfInterrupt(@Nullable final Throwable t) {
-    if (t instanceof InvocationInterruptedException) {
-      throw ((InvocationInterruptedException) t);
+    if (t instanceof InterruptedInvocationException) {
+      throw ((InterruptedInvocationException) t);
     }
 
     if (t instanceof InterruptedException) {
-      throw new InvocationInterruptedException((InterruptedException) t);
+      throw new InterruptedInvocationException((InterruptedException) t);
     }
   }
 }

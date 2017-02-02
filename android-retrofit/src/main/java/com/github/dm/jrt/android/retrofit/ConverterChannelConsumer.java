@@ -121,7 +121,7 @@ class ConverterChannelConsumer implements ChannelConsumer<ParcelableFlow<Object>
   }
 
   @Override
-  public void onOutput(final ParcelableFlow<Object> output) throws Exception {
+  public void onOutput(final ParcelableFlow<Object> output) {
     switch (output.id) {
       case MEDIA_TYPE_ID:
         final String mediaType = output.data();

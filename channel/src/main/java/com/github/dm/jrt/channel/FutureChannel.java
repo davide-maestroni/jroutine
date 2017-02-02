@@ -23,8 +23,8 @@ import com.github.dm.jrt.core.channel.OutputTimeoutException;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.ChannelConfiguration.TimeoutActionType;
+import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
 import com.github.dm.jrt.core.invocation.InvocationException;
-import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;
@@ -191,7 +191,7 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
             return;
 
           } catch (final InterruptedException e) {
-            consumer.onError(new InvocationInterruptedException(e));
+            consumer.onError(new InterruptedInvocationException(e));
             return;
 
           } catch (final Throwable t) {
@@ -202,7 +202,7 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
           consumer.onComplete();
 
         } catch (final Throwable t) {
-          InvocationInterruptedException.throwIfInterrupt(t);
+          InterruptedInvocationException.throwIfInterrupt(t);
           mLogger.wrn(t, "consumer exception (%s)", consumer);
         }
       }
@@ -272,7 +272,7 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
       return AbortException.wrapIfNeeded(mAbortException.get());
 
     } catch (final InterruptedException e) {
-      return new InvocationInterruptedException(e);
+      return new InterruptedInvocationException(e);
 
     } catch (final Throwable t) {
       return InvocationException.wrapIfNeeded(t);
@@ -473,7 +473,7 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
       throw e;
 
     } catch (final Throwable t) {
-      InvocationInterruptedException.throwIfInterrupt(t);
+      InterruptedInvocationException.throwIfInterrupt(t);
       throw InvocationException.wrapIfNeeded(t);
     }
 
@@ -520,7 +520,7 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
       throw e;
 
     } catch (final Throwable t) {
-      InvocationInterruptedException.throwIfInterrupt(t);
+      InterruptedInvocationException.throwIfInterrupt(t);
       throw InvocationException.wrapIfNeeded(t);
     }
   }

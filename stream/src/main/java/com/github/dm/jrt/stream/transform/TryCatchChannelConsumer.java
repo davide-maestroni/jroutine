@@ -19,7 +19,7 @@ package com.github.dm.jrt.stream.transform;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.common.RoutineException;
-import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
+import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.BiConsumer;
 
@@ -63,7 +63,7 @@ class TryCatchChannelConsumer<OUT> implements ChannelConsumer<OUT> {
 
     } catch (final Throwable t) {
       channel.abort(t);
-      InvocationInterruptedException.throwIfInterrupt(t);
+      InterruptedInvocationException.throwIfInterrupt(t);
     }
   }
 

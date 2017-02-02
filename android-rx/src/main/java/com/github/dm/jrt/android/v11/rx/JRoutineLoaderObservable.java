@@ -267,7 +267,8 @@ public class JRoutineLoaderObservable {
     }
 
     @Override
-    public void onRecycle(final boolean isReused) {
+    public boolean onRecycle(final boolean isReused) {
+      return true;
     }
 
     @Override

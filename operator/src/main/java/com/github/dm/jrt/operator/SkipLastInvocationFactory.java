@@ -85,8 +85,9 @@ class SkipLastInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
     }
 
     @Override
-    public void onRecycle(final boolean isReused) throws Exception {
+    public boolean onRecycle(final boolean isReused) {
       mData.clear();
+      return true;
     }
   }
 }

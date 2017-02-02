@@ -369,20 +369,23 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
     private final int mCount;
 
     public PassingStringInvocation() {
-
       this(1);
     }
 
     public PassingStringInvocation(final int count) {
-
       mCount = count;
     }
 
+    @Override
     public void onInput(final String input, @NotNull final Channel<String, ?> result) {
-
       for (int i = 0; i < mCount; i++) {
         result.pass(input);
       }
+    }
+
+    @Override
+    public boolean onRecycle(final boolean isReused) {
+      return true;
     }
   }
 
@@ -392,20 +395,23 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
     private final int mCount;
 
     public PassingStringInvocation2() {
-
       this(1);
     }
 
     public PassingStringInvocation2(final int count) {
-
       mCount = count;
     }
 
+    @Override
     public void onInput(final String input, @NotNull final Channel<String, ?> result) {
-
       for (int i = 0; i < mCount; i++) {
         result.pass(input);
       }
+    }
+
+    @Override
+    public boolean onRecycle(final boolean isReused) {
+      return true;
     }
   }
 }

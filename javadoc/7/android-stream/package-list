@@ -1,2 +1,3 @@
-com.github.dm.jrt.android.v11.stream
-com.github.dm.jrt.android.v4.stream
+com.github.dm.jrt.android.stream.builder
+com.github.dm.jrt.android.v11.stream.transform
+com.github.dm.jrt.android.v4.stream.transform

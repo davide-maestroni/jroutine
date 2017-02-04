@@ -50,6 +50,7 @@
 <ul>
     <li><a href="http://davide-maestroni.github.io/jroutine/javadoc/7/android-core" target="_blank">jroutine-android-core</a> &mdash; core routine and channel classes</li>
     <li><a href="http://davide-maestroni.github.io/jroutine/javadoc/7/core" target="_blank">jroutine-core</a> &mdash; core routine and channel classes</li>
+    <li><a href="http://davide-maestroni.github.io/jroutine/javadoc/7/rx" target="_blank">jroutine-rx</a> &mdash; RxJava integration</li>
 </ul>
 <h2>Usage examples</h2>
 <p>
@@ -87,13 +88,11 @@
             protected void onCreate(final Bundle savedInstanceState) {
                 super.onCreate(savedInstanceState);
                 setContentView(R.layout.main_layout);
-                JRoutineLoaderObservable.with(Observable.just("Hello RxJava"))
+                JRoutineLoaderObservable.with(Observable.just("Hello RxJava").map(getMappingFunction()))
                                         .applyLoaderConfiguration()
                                         .withInvocationId(R.id.hello_invocation)
                                         .configured()
-                                        .subscribeOn(loaderFrom(this))
-                                        .map(getMappingFunction())
-                                        .observeOn(AndroidSchedulers.mainThread())
+                                        .observeOn(loaderFrom(this))
                                         .subscribe(getAction(this));
             }
         }
@@ -131,13 +130,11 @@
             protected void onCreate(final Bundle savedInstanceState) {
                 super.onCreate(savedInstanceState);
                 setContentView(R.layout.main_layout);
-                JRoutineLoaderObservableCompat.with(Observable.just("Hello RxJava"))
+                JRoutineLoaderObservableCompat.with(Observable.just("Hello RxJava").map(getMappingFunction()))
                                               .applyLoaderConfiguration()
                                               .withInvocationId(R.id.hello_invocation)
                                               .configured()
-                                              .subscribeOn(loaderFrom(this))
-                                              .map(getMappingFunction())
-                                              .observeOn(AndroidSchedulers.mainThread())
+                                              .observeOn(loaderFrom(this))
                                               .subscribe(getAction(this));
             }
         }

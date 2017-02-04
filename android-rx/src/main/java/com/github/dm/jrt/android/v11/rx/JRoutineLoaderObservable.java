@@ -22,23 +22,41 @@ import com.github.dm.jrt.android.core.config.LoaderConfigurable;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.core.invocation.ContextInvocation;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
+import com.github.dm.jrt.android.core.invocation.TemplateContextInvocation;
 import com.github.dm.jrt.android.core.routine.LoaderRoutine;
 import com.github.dm.jrt.android.v11.core.JRoutineLoader;
 import com.github.dm.jrt.android.v11.core.LoaderContext;
 import com.github.dm.jrt.core.channel.Channel;
+import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.InvocationConfigurable;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.rx.JRoutineObservable;
 
 import org.jetbrains.annotations.NotNull;
 
 import rx.Observable;
+import rx.Observable.OnSubscribe;
 import rx.Observable.Operator;
 import rx.Subscriber;
 
+import static com.github.dm.jrt.core.util.Reflection.asArgs;
+
 /**
  * Utility class integrating the JRoutine Android classes with RxJava ones.
+ * <p>
+ * The example below shows how it's possible to make the computation happen in a dedicated Loader:
+ * <pre><code>
+ * JRoutineLoaderObservable.with(myObservable)
+ *                         .applyLoaderConfiguration()
+ *                         .withInvocationId(INVOCATION_ID)
+ *                         .configured()
+ *                         .observeOn(loaderFrom(activity))
+ *                         .subscribe(getAction());
+ * </code></pre>
+ * Note that the Loader ID, by default, will only depend on the inputs, so, in order to avoid
+ * clashing, it is advisable to explicitly set one through the configuration.
  * <p>
  * See {@link com.github.dm.jrt.android.v4.rx.JRoutineLoaderObservableCompat
  * JRoutineLoaderObservableCompat} for support of API levels lower than
@@ -50,25 +68,11 @@ import rx.Subscriber;
 public class JRoutineLoaderObservable {
 
   /**
-   * Returns a Loader observable instance wrapping the specified one.
-   * <p>
-   * The example below shows how it's possible to make the computation happen in a dedicated Loader:
-   * <pre><code>
-   * JRoutineLoaderObservable.with(myObservable)
-   *                         .applyLoaderConfiguration()
-   *                         .withInvocationId(INVOCATION_ID)
-   *                         .configured()
-   *                         .subscribeOn(loaderFrom(activity))
-   *                         .map(getMappingFunction())
-   *                         .observeOn(AndroidSchedulers.mainThread())
-   *                         .subscribe(getAction());
-   * </code></pre>
-   * Note that the Loader ID, by default, will only depend on the inputs, so that, in order to avoid
-   * clashing, it is advisable to explicitly set the invocation ID like shown in the example.
+   * Returns a Loader Observable instance wrapping the specified one.
    *
-   * @param observable the observable.
+   * @param observable the Observable.
    * @param <DATA>     the data type.
-   * @return the Loader observable.
+   * @return the Loader Observable.
    */
   @NotNull
   public static <DATA> LoaderObservable<DATA> with(@NotNull final Observable<DATA> observable) {
@@ -76,7 +80,7 @@ public class JRoutineLoaderObservable {
   }
 
   /**
-   * Class wrapping an observable so to enable it to dispatch data to a dedicated Loader.
+   * Class wrapping an Observable so to enable it to dispatch data to a dedicated Loader.
    *
    * @param <DATA> the data type.
    */
@@ -94,10 +98,10 @@ public class JRoutineLoaderObservable {
     /**
      * Constructor.
      *
-     * @param observable the observable.
+     * @param observable the Observable.
      */
     private LoaderObservable(@NotNull final Observable<DATA> observable) {
-      mObservable = ConstantConditions.notNull("observable", observable);
+      mObservable = ConstantConditions.notNull("Observable", observable);
     }
 
     @NotNull
@@ -131,10 +135,25 @@ public class JRoutineLoaderObservable {
     }
 
     /**
-     * Returns an observable dispatching data to a dedicated Loader.
+     * Returns an Observable performing its emissions and notifications in a dedicated Loader.
+     * <br>
+     * The returned Observable will asynchronously subscribe Observers on the main thread.
      *
      * @param context the Loader context.
-     * @return the observable.
+     * @return the Observable.
+     */
+    @NotNull
+    public Observable<DATA> observeOn(@NotNull final LoaderContext context) {
+      return Observable.create(
+          new OnSubscribeLoader<DATA>(context, mInvocationConfiguration, mLoaderConfiguration,
+              mObservable));
+    }
+
+    /**
+     * Returns an Observable asynchronously subscribing Observers in a dedicated Loader.
+     *
+     * @param context the Loader context.
+     * @return the Observable.
      */
     @NotNull
     public Observable<DATA> subscribeOn(@NotNull final LoaderContext context) {
@@ -144,7 +163,7 @@ public class JRoutineLoaderObservable {
   }
 
   /**
-   * Operator enabling an observable to dispatch data to a dedicated Loader.
+   * Operator enabling an Observable to dispatch data to a dedicated Loader.
    *
    * @param <DATA> the data type.
    */
@@ -221,6 +240,150 @@ public class JRoutineLoaderObservable {
     public void onStart() {
       super.onStart();
       mChannel = mRoutine.call();
+    }
+  }
+
+  /**
+   * Context invocation passing Observable data to the result channel.
+   *
+   * @param <DATA> the data type.
+   */
+  private static class ObservableInvocation<DATA> extends TemplateContextInvocation<Void, DATA> {
+
+    private final Observable<DATA> mObservable;
+
+    /**
+     * Constructor.
+     *
+     * @param observable the Observable instance.
+     */
+    private ObservableInvocation(final Observable<DATA> observable) {
+      mObservable = observable;
+    }
+
+    @Override
+    public void onComplete(@NotNull final Channel<DATA, ?> result) {
+      JRoutineObservable.with(mObservable).buildChannel().bind(result);
+    }
+
+    @Override
+    public boolean onRecycle(final boolean isReused) {
+      return true;
+    }
+  }
+
+  /**
+   * Factory of context invocations passing Observable data to the result channel.
+   *
+   * @param <DATA> the data type.
+   */
+  private static class ObservableInvocationFactory<DATA>
+      extends ContextInvocationFactory<Void, DATA> {
+
+    private final Observable<DATA> mObservable;
+
+    /**
+     * Constructor.
+     *
+     * @param observable the Observable instance.
+     */
+    private ObservableInvocationFactory(@NotNull final Observable<DATA> observable) {
+      super(asArgs(observable));
+      mObservable = observable;
+    }
+
+    @NotNull
+    @Override
+    public ContextInvocation<Void, DATA> newInvocation() throws Exception {
+      return new ObservableInvocation<DATA>(mObservable);
+    }
+  }
+
+  /**
+   * Subscription listener calling the subscriber in a dedicated Loader.
+   *
+   * @param <DATA> the data type.
+   */
+  private static class OnSubscribeLoader<DATA> implements OnSubscribe<DATA> {
+
+    private final LoaderContext mContext;
+
+    private final InvocationConfiguration mInvocationConfiguration;
+
+    private final LoaderConfiguration mLoaderConfiguration;
+
+    private final Observable<DATA> mObservable;
+
+    /**
+     * Constructor.
+     *
+     * @param context                 the Loader context.
+     * @param invocationConfiguration the invocation configuration.
+     * @param loaderConfiguration     the loader configuration.
+     * @param observable              the Observable instance.
+     */
+    private OnSubscribeLoader(@NotNull final LoaderContext context,
+        @NotNull final InvocationConfiguration invocationConfiguration,
+        @NotNull final LoaderConfiguration loaderConfiguration,
+        @NotNull final Observable<DATA> observable) {
+      mContext = ConstantConditions.notNull("loader context", context);
+      mInvocationConfiguration = invocationConfiguration;
+      mLoaderConfiguration = loaderConfiguration;
+      mObservable = observable;
+    }
+
+    @Override
+    public void call(final Subscriber<? super DATA> subscriber) {
+      JRoutineLoader.on(mContext)
+                    .with(new ObservableInvocationFactory<DATA>(mObservable))
+                    .apply(mInvocationConfiguration)
+                    .apply(mLoaderConfiguration)
+                    .call()
+                    .bind(new SubscriberConsumer<DATA>(subscriber))
+                    .close();
+    }
+  }
+
+  /**
+   * Channel consumer passing data to a subscriber.
+   *
+   * @param <DATA> the data type.
+   */
+  private static class SubscriberConsumer<DATA> implements ChannelConsumer<DATA> {
+
+    private final Subscriber<? super DATA> mSubscriber;
+
+    /**
+     * Constructor.
+     *
+     * @param subscriber the subscriber instance.
+     */
+    private SubscriberConsumer(@NotNull final Subscriber<? super DATA> subscriber) {
+      mSubscriber = subscriber;
+    }
+
+    @Override
+    public void onComplete() {
+      final Subscriber<? super DATA> subscriber = mSubscriber;
+      if (!subscriber.isUnsubscribed()) {
+        subscriber.onCompleted();
+      }
+    }
+
+    @Override
+    public void onError(@NotNull final RoutineException error) {
+      final Subscriber<? super DATA> subscriber = mSubscriber;
+      if (!subscriber.isUnsubscribed()) {
+        subscriber.onError(error.getCause());
+      }
+    }
+
+    @Override
+    public void onOutput(final DATA output) {
+      final Subscriber<? super DATA> subscriber = mSubscriber;
+      if (!subscriber.isUnsubscribed()) {
+        subscriber.onNext(output);
+      }
     }
   }
 

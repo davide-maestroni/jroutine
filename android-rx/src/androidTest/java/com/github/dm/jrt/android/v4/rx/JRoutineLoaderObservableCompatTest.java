@@ -51,7 +51,41 @@ public class JRoutineLoaderObservableCompatTest
     super(TestActivity.class);
   }
 
-  public void testActivity() throws InterruptedException {
+  public void testActivityObserveOn() throws InterruptedException {
+    final CountDownLatch latch = new CountDownLatch(3);
+    final List<String> expected = Arrays.asList("TEST1", "TEST2", "TEST3");
+    final AtomicBoolean isSuccess = new AtomicBoolean(true);
+    JRoutineLoaderObservableCompat.with(
+        Observable.just("test1", "test2", "test3").map(new Func1<String, String>() {
+
+          @Override
+          public String call(final String s) {
+            return s.toUpperCase();
+          }
+        }))
+                                  .applyInvocationConfiguration()
+                                  .withLog(AndroidLogs.androidLog())
+                                  .configured()
+                                  .applyLoaderConfiguration()
+                                  .withResultStaleTime(seconds(10))
+                                  .configured()
+                                  .observeOn(loaderFrom(getActivity()))
+                                  .subscribe(new Action1<String>() {
+
+                                    @Override
+                                    public void call(final String s) {
+                                      if (!expected.contains(s)) {
+                                        isSuccess.set(false);
+                                      }
+
+                                      latch.countDown();
+                                    }
+                                  });
+    latch.await(10, TimeUnit.SECONDS);
+    assertThat(isSuccess.get()).isTrue();
+  }
+
+  public void testActivitySubscribeOn() throws InterruptedException {
     final CountDownLatch latch = new CountDownLatch(3);
     final List<String> expected = Arrays.asList("TEST1", "TEST2", "TEST3");
     final AtomicBoolean isSuccess = new AtomicBoolean(true);
@@ -86,7 +120,35 @@ public class JRoutineLoaderObservableCompatTest
     assertThat(isSuccess.get()).isTrue();
   }
 
-  public void testFragment() throws InterruptedException {
+  public void testFragmentObserveOn() throws InterruptedException {
+    final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+                                                              .findFragmentById(R.id.test_fragment);
+    final CountDownLatch latch = new CountDownLatch(3);
+    final List<String> expected = Arrays.asList("TEST1", "TEST2", "TEST3");
+    final AtomicBoolean isSuccess = new AtomicBoolean(true);
+    JRoutineLoaderObservableCompat.with(
+        Observable.just("test1", "test2", "test3").map(new Func1<String, String>() {
+
+          @Override
+          public String call(final String s) {
+            return s.toUpperCase();
+          }
+        })).observeOn(loaderFrom(fragment)).subscribe(new Action1<String>() {
+
+      @Override
+      public void call(final String s) {
+        if (!expected.contains(s)) {
+          isSuccess.set(false);
+        }
+
+        latch.countDown();
+      }
+    });
+    latch.await(10, TimeUnit.SECONDS);
+    assertThat(isSuccess.get()).isTrue();
+  }
+
+  public void testFragmentSubscribeOn() throws InterruptedException {
     final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                               .findFragmentById(R.id.test_fragment);
     final CountDownLatch latch = new CountDownLatch(3);

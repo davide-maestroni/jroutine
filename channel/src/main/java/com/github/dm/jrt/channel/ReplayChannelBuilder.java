@@ -44,6 +44,6 @@ class ReplayChannelBuilder<OUT> extends AbstractChannelBuilder<OUT, OUT> {
 
   @NotNull
   public Channel<OUT, OUT> buildChannel() {
-    return new ReplayChannel<OUT>(getConfiguration(), mChannel);
+    return new ReplayOutputChannel<OUT>(getConfiguration(), mChannel);
   }
 }

@@ -137,7 +137,7 @@ public class Operators {
    */
   @NotNull
   public static <DATA> InvocationFactory<DATA, DATA> append(@Nullable final DATA output) {
-    return append(Channels.replay(JRoutineCore.of(output).buildChannel()).buildChannel());
+    return append(Channels.replayOutput(JRoutineCore.of(output).buildChannel()).buildChannel());
   }
 
   /**
@@ -149,7 +149,7 @@ public class Operators {
    */
   @NotNull
   public static <DATA> InvocationFactory<DATA, DATA> append(@Nullable final DATA... outputs) {
-    return append(Channels.replay(JRoutineCore.of(outputs).buildChannel()).buildChannel());
+    return append(Channels.replayOutput(JRoutineCore.of(outputs).buildChannel()).buildChannel());
   }
 
   /**
@@ -163,7 +163,7 @@ public class Operators {
   @NotNull
   public static <DATA> InvocationFactory<DATA, DATA> append(
       @Nullable final Iterable<? extends DATA> outputs) {
-    return append(Channels.replay(JRoutineCore.of(outputs).buildChannel()).buildChannel());
+    return append(Channels.replayOutput(JRoutineCore.of(outputs).buildChannel()).buildChannel());
   }
 
   /**
@@ -172,7 +172,7 @@ public class Operators {
    * <p>
    * Note that the passed channel will be bound as a result of the call, so, in order to support
    * multiple invocations, consider wrapping the channel in a replayable one, by calling the
-   * {@link Channels#replay(Channel)} utility method.
+   * {@link Channels#replayOutput(Channel)} utility method.
    *
    * @param channel the output channel.
    * @param <DATA>  the data type.
@@ -853,7 +853,7 @@ public class Operators {
    */
   @NotNull
   public static <DATA> InvocationFactory<DATA, DATA> orElse(@Nullable final DATA output) {
-    return orElse(Channels.replay(JRoutineCore.of(output).buildChannel()).buildChannel());
+    return orElse(Channels.replayOutput(JRoutineCore.of(output).buildChannel()).buildChannel());
   }
 
   /**
@@ -866,7 +866,7 @@ public class Operators {
    */
   @NotNull
   public static <DATA> InvocationFactory<DATA, DATA> orElse(@Nullable final DATA... outputs) {
-    return orElse(Channels.replay(JRoutineCore.of(outputs).buildChannel()).buildChannel());
+    return orElse(Channels.replayOutput(JRoutineCore.of(outputs).buildChannel()).buildChannel());
   }
 
   /**
@@ -880,7 +880,7 @@ public class Operators {
   @NotNull
   public static <DATA> InvocationFactory<DATA, DATA> orElse(
       @Nullable final Iterable<? extends DATA> outputs) {
-    return orElse(Channels.replay(JRoutineCore.of(outputs).buildChannel()).buildChannel());
+    return orElse(Channels.replayOutput(JRoutineCore.of(outputs).buildChannel()).buildChannel());
   }
 
   /**
@@ -889,7 +889,7 @@ public class Operators {
    * <p>
    * Note that the passed channel will be bound as a result of the call, so, in order to support
    * multiple invocations, consider wrapping the channel in a replayable one, by calling the
-   * {@link Channels#replay(Channel)} utility method.
+   * {@link Channels#replayOutput(Channel)} utility method.
    *
    * @param channel the output channel.
    * @param <DATA>  the data type.
@@ -1053,7 +1053,7 @@ public class Operators {
    */
   @NotNull
   public static <DATA> InvocationFactory<DATA, DATA> prepend(@Nullable final DATA output) {
-    return prepend(Channels.replay(JRoutineCore.of(output).buildChannel()).buildChannel());
+    return prepend(Channels.replayOutput(JRoutineCore.of(output).buildChannel()).buildChannel());
   }
 
   /**
@@ -1068,7 +1068,7 @@ public class Operators {
    */
   @NotNull
   public static <DATA> InvocationFactory<DATA, DATA> prepend(@Nullable final DATA... outputs) {
-    return prepend(Channels.replay(JRoutineCore.of(outputs).buildChannel()).buildChannel());
+    return prepend(Channels.replayOutput(JRoutineCore.of(outputs).buildChannel()).buildChannel());
   }
 
   /**
@@ -1085,7 +1085,7 @@ public class Operators {
   @NotNull
   public static <DATA> InvocationFactory<DATA, DATA> prepend(
       @Nullable final Iterable<? extends DATA> outputs) {
-    return prepend(Channels.replay(JRoutineCore.of(outputs).buildChannel()).buildChannel());
+    return prepend(Channels.replayOutput(JRoutineCore.of(outputs).buildChannel()).buildChannel());
   }
 
   /**
@@ -1097,7 +1097,7 @@ public class Operators {
    * <p>
    * Note that the passed channel will be bound as a result of the call, so, in order to support
    * multiple invocations, consider wrapping the channel in a replayable one, by calling the
-   * {@link Channels#replay(Channel)} utility method.
+   * {@link Channels#replayOutput(Channel)} utility method.
    *
    * @param channel the output channel.
    * @param <DATA>  the data type.
@@ -1500,7 +1500,7 @@ public class Operators {
    */
   @NotNull
   public static <IN, OUT> InvocationFactory<IN, OUT> then(@Nullable final OUT output) {
-    return then(Channels.replay(JRoutineCore.of(output).buildChannel()).buildChannel());
+    return then(Channels.replayOutput(JRoutineCore.of(output).buildChannel()).buildChannel());
   }
 
   /**
@@ -1516,7 +1516,7 @@ public class Operators {
    */
   @NotNull
   public static <IN, OUT> InvocationFactory<IN, OUT> then(@Nullable final OUT... outputs) {
-    return then(Channels.replay(JRoutineCore.of(outputs).buildChannel()).buildChannel());
+    return then(Channels.replayOutput(JRoutineCore.of(outputs).buildChannel()).buildChannel());
   }
 
   /**
@@ -1533,7 +1533,7 @@ public class Operators {
   @NotNull
   public static <IN, OUT> InvocationFactory<IN, OUT> then(
       @Nullable final Iterable<? extends OUT> outputs) {
-    return then(Channels.replay(JRoutineCore.of(outputs).buildChannel()).buildChannel());
+    return then(Channels.replayOutput(JRoutineCore.of(outputs).buildChannel()).buildChannel());
   }
 
   /**
@@ -1544,7 +1544,7 @@ public class Operators {
    * <p>
    * Note that the passed channel will be bound as a result of the call, so, in order to support
    * multiple invocations, consider wrapping the channel in a replayable one, by calling the
-   * {@link Channels#replay(Channel)} utility method.
+   * {@link Channels#replayOutput(Channel)} utility method.
    *
    * @param channel the output channel.
    * @param <IN>    the input data type.

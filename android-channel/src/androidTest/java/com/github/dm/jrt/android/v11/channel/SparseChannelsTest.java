@@ -76,277 +76,6 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
     return map;
   }
 
-  public void testCombine() {
-
-    if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-      return;
-    }
-
-    final Channel<String, String> channel1 = JRoutineLoader.on(loaderFrom(getActivity()))
-                                                           .with(factoryOf(PassingString.class))
-                                                           .call()
-                                                           .sorted();
-    final Channel<Integer, Integer> channel2 = JRoutineLoader.on(loaderFrom(getActivity()))
-                                                             .with(factoryOf(PassingInteger.class))
-                                                             .call()
-                                                             .sorted();
-    SparseChannels.combine(channel1, channel2)
-                  .buildChannel()
-                  .pass(new ParcelableFlow<String>(0, "test1"))
-                  .pass(new ParcelableFlow<Integer>(1, 1))
-                  .close();
-    SparseChannels.combine(3, channel1, channel2)
-                  .buildChannel()
-                  .pass(new ParcelableFlow<String>(3, "test2"))
-                  .pass(new ParcelableFlow<Integer>(4, 2))
-                  .close();
-    SparseChannels.combine(Arrays.<Channel<?, ?>>asList(channel1, channel2))
-                  .buildChannel()
-                  .pass(new ParcelableFlow<String>(0, "test3"))
-                  .pass(new ParcelableFlow<Integer>(1, 3))
-                  .close();
-    SparseChannels.combine(-5, Arrays.<Channel<?, ?>>asList(channel1, channel2))
-                  .buildChannel()
-                  .pass(new ParcelableFlow<String>(-5, "test4"))
-                  .pass(new ParcelableFlow<Integer>(-4, 4))
-                  .close();
-    final SparseArray<Channel<?, ?>> map = new SparseArray<Channel<?, ?>>(2);
-    map.put(31, channel1);
-    map.put(17, channel2);
-    SparseChannels.combine(map)
-                  .buildChannel()
-                  .pass(new ParcelableFlow<String>(31, "test5"))
-                  .pass(new ParcelableFlow<Integer>(17, 5))
-                  .close();
-    assertThat(channel1.close().in(seconds(10)).all()).containsExactly("test1", "test2", "test3",
-        "test4", "test5");
-    assertThat(channel2.close().in(seconds(10)).all()).containsExactly(1, 2, 3, 4, 5);
-  }
-
-  public void testCombineAbort() {
-
-    if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-      return;
-    }
-
-    Channel<String, String> channel1;
-    Channel<Integer, Integer> channel2;
-    channel1 = JRoutineLoader.on(loaderFrom(getActivity()))
-                             .with(factoryOf(PassingString.class))
-                             .call()
-                             .sorted();
-    channel2 = JRoutineLoader.on(loaderFrom(getActivity()))
-                             .with(factoryOf(PassingInteger.class))
-                             .call()
-                             .sorted();
-    SparseChannels.combine(channel1, channel2).buildChannel().abort();
-
-    try {
-
-      channel1.close().in(seconds(10)).next();
-
-      fail();
-
-    } catch (final AbortException ignored) {
-
-    }
-
-    try {
-
-      channel2.close().in(seconds(10)).next();
-
-      fail();
-
-    } catch (final AbortException ignored) {
-
-    }
-
-    channel1 = JRoutineLoader.on(loaderFrom(getActivity()))
-                             .with(factoryOf(PassingString.class))
-                             .call()
-                             .sorted();
-    channel2 = JRoutineLoader.on(loaderFrom(getActivity()))
-                             .with(factoryOf(PassingInteger.class))
-                             .call()
-                             .sorted();
-    SparseChannels.combine(3, channel1, channel2).buildChannel().abort();
-
-    try {
-
-      channel1.close().in(seconds(10)).next();
-
-      fail();
-
-    } catch (final AbortException ignored) {
-
-    }
-
-    try {
-
-      channel2.close().in(seconds(10)).next();
-
-      fail();
-
-    } catch (final AbortException ignored) {
-
-    }
-
-    channel1 = JRoutineLoader.on(loaderFrom(getActivity()))
-                             .with(factoryOf(PassingString.class))
-                             .call()
-                             .sorted();
-    channel2 = JRoutineLoader.on(loaderFrom(getActivity()))
-                             .with(factoryOf(PassingInteger.class))
-                             .call()
-                             .sorted();
-    SparseChannels.combine(Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannel().abort();
-
-    try {
-
-      channel1.close().in(seconds(10)).next();
-
-      fail();
-
-    } catch (final AbortException ignored) {
-
-    }
-
-    try {
-
-      channel2.close().in(seconds(10)).next();
-
-      fail();
-
-    } catch (final AbortException ignored) {
-
-    }
-
-    channel1 = JRoutineLoader.on(loaderFrom(getActivity()))
-                             .with(factoryOf(PassingString.class))
-                             .call()
-                             .sorted();
-    channel2 = JRoutineLoader.on(loaderFrom(getActivity()))
-                             .with(factoryOf(PassingInteger.class))
-                             .call()
-                             .sorted();
-    SparseChannels.combine(-5, Arrays.<Channel<?, ?>>asList(channel1, channel2))
-                  .buildChannel()
-                  .abort();
-
-    try {
-
-      channel1.close().in(seconds(10)).next();
-
-      fail();
-
-    } catch (final AbortException ignored) {
-
-    }
-
-    try {
-
-      channel2.close().in(seconds(10)).next();
-
-      fail();
-
-    } catch (final AbortException ignored) {
-
-    }
-
-    channel1 = JRoutineLoader.on(loaderFrom(getActivity()))
-                             .with(factoryOf(PassingString.class))
-                             .call()
-                             .sorted();
-    channel2 = JRoutineLoader.on(loaderFrom(getActivity()))
-                             .with(factoryOf(PassingInteger.class))
-                             .call()
-                             .sorted();
-    final SparseArray<Channel<?, ?>> map = new SparseArray<Channel<?, ?>>(2);
-    map.put(31, channel1);
-    map.put(17, channel2);
-    SparseChannels.combine(map).buildChannel().abort();
-
-    try {
-
-      channel1.close().in(seconds(10)).next();
-
-      fail();
-
-    } catch (final AbortException ignored) {
-
-    }
-
-    try {
-
-      channel2.close().in(seconds(10)).next();
-
-      fail();
-
-    } catch (final AbortException ignored) {
-
-    }
-  }
-
-  public void testCombineError() {
-
-    if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-      return;
-    }
-
-    try {
-
-      SparseChannels.combine();
-
-      fail();
-
-    } catch (final IllegalArgumentException ignored) {
-
-    }
-
-    try {
-
-      SparseChannels.combine(0);
-
-      fail();
-
-    } catch (final IllegalArgumentException ignored) {
-
-    }
-
-    try {
-
-      SparseChannels.combine(Collections.<Channel<?, ?>>emptyList());
-
-      fail();
-
-    } catch (final IllegalArgumentException ignored) {
-
-    }
-
-    try {
-
-      SparseChannels.combine(0, Collections.<Channel<?, ?>>emptyList());
-
-      fail();
-
-    } catch (final IllegalArgumentException ignored) {
-
-    }
-
-    try {
-
-      SparseChannels.combine(new SparseArray<Channel<?, ?>>(0));
-
-      fail();
-
-    } catch (final IllegalArgumentException ignored) {
-
-    }
-  }
-
   @SuppressWarnings("unchecked")
   public void testConfiguration() {
     final Channel<ParcelableFlow<String>, ParcelableFlow<String>> channel =
@@ -513,7 +242,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
     final Channel<Integer, Integer> channel2 = builder2.buildChannel();
 
     final Channel<?, ? extends ParcelableFlow<Object>> channel =
-        SparseChannels.mergeParcelable(Arrays.<Channel<?, ?>>asList(channel1, channel2))
+        SparseChannels.mergeParcelableOutput(Arrays.<Channel<?, ?>>asList(channel1, channel2))
                       .buildChannel();
     final Channel<?, ParcelableFlow<Object>> output = JRoutineLoader.on(loaderFrom(getActivity()))
                                                                     .with(factoryOf(Sort.class))
@@ -562,7 +291,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
     channelMap.put(7, channel1);
     channelMap.put(-3, channel2);
     final Channel<?, ? extends ParcelableFlow<?>> outputChannel =
-        SparseChannels.mergeParcelable(channelMap).buildChannel();
+        SparseChannels.mergeParcelableOutput(channelMap).buildChannel();
     channel1.pass("test3").close();
     channel2.pass(111).close();
     assertThat(outputChannel.in(seconds(10)).all()).containsOnly(
@@ -591,7 +320,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
     channelMap.put(7, channel1);
     channelMap.put(-3, channel2);
     final Channel<?, ? extends ParcelableFlow<?>> outputChannel =
-        SparseChannels.mergeParcelable(channelMap).buildChannel();
+        SparseChannels.mergeParcelableOutput(channelMap).buildChannel();
     channel1.abort();
     channel2.pass(111).close();
 
@@ -615,7 +344,280 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
 
     try {
 
-      SparseChannels.mergeParcelable(new SparseArray<Channel<?, ?>>(0));
+      SparseChannels.mergeParcelableOutput(new SparseArray<Channel<?, ?>>(0));
+
+      fail();
+
+    } catch (final IllegalArgumentException ignored) {
+
+    }
+  }
+
+  public void testMergeInput() {
+
+    if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+      return;
+    }
+
+    final Channel<String, String> channel1 = JRoutineLoader.on(loaderFrom(getActivity()))
+                                                           .with(factoryOf(PassingString.class))
+                                                           .call()
+                                                           .sorted();
+    final Channel<Integer, Integer> channel2 = JRoutineLoader.on(loaderFrom(getActivity()))
+                                                             .with(factoryOf(PassingInteger.class))
+                                                             .call()
+                                                             .sorted();
+    SparseChannels.mergeInput(channel1, channel2)
+                  .buildChannel()
+                  .pass(new ParcelableFlow<String>(0, "test1"))
+                  .pass(new ParcelableFlow<Integer>(1, 1))
+                  .close();
+    SparseChannels.mergeInput(3, channel1, channel2)
+                  .buildChannel()
+                  .pass(new ParcelableFlow<String>(3, "test2"))
+                  .pass(new ParcelableFlow<Integer>(4, 2))
+                  .close();
+    SparseChannels.mergeInput(Arrays.<Channel<?, ?>>asList(channel1, channel2))
+                  .buildChannel()
+                  .pass(new ParcelableFlow<String>(0, "test3"))
+                  .pass(new ParcelableFlow<Integer>(1, 3))
+                  .close();
+    SparseChannels.mergeInput(-5, Arrays.<Channel<?, ?>>asList(channel1, channel2))
+                  .buildChannel()
+                  .pass(new ParcelableFlow<String>(-5, "test4"))
+                  .pass(new ParcelableFlow<Integer>(-4, 4))
+                  .close();
+    final SparseArray<Channel<?, ?>> map = new SparseArray<Channel<?, ?>>(2);
+    map.put(31, channel1);
+    map.put(17, channel2);
+    SparseChannels.mergeInput(map)
+                  .buildChannel()
+                  .pass(new ParcelableFlow<String>(31, "test5"))
+                  .pass(new ParcelableFlow<Integer>(17, 5))
+                  .close();
+    assertThat(channel1.close().in(seconds(10)).all()).containsExactly("test1", "test2", "test3",
+        "test4", "test5");
+    assertThat(channel2.close().in(seconds(10)).all()).containsExactly(1, 2, 3, 4, 5);
+  }
+
+  public void testMergeInputAbort() {
+
+    if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+      return;
+    }
+
+    Channel<String, String> channel1;
+    Channel<Integer, Integer> channel2;
+    channel1 = JRoutineLoader.on(loaderFrom(getActivity()))
+                             .with(factoryOf(PassingString.class))
+                             .call()
+                             .sorted();
+    channel2 = JRoutineLoader.on(loaderFrom(getActivity()))
+                             .with(factoryOf(PassingInteger.class))
+                             .call()
+                             .sorted();
+    SparseChannels.mergeInput(channel1, channel2).buildChannel().abort();
+
+    try {
+
+      channel1.close().in(seconds(10)).next();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+
+    try {
+
+      channel2.close().in(seconds(10)).next();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+
+    channel1 = JRoutineLoader.on(loaderFrom(getActivity()))
+                             .with(factoryOf(PassingString.class))
+                             .call()
+                             .sorted();
+    channel2 = JRoutineLoader.on(loaderFrom(getActivity()))
+                             .with(factoryOf(PassingInteger.class))
+                             .call()
+                             .sorted();
+    SparseChannels.mergeInput(3, channel1, channel2).buildChannel().abort();
+
+    try {
+
+      channel1.close().in(seconds(10)).next();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+
+    try {
+
+      channel2.close().in(seconds(10)).next();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+
+    channel1 = JRoutineLoader.on(loaderFrom(getActivity()))
+                             .with(factoryOf(PassingString.class))
+                             .call()
+                             .sorted();
+    channel2 = JRoutineLoader.on(loaderFrom(getActivity()))
+                             .with(factoryOf(PassingInteger.class))
+                             .call()
+                             .sorted();
+    SparseChannels.mergeInput(Arrays.<Channel<?, ?>>asList(channel1, channel2))
+                  .buildChannel()
+                  .abort();
+
+    try {
+
+      channel1.close().in(seconds(10)).next();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+
+    try {
+
+      channel2.close().in(seconds(10)).next();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+
+    channel1 = JRoutineLoader.on(loaderFrom(getActivity()))
+                             .with(factoryOf(PassingString.class))
+                             .call()
+                             .sorted();
+    channel2 = JRoutineLoader.on(loaderFrom(getActivity()))
+                             .with(factoryOf(PassingInteger.class))
+                             .call()
+                             .sorted();
+    SparseChannels.mergeInput(-5, Arrays.<Channel<?, ?>>asList(channel1, channel2))
+                  .buildChannel()
+                  .abort();
+
+    try {
+
+      channel1.close().in(seconds(10)).next();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+
+    try {
+
+      channel2.close().in(seconds(10)).next();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+
+    channel1 = JRoutineLoader.on(loaderFrom(getActivity()))
+                             .with(factoryOf(PassingString.class))
+                             .call()
+                             .sorted();
+    channel2 = JRoutineLoader.on(loaderFrom(getActivity()))
+                             .with(factoryOf(PassingInteger.class))
+                             .call()
+                             .sorted();
+    final SparseArray<Channel<?, ?>> map = new SparseArray<Channel<?, ?>>(2);
+    map.put(31, channel1);
+    map.put(17, channel2);
+    SparseChannels.mergeInput(map).buildChannel().abort();
+
+    try {
+
+      channel1.close().in(seconds(10)).next();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+
+    try {
+
+      channel2.close().in(seconds(10)).next();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+  }
+
+  public void testMergeInputError() {
+
+    if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+      return;
+    }
+
+    try {
+
+      SparseChannels.mergeInput();
+
+      fail();
+
+    } catch (final IllegalArgumentException ignored) {
+
+    }
+
+    try {
+
+      SparseChannels.mergeInput(0);
+
+      fail();
+
+    } catch (final IllegalArgumentException ignored) {
+
+    }
+
+    try {
+
+      SparseChannels.mergeInput(Collections.<Channel<?, ?>>emptyList());
+
+      fail();
+
+    } catch (final IllegalArgumentException ignored) {
+
+    }
+
+    try {
+
+      SparseChannels.mergeInput(0, Collections.<Channel<?, ?>>emptyList());
+
+      fail();
+
+    } catch (final IllegalArgumentException ignored) {
+
+    }
+
+    try {
+
+      SparseChannels.mergeInput(new SparseArray<Channel<?, ?>>(0));
 
       fail();
 

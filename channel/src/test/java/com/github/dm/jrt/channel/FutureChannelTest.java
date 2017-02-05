@@ -82,7 +82,7 @@ public class FutureChannelTest {
           }
         }, 1, TimeUnit.SECONDS);
     final DurationMeasure timeout = seconds(1);
-    final Channel<?, String> channel = Channels.fromFutureInterruptIfRunning(future).buildChannel();
+    final Channel<?, String> channel = Channels.fromFuture(future, true).buildChannel();
     channel.abort(new IllegalStateException());
     try {
       channel.in(timeout).throwError();
@@ -129,7 +129,7 @@ public class FutureChannelTest {
             return "test";
           }
         }, 3, TimeUnit.SECONDS);
-    final Channel<?, String> channel = Channels.fromFutureInterruptIfRunning(future).buildChannel();
+    final Channel<?, String> channel = Channels.fromFuture(future, true).buildChannel();
     assertThat(channel.inNoTime().eventuallyContinue().all()).isEmpty();
     final ArrayList<String> results = new ArrayList<String>();
     channel.in(10, TimeUnit.MILLISECONDS).allInto(results);

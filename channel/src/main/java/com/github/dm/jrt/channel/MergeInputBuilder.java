@@ -24,37 +24,32 @@ import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
- * Builder implementation returning a channel distributing data into a set of channels.
+ * Builder implementation returning a channel merging data from a collection of channels.
  * <p>
  * Created by davide-maestroni on 02/26/2016.
  *
  * @param <IN> the input data type.
  */
-class DistributeBuilder<IN> extends AbstractChannelBuilder<List<? extends IN>, List<? extends IN>> {
+class MergeInputBuilder<IN> extends AbstractChannelBuilder<Flow<? extends IN>, Flow<? extends IN>> {
 
   private final ArrayList<Channel<? extends IN, ?>> mChannels;
 
-  private final boolean mIsFlush;
-
-  private final IN mPlaceholder;
+  private final int mStartId;
 
   /**
    * Constructor.
    *
-   * @param isFlush     whether to flush data.
-   * @param placeholder the placeholder instance.
-   * @param channels    the channels.
+   * @param startId  the flow start ID.
+   * @param channels the channels to merge.
    * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
    * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
    *                                            null object.
    */
-  DistributeBuilder(final boolean isFlush, @Nullable final IN placeholder,
+  MergeInputBuilder(final int startId,
       @NotNull final Iterable<? extends Channel<? extends IN, ?>> channels) {
     final ArrayList<Channel<? extends IN, ?>> channelList =
         new ArrayList<Channel<? extends IN, ?>>();
@@ -70,16 +65,16 @@ class DistributeBuilder<IN> extends AbstractChannelBuilder<List<? extends IN>, L
       throw new IllegalArgumentException("the collection of channels must not be empty");
     }
 
-    mIsFlush = isFlush;
-    mPlaceholder = placeholder;
+    mStartId = startId;
     mChannels = channelList;
   }
 
   @NotNull
   @SuppressWarnings("unchecked")
-  public Channel<List<? extends IN>, List<? extends IN>> buildChannel() {
+  public Channel<Flow<? extends IN>, Flow<? extends IN>> buildChannel() {
     final ArrayList<Channel<? extends IN, ?>> channels = mChannels;
-    final ArrayList<Channel<?, ?>> channelList = new ArrayList<Channel<?, ?>>(channels.size());
+    final ArrayList<Channel<? extends IN, ?>> channelList =
+        new ArrayList<Channel<? extends IN, ?>>(channels.size());
     final ChannelConfiguration configuration = getConfiguration();
     for (final Channel<? extends IN, ?> channel : channels) {
       final Channel<IN, IN> outputChannel =
@@ -88,70 +83,58 @@ class DistributeBuilder<IN> extends AbstractChannelBuilder<List<? extends IN>, L
       channelList.add(outputChannel);
     }
 
-    final Channel<List<? extends IN>, ?> inputChannel =
-        JRoutineCore.<List<? extends IN>>ofInputs().apply(configuration).buildChannel();
-    return inputChannel.bind(new DistributeChannelConsumer(mIsFlush, mPlaceholder, channelList));
+    final Channel<Flow<? extends IN>, ?> inputChannel =
+        JRoutineCore.<Flow<? extends IN>>ofInputs().apply(configuration).buildChannel();
+    return inputChannel.bind(new SortingArrayChannelConsumer(mStartId, channelList));
   }
 
   /**
-   * Channel consumer distributing list of data among a list of channels.
-   *
-   * @param <IN> the input data type.
+   * Channel consumer sorting flow inputs among a list of channels.
    */
-  private static class DistributeChannelConsumer<IN>
-      implements ChannelConsumer<List<? extends IN>> {
+  private static class SortingArrayChannelConsumer<IN>
+      implements ChannelConsumer<Flow<? extends IN>> {
 
-    private final ArrayList<Channel<? extends IN, ?>> mChannels;
+    private final ArrayList<Channel<? extends IN, ?>> mChannelList;
 
-    private final boolean mIsFlush;
+    private final int mSize;
 
-    private final IN mPlaceholder;
+    private final int mStartId;
 
     /**
      * Constructor.
      *
-     * @param isFlush     whether the inputs have to be flushed.
-     * @param placeholder the placeholder instance.
-     * @param channels    the list of channels.
+     * @param startId  the flow start ID.
+     * @param channels the list of channels.
      */
-    private DistributeChannelConsumer(final boolean isFlush, @Nullable final IN placeholder,
+    private SortingArrayChannelConsumer(final int startId,
         @NotNull final ArrayList<Channel<? extends IN, ?>> channels) {
-      mIsFlush = isFlush;
-      mChannels = channels;
-      mPlaceholder = placeholder;
+      mStartId = startId;
+      mChannelList = channels;
+      mSize = channels.size();
     }
 
     public void onComplete() {
-      for (final Channel<? extends IN, ?> channel : mChannels) {
+      for (final Channel<? extends IN, ?> channel : mChannelList) {
         channel.close();
       }
     }
 
     public void onError(@NotNull final RoutineException error) {
-      for (final Channel<? extends IN, ?> channel : mChannels) {
+      for (final Channel<? extends IN, ?> channel : mChannelList) {
         channel.abort(error);
       }
     }
 
-    public void onOutput(final List<? extends IN> inputs) {
-      final int inputSize = inputs.size();
-      final ArrayList<Channel<? extends IN, ?>> channels = mChannels;
-      final int size = channels.size();
-      if (inputSize > size) {
-        throw new IllegalArgumentException();
+    public void onOutput(final Flow<? extends IN> flow) {
+      final int id = flow.id - mStartId;
+      if ((id < 0) || (id >= mSize)) {
+        return;
       }
 
-      final IN placeholder = mPlaceholder;
-      final boolean isFlush = mIsFlush;
-      for (int i = 0; i < size; ++i) {
-        @SuppressWarnings("unchecked") final Channel<IN, ?> channel =
-            (Channel<IN, ?>) channels.get(i);
-        if (i < inputSize) {
-          channel.pass(inputs.get(i));
-
-        } else if (isFlush) {
-          channel.pass(placeholder);
-        }
+      @SuppressWarnings("unchecked") final Channel<IN, ?> channel =
+          (Channel<IN, ?>) mChannelList.get(id);
+      if (channel != null) {
+        channel.pass(flow.data);
       }
     }
   }

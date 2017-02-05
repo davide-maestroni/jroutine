@@ -19,31 +19,32 @@ package com.github.dm.jrt.channel;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.AbstractChannelBuilder;
 import com.github.dm.jrt.core.channel.Channel;
+import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 
 /**
- * Builder implementation returning a channel blending data from a set of output channels.
+ * Builder implementation returning a channel concatenating data from a set of channels.
  * <p>
  * Created by davide-maestroni on 02/26/2016.
  *
  * @param <OUT> the output data type.
  */
-class BlendBuilder<OUT> extends AbstractChannelBuilder<OUT, OUT> {
+class ConcatOutputBuilder<OUT> extends AbstractChannelBuilder<OUT, OUT> {
 
   private final ArrayList<Channel<?, ? extends OUT>> mChannels;
 
   /**
    * Constructor.
    *
-   * @param channels the channels to blend.
+   * @param channels the channels to concat.
    * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
    * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
    *                                            null object.
    */
-  BlendBuilder(@NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
+  ConcatOutputBuilder(@NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
     final ArrayList<Channel<?, ? extends OUT>> channelList =
         new ArrayList<Channel<?, ? extends OUT>>();
     for (final Channel<?, ? extends OUT> channel : channels) {
@@ -63,8 +64,11 @@ class BlendBuilder<OUT> extends AbstractChannelBuilder<OUT, OUT> {
 
   @NotNull
   public Channel<OUT, OUT> buildChannel() {
-    final Channel<OUT, OUT> outputChannel =
-        JRoutineCore.<OUT>ofInputs().apply(getConfiguration()).buildChannel();
+    final Channel<OUT, OUT> outputChannel = JRoutineCore.<OUT>ofInputs().applyChannelConfiguration()
+                                                                        .with(getConfiguration())
+                                                                        .withOrder(OrderType.SORTED)
+                                                                        .configured()
+                                                                        .buildChannel();
     for (final Channel<?, ? extends OUT> channel : mChannels) {
       channel.bind(outputChannel);
     }

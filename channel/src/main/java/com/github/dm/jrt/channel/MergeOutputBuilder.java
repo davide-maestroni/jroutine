@@ -1,20 +1,4 @@
-/*
- * Copyright 2016 Davide Maestroni
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-package com.github.dm.jrt.android.channel;
+package com.github.dm.jrt.channel;
 
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.AbstractChannelBuilder;
@@ -27,11 +11,11 @@ import java.util.ArrayList;
 /**
  * Builder implementation merging data from a set of output channels into a flow one.
  * <p>
- * Created by davide-maestroni on 02/26/2016.
+ * Created by davide-maestroni on 05/03/2016.
  *
  * @param <OUT> the output data type.
  */
-class MergeBuilder<OUT> extends AbstractChannelBuilder<ParcelableFlow<OUT>, ParcelableFlow<OUT>> {
+class MergeOutputBuilder<OUT> extends AbstractChannelBuilder<Flow<OUT>, Flow<OUT>> {
 
   private final ArrayList<Channel<?, ? extends OUT>> mChannels;
 
@@ -46,7 +30,7 @@ class MergeBuilder<OUT> extends AbstractChannelBuilder<ParcelableFlow<OUT>, Parc
    * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
    *                                            null object.
    */
-  MergeBuilder(final int startId,
+  MergeOutputBuilder(final int startId,
       @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
     final ArrayList<Channel<?, ? extends OUT>> channelList =
         new ArrayList<Channel<?, ? extends OUT>>();
@@ -67,13 +51,12 @@ class MergeBuilder<OUT> extends AbstractChannelBuilder<ParcelableFlow<OUT>, Parc
   }
 
   @NotNull
-  @Override
-  public Channel<ParcelableFlow<OUT>, ParcelableFlow<OUT>> buildChannel() {
-    final Channel<ParcelableFlow<OUT>, ParcelableFlow<OUT>> outputChannel =
-        JRoutineCore.<ParcelableFlow<OUT>>ofInputs().apply(getConfiguration()).buildChannel();
+  public Channel<Flow<OUT>, Flow<OUT>> buildChannel() {
+    final Channel<Flow<OUT>, Flow<OUT>> outputChannel =
+        JRoutineCore.<Flow<OUT>>ofInputs().apply(getConfiguration()).buildChannel();
     int i = mStartId;
     for (final Channel<?, ? extends OUT> channel : mChannels) {
-      outputChannel.pass(AndroidChannels.outputParcelableFlow(channel, i++).buildChannel());
+      outputChannel.pass(new OutputFlowBuilder<OUT>(channel, i++).buildChannel());
     }
 
     return outputChannel.close();

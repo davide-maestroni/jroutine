@@ -58,22 +58,23 @@ import static org.junit.Assert.fail;
 public class ChannelsTest {
 
   @Test
-  public void testBlend() {
+  public void testBlendOutput() {
 
     Channel<?, String> channel1 = JRoutineCore.of("test1", "test2", "test3").buildChannel();
     Channel<?, String> channel2 = JRoutineCore.of("test4", "test5", "test6").buildChannel();
-    assertThat(Channels.blend(channel2, channel1).buildChannel().in(seconds(1)).all()).containsOnly(
+    assertThat(
+        Channels.blendOutput(channel2, channel1).buildChannel().in(seconds(1)).all()).containsOnly(
         "test1", "test2", "test3", "test4", "test5", "test6");
     channel1 = JRoutineCore.of("test1", "test2", "test3").buildChannel();
     channel2 = JRoutineCore.of("test4", "test5", "test6").buildChannel();
-    assertThat(Channels.blend(Arrays.<Channel<?, ?>>asList(channel1, channel2))
+    assertThat(Channels.blendOutput(Arrays.<Channel<?, ?>>asList(channel1, channel2))
                        .buildChannel()
                        .in(seconds(1))
                        .all()).containsOnly("test1", "test2", "test3", "test4", "test5", "test6");
   }
 
   @Test
-  public void testBlendAbort() {
+  public void testBlendOutputAbort() {
 
     final ChannelBuilder<String, String> builder1 = JRoutineCore.ofInputs();
     final ChannelBuilder<Integer, Integer> builder2 = JRoutineCore.ofInputs();
@@ -88,7 +89,7 @@ public class ChannelsTest {
 
     try {
 
-      routine.call(Channels.blend(channel1, channel2).buildChannel()).in(seconds(1)).all();
+      routine.call(Channels.blendOutput(channel1, channel2).buildChannel()).in(seconds(1)).all();
 
       fail();
 
@@ -103,7 +104,8 @@ public class ChannelsTest {
 
     try {
 
-      routine.call(Channels.blend(Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannel())
+      routine.call(
+          Channels.blendOutput(Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannel())
              .in(seconds(1))
              .all();
 
@@ -116,11 +118,11 @@ public class ChannelsTest {
 
   @Test
   @SuppressWarnings("ConstantConditions")
-  public void testBlendError() {
+  public void testBlendOutputError() {
 
     try {
 
-      Channels.blend();
+      Channels.blendOutput();
 
       fail();
 
@@ -130,7 +132,7 @@ public class ChannelsTest {
 
     try {
 
-      Channels.blend((Channel<?, ?>[]) null);
+      Channels.blendOutput((Channel<?, ?>[]) null);
 
       fail();
 
@@ -140,7 +142,7 @@ public class ChannelsTest {
 
     try {
 
-      Channels.blend(new Channel[]{null});
+      Channels.blendOutput(new Channel[]{null});
 
       fail();
 
@@ -150,7 +152,7 @@ public class ChannelsTest {
 
     try {
 
-      Channels.blend(Collections.<Channel<?, ?>>emptyList());
+      Channels.blendOutput(Collections.<Channel<?, ?>>emptyList());
 
       fail();
 
@@ -160,7 +162,7 @@ public class ChannelsTest {
 
     try {
 
-      Channels.blend((List<Channel<?, ?>>) null);
+      Channels.blendOutput((List<Channel<?, ?>>) null);
 
       fail();
 
@@ -170,7 +172,7 @@ public class ChannelsTest {
 
     try {
 
-      Channels.blend(Collections.<Channel<?, ?>>singletonList(null));
+      Channels.blendOutput(Collections.<Channel<?, ?>>singletonList(null));
 
       fail();
 
@@ -180,289 +182,18 @@ public class ChannelsTest {
   }
 
   @Test
-  public void testCombine() {
-
-    final Channel<String, String> channel1 =
-        JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
-    final Channel<Integer, Integer> channel2 =
-        JRoutineCore.with(IdentityInvocation.<Integer>factoryOf()).call().sorted();
-    Channels.combine(channel1, channel2)
-            .buildChannel()
-            .pass(new Flow<String>(0, "test1"))
-            .pass(new Flow<Integer>(1, 1))
-            .close();
-    Channels.combine(3, channel1, channel2)
-            .buildChannel()
-            .pass(new Flow<String>(3, "test2"))
-            .pass(new Flow<Integer>(4, 2))
-            .close();
-    Channels.combine(Arrays.<Channel<?, ?>>asList(channel1, channel2))
-            .buildChannel()
-            .pass(new Flow<String>(0, "test3"))
-            .pass(new Flow<Integer>(1, 3))
-            .close();
-    Channels.combine(-5, Arrays.<Channel<?, ?>>asList(channel1, channel2))
-            .buildChannel()
-            .pass(new Flow<String>(-5, "test4"))
-            .pass(new Flow<Integer>(-4, 4))
-            .close();
-    final HashMap<Integer, Channel<?, ?>> map = new HashMap<Integer, Channel<?, ?>>(2);
-    map.put(31, channel1);
-    map.put(17, channel2);
-    Channels.combine(map)
-            .buildChannel()
-            .pass(new Flow<String>(31, "test5"))
-            .pass(new Flow<Integer>(17, 5))
-            .close();
-    assertThat(channel1.close().in(seconds(1)).all()).containsExactly("test1", "test2", "test3",
-        "test4", "test5");
-    assertThat(channel2.close().in(seconds(1)).all()).containsExactly(1, 2, 3, 4, 5);
-  }
-
-  @Test
-  public void testCombineAbort() {
-
-    Channel<String, String> channel1;
-    Channel<Integer, Integer> channel2;
-    channel1 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
-    channel2 = JRoutineCore.with(IdentityInvocation.<Integer>factoryOf()).call().sorted();
-    Channels.combine(channel1, channel2).buildChannel().abort();
-
-    try {
-
-      channel1.close().in(seconds(1)).next();
-
-      fail();
-
-    } catch (final AbortException ignored) {
-
-    }
-
-    try {
-
-      channel2.close().in(seconds(1)).next();
-
-      fail();
-
-    } catch (final AbortException ignored) {
-
-    }
-
-    channel1 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
-    channel2 = JRoutineCore.with(IdentityInvocation.<Integer>factoryOf()).call().sorted();
-    Channels.combine(3, channel1, channel2).buildChannel().abort();
-
-    try {
-
-      channel1.close().in(seconds(1)).next();
-
-      fail();
-
-    } catch (final AbortException ignored) {
-
-    }
-
-    try {
-
-      channel2.close().in(seconds(1)).next();
-
-      fail();
-
-    } catch (final AbortException ignored) {
-
-    }
-
-    channel1 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
-    channel2 = JRoutineCore.with(IdentityInvocation.<Integer>factoryOf()).call().sorted();
-    Channels.combine(Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannel().abort();
-
-    try {
-
-      channel1.close().in(seconds(1)).next();
-
-      fail();
-
-    } catch (final AbortException ignored) {
-
-    }
-
-    try {
-
-      channel2.close().in(seconds(1)).next();
-
-      fail();
-
-    } catch (final AbortException ignored) {
-
-    }
-
-    channel1 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
-    channel2 = JRoutineCore.with(IdentityInvocation.<Integer>factoryOf()).call().sorted();
-    Channels.combine(-5, Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannel().abort();
-
-    try {
-
-      channel1.close().in(seconds(1)).next();
-
-      fail();
-
-    } catch (final AbortException ignored) {
-
-    }
-
-    try {
-
-      channel2.close().in(seconds(1)).next();
-
-      fail();
-
-    } catch (final AbortException ignored) {
-
-    }
-
-    channel1 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
-    channel2 = JRoutineCore.with(IdentityInvocation.<Integer>factoryOf()).call().sorted();
-    final HashMap<Integer, Channel<?, ?>> map = new HashMap<Integer, Channel<?, ?>>(2);
-    map.put(31, channel1);
-    map.put(17, channel2);
-    Channels.combine(map).buildChannel().abort();
-
-    try {
-
-      channel1.close().in(seconds(1)).next();
-
-      fail();
-
-    } catch (final AbortException ignored) {
-
-    }
-
-    try {
-
-      channel2.close().in(seconds(1)).next();
-
-      fail();
-
-    } catch (final AbortException ignored) {
-
-    }
-  }
-
-  @Test
-  public void testCombineError() {
-
-    try {
-
-      Channels.combine();
-
-      fail();
-
-    } catch (final IllegalArgumentException ignored) {
-
-    }
-
-    try {
-
-      Channels.combine(0);
-
-      fail();
-
-    } catch (final IllegalArgumentException ignored) {
-
-    }
-
-    try {
-
-      Channels.combine(Collections.<Channel<?, ?>>emptyList());
-
-      fail();
-
-    } catch (final IllegalArgumentException ignored) {
-
-    }
-
-    try {
-
-      Channels.combine(0, Collections.<Channel<?, ?>>emptyList());
-
-      fail();
-
-    } catch (final IllegalArgumentException ignored) {
-
-    }
-
-    try {
-
-      Channels.combine(Collections.<Integer, Channel<?, ?>>emptyMap());
-
-      fail();
-
-    } catch (final IllegalArgumentException ignored) {
-
-    }
-
-    try {
-
-      Channels.combine(new Channel[]{null});
-
-      fail();
-
-    } catch (final NullPointerException ignored) {
-
-    }
-
-    try {
-
-      Channels.combine(0, new Channel[]{null});
-
-      fail();
-
-    } catch (final NullPointerException ignored) {
-
-    }
-
-    try {
-
-      Channels.combine(Collections.<Channel<?, ?>>singletonList(null));
-
-      fail();
-
-    } catch (final NullPointerException ignored) {
-
-    }
-
-    try {
-
-      Channels.combine(0, Collections.<Channel<?, ?>>singletonList(null));
-
-      fail();
-
-    } catch (final NullPointerException ignored) {
-
-    }
-
-    try {
-
-      Channels.combine(Collections.<Integer, Channel<?, ?>>singletonMap(0, null));
-
-      fail();
-
-    } catch (final NullPointerException ignored) {
-
-    }
-  }
-
-  @Test
-  public void testConcat() {
+  public void testConcatOutput() {
 
     Channel<?, String> channel1 = JRoutineCore.of("test1", "test2", "test3").buildChannel();
     Channel<?, String> channel2 = JRoutineCore.of("test4", "test5", "test6").buildChannel();
-    assertThat(
-        Channels.concat(channel2, channel1).buildChannel().in(seconds(1)).all()).containsExactly(
-        "test4", "test5", "test6", "test1", "test2", "test3");
+    assertThat(Channels.concatOutput(channel2, channel1)
+                       .buildChannel()
+                       .in(seconds(1))
+                       .all()).containsExactly("test4", "test5", "test6", "test1", "test2",
+        "test3");
     channel1 = JRoutineCore.of("test1", "test2", "test3").buildChannel();
     channel2 = JRoutineCore.of("test4", "test5", "test6").buildChannel();
-    assertThat(Channels.concat(Arrays.<Channel<?, ?>>asList(channel1, channel2))
+    assertThat(Channels.concatOutput(Arrays.<Channel<?, ?>>asList(channel1, channel2))
                        .buildChannel()
                        .in(seconds(1))
                        .all()).containsExactly("test1", "test2", "test3", "test4", "test5",
@@ -470,7 +201,7 @@ public class ChannelsTest {
   }
 
   @Test
-  public void testConcatAbort() {
+  public void testConcatOutputAbort() {
 
     final ChannelBuilder<String, String> builder1 = JRoutineCore.ofInputs();
     final ChannelBuilder<Integer, Integer> builder2 = JRoutineCore.ofInputs();
@@ -485,7 +216,7 @@ public class ChannelsTest {
 
     try {
 
-      routine.call(Channels.concat(channel1, channel2).buildChannel()).in(seconds(1)).all();
+      routine.call(Channels.concatOutput(channel1, channel2).buildChannel()).in(seconds(1)).all();
 
       fail();
 
@@ -500,7 +231,8 @@ public class ChannelsTest {
 
     try {
 
-      routine.call(Channels.concat(Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannel())
+      routine.call(
+          Channels.concatOutput(Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannel())
              .in(seconds(1))
              .all();
 
@@ -513,11 +245,11 @@ public class ChannelsTest {
 
   @Test
   @SuppressWarnings("ConstantConditions")
-  public void testConcatError() {
+  public void testConcatOutputError() {
 
     try {
 
-      Channels.concat();
+      Channels.concatOutput();
 
       fail();
 
@@ -527,7 +259,7 @@ public class ChannelsTest {
 
     try {
 
-      Channels.concat((Channel<?, ?>[]) null);
+      Channels.concatOutput((Channel<?, ?>[]) null);
 
       fail();
 
@@ -537,7 +269,7 @@ public class ChannelsTest {
 
     try {
 
-      Channels.concat(new Channel[]{null});
+      Channels.concatOutput(new Channel[]{null});
 
       fail();
 
@@ -547,7 +279,7 @@ public class ChannelsTest {
 
     try {
 
-      Channels.concat(Collections.<Channel<?, ?>>emptyList());
+      Channels.concatOutput(Collections.<Channel<?, ?>>emptyList());
 
       fail();
 
@@ -557,7 +289,7 @@ public class ChannelsTest {
 
     try {
 
-      Channels.concat((List<Channel<?, ?>>) null);
+      Channels.concatOutput((List<Channel<?, ?>>) null);
 
       fail();
 
@@ -567,7 +299,7 @@ public class ChannelsTest {
 
     try {
 
-      Channels.concat(Collections.<Channel<?, ?>>singletonList(null));
+      Channels.concatOutput(Collections.<Channel<?, ?>>singletonList(null));
 
       fail();
 
@@ -623,285 +355,6 @@ public class ChannelsTest {
     }
 
     assertThat(failed).isFalse();
-  }
-
-  @Test
-  public void testDistribute() {
-
-    final Channel<String, String> channel1 =
-        JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
-    final Channel<String, String> channel2 =
-        JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
-    Channels.distribute(channel1, channel2)
-            .buildChannel()
-            .pass(Arrays.asList("test1-1", "test1-2"))
-            .close();
-    Channels.distribute(Arrays.<Channel<?, ?>>asList(channel1, channel2))
-            .buildChannel()
-            .pass(Arrays.asList("test2-1", "test2-2"))
-            .close();
-    Channels.distribute(channel1, channel2)
-            .buildChannel()
-            .pass(Collections.singletonList("test3-1"))
-            .close();
-    assertThat(channel1.close().in(seconds(1)).all()).containsExactly("test1-1", "test2-1",
-        "test3-1");
-    assertThat(channel2.close().in(seconds(1)).all()).containsExactly("test1-2", "test2-2");
-  }
-
-  @Test
-  public void testDistributeAbort() {
-
-    Channel<String, String> channel1;
-    Channel<String, String> channel2;
-    channel1 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
-    channel2 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
-    Channels.distribute(channel1, channel2).buildChannel().abort();
-
-    try {
-
-      channel1.close().in(seconds(1)).next();
-
-      fail();
-
-    } catch (final AbortException ignored) {
-
-    }
-
-    try {
-
-      channel2.close().in(seconds(1)).next();
-
-      fail();
-
-    } catch (final AbortException ignored) {
-
-    }
-
-    channel1 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
-    channel2 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
-    Channels.distribute(Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannel().abort();
-
-    try {
-
-      channel1.close().in(seconds(1)).next();
-
-      fail();
-
-    } catch (final AbortException ignored) {
-
-    }
-
-    try {
-
-      channel2.close().in(seconds(1)).next();
-
-      fail();
-
-    } catch (final AbortException ignored) {
-
-    }
-  }
-
-  @Test
-  public void testDistributeError() {
-
-    final Channel<String, String> channel1 =
-        JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
-    Channels.distribute(channel1).buildChannel().pass(Arrays.asList("test1-1", "test1-2")).close();
-
-    try {
-
-      channel1.close().in(seconds(1)).all();
-
-      fail();
-
-    } catch (final InvocationException ignored) {
-
-    }
-
-    try {
-
-      Channels.distribute();
-
-      fail();
-
-    } catch (final IllegalArgumentException ignored) {
-
-    }
-
-    try {
-
-      Channels.distribute(Collections.<Channel<?, ?>>emptyList());
-
-      fail();
-
-    } catch (final IllegalArgumentException ignored) {
-
-    }
-
-    try {
-
-      Channels.distribute(new Channel[]{null});
-
-      fail();
-
-    } catch (final NullPointerException ignored) {
-
-    }
-
-    try {
-
-      Channels.distribute(Collections.<Channel<?, ?>>singletonList(null));
-
-      fail();
-
-    } catch (final NullPointerException ignored) {
-
-    }
-  }
-
-  @Test
-  public void testDistributePlaceHolderError() {
-
-    final Channel<String, String> channel1 =
-        JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
-    Channels.distribute((Object) null, channel1)
-            .buildChannel()
-            .pass(Arrays.asList("test1-1", "test1-2"))
-            .close();
-
-    try {
-
-      channel1.close().in(seconds(1)).all();
-
-      fail();
-
-    } catch (final InvocationException ignored) {
-
-    }
-
-    try {
-
-      Channels.distribute(new Object());
-
-      fail();
-
-    } catch (final IllegalArgumentException ignored) {
-
-    }
-
-    try {
-
-      Channels.distribute(null, Collections.<Channel<?, ?>>emptyList());
-
-      fail();
-
-    } catch (final IllegalArgumentException ignored) {
-
-    }
-
-    try {
-
-      Channels.distribute(new Object(), new Channel[]{null});
-
-      fail();
-
-    } catch (final NullPointerException ignored) {
-
-    }
-
-    try {
-
-      Channels.distribute(new Object(), Collections.<Channel<?, ?>>singletonList(null));
-
-      fail();
-
-    } catch (final NullPointerException ignored) {
-
-    }
-  }
-
-  @Test
-  public void testDistributePlaceholder() {
-
-    final Channel<String, String> channel1 =
-        JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
-    final Channel<String, String> channel2 =
-        JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
-    Channels.distribute((Object) null, channel1, channel2)
-            .buildChannel()
-            .pass(Arrays.asList("test1-1", "test1-2"))
-            .close();
-    final String placeholder = "placeholder";
-    Channels.distribute((Object) placeholder, Arrays.<Channel<?, ?>>asList(channel1, channel2))
-            .buildChannel()
-            .pass(Arrays.asList("test2-1", "test2-2"))
-            .close();
-    Channels.distribute(placeholder, channel1, channel2)
-            .buildChannel()
-            .pass(Collections.singletonList("test3-1"))
-            .close();
-    assertThat(channel1.close().in(seconds(1)).all()).containsExactly("test1-1", "test2-1",
-        "test3-1");
-    assertThat(channel2.close().in(seconds(1)).all()).containsExactly("test1-2", "test2-2",
-        placeholder);
-  }
-
-  @Test
-  public void testDistributePlaceholderAbort() {
-
-    Channel<String, String> channel1;
-    Channel<String, String> channel2;
-    channel1 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
-    channel2 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
-    Channels.distribute((Object) null, channel1, channel2).buildChannel().abort();
-
-    try {
-
-      channel1.close().in(seconds(1)).next();
-
-      fail();
-
-    } catch (final AbortException ignored) {
-
-    }
-
-    try {
-
-      channel2.close().in(seconds(1)).next();
-
-      fail();
-
-    } catch (final AbortException ignored) {
-
-    }
-
-    channel1 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
-    channel2 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
-    Channels.distribute(null, Arrays.<Channel<?, ?>>asList(channel1, channel2))
-            .buildChannel()
-            .abort();
-
-    try {
-
-      channel1.close().in(seconds(1)).next();
-
-      fail();
-
-    } catch (final AbortException ignored) {
-
-    }
-
-    try {
-
-      channel2.close().in(seconds(1)).next();
-
-      fail();
-
-    } catch (final AbortException ignored) {
-
-    }
   }
 
   @Test
@@ -1103,22 +556,24 @@ public class ChannelsTest {
     channel2 = builder2.buildChannel();
     channel1.sorted().after(millis(100)).pass("testtest").pass("test2").close();
     channel2.sorted().after(millis(110)).pass(6).pass(4).close();
-    assertThat(routine.call(Channels.join(channel1, channel2).buildChannel()).in(seconds(10)).all())
-        .containsExactly('s', '2');
+    assertThat(routine.call(Channels.joinOutput(channel1, channel2).buildChannel())
+                      .in(seconds(10))
+                      .all()).containsExactly('s', '2');
     channel1 = builder1.buildChannel();
     channel2 = builder2.buildChannel();
     channel1.sorted().after(millis(100)).pass("testtest").pass("test2").close();
     channel2.sorted().after(millis(110)).pass(6).pass(4).close();
-    assertThat(
-        routine.call(Channels.join(Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannel())
-               .in(seconds(10))
-               .all()).containsExactly('s', '2');
+    assertThat(routine.call(
+        Channels.joinOutput(Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannel())
+                      .in(seconds(10))
+                      .all()).containsExactly('s', '2');
     channel1 = builder1.buildChannel();
     channel2 = builder2.buildChannel();
     channel1.sorted().after(millis(100)).pass("testtest").pass("test2").pass("test3").close();
     channel2.sorted().after(millis(110)).pass(6).pass(4).close();
-    assertThat(routine.call(Channels.join(channel1, channel2).buildChannel()).in(seconds(10)).all())
-        .containsExactly('s', '2');
+    assertThat(routine.call(Channels.joinOutput(channel1, channel2).buildChannel())
+                      .in(seconds(10))
+                      .all()).containsExactly('s', '2');
   }
 
   @Test
@@ -1136,7 +591,7 @@ public class ChannelsTest {
 
     try {
 
-      routine.call(Channels.join(channel1, channel2).buildChannel()).in(seconds(1)).all();
+      routine.call(Channels.joinOutput(channel1, channel2).buildChannel()).in(seconds(1)).all();
 
       fail();
 
@@ -1151,7 +606,8 @@ public class ChannelsTest {
 
     try {
 
-      routine.call(Channels.join(Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannel())
+      routine.call(
+          Channels.joinOutput(Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannel())
              .in(seconds(1))
              .all();
 
@@ -1174,7 +630,7 @@ public class ChannelsTest {
     channel2 = builder2.buildChannel();
     channel1.after(millis(100)).pass("test").pass("test").close();
     try {
-      routine.call(Channels.join(channel1, channel2)
+      routine.call(Channels.joinOutput(channel1, channel2)
                            .applyChannelConfiguration()
                            .withBackoff(afterCount(0).constantDelay(millis(100)))
                            .withMaxSize(1)
@@ -1192,7 +648,7 @@ public class ChannelsTest {
 
     try {
 
-      Channels.join();
+      Channels.joinOutput();
 
       fail();
 
@@ -1202,7 +658,7 @@ public class ChannelsTest {
 
     try {
 
-      Channels.join(Collections.<Channel<?, ?>>emptyList());
+      Channels.joinOutput(Collections.<Channel<?, ?>>emptyList());
 
       fail();
 
@@ -1212,7 +668,7 @@ public class ChannelsTest {
 
     try {
 
-      Channels.join(new Channel[]{null});
+      Channels.joinOutput(new Channel[]{null});
 
       fail();
 
@@ -1222,11 +678,290 @@ public class ChannelsTest {
 
     try {
 
-      Channels.join(Collections.<Channel<?, ?>>singletonList(null));
+      Channels.joinOutput(Collections.<Channel<?, ?>>singletonList(null));
 
       fail();
 
     } catch (final NullPointerException ignored) {
+
+    }
+  }
+
+  @Test
+  public void testJoinInput() {
+
+    final Channel<String, String> channel1 =
+        JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
+    final Channel<String, String> channel2 =
+        JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
+    Channels.joinInput(channel1, channel2)
+            .buildChannel()
+            .pass(Arrays.asList("test1-1", "test1-2"))
+            .close();
+    Channels.joinInput(Arrays.<Channel<?, ?>>asList(channel1, channel2))
+            .buildChannel()
+            .pass(Arrays.asList("test2-1", "test2-2"))
+            .close();
+    Channels.joinInput(channel1, channel2)
+            .buildChannel()
+            .pass(Collections.singletonList("test3-1"))
+            .close();
+    assertThat(channel1.close().in(seconds(1)).all()).containsExactly("test1-1", "test2-1",
+        "test3-1");
+    assertThat(channel2.close().in(seconds(1)).all()).containsExactly("test1-2", "test2-2");
+  }
+
+  @Test
+  public void testJoinInputAbort() {
+
+    Channel<String, String> channel1;
+    Channel<String, String> channel2;
+    channel1 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
+    channel2 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
+    Channels.joinInput(channel1, channel2).buildChannel().abort();
+
+    try {
+
+      channel1.close().in(seconds(1)).next();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+
+    try {
+
+      channel2.close().in(seconds(1)).next();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+
+    channel1 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
+    channel2 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
+    Channels.joinInput(Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannel().abort();
+
+    try {
+
+      channel1.close().in(seconds(1)).next();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+
+    try {
+
+      channel2.close().in(seconds(1)).next();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+  }
+
+  @Test
+  public void testJoinInputError() {
+
+    final Channel<String, String> channel1 =
+        JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
+    Channels.joinInput(channel1).buildChannel().pass(Arrays.asList("test1-1", "test1-2")).close();
+
+    try {
+
+      channel1.close().in(seconds(1)).all();
+
+      fail();
+
+    } catch (final InvocationException ignored) {
+
+    }
+
+    try {
+
+      Channels.joinInput();
+
+      fail();
+
+    } catch (final IllegalArgumentException ignored) {
+
+    }
+
+    try {
+
+      Channels.joinInput(Collections.<Channel<?, ?>>emptyList());
+
+      fail();
+
+    } catch (final IllegalArgumentException ignored) {
+
+    }
+
+    try {
+
+      Channels.joinInput(new Channel[]{null});
+
+      fail();
+
+    } catch (final NullPointerException ignored) {
+
+    }
+
+    try {
+
+      Channels.joinInput(Collections.<Channel<?, ?>>singletonList(null));
+
+      fail();
+
+    } catch (final NullPointerException ignored) {
+
+    }
+  }
+
+  @Test
+  public void testJoinInputPlaceHolderError() {
+
+    final Channel<String, String> channel1 =
+        JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
+    Channels.joinInput((Object) null, channel1)
+            .buildChannel()
+            .pass(Arrays.asList("test1-1", "test1-2"))
+            .close();
+
+    try {
+
+      channel1.close().in(seconds(1)).all();
+
+      fail();
+
+    } catch (final InvocationException ignored) {
+
+    }
+
+    try {
+
+      Channels.joinInput(new Object());
+
+      fail();
+
+    } catch (final IllegalArgumentException ignored) {
+
+    }
+
+    try {
+
+      Channels.joinInput(null, Collections.<Channel<?, ?>>emptyList());
+
+      fail();
+
+    } catch (final IllegalArgumentException ignored) {
+
+    }
+
+    try {
+
+      Channels.joinInput(new Object(), new Channel[]{null});
+
+      fail();
+
+    } catch (final NullPointerException ignored) {
+
+    }
+
+    try {
+
+      Channels.joinInput(new Object(), Collections.<Channel<?, ?>>singletonList(null));
+
+      fail();
+
+    } catch (final NullPointerException ignored) {
+
+    }
+  }
+
+  @Test
+  public void testJoinInputPlaceholder() {
+
+    final Channel<String, String> channel1 =
+        JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
+    final Channel<String, String> channel2 =
+        JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
+    Channels.joinInput((Object) null, channel1, channel2)
+            .buildChannel()
+            .pass(Arrays.asList("test1-1", "test1-2"))
+            .close();
+    final String placeholder = "placeholder";
+    Channels.joinInput((Object) placeholder, Arrays.<Channel<?, ?>>asList(channel1, channel2))
+            .buildChannel()
+            .pass(Arrays.asList("test2-1", "test2-2"))
+            .close();
+    Channels.joinInput(placeholder, channel1, channel2)
+            .buildChannel()
+            .pass(Collections.singletonList("test3-1"))
+            .close();
+    assertThat(channel1.close().in(seconds(1)).all()).containsExactly("test1-1", "test2-1",
+        "test3-1");
+    assertThat(channel2.close().in(seconds(1)).all()).containsExactly("test1-2", "test2-2",
+        placeholder);
+  }
+
+  @Test
+  public void testJoinInputPlaceholderAbort() {
+
+    Channel<String, String> channel1;
+    Channel<String, String> channel2;
+    channel1 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
+    channel2 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
+    Channels.joinInput((Object) null, channel1, channel2).buildChannel().abort();
+
+    try {
+
+      channel1.close().in(seconds(1)).next();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+
+    try {
+
+      channel2.close().in(seconds(1)).next();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+
+    channel1 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
+    channel2 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
+    Channels.joinInput(null, Arrays.<Channel<?, ?>>asList(channel1, channel2))
+            .buildChannel()
+            .abort();
+
+    try {
+
+      channel1.close().in(seconds(1)).next();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+
+    try {
+
+      channel2.close().in(seconds(1)).next();
+
+      fail();
+
+    } catch (final AbortException ignored) {
 
     }
   }
@@ -1243,7 +978,7 @@ public class ChannelsTest {
     channel2 = builder2.buildChannel();
     channel1.sorted().after(millis(100)).pass("testtest").pass("test2").close();
     channel2.sorted().after(millis(110)).pass(6).pass(4).close();
-    assertThat(routine.call(Channels.join(new Object(), channel1, channel2).buildChannel())
+    assertThat(routine.call(Channels.joinOutput(new Object(), channel1, channel2).buildChannel())
                       .in(seconds(10))
                       .all()).containsExactly('s', '2');
     channel1 = builder1.buildChannel();
@@ -1251,7 +986,7 @@ public class ChannelsTest {
     channel1.sorted().after(millis(100)).pass("testtest").pass("test2").close();
     channel2.sorted().after(millis(110)).pass(6).pass(4).close();
     assertThat(routine.call(
-        Channels.join(null, Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannel())
+        Channels.joinOutput(null, Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannel())
                       .in(seconds(10))
                       .all()).containsExactly('s', '2');
     channel1 = builder1.buildChannel();
@@ -1261,7 +996,7 @@ public class ChannelsTest {
 
     try {
 
-      routine.call(Channels.join(new Object(), channel1, channel2).buildChannel())
+      routine.call(Channels.joinOutput(new Object(), channel1, channel2).buildChannel())
              .in(seconds(10))
              .all();
 
@@ -1287,7 +1022,7 @@ public class ChannelsTest {
 
     try {
 
-      routine.call(Channels.join((Object) null, channel1, channel2).buildChannel())
+      routine.call(Channels.joinOutput((Object) null, channel1, channel2).buildChannel())
              .in(seconds(1))
              .all();
 
@@ -1304,8 +1039,9 @@ public class ChannelsTest {
 
     try {
 
-      routine.call(Channels.join(new Object(), Arrays.<Channel<?, ?>>asList(channel1, channel2))
-                           .buildChannel()).in(seconds(1)).all();
+      routine.call(
+          Channels.joinOutput(new Object(), Arrays.<Channel<?, ?>>asList(channel1, channel2))
+                  .buildChannel()).in(seconds(1)).all();
 
       fail();
 
@@ -1319,7 +1055,7 @@ public class ChannelsTest {
 
     try {
 
-      Channels.join(new Object());
+      Channels.joinOutput(new Object());
 
       fail();
 
@@ -1329,7 +1065,7 @@ public class ChannelsTest {
 
     try {
 
-      Channels.join(null, Collections.<Channel<?, ?>>emptyList());
+      Channels.joinOutput(null, Collections.<Channel<?, ?>>emptyList());
 
       fail();
 
@@ -1339,7 +1075,7 @@ public class ChannelsTest {
 
     try {
 
-      Channels.join(new Object(), new Channel[]{null});
+      Channels.joinOutput(new Object(), new Channel[]{null});
 
       fail();
 
@@ -1349,7 +1085,7 @@ public class ChannelsTest {
 
     try {
 
-      Channels.join(new Object(), Collections.<Channel<?, ?>>singletonList(null));
+      Channels.joinOutput(new Object(), Collections.<Channel<?, ?>>singletonList(null));
 
       fail();
 
@@ -1373,7 +1109,7 @@ public class ChannelsTest {
     final Channel<Integer, Integer> channel2 = builder2.buildChannel();
 
     final Channel<?, ? extends Flow<Object>> channel =
-        Channels.merge(Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannel();
+        Channels.mergeOutput(Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannel();
     final Channel<?, Flow<Object>> output = JRoutineCore.with(new Sort())
                                                         .applyInvocationConfiguration()
                                                         .withInputOrder(OrderType.SORTED)
@@ -1413,7 +1149,7 @@ public class ChannelsTest {
     Channel<?, ? extends Flow<?>> outputChannel;
     channel1 = builder1.buildChannel();
     channel2 = builder2.buildChannel();
-    outputChannel = Channels.merge(-7, channel1, channel2).buildChannel();
+    outputChannel = Channels.mergeOutput(-7, channel1, channel2).buildChannel();
     channel1.pass("test1").close();
     channel2.pass(13).close();
     assertThat(outputChannel.in(seconds(1)).all()).containsOnly(new Flow<String>(-7, "test1"),
@@ -1421,21 +1157,22 @@ public class ChannelsTest {
     channel1 = builder1.buildChannel();
     channel2 = builder2.buildChannel();
     outputChannel =
-        Channels.merge(11, Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannel();
+        Channels.mergeOutput(11, Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannel();
     channel2.pass(13).close();
     channel1.pass("test1").close();
     assertThat(outputChannel.in(seconds(1)).all()).containsOnly(new Flow<String>(11, "test1"),
         new Flow<Integer>(12, 13));
     channel1 = builder1.buildChannel();
     channel2 = builder2.buildChannel();
-    outputChannel = Channels.merge(channel1, channel2).buildChannel();
+    outputChannel = Channels.mergeOutput(channel1, channel2).buildChannel();
     channel1.pass("test2").close();
     channel2.pass(-17).close();
     assertThat(outputChannel.in(seconds(1)).all()).containsOnly(new Flow<String>(0, "test2"),
         new Flow<Integer>(1, -17));
     channel1 = builder1.buildChannel();
     channel2 = builder2.buildChannel();
-    outputChannel = Channels.merge(Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannel();
+    outputChannel =
+        Channels.mergeOutput(Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannel();
     channel1.pass("test2").close();
     channel2.pass(-17).close();
     assertThat(outputChannel.in(seconds(1)).all()).containsOnly(new Flow<String>(0, "test2"),
@@ -1445,7 +1182,7 @@ public class ChannelsTest {
     final HashMap<Integer, Channel<?, ?>> channelMap = new HashMap<Integer, Channel<?, ?>>(2);
     channelMap.put(7, channel1);
     channelMap.put(-3, channel2);
-    outputChannel = Channels.merge(channelMap).buildChannel();
+    outputChannel = Channels.mergeOutput(channelMap).buildChannel();
     channel1.pass("test3").close();
     channel2.pass(111).close();
     assertThat(outputChannel.in(seconds(1)).all()).containsOnly(new Flow<String>(7, "test3"),
@@ -1468,7 +1205,7 @@ public class ChannelsTest {
     final Routine<Flow<String>, String> routine =
         JRoutineCore.with(factoryOf(new ClassToken<Amb<String>>() {})).buildRoutine();
     final Channel<?, String> outputChannel = routine.call(
-        Channels.merge(Arrays.asList(channel1, channel2, channel3, channel4)).buildChannel());
+        Channels.mergeOutput(Arrays.asList(channel1, channel2, channel3, channel4)).buildChannel());
 
     for (int i = 0; i < 4; i++) {
 
@@ -1503,7 +1240,7 @@ public class ChannelsTest {
     Channel<?, ? extends Flow<?>> outputChannel;
     channel1 = builder1.buildChannel();
     channel2 = builder2.buildChannel();
-    outputChannel = Channels.merge(-7, channel1, channel2).buildChannel();
+    outputChannel = Channels.mergeOutput(-7, channel1, channel2).buildChannel();
     channel1.pass("test1").close();
     channel2.abort();
 
@@ -1520,7 +1257,7 @@ public class ChannelsTest {
     channel1 = builder1.buildChannel();
     channel2 = builder2.buildChannel();
     outputChannel =
-        Channels.merge(11, Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannel();
+        Channels.mergeOutput(11, Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannel();
     channel2.abort();
     channel1.pass("test1").close();
 
@@ -1536,7 +1273,7 @@ public class ChannelsTest {
 
     channel1 = builder1.buildChannel();
     channel2 = builder2.buildChannel();
-    outputChannel = Channels.merge(channel1, channel2).buildChannel();
+    outputChannel = Channels.mergeOutput(channel1, channel2).buildChannel();
     channel1.abort();
     channel2.pass(-17).close();
 
@@ -1552,7 +1289,8 @@ public class ChannelsTest {
 
     channel1 = builder1.buildChannel();
     channel2 = builder2.buildChannel();
-    outputChannel = Channels.merge(Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannel();
+    outputChannel =
+        Channels.mergeOutput(Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannel();
     channel1.pass("test2").close();
     channel2.abort();
 
@@ -1571,7 +1309,7 @@ public class ChannelsTest {
     final HashMap<Integer, Channel<?, ?>> channelMap = new HashMap<Integer, Channel<?, ?>>(2);
     channelMap.put(7, channel1);
     channelMap.put(-3, channel2);
-    outputChannel = Channels.merge(channelMap).buildChannel();
+    outputChannel = Channels.mergeOutput(channelMap).buildChannel();
     channel1.abort();
     channel2.pass(111).close();
 
@@ -1591,7 +1329,7 @@ public class ChannelsTest {
 
     try {
 
-      Channels.merge(0, Collections.<Channel<?, Object>>emptyList());
+      Channels.mergeOutput(0, Collections.<Channel<?, Object>>emptyList());
 
       fail();
 
@@ -1601,7 +1339,7 @@ public class ChannelsTest {
 
     try {
 
-      Channels.merge(0);
+      Channels.mergeOutput(0);
 
       fail();
 
@@ -1611,7 +1349,7 @@ public class ChannelsTest {
 
     try {
 
-      Channels.merge(Collections.<Channel<?, Object>>emptyList());
+      Channels.mergeOutput(Collections.<Channel<?, Object>>emptyList());
 
       fail();
 
@@ -1621,7 +1359,7 @@ public class ChannelsTest {
 
     try {
 
-      Channels.merge(Collections.<Integer, Channel<?, Object>>emptyMap());
+      Channels.mergeOutput(Collections.<Integer, Channel<?, Object>>emptyMap());
 
       fail();
 
@@ -1631,7 +1369,7 @@ public class ChannelsTest {
 
     try {
 
-      Channels.merge();
+      Channels.mergeOutput();
 
       fail();
 
@@ -1641,7 +1379,7 @@ public class ChannelsTest {
 
     try {
 
-      Channels.merge(new Channel[]{null});
+      Channels.mergeOutput(new Channel[]{null});
 
       fail();
 
@@ -1651,7 +1389,7 @@ public class ChannelsTest {
 
     try {
 
-      Channels.merge(Collections.<Channel<?, ?>>singletonList(null));
+      Channels.mergeOutput(Collections.<Channel<?, ?>>singletonList(null));
 
       fail();
 
@@ -1661,7 +1399,7 @@ public class ChannelsTest {
 
     try {
 
-      Channels.merge(0, new Channel[]{null});
+      Channels.mergeOutput(0, new Channel[]{null});
 
       fail();
 
@@ -1671,7 +1409,7 @@ public class ChannelsTest {
 
     try {
 
-      Channels.merge(0, Collections.<Channel<?, ?>>singletonList(null));
+      Channels.mergeOutput(0, Collections.<Channel<?, ?>>singletonList(null));
 
       fail();
 
@@ -1681,7 +1419,282 @@ public class ChannelsTest {
 
     try {
 
-      Channels.merge(Collections.<Integer, Channel<?, ?>>singletonMap(1, null));
+      Channels.mergeOutput(Collections.<Integer, Channel<?, ?>>singletonMap(1, null));
+
+      fail();
+
+    } catch (final NullPointerException ignored) {
+
+    }
+  }
+
+  @Test
+  public void testMergeInput() {
+
+    final Channel<String, String> channel1 =
+        JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
+    final Channel<Integer, Integer> channel2 =
+        JRoutineCore.with(IdentityInvocation.<Integer>factoryOf()).call().sorted();
+    Channels.mergeInput(channel1, channel2)
+            .buildChannel()
+            .pass(new Flow<String>(0, "test1"))
+            .pass(new Flow<Integer>(1, 1))
+            .close();
+    Channels.mergeInput(3, channel1, channel2)
+            .buildChannel()
+            .pass(new Flow<String>(3, "test2"))
+            .pass(new Flow<Integer>(4, 2))
+            .close();
+    Channels.mergeInput(Arrays.<Channel<?, ?>>asList(channel1, channel2))
+            .buildChannel()
+            .pass(new Flow<String>(0, "test3"))
+            .pass(new Flow<Integer>(1, 3))
+            .close();
+    Channels.mergeInput(-5, Arrays.<Channel<?, ?>>asList(channel1, channel2))
+            .buildChannel()
+            .pass(new Flow<String>(-5, "test4"))
+            .pass(new Flow<Integer>(-4, 4))
+            .close();
+    final HashMap<Integer, Channel<?, ?>> map = new HashMap<Integer, Channel<?, ?>>(2);
+    map.put(31, channel1);
+    map.put(17, channel2);
+    Channels.mergeInput(map)
+            .buildChannel()
+            .pass(new Flow<String>(31, "test5"))
+            .pass(new Flow<Integer>(17, 5))
+            .close();
+    assertThat(channel1.close().in(seconds(1)).all()).containsExactly("test1", "test2", "test3",
+        "test4", "test5");
+    assertThat(channel2.close().in(seconds(1)).all()).containsExactly(1, 2, 3, 4, 5);
+  }
+
+  @Test
+  public void testMergeInputAbort() {
+
+    Channel<String, String> channel1;
+    Channel<Integer, Integer> channel2;
+    channel1 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
+    channel2 = JRoutineCore.with(IdentityInvocation.<Integer>factoryOf()).call().sorted();
+    Channels.mergeInput(channel1, channel2).buildChannel().abort();
+
+    try {
+
+      channel1.close().in(seconds(1)).next();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+
+    try {
+
+      channel2.close().in(seconds(1)).next();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+
+    channel1 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
+    channel2 = JRoutineCore.with(IdentityInvocation.<Integer>factoryOf()).call().sorted();
+    Channels.mergeInput(3, channel1, channel2).buildChannel().abort();
+
+    try {
+
+      channel1.close().in(seconds(1)).next();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+
+    try {
+
+      channel2.close().in(seconds(1)).next();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+
+    channel1 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
+    channel2 = JRoutineCore.with(IdentityInvocation.<Integer>factoryOf()).call().sorted();
+    Channels.mergeInput(Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannel().abort();
+
+    try {
+
+      channel1.close().in(seconds(1)).next();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+
+    try {
+
+      channel2.close().in(seconds(1)).next();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+
+    channel1 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
+    channel2 = JRoutineCore.with(IdentityInvocation.<Integer>factoryOf()).call().sorted();
+    Channels.mergeInput(-5, Arrays.<Channel<?, ?>>asList(channel1, channel2))
+            .buildChannel()
+            .abort();
+
+    try {
+
+      channel1.close().in(seconds(1)).next();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+
+    try {
+
+      channel2.close().in(seconds(1)).next();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+
+    channel1 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
+    channel2 = JRoutineCore.with(IdentityInvocation.<Integer>factoryOf()).call().sorted();
+    final HashMap<Integer, Channel<?, ?>> map = new HashMap<Integer, Channel<?, ?>>(2);
+    map.put(31, channel1);
+    map.put(17, channel2);
+    Channels.mergeInput(map).buildChannel().abort();
+
+    try {
+
+      channel1.close().in(seconds(1)).next();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+
+    try {
+
+      channel2.close().in(seconds(1)).next();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+  }
+
+  @Test
+  public void testMergeInputError() {
+
+    try {
+
+      Channels.mergeInput();
+
+      fail();
+
+    } catch (final IllegalArgumentException ignored) {
+
+    }
+
+    try {
+
+      Channels.mergeInput(0);
+
+      fail();
+
+    } catch (final IllegalArgumentException ignored) {
+
+    }
+
+    try {
+
+      Channels.mergeInput(Collections.<Channel<?, ?>>emptyList());
+
+      fail();
+
+    } catch (final IllegalArgumentException ignored) {
+
+    }
+
+    try {
+
+      Channels.mergeInput(0, Collections.<Channel<?, ?>>emptyList());
+
+      fail();
+
+    } catch (final IllegalArgumentException ignored) {
+
+    }
+
+    try {
+
+      Channels.mergeInput(Collections.<Integer, Channel<?, ?>>emptyMap());
+
+      fail();
+
+    } catch (final IllegalArgumentException ignored) {
+
+    }
+
+    try {
+
+      Channels.mergeInput(new Channel[]{null});
+
+      fail();
+
+    } catch (final NullPointerException ignored) {
+
+    }
+
+    try {
+
+      Channels.mergeInput(0, new Channel[]{null});
+
+      fail();
+
+    } catch (final NullPointerException ignored) {
+
+    }
+
+    try {
+
+      Channels.mergeInput(Collections.<Channel<?, ?>>singletonList(null));
+
+      fail();
+
+    } catch (final NullPointerException ignored) {
+
+    }
+
+    try {
+
+      Channels.mergeInput(0, Collections.<Channel<?, ?>>singletonList(null));
+
+      fail();
+
+    } catch (final NullPointerException ignored) {
+
+    }
+
+    try {
+
+      Channels.mergeInput(Collections.<Integer, Channel<?, ?>>singletonMap(0, null));
 
       fail();
 
@@ -1937,7 +1950,7 @@ public class ChannelsTest {
   public void testReplayError() {
 
     try {
-      Channels.replay(null);
+      Channels.replayOutput(null);
       fail();
 
     } catch (final NullPointerException ignored) {

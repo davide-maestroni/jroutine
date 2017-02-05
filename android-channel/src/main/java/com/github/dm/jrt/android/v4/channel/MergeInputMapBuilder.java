@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.android.v11.channel;
+package com.github.dm.jrt.android.v4.channel;
 
-import android.util.SparseArray;
+import android.support.v4.util.SparseArrayCompat;
 
-import com.github.dm.jrt.android.channel.AndroidChannels;
-import com.github.dm.jrt.android.channel.ParcelableFlow;
+import com.github.dm.jrt.channel.Flow;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.AbstractChannelBuilder;
 import com.github.dm.jrt.core.channel.Channel;
@@ -27,16 +26,16 @@ import com.github.dm.jrt.core.channel.Channel;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Builder implementation returning a channel merging data from a map of output channels.
+ * Builder implementation returning a channel merging data from a map of channels.
  * <p>
  * Created by davide-maestroni on 02/26/2016.
  *
- * @param <OUT> the output data type.
+ * @param <IN> the input data type.
  */
-class MergeMapBuilder<OUT>
-    extends AbstractChannelBuilder<ParcelableFlow<OUT>, ParcelableFlow<OUT>> {
+class MergeInputMapBuilder<IN>
+    extends AbstractChannelBuilder<Flow<? extends IN>, Flow<? extends IN>> {
 
-  private final SparseArray<? extends Channel<?, ? extends OUT>> mChannelMap;
+  private final SparseArrayCompat<? extends Channel<? extends IN, ?>> mChannelMap;
 
   /**
    * Constructor.
@@ -46,12 +45,13 @@ class MergeMapBuilder<OUT>
    * @throws java.lang.NullPointerException     if the specified map is null or contains a null
    *                                            object.
    */
-  MergeMapBuilder(@NotNull final SparseArray<? extends Channel<?, ? extends OUT>> channels) {
+  MergeInputMapBuilder(
+      @NotNull final SparseArrayCompat<? extends Channel<? extends IN, ?>> channels) {
     if (channels.size() == 0) {
       throw new IllegalArgumentException("the map of channels must not be empty");
     }
 
-    final SparseArray<? extends Channel<?, ? extends OUT>> channelMap = channels.clone();
+    final SparseArrayCompat<? extends Channel<? extends IN, ?>> channelMap = channels.clone();
     if (channelMap.indexOfValue(null) >= 0) {
       throw new NullPointerException("the map of channels must not contain null objects");
     }
@@ -61,17 +61,20 @@ class MergeMapBuilder<OUT>
 
   @NotNull
   @Override
-  public Channel<ParcelableFlow<OUT>, ParcelableFlow<OUT>> buildChannel() {
-    final SparseArray<? extends Channel<?, ? extends OUT>> channelMap = mChannelMap;
-    final Channel<ParcelableFlow<OUT>, ParcelableFlow<OUT>> outputChannel =
-        JRoutineCore.<ParcelableFlow<OUT>>ofInputs().apply(getConfiguration()).buildChannel();
+  public Channel<Flow<? extends IN>, Flow<? extends IN>> buildChannel() {
+    final SparseArrayCompat<? extends Channel<? extends IN, ?>> channelMap = mChannelMap;
     final int size = channelMap.size();
+    final SparseArrayCompat<Channel<IN, ?>> inputChannelMap =
+        new SparseArrayCompat<Channel<IN, ?>>(size);
     for (int i = 0; i < size; ++i) {
-      outputChannel.pass(
-          AndroidChannels.outputParcelableFlow(channelMap.valueAt(i), channelMap.keyAt(i))
-                         .buildChannel());
+      final Channel<IN, IN> outputChannel = JRoutineCore.<IN>ofInputs().buildChannel();
+      outputChannel.bind((Channel<IN, ?>) channelMap.valueAt(i));
+      inputChannelMap.put(channelMap.keyAt(i), outputChannel);
     }
 
-    return outputChannel.close();
+    final Channel<Flow<? extends IN>, Flow<? extends IN>> inputChannel =
+        JRoutineCore.<Flow<? extends IN>>ofInputs().apply(getConfiguration()).buildChannel();
+    inputChannel.bind(new SortingMapChannelConsumer<IN>(inputChannelMap));
+    return inputChannel;
   }
 }

@@ -47,7 +47,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @param <OUT> the output data type.
  */
-class ReplayChannel<OUT> implements Channel<OUT, OUT>, ChannelConsumer<OUT> {
+class ReplayOutputChannel<OUT> implements Channel<OUT, OUT>, ChannelConsumer<OUT> {
 
   private final ArrayList<OUT> mCached = new ArrayList<OUT>();
 
@@ -75,13 +75,18 @@ class ReplayChannel<OUT> implements Channel<OUT, OUT>, ChannelConsumer<OUT> {
    * @param configuration the channel configuration.
    * @param channel       the channel to replay.
    */
-  ReplayChannel(@Nullable final ChannelConfiguration configuration,
+  ReplayOutputChannel(@Nullable final ChannelConfiguration configuration,
       @NotNull final Channel<?, OUT> channel) {
     mConfiguration =
         (configuration != null) ? configuration : ChannelConfiguration.defaultConfiguration();
     mOutputChannel = createOutputChannel();
     mChannel = channel;
     channel.bind((ChannelConsumer<? super OUT>) this);
+  }
+
+  @NotNull
+  private static IllegalStateException illegalInput() {
+    return new IllegalStateException("cannot pass data to a replay output channel");
   }
 
   public boolean abort() {
@@ -281,22 +286,22 @@ class ReplayChannel<OUT> implements Channel<OUT, OUT>, ChannelConsumer<OUT> {
 
   @NotNull
   public Channel<OUT, OUT> pass(@Nullable final Channel<?, ? extends OUT> channel) {
-    throw new IllegalStateException("cannot pass data to a replay channel");
+    throw illegalInput();
   }
 
   @NotNull
   public Channel<OUT, OUT> pass(@Nullable final Iterable<? extends OUT> inputs) {
-    throw new IllegalStateException("cannot pass data to a replay channel");
+    throw illegalInput();
   }
 
   @NotNull
   public Channel<OUT, OUT> pass(@Nullable final OUT input) {
-    throw new IllegalStateException("cannot pass data to a replay channel");
+    throw illegalInput();
   }
 
   @NotNull
   public Channel<OUT, OUT> pass(@Nullable final OUT... inputs) {
-    throw new IllegalStateException("cannot pass data to a replay channel");
+    throw illegalInput();
   }
 
   public int size() {

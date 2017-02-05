@@ -735,7 +735,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
     final Channel<OUT, OUT> resultChannel = JRoutineCore.<OUT>ofInputs().buildChannel();
     outputChannels.add(resultChannel);
     final Channel<?, ? extends Flow<Object>> inputChannel =
-        (!inputChannels.isEmpty()) ? Channels.merge(inputChannels).buildChannel()
+        (!inputChannels.isEmpty()) ? Channels.mergeOutput(inputChannels).buildChannel()
             : JRoutineCore.<Flow<Object>>of().buildChannel();
     final Channel<Flow<Object>, Flow<Object>> outputChannel =
         mode.invoke(JRoutineCore.with(factory).apply(getConfiguration()))
@@ -988,7 +988,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
         mIsBound = true;
         final List<Channel<?, ?>> outputChannels = getOutputChannels();
         if (!outputChannels.isEmpty()) {
-          result.pass(Channels.merge(outputChannels).buildChannel());
+          result.pass(Channels.mergeOutput(outputChannels).buildChannel());
         }
       }
     }

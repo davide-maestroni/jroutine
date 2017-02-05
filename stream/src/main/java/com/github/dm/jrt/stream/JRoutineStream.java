@@ -242,7 +242,8 @@ public class JRoutineStream {
    */
   @NotNull
   public static <IN> StreamBuilder<IN, IN> withStreamOf(@Nullable final IN input) {
-    return withStreamOf(Channels.replay(JRoutineCore.of(input).buildChannel()).buildChannel());
+    return withStreamOf(
+        Channels.replayOutput(JRoutineCore.of(input).buildChannel()).buildChannel());
   }
 
   /**
@@ -259,7 +260,8 @@ public class JRoutineStream {
    */
   @NotNull
   public static <IN> StreamBuilder<IN, IN> withStreamOf(@Nullable final IN... inputs) {
-    return withStreamOf(Channels.replay(JRoutineCore.of(inputs).buildChannel()).buildChannel());
+    return withStreamOf(
+        Channels.replayOutput(JRoutineCore.of(inputs).buildChannel()).buildChannel());
   }
 
   /**
@@ -277,7 +279,8 @@ public class JRoutineStream {
   @NotNull
   public static <IN> StreamBuilder<IN, IN> withStreamOf(
       @Nullable final Iterable<? extends IN> inputs) {
-    return withStreamOf(Channels.replay(JRoutineCore.of(inputs).buildChannel()).buildChannel());
+    return withStreamOf(
+        Channels.replayOutput(JRoutineCore.of(inputs).buildChannel()).buildChannel());
   }
 
   /**
@@ -290,7 +293,7 @@ public class JRoutineStream {
    * <p>
    * Note that the passed channel will be bound as a result of the call, so, in order to support
    * multiple invocations, consider wrapping the channel in a replayable one, by calling the
-   * {@link Channels#replay(Channel)} utility method.
+   * {@link Channels#replayOutput(Channel)} utility method.
    *
    * @param channel the input channel.
    * @param <IN>    the input data type.

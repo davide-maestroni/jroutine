@@ -56,12 +56,12 @@ public class AndroidChannels extends Channels {
    * @throws java.lang.IllegalArgumentException if the specified array is empty.
    * @throws java.lang.NullPointerException     if the specified array is null or contains a null
    *                                            object.
-   * @see Channels#merge(Channel...)
+   * @see Channels#mergeOutput(Channel...)
    */
   @NotNull
-  public static <OUT> ChannelBuilder<?, ParcelableFlow<OUT>> mergeParcelable(
+  public static <OUT> ChannelBuilder<?, ParcelableFlow<OUT>> mergeParcelableOutput(
       @NotNull final Channel<?, ?>... channels) {
-    return mergeParcelable(0, channels);
+    return mergeParcelableOutput(0, channels);
   }
 
   /**
@@ -81,13 +81,14 @@ public class AndroidChannels extends Channels {
    * @throws java.lang.IllegalArgumentException if the specified array is empty.
    * @throws java.lang.NullPointerException     if the specified array is null or contains a null
    *                                            object.
-   * @see Channels#merge(int, Channel...)
+   * @see Channels#mergeOutput(int, Channel...)
    */
   @NotNull
   @SuppressWarnings("unchecked")
-  public static <OUT> ChannelBuilder<?, ParcelableFlow<OUT>> mergeParcelable(final int startId,
-      @NotNull final Channel<?, ?>... channels) {
-    return (MergeBuilder<OUT>) new MergeBuilder<Object>(startId, Arrays.asList(channels));
+  public static <OUT> ChannelBuilder<?, ParcelableFlow<OUT>> mergeParcelableOutput(
+      final int startId, @NotNull final Channel<?, ?>... channels) {
+    return (MergeOutputBuilder<OUT>) new MergeOutputBuilder<Object>(startId,
+        Arrays.asList(channels));
   }
 
   /**
@@ -107,12 +108,12 @@ public class AndroidChannels extends Channels {
    * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
    * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
    *                                            null object.
-   * @see Channels#merge(int, Iterable)
+   * @see Channels#mergeOutput(int, Iterable)
    */
   @NotNull
-  public static <OUT> ChannelBuilder<?, ParcelableFlow<OUT>> mergeParcelable(final int startId,
-      @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
-    return new MergeBuilder<OUT>(startId, channels);
+  public static <OUT> ChannelBuilder<?, ParcelableFlow<OUT>> mergeParcelableOutput(
+      final int startId, @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
+    return new MergeOutputBuilder<OUT>(startId, channels);
   }
 
   /**
@@ -131,12 +132,12 @@ public class AndroidChannels extends Channels {
    * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
    * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
    *                                            null object.
-   * @see Channels#merge(Iterable)
+   * @see Channels#mergeOutput(Iterable)
    */
   @NotNull
-  public static <OUT> ChannelBuilder<?, ParcelableFlow<OUT>> mergeParcelable(
+  public static <OUT> ChannelBuilder<?, ParcelableFlow<OUT>> mergeParcelableOutput(
       @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
-    return mergeParcelable(0, channels);
+    return mergeParcelableOutput(0, channels);
   }
 
   /**

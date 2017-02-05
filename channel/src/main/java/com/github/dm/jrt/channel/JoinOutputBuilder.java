@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @param <OUT> the output data type.
  */
-class JoinBuilder<OUT> extends AbstractChannelBuilder<List<OUT>, List<OUT>> {
+class JoinOutputBuilder<OUT> extends AbstractChannelBuilder<List<OUT>, List<OUT>> {
 
   private final ArrayList<Channel<?, ? extends OUT>> mChannels;
 
@@ -44,7 +44,7 @@ class JoinBuilder<OUT> extends AbstractChannelBuilder<List<OUT>, List<OUT>> {
    * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
    *                                            null object.
    */
-  JoinBuilder(final boolean isFlush, @Nullable final OUT placeholder,
+  JoinOutputBuilder(final boolean isFlush, @Nullable final OUT placeholder,
       @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
     final ArrayList<Channel<?, ? extends OUT>> channelList =
         new ArrayList<Channel<?, ? extends OUT>>();

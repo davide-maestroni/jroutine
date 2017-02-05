@@ -363,7 +363,8 @@ public class ServiceRoutineMethod extends RoutineMethod
     final Channel<OUT, OUT> resultChannel = JRoutineCore.<OUT>ofInputs().buildChannel();
     outputChannels.add(resultChannel);
     final Channel<?, ? extends ParcelableFlow<Object>> inputChannel =
-        (!inputChannels.isEmpty()) ? AndroidChannels.mergeParcelable(inputChannels).buildChannel()
+        (!inputChannels.isEmpty()) ? AndroidChannels.mergeParcelableOutput(inputChannels)
+                                                    .buildChannel()
             : JRoutineCore.<ParcelableFlow<Object>>of().buildChannel();
     final Channel<ParcelableFlow<Object>, ParcelableFlow<Object>> outputChannel = mode.invoke(
         JRoutineService.on(mContext)
@@ -700,7 +701,7 @@ public class ServiceRoutineMethod extends RoutineMethod
         mIsBound = true;
         final List<Channel<?, ?>> outputChannels = mOutputChannels;
         if (!outputChannels.isEmpty()) {
-          result.pass(AndroidChannels.mergeParcelable(outputChannels).buildChannel());
+          result.pass(AndroidChannels.mergeParcelableOutput(outputChannels).buildChannel());
         }
       }
     }

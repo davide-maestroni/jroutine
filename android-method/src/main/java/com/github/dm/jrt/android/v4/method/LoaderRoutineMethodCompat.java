@@ -404,7 +404,8 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
     final Channel<?, OUT> resultChannel = JRoutineCore.<OUT>ofInputs().buildChannel();
     outputChannels.add(resultChannel);
     final Channel<?, ? extends Flow<Object>> inputChannel =
-        (!inputChannels.isEmpty()) ? AndroidChannels.mergeParcelable(inputChannels).buildChannel()
+        (!inputChannels.isEmpty()) ? AndroidChannels.mergeParcelableOutput(inputChannels)
+                                                    .buildChannel()
             : JRoutineCore.<Flow<Object>>of().buildChannel();
     final Channel<Flow<Object>, Flow<Object>> outputChannel = mode.invoke(
         JRoutineLoaderCompat.on(mContext)
@@ -696,7 +697,7 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
         mIsBound = true;
         final List<Channel<?, ?>> outputChannels = getOutputChannels();
         if (!outputChannels.isEmpty()) {
-          result.pass(Channels.merge(outputChannels).buildChannel());
+          result.pass(Channels.mergeOutput(outputChannels).buildChannel());
         }
       }
     }

@@ -47,7 +47,7 @@ public class SparseChannelsCompat extends AndroidChannels {
   }
 
   /**
-   * Returns a builder of channels combining the specified instances into a flow one.
+   * Returns a builder of channels merging the specified instances into a flow one.
    * <br>
    * The flow IDs will be the keys of the specified map.
    * <p>
@@ -62,12 +62,12 @@ public class SparseChannelsCompat extends AndroidChannels {
    * @throws java.lang.IllegalArgumentException if the specified map is empty.
    * @throws java.lang.NullPointerException     if the specified map is null or contains a null
    *                                            object.
-   * @see AndroidChannels#combine(Map)
+   * @see AndroidChannels#mergeInput(Map)
    */
   @NotNull
-  public static <IN> ChannelBuilder<Flow<? extends IN>, ?> combine(
+  public static <IN> ChannelBuilder<Flow<? extends IN>, ?> mergeInput(
       @NotNull final SparseArrayCompat<? extends Channel<? extends IN, ?>> channels) {
-    return new CombineMapBuilder<IN>(channels);
+    return new MergeInputMapBuilder<IN>(channels);
   }
 
   /**
@@ -86,12 +86,12 @@ public class SparseChannelsCompat extends AndroidChannels {
    * @throws java.lang.IllegalArgumentException if the specified map is empty.
    * @throws java.lang.NullPointerException     if the specified map is null or contains a null
    *                                            object.
-   * @see AndroidChannels#merge(Map)
+   * @see AndroidChannels#mergeOutput(Map)
    */
   @NotNull
-  public static <OUT> ChannelBuilder<?, ParcelableFlow<OUT>> mergeParcelable(
+  public static <OUT> ChannelBuilder<?, ParcelableFlow<OUT>> mergeParcelableOutput(
       @NotNull final SparseArrayCompat<? extends Channel<?, ? extends OUT>> channels) {
-    return new MergeMapBuilder<OUT>(channels);
+    return new MergeOutputMapBuilder<OUT>(channels);
   }
 
   /**

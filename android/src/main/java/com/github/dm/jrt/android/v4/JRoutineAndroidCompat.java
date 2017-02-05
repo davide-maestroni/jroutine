@@ -458,7 +458,7 @@ public class JRoutineAndroidCompat extends SparseChannelsCompat {
    * <p>
    * Note that the passed channel will be bound as a result of the call, so, in order to support
    * multiple invocations, consider wrapping the channel in a replayable one, by calling the
-   * {@link Channels#replay(Channel)} utility method.
+   * {@link Channels#replayOutput(Channel)} utility method.
    *
    * @param channel the input channel.
    * @param <IN>    the input data type.

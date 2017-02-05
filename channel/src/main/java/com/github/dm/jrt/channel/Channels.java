@@ -48,6 +48,8 @@ public class Channels {
     ConstantConditions.avoid();
   }
 
+  // TODO: 05/02/2017 List<Channel<?, ?>> blendInput(int count)?
+
   /**
    * Returns a builder of channels blending the outputs coming from the specified ones.
    * <p>
@@ -70,13 +72,13 @@ public class Channels {
    */
   @NotNull
   @SuppressWarnings("unchecked")
-  public static <OUT> ChannelBuilder<?, OUT> blend(@NotNull final Channel<?, ?>... channels) {
+  public static <OUT> ChannelBuilder<?, OUT> blendOutput(@NotNull final Channel<?, ?>... channels) {
     final int length = channels.length;
     if (length == 0) {
       throw new IllegalArgumentException("the array of channels must not be empty");
     }
 
-    return (BlendBuilder<OUT>) new BlendBuilder<Object>(Arrays.asList(channels));
+    return (BlendOutputBuilder<OUT>) new BlendOutputBuilder<Object>(Arrays.asList(channels));
   }
 
   /**
@@ -100,152 +102,9 @@ public class Channels {
    *                                            null object.
    */
   @NotNull
-  public static <OUT> ChannelBuilder<?, OUT> blend(
+  public static <OUT> ChannelBuilder<?, OUT> blendOutput(
       @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
-    return new BlendBuilder<OUT>(channels);
-  }
-
-  /**
-   * Returns a builder of channels combining the specified instances into a flow one.
-   * <br>
-   * The flow IDs will be the position in the array.
-   * <p>
-   * Note that the builder will successfully create several channel instances.
-   * <p>
-   * Given channels {@code A}, {@code B} and {@code C}, their final output will be:
-   * <pre><code>
-   * A =&gt; [Flow(0, IN).data, Flow(0, IN).data, Flow(0, IN).data, ...]
-   * B =&gt; [Flow(1, IN).data, Flow(1, IN).data, Flow(1, IN).data, ...]
-   * C =&gt; [Flow(2, IN).data, Flow(2, IN).data, Flow(2, IN).data, ...]
-   * </code></pre>
-   *
-   * @param channels the array of channels.
-   * @param <IN>     the input data type.
-   * @return the flow channel builder.
-   * @throws java.lang.IllegalArgumentException if the specified array is empty.
-   * @throws java.lang.NullPointerException     if the specified array is null or contains a null
-   *                                            object.
-   */
-  @NotNull
-  public static <IN> ChannelBuilder<Flow<? extends IN>, ?> combine(
-      @NotNull final Channel<?, ?>... channels) {
-    return combine(0, channels);
-  }
-
-  /**
-   * Returns a builder of channels combining the specified instances into a flow one.
-   * <br>
-   * The flow IDs will start from the specified one.
-   * <p>
-   * Note that the builder will successfully create several channel instances.
-   * <p>
-   * Given channels {@code A}, {@code B} and {@code C}, their final output will be:
-   * <pre><code>
-   * A =&gt; [Flow(startId + 0, IN).data, Flow(startId + 0, IN).data, ...]
-   * B =&gt; [Flow(startId + 1, IN).data, Flow(startId + 1, IN).data, ...]
-   * C =&gt; [Flow(startId + 2, IN).data, Flow(startId + 2, IN).data, ...]
-   * </code></pre>
-   *
-   * @param startId  the flow start ID.
-   * @param channels the array of channels.
-   * @param <IN>     the input data type.
-   * @return the flow channel builder.
-   * @throws java.lang.IllegalArgumentException if the specified array is empty.
-   * @throws java.lang.NullPointerException     if the specified array is null or contains a null
-   *                                            object.
-   */
-  @NotNull
-  @SuppressWarnings("unchecked")
-  public static <IN> ChannelBuilder<Flow<? extends IN>, ?> combine(final int startId,
-      @NotNull final Channel<?, ?>... channels) {
-    final int length = channels.length;
-    if (length == 0) {
-      throw new IllegalArgumentException("the array of channels must not be empty");
-    }
-
-    return (CombineBuilder<IN>) new CombineBuilder<Object>(startId, Arrays.asList(channels));
-  }
-
-  /**
-   * Returns a builder of channels combining the specified instances into a flow one.
-   * <br>
-   * The flow IDs will start from the specified one.
-   * <p>
-   * Note that the builder will successfully create several channel instances.
-   * <p>
-   * Given channels {@code A}, {@code B} and {@code C}, their final output will be:
-   * <pre><code>
-   * A =&gt; [Flow(startId + 0, IN).data, Flow(startId + 0, IN).data, ...]
-   * B =&gt; [Flow(startId + 1, IN).data, Flow(startId + 1, IN).data, ...]
-   * C =&gt; [Flow(startId + 2, IN).data, Flow(startId + 2, IN).data, ...]
-   * </code></pre>
-   *
-   * @param startId  the flow start ID.
-   * @param channels the iterable of channels.
-   * @param <IN>     the input data type.
-   * @return the flow channel builder.
-   * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
-   * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
-   *                                            null object.
-   */
-  @NotNull
-  public static <IN> ChannelBuilder<Flow<? extends IN>, ?> combine(final int startId,
-      @NotNull final Iterable<? extends Channel<? extends IN, ?>> channels) {
-    return new CombineBuilder<IN>(startId, channels);
-  }
-
-  /**
-   * Returns a builder of channels combining the specified instances into a flow one.
-   * <br>
-   * The flow IDs will be the position in the iterable.
-   * <p>
-   * Note that the builder will successfully create several channel instances.
-   * <p>
-   * Given channels {@code A}, {@code B} and {@code C}, their final output will be:
-   * <pre><code>
-   * A =&gt; [Flow(0, IN).data, Flow(0, IN).data, Flow(0, IN).data, ...]
-   * B =&gt; [Flow(1, IN).data, Flow(1, IN).data, Flow(1, IN).data, ...]
-   * C =&gt; [Flow(2, IN).data, Flow(2, IN).data, Flow(2, IN).data, ...]
-   * </code></pre>
-   *
-   * @param channels the iterable of channels.
-   * @param <IN>     the input data type.
-   * @return the flow channel builder.
-   * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
-   * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
-   *                                            null object.
-   */
-  @NotNull
-  public static <IN> ChannelBuilder<Flow<? extends IN>, ?> combine(
-      @NotNull final Iterable<? extends Channel<? extends IN, ?>> channels) {
-    return combine(0, channels);
-  }
-
-  /**
-   * Returns a builder of channels combining the specified instances into a flow one.
-   * <br>
-   * The flow IDs will be the keys of the specified map.
-   * <p>
-   * Note that the builder will successfully create several channel instances.
-   * <p>
-   * Given channels {@code A}, {@code B} and {@code C}, their final output will be:
-   * <pre><code>
-   * A =&gt; [Flow(key(A), IN).data, Flow(key(A), IN).data, ...]
-   * B =&gt; [Flow(key(B), IN).data, Flow(key(B), IN).data, ...]
-   * C =&gt; [Flow(key(C), IN).data, Flow(key(C), IN).data, ...]
-   * </code></pre>
-   *
-   * @param channels the map of IDs and channels.
-   * @param <IN>     the input data type.
-   * @return the flow channel builder.
-   * @throws java.lang.IllegalArgumentException if the specified map is empty.
-   * @throws java.lang.NullPointerException     if the specified map is null or contains a null
-   *                                            object.
-   */
-  @NotNull
-  public static <IN> ChannelBuilder<Flow<? extends IN>, ?> combine(
-      @NotNull final Map<Integer, ? extends Channel<? extends IN, ?>> channels) {
-    return new CombineMapBuilder<IN>(channels);
+    return new BlendOutputBuilder<OUT>(channels);
   }
 
   /**
@@ -272,13 +131,14 @@ public class Channels {
    */
   @NotNull
   @SuppressWarnings("unchecked")
-  public static <OUT> ChannelBuilder<?, OUT> concat(@NotNull final Channel<?, ?>... channels) {
+  public static <OUT> ChannelBuilder<?, OUT> concatOutput(
+      @NotNull final Channel<?, ?>... channels) {
     final int length = channels.length;
     if (length == 0) {
       throw new IllegalArgumentException("the array of channels must not be empty");
     }
 
-    return (ConcatBuilder<OUT>) new ConcatBuilder<Object>(Arrays.asList(channels));
+    return (ConcatOutputBuilder<OUT>) new ConcatOutputBuilder<Object>(Arrays.asList(channels));
   }
 
   /**
@@ -304,120 +164,9 @@ public class Channels {
    *                                            null object.
    */
   @NotNull
-  public static <OUT> ChannelBuilder<?, OUT> concat(
+  public static <OUT> ChannelBuilder<?, OUT> concatOutput(
       @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
-    return new ConcatBuilder<OUT>(channels);
-  }
-
-  /**
-   * Returns a builder of channels distributing the input data among the specified ones. If the
-   * list of data exceeds the number of channels, the invocation will be aborted.
-   * <p>
-   * Note that the builder will successfully create several channel instances.
-   * <p>
-   * Given channels {@code A}, {@code B} and {@code C}, their final output will be:
-   * <pre><code>
-   * A =&gt; [list(0), list(0), list(0), ..., list(0), ..., list(0), ...]
-   * B =&gt; [list(1), list(1), list(1), ..., list(1), ..., list(1)]
-   * C =&gt; [list(2), list(2), list(2), ..., list(2)]
-   * </code></pre>
-   *
-   * @param channels the array of channels.
-   * @param <IN>     the input data type.
-   * @return the channel builder.
-   * @throws java.lang.IllegalArgumentException if the specified array is empty.
-   * @throws java.lang.NullPointerException     if the specified array is null or contains a null
-   *                                            object.
-   */
-  @NotNull
-  public static <IN> ChannelBuilder<List<? extends IN>, ?> distribute(
-      @NotNull final Channel<?, ?>... channels) {
-    return distribute(false, null, channels);
-  }
-
-  /**
-   * Returns a builder of channels distributing the input data among the specified ones. If the
-   * list of data is smaller than the specified number of channels, the remaining ones will be fed
-   * with the specified placeholder instance. While, if the list of data exceeds the number of
-   * channels, the invocation will be aborted.
-   * <p>
-   * Note that the builder will successfully create several channel instances.
-   * <p>
-   * Given channels {@code A}, {@code B} and {@code C}, their final output will be:
-   * <pre><code>
-   * A =&gt; [list(0), list(0), list(0), ..., list(0), ..., list(0), ...]
-   * B =&gt; [list(1), list(1), list(1), ..., list(1), ..., list(1), placeholder, ...]
-   * C =&gt; [list(2), list(2), list(2), ..., list(2), placeholder, placeholder, ...]
-   * </code></pre>
-   *
-   * @param placeholder the placeholder instance.
-   * @param channels    the array of channels.
-   * @param <IN>        the input data type.
-   * @return the channel builder.
-   * @throws java.lang.IllegalArgumentException if the specified array is empty.
-   * @throws java.lang.NullPointerException     if the specified array is null or contains a null
-   *                                            object.
-   */
-  @NotNull
-  public static <IN> ChannelBuilder<List<? extends IN>, ?> distribute(
-      @Nullable final IN placeholder, @NotNull final Channel<?, ?>... channels) {
-    return distribute(true, placeholder, channels);
-  }
-
-  /**
-   * Returns a builder of channels distributing the input data among the specified ones. If the
-   * list of data is smaller than the specified number of channels, the remaining ones will be fed
-   * with the specified placeholder instance. While, if the list of data exceeds the number of
-   * channels, the invocation will be aborted.
-   * <p>
-   * Note that the builder will successfully create several channel instances.
-   * <p>
-   * Given channels {@code A}, {@code B} and {@code C}, their final output will be:
-   * <pre><code>
-   * A =&gt; [list(0), list(0), list(0), ..., list(0), ..., list(0), ...]
-   * B =&gt; [list(1), list(1), list(1), ..., list(1), ..., list(1), placeholder, ...]
-   * C =&gt; [list(2), list(2), list(2), ..., list(2), placeholder, placeholder, ...]
-   * </code></pre>
-   *
-   * @param placeholder the placeholder instance.
-   * @param channels    the iterable of channels.
-   * @param <IN>        the input data type.
-   * @return the channel builder.
-   * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
-   * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
-   *                                            null object.
-   */
-  @NotNull
-  public static <IN> ChannelBuilder<List<? extends IN>, ?> distribute(
-      @Nullable final IN placeholder,
-      @NotNull final Iterable<? extends Channel<? extends IN, ?>> channels) {
-    return distribute(true, placeholder, channels);
-  }
-
-  /**
-   * Returns a builder of channels distributing the input data among the specified ones. If the
-   * list of data exceeds the number of channels, the invocation will be aborted.
-   * <p>
-   * Note that the builder will successfully create several channel instances.
-   * <p>
-   * Given channels {@code A}, {@code B} and {@code C}, their final output will be:
-   * <pre><code>
-   * A =&gt; [list(0), list(0), list(0), ..., list(0), ..., list(0), ...]
-   * B =&gt; [list(1), list(1), list(1), ..., list(1), ..., list(1)]
-   * C =&gt; [list(2), list(2), list(2), ..., list(2)]
-   * </code></pre>
-   *
-   * @param channels the iterable of channels.
-   * @param <IN>     the input data type.
-   * @return the channel builder.
-   * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
-   * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
-   *                                            null object.
-   */
-  @NotNull
-  public static <IN> ChannelBuilder<List<? extends IN>, ?> distribute(
-      @NotNull final Iterable<? extends Channel<? extends IN, ?>> channels) {
-    return distribute(false, null, channels);
+    return new ConcatOutputBuilder<OUT>(channels);
   }
 
   /**
@@ -663,20 +412,22 @@ public class Channels {
    * Returns a builder of channels producing the result of the specified Future.
    * <br>
    * If the channel is aborted the Future will be cancelled with {@code mayInterruptIfRunning} set
-   * to true.
+   * to the specified value.
    * <p>
    * Note that the configured runner will be employed to wait for the Future to complete.
    * <br>
    * Note also that the returned channel will be already closed.
    *
-   * @param future the Future instance.
-   * @param <OUT>  the output data type.
+   * @param future                the Future instance.
+   * @param mayInterruptIfRunning true if the thread executing the Future task should be
+   *                              interrupted; otherwise, in-progress tasks are allowed to complete.
+   * @param <OUT>                 the output data type.
    * @return the channel builder.
    */
   @NotNull
-  public static <OUT> ChannelBuilder<?, OUT> fromFutureInterruptIfRunning(
-      @NotNull final Future<OUT> future) {
-    return new FutureChannelBuilder<OUT>(future, true);
+  public static <OUT> ChannelBuilder<?, OUT> fromFuture(@NotNull final Future<OUT> future,
+      final boolean mayInterruptIfRunning) {
+    return new FutureChannelBuilder<OUT>(future, mayInterruptIfRunning);
   }
 
   /**
@@ -703,6 +454,116 @@ public class Channels {
   }
 
   /**
+   * Returns a builder of channels distributing the input data among the specified ones. If the
+   * list of data exceeds the number of channels, the invocation will be aborted.
+   * <p>
+   * Note that the builder will successfully create several channel instances.
+   * <p>
+   * Given channels {@code A}, {@code B} and {@code C}, their final output will be:
+   * <pre><code>
+   * A =&gt; [list(0), list(0), list(0), ..., list(0), ..., list(0), ...]
+   * B =&gt; [list(1), list(1), list(1), ..., list(1), ..., list(1)]
+   * C =&gt; [list(2), list(2), list(2), ..., list(2)]
+   * </code></pre>
+   *
+   * @param channels the array of channels.
+   * @param <IN>     the input data type.
+   * @return the channel builder.
+   * @throws java.lang.IllegalArgumentException if the specified array is empty.
+   * @throws java.lang.NullPointerException     if the specified array is null or contains a null
+   *                                            object.
+   */
+  @NotNull
+  public static <IN> ChannelBuilder<List<? extends IN>, ?> joinInput(
+      @NotNull final Channel<?, ?>... channels) {
+    return joinInput(false, null, channels);
+  }
+
+  /**
+   * Returns a builder of channels distributing the input data among the specified ones. If the
+   * list of data is smaller than the specified number of channels, the remaining ones will be fed
+   * with the specified placeholder instance. While, if the list of data exceeds the number of
+   * channels, the invocation will be aborted.
+   * <p>
+   * Note that the builder will successfully create several channel instances.
+   * <p>
+   * Given channels {@code A}, {@code B} and {@code C}, their final output will be:
+   * <pre><code>
+   * A =&gt; [list(0), list(0), list(0), ..., list(0), ..., list(0), ...]
+   * B =&gt; [list(1), list(1), list(1), ..., list(1), ..., list(1), placeholder, ...]
+   * C =&gt; [list(2), list(2), list(2), ..., list(2), placeholder, placeholder, ...]
+   * </code></pre>
+   *
+   * @param placeholder the placeholder instance.
+   * @param channels    the array of channels.
+   * @param <IN>        the input data type.
+   * @return the channel builder.
+   * @throws java.lang.IllegalArgumentException if the specified array is empty.
+   * @throws java.lang.NullPointerException     if the specified array is null or contains a null
+   *                                            object.
+   */
+  @NotNull
+  public static <IN> ChannelBuilder<List<? extends IN>, ?> joinInput(@Nullable final IN placeholder,
+      @NotNull final Channel<?, ?>... channels) {
+    return joinInput(true, placeholder, channels);
+  }
+
+  /**
+   * Returns a builder of channels distributing the input data among the specified ones. If the
+   * list of data is smaller than the specified number of channels, the remaining ones will be fed
+   * with the specified placeholder instance. While, if the list of data exceeds the number of
+   * channels, the invocation will be aborted.
+   * <p>
+   * Note that the builder will successfully create several channel instances.
+   * <p>
+   * Given channels {@code A}, {@code B} and {@code C}, their final output will be:
+   * <pre><code>
+   * A =&gt; [list(0), list(0), list(0), ..., list(0), ..., list(0), ...]
+   * B =&gt; [list(1), list(1), list(1), ..., list(1), ..., list(1), placeholder, ...]
+   * C =&gt; [list(2), list(2), list(2), ..., list(2), placeholder, placeholder, ...]
+   * </code></pre>
+   *
+   * @param placeholder the placeholder instance.
+   * @param channels    the iterable of channels.
+   * @param <IN>        the input data type.
+   * @return the channel builder.
+   * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
+   * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
+   *                                            null object.
+   */
+  @NotNull
+  public static <IN> ChannelBuilder<List<? extends IN>, ?> joinInput(@Nullable final IN placeholder,
+      @NotNull final Iterable<? extends Channel<? extends IN, ?>> channels) {
+    return joinInput(true, placeholder, channels);
+  }
+
+  /**
+   * Returns a builder of channels distributing the input data among the specified ones. If the
+   * list of data exceeds the number of channels, the invocation will be aborted.
+   * <p>
+   * Note that the builder will successfully create several channel instances.
+   * <p>
+   * Given channels {@code A}, {@code B} and {@code C}, their final output will be:
+   * <pre><code>
+   * A =&gt; [list(0), list(0), list(0), ..., list(0), ..., list(0), ...]
+   * B =&gt; [list(1), list(1), list(1), ..., list(1), ..., list(1)]
+   * C =&gt; [list(2), list(2), list(2), ..., list(2)]
+   * </code></pre>
+   *
+   * @param channels the iterable of channels.
+   * @param <IN>     the input data type.
+   * @return the channel builder.
+   * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
+   * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
+   *                                            null object.
+   */
+  @NotNull
+  public static <IN> ChannelBuilder<List<? extends IN>, ?> joinInput(
+      @NotNull final Iterable<? extends Channel<? extends IN, ?>> channels) {
+    return joinInput(false, null, channels);
+  }
+
+  /**
    * Returns a builder of channels joining the data coming from the specified ones.
    * <br>
    * An output will be generated only when at least one result is available for each channel.
@@ -725,8 +586,9 @@ public class Channels {
    *                                            object.
    */
   @NotNull
-  public static <OUT> ChannelBuilder<?, List<OUT>> join(@NotNull final Channel<?, ?>... channels) {
-    return join(false, null, channels);
+  public static <OUT> ChannelBuilder<?, List<OUT>> joinOutput(
+      @NotNull final Channel<?, ?>... channels) {
+    return joinOutput(false, null, channels);
   }
 
   /**
@@ -752,9 +614,9 @@ public class Channels {
    *                                            null object.
    */
   @NotNull
-  public static <OUT> ChannelBuilder<?, List<OUT>> join(
+  public static <OUT> ChannelBuilder<?, List<OUT>> joinOutput(
       @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
-    return join(false, null, channels);
+    return joinOutput(false, null, channels);
   }
 
   /**
@@ -784,9 +646,9 @@ public class Channels {
    *                                            object.
    */
   @NotNull
-  public static <OUT> ChannelBuilder<?, List<OUT>> join(@Nullable final OUT placeholder,
+  public static <OUT> ChannelBuilder<?, List<OUT>> joinOutput(@Nullable final OUT placeholder,
       @NotNull final Channel<?, ?>... channels) {
-    return join(true, placeholder, channels);
+    return joinOutput(true, placeholder, channels);
   }
 
   /**
@@ -816,9 +678,152 @@ public class Channels {
    *                                            null object.
    */
   @NotNull
-  public static <OUT> ChannelBuilder<?, List<OUT>> join(@Nullable final OUT placeholder,
+  public static <OUT> ChannelBuilder<?, List<OUT>> joinOutput(@Nullable final OUT placeholder,
       @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
-    return join(true, placeholder, channels);
+    return joinOutput(true, placeholder, channels);
+  }
+
+  /**
+   * Returns a builder of channels merging the specified instances into a flow one.
+   * <br>
+   * The flow IDs will be the position in the array.
+   * <p>
+   * Note that the builder will successfully create several channel instances.
+   * <p>
+   * Given channels {@code A}, {@code B} and {@code C}, their final output will be:
+   * <pre><code>
+   * A =&gt; [Flow(0, IN).data, Flow(0, IN).data, Flow(0, IN).data, ...]
+   * B =&gt; [Flow(1, IN).data, Flow(1, IN).data, Flow(1, IN).data, ...]
+   * C =&gt; [Flow(2, IN).data, Flow(2, IN).data, Flow(2, IN).data, ...]
+   * </code></pre>
+   *
+   * @param channels the array of channels.
+   * @param <IN>     the input data type.
+   * @return the flow channel builder.
+   * @throws java.lang.IllegalArgumentException if the specified array is empty.
+   * @throws java.lang.NullPointerException     if the specified array is null or contains a null
+   *                                            object.
+   */
+  @NotNull
+  public static <IN> ChannelBuilder<Flow<? extends IN>, ?> mergeInput(
+      @NotNull final Channel<?, ?>... channels) {
+    return mergeInput(0, channels);
+  }
+
+  /**
+   * Returns a builder of channels merging the specified instances into a flow one.
+   * <br>
+   * The flow IDs will start from the specified one.
+   * <p>
+   * Note that the builder will successfully create several channel instances.
+   * <p>
+   * Given channels {@code A}, {@code B} and {@code C}, their final output will be:
+   * <pre><code>
+   * A =&gt; [Flow(startId + 0, IN).data, Flow(startId + 0, IN).data, ...]
+   * B =&gt; [Flow(startId + 1, IN).data, Flow(startId + 1, IN).data, ...]
+   * C =&gt; [Flow(startId + 2, IN).data, Flow(startId + 2, IN).data, ...]
+   * </code></pre>
+   *
+   * @param startId  the flow start ID.
+   * @param channels the array of channels.
+   * @param <IN>     the input data type.
+   * @return the flow channel builder.
+   * @throws java.lang.IllegalArgumentException if the specified array is empty.
+   * @throws java.lang.NullPointerException     if the specified array is null or contains a null
+   *                                            object.
+   */
+  @NotNull
+  @SuppressWarnings("unchecked")
+  public static <IN> ChannelBuilder<Flow<? extends IN>, ?> mergeInput(final int startId,
+      @NotNull final Channel<?, ?>... channels) {
+    final int length = channels.length;
+    if (length == 0) {
+      throw new IllegalArgumentException("the array of channels must not be empty");
+    }
+
+    return (MergeInputBuilder<IN>) new MergeInputBuilder<Object>(startId, Arrays.asList(channels));
+  }
+
+  /**
+   * Returns a builder of channels merging the specified instances into a flow one.
+   * <br>
+   * The flow IDs will start from the specified one.
+   * <p>
+   * Note that the builder will successfully create several channel instances.
+   * <p>
+   * Given channels {@code A}, {@code B} and {@code C}, their final output will be:
+   * <pre><code>
+   * A =&gt; [Flow(startId + 0, IN).data, Flow(startId + 0, IN).data, ...]
+   * B =&gt; [Flow(startId + 1, IN).data, Flow(startId + 1, IN).data, ...]
+   * C =&gt; [Flow(startId + 2, IN).data, Flow(startId + 2, IN).data, ...]
+   * </code></pre>
+   *
+   * @param startId  the flow start ID.
+   * @param channels the iterable of channels.
+   * @param <IN>     the input data type.
+   * @return the flow channel builder.
+   * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
+   * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
+   *                                            null object.
+   */
+  @NotNull
+  public static <IN> ChannelBuilder<Flow<? extends IN>, ?> mergeInput(final int startId,
+      @NotNull final Iterable<? extends Channel<? extends IN, ?>> channels) {
+    return new MergeInputBuilder<IN>(startId, channels);
+  }
+
+  /**
+   * Returns a builder of channels merging the specified instances into a flow one.
+   * <br>
+   * The flow IDs will be the position in the iterable.
+   * <p>
+   * Note that the builder will successfully create several channel instances.
+   * <p>
+   * Given channels {@code A}, {@code B} and {@code C}, their final output will be:
+   * <pre><code>
+   * A =&gt; [Flow(0, IN).data, Flow(0, IN).data, Flow(0, IN).data, ...]
+   * B =&gt; [Flow(1, IN).data, Flow(1, IN).data, Flow(1, IN).data, ...]
+   * C =&gt; [Flow(2, IN).data, Flow(2, IN).data, Flow(2, IN).data, ...]
+   * </code></pre>
+   *
+   * @param channels the iterable of channels.
+   * @param <IN>     the input data type.
+   * @return the flow channel builder.
+   * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
+   * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
+   *                                            null object.
+   */
+  @NotNull
+  public static <IN> ChannelBuilder<Flow<? extends IN>, ?> mergeInput(
+      @NotNull final Iterable<? extends Channel<? extends IN, ?>> channels) {
+    return mergeInput(0, channels);
+  }
+
+  /**
+   * Returns a builder of channels merging the specified instances into a flow one.
+   * <br>
+   * The flow IDs will be the keys of the specified map.
+   * <p>
+   * Note that the builder will successfully create several channel instances.
+   * <p>
+   * Given channels {@code A}, {@code B} and {@code C}, their final output will be:
+   * <pre><code>
+   * A =&gt; [Flow(key(A), IN).data, Flow(key(A), IN).data, ...]
+   * B =&gt; [Flow(key(B), IN).data, Flow(key(B), IN).data, ...]
+   * C =&gt; [Flow(key(C), IN).data, Flow(key(C), IN).data, ...]
+   * </code></pre>
+   *
+   * @param channels the map of IDs and channels.
+   * @param <IN>     the input data type.
+   * @return the flow channel builder.
+   * @throws java.lang.IllegalArgumentException if the specified map is empty.
+   * @throws java.lang.NullPointerException     if the specified map is null or contains a null
+   *                                            object.
+   */
+  @NotNull
+  public static <IN> ChannelBuilder<Flow<? extends IN>, ?> mergeInput(
+      @NotNull final Map<Integer, ? extends Channel<? extends IN, ?>> channels) {
+    return new MergeInputMapBuilder<IN>(channels);
   }
 
   /**
@@ -844,8 +849,9 @@ public class Channels {
    *                                            object.
    */
   @NotNull
-  public static <OUT> ChannelBuilder<?, Flow<OUT>> merge(@NotNull final Channel<?, ?>... channels) {
-    return merge(0, channels);
+  public static <OUT> ChannelBuilder<?, Flow<OUT>> mergeOutput(
+      @NotNull final Channel<?, ?>... channels) {
+    return mergeOutput(0, channels);
   }
 
   /**
@@ -873,13 +879,14 @@ public class Channels {
    */
   @NotNull
   @SuppressWarnings("unchecked")
-  public static <OUT> ChannelBuilder<?, Flow<OUT>> merge(final int startId,
+  public static <OUT> ChannelBuilder<?, Flow<OUT>> mergeOutput(final int startId,
       @NotNull final Channel<?, ?>... channels) {
     if (channels.length == 0) {
       throw new IllegalArgumentException("the array of channels must not be empty");
     }
 
-    return (MergeBuilder<OUT>) new MergeBuilder<Object>(startId, Arrays.asList(channels));
+    return (MergeOutputBuilder<OUT>) new MergeOutputBuilder<Object>(startId,
+        Arrays.asList(channels));
   }
 
   /**
@@ -906,9 +913,9 @@ public class Channels {
    *                                            null object.
    */
   @NotNull
-  public static <OUT> ChannelBuilder<?, Flow<OUT>> merge(final int startId,
+  public static <OUT> ChannelBuilder<?, Flow<OUT>> mergeOutput(final int startId,
       @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
-    return new MergeBuilder<OUT>(startId, channels);
+    return new MergeOutputBuilder<OUT>(startId, channels);
   }
 
   /**
@@ -934,9 +941,9 @@ public class Channels {
    *                                            null object.
    */
   @NotNull
-  public static <OUT> ChannelBuilder<?, Flow<OUT>> merge(
+  public static <OUT> ChannelBuilder<?, Flow<OUT>> mergeOutput(
       @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
-    return merge(0, channels);
+    return mergeOutput(0, channels);
   }
 
   /**
@@ -962,7 +969,7 @@ public class Channels {
    *                                            object.
    */
   @NotNull
-  public static <OUT> ChannelBuilder<?, Flow<OUT>> merge(
+  public static <OUT> ChannelBuilder<?, Flow<OUT>> mergeOutput(
       @NotNull final Map<Integer, ? extends Channel<?, ? extends OUT>> channels) {
     return new MergeMapBuilder<OUT>(channels);
   }
@@ -1018,47 +1025,47 @@ public class Channels {
    * @return the replaying channel builder.
    */
   @NotNull
-  public static <OUT> ChannelBuilder<?, OUT> replay(@NotNull final Channel<?, OUT> channel) {
+  public static <OUT> ChannelBuilder<?, OUT> replayOutput(@NotNull final Channel<?, OUT> channel) {
     return new ReplayChannelBuilder<OUT>(channel);
   }
 
   @NotNull
   @SuppressWarnings("unchecked")
-  private static <IN> ChannelBuilder<List<? extends IN>, ?> distribute(final boolean isFlush,
+  private static <IN> ChannelBuilder<List<? extends IN>, ?> joinInput(final boolean isFlush,
       @Nullable final IN placeholder, @NotNull final Channel<?, ?>... channels) {
     final int length = channels.length;
     if (length == 0) {
       throw new IllegalArgumentException("the array of channels must not be empty");
     }
 
-    return (DistributeBuilder<IN>) new DistributeBuilder<Object>(isFlush, placeholder,
+    return (JoinInputBuilder<IN>) new JoinInputBuilder<Object>(isFlush, placeholder,
         Arrays.asList(channels));
   }
 
   @NotNull
-  private static <IN> ChannelBuilder<List<? extends IN>, ?> distribute(final boolean isFlush,
+  private static <IN> ChannelBuilder<List<? extends IN>, ?> joinInput(final boolean isFlush,
       @Nullable final IN placeholder,
       @NotNull final Iterable<? extends Channel<? extends IN, ?>> channels) {
-    return new DistributeBuilder<IN>(isFlush, placeholder, channels);
+    return new JoinInputBuilder<IN>(isFlush, placeholder, channels);
   }
 
   @NotNull
-  private static <OUT> ChannelBuilder<?, List<OUT>> join(final boolean isFlush,
+  private static <OUT> ChannelBuilder<?, List<OUT>> joinOutput(final boolean isFlush,
       @Nullable final OUT placeholder,
       @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
-    return new JoinBuilder<OUT>(isFlush, placeholder, channels);
+    return new JoinOutputBuilder<OUT>(isFlush, placeholder, channels);
   }
 
   @NotNull
   @SuppressWarnings("unchecked")
-  private static <OUT> ChannelBuilder<?, List<OUT>> join(final boolean isFlush,
+  private static <OUT> ChannelBuilder<?, List<OUT>> joinOutput(final boolean isFlush,
       @Nullable final OUT placeholder, @NotNull final Channel<?, ?>... channels) {
     final int length = channels.length;
     if (length == 0) {
       throw new IllegalArgumentException("the array of channels must not be empty");
     }
 
-    return (JoinBuilder<OUT>) new JoinBuilder<Object>(isFlush, placeholder,
+    return (JoinOutputBuilder<OUT>) new JoinOutputBuilder<Object>(isFlush, placeholder,
         Arrays.asList(channels));
   }
 }

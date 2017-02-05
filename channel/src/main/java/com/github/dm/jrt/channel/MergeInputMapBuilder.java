@@ -28,25 +28,26 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 /**
- * Builder implementation returning a channel combining data from a map of channels.
+ * Builder implementation returning a channel merging data from a map of channels.
  * <p>
  * Created by davide-maestroni on 02/26/2016.
  *
  * @param <IN> the input data type.
  */
-class CombineMapBuilder<IN> extends AbstractChannelBuilder<Flow<? extends IN>, Flow<? extends IN>> {
+class MergeInputMapBuilder<IN>
+    extends AbstractChannelBuilder<Flow<? extends IN>, Flow<? extends IN>> {
 
   private final HashMap<Integer, Channel<? extends IN, ?>> mChannelMap;
 
   /**
    * Constructor.
    *
-   * @param channels the map of channels to combine.
+   * @param channels the map of channels to merge.
    * @throws java.lang.IllegalArgumentException if the specified map is empty.
    * @throws java.lang.NullPointerException     if the specified map is null or contains a null
    *                                            object.
    */
-  CombineMapBuilder(@NotNull final Map<Integer, ? extends Channel<? extends IN, ?>> channels) {
+  MergeInputMapBuilder(@NotNull final Map<Integer, ? extends Channel<? extends IN, ?>> channels) {
     if (channels.isEmpty()) {
       throw new IllegalArgumentException("the map of channels must not be empty");
     }

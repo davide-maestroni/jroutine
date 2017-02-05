@@ -62,264 +62,6 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     super(TestActivity.class);
   }
 
-  public void testCombine() {
-
-    final Channel<String, String> channel1 = JRoutineService.on(serviceFrom(getActivity()))
-                                                            .with(factoryOf(PassingString.class))
-                                                            .call()
-                                                            .sorted();
-    final Channel<Integer, Integer> channel2 = JRoutineService.on(serviceFrom(getActivity()))
-                                                              .with(factoryOf(PassingInteger.class))
-                                                              .call()
-                                                              .sorted();
-    AndroidChannels.combine(channel1, channel2)
-                   .buildChannel()
-                   .pass(new ParcelableFlow<String>(0, "test1"))
-                   .pass(new ParcelableFlow<Integer>(1, 1))
-                   .close();
-    AndroidChannels.combine(3, channel1, channel2)
-                   .buildChannel()
-                   .pass(new ParcelableFlow<String>(3, "test2"))
-                   .pass(new ParcelableFlow<Integer>(4, 2))
-                   .close();
-    AndroidChannels.combine(Arrays.<Channel<?, ?>>asList(channel1, channel2))
-                   .buildChannel()
-                   .pass(new ParcelableFlow<String>(0, "test3"))
-                   .pass(new ParcelableFlow<Integer>(1, 3))
-                   .close();
-    AndroidChannels.combine(-5, Arrays.<Channel<?, ?>>asList(channel1, channel2))
-                   .buildChannel()
-                   .pass(new ParcelableFlow<String>(-5, "test4"))
-                   .pass(new ParcelableFlow<Integer>(-4, 4))
-                   .close();
-    final HashMap<Integer, Channel<?, ?>> map = new HashMap<Integer, Channel<?, ?>>(2);
-    map.put(31, channel1);
-    map.put(17, channel2);
-    AndroidChannels.combine(map)
-                   .buildChannel()
-                   .pass(new ParcelableFlow<String>(31, "test5"))
-                   .pass(new ParcelableFlow<Integer>(17, 5))
-                   .close();
-    assertThat(channel1.close().in(seconds(10)).all()).containsExactly("test1", "test2", "test3",
-        "test4", "test5");
-    assertThat(channel2.close().in(seconds(10)).all()).containsExactly(1, 2, 3, 4, 5);
-  }
-
-  public void testCombineAbort() {
-
-    Channel<String, String> channel1;
-    Channel<Integer, Integer> channel2;
-    channel1 = JRoutineService.on(serviceFrom(getActivity()))
-                              .with(factoryOf(PassingString.class))
-                              .call()
-                              .sorted();
-    channel2 = JRoutineService.on(serviceFrom(getActivity()))
-                              .with(factoryOf(PassingInteger.class))
-                              .call()
-                              .sorted();
-    AndroidChannels.combine(channel1, channel2).buildChannel().abort();
-
-    try {
-
-      channel1.close().in(seconds(10)).next();
-
-      fail();
-
-    } catch (final AbortException ignored) {
-
-    }
-
-    try {
-
-      channel2.close().in(seconds(10)).next();
-
-      fail();
-
-    } catch (final AbortException ignored) {
-
-    }
-
-    channel1 = JRoutineService.on(serviceFrom(getActivity()))
-                              .with(factoryOf(PassingString.class))
-                              .call()
-                              .sorted();
-    channel2 = JRoutineService.on(serviceFrom(getActivity()))
-                              .with(factoryOf(PassingInteger.class))
-                              .call()
-                              .sorted();
-    AndroidChannels.combine(3, channel1, channel2).buildChannel().abort();
-
-    try {
-
-      channel1.close().in(seconds(10)).next();
-
-      fail();
-
-    } catch (final AbortException ignored) {
-
-    }
-
-    try {
-
-      channel2.close().in(seconds(10)).next();
-
-      fail();
-
-    } catch (final AbortException ignored) {
-
-    }
-
-    channel1 = JRoutineService.on(serviceFrom(getActivity()))
-                              .with(factoryOf(PassingString.class))
-                              .call()
-                              .sorted();
-    channel2 = JRoutineService.on(serviceFrom(getActivity()))
-                              .with(factoryOf(PassingInteger.class))
-                              .call()
-                              .sorted();
-    AndroidChannels.combine(Arrays.<Channel<?, ?>>asList(channel1, channel2))
-                   .buildChannel()
-                   .abort();
-
-    try {
-
-      channel1.close().in(seconds(10)).next();
-
-      fail();
-
-    } catch (final AbortException ignored) {
-
-    }
-
-    try {
-
-      channel2.close().in(seconds(10)).next();
-
-      fail();
-
-    } catch (final AbortException ignored) {
-
-    }
-
-    channel1 = JRoutineService.on(serviceFrom(getActivity()))
-                              .with(factoryOf(PassingString.class))
-                              .call()
-                              .sorted();
-    channel2 = JRoutineService.on(serviceFrom(getActivity()))
-                              .with(factoryOf(PassingInteger.class))
-                              .call()
-                              .sorted();
-    AndroidChannels.combine(-5, Arrays.<Channel<?, ?>>asList(channel1, channel2))
-                   .buildChannel()
-                   .abort();
-
-    try {
-
-      channel1.close().in(seconds(10)).next();
-
-      fail();
-
-    } catch (final AbortException ignored) {
-
-    }
-
-    try {
-
-      channel2.close().in(seconds(10)).next();
-
-      fail();
-
-    } catch (final AbortException ignored) {
-
-    }
-
-    channel1 = JRoutineService.on(serviceFrom(getActivity()))
-                              .with(factoryOf(PassingString.class))
-                              .call()
-                              .sorted();
-    channel2 = JRoutineService.on(serviceFrom(getActivity()))
-                              .with(factoryOf(PassingInteger.class))
-                              .call()
-                              .sorted();
-    final HashMap<Integer, Channel<?, ?>> map = new HashMap<Integer, Channel<?, ?>>(2);
-    map.put(31, channel1);
-    map.put(17, channel2);
-    AndroidChannels.combine(map).buildChannel().abort();
-
-    try {
-
-      channel1.close().in(seconds(10)).next();
-
-      fail();
-
-    } catch (final AbortException ignored) {
-
-    }
-
-    try {
-
-      channel2.close().in(seconds(10)).next();
-
-      fail();
-
-    } catch (final AbortException ignored) {
-
-    }
-  }
-
-  public void testCombineError() {
-
-    try {
-
-      AndroidChannels.combine();
-
-      fail();
-
-    } catch (final IllegalArgumentException ignored) {
-
-    }
-
-    try {
-
-      AndroidChannels.combine(0);
-
-      fail();
-
-    } catch (final IllegalArgumentException ignored) {
-
-    }
-
-    try {
-
-      AndroidChannels.combine(Collections.<Channel<?, ?>>emptyList());
-
-      fail();
-
-    } catch (final IllegalArgumentException ignored) {
-
-    }
-
-    try {
-
-      AndroidChannels.combine(0, Collections.<Channel<?, ?>>emptyList());
-
-      fail();
-
-    } catch (final IllegalArgumentException ignored) {
-
-    }
-
-    try {
-
-      AndroidChannels.combine(Collections.<Integer, Channel<?, ?>>emptyMap());
-
-      fail();
-
-    } catch (final IllegalArgumentException ignored) {
-
-    }
-  }
-
   @SuppressWarnings("unchecked")
   public void testConfiguration() {
     final Channel<?, String> channel = JRoutineCore.of("test").buildChannel();
@@ -346,281 +88,6 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     }
 
     assertThat(failed).isFalse();
-  }
-
-  public void testDistribute() {
-
-    final Channel<String, String> channel1 = JRoutineService.on(serviceFrom(getActivity()))
-                                                            .with(factoryOf(PassingString.class))
-                                                            .call()
-                                                            .sorted();
-    final Channel<String, String> channel2 = JRoutineService.on(serviceFrom(getActivity()))
-                                                            .with(factoryOf(PassingString.class))
-                                                            .call()
-                                                            .sorted();
-    AndroidChannels.distribute(channel1, channel2)
-                   .buildChannel()
-                   .pass(Arrays.asList("test1-1", "test1-2"))
-                   .close();
-    AndroidChannels.distribute(Arrays.<Channel<?, ?>>asList(channel1, channel2))
-                   .buildChannel()
-                   .pass(Arrays.asList("test2-1", "test2-2"))
-                   .close();
-    AndroidChannels.distribute(channel1, channel2)
-                   .buildChannel()
-                   .pass(Collections.singletonList("test3-1"))
-                   .close();
-    assertThat(channel1.close().in(seconds(10)).all()).containsExactly("test1-1", "test2-1",
-        "test3-1");
-    assertThat(channel2.close().in(seconds(10)).all()).containsExactly("test1-2", "test2-2");
-  }
-
-  public void testDistributeAbort() {
-
-    Channel<String, String> channel1;
-    Channel<String, String> channel2;
-    channel1 = JRoutineService.on(serviceFrom(getActivity()))
-                              .with(factoryOf(PassingString.class))
-                              .call()
-                              .sorted();
-    channel2 = JRoutineService.on(serviceFrom(getActivity()))
-                              .with(factoryOf(PassingString.class))
-                              .call()
-                              .sorted();
-    AndroidChannels.distribute(channel1, channel2).buildChannel().abort();
-
-    try {
-
-      channel1.close().in(seconds(10)).next();
-
-      fail();
-
-    } catch (final AbortException ignored) {
-
-    }
-
-    try {
-
-      channel2.close().in(seconds(10)).next();
-
-      fail();
-
-    } catch (final AbortException ignored) {
-
-    }
-
-    channel1 = JRoutineService.on(serviceFrom(getActivity()))
-                              .with(factoryOf(PassingString.class))
-                              .call()
-                              .sorted();
-    channel2 = JRoutineService.on(serviceFrom(getActivity()))
-                              .with(factoryOf(PassingString.class))
-                              .call()
-                              .sorted();
-    AndroidChannels.distribute(Arrays.<Channel<?, ?>>asList(channel1, channel2))
-                   .buildChannel()
-                   .abort();
-
-    try {
-
-      channel1.close().in(seconds(10)).next();
-
-      fail();
-
-    } catch (final AbortException ignored) {
-
-    }
-
-    try {
-
-      channel2.close().in(seconds(10)).next();
-
-      fail();
-
-    } catch (final AbortException ignored) {
-
-    }
-  }
-
-  public void testDistributeError() {
-
-    final Channel<String, String> channel1 = JRoutineService.on(serviceFrom(getActivity()))
-                                                            .with(factoryOf(PassingString.class))
-                                                            .call()
-                                                            .sorted();
-    AndroidChannels.distribute(channel1)
-                   .buildChannel()
-                   .pass(Arrays.asList("test1-1", "test1-2"))
-                   .close();
-
-    try {
-
-      channel1.close().in(seconds(10)).all();
-
-      fail();
-
-    } catch (final InvocationException ignored) {
-
-    }
-
-    try {
-
-      AndroidChannels.distribute();
-
-      fail();
-
-    } catch (final IllegalArgumentException ignored) {
-
-    }
-
-    try {
-
-      AndroidChannels.distribute(Collections.<Channel<?, ?>>emptyList());
-
-      fail();
-
-    } catch (final IllegalArgumentException ignored) {
-
-    }
-  }
-
-  public void testDistributePlaceholder() {
-
-    final Channel<String, String> channel1 = JRoutineService.on(serviceFrom(getActivity()))
-                                                            .with(factoryOf(PassingString.class))
-                                                            .call()
-                                                            .sorted();
-    final Channel<String, String> channel2 = JRoutineService.on(serviceFrom(getActivity()))
-                                                            .with(factoryOf(PassingString.class))
-                                                            .call()
-                                                            .sorted();
-    AndroidChannels.distribute((Object) null, channel1, channel2)
-                   .buildChannel()
-                   .pass(Arrays.asList("test1-1", "test1-2"))
-                   .close();
-    final String placeholder = "placeholder";
-    AndroidChannels.distribute((Object) placeholder,
-        Arrays.<Channel<?, ?>>asList(channel1, channel2))
-                   .buildChannel()
-                   .pass(Arrays.asList("test2-1", "test2-2"))
-                   .close();
-    AndroidChannels.distribute(placeholder, channel1, channel2)
-                   .buildChannel()
-                   .pass(Collections.singletonList("test3-1"))
-                   .close();
-    assertThat(channel1.close().in(seconds(10)).all()).containsExactly("test1-1", "test2-1",
-        "test3-1");
-    assertThat(channel2.close().in(seconds(10)).all()).containsExactly("test1-2", "test2-2",
-        placeholder);
-  }
-
-  public void testDistributePlaceholderAbort() {
-
-    Channel<String, String> channel1;
-    Channel<String, String> channel2;
-    channel1 = JRoutineService.on(serviceFrom(getActivity()))
-                              .with(factoryOf(PassingString.class))
-                              .call()
-                              .sorted();
-    channel2 = JRoutineService.on(serviceFrom(getActivity()))
-                              .with(factoryOf(PassingString.class))
-                              .call()
-                              .sorted();
-    AndroidChannels.distribute((Object) null, channel1, channel2).buildChannel().abort();
-
-    try {
-
-      channel1.close().in(seconds(10)).next();
-
-      fail();
-
-    } catch (final AbortException ignored) {
-
-    }
-
-    try {
-
-      channel2.close().in(seconds(10)).next();
-
-      fail();
-
-    } catch (final AbortException ignored) {
-
-    }
-
-    channel1 = JRoutineService.on(serviceFrom(getActivity()))
-                              .with(factoryOf(PassingString.class))
-                              .call()
-                              .sorted();
-    channel2 = JRoutineService.on(serviceFrom(getActivity()))
-                              .with(factoryOf(PassingString.class))
-                              .call()
-                              .sorted();
-    AndroidChannels.distribute(null, Arrays.<Channel<?, ?>>asList(channel1, channel2))
-                   .buildChannel()
-                   .abort();
-
-    try {
-
-      channel1.close().in(seconds(10)).next();
-
-      fail();
-
-    } catch (final AbortException ignored) {
-
-    }
-
-    try {
-
-      channel2.close().in(seconds(10)).next();
-
-      fail();
-
-    } catch (final AbortException ignored) {
-
-    }
-  }
-
-  public void testDistributePlaceholderError() {
-
-    final Channel<String, String> channel1 = JRoutineService.on(serviceFrom(getActivity()))
-                                                            .with(factoryOf(PassingString.class))
-                                                            .call()
-                                                            .sorted();
-    AndroidChannels.distribute((Object) null, channel1)
-                   .buildChannel()
-                   .pass(Arrays.asList("test1-1", "test1-2"))
-                   .close();
-
-    try {
-
-      channel1.close().in(seconds(10)).all();
-
-      fail();
-
-    } catch (final InvocationException ignored) {
-
-    }
-
-    try {
-
-      AndroidChannels.distribute(new Object());
-
-      fail();
-
-    } catch (final IllegalArgumentException ignored) {
-
-    }
-
-    try {
-
-      AndroidChannels.distribute(null, Collections.<Channel<?, ?>>emptyList());
-
-      fail();
-
-    } catch (final IllegalArgumentException ignored) {
-
-    }
   }
 
   @SuppressWarnings("unchecked")
@@ -703,24 +170,24 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     channel2 = builder2.buildChannel();
     channel1.sorted().after(millis(100)).pass("testtest").pass("test2").close();
     channel2.sorted().after(millis(110)).pass(6).pass(4).close();
-    assertThat(
-        routine.call(AndroidChannels.join(channel1, channel2).buildChannel()).in(seconds(10)).all())
-        .containsExactly('s', '2');
+    assertThat(routine.call(AndroidChannels.joinOutput(channel1, channel2).buildChannel())
+                      .in(seconds(10))
+                      .all()).containsExactly('s', '2');
     channel1 = builder1.buildChannel();
     channel2 = builder2.buildChannel();
     channel1.sorted().after(millis(100)).pass("testtest").pass("test2").close();
     channel2.sorted().after(millis(110)).pass(6).pass(4).close();
     assertThat(routine.call(
-        AndroidChannels.join(Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannel())
+        AndroidChannels.joinOutput(Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannel())
                       .in(seconds(10))
                       .all()).containsExactly('s', '2');
     channel1 = builder1.buildChannel();
     channel2 = builder2.buildChannel();
     channel1.sorted().after(millis(100)).pass("testtest").pass("test2").pass("test3").close();
     channel2.sorted().after(millis(110)).pass(6).pass(4).close();
-    assertThat(
-        routine.call(AndroidChannels.join(channel1, channel2).buildChannel()).in(seconds(10)).all())
-        .containsExactly('s', '2');
+    assertThat(routine.call(AndroidChannels.joinOutput(channel1, channel2).buildChannel())
+                      .in(seconds(10))
+                      .all()).containsExactly('s', '2');
   }
 
   public void testJoinAbort() {
@@ -738,7 +205,9 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      routine.call(AndroidChannels.join(channel1, channel2).buildChannel()).in(seconds(10)).all();
+      routine.call(AndroidChannels.joinOutput(channel1, channel2).buildChannel())
+             .in(seconds(10))
+             .all();
 
       fail();
 
@@ -753,10 +222,8 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      routine.call(
-          AndroidChannels.join(Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannel())
-             .in(seconds(10))
-             .all();
+      routine.call(AndroidChannels.joinOutput(Arrays.<Channel<?, ?>>asList(channel1, channel2))
+                                  .buildChannel()).in(seconds(10)).all();
 
       fail();
 
@@ -769,7 +236,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      AndroidChannels.join();
+      AndroidChannels.joinOutput();
 
       fail();
 
@@ -779,7 +246,282 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      AndroidChannels.join(Collections.<Channel<?, ?>>emptyList());
+      AndroidChannels.joinOutput(Collections.<Channel<?, ?>>emptyList());
+
+      fail();
+
+    } catch (final IllegalArgumentException ignored) {
+
+    }
+  }
+
+  public void testJoinInput() {
+
+    final Channel<String, String> channel1 = JRoutineService.on(serviceFrom(getActivity()))
+                                                            .with(factoryOf(PassingString.class))
+                                                            .call()
+                                                            .sorted();
+    final Channel<String, String> channel2 = JRoutineService.on(serviceFrom(getActivity()))
+                                                            .with(factoryOf(PassingString.class))
+                                                            .call()
+                                                            .sorted();
+    AndroidChannels.joinInput(channel1, channel2)
+                   .buildChannel()
+                   .pass(Arrays.asList("test1-1", "test1-2"))
+                   .close();
+    AndroidChannels.joinInput(Arrays.<Channel<?, ?>>asList(channel1, channel2))
+                   .buildChannel()
+                   .pass(Arrays.asList("test2-1", "test2-2"))
+                   .close();
+    AndroidChannels.joinInput(channel1, channel2)
+                   .buildChannel()
+                   .pass(Collections.singletonList("test3-1"))
+                   .close();
+    assertThat(channel1.close().in(seconds(10)).all()).containsExactly("test1-1", "test2-1",
+        "test3-1");
+    assertThat(channel2.close().in(seconds(10)).all()).containsExactly("test1-2", "test2-2");
+  }
+
+  public void testJoinInputAbort() {
+
+    Channel<String, String> channel1;
+    Channel<String, String> channel2;
+    channel1 = JRoutineService.on(serviceFrom(getActivity()))
+                              .with(factoryOf(PassingString.class))
+                              .call()
+                              .sorted();
+    channel2 = JRoutineService.on(serviceFrom(getActivity()))
+                              .with(factoryOf(PassingString.class))
+                              .call()
+                              .sorted();
+    AndroidChannels.joinInput(channel1, channel2).buildChannel().abort();
+
+    try {
+
+      channel1.close().in(seconds(10)).next();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+
+    try {
+
+      channel2.close().in(seconds(10)).next();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+
+    channel1 = JRoutineService.on(serviceFrom(getActivity()))
+                              .with(factoryOf(PassingString.class))
+                              .call()
+                              .sorted();
+    channel2 = JRoutineService.on(serviceFrom(getActivity()))
+                              .with(factoryOf(PassingString.class))
+                              .call()
+                              .sorted();
+    AndroidChannels.joinInput(Arrays.<Channel<?, ?>>asList(channel1, channel2))
+                   .buildChannel()
+                   .abort();
+
+    try {
+
+      channel1.close().in(seconds(10)).next();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+
+    try {
+
+      channel2.close().in(seconds(10)).next();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+  }
+
+  public void testJoinInputError() {
+
+    final Channel<String, String> channel1 = JRoutineService.on(serviceFrom(getActivity()))
+                                                            .with(factoryOf(PassingString.class))
+                                                            .call()
+                                                            .sorted();
+    AndroidChannels.joinInput(channel1)
+                   .buildChannel()
+                   .pass(Arrays.asList("test1-1", "test1-2"))
+                   .close();
+
+    try {
+
+      channel1.close().in(seconds(10)).all();
+
+      fail();
+
+    } catch (final InvocationException ignored) {
+
+    }
+
+    try {
+
+      AndroidChannels.joinInput();
+
+      fail();
+
+    } catch (final IllegalArgumentException ignored) {
+
+    }
+
+    try {
+
+      AndroidChannels.joinInput(Collections.<Channel<?, ?>>emptyList());
+
+      fail();
+
+    } catch (final IllegalArgumentException ignored) {
+
+    }
+  }
+
+  public void testJoinInputPlaceholder() {
+
+    final Channel<String, String> channel1 = JRoutineService.on(serviceFrom(getActivity()))
+                                                            .with(factoryOf(PassingString.class))
+                                                            .call()
+                                                            .sorted();
+    final Channel<String, String> channel2 = JRoutineService.on(serviceFrom(getActivity()))
+                                                            .with(factoryOf(PassingString.class))
+                                                            .call()
+                                                            .sorted();
+    AndroidChannels.joinInput((Object) null, channel1, channel2)
+                   .buildChannel()
+                   .pass(Arrays.asList("test1-1", "test1-2"))
+                   .close();
+    final String placeholder = "placeholder";
+    AndroidChannels.joinInput((Object) placeholder,
+        Arrays.<Channel<?, ?>>asList(channel1, channel2))
+                   .buildChannel()
+                   .pass(Arrays.asList("test2-1", "test2-2"))
+                   .close();
+    AndroidChannels.joinInput(placeholder, channel1, channel2)
+                   .buildChannel()
+                   .pass(Collections.singletonList("test3-1"))
+                   .close();
+    assertThat(channel1.close().in(seconds(10)).all()).containsExactly("test1-1", "test2-1",
+        "test3-1");
+    assertThat(channel2.close().in(seconds(10)).all()).containsExactly("test1-2", "test2-2",
+        placeholder);
+  }
+
+  public void testJoinInputPlaceholderAbort() {
+
+    Channel<String, String> channel1;
+    Channel<String, String> channel2;
+    channel1 = JRoutineService.on(serviceFrom(getActivity()))
+                              .with(factoryOf(PassingString.class))
+                              .call()
+                              .sorted();
+    channel2 = JRoutineService.on(serviceFrom(getActivity()))
+                              .with(factoryOf(PassingString.class))
+                              .call()
+                              .sorted();
+    AndroidChannels.joinInput((Object) null, channel1, channel2).buildChannel().abort();
+
+    try {
+
+      channel1.close().in(seconds(10)).next();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+
+    try {
+
+      channel2.close().in(seconds(10)).next();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+
+    channel1 = JRoutineService.on(serviceFrom(getActivity()))
+                              .with(factoryOf(PassingString.class))
+                              .call()
+                              .sorted();
+    channel2 = JRoutineService.on(serviceFrom(getActivity()))
+                              .with(factoryOf(PassingString.class))
+                              .call()
+                              .sorted();
+    AndroidChannels.joinInput(null, Arrays.<Channel<?, ?>>asList(channel1, channel2))
+                   .buildChannel()
+                   .abort();
+
+    try {
+
+      channel1.close().in(seconds(10)).next();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+
+    try {
+
+      channel2.close().in(seconds(10)).next();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+  }
+
+  public void testJoinInputPlaceholderError() {
+
+    final Channel<String, String> channel1 = JRoutineService.on(serviceFrom(getActivity()))
+                                                            .with(factoryOf(PassingString.class))
+                                                            .call()
+                                                            .sorted();
+    AndroidChannels.joinInput((Object) null, channel1)
+                   .buildChannel()
+                   .pass(Arrays.asList("test1-1", "test1-2"))
+                   .close();
+
+    try {
+
+      channel1.close().in(seconds(10)).all();
+
+      fail();
+
+    } catch (final InvocationException ignored) {
+
+    }
+
+    try {
+
+      AndroidChannels.joinInput(new Object());
+
+      fail();
+
+    } catch (final IllegalArgumentException ignored) {
+
+    }
+
+    try {
+
+      AndroidChannels.joinInput(null, Collections.<Channel<?, ?>>emptyList());
 
       fail();
 
@@ -800,17 +542,17 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     channel2 = builder2.buildChannel();
     channel1.sorted().after(millis(100)).pass("testtest").pass("test2").close();
     channel2.sorted().after(millis(110)).pass(6).pass(4).close();
-    assertThat(routine.call(AndroidChannels.join(new Object(), channel1, channel2).buildChannel())
-                      .in(seconds(10))
-                      .all()).containsExactly('s', '2');
+    assertThat(
+        routine.call(AndroidChannels.joinOutput(new Object(), channel1, channel2).buildChannel())
+               .in(seconds(10))
+               .all()).containsExactly('s', '2');
     channel1 = builder1.buildChannel();
     channel2 = builder2.buildChannel();
     channel1.sorted().after(millis(100)).pass("testtest").pass("test2").close();
     channel2.sorted().after(millis(110)).pass(6).pass(4).close();
     assertThat(routine.call(
-        AndroidChannels.join(null, Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannel())
-                      .in(seconds(10))
-                      .all()).containsExactly('s', '2');
+        AndroidChannels.joinOutput(null, Arrays.<Channel<?, ?>>asList(channel1, channel2))
+                       .buildChannel()).in(seconds(10)).all()).containsExactly('s', '2');
     channel1 = builder1.buildChannel();
     channel2 = builder2.buildChannel();
     channel1.sorted().after(millis(100)).pass("testtest").pass("test2").pass("test3").close();
@@ -818,7 +560,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      routine.call(AndroidChannels.join(new Object(), channel1, channel2).buildChannel())
+      routine.call(AndroidChannels.joinOutput(new Object(), channel1, channel2).buildChannel())
              .in(seconds(10))
              .all();
 
@@ -844,7 +586,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      routine.call(AndroidChannels.join((Object) null, channel1, channel2).buildChannel())
+      routine.call(AndroidChannels.joinOutput((Object) null, channel1, channel2).buildChannel())
              .in(seconds(10))
              .all();
 
@@ -862,7 +604,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     try {
 
       routine.call(
-          AndroidChannels.join(new Object(), Arrays.<Channel<?, ?>>asList(channel1, channel2))
+          AndroidChannels.joinOutput(new Object(), Arrays.<Channel<?, ?>>asList(channel1, channel2))
                          .buildChannel()).in(seconds(10)).all();
 
       fail();
@@ -876,7 +618,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      AndroidChannels.join(new Object());
+      AndroidChannels.joinOutput(new Object());
 
       fail();
 
@@ -886,7 +628,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      AndroidChannels.join(null, Collections.<Channel<?, ?>>emptyList());
+      AndroidChannels.joinOutput(null, Collections.<Channel<?, ?>>emptyList());
 
       fail();
 
@@ -909,7 +651,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     final Channel<Integer, Integer> channel2 = builder2.buildChannel();
 
     final Channel<?, ? extends ParcelableFlow<Object>> channel =
-        AndroidChannels.mergeParcelable(Arrays.<Channel<?, ?>>asList(channel1, channel2))
+        AndroidChannels.mergeParcelableOutput(Arrays.<Channel<?, ?>>asList(channel1, channel2))
                        .buildChannel();
     final Channel<?, ParcelableFlow<Object>> output = JRoutineService.on(serviceFrom(getActivity()))
                                                                      .with(factoryOf(Sort.class))
@@ -952,7 +694,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     Channel<?, ? extends ParcelableFlow<?>> outputChannel;
     channel1 = builder1.buildChannel();
     channel2 = builder2.buildChannel();
-    outputChannel = AndroidChannels.mergeParcelable(-7, channel1, channel2).buildChannel();
+    outputChannel = AndroidChannels.mergeParcelableOutput(-7, channel1, channel2).buildChannel();
     channel1.pass("test1").close();
     channel2.pass(13).close();
     assertThat(outputChannel.in(seconds(10)).all()).containsOnly(
@@ -960,14 +702,14 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     channel1 = builder1.buildChannel();
     channel2 = builder2.buildChannel();
     outputChannel =
-        AndroidChannels.mergeParcelable(11, Arrays.asList(channel1, channel2)).buildChannel();
+        AndroidChannels.mergeParcelableOutput(11, Arrays.asList(channel1, channel2)).buildChannel();
     channel2.pass(13).close();
     channel1.pass("test1").close();
     assertThat(outputChannel.in(seconds(10)).all()).containsOnly(
         new ParcelableFlow<String>(11, "test1"), new ParcelableFlow<Integer>(12, 13));
     channel1 = builder1.buildChannel();
     channel2 = builder2.buildChannel();
-    outputChannel = AndroidChannels.mergeParcelable(channel1, channel2).buildChannel();
+    outputChannel = AndroidChannels.mergeParcelableOutput(channel1, channel2).buildChannel();
     channel1.pass("test2").close();
     channel2.pass(-17).close();
     assertThat(outputChannel.in(seconds(10)).all()).containsOnly(
@@ -975,7 +717,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     channel1 = builder1.buildChannel();
     channel2 = builder2.buildChannel();
     outputChannel =
-        AndroidChannels.mergeParcelable(Arrays.asList(channel1, channel2)).buildChannel();
+        AndroidChannels.mergeParcelableOutput(Arrays.asList(channel1, channel2)).buildChannel();
     channel1.pass("test2").close();
     channel2.pass(-17).close();
     assertThat(outputChannel.in(seconds(10)).all()).containsOnly(
@@ -998,7 +740,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
         JRoutineCore.with(InvocationFactory.factoryOf(new ClassToken<Amb<String>>() {}))
                     .buildRoutine();
     final Channel<?, String> outputChannel = routine.call(
-        AndroidChannels.mergeParcelable(Arrays.asList(channel1, channel2, channel3, channel4))
+        AndroidChannels.mergeParcelableOutput(Arrays.asList(channel1, channel2, channel3, channel4))
                        .buildChannel());
 
     for (int i = 0; i < 4; i++) {
@@ -1034,7 +776,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     Channel<?, ? extends ParcelableFlow<?>> outputChannel;
     channel1 = builder1.buildChannel();
     channel2 = builder2.buildChannel();
-    outputChannel = AndroidChannels.mergeParcelable(-7, channel1, channel2).buildChannel();
+    outputChannel = AndroidChannels.mergeParcelableOutput(-7, channel1, channel2).buildChannel();
     channel1.pass("test1").close();
     channel2.abort();
 
@@ -1051,7 +793,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     channel1 = builder1.buildChannel();
     channel2 = builder2.buildChannel();
     outputChannel =
-        AndroidChannels.mergeParcelable(11, Arrays.asList(channel1, channel2)).buildChannel();
+        AndroidChannels.mergeParcelableOutput(11, Arrays.asList(channel1, channel2)).buildChannel();
     channel2.abort();
     channel1.pass("test1").close();
 
@@ -1067,7 +809,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     channel1 = builder1.buildChannel();
     channel2 = builder2.buildChannel();
-    outputChannel = AndroidChannels.mergeParcelable(channel1, channel2).buildChannel();
+    outputChannel = AndroidChannels.mergeParcelableOutput(channel1, channel2).buildChannel();
     channel1.abort();
     channel2.pass(-17).close();
 
@@ -1084,7 +826,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     channel1 = builder1.buildChannel();
     channel2 = builder2.buildChannel();
     outputChannel =
-        AndroidChannels.mergeParcelable(Arrays.asList(channel1, channel2)).buildChannel();
+        AndroidChannels.mergeParcelableOutput(Arrays.asList(channel1, channel2)).buildChannel();
     channel1.pass("test2").close();
     channel2.abort();
 
@@ -1103,7 +845,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      AndroidChannels.mergeParcelable(0, Collections.<Channel<?, Object>>emptyList());
+      AndroidChannels.mergeParcelableOutput(0, Collections.<Channel<?, Object>>emptyList());
 
       fail();
 
@@ -1113,7 +855,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      AndroidChannels.mergeParcelable(0);
+      AndroidChannels.mergeParcelableOutput(0);
 
       fail();
 
@@ -1123,7 +865,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      AndroidChannels.mergeParcelable(Collections.<Channel<?, Object>>emptyList());
+      AndroidChannels.mergeParcelableOutput(Collections.<Channel<?, Object>>emptyList());
 
       fail();
 
@@ -1133,7 +875,265 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      AndroidChannels.mergeParcelable();
+      AndroidChannels.mergeParcelableOutput();
+
+      fail();
+
+    } catch (final IllegalArgumentException ignored) {
+
+    }
+  }
+
+  public void testMergeInput() {
+
+    final Channel<String, String> channel1 = JRoutineService.on(serviceFrom(getActivity()))
+                                                            .with(factoryOf(PassingString.class))
+                                                            .call()
+                                                            .sorted();
+    final Channel<Integer, Integer> channel2 = JRoutineService.on(serviceFrom(getActivity()))
+                                                              .with(factoryOf(PassingInteger.class))
+                                                              .call()
+                                                              .sorted();
+    AndroidChannels.mergeInput(channel1, channel2)
+                   .buildChannel()
+                   .pass(new ParcelableFlow<String>(0, "test1"))
+                   .pass(new ParcelableFlow<Integer>(1, 1))
+                   .close();
+    AndroidChannels.mergeInput(3, channel1, channel2)
+                   .buildChannel()
+                   .pass(new ParcelableFlow<String>(3, "test2"))
+                   .pass(new ParcelableFlow<Integer>(4, 2))
+                   .close();
+    AndroidChannels.mergeInput(Arrays.<Channel<?, ?>>asList(channel1, channel2))
+                   .buildChannel()
+                   .pass(new ParcelableFlow<String>(0, "test3"))
+                   .pass(new ParcelableFlow<Integer>(1, 3))
+                   .close();
+    AndroidChannels.mergeInput(-5, Arrays.<Channel<?, ?>>asList(channel1, channel2))
+                   .buildChannel()
+                   .pass(new ParcelableFlow<String>(-5, "test4"))
+                   .pass(new ParcelableFlow<Integer>(-4, 4))
+                   .close();
+    final HashMap<Integer, Channel<?, ?>> map = new HashMap<Integer, Channel<?, ?>>(2);
+    map.put(31, channel1);
+    map.put(17, channel2);
+    AndroidChannels.mergeInput(map)
+                   .buildChannel()
+                   .pass(new ParcelableFlow<String>(31, "test5"))
+                   .pass(new ParcelableFlow<Integer>(17, 5))
+                   .close();
+    assertThat(channel1.close().in(seconds(10)).all()).containsExactly("test1", "test2", "test3",
+        "test4", "test5");
+    assertThat(channel2.close().in(seconds(10)).all()).containsExactly(1, 2, 3, 4, 5);
+  }
+
+  public void testMergeInputAbort() {
+
+    Channel<String, String> channel1;
+    Channel<Integer, Integer> channel2;
+    channel1 = JRoutineService.on(serviceFrom(getActivity()))
+                              .with(factoryOf(PassingString.class))
+                              .call()
+                              .sorted();
+    channel2 = JRoutineService.on(serviceFrom(getActivity()))
+                              .with(factoryOf(PassingInteger.class))
+                              .call()
+                              .sorted();
+    AndroidChannels.mergeInput(channel1, channel2).buildChannel().abort();
+
+    try {
+
+      channel1.close().in(seconds(10)).next();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+
+    try {
+
+      channel2.close().in(seconds(10)).next();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+
+    channel1 = JRoutineService.on(serviceFrom(getActivity()))
+                              .with(factoryOf(PassingString.class))
+                              .call()
+                              .sorted();
+    channel2 = JRoutineService.on(serviceFrom(getActivity()))
+                              .with(factoryOf(PassingInteger.class))
+                              .call()
+                              .sorted();
+    AndroidChannels.mergeInput(3, channel1, channel2).buildChannel().abort();
+
+    try {
+
+      channel1.close().in(seconds(10)).next();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+
+    try {
+
+      channel2.close().in(seconds(10)).next();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+
+    channel1 = JRoutineService.on(serviceFrom(getActivity()))
+                              .with(factoryOf(PassingString.class))
+                              .call()
+                              .sorted();
+    channel2 = JRoutineService.on(serviceFrom(getActivity()))
+                              .with(factoryOf(PassingInteger.class))
+                              .call()
+                              .sorted();
+    AndroidChannels.mergeInput(Arrays.<Channel<?, ?>>asList(channel1, channel2))
+                   .buildChannel()
+                   .abort();
+
+    try {
+
+      channel1.close().in(seconds(10)).next();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+
+    try {
+
+      channel2.close().in(seconds(10)).next();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+
+    channel1 = JRoutineService.on(serviceFrom(getActivity()))
+                              .with(factoryOf(PassingString.class))
+                              .call()
+                              .sorted();
+    channel2 = JRoutineService.on(serviceFrom(getActivity()))
+                              .with(factoryOf(PassingInteger.class))
+                              .call()
+                              .sorted();
+    AndroidChannels.mergeInput(-5, Arrays.<Channel<?, ?>>asList(channel1, channel2))
+                   .buildChannel()
+                   .abort();
+
+    try {
+
+      channel1.close().in(seconds(10)).next();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+
+    try {
+
+      channel2.close().in(seconds(10)).next();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+
+    channel1 = JRoutineService.on(serviceFrom(getActivity()))
+                              .with(factoryOf(PassingString.class))
+                              .call()
+                              .sorted();
+    channel2 = JRoutineService.on(serviceFrom(getActivity()))
+                              .with(factoryOf(PassingInteger.class))
+                              .call()
+                              .sorted();
+    final HashMap<Integer, Channel<?, ?>> map = new HashMap<Integer, Channel<?, ?>>(2);
+    map.put(31, channel1);
+    map.put(17, channel2);
+    AndroidChannels.mergeInput(map).buildChannel().abort();
+
+    try {
+
+      channel1.close().in(seconds(10)).next();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+
+    try {
+
+      channel2.close().in(seconds(10)).next();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+  }
+
+  public void testMergeInputError() {
+
+    try {
+
+      AndroidChannels.mergeInput();
+
+      fail();
+
+    } catch (final IllegalArgumentException ignored) {
+
+    }
+
+    try {
+
+      AndroidChannels.mergeInput(0);
+
+      fail();
+
+    } catch (final IllegalArgumentException ignored) {
+
+    }
+
+    try {
+
+      AndroidChannels.mergeInput(Collections.<Channel<?, ?>>emptyList());
+
+      fail();
+
+    } catch (final IllegalArgumentException ignored) {
+
+    }
+
+    try {
+
+      AndroidChannels.mergeInput(0, Collections.<Channel<?, ?>>emptyList());
+
+      fail();
+
+    } catch (final IllegalArgumentException ignored) {
+
+    }
+
+    try {
+
+      AndroidChannels.mergeInput(Collections.<Integer, Channel<?, ?>>emptyMap());
 
       fail();
 

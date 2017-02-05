@@ -1095,6 +1095,30 @@ public class ChannelsTest {
   }
 
   @Test
+  public void testList() {
+    final int count = 7;
+    final List<? extends Channel<Object, Object>> channels = Channels.number(count)
+                                                                     .applyChannelConfiguration()
+                                                                     .withRunner(
+                                                                         Runners.immediateRunner())
+                                                                     .configured()
+                                                                     .buildChannels();
+    for (final Channel<Object, Object> channel : channels) {
+      assertThat(channel.pass("test").next()).isEqualTo("test");
+    }
+  }
+
+  @Test
+  public void testListEmpty() {
+    assertThat(Channels.number(0).buildChannels()).isEmpty();
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testListError() {
+    Channels.number(-1);
+  }
+
+  @Test
   public void testMap() {
 
     final ChannelBuilder<String, String> builder1 =

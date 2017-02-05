@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.channel;
 
+import com.github.dm.jrt.channel.builder.ChannelListBuilder;
 import com.github.dm.jrt.channel.builder.ChannelMapBuilder;
 import com.github.dm.jrt.core.builder.ChannelBuilder;
 import com.github.dm.jrt.core.channel.Channel;
@@ -47,8 +48,6 @@ public class Channels {
   protected Channels() {
     ConstantConditions.avoid();
   }
-
-  // TODO: 05/02/2017 List<Channel<?, ?>> blendInput(int count)?
 
   /**
    * Returns a builder of channels blending the outputs coming from the specified ones.
@@ -972,6 +971,19 @@ public class Channels {
   public static <OUT> ChannelBuilder<?, Flow<OUT>> mergeOutput(
       @NotNull final Map<Integer, ? extends Channel<?, ? extends OUT>> channels) {
     return new MergeMapBuilder<OUT>(channels);
+  }
+
+  /**
+   * Returns a builder of list of channels.
+   *
+   * @param count  the number of channels to build.
+   * @param <DATA> the data type.
+   * @return the channel builder.
+   * @throws java.lang.IllegalArgumentException if the specified count is negative.
+   */
+  @NotNull
+  public static <DATA> ChannelListBuilder<DATA, DATA> number(final int count) {
+    return new InstanceChannelListBuilder<DATA>(count);
   }
 
   /**

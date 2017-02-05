@@ -308,7 +308,10 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
     public Channel<?, Object> apply(final Channel<?, ParcelableFlow<Object>> channel) {
       final Channel<Object, Object> outputChannel =
           JRoutineCore.ofInputs().apply(mConfiguration).buildChannel();
-      mRoutine.call(channel).bind(new ConverterChannelConsumer(mConverter, outputChannel));
+      mRoutine.call()
+              .bind(new ConverterChannelConsumer(mConverter, outputChannel))
+              .pass(channel)
+              .close();
       return outputChannel;
     }
   }
@@ -351,8 +354,10 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
     public <OUT> Channel adapt(final Call<OUT> call) {
       final Channel<Object, Object> outputChannel =
           JRoutineCore.ofInputs().apply(mChannelConfiguration).buildChannel();
-      getRoutine().call(invokeCall(call))
-                  .bind(new ConverterChannelConsumer(mConverter, outputChannel));
+      getRoutine().call()
+                  .bind(new ConverterChannelConsumer(mConverter, outputChannel))
+                  .pass(invokeCall(call))
+                  .close();
       return outputChannel;
     }
   }

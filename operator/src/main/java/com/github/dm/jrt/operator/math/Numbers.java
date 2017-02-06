@@ -729,6 +729,7 @@ public class Numbers {
    *                                            not supported.
    */
   @NotNull
+  @SuppressWarnings("unchecked")
   public static <N extends Number> N convertTo(@NotNull final Class<N> type,
       @NotNull final Number n) {
     return (N) getOperation(type).convert(n);
@@ -745,6 +746,7 @@ public class Numbers {
    * @return the converted number or null.
    */
   @Nullable
+  @SuppressWarnings("unchecked")
   public static <N extends Number> N convertToSafe(@Nullable final Class<N> type,
       @Nullable final Number n) {
     if (n == null) {

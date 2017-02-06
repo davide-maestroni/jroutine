@@ -15,7 +15,7 @@
  */
 
 /**
- * Definition of annotations used to configure proxy routines.
+ * Definition of annotations used to configure reflection routines.
  * <p>
  * Created by davide-maestroni on 10/14/2014.
  */

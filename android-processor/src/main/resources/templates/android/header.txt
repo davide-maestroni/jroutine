@@ -25,11 +25,11 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
   public ${generatedClassName}(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.ServiceContext context,
       @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.reflect.ContextInvocationTarget<?> target,
       @org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.config.InvocationConfiguration invocationConfiguration,
-      @org.jetbrains.annotations.NotNull final com.github.dm.jrt.reflect.config.ReflectionConfiguration reflectionConfiguration,
+      @org.jetbrains.annotations.NotNull final com.github.dm.jrt.reflect.config.CallConfiguration callConfiguration,
       @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.config.ServiceConfiguration serviceConfiguration) {
     com.github.dm.jrt.core.util.ConstantConditions.notNull("Service context", context);
     com.github.dm.jrt.core.util.ConstantConditions.notNull("invocation configuration", invocationConfiguration);
-    com.github.dm.jrt.core.util.ConstantConditions.notNull("reflection configuration", reflectionConfiguration);
+    com.github.dm.jrt.core.util.ConstantConditions.notNull("call configuration", callConfiguration);
     com.github.dm.jrt.core.util.ConstantConditions.notNull("Service configuration", serviceConfiguration);
     if (target.getTargetClass().isPrimitive()) {
       // The parceling of primitive classes is broken...
@@ -114,8 +114,8 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
     @org.jetbrains.annotations.NotNull
     protected ${interfaceFullName} newProxy(
         @org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.config.InvocationConfiguration invocationConfiguration,
-        @org.jetbrains.annotations.NotNull final com.github.dm.jrt.reflect.config.ReflectionConfiguration reflectionConfiguration,
+        @org.jetbrains.annotations.NotNull final com.github.dm.jrt.reflect.config.CallConfiguration callConfiguration,
         @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.config.ServiceConfiguration serviceConfiguration) {
-      return new ${generatedClassName}${genericTypes}(mContext, mTarget, invocationConfiguration, reflectionConfiguration, serviceConfiguration);
+      return new ${generatedClassName}${genericTypes}(mContext, mTarget, invocationConfiguration, callConfiguration, serviceConfiguration);
     }
   }

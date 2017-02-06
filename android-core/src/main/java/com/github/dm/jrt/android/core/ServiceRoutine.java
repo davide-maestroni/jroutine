@@ -437,15 +437,15 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
     @Override
     public void onRestart() {
       final Logger logger = mLogger;
-      mInputChannel = JRoutineCore.<IN>ofInputs().applyChannelConfiguration()
+      mInputChannel = JRoutineCore.<IN>ofInputs().channelConfiguration()
                                                  .withLog(logger.getLog())
                                                  .withLogLevel(logger.getLogLevel())
-                                                 .configured()
+                                                 .apply()
                                                  .buildChannel();
-      mOutputChannel = JRoutineCore.<OUT>ofInputs().applyChannelConfiguration()
+      mOutputChannel = JRoutineCore.<OUT>ofInputs().channelConfiguration()
                                                    .withLog(logger.getLog())
                                                    .withLogLevel(logger.getLogLevel())
-                                                   .configured()
+                                                   .apply()
                                                    .buildChannel();
       final Looper looper = mServiceConfiguration.getMessageLooperOrElse(Looper.getMainLooper());
       final IncomingHandler<OUT> handler =

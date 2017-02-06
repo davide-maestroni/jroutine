@@ -41,7 +41,7 @@ public abstract class AbstractChannelListBuilder<IN, OUT> implements ChannelList
   }
 
   @NotNull
-  public Builder<? extends ChannelListBuilder<IN, OUT>> applyChannelConfiguration() {
+  public Builder<? extends ChannelListBuilder<IN, OUT>> channelConfiguration() {
     return new Builder<ChannelListBuilder<IN, OUT>>(this, mConfiguration);
   }
 

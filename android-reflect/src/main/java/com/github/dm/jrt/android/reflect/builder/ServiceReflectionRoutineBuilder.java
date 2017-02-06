@@ -19,7 +19,7 @@ package com.github.dm.jrt.android.reflect.builder;
 import com.github.dm.jrt.android.core.config.ServiceConfigurable;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilder;
-import com.github.dm.jrt.reflect.config.ReflectionConfiguration;
+import com.github.dm.jrt.reflect.config.CallConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -46,7 +46,14 @@ public interface ServiceReflectionRoutineBuilder
    */
   @NotNull
   @Override
-  ServiceReflectionRoutineBuilder apply(@NotNull ReflectionConfiguration configuration);
+  ServiceReflectionRoutineBuilder apply(@NotNull CallConfiguration configuration);
+
+  /**
+   * {@inheritDoc}
+   */
+  @NotNull
+  @Override
+  CallConfiguration.Builder<? extends ServiceReflectionRoutineBuilder> callConfiguration();
 
   /**
    * {@inheritDoc}
@@ -54,13 +61,5 @@ public interface ServiceReflectionRoutineBuilder
   @NotNull
   @Override
   InvocationConfiguration.Builder<? extends ServiceReflectionRoutineBuilder>
-  applyInvocationConfiguration();
-
-  /**
-   * {@inheritDoc}
-   */
-  @NotNull
-  @Override
-  ReflectionConfiguration.Builder<? extends ServiceReflectionRoutineBuilder>
-  applyReflectionConfiguration();
+  invocationConfiguration();
 }

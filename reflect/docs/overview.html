@@ -81,12 +81,12 @@
 
             public static void main(final String[] args) {
                 final ReflectionRoutineBuilder builder = JRoutineReflection.with(classOfType(Main.class))
-                                                                           .applyReflectionConfiguration()
+                                                                           .callConfiguration()
                                                                            .withSharedFields()
-                                                                           .configured()
-                                                                           .applyInvocationConfiguration()
+                                                                           .apply()
+                                                                           .invocationConfiguration()
                                                                            .withOutputTimeout(seconds(3))
-                                                                           .configured();
+                                                                           .apply();
                 final Routine&lt;String, Integer&gt; parseRoutine = builder.method(PARSE);
                 final Routine&lt;Integer, Integer&gt; squareRoutine = builder.method(SQUARE);
                 final Routine&lt;List&lt;Integer&gt;, Double&gt; meanRoutine = builder.method(MEAN);
@@ -134,12 +134,12 @@
             public static void main(final String[] args) {
                 final Main main = new Main();
                 final AsyncMain proxy = JRoutineReflection.with(instance(main))
-                                                          .applyReflectionConfiguration()
+                                                          .callConfiguration()
                                                           .withSharedFields()
-                                                          .configured()
-                                                          .applyInvocationConfiguration()
+                                                          .apply()
+                                                          .invocationConfiguration()
                                                           .withOutputTimeout(seconds(3))
-                                                          .configured()
+                                                          .apply()
                                                           .buildProxy(AsyncMain.class);
                 final double rms = proxy.squareRootMean(proxy.square(proxy.parseArg(JRoutineCore.of(args).buildChannel())));
                 System.out.println(rms);

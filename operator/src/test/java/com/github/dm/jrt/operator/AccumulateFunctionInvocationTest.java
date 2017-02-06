@@ -51,9 +51,9 @@ public class AccumulateFunctionInvocationTest {
 
     final BiFunction<String, String, String> function = createFunction();
     assertThat(JRoutineCore.with(functionFactory(function))
-                           .applyInvocationConfiguration()
+                           .invocationConfiguration()
                            .withRunner(Runners.syncRunner())
-                           .configured()
+                           .apply()
                            .call("test1", "test2", "test3")
                            .next()).isEqualTo("test1test2test3");
     assertThat(JRoutineCore.with(functionFactory(new Supplier<String>() {
@@ -63,9 +63,9 @@ public class AccumulateFunctionInvocationTest {
         return "test0";
       }
     }, function))
-                           .applyInvocationConfiguration()
+                           .invocationConfiguration()
                            .withRunner(Runners.syncRunner())
-                           .configured()
+                           .apply()
                            .call("test1", "test2", "test3")
                            .next()).isEqualTo("test0test1test2test3");
   }

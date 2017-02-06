@@ -457,7 +457,7 @@ public class RoutineProcessor extends AbstractProcessor {
              .append(" = ")
              .append("initRoutine")
              .append(i)
-             .append("(target, invocationConfiguration, reflectionConfiguration);")
+             .append("(target, invocationConfiguration, callConfiguration);")
              .append(NEW_LINE);
     }
 
@@ -1831,8 +1831,8 @@ public class RoutineProcessor extends AbstractProcessor {
       methodHeader = methodHeader.replace("${sharedFields}", builder.toString());
 
     } else {
-      methodHeader = methodHeader.replace("${sharedFields}",
-          "reflectionConfiguration.getSharedFieldsOrElse(null)");
+      methodHeader =
+          methodHeader.replace("${sharedFields}", "callConfiguration.getSharedFieldsOrElse(null)");
     }
 
     writer.append(methodHeader);
@@ -1884,7 +1884,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
     } else {
       methodInvocationHeader = methodInvocationHeader.replace("${sharedFields}",
-          "reflectionConfiguration.getSharedFieldsOrElse(null)");
+          "callConfiguration.getSharedFieldsOrElse(null)");
     }
 
     final boolean isStatic = targetMethod.getModifiers().contains(Modifier.STATIC);

@@ -111,9 +111,9 @@
                               .immediate()
                               .map(loadUri())
                               .lift(LoaderTransformations.&lt;URI, Bitmap&gt;runOn(loaderFrom(this))
-                                                         .applyLoaderConfiguration()
+                                                         .loaderConfiguration()
                                                          .withInvocationId(11) // explicitly set the invocation ID so to make the invocation survive rotations
-                                                         .configured()
+                                                         .apply()
                                                          .buildFunction())
                               .call(IMAGE_URI);
                               .bind(onError(showToast(this)).andOnOutput(showImage(imageView)));

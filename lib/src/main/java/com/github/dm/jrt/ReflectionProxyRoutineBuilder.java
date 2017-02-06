@@ -18,7 +18,7 @@ package com.github.dm.jrt;
 
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilder;
-import com.github.dm.jrt.reflect.config.ReflectionConfiguration;
+import com.github.dm.jrt.reflect.config.CallConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -47,21 +47,20 @@ public interface ReflectionProxyRoutineBuilder extends ReflectionRoutineBuilder 
    * {@inheritDoc}
    */
   @NotNull
-  ReflectionProxyRoutineBuilder apply(@NotNull ReflectionConfiguration configuration);
+  ReflectionProxyRoutineBuilder apply(@NotNull CallConfiguration configuration);
+
+  /**
+   * {@inheritDoc}
+   */
+  @NotNull
+  CallConfiguration.Builder<? extends ReflectionProxyRoutineBuilder> callConfiguration();
 
   /**
    * {@inheritDoc}
    */
   @NotNull
   InvocationConfiguration.Builder<? extends ReflectionProxyRoutineBuilder>
-  applyInvocationConfiguration();
-
-  /**
-   * {@inheritDoc}
-   */
-  @NotNull
-  ReflectionConfiguration.Builder<? extends ReflectionProxyRoutineBuilder>
-  applyReflectionConfiguration();
+  invocationConfiguration();
 
   /**
    * Force the type of strategy to be employed to create the proxy instance.

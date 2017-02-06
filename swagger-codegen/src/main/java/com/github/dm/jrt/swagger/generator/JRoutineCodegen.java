@@ -158,17 +158,28 @@ public class JRoutineCodegen extends JavaClientCodegen {
   }
 
   @Override
-  public CodegenOperation fromOperation(final String path, final String httpMethod,
-      final Operation operation, final Map<String, Model> definitions, final Swagger swagger) {
-    final CodegenOperation codegenOperation =
-        super.fromOperation(path, httpMethod, operation, definitions, swagger);
-    codegenOperation.path = swagger.getBasePath() + codegenOperation.path;
-    return codegenOperation;
+  public void setLibrary(final String library) {
   }
 
   @Override
   public String getName() {
     return "jroutine";
+  }
+
+  @Override
+  public void processOpts() {
+    final Map<String, Object> additionalProperties = this.additionalProperties;
+    additionalProperties.remove(USE_RX_JAVA);
+    additionalProperties.remove("usePlay24WS");
+    setupConverterOption(additionalProperties);
+    super.processOpts();
+    setupConverterOption(additionalProperties);
+    final Map<String, String> apiTemplateFiles = this.apiTemplateFiles;
+    apiTemplateFiles.remove("api.mustache");
+    apiTemplateFiles.put("jroutine_api.mustache", ".java");
+    final Map<String, String> modelTemplateFiles = this.modelTemplateFiles;
+    modelTemplateFiles.remove("model.mustache");
+    modelTemplateFiles.put("jroutine_model.mustache", ".java");
   }
 
   @Override
@@ -207,23 +218,12 @@ public class JRoutineCodegen extends JavaClientCodegen {
   }
 
   @Override
-  public void processOpts() {
-    final Map<String, Object> additionalProperties = this.additionalProperties;
-    additionalProperties.remove(USE_RX_JAVA);
-    additionalProperties.remove("usePlay24WS");
-    setupConverterOption(additionalProperties);
-    super.processOpts();
-    setupConverterOption(additionalProperties);
-    final Map<String, String> apiTemplateFiles = this.apiTemplateFiles;
-    apiTemplateFiles.remove("api.mustache");
-    apiTemplateFiles.put("jroutine_api.mustache", ".java");
-    final Map<String, String> modelTemplateFiles = this.modelTemplateFiles;
-    modelTemplateFiles.remove("model.mustache");
-    modelTemplateFiles.put("jroutine_model.mustache", ".java");
-  }
-
-  @Override
-  public void setLibrary(final String library) {
+  public CodegenOperation fromOperation(final String path, final String httpMethod,
+      final Operation operation, final Map<String, Model> definitions, final Swagger swagger) {
+    final CodegenOperation codegenOperation =
+        super.fromOperation(path, httpMethod, operation, definitions, swagger);
+    codegenOperation.path = swagger.getBasePath() + codegenOperation.path;
+    return codegenOperation;
   }
 
   @NotNull

@@ -41,7 +41,7 @@ public abstract class AbstractChannelBuilder<IN, OUT> implements ChannelBuilder<
   }
 
   @NotNull
-  public Builder<? extends ChannelBuilder<IN, OUT>> applyChannelConfiguration() {
+  public Builder<? extends ChannelBuilder<IN, OUT>> channelConfiguration() {
     return new Builder<ChannelBuilder<IN, OUT>>(this, mConfiguration);
   }
 

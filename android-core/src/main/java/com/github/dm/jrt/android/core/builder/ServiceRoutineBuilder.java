@@ -52,5 +52,5 @@ public interface ServiceRoutineBuilder<IN, OUT>
    */
   @NotNull
   @Override
-  Builder<? extends ServiceRoutineBuilder<IN, OUT>> applyInvocationConfiguration();
+  Builder<? extends ServiceRoutineBuilder<IN, OUT>> invocationConfiguration();
 }

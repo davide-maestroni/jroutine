@@ -60,6 +60,7 @@ class MergeInputMapBuilder<IN>
 
   @NotNull
   @Override
+  @SuppressWarnings("unchecked")
   public Channel<Flow<? extends IN>, Flow<? extends IN>> buildChannel() {
     final SparseArray<? extends Channel<? extends IN, ?>> channelMap = mChannelMap;
     final int size = channelMap.size();

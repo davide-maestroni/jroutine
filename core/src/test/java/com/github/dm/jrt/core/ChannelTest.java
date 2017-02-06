@@ -186,11 +186,11 @@ public class ChannelTest {
   @Test
   public void testAsynchronousInput2() {
     final DurationMeasure timeout = seconds(1);
-    final Channel<String, String> channel1 =
-        JRoutineCore.<String>ofInputs().applyChannelConfiguration()
-                                       .withOrder(OrderType.SORTED)
-                                       .configured()
-                                       .buildChannel();
+    final Channel<String, String> channel1 = JRoutineCore.<String>ofInputs().channelConfiguration()
+                                                                            .withOrder(
+                                                                                OrderType.SORTED)
+                                                                            .apply()
+                                                                            .buildChannel();
     new Thread() {
 
       @Override
@@ -324,9 +324,9 @@ public class ChannelTest {
   public void testMaxSize() {
     try {
       JRoutineCore.ofInputs()
-                  .applyChannelConfiguration()
+                  .channelConfiguration()
                   .withMaxSize(1)
-                  .configured()
+                  .apply()
                   .buildChannel()
                   .pass("test1", "test2");
       fail();
@@ -501,14 +501,14 @@ public class ChannelTest {
   public void testOrderType() {
     final DurationMeasure timeout = seconds(1);
     final Channel<Object, Object> channel = JRoutineCore.ofInputs()
-                                                        .applyChannelConfiguration()
+                                                        .channelConfiguration()
                                                         .withOrder(OrderType.SORTED)
                                                         .withRunner(Runners.sharedRunner())
                                                         .withMaxSize(1)
                                                         .withBackoff(noDelay())
                                                         .withLogLevel(Level.DEBUG)
                                                         .withLog(new NullLog())
-                                                        .configured()
+                                                        .apply()
                                                         .buildChannel();
     channel.pass(-77L);
     assertThat(channel.in(timeout).next()).isEqualTo(-77L);
@@ -548,11 +548,11 @@ public class ChannelTest {
   @Test
   public void testPassTimeout() {
     final Channel<Object, Object> channel1 = JRoutineCore.ofInputs()
-                                                         .applyChannelConfiguration()
+                                                         .channelConfiguration()
                                                          .withOutputTimeout(millis(10))
                                                          .withOutputTimeoutAction(
                                                              TimeoutActionType.CONTINUE)
-                                                         .configured()
+                                                         .apply()
                                                          .buildChannel();
     assertThat(channel1.all()).isEmpty();
   }
@@ -560,11 +560,11 @@ public class ChannelTest {
   @Test
   public void testPassTimeout2() {
     final Channel<Object, Object> channel2 = JRoutineCore.ofInputs()
-                                                         .applyChannelConfiguration()
+                                                         .channelConfiguration()
                                                          .withOutputTimeout(millis(10))
                                                          .withOutputTimeoutAction(
                                                              TimeoutActionType.ABORT)
-                                                         .configured()
+                                                         .apply()
                                                          .buildChannel();
     try {
       channel2.all();
@@ -577,11 +577,11 @@ public class ChannelTest {
   @Test
   public void testPassTimeout3() {
     final Channel<Object, Object> channel3 = JRoutineCore.ofInputs()
-                                                         .applyChannelConfiguration()
+                                                         .channelConfiguration()
                                                          .withOutputTimeout(millis(10))
                                                          .withOutputTimeoutAction(
                                                              TimeoutActionType.FAIL)
-                                                         .configured()
+                                                         .apply()
                                                          .buildChannel();
     try {
       channel3.all();

@@ -78,9 +78,9 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
     final Channel<?, Data> channel =
         JRoutineService.on(serviceFrom(getActivity(), RemoteInvocationService.class))
                        .with(factoryOf(Delay.class))
-                       .applyServiceConfiguration()
+                       .serviceConfiguration()
                        .withRunnerClass(MainRunner.class)
-                       .configured()
+                       .apply()
                        .call(data);
     assertThat(channel.abort(new IllegalArgumentException("test"))).isTrue();
 
@@ -189,14 +189,14 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
     final Routine<String, String> routine =
         JRoutineService.on(serviceFrom(getActivity(), RemoteInvocationService.class))
                        .with(targetFactory)
-                       .applyInvocationConfiguration()
+                       .invocationConfiguration()
                        .withRunner(Runners.syncRunner())
                        .withInputOrder(OrderType.UNSORTED)
                        .withLogLevel(Level.DEBUG)
-                       .configured()
-                       .applyServiceConfiguration()
+                       .apply()
+                       .serviceConfiguration()
                        .withLogClass(AndroidLog.class)
-                       .configured()
+                       .apply()
                        .buildRoutine();
     assertThat(routine.call("1", "2", "3", "4", "5").in(timeout).all()).containsOnly("1", "2", "3",
         "4", "5");
@@ -207,10 +207,10 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
     final Channel<?, String> channel =
         JRoutineService.on(serviceFrom(getActivity(), RemoteInvocationService.class))
                        .with(factoryOf(StringDelay.class))
-                       .applyInvocationConfiguration()
+                       .invocationConfiguration()
                        .withOutputTimeout(millis(10))
                        .withOutputTimeoutAction(TimeoutActionType.CONTINUE)
-                       .configured()
+                       .apply()
                        .call("test1");
     assertThat(channel.all()).isEmpty();
     assertThat(channel.in(seconds(10)).getComplete()).isTrue();
@@ -221,10 +221,10 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
     final Channel<?, String> channel =
         JRoutineService.on(serviceFrom(getActivity(), RemoteInvocationService.class))
                        .with(factoryOf(StringDelay.class))
-                       .applyInvocationConfiguration()
+                       .invocationConfiguration()
                        .withOutputTimeout(millis(10))
                        .withOutputTimeoutAction(TimeoutActionType.ABORT)
-                       .configured()
+                       .apply()
                        .call("test2");
 
     try {
@@ -245,10 +245,10 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
     final Channel<?, String> channel =
         JRoutineService.on(serviceFrom(getActivity(), RemoteInvocationService.class))
                        .with(factoryOf(StringDelay.class))
-                       .applyInvocationConfiguration()
+                       .invocationConfiguration()
                        .withOutputTimeout(millis(10))
                        .withOutputTimeoutAction(TimeoutActionType.FAIL)
-                       .configured()
+                       .apply()
                        .call("test3");
 
     try {
@@ -272,13 +272,13 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
     final Routine<String, String> routine1 =
         JRoutineService.on(serviceFrom(getActivity(), RemoteInvocationService.class))
                        .with(targetFactory)
-                       .applyInvocationConfiguration()
+                       .invocationConfiguration()
                        .withInputOrder(OrderType.UNSORTED)
                        .withLogLevel(Level.DEBUG)
-                       .configured()
-                       .applyServiceConfiguration()
+                       .apply()
+                       .serviceConfiguration()
                        .withLogClass(AndroidLog.class)
-                       .configured()
+                       .apply()
                        .buildRoutine();
     assertThat(routine1.call("1", "2", "3", "4", "5").in(timeout).all()).containsOnly("1", "2", "3",
         "4", "5");
@@ -293,13 +293,13 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
     final Routine<String, String> routine2 =
         JRoutineService.on(serviceFrom(getActivity(), RemoteInvocationService.class))
                        .with(factoryOf(token))
-                       .applyInvocationConfiguration()
+                       .invocationConfiguration()
                        .withOutputOrder(OrderType.UNSORTED)
                        .withLogLevel(Level.DEBUG)
-                       .configured()
-                       .applyServiceConfiguration()
+                       .apply()
+                       .serviceConfiguration()
                        .withLogClass(AndroidLog.class)
-                       .configured()
+                       .apply()
                        .buildRoutine();
     assertThat(routine2.call("1", "2", "3", "4", "5").in(timeout).all()).containsExactly("1", "2",
         "3", "4", "5");
@@ -315,10 +315,10 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
     final Routine<String, String> routine3 =
         JRoutineService.on(serviceFrom(getActivity(), RemoteInvocationService.class))
                        .with(targetFactory)
-                       .applyInvocationConfiguration()
+                       .invocationConfiguration()
                        .withInputOrder(OrderType.SORTED)
                        .withOutputOrder(OrderType.SORTED)
-                       .configured()
+                       .apply()
                        .buildRoutine();
     assertThat(routine3.call("1", "2", "3", "4", "5").in(timeout).all()).containsExactly("1", "2",
         "3", "4", "5");
@@ -334,10 +334,10 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
     final Routine<String, String> routine4 =
         JRoutineService.on(serviceFrom(getActivity(), RemoteInvocationService.class))
                        .with(targetFactory)
-                       .applyInvocationConfiguration()
+                       .invocationConfiguration()
                        .withCoreInstances(0)
                        .withMaxInstances(2)
-                       .configured()
+                       .apply()
                        .buildRoutine();
     assertThat(routine4.call("1", "2", "3", "4", "5").in(timeout).all()).containsOnly("1", "2", "3",
         "4", "5");
@@ -353,10 +353,10 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
     final Routine<Void, String> routine4 =
         JRoutineService.on(serviceFrom(getActivity(), RemoteInvocationService.class))
                        .with(targetFactory)
-                       .applyInvocationConfiguration()
+                       .invocationConfiguration()
                        .withCoreInstances(0)
                        .withMaxInstances(2)
-                       .configured()
+                       .apply()
                        .buildRoutine();
     assertThat(routine4.close().in(timeout).all()).containsOnly("test1", "test2", "test3");
     assertThat(routine4.callParallel().close().in(timeout).all()).containsOnly("test1", "test2",

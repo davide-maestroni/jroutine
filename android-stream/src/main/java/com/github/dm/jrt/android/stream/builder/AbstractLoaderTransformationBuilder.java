@@ -51,15 +51,15 @@ public abstract class AbstractLoaderTransformationBuilder<IN, OUT, BEFORE, AFTER
 
   @NotNull
   @Override
-  public Builder<? extends LoaderTransformationBuilder<IN, OUT, BEFORE, AFTER>>
-  applyLoaderConfiguration() {
-    return new Builder<LoaderTransformationBuilder<IN, OUT, BEFORE, AFTER>>(this, mConfiguration);
+  public LiftFunction<IN, OUT, BEFORE, AFTER> buildFunction() {
+    return new BuilderLiftFunction(mConfiguration);
   }
 
   @NotNull
   @Override
-  public LiftFunction<IN, OUT, BEFORE, AFTER> buildFunction() {
-    return new BuilderLiftFunction(mConfiguration);
+  public Builder<? extends LoaderTransformationBuilder<IN, OUT, BEFORE, AFTER>>
+  loaderConfiguration() {
+    return new Builder<LoaderTransformationBuilder<IN, OUT, BEFORE, AFTER>>(this, mConfiguration);
   }
 
   /**

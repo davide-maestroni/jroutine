@@ -19,7 +19,7 @@ package com.github.dm.jrt.android.proxy.builder;
 import com.github.dm.jrt.android.core.config.ServiceConfigurable;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.proxy.builder.ProxyObjectBuilder;
-import com.github.dm.jrt.reflect.config.ReflectionConfiguration;
+import com.github.dm.jrt.reflect.config.CallConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -46,23 +46,7 @@ public interface ServiceProxyObjectBuilder<TYPE>
    */
   @NotNull
   @Override
-  ServiceProxyObjectBuilder<TYPE> apply(@NotNull ReflectionConfiguration configuration);
-
-  /**
-   * {@inheritDoc}
-   */
-  @NotNull
-  @Override
-  InvocationConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>>
-  applyInvocationConfiguration();
-
-  /**
-   * {@inheritDoc}
-   */
-  @NotNull
-  @Override
-  ReflectionConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>>
-  applyReflectionConfiguration();
+  ServiceProxyObjectBuilder<TYPE> apply(@NotNull CallConfiguration configuration);
 
   /**
    * Returns a proxy object enabling asynchronous call of the target instance methods.
@@ -84,4 +68,19 @@ public interface ServiceProxyObjectBuilder<TYPE>
   @NotNull
   @Override
   TYPE buildProxy();
+
+  /**
+   * {@inheritDoc}
+   */
+  @NotNull
+  @Override
+  CallConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>> callConfiguration();
+
+  /**
+   * {@inheritDoc}
+   */
+  @NotNull
+  @Override
+  InvocationConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>>
+  invocationConfiguration();
 }

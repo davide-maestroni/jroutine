@@ -67,7 +67,7 @@ class DefaultLoaderChannelBuilder implements LoaderChannelBuilder {
 
   @NotNull
   @Override
-  public LoaderConfiguration.Builder<? extends LoaderChannelBuilder> applyLoaderConfiguration() {
+  public LoaderConfiguration.Builder<? extends LoaderChannelBuilder> loaderConfiguration() {
     final LoaderConfiguration config = mLoaderConfiguration;
     return new LoaderConfiguration.Builder<LoaderChannelBuilder>(this, config);
   }
@@ -93,12 +93,12 @@ class DefaultLoaderChannelBuilder implements LoaderChannelBuilder {
         new MissingLoaderInvocationFactory<OUT>(loaderId);
     final DefaultLoaderRoutineBuilder<Void, OUT> builder =
         new DefaultLoaderRoutineBuilder<Void, OUT>(context, factory);
-    return builder.apply(builderFromOutput(mChannelConfiguration).configured())
-                  .applyLoaderConfiguration()
+    return builder.apply(builderFromOutput(mChannelConfiguration).apply())
+                  .loaderConfiguration()
                   .withClashResolution(ClashResolutionType.JOIN)
                   .withMatchResolution(ClashResolutionType.JOIN)
                   .with(loaderConfiguration)
-                  .configured()
+                  .apply()
                   .close();
   }
 
@@ -165,7 +165,7 @@ class DefaultLoaderChannelBuilder implements LoaderChannelBuilder {
 
   @NotNull
   @Override
-  public ChannelConfiguration.Builder<? extends LoaderChannelBuilder> applyChannelConfiguration() {
+  public ChannelConfiguration.Builder<? extends LoaderChannelBuilder> channelConfiguration() {
     final ChannelConfiguration config = mChannelConfiguration;
     return new ChannelConfiguration.Builder<LoaderChannelBuilder>(this, config);
   }

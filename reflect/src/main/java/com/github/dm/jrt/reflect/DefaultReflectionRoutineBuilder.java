@@ -33,7 +33,7 @@ import com.github.dm.jrt.reflect.annotation.AsyncOutput.OutputMode;
 import com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilder;
 import com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilders.MethodInfo;
 import com.github.dm.jrt.reflect.common.Mutex;
-import com.github.dm.jrt.reflect.config.ReflectionConfiguration;
+import com.github.dm.jrt.reflect.config.CallConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -65,11 +65,10 @@ class DefaultReflectionRoutineBuilder implements ReflectionRoutineBuilder {
 
   private final InvocationTarget<?> mTarget;
 
+  private CallConfiguration mCallConfiguration = CallConfiguration.defaultConfiguration();
+
   private InvocationConfiguration mInvocationConfiguration =
       InvocationConfiguration.defaultConfiguration();
-
-  private ReflectionConfiguration mReflectionConfiguration =
-      ReflectionConfiguration.defaultConfiguration();
 
   /**
    * Constructor.
@@ -96,24 +95,9 @@ class DefaultReflectionRoutineBuilder implements ReflectionRoutineBuilder {
   }
 
   @NotNull
-  public ReflectionRoutineBuilder apply(@NotNull final ReflectionConfiguration configuration) {
-    mReflectionConfiguration =
-        ConstantConditions.notNull("reflection configuration", configuration);
+  public ReflectionRoutineBuilder apply(@NotNull final CallConfiguration configuration) {
+    mCallConfiguration = ConstantConditions.notNull("call configuration", configuration);
     return this;
-  }
-
-  @NotNull
-  public InvocationConfiguration.Builder<? extends ReflectionRoutineBuilder>
-  applyInvocationConfiguration() {
-    final InvocationConfiguration config = mInvocationConfiguration;
-    return new InvocationConfiguration.Builder<ReflectionRoutineBuilder>(this, config);
-  }
-
-  @NotNull
-  public ReflectionConfiguration.Builder<? extends ReflectionRoutineBuilder>
-  applyReflectionConfiguration() {
-    final ReflectionConfiguration config = mReflectionConfiguration;
-    return new ReflectionConfiguration.Builder<ReflectionRoutineBuilder>(this, config);
   }
 
   @NotNull
@@ -152,14 +136,27 @@ class DefaultReflectionRoutineBuilder implements ReflectionRoutineBuilder {
   @NotNull
   public <IN, OUT> Routine<IN, OUT> method(@NotNull final Method method) {
     return getRoutine(withAnnotations(mInvocationConfiguration, method),
-        withAnnotations(mReflectionConfiguration, method), method, null, null);
+        withAnnotations(mCallConfiguration, method), method, null, null);
+  }
+
+  @NotNull
+  public CallConfiguration.Builder<? extends ReflectionRoutineBuilder> callConfiguration() {
+    final CallConfiguration config = mCallConfiguration;
+    return new CallConfiguration.Builder<ReflectionRoutineBuilder>(this, config);
+  }
+
+  @NotNull
+  public InvocationConfiguration.Builder<? extends ReflectionRoutineBuilder>
+  invocationConfiguration() {
+    final InvocationConfiguration config = mInvocationConfiguration;
+    return new InvocationConfiguration.Builder<ReflectionRoutineBuilder>(this, config);
   }
 
   @NotNull
   @SuppressWarnings("unchecked")
   private <IN, OUT> Routine<IN, OUT> getRoutine(
       @NotNull final InvocationConfiguration invocationConfiguration,
-      @NotNull final ReflectionConfiguration reflectionConfiguration, @NotNull final Method method,
+      @NotNull final CallConfiguration callConfiguration, @NotNull final Method method,
       @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
     final InvocationTarget<?> target = mTarget;
     final Object targetInstance = target.getTarget();
@@ -176,13 +173,12 @@ class DefaultReflectionRoutineBuilder implements ReflectionRoutineBuilder {
       }
 
       final RoutineInfo routineInfo =
-          new RoutineInfo(invocationConfiguration, reflectionConfiguration, method, inputMode,
+          new RoutineInfo(invocationConfiguration, callConfiguration, method, inputMode,
               outputMode);
       Routine<?, ?> routine = routineMap.get(routineInfo);
       if (routine == null) {
         final MethodInvocationFactory factory =
-            new MethodInvocationFactory(reflectionConfiguration, target, method, inputMode,
-                outputMode);
+            new MethodInvocationFactory(callConfiguration, target, method, inputMode, outputMode);
         routine = JRoutineCore.with(factory).apply(invocationConfiguration).buildRoutine();
         routineMap.put(routineInfo, routine);
       }
@@ -209,18 +205,18 @@ class DefaultReflectionRoutineBuilder implements ReflectionRoutineBuilder {
     /**
      * Constructor.
      *
-     * @param reflectionConfiguration the reflection configuration.
-     * @param target                  the invocation target.
-     * @param method                  the method to wrap.
-     * @param inputMode               the input transfer mode.
-     * @param outputMode              the output transfer mode.
+     * @param callConfiguration the call configuration.
+     * @param target            the invocation target.
+     * @param method            the method to wrap.
+     * @param inputMode         the input transfer mode.
+     * @param outputMode        the output transfer mode.
      */
-    private MethodCallInvocation(@NotNull final ReflectionConfiguration reflectionConfiguration,
+    private MethodCallInvocation(@NotNull final CallConfiguration callConfiguration,
         @NotNull final InvocationTarget<?> target, @NotNull final Method method,
         @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
       final Object mutexTarget =
           (Modifier.isStatic(method.getModifiers())) ? target.getTargetClass() : target.getTarget();
-      mMutex = getSharedMutex(mutexTarget, reflectionConfiguration.getSharedFieldsOrElse(null));
+      mMutex = getSharedMutex(mutexTarget, callConfiguration.getSharedFieldsOrElse(null));
       mTarget = target;
       mMethod = method;
       mInputMode = inputMode;
@@ -244,30 +240,30 @@ class DefaultReflectionRoutineBuilder implements ReflectionRoutineBuilder {
    */
   private static class MethodInvocationFactory extends InvocationFactory<Object, Object> {
 
+    private final CallConfiguration mCallConfiguration;
+
     private final InputMode mInputMode;
 
     private final Method mMethod;
 
     private final OutputMode mOutputMode;
 
-    private final ReflectionConfiguration mReflectionConfiguration;
-
     private final InvocationTarget<?> mTarget;
 
     /**
      * Constructor.
      *
-     * @param reflectionConfiguration the reflection configuration.
-     * @param target                  the invocation target.
-     * @param method                  the method to wrap.
-     * @param inputMode               the input transfer mode.
-     * @param outputMode              the output transfer mode.
+     * @param callConfiguration the call configuration.
+     * @param target            the invocation target.
+     * @param method            the method to wrap.
+     * @param inputMode         the input transfer mode.
+     * @param outputMode        the output transfer mode.
      */
-    private MethodInvocationFactory(@NotNull final ReflectionConfiguration reflectionConfiguration,
+    private MethodInvocationFactory(@NotNull final CallConfiguration callConfiguration,
         @NotNull final InvocationTarget<?> target, @NotNull final Method method,
         @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
-      super(asArgs(reflectionConfiguration, target, method, inputMode, outputMode));
-      mReflectionConfiguration = reflectionConfiguration;
+      super(asArgs(callConfiguration, target, method, inputMode, outputMode));
+      mCallConfiguration = callConfiguration;
       mTarget = target;
       mMethod = method;
       mInputMode = inputMode;
@@ -277,7 +273,7 @@ class DefaultReflectionRoutineBuilder implements ReflectionRoutineBuilder {
     @NotNull
     @Override
     public Invocation<Object, Object> newInvocation() {
-      return new MethodCallInvocation(mReflectionConfiguration, mTarget, mMethod, mInputMode,
+      return new MethodCallInvocation(mCallConfiguration, mTarget, mMethod, mInputMode,
           mOutputMode);
     }
   }
@@ -291,17 +287,15 @@ class DefaultReflectionRoutineBuilder implements ReflectionRoutineBuilder {
      * Constructor.
      *
      * @param invocationConfiguration the invocation configuration.
-     * @param reflectionConfiguration the reflection configuration.
+     * @param callConfiguration       the call configuration.
      * @param method                  the method to wrap.
      * @param inputMode               the input transfer mode.
      * @param outputMode              the output transfer mode.
      */
     private RoutineInfo(@NotNull final InvocationConfiguration invocationConfiguration,
-        @NotNull final ReflectionConfiguration reflectionConfiguration,
-        @NotNull final Method method, @Nullable final InputMode inputMode,
-        @Nullable final OutputMode outputMode) {
-      super(
-          asArgs(invocationConfiguration, reflectionConfiguration, method, inputMode, outputMode));
+        @NotNull final CallConfiguration callConfiguration, @NotNull final Method method,
+        @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
+      super(asArgs(invocationConfiguration, callConfiguration, method, inputMode, outputMode));
     }
   }
 
@@ -310,16 +304,16 @@ class DefaultReflectionRoutineBuilder implements ReflectionRoutineBuilder {
    */
   private class ProxyInvocationHandler implements InvocationHandler {
 
-    private final InvocationConfiguration mInvocationConfiguration;
+    private final CallConfiguration mCallConfiguration;
 
-    private final ReflectionConfiguration mReflectionConfiguration;
+    private final InvocationConfiguration mInvocationConfiguration;
 
     /**
      * Constructor.
      */
     private ProxyInvocationHandler() {
       mInvocationConfiguration = DefaultReflectionRoutineBuilder.this.mInvocationConfiguration;
-      mReflectionConfiguration = DefaultReflectionRoutineBuilder.this.mReflectionConfiguration;
+      mCallConfiguration = DefaultReflectionRoutineBuilder.this.mCallConfiguration;
     }
 
     public Object invoke(final Object proxy, final Method method, final Object[] args) throws
@@ -329,7 +323,7 @@ class DefaultReflectionRoutineBuilder implements ReflectionRoutineBuilder {
       final OutputMode outputMode = methodInfo.outputMode;
       final Routine<Object, Object> routine =
           getRoutine(withAnnotations(mInvocationConfiguration, method),
-              withAnnotations(mReflectionConfiguration, method), methodInfo.method, inputMode,
+              withAnnotations(mCallConfiguration, method), methodInfo.method, inputMode,
               outputMode);
       return invokeRoutine(routine, method, asArgs(args), methodInfo.invocationMode, inputMode,
           outputMode);

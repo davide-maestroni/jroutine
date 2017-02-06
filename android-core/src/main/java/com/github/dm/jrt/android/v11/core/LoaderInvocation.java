@@ -347,9 +347,9 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
         new LoaderContextInvocationFactory<IN, OUT>(this, mLoaderId);
     final Routine<IN, OUT> routine =
         JRoutineCore.with(fromFactory(loaderContext.getApplicationContext(), factory))
-                    .applyInvocationConfiguration()
+                    .invocationConfiguration()
                     .withRunner(Runners.syncRunner())
-                    .configured()
+                    .apply()
                     .buildRoutine();
     routine.call().abort(reason);
     routine.clear();
@@ -789,11 +789,11 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
       logger.dbg("creating new result channel");
       final InvocationLoader<?, OUT> internalLoader = mLoader;
       final ArrayList<Channel<OUT, ?>> channels = mNewChannels;
-      final Channel<OUT, OUT> channel = JRoutineCore.<OUT>ofInputs().applyChannelConfiguration()
+      final Channel<OUT, OUT> channel = JRoutineCore.<OUT>ofInputs().channelConfiguration()
                                                                     .withLog(logger.getLog())
                                                                     .withLogLevel(
                                                                         logger.getLogLevel())
-                                                                    .configured()
+                                                                    .apply()
                                                                     .buildChannel();
       channels.add(channel);
       internalLoader.setInvocationCount(

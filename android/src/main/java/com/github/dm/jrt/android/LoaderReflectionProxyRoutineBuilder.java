@@ -20,7 +20,7 @@ import com.github.dm.jrt.ReflectionProxyRoutineBuilder;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.reflect.builder.LoaderReflectionRoutineBuilder;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
-import com.github.dm.jrt.reflect.config.ReflectionConfiguration;
+import com.github.dm.jrt.reflect.config.CallConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -52,7 +52,14 @@ public interface LoaderReflectionProxyRoutineBuilder
    */
   @NotNull
   @Override
-  LoaderReflectionProxyRoutineBuilder apply(@NotNull ReflectionConfiguration configuration);
+  LoaderReflectionProxyRoutineBuilder apply(@NotNull CallConfiguration configuration);
+
+  /**
+   * {@inheritDoc}
+   */
+  @NotNull
+  @Override
+  CallConfiguration.Builder<? extends LoaderReflectionProxyRoutineBuilder> callConfiguration();
 
   /**
    * {@inheritDoc}
@@ -60,15 +67,7 @@ public interface LoaderReflectionProxyRoutineBuilder
   @NotNull
   @Override
   InvocationConfiguration.Builder<? extends LoaderReflectionProxyRoutineBuilder>
-  applyInvocationConfiguration();
-
-  /**
-   * {@inheritDoc}
-   */
-  @NotNull
-  @Override
-  ReflectionConfiguration.Builder<? extends LoaderReflectionProxyRoutineBuilder>
-  applyReflectionConfiguration();
+  invocationConfiguration();
 
   /**
    * {@inheritDoc}
@@ -92,6 +91,5 @@ public interface LoaderReflectionProxyRoutineBuilder
    */
   @NotNull
   @Override
-  LoaderConfiguration.Builder<? extends LoaderReflectionProxyRoutineBuilder>
-  applyLoaderConfiguration();
+  LoaderConfiguration.Builder<? extends LoaderReflectionProxyRoutineBuilder> loaderConfiguration();
 }

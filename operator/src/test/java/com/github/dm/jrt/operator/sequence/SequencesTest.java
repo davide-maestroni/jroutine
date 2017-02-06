@@ -303,9 +303,9 @@ public class SequencesTest {
             return (char) (character + 1);
           }
         })))
-                           .applyInvocationConfiguration()
+                           .invocationConfiguration()
                            .withOutputOrder(OrderType.SORTED)
-                           .configured()
+                           .apply()
                            .callParallel()
                            .close()
                            .in(seconds(3))
@@ -317,9 +317,9 @@ public class SequencesTest {
             return (char) (character + 1);
           }
         })))
-                           .applyInvocationConfiguration()
+                           .invocationConfiguration()
                            .withRunner(Runners.syncRunner())
-                           .configured()
+                           .apply()
                            .close()
                            .all()).containsExactly('a', 'b', 'c', 'd', 'e');
   }

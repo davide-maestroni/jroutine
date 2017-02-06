@@ -42,8 +42,8 @@ import com.github.dm.jrt.core.util.Reflection;
 import com.github.dm.jrt.method.RoutineMethod;
 import com.github.dm.jrt.method.annotation.Input;
 import com.github.dm.jrt.method.annotation.Output;
-import com.github.dm.jrt.reflect.config.ReflectionConfigurable;
-import com.github.dm.jrt.reflect.config.ReflectionConfiguration;
+import com.github.dm.jrt.reflect.config.CallConfigurable;
+import com.github.dm.jrt.reflect.config.CallConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -238,15 +238,6 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
     return (LoaderRoutineMethodCompat) super.apply(configuration);
   }
 
-  @NotNull
-  @Override
-  @SuppressWarnings("unchecked")
-  public InvocationConfiguration.Builder<? extends LoaderRoutineMethodCompat>
-  applyInvocationConfiguration() {
-    return (InvocationConfiguration.Builder<? extends LoaderRoutineMethodCompat>) super
-        .applyInvocationConfiguration();
-  }
-
   /**
    * Calls the routine.
    * <br>
@@ -316,6 +307,15 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
         InvocationMode.PARALLEL, safeParams);
   }
 
+  @NotNull
+  @Override
+  @SuppressWarnings("unchecked")
+  public InvocationConfiguration.Builder<? extends LoaderRoutineMethodCompat>
+  invocationConfiguration() {
+    return (InvocationConfiguration.Builder<? extends LoaderRoutineMethodCompat>) super
+        .invocationConfiguration();
+  }
+
   /**
    * Tells the routine to ignore the method return value, that is, it will not be passed to the
    * output channel.
@@ -354,7 +354,7 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
 
   @NotNull
   @Override
-  public Builder<? extends LoaderRoutineMethodCompat> applyLoaderConfiguration() {
+  public Builder<? extends LoaderRoutineMethodCompat> loaderConfiguration() {
     return new Builder<LoaderRoutineMethodCompat>(this, mConfiguration);
   }
 
@@ -445,7 +445,7 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
    * Implementation of a Loader routine method wrapping an object method.
    */
   public static class ReflectionLoaderRoutineMethodCompat extends LoaderRoutineMethodCompat
-      implements ReflectionConfigurable<ReflectionLoaderRoutineMethodCompat> {
+      implements CallConfigurable<ReflectionLoaderRoutineMethodCompat> {
 
     private final LoaderContextCompat mContext;
 
@@ -453,7 +453,7 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
 
     private final ContextInvocationTarget<?> mTarget;
 
-    private ReflectionConfiguration mConfiguration = ReflectionConfiguration.defaultConfiguration();
+    private CallConfiguration mConfiguration = CallConfiguration.defaultConfiguration();
 
     /**
      * Constructor.
@@ -473,8 +473,8 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
     @NotNull
     @Override
     public ReflectionLoaderRoutineMethodCompat apply(
-        @NotNull final ReflectionConfiguration configuration) {
-      mConfiguration = ConstantConditions.notNull("reflection configuration", configuration);
+        @NotNull final CallConfiguration configuration) {
+      mConfiguration = ConstantConditions.notNull("call configuration", configuration);
       return this;
     }
 
@@ -489,9 +489,9 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
     @Override
     @SuppressWarnings("unchecked")
     public InvocationConfiguration.Builder<? extends ReflectionLoaderRoutineMethodCompat>
-    applyInvocationConfiguration() {
+    invocationConfiguration() {
       return (InvocationConfiguration.Builder<? extends ReflectionLoaderRoutineMethodCompat>)
-          super.applyInvocationConfiguration();
+          super.invocationConfiguration();
     }
 
     @NotNull
@@ -516,16 +516,15 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
     @NotNull
     @Override
     @SuppressWarnings("unchecked")
-    public Builder<? extends ReflectionLoaderRoutineMethodCompat> applyLoaderConfiguration() {
-      return (Builder<? extends ReflectionLoaderRoutineMethodCompat>) super
-          .applyLoaderConfiguration();
+    public Builder<? extends ReflectionLoaderRoutineMethodCompat> loaderConfiguration() {
+      return (Builder<? extends ReflectionLoaderRoutineMethodCompat>) super.loaderConfiguration();
     }
 
     @NotNull
     @Override
-    public ReflectionConfiguration.Builder<? extends ReflectionLoaderRoutineMethodCompat>
-    applyReflectionConfiguration() {
-      return new ReflectionConfiguration.Builder<ReflectionLoaderRoutineMethodCompat>(this,
+    public CallConfiguration.Builder<? extends ReflectionLoaderRoutineMethodCompat>
+    callConfiguration() {
+      return new CallConfiguration.Builder<ReflectionLoaderRoutineMethodCompat>(this,
           mConfiguration);
     }
 

@@ -309,9 +309,9 @@ public class ServiceRoutineMethodTest extends ActivityInstrumentationTestCase2<T
         String.class.getMethod("toString")).call().in(seconds(10)).next()).isEqualTo("test");
     assertThat(ServiceRoutineMethod.from(serviceFrom(getActivity()), instanceOf(String.class, test),
         String.class.getMethod("toString"))
-                                   .applyReflectionConfiguration()
+                                   .callConfiguration()
                                    .withSharedFields()
-                                   .configured()
+                                   .apply()
                                    .call()
                                    .in(seconds(10))
                                    .next()).isEqualTo("test");
@@ -323,9 +323,9 @@ public class ServiceRoutineMethodTest extends ActivityInstrumentationTestCase2<T
         "toString").call().in(seconds(10)).next()).isEqualTo("test");
     assertThat(ServiceRoutineMethod.from(serviceFrom(getActivity()), instanceOf(String.class, test),
         "toString")
-                                   .applyReflectionConfiguration()
+                                   .callConfiguration()
                                    .withSharedFields()
-                                   .configured()
+                                   .apply()
                                    .call()
                                    .in(seconds(10))
                                    .next()).isEqualTo("test");
@@ -338,9 +338,9 @@ public class ServiceRoutineMethodTest extends ActivityInstrumentationTestCase2<T
   public void testParallel() {
     final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
     final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
-    new SumRoutine(serviceFrom(getActivity())).applyInvocationConfiguration()
+    new SumRoutine(serviceFrom(getActivity())).invocationConfiguration()
                                               .withOutputOrder(OrderType.SORTED)
-                                              .configured()
+                                              .apply()
                                               .callParallel(inputChannel, outputChannel);
     inputChannel.pass(1, 2, 3, 4, 5).close();
     assertThat(outputChannel.in(seconds(10)).all()).containsOnly(1, 2, 3, 4, 5);

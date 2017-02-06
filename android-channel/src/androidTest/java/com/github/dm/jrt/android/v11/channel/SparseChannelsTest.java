@@ -82,10 +82,10 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
         JRoutineCore.<ParcelableFlow<String>>ofInputs().buildChannel();
     final TestLog testLog = new TestLog();
     SparseChannels.parcelableFlowInput(3, 1, channel)
-                  .applyChannelConfiguration()
+                  .channelConfiguration()
                   .withLog(testLog)
                   .withLogLevel(Level.DEBUG)
-                  .configured()
+                  .apply()
                   .buildChannelArray()
                   .get(3)
                   .pass("test")
@@ -231,13 +231,9 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
     }
 
     final ChannelBuilder<String, String> builder1 =
-        JRoutineCore.<String>ofInputs().applyChannelConfiguration()
-                                       .withOrder(OrderType.SORTED)
-                                       .configured();
+        JRoutineCore.<String>ofInputs().channelConfiguration().withOrder(OrderType.SORTED).apply();
     final ChannelBuilder<Integer, Integer> builder2 =
-        JRoutineCore.<Integer>ofInputs().applyChannelConfiguration()
-                                        .withOrder(OrderType.SORTED)
-                                        .configured();
+        JRoutineCore.<Integer>ofInputs().channelConfiguration().withOrder(OrderType.SORTED).apply();
     final Channel<String, String> channel1 = builder1.buildChannel();
     final Channel<Integer, Integer> channel2 = builder2.buildChannel();
 
@@ -246,10 +242,10 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
                       .buildChannel();
     final Channel<?, ParcelableFlow<Object>> output = JRoutineLoader.on(loaderFrom(getActivity()))
                                                                     .with(factoryOf(Sort.class))
-                                                                    .applyInvocationConfiguration()
+                                                                    .invocationConfiguration()
                                                                     .withInputOrder(
                                                                         OrderType.SORTED)
-                                                                    .configured()
+                                                                    .apply()
                                                                     .call(channel);
     final SparseArray<? extends Channel<?, Object>> channelMap =
         SparseChannels.parcelableFlowOutput(output, Sort.INTEGER, Sort.STRING).buildChannelArray();
@@ -278,13 +274,9 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
     }
 
     final ChannelBuilder<String, String> builder1 =
-        JRoutineCore.<String>ofInputs().applyChannelConfiguration()
-                                       .withOrder(OrderType.SORTED)
-                                       .configured();
+        JRoutineCore.<String>ofInputs().channelConfiguration().withOrder(OrderType.SORTED).apply();
     final ChannelBuilder<Integer, Integer> builder2 =
-        JRoutineCore.<Integer>ofInputs().applyChannelConfiguration()
-                                        .withOrder(OrderType.SORTED)
-                                        .configured();
+        JRoutineCore.<Integer>ofInputs().channelConfiguration().withOrder(OrderType.SORTED).apply();
     final Channel<String, String> channel1 = builder1.buildChannel();
     final Channel<Integer, Integer> channel2 = builder2.buildChannel();
     final SparseArray<Channel<?, ?>> channelMap = new SparseArray<Channel<?, ?>>(2);
@@ -307,13 +299,9 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
     }
 
     final ChannelBuilder<String, String> builder1 =
-        JRoutineCore.<String>ofInputs().applyChannelConfiguration()
-                                       .withOrder(OrderType.SORTED)
-                                       .configured();
+        JRoutineCore.<String>ofInputs().channelConfiguration().withOrder(OrderType.SORTED).apply();
     final ChannelBuilder<Integer, Integer> builder2 =
-        JRoutineCore.<Integer>ofInputs().applyChannelConfiguration()
-                                        .withOrder(OrderType.SORTED)
-                                        .configured();
+        JRoutineCore.<Integer>ofInputs().channelConfiguration().withOrder(OrderType.SORTED).apply();
     final Channel<String, String> channel1 = builder1.buildChannel();
     final Channel<Integer, Integer> channel2 = builder2.buildChannel();
     final SparseArray<Channel<?, ?>> channelMap = new SparseArray<Channel<?, ?>>(2);

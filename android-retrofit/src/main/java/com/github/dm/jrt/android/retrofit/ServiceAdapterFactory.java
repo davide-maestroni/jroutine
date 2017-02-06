@@ -215,18 +215,6 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
       return this;
     }
 
-    @NotNull
-    @Override
-    public InvocationConfiguration.Builder<? extends Builder> applyInvocationConfiguration() {
-      return new InvocationConfiguration.Builder<Builder>(this, mInvocationConfiguration);
-    }
-
-    @NotNull
-    @Override
-    public ServiceConfiguration.Builder<? extends Builder> applyServiceConfiguration() {
-      return new ServiceConfiguration.Builder<Builder>(this, mServiceConfiguration);
-    }
-
     /**
      * Builds and return a new factory instance.
      *
@@ -236,6 +224,18 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
     public ServiceAdapterFactory buildFactory() {
       return new ServiceAdapterFactory(mServiceContext, mInvocationConfiguration,
           mServiceConfiguration);
+    }
+
+    @NotNull
+    @Override
+    public InvocationConfiguration.Builder<? extends Builder> invocationConfiguration() {
+      return new InvocationConfiguration.Builder<Builder>(this, mInvocationConfiguration);
+    }
+
+    @NotNull
+    @Override
+    public ServiceConfiguration.Builder<? extends Builder> serviceConfiguration() {
+      return new ServiceConfiguration.Builder<Builder>(this, mServiceConfiguration);
     }
   }
 
@@ -341,7 +341,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
         @NotNull final Type responseType) {
       super(routine, responseType);
       mInvocationConfiguration = configuration;
-      mChannelConfiguration = configuration.outputConfigurationBuilder().configured();
+      mChannelConfiguration = configuration.outputConfigurationBuilder().apply();
       mConverter = converter;
     }
 

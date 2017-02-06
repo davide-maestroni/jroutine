@@ -96,8 +96,8 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends AbstractRoutineBuil
   @NotNull
   @Override
   @SuppressWarnings("unchecked")
-  public Builder<? extends StreamBuilder<IN, OUT>> applyInvocationConfiguration() {
-    return (Builder<? extends StreamBuilder<IN, OUT>>) super.applyInvocationConfiguration();
+  public Builder<? extends StreamBuilder<IN, OUT>> invocationConfiguration() {
+    return (Builder<? extends StreamBuilder<IN, OUT>>) super.invocationConfiguration();
   }
 
   @NotNull
@@ -106,17 +106,6 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends AbstractRoutineBuil
     final StreamConfiguration streamConfiguration = mStreamConfiguration;
     return apply(configuration, streamConfiguration.getCurrentInvocationConfiguration(),
         streamConfiguration.getInvocationMode());
-  }
-
-  @NotNull
-  public Builder<? extends StreamBuilder<IN, OUT>> applyStreamInvocationConfiguration() {
-    return new Builder<StreamBuilder<IN, OUT>>(new Configurable<StreamBuilder<IN, OUT>>() {
-
-      @NotNull
-      public StreamBuilder<IN, OUT> apply(@NotNull final InvocationConfiguration configuration) {
-        return AbstractStreamBuilder.this.applyStream(configuration);
-      }
-    }, mStreamConfiguration.getStreamInvocationConfiguration());
   }
 
   @NotNull
@@ -275,15 +264,26 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends AbstractRoutineBuil
 
   @NotNull
   public StreamBuilder<IN, OUT> mapOn(@Nullable final Runner runner) {
-    return async().applyStreamInvocationConfiguration()
+    return async().streamInvocationConfiguration()
                   .withRunner(runner)
-                  .configured()
+                  .apply()
                   .map(IdentityInvocation.<OUT>factoryOf());
   }
 
   @NotNull
   public StreamBuilder<IN, OUT> sorted() {
-    return applyStreamInvocationConfiguration().withOutputOrder(OrderType.SORTED).configured();
+    return streamInvocationConfiguration().withOutputOrder(OrderType.SORTED).apply();
+  }
+
+  @NotNull
+  public Builder<? extends StreamBuilder<IN, OUT>> streamInvocationConfiguration() {
+    return new Builder<StreamBuilder<IN, OUT>>(new Configurable<StreamBuilder<IN, OUT>>() {
+
+      @NotNull
+      public StreamBuilder<IN, OUT> apply(@NotNull final InvocationConfiguration configuration) {
+        return AbstractStreamBuilder.this.applyStream(configuration);
+      }
+    }, mStreamConfiguration.getStreamInvocationConfiguration());
   }
 
   @NotNull
@@ -298,7 +298,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends AbstractRoutineBuil
 
   @NotNull
   public StreamBuilder<IN, OUT> unsorted() {
-    return applyStreamInvocationConfiguration().withOutputOrder(OrderType.UNSORTED).configured();
+    return streamInvocationConfiguration().withOutputOrder(OrderType.UNSORTED).apply();
   }
 
   @NotNull
@@ -384,7 +384,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends AbstractRoutineBuil
     return apply(streamConfiguration.getStreamInvocationConfiguration()
                                     .builderFrom()
                                     .withRunner(runner)
-                                    .configured(),
+                                    .apply(),
         streamConfiguration.getCurrentInvocationConfiguration(), invocationMode);
   }
 

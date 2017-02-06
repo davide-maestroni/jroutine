@@ -36,8 +36,8 @@ import com.github.dm.jrt.method.annotation.Input;
 import com.github.dm.jrt.method.annotation.Output;
 import com.github.dm.jrt.reflect.InvocationTarget;
 import com.github.dm.jrt.reflect.JRoutineReflection;
-import com.github.dm.jrt.reflect.config.ReflectionConfigurable;
-import com.github.dm.jrt.reflect.config.ReflectionConfiguration;
+import com.github.dm.jrt.reflect.config.CallConfigurable;
+import com.github.dm.jrt.reflect.config.CallConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -595,11 +595,6 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
     return this;
   }
 
-  @NotNull
-  public InvocationConfiguration.Builder<? extends RoutineMethod> applyInvocationConfiguration() {
-    return new Builder<RoutineMethod>(this, mConfiguration);
-  }
-
   /**
    * Calls the routine.
    * <br>
@@ -671,6 +666,11 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
     final Method method = findBestMatchingMethod(type, safeParams);
     return call(new MultiInvocationFactory(type, constructor, mArgs, method, safeParams), method,
         InvocationMode.PARALLEL, safeParams);
+  }
+
+  @NotNull
+  public InvocationConfiguration.Builder<? extends RoutineMethod> invocationConfiguration() {
+    return new Builder<RoutineMethod>(this, mConfiguration);
   }
 
   /**
@@ -770,13 +770,13 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
    * Implementation of a routine method wrapping an object method.
    */
   public static class ReflectionRoutineMethod extends RoutineMethod
-      implements ReflectionConfigurable<ReflectionRoutineMethod> {
+      implements CallConfigurable<ReflectionRoutineMethod> {
 
     private final Method mMethod;
 
     private final InvocationTarget<?> mTarget;
 
-    private ReflectionConfiguration mConfiguration = ReflectionConfiguration.defaultConfiguration();
+    private CallConfiguration mConfiguration = CallConfiguration.defaultConfiguration();
 
     /**
      * Constructor.
@@ -791,8 +791,8 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
     }
 
     @NotNull
-    public ReflectionRoutineMethod apply(@NotNull final ReflectionConfiguration configuration) {
-      mConfiguration = ConstantConditions.notNull("reflection configuration", configuration);
+    public ReflectionRoutineMethod apply(@NotNull final CallConfiguration configuration) {
+      mConfiguration = ConstantConditions.notNull("call configuration", configuration);
       return this;
     }
 
@@ -800,13 +800,6 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
     @Override
     public ReflectionRoutineMethod apply(@NotNull final InvocationConfiguration configuration) {
       return (ReflectionRoutineMethod) super.apply(configuration);
-    }
-
-    @NotNull
-    @Override
-    @SuppressWarnings("unchecked")
-    public Builder<? extends ReflectionRoutineMethod> applyInvocationConfiguration() {
-      return (Builder<? extends ReflectionRoutineMethod>) super.applyInvocationConfiguration();
     }
 
     @NotNull
@@ -822,9 +815,15 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
     }
 
     @NotNull
-    public ReflectionConfiguration.Builder<? extends ReflectionRoutineMethod>
-    applyReflectionConfiguration() {
-      return new ReflectionConfiguration.Builder<ReflectionRoutineMethod>(this, mConfiguration);
+    @Override
+    @SuppressWarnings("unchecked")
+    public Builder<? extends ReflectionRoutineMethod> invocationConfiguration() {
+      return (Builder<? extends ReflectionRoutineMethod>) super.invocationConfiguration();
+    }
+
+    @NotNull
+    public CallConfiguration.Builder<? extends ReflectionRoutineMethod> callConfiguration() {
+      return new CallConfiguration.Builder<ReflectionRoutineMethod>(this, mConfiguration);
     }
 
     @NotNull

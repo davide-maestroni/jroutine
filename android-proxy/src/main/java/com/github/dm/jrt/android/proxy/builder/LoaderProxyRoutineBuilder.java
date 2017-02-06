@@ -20,7 +20,7 @@ import com.github.dm.jrt.android.core.config.LoaderConfigurable;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.proxy.builder.ProxyRoutineBuilder;
-import com.github.dm.jrt.reflect.config.ReflectionConfiguration;
+import com.github.dm.jrt.reflect.config.CallConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -36,7 +36,7 @@ public interface LoaderProxyRoutineBuilder
   /**
    * {@inheritDoc}
    * <p>
-   * The configured asynchronous runner will be ignored.
+   * The configured runner will be ignored.
    */
   @NotNull
   @Override
@@ -47,25 +47,7 @@ public interface LoaderProxyRoutineBuilder
    */
   @NotNull
   @Override
-  LoaderProxyRoutineBuilder apply(@NotNull ReflectionConfiguration configuration);
-
-  /**
-   * {@inheritDoc}
-   * <p>
-   * The configured asynchronous runner will be ignored.
-   */
-  @NotNull
-  @Override
-  InvocationConfiguration.Builder<? extends LoaderProxyRoutineBuilder>
-  applyInvocationConfiguration();
-
-  /**
-   * {@inheritDoc}
-   */
-  @NotNull
-  @Override
-  ReflectionConfiguration.Builder<? extends LoaderProxyRoutineBuilder>
-  applyReflectionConfiguration();
+  LoaderProxyRoutineBuilder apply(@NotNull CallConfiguration configuration);
 
   /**
    * Returns a proxy object enabling asynchronous call of the target instance methods.
@@ -130,4 +112,20 @@ public interface LoaderProxyRoutineBuilder
   @NotNull
   @Override
   <TYPE> TYPE buildProxy(@NotNull ClassToken<TYPE> itf);
+
+  /**
+   * {@inheritDoc}
+   */
+  @NotNull
+  @Override
+  CallConfiguration.Builder<? extends LoaderProxyRoutineBuilder> callConfiguration();
+
+  /**
+   * {@inheritDoc}
+   * <p>
+   * The configured runner will be ignored.
+   */
+  @NotNull
+  @Override
+  InvocationConfiguration.Builder<? extends LoaderProxyRoutineBuilder> invocationConfiguration();
 }

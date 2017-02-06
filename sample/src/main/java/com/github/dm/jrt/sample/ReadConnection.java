@@ -60,9 +60,9 @@ public class ReadConnection extends MappingInvocation<URI, ByteChunk> {
     // We employ the utility class dedicated to the optimized transfer of bytes through a routine
     // channel
     final ChunkOutputStream outputStream = ByteChannel.withOutput(result)
-                                                      .applyChunkStreamConfiguration()
+                                                      .chunkStreamConfiguration()
                                                       .withChunkSize(MAX_CHUNK_SIZE)
-                                                      .configured()
+                                                      .apply()
                                                       .buildOutputStream();
     try {
       outputStream.transferFrom(connection.getInputStream());

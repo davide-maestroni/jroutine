@@ -19,7 +19,7 @@ package com.github.dm.jrt.android.retrofit;
 import com.github.dm.jrt.android.channel.AndroidChannels;
 import com.github.dm.jrt.android.channel.ParcelableFlow;
 import com.github.dm.jrt.android.channel.io.ParcelableByteChannel;
-import com.github.dm.jrt.channel.builder.ChunkStreamConfiguration.CloseActionType;
+import com.github.dm.jrt.channel.config.ChunkStreamConfiguration.CloseActionType;
 import com.github.dm.jrt.channel.io.ByteChannel.ChunkOutputStream;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
@@ -67,10 +67,10 @@ class CallMappingInvocation extends MappingInvocation<Call<?>, ParcelableFlow<Ob
       final Channel<Object, ?> channel =
           AndroidChannels.parcelableFlowInput(result, BYTES_ID).buildChannel();
       final ChunkOutputStream outputStream = ParcelableByteChannel.withOutput(channel)
-                                                                  .applyChunkStreamConfiguration()
+                                                                  .chunkStreamConfiguration()
                                                                   .withOnClose(
                                                                       CloseActionType.CLOSE_CHANNEL)
-                                                                  .configured()
+                                                                  .apply()
                                                                   .buildOutputStream();
       final BufferedSink buffer = Okio.buffer(Okio.sink(outputStream));
       body.writeTo(buffer);

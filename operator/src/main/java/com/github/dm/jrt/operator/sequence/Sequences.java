@@ -173,6 +173,7 @@ public class Sequences {
           getHigherPrecisionOperation(addOperation.convert(0).getClass(), end.getClass());
     }
 
+    @SuppressWarnings("unchecked")
     public void accept(final Channel<N, ?> result) {
       final N start = mStart;
       final N end = mEnd;

@@ -44,11 +44,6 @@ public abstract class AbstractRoutineBuilder<IN, OUT> extends TemplateRoutine<IN
   }
 
   @NotNull
-  public Builder<? extends RoutineBuilder<IN, OUT>> applyInvocationConfiguration() {
-    return new Builder<RoutineBuilder<IN, OUT>>(this, mConfiguration);
-  }
-
-  @NotNull
   public Channel<IN, OUT> call() {
     return buildRoutine().call();
   }
@@ -56,6 +51,11 @@ public abstract class AbstractRoutineBuilder<IN, OUT> extends TemplateRoutine<IN
   @NotNull
   public Channel<IN, OUT> callParallel() {
     return buildRoutine().callParallel();
+  }
+
+  @NotNull
+  public Builder<? extends RoutineBuilder<IN, OUT>> invocationConfiguration() {
+    return new Builder<RoutineBuilder<IN, OUT>>(this, mConfiguration);
   }
 
   /**

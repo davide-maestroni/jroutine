@@ -23,7 +23,7 @@
     @SuppressWarnings("unused")
     private final com.github.dm.jrt.reflect.InvocationTarget<?> mTarget;
 
-    private Invocation${methodCount}(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.reflect.config.ReflectionConfiguration reflectionConfiguration,
+    private Invocation${methodCount}(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.reflect.config.CallConfiguration callConfiguration,
         @org.jetbrains.annotations.NotNull final com.github.dm.jrt.reflect.InvocationTarget<?> target) {
       mMutex = com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilders.getSharedMutex(${mutexTarget}, ${sharedFields});
       mTarget = target;

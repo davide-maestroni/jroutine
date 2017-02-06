@@ -53,14 +53,12 @@ public class ChannelConfigurationTest {
                                                         .withRunner(Runners.syncRunner())
                                                         .withLog(new NullLog())
                                                         .withMaxSize(100)
-                                                        .configured();
-    assertThat(builderFrom(configuration).configured().hashCode()).isEqualTo(
-        configuration.hashCode());
-    assertThat(builderFrom(configuration).configured()).isEqualTo(configuration);
-    assertThat(builderFrom(null).configured().hashCode()).isEqualTo(
+                                                        .apply();
+    assertThat(builderFrom(configuration).apply().hashCode()).isEqualTo(configuration.hashCode());
+    assertThat(builderFrom(configuration).apply()).isEqualTo(configuration);
+    assertThat(builderFrom(null).apply().hashCode()).isEqualTo(
         ChannelConfiguration.defaultConfiguration().hashCode());
-    assertThat(builderFrom(null).configured()).isEqualTo(
-        ChannelConfiguration.defaultConfiguration());
+    assertThat(builderFrom(null).apply()).isEqualTo(ChannelConfiguration.defaultConfiguration());
   }
 
   @Test
@@ -91,10 +89,10 @@ public class ChannelConfigurationTest {
                                                         .withOutputTimeout(seconds(10))
                                                         .withOutputTimeoutAction(
                                                             TimeoutActionType.ABORT)
-                                                        .configured();
-    assertThat(builder().with(configuration).configured()).isEqualTo(configuration);
-    assertThat(configuration.builderFrom().configured()).isEqualTo(configuration);
-    assertThat(configuration.builderFrom().with(null).configured()).isEqualTo(
+                                                        .apply();
+    assertThat(builder().with(configuration).apply()).isEqualTo(configuration);
+    assertThat(configuration.builderFrom().apply()).isEqualTo(configuration);
+    assertThat(configuration.builderFrom().with(null).apply()).isEqualTo(
         ChannelConfiguration.defaultConfiguration());
   }
 
@@ -105,14 +103,14 @@ public class ChannelConfigurationTest {
                                                         .withRunner(Runners.syncRunner())
                                                         .withLog(new NullLog())
                                                         .withMaxSize(100)
-                                                        .configured();
-    assertThat(configuration).isNotEqualTo(builder().withBackoff(noDelay()).configured());
+                                                        .apply();
+    assertThat(configuration).isNotEqualTo(builder().withBackoff(noDelay()).apply());
     assertThat(configuration).isNotEqualTo(
-        builder().withBackoff(afterCount(1).constantDelay(1, TimeUnit.MILLISECONDS)).configured());
+        builder().withBackoff(afterCount(1).constantDelay(1, TimeUnit.MILLISECONDS)).apply());
     assertThat(configuration.builderFrom()
                             .withBackoff(afterCount(1).constantDelay(millis(1)))
-                            .configured()).isNotEqualTo(
-        builder().withBackoff(afterCount(1).constantDelay(1, TimeUnit.MILLISECONDS)).configured());
+                            .apply()).isNotEqualTo(
+        builder().withBackoff(afterCount(1).constantDelay(1, TimeUnit.MILLISECONDS)).apply());
   }
 
   @Test
@@ -122,10 +120,10 @@ public class ChannelConfigurationTest {
                                                         .withRunner(Runners.syncRunner())
                                                         .withLog(new NullLog())
                                                         .withMaxSize(100)
-                                                        .configured();
-    assertThat(configuration).isNotEqualTo(builder().withOrder(OrderType.UNSORTED).configured());
-    assertThat(configuration.builderFrom().withOrder(OrderType.SORTED).configured()).isNotEqualTo(
-        builder().withOrder(OrderType.SORTED).configured());
+                                                        .apply();
+    assertThat(configuration).isNotEqualTo(builder().withOrder(OrderType.UNSORTED).apply());
+    assertThat(configuration.builderFrom().withOrder(OrderType.SORTED).apply()).isNotEqualTo(
+        builder().withOrder(OrderType.SORTED).apply());
   }
 
   @Test
@@ -135,10 +133,10 @@ public class ChannelConfigurationTest {
                                                         .withRunner(Runners.syncRunner())
                                                         .withLog(new NullLog())
                                                         .withMaxSize(100)
-                                                        .configured();
-    assertThat(configuration).isNotEqualTo(builder().withMaxSize(10).configured());
-    assertThat(configuration.builderFrom().withMaxSize(1).configured()).isNotEqualTo(
-        builder().withMaxSize(1).configured());
+                                                        .apply();
+    assertThat(configuration).isNotEqualTo(builder().withMaxSize(10).apply());
+    assertThat(configuration.builderFrom().withMaxSize(1).apply()).isNotEqualTo(
+        builder().withMaxSize(1).apply());
   }
 
   @Test
@@ -162,10 +160,10 @@ public class ChannelConfigurationTest {
                                                         .withRunner(Runners.syncRunner())
                                                         .withLog(new NullLog())
                                                         .withMaxSize(100)
-                                                        .configured();
-    assertThat(configuration).isNotEqualTo(builder().withLog(Logs.nullLog()).configured());
-    assertThat(configuration.builderFrom().withLog(Logs.systemLog()).configured()).isNotEqualTo(
-        builder().withLog(Logs.systemLog()).configured());
+                                                        .apply();
+    assertThat(configuration).isNotEqualTo(builder().withLog(Logs.nullLog()).apply());
+    assertThat(configuration.builderFrom().withLog(Logs.systemLog()).apply()).isNotEqualTo(
+        builder().withLog(Logs.systemLog()).apply());
   }
 
   @Test
@@ -175,10 +173,10 @@ public class ChannelConfigurationTest {
                                                         .withRunner(Runners.syncRunner())
                                                         .withLog(new NullLog())
                                                         .withMaxSize(100)
-                                                        .configured();
-    assertThat(configuration).isNotEqualTo(builder().withLogLevel(Level.DEBUG).configured());
-    assertThat(configuration.builderFrom().withLogLevel(Level.WARNING).configured()).isNotEqualTo(
-        builder().withLogLevel(Level.WARNING).configured());
+                                                        .apply();
+    assertThat(configuration).isNotEqualTo(builder().withLogLevel(Level.DEBUG).apply());
+    assertThat(configuration.builderFrom().withLogLevel(Level.WARNING).apply()).isNotEqualTo(
+        builder().withLogLevel(Level.WARNING).apply());
   }
 
   @Test
@@ -188,15 +186,15 @@ public class ChannelConfigurationTest {
                                                         .withRunner(Runners.syncRunner())
                                                         .withLog(new NullLog())
                                                         .withMaxSize(100)
-                                                        .configured();
+                                                        .apply();
     assertThat(configuration).isNotEqualTo(
-        builder().withOutputTimeoutAction(TimeoutActionType.ABORT).configured());
+        builder().withOutputTimeoutAction(TimeoutActionType.ABORT).apply());
     assertThat(configuration).isNotEqualTo(
-        builder().withOutputTimeoutAction(TimeoutActionType.CONTINUE).configured());
+        builder().withOutputTimeoutAction(TimeoutActionType.CONTINUE).apply());
     assertThat(configuration.builderFrom()
                             .withOutputTimeoutAction(TimeoutActionType.FAIL)
-                            .configured()).isNotEqualTo(
-        builder().withOutputTimeoutAction(TimeoutActionType.FAIL).configured());
+                            .apply()).isNotEqualTo(
+        builder().withOutputTimeoutAction(TimeoutActionType.FAIL).apply());
   }
 
   @Test
@@ -206,12 +204,12 @@ public class ChannelConfigurationTest {
                                                         .withRunner(Runners.syncRunner())
                                                         .withLog(new NullLog())
                                                         .withMaxSize(100)
-                                                        .configured();
-    assertThat(configuration).isNotEqualTo(builder().withOutputTimeout(noTime()).configured());
+                                                        .apply();
+    assertThat(configuration).isNotEqualTo(builder().withOutputTimeout(noTime()).apply());
     assertThat(configuration).isNotEqualTo(
-        builder().withOutputTimeout(1, TimeUnit.MILLISECONDS).configured());
-    assertThat(configuration.builderFrom().withOutputTimeout(millis(1)).configured()).isNotEqualTo(
-        builder().withOutputTimeout(1, TimeUnit.MILLISECONDS).configured());
+        builder().withOutputTimeout(1, TimeUnit.MILLISECONDS).apply());
+    assertThat(configuration.builderFrom().withOutputTimeout(millis(1)).apply()).isNotEqualTo(
+        builder().withOutputTimeout(1, TimeUnit.MILLISECONDS).apply());
   }
 
   @Test
@@ -221,11 +219,9 @@ public class ChannelConfigurationTest {
                                                         .withRunner(Runners.syncRunner())
                                                         .withLog(new NullLog())
                                                         .withMaxSize(100)
-                                                        .configured();
-    assertThat(configuration).isNotEqualTo(
-        builder().withRunner(Runners.sharedRunner()).configured());
-    assertThat(
-        configuration.builderFrom().withRunner(Runners.syncRunner()).configured()).isNotEqualTo(
-        builder().withRunner(Runners.syncRunner()).configured());
+                                                        .apply();
+    assertThat(configuration).isNotEqualTo(builder().withRunner(Runners.sharedRunner()).apply());
+    assertThat(configuration.builderFrom().withRunner(Runners.syncRunner()).apply()).isNotEqualTo(
+        builder().withRunner(Runners.syncRunner()).apply());
   }
 }

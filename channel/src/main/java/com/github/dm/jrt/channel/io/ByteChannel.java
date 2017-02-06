@@ -16,9 +16,9 @@
 
 package com.github.dm.jrt.channel.io;
 
-import com.github.dm.jrt.channel.builder.ChunkStreamConfiguration;
-import com.github.dm.jrt.channel.builder.ChunkStreamConfiguration.Builder;
-import com.github.dm.jrt.channel.builder.ChunkStreamConfiguration.CloseActionType;
+import com.github.dm.jrt.channel.config.ChunkStreamConfiguration;
+import com.github.dm.jrt.channel.config.ChunkStreamConfiguration.Builder;
+import com.github.dm.jrt.channel.config.ChunkStreamConfiguration.CloseActionType;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.SimpleQueue;
@@ -430,13 +430,13 @@ public class ByteChannel {
     }
 
     @NotNull
-    public Builder<? extends ChunkOutputStreamBuilder> applyChunkStreamConfiguration() {
-      return new Builder<ChunkOutputStreamBuilder>(this, mConfiguration);
+    public ChunkOutputStream buildOutputStream() {
+      return new ByteChannel(mConfiguration).getOutputStream(mChannel);
     }
 
     @NotNull
-    public ChunkOutputStream buildOutputStream() {
-      return new ByteChannel(mConfiguration).getOutputStream(mChannel);
+    public Builder<? extends ChunkOutputStreamBuilder> chunkStreamConfiguration() {
+      return new Builder<ChunkOutputStreamBuilder>(this, mConfiguration);
     }
   }
 

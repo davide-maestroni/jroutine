@@ -30,7 +30,7 @@ import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.reflect.config.ReflectionConfiguration;
+import com.github.dm.jrt.reflect.config.CallConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -48,15 +48,14 @@ class DefaultLoaderReflectionProxyRoutineBuilder implements LoaderReflectionProx
 
   private final ContextInvocationTarget<?> mTarget;
 
+  private CallConfiguration mCallConfiguration = CallConfiguration.defaultConfiguration();
+
   private InvocationConfiguration mInvocationConfiguration =
       InvocationConfiguration.defaultConfiguration();
 
   private LoaderConfiguration mLoaderConfiguration = LoaderConfiguration.defaultConfiguration();
 
   private ProxyStrategyType mProxyStrategyType;
-
-  private ReflectionConfiguration mReflectionConfiguration =
-      ReflectionConfiguration.defaultConfiguration();
 
   /**
    * Constructor.
@@ -81,16 +80,30 @@ class DefaultLoaderReflectionProxyRoutineBuilder implements LoaderReflectionProx
 
   @NotNull
   @Override
-  public LoaderReflectionProxyRoutineBuilder apply(
-      @NotNull final ReflectionConfiguration configuration) {
-    mReflectionConfiguration =
-        ConstantConditions.notNull("reflection configuration", configuration);
+  public LoaderReflectionProxyRoutineBuilder apply(@NotNull final CallConfiguration configuration) {
+    mCallConfiguration = ConstantConditions.notNull("call configuration", configuration);
     return this;
   }
 
   @NotNull
   @Override
-  public Builder<? extends LoaderReflectionProxyRoutineBuilder> applyInvocationConfiguration() {
+  public CallConfiguration.Builder<? extends LoaderReflectionProxyRoutineBuilder>
+  callConfiguration() {
+    return new CallConfiguration.Builder<LoaderReflectionProxyRoutineBuilder>(
+        new CallConfiguration.Configurable<LoaderReflectionProxyRoutineBuilder>() {
+
+          @NotNull
+          @Override
+          public LoaderReflectionProxyRoutineBuilder apply(
+              @NotNull final CallConfiguration configuration) {
+            return DefaultLoaderReflectionProxyRoutineBuilder.this.apply(configuration);
+          }
+        }, mCallConfiguration);
+  }
+
+  @NotNull
+  @Override
+  public Builder<? extends LoaderReflectionProxyRoutineBuilder> invocationConfiguration() {
     return new InvocationConfiguration.Builder<LoaderReflectionProxyRoutineBuilder>(
         new InvocationConfiguration.Configurable<LoaderReflectionProxyRoutineBuilder>() {
 
@@ -101,22 +114,6 @@ class DefaultLoaderReflectionProxyRoutineBuilder implements LoaderReflectionProx
             return DefaultLoaderReflectionProxyRoutineBuilder.this.apply(configuration);
           }
         }, mInvocationConfiguration);
-  }
-
-  @NotNull
-  @Override
-  public ReflectionConfiguration.Builder<? extends LoaderReflectionProxyRoutineBuilder>
-  applyReflectionConfiguration() {
-    return new ReflectionConfiguration.Builder<LoaderReflectionProxyRoutineBuilder>(
-        new ReflectionConfiguration.Configurable<LoaderReflectionProxyRoutineBuilder>() {
-
-          @NotNull
-          @Override
-          public LoaderReflectionProxyRoutineBuilder apply(
-              @NotNull final ReflectionConfiguration configuration) {
-            return DefaultLoaderReflectionProxyRoutineBuilder.this.apply(configuration);
-          }
-        }, mReflectionConfiguration);
   }
 
   @NotNull
@@ -138,7 +135,7 @@ class DefaultLoaderReflectionProxyRoutineBuilder implements LoaderReflectionProx
   @NotNull
   @Override
   public LoaderConfiguration.Builder<? extends LoaderReflectionProxyRoutineBuilder>
-  applyLoaderConfiguration() {
+  loaderConfiguration() {
     return new LoaderConfiguration.Builder<LoaderReflectionProxyRoutineBuilder>(
         new LoaderConfiguration.Configurable<LoaderReflectionProxyRoutineBuilder>() {
 
@@ -200,7 +197,7 @@ class DefaultLoaderReflectionProxyRoutineBuilder implements LoaderReflectionProx
     return JRoutineLoaderProxy.on(mContext)
                               .with(mTarget)
                               .apply(mInvocationConfiguration)
-                              .apply(mReflectionConfiguration)
+                              .apply(mCallConfiguration)
                               .apply(mLoaderConfiguration);
   }
 
@@ -209,7 +206,7 @@ class DefaultLoaderReflectionProxyRoutineBuilder implements LoaderReflectionProx
     return JRoutineLoaderReflection.on(mContext)
                                    .with(mTarget)
                                    .apply(mInvocationConfiguration)
-                                   .apply(mReflectionConfiguration)
+                                   .apply(mCallConfiguration)
                                    .apply(mLoaderConfiguration);
   }
 }

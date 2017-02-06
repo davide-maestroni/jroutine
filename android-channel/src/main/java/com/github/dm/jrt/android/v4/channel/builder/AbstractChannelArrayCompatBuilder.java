@@ -45,7 +45,7 @@ public abstract class AbstractChannelArrayCompatBuilder<IN, OUT>
 
   @NotNull
   @Override
-  public Builder<? extends ChannelArrayCompatBuilder<IN, OUT>> applyChannelConfiguration() {
+  public Builder<? extends ChannelArrayCompatBuilder<IN, OUT>> channelConfiguration() {
     return new Builder<ChannelArrayCompatBuilder<IN, OUT>>(this, mConfiguration);
   }
 

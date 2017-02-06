@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Davide Maestroni
+ * Copyright 2017 Davide Maestroni
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,31 +14,31 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.reflect.config;
+package com.github.dm.jrt.channel.config;
 
-import com.github.dm.jrt.reflect.config.ReflectionConfiguration.Builder;
-import com.github.dm.jrt.reflect.config.ReflectionConfiguration.Configurable;
+import com.github.dm.jrt.channel.config.ChunkStreamConfiguration.Builder;
+import com.github.dm.jrt.channel.config.ChunkStreamConfiguration.Configurable;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Interface defining an object that can be configured through a reflection configuration.
+ * Interface defining an object that can be configured through an output stream configuration.
  * <p>
- * Created by davide-maestroni on 05/01/2015.
+ * Created by davide-maestroni on 01/01/2017.
  *
  * @param <TYPE> the object type.
  */
-public interface ReflectionConfigurable<TYPE> extends Configurable<TYPE> {
+public interface ChunkStreamConfigurable<TYPE> extends Configurable<TYPE> {
 
   /**
-   * Gets the reflection configuration builder related to the instance.
+   * Gets the output stream configuration builder related to the instance.
    * <br>
    * The configuration options not supported by the specific implementation might be ignored.
    * <p>
    * Note that the configuration builder must be initialized with the current configuration.
    *
-   * @return the reflection configuration builder.
+   * @return the output stream configuration builder.
    */
   @NotNull
-  Builder<? extends TYPE> applyReflectionConfiguration();
+  Builder<? extends TYPE> chunkStreamConfiguration();
 }

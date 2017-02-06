@@ -208,9 +208,9 @@ public class RoutineMethodTest {
   public void testCallSync() {
     final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
     final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
-    new SumRoutine().applyInvocationConfiguration()
+    new SumRoutine().invocationConfiguration()
                     .withRunner(Runners.syncRunner())
-                    .configured()
+                    .apply()
                     .call(inputChannel, outputChannel);
     inputChannel.pass(1, 2, 3, 4, 5).close();
     assertThat(outputChannel.next()).isEqualTo(15);
@@ -278,12 +278,12 @@ public class RoutineMethodTest {
                             .in(seconds(1))
                             .next()).isEqualTo("test");
     assertThat(RoutineMethod.from(instance(test), String.class.getMethod("toString"))
-                            .applyInvocationConfiguration()
+                            .invocationConfiguration()
                             .withRunner(Runners.syncRunner())
-                            .configured()
-                            .applyReflectionConfiguration()
+                            .apply()
+                            .callConfiguration()
                             .withSharedFields()
-                            .configured()
+                            .apply()
                             .call()
                             .next()).isEqualTo("test");
   }
@@ -295,12 +295,12 @@ public class RoutineMethodTest {
         RoutineMethod.from(instance(test), "toString").call().in(seconds(1)).next()).isEqualTo(
         "test");
     assertThat(RoutineMethod.from(instance(test), "toString")
-                            .applyInvocationConfiguration()
+                            .invocationConfiguration()
                             .withRunner(Runners.syncRunner())
-                            .configured()
-                            .applyReflectionConfiguration()
+                            .apply()
+                            .callConfiguration()
                             .withSharedFields()
-                            .configured()
+                            .apply()
                             .call()
                             .next()).isEqualTo("test");
   }
@@ -387,9 +387,9 @@ public class RoutineMethodTest {
 
     final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
     final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
-    new SumRoutine(0).applyInvocationConfiguration()
+    new SumRoutine(0).invocationConfiguration()
                      .withRunner(Runners.syncRunner())
-                     .configured()
+                     .apply()
                      .callParallel(inputChannel, outputChannel);
     inputChannel.pass(1, 2, 3, 4, 5).close();
     assertThat(outputChannel.all()).containsOnly(1, 2, 3, 4, 5);
@@ -420,9 +420,9 @@ public class RoutineMethodTest {
     i[0] = 1;
     final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
     final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
-    new SumRoutine().applyInvocationConfiguration()
+    new SumRoutine().invocationConfiguration()
                     .withRunner(Runners.syncRunner())
-                    .configured()
+                    .apply()
                     .callParallel(inputChannel, outputChannel);
     inputChannel.pass(1, 2, 3, 4, 5).close();
     assertThat(outputChannel.all()).containsOnly(2, 3, 4, 5, 6);
@@ -450,9 +450,9 @@ public class RoutineMethodTest {
   public void testParallel() {
     final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
     final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
-    new SumRoutine().applyInvocationConfiguration()
+    new SumRoutine().invocationConfiguration()
                     .withRunner(Runners.syncRunner())
-                    .configured()
+                    .apply()
                     .callParallel(inputChannel, outputChannel);
     inputChannel.pass(1, 2, 3, 4, 5).close();
     assertThat(outputChannel.all()).containsOnly(1, 2, 3, 4, 5);
@@ -478,9 +478,9 @@ public class RoutineMethodTest {
   public void testParallel3() {
     final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
     final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
-    new SumRoutineInner(0).applyInvocationConfiguration()
+    new SumRoutineInner(0).invocationConfiguration()
                           .withRunner(Runners.syncRunner())
-                          .configured()
+                          .apply()
                           .callParallel(inputChannel, outputChannel);
     inputChannel.pass(1, 2, 3, 4, 5).close();
     assertThat(outputChannel.all()).containsOnly(1, 2, 3, 4, 5);

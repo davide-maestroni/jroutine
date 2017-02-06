@@ -20,7 +20,7 @@ import com.github.dm.jrt.ReflectionProxyRoutineBuilder;
 import com.github.dm.jrt.android.core.config.ServiceConfiguration;
 import com.github.dm.jrt.android.reflect.builder.ServiceReflectionRoutineBuilder;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
-import com.github.dm.jrt.reflect.config.ReflectionConfiguration;
+import com.github.dm.jrt.reflect.config.CallConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -53,7 +53,14 @@ public interface ServiceReflectionProxyRoutineBuilder
    */
   @NotNull
   @Override
-  ServiceReflectionProxyRoutineBuilder apply(@NotNull ReflectionConfiguration configuration);
+  ServiceReflectionProxyRoutineBuilder apply(@NotNull CallConfiguration configuration);
+
+  /**
+   * {@inheritDoc}
+   */
+  @NotNull
+  @Override
+  CallConfiguration.Builder<? extends ServiceReflectionProxyRoutineBuilder> callConfiguration();
 
   /**
    * {@inheritDoc}
@@ -61,15 +68,7 @@ public interface ServiceReflectionProxyRoutineBuilder
   @NotNull
   @Override
   InvocationConfiguration.Builder<? extends ServiceReflectionProxyRoutineBuilder>
-  applyInvocationConfiguration();
-
-  /**
-   * {@inheritDoc}
-   */
-  @NotNull
-  @Override
-  ReflectionConfiguration.Builder<? extends ServiceReflectionProxyRoutineBuilder>
-  applyReflectionConfiguration();
+  invocationConfiguration();
 
   /**
    * {@inheritDoc}
@@ -93,5 +92,5 @@ public interface ServiceReflectionProxyRoutineBuilder
   @NotNull
   @Override
   ServiceConfiguration.Builder<? extends ServiceReflectionProxyRoutineBuilder>
-  applyServiceConfiguration();
+  serviceConfiguration();
 }

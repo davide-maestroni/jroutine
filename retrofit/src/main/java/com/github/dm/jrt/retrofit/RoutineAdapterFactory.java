@@ -102,11 +102,6 @@ public class RoutineAdapterFactory extends AbstractAdapterFactory {
       return this;
     }
 
-    @NotNull
-    public InvocationConfiguration.Builder<? extends Builder> applyInvocationConfiguration() {
-      return new InvocationConfiguration.Builder<Builder>(this, mConfiguration);
-    }
-
     /**
      * Builds and return a new factory instance.
      *
@@ -127,6 +122,11 @@ public class RoutineAdapterFactory extends AbstractAdapterFactory {
     public Builder delegateFactory(@Nullable final CallAdapter.Factory factory) {
       mDelegateFactory = factory;
       return this;
+    }
+
+    @NotNull
+    public InvocationConfiguration.Builder<? extends Builder> invocationConfiguration() {
+      return new InvocationConfiguration.Builder<Builder>(this, mConfiguration);
     }
   }
 }

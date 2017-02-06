@@ -314,10 +314,10 @@ public class ChannelsTest {
     final Channel<?, String> channel = JRoutineCore.of("test").buildChannel();
     final TestLog testLog = new TestLog();
     assertThat(Channels.outputFlow(channel, 3)
-                       .applyChannelConfiguration()
+                       .channelConfiguration()
                        .withLog(testLog)
                        .withLogLevel(Level.DEBUG)
-                       .configured()
+                       .apply()
                        .buildChannel()
                        .all()).containsExactly(new Flow<String>(3, "test"));
     assertThat(testLog.mLogCount).isGreaterThan(0);
@@ -330,10 +330,10 @@ public class ChannelsTest {
         JRoutineCore.<Flow<String>>ofInputs().buildChannel();
     final TestLog testLog = new TestLog();
     Channels.flowInput(3, 1, channel)
-            .applyChannelConfiguration()
+            .channelConfiguration()
             .withLog(testLog)
             .withLogLevel(Level.DEBUG)
-            .configured()
+            .apply()
             .buildChannelMap()
             .get(3)
             .pass("test")
@@ -631,10 +631,10 @@ public class ChannelsTest {
     channel1.after(millis(100)).pass("test").pass("test").close();
     try {
       routine.call(Channels.joinOutput(channel1, channel2)
-                           .applyChannelConfiguration()
+                           .channelConfiguration()
                            .withBackoff(afterCount(0).constantDelay(millis(100)))
                            .withMaxSize(1)
-                           .configured()
+                           .apply()
                            .buildChannel()).in(seconds(10)).all();
       fail();
 
@@ -1098,10 +1098,10 @@ public class ChannelsTest {
   public void testList() {
     final int count = 7;
     final List<? extends Channel<Object, Object>> channels = Channels.number(count)
-                                                                     .applyChannelConfiguration()
+                                                                     .channelConfiguration()
                                                                      .withRunner(
                                                                          Runners.immediateRunner())
-                                                                     .configured()
+                                                                     .apply()
                                                                      .buildChannels();
     for (final Channel<Object, Object> channel : channels) {
       assertThat(channel.pass("test").next()).isEqualTo("test");
@@ -1122,22 +1122,18 @@ public class ChannelsTest {
   public void testMap() {
 
     final ChannelBuilder<String, String> builder1 =
-        JRoutineCore.<String>ofInputs().applyChannelConfiguration()
-                                       .withOrder(OrderType.SORTED)
-                                       .configured();
+        JRoutineCore.<String>ofInputs().channelConfiguration().withOrder(OrderType.SORTED).apply();
     final ChannelBuilder<Integer, Integer> builder2 =
-        JRoutineCore.<Integer>ofInputs().applyChannelConfiguration()
-                                        .withOrder(OrderType.SORTED)
-                                        .configured();
+        JRoutineCore.<Integer>ofInputs().channelConfiguration().withOrder(OrderType.SORTED).apply();
     final Channel<String, String> channel1 = builder1.buildChannel();
     final Channel<Integer, Integer> channel2 = builder2.buildChannel();
 
     final Channel<?, ? extends Flow<Object>> channel =
         Channels.mergeOutput(Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannel();
     final Channel<?, Flow<Object>> output = JRoutineCore.with(new Sort())
-                                                        .applyInvocationConfiguration()
+                                                        .invocationConfiguration()
                                                         .withInputOrder(OrderType.SORTED)
-                                                        .configured()
+                                                        .apply()
                                                         .call(channel);
     final Map<Integer, ? extends Channel<?, Object>> channelMap =
         Channels.flowOutput(output, Sort.INTEGER, Sort.STRING).buildChannelMap();
@@ -1161,13 +1157,9 @@ public class ChannelsTest {
   public void testMerge() {
 
     final ChannelBuilder<String, String> builder1 =
-        JRoutineCore.<String>ofInputs().applyChannelConfiguration()
-                                       .withOrder(OrderType.SORTED)
-                                       .configured();
+        JRoutineCore.<String>ofInputs().channelConfiguration().withOrder(OrderType.SORTED).apply();
     final ChannelBuilder<Integer, Integer> builder2 =
-        JRoutineCore.<Integer>ofInputs().applyChannelConfiguration()
-                                        .withOrder(OrderType.SORTED)
-                                        .configured();
+        JRoutineCore.<Integer>ofInputs().channelConfiguration().withOrder(OrderType.SORTED).apply();
     Channel<String, String> channel1;
     Channel<Integer, Integer> channel2;
     Channel<?, ? extends Flow<?>> outputChannel;
@@ -1218,9 +1210,7 @@ public class ChannelsTest {
   public void testMerge4() {
 
     final ChannelBuilder<String, String> builder =
-        JRoutineCore.<String>ofInputs().applyChannelConfiguration()
-                                       .withOrder(OrderType.SORTED)
-                                       .configured();
+        JRoutineCore.<String>ofInputs().channelConfiguration().withOrder(OrderType.SORTED).apply();
     final Channel<String, String> channel1 = builder.buildChannel();
     final Channel<String, String> channel2 = builder.buildChannel();
     final Channel<String, String> channel3 = builder.buildChannel();
@@ -1252,13 +1242,9 @@ public class ChannelsTest {
   public void testMergeAbort() {
 
     final ChannelBuilder<String, String> builder1 =
-        JRoutineCore.<String>ofInputs().applyChannelConfiguration()
-                                       .withOrder(OrderType.SORTED)
-                                       .configured();
+        JRoutineCore.<String>ofInputs().channelConfiguration().withOrder(OrderType.SORTED).apply();
     final ChannelBuilder<Integer, Integer> builder2 =
-        JRoutineCore.<Integer>ofInputs().applyChannelConfiguration()
-                                        .withOrder(OrderType.SORTED)
-                                        .configured();
+        JRoutineCore.<Integer>ofInputs().channelConfiguration().withOrder(OrderType.SORTED).apply();
     Channel<String, String> channel1;
     Channel<Integer, Integer> channel2;
     Channel<?, ? extends Flow<?>> outputChannel;
@@ -1761,10 +1747,10 @@ public class ChannelsTest {
   public void testOutputMap() {
 
     final Routine<Flow<Object>, Flow<Object>> routine = JRoutineCore.with(new Sort())
-                                                                    .applyInvocationConfiguration()
+                                                                    .invocationConfiguration()
                                                                     .withRunner(
                                                                         Runners.syncRunner())
-                                                                    .configured()
+                                                                    .apply()
                                                                     .buildRoutine();
     Map<Integer, ? extends Channel<?, Object>> channelMap;
     Channel<?, Flow<Object>> channel;
@@ -1993,16 +1979,16 @@ public class ChannelsTest {
     final Channel<?, Flow<Object>> outputChannel = routine.call(inputChannel);
     final Channel<?, Object> intChannel =
         Channels.flowOutput(outputChannel, Sort.INTEGER, Sort.STRING)
-                .applyChannelConfiguration()
+                .channelConfiguration()
                 .withLogLevel(Level.WARNING)
-                .configured()
+                .apply()
                 .buildChannelMap()
                 .get(Sort.INTEGER);
     final Channel<?, Object> strChannel =
         Channels.flowOutput(outputChannel, Sort.STRING, Sort.INTEGER)
-                .applyChannelConfiguration()
+                .channelConfiguration()
                 .withLogLevel(Level.WARNING)
-                .configured()
+                .apply()
                 .buildChannelMap()
                 .get(Sort.STRING);
     inputChannel.pass(new Flow<Object>(Sort.STRING, "test21"), new Flow<Object>(Sort.INTEGER, -11));

@@ -243,9 +243,9 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
     final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
         JRoutineAndroid.<ParcelableByteChunk>ofInputs().buildChannel();
     final ChunkOutputStream stream = JRoutineAndroid.withOutput(channel)
-                                                    .applyChunkStreamConfiguration()
+                                                    .chunkStreamConfiguration()
                                                     .withChunkSize(3)
-                                                    .configured()
+                                                    .apply()
                                                     .buildOutputStream();
     stream.write(new byte[]{31, 17, (byte) 155, 13});
     stream.flush();
@@ -274,9 +274,9 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
     final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
         JRoutineAndroid.<ParcelableByteChunk>ofInputs().buildChannel();
     final ChunkOutputStream stream = JRoutineAndroid.withOutput(channel)
-                                                    .applyChunkStreamConfiguration()
+                                                    .chunkStreamConfiguration()
                                                     .withChunkSize(3)
-                                                    .configured()
+                                                    .apply()
                                                     .buildOutputStream();
     stream.write(new byte[]{31, 17, (byte) 155, 13});
     stream.flush();
@@ -412,10 +412,10 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
     new TestClass("test");
     assertThat(JRoutineAndroid.on(getActivity())
                               .withInstanceOf(TestClass.class)
-                              .applyLoaderConfiguration()
+                              .loaderConfiguration()
                               .withLoaderId(33)
                               .withCacheStrategy(CacheStrategyType.CACHE)
-                              .configured()
+                              .apply()
                               .method("getStringLow")
                               .close()
                               .in(seconds(10))
@@ -540,15 +540,15 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
     new TestClass("TEST");
     assertThat(JRoutineAndroid.on(getActivity())
                               .withInstanceOf(TestClass.class)
-                              .applyInvocationConfiguration()
+                              .invocationConfiguration()
                               .withLog(AndroidLogs.androidLog())
-                              .configured()
-                              .applyReflectionConfiguration()
+                              .apply()
+                              .callConfiguration()
                               .withSharedFields()
-                              .configured()
-                              .applyLoaderConfiguration()
+                              .apply()
+                              .loaderConfiguration()
                               .withInvocationId(11)
-                              .configured()
+                              .apply()
                               .buildProxy(TestAnnotatedProxy.class)
                               .getStringLow()
                               .all()).containsExactly("test");
@@ -784,15 +784,15 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
     new TestClass("TEST");
     assertThat(JRoutineAndroid.on((Context) getActivity())
                               .withInstanceOf(TestClass.class)
-                              .applyInvocationConfiguration()
+                              .invocationConfiguration()
                               .withLog(AndroidLogs.androidLog())
-                              .configured()
-                              .applyReflectionConfiguration()
+                              .apply()
+                              .callConfiguration()
                               .withSharedFields()
-                              .configured()
-                              .applyServiceConfiguration()
+                              .apply()
+                              .serviceConfiguration()
                               .withLogClass(AndroidLog.class)
-                              .configured()
+                              .apply()
                               .buildProxy(TestAnnotatedProxy.class)
                               .getStringLow()
                               .all()).containsExactly("test");

@@ -23,7 +23,7 @@ import com.github.dm.jrt.proxy.annotation.Proxy;
 import com.github.dm.jrt.proxy.builder.AbstractProxyObjectBuilder;
 import com.github.dm.jrt.proxy.builder.ProxyRoutineBuilder;
 import com.github.dm.jrt.reflect.InvocationTarget;
-import com.github.dm.jrt.reflect.config.ReflectionConfiguration;
+import com.github.dm.jrt.reflect.config.CallConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -41,11 +41,10 @@ class DefaultProxyRoutineBuilder implements ProxyRoutineBuilder {
 
   private final InvocationTarget<?> mTarget;
 
+  private CallConfiguration mCallConfiguration = CallConfiguration.defaultConfiguration();
+
   private InvocationConfiguration mInvocationConfiguration =
       InvocationConfiguration.defaultConfiguration();
-
-  private ReflectionConfiguration mReflectionConfiguration =
-      ReflectionConfiguration.defaultConfiguration();
 
   /**
    * Constructor.
@@ -72,24 +71,9 @@ class DefaultProxyRoutineBuilder implements ProxyRoutineBuilder {
   }
 
   @NotNull
-  public ProxyRoutineBuilder apply(@NotNull final ReflectionConfiguration configuration) {
-    mReflectionConfiguration =
-        ConstantConditions.notNull("reflection configuration", configuration);
+  public ProxyRoutineBuilder apply(@NotNull final CallConfiguration configuration) {
+    mCallConfiguration = ConstantConditions.notNull("call configuration", configuration);
     return this;
-  }
-
-  @NotNull
-  public InvocationConfiguration.Builder<? extends ProxyRoutineBuilder>
-  applyInvocationConfiguration() {
-    final InvocationConfiguration config = mInvocationConfiguration;
-    return new InvocationConfiguration.Builder<ProxyRoutineBuilder>(this, config);
-  }
-
-  @NotNull
-  public ReflectionConfiguration.Builder<? extends ProxyRoutineBuilder>
-  applyReflectionConfiguration() {
-    final ReflectionConfiguration config = mReflectionConfiguration;
-    return new ReflectionConfiguration.Builder<ProxyRoutineBuilder>(this, config);
   }
 
   @NotNull
@@ -106,12 +90,24 @@ class DefaultProxyRoutineBuilder implements ProxyRoutineBuilder {
     }
 
     final TargetProxyObjectBuilder<TYPE> builder = new TargetProxyObjectBuilder<TYPE>(mTarget, itf);
-    return builder.apply(mInvocationConfiguration).apply(mReflectionConfiguration).buildProxy();
+    return builder.apply(mInvocationConfiguration).apply(mCallConfiguration).buildProxy();
   }
 
   @NotNull
   public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
     return buildProxy(itf.getRawClass());
+  }
+
+  @NotNull
+  public CallConfiguration.Builder<? extends ProxyRoutineBuilder> callConfiguration() {
+    final CallConfiguration config = mCallConfiguration;
+    return new CallConfiguration.Builder<ProxyRoutineBuilder>(this, config);
+  }
+
+  @NotNull
+  public InvocationConfiguration.Builder<? extends ProxyRoutineBuilder> invocationConfiguration() {
+    final InvocationConfiguration config = mInvocationConfiguration;
+    return new InvocationConfiguration.Builder<ProxyRoutineBuilder>(this, config);
   }
 
   /**
@@ -153,7 +149,7 @@ class DefaultProxyRoutineBuilder implements ProxyRoutineBuilder {
     @Override
     @SuppressWarnings("unchecked")
     protected TYPE newProxy(@NotNull final InvocationConfiguration invocationConfiguration,
-        @NotNull final ReflectionConfiguration reflectionConfiguration) throws Exception {
+        @NotNull final CallConfiguration callConfiguration) throws Exception {
       final Object target = mTarget;
       final Class<? super TYPE> interfaceClass = mInterfaceClass;
       final Proxy annotation = interfaceClass.getAnnotation(Proxy.class);
@@ -180,9 +176,8 @@ class DefaultProxyRoutineBuilder implements ProxyRoutineBuilder {
           packageName + annotation.classPrefix() + className + annotation.classSuffix();
       final Constructor<?> constructor =
           findBestMatchingConstructor(Class.forName(fullClassName), target, invocationConfiguration,
-              reflectionConfiguration);
-      return (TYPE) constructor.newInstance(target, invocationConfiguration,
-          reflectionConfiguration);
+              callConfiguration);
+      return (TYPE) constructor.newInstance(target, invocationConfiguration, callConfiguration);
     }
   }
 }

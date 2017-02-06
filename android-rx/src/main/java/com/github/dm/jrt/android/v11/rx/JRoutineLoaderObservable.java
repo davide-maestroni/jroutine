@@ -49,9 +49,9 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * The example below shows how it's possible to make the computation happen in a dedicated Loader:
  * <pre><code>
  * JRoutineLoaderObservable.with(myObservable)
- *                         .applyLoaderConfiguration()
+ *                         .loaderConfiguration()
  *                         .withInvocationId(INVOCATION_ID)
- *                         .configured()
+ *                         .apply()
  *                         .observeOn(loaderFrom(activity))
  *                         .subscribe(getAction());
  * </code></pre>
@@ -122,15 +122,14 @@ public class JRoutineLoaderObservable {
     @NotNull
     @Override
     public InvocationConfiguration.Builder<? extends LoaderObservable<DATA>>
-    applyInvocationConfiguration() {
+    invocationConfiguration() {
       return new InvocationConfiguration.Builder<LoaderObservable<DATA>>(this,
           mInvocationConfiguration);
     }
 
     @NotNull
     @Override
-    public LoaderConfiguration.Builder<? extends LoaderObservable<DATA>> applyLoaderConfiguration
-        () {
+    public LoaderConfiguration.Builder<? extends LoaderObservable<DATA>> loaderConfiguration() {
       return new LoaderConfiguration.Builder<LoaderObservable<DATA>>(this, mLoaderConfiguration);
     }
 

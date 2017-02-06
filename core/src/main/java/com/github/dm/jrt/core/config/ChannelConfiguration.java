@@ -381,7 +381,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
      * @return the configured object.
      */
     @NotNull
-    public TYPE configured() {
+    public TYPE apply() {
       return mConfigurable.apply(buildConfiguration());
     }
 

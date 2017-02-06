@@ -54,7 +54,7 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
 
   public void testClass() {
     final InvocationConfiguration configuration =
-        InvocationConfiguration.builder().withRunner(Runners.syncRunner()).configured();
+        InvocationConfiguration.builder().withRunner(Runners.syncRunner()).apply();
     assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(Case.class)))
                            .apply(configuration)
                            .call("TEST")
@@ -90,9 +90,9 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
     final InvocationFactory<String, String> factory =
         fromFactory(getActivity(), factoryOf(tokenOf(Case.class)));
     assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryFrom(factory)))
-                           .applyInvocationConfiguration()
+                           .invocationConfiguration()
                            .withRunner(Runners.syncRunner())
-                           .configured()
+                           .apply()
                            .call("TEST")
                            .all()).containsExactly("test");
   }
@@ -141,7 +141,7 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
 
   public void testTemplateInvocation() {
     final InvocationConfiguration configuration =
-        InvocationConfiguration.builder().withRunner(Runners.syncRunner()).configured();
+        InvocationConfiguration.builder().withRunner(Runners.syncRunner()).apply();
     assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(ContextTest.class)))
                            .apply(configuration)
                            .close()
@@ -154,7 +154,7 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
 
   public void testToken() {
     final InvocationConfiguration configuration =
-        InvocationConfiguration.builder().withRunner(Runners.syncRunner()).configured();
+        InvocationConfiguration.builder().withRunner(Runners.syncRunner()).apply();
     assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(tokenOf(Case.class))))
                            .apply(configuration)
                            .call("TEST")
@@ -187,7 +187,7 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
 
   public void testWrapper() {
     final InvocationConfiguration configuration =
-        InvocationConfiguration.builder().withRunner(Runners.syncRunner()).configured();
+        InvocationConfiguration.builder().withRunner(Runners.syncRunner()).apply();
     assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(CaseWrapper.class)))
                            .apply(configuration)
                            .call("TEST")

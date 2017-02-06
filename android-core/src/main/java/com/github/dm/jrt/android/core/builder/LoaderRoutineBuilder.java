@@ -53,7 +53,7 @@ public interface LoaderRoutineBuilder<IN, OUT>
   /**
    * {@inheritDoc}
    * <p>
-   * The configured asynchronous runner will be ignored.
+   * The configured runner will be ignored.
    */
   @NotNull
   @Override
@@ -61,17 +61,17 @@ public interface LoaderRoutineBuilder<IN, OUT>
 
   /**
    * {@inheritDoc}
-   * <p>
-   * The configured asynchronous runner will be ignored.
-   */
-  @NotNull
-  @Override
-  Builder<? extends LoaderRoutineBuilder<IN, OUT>> applyInvocationConfiguration();
-
-  /**
-   * {@inheritDoc}
    */
   @NotNull
   @Override
   LoaderRoutine<IN, OUT> buildRoutine();
+
+  /**
+   * {@inheritDoc}
+   * <p>
+   * The configured runner will be ignored.
+   */
+  @NotNull
+  @Override
+  Builder<? extends LoaderRoutineBuilder<IN, OUT>> invocationConfiguration();
 }

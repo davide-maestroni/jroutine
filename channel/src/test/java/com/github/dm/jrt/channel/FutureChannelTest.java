@@ -729,10 +729,10 @@ public class FutureChannelTest {
           }
         }, 3, TimeUnit.SECONDS);
     final Channel<?, String> channel = Channels.fromFuture(future)
-                                               .applyChannelConfiguration()
+                                               .channelConfiguration()
                                                .withOutputTimeout(millis(10))
                                                .withOutputTimeoutAction(TimeoutActionType.CONTINUE)
-                                               .configured()
+                                               .apply()
                                                .buildChannel();
     assertThat(channel.all()).isEmpty();
   }
@@ -747,10 +747,10 @@ public class FutureChannelTest {
           }
         }, 3, TimeUnit.SECONDS);
     final Channel<?, String> channel = Channels.fromFuture(future)
-                                               .applyChannelConfiguration()
+                                               .channelConfiguration()
                                                .withOutputTimeout(millis(10))
                                                .withOutputTimeoutAction(TimeoutActionType.ABORT)
-                                               .configured()
+                                               .apply()
                                                .buildChannel();
     try {
       channel.all();
@@ -770,10 +770,10 @@ public class FutureChannelTest {
           }
         }, 3, TimeUnit.SECONDS);
     final Channel<?, String> channel = Channels.fromFuture(future)
-                                               .applyChannelConfiguration()
+                                               .channelConfiguration()
                                                .withOutputTimeout(millis(10))
                                                .withOutputTimeoutAction(TimeoutActionType.FAIL)
-                                               .configured()
+                                               .apply()
                                                .buildChannel();
     try {
       channel.all();

@@ -26,7 +26,7 @@ import com.github.dm.jrt.proxy.builder.ProxyRoutineBuilder;
 import com.github.dm.jrt.reflect.InvocationTarget;
 import com.github.dm.jrt.reflect.JRoutineReflection;
 import com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilder;
-import com.github.dm.jrt.reflect.config.ReflectionConfiguration;
+import com.github.dm.jrt.reflect.config.CallConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -42,13 +42,12 @@ class DefaultReflectionProxyRoutineBuilder implements ReflectionProxyRoutineBuil
 
   private final InvocationTarget<?> mTarget;
 
+  private CallConfiguration mCallConfiguration = CallConfiguration.defaultConfiguration();
+
   private InvocationConfiguration mInvocationConfiguration =
       InvocationConfiguration.defaultConfiguration();
 
   private ProxyStrategyType mProxyStrategyType;
-
-  private ReflectionConfiguration mReflectionConfiguration =
-      ReflectionConfiguration.defaultConfiguration();
 
   /**
    * Constructor.
@@ -75,15 +74,28 @@ class DefaultReflectionProxyRoutineBuilder implements ReflectionProxyRoutineBuil
   }
 
   @NotNull
-  public ReflectionProxyRoutineBuilder apply(@NotNull final ReflectionConfiguration configuration) {
-    mReflectionConfiguration =
-        ConstantConditions.notNull("reflection configuration", configuration);
+  public ReflectionProxyRoutineBuilder apply(@NotNull final CallConfiguration configuration) {
+    mCallConfiguration = ConstantConditions.notNull("call configuration", configuration);
     return this;
   }
 
   @NotNull
+  public CallConfiguration.Builder<? extends ReflectionProxyRoutineBuilder> callConfiguration() {
+    final CallConfiguration config = mCallConfiguration;
+    return new CallConfiguration.Builder<ReflectionProxyRoutineBuilder>(
+        new CallConfiguration.Configurable<ReflectionProxyRoutineBuilder>() {
+
+          @NotNull
+          public ReflectionProxyRoutineBuilder apply(
+              @NotNull final CallConfiguration configuration) {
+            return DefaultReflectionProxyRoutineBuilder.this.apply(configuration);
+          }
+        }, config);
+  }
+
+  @NotNull
   public InvocationConfiguration.Builder<? extends ReflectionProxyRoutineBuilder>
-  applyInvocationConfiguration() {
+  invocationConfiguration() {
     final InvocationConfiguration config = mInvocationConfiguration;
     return new InvocationConfiguration.Builder<ReflectionProxyRoutineBuilder>(
         new InvocationConfiguration.Configurable<ReflectionProxyRoutineBuilder>() {
@@ -91,21 +103,6 @@ class DefaultReflectionProxyRoutineBuilder implements ReflectionProxyRoutineBuil
           @NotNull
           public ReflectionProxyRoutineBuilder apply(
               @NotNull final InvocationConfiguration configuration) {
-            return DefaultReflectionProxyRoutineBuilder.this.apply(configuration);
-          }
-        }, config);
-  }
-
-  @NotNull
-  public ReflectionConfiguration.Builder<? extends ReflectionProxyRoutineBuilder>
-  applyReflectionConfiguration() {
-    final ReflectionConfiguration config = mReflectionConfiguration;
-    return new ReflectionConfiguration.Builder<ReflectionProxyRoutineBuilder>(
-        new ReflectionConfiguration.Configurable<ReflectionProxyRoutineBuilder>() {
-
-          @NotNull
-          public ReflectionProxyRoutineBuilder apply(
-              @NotNull final ReflectionConfiguration configuration) {
             return DefaultReflectionProxyRoutineBuilder.this.apply(configuration);
           }
         }, config);
@@ -159,15 +156,13 @@ class DefaultReflectionProxyRoutineBuilder implements ReflectionProxyRoutineBuil
 
   @NotNull
   private ProxyRoutineBuilder newProxyBuilder() {
-    return JRoutineProxy.with(mTarget)
-                        .apply(mInvocationConfiguration)
-                        .apply(mReflectionConfiguration);
+    return JRoutineProxy.with(mTarget).apply(mInvocationConfiguration).apply(mCallConfiguration);
   }
 
   @NotNull
   private ReflectionRoutineBuilder newReflectionBuilder() {
     return JRoutineReflection.with(mTarget)
                              .apply(mInvocationConfiguration)
-                             .apply(mReflectionConfiguration);
+                             .apply(mCallConfiguration);
   }
 }

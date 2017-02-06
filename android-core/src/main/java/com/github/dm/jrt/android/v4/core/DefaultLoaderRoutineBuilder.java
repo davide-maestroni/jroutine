@@ -81,8 +81,8 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends AbstractRoutineBuilder<IN, OU
   @Override
   @SuppressWarnings("unchecked")
   public InvocationConfiguration.Builder<? extends
-      LoaderRoutineBuilder<IN, OUT>> applyInvocationConfiguration() {
-    return (Builder<? extends LoaderRoutineBuilder<IN, OUT>>) super.applyInvocationConfiguration();
+      LoaderRoutineBuilder<IN, OUT>> invocationConfiguration() {
+    return (Builder<? extends LoaderRoutineBuilder<IN, OUT>>) super.invocationConfiguration();
   }
 
   @NotNull
@@ -90,14 +90,6 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends AbstractRoutineBuilder<IN, OU
   public LoaderRoutineBuilder<IN, OUT> apply(@NotNull final LoaderConfiguration configuration) {
     mLoaderConfiguration = ConstantConditions.notNull("Loader configuration", configuration);
     return this;
-  }
-
-  @NotNull
-  @Override
-  public LoaderConfiguration.Builder<? extends LoaderRoutineBuilder<IN, OUT>>
-  applyLoaderConfiguration() {
-    final LoaderConfiguration config = mLoaderConfiguration;
-    return new LoaderConfiguration.Builder<LoaderRoutineBuilder<IN, OUT>>(this, config);
   }
 
   @NotNull
@@ -112,7 +104,7 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends AbstractRoutineBuilder<IN, OU
 
     final InvocationConfiguration.Builder<InvocationConfiguration> builder =
         configuration.builderFrom().withRunner(zeroDelayRunner(mainRunner()));
-    return new DefaultLoaderRoutine<IN, OUT>(mContext, mFactory, builder.configured(),
+    return new DefaultLoaderRoutine<IN, OUT>(mContext, mFactory, builder.apply(),
         mLoaderConfiguration);
   }
 
@@ -133,5 +125,13 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends AbstractRoutineBuilder<IN, OU
   @Override
   public void clear(@Nullable final Iterable<? extends IN> inputs) {
     buildRoutine().clear(inputs);
+  }
+
+  @NotNull
+  @Override
+  public LoaderConfiguration.Builder<? extends LoaderRoutineBuilder<IN, OUT>> loaderConfiguration
+      () {
+    final LoaderConfiguration config = mLoaderConfiguration;
+    return new LoaderConfiguration.Builder<LoaderRoutineBuilder<IN, OUT>>(this, config);
   }
 }

@@ -41,9 +41,9 @@ public class JRoutineObservableTest {
   @Test
   public void testChannel() {
     final Channel<?, String> channel = JRoutineObservable.with(Observable.just("test1", "test2"))
-                                                         .applyChannelConfiguration()
+                                                         .channelConfiguration()
                                                          .withMaxSize(2)
-                                                         .configured()
+                                                         .apply()
                                                          .buildChannel();
     assertThat(channel.all()).containsExactly("test1", "test2");
   }

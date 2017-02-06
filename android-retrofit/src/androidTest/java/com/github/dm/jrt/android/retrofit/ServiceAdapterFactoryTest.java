@@ -68,9 +68,9 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
     try {
       final ServiceAdapterFactory adapterFactory = //
           ServiceAdapterFactory.on(context)
-                               .applyInvocationConfiguration()
+                               .invocationConfiguration()
                                .withOutputTimeout(seconds(10))
-                               .configured()
+                               .apply()
                                .buildFactory();
       final GsonConverterFactory converterFactory = GsonConverterFactory.create();
       final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + server.getPort())
@@ -111,9 +111,9 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
     try {
       final ServiceAdapterFactory adapterFactory = //
           ServiceAdapterFactory.on(context)
-                               .applyInvocationConfiguration()
+                               .invocationConfiguration()
                                .withOutputTimeout(seconds(10))
-                               .configured()
+                               .apply()
                                .buildFactory();
       final GsonConverterFactory converterFactory = GsonConverterFactory.create();
       final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + server.getPort())

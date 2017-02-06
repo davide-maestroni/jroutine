@@ -62,13 +62,13 @@ public class LoaderRoutineRotationTest
     final DurationMeasure timeout = DurationMeasure.seconds(10);
     final Routine<String, String> routine = JRoutineLoader.on(loaderFrom(getActivity()))
                                                           .with(factoryOf(ToUpperCase.class))
-                                                          .applyLoaderConfiguration()
+                                                          .loaderConfiguration()
                                                           .withLoaderId(0)
                                                           .withClashResolution(
                                                               ClashResolutionType.JOIN)
                                                           .withResultStaleTime(
                                                               DurationMeasure.minutes(1))
-                                                          .configured()
+                                                          .apply()
                                                           .buildRoutine();
     routine.call("test1");
 
@@ -87,12 +87,12 @@ public class LoaderRoutineRotationTest
     final DurationMeasure timeout = DurationMeasure.seconds(10);
     JRoutineLoader.on(loaderFrom(getActivity()))
                   .with(factoryOf(ToUpperCase.class))
-                  .applyInvocationConfiguration()
+                  .invocationConfiguration()
                   .withOutputOrder(OrderType.SORTED)
-                  .configured()
-                  .applyLoaderConfiguration()
+                  .apply()
+                  .loaderConfiguration()
                   .withLoaderId(0)
-                  .configured()
+                  .apply()
                   .call("test1", "test2");
 
     simulateRotation();
@@ -164,12 +164,12 @@ public class LoaderRoutineRotationTest
     final DurationMeasure timeout = DurationMeasure.seconds(10);
     final Routine<String, String> routine = JRoutineLoader.on(loaderFrom(getActivity()))
                                                           .with(factoryOf(ToUpperCase.class))
-                                                          .applyLoaderConfiguration()
+                                                          .loaderConfiguration()
                                                           .withLoaderId(0)
                                                           .withClashResolution(
                                                               ClashResolutionType.JOIN)
                                                           .withResultStaleTime(noTime())
-                                                          .configured()
+                                                          .apply()
                                                           .buildRoutine();
     routine.call("test1");
 

@@ -142,15 +142,15 @@ public class JRoutineObservable {
     }
 
     @NotNull
-    public Builder<? extends ChannelBuilder<OUT, OUT>> applyChannelConfiguration() {
-      return new Builder<ChannelBuilder<OUT, OUT>>(this, mConfiguration);
-    }
-
-    @NotNull
     public Channel<OUT, OUT> buildChannel() {
       final Channel<OUT, OUT> channel = JRoutineCore.<OUT>ofInputs().buildChannel();
       mObservable.subscribe(new ChannelObserver<OUT>(channel));
       return channel;
+    }
+
+    @NotNull
+    public Builder<? extends ChannelBuilder<OUT, OUT>> channelConfiguration() {
+      return new Builder<ChannelBuilder<OUT, OUT>>(this, mConfiguration);
     }
   }
 

@@ -156,9 +156,9 @@ public class OperatorsTest {
         return "TEST2";
       }
     }))
-                           .applyInvocationConfiguration()
+                           .invocationConfiguration()
                            .withRunner(Runners.syncRunner())
-                           .configured()
+                           .apply()
                            .call("test1")
                            .all()).containsExactly("test1", "TEST2");
     assertThat(JRoutineCore.with(appendAccept(new Consumer<Channel<String, ?>>() {
@@ -167,9 +167,9 @@ public class OperatorsTest {
         resultChannel.pass("TEST2");
       }
     }))
-                           .applyInvocationConfiguration()
+                           .invocationConfiguration()
                            .withRunner(Runners.syncRunner())
-                           .configured()
+                           .apply()
                            .call("test1")
                            .all()).containsExactly("test1", "TEST2");
     assertThat(JRoutineCore.with(appendGet(3, new Supplier<String>() {
@@ -178,9 +178,9 @@ public class OperatorsTest {
         return "TEST2";
       }
     }))
-                           .applyInvocationConfiguration()
+                           .invocationConfiguration()
                            .withRunner(Runners.syncRunner())
-                           .configured()
+                           .apply()
                            .call("test1")
                            .in(seconds(3))
                            .all()).containsExactly("test1", "TEST2", "TEST2", "TEST2");
@@ -190,9 +190,9 @@ public class OperatorsTest {
         resultChannel.pass("TEST2");
       }
     }))
-                           .applyInvocationConfiguration()
+                           .invocationConfiguration()
                            .withRunner(Runners.syncRunner())
-                           .configured()
+                           .apply()
                            .call("test1")
                            .all()).containsExactly("test1", "TEST2", "TEST2", "TEST2");
     assertThat(JRoutineCore.with(appendGet(new Supplier<String>() {
@@ -623,9 +623,9 @@ public class OperatorsTest {
         builder.append(builder2);
       }
     }))
-                           .applyInvocationConfiguration()
+                           .invocationConfiguration()
                            .withRunner(Runners.syncRunner())
-                           .configured()
+                           .apply()
                            .call(new StringBuilder("test1"), new StringBuilder("test2"),
                                new StringBuilder("test3"))
                            .in(seconds(3))
@@ -648,9 +648,9 @@ public class OperatorsTest {
         return new ArrayList<String>();
       }
     }))
-                           .applyInvocationConfiguration()
+                           .invocationConfiguration()
                            .withRunner(Runners.syncRunner())
-                           .configured()
+                           .apply()
                            .call("test1", "test2", "test3")
                            .in(seconds(3))
                            .next()).containsExactly("test1", "test2", "test3");
@@ -666,9 +666,9 @@ public class OperatorsTest {
         return new ArrayList<String>();
       }
     }))
-                           .applyInvocationConfiguration()
+                           .invocationConfiguration()
                            .withRunner(Runners.syncRunner())
-                           .configured()
+                           .apply()
                            .close()
                            .in(seconds(3))
                            .next()).isEmpty();
@@ -721,9 +721,9 @@ public class OperatorsTest {
         b.append(s);
       }
     }))
-                           .applyInvocationConfiguration()
+                           .invocationConfiguration()
                            .withRunner(Runners.syncRunner())
-                           .configured()
+                           .apply()
                            .call("test1", "test2", "test3")
                            .in(seconds(3))
                            .next()
@@ -855,15 +855,15 @@ public class OperatorsTest {
                            .in(seconds(3))
                            .all()).containsExactly("test");
     assertThat(JRoutineCore.with(filter(Functions.isNotNull()))
-                           .applyInvocationConfiguration()
+                           .invocationConfiguration()
                            .withRunner(Runners.syncRunner())
-                           .configured()
+                           .apply()
                            .call(null, "test")
                            .all()).containsExactly("test");
     assertThat(JRoutineCore.with(filter(Functions.isNotNull()))
-                           .applyInvocationConfiguration()
+                           .invocationConfiguration()
                            .withRunner(Runners.syncRunner())
-                           .configured()
+                           .apply()
                            .callParallel(null, "test")
                            .in(seconds(3))
                            .all()).containsExactly("test");
@@ -1328,23 +1328,23 @@ public class OperatorsTest {
       }
     })).close().in(seconds(3)).all()).containsExactly("est", "est");
     assertThat(JRoutineCore.with(orElse("est"))
-                           .applyInvocationConfiguration()
+                           .invocationConfiguration()
                            .withRunner(Runners.syncRunner())
-                           .configured()
+                           .apply()
                            .call("test")
                            .in(seconds(3))
                            .all()).containsExactly("test");
     assertThat(JRoutineCore.with(orElse("est1", "est2"))
-                           .applyInvocationConfiguration()
+                           .invocationConfiguration()
                            .withRunner(Runners.syncRunner())
-                           .configured()
+                           .apply()
                            .call("test")
                            .in(seconds(3))
                            .all()).containsExactly("test");
     assertThat(JRoutineCore.with(orElse(Arrays.asList("est1", "est2")))
-                           .applyInvocationConfiguration()
+                           .invocationConfiguration()
                            .withRunner(Runners.syncRunner())
-                           .configured()
+                           .apply()
                            .call("test")
                            .in(seconds(3))
                            .all()).containsExactly("test");
@@ -1354,9 +1354,9 @@ public class OperatorsTest {
         result.pass("est");
       }
     }))
-                           .applyInvocationConfiguration()
+                           .invocationConfiguration()
                            .withRunner(Runners.syncRunner())
-                           .configured()
+                           .apply()
                            .call("test")
                            .in(seconds(3))
                            .all()).containsExactly("test");
@@ -1366,9 +1366,9 @@ public class OperatorsTest {
         result.pass("est");
       }
     }))
-                           .applyInvocationConfiguration()
+                           .invocationConfiguration()
                            .withRunner(Runners.syncRunner())
-                           .configured()
+                           .apply()
                            .close()
                            .in(seconds(3))
                            .all()).containsExactly("est", "est");
@@ -1378,9 +1378,9 @@ public class OperatorsTest {
         return "est";
       }
     }))
-                           .applyInvocationConfiguration()
+                           .invocationConfiguration()
                            .withRunner(Runners.syncRunner())
-                           .configured()
+                           .apply()
                            .call("test")
                            .in(seconds(3))
                            .all()).containsExactly("test");
@@ -1390,9 +1390,9 @@ public class OperatorsTest {
         return "est";
       }
     }))
-                           .applyInvocationConfiguration()
+                           .invocationConfiguration()
                            .withRunner(Runners.syncRunner())
-                           .configured()
+                           .apply()
                            .close()
                            .in(seconds(3))
                            .all()).containsExactly("est", "est");
@@ -1555,9 +1555,9 @@ public class OperatorsTest {
         return "TEST2";
       }
     }))
-                           .applyInvocationConfiguration()
+                           .invocationConfiguration()
                            .withRunner(Runners.syncRunner())
-                           .configured()
+                           .apply()
                            .call("test1")
                            .all()).containsExactly("TEST2", "test1");
     assertThat(JRoutineCore.with(prependAccept(new Consumer<Channel<String, ?>>() {
@@ -1566,9 +1566,9 @@ public class OperatorsTest {
         resultChannel.pass("TEST2");
       }
     }))
-                           .applyInvocationConfiguration()
+                           .invocationConfiguration()
                            .withRunner(Runners.syncRunner())
-                           .configured()
+                           .apply()
                            .call("test1")
                            .all()).containsExactly("TEST2", "test1");
     assertThat(JRoutineCore.with(prependGet(3, new Supplier<String>() {
@@ -1577,9 +1577,9 @@ public class OperatorsTest {
         return "TEST2";
       }
     }))
-                           .applyInvocationConfiguration()
+                           .invocationConfiguration()
                            .withRunner(Runners.syncRunner())
-                           .configured()
+                           .apply()
                            .call("test1")
                            .in(seconds(3))
                            .all()).containsExactly("TEST2", "TEST2", "TEST2", "test1");
@@ -1589,9 +1589,9 @@ public class OperatorsTest {
         resultChannel.pass("TEST2");
       }
     }))
-                           .applyInvocationConfiguration()
+                           .invocationConfiguration()
                            .withRunner(Runners.syncRunner())
-                           .configured()
+                           .apply()
                            .call("test1")
                            .all()).containsExactly("TEST2", "TEST2", "TEST2", "test1");
     assertThat(JRoutineCore.with(prependGet(new Supplier<String>() {
@@ -1660,9 +1660,9 @@ public class OperatorsTest {
         return s + s2;
       }
     }))
-                           .applyInvocationConfiguration()
+                           .invocationConfiguration()
                            .withRunner(Runners.syncRunner())
-                           .configured()
+                           .apply()
                            .call("test1", "test2", "test3")
                            .all()).containsExactly("test1test2test3");
   }
@@ -1703,9 +1703,9 @@ public class OperatorsTest {
         return b.append(s);
       }
     }))
-                           .applyInvocationConfiguration()
+                           .invocationConfiguration()
                            .withRunner(Runners.syncRunner())
-                           .configured()
+                           .apply()
                            .call("test1", "test2", "test3")
                            .next()
                            .toString()).isEqualTo("test1test2test3");
@@ -1990,9 +1990,9 @@ public class OperatorsTest {
         return "TEST2";
       }
     }))
-                           .applyInvocationConfiguration()
+                           .invocationConfiguration()
                            .withRunner(Runners.syncRunner())
-                           .configured()
+                           .apply()
                            .call("test1")
                            .all()).containsExactly("TEST2");
     assertThat(JRoutineCore.with(thenAccept(new Consumer<Channel<String, ?>>() {
@@ -2001,9 +2001,9 @@ public class OperatorsTest {
         resultChannel.pass("TEST2");
       }
     }))
-                           .applyInvocationConfiguration()
+                           .invocationConfiguration()
                            .withRunner(Runners.syncRunner())
-                           .configured()
+                           .apply()
                            .call("test1")
                            .all()).containsExactly("TEST2");
     assertThat(JRoutineCore.with(thenGet(3, new Supplier<String>() {
@@ -2012,9 +2012,9 @@ public class OperatorsTest {
         return "TEST2";
       }
     }))
-                           .applyInvocationConfiguration()
+                           .invocationConfiguration()
                            .withRunner(Runners.syncRunner())
-                           .configured()
+                           .apply()
                            .call("test1")
                            .in(seconds(3))
                            .all()).containsExactly("TEST2", "TEST2", "TEST2");
@@ -2024,9 +2024,9 @@ public class OperatorsTest {
         resultChannel.pass("TEST2");
       }
     }))
-                           .applyInvocationConfiguration()
+                           .invocationConfiguration()
                            .withRunner(Runners.syncRunner())
-                           .configured()
+                           .apply()
                            .call("test1")
                            .all()).containsExactly("TEST2", "TEST2", "TEST2");
     assertThat(JRoutineCore.with(thenGet(new Supplier<String>() {

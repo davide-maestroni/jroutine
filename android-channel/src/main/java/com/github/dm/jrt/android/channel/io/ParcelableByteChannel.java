@@ -19,8 +19,8 @@ package com.github.dm.jrt.android.channel.io;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.github.dm.jrt.channel.builder.ChunkStreamConfiguration;
-import com.github.dm.jrt.channel.builder.ChunkStreamConfiguration.Builder;
+import com.github.dm.jrt.channel.config.ChunkStreamConfiguration;
+import com.github.dm.jrt.channel.config.ChunkStreamConfiguration.Builder;
 import com.github.dm.jrt.channel.io.ByteChannel;
 import com.github.dm.jrt.channel.io.ByteChannel.ByteChunk;
 import com.github.dm.jrt.channel.io.ByteChannel.ChunkInputStream;
@@ -186,9 +186,9 @@ public class ParcelableByteChannel {
         final Channel<ByteChunk, ByteChunk> channel =
             JRoutineCore.<ByteChunk>ofInputs().buildChannel();
         final ChunkOutputStream outputStream = ByteChannel.withOutput(channel)
-                                                          .applyChunkStreamConfiguration()
+                                                          .chunkStreamConfiguration()
                                                           .withChunkSize(Math.max(data.length, 1))
-                                                          .configured()
+                                                          .apply()
                                                           .buildOutputStream();
         try {
           outputStream.write(data);
@@ -321,16 +321,16 @@ public class ParcelableByteChannel {
     }
 
     @NotNull
-    public Builder<? extends ChunkOutputStreamBuilder> applyChunkStreamConfiguration() {
-      return new Builder<ChunkOutputStreamBuilder>(this, mConfiguration);
-    }
-
-    @NotNull
     public ChunkOutputStream buildOutputStream() {
       final Channel<ByteChunk, ByteChunk> outputChannel =
           JRoutineCore.<ByteChunk>ofInputs().buildChannel();
       outputChannel.bind(new ChunkChannelConsumer(mChannel));
       return ByteChannel.withOutput(outputChannel).apply(mConfiguration).buildOutputStream();
+    }
+
+    @NotNull
+    public Builder<? extends ChunkOutputStreamBuilder> chunkStreamConfiguration() {
+      return new Builder<ChunkOutputStreamBuilder>(this, mConfiguration);
     }
   }
 

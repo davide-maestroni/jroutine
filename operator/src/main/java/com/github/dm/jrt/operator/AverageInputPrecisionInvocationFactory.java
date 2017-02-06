@@ -90,6 +90,7 @@ class AverageInputPrecisionInvocationFactory<IN extends Number, OUT extends Numb
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void onComplete(@NotNull final Channel<N, ?> result) {
       final Operation<?> outputOperation = mOutputOperation;
       final int count = mCount;

@@ -89,9 +89,9 @@
                 super.onCreate(savedInstanceState);
                 setContentView(R.layout.main_layout);
                 JRoutineLoaderObservable.with(Observable.just("Hello RxJava").map(getMappingFunction()))
-                                        .applyLoaderConfiguration()
+                                        .loaderConfiguration()
                                         .withInvocationId(R.id.hello_invocation)
-                                        .configured()
+                                        .apply()
                                         .observeOn(loaderFrom(this))
                                         .subscribe(getAction(this));
             }
@@ -131,9 +131,9 @@
                 super.onCreate(savedInstanceState);
                 setContentView(R.layout.main_layout);
                 JRoutineLoaderObservableCompat.with(Observable.just("Hello RxJava").map(getMappingFunction()))
-                                              .applyLoaderConfiguration()
+                                              .loaderConfiguration()
                                               .withInvocationId(R.id.hello_invocation)
-                                              .configured()
+                                              .apply()
                                               .observeOn(loaderFrom(this))
                                               .subscribe(getAction(this));
             }

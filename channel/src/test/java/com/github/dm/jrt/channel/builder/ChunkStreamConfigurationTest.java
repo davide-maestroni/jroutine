@@ -16,13 +16,13 @@
 
 package com.github.dm.jrt.channel.builder;
 
-import com.github.dm.jrt.channel.builder.ChunkStreamConfiguration.Builder;
-import com.github.dm.jrt.channel.builder.ChunkStreamConfiguration.CloseActionType;
+import com.github.dm.jrt.channel.config.ChunkStreamConfiguration.Builder;
+import com.github.dm.jrt.channel.config.ChunkStreamConfiguration.CloseActionType;
 
 import org.junit.Test;
 
-import static com.github.dm.jrt.channel.builder.ChunkStreamConfiguration.builder;
-import static com.github.dm.jrt.channel.builder.ChunkStreamConfiguration.builderFrom;
+import static com.github.dm.jrt.channel.config.ChunkStreamConfiguration.builder;
+import static com.github.dm.jrt.channel.config.ChunkStreamConfiguration.builderFrom;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -35,14 +35,14 @@ public class ChunkStreamConfigurationTest {
 
   @Test
   public void testBufferSizeEquals() {
-    final ChunkStreamConfiguration configuration = builder().withChunkSize(11)
-                                                            .withCorePoolSize(17)
-                                                            .withOnClose(
-                                                                CloseActionType.CLOSE_CHANNEL)
-                                                            .configured();
-    assertThat(configuration).isNotEqualTo(builder().withChunkSize(3).configured());
-    assertThat(configuration.builderFrom().withChunkSize(27).configured()).isNotEqualTo(
-        builder().withChunkSize(27).configured());
+    final com.github.dm.jrt.channel.config.ChunkStreamConfiguration configuration =
+        builder().withChunkSize(11)
+                 .withCorePoolSize(17)
+                 .withOnClose(CloseActionType.CLOSE_CHANNEL)
+                 .apply();
+    assertThat(configuration).isNotEqualTo(builder().withChunkSize(3).apply());
+    assertThat(configuration.builderFrom().withChunkSize(27).apply()).isNotEqualTo(
+        builder().withChunkSize(27).apply());
   }
 
   @Test
@@ -64,18 +64,18 @@ public class ChunkStreamConfigurationTest {
 
   @Test
   public void testBuildFrom() {
-    final ChunkStreamConfiguration configuration = builder().withChunkSize(11)
-                                                            .withCorePoolSize(17)
-                                                            .withOnClose(
-                                                                CloseActionType.CLOSE_CHANNEL)
-                                                            .configured();
-    assertThat(builderFrom(configuration).configured().hashCode()).isEqualTo(
-        configuration.hashCode());
-    assertThat(builderFrom(configuration).configured()).isEqualTo(configuration);
-    assertThat(builderFrom(null).configured().hashCode()).isEqualTo(
-        ChunkStreamConfiguration.defaultConfiguration().hashCode());
-    assertThat(builderFrom(null).configured()).isEqualTo(
-        ChunkStreamConfiguration.defaultConfiguration());
+    final com.github.dm.jrt.channel.config.ChunkStreamConfiguration configuration =
+        builder().withChunkSize(11)
+                 .withCorePoolSize(17)
+                 .withOnClose(CloseActionType.CLOSE_CHANNEL)
+                 .apply();
+    assertThat(builderFrom(configuration).apply().hashCode()).isEqualTo(configuration.hashCode());
+    assertThat(builderFrom(configuration).apply()).isEqualTo(configuration);
+    assertThat(builderFrom(null).apply().hashCode()).isEqualTo(
+        com.github.dm.jrt.channel.config.ChunkStreamConfiguration.defaultConfiguration()
+                                                                 .hashCode());
+    assertThat(builderFrom(null).apply()).isEqualTo(
+        com.github.dm.jrt.channel.config.ChunkStreamConfiguration.defaultConfiguration());
   }
 
   @Test
@@ -89,7 +89,8 @@ public class ChunkStreamConfigurationTest {
     }
 
     try {
-      new Builder<Object>(null, ChunkStreamConfiguration.defaultConfiguration());
+      new Builder<Object>(null,
+          com.github.dm.jrt.channel.config.ChunkStreamConfiguration.defaultConfiguration());
       fail();
 
     } catch (final NullPointerException ignored) {
@@ -98,42 +99,41 @@ public class ChunkStreamConfigurationTest {
 
   @Test
   public void testBuilderFromEquals() {
-    final ChunkStreamConfiguration configuration = builder().withChunkSize(11)
-                                                            .withCorePoolSize(17)
-                                                            .withOnClose(
-                                                                CloseActionType.CLOSE_CHANNEL)
-                                                            .configured();
-    assertThat(builder().with(configuration).configured()).isEqualTo(configuration);
-    assertThat(configuration.builderFrom().configured()).isEqualTo(configuration);
-    assertThat(configuration.builderFrom().with(null).configured()).isEqualTo(
-        ChunkStreamConfiguration.defaultConfiguration());
+    final com.github.dm.jrt.channel.config.ChunkStreamConfiguration configuration =
+        builder().withChunkSize(11)
+                 .withCorePoolSize(17)
+                 .withOnClose(CloseActionType.CLOSE_CHANNEL)
+                 .apply();
+    assertThat(builder().with(configuration).apply()).isEqualTo(configuration);
+    assertThat(configuration.builderFrom().apply()).isEqualTo(configuration);
+    assertThat(configuration.builderFrom().with(null).apply()).isEqualTo(
+        com.github.dm.jrt.channel.config.ChunkStreamConfiguration.defaultConfiguration());
   }
 
   @Test
   public void testCloseActionEquals() {
-    final ChunkStreamConfiguration configuration = builder().withChunkSize(11)
-                                                            .withCorePoolSize(17)
-                                                            .withOnClose(
-                                                                CloseActionType.CLOSE_CHANNEL)
-                                                            .configured();
+    final com.github.dm.jrt.channel.config.ChunkStreamConfiguration configuration =
+        builder().withChunkSize(11)
+                 .withCorePoolSize(17)
+                 .withOnClose(CloseActionType.CLOSE_CHANNEL)
+                 .apply();
     assertThat(configuration).isNotEqualTo(
-        builder().withOnClose(CloseActionType.FLUSH_STREAM).configured());
-    assertThat(configuration.builderFrom()
-                            .withOnClose(CloseActionType.FLUSH_STREAM)
-                            .configured()).isNotEqualTo(
-        builder().withOnClose(CloseActionType.FLUSH_STREAM).configured());
+        builder().withOnClose(CloseActionType.FLUSH_STREAM).apply());
+    assertThat(
+        configuration.builderFrom().withOnClose(CloseActionType.FLUSH_STREAM).apply()).isNotEqualTo(
+        builder().withOnClose(CloseActionType.FLUSH_STREAM).apply());
   }
 
   @Test
   public void testPoolSizeEquals() {
-    final ChunkStreamConfiguration configuration = builder().withChunkSize(11)
-                                                            .withCorePoolSize(17)
-                                                            .withOnClose(
-                                                                CloseActionType.CLOSE_CHANNEL)
-                                                            .configured();
-    assertThat(configuration).isNotEqualTo(builder().withCorePoolSize(0).configured());
-    assertThat(configuration.builderFrom().withCorePoolSize(0).configured()).isNotEqualTo(
-        builder().withCorePoolSize(0).configured());
+    final com.github.dm.jrt.channel.config.ChunkStreamConfiguration configuration =
+        builder().withChunkSize(11)
+                 .withCorePoolSize(17)
+                 .withOnClose(CloseActionType.CLOSE_CHANNEL)
+                 .apply();
+    assertThat(configuration).isNotEqualTo(builder().withCorePoolSize(0).apply());
+    assertThat(configuration.builderFrom().withCorePoolSize(0).apply()).isNotEqualTo(
+        builder().withCorePoolSize(0).apply());
   }
 
   @Test

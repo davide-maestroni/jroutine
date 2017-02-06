@@ -161,18 +161,6 @@ public class LoaderAdapterFactoryCompat extends ContextAdapterFactory {
       return this;
     }
 
-    @NotNull
-    @Override
-    public InvocationConfiguration.Builder<? extends Builder> applyInvocationConfiguration() {
-      return new InvocationConfiguration.Builder<Builder>(this, mInvocationConfiguration);
-    }
-
-    @NotNull
-    @Override
-    public LoaderConfiguration.Builder<? extends Builder> applyLoaderConfiguration() {
-      return new LoaderConfiguration.Builder<Builder>(this, mLoaderConfiguration);
-    }
-
     /**
      * Builds and return a new factory instance.
      *
@@ -194,6 +182,18 @@ public class LoaderAdapterFactoryCompat extends ContextAdapterFactory {
     public Builder delegateFactory(@Nullable final CallAdapter.Factory factory) {
       mDelegateFactory = factory;
       return this;
+    }
+
+    @NotNull
+    @Override
+    public InvocationConfiguration.Builder<? extends Builder> invocationConfiguration() {
+      return new InvocationConfiguration.Builder<Builder>(this, mInvocationConfiguration);
+    }
+
+    @NotNull
+    @Override
+    public LoaderConfiguration.Builder<? extends Builder> loaderConfiguration() {
+      return new LoaderConfiguration.Builder<Builder>(this, mLoaderConfiguration);
     }
   }
 }

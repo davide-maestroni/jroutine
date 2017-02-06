@@ -43,7 +43,7 @@ public abstract class AbstractChannelArrayBuilder<IN, OUT> implements ChannelArr
 
   @NotNull
   @Override
-  public Builder<? extends ChannelArrayBuilder<IN, OUT>> applyChannelConfiguration() {
+  public Builder<? extends ChannelArrayBuilder<IN, OUT>> channelConfiguration() {
     return new Builder<ChannelArrayBuilder<IN, OUT>>(this, mConfiguration);
   }
 

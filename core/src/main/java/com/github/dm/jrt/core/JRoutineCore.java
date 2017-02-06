@@ -44,9 +44,9 @@ import java.util.Collections;
  * <pre><code>
  * final Routine&lt;Input, Result&gt; routine =
  *     JRoutineCore.with(myFactory)
- *                 .applyInvocationConfiguration()
+ *                 .invocationConfiguration()
  *                 .withLogLevel(Level.WARNING)
- *                 .configured()
+ *                 .apply()
  *                 .buildRoutine();
  * </code></pre>
  * <p>

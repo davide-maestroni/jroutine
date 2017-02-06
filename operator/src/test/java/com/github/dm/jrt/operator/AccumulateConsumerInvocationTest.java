@@ -56,9 +56,9 @@ public class AccumulateConsumerInvocationTest {
 
     final BiConsumer<List<String>, List<String>> consumer = createConsumer();
     assertThat(JRoutineCore.with(consumerFactory(consumer))
-                           .applyInvocationConfiguration()
+                           .invocationConfiguration()
                            .withRunner(Runners.syncRunner())
-                           .configured()
+                           .apply()
                            .call(new ArrayList<String>() {{
                              add("test1");
                            }}, new ArrayList<String>() {{
@@ -76,9 +76,9 @@ public class AccumulateConsumerInvocationTest {
         }};
       }
     }, consumer))
-                           .applyInvocationConfiguration()
+                           .invocationConfiguration()
                            .withRunner(Runners.syncRunner())
-                           .configured()
+                           .apply()
                            .call(new ArrayList<String>() {{
                              add("test1");
                            }}, new ArrayList<String>() {{

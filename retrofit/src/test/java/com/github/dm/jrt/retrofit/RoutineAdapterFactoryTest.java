@@ -63,9 +63,9 @@ public class RoutineAdapterFactoryTest {
       {
         final RoutineAdapterFactory adapterFactory = //
             RoutineAdapterFactory.builder()
-                                 .applyInvocationConfiguration()
+                                 .invocationConfiguration()
                                  .withOutputTimeout(seconds(3))
-                                 .configured()
+                                 .apply()
                                  .buildFactory();
         final GsonConverterFactory converterFactory = GsonConverterFactory.create();
         final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + server.getPort())
@@ -91,9 +91,9 @@ public class RoutineAdapterFactoryTest {
         final RoutineAdapterFactory adapterFactory = //
             RoutineAdapterFactory.builder()
                                  .delegateFactory(factory)
-                                 .applyInvocationConfiguration()
+                                 .invocationConfiguration()
                                  .withOutputTimeout(seconds(3))
-                                 .configured()
+                                 .apply()
                                  .buildFactory();
         final GsonConverterFactory converterFactory = GsonConverterFactory.create();
         final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + server.getPort())
@@ -119,9 +119,9 @@ public class RoutineAdapterFactoryTest {
         final RoutineAdapterFactory adapterFactory = //
             RoutineAdapterFactory.builder()
                                  .delegateFactory(factory)
-                                 .applyInvocationConfiguration()
+                                 .invocationConfiguration()
                                  .withOutputTimeout(seconds(3))
-                                 .configured()
+                                 .apply()
                                  .buildFactory();
         final GsonConverterFactory converterFactory = GsonConverterFactory.create();
         final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + server.getPort())

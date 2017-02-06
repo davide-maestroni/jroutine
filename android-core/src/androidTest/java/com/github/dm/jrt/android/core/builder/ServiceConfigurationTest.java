@@ -44,11 +44,10 @@ public class ServiceConfigurationTest extends AndroidTestCase {
     final ServiceConfiguration configuration = builder().withMessageLooper(Looper.getMainLooper())
                                                         .withRunnerClass(MainRunner.class)
                                                         .withLogClass(AndroidLog.class)
-                                                        .configured();
+                                                        .apply();
 
-    assertThat(builderFrom(configuration).configured()).isEqualTo(configuration);
-    assertThat(builderFrom(null).configured()).isEqualTo(
-        ServiceConfiguration.defaultConfiguration());
+    assertThat(builderFrom(configuration).apply()).isEqualTo(configuration);
+    assertThat(builderFrom(null).apply()).isEqualTo(ServiceConfiguration.defaultConfiguration());
   }
 
   @SuppressWarnings("ConstantConditions")
@@ -82,10 +81,10 @@ public class ServiceConfigurationTest extends AndroidTestCase {
                                                         .withRunnerArgs(1)
                                                         .withLogClass(AndroidLog.class)
                                                         .withLogArgs("test")
-                                                        .configured();
-    assertThat(builder().with(configuration).configured()).isEqualTo(configuration);
-    assertThat(configuration.builderFrom().configured()).isEqualTo(configuration);
-    assertThat(configuration.builderFrom().with(null).configured()).isEqualTo(
+                                                        .apply();
+    assertThat(builder().with(configuration).apply()).isEqualTo(configuration);
+    assertThat(configuration.builderFrom().apply()).isEqualTo(configuration);
+    assertThat(configuration.builderFrom().with(null).apply()).isEqualTo(
         ServiceConfiguration.defaultConfiguration());
   }
 
@@ -94,10 +93,9 @@ public class ServiceConfigurationTest extends AndroidTestCase {
     final ServiceConfiguration configuration = builder().withMessageLooper(Looper.getMainLooper())
                                                         .withRunnerClass(MainRunner.class)
                                                         .withLogArgs(1)
-                                                        .configured();
-    assertThat(configuration).isNotEqualTo(builder().withLogArgs(1).configured());
-    assertThat(builder().withLogArgs(1).configured()).isNotEqualTo(
-        builder().withLogArgs().configured());
+                                                        .apply();
+    assertThat(configuration).isNotEqualTo(builder().withLogArgs(1).apply());
+    assertThat(builder().withLogArgs(1).apply()).isNotEqualTo(builder().withLogArgs().apply());
   }
 
   public void testLogClassEquals() {
@@ -105,10 +103,10 @@ public class ServiceConfigurationTest extends AndroidTestCase {
     final ServiceConfiguration configuration = builder().withMessageLooper(Looper.getMainLooper())
                                                         .withRunnerClass(MainRunner.class)
                                                         .withLogClass(AndroidLog.class)
-                                                        .configured();
-    assertThat(configuration).isNotEqualTo(builder().withLogClass(SystemLog.class).configured());
-    assertThat(builder().withLogClass(SystemLog.class).configured()).isNotEqualTo(
-        builder().withLogClass(NullLog.class).configured());
+                                                        .apply();
+    assertThat(configuration).isNotEqualTo(builder().withLogClass(SystemLog.class).apply());
+    assertThat(builder().withLogClass(SystemLog.class).apply()).isNotEqualTo(
+        builder().withLogClass(NullLog.class).apply());
   }
 
   public void testLooperEquals() {
@@ -116,11 +114,10 @@ public class ServiceConfigurationTest extends AndroidTestCase {
     final ServiceConfiguration configuration = builder().withMessageLooper(Looper.getMainLooper())
                                                         .withRunnerClass(MainRunner.class)
                                                         .withLogClass(AndroidLog.class)
-                                                        .configured();
-    assertThat(configuration).isNotEqualTo(
-        builder().withMessageLooper(Looper.myLooper()).configured());
-    assertThat(builder().withMessageLooper(Looper.myLooper()).configured()).isNotEqualTo(
-        builder().withMessageLooper(Looper.getMainLooper()).configured());
+                                                        .apply();
+    assertThat(configuration).isNotEqualTo(builder().withMessageLooper(Looper.myLooper()).apply());
+    assertThat(builder().withMessageLooper(Looper.myLooper()).apply()).isNotEqualTo(
+        builder().withMessageLooper(Looper.getMainLooper()).apply());
   }
 
   public void testRunnerArgsEquals() {
@@ -128,10 +125,10 @@ public class ServiceConfigurationTest extends AndroidTestCase {
     final ServiceConfiguration configuration = builder().withMessageLooper(Looper.getMainLooper())
                                                         .withRunnerArgs("test")
                                                         .withLogClass(AndroidLog.class)
-                                                        .configured();
-    assertThat(configuration).isNotEqualTo(builder().withRunnerArgs("test").configured());
-    assertThat(builder().withRunnerArgs("test").configured()).isNotEqualTo(
-        builder().withRunnerArgs().configured());
+                                                        .apply();
+    assertThat(configuration).isNotEqualTo(builder().withRunnerArgs("test").apply());
+    assertThat(builder().withRunnerArgs("test").apply()).isNotEqualTo(
+        builder().withRunnerArgs().apply());
   }
 
   public void testRunnerClassEquals() {
@@ -139,11 +136,10 @@ public class ServiceConfigurationTest extends AndroidTestCase {
     final ServiceConfiguration configuration = builder().withMessageLooper(Looper.getMainLooper())
                                                         .withRunnerClass(MainRunner.class)
                                                         .withLogClass(AndroidLog.class)
-                                                        .configured();
-    assertThat(configuration).isNotEqualTo(
-        builder().withRunnerClass(TestRunner.class).configured());
-    assertThat(builder().withRunnerClass(TestRunner.class).configured()).isNotEqualTo(
-        builder().withRunnerClass(MainRunner.class).configured());
+                                                        .apply();
+    assertThat(configuration).isNotEqualTo(builder().withRunnerClass(TestRunner.class).apply());
+    assertThat(builder().withRunnerClass(TestRunner.class).apply()).isNotEqualTo(
+        builder().withRunnerClass(MainRunner.class).apply());
   }
 
   public static class TestRunner extends RunnerDecorator {

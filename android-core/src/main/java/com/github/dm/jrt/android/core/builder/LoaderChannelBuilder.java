@@ -48,15 +48,6 @@ public interface LoaderChannelBuilder
   LoaderChannelBuilder apply(@NotNull LoaderConfiguration configuration);
 
   /**
-   * {@inheritDoc}
-   * <p>
-   * The clash resolution types will be ignored.
-   */
-  @NotNull
-  @Override
-  Builder<? extends LoaderChannelBuilder> applyLoaderConfiguration();
-
-  /**
    * Builds and returns a channel bound to the routine invocation.
    *
    * @param <OUT> the output data type.
@@ -91,4 +82,13 @@ public interface LoaderChannelBuilder
    * @param input the input.
    */
   void clear(@Nullable Object input);
+
+  /**
+   * {@inheritDoc}
+   * <p>
+   * The clash resolution types will be ignored.
+   */
+  @NotNull
+  @Override
+  Builder<? extends LoaderChannelBuilder> loaderConfiguration();
 }

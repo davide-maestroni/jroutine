@@ -43,7 +43,7 @@ public abstract class AbstractChannelMapBuilder<KEY, IN, OUT>
   }
 
   @NotNull
-  public Builder<? extends ChannelMapBuilder<KEY, IN, OUT>> applyChannelConfiguration() {
+  public Builder<? extends ChannelMapBuilder<KEY, IN, OUT>> channelConfiguration() {
     return new Builder<ChannelMapBuilder<KEY, IN, OUT>>(this, mConfiguration);
   }
 

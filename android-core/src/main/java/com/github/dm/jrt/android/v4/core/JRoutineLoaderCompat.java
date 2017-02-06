@@ -202,9 +202,9 @@ public class JRoutineLoaderCompat {
      */
     @NotNull
     public LoaderChannelBuilder withId(final int loaderId) {
-      return new DefaultLoaderChannelBuilder(mContext).applyLoaderConfiguration()
+      return new DefaultLoaderChannelBuilder(mContext).loaderConfiguration()
                                                       .withLoaderId(loaderId)
-                                                      .configured();
+                                                      .apply();
     }
   }
 }

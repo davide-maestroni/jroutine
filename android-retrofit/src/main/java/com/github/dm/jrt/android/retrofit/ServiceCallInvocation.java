@@ -22,7 +22,7 @@ import com.github.dm.jrt.android.channel.io.ParcelableByteChannel;
 import com.github.dm.jrt.android.channel.io.ParcelableByteChannel.ParcelableByteChunk;
 import com.github.dm.jrt.android.core.invocation.AbstractContextInvocation;
 import com.github.dm.jrt.android.reflect.ContextInvocationTarget;
-import com.github.dm.jrt.channel.builder.ChunkStreamConfiguration.CloseActionType;
+import com.github.dm.jrt.channel.config.ChunkStreamConfiguration.CloseActionType;
 import com.github.dm.jrt.channel.io.ByteChannel.ChunkOutputStream;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
@@ -189,10 +189,10 @@ public class ServiceCallInvocation
         AndroidChannels.parcelableFlowInput(result, ConverterChannelConsumer.BYTES_ID)
                        .buildChannel();
     final ChunkOutputStream outputStream = ParcelableByteChannel.withOutput(channel)
-                                                                .applyChunkStreamConfiguration()
+                                                                .chunkStreamConfiguration()
                                                                 .withOnClose(
                                                                     CloseActionType.CLOSE_CHANNEL)
-                                                                .configured()
+                                                                .apply()
                                                                 .buildOutputStream();
     try {
       outputStream.transferFrom(responseBody.byteStream());

@@ -30,7 +30,7 @@ import java.util.Set;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
- * Class storing the reflection routine configuration.
+ * Class storing the method call configuration.
  * <p>
  * Each instance is immutable, thus, in order to modify an existing configuration, a new builder
  * must be created from it.
@@ -44,12 +44,11 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * <p>
  * Created by davide-maestroni on 04/20/2015.
  */
-public final class ReflectionConfiguration extends DeepEqualObject {
+public final class CallConfiguration extends DeepEqualObject {
 
   private static final DefaultConfigurable sDefaultConfigurable = new DefaultConfigurable();
 
-  private static final ReflectionConfiguration sDefaultConfiguration =
-      builder().buildConfiguration();
+  private static final CallConfiguration sDefaultConfiguration = builder().buildConfiguration();
 
   private final Set<String> mFieldNames;
 
@@ -58,32 +57,32 @@ public final class ReflectionConfiguration extends DeepEqualObject {
    *
    * @param fieldNames the shared field names.
    */
-  private ReflectionConfiguration(@Nullable final Set<String> fieldNames) {
+  private CallConfiguration(@Nullable final Set<String> fieldNames) {
     super(asArgs(fieldNames));
     mFieldNames = (fieldNames != null) ? Collections.unmodifiableSet(fieldNames) : null;
   }
 
   /**
-   * Returns a reflection configuration builder.
+   * Returns a call configuration builder.
    *
    * @return the builder.
    */
   @NotNull
-  public static Builder<ReflectionConfiguration> builder() {
-    return new Builder<ReflectionConfiguration>(sDefaultConfigurable);
+  public static Builder<CallConfiguration> builder() {
+    return new Builder<CallConfiguration>(sDefaultConfigurable);
   }
 
   /**
-   * Returns a reflection configuration builder initialized with the specified configuration.
+   * Returns a call configuration builder initialized with the specified configuration.
    *
-   * @param initialConfiguration the initial reflection configuration.
+   * @param initialConfiguration the initial call configuration.
    * @return the builder.
    */
   @NotNull
-  public static Builder<ReflectionConfiguration> builderFrom(
-      @Nullable final ReflectionConfiguration initialConfiguration) {
+  public static Builder<CallConfiguration> builderFrom(
+      @Nullable final CallConfiguration initialConfiguration) {
     return (initialConfiguration == null) ? builder()
-        : new Builder<ReflectionConfiguration>(sDefaultConfigurable, initialConfiguration);
+        : new Builder<CallConfiguration>(sDefaultConfigurable, initialConfiguration);
   }
 
   /**
@@ -92,17 +91,17 @@ public final class ReflectionConfiguration extends DeepEqualObject {
    * @return the configuration instance.
    */
   @NotNull
-  public static ReflectionConfiguration defaultConfiguration() {
+  public static CallConfiguration defaultConfiguration() {
     return sDefaultConfiguration;
   }
 
   /**
-   * Returns a reflection configuration builder initialized with this configuration.
+   * Returns a call configuration builder initialized with this configuration.
    *
    * @return the builder.
    */
   @NotNull
-  public Builder<ReflectionConfiguration> builderFrom() {
+  public Builder<CallConfiguration> builderFrom() {
     return builderFrom(this);
   }
 
@@ -131,7 +130,7 @@ public final class ReflectionConfiguration extends DeepEqualObject {
      * @return the configurable instance.
      */
     @NotNull
-    TYPE apply(@NotNull ReflectionConfiguration configuration);
+    TYPE apply(@NotNull CallConfiguration configuration);
   }
 
   /**
@@ -158,10 +157,10 @@ public final class ReflectionConfiguration extends DeepEqualObject {
      * Constructor.
      *
      * @param configurable         the configurable instance.
-     * @param initialConfiguration the initial reflection configuration.
+     * @param initialConfiguration the initial call configuration.
      */
     public Builder(@NotNull final Configurable<? extends TYPE> configurable,
-        @NotNull final ReflectionConfiguration initialConfiguration) {
+        @NotNull final CallConfiguration initialConfiguration) {
       mConfigurable = ConstantConditions.notNull("configurable instance", configurable);
       setConfiguration(initialConfiguration);
     }
@@ -179,7 +178,7 @@ public final class ReflectionConfiguration extends DeepEqualObject {
      * @return the configured object.
      */
     @NotNull
-    public TYPE configured() {
+    public TYPE apply() {
       return mConfigurable.apply(buildConfiguration());
     }
 
@@ -188,11 +187,11 @@ public final class ReflectionConfiguration extends DeepEqualObject {
      * configuration options will be reset to their default, otherwise only the non-default
      * options will be applied.
      *
-     * @param configuration the reflection configuration.
+     * @param configuration the call configuration.
      * @return this builder.
      */
     @NotNull
-    public Builder<TYPE> with(@Nullable final ReflectionConfiguration configuration) {
+    public Builder<TYPE> with(@Nullable final CallConfiguration configuration) {
       if (configuration == null) {
         setConfiguration(defaultConfiguration());
         return this;
@@ -242,11 +241,11 @@ public final class ReflectionConfiguration extends DeepEqualObject {
     }
 
     @NotNull
-    private ReflectionConfiguration buildConfiguration() {
-      return new ReflectionConfiguration(mFieldNames);
+    private CallConfiguration buildConfiguration() {
+      return new CallConfiguration(mFieldNames);
     }
 
-    private void setConfiguration(@NotNull final ReflectionConfiguration configuration) {
+    private void setConfiguration(@NotNull final CallConfiguration configuration) {
       mFieldNames = configuration.mFieldNames;
     }
   }
@@ -254,10 +253,10 @@ public final class ReflectionConfiguration extends DeepEqualObject {
   /**
    * Default configurable implementation.
    */
-  private static class DefaultConfigurable implements Configurable<ReflectionConfiguration> {
+  private static class DefaultConfigurable implements Configurable<CallConfiguration> {
 
     @NotNull
-    public ReflectionConfiguration apply(@NotNull final ReflectionConfiguration configuration) {
+    public CallConfiguration apply(@NotNull final CallConfiguration configuration) {
       return configuration;
     }
   }

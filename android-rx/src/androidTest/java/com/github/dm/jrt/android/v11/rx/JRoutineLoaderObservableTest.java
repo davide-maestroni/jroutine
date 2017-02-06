@@ -67,12 +67,12 @@ public class JRoutineLoaderObservableTest extends ActivityInstrumentationTestCas
             return s.toUpperCase();
           }
         }))
-                            .applyInvocationConfiguration()
+                            .invocationConfiguration()
                             .withLog(AndroidLogs.androidLog())
-                            .configured()
-                            .applyLoaderConfiguration()
+                            .apply()
+                            .loaderConfiguration()
                             .withResultStaleTime(seconds(10))
-                            .configured()
+                            .apply()
                             .observeOn(loaderFrom(getActivity()))
                             .subscribe(new Action1<String>() {
 
@@ -98,12 +98,12 @@ public class JRoutineLoaderObservableTest extends ActivityInstrumentationTestCas
     final List<String> expected = Arrays.asList("TEST1", "TEST2", "TEST3");
     final AtomicBoolean isSuccess = new AtomicBoolean(true);
     JRoutineLoaderObservable.with(Observable.just("test1", "test2", "test3"))
-                            .applyInvocationConfiguration()
+                            .invocationConfiguration()
                             .withLog(AndroidLogs.androidLog())
-                            .configured()
-                            .applyLoaderConfiguration()
+                            .apply()
+                            .loaderConfiguration()
                             .withResultStaleTime(seconds(10))
-                            .configured()
+                            .apply()
                             .subscribeOn(loaderFrom(getActivity()))
                             .map(new Func1<String, String>() {
 

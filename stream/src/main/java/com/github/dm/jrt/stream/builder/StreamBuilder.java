@@ -55,12 +55,6 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
   StreamBuilder<IN, OUT> apply(@NotNull InvocationConfiguration configuration);
 
   /**
-   * {@inheritDoc}
-   */
-  @NotNull
-  Builder<? extends StreamBuilder<IN, OUT>> applyInvocationConfiguration();
-
-  /**
    * Sets the specified configuration as the stream one.
    *
    * @param configuration the configuration.
@@ -68,20 +62,6 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
    */
   @NotNull
   StreamBuilder<IN, OUT> applyStream(@NotNull InvocationConfiguration configuration);
-
-  /**
-   * Gets the invocation configuration builder related to the whole stream.
-   * <br>
-   * The configuration options will be applied to all the next concatenated routine unless
-   * overwritten by specific ones.
-   * <p>
-   * Note that the configuration builder will be initialized with the current stream
-   * configuration.
-   *
-   * @return the invocation configuration builder.
-   */
-  @NotNull
-  Builder<? extends StreamBuilder<IN, OUT>> applyStreamInvocationConfiguration();
 
   /**
    * Modifies the stream configuration, so that the concatenated routines will be invoked in
@@ -222,6 +202,12 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
   StreamBuilder<IN, OUT> immediateParallel();
 
   /**
+   * {@inheritDoc}
+   */
+  @NotNull
+  Builder<? extends StreamBuilder<IN, OUT>> invocationConfiguration();
+
+  /**
    * Transforms the stream by modifying the chain building function.
    * <br>
    * The current configuration of the stream will be passed as the first parameter.
@@ -340,7 +326,7 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
       @NotNull BiConsumer<? super List<OUT>, ? super Channel<AFTER, ?>> mappingConsumer);
 
   /**
-   * Short for {@code async().applyStreamInvocationConfiguration().withRunner(runner).configured()
+   * Short for {@code async().streamInvocationConfiguration().withRunner(runner).apply()
    * .map(IdentityInvocation.&lt;OUT&gt;factoryOf())}.
    * <br>
    * This method is useful to easily make the stream run on the specified runner.
@@ -364,6 +350,20 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
    */
   @NotNull
   StreamBuilder<IN, OUT> sorted();
+
+  /**
+   * Gets the invocation configuration builder related to the whole stream.
+   * <br>
+   * The configuration options will be applied to all the next concatenated routine unless
+   * overwritten by specific ones.
+   * <p>
+   * Note that the configuration builder will be initialized with the current stream
+   * configuration.
+   *
+   * @return the invocation configuration builder.
+   */
+  @NotNull
+  Builder<? extends StreamBuilder<IN, OUT>> streamInvocationConfiguration();
 
   /**
    * Modifies the stream configuration, so that the concatenated routines will be invoked in

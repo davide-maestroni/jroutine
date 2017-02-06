@@ -56,7 +56,7 @@ import java.lang.annotation.Target;
  * <p>
  * Created by davide-maestroni on 01/26/2015.
  *
- * @see com.github.dm.jrt.reflect.config.ReflectionConfiguration ReflectionConfiguration
+ * @see com.github.dm.jrt.reflect.config.CallConfiguration CallConfiguration
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

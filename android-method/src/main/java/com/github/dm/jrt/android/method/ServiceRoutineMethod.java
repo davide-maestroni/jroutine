@@ -41,8 +41,8 @@ import com.github.dm.jrt.core.util.Reflection;
 import com.github.dm.jrt.method.RoutineMethod;
 import com.github.dm.jrt.method.annotation.Input;
 import com.github.dm.jrt.method.annotation.Output;
-import com.github.dm.jrt.reflect.config.ReflectionConfigurable;
-import com.github.dm.jrt.reflect.config.ReflectionConfiguration;
+import com.github.dm.jrt.reflect.config.CallConfigurable;
+import com.github.dm.jrt.reflect.config.CallConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -225,15 +225,6 @@ public class ServiceRoutineMethod extends RoutineMethod
     return (ServiceRoutineMethod) super.apply(configuration);
   }
 
-  @NotNull
-  @Override
-  @SuppressWarnings("unchecked")
-  public InvocationConfiguration.Builder<? extends ServiceRoutineMethod>
-  applyInvocationConfiguration() {
-    return (InvocationConfiguration.Builder<? extends ServiceRoutineMethod>) super
-        .applyInvocationConfiguration();
-  }
-
   /**
    * Calls the routine.
    * <br>
@@ -276,6 +267,14 @@ public class ServiceRoutineMethod extends RoutineMethod
         safeParams);
   }
 
+  @NotNull
+  @Override
+  @SuppressWarnings("unchecked")
+  public InvocationConfiguration.Builder<? extends ServiceRoutineMethod> invocationConfiguration() {
+    return (InvocationConfiguration.Builder<? extends ServiceRoutineMethod>) super
+        .invocationConfiguration();
+  }
+
   /**
    * Tells the routine to ignore the method return value, that is, it will not be passed to the
    * output channel.
@@ -314,7 +313,7 @@ public class ServiceRoutineMethod extends RoutineMethod
 
   @NotNull
   @Override
-  public Builder<? extends ServiceRoutineMethod> applyServiceConfiguration() {
+  public Builder<? extends ServiceRoutineMethod> serviceConfiguration() {
     return new Builder<ServiceRoutineMethod>(this, mConfiguration);
   }
 
@@ -404,7 +403,7 @@ public class ServiceRoutineMethod extends RoutineMethod
    * Implementation of a Service routine method wrapping an object method.
    */
   public static class ReflectionServiceRoutineMethod extends ServiceRoutineMethod
-      implements ReflectionConfigurable<ReflectionServiceRoutineMethod> {
+      implements CallConfigurable<ReflectionServiceRoutineMethod> {
 
     private final ServiceContext mContext;
 
@@ -412,7 +411,7 @@ public class ServiceRoutineMethod extends RoutineMethod
 
     private final ContextInvocationTarget<?> mTarget;
 
-    private ReflectionConfiguration mConfiguration = ReflectionConfiguration.defaultConfiguration();
+    private CallConfiguration mConfiguration = CallConfiguration.defaultConfiguration();
 
     /**
      * Constructor.
@@ -440,9 +439,9 @@ public class ServiceRoutineMethod extends RoutineMethod
     @Override
     @SuppressWarnings("unchecked")
     public InvocationConfiguration.Builder<? extends ReflectionServiceRoutineMethod>
-    applyInvocationConfiguration() {
+    invocationConfiguration() {
       return (InvocationConfiguration.Builder<? extends ReflectionServiceRoutineMethod>) super
-          .applyInvocationConfiguration();
+          .invocationConfiguration();
     }
 
     @NotNull
@@ -466,24 +465,21 @@ public class ServiceRoutineMethod extends RoutineMethod
     @NotNull
     @Override
     @SuppressWarnings("unchecked")
-    public Builder<? extends ReflectionServiceRoutineMethod> applyServiceConfiguration() {
-      return (Builder<? extends ReflectionServiceRoutineMethod>) super.applyServiceConfiguration();
+    public Builder<? extends ReflectionServiceRoutineMethod> serviceConfiguration() {
+      return (Builder<? extends ReflectionServiceRoutineMethod>) super.serviceConfiguration();
     }
 
     @NotNull
     @Override
-    public ReflectionServiceRoutineMethod apply(
-        @NotNull final ReflectionConfiguration configuration) {
-      mConfiguration = ConstantConditions.notNull("reflection configuration", configuration);
+    public ReflectionServiceRoutineMethod apply(@NotNull final CallConfiguration configuration) {
+      mConfiguration = ConstantConditions.notNull("call configuration", configuration);
       return this;
     }
 
     @NotNull
     @Override
-    public ReflectionConfiguration.Builder<? extends ReflectionServiceRoutineMethod>
-    applyReflectionConfiguration() {
-      return new ReflectionConfiguration.Builder<ReflectionServiceRoutineMethod>(this,
-          mConfiguration);
+    public CallConfiguration.Builder<? extends ReflectionServiceRoutineMethod> callConfiguration() {
+      return new CallConfiguration.Builder<ReflectionServiceRoutineMethod>(this, mConfiguration);
     }
 
     @NotNull

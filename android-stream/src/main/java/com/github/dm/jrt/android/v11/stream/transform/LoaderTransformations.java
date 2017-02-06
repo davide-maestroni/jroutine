@@ -61,9 +61,9 @@ public class LoaderTransformations {
    * JRoutineStream.withStreamOf(data)
    *               .map(getMappingFunction())
    *               .lift(LoaderTransformations.runOn(loaderFrom(activity))
-   *                                          .applyLoaderConfiguration()
+   *                                          .loaderConfiguration()
    *                                          .withInvocationId(INVOCATION_ID)
-   *                                          .configured()
+   *                                          .apply()
    *                                          .buildFunction())
    *               .close()
    *               .bind(getConsumer());

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.channel.builder;
+package com.github.dm.jrt.channel.config;
 
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DeepEqualObject;
@@ -242,7 +242,7 @@ public class ChunkStreamConfiguration extends DeepEqualObject {
      * @return the configured object.
      */
     @NotNull
-    public TYPE configured() {
+    public TYPE apply() {
       return mConfigurable.apply(buildConfiguration());
     }
 

@@ -23,19 +23,19 @@
   private com.github.dm.jrt.core.routine.Routine<?, ${resultClassName}> initRoutine${methodCount}(
       @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.reflect.ContextInvocationTarget<?> target,
       @org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.config.InvocationConfiguration invocationConfiguration,
-      @org.jetbrains.annotations.NotNull final com.github.dm.jrt.reflect.config.ReflectionConfiguration reflectionConfiguration,
+      @org.jetbrains.annotations.NotNull final com.github.dm.jrt.reflect.config.CallConfiguration callConfiguration,
       @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.config.ServiceConfiguration serviceConfiguration) {
     final java.util.Set<String> sharedFields = ${sharedFields};
     final com.github.dm.jrt.android.core.invocation.TargetInvocationFactory<Object, ${resultClassName}> targetFactory = com.github.dm.jrt.android.core.invocation.TargetInvocationFactory.factoryOf(
         // We need to work around Proguard stripping away generics information, so the use of a ClassToken is not an option
         (Class<? extends com.github.dm.jrt.android.core.invocation.ContextInvocation<Object, ${resultClassName}>>) new ContextInvocation${methodCount}${genericTypes}(sharedFields, target).getClass(), sharedFields, target);
-    return getBuilder(mContext, targetFactory).applyInvocationConfiguration()
+    return getBuilder(mContext, targetFactory).invocationConfiguration()
                                               .with(invocationConfiguration)
                                               ${routineBuilderOptions}
-                                              .configured()
-                                              .applyServiceConfiguration()
+                                              .apply()
+                                              .serviceConfiguration()
                                               .with(serviceConfiguration)
                                               ${serviceBuilderOptions}
-                                              .configured()
+                                              .apply()
                                               .buildRoutine();
   }

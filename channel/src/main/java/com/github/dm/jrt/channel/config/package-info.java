@@ -14,26 +14,9 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.channel.io;
-
-import com.github.dm.jrt.channel.config.ChunkStreamConfigurable;
-import com.github.dm.jrt.channel.io.ByteChannel.ChunkOutputStream;
-
-import org.jetbrains.annotations.NotNull;
-
 /**
- * Interface defining a builder of chunk output streams.
+ * Classes storing channel related configurations.
  * <p>
- * Created by davide-maestroni on 01/01/2017.
+ * Created by davide-maestroni on 02/06/2017.
  */
-public interface ChunkOutputStreamBuilder
-    extends ChunkStreamConfigurable<ChunkOutputStreamBuilder> {
-
-  /**
-   * Builds a new output stream instance.
-   *
-   * @return the output stream instance.
-   */
-  @NotNull
-  ChunkOutputStream buildOutputStream();
-}
+package com.github.dm.jrt.channel.config;

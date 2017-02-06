@@ -66,9 +66,9 @@ public class LoaderTransformationsTest extends ActivityInstrumentationTestCase2<
                              })
                              .map(Operators.<Integer, Integer>sum(Integer.class))
                              .lift(LoaderTransformations.<String, Integer>runOn(
-                                 loaderFrom(getActivity())).applyLoaderConfiguration()
+                                 loaderFrom(getActivity())).loaderConfiguration()
                                                            .withInvocationId(12)
-                                                           .configured()
+                                                           .apply()
                                                            .buildFunction())
                              .close()
                              .in(seconds(10))

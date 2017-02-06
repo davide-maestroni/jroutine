@@ -80,11 +80,11 @@ public class TransformationsTest {
   public void testBackoff() {
     Assertions.assertThat(JRoutineStream //
         .<Integer>withStream().map(appendAccept(range(1, 1000)))
-                              .applyInvocationConfiguration()
+                              .invocationConfiguration()
                               .withRunner(getSingleThreadRunner())
                               .withInputBackoff(
                                   BackoffBuilder.afterCount(2).linearDelay(seconds(10)))
-                              .configured()
+                              .apply()
                               .map(Functions.<Number>identity())
                               .map(new Function<Number, Double>() {
 
@@ -118,11 +118,11 @@ public class TransformationsTest {
                               .next()).isCloseTo(21, Offset.offset(0.1));
     Assertions.assertThat(JRoutineStream //
         .<Integer>withStream().map(appendAccept(range(1, 1000)))
-                              .applyInvocationConfiguration()
+                              .invocationConfiguration()
                               .withRunner(getSingleThreadRunner())
                               .withInputBackoff(
                                   BackoffBuilder.afterCount(2).constantDelay(seconds(10)))
-                              .configured()
+                              .apply()
                               .map(Functions.<Number>identity())
                               .map(new Function<Number, Double>() {
 
@@ -471,9 +471,9 @@ public class TransformationsTest {
   public void testThrottle() throws InterruptedException {
     final Routine<Object, Object> routine = JRoutineStream.withStream()
                                                           .lift(throttle(1))
-                                                          .applyInvocationConfiguration()
+                                                          .invocationConfiguration()
                                                           .withRunner(Runners.poolRunner(1))
-                                                          .configured()
+                                                          .apply()
                                                           .buildRoutine();
     final Channel<Object, Object> channel1 = routine.call().pass("test1");
     final Channel<Object, Object> channel2 = routine.call().pass("test2");
@@ -486,9 +486,9 @@ public class TransformationsTest {
   public void testThrottleAbort() throws InterruptedException {
     final Routine<Object, Object> routine = JRoutineStream.withStream()
                                                           .lift(throttle(1))
-                                                          .applyInvocationConfiguration()
+                                                          .invocationConfiguration()
                                                           .withRunner(Runners.poolRunner(1))
-                                                          .configured()
+                                                          .apply()
                                                           .buildRoutine();
     final Channel<Object, Object> channel1 = routine.call().pass("test1");
     final Channel<Object, Object> channel2 = routine.call().pass("test2");

@@ -62,9 +62,9 @@ public class LoaderTransformationsCompatTest
                              })
                              .map(Operators.<Integer, Integer>sum(Integer.class))
                              .lift(LoaderTransformationsCompat.<String, Integer>runOn(
-                                 loaderFrom(getActivity())).applyLoaderConfiguration()
+                                 loaderFrom(getActivity())).loaderConfiguration()
                                                            .withInvocationId(12)
-                                                           .configured()
+                                                           .apply()
                                                            .buildFunction())
                              .close()
                              .in(seconds(10))

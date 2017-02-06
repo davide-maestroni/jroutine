@@ -83,9 +83,9 @@ public class JRoutineCodegenTest {
         final RoutineAdapterFactory adapterFactory = //
             RoutineAdapterFactory.builder()
                                  .delegateFactory(factory)
-                                 .applyInvocationConfiguration()
+                                 .invocationConfiguration()
                                  .withOutputTimeout(seconds(3))
-                                 .configured()
+                                 .apply()
                                  .buildFactory();
         final UsersApi service =
             new UsersApiClient().withBaseUrl("http://localhost:" + server.getPort())
@@ -109,9 +109,9 @@ public class JRoutineCodegenTest {
         final RoutineAdapterFactory adapterFactory = //
             RoutineAdapterFactory.builder()
                                  .delegateFactory(factory)
-                                 .applyInvocationConfiguration()
+                                 .invocationConfiguration()
                                  .withOutputTimeout(seconds(3))
-                                 .configured()
+                                 .apply()
                                  .buildFactory();
         final UsersApi service =
             new UsersApiClient().withBaseUrl("http://localhost:" + server.getPort())

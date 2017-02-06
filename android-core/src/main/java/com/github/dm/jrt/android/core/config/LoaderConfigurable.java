@@ -40,5 +40,5 @@ public interface LoaderConfigurable<TYPE> extends Configurable<TYPE> {
    * @return the Loader configuration builder.
    */
   @NotNull
-  Builder<? extends TYPE> applyLoaderConfiguration();
+  Builder<? extends TYPE> loaderConfiguration();
 }

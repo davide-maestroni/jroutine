@@ -385,10 +385,10 @@ class ReplayOutputChannel<OUT> implements Channel<OUT, OUT>, ChannelConsumer<OUT
 
   @NotNull
   private Channel<OUT, OUT> createOutputChannel() {
-    return JRoutineCore.<OUT>ofInputs().applyChannelConfiguration()
+    return JRoutineCore.<OUT>ofInputs().channelConfiguration()
                                        .with(mConfiguration)
                                        .withOrder(OrderType.SORTED)
-                                       .configured()
+                                       .apply()
                                        .buildChannel();
   }
 }

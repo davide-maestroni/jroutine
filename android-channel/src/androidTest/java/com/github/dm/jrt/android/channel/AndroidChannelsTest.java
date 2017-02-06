@@ -67,10 +67,10 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     final Channel<?, String> channel = JRoutineCore.of("test").buildChannel();
     final TestLog testLog = new TestLog();
     assertThat(AndroidChannels.outputParcelableFlow(channel, 3)
-                              .applyChannelConfiguration()
+                              .channelConfiguration()
                               .withLog(testLog)
                               .withLogLevel(Level.DEBUG)
-                              .configured()
+                              .apply()
                               .buildChannel()
                               .all()).containsExactly(new ParcelableFlow<String>(3, "test"));
     assertThat(testLog.mLogCount).isGreaterThan(0);
@@ -640,13 +640,9 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
   public void testMap() {
 
     final ChannelBuilder<String, String> builder1 =
-        JRoutineCore.<String>ofInputs().applyChannelConfiguration()
-                                       .withOrder(OrderType.SORTED)
-                                       .configured();
+        JRoutineCore.<String>ofInputs().channelConfiguration().withOrder(OrderType.SORTED).apply();
     final ChannelBuilder<Integer, Integer> builder2 =
-        JRoutineCore.<Integer>ofInputs().applyChannelConfiguration()
-                                        .withOrder(OrderType.SORTED)
-                                        .configured();
+        JRoutineCore.<Integer>ofInputs().channelConfiguration().withOrder(OrderType.SORTED).apply();
     final Channel<String, String> channel1 = builder1.buildChannel();
     final Channel<Integer, Integer> channel2 = builder2.buildChannel();
 
@@ -655,10 +651,10 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
                        .buildChannel();
     final Channel<?, ParcelableFlow<Object>> output = JRoutineService.on(serviceFrom(getActivity()))
                                                                      .with(factoryOf(Sort.class))
-                                                                     .applyInvocationConfiguration()
+                                                                     .invocationConfiguration()
                                                                      .withInputOrder(
                                                                          OrderType.SORTED)
-                                                                     .configured()
+                                                                     .apply()
                                                                      .call(channel);
     final Map<Integer, ? extends Channel<?, Object>> channelMap =
         AndroidChannels.flowOutput(output, Sort.INTEGER, Sort.STRING).buildChannelMap();
@@ -682,13 +678,9 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
   public void testMerge() {
 
     final ChannelBuilder<String, String> builder1 =
-        JRoutineCore.<String>ofInputs().applyChannelConfiguration()
-                                       .withOrder(OrderType.SORTED)
-                                       .configured();
+        JRoutineCore.<String>ofInputs().channelConfiguration().withOrder(OrderType.SORTED).apply();
     final ChannelBuilder<Integer, Integer> builder2 =
-        JRoutineCore.<Integer>ofInputs().applyChannelConfiguration()
-                                        .withOrder(OrderType.SORTED)
-                                        .configured();
+        JRoutineCore.<Integer>ofInputs().channelConfiguration().withOrder(OrderType.SORTED).apply();
     Channel<String, String> channel1;
     Channel<Integer, Integer> channel2;
     Channel<?, ? extends ParcelableFlow<?>> outputChannel;
@@ -728,9 +720,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
   public void testMerge4() {
 
     final ChannelBuilder<String, String> builder =
-        JRoutineCore.<String>ofInputs().applyChannelConfiguration()
-                                       .withOrder(OrderType.SORTED)
-                                       .configured();
+        JRoutineCore.<String>ofInputs().channelConfiguration().withOrder(OrderType.SORTED).apply();
     final Channel<String, String> channel1 = builder.buildChannel();
     final Channel<String, String> channel2 = builder.buildChannel();
     final Channel<String, String> channel3 = builder.buildChannel();
@@ -764,13 +754,9 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
   public void testMergeAbort() {
 
     final ChannelBuilder<String, String> builder1 =
-        JRoutineCore.<String>ofInputs().applyChannelConfiguration()
-                                       .withOrder(OrderType.SORTED)
-                                       .configured();
+        JRoutineCore.<String>ofInputs().channelConfiguration().withOrder(OrderType.SORTED).apply();
     final ChannelBuilder<Integer, Integer> builder2 =
-        JRoutineCore.<Integer>ofInputs().applyChannelConfiguration()
-                                        .withOrder(OrderType.SORTED)
-                                        .configured();
+        JRoutineCore.<Integer>ofInputs().channelConfiguration().withOrder(OrderType.SORTED).apply();
     Channel<String, String> channel1;
     Channel<Integer, Integer> channel2;
     Channel<?, ? extends ParcelableFlow<?>> outputChannel;

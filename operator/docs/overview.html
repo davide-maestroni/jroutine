@@ -72,9 +72,9 @@
                         JRoutineCore.with(Operators.&lt;Integer, Double&gt;average(Double.class))).buildRoutine();
                 final Routine&lt;Double, Double&gt; sqrtRoutine =
                         JRoutineCore.with(Functions.&lt;Double, Double&gt;functionMapping(Math::sqrt))
-                                    .applyInvocationConfiguration()
+                                    .invocationConfiguration()
                                     .withRunner(syncRunner())
-                                    .configured()
+                                    .apply()
                                     .buildRoutine();
                 final Double rms = parseRoutine.callParallel(args)
                                                .bind(squareRoutine.callParallel())

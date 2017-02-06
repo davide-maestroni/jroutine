@@ -79,6 +79,7 @@ class AverageOutputPrecisionInvocationFactory<N extends Number>
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void onComplete(@NotNull final Channel<N, ?> result) {
       final int count = mCount;
       if (count == 0) {

@@ -48,7 +48,7 @@ import com.github.dm.jrt.reflect.annotation.OutputTimeoutAction;
 import com.github.dm.jrt.reflect.annotation.Priority;
 import com.github.dm.jrt.reflect.annotation.SharedFields;
 import com.github.dm.jrt.reflect.common.Mutex;
-import com.github.dm.jrt.reflect.config.ReflectionConfiguration;
+import com.github.dm.jrt.reflect.config.CallConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -578,7 +578,7 @@ public class ReflectionRoutineBuilders {
     final InvocationConfiguration.Builder<InvocationConfiguration> builder =
         InvocationConfiguration.builderFrom(configuration);
     if (annotations == null) {
-      return builder.configured();
+      return builder.apply();
     }
 
     for (final Annotation annotation : annotations) {
@@ -628,7 +628,7 @@ public class ReflectionRoutineBuilders {
       }
     }
 
-    return builder.configured();
+    return builder.apply();
   }
 
   /**
@@ -669,13 +669,12 @@ public class ReflectionRoutineBuilders {
    * @see com.github.dm.jrt.reflect.annotation.SharedFields SharedFields
    */
   @NotNull
-  public static ReflectionConfiguration withAnnotations(
-      @Nullable final ReflectionConfiguration configuration,
+  public static CallConfiguration withAnnotations(@Nullable final CallConfiguration configuration,
       @Nullable final Annotation... annotations) {
-    final ReflectionConfiguration.Builder<ReflectionConfiguration> builder =
-        ReflectionConfiguration.builderFrom(configuration);
+    final CallConfiguration.Builder<CallConfiguration> builder =
+        CallConfiguration.builderFrom(configuration);
     if (annotations == null) {
-      return builder.configured();
+      return builder.apply();
     }
 
     for (final Annotation annotation : annotations) {
@@ -685,7 +684,7 @@ public class ReflectionRoutineBuilders {
       }
     }
 
-    return builder.configured();
+    return builder.apply();
   }
 
   /**
@@ -698,8 +697,8 @@ public class ReflectionRoutineBuilders {
    * @see com.github.dm.jrt.reflect.annotation.SharedFields SharedFields
    */
   @NotNull
-  public static ReflectionConfiguration withAnnotations(
-      @Nullable final ReflectionConfiguration configuration, @NotNull final Method method) {
+  public static CallConfiguration withAnnotations(@Nullable final CallConfiguration configuration,
+      @NotNull final Method method) {
     return withAnnotations(configuration, method.getDeclaredAnnotations());
   }
 

@@ -42,7 +42,7 @@ import com.github.dm.jrt.reflect.annotation.SharedFields;
 import com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilders;
 import com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilders.MethodInfo;
 import com.github.dm.jrt.reflect.common.Mutex;
-import com.github.dm.jrt.reflect.config.ReflectionConfiguration;
+import com.github.dm.jrt.reflect.config.CallConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -90,11 +90,10 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
 
   private final ContextInvocationTarget<?> mTarget;
 
+  private CallConfiguration mCallConfiguration = CallConfiguration.defaultConfiguration();
+
   private InvocationConfiguration mInvocationConfiguration =
       InvocationConfiguration.defaultConfiguration();
-
-  private ReflectionConfiguration mReflectionConfiguration =
-      ReflectionConfiguration.defaultConfiguration();
 
   private ServiceConfiguration mServiceConfiguration = ServiceConfiguration.defaultConfiguration();
 
@@ -112,7 +111,7 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
 
   @Nullable
   private static Set<String> fieldsWithShareAnnotation(
-      @NotNull final ReflectionConfiguration configuration, @NotNull final Method method) {
+      @NotNull final CallConfiguration configuration, @NotNull final Method method) {
     final SharedFields sharedFieldsAnnotation = method.getAnnotation(SharedFields.class);
     if (sharedFieldsAnnotation != null) {
       final HashSet<String> set = new HashSet<String>();
@@ -172,17 +171,15 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
 
   @NotNull
   @Override
-  public ServiceReflectionRoutineBuilder apply(
-      @NotNull final ReflectionConfiguration configuration) {
-    mReflectionConfiguration =
-        ConstantConditions.notNull("reflection configuration", configuration);
+  public ServiceReflectionRoutineBuilder apply(@NotNull final CallConfiguration configuration) {
+    mCallConfiguration = ConstantConditions.notNull("call configuration", configuration);
     return this;
   }
 
   @NotNull
   @Override
   public InvocationConfiguration.Builder<? extends ServiceReflectionRoutineBuilder>
-  applyInvocationConfiguration() {
+  invocationConfiguration() {
     final InvocationConfiguration config = mInvocationConfiguration;
     return new InvocationConfiguration.Builder<ServiceReflectionRoutineBuilder>(
         new InvocationConfiguration.Configurable<ServiceReflectionRoutineBuilder>() {
@@ -198,27 +195,18 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
 
   @NotNull
   @Override
-  public ReflectionConfiguration.Builder<? extends ServiceReflectionRoutineBuilder>
-  applyReflectionConfiguration() {
-    final ReflectionConfiguration config = mReflectionConfiguration;
-    return new ReflectionConfiguration.Builder<ServiceReflectionRoutineBuilder>(
-        new ReflectionConfiguration.Configurable<ServiceReflectionRoutineBuilder>() {
+  public CallConfiguration.Builder<? extends ServiceReflectionRoutineBuilder> callConfiguration() {
+    final CallConfiguration config = mCallConfiguration;
+    return new CallConfiguration.Builder<ServiceReflectionRoutineBuilder>(
+        new CallConfiguration.Configurable<ServiceReflectionRoutineBuilder>() {
 
           @NotNull
           @Override
           public ServiceReflectionRoutineBuilder apply(
-              @NotNull final ReflectionConfiguration configuration) {
+              @NotNull final CallConfiguration configuration) {
             return DefaultServiceReflectionRoutineBuilder.this.apply(configuration);
           }
         }, config);
-  }
-
-  @NotNull
-  @Override
-  public ServiceConfiguration.Builder<? extends ServiceReflectionRoutineBuilder>
-  applyServiceConfiguration() {
-    final ServiceConfiguration config = mServiceConfiguration;
-    return new ServiceConfiguration.Builder<ServiceReflectionRoutineBuilder>(this, config);
   }
 
   @NotNull
@@ -250,8 +238,7 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
       return method(name, Reflection.NO_PARAMS);
     }
 
-    final Set<String> sharedFields =
-        fieldsWithShareAnnotation(mReflectionConfiguration, targetMethod);
+    final Set<String> sharedFields = fieldsWithShareAnnotation(mCallConfiguration, targetMethod);
     final Object[] args = asArgs(sharedFields, target, name);
     final TargetInvocationFactory<Object, Object> factory =
         factoryOf(MethodAliasInvocation.class, args);
@@ -273,8 +260,7 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
       @NotNull final Class<?>... parameterTypes) {
     final ContextInvocationTarget<?> target = mTarget;
     final Method targetMethod = findMethod(target.getTargetClass(), name, parameterTypes);
-    final Set<String> sharedFields =
-        fieldsWithShareAnnotation(mReflectionConfiguration, targetMethod);
+    final Set<String> sharedFields = fieldsWithShareAnnotation(mCallConfiguration, targetMethod);
     final Object[] args = asArgs(sharedFields, target, name, toNames(parameterTypes));
     final TargetInvocationFactory<Object, Object> factory =
         factoryOf(MethodSignatureInvocation.class, args);
@@ -293,6 +279,14 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
   @Override
   public <IN, OUT> Routine<IN, OUT> method(@NotNull final Method method) {
     return method(method.getName(), method.getParameterTypes());
+  }
+
+  @NotNull
+  @Override
+  public ServiceConfiguration.Builder<? extends ServiceReflectionRoutineBuilder>
+  serviceConfiguration() {
+    final ServiceConfiguration config = mServiceConfiguration;
+    return new ServiceConfiguration.Builder<ServiceReflectionRoutineBuilder>(this, config);
   }
 
   /**
@@ -337,12 +331,12 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
       final InvocationTarget target = mTarget.getInvocationTarget(context);
       mInstance = target.getTarget();
       mRoutine = JRoutineReflection.with(target)
-                                   .applyInvocationConfiguration()
+                                   .invocationConfiguration()
                                    .withRunner(Runners.syncRunner())
-                                   .configured()
-                                   .applyReflectionConfiguration()
+                                   .apply()
+                                   .callConfiguration()
                                    .withSharedFields(mSharedFields)
-                                   .configured()
+                                   .apply()
                                    .method(mAliasName);
     }
 
@@ -447,12 +441,12 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
       final InvocationTarget target = mTarget.getInvocationTarget(context);
       mInstance = target.getTarget();
       mRoutine = JRoutineReflection.with(target)
-                                   .applyInvocationConfiguration()
+                                   .invocationConfiguration()
                                    .withRunner(Runners.syncRunner())
-                                   .configured()
-                                   .applyReflectionConfiguration()
+                                   .apply()
+                                   .callConfiguration()
                                    .withSharedFields(mSharedFields)
-                                   .configured()
+                                   .apply()
                                    .method(mMethodName, mParameterTypes);
     }
   }
@@ -525,11 +519,11 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
    */
   private static class ProxyInvocationHandler implements InvocationHandler {
 
+    private final CallConfiguration mCallConfiguration;
+
     private final ServiceContext mContext;
 
     private final InvocationConfiguration mInvocationConfiguration;
-
-    private final ReflectionConfiguration mReflectionConfiguration;
 
     private final ServiceConfiguration mServiceConfiguration;
 
@@ -544,7 +538,7 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
       mContext = builder.mContext;
       mTarget = builder.mTarget;
       mInvocationConfiguration = builder.mInvocationConfiguration;
-      mReflectionConfiguration = builder.mReflectionConfiguration;
+      mCallConfiguration = builder.mCallConfiguration;
       mServiceConfiguration = builder.mServiceConfiguration;
     }
 
@@ -557,7 +551,7 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
       final InputMode inputMode = methodInfo.inputMode;
       final OutputMode outputMode = methodInfo.outputMode;
       final Class<?>[] targetParameterTypes = targetMethod.getParameterTypes();
-      final Set<String> sharedFields = fieldsWithShareAnnotation(mReflectionConfiguration, method);
+      final Set<String> sharedFields = fieldsWithShareAnnotation(mCallConfiguration, method);
       final Object[] factoryArgs =
           asArgs(sharedFields, target, targetMethod.getName(), toNames(targetParameterTypes),
               inputMode, outputMode);

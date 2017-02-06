@@ -15,7 +15,7 @@
  */
 
 /**
- * Classes storing proxy routine configurations.
+ * Classes storing reflection routine configurations.
  * <p>
  * Created by davide-maestroni on 03/12/2016.
  */

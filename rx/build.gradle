@@ -28,7 +28,7 @@ compileTestJavaCompatibility = JavaVersion.VERSION_1_7
 
 dependencies {
   compile 'com.intellij:annotations:12.0'
-  compile 'io.reactivex:rxjava:1.2.5'
+  compile 'io.reactivex:rxjava:1.2.6'
   testCompile 'junit:junit:4.12'
   testCompile 'org.assertj:assertj-core:2.4.1'
 }

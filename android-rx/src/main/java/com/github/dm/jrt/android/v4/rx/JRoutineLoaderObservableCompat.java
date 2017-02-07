@@ -27,7 +27,6 @@ import com.github.dm.jrt.android.core.routine.LoaderRoutine;
 import com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.InvocationConfigurable;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
@@ -37,7 +36,6 @@ import com.github.dm.jrt.rx.JRoutineObservable;
 import org.jetbrains.annotations.NotNull;
 
 import rx.Observable;
-import rx.Observable.OnSubscribe;
 import rx.Observable.Operator;
 import rx.Subscriber;
 
@@ -139,9 +137,12 @@ public class JRoutineLoaderObservableCompat {
      */
     @NotNull
     public Observable<DATA> observeOn(@NotNull final LoaderContextCompat context) {
-      return Observable.create(
-          new OnSubscribeLoader<DATA>(context, mInvocationConfiguration, mLoaderConfiguration,
-              mObservable));
+      return JRoutineObservable.create(JRoutineLoaderCompat.on(context)
+                                                           .with(
+                                                               new ObservableInvocationFactory<DATA>(
+                                                                   mObservable))
+                                                           .apply(mInvocationConfiguration)
+                                                           .apply(mLoaderConfiguration));
     }
 
     /**
@@ -292,94 +293,6 @@ public class JRoutineLoaderObservableCompat {
     @Override
     public ContextInvocation<Void, DATA> newInvocation() throws Exception {
       return new ObservableInvocation<DATA>(mObservable);
-    }
-  }
-
-  /**
-   * Subscription listener calling the subscriber in a dedicated Loader.
-   *
-   * @param <DATA> the data type.
-   */
-  private static class OnSubscribeLoader<DATA> implements OnSubscribe<DATA> {
-
-    private final LoaderContextCompat mContext;
-
-    private final InvocationConfiguration mInvocationConfiguration;
-
-    private final LoaderConfiguration mLoaderConfiguration;
-
-    private final Observable<DATA> mObservable;
-
-    /**
-     * Constructor.
-     *
-     * @param context                 the Loader context.
-     * @param invocationConfiguration the invocation configuration.
-     * @param loaderConfiguration     the loader configuration.
-     * @param observable              the Observable instance.
-     */
-    private OnSubscribeLoader(@NotNull final LoaderContextCompat context,
-        @NotNull final InvocationConfiguration invocationConfiguration,
-        @NotNull final LoaderConfiguration loaderConfiguration,
-        @NotNull final Observable<DATA> observable) {
-      mContext = ConstantConditions.notNull("loader context", context);
-      mInvocationConfiguration = invocationConfiguration;
-      mLoaderConfiguration = loaderConfiguration;
-      mObservable = observable;
-    }
-
-    @Override
-    public void call(final Subscriber<? super DATA> subscriber) {
-      JRoutineLoaderCompat.on(mContext)
-                          .with(new ObservableInvocationFactory<DATA>(mObservable))
-                          .apply(mInvocationConfiguration)
-                          .apply(mLoaderConfiguration)
-                          .call()
-                          .bind(new SubscriberConsumer<DATA>(subscriber))
-                          .close();
-    }
-  }
-
-  /**
-   * Channel consumer passing data to a subscriber.
-   *
-   * @param <DATA> the data type.
-   */
-  private static class SubscriberConsumer<DATA> implements ChannelConsumer<DATA> {
-
-    private final Subscriber<? super DATA> mSubscriber;
-
-    /**
-     * Constructor.
-     *
-     * @param subscriber the subscriber instance.
-     */
-    private SubscriberConsumer(@NotNull final Subscriber<? super DATA> subscriber) {
-      mSubscriber = subscriber;
-    }
-
-    @Override
-    public void onComplete() {
-      final Subscriber<? super DATA> subscriber = mSubscriber;
-      if (!subscriber.isUnsubscribed()) {
-        subscriber.onCompleted();
-      }
-    }
-
-    @Override
-    public void onError(@NotNull final RoutineException error) {
-      final Subscriber<? super DATA> subscriber = mSubscriber;
-      if (!subscriber.isUnsubscribed()) {
-        subscriber.onError(error.getCause());
-      }
-    }
-
-    @Override
-    public void onOutput(final DATA output) {
-      final Subscriber<? super DATA> subscriber = mSubscriber;
-      if (!subscriber.isUnsubscribed()) {
-        subscriber.onNext(output);
-      }
     }
   }
 

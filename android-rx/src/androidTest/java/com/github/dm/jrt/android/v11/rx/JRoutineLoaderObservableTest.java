@@ -85,7 +85,7 @@ public class JRoutineLoaderObservableTest extends ActivityInstrumentationTestCas
                                 latch.countDown();
                               }
                             });
-    latch.await(10000, TimeUnit.SECONDS);
+    latch.await(10, TimeUnit.SECONDS);
     assertThat(isSuccess.get()).isTrue();
   }
 

@@ -514,7 +514,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
       return new ArrayList<OUT>(0);
     }
 
-    final ArrayList<OUT> results = new ArrayList<OUT>(count);
+    final ArrayList<OUT> results = new ArrayList<OUT>();
     final Iterator<OUT> iterator = expiringIterator();
     for (int i = 0; i < count && iterator.hasNext(); ++i) {
       results.add(iterator.next());

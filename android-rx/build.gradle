@@ -70,7 +70,7 @@ dependencies {
   androidTestCompile 'com.squareup.assertj:assertj-android:1.1.1'
   androidTestCompile 'io.reactivex:rxandroid:1.2.1'
   compile 'com.android.support:support-v4:23.2.1'
-  compile 'io.reactivex:rxjava:1.2.5'
+  compile 'io.reactivex:rxjava:1.2.6'
 }
 
 conditionalDependencies {

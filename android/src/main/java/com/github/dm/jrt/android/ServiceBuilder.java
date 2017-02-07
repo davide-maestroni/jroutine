@@ -196,9 +196,8 @@ public class ServiceBuilder {
    * @return the routine builder instance.
    */
   @NotNull
-  public ServiceReflectionProxyRoutineBuilder with(
-      @NotNull final ContextInvocationTarget<?> target) {
-    return new DefaultServiceReflectionProxyRoutineBuilder(mContext, target);
+  public ServiceWrapperRoutineBuilder with(@NotNull final ContextInvocationTarget<?> target) {
+    return new DefaultServiceWrapperRoutineBuilder(mContext, target);
   }
 
   /**
@@ -237,7 +236,7 @@ public class ServiceBuilder {
    * @return the routine builder instance.
    */
   @NotNull
-  public ServiceReflectionProxyRoutineBuilder withClassOfType(@NotNull final Class<?> targetClass) {
+  public ServiceWrapperRoutineBuilder withClassOfType(@NotNull final Class<?> targetClass) {
     return with(classOfType(targetClass));
   }
 
@@ -255,7 +254,7 @@ public class ServiceBuilder {
    * @return the routine builder instance.
    */
   @NotNull
-  public ServiceReflectionProxyRoutineBuilder withInstanceOf(@NotNull final Class<?> targetClass) {
+  public ServiceWrapperRoutineBuilder withInstanceOf(@NotNull final Class<?> targetClass) {
     return with(instanceOf(targetClass));
   }
 
@@ -274,7 +273,7 @@ public class ServiceBuilder {
    * @return the routine builder instance.
    */
   @NotNull
-  public ServiceReflectionProxyRoutineBuilder withInstanceOf(@NotNull final Class<?> targetClass,
+  public ServiceWrapperRoutineBuilder withInstanceOf(@NotNull final Class<?> targetClass,
       @Nullable final Object... factoryArgs) {
     return with(instanceOf(targetClass, factoryArgs));
   }

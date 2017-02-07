@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.android.v11;
 
-import com.github.dm.jrt.android.LoaderReflectionProxyRoutineBuilder;
+import com.github.dm.jrt.android.LoaderWrapperRoutineBuilder;
 import com.github.dm.jrt.android.core.builder.LoaderChannelBuilder;
 import com.github.dm.jrt.android.core.builder.LoaderRoutineBuilder;
 import com.github.dm.jrt.android.core.invocation.ContextInvocation;
@@ -309,9 +309,8 @@ public class LoaderBuilder {
    * @return the routine builder instance.
    */
   @NotNull
-  public LoaderReflectionProxyRoutineBuilder with(
-      @NotNull final ContextInvocationTarget<?> target) {
-    return new DefaultLoaderReflectionProxyRoutineBuilder(mContext, target);
+  public LoaderWrapperRoutineBuilder with(@NotNull final ContextInvocationTarget<?> target) {
+    return new DefaultLoaderWrapperRoutineBuilder(mContext, target);
   }
 
   /**
@@ -389,7 +388,7 @@ public class LoaderBuilder {
    * @return the routine builder instance.
    */
   @NotNull
-  public LoaderReflectionProxyRoutineBuilder withClassOfType(@NotNull final Class<?> targetClass) {
+  public LoaderWrapperRoutineBuilder withClassOfType(@NotNull final Class<?> targetClass) {
     return with(classOfType(targetClass));
   }
 
@@ -511,7 +510,7 @@ public class LoaderBuilder {
    * @return the routine builder instance.
    */
   @NotNull
-  public LoaderReflectionProxyRoutineBuilder withInstanceOf(@NotNull final Class<?> targetClass) {
+  public LoaderWrapperRoutineBuilder withInstanceOf(@NotNull final Class<?> targetClass) {
     return with(instanceOf(targetClass));
   }
 
@@ -531,7 +530,7 @@ public class LoaderBuilder {
    * @return the routine builder instance.
    */
   @NotNull
-  public LoaderReflectionProxyRoutineBuilder withInstanceOf(@NotNull final Class<?> targetClass,
+  public LoaderWrapperRoutineBuilder withInstanceOf(@NotNull final Class<?> targetClass,
       @Nullable final Object... factoryArgs) {
     return with(instanceOf(targetClass, factoryArgs));
   }

@@ -354,8 +354,8 @@ public class JRoutine extends Channels {
    *                                            interface.
    */
   @NotNull
-  public static ReflectionProxyRoutineBuilder with(@NotNull final InvocationTarget<?> target) {
-    return new DefaultReflectionProxyRoutineBuilder(target);
+  public static WrapperRoutineBuilder with(@NotNull final InvocationTarget<?> target) {
+    return new DefaultWrapperRoutineBuilder(target);
   }
 
   /**
@@ -391,7 +391,7 @@ public class JRoutine extends Channels {
    *                                            interface.
    */
   @NotNull
-  public static ReflectionProxyRoutineBuilder with(@NotNull final Object object) {
+  public static WrapperRoutineBuilder with(@NotNull final Object object) {
     return (object instanceof Class) ? withClassOfType((Class<?>) object) : withInstance(object);
   }
 
@@ -438,7 +438,7 @@ public class JRoutine extends Channels {
    * @throws java.lang.IllegalArgumentException if the specified class represents an interface.
    */
   @NotNull
-  public static ReflectionProxyRoutineBuilder withClassOfType(@NotNull final Class<?> targetClass) {
+  public static WrapperRoutineBuilder withClassOfType(@NotNull final Class<?> targetClass) {
     return with(classOfType(targetClass));
   }
 
@@ -509,7 +509,7 @@ public class JRoutine extends Channels {
    * @return the routine builder instance.
    */
   @NotNull
-  public static ReflectionProxyRoutineBuilder withInstance(@NotNull final Object object) {
+  public static WrapperRoutineBuilder withInstance(@NotNull final Object object) {
     return with(instance(object));
   }
 

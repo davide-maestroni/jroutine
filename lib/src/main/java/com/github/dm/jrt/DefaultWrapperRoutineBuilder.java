@@ -38,7 +38,7 @@ import java.lang.reflect.Method;
  * <p>
  * Created by davide-maestroni on 03/03/2016.
  */
-class DefaultReflectionProxyRoutineBuilder implements ReflectionProxyRoutineBuilder {
+class DefaultWrapperRoutineBuilder implements WrapperRoutineBuilder {
 
   private final InvocationTarget<?> mTarget;
 
@@ -56,7 +56,7 @@ class DefaultReflectionProxyRoutineBuilder implements ReflectionProxyRoutineBuil
    * @throws java.lang.IllegalArgumentException if the class of specified target represents an
    *                                            interface.
    */
-  DefaultReflectionProxyRoutineBuilder(@NotNull final InvocationTarget<?> target) {
+  DefaultWrapperRoutineBuilder(@NotNull final InvocationTarget<?> target) {
     final Class<?> targetClass = target.getTargetClass();
     if (targetClass.isInterface()) {
       throw new IllegalArgumentException(
@@ -67,51 +67,47 @@ class DefaultReflectionProxyRoutineBuilder implements ReflectionProxyRoutineBuil
   }
 
   @NotNull
-  public ReflectionProxyRoutineBuilder apply(@NotNull final InvocationConfiguration configuration) {
+  public WrapperRoutineBuilder apply(@NotNull final InvocationConfiguration configuration) {
     mInvocationConfiguration =
         ConstantConditions.notNull("invocation configuration", configuration);
     return this;
   }
 
   @NotNull
-  public ReflectionProxyRoutineBuilder apply(@NotNull final WrapperConfiguration configuration) {
+  public WrapperRoutineBuilder apply(@NotNull final WrapperConfiguration configuration) {
     mWrapperConfiguration = ConstantConditions.notNull("wrapper configuration", configuration);
     return this;
   }
 
   @NotNull
-  public InvocationConfiguration.Builder<? extends ReflectionProxyRoutineBuilder>
-  invocationConfiguration() {
+  public InvocationConfiguration.Builder<? extends WrapperRoutineBuilder> invocationConfiguration
+      () {
     final InvocationConfiguration config = mInvocationConfiguration;
-    return new InvocationConfiguration.Builder<ReflectionProxyRoutineBuilder>(
-        new InvocationConfiguration.Configurable<ReflectionProxyRoutineBuilder>() {
+    return new InvocationConfiguration.Builder<WrapperRoutineBuilder>(
+        new InvocationConfiguration.Configurable<WrapperRoutineBuilder>() {
 
           @NotNull
-          public ReflectionProxyRoutineBuilder apply(
-              @NotNull final InvocationConfiguration configuration) {
-            return DefaultReflectionProxyRoutineBuilder.this.apply(configuration);
+          public WrapperRoutineBuilder apply(@NotNull final InvocationConfiguration configuration) {
+            return DefaultWrapperRoutineBuilder.this.apply(configuration);
           }
         }, config);
   }
 
   @NotNull
-  public ReflectionProxyRoutineBuilder withStrategy(
-      @Nullable final ProxyStrategyType strategyType) {
+  public WrapperRoutineBuilder withStrategy(@Nullable final ProxyStrategyType strategyType) {
     mProxyStrategyType = strategyType;
     return this;
   }
 
   @NotNull
-  public WrapperConfiguration.Builder<? extends ReflectionProxyRoutineBuilder>
-  wrapperConfiguration() {
+  public WrapperConfiguration.Builder<? extends WrapperRoutineBuilder> wrapperConfiguration() {
     final WrapperConfiguration config = mWrapperConfiguration;
-    return new WrapperConfiguration.Builder<ReflectionProxyRoutineBuilder>(
-        new WrapperConfiguration.Configurable<ReflectionProxyRoutineBuilder>() {
+    return new WrapperConfiguration.Builder<WrapperRoutineBuilder>(
+        new WrapperConfiguration.Configurable<WrapperRoutineBuilder>() {
 
           @NotNull
-          public ReflectionProxyRoutineBuilder apply(
-              @NotNull final WrapperConfiguration configuration) {
-            return DefaultReflectionProxyRoutineBuilder.this.apply(configuration);
+          public WrapperRoutineBuilder apply(@NotNull final WrapperConfiguration configuration) {
+            return DefaultWrapperRoutineBuilder.this.apply(configuration);
           }
         }, config);
   }

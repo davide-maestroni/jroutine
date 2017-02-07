@@ -16,9 +16,9 @@
 
 package com.github.dm.jrt.android;
 
-import com.github.dm.jrt.ReflectionProxyRoutineBuilder;
-import com.github.dm.jrt.android.core.config.ServiceConfiguration;
-import com.github.dm.jrt.android.reflect.builder.ServiceReflectionRoutineBuilder;
+import com.github.dm.jrt.WrapperRoutineBuilder;
+import com.github.dm.jrt.android.core.config.LoaderConfiguration;
+import com.github.dm.jrt.android.reflect.builder.LoaderReflectionRoutineBuilder;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.reflect.config.WrapperConfiguration;
 
@@ -26,7 +26,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Service routine builder acting both as proxy and reflection builder.
+ * Loader routine builder acting both as proxy and reflection builder.
  * <p>
  * The builder will automatically choose whether to employ reflection or code generation to build
  * the proxy instance, based on the presence of the proper annotation and target value. So, if the
@@ -37,61 +37,58 @@ import org.jetbrains.annotations.Nullable;
  * <p>
  * Created by davide-maestroni on 03/06/2016.
  */
-@SuppressWarnings("WeakerAccess")
-public interface ServiceReflectionProxyRoutineBuilder
-    extends ReflectionProxyRoutineBuilder, ServiceReflectionRoutineBuilder {
+public interface LoaderWrapperRoutineBuilder
+    extends WrapperRoutineBuilder, LoaderReflectionRoutineBuilder {
 
   /**
    * {@inheritDoc}
    */
   @NotNull
   @Override
-  ServiceReflectionProxyRoutineBuilder apply(@NotNull InvocationConfiguration configuration);
+  LoaderWrapperRoutineBuilder apply(@NotNull InvocationConfiguration configuration);
 
   /**
    * {@inheritDoc}
    */
   @NotNull
   @Override
-  ServiceReflectionProxyRoutineBuilder apply(@NotNull WrapperConfiguration configuration);
+  LoaderWrapperRoutineBuilder apply(@NotNull WrapperConfiguration configuration);
 
   /**
    * {@inheritDoc}
    */
   @NotNull
   @Override
-  InvocationConfiguration.Builder<? extends ServiceReflectionProxyRoutineBuilder>
-  invocationConfiguration();
+  InvocationConfiguration.Builder<? extends LoaderWrapperRoutineBuilder> invocationConfiguration();
 
   /**
    * {@inheritDoc}
    *
-   * @see com.github.dm.jrt.android.proxy.JRoutineServiceProxy JRoutineServiceProxy
+   * @see com.github.dm.jrt.android.v11.proxy.JRoutineLoaderProxy JRoutineLoaderProxy
+   * @see com.github.dm.jrt.android.v4.proxy.JRoutineLoaderProxyCompat JRoutineLoaderProxyCompat
    */
   @NotNull
   @Override
-  ServiceReflectionProxyRoutineBuilder withStrategy(@Nullable ProxyStrategyType strategyType);
+  LoaderWrapperRoutineBuilder withStrategy(@Nullable ProxyStrategyType strategyType);
 
   /**
    * {@inheritDoc}
    */
   @NotNull
   @Override
-  WrapperConfiguration.Builder<? extends ServiceReflectionProxyRoutineBuilder>
-  wrapperConfiguration();
+  WrapperConfiguration.Builder<? extends LoaderWrapperRoutineBuilder> wrapperConfiguration();
 
   /**
    * {@inheritDoc}
    */
   @NotNull
   @Override
-  ServiceReflectionProxyRoutineBuilder apply(@NotNull ServiceConfiguration configuration);
+  LoaderWrapperRoutineBuilder apply(@NotNull LoaderConfiguration configuration);
 
   /**
    * {@inheritDoc}
    */
   @NotNull
   @Override
-  ServiceConfiguration.Builder<? extends ServiceReflectionProxyRoutineBuilder>
-  serviceConfiguration();
+  LoaderConfiguration.Builder<? extends LoaderWrapperRoutineBuilder> loaderConfiguration();
 }

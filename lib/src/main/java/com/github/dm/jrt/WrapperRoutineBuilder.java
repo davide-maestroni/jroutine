@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.android;
+package com.github.dm.jrt;
 
-import com.github.dm.jrt.ReflectionProxyRoutineBuilder;
-import com.github.dm.jrt.android.core.config.LoaderConfiguration;
-import com.github.dm.jrt.android.reflect.builder.LoaderReflectionRoutineBuilder;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilder;
 import com.github.dm.jrt.reflect.config.WrapperConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Loader routine builder acting both as proxy and reflection builder.
+ * Routine builder acting both as proxy and reflection builder.
  * <p>
  * The builder will automatically choose whether to employ reflection or code generation to build
  * the proxy instance, based on the presence of the proper annotation and target value. So, if the
@@ -35,62 +33,63 @@ import org.jetbrains.annotations.Nullable;
  * <br>
  * Note that the use of one or the other can be forced by calling the proper method.
  * <p>
- * Created by davide-maestroni on 03/06/2016.
+ * Created by davide-maestroni on 03/03/2016.
  */
-public interface LoaderReflectionProxyRoutineBuilder
-    extends ReflectionProxyRoutineBuilder, LoaderReflectionRoutineBuilder {
+public interface WrapperRoutineBuilder extends ReflectionRoutineBuilder {
 
   /**
    * {@inheritDoc}
    */
   @NotNull
-  @Override
-  LoaderReflectionProxyRoutineBuilder apply(@NotNull InvocationConfiguration configuration);
+  WrapperRoutineBuilder apply(@NotNull InvocationConfiguration configuration);
 
   /**
    * {@inheritDoc}
    */
   @NotNull
-  @Override
-  LoaderReflectionProxyRoutineBuilder apply(@NotNull WrapperConfiguration configuration);
+  WrapperRoutineBuilder apply(@NotNull WrapperConfiguration configuration);
 
   /**
    * {@inheritDoc}
    */
   @NotNull
-  @Override
-  InvocationConfiguration.Builder<? extends LoaderReflectionProxyRoutineBuilder>
-  invocationConfiguration();
+  InvocationConfiguration.Builder<? extends WrapperRoutineBuilder> invocationConfiguration();
 
   /**
-   * {@inheritDoc}
+   * Force the type of strategy to be employed to create the proxy instance.
+   * <br>
+   * A null value means default algorithm will be applied, that is, the type will be automatically
+   * chosen based on the presence of the specific annotation.
    *
-   * @see com.github.dm.jrt.android.v11.proxy.JRoutineLoaderProxy JRoutineLoaderProxy
-   * @see com.github.dm.jrt.android.v4.proxy.JRoutineLoaderProxyCompat JRoutineLoaderProxyCompat
+   * @param strategyType the strategy type.
+   * @return this builder.
+   * @see com.github.dm.jrt.proxy.JRoutineProxy JRoutineProxy
    */
   @NotNull
-  @Override
-  LoaderReflectionProxyRoutineBuilder withStrategy(@Nullable ProxyStrategyType strategyType);
+  WrapperRoutineBuilder withStrategy(@Nullable ProxyStrategyType strategyType);
 
   /**
    * {@inheritDoc}
    */
   @NotNull
-  @Override
-  WrapperConfiguration.Builder<? extends LoaderReflectionProxyRoutineBuilder>
-  wrapperConfiguration();
+  WrapperConfiguration.Builder<? extends WrapperRoutineBuilder> wrapperConfiguration();
 
   /**
-   * {@inheritDoc}
+   * Proxy instantiation strategy type enumeration.
    */
-  @NotNull
-  @Override
-  LoaderReflectionProxyRoutineBuilder apply(@NotNull LoaderConfiguration configuration);
+  enum ProxyStrategyType {
 
-  /**
-   * {@inheritDoc}
-   */
-  @NotNull
-  @Override
-  LoaderConfiguration.Builder<? extends LoaderReflectionProxyRoutineBuilder> loaderConfiguration();
+    /**
+     * Reflection strategy.
+     * <br>
+     * The proxy instance will be created through reflection.
+     */
+    REFLECTION,
+    /**
+     * Code generation strategy.
+     * <br>
+     * The proxy instance will be created through code generation.
+     */
+    CODE_GENERATION
+  }
 }

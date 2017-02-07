@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt;
+package com.github.dm.jrt.android;
 
+import com.github.dm.jrt.WrapperRoutineBuilder;
+import com.github.dm.jrt.android.core.config.ServiceConfiguration;
+import com.github.dm.jrt.android.reflect.builder.ServiceReflectionRoutineBuilder;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
-import com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilder;
 import com.github.dm.jrt.reflect.config.WrapperConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Routine builder acting both as proxy and reflection builder.
+ * Service routine builder acting both as proxy and reflection builder.
  * <p>
  * The builder will automatically choose whether to employ reflection or code generation to build
  * the proxy instance, based on the presence of the proper annotation and target value. So, if the
@@ -33,64 +35,60 @@ import org.jetbrains.annotations.Nullable;
  * <br>
  * Note that the use of one or the other can be forced by calling the proper method.
  * <p>
- * Created by davide-maestroni on 03/03/2016.
+ * Created by davide-maestroni on 03/06/2016.
  */
-public interface ReflectionProxyRoutineBuilder extends ReflectionRoutineBuilder {
+@SuppressWarnings("WeakerAccess")
+public interface ServiceWrapperRoutineBuilder
+    extends WrapperRoutineBuilder, ServiceReflectionRoutineBuilder {
 
   /**
    * {@inheritDoc}
    */
   @NotNull
-  ReflectionProxyRoutineBuilder apply(@NotNull InvocationConfiguration configuration);
+  @Override
+  ServiceWrapperRoutineBuilder apply(@NotNull InvocationConfiguration configuration);
 
   /**
    * {@inheritDoc}
    */
   @NotNull
-  ReflectionProxyRoutineBuilder apply(@NotNull WrapperConfiguration configuration);
+  @Override
+  ServiceWrapperRoutineBuilder apply(@NotNull WrapperConfiguration configuration);
 
   /**
    * {@inheritDoc}
    */
   @NotNull
-  InvocationConfiguration.Builder<? extends ReflectionProxyRoutineBuilder>
-  invocationConfiguration();
+  @Override
+  InvocationConfiguration.Builder<? extends ServiceWrapperRoutineBuilder> invocationConfiguration();
 
   /**
-   * Force the type of strategy to be employed to create the proxy instance.
-   * <br>
-   * A null value means default algorithm will be applied, that is, the type will be automatically
-   * chosen based on the presence of the specific annotation.
+   * {@inheritDoc}
    *
-   * @param strategyType the strategy type.
-   * @return this builder.
-   * @see com.github.dm.jrt.proxy.JRoutineProxy JRoutineProxy
+   * @see com.github.dm.jrt.android.proxy.JRoutineServiceProxy JRoutineServiceProxy
    */
   @NotNull
-  ReflectionProxyRoutineBuilder withStrategy(@Nullable ProxyStrategyType strategyType);
+  @Override
+  ServiceWrapperRoutineBuilder withStrategy(@Nullable ProxyStrategyType strategyType);
 
   /**
    * {@inheritDoc}
    */
   @NotNull
-  WrapperConfiguration.Builder<? extends ReflectionProxyRoutineBuilder> wrapperConfiguration();
+  @Override
+  WrapperConfiguration.Builder<? extends ServiceWrapperRoutineBuilder> wrapperConfiguration();
 
   /**
-   * Proxy instantiation strategy type enumeration.
+   * {@inheritDoc}
    */
-  enum ProxyStrategyType {
+  @NotNull
+  @Override
+  ServiceWrapperRoutineBuilder apply(@NotNull ServiceConfiguration configuration);
 
-    /**
-     * Reflection strategy.
-     * <br>
-     * The proxy instance will be created through reflection.
-     */
-    REFLECTION,
-    /**
-     * Code generation strategy.
-     * <br>
-     * The proxy instance will be created through code generation.
-     */
-    CODE_GENERATION
-  }
+  /**
+   * {@inheritDoc}
+   */
+  @NotNull
+  @Override
+  ServiceConfiguration.Builder<? extends ServiceWrapperRoutineBuilder> serviceConfiguration();
 }

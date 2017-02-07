@@ -67,13 +67,6 @@ class DefaultLoaderChannelBuilder implements LoaderChannelBuilder {
 
   @NotNull
   @Override
-  public LoaderConfiguration.Builder<? extends LoaderChannelBuilder> loaderConfiguration() {
-    final LoaderConfiguration config = mLoaderConfiguration;
-    return new LoaderConfiguration.Builder<LoaderChannelBuilder>(this, config);
-  }
-
-  @NotNull
-  @Override
   public <OUT> Channel<?, OUT> buildChannel() {
     final LoaderConfiguration loaderConfiguration = mLoaderConfiguration;
     final int loaderId = loaderConfiguration.getLoaderIdOrElse(LoaderConfiguration.AUTO);
@@ -154,6 +147,13 @@ class DefaultLoaderChannelBuilder implements LoaderChannelBuilder {
       clearLoader(context, mLoaderConfiguration.getLoaderIdOrElse(LoaderConfiguration.AUTO),
           Collections.singletonList(input));
     }
+  }
+
+  @NotNull
+  @Override
+  public LoaderConfiguration.Builder<? extends LoaderChannelBuilder> loaderConfiguration() {
+    final LoaderConfiguration config = mLoaderConfiguration;
+    return new LoaderConfiguration.Builder<LoaderChannelBuilder>(this, config);
   }
 
   @NotNull

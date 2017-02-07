@@ -42,14 +42,12 @@ import rx.functions.Action3;
 import rx.functions.Func0;
 import rx.observables.AsyncOnSubscribe;
 
-import static com.github.dm.jrt.core.util.DurationMeasure.noTime;
-
 /**
  * Utility class integrating the JRoutine classes with RxJava ones.
  * <p>
  * The example below shows how it's possible to create an Observable instance from a channel:
  * <pre><code>
- * JRoutineObservable.create(myChannel).subscribe(getAction());
+ * JRoutineObservable.create(myChannel.in(seconds(3))).subscribe(getAction());
  * </code></pre>
  * <p>
  * In a dual way, a channel can be created from an Observable:
@@ -74,11 +72,12 @@ public class JRoutineObservable {
   /**
    * Creates a new observable from the specified channel.
    * <br>
-   * Note that the channel will be bound only when an observer subscribes to the observable.
+   * Note that, unless properly configure, the channel might timeout when polled for outputs.
    *
    * @param channel the channel instance.
    * @param <OUT>   the output data type.
    * @return the observable instance.
+   * @see com.github.dm.jrt.core.config.ChannelConfiguration ChannelConfiguration
    */
   @NotNull
   public static <OUT> Observable<OUT> create(@NotNull final Channel<?, OUT> channel) {
@@ -91,12 +90,15 @@ public class JRoutineObservable {
 
   /**
    * Creates a new observable by invoking the specified routine.
+   * <br>
+   * Note that, unless properly configure, the invocation might timeout when polled for outputs.
    *
    * @param routine the routine instance.
    * @param input   the invocation input.
    * @param <IN>    the input data type.
    * @param <OUT>   the output data type.
    * @return the observable instance.
+   * @see com.github.dm.jrt.core.config.InvocationConfiguration InvocationConfiguration
    */
   @NotNull
   public static <IN, OUT> Observable<OUT> create(@NotNull final Routine<? super IN, OUT> routine,
@@ -106,12 +108,15 @@ public class JRoutineObservable {
 
   /**
    * Creates a new observable by invoking the specified routine.
+   * <br>
+   * Note that, unless properly configure, the invocation might timeout when polled for outputs.
    *
    * @param routine the routine instance.
    * @param inputs  the invocation inputs.
    * @param <IN>    the input data type.
    * @param <OUT>   the output data type.
    * @return the observable instance.
+   * @see com.github.dm.jrt.core.config.InvocationConfiguration InvocationConfiguration
    */
   @NotNull
   public static <IN, OUT> Observable<OUT> create(@NotNull final Routine<? super IN, OUT> routine,
@@ -125,12 +130,15 @@ public class JRoutineObservable {
 
   /**
    * Creates a new observable by invoking the specified routine.
+   * <br>
+   * Note that, unless properly configure, the invocation might timeout when polled for outputs.
    *
    * @param routine the routine instance.
    * @param inputs  an iterable returning the invocation inputs.
    * @param <IN>    the input data type.
    * @param <OUT>   the output data type.
    * @return the observable instance.
+   * @see com.github.dm.jrt.core.config.InvocationConfiguration InvocationConfiguration
    */
   @NotNull
   public static <IN, OUT> Observable<OUT> create(@NotNull final Routine<? super IN, OUT> routine,
@@ -148,10 +156,13 @@ public class JRoutineObservable {
 
   /**
    * Creates a new observable by invoking the specified routine.
+   * <br>
+   * Note that, unless properly configure, the invocation might timeout when polled for outputs.
    *
    * @param routine the routine instance.
    * @param <OUT>   the output data type.
    * @return the observable instance.
+   * @see com.github.dm.jrt.core.config.InvocationConfiguration InvocationConfiguration
    */
   @NotNull
   @SuppressWarnings("unchecked")
@@ -164,12 +175,15 @@ public class JRoutineObservable {
 
   /**
    * Creates a new observable by invoking a routine instantiated through the specified builder.
+   * <br>
+   * Note that, unless properly configure, the invocation might timeout when polled for outputs.
    *
    * @param builder the routine builder.
    * @param input   the invocation input.
    * @param <IN>    the input data type.
    * @param <OUT>   the output data type.
    * @return the observable instance.
+   * @see com.github.dm.jrt.core.config.InvocationConfiguration InvocationConfiguration
    */
   @NotNull
   public static <IN, OUT> Observable<OUT> create(
@@ -179,12 +193,15 @@ public class JRoutineObservable {
 
   /**
    * Creates a new observable by invoking a routine instantiated through the specified builder.
+   * <br>
+   * Note that, unless properly configure, the invocation might timeout when polled for outputs.
    *
    * @param builder the routine builder.
    * @param inputs  the invocation inputs.
    * @param <IN>    the input data type.
    * @param <OUT>   the output data type.
    * @return the observable instance.
+   * @see com.github.dm.jrt.core.config.InvocationConfiguration InvocationConfiguration
    */
   @NotNull
   public static <IN, OUT> Observable<OUT> create(
@@ -194,12 +211,15 @@ public class JRoutineObservable {
 
   /**
    * Creates a new observable by invoking a routine instantiated through the specified builder.
+   * <br>
+   * Note that, unless properly configure, the invocation might timeout when polled for outputs.
    *
    * @param builder the routine builder.
    * @param inputs  an iterable returning the invocation inputs.
    * @param <IN>    the input data type.
    * @param <OUT>   the output data type.
    * @return the observable instance.
+   * @see com.github.dm.jrt.core.config.InvocationConfiguration InvocationConfiguration
    */
   @NotNull
   public static <IN, OUT> Observable<OUT> create(
@@ -209,10 +229,13 @@ public class JRoutineObservable {
 
   /**
    * Creates a new observable by invoking a routine instantiated through the specified builder.
+   * <br>
+   * Note that, unless properly configure, the invocation might timeout when polled for outputs.
    *
    * @param builder the routine builder.
    * @param <OUT>   the output data type.
    * @return the observable instance.
+   * @see com.github.dm.jrt.core.config.InvocationConfiguration InvocationConfiguration
    */
   @NotNull
   public static <OUT> Observable<OUT> create(@NotNull final RoutineBuilder<?, OUT> builder) {
@@ -267,7 +290,7 @@ public class JRoutineObservable {
         final Observer<Observable<? extends OUT>> observer) {
       try {
         final int count = (int) Math.min(Integer.MAX_VALUE, requested);
-        final List<OUT> outputs = channel.in(noTime()).eventuallyContinue().next(count);
+        final List<OUT> outputs = channel.next(count);
         if (!outputs.isEmpty()) {
           observer.onNext(Observable.from(outputs));
 
@@ -285,7 +308,7 @@ public class JRoutineObservable {
     }
 
     public void call(final Channel<?, OUT> channel) {
-      channel.after(noTime()).abort();
+      channel.abort();
     }
   }
 

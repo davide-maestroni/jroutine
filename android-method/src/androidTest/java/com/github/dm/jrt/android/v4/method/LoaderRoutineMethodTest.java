@@ -337,7 +337,7 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
     assertThat(
         LoaderRoutineMethodCompat.from(loaderFrom(getActivity()), instanceOf(String.class, test),
             String.class.getMethod("toString"))
-                                 .callConfiguration()
+                                 .wrapperConfiguration()
                                  .withSharedFields()
                                  .apply()
                                  .call()
@@ -353,7 +353,7 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
     assertThat(
         LoaderRoutineMethodCompat.from(loaderFrom(getActivity()), instanceOf(String.class, test),
             "toString")
-                                 .callConfiguration()
+                                 .wrapperConfiguration()
                                  .withSharedFields()
                                  .apply()
                                  .call()

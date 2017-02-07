@@ -42,8 +42,8 @@ import com.github.dm.jrt.core.util.Reflection;
 import com.github.dm.jrt.method.RoutineMethod;
 import com.github.dm.jrt.method.annotation.Input;
 import com.github.dm.jrt.method.annotation.Output;
-import com.github.dm.jrt.reflect.config.CallConfigurable;
-import com.github.dm.jrt.reflect.config.CallConfiguration;
+import com.github.dm.jrt.reflect.config.WrapperConfigurable;
+import com.github.dm.jrt.reflect.config.WrapperConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -447,7 +447,7 @@ public class LoaderRoutineMethod extends RoutineMethod
    * Implementation of a Loader routine method wrapping an object method.
    */
   public static class ReflectionLoaderRoutineMethod extends LoaderRoutineMethod
-      implements CallConfigurable<ReflectionLoaderRoutineMethod> {
+      implements WrapperConfigurable<ReflectionLoaderRoutineMethod> {
 
     private final LoaderContext mContext;
 
@@ -455,7 +455,7 @@ public class LoaderRoutineMethod extends RoutineMethod
 
     private final ContextInvocationTarget<?> mTarget;
 
-    private CallConfiguration mConfiguration = CallConfiguration.defaultConfiguration();
+    private WrapperConfiguration mConfiguration = WrapperConfiguration.defaultConfiguration();
 
     /**
      * Constructor.
@@ -474,8 +474,8 @@ public class LoaderRoutineMethod extends RoutineMethod
 
     @NotNull
     @Override
-    public ReflectionLoaderRoutineMethod apply(@NotNull final CallConfiguration configuration) {
-      mConfiguration = ConstantConditions.notNull("call configuration", configuration);
+    public ReflectionLoaderRoutineMethod apply(@NotNull final WrapperConfiguration configuration) {
+      mConfiguration = ConstantConditions.notNull("wrapper configuration", configuration);
       return this;
     }
 
@@ -488,15 +488,6 @@ public class LoaderRoutineMethod extends RoutineMethod
 
     @NotNull
     @Override
-    @SuppressWarnings("unchecked")
-    public InvocationConfiguration.Builder<? extends ReflectionLoaderRoutineMethod>
-    invocationConfiguration() {
-      return (InvocationConfiguration.Builder<? extends ReflectionLoaderRoutineMethod>) super
-          .invocationConfiguration();
-    }
-
-    @NotNull
-    @Override
     public <OUT> Channel<?, OUT> call(@Nullable final Object... params) {
       return call(InvocationMode.ASYNC, params);
     }
@@ -505,6 +496,15 @@ public class LoaderRoutineMethod extends RoutineMethod
     @Override
     public <OUT> Channel<?, OUT> callParallel(@Nullable final Object... params) {
       return call(InvocationMode.PARALLEL, params);
+    }
+
+    @NotNull
+    @Override
+    @SuppressWarnings("unchecked")
+    public InvocationConfiguration.Builder<? extends ReflectionLoaderRoutineMethod>
+    invocationConfiguration() {
+      return (InvocationConfiguration.Builder<? extends ReflectionLoaderRoutineMethod>) super
+          .invocationConfiguration();
     }
 
     @NotNull
@@ -522,8 +522,9 @@ public class LoaderRoutineMethod extends RoutineMethod
 
     @NotNull
     @Override
-    public CallConfiguration.Builder<? extends ReflectionLoaderRoutineMethod> callConfiguration() {
-      return new CallConfiguration.Builder<ReflectionLoaderRoutineMethod>(this, mConfiguration);
+    public WrapperConfiguration.Builder<? extends ReflectionLoaderRoutineMethod>
+    wrapperConfiguration() {
+      return new WrapperConfiguration.Builder<ReflectionLoaderRoutineMethod>(this, mConfiguration);
     }
 
     @NotNull

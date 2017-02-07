@@ -54,7 +54,7 @@ import com.github.dm.jrt.reflect.annotation.Invoke;
 import com.github.dm.jrt.reflect.annotation.OutputTimeout;
 import com.github.dm.jrt.reflect.annotation.OutputTimeoutAction;
 import com.github.dm.jrt.reflect.annotation.SharedFields;
-import com.github.dm.jrt.reflect.config.CallConfiguration;
+import com.github.dm.jrt.reflect.config.WrapperConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -289,7 +289,7 @@ public class LoaderReflectionRoutineActivityTest
     try {
 
       new DefaultLoaderReflectionRoutineBuilder(loaderFrom(getActivity()),
-          instanceOf(TestClass.class)).apply((CallConfiguration) null);
+          instanceOf(TestClass.class)).apply((WrapperConfiguration) null);
 
       fail();
 
@@ -336,7 +336,7 @@ public class LoaderReflectionRoutineActivityTest
                             .invocationConfiguration()
                             .with(configuration)
                             .apply()
-                            .callConfiguration()
+                            .wrapperConfiguration()
                             .withSharedFields("test")
                             .apply()
                             .method(TestClass.GET);
@@ -347,7 +347,7 @@ public class LoaderReflectionRoutineActivityTest
                             .invocationConfiguration()
                             .with(configuration)
                             .apply()
-                            .callConfiguration()
+                            .wrapperConfiguration()
                             .withSharedFields("test")
                             .apply()
                             .buildProxy(SquareItf.class)
@@ -697,7 +697,7 @@ public class LoaderReflectionRoutineActivityTest
                                                                          Runners.poolRunner())
                                                                      .withMaxInstances(1)
                                                                      .apply()
-                                                                     .callConfiguration()
+                                                                     .wrapperConfiguration()
                                                                      .withSharedFields("test")
                                                                      .apply()
                                                                      .method(
@@ -1097,9 +1097,9 @@ public class LoaderReflectionRoutineActivityTest
     long startTime = System.currentTimeMillis();
 
     Channel<?, Object> getOne =
-        builder.callConfiguration().withSharedFields("1").apply().method("getOne").close();
+        builder.wrapperConfiguration().withSharedFields("1").apply().method("getOne").close();
     Channel<?, Object> getTwo =
-        builder.callConfiguration().withSharedFields("2").apply().method("getTwo").close();
+        builder.wrapperConfiguration().withSharedFields("2").apply().method("getTwo").close();
 
     assertThat(getOne.getComplete()).isTrue();
     assertThat(getTwo.getComplete()).isTrue();

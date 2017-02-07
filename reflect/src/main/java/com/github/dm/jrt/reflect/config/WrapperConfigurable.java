@@ -16,29 +16,29 @@
 
 package com.github.dm.jrt.reflect.config;
 
-import com.github.dm.jrt.reflect.config.CallConfiguration.Builder;
-import com.github.dm.jrt.reflect.config.CallConfiguration.Configurable;
+import com.github.dm.jrt.reflect.config.WrapperConfiguration.Builder;
+import com.github.dm.jrt.reflect.config.WrapperConfiguration.Configurable;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Interface defining an object that can be configured through a call configuration.
+ * Interface defining an object that can be configured through a wrapper configuration.
  * <p>
  * Created by davide-maestroni on 05/01/2015.
  *
  * @param <TYPE> the object type.
  */
-public interface CallConfigurable<TYPE> extends Configurable<TYPE> {
+public interface WrapperConfigurable<TYPE> extends Configurable<TYPE> {
 
   /**
-   * Gets the call configuration builder related to the instance.
+   * Gets the wrapper configuration builder related to the instance.
    * <br>
    * The configuration options not supported by the specific implementation might be ignored.
    * <p>
    * Note that the configuration builder must be initialized with the current configuration.
    *
-   * @return the call configuration builder.
+   * @return the wrapper configuration builder.
    */
   @NotNull
-  Builder<? extends TYPE> callConfiguration();
+  Builder<? extends TYPE> wrapperConfiguration();
 }

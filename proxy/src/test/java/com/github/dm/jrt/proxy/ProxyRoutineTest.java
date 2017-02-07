@@ -285,7 +285,7 @@ public class ProxyRoutineTest {
     final TestProxy testProxy = builder.invocationConfiguration()
                                        .with(configuration)
                                        .apply()
-                                       .callConfiguration()
+                                       .wrapperConfiguration()
                                        .withSharedFields()
                                        .apply()
                                        .buildProxy();
@@ -308,7 +308,7 @@ public class ProxyRoutineTest {
                             .invocationConfiguration()
                             .with(configuration)
                             .apply()
-                            .callConfiguration()
+                            .wrapperConfiguration()
                             .withSharedFields()
                             .apply()
                             .buildProxy(tokenOf(TestProxy.class))).isSameAs(testProxy);
@@ -372,12 +372,12 @@ public class ProxyRoutineTest {
 
     long startTime = System.currentTimeMillis();
 
-    Channel<?, Integer> getOne = builder.callConfiguration()
+    Channel<?, Integer> getOne = builder.wrapperConfiguration()
                                         .withSharedFields("1")
                                         .apply()
                                         .buildProxy(TestClassAsync.class)
                                         .getOne();
-    Channel<?, Integer> getTwo = builder.callConfiguration()
+    Channel<?, Integer> getTwo = builder.wrapperConfiguration()
                                         .withSharedFields("2")
                                         .apply()
                                         .buildProxy(TestClassAsync.class)

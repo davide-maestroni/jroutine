@@ -69,8 +69,6 @@ public class ByteChannel {
 
   private static final int DEFAULT_POOL_SIZE = 16;
 
-  private static final int DEFAULT_MEM_SIZE = DEFAULT_POOL_SIZE * DEFAULT_CHUNK_SIZE;
-
   private final SimpleQueue<ByteChunk> mChunkPool;
 
   private final ChunkStreamConfiguration mConfiguration;
@@ -86,9 +84,8 @@ public class ByteChannel {
    */
   private ByteChannel(@NotNull final ChunkStreamConfiguration configuration) {
     mConfiguration = configuration;
-    final int chunkSize = (mDataChunkSize = configuration.getChunkSizeOrElse(DEFAULT_CHUNK_SIZE));
-    final int poolSize =
-        (mCorePoolSize = configuration.getCorePoolSizeOrElse(DEFAULT_MEM_SIZE / chunkSize));
+    mDataChunkSize = configuration.getChunkSizeOrElse(DEFAULT_CHUNK_SIZE);
+    final int poolSize = (mCorePoolSize = configuration.getCorePoolSizeOrElse(DEFAULT_POOL_SIZE));
     mChunkPool = new SimpleQueue<ByteChunk>(Math.max(poolSize, 1));
   }
 

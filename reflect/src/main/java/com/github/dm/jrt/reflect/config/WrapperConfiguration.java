@@ -30,7 +30,7 @@ import java.util.Set;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
- * Class storing the method call configuration.
+ * Class storing the method wrapper configuration.
  * <p>
  * Each instance is immutable, thus, in order to modify an existing configuration, a new builder
  * must be created from it.
@@ -44,11 +44,11 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * <p>
  * Created by davide-maestroni on 04/20/2015.
  */
-public final class CallConfiguration extends DeepEqualObject {
+public final class WrapperConfiguration extends DeepEqualObject {
 
   private static final DefaultConfigurable sDefaultConfigurable = new DefaultConfigurable();
 
-  private static final CallConfiguration sDefaultConfiguration = builder().buildConfiguration();
+  private static final WrapperConfiguration sDefaultConfiguration = builder().buildConfiguration();
 
   private final Set<String> mFieldNames;
 
@@ -57,32 +57,32 @@ public final class CallConfiguration extends DeepEqualObject {
    *
    * @param fieldNames the shared field names.
    */
-  private CallConfiguration(@Nullable final Set<String> fieldNames) {
+  private WrapperConfiguration(@Nullable final Set<String> fieldNames) {
     super(asArgs(fieldNames));
     mFieldNames = (fieldNames != null) ? Collections.unmodifiableSet(fieldNames) : null;
   }
 
   /**
-   * Returns a call configuration builder.
+   * Returns a wrapper configuration builder.
    *
    * @return the builder.
    */
   @NotNull
-  public static Builder<CallConfiguration> builder() {
-    return new Builder<CallConfiguration>(sDefaultConfigurable);
+  public static Builder<WrapperConfiguration> builder() {
+    return new Builder<WrapperConfiguration>(sDefaultConfigurable);
   }
 
   /**
-   * Returns a call configuration builder initialized with the specified configuration.
+   * Returns a wrapper configuration builder initialized with the specified configuration.
    *
-   * @param initialConfiguration the initial call configuration.
+   * @param initialConfiguration the initial wrapper configuration.
    * @return the builder.
    */
   @NotNull
-  public static Builder<CallConfiguration> builderFrom(
-      @Nullable final CallConfiguration initialConfiguration) {
+  public static Builder<WrapperConfiguration> builderFrom(
+      @Nullable final WrapperConfiguration initialConfiguration) {
     return (initialConfiguration == null) ? builder()
-        : new Builder<CallConfiguration>(sDefaultConfigurable, initialConfiguration);
+        : new Builder<WrapperConfiguration>(sDefaultConfigurable, initialConfiguration);
   }
 
   /**
@@ -91,17 +91,17 @@ public final class CallConfiguration extends DeepEqualObject {
    * @return the configuration instance.
    */
   @NotNull
-  public static CallConfiguration defaultConfiguration() {
+  public static WrapperConfiguration defaultConfiguration() {
     return sDefaultConfiguration;
   }
 
   /**
-   * Returns a call configuration builder initialized with this configuration.
+   * Returns a wrapper configuration builder initialized with this configuration.
    *
    * @return the builder.
    */
   @NotNull
-  public Builder<CallConfiguration> builderFrom() {
+  public Builder<WrapperConfiguration> builderFrom() {
     return builderFrom(this);
   }
 
@@ -130,7 +130,7 @@ public final class CallConfiguration extends DeepEqualObject {
      * @return the configurable instance.
      */
     @NotNull
-    TYPE apply(@NotNull CallConfiguration configuration);
+    TYPE apply(@NotNull WrapperConfiguration configuration);
   }
 
   /**
@@ -157,10 +157,10 @@ public final class CallConfiguration extends DeepEqualObject {
      * Constructor.
      *
      * @param configurable         the configurable instance.
-     * @param initialConfiguration the initial call configuration.
+     * @param initialConfiguration the initial wrapper configuration.
      */
     public Builder(@NotNull final Configurable<? extends TYPE> configurable,
-        @NotNull final CallConfiguration initialConfiguration) {
+        @NotNull final WrapperConfiguration initialConfiguration) {
       mConfigurable = ConstantConditions.notNull("configurable instance", configurable);
       setConfiguration(initialConfiguration);
     }
@@ -187,11 +187,11 @@ public final class CallConfiguration extends DeepEqualObject {
      * configuration options will be reset to their default, otherwise only the non-default
      * options will be applied.
      *
-     * @param configuration the call configuration.
+     * @param configuration the wrapper configuration.
      * @return this builder.
      */
     @NotNull
-    public Builder<TYPE> with(@Nullable final CallConfiguration configuration) {
+    public Builder<TYPE> with(@Nullable final WrapperConfiguration configuration) {
       if (configuration == null) {
         setConfiguration(defaultConfiguration());
         return this;
@@ -241,11 +241,11 @@ public final class CallConfiguration extends DeepEqualObject {
     }
 
     @NotNull
-    private CallConfiguration buildConfiguration() {
-      return new CallConfiguration(mFieldNames);
+    private WrapperConfiguration buildConfiguration() {
+      return new WrapperConfiguration(mFieldNames);
     }
 
-    private void setConfiguration(@NotNull final CallConfiguration configuration) {
+    private void setConfiguration(@NotNull final WrapperConfiguration configuration) {
       mFieldNames = configuration.mFieldNames;
     }
   }
@@ -253,10 +253,10 @@ public final class CallConfiguration extends DeepEqualObject {
   /**
    * Default configurable implementation.
    */
-  private static class DefaultConfigurable implements Configurable<CallConfiguration> {
+  private static class DefaultConfigurable implements Configurable<WrapperConfiguration> {
 
     @NotNull
-    public CallConfiguration apply(@NotNull final CallConfiguration configuration) {
+    public WrapperConfiguration apply(@NotNull final WrapperConfiguration configuration) {
       return configuration;
     }
   }

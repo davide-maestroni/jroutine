@@ -36,8 +36,8 @@ import com.github.dm.jrt.method.annotation.Input;
 import com.github.dm.jrt.method.annotation.Output;
 import com.github.dm.jrt.reflect.InvocationTarget;
 import com.github.dm.jrt.reflect.JRoutineReflection;
-import com.github.dm.jrt.reflect.config.CallConfigurable;
-import com.github.dm.jrt.reflect.config.CallConfiguration;
+import com.github.dm.jrt.reflect.config.WrapperConfigurable;
+import com.github.dm.jrt.reflect.config.WrapperConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -770,13 +770,13 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
    * Implementation of a routine method wrapping an object method.
    */
   public static class ReflectionRoutineMethod extends RoutineMethod
-      implements CallConfigurable<ReflectionRoutineMethod> {
+      implements WrapperConfigurable<ReflectionRoutineMethod> {
 
     private final Method mMethod;
 
     private final InvocationTarget<?> mTarget;
 
-    private CallConfiguration mConfiguration = CallConfiguration.defaultConfiguration();
+    private WrapperConfiguration mConfiguration = WrapperConfiguration.defaultConfiguration();
 
     /**
      * Constructor.
@@ -791,8 +791,8 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
     }
 
     @NotNull
-    public ReflectionRoutineMethod apply(@NotNull final CallConfiguration configuration) {
-      mConfiguration = ConstantConditions.notNull("call configuration", configuration);
+    public ReflectionRoutineMethod apply(@NotNull final WrapperConfiguration configuration) {
+      mConfiguration = ConstantConditions.notNull("wrapper configuration", configuration);
       return this;
     }
 
@@ -822,8 +822,8 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
     }
 
     @NotNull
-    public CallConfiguration.Builder<? extends ReflectionRoutineMethod> callConfiguration() {
-      return new CallConfiguration.Builder<ReflectionRoutineMethod>(this, mConfiguration);
+    public WrapperConfiguration.Builder<? extends ReflectionRoutineMethod> wrapperConfiguration() {
+      return new WrapperConfiguration.Builder<ReflectionRoutineMethod>(this, mConfiguration);
     }
 
     @NotNull

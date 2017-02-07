@@ -16,13 +16,13 @@
 
 package com.github.dm.jrt.reflect.builder;
 
-import com.github.dm.jrt.reflect.config.CallConfiguration;
-import com.github.dm.jrt.reflect.config.CallConfiguration.Builder;
+import com.github.dm.jrt.reflect.config.WrapperConfiguration;
+import com.github.dm.jrt.reflect.config.WrapperConfiguration.Builder;
 
 import org.junit.Test;
 
-import static com.github.dm.jrt.reflect.config.CallConfiguration.builder;
-import static com.github.dm.jrt.reflect.config.CallConfiguration.builderFrom;
+import static com.github.dm.jrt.reflect.config.WrapperConfiguration.builder;
+import static com.github.dm.jrt.reflect.config.WrapperConfiguration.builderFrom;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -31,15 +31,15 @@ import static org.junit.Assert.fail;
  * <p>
  * Created by davide-maestroni on 04/21/2015.
  */
-public class CallConfigurationTest {
+public class WrapperConfigurationTest {
 
   @Test
   public void testBuildFrom() {
 
-    final CallConfiguration configuration = builder().withSharedFields("test").apply();
+    final WrapperConfiguration configuration = builder().withSharedFields("test").apply();
     assertThat(configuration.builderFrom().apply()).isEqualTo(configuration);
     assertThat(configuration.builderFrom().apply().hashCode()).isEqualTo(configuration.hashCode());
-    assertThat(builderFrom(null).apply()).isEqualTo(CallConfiguration.defaultConfiguration());
+    assertThat(builderFrom(null).apply()).isEqualTo(WrapperConfiguration.defaultConfiguration());
   }
 
   @Test
@@ -58,7 +58,7 @@ public class CallConfigurationTest {
 
     try {
 
-      new Builder<Object>(null, CallConfiguration.defaultConfiguration());
+      new Builder<Object>(null, WrapperConfiguration.defaultConfiguration());
 
       fail();
 
@@ -70,11 +70,11 @@ public class CallConfigurationTest {
   @Test
   public void testBuilderFromEquals() {
 
-    final CallConfiguration configuration = builder().withSharedFields("test").apply();
+    final WrapperConfiguration configuration = builder().withSharedFields("test").apply();
     assertThat(builder().with(configuration).apply()).isEqualTo(configuration);
     assertThat(configuration.builderFrom().apply()).isEqualTo(configuration);
     assertThat(configuration.builderFrom().with(null).apply()).isEqualTo(
-        CallConfiguration.defaultConfiguration());
+        WrapperConfiguration.defaultConfiguration());
   }
 
   @Test
@@ -95,7 +95,7 @@ public class CallConfigurationTest {
   @Test
   public void testSharedFieldsEquals() {
 
-    final CallConfiguration configuration = builder().withSharedFields("group").apply();
+    final WrapperConfiguration configuration = builder().withSharedFields("group").apply();
     assertThat(configuration).isNotEqualTo(builder().withSharedFields("test").apply());
     assertThat(configuration.builderFrom().withSharedFields("test").apply()).isEqualTo(
         builder().withSharedFields("test").apply());

@@ -24,7 +24,7 @@ import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;
-import com.github.dm.jrt.reflect.config.CallConfiguration;
+import com.github.dm.jrt.reflect.config.WrapperConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -48,12 +48,12 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
       sContextProxies =
       new WeakIdentityHashMap<Context, HashMap<Class<?>, HashMap<ProxyInfo, Object>>>();
 
-  private CallConfiguration mCallConfiguration = CallConfiguration.defaultConfiguration();
-
   private InvocationConfiguration mInvocationConfiguration =
       InvocationConfiguration.defaultConfiguration();
 
   private ServiceConfiguration mServiceConfiguration = ServiceConfiguration.defaultConfiguration();
+
+  private WrapperConfiguration mWrapperConfiguration = WrapperConfiguration.defaultConfiguration();
 
   @NotNull
   @Override
@@ -73,8 +73,8 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
 
   @NotNull
   @Override
-  public ServiceProxyObjectBuilder<TYPE> apply(@NotNull final CallConfiguration configuration) {
-    mCallConfiguration = ConstantConditions.notNull("call configuration", configuration);
+  public ServiceProxyObjectBuilder<TYPE> apply(@NotNull final WrapperConfiguration configuration) {
+    mWrapperConfiguration = ConstantConditions.notNull("wrapper configuration", configuration);
     return this;
   }
 
@@ -104,10 +104,10 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
       }
 
       final InvocationConfiguration invocationConfiguration = mInvocationConfiguration;
-      final CallConfiguration callConfiguration = mCallConfiguration;
+      final WrapperConfiguration wrapperConfiguration = mWrapperConfiguration;
       final ServiceConfiguration serviceConfiguration = mServiceConfiguration;
       final ProxyInfo proxyInfo =
-          new ProxyInfo(getInterfaceClass(), invocationConfiguration, callConfiguration,
+          new ProxyInfo(getInterfaceClass(), invocationConfiguration, wrapperConfiguration,
               serviceConfiguration);
       final Object instance = proxies.get(proxyInfo);
       if (instance != null) {
@@ -116,7 +116,7 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
 
       try {
         final TYPE newInstance =
-            newProxy(invocationConfiguration, callConfiguration, serviceConfiguration);
+            newProxy(invocationConfiguration, wrapperConfiguration, serviceConfiguration);
         proxies.put(proxyInfo, newInstance);
         return newInstance;
 
@@ -125,22 +125,6 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
         throw new IllegalArgumentException(t);
       }
     }
-  }
-
-  @NotNull
-  @Override
-  public CallConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>> callConfiguration() {
-    final CallConfiguration config = mCallConfiguration;
-    return new CallConfiguration.Builder<ServiceProxyObjectBuilder<TYPE>>(
-        new CallConfiguration.Configurable<ServiceProxyObjectBuilder<TYPE>>() {
-
-          @NotNull
-          @Override
-          public ServiceProxyObjectBuilder<TYPE> apply(
-              @NotNull final CallConfiguration configuration) {
-            return AbstractServiceProxyObjectBuilder.this.apply(configuration);
-          }
-        }, config);
   }
 
   @NotNull
@@ -155,6 +139,23 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
           @Override
           public ServiceProxyObjectBuilder<TYPE> apply(
               @NotNull final InvocationConfiguration configuration) {
+            return AbstractServiceProxyObjectBuilder.this.apply(configuration);
+          }
+        }, config);
+  }
+
+  @NotNull
+  @Override
+  public WrapperConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>>
+  wrapperConfiguration() {
+    final WrapperConfiguration config = mWrapperConfiguration;
+    return new WrapperConfiguration.Builder<ServiceProxyObjectBuilder<TYPE>>(
+        new WrapperConfiguration.Configurable<ServiceProxyObjectBuilder<TYPE>>() {
+
+          @NotNull
+          @Override
+          public ServiceProxyObjectBuilder<TYPE> apply(
+              @NotNull final WrapperConfiguration configuration) {
             return AbstractServiceProxyObjectBuilder.this.apply(configuration);
           }
         }, config);
@@ -198,14 +199,14 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
    * Creates and return a new proxy instance.
    *
    * @param invocationConfiguration the invocation configuration.
-   * @param callConfiguration       the call configuration.
+   * @param wrapperConfiguration    the wrapper configuration.
    * @param serviceConfiguration    the Service configuration.
    * @return the proxy instance.
    * @throws java.lang.Exception if an unexpected error occurs.
    */
   @NotNull
   protected abstract TYPE newProxy(@NotNull InvocationConfiguration invocationConfiguration,
-      @NotNull CallConfiguration callConfiguration,
+      @NotNull WrapperConfiguration wrapperConfiguration,
       @NotNull ServiceConfiguration serviceConfiguration) throws Exception;
 
   /**
@@ -218,14 +219,14 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
      *
      * @param itf                     the proxy interface class.
      * @param invocationConfiguration the invocation configuration.
-     * @param callConfiguration       the call configuration.
+     * @param wrapperConfiguration    the wrapper configuration.
      * @param serviceConfiguration    the Service configuration.
      */
     private ProxyInfo(@NotNull final Class<?> itf,
         @NotNull final InvocationConfiguration invocationConfiguration,
-        @NotNull final CallConfiguration callConfiguration,
+        @NotNull final WrapperConfiguration wrapperConfiguration,
         @NotNull final ServiceConfiguration serviceConfiguration) {
-      super(asArgs(itf, invocationConfiguration, callConfiguration, serviceConfiguration));
+      super(asArgs(itf, invocationConfiguration, wrapperConfiguration, serviceConfiguration));
     }
   }
 }

@@ -44,7 +44,7 @@ import com.github.dm.jrt.reflect.annotation.AsyncOutput.OutputMode;
 import com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilders;
 import com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilders.MethodInfo;
 import com.github.dm.jrt.reflect.common.Mutex;
-import com.github.dm.jrt.reflect.config.CallConfiguration;
+import com.github.dm.jrt.reflect.config.WrapperConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -71,12 +71,12 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
 
   private final ContextInvocationTarget<?> mTarget;
 
-  private CallConfiguration mCallConfiguration = CallConfiguration.defaultConfiguration();
-
   private InvocationConfiguration mInvocationConfiguration =
       InvocationConfiguration.defaultConfiguration();
 
   private LoaderConfiguration mLoaderConfiguration = LoaderConfiguration.defaultConfiguration();
+
+  private WrapperConfiguration mWrapperConfiguration = WrapperConfiguration.defaultConfiguration();
 
   /**
    * Constructor.
@@ -108,42 +108,9 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
 
   @NotNull
   @Override
-  public LoaderReflectionRoutineBuilder apply(@NotNull final CallConfiguration configuration) {
-    mCallConfiguration = ConstantConditions.notNull("call configuration", configuration);
+  public LoaderReflectionRoutineBuilder apply(@NotNull final WrapperConfiguration configuration) {
+    mWrapperConfiguration = ConstantConditions.notNull("wrapper configuration", configuration);
     return this;
-  }
-
-  @NotNull
-  @Override
-  public InvocationConfiguration.Builder<? extends LoaderReflectionRoutineBuilder>
-  invocationConfiguration() {
-    final InvocationConfiguration config = mInvocationConfiguration;
-    return new InvocationConfiguration.Builder<LoaderReflectionRoutineBuilder>(
-        new InvocationConfiguration.Configurable<LoaderReflectionRoutineBuilder>() {
-
-          @NotNull
-          @Override
-          public LoaderReflectionRoutineBuilder apply(
-              @NotNull final InvocationConfiguration configuration) {
-            return DefaultLoaderReflectionRoutineBuilder.this.apply(configuration);
-          }
-        }, config);
-  }
-
-  @NotNull
-  @Override
-  public CallConfiguration.Builder<? extends LoaderReflectionRoutineBuilder> callConfiguration() {
-    final CallConfiguration config = mCallConfiguration;
-    return new CallConfiguration.Builder<LoaderReflectionRoutineBuilder>(
-        new CallConfiguration.Configurable<LoaderReflectionRoutineBuilder>() {
-
-          @NotNull
-          @Override
-          public LoaderReflectionRoutineBuilder apply(
-              @NotNull final CallConfiguration configuration) {
-            return DefaultLoaderReflectionRoutineBuilder.this.apply(configuration);
-          }
-        }, config);
   }
 
   @NotNull
@@ -174,10 +141,10 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
       return method(name, Reflection.NO_PARAMS);
     }
 
-    final CallConfiguration callConfiguration =
-        ReflectionRoutineBuilders.withAnnotations(mCallConfiguration, targetMethod);
+    final WrapperConfiguration wrapperConfiguration =
+        ReflectionRoutineBuilders.withAnnotations(mWrapperConfiguration, targetMethod);
     final MethodAliasInvocationFactory<IN, OUT> factory =
-        new MethodAliasInvocationFactory<IN, OUT>(targetMethod, callConfiguration, target, name);
+        new MethodAliasInvocationFactory<IN, OUT>(targetMethod, wrapperConfiguration, target, name);
     final InvocationConfiguration invocationConfiguration =
         ReflectionRoutineBuilders.withAnnotations(mInvocationConfiguration, targetMethod);
     final LoaderConfiguration loaderConfiguration =
@@ -199,10 +166,11 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
   @NotNull
   @Override
   public <IN, OUT> LoaderRoutine<IN, OUT> method(@NotNull final Method method) {
-    final CallConfiguration callConfiguration =
-        ReflectionRoutineBuilders.withAnnotations(mCallConfiguration, method);
+    final WrapperConfiguration wrapperConfiguration =
+        ReflectionRoutineBuilders.withAnnotations(mWrapperConfiguration, method);
     final MethodSignatureInvocationFactory<IN, OUT> factory =
-        new MethodSignatureInvocationFactory<IN, OUT>(method, callConfiguration, mTarget, method);
+        new MethodSignatureInvocationFactory<IN, OUT>(method, wrapperConfiguration, mTarget,
+            method);
     final InvocationConfiguration invocationConfiguration =
         ReflectionRoutineBuilders.withAnnotations(mInvocationConfiguration, method);
     final LoaderConfiguration loaderConfiguration =
@@ -212,6 +180,40 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
                          .apply(invocationConfiguration)
                          .apply(loaderConfiguration)
                          .buildRoutine();
+  }
+
+  @NotNull
+  @Override
+  public WrapperConfiguration.Builder<? extends LoaderReflectionRoutineBuilder>
+  wrapperConfiguration() {
+    final WrapperConfiguration config = mWrapperConfiguration;
+    return new WrapperConfiguration.Builder<LoaderReflectionRoutineBuilder>(
+        new WrapperConfiguration.Configurable<LoaderReflectionRoutineBuilder>() {
+
+          @NotNull
+          @Override
+          public LoaderReflectionRoutineBuilder apply(
+              @NotNull final WrapperConfiguration configuration) {
+            return DefaultLoaderReflectionRoutineBuilder.this.apply(configuration);
+          }
+        }, config);
+  }
+
+  @NotNull
+  @Override
+  public InvocationConfiguration.Builder<? extends LoaderReflectionRoutineBuilder>
+  invocationConfiguration() {
+    final InvocationConfiguration config = mInvocationConfiguration;
+    return new InvocationConfiguration.Builder<LoaderReflectionRoutineBuilder>(
+        new InvocationConfiguration.Configurable<LoaderReflectionRoutineBuilder>() {
+
+          @NotNull
+          @Override
+          public LoaderReflectionRoutineBuilder apply(
+              @NotNull final InvocationConfiguration configuration) {
+            return DefaultLoaderReflectionRoutineBuilder.this.apply(configuration);
+          }
+        }, config);
   }
 
   @NotNull
@@ -232,9 +234,9 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
 
     private final String mAliasName;
 
-    private final CallConfiguration mCallConfiguration;
-
     private final ContextInvocationTarget<?> mTarget;
+
+    private final WrapperConfiguration mWrapperConfiguration;
 
     private Channel<IN, OUT> mChannel;
 
@@ -245,13 +247,13 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
     /**
      * Constructor.
      *
-     * @param callConfiguration the call configuration.
-     * @param target            the invocation target.
-     * @param name              the alias name.
+     * @param wrapperConfiguration the wrapper configuration.
+     * @param target               the invocation target.
+     * @param name                 the alias name.
      */
-    private MethodAliasInvocation(@NotNull final CallConfiguration callConfiguration,
+    private MethodAliasInvocation(@NotNull final WrapperConfiguration wrapperConfiguration,
         @NotNull final ContextInvocationTarget<?> target, @NotNull final String name) {
-      mCallConfiguration = callConfiguration;
+      mWrapperConfiguration = wrapperConfiguration;
       mTarget = target;
       mAliasName = name;
     }
@@ -274,7 +276,7 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
                                    .invocationConfiguration()
                                    .withRunner(Runners.syncRunner())
                                    .apply()
-                                   .apply(mCallConfiguration)
+                                   .apply(mWrapperConfiguration)
                                    .method(mAliasName);
     }
 
@@ -314,25 +316,25 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
   private static class MethodAliasInvocationFactory<IN, OUT>
       extends ContextInvocationFactory<IN, OUT> {
 
-    private final CallConfiguration mCallConfiguration;
-
     private final String mName;
 
     private final ContextInvocationTarget<?> mTarget;
 
+    private final WrapperConfiguration mWrapperConfiguration;
+
     /**
      * Constructor.
      *
-     * @param targetMethod      the target method.
-     * @param callConfiguration the call configuration.
-     * @param target            the invocation target.
-     * @param name              the alias name.
+     * @param targetMethod         the target method.
+     * @param wrapperConfiguration the wrapper configuration.
+     * @param target               the invocation target.
+     * @param name                 the alias name.
      */
     private MethodAliasInvocationFactory(@NotNull final Method targetMethod,
-        @NotNull final CallConfiguration callConfiguration,
+        @NotNull final WrapperConfiguration wrapperConfiguration,
         @NotNull final ContextInvocationTarget<?> target, @NotNull final String name) {
-      super(asArgs(targetMethod, callConfiguration, target, name));
-      mCallConfiguration = callConfiguration;
+      super(asArgs(targetMethod, wrapperConfiguration, target, name));
+      mWrapperConfiguration = wrapperConfiguration;
       mTarget = target;
       mName = name;
     }
@@ -340,7 +342,7 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
     @NotNull
     @Override
     public ContextInvocation<IN, OUT> newInvocation() {
-      return new MethodAliasInvocation<IN, OUT>(mCallConfiguration, mTarget, mName);
+      return new MethodAliasInvocation<IN, OUT>(mWrapperConfiguration, mTarget, mName);
     }
   }
 
@@ -352,11 +354,11 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
    */
   private static class MethodSignatureInvocation<IN, OUT> implements ContextInvocation<IN, OUT> {
 
-    private final CallConfiguration mCallConfiguration;
-
     private final Method mMethod;
 
     private final ContextInvocationTarget<?> mTarget;
+
+    private final WrapperConfiguration mWrapperConfiguration;
 
     private Channel<IN, OUT> mChannel;
 
@@ -367,13 +369,13 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
     /**
      * Constructor.
      *
-     * @param callConfiguration the call configuration.
-     * @param target            the invocation target.
-     * @param method            the method.
+     * @param wrapperConfiguration the wrapper configuration.
+     * @param target               the invocation target.
+     * @param method               the method.
      */
-    private MethodSignatureInvocation(@NotNull final CallConfiguration callConfiguration,
+    private MethodSignatureInvocation(@NotNull final WrapperConfiguration wrapperConfiguration,
         @NotNull final ContextInvocationTarget<?> target, @NotNull final Method method) {
-      mCallConfiguration = callConfiguration;
+      mWrapperConfiguration = wrapperConfiguration;
       mTarget = target;
       mMethod = method;
     }
@@ -422,7 +424,7 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
                                    .invocationConfiguration()
                                    .withRunner(Runners.syncRunner())
                                    .apply()
-                                   .apply(mCallConfiguration)
+                                   .apply(mWrapperConfiguration)
                                    .method(mMethod);
     }
   }
@@ -436,25 +438,25 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
   private static class MethodSignatureInvocationFactory<IN, OUT>
       extends ContextInvocationFactory<IN, OUT> {
 
-    private final CallConfiguration mCallConfiguration;
-
     private final Method mMethod;
 
     private final ContextInvocationTarget<?> mTarget;
 
+    private final WrapperConfiguration mWrapperConfiguration;
+
     /**
      * Constructor.
      *
-     * @param targetMethod      the target method.
-     * @param callConfiguration the call configuration.
-     * @param target            the invocation target.
-     * @param method            the method.
+     * @param targetMethod         the target method.
+     * @param wrapperConfiguration the wrapper configuration.
+     * @param target               the invocation target.
+     * @param method               the method.
      */
     private MethodSignatureInvocationFactory(@NotNull final Method targetMethod,
-        @NotNull final CallConfiguration callConfiguration,
+        @NotNull final WrapperConfiguration wrapperConfiguration,
         @NotNull final ContextInvocationTarget<?> target, @NotNull final Method method) {
-      super(asArgs(targetMethod, callConfiguration, target, method));
-      mCallConfiguration = callConfiguration;
+      super(asArgs(targetMethod, wrapperConfiguration, target, method));
+      mWrapperConfiguration = wrapperConfiguration;
       mTarget = target;
       mMethod = method;
     }
@@ -462,7 +464,7 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
     @NotNull
     @Override
     public ContextInvocation<IN, OUT> newInvocation() {
-      return new MethodSignatureInvocation<IN, OUT>(mCallConfiguration, mTarget, mMethod);
+      return new MethodSignatureInvocation<IN, OUT>(mWrapperConfiguration, mTarget, mMethod);
     }
   }
 
@@ -470,8 +472,6 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
    * Proxy method invocation.
    */
   private static class ProxyInvocation extends CallContextInvocation<Object, Object> {
-
-    private final CallConfiguration mCallConfiguration;
 
     private final InputMode mInputMode;
 
@@ -481,6 +481,8 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
 
     private final Method mTargetMethod;
 
+    private final WrapperConfiguration mWrapperConfiguration;
+
     private Object mInstance;
 
     private Mutex mMutex = Mutex.NONE;
@@ -488,18 +490,18 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
     /**
      * Constructor.
      *
-     * @param targetMethod      the target method.
-     * @param callConfiguration the call configuration.
-     * @param target            the invocation target.
-     * @param inputMode         the input transfer mode.
-     * @param outputMode        the output transfer mode.
+     * @param targetMethod         the target method.
+     * @param wrapperConfiguration the wrapper configuration.
+     * @param target               the invocation target.
+     * @param inputMode            the input transfer mode.
+     * @param outputMode           the output transfer mode.
      */
     private ProxyInvocation(@NotNull final Method targetMethod,
-        @NotNull final CallConfiguration callConfiguration,
+        @NotNull final WrapperConfiguration wrapperConfiguration,
         @NotNull final ContextInvocationTarget<?> target, @Nullable final InputMode inputMode,
         @Nullable final OutputMode outputMode) {
       mTargetMethod = targetMethod;
-      mCallConfiguration = callConfiguration;
+      mWrapperConfiguration = wrapperConfiguration;
       mTarget = target;
       mInputMode = inputMode;
       mOutputMode = outputMode;
@@ -513,7 +515,7 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
           (Modifier.isStatic(mTargetMethod.getModifiers())) ? target.getTargetClass()
               : target.getTarget();
       mMutex = ReflectionRoutineBuilders.getSharedMutex(mutexTarget,
-          mCallConfiguration.getSharedFieldsOrElse(null));
+          mWrapperConfiguration.getSharedFieldsOrElse(null));
       mInstance = target.getTarget();
       final Object targetInstance = mInstance;
       if (targetInstance == null) {
@@ -543,8 +545,6 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
    */
   private static class ProxyInvocationFactory extends ContextInvocationFactory<Object, Object> {
 
-    private final CallConfiguration mCallConfiguration;
-
     private final InputMode mInputMode;
 
     private final OutputMode mOutputMode;
@@ -553,22 +553,24 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
 
     private final Method mTargetMethod;
 
+    private final WrapperConfiguration mWrapperConfiguration;
+
     /**
      * Constructor.
      *
-     * @param targetMethod      the target method.
-     * @param callConfiguration the call configuration.
-     * @param target            the invocation target.
-     * @param inputMode         the input transfer mode.
-     * @param outputMode        the output transfer mode.
+     * @param targetMethod         the target method.
+     * @param wrapperConfiguration the wrapper configuration.
+     * @param target               the invocation target.
+     * @param inputMode            the input transfer mode.
+     * @param outputMode           the output transfer mode.
      */
     private ProxyInvocationFactory(@NotNull final Method targetMethod,
-        @NotNull final CallConfiguration callConfiguration,
+        @NotNull final WrapperConfiguration wrapperConfiguration,
         @NotNull final ContextInvocationTarget<?> target, @Nullable final InputMode inputMode,
         @Nullable final OutputMode outputMode) {
-      super(asArgs(targetMethod, callConfiguration, target, inputMode, outputMode));
+      super(asArgs(targetMethod, wrapperConfiguration, target, inputMode, outputMode));
       mTargetMethod = targetMethod;
-      mCallConfiguration = callConfiguration;
+      mWrapperConfiguration = wrapperConfiguration;
       mTarget = target;
       mInputMode = inputMode;
       mOutputMode = outputMode;
@@ -577,7 +579,7 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
     @NotNull
     @Override
     public ContextInvocation<Object, Object> newInvocation() {
-      return new ProxyInvocation(mTargetMethod, mCallConfiguration, mTarget, mInputMode,
+      return new ProxyInvocation(mTargetMethod, mWrapperConfiguration, mTarget, mInputMode,
           mOutputMode);
     }
   }
@@ -587,8 +589,6 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
    */
   private static class ProxyInvocationHandler implements InvocationHandler {
 
-    private final CallConfiguration mCallConfiguration;
-
     private final LoaderContext mContext;
 
     private final InvocationConfiguration mInvocationConfiguration;
@@ -596,6 +596,8 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
     private final LoaderConfiguration mLoaderConfiguration;
 
     private final ContextInvocationTarget<?> mTarget;
+
+    private final WrapperConfiguration mWrapperConfiguration;
 
     /**
      * Constructor.
@@ -606,7 +608,7 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
       mContext = builder.mContext;
       mTarget = builder.mTarget;
       mInvocationConfiguration = builder.mInvocationConfiguration;
-      mCallConfiguration = builder.mCallConfiguration;
+      mWrapperConfiguration = builder.mWrapperConfiguration;
       mLoaderConfiguration = builder.mLoaderConfiguration;
     }
 
@@ -619,14 +621,14 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
       final Method targetMethod = methodInfo.method;
       final InputMode inputMode = methodInfo.inputMode;
       final OutputMode outputMode = methodInfo.outputMode;
-      final CallConfiguration callConfiguration =
-          ReflectionRoutineBuilders.withAnnotations(mCallConfiguration, targetMethod);
+      final WrapperConfiguration wrapperConfiguration =
+          ReflectionRoutineBuilders.withAnnotations(mWrapperConfiguration, targetMethod);
       final InvocationConfiguration invocationConfiguration =
           ReflectionRoutineBuilders.withAnnotations(mInvocationConfiguration, method);
       final LoaderConfiguration loaderConfiguration =
           AndroidReflectionRoutineBuilders.withAnnotations(mLoaderConfiguration, method);
       final ProxyInvocationFactory factory =
-          new ProxyInvocationFactory(targetMethod, callConfiguration, target, inputMode,
+          new ProxyInvocationFactory(targetMethod, wrapperConfiguration, target, inputMode,
               outputMode);
       final LoaderRoutineBuilder<Object, Object> builder =
           JRoutineLoader.on(mContext).with(factory);

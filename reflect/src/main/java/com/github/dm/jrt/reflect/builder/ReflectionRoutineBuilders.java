@@ -48,7 +48,7 @@ import com.github.dm.jrt.reflect.annotation.OutputTimeoutAction;
 import com.github.dm.jrt.reflect.annotation.Priority;
 import com.github.dm.jrt.reflect.annotation.SharedFields;
 import com.github.dm.jrt.reflect.common.Mutex;
-import com.github.dm.jrt.reflect.config.CallConfiguration;
+import com.github.dm.jrt.reflect.config.WrapperConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -669,10 +669,11 @@ public class ReflectionRoutineBuilders {
    * @see com.github.dm.jrt.reflect.annotation.SharedFields SharedFields
    */
   @NotNull
-  public static CallConfiguration withAnnotations(@Nullable final CallConfiguration configuration,
+  public static WrapperConfiguration withAnnotations(
+      @Nullable final WrapperConfiguration configuration,
       @Nullable final Annotation... annotations) {
-    final CallConfiguration.Builder<CallConfiguration> builder =
-        CallConfiguration.builderFrom(configuration);
+    final WrapperConfiguration.Builder<WrapperConfiguration> builder =
+        WrapperConfiguration.builderFrom(configuration);
     if (annotations == null) {
       return builder.apply();
     }
@@ -697,8 +698,8 @@ public class ReflectionRoutineBuilders {
    * @see com.github.dm.jrt.reflect.annotation.SharedFields SharedFields
    */
   @NotNull
-  public static CallConfiguration withAnnotations(@Nullable final CallConfiguration configuration,
-      @NotNull final Method method) {
+  public static WrapperConfiguration withAnnotations(
+      @Nullable final WrapperConfiguration configuration, @NotNull final Method method) {
     return withAnnotations(configuration, method.getDeclaredAnnotations());
   }
 

@@ -270,7 +270,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
     final TestProxy testProxy = builder.invocationConfiguration()
                                        .with(configuration)
                                        .apply()
-                                       .callConfiguration()
+                                       .wrapperConfiguration()
                                        .withSharedFields()
                                        .apply()
                                        .loaderConfiguration()
@@ -297,7 +297,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
                                   .invocationConfiguration()
                                   .with(configuration)
                                   .apply()
-                                  .callConfiguration()
+                                  .wrapperConfiguration()
                                   .withSharedFields()
                                   .apply()
                                   .loaderConfiguration()
@@ -381,12 +381,12 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
 
     long startTime = System.currentTimeMillis();
 
-    Channel<?, Integer> getOne = builder.callConfiguration()
+    Channel<?, Integer> getOne = builder.wrapperConfiguration()
                                         .withSharedFields("1")
                                         .apply()
                                         .buildProxy(TestClassAsync.class)
                                         .getOne();
-    Channel<?, Integer> getTwo = builder.callConfiguration()
+    Channel<?, Integer> getTwo = builder.wrapperConfiguration()
                                         .withSharedFields("2")
                                         .apply()
                                         .buildProxy(TestClassAsync.class)

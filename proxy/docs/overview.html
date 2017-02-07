@@ -78,7 +78,7 @@
             public static void main(final String[] args) {
                 final Main main = new Main();
                 final AsyncMain proxy = JRoutineProxy.with(instance(main))
-                                                     .callConfiguration()
+                                                     .wrapperConfiguration()
                                                      .withSharedFields()
                                                      .apply()
                                                      .invocationConfiguration()
@@ -140,7 +140,7 @@
             public static void main(final String[] args) {
                 final Main main = new Main();
                 final AsyncMain proxy = Proxy_Main_AsyncMain.with(instance(main))
-                                                            .callConfiguration()
+                                                            .wrapperConfiguration()
                                                             .withSharedFields()
                                                             .apply()
                                                             .invocationConfiguration()

@@ -26,7 +26,7 @@ import com.github.dm.jrt.proxy.builder.ProxyRoutineBuilder;
 import com.github.dm.jrt.reflect.InvocationTarget;
 import com.github.dm.jrt.reflect.JRoutineReflection;
 import com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilder;
-import com.github.dm.jrt.reflect.config.CallConfiguration;
+import com.github.dm.jrt.reflect.config.WrapperConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -42,12 +42,12 @@ class DefaultReflectionProxyRoutineBuilder implements ReflectionProxyRoutineBuil
 
   private final InvocationTarget<?> mTarget;
 
-  private CallConfiguration mCallConfiguration = CallConfiguration.defaultConfiguration();
-
   private InvocationConfiguration mInvocationConfiguration =
       InvocationConfiguration.defaultConfiguration();
 
   private ProxyStrategyType mProxyStrategyType;
+
+  private WrapperConfiguration mWrapperConfiguration = WrapperConfiguration.defaultConfiguration();
 
   /**
    * Constructor.
@@ -74,23 +74,9 @@ class DefaultReflectionProxyRoutineBuilder implements ReflectionProxyRoutineBuil
   }
 
   @NotNull
-  public ReflectionProxyRoutineBuilder apply(@NotNull final CallConfiguration configuration) {
-    mCallConfiguration = ConstantConditions.notNull("call configuration", configuration);
+  public ReflectionProxyRoutineBuilder apply(@NotNull final WrapperConfiguration configuration) {
+    mWrapperConfiguration = ConstantConditions.notNull("wrapper configuration", configuration);
     return this;
-  }
-
-  @NotNull
-  public CallConfiguration.Builder<? extends ReflectionProxyRoutineBuilder> callConfiguration() {
-    final CallConfiguration config = mCallConfiguration;
-    return new CallConfiguration.Builder<ReflectionProxyRoutineBuilder>(
-        new CallConfiguration.Configurable<ReflectionProxyRoutineBuilder>() {
-
-          @NotNull
-          public ReflectionProxyRoutineBuilder apply(
-              @NotNull final CallConfiguration configuration) {
-            return DefaultReflectionProxyRoutineBuilder.this.apply(configuration);
-          }
-        }, config);
   }
 
   @NotNull
@@ -113,6 +99,21 @@ class DefaultReflectionProxyRoutineBuilder implements ReflectionProxyRoutineBuil
       @Nullable final ProxyStrategyType strategyType) {
     mProxyStrategyType = strategyType;
     return this;
+  }
+
+  @NotNull
+  public WrapperConfiguration.Builder<? extends ReflectionProxyRoutineBuilder>
+  wrapperConfiguration() {
+    final WrapperConfiguration config = mWrapperConfiguration;
+    return new WrapperConfiguration.Builder<ReflectionProxyRoutineBuilder>(
+        new WrapperConfiguration.Configurable<ReflectionProxyRoutineBuilder>() {
+
+          @NotNull
+          public ReflectionProxyRoutineBuilder apply(
+              @NotNull final WrapperConfiguration configuration) {
+            return DefaultReflectionProxyRoutineBuilder.this.apply(configuration);
+          }
+        }, config);
   }
 
   @NotNull
@@ -156,13 +157,13 @@ class DefaultReflectionProxyRoutineBuilder implements ReflectionProxyRoutineBuil
 
   @NotNull
   private ProxyRoutineBuilder newProxyBuilder() {
-    return JRoutineProxy.with(mTarget).apply(mInvocationConfiguration).apply(mCallConfiguration);
+    return JRoutineProxy.with(mTarget).apply(mInvocationConfiguration).apply(mWrapperConfiguration);
   }
 
   @NotNull
   private ReflectionRoutineBuilder newReflectionBuilder() {
     return JRoutineReflection.with(mTarget)
                              .apply(mInvocationConfiguration)
-                             .apply(mCallConfiguration);
+                             .apply(mWrapperConfiguration);
   }
 }

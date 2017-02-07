@@ -18,7 +18,7 @@ package com.github.dm.jrt;
 
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilder;
-import com.github.dm.jrt.reflect.config.CallConfiguration;
+import com.github.dm.jrt.reflect.config.WrapperConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -47,13 +47,7 @@ public interface ReflectionProxyRoutineBuilder extends ReflectionRoutineBuilder 
    * {@inheritDoc}
    */
   @NotNull
-  ReflectionProxyRoutineBuilder apply(@NotNull CallConfiguration configuration);
-
-  /**
-   * {@inheritDoc}
-   */
-  @NotNull
-  CallConfiguration.Builder<? extends ReflectionProxyRoutineBuilder> callConfiguration();
+  ReflectionProxyRoutineBuilder apply(@NotNull WrapperConfiguration configuration);
 
   /**
    * {@inheritDoc}
@@ -74,6 +68,12 @@ public interface ReflectionProxyRoutineBuilder extends ReflectionRoutineBuilder 
    */
   @NotNull
   ReflectionProxyRoutineBuilder withStrategy(@Nullable ProxyStrategyType strategyType);
+
+  /**
+   * {@inheritDoc}
+   */
+  @NotNull
+  WrapperConfiguration.Builder<? extends ReflectionProxyRoutineBuilder> wrapperConfiguration();
 
   /**
    * Proxy instantiation strategy type enumeration.

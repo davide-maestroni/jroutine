@@ -19,7 +19,7 @@ package com.github.dm.jrt.reflect.builder;
 import com.github.dm.jrt.core.config.InvocationConfigurable;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ClassToken;
-import com.github.dm.jrt.reflect.config.CallConfigurable;
+import com.github.dm.jrt.reflect.config.WrapperConfigurable;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -31,7 +31,7 @@ import java.lang.reflect.Method;
  * Created by davide-maestroni on 03/07/2015.
  */
 public interface ReflectionRoutineBuilder extends InvocationConfigurable<ReflectionRoutineBuilder>,
-    CallConfigurable<ReflectionRoutineBuilder> {
+    WrapperConfigurable<ReflectionRoutineBuilder> {
 
   /**
    * Returns a proxy object enabling asynchronous call of the target instance methods.

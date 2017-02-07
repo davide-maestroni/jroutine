@@ -90,36 +90,6 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
   }
 
   @Override
-  protected void onStartLoading() {
-    super.onStartLoading();
-    final Logger logger = mLogger;
-    logger.dbg("start background invocation");
-    final InvocationResult<OUT> result = mResult;
-    if (takeContentChanged() || (result == null)) {
-      forceLoad();
-
-    } else {
-      logger.dbg("re-delivering result: %s", result);
-      super.deliverResult(result);
-    }
-  }
-
-  @Override
-  protected void onReset() {
-    try {
-      mInvocation.onRecycle(false);
-
-    } catch (final Throwable t) {
-      InterruptedInvocationException.throwIfInterrupt(t);
-      mLogger.wrn(t, "ignoring exception while discarding invocation instance");
-    }
-
-    mLogger.dbg("resetting result");
-    mResult = null;
-    super.onReset();
-  }
-
-  @Override
   public InvocationResult<OUT> loadInBackground() {
     final Logger logger = mLogger;
     final InvocationChannelConsumer<OUT> consumer =
@@ -138,6 +108,36 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
                 .pass(mInputs)
                 .close();
     return consumer.createResult();
+  }
+
+  @Override
+  protected void onReset() {
+    try {
+      mInvocation.onRecycle(false);
+
+    } catch (final Throwable t) {
+      InterruptedInvocationException.throwIfInterrupt(t);
+      mLogger.wrn(t, "ignoring exception while discarding invocation instance");
+    }
+
+    mLogger.dbg("resetting result");
+    mResult = null;
+    super.onReset();
+  }
+
+  @Override
+  protected void onStartLoading() {
+    super.onStartLoading();
+    final Logger logger = mLogger;
+    logger.dbg("start background invocation");
+    final InvocationResult<OUT> result = mResult;
+    if (takeContentChanged() || (result == null)) {
+      forceLoad();
+
+    } else {
+      logger.dbg("re-delivering result: %s", result);
+      super.deliverResult(result);
+    }
   }
 
   /**

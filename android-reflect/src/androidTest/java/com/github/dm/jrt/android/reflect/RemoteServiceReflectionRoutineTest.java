@@ -48,7 +48,7 @@ import com.github.dm.jrt.reflect.annotation.Invoke;
 import com.github.dm.jrt.reflect.annotation.OutputTimeout;
 import com.github.dm.jrt.reflect.annotation.OutputTimeoutAction;
 import com.github.dm.jrt.reflect.annotation.SharedFields;
-import com.github.dm.jrt.reflect.config.CallConfiguration;
+import com.github.dm.jrt.reflect.config.WrapperConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -176,7 +176,7 @@ public class RemoteServiceReflectionRoutineTest
 
       new DefaultServiceReflectionRoutineBuilder(
           serviceFrom(getActivity(), RemoteInvocationService.class),
-          instanceOf(TestClass.class)).apply((CallConfiguration) null);
+          instanceOf(TestClass.class)).apply((WrapperConfiguration) null);
 
       fail();
 
@@ -472,7 +472,7 @@ public class RemoteServiceReflectionRoutineTest
                                  .withRunner(Runners.poolRunner())
                                  .withMaxInstances(1)
                                  .apply()
-                                 .callConfiguration()
+                                 .wrapperConfiguration()
                                  .withSharedFields("test")
                                  .apply()
                                  .method(TestClass.class.getMethod("getLong"));
@@ -836,9 +836,9 @@ public class RemoteServiceReflectionRoutineTest
     long startTime = System.currentTimeMillis();
 
     Channel<?, Object> getOne =
-        builder.callConfiguration().withSharedFields("1").apply().method("getOne").close();
+        builder.wrapperConfiguration().withSharedFields("1").apply().method("getOne").close();
     Channel<?, Object> getTwo =
-        builder.callConfiguration().withSharedFields("2").apply().method("getTwo").close();
+        builder.wrapperConfiguration().withSharedFields("2").apply().method("getTwo").close();
 
     assertThat(getOne.getComplete()).isTrue();
     assertThat(getTwo.getComplete()).isTrue();

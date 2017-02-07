@@ -309,7 +309,7 @@ public class ServiceRoutineMethodTest extends ActivityInstrumentationTestCase2<T
         String.class.getMethod("toString")).call().in(seconds(10)).next()).isEqualTo("test");
     assertThat(ServiceRoutineMethod.from(serviceFrom(getActivity()), instanceOf(String.class, test),
         String.class.getMethod("toString"))
-                                   .callConfiguration()
+                                   .wrapperConfiguration()
                                    .withSharedFields()
                                    .apply()
                                    .call()
@@ -322,13 +322,8 @@ public class ServiceRoutineMethodTest extends ActivityInstrumentationTestCase2<T
     assertThat(ServiceRoutineMethod.from(serviceFrom(getActivity()), instanceOf(String.class, test),
         "toString").call().in(seconds(10)).next()).isEqualTo("test");
     assertThat(ServiceRoutineMethod.from(serviceFrom(getActivity()), instanceOf(String.class, test),
-        "toString")
-                                   .callConfiguration()
-                                   .withSharedFields()
-                                   .apply()
-                                   .call()
-                                   .in(seconds(10))
-                                   .next()).isEqualTo("test");
+        "toString").wrapperConfiguration().withSharedFields().apply().call().in(seconds(10)).next())
+        .isEqualTo("test");
   }
 
   public void testNoInputs() {

@@ -81,7 +81,7 @@
 
             public static void main(final String[] args) {
                 final ReflectionRoutineBuilder builder = JRoutineReflection.with(classOfType(Main.class))
-                                                                           .callConfiguration()
+                                                                           .wrapperConfiguration()
                                                                            .withSharedFields()
                                                                            .apply()
                                                                            .invocationConfiguration()
@@ -134,7 +134,7 @@
             public static void main(final String[] args) {
                 final Main main = new Main();
                 final AsyncMain proxy = JRoutineReflection.with(instance(main))
-                                                          .callConfiguration()
+                                                          .wrapperConfiguration()
                                                           .withSharedFields()
                                                           .apply()
                                                           .invocationConfiguration()

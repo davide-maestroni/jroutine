@@ -41,8 +41,8 @@ import com.github.dm.jrt.core.util.Reflection;
 import com.github.dm.jrt.method.RoutineMethod;
 import com.github.dm.jrt.method.annotation.Input;
 import com.github.dm.jrt.method.annotation.Output;
-import com.github.dm.jrt.reflect.config.CallConfigurable;
-import com.github.dm.jrt.reflect.config.CallConfiguration;
+import com.github.dm.jrt.reflect.config.WrapperConfigurable;
+import com.github.dm.jrt.reflect.config.WrapperConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -403,7 +403,7 @@ public class ServiceRoutineMethod extends RoutineMethod
    * Implementation of a Service routine method wrapping an object method.
    */
   public static class ReflectionServiceRoutineMethod extends ServiceRoutineMethod
-      implements CallConfigurable<ReflectionServiceRoutineMethod> {
+      implements WrapperConfigurable<ReflectionServiceRoutineMethod> {
 
     private final ServiceContext mContext;
 
@@ -411,7 +411,7 @@ public class ServiceRoutineMethod extends RoutineMethod
 
     private final ContextInvocationTarget<?> mTarget;
 
-    private CallConfiguration mConfiguration = CallConfiguration.defaultConfiguration();
+    private WrapperConfiguration mConfiguration = WrapperConfiguration.defaultConfiguration();
 
     /**
      * Constructor.
@@ -437,15 +437,6 @@ public class ServiceRoutineMethod extends RoutineMethod
 
     @NotNull
     @Override
-    @SuppressWarnings("unchecked")
-    public InvocationConfiguration.Builder<? extends ReflectionServiceRoutineMethod>
-    invocationConfiguration() {
-      return (InvocationConfiguration.Builder<? extends ReflectionServiceRoutineMethod>) super
-          .invocationConfiguration();
-    }
-
-    @NotNull
-    @Override
     public <OUT> Channel<?, OUT> call(@Nullable final Object... params) {
       return call(InvocationMode.ASYNC, params);
     }
@@ -454,6 +445,15 @@ public class ServiceRoutineMethod extends RoutineMethod
     @Override
     public <OUT> Channel<?, OUT> callParallel(@Nullable final Object... params) {
       return call(InvocationMode.PARALLEL, params);
+    }
+
+    @NotNull
+    @Override
+    @SuppressWarnings("unchecked")
+    public InvocationConfiguration.Builder<? extends ReflectionServiceRoutineMethod>
+    invocationConfiguration() {
+      return (InvocationConfiguration.Builder<? extends ReflectionServiceRoutineMethod>) super
+          .invocationConfiguration();
     }
 
     @NotNull
@@ -471,15 +471,16 @@ public class ServiceRoutineMethod extends RoutineMethod
 
     @NotNull
     @Override
-    public ReflectionServiceRoutineMethod apply(@NotNull final CallConfiguration configuration) {
-      mConfiguration = ConstantConditions.notNull("call configuration", configuration);
+    public ReflectionServiceRoutineMethod apply(@NotNull final WrapperConfiguration configuration) {
+      mConfiguration = ConstantConditions.notNull("wrapper configuration", configuration);
       return this;
     }
 
     @NotNull
     @Override
-    public CallConfiguration.Builder<? extends ReflectionServiceRoutineMethod> callConfiguration() {
-      return new CallConfiguration.Builder<ReflectionServiceRoutineMethod>(this, mConfiguration);
+    public WrapperConfiguration.Builder<? extends ReflectionServiceRoutineMethod>
+    wrapperConfiguration() {
+      return new WrapperConfiguration.Builder<ReflectionServiceRoutineMethod>(this, mConfiguration);
     }
 
     @NotNull

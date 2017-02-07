@@ -20,7 +20,7 @@ import com.github.dm.jrt.ReflectionProxyRoutineBuilder;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.reflect.builder.LoaderReflectionRoutineBuilder;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
-import com.github.dm.jrt.reflect.config.CallConfiguration;
+import com.github.dm.jrt.reflect.config.WrapperConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -52,14 +52,7 @@ public interface LoaderReflectionProxyRoutineBuilder
    */
   @NotNull
   @Override
-  LoaderReflectionProxyRoutineBuilder apply(@NotNull CallConfiguration configuration);
-
-  /**
-   * {@inheritDoc}
-   */
-  @NotNull
-  @Override
-  CallConfiguration.Builder<? extends LoaderReflectionProxyRoutineBuilder> callConfiguration();
+  LoaderReflectionProxyRoutineBuilder apply(@NotNull WrapperConfiguration configuration);
 
   /**
    * {@inheritDoc}
@@ -78,6 +71,14 @@ public interface LoaderReflectionProxyRoutineBuilder
   @NotNull
   @Override
   LoaderReflectionProxyRoutineBuilder withStrategy(@Nullable ProxyStrategyType strategyType);
+
+  /**
+   * {@inheritDoc}
+   */
+  @NotNull
+  @Override
+  WrapperConfiguration.Builder<? extends LoaderReflectionProxyRoutineBuilder>
+  wrapperConfiguration();
 
   /**
    * {@inheritDoc}

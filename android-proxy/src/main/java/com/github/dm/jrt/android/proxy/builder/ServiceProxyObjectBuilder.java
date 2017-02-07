@@ -19,7 +19,7 @@ package com.github.dm.jrt.android.proxy.builder;
 import com.github.dm.jrt.android.core.config.ServiceConfigurable;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.proxy.builder.ProxyObjectBuilder;
-import com.github.dm.jrt.reflect.config.CallConfiguration;
+import com.github.dm.jrt.reflect.config.WrapperConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -46,7 +46,7 @@ public interface ServiceProxyObjectBuilder<TYPE>
    */
   @NotNull
   @Override
-  ServiceProxyObjectBuilder<TYPE> apply(@NotNull CallConfiguration configuration);
+  ServiceProxyObjectBuilder<TYPE> apply(@NotNull WrapperConfiguration configuration);
 
   /**
    * Returns a proxy object enabling asynchronous call of the target instance methods.
@@ -74,13 +74,13 @@ public interface ServiceProxyObjectBuilder<TYPE>
    */
   @NotNull
   @Override
-  CallConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>> callConfiguration();
+  InvocationConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>>
+  invocationConfiguration();
 
   /**
    * {@inheritDoc}
    */
   @NotNull
   @Override
-  InvocationConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>>
-  invocationConfiguration();
+  WrapperConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>> wrapperConfiguration();
 }

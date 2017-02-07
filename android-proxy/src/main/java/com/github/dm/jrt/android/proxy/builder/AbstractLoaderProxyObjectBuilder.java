@@ -23,7 +23,7 @@ import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;
-import com.github.dm.jrt.reflect.config.CallConfiguration;
+import com.github.dm.jrt.reflect.config.WrapperConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -46,12 +46,12 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
       sContextProxies =
       new WeakIdentityHashMap<Object, HashMap<Class<?>, HashMap<ProxyInfo, Object>>>();
 
-  private CallConfiguration mCallConfiguration = CallConfiguration.defaultConfiguration();
-
   private InvocationConfiguration mInvocationConfiguration =
       InvocationConfiguration.defaultConfiguration();
 
   private LoaderConfiguration mLoaderConfiguration = LoaderConfiguration.defaultConfiguration();
+
+  private WrapperConfiguration mWrapperConfiguration = WrapperConfiguration.defaultConfiguration();
 
   @NotNull
   @Override
@@ -71,8 +71,8 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
 
   @NotNull
   @Override
-  public LoaderProxyObjectBuilder<TYPE> apply(@NotNull final CallConfiguration configuration) {
-    mCallConfiguration = ConstantConditions.notNull("call configuration", configuration);
+  public LoaderProxyObjectBuilder<TYPE> apply(@NotNull final WrapperConfiguration configuration) {
+    mWrapperConfiguration = ConstantConditions.notNull("wrapper configuration", configuration);
     return this;
   }
 
@@ -102,10 +102,10 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
       }
 
       final InvocationConfiguration invocationConfiguration = mInvocationConfiguration;
-      final CallConfiguration callConfiguration = mCallConfiguration;
+      final WrapperConfiguration wrapperConfiguration = mWrapperConfiguration;
       final LoaderConfiguration loaderConfiguration = mLoaderConfiguration;
       final ProxyInfo proxyInfo =
-          new ProxyInfo(getInterfaceClass(), invocationConfiguration, callConfiguration,
+          new ProxyInfo(getInterfaceClass(), invocationConfiguration, wrapperConfiguration,
               loaderConfiguration);
       final Object instance = proxies.get(proxyInfo);
       if (instance != null) {
@@ -120,7 +120,7 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
 
       try {
         final TYPE newInstance =
-            newProxy(invocationConfiguration, callConfiguration, loaderConfiguration);
+            newProxy(invocationConfiguration, wrapperConfiguration, loaderConfiguration);
         proxies.put(proxyInfo, newInstance);
         return newInstance;
 
@@ -129,22 +129,6 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
         throw new IllegalArgumentException(t);
       }
     }
-  }
-
-  @NotNull
-  @Override
-  public CallConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>> callConfiguration() {
-    final CallConfiguration config = mCallConfiguration;
-    return new CallConfiguration.Builder<LoaderProxyObjectBuilder<TYPE>>(
-        new CallConfiguration.Configurable<LoaderProxyObjectBuilder<TYPE>>() {
-
-          @NotNull
-          @Override
-          public LoaderProxyObjectBuilder<TYPE> apply(
-              @NotNull final CallConfiguration configuration) {
-            return AbstractLoaderProxyObjectBuilder.this.apply(configuration);
-          }
-        }, config);
   }
 
   @NotNull
@@ -159,6 +143,23 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
           @Override
           public LoaderProxyObjectBuilder<TYPE> apply(
               @NotNull final InvocationConfiguration configuration) {
+            return AbstractLoaderProxyObjectBuilder.this.apply(configuration);
+          }
+        }, config);
+  }
+
+  @NotNull
+  @Override
+  public WrapperConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>>
+  wrapperConfiguration() {
+    final WrapperConfiguration config = mWrapperConfiguration;
+    return new WrapperConfiguration.Builder<LoaderProxyObjectBuilder<TYPE>>(
+        new WrapperConfiguration.Configurable<LoaderProxyObjectBuilder<TYPE>>() {
+
+          @NotNull
+          @Override
+          public LoaderProxyObjectBuilder<TYPE> apply(
+              @NotNull final WrapperConfiguration configuration) {
             return AbstractLoaderProxyObjectBuilder.this.apply(configuration);
           }
         }, config);
@@ -202,14 +203,14 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
    * Creates and return a new proxy instance.
    *
    * @param invocationConfiguration the invocation configuration.
-   * @param callConfiguration       the call configuration.
+   * @param wrapperConfiguration    the wrapper configuration.
    * @param loaderConfiguration     the Loader configuration.
    * @return the proxy instance.
    * @throws java.lang.Exception if an unexpected error occurs.
    */
   @NotNull
   protected abstract TYPE newProxy(@NotNull InvocationConfiguration invocationConfiguration,
-      @NotNull CallConfiguration callConfiguration,
+      @NotNull WrapperConfiguration wrapperConfiguration,
       @NotNull LoaderConfiguration loaderConfiguration) throws Exception;
 
   /**
@@ -222,14 +223,14 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
      *
      * @param itf                     the proxy interface class.
      * @param invocationConfiguration the invocation configuration.
-     * @param callConfiguration       the call configuration.
+     * @param wrapperConfiguration    the wrapper configuration.
      * @param loaderConfiguration     the Loader configuration.
      */
     private ProxyInfo(@NotNull final Class<?> itf,
         @NotNull final InvocationConfiguration invocationConfiguration,
-        @NotNull final CallConfiguration callConfiguration,
+        @NotNull final WrapperConfiguration wrapperConfiguration,
         @NotNull final LoaderConfiguration loaderConfiguration) {
-      super(asArgs(itf, invocationConfiguration, callConfiguration, loaderConfiguration));
+      super(asArgs(itf, invocationConfiguration, wrapperConfiguration, loaderConfiguration));
     }
   }
 }

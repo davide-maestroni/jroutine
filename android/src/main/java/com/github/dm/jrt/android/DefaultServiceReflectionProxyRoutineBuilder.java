@@ -28,7 +28,7 @@ import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.reflect.config.CallConfiguration;
+import com.github.dm.jrt.reflect.config.WrapperConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -46,14 +46,14 @@ class DefaultServiceReflectionProxyRoutineBuilder implements ServiceReflectionPr
 
   private final ContextInvocationTarget<?> mTarget;
 
-  private CallConfiguration mCallConfiguration = CallConfiguration.defaultConfiguration();
-
   private InvocationConfiguration mInvocationConfiguration =
       InvocationConfiguration.defaultConfiguration();
 
   private ProxyStrategyType mProxyStrategyType;
 
   private ServiceConfiguration mServiceConfiguration = ServiceConfiguration.defaultConfiguration();
+
+  private WrapperConfiguration mWrapperConfiguration = WrapperConfiguration.defaultConfiguration();
 
   /**
    * Constructor.
@@ -79,25 +79,9 @@ class DefaultServiceReflectionProxyRoutineBuilder implements ServiceReflectionPr
   @NotNull
   @Override
   public ServiceReflectionProxyRoutineBuilder apply(
-      @NotNull final CallConfiguration configuration) {
-    mCallConfiguration = ConstantConditions.notNull("call configuration", configuration);
+      @NotNull final WrapperConfiguration configuration) {
+    mWrapperConfiguration = ConstantConditions.notNull("wrapper configuration", configuration);
     return this;
-  }
-
-  @NotNull
-  @Override
-  public CallConfiguration.Builder<? extends ServiceReflectionProxyRoutineBuilder>
-  callConfiguration() {
-    return new CallConfiguration.Builder<ServiceReflectionProxyRoutineBuilder>(
-        new CallConfiguration.Configurable<ServiceReflectionProxyRoutineBuilder>() {
-
-          @NotNull
-          @Override
-          public ServiceReflectionProxyRoutineBuilder apply(
-              @NotNull final CallConfiguration configuration) {
-            return DefaultServiceReflectionProxyRoutineBuilder.this.apply(configuration);
-          }
-        }, mCallConfiguration);
   }
 
   @NotNull
@@ -122,6 +106,22 @@ class DefaultServiceReflectionProxyRoutineBuilder implements ServiceReflectionPr
       @Nullable final ProxyStrategyType strategyType) {
     mProxyStrategyType = strategyType;
     return this;
+  }
+
+  @NotNull
+  @Override
+  public WrapperConfiguration.Builder<? extends ServiceReflectionProxyRoutineBuilder>
+  wrapperConfiguration() {
+    return new WrapperConfiguration.Builder<ServiceReflectionProxyRoutineBuilder>(
+        new WrapperConfiguration.Configurable<ServiceReflectionProxyRoutineBuilder>() {
+
+          @NotNull
+          @Override
+          public ServiceReflectionProxyRoutineBuilder apply(
+              @NotNull final WrapperConfiguration configuration) {
+            return DefaultServiceReflectionProxyRoutineBuilder.this.apply(configuration);
+          }
+        }, mWrapperConfiguration);
   }
 
   @NotNull
@@ -197,7 +197,7 @@ class DefaultServiceReflectionProxyRoutineBuilder implements ServiceReflectionPr
     return JRoutineServiceProxy.on(mContext)
                                .with(mTarget)
                                .apply(mInvocationConfiguration)
-                               .apply(mCallConfiguration)
+                               .apply(mWrapperConfiguration)
                                .apply(mServiceConfiguration);
   }
 
@@ -206,7 +206,7 @@ class DefaultServiceReflectionProxyRoutineBuilder implements ServiceReflectionPr
     return JRoutineServiceReflection.on(mContext)
                                     .with(mTarget)
                                     .apply(mInvocationConfiguration)
-                                    .apply(mCallConfiguration)
+                                    .apply(mWrapperConfiguration)
                                     .apply(mServiceConfiguration);
   }
 }

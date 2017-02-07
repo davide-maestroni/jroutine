@@ -42,7 +42,7 @@ import com.github.dm.jrt.reflect.annotation.SharedFields;
 import com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilders;
 import com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilders.MethodInfo;
 import com.github.dm.jrt.reflect.common.Mutex;
-import com.github.dm.jrt.reflect.config.CallConfiguration;
+import com.github.dm.jrt.reflect.config.WrapperConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -90,12 +90,12 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
 
   private final ContextInvocationTarget<?> mTarget;
 
-  private CallConfiguration mCallConfiguration = CallConfiguration.defaultConfiguration();
-
   private InvocationConfiguration mInvocationConfiguration =
       InvocationConfiguration.defaultConfiguration();
 
   private ServiceConfiguration mServiceConfiguration = ServiceConfiguration.defaultConfiguration();
+
+  private WrapperConfiguration mWrapperConfiguration = WrapperConfiguration.defaultConfiguration();
 
   /**
    * Constructor.
@@ -111,7 +111,7 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
 
   @Nullable
   private static Set<String> fieldsWithShareAnnotation(
-      @NotNull final CallConfiguration configuration, @NotNull final Method method) {
+      @NotNull final WrapperConfiguration configuration, @NotNull final Method method) {
     final SharedFields sharedFieldsAnnotation = method.getAnnotation(SharedFields.class);
     if (sharedFieldsAnnotation != null) {
       final HashSet<String> set = new HashSet<String>();
@@ -171,9 +171,26 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
 
   @NotNull
   @Override
-  public ServiceReflectionRoutineBuilder apply(@NotNull final CallConfiguration configuration) {
-    mCallConfiguration = ConstantConditions.notNull("call configuration", configuration);
+  public ServiceReflectionRoutineBuilder apply(@NotNull final WrapperConfiguration configuration) {
+    mWrapperConfiguration = ConstantConditions.notNull("wrapper configuration", configuration);
     return this;
+  }
+
+  @NotNull
+  @Override
+  public WrapperConfiguration.Builder<? extends ServiceReflectionRoutineBuilder>
+  wrapperConfiguration() {
+    final WrapperConfiguration config = mWrapperConfiguration;
+    return new WrapperConfiguration.Builder<ServiceReflectionRoutineBuilder>(
+        new WrapperConfiguration.Configurable<ServiceReflectionRoutineBuilder>() {
+
+          @NotNull
+          @Override
+          public ServiceReflectionRoutineBuilder apply(
+              @NotNull final WrapperConfiguration configuration) {
+            return DefaultServiceReflectionRoutineBuilder.this.apply(configuration);
+          }
+        }, config);
   }
 
   @NotNull
@@ -188,22 +205,6 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
           @Override
           public ServiceReflectionRoutineBuilder apply(
               @NotNull final InvocationConfiguration configuration) {
-            return DefaultServiceReflectionRoutineBuilder.this.apply(configuration);
-          }
-        }, config);
-  }
-
-  @NotNull
-  @Override
-  public CallConfiguration.Builder<? extends ServiceReflectionRoutineBuilder> callConfiguration() {
-    final CallConfiguration config = mCallConfiguration;
-    return new CallConfiguration.Builder<ServiceReflectionRoutineBuilder>(
-        new CallConfiguration.Configurable<ServiceReflectionRoutineBuilder>() {
-
-          @NotNull
-          @Override
-          public ServiceReflectionRoutineBuilder apply(
-              @NotNull final CallConfiguration configuration) {
             return DefaultServiceReflectionRoutineBuilder.this.apply(configuration);
           }
         }, config);
@@ -238,7 +239,7 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
       return method(name, Reflection.NO_PARAMS);
     }
 
-    final Set<String> sharedFields = fieldsWithShareAnnotation(mCallConfiguration, targetMethod);
+    final Set<String> sharedFields = fieldsWithShareAnnotation(mWrapperConfiguration, targetMethod);
     final Object[] args = asArgs(sharedFields, target, name);
     final TargetInvocationFactory<Object, Object> factory =
         factoryOf(MethodAliasInvocation.class, args);
@@ -260,7 +261,7 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
       @NotNull final Class<?>... parameterTypes) {
     final ContextInvocationTarget<?> target = mTarget;
     final Method targetMethod = findMethod(target.getTargetClass(), name, parameterTypes);
-    final Set<String> sharedFields = fieldsWithShareAnnotation(mCallConfiguration, targetMethod);
+    final Set<String> sharedFields = fieldsWithShareAnnotation(mWrapperConfiguration, targetMethod);
     final Object[] args = asArgs(sharedFields, target, name, toNames(parameterTypes));
     final TargetInvocationFactory<Object, Object> factory =
         factoryOf(MethodSignatureInvocation.class, args);
@@ -334,7 +335,7 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
                                    .invocationConfiguration()
                                    .withRunner(Runners.syncRunner())
                                    .apply()
-                                   .callConfiguration()
+                                   .wrapperConfiguration()
                                    .withSharedFields(mSharedFields)
                                    .apply()
                                    .method(mAliasName);
@@ -444,7 +445,7 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
                                    .invocationConfiguration()
                                    .withRunner(Runners.syncRunner())
                                    .apply()
-                                   .callConfiguration()
+                                   .wrapperConfiguration()
                                    .withSharedFields(mSharedFields)
                                    .apply()
                                    .method(mMethodName, mParameterTypes);
@@ -519,8 +520,6 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
    */
   private static class ProxyInvocationHandler implements InvocationHandler {
 
-    private final CallConfiguration mCallConfiguration;
-
     private final ServiceContext mContext;
 
     private final InvocationConfiguration mInvocationConfiguration;
@@ -528,6 +527,8 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
     private final ServiceConfiguration mServiceConfiguration;
 
     private final ContextInvocationTarget<?> mTarget;
+
+    private final WrapperConfiguration mWrapperConfiguration;
 
     /**
      * Constructor.
@@ -538,7 +539,7 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
       mContext = builder.mContext;
       mTarget = builder.mTarget;
       mInvocationConfiguration = builder.mInvocationConfiguration;
-      mCallConfiguration = builder.mCallConfiguration;
+      mWrapperConfiguration = builder.mWrapperConfiguration;
       mServiceConfiguration = builder.mServiceConfiguration;
     }
 
@@ -551,7 +552,7 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
       final InputMode inputMode = methodInfo.inputMode;
       final OutputMode outputMode = methodInfo.outputMode;
       final Class<?>[] targetParameterTypes = targetMethod.getParameterTypes();
-      final Set<String> sharedFields = fieldsWithShareAnnotation(mCallConfiguration, method);
+      final Set<String> sharedFields = fieldsWithShareAnnotation(mWrapperConfiguration, method);
       final Object[] factoryArgs =
           asArgs(sharedFields, target, targetMethod.getName(), toNames(targetParameterTypes),
               inputMode, outputMode);

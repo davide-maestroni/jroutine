@@ -30,7 +30,7 @@ import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.reflect.config.CallConfiguration;
+import com.github.dm.jrt.reflect.config.WrapperConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -49,14 +49,14 @@ class DefaultLoaderReflectionProxyRoutineBuilderCompat
 
   private final ContextInvocationTarget<?> mTarget;
 
-  private CallConfiguration mCallConfiguration = CallConfiguration.defaultConfiguration();
-
   private InvocationConfiguration mInvocationConfiguration =
       InvocationConfiguration.defaultConfiguration();
 
   private LoaderConfiguration mLoaderConfiguration = LoaderConfiguration.defaultConfiguration();
 
   private ProxyStrategyType mProxyStrategyType;
+
+  private WrapperConfiguration mWrapperConfiguration = WrapperConfiguration.defaultConfiguration();
 
   /**
    * Constructor.
@@ -81,25 +81,10 @@ class DefaultLoaderReflectionProxyRoutineBuilderCompat
 
   @NotNull
   @Override
-  public LoaderReflectionProxyRoutineBuilder apply(@NotNull final CallConfiguration configuration) {
-    mCallConfiguration = ConstantConditions.notNull("call configuration", configuration);
+  public LoaderReflectionProxyRoutineBuilder apply(
+      @NotNull final WrapperConfiguration configuration) {
+    mWrapperConfiguration = ConstantConditions.notNull("wrapper configuration", configuration);
     return this;
-  }
-
-  @NotNull
-  @Override
-  public CallConfiguration.Builder<? extends LoaderReflectionProxyRoutineBuilder>
-  callConfiguration() {
-    return new CallConfiguration.Builder<LoaderReflectionProxyRoutineBuilder>(
-        new CallConfiguration.Configurable<LoaderReflectionProxyRoutineBuilder>() {
-
-          @NotNull
-          @Override
-          public LoaderReflectionProxyRoutineBuilder apply(
-              @NotNull final CallConfiguration configuration) {
-            return DefaultLoaderReflectionProxyRoutineBuilderCompat.this.apply(configuration);
-          }
-        }, mCallConfiguration);
   }
 
   @NotNull
@@ -123,6 +108,22 @@ class DefaultLoaderReflectionProxyRoutineBuilderCompat
       @Nullable final ProxyStrategyType strategyType) {
     mProxyStrategyType = strategyType;
     return this;
+  }
+
+  @NotNull
+  @Override
+  public WrapperConfiguration.Builder<? extends LoaderReflectionProxyRoutineBuilder>
+  wrapperConfiguration() {
+    return new WrapperConfiguration.Builder<LoaderReflectionProxyRoutineBuilder>(
+        new WrapperConfiguration.Configurable<LoaderReflectionProxyRoutineBuilder>() {
+
+          @NotNull
+          @Override
+          public LoaderReflectionProxyRoutineBuilder apply(
+              @NotNull final WrapperConfiguration configuration) {
+            return DefaultLoaderReflectionProxyRoutineBuilderCompat.this.apply(configuration);
+          }
+        }, mWrapperConfiguration);
   }
 
   @NotNull
@@ -198,7 +199,7 @@ class DefaultLoaderReflectionProxyRoutineBuilderCompat
     return JRoutineLoaderProxyCompat.on(mContext)
                                     .with(mTarget)
                                     .apply(mInvocationConfiguration)
-                                    .apply(mCallConfiguration)
+                                    .apply(mWrapperConfiguration)
                                     .apply(mLoaderConfiguration);
   }
 
@@ -207,7 +208,7 @@ class DefaultLoaderReflectionProxyRoutineBuilderCompat
     return JRoutineLoaderReflectionCompat.on(mContext)
                                          .with(mTarget)
                                          .apply(mInvocationConfiguration)
-                                         .apply(mCallConfiguration)
+                                         .apply(mWrapperConfiguration)
                                          .apply(mLoaderConfiguration);
   }
 }

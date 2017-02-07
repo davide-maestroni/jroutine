@@ -442,7 +442,7 @@ public class JRoutineTest {
                                                     .invocationConfiguration()
                                                     .withRunner(Runners.syncRunner())
                                                     .apply()
-                                                    .callConfiguration()
+                                                    .wrapperConfiguration()
                                                     .withSharedFields()
                                                     .apply()
                                                     .method(TestClass.class.getMethod("getLong"));
@@ -546,7 +546,7 @@ public class JRoutineTest {
                                   .withLogLevel(Level.DEBUG)
                                   .withLog(new NullLog())
                                   .apply()
-                                  .callConfiguration()
+                                  .wrapperConfiguration()
                                   .withSharedFields()
                                   .apply()
                                   .buildProxy(TestItf.class);

@@ -121,11 +121,11 @@ public class ContextRoutineProcessor extends RoutineProcessor {
       builder.append("mRoutine").append(i).append(" = ").append("initRoutine").append(i);
       if (annotationElement == serviceProxyElement) {
         builder.append(
-            "(target, invocationConfiguration, callConfiguration, serviceConfiguration);");
+            "(target, invocationConfiguration, wrapperConfiguration, serviceConfiguration);");
 
       } else {
         builder.append(
-            "(target, invocationConfiguration, callConfiguration, loaderConfiguration);");
+            "(target, invocationConfiguration, wrapperConfiguration, loaderConfiguration);");
       }
 
       builder.append(NEW_LINE);

@@ -21,7 +21,7 @@ import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;
-import com.github.dm.jrt.reflect.config.CallConfiguration;
+import com.github.dm.jrt.reflect.config.WrapperConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -42,10 +42,10 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
   private static final WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>> sProxies =
       new WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>>();
 
-  private CallConfiguration mCallConfiguration = CallConfiguration.defaultConfiguration();
-
   private InvocationConfiguration mInvocationConfiguration =
       InvocationConfiguration.defaultConfiguration();
+
+  private WrapperConfiguration mWrapperConfiguration = WrapperConfiguration.defaultConfiguration();
 
   @NotNull
   public ProxyObjectBuilder<TYPE> apply(@NotNull final InvocationConfiguration configuration) {
@@ -55,8 +55,8 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
   }
 
   @NotNull
-  public ProxyObjectBuilder<TYPE> apply(@NotNull final CallConfiguration configuration) {
-    mCallConfiguration = ConstantConditions.notNull("call configuration", configuration);
+  public ProxyObjectBuilder<TYPE> apply(@NotNull final WrapperConfiguration configuration) {
+    mWrapperConfiguration = ConstantConditions.notNull("wrapper configuration", configuration);
     return this;
   }
 
@@ -73,16 +73,16 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
       }
 
       final InvocationConfiguration invocationConfiguration = mInvocationConfiguration;
-      final CallConfiguration callConfiguration = mCallConfiguration;
+      final WrapperConfiguration wrapperConfiguration = mWrapperConfiguration;
       final ClassInfo classInfo =
-          new ClassInfo(getInterfaceClass(), invocationConfiguration, callConfiguration);
+          new ClassInfo(getInterfaceClass(), invocationConfiguration, wrapperConfiguration);
       final Object instance = proxyMap.get(classInfo);
       if (instance != null) {
         return (TYPE) instance;
       }
 
       try {
-        final TYPE newInstance = newProxy(invocationConfiguration, callConfiguration);
+        final TYPE newInstance = newProxy(invocationConfiguration, wrapperConfiguration);
         proxyMap.put(classInfo, newInstance);
         return newInstance;
 
@@ -94,16 +94,16 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
   }
 
   @NotNull
-  public CallConfiguration.Builder<? extends ProxyObjectBuilder<TYPE>> callConfiguration() {
-    final CallConfiguration config = mCallConfiguration;
-    return new CallConfiguration.Builder<ProxyObjectBuilder<TYPE>>(this, config);
-  }
-
-  @NotNull
   public InvocationConfiguration.Builder<? extends ProxyObjectBuilder<TYPE>>
   invocationConfiguration() {
     final InvocationConfiguration config = mInvocationConfiguration;
     return new InvocationConfiguration.Builder<ProxyObjectBuilder<TYPE>>(this, config);
+  }
+
+  @NotNull
+  public WrapperConfiguration.Builder<? extends ProxyObjectBuilder<TYPE>> wrapperConfiguration() {
+    final WrapperConfiguration config = mWrapperConfiguration;
+    return new WrapperConfiguration.Builder<ProxyObjectBuilder<TYPE>>(this, config);
   }
 
   /**
@@ -126,13 +126,13 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
    * Creates and return a new proxy instance.
    *
    * @param invocationConfiguration the invocation configuration.
-   * @param callConfiguration       the call configuration.
+   * @param wrapperConfiguration    the wrapper configuration.
    * @return the proxy instance.
    * @throws java.lang.Exception if an unexpected error occurs.
    */
   @NotNull
   protected abstract TYPE newProxy(@NotNull InvocationConfiguration invocationConfiguration,
-      @NotNull CallConfiguration callConfiguration) throws Exception;
+      @NotNull WrapperConfiguration wrapperConfiguration) throws Exception;
 
   /**
    * Class used as key to identify a specific proxy instance.
@@ -144,12 +144,12 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
      *
      * @param itf                     the proxy interface class.
      * @param invocationConfiguration the invocation configuration.
-     * @param callConfiguration       the call configuration.
+     * @param wrapperConfiguration    the wrapper configuration.
      */
     private ClassInfo(@NotNull final Class<?> itf,
         @NotNull final InvocationConfiguration invocationConfiguration,
-        @NotNull final CallConfiguration callConfiguration) {
-      super(asArgs(itf, invocationConfiguration, callConfiguration));
+        @NotNull final WrapperConfiguration wrapperConfiguration) {
+      super(asArgs(itf, invocationConfiguration, wrapperConfiguration));
     }
   }
 }

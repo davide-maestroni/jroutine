@@ -61,7 +61,7 @@ import com.github.dm.jrt.reflect.annotation.OutputTimeoutAction;
 import com.github.dm.jrt.reflect.annotation.Priority;
 import com.github.dm.jrt.reflect.annotation.SharedFields;
 import com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilder;
-import com.github.dm.jrt.reflect.config.CallConfiguration;
+import com.github.dm.jrt.reflect.config.WrapperConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -269,7 +269,7 @@ public class ReflectionRoutineTest {
     try {
 
       new DefaultReflectionRoutineBuilder(classOfType(TestStatic.class)).apply(
-          (CallConfiguration) null);
+          (WrapperConfiguration) null);
 
       fail();
 
@@ -648,7 +648,7 @@ public class ReflectionRoutineTest {
                                                                .withRunner(Runners.poolRunner())
                                                                .withMaxInstances(1)
                                                                .apply()
-                                                               .callConfiguration()
+                                                               .wrapperConfiguration()
                                                                .withSharedFields("test")
                                                                .apply()
                                                                .method(TestClass.class.getMethod(
@@ -1250,9 +1250,9 @@ public class ReflectionRoutineTest {
     long startTime = System.currentTimeMillis();
 
     Channel<?, Object> getOne =
-        builder.callConfiguration().withSharedFields().apply().method("getOne").close();
+        builder.wrapperConfiguration().withSharedFields().apply().method("getOne").close();
     Channel<?, Object> getTwo =
-        builder.callConfiguration().withSharedFields().apply().method("getTwo").close();
+        builder.wrapperConfiguration().withSharedFields().apply().method("getTwo").close();
 
     assertThat(getOne.getComplete()).isTrue();
     assertThat(getTwo.getComplete()).isTrue();
@@ -1260,8 +1260,8 @@ public class ReflectionRoutineTest {
 
     startTime = System.currentTimeMillis();
 
-    getOne = builder.callConfiguration().withSharedFields("1").apply().method("getOne").close();
-    getTwo = builder.callConfiguration().withSharedFields("2").apply().method("getTwo").close();
+    getOne = builder.wrapperConfiguration().withSharedFields("1").apply().method("getOne").close();
+    getTwo = builder.wrapperConfiguration().withSharedFields("2").apply().method("getTwo").close();
 
     assertThat(getOne.getComplete()).isTrue();
     assertThat(getTwo.getComplete()).isTrue();
@@ -1289,7 +1289,7 @@ public class ReflectionRoutineTest {
 
     Channel<?, Object> getOne = builder.method("getOne").close();
     Channel<?, Object> getTwo =
-        builder.callConfiguration().withSharedFields().apply().method("getTwo").close();
+        builder.wrapperConfiguration().withSharedFields().apply().method("getTwo").close();
 
     assertThat(getOne.getComplete()).isTrue();
     assertThat(getTwo.getComplete()).isTrue();
@@ -1298,8 +1298,8 @@ public class ReflectionRoutineTest {
     startTime = System.currentTimeMillis();
 
     getOne =
-        builder.callConfiguration().withSharedFields("1", "2").apply().method("getOne").close();
-    getTwo = builder.callConfiguration().withSharedFields().apply().method("getTwo").close();
+        builder.wrapperConfiguration().withSharedFields("1", "2").apply().method("getOne").close();
+    getTwo = builder.wrapperConfiguration().withSharedFields().apply().method("getTwo").close();
 
     assertThat(getOne.getComplete()).isTrue();
     assertThat(getTwo.getComplete()).isTrue();
@@ -1308,7 +1308,7 @@ public class ReflectionRoutineTest {
     startTime = System.currentTimeMillis();
 
     getOne =
-        builder.callConfiguration().withSharedFields("1", "2").apply().method("getOne").close();
+        builder.wrapperConfiguration().withSharedFields("1", "2").apply().method("getOne").close();
     getTwo = builder.method("getTwo").close();
 
     assertThat(getOne.getComplete()).isTrue();
@@ -1318,8 +1318,8 @@ public class ReflectionRoutineTest {
     startTime = System.currentTimeMillis();
 
     getOne =
-        builder.callConfiguration().withSharedFields("1", "2").apply().method("getOne").close();
-    getTwo = builder.callConfiguration().withSharedFields("2").apply().method("getTwo").close();
+        builder.wrapperConfiguration().withSharedFields("1", "2").apply().method("getOne").close();
+    getTwo = builder.wrapperConfiguration().withSharedFields("2").apply().method("getTwo").close();
 
     assertThat(getOne.getComplete()).isTrue();
     assertThat(getTwo.getComplete()).isTrue();
@@ -1336,9 +1336,9 @@ public class ReflectionRoutineTest {
     long startTime = System.currentTimeMillis();
 
     Channel<?, Object> getOne =
-        builder.callConfiguration().withSharedFields().apply().method("getOne").close();
+        builder.wrapperConfiguration().withSharedFields().apply().method("getOne").close();
     Channel<?, Object> getTwo =
-        builder.callConfiguration().withSharedFields().apply().method("getTwo").close();
+        builder.wrapperConfiguration().withSharedFields().apply().method("getTwo").close();
 
     assertThat(getOne.getComplete()).isTrue();
     assertThat(getTwo.getComplete()).isTrue();
@@ -1346,8 +1346,8 @@ public class ReflectionRoutineTest {
 
     startTime = System.currentTimeMillis();
 
-    getOne = builder.callConfiguration().withSharedFields("1").apply().method("getOne").close();
-    getTwo = builder.callConfiguration().withSharedFields("2").apply().method("getTwo").close();
+    getOne = builder.wrapperConfiguration().withSharedFields("1").apply().method("getOne").close();
+    getTwo = builder.wrapperConfiguration().withSharedFields("2").apply().method("getTwo").close();
 
     assertThat(getOne.getComplete()).isTrue();
     assertThat(getTwo.getComplete()).isTrue();
@@ -1374,7 +1374,7 @@ public class ReflectionRoutineTest {
 
     Channel<?, Object> getOne = builder.method("getOne").close();
     Channel<?, Object> getTwo =
-        builder.callConfiguration().withSharedFields().apply().method("getTwo").close();
+        builder.wrapperConfiguration().withSharedFields().apply().method("getTwo").close();
 
     assertThat(getOne.getComplete()).isTrue();
     assertThat(getTwo.getComplete()).isTrue();
@@ -1383,8 +1383,8 @@ public class ReflectionRoutineTest {
     startTime = System.currentTimeMillis();
 
     getOne =
-        builder.callConfiguration().withSharedFields("1", "2").apply().method("getOne").close();
-    getTwo = builder.callConfiguration().withSharedFields().apply().method("getTwo").close();
+        builder.wrapperConfiguration().withSharedFields("1", "2").apply().method("getOne").close();
+    getTwo = builder.wrapperConfiguration().withSharedFields().apply().method("getTwo").close();
 
     assertThat(getOne.getComplete()).isTrue();
     assertThat(getTwo.getComplete()).isTrue();
@@ -1393,7 +1393,7 @@ public class ReflectionRoutineTest {
     startTime = System.currentTimeMillis();
 
     getOne =
-        builder.callConfiguration().withSharedFields("1", "2").apply().method("getOne").close();
+        builder.wrapperConfiguration().withSharedFields("1", "2").apply().method("getOne").close();
     getTwo = builder.method("getTwo").close();
 
     assertThat(getOne.getComplete()).isTrue();
@@ -1403,8 +1403,8 @@ public class ReflectionRoutineTest {
     startTime = System.currentTimeMillis();
 
     getOne =
-        builder.callConfiguration().withSharedFields("1", "2").apply().method("getOne").close();
-    getTwo = builder.callConfiguration().withSharedFields("2").apply().method("getTwo").close();
+        builder.wrapperConfiguration().withSharedFields("1", "2").apply().method("getOne").close();
+    getTwo = builder.wrapperConfiguration().withSharedFields("2").apply().method("getTwo").close();
 
     assertThat(getOne.getComplete()).isTrue();
     assertThat(getTwo.getComplete()).isTrue();
@@ -1421,7 +1421,7 @@ public class ReflectionRoutineTest {
                                                                .withMaxInstances(1)
                                                                .withCoreInstances(0)
                                                                .apply()
-                                                               .callConfiguration()
+                                                               .wrapperConfiguration()
                                                                .withSharedFields("test")
                                                                .apply()
                                                                .method(TestStatic.class.getMethod(

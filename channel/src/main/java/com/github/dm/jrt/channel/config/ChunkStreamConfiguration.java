@@ -199,7 +199,7 @@ public class ChunkStreamConfiguration extends DeepEqualObject {
   }
 
   /**
-   * Builder of object configurations.
+   * Builder of output stream configurations.
    *
    * @param <TYPE> the configurable object type.
    */

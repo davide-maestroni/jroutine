@@ -35,7 +35,7 @@
     @org.jetbrains.annotations.NotNull
     @Override
     public com.github.dm.jrt.core.invocation.Invocation<Object, ${resultClassName}> newInvocation() {
-      return new Invocation${methodCount}${genericTypes}(mCallConfiguration, mTarget);
+      return new Invocation${methodCount}${genericTypes}(mWrapperConfiguration, mTarget);
     }
   }
 

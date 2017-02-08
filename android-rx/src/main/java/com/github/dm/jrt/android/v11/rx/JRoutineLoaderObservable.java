@@ -32,6 +32,8 @@ import com.github.dm.jrt.core.config.InvocationConfigurable;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.rx.JRoutineObservable;
+import com.github.dm.jrt.rx.config.ObservableConfigurable;
+import com.github.dm.jrt.rx.config.ObservableConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -83,8 +85,8 @@ public class JRoutineLoaderObservable {
    * @param <DATA> the data type.
    */
   public static class LoaderObservable<DATA>
-      implements InvocationConfigurable<LoaderObservable<DATA>>,
-      LoaderConfigurable<LoaderObservable<DATA>> {
+      implements ObservableConfigurable<Void, LoaderObservable<DATA>>,
+      InvocationConfigurable<LoaderObservable<DATA>>, LoaderConfigurable<LoaderObservable<DATA>> {
 
     private final Observable<DATA> mObservable;
 
@@ -93,13 +95,16 @@ public class JRoutineLoaderObservable {
 
     private LoaderConfiguration mLoaderConfiguration = LoaderConfiguration.defaultConfiguration();
 
+    private ObservableConfiguration<Void> mObservableConfiguration =
+        ObservableConfiguration.defaultConfiguration();
+
     /**
      * Constructor.
      *
      * @param observable the Observable.
      */
     private LoaderObservable(@NotNull final Observable<DATA> observable) {
-      mObservable = ConstantConditions.notNull("Observable", observable);
+      mObservable = ConstantConditions.notNull("Observable instance", observable);
     }
 
     @NotNull
@@ -119,6 +124,15 @@ public class JRoutineLoaderObservable {
 
     @NotNull
     @Override
+    public LoaderObservable<DATA> apply(
+        @NotNull final ObservableConfiguration<Void> configuration) {
+      mObservableConfiguration =
+          ConstantConditions.notNull("Observable configuration", configuration);
+      return this;
+    }
+
+    @NotNull
+    @Override
     public InvocationConfiguration.Builder<? extends LoaderObservable<DATA>>
     invocationConfiguration() {
       return new InvocationConfiguration.Builder<LoaderObservable<DATA>>(this,
@@ -131,6 +145,13 @@ public class JRoutineLoaderObservable {
       return new LoaderConfiguration.Builder<LoaderObservable<DATA>>(this, mLoaderConfiguration);
     }
 
+    @NotNull
+    @Override
+    public ObservableConfiguration.Builder<Void, LoaderObservable<DATA>> observableConfiguration() {
+      return new ObservableConfiguration.Builder<Void, LoaderObservable<DATA>>(this,
+          mObservableConfiguration);
+    }
+
     /**
      * Returns an Observable performing its emissions and notifications in a dedicated Loader.
      * <br>
@@ -141,11 +162,13 @@ public class JRoutineLoaderObservable {
      */
     @NotNull
     public Observable<DATA> observeOn(@NotNull final LoaderContext context) {
-      return JRoutineObservable.create(JRoutineLoader.on(context)
-                                                     .with(new ObservableInvocationFactory<DATA>(
-                                                         mObservable))
-                                                     .apply(mInvocationConfiguration)
-                                                     .apply(mLoaderConfiguration));
+      return JRoutineObservable.from(JRoutineLoader.on(context)
+                                                   .with(new ObservableInvocationFactory<DATA>(
+                                                       mObservable))
+                                                   .apply(mInvocationConfiguration)
+                                                   .apply(mLoaderConfiguration))
+                               .apply(mObservableConfiguration)
+                               .buildObservable();
     }
 
     /**

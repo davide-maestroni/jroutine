@@ -20,34 +20,33 @@ import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.ChannelBuilder;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.channel.Channel;
+import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.ChannelConfiguration.Builder;
-import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.rx.builder.AbstractObservableBuilder;
+import com.github.dm.jrt.rx.builder.ObservableBuilder;
+import com.github.dm.jrt.rx.config.ObservableConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
+import rx.Emitter;
+import rx.Emitter.BackpressureMode;
 import rx.Observable;
 import rx.Observer;
 import rx.functions.Action1;
-import rx.functions.Action3;
-import rx.functions.Func0;
-import rx.observables.AsyncOnSubscribe;
+import rx.functions.Cancellable;
 
 /**
  * Utility class integrating the JRoutine classes with RxJava ones.
  * <p>
  * The example below shows how it's possible to create an Observable instance from a channel:
  * <pre><code>
- * JRoutineObservable.create(myChannel.in(seconds(3))).subscribe(getAction());
+ * JRoutineObservable.from(myChannel).buildObservable().subscribe(getAction());
  * </code></pre>
  * <p>
  * In a dual way, a channel can be created from an Observable:
@@ -60,8 +59,6 @@ import rx.observables.AsyncOnSubscribe;
 @SuppressWarnings("WeakerAccess")
 public class JRoutineObservable {
 
-  private static final ChannelNext<?> sChannelNext = new ChannelNext<Object>();
-
   /**
    * Avoid explicit instantiation.
    */
@@ -70,182 +67,49 @@ public class JRoutineObservable {
   }
 
   /**
-   * Creates a new observable from the specified channel.
-   * <br>
-   * Note that, unless properly configure, the channel might timeout when polled for outputs.
+   * Returns a builder of Observables fed by the specified channel.
    *
    * @param channel the channel instance.
    * @param <OUT>   the output data type.
-   * @return the observable instance.
-   * @see com.github.dm.jrt.core.config.ChannelConfiguration ChannelConfiguration
+   * @return the Observable builder.
    */
   @NotNull
-  public static <OUT> Observable<OUT> create(@NotNull final Channel<?, OUT> channel) {
-    @SuppressWarnings("unchecked") final ChannelNext<OUT> channelNext =
-        (ChannelNext<OUT>) sChannelNext;
-    return Observable.create(
-        AsyncOnSubscribe.createSingleState(new ChannelGenerator<OUT>(channel), channelNext,
-            channelNext));
+  public static <OUT> ObservableBuilder<?, OUT> from(@NotNull final Channel<?, OUT> channel) {
+    return new ChannelObservableBuilder<OUT>(channel);
   }
 
   /**
-   * Creates a new observable by invoking the specified routine.
-   * <br>
-   * Note that, unless properly configure, the invocation might timeout when polled for outputs.
+   * Returns a builder of Observables fed by an invocation of the specified routine.
    *
    * @param routine the routine instance.
-   * @param input   the invocation input.
    * @param <IN>    the input data type.
    * @param <OUT>   the output data type.
-   * @return the observable instance.
-   * @see com.github.dm.jrt.core.config.InvocationConfiguration InvocationConfiguration
+   * @return the Observable builder.
    */
   @NotNull
-  public static <IN, OUT> Observable<OUT> create(@NotNull final Routine<? super IN, OUT> routine,
-      @Nullable final IN input) {
-    return create(routine, Collections.singletonList(input));
+  public static <IN, OUT> ObservableBuilder<IN, OUT> from(@NotNull final Routine<IN, OUT> routine) {
+    return new RoutineObservableBuilder<IN, OUT>(routine);
   }
 
   /**
-   * Creates a new observable by invoking the specified routine.
-   * <br>
-   * Note that, unless properly configure, the invocation might timeout when polled for outputs.
-   *
-   * @param routine the routine instance.
-   * @param inputs  the invocation inputs.
-   * @param <IN>    the input data type.
-   * @param <OUT>   the output data type.
-   * @return the observable instance.
-   * @see com.github.dm.jrt.core.config.InvocationConfiguration InvocationConfiguration
-   */
-  @NotNull
-  public static <IN, OUT> Observable<OUT> create(@NotNull final Routine<? super IN, OUT> routine,
-      @Nullable final IN... inputs) {
-    if (inputs == null) {
-      return create(routine);
-    }
-
-    return create(routine, Arrays.asList(inputs));
-  }
-
-  /**
-   * Creates a new observable by invoking the specified routine.
-   * <br>
-   * Note that, unless properly configure, the invocation might timeout when polled for outputs.
-   *
-   * @param routine the routine instance.
-   * @param inputs  an iterable returning the invocation inputs.
-   * @param <IN>    the input data type.
-   * @param <OUT>   the output data type.
-   * @return the observable instance.
-   * @see com.github.dm.jrt.core.config.InvocationConfiguration InvocationConfiguration
-   */
-  @NotNull
-  public static <IN, OUT> Observable<OUT> create(@NotNull final Routine<? super IN, OUT> routine,
-      @Nullable final Iterable<IN> inputs) {
-    if (inputs == null) {
-      return create(routine);
-    }
-
-    @SuppressWarnings("unchecked") final ChannelNext<OUT> channelNext =
-        (ChannelNext<OUT>) sChannelNext;
-    return Observable.create(
-        AsyncOnSubscribe.createSingleState(new RoutineGenerator<IN, OUT>(routine, inputs),
-            channelNext, channelNext));
-  }
-
-  /**
-   * Creates a new observable by invoking the specified routine.
-   * <br>
-   * Note that, unless properly configure, the invocation might timeout when polled for outputs.
-   *
-   * @param routine the routine instance.
-   * @param <OUT>   the output data type.
-   * @return the observable instance.
-   * @see com.github.dm.jrt.core.config.InvocationConfiguration InvocationConfiguration
-   */
-  @NotNull
-  @SuppressWarnings("unchecked")
-  public static <OUT> Observable<OUT> create(@NotNull final Routine<?, OUT> routine) {
-    final ChannelNext<OUT> channelNext = (ChannelNext<OUT>) sChannelNext;
-    return Observable.create(AsyncOnSubscribe.createSingleState(
-        new RoutineGenerator<Object, OUT>((Routine<Object, OUT>) routine, null), channelNext,
-        channelNext));
-  }
-
-  /**
-   * Creates a new observable by invoking a routine instantiated through the specified builder.
-   * <br>
-   * Note that, unless properly configure, the invocation might timeout when polled for outputs.
+   * Returns a builder of Observables fed by an invocation of a routine created through the
+   * specified builder.
    *
    * @param builder the routine builder.
-   * @param input   the invocation input.
    * @param <IN>    the input data type.
    * @param <OUT>   the output data type.
-   * @return the observable instance.
-   * @see com.github.dm.jrt.core.config.InvocationConfiguration InvocationConfiguration
+   * @return the Observable builder.
    */
   @NotNull
-  public static <IN, OUT> Observable<OUT> create(
-      @NotNull final RoutineBuilder<? super IN, OUT> builder, @Nullable final IN input) {
-    return create(builder.buildRoutine(), input);
+  public static <IN, OUT> ObservableBuilder<IN, OUT> from(
+      @NotNull final RoutineBuilder<IN, OUT> builder) {
+    return from(builder.buildRoutine());
   }
 
   /**
-   * Creates a new observable by invoking a routine instantiated through the specified builder.
-   * <br>
-   * Note that, unless properly configure, the invocation might timeout when polled for outputs.
+   * Returns a builder of channels fed by the specified Observable.
    *
-   * @param builder the routine builder.
-   * @param inputs  the invocation inputs.
-   * @param <IN>    the input data type.
-   * @param <OUT>   the output data type.
-   * @return the observable instance.
-   * @see com.github.dm.jrt.core.config.InvocationConfiguration InvocationConfiguration
-   */
-  @NotNull
-  public static <IN, OUT> Observable<OUT> create(
-      @NotNull final RoutineBuilder<? super IN, OUT> builder, @Nullable final IN... inputs) {
-    return create(builder.buildRoutine(), inputs);
-  }
-
-  /**
-   * Creates a new observable by invoking a routine instantiated through the specified builder.
-   * <br>
-   * Note that, unless properly configure, the invocation might timeout when polled for outputs.
-   *
-   * @param builder the routine builder.
-   * @param inputs  an iterable returning the invocation inputs.
-   * @param <IN>    the input data type.
-   * @param <OUT>   the output data type.
-   * @return the observable instance.
-   * @see com.github.dm.jrt.core.config.InvocationConfiguration InvocationConfiguration
-   */
-  @NotNull
-  public static <IN, OUT> Observable<OUT> create(
-      @NotNull final RoutineBuilder<? super IN, OUT> builder, @Nullable final Iterable<IN> inputs) {
-    return create(builder.buildRoutine(), inputs);
-  }
-
-  /**
-   * Creates a new observable by invoking a routine instantiated through the specified builder.
-   * <br>
-   * Note that, unless properly configure, the invocation might timeout when polled for outputs.
-   *
-   * @param builder the routine builder.
-   * @param <OUT>   the output data type.
-   * @return the observable instance.
-   * @see com.github.dm.jrt.core.config.InvocationConfiguration InvocationConfiguration
-   */
-  @NotNull
-  public static <OUT> Observable<OUT> create(@NotNull final RoutineBuilder<?, OUT> builder) {
-    return create(builder.buildRoutine());
-  }
-
-  /**
-   * Returns a builder of channels fed by the specified observable.
-   *
-   * @param observable the observable instance.
+   * @param observable the Observable instance.
    * @param <OUT>      the output data type.
    * @return the channel builder.
    */
@@ -255,11 +119,11 @@ public class JRoutineObservable {
   }
 
   /**
-   * Function returning a channel instance.
+   * Function binding a channel to an emitter.
    *
    * @param <OUT> the output data type.
    */
-  private static class ChannelGenerator<OUT> implements Func0<Channel<?, OUT>> {
+  private static class ChannelEmitter<OUT> implements Action1<Emitter<OUT>>, Cancellable {
 
     private final Channel<?, OUT> mChannel;
 
@@ -268,47 +132,43 @@ public class JRoutineObservable {
      *
      * @param channel the channel instance.
      */
-    private ChannelGenerator(@NotNull final Channel<?, OUT> channel) {
-      mChannel = ConstantConditions.notNull("channel instance", channel);
+    private ChannelEmitter(@NotNull final Channel<?, OUT> channel) {
+      mChannel = channel;
     }
 
-    public Channel<?, OUT> call() {
-      return mChannel;
+    public void call(final Emitter<OUT> outEmitter) {
+      outEmitter.setCancellation(this);
+      mChannel.bind(new EmitterConsumer<OUT>(outEmitter));
+    }
+
+    public void cancel() {
+      mChannel.abort();
     }
   }
 
   /**
-   * Subscription listener reading channel data.
+   * Builder of Observables emitting a channel output data.
    *
    * @param <OUT> the output data type.
    */
-  private static class ChannelNext<OUT>
-      implements Action3<Channel<?, OUT>, Long, Observer<Observable<? extends OUT>>>,
-      Action1<Channel<?, OUT>> {
+  private static class ChannelObservableBuilder<OUT>
+      extends AbstractObservableBuilder<Object, OUT> {
 
-    public void call(final Channel<?, OUT> channel, final Long requested,
-        final Observer<Observable<? extends OUT>> observer) {
-      try {
-        final int count = (int) Math.min(Integer.MAX_VALUE, requested);
-        final List<OUT> outputs = channel.next(count);
-        if (!outputs.isEmpty()) {
-          observer.onNext(Observable.from(outputs));
+    private final Channel<?, OUT> mChannel;
 
-        } else if (channel.getComplete()) {
-          observer.onCompleted();
-
-        } else {
-          observer.onNext(Observable.<OUT>empty());
-        }
-
-      } catch (final RoutineException e) {
-        observer.onError(e);
-        InterruptedInvocationException.throwIfInterrupt(e);
-      }
+    /**
+     * Constructor.
+     *
+     * @param channel the channel instance.
+     */
+    private ChannelObservableBuilder(@NotNull final Channel<?, OUT> channel) {
+      mChannel = ConstantConditions.notNull("channel instance", channel);
     }
 
-    public void call(final Channel<?, OUT> channel) {
-      channel.abort();
+    @NotNull
+    public Observable<OUT> buildObservable() {
+      return Observable.fromEmitter(new ChannelEmitter<OUT>(mChannel),
+          getConfiguration().getBackpressureOrElse(BackpressureMode.BUFFER));
     }
   }
 
@@ -344,7 +204,38 @@ public class JRoutineObservable {
   }
 
   /**
-   * Builder of channels fed by an observable.
+   * Channel consumer feeding an emitter.
+   *
+   * @param <OUT> the output data type.
+   */
+  private static class EmitterConsumer<OUT> implements ChannelConsumer<OUT> {
+
+    private final Emitter<OUT> mEmitter;
+
+    /**
+     * Constructor.
+     *
+     * @param emitter the emitter instance.
+     */
+    private EmitterConsumer(@NotNull final Emitter<OUT> emitter) {
+      mEmitter = emitter;
+    }
+
+    public void onComplete() {
+      mEmitter.onCompleted();
+    }
+
+    public void onError(@NotNull final RoutineException error) {
+      mEmitter.onError(error);
+    }
+
+    public void onOutput(final OUT output) {
+      mEmitter.onNext(output);
+    }
+  }
+
+  /**
+   * Builder of channels fed by an Observable.
    *
    * @param <OUT> the output data type.
    */
@@ -357,10 +248,10 @@ public class JRoutineObservable {
     /**
      * Constructor.
      *
-     * @param observable the feeding observable.
+     * @param observable the feeding Observable.
      */
     private ObservableChannelBuilder(@NotNull final Observable<OUT> observable) {
-      mObservable = ConstantConditions.notNull("observable instance", observable);
+      mObservable = ConstantConditions.notNull("Observable instance", observable);
     }
 
     @NotNull
@@ -383,12 +274,12 @@ public class JRoutineObservable {
   }
 
   /**
-   * Function returning a routine invocation channel.
+   * Function binding an invocation channel to an emitter.
    *
    * @param <IN>  the input data type.
    * @param <OUT> the output data type.
    */
-  private static class RoutineGenerator<IN, OUT> implements Func0<Channel<?, OUT>> {
+  private static class RoutineEmitter<IN, OUT> implements Action1<Emitter<OUT>> {
 
     private final Iterable<IN> mInputs;
 
@@ -400,14 +291,43 @@ public class JRoutineObservable {
      * @param routine the routine instance.
      * @param inputs  an iterable returning the invocation inputs.
      */
-    private RoutineGenerator(@NotNull final Routine<? super IN, OUT> routine,
+    private RoutineEmitter(@NotNull final Routine<? super IN, OUT> routine,
         @Nullable final Iterable<IN> inputs) {
-      mRoutine = ConstantConditions.notNull("routine instance", routine);
+      mRoutine = routine;
       mInputs = inputs;
     }
 
-    public Channel<?, OUT> call() {
-      return mRoutine.call(mInputs);
+    public void call(final Emitter<OUT> outEmitter) {
+      final Channel<? super IN, OUT> channel = mRoutine.call();
+      outEmitter.setCancellation(new ChannelEmitter<OUT>(channel));
+      channel.bind(new EmitterConsumer<OUT>(outEmitter)).pass(mInputs).close();
+    }
+  }
+
+  /**
+   * @param <IN>  the input data type.
+   * @param <OUT> the output data type.
+   */
+  private static class RoutineObservableBuilder<IN, OUT>
+      extends AbstractObservableBuilder<IN, OUT> {
+
+    private final Routine<IN, OUT> mRoutine;
+
+    /**
+     * Constructor.
+     *
+     * @param routine the routine instance.
+     */
+    private RoutineObservableBuilder(@NotNull final Routine<IN, OUT> routine) {
+      mRoutine = ConstantConditions.notNull("routine instance", routine);
+    }
+
+    @NotNull
+    public Observable<OUT> buildObservable() {
+      final ObservableConfiguration<IN> configuration = getConfiguration();
+      return Observable.fromEmitter(
+          new RoutineEmitter<IN, OUT>(mRoutine, configuration.getInputsOrElse(null)),
+          configuration.getBackpressureOrElse(BackpressureMode.BUFFER));
     }
   }
 }

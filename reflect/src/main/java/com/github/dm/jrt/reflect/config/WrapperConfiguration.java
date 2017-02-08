@@ -134,7 +134,7 @@ public final class WrapperConfiguration extends DeepEqualObject {
   }
 
   /**
-   * Builder of object configurations.
+   * Builder of wrapper configurations.
    *
    * @param <TYPE> the configurable object type.
    */

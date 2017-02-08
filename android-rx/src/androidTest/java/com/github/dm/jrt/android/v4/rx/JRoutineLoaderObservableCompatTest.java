@@ -20,7 +20,6 @@ import android.annotation.TargetApi;
 import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
-import com.github.dm.jrt.android.core.log.AndroidLogs;
 import com.github.dm.jrt.android.rx.R;
 
 import java.util.Arrays;
@@ -29,6 +28,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import rx.Emitter.BackpressureMode;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
@@ -63,8 +63,11 @@ public class JRoutineLoaderObservableCompatTest
             return s.toUpperCase();
           }
         }))
+                                  .observableConfiguration()
+                                  .withBackpressure(BackpressureMode.BUFFER)
+                                  .apply()
                                   .invocationConfiguration()
-                                  .withLog(AndroidLogs.androidLog())
+                                  .withOutputTimeout(seconds(10))
                                   .apply()
                                   .loaderConfiguration()
                                   .withResultStaleTime(seconds(10))
@@ -80,6 +83,15 @@ public class JRoutineLoaderObservableCompatTest
 
                                       latch.countDown();
                                     }
+                                  }, new Action1<Throwable>() {
+
+                                    @Override
+                                    public void call(final Throwable throwable) {
+                                      isSuccess.set(false);
+                                      while (latch.getCount() > 0) {
+                                        latch.countDown();
+                                      }
+                                    }
                                   });
     latch.await(10, TimeUnit.SECONDS);
     assertThat(isSuccess.get()).isTrue();
@@ -90,8 +102,11 @@ public class JRoutineLoaderObservableCompatTest
     final List<String> expected = Arrays.asList("TEST1", "TEST2", "TEST3");
     final AtomicBoolean isSuccess = new AtomicBoolean(true);
     JRoutineLoaderObservableCompat.with(Observable.just("test1", "test2", "test3"))
+                                  .observableConfiguration()
+                                  .withBackpressure(BackpressureMode.BUFFER)
+                                  .apply()
                                   .invocationConfiguration()
-                                  .withLog(AndroidLogs.androidLog())
+                                  .withOutputTimeout(seconds(10))
                                   .apply()
                                   .loaderConfiguration()
                                   .withResultStaleTime(seconds(10))
@@ -114,6 +129,15 @@ public class JRoutineLoaderObservableCompatTest
                                       }
 
                                       latch.countDown();
+                                    }
+                                  }, new Action1<Throwable>() {
+
+                                    @Override
+                                    public void call(final Throwable throwable) {
+                                      isSuccess.set(false);
+                                      while (latch.getCount() > 0) {
+                                        latch.countDown();
+                                      }
                                     }
                                   });
     latch.await(10, TimeUnit.SECONDS);
@@ -142,6 +166,15 @@ public class JRoutineLoaderObservableCompatTest
         }
 
         latch.countDown();
+      }
+    }, new Action1<Throwable>() {
+
+      @Override
+      public void call(final Throwable throwable) {
+        isSuccess.set(false);
+        while (latch.getCount() > 0) {
+          latch.countDown();
+        }
       }
     });
     latch.await(10, TimeUnit.SECONDS);
@@ -173,6 +206,15 @@ public class JRoutineLoaderObservableCompatTest
                                       }
 
                                       latch.countDown();
+                                    }
+                                  }, new Action1<Throwable>() {
+
+                                    @Override
+                                    public void call(final Throwable throwable) {
+                                      isSuccess.set(false);
+                                      while (latch.getCount() > 0) {
+                                        latch.countDown();
+                                      }
                                     }
                                   });
     latch.await(10, TimeUnit.SECONDS);

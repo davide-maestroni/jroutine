@@ -17,7 +17,6 @@
 package com.github.dm.jrt.rx;
 
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.CommandInvocation;
@@ -28,6 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -47,20 +47,16 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class JRoutineObservableTest {
 
-  private static <IN, OUT> RoutineBuilder<IN, OUT> configure(
-      @NotNull final RoutineBuilder<IN, OUT> builder) {
-    return builder.invocationConfiguration().withOutputTimeout(seconds(1)).apply();
-  }
-
   @Test
-  public void testBuilder0() {
+  public void testBuilder0() throws InterruptedException {
+    final Semaphore semaphore = new Semaphore(0);
     final AtomicReference<String> reference = new AtomicReference<String>();
-    JRoutineObservable.create(configure(JRoutineCore.with(new CommandInvocation<String>(null) {
+    JRoutineObservable.from(JRoutineCore.with(new CommandInvocation<String>(null) {
 
       public void onComplete(@NotNull final Channel<String, ?> result) {
         result.pass("test");
       }
-    }))).map(new Func1<String, String>() {
+    })).buildObservable().map(new Func1<String, String>() {
 
       public String call(final String s) {
         return s.toUpperCase();
@@ -69,83 +65,109 @@ public class JRoutineObservableTest {
 
       public void call(final String s) {
         reference.set(s);
+        semaphore.release();
       }
     });
+    semaphore.tryAcquire(1, TimeUnit.SECONDS);
     assertThat(reference.get()).isEqualTo("TEST");
   }
 
   @Test
-  public void testBuilder1() {
+  public void testBuilder1() throws InterruptedException {
+    final Semaphore semaphore = new Semaphore(0);
     final AtomicReference<String> reference = new AtomicReference<String>();
-    JRoutineObservable.create(
-        configure(JRoutineCore.with(new MappingInvocation<String, String>(null) {
+    JRoutineObservable.from(JRoutineCore.with(new MappingInvocation<String, String>(null) {
 
-          public void onInput(final String input, @NotNull final Channel<String, ?> result) {
-            if (input != null) {
-              result.pass(input);
-            }
-          }
-        })), "test").map(new Func1<String, String>() {
-
-      public String call(final String s) {
-        return s.toUpperCase();
+      public void onInput(final String input, @NotNull final Channel<String, ?> result) {
+        if (input != null) {
+          result.pass(input);
+        }
       }
-    }).subscribe(new Action1<String>() {
+    }))
+                      .observableConfiguration()
+                      .withInput("test")
+                      .apply()
+                      .buildObservable()
+                      .map(new Func1<String, String>() {
 
-      public void call(final String s) {
-        reference.set(s);
-      }
-    });
+                        public String call(final String s) {
+                          return s.toUpperCase();
+                        }
+                      })
+                      .subscribe(new Action1<String>() {
+
+                        public void call(final String s) {
+                          reference.set(s);
+                          semaphore.release();
+                        }
+                      });
+    semaphore.tryAcquire(1, TimeUnit.SECONDS);
     assertThat(reference.get()).isEqualTo("TEST");
   }
 
   @Test
-  public void testBuilder2() {
+  public void testBuilder2() throws InterruptedException {
+    final Semaphore semaphore = new Semaphore(0);
     final AtomicReference<String> reference = new AtomicReference<String>();
-    JRoutineObservable.create(
-        configure(JRoutineCore.with(new MappingInvocation<String, String>(null) {
+    JRoutineObservable.from(JRoutineCore.with(new MappingInvocation<String, String>(null) {
 
-          public void onInput(final String input, @NotNull final Channel<String, ?> result) {
-            if (input != null) {
-              result.pass(input);
-            }
-          }
-        })), null, "test").map(new Func1<String, String>() {
-
-      public String call(final String s) {
-        return s.toUpperCase();
+      public void onInput(final String input, @NotNull final Channel<String, ?> result) {
+        if (input != null) {
+          result.pass(input);
+        }
       }
-    }).subscribe(new Action1<String>() {
+    }))
+                      .observableConfiguration()
+                      .withInputs(null, "test")
+                      .apply()
+                      .buildObservable()
+                      .map(new Func1<String, String>() {
 
-      public void call(final String s) {
-        reference.set(s);
-      }
-    });
+                        public String call(final String s) {
+                          return s.toUpperCase();
+                        }
+                      })
+                      .subscribe(new Action1<String>() {
+
+                        public void call(final String s) {
+                          reference.set(s);
+                          semaphore.release();
+                        }
+                      });
+    semaphore.tryAcquire(1, TimeUnit.SECONDS);
     assertThat(reference.get()).isEqualTo("TEST");
   }
 
   @Test
-  public void testBuilder3() {
+  public void testBuilder3() throws InterruptedException {
+    final Semaphore semaphore = new Semaphore(0);
     final AtomicReference<String> reference = new AtomicReference<String>();
-    JRoutineObservable.create(
-        configure(JRoutineCore.with(new MappingInvocation<String, String>(null) {
+    JRoutineObservable.from(JRoutineCore.with(new MappingInvocation<String, String>(null) {
 
-          public void onInput(final String input, @NotNull final Channel<String, ?> result) {
-            if (input != null) {
-              result.pass(input);
-            }
-          }
-        })), Arrays.asList(null, "test")).map(new Func1<String, String>() {
-
-      public String call(final String s) {
-        return s.toUpperCase();
+      public void onInput(final String input, @NotNull final Channel<String, ?> result) {
+        if (input != null) {
+          result.pass(input);
+        }
       }
-    }).subscribe(new Action1<String>() {
+    }))
+                      .observableConfiguration()
+                      .withInputs(Arrays.asList(null, "test"))
+                      .apply()
+                      .buildObservable()
+                      .map(new Func1<String, String>() {
 
-      public void call(final String s) {
-        reference.set(s);
-      }
-    });
+                        public String call(final String s) {
+                          return s.toUpperCase();
+                        }
+                      })
+                      .subscribe(new Action1<String>() {
+
+                        public void call(final String s) {
+                          reference.set(s);
+                          semaphore.release();
+                        }
+                      });
+    semaphore.tryAcquire(1, TimeUnit.SECONDS);
     assertThat(reference.get()).isEqualTo("TEST");
   }
 
@@ -188,7 +210,8 @@ public class JRoutineObservableTest {
   @Test
   public void testObservable() {
     final AtomicReference<String> reference = new AtomicReference<String>();
-    JRoutineObservable.create(JRoutineCore.of("test").buildChannel())
+    JRoutineObservable.from(JRoutineCore.of("test").buildChannel())
+                      .buildObservable()
                       .map(new Func1<String, String>() {
 
                         public String call(final String s) {
@@ -209,7 +232,8 @@ public class JRoutineObservableTest {
   public void testObservableError() {
     final AtomicReference<String> reference = new AtomicReference<String>();
     final AtomicReference<Throwable> errorReference = new AtomicReference<Throwable>();
-    JRoutineObservable.create(JRoutineCore.of("test").buildChannel())
+    JRoutineObservable.from(JRoutineCore.of("test").buildChannel())
+                      .buildObservable()
                       .map(new Func1<String, String>() {
 
                         public String call(final String s) {
@@ -240,7 +264,7 @@ public class JRoutineObservableTest {
     final AtomicReference<Throwable> errorReference = new AtomicReference<Throwable>();
     final Channel<String, String> channel = JRoutineCore.<String>ofInputs().buildChannel();
     channel.abort();
-    JRoutineObservable.create(channel).map(new Func1<String, String>() {
+    JRoutineObservable.from(channel).buildObservable().map(new Func1<String, String>() {
 
       public String call(final String s) {
         return s.toUpperCase();
@@ -267,7 +291,8 @@ public class JRoutineObservableTest {
     final AtomicReference<String> reference = new AtomicReference<String>();
     final AtomicReference<Throwable> errorReference = new AtomicReference<Throwable>();
     final Channel<String, String> channel = JRoutineCore.<String>ofInputs().buildChannel();
-    JRoutineObservable.create(channel.after(seconds(1)).pass("test").in(seconds(2)))
+    JRoutineObservable.from(channel.after(seconds(1)).pass("test"))
+                      .buildObservable()
                       .map(new Func1<String, String>() {
 
                         public String call(final String s) {
@@ -289,7 +314,6 @@ public class JRoutineObservableTest {
                         }
                       })
                       .unsubscribe();
-    seconds(.5).sleepAtLeast();
     assertThat(channel.in(seconds(1)).getError()).isExactlyInstanceOf(AbortException.class);
     assertThat(reference.get()).isNull();
     assertThat(errorReference.get()).isNull();

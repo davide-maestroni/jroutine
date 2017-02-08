@@ -27,7 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 /**
- * Object configuration unit tests.
+ * Wrapper configuration unit tests.
  * <p>
  * Created by davide-maestroni on 04/21/2015.
  */

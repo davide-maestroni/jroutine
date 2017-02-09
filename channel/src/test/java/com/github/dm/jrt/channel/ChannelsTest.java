@@ -42,6 +42,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 import static com.github.dm.jrt.core.common.BackoffBuilder.afterCount;
 import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
@@ -179,6 +180,32 @@ public class ChannelsTest {
     } catch (final NullPointerException ignored) {
 
     }
+  }
+
+  @Test
+  public void testCallableAsync() {
+    assertThat(Channels.fromCallable(new Callable<String>() {
+
+      public String call() {
+        return "test";
+      }
+    }).buildChannel().in(seconds(1)).next()).isEqualTo("test");
+  }
+
+  @Test
+  public void testCallableSync() {
+    assertThat(Channels.fromCallable(new Callable<String>() {
+
+      public String call() throws InterruptedException {
+        seconds(.3).sleepAtLeast();
+        return "test";
+      }
+    })
+                       .channelConfiguration()
+                       .withRunner(Runners.immediateRunner())
+                       .apply()
+                       .buildChannel()
+                       .next()).isEqualTo("test");
   }
 
   @Test

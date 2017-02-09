@@ -46,7 +46,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static com.github.dm.jrt.core.util.DurationMeasure.fromUnit;
 import static com.github.dm.jrt.core.util.DurationMeasure.noTime;
@@ -55,10 +54,10 @@ import static com.github.dm.jrt.core.util.DurationMeasure.noTime;
  * Implementation of a channel backed by a Future instance.
  * <p>
  * Created by davide-maestroni on 08/30/2016.
+ *
+ * @param <OUT> the output data type.
  */
 class FutureChannel<OUT> implements Channel<OUT, OUT> {
-
-  private final AtomicReference<Throwable> mAbortException = new AtomicReference<Throwable>(null);
 
   private final Future<OUT> mFuture;
 
@@ -66,9 +65,9 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
 
   private final AtomicBoolean mIsBound = new AtomicBoolean();
 
-  private final Logger mLogger;
+  private final AtomicBoolean mIsOutput = new AtomicBoolean();
 
-  private final Object mMutex = new Object();
+  private final Logger mLogger;
 
   private final LocalField<DurationMeasure> mOutputTimeout;
 
@@ -80,7 +79,7 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
 
   private final ThreadLocal<Throwable> mTimeoutException = new ThreadLocal<Throwable>();
 
-  private boolean mIsOutput;
+  private Throwable mAbortException;
 
   /**
    * Constructor.
@@ -112,7 +111,7 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
     if (delay.isZero()) {
       final boolean isCancelled = future.cancel(mInterruptIfRunning);
       if (isCancelled) {
-        mAbortException.set(reason);
+        mAbortException = reason;
       }
 
       return isCancelled;
@@ -187,7 +186,7 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
             consumer.onOutput(mFuture.get());
 
           } catch (final CancellationException e) {
-            consumer.onError(AbortException.wrapIfNeeded(mAbortException.get()));
+            consumer.onError(AbortException.wrapIfNeeded(mAbortException));
             return;
 
           } catch (final InterruptedException e) {
@@ -269,7 +268,7 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
     } catch (final TimeoutException ignored) {
 
     } catch (final CancellationException e) {
-      return AbortException.wrapIfNeeded(mAbortException.get());
+      return AbortException.wrapIfNeeded(mAbortException);
 
     } catch (final InterruptedException e) {
       return new InterruptedInvocationException(e);
@@ -345,9 +344,7 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
 
   public int outputSize() {
     if (mFuture.isDone()) {
-      synchronized (mMutex) {
-        return mIsOutput ? 0 : 1;
-      }
+      return mIsOutput.get() ? 0 : 1;
     }
 
     return 0;
@@ -432,7 +429,7 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
   @NotNull
   private Channel<OUT, OUT> failPass() {
     if (mFuture.isCancelled()) {
-      throw AbortException.wrapIfNeeded(mAbortException.get());
+      throw AbortException.wrapIfNeeded(mAbortException);
     }
 
     throw new IllegalStateException("the channel is closed");
@@ -443,16 +440,14 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
     verifyBound();
     final Logger logger = mLogger;
     try {
-      synchronized (mMutex) {
-        if (mIsOutput) {
-          return false;
-        }
-
-        mFuture.get(timeout, timeUnit);
-        verifyBound();
-        logger.dbg("has output: %s [%d %s]", true, timeout, timeUnit);
-        return true;
+      if (mIsOutput.get()) {
+        return false;
       }
+
+      mFuture.get(timeout, timeUnit);
+      verifyBound();
+      logger.dbg("has output: %s [%d %s]", true, timeout, timeUnit);
+      return true;
 
     } catch (final TimeoutException e) {
       logger.wrn("has output timeout: [%d %s] => [%s]", timeout, timeUnit, timeoutAction);
@@ -467,7 +462,7 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
       }
 
     } catch (final CancellationException e) {
-      throw AbortException.wrapIfNeeded(mAbortException.get());
+      throw AbortException.wrapIfNeeded(mAbortException);
 
     } catch (final IllegalStateException e) {
       throw e;
@@ -485,16 +480,13 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
       @NotNull final TimeoutActionType timeoutAction, @Nullable final Throwable timeoutException) {
     verifyBound();
     try {
-      synchronized (mMutex) {
-        if (mIsOutput) {
-          throw new NoSuchElementException();
-        }
-
-        final OUT output = mFuture.get(timeout, timeUnit);
-        verifyBound();
-        mIsOutput = true;
-        return output;
+      if (mIsOutput.getAndSet(true)) {
+        throw new NoSuchElementException();
       }
+
+      final OUT output = mFuture.get(timeout, timeUnit);
+      verifyBound();
+      return output;
 
     } catch (final NoSuchElementException e) {
       throw e;
@@ -514,7 +506,7 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
       throw new NoSuchElementException();
 
     } catch (final CancellationException e) {
-      throw AbortException.wrapIfNeeded(mAbortException.get());
+      throw AbortException.wrapIfNeeded(mAbortException);
 
     } catch (final IllegalStateException e) {
       throw e;
@@ -540,6 +532,8 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
     private final TimeoutActionType mAction;
 
     private final Throwable mException;
+
+    private final Object mMutex = new Object();
 
     private final long mTimeoutMillis;
 

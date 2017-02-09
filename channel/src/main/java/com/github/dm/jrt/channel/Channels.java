@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
 /**
@@ -386,6 +387,18 @@ public class Channels {
     }
 
     return new OutputMapBuilder<OUT>(channel, idSet);
+  }
+
+  /**
+   * Returns a builder of channels producing the result of the specified Callable.
+   *
+   * @param callable the Callable instance.
+   * @param <OUT>    the output data type.
+   * @return the channel builder.
+   */
+  @NotNull
+  public static <OUT> ChannelBuilder<?, OUT> fromCallable(@NotNull final Callable<OUT> callable) {
+    return new CallableChannelBuilder<OUT>(callable);
   }
 
   /**

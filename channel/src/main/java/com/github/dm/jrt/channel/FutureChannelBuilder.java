@@ -28,6 +28,8 @@ import java.util.concurrent.Future;
  * Builder implementation returning a channel wrapping a Future instance.
  * <p>
  * Created by davide-maestroni on 08/31/2016.
+ *
+ * @param <OUT> the output data type.
  */
 class FutureChannelBuilder<OUT> extends AbstractChannelBuilder<OUT, OUT> {
 

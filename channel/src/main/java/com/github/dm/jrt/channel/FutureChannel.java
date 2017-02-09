@@ -65,7 +65,7 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
 
   private final AtomicBoolean mIsBound = new AtomicBoolean();
 
-  private final AtomicBoolean mIsOutput = new AtomicBoolean();
+  private final AtomicBoolean mIsRead = new AtomicBoolean();
 
   private final Logger mLogger;
 
@@ -177,35 +177,53 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
       throw new IllegalStateException("the channel is already bound");
     }
 
-    final DurationMeasure delay = mResultDelay.get();
-    mRunner.run(new Execution() {
+    if (mIsRead.get()) {
 
-      public void run() {
-        try {
+      try {
+        if (mFuture.isCancelled()) {
+          consumer.onError(AbortException.wrapIfNeeded(mAbortException));
+
+        } else {
+          consumer.onComplete();
+        }
+
+      } catch (final Throwable t) {
+        InterruptedInvocationException.throwIfInterrupt(t);
+        mLogger.wrn(t, "consumer exception (%s)", consumer);
+      }
+
+    } else {
+      final DurationMeasure delay = mResultDelay.get();
+      mRunner.run(new Execution() {
+
+        public void run() {
           try {
-            consumer.onOutput(mFuture.get());
+            try {
+              consumer.onOutput(mFuture.get());
 
-          } catch (final CancellationException e) {
-            consumer.onError(AbortException.wrapIfNeeded(mAbortException));
-            return;
+            } catch (final CancellationException e) {
+              consumer.onError(AbortException.wrapIfNeeded(mAbortException));
+              return;
 
-          } catch (final InterruptedException e) {
-            consumer.onError(new InterruptedInvocationException(e));
-            return;
+            } catch (final InterruptedException e) {
+              consumer.onError(new InterruptedInvocationException(e));
+              return;
+
+            } catch (final Throwable t) {
+              consumer.onError(InvocationException.wrapIfNeeded(t));
+              return;
+            }
+
+            consumer.onComplete();
 
           } catch (final Throwable t) {
-            consumer.onError(InvocationException.wrapIfNeeded(t));
-            return;
+            InterruptedInvocationException.throwIfInterrupt(t);
+            mLogger.wrn(t, "consumer exception (%s)", consumer);
           }
-
-          consumer.onComplete();
-
-        } catch (final Throwable t) {
-          InterruptedInvocationException.throwIfInterrupt(t);
-          mLogger.wrn(t, "consumer exception (%s)", consumer);
         }
-      }
-    }, delay.value, delay.unit);
+      }, delay.value, delay.unit);
+    }
+
     return this;
   }
 
@@ -344,7 +362,7 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
 
   public int outputSize() {
     if (mFuture.isDone()) {
-      return mIsOutput.get() ? 0 : 1;
+      return mIsRead.get() ? 0 : 1;
     }
 
     return 0;
@@ -440,7 +458,7 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
     verifyBound();
     final Logger logger = mLogger;
     try {
-      if (mIsOutput.get()) {
+      if (mIsRead.get()) {
         return false;
       }
 
@@ -480,11 +498,15 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
       @NotNull final TimeoutActionType timeoutAction, @Nullable final Throwable timeoutException) {
     verifyBound();
     try {
-      if (mIsOutput.getAndSet(true)) {
+      if (mIsRead.get()) {
         throw new NoSuchElementException();
       }
 
       final OUT output = mFuture.get(timeout, timeUnit);
+      if (mIsRead.getAndSet(true)) {
+        throw new NoSuchElementException();
+      }
+
       verifyBound();
       return output;
 

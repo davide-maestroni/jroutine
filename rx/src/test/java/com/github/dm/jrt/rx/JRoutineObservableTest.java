@@ -33,6 +33,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import rx.Observable;
 import rx.Observer;
+import rx.Subscription;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
@@ -41,7 +42,7 @@ import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * JRoutine Reactive Extension unit tests.
+ * JRoutine Observable unit tests.
  * <p>
  * Created by davide-maestroni on 12/09/2016.
  */
@@ -291,29 +292,31 @@ public class JRoutineObservableTest {
     final AtomicReference<String> reference = new AtomicReference<String>();
     final AtomicReference<Throwable> errorReference = new AtomicReference<Throwable>();
     final Channel<String, String> channel = JRoutineCore.<String>ofInputs().buildChannel();
-    JRoutineObservable.from(channel.after(seconds(1)).pass("test"))
-                      .buildObservable()
-                      .map(new Func1<String, String>() {
+    final Subscription subscription =
+        JRoutineObservable.from(channel.after(seconds(2)).pass("test"))
+                          .buildObservable()
+                          .map(new Func1<String, String>() {
 
-                        public String call(final String s) {
-                          return s.toUpperCase();
-                        }
-                      })
-                      .subscribeOn(Schedulers.computation())
-                      .subscribe(new Observer<String>() {
+                            public String call(final String s) {
+                              return s.toUpperCase();
+                            }
+                          })
+                          .subscribeOn(Schedulers.computation())
+                          .subscribe(new Observer<String>() {
 
-                        public void onCompleted() {
-                        }
+                            public void onCompleted() {
+                            }
 
-                        public void onError(final Throwable e) {
-                          errorReference.set(e);
-                        }
+                            public void onError(final Throwable e) {
+                              errorReference.set(e);
+                            }
 
-                        public void onNext(final String s) {
-                          reference.set(s);
-                        }
-                      })
-                      .unsubscribe();
+                            public void onNext(final String s) {
+                              reference.set(s);
+                            }
+                          });
+    seconds(.5).sleepAtLeast();
+    subscription.unsubscribe();
     assertThat(channel.in(seconds(1)).getError()).isExactlyInstanceOf(AbortException.class);
     assertThat(reference.get()).isNull();
     assertThat(errorReference.get()).isNull();

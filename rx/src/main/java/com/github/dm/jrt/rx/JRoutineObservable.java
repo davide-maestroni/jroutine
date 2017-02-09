@@ -41,6 +41,8 @@ import rx.Observer;
 import rx.functions.Action1;
 import rx.functions.Cancellable;
 
+import static com.github.dm.jrt.core.util.DurationMeasure.noTime;
+
 /**
  * Utility class integrating the JRoutine classes with RxJava ones.
  * <p>
@@ -142,7 +144,7 @@ public class JRoutineObservable {
     }
 
     public void cancel() {
-      mChannel.abort();
+      mChannel.after(noTime()).abort();
     }
   }
 
@@ -281,7 +283,7 @@ public class JRoutineObservable {
    */
   private static class RoutineEmitter<IN, OUT> implements Action1<Emitter<OUT>> {
 
-    private final Iterable<IN> mInputs;
+    private final Iterable<? extends IN> mInputs;
 
     private final Routine<? super IN, OUT> mRoutine;
 
@@ -292,7 +294,7 @@ public class JRoutineObservable {
      * @param inputs  an iterable returning the invocation inputs.
      */
     private RoutineEmitter(@NotNull final Routine<? super IN, OUT> routine,
-        @Nullable final Iterable<IN> inputs) {
+        @Nullable final Iterable<? extends IN> inputs) {
       mRoutine = routine;
       mInputs = inputs;
     }

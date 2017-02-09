@@ -43,7 +43,7 @@ dependencies {
   swaggerCompile project
   testCompile project(':operator')
   testCompile project(':retrofit')
-  testCompile 'com.squareup.okhttp3:mockwebserver:3.5.0'
+  testCompile 'com.squareup.okhttp3:mockwebserver:3.6.0'
   testCompile 'com.squareup.retrofit2:converter-gson:2.1.0'
   testCompile 'com.squareup.retrofit2:converter-scalars:2.1.0'
   testCompile 'com.squareup.retrofit2:converter-jackson:2.1.0'

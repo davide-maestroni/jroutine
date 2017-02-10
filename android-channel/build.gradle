@@ -24,6 +24,11 @@ group = project.getProperty('groupName')
 version = project.getProperty('releaseVersion')
 archivesBaseName = "${project.parent.name}-${project.name}"
 
+ext {
+  channelVersion = '7.0.0'
+  coreVersion = '7.0.0'
+}
+
 android {
   compileSdkVersion 23
   buildToolsVersion '23.0.3'
@@ -68,8 +73,8 @@ dependencies {
 }
 
 conditionalDependencies {
-  compile name: 'channel', version: '7.0.0'
-  compile name: 'core', version: '7.0.0'
+  compile name: 'channel', version: channelVersion
+  compile name: 'core', version: coreVersion
 }
 
 jacoco {
@@ -81,8 +86,8 @@ findbugs {
 }
 
 tasks.withType(Javadoc) {
-  def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/7'
+  def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc'
   options.overview("${project.projectDir}/docs/overview.html")
-  options.links("${prefix}/channel/",
-      "${prefix}/core/")
+  options.links("${prefix}/${channelVersion}/channel/",
+      "${prefix}/${coreVersion}/core/")
 }

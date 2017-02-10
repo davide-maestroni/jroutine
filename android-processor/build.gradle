@@ -25,8 +25,12 @@ archivesBaseName = "${project.parent.name}-${project.name}"
 compileJavaCompatibility = JavaVersion.VERSION_1_6
 compileTestJavaCompatibility = JavaVersion.VERSION_1_6
 
+ext {
+  processorVersion = '7.0.0'
+}
+
 conditionalDependencies {
-  compile name: 'processor', version: '7.0.0'
+  compile name: 'processor', version: processorVersion
 }
 
 findbugs {
@@ -34,11 +38,7 @@ findbugs {
 }
 
 javadoc {
-  def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/7'
+  def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc'
   options.overview("${project.projectDir}/docs/overview.html")
-  options.links("${prefix}/android-core/",
-      "${prefix}/android-reflect/",
-      "${prefix}/core/",
-      "${prefix}/processor/",
-      "${prefix}/reflect/")
+  options.links("${prefix}/${processorVersion}/processor/")
 }

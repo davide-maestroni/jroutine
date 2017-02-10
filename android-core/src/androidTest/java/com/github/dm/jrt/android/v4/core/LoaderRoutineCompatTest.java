@@ -78,11 +78,11 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Created by davide-maestroni on 12/10/2014.
  */
 @TargetApi(VERSION_CODES.FROYO)
-public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActivity> {
+public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<TestActivity> {
 
   private static final int TEST_ROUTINE_ID = 0;
 
-  public LoaderRoutineTest() {
+  public LoaderRoutineCompatTest() {
 
     super(TestActivity.class);
   }

@@ -34,9 +34,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Created by davide-maestroni on 03/09/2016.
  */
 @TargetApi(VERSION_CODES.HONEYCOMB)
-public class LoaderContextTest extends ActivityInstrumentationTestCase2<TestActivity> {
+public class LoaderContextCompatTest extends ActivityInstrumentationTestCase2<TestActivity> {
 
-  public LoaderContextTest() {
+  public LoaderContextCompatTest() {
 
     super(TestActivity.class);
   }

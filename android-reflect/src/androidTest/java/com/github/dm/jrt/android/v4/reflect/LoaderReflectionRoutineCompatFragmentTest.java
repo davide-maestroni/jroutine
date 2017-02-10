@@ -82,10 +82,10 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Created by davide-maestroni on 04/07/2015.
  */
 @TargetApi(VERSION_CODES.FROYO)
-public class LoaderReflectionRoutineFragmentTest
+public class LoaderReflectionRoutineCompatFragmentTest
     extends ActivityInstrumentationTestCase2<TestActivity> {
 
-  public LoaderReflectionRoutineFragmentTest() {
+  public LoaderReflectionRoutineCompatFragmentTest() {
 
     super(TestActivity.class);
   }

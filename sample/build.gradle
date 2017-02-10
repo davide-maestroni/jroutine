@@ -20,24 +20,24 @@ apply from: '../extra.gradle'
 compileJavaCompatibility = JavaVersion.VERSION_1_5
 compileTestJavaCompatibility = JavaVersion.VERSION_1_7
 
+ext {
+  channelVersion = '7.0.0'
+  coreVersion = '7.0.0'
+}
+
 dependencies {
   testCompile 'junit:junit:4.12'
   testCompile 'org.assertj:assertj-core:2.4.1'
 }
 
 conditionalDependencies {
-  compile name: 'lib', version: '7.0.0'
+  compile name: 'channel', version: channelVersion
+  compile name: 'core', version: coreVersion
 }
 
 javadoc {
-  def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/7'
+  def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc'
   options.overview("${project.projectDir}/docs/overview.html")
-  options.links("${prefix}/channel/",
-      "${prefix}/core/",
-      "${prefix}/function/",
-      "${prefix}/lib/",
-      "${prefix}/operator/",
-      "${prefix}/proxy/",
-      "${prefix}/reflect/",
-      "${prefix}/stream/")
+  options.links("${prefix}/${channelVersion}/channel/",
+      "${prefix}/${coreVersion}/core/")
 }

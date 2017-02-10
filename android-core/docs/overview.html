@@ -22,7 +22,7 @@
 <a href="https://github.com/davide-maestroni/jroutine" target="_blank">Parallel programming on the go.</a>
 <h1>Overview</h1>
 <p>
-    Android platform customization of the <a href="http://davide-maestroni.github.io/jroutine/javadoc/7/core" target="_blank">jroutine-core</a> library.
+    Android platform customization of the <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/core" target="_blank">jroutine-core</a> library.
 </p>
 <p>
     This module provides the implementation of routines enabling asynchronous invocations inside dedicated Android Services and Loaders.<br>
@@ -31,32 +31,32 @@
 <h2>Main concepts</h2>
 <ul>
     <li>
-        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7/android-core/com/github/dm/jrt/android/core/invocation/ContextInvocation.html">ContextInvocation</a>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/android-core/com/github/dm/jrt/android/core/invocation/ContextInvocation.html">ContextInvocation</a>
         <p>
-            Interface representing an Android Context aware <a href="http://davide-maestroni.github.io/jroutine/javadoc/7/core/com/github/dm/jrt/core/invocation/Invocation.html">Invocation</a>.
+            Interface representing an Android Context aware <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/core/com/github/dm/jrt/core/invocation/Invocation.html">Invocation</a>.
         </p>
     </li>
     <li>
-        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7/android-core/com/github/dm/jrt/android/core/invocation/ContextInvocationFactory.html">ContextInvocationFactory</a>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/android-core/com/github/dm/jrt/android/core/invocation/ContextInvocationFactory.html">ContextInvocationFactory</a>
         <p>
             A factory is needed to dynamically instantiate new Context invocation objects. In fact, the same routine can be invoked several times on different threads, and, each time, an invocation instance will be required to process the input data.
             Invocation factories might be used to identify the invocation type, for this reason the constructor parameters (which should always be immutable or effectively so) are required to be passed to the base class.
         </p>
     </li>
     <li>
-        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7/android-core/com/github/dm/jrt/android/core/invocation/TargetInvocationFactory.html">TargetInvocationFactory</a>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/android-core/com/github/dm/jrt/android/core/invocation/TargetInvocationFactory.html">TargetInvocationFactory</a>
         <p>
             A target invocation factory is meant to describe a factory of invocations to be used by an Android Service to build and run new invocations.
         </p>
     </li>
     <li>
-        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7/android-core/com/github/dm/jrt/android/core/routine/LoaderRoutine.html">LoaderRoutine</a>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/android-core/com/github/dm/jrt/android/core/routine/LoaderRoutine.html">LoaderRoutine</a>
         <p>
             A Loader routine object enables the execution of invocations inside a Loader instance.
         </p>
     </li>
     <li>
-        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7/android-core/com/github/dm/jrt/android/core/builder/LoaderRoutineBuilder.html">LoaderRoutineBuilder</a>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/android-core/com/github/dm/jrt/android/core/builder/LoaderRoutineBuilder.html">LoaderRoutineBuilder</a>
         <p>
             Each Loader routine instance needs an invocation factory and a specific configuration, so routine builders provide a convenient way to set the required options.
             The invocation factory and the inputs are automatically employed compute the specific Loader ID.
@@ -64,7 +64,7 @@
         </p>
     </li>
     <li>
-        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7/android-core/com/github/dm/jrt/android/core/builder/ServiceRoutineBuilder.html">ServiceRoutineBuilder</a>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/android-core/com/github/dm/jrt/android/core/builder/ServiceRoutineBuilder.html">ServiceRoutineBuilder</a>
         <p>
             Routine instances running in a dedicated Service can be built through specifically configured routine builder.
             Each Service routine instance needs a target invocation factory and a specific configuration, so routine builders provide a convenient way to set the required options.
@@ -75,51 +75,51 @@
 <h2>Main classes</h2>
 <ul>
     <li>
-        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7/android-core/com/github/dm/jrt/android/core/log/AndroidLogs.html">AndroidLogs</a>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/android-core/com/github/dm/jrt/android/core/log/AndroidLogs.html">AndroidLogs</a>
         <p>
             Utility class acting as a factory of log instances.
         </p>
     </li>
     <li>
-        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7/android-core/com/github/dm/jrt/android/core/runner/AndroidRunners.html">AndroidRunners</a>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/android-core/com/github/dm/jrt/android/core/runner/AndroidRunners.html">AndroidRunners</a>
         <p>
             Utility class acting as a factory of runner instances.
         </p>
     </li>
     <li>
-        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7/android-core/com/github/dm/jrt/android/v11/core/LoaderContext.html">LoaderContext</a>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/android-core/com/github/dm/jrt/android/v11/core/LoaderContext.html">LoaderContext</a>
         <p>
             A Loader context instance is meant to describe an Android Context to be used with Loader instances.
         </p>
     </li>
     <li>
-        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7/android-core/com/github/dm/jrt/android/v11/core/JRoutineLoader.html">JRoutineLoader</a>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/android-core/com/github/dm/jrt/android/v11/core/JRoutineLoader.html">JRoutineLoader</a>
         <p>
             Utility class acting as a factory of Loader routine and channel builders.
         </p>
     </li>
     <li>
-        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7/android-core/com/github/dm/jrt/android/v4/core/LoaderContextCompat.html">LoaderContextCompat</a>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/android-core/com/github/dm/jrt/android/v4/core/LoaderContextCompat.html">LoaderContextCompat</a>
         <p>
             A Loader context instance is meant to describe an Android Context to be used with Loader instances.<br>
             This class is specifically meant to employ the Android Support library for retro-compatibility.
         </p>
     </li>
     <li>
-        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7/android-core/com/github/dm/jrt/android/v4/core/JRoutineLoaderCompat.html">JRoutineLoaderCompat</a>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/android-core/com/github/dm/jrt/android/v4/core/JRoutineLoaderCompat.html">JRoutineLoaderCompat</a>
         <p>
             Utility class acting as a factory of Loader routine and channel builders.<br>
             This class is specifically meant to employ the Android Support library for retro-compatibility.
         </p>
     </li>
     <li>
-        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7/android-core/com/github/dm/jrt/android/core/ServiceContext.html">ServiceContext</a>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/android-core/com/github/dm/jrt/android/core/ServiceContext.html">ServiceContext</a>
         <p>
             A Service context instance is meant to describe an Android Context to be used with Service instances.
         </p>
     </li>
     <li>
-        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7/android-core/com/github/dm/jrt/android/core/JRoutineService.html">JRoutineService</a>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/android-core/com/github/dm/jrt/android/core/JRoutineService.html">JRoutineService</a>
         <p>
             Utility class acting as a factory of Service routine builders.
         </p>
@@ -130,7 +130,7 @@
     Below a full list of the included modules:
 </p>
 <ul>
-    <li><a href="http://davide-maestroni.github.io/jroutine/javadoc/7/core" target="_blank">jroutine-core</a> &mdash; core routine and channel classes</li>
+    <li><a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/core" target="_blank">jroutine-core</a> &mdash; core routine and channel classes</li>
 </ul>
 <h2>Usage examples</h2>
 <p>

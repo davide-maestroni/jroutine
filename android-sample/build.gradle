@@ -17,6 +17,20 @@
 apply plugin: 'com.android.application'
 apply from: '../extra.gradle'
 
+ext {
+  androidChannelVersion = '7.0.0'
+  androidCoreVersion = '7.0.0'
+  androidReflectVersion = '7.0.0'
+  androidRetrofitVersion = '7.0.0'
+  androidStreamVersion = '7.0.0'
+  channelVersion = '7.0.0'
+  coreVersion = '7.0.0'
+  functionVersion = '7.0.0'
+  reflectVersion = '7.0.0'
+  retrofitVersion = '7.0.0'
+  streamVersion = '7.0.0'
+}
+
 android {
   compileSdkVersion 23
   buildToolsVersion '23.0.3'
@@ -59,29 +73,25 @@ dependencies {
 }
 
 conditionalDependencies {
-  compile name: 'android-retrofit', version: '7.0.0'
+  compile name: 'android-retrofit', version: androidRetrofitVersion
+  compile name: 'core', version: coreVersion
 }
 
 tasks.withType(Javadoc) {
-  def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/7'
+  def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc'
   options.overview("${project.projectDir}/docs/overview.html")
   options.links('https://square.github.io/retrofit/2.x/retrofit/',
-      "${prefix}/android/",
-      "${prefix}/android-channel/",
-      "${prefix}/android-core/",
-      "${prefix}/android-proxy/",
-      "${prefix}/android-reflect/",
-      "${prefix}/android-retrofit/",
-      "${prefix}/android-stream/",
-      "${prefix}/channel/",
-      "${prefix}/core/",
-      "${prefix}/function/",
-      "${prefix}/lib/",
-      "${prefix}/operator/",
-      "${prefix}/proxy/",
-      "${prefix}/reflect/",
-      "${prefix}/retrofit/",
-      "${prefix}/stream/")
+      "${prefix}/${androidChannelVersion}/android-channel/",
+      "${prefix}/${androidCoreVersion}/android-core/",
+      "${prefix}/${androidReflectVersion}/android-reflect/",
+      "${prefix}/${androidRetrofitVersion}/android-retrofit/",
+      "${prefix}/${androidStreamVersion}/android-stream/",
+      "${prefix}/${channelVersion}/channel/",
+      "${prefix}/${coreVersion}/core/",
+      "${prefix}/${functionVersion}/function/",
+      "${prefix}/${reflectVersion}/reflect/",
+      "${prefix}/${retrofitVersion}/retrofit/",
+      "${prefix}/${streamVersion}/stream/")
 }
 
 project.gradle.taskGraph.whenReady {

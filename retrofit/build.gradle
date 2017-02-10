@@ -26,6 +26,12 @@ archivesBaseName = "${project.parent.name}-${project.name}"
 compileJavaCompatibility = JavaVersion.VERSION_1_5
 compileTestJavaCompatibility = JavaVersion.VERSION_1_7
 
+ext {
+  coreVersion = '7.0.0'
+  reflectVersion = '7.0.0'
+  streamVersion = '7.0.0'
+}
+
 dependencies {
   compile 'com.intellij:annotations:12.0'
   compile 'com.squareup.retrofit2:retrofit:2.1.0'
@@ -37,9 +43,9 @@ dependencies {
 }
 
 conditionalDependencies {
-  compile name: 'core', version: '7.0.0'
-  compile name: 'reflect', version: '7.0.0'
-  compile name: 'stream', version: '7.0.0'
+  compile name: 'core', version: coreVersion
+  compile name: 'reflect', version: reflectVersion
+  compile name: 'stream', version: streamVersion
 }
 
 jacocoTestReport {
@@ -58,12 +64,10 @@ findbugs {
 }
 
 javadoc {
-  def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/7'
+  def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc'
   options.overview("${project.projectDir}/docs/overview.html")
   options.links('https://square.github.io/retrofit/2.x/retrofit/',
-      "${prefix}/channel/",
-      "${prefix}/core/",
-      "${prefix}/function/",
-      "${prefix}/reflect/",
-      "${prefix}/stream/")
+      "${prefix}/${coreVersion}/core/",
+      "${prefix}/${reflectVersion}/reflect/",
+      "${prefix}/${streamVersion}/stream/")
 }

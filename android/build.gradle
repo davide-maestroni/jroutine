@@ -24,6 +24,21 @@ group = project.getProperty('groupName')
 version = project.getProperty('releaseVersion')
 archivesBaseName = "${project.parent.name}-${project.name}"
 
+ext {
+  androidChannelVersion = '7.0.0'
+  androidCoreVersion = '7.0.0'
+  androidMethodVersion = '7.0.0'
+  androidProxyVersion = '7.0.0'
+  androidReflectVersion = '7.0.0'
+  androidStreamVersion = '7.0.0'
+  channelVersion = '7.0.0'
+  coreVersion = '7.0.0'
+  functionVersion = '7.0.0'
+  libVersion = '7.0.0'
+  reflectVersion = '7.0.0'
+  streamVersion = '7.0.0'
+}
+
 android {
   compileSdkVersion 23
   buildToolsVersion '23.0.3'
@@ -71,13 +86,18 @@ dependencies {
 }
 
 conditionalDependencies {
-  compile name: 'android-channel', version: '7.0.0'
-  compile name: 'android-core', version: '7.0.0'
-  compile name: 'android-method', version: '7.0.0'
-  compile name: 'android-proxy', version: '7.0.0'
-  compile name: 'android-reflect', version: '7.0.0'
-  compile name: 'android-stream', version: '7.0.0'
-  compile name: 'lib', version: '7.0.0'
+  compile name: 'android-channel', version: androidChannelVersion
+  compile name: 'android-core', version: androidCoreVersion
+  compile name: 'android-method', version: androidMethodVersion
+  compile name: 'android-proxy', version: androidProxyVersion
+  compile name: 'android-reflect', version: androidReflectVersion
+  compile name: 'android-stream', version: androidStreamVersion
+  compile name: 'channel', version: channelVersion
+  compile name: 'core', version: coreVersion
+  compile name: 'function', version: functionVersion
+  compile name: 'lib', version: libVersion
+  compile name: 'reflect', version: reflectVersion
+  compile name: 'stream', version: streamVersion
 }
 
 jacoco {
@@ -89,21 +109,18 @@ findbugs {
 }
 
 tasks.withType(Javadoc) {
-  def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/7'
+  def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc'
   options.overview("${project.projectDir}/docs/overview.html")
-  options.links("${prefix}/android-channel/",
-      "${prefix}/android-core/",
-      "${prefix}/android-method/",
-      "${prefix}/android-proxy/",
-      "${prefix}/android-reflect/",
-      "${prefix}/android-stream/",
-      "${prefix}/channel/",
-      "${prefix}/core/",
-      "${prefix}/function/",
-      "${prefix}/lib/",
-      "${prefix}/method/",
-      "${prefix}/operator/",
-      "${prefix}/proxy/",
-      "${prefix}/reflect/",
-      "${prefix}/stream/")
+  options.links("${prefix}/${androidChannelVersion}/android-channel/",
+      "${prefix}/${androidCoreVersion}/android-core/",
+      "${prefix}/${androidMethodVersion}/android-method/",
+      "${prefix}/${androidProxyVersion}/android-proxy/",
+      "${prefix}/${androidReflectVersion}/android-reflect/",
+      "${prefix}/${androidStreamVersion}/android-stream/",
+      "${prefix}/${channelVersion}/channel/",
+      "${prefix}/${coreVersion}/core/",
+      "${prefix}/${functionVersion}/function/",
+      "${prefix}/${libVersion}/lib/",
+      "${prefix}/${reflectVersion}/reflect/",
+      "${prefix}/${streamVersion}/stream/")
 }

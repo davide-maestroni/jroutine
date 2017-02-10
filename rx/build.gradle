@@ -28,6 +28,7 @@ compileTestJavaCompatibility = JavaVersion.VERSION_1_7
 
 ext {
   rxJavaVersion = '1.2.6'
+  coreVersion = '7.0.0'
 }
 
 dependencies {
@@ -38,7 +39,7 @@ dependencies {
 }
 
 conditionalDependencies {
-  compile name: 'core', version: '7.0.0'
+  compile name: 'core', version: coreVersion
 }
 
 jacocoTestReport {
@@ -57,8 +58,8 @@ findbugs {
 }
 
 javadoc {
-  def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/7'
+  def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc'
   options.overview("${project.projectDir}/docs/overview.html")
   options.links("http://reactivex.io/RxJava/1.x/javadoc/${rxJavaVersion}/",
-      "${prefix}/core/")
+      "${prefix}/${coreVersion}/core/")
 }

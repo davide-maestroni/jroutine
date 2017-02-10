@@ -47,9 +47,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @TargetApi(VERSION_CODES.FROYO)
 @SuppressWarnings("unused")
-public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<TestActivity> {
+public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCase2<TestActivity> {
 
-  public LoaderRoutineMethodTest() {
+  public LoaderRoutineMethodCompatTest() {
     super(TestActivity.class);
   }
 
@@ -275,19 +275,19 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
 
   public void testFromClass() throws NoSuchMethodException {
     assertThat(LoaderRoutineMethodCompat.from(loaderFrom(getActivity()),
-        LoaderRoutineMethodTest.class.getMethod("length", String.class))
+        LoaderRoutineMethodCompatTest.class.getMethod("length", String.class))
                                         .call("test")
                                         .in(seconds(10))
                                         .next()).isEqualTo(4);
     assertThat(LoaderRoutineMethodCompat.from(loaderFrom(getActivity()),
-        LoaderRoutineMethodTest.class.getMethod("length", String.class))
+        LoaderRoutineMethodCompatTest.class.getMethod("length", String.class))
                                         .call(JRoutineCore.of("test").buildChannel())
                                         .in(seconds(10))
                                         .next()).isEqualTo(4);
     final Channel<String, String> inputChannel = JRoutineCore.<String>ofInputs().buildChannel();
     final Channel<?, Object> outputChannel =
         LoaderRoutineMethodCompat.from(loaderFrom(getActivity()),
-            LoaderRoutineMethodTest.class.getMethod("length", String.class))
+            LoaderRoutineMethodCompatTest.class.getMethod("length", String.class))
                                  .callParallel(inputChannel);
     inputChannel.pass("test", "test1", "test22").close();
     assertThat(outputChannel.in(seconds(10)).all()).containsOnly(4, 5, 6);
@@ -295,19 +295,19 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
 
   public void testFromClass2() throws NoSuchMethodException {
     assertThat(LoaderRoutineMethodCompat.from(loaderFrom(getActivity()),
-        classOfType(LoaderRoutineMethodTest.class), "length", String.class)
+        classOfType(LoaderRoutineMethodCompatTest.class), "length", String.class)
                                         .call("test")
                                         .in(seconds(10))
                                         .next()).isEqualTo(4);
     assertThat(LoaderRoutineMethodCompat.from(loaderFrom(getActivity()),
-        classOfType(LoaderRoutineMethodTest.class), "length", String.class)
+        classOfType(LoaderRoutineMethodCompatTest.class), "length", String.class)
                                         .call(JRoutineCore.of("test").buildChannel())
                                         .in(seconds(10))
                                         .next()).isEqualTo(4);
     final Channel<String, String> inputChannel = JRoutineCore.<String>ofInputs().buildChannel();
     final Channel<?, Object> outputChannel =
         LoaderRoutineMethodCompat.from(loaderFrom(getActivity()),
-            classOfType(LoaderRoutineMethodTest.class), "length", String.class).call(inputChannel);
+            classOfType(LoaderRoutineMethodCompatTest.class), "length", String.class).call(inputChannel);
     inputChannel.pass("test").close();
     assertThat(outputChannel.in(seconds(10)).next()).isEqualTo(4);
   }
@@ -322,7 +322,7 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
 
     try {
       LoaderRoutineMethodCompat.from(loaderFrom(getActivity()), instanceOf(String.class, "test"),
-          LoaderRoutineMethodTest.class.getMethod("length", String.class));
+          LoaderRoutineMethodCompatTest.class.getMethod("length", String.class));
       fail();
 
     } catch (final IllegalArgumentException ignored) {

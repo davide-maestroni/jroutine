@@ -44,10 +44,10 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Created by davide-maestroni on 01/28/2015.
  */
 @TargetApi(VERSION_CODES.FROYO)
-public class LoaderRoutineRotationTest
+public class LoaderRoutineCompatRotationTest
     extends ActivityInstrumentationTestCase2<RotationTestActivity> {
 
-  public LoaderRoutineRotationTest() {
+  public LoaderRoutineCompatRotationTest() {
 
     super(RotationTestActivity.class);
   }

@@ -26,6 +26,10 @@ archivesBaseName = "${project.parent.name}-${project.name}"
 compileJavaCompatibility = JavaVersion.VERSION_1_5
 compileTestJavaCompatibility = JavaVersion.VERSION_1_7
 
+ext {
+  coreVersion = '7.0.0'
+}
+
 dependencies {
   compile 'com.intellij:annotations:12.0'
   testCompile 'junit:junit:4.12'
@@ -33,7 +37,7 @@ dependencies {
 }
 
 conditionalDependencies {
-  compile name: 'core', version: '7.0.0'
+  compile name: 'core', version: coreVersion
 }
 
 jacocoTestReport {
@@ -52,9 +56,9 @@ findbugs {
 }
 
 javadoc {
-  def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/7'
+  def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc'
   options.overview("${project.projectDir}/docs/overview.html")
-  options.links("${prefix}/core/")
+  options.links("${prefix}/${coreVersion}/core/")
 }
 
 tasks.withType(FindBugs) {

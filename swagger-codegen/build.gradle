@@ -35,6 +35,7 @@ configurations.create('swaggerCompile')
 
 ext {
   swaggerVersion = '2.2.2-20170113.000507-4'
+  generatedSourceDir = 'src/test/java/com/github/dm/jrt/swagger/client'
 }
 
 dependencies {
@@ -51,10 +52,6 @@ dependencies {
   testCompile 'junit:junit:4.12'
   testCompile 'org.apache.oltu.oauth2:org.apache.oltu.oauth2.client:1.0.2'
   testCompile 'org.assertj:assertj-core:2.4.1'
-}
-
-ext {
-  generatedSourceDir = 'src/test/java/com/github/dm/jrt/swagger/client'
 }
 
 clean {

@@ -25,9 +25,14 @@ archivesBaseName = "${project.parent.name}-${project.name}"
 compileJavaCompatibility = JavaVersion.VERSION_1_6
 compileTestJavaCompatibility = JavaVersion.VERSION_1_7
 
+ext {
+  coreVersion = '7.0.0'
+  reflectVersion = '7.0.0'
+}
+
 conditionalDependencies {
-  compile name: 'core', version: '7.0.0'
-  compile name: 'reflect', version: '7.0.0'
+  compile name: 'core', version: coreVersion
+  compile name: 'reflect', version: reflectVersion
 }
 
 findbugs {
@@ -35,9 +40,10 @@ findbugs {
 }
 
 javadoc {
-  def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/7'
+  def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc'
   options.overview("${project.projectDir}/docs/overview.html")
-  options.links("${prefix}/core/", "${prefix}/reflect/")
+  options.links("${prefix}/${coreVersion}/core/",
+      "${prefix}/${reflectVersion}/reflect/")
 }
 
 tasks.withType(FindBugs) {

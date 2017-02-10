@@ -24,6 +24,16 @@ group = project.getProperty('groupName')
 version = project.getProperty('releaseVersion')
 archivesBaseName = "${project.parent.name}-${project.name}"
 
+ext {
+  androidChannelVersion = '7.0.0'
+  androidCoreVersion = '7.0.0'
+  androidReflectVersion = '7.0.0'
+  channelVersion = '7.0.0'
+  coreVersion = '7.0.0'
+  methodVersion = '7.0.0'
+  reflectVersion = '7.0.0'
+}
+
 android {
   compileSdkVersion 23
   buildToolsVersion '23.0.3'
@@ -67,10 +77,13 @@ dependencies {
 }
 
 conditionalDependencies {
-  compile name: 'android-channel', version: '7.0.0'
-  compile name: 'android-core', version: '7.0.0'
-  compile name: 'android-reflect', version: '7.0.0'
-  compile name: 'method', version: '7.0.0'
+  compile name: 'android-channel', version: androidChannelVersion
+  compile name: 'android-core', version: androidCoreVersion
+  compile name: 'android-reflect', version: androidReflectVersion
+  compile name: 'channel', version: channelVersion
+  compile name: 'core', version: coreVersion
+  compile name: 'method', version: methodVersion
+  compile name: 'reflect', version: reflectVersion
 }
 
 jacoco {
@@ -86,13 +99,13 @@ tasks.withType(FindBugs) {
 }
 
 tasks.withType(Javadoc) {
-  def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/7'
+  def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc'
   options.overview("${project.projectDir}/docs/overview.html")
-  options.links("${prefix}/android-channel/",
-      "${prefix}/android-core/",
-      "${prefix}/android-reflect/",
-      "${prefix}/channel/",
-      "${prefix}/core/",
-      "${prefix}/method/",
-      "${prefix}/reflect/")
+  options.links("${prefix}/${androidChannelVersion}/android-channel/",
+      "${prefix}/${androidCoreVersion}/android-core/",
+      "${prefix}/${androidReflectVersion}/android-reflect/",
+      "${prefix}/${channelVersion}/channel/",
+      "${prefix}/${coreVersion}/core/",
+      "${prefix}/${methodVersion}/method/",
+      "${prefix}/${reflectVersion}/reflect/")
 }

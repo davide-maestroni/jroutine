@@ -61,12 +61,12 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Created by davide-maestroni on 05/19/2016.
  */
 @TargetApi(VERSION_CODES.FROYO)
-public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<TestActivity> {
+public class LoaderAdapterFactoryCompatTest extends ActivityInstrumentationTestCase2<TestActivity> {
 
   private static final String BODY = "[{\"id\":\"1\", \"name\":\"Repo1\"}, {\"id\":\"2\","
       + " \"name\":\"Repo2\"}, {\"id\":\"3\", \"name\":\"Repo3\", \"isPrivate\":true}]";
 
-  public LoaderAdapterFactoryTest() {
+  public LoaderAdapterFactoryCompatTest() {
     super(TestActivity.class);
   }
 

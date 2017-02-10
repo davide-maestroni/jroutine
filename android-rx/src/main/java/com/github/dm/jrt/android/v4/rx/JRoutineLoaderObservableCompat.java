@@ -108,7 +108,7 @@ public class JRoutineLoaderObservableCompat {
     @NotNull
     @Override
     public LoaderObservableCompat<DATA> apply(@NotNull final LoaderConfiguration configuration) {
-      mLoaderConfiguration = ConstantConditions.notNull("loader configuration", configuration);
+      mLoaderConfiguration = ConstantConditions.notNull("Loader configuration", configuration);
       return this;
     }
 
@@ -205,12 +205,12 @@ public class JRoutineLoaderObservableCompat {
      *
      * @param context                 the Loader context.
      * @param invocationConfiguration the invocation configuration.
-     * @param loaderConfiguration     the loader configuration.
+     * @param loaderConfiguration     the Loader configuration.
      */
     private LoaderOperator(@NotNull final LoaderContextCompat context,
         @NotNull final InvocationConfiguration invocationConfiguration,
         @NotNull final LoaderConfiguration loaderConfiguration) {
-      mContext = ConstantConditions.notNull("loader context", context);
+      mContext = ConstantConditions.notNull("Loader context", context);
       mInvocationConfiguration = invocationConfiguration;
       mLoaderConfiguration = loaderConfiguration;
     }
@@ -320,13 +320,13 @@ public class JRoutineLoaderObservableCompat {
 
     @NotNull
     @Override
-    public ContextInvocation<Void, DATA> newInvocation() throws Exception {
+    public ContextInvocation<Void, DATA> newInvocation() {
       return new ObservableInvocation<DATA>(mObservable);
     }
   }
 
   /**
-   * Context invocation passing data to a subscriber.
+   * Context invocation passing data to a Subscriber.
    *
    * @param <DATA> the data type.
    */
@@ -337,7 +337,7 @@ public class JRoutineLoaderObservableCompat {
     /**
      * Constructor.
      *
-     * @param subscriber the subscriber instance.
+     * @param subscriber the Subscriber instance.
      */
     private SubscriberInvocation(@NotNull final Subscriber<? super DATA> subscriber) {
       mSubscriber = subscriber;
@@ -382,7 +382,7 @@ public class JRoutineLoaderObservableCompat {
   }
 
   /**
-   * Factory of context invocation passing data to a subscriber.
+   * Factory of context invocation passing data to a Subscriber.
    *
    * @param <DATA> the data type.
    */
@@ -394,11 +394,11 @@ public class JRoutineLoaderObservableCompat {
     /**
      * Constructor.
      *
-     * @param subscriber the subscriber instance.
+     * @param subscriber the Subscriber instance.
      */
     private SubscriberInvocationFactory(@NotNull final Subscriber<? super DATA> subscriber) {
       super(null);
-      mSubscriber = ConstantConditions.notNull("subscriber", subscriber);
+      mSubscriber = ConstantConditions.notNull("Subscriber instance", subscriber);
     }
 
     @NotNull

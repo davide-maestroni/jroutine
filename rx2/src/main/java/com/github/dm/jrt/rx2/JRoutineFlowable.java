@@ -197,7 +197,7 @@ public class JRoutineFlowable {
   }
 
   /**
-   * Function binding a channel to an emitter.
+   * Function binding a channel to an Emitter.
    *
    * @param <OUT> the output data type.
    */
@@ -218,7 +218,7 @@ public class JRoutineFlowable {
       mChannel.after(noTime()).abort();
     }
 
-    public void subscribe(final FlowableEmitter<OUT> emitter) throws Exception {
+    public void subscribe(final FlowableEmitter<OUT> emitter) {
       emitter.setCancellable(this);
       mChannel.bind(new EmitterConsumer<OUT>(emitter));
     }
@@ -260,7 +260,7 @@ public class JRoutineFlowable {
   }
 
   /**
-   * Channel consumer feeding an emitter.
+   * Channel consumer feeding an Emitter.
    *
    * @param <OUT> the output data type.
    */
@@ -271,7 +271,7 @@ public class JRoutineFlowable {
     /**
      * Constructor.
      *
-     * @param emitter the emitter instance.
+     * @param emitter the Emitter instance.
      */
     private EmitterConsumer(@NotNull final FlowableEmitter<OUT> emitter) {
       mEmitter = emitter;
@@ -291,7 +291,7 @@ public class JRoutineFlowable {
   }
 
   /**
-   * Builder of channels fed by an Flowable.
+   * Builder of channels fed by a Flowable.
    *
    * @param <OUT> the output data type.
    */
@@ -369,6 +369,8 @@ public class JRoutineFlowable {
   }
 
   /**
+   * Builder of Flowables emitting a routine invocation output data.
+   *
    * @param <IN>  the input data type.
    * @param <OUT> the output data type.
    */
@@ -395,14 +397,14 @@ public class JRoutineFlowable {
   }
 
   /**
-   * Function binding an invocation channel to an emitter.
+   * Function binding an invocation channel to an Emitter.
    *
    * @param <IN>  the input data type.
    * @param <OUT> the output data type.
    */
   private static class RoutineOnSubscribe<IN, OUT> implements FlowableOnSubscribe<OUT> {
 
-    private final Iterable<IN> mInputs;
+    private final Iterable<? extends IN> mInputs;
 
     private final Routine<? super IN, OUT> mRoutine;
 
@@ -413,7 +415,7 @@ public class JRoutineFlowable {
      * @param inputs  an iterable returning the invocation inputs.
      */
     private RoutineOnSubscribe(@NotNull final Routine<? super IN, OUT> routine,
-        @Nullable final Iterable<IN> inputs) {
+        @Nullable final Iterable<? extends IN> inputs) {
       mRoutine = routine;
       mInputs = inputs;
     }

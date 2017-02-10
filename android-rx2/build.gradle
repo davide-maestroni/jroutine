@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Davide Maestroni
+ * Copyright 2017 Davide Maestroni
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ version = project.getProperty('releaseVersion')
 archivesBaseName = "${project.parent.name}-${project.name}"
 
 ext {
-  rxJavaVersion = '1.2.6'
+  rxJavaVersion = '2.0.5'
 }
 
 android {
@@ -72,15 +72,14 @@ android {
 
 dependencies {
   androidTestCompile 'com.squareup.assertj:assertj-android:1.1.1'
-  androidTestCompile 'io.reactivex:rxandroid:1.2.1'
   compile 'com.android.support:support-v4:23.2.1'
-  compile "io.reactivex:rxjava:${rxJavaVersion}"
+  compile "io.reactivex.rxjava2:rxjava:${rxJavaVersion}"
 }
 
 conditionalDependencies {
   compile name: 'android-core', version: '7.0.0'
   compile name: 'core', version: '7.0.0'
-  compile name: 'rx', version: '7.0.0'
+  compile name: 'rx2', version: '7.0.0'
 }
 
 jacoco {
@@ -94,7 +93,7 @@ findbugs {
 tasks.withType(Javadoc) {
   def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/7'
   options.overview("${project.projectDir}/docs/overview.html")
-  options.links("http://reactivex.io/RxJava/1.x/javadoc/${rxJavaVersion}/",
+  options.links("http://reactivex.io/RxJava/2.x/javadoc/${rxJavaVersion}/",
       "${prefix}/android-core/",
       "${prefix}/core/")
 }

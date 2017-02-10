@@ -121,7 +121,7 @@ public class JRoutineObservable {
   }
 
   /**
-   * Function binding a channel to an emitter.
+   * Function binding a channel to an Emitter.
    *
    * @param <OUT> the output data type.
    */
@@ -217,7 +217,7 @@ public class JRoutineObservable {
     /**
      * Constructor.
      *
-     * @param emitter the emitter instance.
+     * @param emitter the Emitter instance.
      */
     private EmitterConsumer(@NotNull final Emitter<OUT> emitter) {
       mEmitter = emitter;
@@ -276,7 +276,7 @@ public class JRoutineObservable {
   }
 
   /**
-   * Function binding an invocation channel to an emitter.
+   * Function binding an invocation channel to an Emitter.
    *
    * @param <IN>  the input data type.
    * @param <OUT> the output data type.
@@ -307,6 +307,8 @@ public class JRoutineObservable {
   }
 
   /**
+   * Builder of Observables emitting a routine invocation output data.
+   *
    * @param <IN>  the input data type.
    * @param <OUT> the output data type.
    */

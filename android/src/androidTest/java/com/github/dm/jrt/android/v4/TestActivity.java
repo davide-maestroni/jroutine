@@ -22,7 +22,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.WindowManager.LayoutParams;
 
-import com.github.dm.jrt.android.R;
+import com.github.dm.jrt.android.test.R;
 
 /**
  * Test Activity.

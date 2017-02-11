@@ -24,6 +24,7 @@ import android.os.Bundle;
 import android.view.WindowManager.LayoutParams;
 
 import com.github.dm.jrt.android.core.service.InvocationService;
+import com.github.dm.jrt.android.retrofit.test.R;
 
 /**
  * Test Activity.

@@ -1,0 +1,203 @@
+/*
+ * Copyright 2017 Davide Maestroni
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.github.dm.jrt.android.v11.rx;
+
+import android.content.Context;
+
+import com.github.dm.jrt.android.core.config.LoaderConfiguration;
+import com.github.dm.jrt.android.core.invocation.ContextInvocation;
+import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
+import com.github.dm.jrt.android.core.routine.LoaderRoutine;
+import com.github.dm.jrt.android.v11.core.JRoutineLoader;
+import com.github.dm.jrt.android.v11.core.LoaderContext;
+import com.github.dm.jrt.core.channel.Channel;
+import com.github.dm.jrt.core.common.RoutineException;
+import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.util.ConstantConditions;
+
+import org.jetbrains.annotations.NotNull;
+
+import rx.Observable.Operator;
+import rx.Subscriber;
+
+/**
+ * Operator enabling an Observable to dispatch data to a dedicated Loader.
+ * <p>
+ * Created by davide-maestroni on 02/11/2017.
+ *
+ * @param <DATA> the data type.
+ */
+class LoaderOperator<DATA> implements Operator<DATA, DATA> {
+
+  private final LoaderContext mContext;
+
+  private final InvocationConfiguration mInvocationConfiguration;
+
+  private final LoaderConfiguration mLoaderConfiguration;
+
+  /**
+   * Constructor.
+   *
+   * @param context                 the Loader context.
+   * @param invocationConfiguration the invocation configuration.
+   * @param loaderConfiguration     the Loader configuration.
+   */
+  LoaderOperator(@NotNull final LoaderContext context,
+      @NotNull final InvocationConfiguration invocationConfiguration,
+      @NotNull final LoaderConfiguration loaderConfiguration) {
+    mContext = ConstantConditions.notNull("Loader context", context);
+    mInvocationConfiguration =
+        ConstantConditions.notNull("invocation configuration", invocationConfiguration);
+    mLoaderConfiguration = ConstantConditions.notNull("loader configuration", loaderConfiguration);
+  }
+
+  @Override
+  public Subscriber<? super DATA> call(final Subscriber<? super DATA> subscriber) {
+    final SubscriberInvocationFactory<DATA> factory =
+        new SubscriberInvocationFactory<DATA>(subscriber);
+    return new LoaderSubscriber<DATA>(JRoutineLoader.on(mContext)
+                                                    .with(factory)
+                                                    .apply(mInvocationConfiguration)
+                                                    .apply(mLoaderConfiguration)
+                                                    .buildRoutine());
+  }
+
+  /**
+   * Subscriber dispatching data to a dedicated Loader invocation.
+   *
+   * @param <DATA> the data type.
+   */
+  private static class LoaderSubscriber<DATA> extends Subscriber<DATA> {
+
+    private final LoaderRoutine<DATA, Void> mRoutine;
+
+    private Channel<DATA, Void> mChannel;
+
+    /**
+     * Constructor.
+     *
+     * @param routine the Loader routine.
+     */
+    private LoaderSubscriber(@NotNull final LoaderRoutine<DATA, Void> routine) {
+      mRoutine = routine;
+    }
+
+    @Override
+    public void onCompleted() {
+      mChannel.close();
+    }
+
+    @Override
+    public void onError(final Throwable e) {
+      mChannel.abort(e);
+    }
+
+    @Override
+    public void onNext(final DATA data) {
+      mChannel.pass(data);
+    }
+
+    @Override
+    public void onStart() {
+      super.onStart();
+      mChannel = mRoutine.call();
+    }
+  }
+
+  /**
+   * Context invocation passing data to a Subscriber.
+   *
+   * @param <DATA> the data type.
+   */
+  private static class SubscriberInvocation<DATA> implements ContextInvocation<DATA, Void> {
+
+    private final Subscriber<? super DATA> mSubscriber;
+
+    /**
+     * Constructor.
+     *
+     * @param subscriber the Subscriber instance.
+     */
+    private SubscriberInvocation(@NotNull final Subscriber<? super DATA> subscriber) {
+      mSubscriber = subscriber;
+    }
+
+    @Override
+    public void onAbort(@NotNull final RoutineException reason) {
+      final Subscriber<? super DATA> subscriber = mSubscriber;
+      if (!subscriber.isUnsubscribed()) {
+        subscriber.onError(reason);
+      }
+    }
+
+    @Override
+    public void onComplete(@NotNull final Channel<Void, ?> result) {
+      final Subscriber<? super DATA> subscriber = mSubscriber;
+      if (!subscriber.isUnsubscribed()) {
+        subscriber.onCompleted();
+      }
+    }
+
+    @Override
+    public void onInput(final DATA input, @NotNull final Channel<Void, ?> result) {
+      final Subscriber<? super DATA> subscriber = mSubscriber;
+      if (!subscriber.isUnsubscribed()) {
+        subscriber.onNext(input);
+      }
+    }
+
+    @Override
+    public boolean onRecycle(final boolean isReused) {
+      return true;
+    }
+
+    @Override
+    public void onRestart() {
+    }
+
+    @Override
+    public void onContext(@NotNull final Context context) {
+    }
+  }
+
+  /**
+   * Factory of context invocation passing data to a Subscriber.
+   *
+   * @param <DATA> the data type.
+   */
+  private static class SubscriberInvocationFactory<DATA>
+      extends ContextInvocationFactory<DATA, Void> {
+
+    private final Subscriber<? super DATA> mSubscriber;
+
+    /**
+     * Constructor.
+     *
+     * @param subscriber the Subscriber instance.
+     */
+    private SubscriberInvocationFactory(@NotNull final Subscriber<? super DATA> subscriber) {
+      super(null);
+      mSubscriber = ConstantConditions.notNull("Subscriber instance", subscriber);
+    }
+
+    @NotNull
+    @Override
+    public ContextInvocation<DATA, Void> newInvocation() {
+      return new SubscriberInvocation<DATA>(mSubscriber);
+    }
+  }
+}

@@ -23,6 +23,8 @@ import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.view.WindowManager.LayoutParams;
 
+import com.github.dm.jrt.android.method.test.R;
+
 /**
  * Test Activity.
  * <p>

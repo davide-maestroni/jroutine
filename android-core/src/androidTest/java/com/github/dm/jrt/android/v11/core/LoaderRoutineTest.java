@@ -29,7 +29,6 @@ import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.test.ActivityInstrumentationTestCase2;
 
-import com.github.dm.jrt.android.core.R;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.CacheStrategyType;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.ClashResolutionType;
@@ -42,6 +41,7 @@ import com.github.dm.jrt.android.core.invocation.TypeClashException;
 import com.github.dm.jrt.android.core.log.AndroidLogs;
 import com.github.dm.jrt.android.core.routine.LoaderRoutine;
 import com.github.dm.jrt.android.core.runner.AndroidRunners;
+import com.github.dm.jrt.android.core.test.R;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;

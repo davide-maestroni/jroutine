@@ -20,7 +20,7 @@ import android.annotation.TargetApi;
 import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
-import com.github.dm.jrt.android.rx.R;
+import com.github.dm.jrt.android.rx.test.R;
 
 import java.util.Arrays;
 import java.util.List;

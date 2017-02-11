@@ -24,7 +24,7 @@ import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
-import com.github.dm.jrt.android.core.R;
+import com.github.dm.jrt.android.core.test.R;
 
 import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
 import static org.assertj.core.api.Assertions.assertThat;

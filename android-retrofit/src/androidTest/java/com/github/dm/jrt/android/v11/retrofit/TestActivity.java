@@ -22,7 +22,7 @@ import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.view.WindowManager.LayoutParams;
 
-import com.github.dm.jrt.android.retrofit.R;
+import com.github.dm.jrt.android.retrofit.test.R;
 
 /**
  * Test Activity.

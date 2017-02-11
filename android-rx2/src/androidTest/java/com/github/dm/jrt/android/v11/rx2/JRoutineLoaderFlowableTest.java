@@ -21,7 +21,7 @@ import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
-import com.github.dm.jrt.android.rx2.R;
+import com.github.dm.jrt.android.rx2.test.R;
 
 import java.util.Arrays;
 import java.util.List;
@@ -32,6 +32,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 
@@ -177,6 +178,7 @@ public class JRoutineLoaderFlowableTest extends ActivityInstrumentationTestCase2
                               return s.toUpperCase();
                             }
                           })
+                          .observeOn(AndroidSchedulers.mainThread())
                           .subscribe(new Consumer<String>() {
 
                             @Override
@@ -227,6 +229,7 @@ public class JRoutineLoaderFlowableTest extends ActivityInstrumentationTestCase2
                               return s.toUpperCase();
                             }
                           })
+                          .observeOn(AndroidSchedulers.mainThread())
                           .subscribe(new Consumer<String>() {
 
                             @Override
@@ -352,6 +355,7 @@ public class JRoutineLoaderFlowableTest extends ActivityInstrumentationTestCase2
                               return s.toUpperCase();
                             }
                           })
+                          .observeOn(AndroidSchedulers.mainThread())
                           .subscribe(new Consumer<String>() {
 
                             @Override
@@ -395,6 +399,7 @@ public class JRoutineLoaderFlowableTest extends ActivityInstrumentationTestCase2
                               return s.toUpperCase();
                             }
                           })
+                          .observeOn(AndroidSchedulers.mainThread())
                           .subscribe(new Consumer<String>() {
 
                             @Override

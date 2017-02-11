@@ -16,18 +16,10 @@
 
 package com.github.dm.jrt.android.v4.rx2;
 
-import android.content.Context;
-
 import com.github.dm.jrt.android.core.config.LoaderConfigurable;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
-import com.github.dm.jrt.android.core.invocation.ContextInvocation;
-import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
-import com.github.dm.jrt.android.core.invocation.TemplateContextInvocation;
-import com.github.dm.jrt.android.core.routine.LoaderRoutine;
 import com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
-import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.InvocationConfigurable;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -36,17 +28,9 @@ import com.github.dm.jrt.rx2.config.FlowableConfigurable;
 import com.github.dm.jrt.rx2.config.FlowableConfiguration;
 
 import org.jetbrains.annotations.NotNull;
-import org.reactivestreams.Subscriber;
-import org.reactivestreams.Subscription;
 
 import io.reactivex.Flowable;
-import io.reactivex.FlowableOperator;
 import io.reactivex.Observable;
-import io.reactivex.ObservableOperator;
-import io.reactivex.Observer;
-import io.reactivex.disposables.Disposable;
-
-import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
  * Utility class integrating the JRoutine Android classes with RxJava2 ones.
@@ -173,9 +157,10 @@ public class JRoutineLoaderFlowableCompat {
      */
     @NotNull
     public Flowable<DATA> observeOn(@NotNull final LoaderContextCompat context) {
+      final FlowableInvocationFactory<DATA> factory =
+          new FlowableInvocationFactory<DATA>(mFlowable);
       return JRoutineFlowable.from(JRoutineLoaderCompat.on(context)
-                                                       .with(new FlowableInvocationFactory<DATA>(
-                                                           mFlowable))
+                                                       .with(factory)
                                                        .apply(mInvocationConfiguration)
                                                        .apply(mLoaderConfiguration))
                              .apply(mFlowableConfiguration)
@@ -194,46 +179,6 @@ public class JRoutineLoaderFlowableCompat {
           mLoaderConfiguration));
     }
 
-  }
-
-  /**
-   * Operator enabling a Flowable to dispatch data to a dedicated Loader.
-   *
-   * @param <DATA> the data type.
-   */
-  public static class LoaderFlowableOperator<DATA> implements FlowableOperator<DATA, DATA> {
-
-    private final LoaderContextCompat mContext;
-
-    private final InvocationConfiguration mInvocationConfiguration;
-
-    private final LoaderConfiguration mLoaderConfiguration;
-
-    /**
-     * Constructor.
-     *
-     * @param context                 the Loader context.
-     * @param invocationConfiguration the invocation configuration.
-     * @param loaderConfiguration     the Loader configuration.
-     */
-    private LoaderFlowableOperator(@NotNull final LoaderContextCompat context,
-        @NotNull final InvocationConfiguration invocationConfiguration,
-        @NotNull final LoaderConfiguration loaderConfiguration) {
-      mContext = ConstantConditions.notNull("Loader context", context);
-      mInvocationConfiguration = invocationConfiguration;
-      mLoaderConfiguration = loaderConfiguration;
-    }
-
-    @Override
-    public Subscriber<? super DATA> apply(final Subscriber<? super DATA> subscriber) {
-      return new LoaderSubscriber<DATA>(JRoutineLoaderCompat.on(mContext)
-                                                            .with(
-                                                                new SubscriberInvocationFactory<DATA>(
-                                                                    subscriber))
-                                                            .apply(mInvocationConfiguration)
-                                                            .apply(mLoaderConfiguration)
-                                                            .buildRoutine());
-    }
   }
 
   /**
@@ -274,9 +219,10 @@ public class JRoutineLoaderFlowableCompat {
      */
     @NotNull
     public Observable<DATA> observeOn(@NotNull final LoaderContextCompat context) {
+      final ObservableInvocationFactory<DATA> factory =
+          new ObservableInvocationFactory<DATA>(mObservable);
       return JRoutineFlowable.from(JRoutineLoaderCompat.on(context)
-                                                       .with(new ObservableInvocationFactory<DATA>(
-                                                           mObservable))
+                                                       .with(factory)
                                                        .apply(mInvocationConfiguration)
                                                        .apply(mLoaderConfiguration))
                              .apply(mFlowableConfiguration)
@@ -337,388 +283,6 @@ public class JRoutineLoaderFlowableCompat {
     @Override
     public LoaderConfiguration.Builder<? extends LoaderObservable<DATA>> loaderConfiguration() {
       return new LoaderConfiguration.Builder<LoaderObservable<DATA>>(this, mLoaderConfiguration);
-    }
-  }
-
-  /**
-   * Operator enabling an Observable to dispatch data to a dedicated Loader.
-   *
-   * @param <DATA> the data type.
-   */
-  public static class LoaderObservableOperator<DATA> implements ObservableOperator<DATA, DATA> {
-
-    private final LoaderContextCompat mContext;
-
-    private final InvocationConfiguration mInvocationConfiguration;
-
-    private final LoaderConfiguration mLoaderConfiguration;
-
-    /**
-     * Constructor.
-     *
-     * @param context                 the Loader context.
-     * @param invocationConfiguration the invocation configuration.
-     * @param loaderConfiguration     the Loader configuration.
-     */
-    private LoaderObservableOperator(@NotNull final LoaderContextCompat context,
-        @NotNull final InvocationConfiguration invocationConfiguration,
-        @NotNull final LoaderConfiguration loaderConfiguration) {
-      mContext = ConstantConditions.notNull("Loader context", context);
-      mInvocationConfiguration = invocationConfiguration;
-      mLoaderConfiguration = loaderConfiguration;
-    }
-
-    @Override
-    public Observer<? super DATA> apply(final Observer<? super DATA> observer) {
-      return new LoaderObserver<DATA>(JRoutineLoaderCompat.on(mContext)
-                                                          .with(new ObserverInvocationFactory<DATA>(
-                                                              observer))
-                                                          .apply(mInvocationConfiguration)
-                                                          .apply(mLoaderConfiguration)
-                                                          .buildRoutine());
-    }
-  }
-
-  /**
-   * Context invocation passing Flowable data to the result channel.
-   *
-   * @param <DATA> the data type.
-   */
-  private static class FlowableInvocation<DATA> extends TemplateContextInvocation<Void, DATA> {
-
-    private final Flowable<DATA> mFlowable;
-
-    /**
-     * Constructor.
-     *
-     * @param flowable the Flowable instance.
-     */
-    private FlowableInvocation(final Flowable<DATA> flowable) {
-      mFlowable = flowable;
-    }
-
-    @Override
-    public void onComplete(@NotNull final Channel<DATA, ?> result) {
-      JRoutineFlowable.with(mFlowable).buildChannel().bind(result);
-    }
-
-    @Override
-    public boolean onRecycle(final boolean isReused) {
-      return true;
-    }
-  }
-
-  /**
-   * Factory of context invocations passing Flowable data to the result channel.
-   *
-   * @param <DATA> the data type.
-   */
-  private static class FlowableInvocationFactory<DATA>
-      extends ContextInvocationFactory<Void, DATA> {
-
-    private final Flowable<DATA> mFlowable;
-
-    /**
-     * Constructor.
-     *
-     * @param flowable the Flowable instance.
-     */
-    private FlowableInvocationFactory(@NotNull final Flowable<DATA> flowable) {
-      super(asArgs(flowable));
-      mFlowable = flowable;
-    }
-
-    @NotNull
-    @Override
-    public ContextInvocation<Void, DATA> newInvocation() {
-      return new FlowableInvocation<DATA>(mFlowable);
-    }
-  }
-
-  /**
-   * Observer dispatching data to a dedicated Loader invocation.
-   *
-   * @param <DATA> the data type.
-   */
-  private static class LoaderObserver<DATA> implements Observer<DATA> {
-
-    private final LoaderRoutine<DATA, Void> mRoutine;
-
-    private Channel<DATA, Void> mChannel;
-
-    /**
-     * Constructor.
-     *
-     * @param routine the Loader routine.
-     */
-    private LoaderObserver(@NotNull final LoaderRoutine<DATA, Void> routine) {
-      mRoutine = routine;
-    }
-
-    @Override
-    public void onSubscribe(final Disposable d) {
-      mChannel = mRoutine.call();
-    }
-
-    @Override
-    public void onNext(final DATA data) {
-      mChannel.pass(data);
-    }
-
-    @Override
-    public void onError(final Throwable e) {
-      mChannel.abort(e);
-    }
-
-    @Override
-    public void onComplete() {
-      mChannel.close();
-    }
-  }
-
-  /**
-   * Subscriber dispatching data to a dedicated Loader invocation.
-   *
-   * @param <DATA> the data type.
-   */
-  private static class LoaderSubscriber<DATA> implements Subscriber<DATA> {
-
-    private final LoaderRoutine<DATA, Void> mRoutine;
-
-    private Channel<DATA, Void> mChannel;
-
-    /**
-     * Constructor.
-     *
-     * @param routine the Loader routine.
-     */
-    private LoaderSubscriber(@NotNull final LoaderRoutine<DATA, Void> routine) {
-      mRoutine = routine;
-    }
-
-    @Override
-    public void onSubscribe(final Subscription s) {
-      mChannel = mRoutine.call();
-      s.request(Long.MAX_VALUE);
-    }
-
-    @Override
-    public void onNext(final DATA data) {
-      mChannel.pass(data);
-    }
-
-    @Override
-    public void onError(final Throwable e) {
-      mChannel.abort(e);
-    }
-
-    @Override
-    public void onComplete() {
-      mChannel.close();
-    }
-  }
-
-  /**
-   * Context invocation passing Observable data to the result channel.
-   *
-   * @param <DATA> the data type.
-   */
-  private static class ObservableInvocation<DATA> extends TemplateContextInvocation<Void, DATA> {
-
-    private final Observable<DATA> mObservable;
-
-    /**
-     * Constructor.
-     *
-     * @param observable the Observable instance.
-     */
-    private ObservableInvocation(final Observable<DATA> observable) {
-      mObservable = observable;
-    }
-
-    @Override
-    public void onComplete(@NotNull final Channel<DATA, ?> result) {
-      JRoutineFlowable.with(mObservable).buildChannel().bind(result);
-    }
-
-    @Override
-    public boolean onRecycle(final boolean isReused) {
-      return true;
-    }
-  }
-
-  /**
-   * Factory of context invocations passing Observable data to the result channel.
-   *
-   * @param <DATA> the data type.
-   */
-  private static class ObservableInvocationFactory<DATA>
-      extends ContextInvocationFactory<Void, DATA> {
-
-    private final Observable<DATA> mObservable;
-
-    /**
-     * Constructor.
-     *
-     * @param observable the Observable instance.
-     */
-    private ObservableInvocationFactory(@NotNull final Observable<DATA> observable) {
-      super(asArgs(observable));
-      mObservable = observable;
-    }
-
-    @NotNull
-    @Override
-    public ContextInvocation<Void, DATA> newInvocation() {
-      return new ObservableInvocation<DATA>(mObservable);
-    }
-  }
-
-  /**
-   * Context invocation passing data to an Observer.
-   *
-   * @param <DATA> the data type.
-   */
-  private static class ObserverInvocation<DATA> implements ContextInvocation<DATA, Void> {
-
-    private final Observer<? super DATA> mObserver;
-
-    /**
-     * Constructor.
-     *
-     * @param observer the Observer instance.
-     */
-    private ObserverInvocation(@NotNull final Observer<? super DATA> observer) {
-      mObserver = observer;
-    }
-
-    @Override
-    public void onAbort(@NotNull final RoutineException reason) {
-      mObserver.onError(reason);
-    }
-
-    @Override
-    public void onContext(@NotNull final Context context) {
-    }
-
-    @Override
-    public void onComplete(@NotNull final Channel<Void, ?> result) {
-      mObserver.onComplete();
-    }
-
-    @Override
-    public void onInput(final DATA input, @NotNull final Channel<Void, ?> result) {
-      mObserver.onNext(input);
-    }
-
-    @Override
-    public boolean onRecycle(final boolean isReused) {
-      return true;
-    }
-
-    @Override
-    public void onRestart() {
-    }
-  }
-
-  /**
-   * Factory of context invocation passing data to an Observer.
-   *
-   * @param <DATA> the data type.
-   */
-  private static class ObserverInvocationFactory<DATA>
-      extends ContextInvocationFactory<DATA, Void> {
-
-    private final Observer<? super DATA> mObserver;
-
-    /**
-     * Constructor.
-     *
-     * @param observer the Observer instance.
-     */
-    private ObserverInvocationFactory(@NotNull final Observer<? super DATA> observer) {
-      super(null);
-      mObserver = ConstantConditions.notNull("Observer instance", observer);
-    }
-
-    @NotNull
-    @Override
-    public ContextInvocation<DATA, Void> newInvocation() {
-      return new ObserverInvocation<DATA>(mObserver);
-    }
-  }
-
-  /**
-   * Context invocation passing data to a Subscriber.
-   *
-   * @param <DATA> the data type.
-   */
-  private static class SubscriberInvocation<DATA> implements ContextInvocation<DATA, Void> {
-
-    private final Subscriber<? super DATA> mSubscriber;
-
-    /**
-     * Constructor.
-     *
-     * @param subscriber the Subscriber instance.
-     */
-    private SubscriberInvocation(@NotNull final Subscriber<? super DATA> subscriber) {
-      mSubscriber = subscriber;
-    }
-
-    @Override
-    public void onAbort(@NotNull final RoutineException reason) {
-      mSubscriber.onError(reason);
-    }
-
-    @Override
-    public void onContext(@NotNull final Context context) {
-    }
-
-    @Override
-    public void onComplete(@NotNull final Channel<Void, ?> result) {
-      mSubscriber.onComplete();
-    }
-
-    @Override
-    public void onInput(final DATA input, @NotNull final Channel<Void, ?> result) {
-      mSubscriber.onNext(input);
-    }
-
-    @Override
-    public boolean onRecycle(final boolean isReused) {
-      return true;
-    }
-
-    @Override
-    public void onRestart() {
-    }
-  }
-
-  /**
-   * Factory of context invocation passing data to a Subscriber.
-   *
-   * @param <DATA> the data type.
-   */
-  private static class SubscriberInvocationFactory<DATA>
-      extends ContextInvocationFactory<DATA, Void> {
-
-    private final Subscriber<? super DATA> mSubscriber;
-
-    /**
-     * Constructor.
-     *
-     * @param subscriber the Subscriber instance.
-     */
-    private SubscriberInvocationFactory(@NotNull final Subscriber<? super DATA> subscriber) {
-      super(null);
-      mSubscriber = ConstantConditions.notNull("Subscriber instance", subscriber);
-    }
-
-    @NotNull
-    @Override
-    public ContextInvocation<DATA, Void> newInvocation() {
-      return new SubscriberInvocation<DATA>(mSubscriber);
     }
   }
 }

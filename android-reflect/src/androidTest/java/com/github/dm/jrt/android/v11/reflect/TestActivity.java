@@ -22,7 +22,7 @@ import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.view.WindowManager.LayoutParams;
 
-import com.github.dm.jrt.android.reflect.R;
+import com.github.dm.jrt.android.reflect.test.R;
 
 /**
  * Test Activity.

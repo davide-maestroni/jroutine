@@ -22,7 +22,7 @@ import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.view.WindowManager.LayoutParams;
 
-import com.github.dm.jrt.android.core.R;
+import com.github.dm.jrt.android.core.test.R;
 
 /**
  * Test Activity ensuring the creation of the Loader manager during call to {@code onCreate()}.

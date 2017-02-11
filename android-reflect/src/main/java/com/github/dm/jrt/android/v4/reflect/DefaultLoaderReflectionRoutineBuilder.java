@@ -184,23 +184,6 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
 
   @NotNull
   @Override
-  public WrapperConfiguration.Builder<? extends LoaderReflectionRoutineBuilder>
-  wrapperConfiguration() {
-    final WrapperConfiguration config = mWrapperConfiguration;
-    return new WrapperConfiguration.Builder<LoaderReflectionRoutineBuilder>(
-        new WrapperConfiguration.Configurable<LoaderReflectionRoutineBuilder>() {
-
-          @NotNull
-          @Override
-          public LoaderReflectionRoutineBuilder apply(
-              @NotNull final WrapperConfiguration configuration) {
-            return DefaultLoaderReflectionRoutineBuilder.this.apply(configuration);
-          }
-        }, config);
-  }
-
-  @NotNull
-  @Override
   public InvocationConfiguration.Builder<? extends LoaderReflectionRoutineBuilder>
   invocationConfiguration() {
     final InvocationConfiguration config = mInvocationConfiguration;
@@ -211,6 +194,23 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
           @Override
           public LoaderReflectionRoutineBuilder apply(
               @NotNull final InvocationConfiguration configuration) {
+            return DefaultLoaderReflectionRoutineBuilder.this.apply(configuration);
+          }
+        }, config);
+  }
+
+  @NotNull
+  @Override
+  public WrapperConfiguration.Builder<? extends LoaderReflectionRoutineBuilder>
+  wrapperConfiguration() {
+    final WrapperConfiguration config = mWrapperConfiguration;
+    return new WrapperConfiguration.Builder<LoaderReflectionRoutineBuilder>(
+        new WrapperConfiguration.Configurable<LoaderReflectionRoutineBuilder>() {
+
+          @NotNull
+          @Override
+          public LoaderReflectionRoutineBuilder apply(
+              @NotNull final WrapperConfiguration configuration) {
             return DefaultLoaderReflectionRoutineBuilder.this.apply(configuration);
           }
         }, config);

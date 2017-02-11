@@ -178,23 +178,6 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
 
   @NotNull
   @Override
-  public WrapperConfiguration.Builder<? extends ServiceReflectionRoutineBuilder>
-  wrapperConfiguration() {
-    final WrapperConfiguration config = mWrapperConfiguration;
-    return new WrapperConfiguration.Builder<ServiceReflectionRoutineBuilder>(
-        new WrapperConfiguration.Configurable<ServiceReflectionRoutineBuilder>() {
-
-          @NotNull
-          @Override
-          public ServiceReflectionRoutineBuilder apply(
-              @NotNull final WrapperConfiguration configuration) {
-            return DefaultServiceReflectionRoutineBuilder.this.apply(configuration);
-          }
-        }, config);
-  }
-
-  @NotNull
-  @Override
   public InvocationConfiguration.Builder<? extends ServiceReflectionRoutineBuilder>
   invocationConfiguration() {
     final InvocationConfiguration config = mInvocationConfiguration;
@@ -205,6 +188,23 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
           @Override
           public ServiceReflectionRoutineBuilder apply(
               @NotNull final InvocationConfiguration configuration) {
+            return DefaultServiceReflectionRoutineBuilder.this.apply(configuration);
+          }
+        }, config);
+  }
+
+  @NotNull
+  @Override
+  public WrapperConfiguration.Builder<? extends ServiceReflectionRoutineBuilder>
+  wrapperConfiguration() {
+    final WrapperConfiguration config = mWrapperConfiguration;
+    return new WrapperConfiguration.Builder<ServiceReflectionRoutineBuilder>(
+        new WrapperConfiguration.Configurable<ServiceReflectionRoutineBuilder>() {
+
+          @NotNull
+          @Override
+          public ServiceReflectionRoutineBuilder apply(
+              @NotNull final WrapperConfiguration configuration) {
             return DefaultServiceReflectionRoutineBuilder.this.apply(configuration);
           }
         }, config);

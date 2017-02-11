@@ -117,22 +117,6 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder {
 
   @NotNull
   @Override
-  public WrapperConfiguration.Builder<? extends LoaderProxyRoutineBuilder> wrapperConfiguration() {
-    final WrapperConfiguration config = mWrapperConfiguration;
-    return new WrapperConfiguration.Builder<LoaderProxyRoutineBuilder>(
-        new WrapperConfiguration.Configurable<LoaderProxyRoutineBuilder>() {
-
-          @NotNull
-          @Override
-          public LoaderProxyRoutineBuilder apply(
-              @NotNull final WrapperConfiguration configuration) {
-            return DefaultLoaderProxyRoutineBuilder.this.apply(configuration);
-          }
-        }, config);
-  }
-
-  @NotNull
-  @Override
   public InvocationConfiguration.Builder<? extends LoaderProxyRoutineBuilder>
   invocationConfiguration() {
     final InvocationConfiguration config = mInvocationConfiguration;
@@ -143,6 +127,22 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder {
           @Override
           public LoaderProxyRoutineBuilder apply(
               @NotNull final InvocationConfiguration configuration) {
+            return DefaultLoaderProxyRoutineBuilder.this.apply(configuration);
+          }
+        }, config);
+  }
+
+  @NotNull
+  @Override
+  public WrapperConfiguration.Builder<? extends LoaderProxyRoutineBuilder> wrapperConfiguration() {
+    final WrapperConfiguration config = mWrapperConfiguration;
+    return new WrapperConfiguration.Builder<LoaderProxyRoutineBuilder>(
+        new WrapperConfiguration.Configurable<LoaderProxyRoutineBuilder>() {
+
+          @NotNull
+          @Override
+          public LoaderProxyRoutineBuilder apply(
+              @NotNull final WrapperConfiguration configuration) {
             return DefaultLoaderProxyRoutineBuilder.this.apply(configuration);
           }
         }, config);

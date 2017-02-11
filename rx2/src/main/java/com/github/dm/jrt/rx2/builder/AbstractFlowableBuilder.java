@@ -32,8 +32,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public abstract class AbstractFlowableBuilder<IN, OUT> implements FlowableBuilder<IN, OUT> {
 
-  private FlowableConfiguration<IN> mConfiguration =
-      FlowableConfiguration.defaultConfiguration();
+  private FlowableConfiguration<IN> mConfiguration = FlowableConfiguration.defaultConfiguration();
 
   @NotNull
   public FlowableBuilder<IN, OUT> apply(@NotNull final FlowableConfiguration<IN> configuration) {

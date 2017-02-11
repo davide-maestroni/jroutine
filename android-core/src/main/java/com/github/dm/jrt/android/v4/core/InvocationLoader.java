@@ -90,24 +90,18 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
   }
 
   @Override
-  public InvocationResult<OUT> loadInBackground() {
+  protected void onStartLoading() {
+    super.onStartLoading();
     final Logger logger = mLogger;
-    final InvocationChannelConsumer<OUT> consumer =
-        new InvocationChannelConsumer<OUT>(this, logger);
-    final LoaderContextInvocationFactory<IN, OUT> factory =
-        new LoaderContextInvocationFactory<IN, OUT>(mInvocation);
-    JRoutineCore.with(fromFactory(getContext(), factory))
-                .invocationConfiguration()
-                .withRunner(Runners.syncRunner())
-                .withOutputOrder(mOrderType)
-                .withLog(logger.getLog())
-                .withLogLevel(logger.getLogLevel())
-                .apply()
-                .call()
-                .bind(consumer)
-                .pass(mInputs)
-                .close();
-    return consumer.createResult();
+    logger.dbg("start background invocation");
+    final InvocationResult<OUT> result = mResult;
+    if (takeContentChanged() || (result == null)) {
+      forceLoad();
+
+    } else {
+      logger.dbg("re-delivering result: %s", result);
+      super.deliverResult(result);
+    }
   }
 
   @Override
@@ -126,18 +120,24 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
   }
 
   @Override
-  protected void onStartLoading() {
-    super.onStartLoading();
+  public InvocationResult<OUT> loadInBackground() {
     final Logger logger = mLogger;
-    logger.dbg("start background invocation");
-    final InvocationResult<OUT> result = mResult;
-    if (takeContentChanged() || (result == null)) {
-      forceLoad();
-
-    } else {
-      logger.dbg("re-delivering result: %s", result);
-      super.deliverResult(result);
-    }
+    final InvocationChannelConsumer<OUT> consumer =
+        new InvocationChannelConsumer<OUT>(this, logger);
+    final LoaderContextInvocationFactory<IN, OUT> factory =
+        new LoaderContextInvocationFactory<IN, OUT>(mInvocation);
+    JRoutineCore.with(fromFactory(getContext(), factory))
+                .invocationConfiguration()
+                .withRunner(Runners.syncRunner())
+                .withOutputOrder(mOrderType)
+                .withLog(logger.getLog())
+                .withLogLevel(logger.getLogLevel())
+                .apply()
+                .call()
+                .bind(consumer)
+                .pass(mInputs)
+                .close();
+    return consumer.createResult();
   }
 
   /**

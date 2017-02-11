@@ -307,7 +307,8 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
     final Channel<String, String> inputChannel = JRoutineCore.<String>ofInputs().buildChannel();
     final Channel<?, Object> outputChannel =
         LoaderRoutineMethodCompat.from(loaderFrom(getActivity()),
-            classOfType(LoaderRoutineMethodCompatTest.class), "length", String.class).call(inputChannel);
+            classOfType(LoaderRoutineMethodCompatTest.class), "length", String.class)
+                                 .call(inputChannel);
     inputChannel.pass("test").close();
     assertThat(outputChannel.in(seconds(10)).next()).isEqualTo(4);
   }

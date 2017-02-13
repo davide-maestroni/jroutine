@@ -84,7 +84,7 @@ class RoutineFlowableBuilder<IN, OUT> extends AbstractFlowableBuilder<IN, OUT> {
     }
 
     public void subscribe(final FlowableEmitter<OUT> emitter) {
-      final Channel<? super IN, OUT> channel = mRoutine.call();
+      final Channel<? super IN, OUT> channel = mRoutine.invoke();
       emitter.setCancellable(new ChannelOnSubscribe<OUT>(channel));
       channel.bind(new EmitterConsumer<OUT>(emitter)).pass(mInputs).close();
     }

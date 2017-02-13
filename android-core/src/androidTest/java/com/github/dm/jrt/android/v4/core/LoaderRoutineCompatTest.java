@@ -370,13 +370,13 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
         new ClassToken<GetContextInvocation<String>>() {};
     assertThat(JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                                    .with(factoryOf(classToken))
-                                   .close()
+                                   .call()
                                    .in(seconds(10))
                                    .next()).isSameAs(getActivity().getApplicationContext());
     final ContextWrapper contextWrapper = new ContextWrapper(getActivity());
     assertThat(JRoutineLoaderCompat.on(loaderFrom(getActivity(), contextWrapper))
                                    .with(factoryOf(classToken, (Object[]) null))
-                                   .close()
+                                   .call()
                                    .in(seconds(10))
                                    .next()).isSameAs(getActivity().getApplicationContext());
   }
@@ -389,7 +389,7 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
     try {
       assertThat(JRoutineLoaderCompat.on(loaderFrom((FragmentActivity) null))
                                      .with(factoryOf(classToken))
-                                     .close()
+                                     .call()
                                      .in(seconds(10))
                                      .next()).isSameAs(getActivity().getApplicationContext());
       fail();
@@ -401,7 +401,7 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
     try {
       assertThat(JRoutineLoaderCompat.on(loaderFrom(getActivity(), null))
                                      .with(factoryOf(classToken))
-                                     .close()
+                                     .call()
                                      .in(seconds(10))
                                      .next()).isSameAs(getActivity().getApplicationContext());
       fail();
@@ -414,7 +414,7 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
     try {
       assertThat(JRoutineLoaderCompat.on(loaderFrom(getActivity(), contextWrapper))
                                      .with(factoryOf(classToken))
-                                     .close()
+                                     .call()
                                      .in(seconds(10))
                                      .next()).isSameAs(getActivity().getApplicationContext());
       fail();
@@ -440,7 +440,7 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
 
     assertThat(routine2.call("test1").in(timeout).all()).containsExactly("test1");
 
-    final Channel<Object, Object> channel = routine2.call().after(timeout).pass("test2");
+    final Channel<Object, Object> channel = routine2.invoke().after(timeout).pass("test2");
     channel.afterNoDelay().abort(new IllegalArgumentException());
 
     try {
@@ -1054,13 +1054,13 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
         new ClassToken<GetContextInvocation<String>>() {};
     assertThat(JRoutineLoaderCompat.on(loaderFrom(fragment))
                                    .with(factoryOf(classToken))
-                                   .close()
+                                   .call()
                                    .in(seconds(10))
                                    .next()).isSameAs(getActivity().getApplicationContext());
     final ContextWrapper contextWrapper = new ContextWrapper(getActivity());
     assertThat(JRoutineLoaderCompat.on(loaderFrom(fragment, contextWrapper))
                                    .with(factoryOf(classToken))
-                                   .close()
+                                   .call()
                                    .in(seconds(10))
                                    .next()).isSameAs(getActivity().getApplicationContext());
   }
@@ -1075,7 +1075,7 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
     try {
       assertThat(JRoutineLoaderCompat.on(loaderFrom((Fragment) null))
                                      .with(factoryOf(classToken))
-                                     .close()
+                                     .call()
                                      .in(seconds(10))
                                      .next()).isSameAs(getActivity().getApplicationContext());
       fail();
@@ -1087,7 +1087,7 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
     try {
       assertThat(JRoutineLoaderCompat.on(loaderFrom(fragment, null))
                                      .with(factoryOf(classToken))
-                                     .close()
+                                     .call()
                                      .in(seconds(10))
                                      .next()).isSameAs(getActivity().getApplicationContext());
       fail();
@@ -1100,7 +1100,7 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
     try {
       assertThat(JRoutineLoaderCompat.on(loaderFrom(fragment, contextWrapper))
                                      .with(factoryOf(classToken))
-                                     .close()
+                                     .call()
                                      .in(seconds(10))
                                      .next()).isSameAs(getActivity().getApplicationContext());
       fail();
@@ -1128,7 +1128,7 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
 
     assertThat(routine2.call("test1").in(timeout).all()).containsExactly("test1");
 
-    final Channel<Object, Object> channel = routine2.call().after(timeout).pass("test2");
+    final Channel<Object, Object> channel = routine2.invoke().after(timeout).pass("test2");
     channel.afterNoDelay().abort(new IllegalArgumentException());
 
     try {
@@ -1628,7 +1628,7 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
                                                                 .with(
                                                                     IdentityContextInvocation
                                                                         .factoryOf())
-                                                                .call();
+                                                                .invoke();
     assertThat(channel.inputSize()).isEqualTo(0);
     channel.after(millis(500)).pass("test");
     assertThat(channel.inputSize()).isEqualTo(1);

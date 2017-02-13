@@ -112,7 +112,7 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
             result.pass("test", "1");
           }
         }).buildRoutine();
-    assertThat(routine.close().in(seconds(10)).all()).containsOnly("test", "1");
+    assertThat(routine.call().in(seconds(10)).all()).containsOnly("test", "1");
   }
 
   private static void testConsumerFunction(@NotNull final Activity activity) {
@@ -186,7 +186,7 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
                                                         LoaderTransformations.<Integer,
                                                             Double>runOn(
                                                             loaderFrom(activity)).buildFunction())
-                                                    .close()
+                                                    .call()
                                                     .in(seconds(10))
                                                     .next()).isCloseTo(21, Offset.offset(0.1));
   }
@@ -200,7 +200,7 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
             return "test";
           }
         }).buildRoutine();
-    assertThat(routine.close().in(seconds(10)).all()).containsOnly("test");
+    assertThat(routine.call().in(seconds(10)).all()).containsOnly("test");
   }
 
   private static void testSupplierContextFactory(@NotNull final Activity activity) {
@@ -387,19 +387,19 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
     assertThat(JRoutineAndroid.on(getActivity())
                               .withClassOfType(TestClass.class)
                               .method("getStringUp")
-                              .close()
+                              .call()
                               .in(seconds(10))
                               .all()).containsExactly("TEST");
     assertThat(JRoutineAndroid.on(getActivity())
                               .withClassOfType(TestClass.class)
                               .method(TestClass.class.getMethod("getStringUp"))
-                              .close()
+                              .call()
                               .in(seconds(10))
                               .all()).containsExactly("TEST");
     assertThat(JRoutineAndroid.on(getActivity())
                               .with(classOfType(TestClass.class))
                               .method("TEST")
-                              .close()
+                              .call()
                               .in(seconds(10))
                               .all()).containsExactly("TEST");
   }
@@ -417,7 +417,7 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
                               .withCacheStrategy(CacheStrategyType.CACHE)
                               .apply()
                               .method("getStringLow")
-                              .close()
+                              .call()
                               .in(seconds(10))
                               .all()).containsExactly("test");
     assertThat(JRoutineAndroid.on(getActivity())
@@ -435,19 +435,19 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
     assertThat(JRoutineAndroid.on(getActivity())
                               .withInstanceOf(TestClass.class, "TEST")
                               .method(TestClass.class.getMethod("getStringLow"))
-                              .close()
+                              .call()
                               .in(seconds(10))
                               .all()).containsExactly("test");
     assertThat(JRoutineAndroid.on(getActivity())
                               .withInstanceOf(TestClass.class)
                               .method("getStringLow")
-                              .close()
+                              .call()
                               .in(seconds(10))
                               .all()).containsExactly("test");
     assertThat(JRoutineAndroid.on(getActivity())
                               .with(instanceOf(TestClass.class))
                               .method("test")
-                              .close()
+                              .call()
                               .in(seconds(10))
                               .all()).containsExactly("test");
   }
@@ -654,19 +654,19 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
     assertThat(JRoutineAndroid.on((Context) getActivity())
                               .withClassOfType(TestClass.class)
                               .method("getStringUp")
-                              .close()
+                              .call()
                               .in(seconds(10))
                               .all()).containsExactly("TEST");
     assertThat(JRoutineAndroid.on((Context) getActivity())
                               .withClassOfType(TestClass.class)
                               .method(TestClass.class.getMethod("getStringUp"))
-                              .close()
+                              .call()
                               .in(seconds(10))
                               .all()).containsExactly("TEST");
     assertThat(JRoutineAndroid.on((Context) getActivity())
                               .with(classOfType(TestClass.class))
                               .method("TEST")
-                              .close()
+                              .call()
                               .in(seconds(10))
                               .all()).containsExactly("TEST");
   }
@@ -679,19 +679,19 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
     assertThat(JRoutineAndroid.on((Context) getActivity())
                               .withInstanceOf(TestClass.class, "TEST")
                               .method(TestClass.class.getMethod("getStringLow"))
-                              .close()
+                              .call()
                               .in(seconds(10))
                               .all()).containsExactly("test");
     assertThat(JRoutineAndroid.on((Context) getActivity())
                               .withInstanceOf(TestClass.class)
                               .method("getStringLow")
-                              .close()
+                              .call()
                               .in(seconds(10))
                               .all()).containsExactly("test");
     assertThat(JRoutineAndroid.on((Context) getActivity())
                               .with(instanceOf(TestClass.class))
                               .method("test")
-                              .close()
+                              .call()
                               .in(seconds(10))
                               .all()).containsExactly("test");
   }
@@ -826,10 +826,10 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
     }
 
     assertThat(
-        JRoutineAndroid.withStreamAccept(range(0, 3)).immediate().close().all()).containsExactly(0,
+        JRoutineAndroid.withStreamAccept(range(0, 3)).immediate().call().all()).containsExactly(0,
         1, 2, 3);
     assertThat(
-        JRoutineAndroid.withStreamAccept(2, range(1, 0)).immediate().close().all()).containsExactly(
+        JRoutineAndroid.withStreamAccept(2, range(1, 0)).immediate().call().all()).containsExactly(
         1, 0, 1, 0);
   }
 
@@ -839,10 +839,10 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
     }
 
     Channel<Integer, Integer> channel =
-        JRoutineAndroid.withStreamAccept(range(0, 3)).immediate().call();
+        JRoutineAndroid.withStreamAccept(range(0, 3)).immediate().invoke();
     assertThat(channel.abort()).isTrue();
     assertThat(channel.getError()).isInstanceOf(AbortException.class);
-    channel = JRoutineAndroid.withStreamAccept(2, range(1, 0)).immediate().call();
+    channel = JRoutineAndroid.withStreamAccept(2, range(1, 0)).immediate().invoke();
     assertThat(channel.abort()).isTrue();
     assertThat(channel.getError()).isInstanceOf(AbortException.class);
   }
@@ -871,11 +871,11 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
     }
 
     assertThat(
-        JRoutineAndroid.withStreamGet(constant("test")).immediate().close().all()).containsExactly(
+        JRoutineAndroid.withStreamGet(constant("test")).immediate().call().all()).containsExactly(
         "test");
     assertThat(JRoutineAndroid.withStreamGet(2, constant("test2"))
                               .immediate()
-                              .close()
+                              .call()
                               .all()).containsExactly("test2", "test2");
   }
 
@@ -885,10 +885,10 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
     }
 
     Channel<String, String> channel =
-        JRoutineAndroid.withStreamGet(constant("test")).immediate().immediate().call();
+        JRoutineAndroid.withStreamGet(constant("test")).immediate().immediate().invoke();
     assertThat(channel.abort()).isTrue();
     assertThat(channel.getError()).isInstanceOf(AbortException.class);
-    channel = JRoutineAndroid.withStreamGet(2, constant("test2")).immediate().call();
+    channel = JRoutineAndroid.withStreamGet(2, constant("test2")).immediate().invoke();
     assertThat(channel.abort()).isTrue();
     assertThat(channel.getError()).isInstanceOf(AbortException.class);
   }
@@ -919,26 +919,26 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
     assertThat(JRoutineAndroid.withStreamOf("test")
                               .lift(LoaderTransformations.<String, String>runOn(
                                   loaderFrom(getActivity())).buildFunction())
-                              .close()
+                              .call()
                               .in(seconds(10))
                               .all()).containsExactly("test");
     assertThat(JRoutineAndroid.withStreamOf("test1", "test2", "test3")
                               .lift(LoaderTransformations.<String, String>runOn(
                                   loaderFrom(getActivity())).buildFunction())
-                              .close()
+                              .call()
                               .in(seconds(10))
                               .all()).containsExactly("test1", "test2", "test3");
     assertThat(JRoutineAndroid.withStreamOf(Arrays.asList("test1", "test2", "test3"))
                               .lift(LoaderTransformations.<String, String>runOn(
                                   loaderFrom(getActivity())).buildFunction())
-                              .close()
+                              .call()
                               .in(seconds(10))
                               .all()).containsExactly("test1", "test2", "test3");
     assertThat(
         JRoutineAndroid.withStreamOf(JRoutineAndroid.of("test1", "test2", "test3").buildChannel())
                        .lift(LoaderTransformations.<String, String>runOn(
                            loaderFrom(getActivity())).buildFunction())
-                       .close()
+                       .call()
                        .in(seconds(10))
                        .all()).containsExactly("test1", "test2", "test3");
   }
@@ -954,26 +954,26 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
                                                              String>runOn(
                                                              loaderFrom(
                                                                  getActivity())).buildFunction())
-                                                     .call();
+                                                     .invoke();
     assertThat(channel.abort()).isTrue();
     assertThat(channel.in(seconds(10)).getError()).isInstanceOf(AbortException.class);
     channel = JRoutineAndroid.withStreamOf("test1", "test2", "test3")
                              .lift(LoaderTransformations.<String, String>runOn(
                                  loaderFrom(getActivity())).buildFunction())
-                             .call();
+                             .invoke();
     assertThat(channel.abort()).isTrue();
     assertThat(channel.in(seconds(10)).getError()).isInstanceOf(AbortException.class);
     channel = JRoutineAndroid.withStreamOf(Arrays.asList("test1", "test2", "test3"))
                              .lift(LoaderTransformations.<String, String>runOn(
                                  loaderFrom(getActivity())).buildFunction())
-                             .call();
+                             .invoke();
     assertThat(channel.abort()).isTrue();
     assertThat(channel.in(seconds(10)).getError()).isInstanceOf(AbortException.class);
     channel =
         JRoutineAndroid.withStreamOf(JRoutineAndroid.of("test1", "test2", "test3").buildChannel())
                        .lift(LoaderTransformations.<String, String>runOn(
                            loaderFrom(getActivity())).buildFunction())
-                       .call();
+                       .invoke();
     assertThat(channel.abort()).isTrue();
     assertThat(channel.in(seconds(10)).getError()).isInstanceOf(AbortException.class);
   }
@@ -1017,7 +1017,7 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
         JRoutineAndroid.ofInputs().buildChannel().bind(new TemplateChannelConsumer<Object>() {}))
                               .lift(LoaderTransformations.runOn(loaderFrom(getActivity()))
                                                          .buildFunction())
-                              .close()
+                              .call()
                               .in(seconds(10))
                               .getError()
                               .getCause()).isInstanceOf(IllegalStateException.class);

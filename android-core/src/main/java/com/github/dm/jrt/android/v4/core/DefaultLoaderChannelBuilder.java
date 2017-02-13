@@ -92,7 +92,7 @@ class DefaultLoaderChannelBuilder implements LoaderChannelBuilder {
                   .withMatchResolution(ClashResolutionType.JOIN)
                   .with(loaderConfiguration)
                   .apply()
-                  .close();
+                  .call();
   }
 
   @Override

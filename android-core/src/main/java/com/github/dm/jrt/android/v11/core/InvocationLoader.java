@@ -136,7 +136,7 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
                 .withLog(logger.getLog())
                 .withLogLevel(logger.getLogLevel())
                 .apply()
-                .call()
+                .invoke()
                 .bind(consumer)
                 .pass(mInputs)
                 .close();

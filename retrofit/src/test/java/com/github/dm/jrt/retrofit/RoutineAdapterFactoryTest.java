@@ -166,7 +166,7 @@ public class RoutineAdapterFactoryTest {
         final GitHubService service = retrofit.create(GitHubService.class);
         assertThat(service.streamRepos("octocat")
                           .map(Operators.<Repo>unfold())
-                          .call()
+                          .invoke()
                           .bind(onOutput(new Consumer<Repo>() {
 
                             public void accept(final Repo repo) throws Exception {
@@ -194,7 +194,7 @@ public class RoutineAdapterFactoryTest {
         final GitHubService service = retrofit.create(GitHubService.class);
         assertThat(service.streamRepos("octocat")
                           .map(Operators.<Repo>unfold())
-                          .call()
+                          .invoke()
                           .bind(onOutput(new Consumer<Repo>() {
 
                             public void accept(final Repo repo) throws Exception {
@@ -222,7 +222,7 @@ public class RoutineAdapterFactoryTest {
         final GitHubService service = retrofit.create(GitHubService.class);
         assertThat(service.streamRepos("octocat")
                           .map(Operators.<Repo>unfold())
-                          .call()
+                          .invoke()
                           .bind(onOutput(new Consumer<Repo>() {
 
                             public void accept(final Repo repo) throws Exception {

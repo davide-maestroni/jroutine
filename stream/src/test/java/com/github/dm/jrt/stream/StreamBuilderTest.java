@@ -113,47 +113,47 @@ public class StreamBuilderTest {
   @Test
   public void testChannel() {
     try {
-      JRoutineStream.withStream().sync().call().all();
+      JRoutineStream.withStream().sync().invoke().all();
       fail();
 
     } catch (final TimeoutException ignored) {
     }
 
     try {
-      JRoutineStream.withStream().sync().call().next();
+      JRoutineStream.withStream().sync().invoke().next();
       fail();
 
     } catch (final TimeoutException ignored) {
     }
 
     try {
-      JRoutineStream.withStream().sync().call().next(2);
+      JRoutineStream.withStream().sync().invoke().next(2);
       fail();
 
     } catch (final TimeoutException ignored) {
     }
 
     try {
-      JRoutineStream.withStream().sync().call().nextOrElse(2);
+      JRoutineStream.withStream().sync().invoke().nextOrElse(2);
       fail();
 
     } catch (final TimeoutException ignored) {
     }
 
     try {
-      JRoutineStream.withStream().sync().call().skipNext(2);
+      JRoutineStream.withStream().sync().invoke().skipNext(2);
       fail();
 
     } catch (final TimeoutException ignored) {
     }
 
-    assertThat(JRoutineStream.withStream().sync().call().abort()).isTrue();
+    assertThat(JRoutineStream.withStream().sync().invoke().abort()).isTrue();
     assertThat(
-        JRoutineStream.withStream().sync().call().abort(new IllegalStateException())).isTrue();
+        JRoutineStream.withStream().sync().invoke().abort(new IllegalStateException())).isTrue();
     assertThat(JRoutineStream.withStream()
                              .sync()
                              .map(append((Object) "test"))
-                             .call()
+                             .invoke()
                              .after(seconds(3))
                              .inNoTime()
                              .close()
@@ -161,7 +161,7 @@ public class StreamBuilderTest {
     assertThat(JRoutineStream.withStream()
                              .sync()
                              .map(append((Object) "test"))
-                             .call()
+                             .invoke()
                              .after(3, TimeUnit.SECONDS)
                              .inNoTime()
                              .close()
@@ -170,7 +170,7 @@ public class StreamBuilderTest {
       final ArrayList<String> results = new ArrayList<String>();
       JRoutineStream.<String>withStream().sync()
                                          .map(append("test"))
-                                         .call()
+                                         .invoke()
                                          .allInto(results)
                                          .getComplete();
       fail();
@@ -182,7 +182,7 @@ public class StreamBuilderTest {
       JRoutineStream.withStream()
                     .sync()
                     .map(append((Object) "test"))
-                    .call()
+                    .invoke()
                     .bind(JRoutineCore.ofInputs().buildChannel())
                     .next();
       fail();
@@ -192,7 +192,7 @@ public class StreamBuilderTest {
 
     assertThat(JRoutineStream.<String>withStream().sync()
                                                   .map(append("test"))
-                                                  .call()
+                                                  .invoke()
                                                   .bind(onOutput(new Consumer<String>() {
 
                                                     public void accept(final String s) {
@@ -202,13 +202,13 @@ public class StreamBuilderTest {
                                                   .close()
                                                   .getError()).isNull();
     assertThat(
-        JRoutineStream.withStream().sync().map(append((Object) "test")).close().next()).isEqualTo(
+        JRoutineStream.withStream().sync().map(append((Object) "test")).call().next()).isEqualTo(
         "test");
     try {
       JRoutineStream.withStream()
                     .sync()
                     .map(append((Object) "test"))
-                    .call()
+                    .invoke()
                     .expiringIterator()
                     .next();
       fail();
@@ -217,7 +217,7 @@ public class StreamBuilderTest {
     }
 
     try {
-      JRoutineStream.withStream().sync().map(append((Object) "test")).call().iterator().next();
+      JRoutineStream.withStream().sync().map(append((Object) "test")).invoke().iterator().next();
       fail();
 
     } catch (final TimeoutException ignored) {
@@ -226,35 +226,35 @@ public class StreamBuilderTest {
     assertThat(JRoutineStream.withStream()
                              .sync()
                              .map(append((Object) "test"))
-                             .call()
+                             .invoke()
                              .eventuallyAbort()
                              .close()
                              .next()).isEqualTo("test");
     assertThat(JRoutineStream.withStream()
                              .sync()
                              .map(append((Object) "test"))
-                             .call()
+                             .invoke()
                              .eventuallyAbort(new IllegalStateException())
                              .close()
                              .next()).isEqualTo("test");
     assertThat(JRoutineStream.withStream()
                              .sync()
                              .map(append((Object) "test"))
-                             .call()
+                             .invoke()
                              .eventuallyContinue()
                              .close()
                              .next()).isEqualTo("test");
     assertThat(JRoutineStream.withStream()
                              .sync()
                              .map(append((Object) "test"))
-                             .call()
+                             .invoke()
                              .eventuallyFail()
                              .close()
                              .next()).isEqualTo("test");
-    assertThat(JRoutineStream.withStream().sync().call().getError()).isNull();
-    assertThat(JRoutineStream.withStream().sync().call().getComplete()).isFalse();
+    assertThat(JRoutineStream.withStream().sync().invoke().getError()).isNull();
+    assertThat(JRoutineStream.withStream().sync().invoke().getComplete()).isFalse();
     try {
-      JRoutineStream.withStream().sync().call().hasNext();
+      JRoutineStream.withStream().sync().invoke().hasNext();
       fail();
 
     } catch (final TimeoutException ignored) {
@@ -263,33 +263,37 @@ public class StreamBuilderTest {
     assertThat(JRoutineStream.withStream()
                              .sync()
                              .map(append((Object) "test"))
-                             .call()
+                             .invoke()
                              .afterNoDelay()
                              .close()
                              .next()).isEqualTo("test");
-    assertThat(JRoutineStream.withStream().sync().call().inputSize()).isZero();
-    assertThat(JRoutineStream.withStream().sync().call().outputSize()).isZero();
-    assertThat(JRoutineStream.withStream().sync().call().size()).isZero();
-    assertThat(JRoutineStream.withStream().sync().call().isBound()).isFalse();
-    assertThat(JRoutineStream.withStream().sync().call().isEmpty()).isTrue();
-    assertThat(JRoutineStream.withStream().sync().call().isOpen()).isTrue();
-    assertThat(JRoutineStream.withStream().sync().call().pass("test").next()).isEqualTo("test");
-    assertThat(JRoutineStream.withStream().sync().call().pass("test", "test").next()).isEqualTo(
+    assertThat(JRoutineStream.withStream().sync().invoke().inputSize()).isZero();
+    assertThat(JRoutineStream.withStream().sync().invoke().outputSize()).isZero();
+    assertThat(JRoutineStream.withStream().sync().invoke().size()).isZero();
+    assertThat(JRoutineStream.withStream().sync().invoke().isBound()).isFalse();
+    assertThat(JRoutineStream.withStream().sync().invoke().isEmpty()).isTrue();
+    assertThat(JRoutineStream.withStream().sync().invoke().isOpen()).isTrue();
+    assertThat(JRoutineStream.withStream().sync().invoke().pass("test").next()).isEqualTo("test");
+    assertThat(JRoutineStream.withStream().sync().invoke().pass("test", "test").next()).isEqualTo(
         "test");
-    assertThat(JRoutineStream.withStream().sync().call().pass(Arrays.asList("test", "test")).next())
-        .isEqualTo("test");
     assertThat(JRoutineStream.withStream()
                              .sync()
-                             .call()
+                             .invoke()
+                             .pass(Arrays.asList("test", "test"))
+                             .next()).isEqualTo("test");
+    assertThat(JRoutineStream.withStream()
+                             .sync()
+                             .invoke()
                              .pass(JRoutineCore.of("test").buildChannel())
                              .next()).isEqualTo("test");
-    assertThat(JRoutineStream.withStream().sync().call().sorted().pass("test").next()).isEqualTo(
+    assertThat(JRoutineStream.withStream().sync().invoke().sorted().pass("test").next()).isEqualTo(
         "test");
-    assertThat(JRoutineStream.withStream().sync().call().unsorted().pass("test").next()).isEqualTo(
+    assertThat(
+        JRoutineStream.withStream().sync().invoke().unsorted().pass("test").next()).isEqualTo(
         "test");
-    JRoutineStream.withStream().sync().call().throwError();
+    JRoutineStream.withStream().sync().invoke().throwError();
     try {
-      JRoutineStream.withStream().sync().call().remove();
+      JRoutineStream.withStream().sync().invoke().remove();
       fail();
 
     } catch (final UnsupportedOperationException ignored) {
@@ -498,7 +502,7 @@ public class StreamBuilderTest {
                                                      }
                                                    })
                                                    .map(Operators.average(Double.class))
-                                                   .close()
+                                                   .call()
                                                    .next()).isCloseTo(21, Offset.offset(0.1));
     assertThat(JRoutineStream.<Integer>withStream().immediateParallel()
                                                    .map(appendAccept(range(1, 1000)))
@@ -514,7 +518,7 @@ public class StreamBuilderTest {
                                                    })
                                                    .immediate()
                                                    .map(Operators.average(Double.class))
-                                                   .close()
+                                                   .call()
                                                    .next()).isCloseTo(21, Offset.offset(0.1));
   }
 
@@ -636,7 +640,7 @@ public class StreamBuilderTest {
           public Integer apply(final Integer integer) {
             return integer << 1;
           }
-        }).call();
+        }).invoke();
     assertThat(channel.pass(1).abort()).isTrue();
     assertThat(channel.getError()).isNotNull();
     channel = JRoutineStream //
@@ -645,7 +649,7 @@ public class StreamBuilderTest {
           public Integer apply(final Integer integer) {
             return integer << 1;
           }
-        }).call();
+        }).invoke();
     assertThat(channel.pass(1).abort()).isTrue();
     assertThat(channel.getError()).isNotNull();
     channel = JRoutineStream //
@@ -657,7 +661,7 @@ public class StreamBuilderTest {
                                   result.pass(integer << 1);
                                 }
                               })
-                              .call();
+                              .invoke();
     assertThat(channel.pass(1).abort()).isTrue();
     assertThat(channel.getError()).isNotNull();
     channel = JRoutineStream //
@@ -669,7 +673,7 @@ public class StreamBuilderTest {
                                   result.pass(integer << 1);
                                 }
                               })
-                              .call();
+                              .invoke();
     assertThat(channel.pass(1).abort()).isTrue();
     assertThat(channel.getError()).isNotNull();
     channel = JRoutineStream //
@@ -683,7 +687,7 @@ public class StreamBuilderTest {
 
             return sum;
           }
-        }).call();
+        }).invoke();
     assertThat(channel.pass(1).abort()).isTrue();
     assertThat(channel.getError()).isNotNull();
     channel = JRoutineStream //
@@ -697,7 +701,7 @@ public class StreamBuilderTest {
 
             return sum;
           }
-        }).call();
+        }).invoke();
     assertThat(channel.pass(1).abort()).isTrue();
     assertThat(channel.getError()).isNotNull();
     channel = JRoutineStream //
@@ -714,7 +718,7 @@ public class StreamBuilderTest {
                                   result.pass(sum);
                                 }
                               })
-                              .call();
+                              .invoke();
     assertThat(channel.pass(1).abort()).isTrue();
     assertThat(channel.getError()).isNotNull();
     channel = JRoutineStream //
@@ -731,7 +735,7 @@ public class StreamBuilderTest {
                                   result.pass(sum);
                                 }
                               })
-                              .call();
+                              .invoke();
     assertThat(channel.pass(1).abort()).isTrue();
     assertThat(channel.getError()).isNotNull();
   }
@@ -789,14 +793,14 @@ public class StreamBuilderTest {
     startTime = System.currentTimeMillis();
     assertThat(JRoutineStream.<String>withStream().lift(
         Transformations.<String, String>lag(1, TimeUnit.SECONDS))
-                                                  .close()
+                                                  .call()
                                                   .in(seconds(3))
                                                   .all()).isEmpty();
     assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
     startTime = System.currentTimeMillis();
     assertThat(
         JRoutineStream.<String>withStream().lift(Transformations.<String, String>lag(seconds(1)))
-                                           .close()
+                                           .call()
                                            .in(seconds(3))
                                            .all()).isEmpty();
     assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
@@ -898,7 +902,7 @@ public class StreamBuilderTest {
                             }
                           });
     try {
-      builder.sync().close().throwError();
+      builder.sync().call().throwError();
       fail();
 
     } catch (final InvocationException e) {
@@ -1387,7 +1391,7 @@ public class StreamBuilderTest {
                                     return data.sum / data.count;
                                   }
                                 })
-                                .close()
+                                .call()
                                 .in(minutes(3))
                                 .next()).isCloseTo(21, Offset.offset(0.1));
       fail();
@@ -1432,7 +1436,7 @@ public class StreamBuilderTest {
                                     return data.sum / data.count;
                                   }
                                 })
-                                .close()
+                                .call()
                                 .in(minutes(3))
                                 .next()).isCloseTo(21, Offset.offset(0.1));
       fail();
@@ -1444,20 +1448,20 @@ public class StreamBuilderTest {
   @Test
   public void testStreamAccept() {
     assertThat(
-        JRoutineStream.withStreamAccept(range(0, 3)).immediate().close().all()).containsExactly(0,
-        1, 2, 3);
+        JRoutineStream.withStreamAccept(range(0, 3)).immediate().call().all()).containsExactly(0, 1,
+        2, 3);
     assertThat(
-        JRoutineStream.withStreamAccept(2, range(1, 0)).immediate().close().all()).containsExactly(
-        1, 0, 1, 0);
+        JRoutineStream.withStreamAccept(2, range(1, 0)).immediate().call().all()).containsExactly(1,
+        0, 1, 0);
   }
 
   @Test
   public void testStreamAcceptAbort() {
     Channel<Integer, Integer> channel =
-        JRoutineStream.withStreamAccept(range(0, 3)).immediate().call();
+        JRoutineStream.withStreamAccept(range(0, 3)).immediate().invoke();
     assertThat(channel.abort()).isTrue();
     assertThat(channel.getError()).isInstanceOf(AbortException.class);
-    channel = JRoutineStream.withStreamAccept(2, range(1, 0)).immediate().call();
+    channel = JRoutineStream.withStreamAccept(2, range(1, 0)).immediate().invoke();
     assertThat(channel.abort()).isTrue();
     assertThat(channel.getError()).isInstanceOf(AbortException.class);
   }
@@ -1478,21 +1482,21 @@ public class StreamBuilderTest {
   @Test
   public void testStreamGet() {
     assertThat(
-        JRoutineStream.withStreamGet(constant("test")).immediate().close().all()).containsExactly(
+        JRoutineStream.withStreamGet(constant("test")).immediate().call().all()).containsExactly(
         "test");
     assertThat(JRoutineStream.withStreamGet(2, constant("test2"))
                              .immediate()
-                             .close()
+                             .call()
                              .all()).containsExactly("test2", "test2");
   }
 
   @Test
   public void testStreamGetAbort() {
     Channel<String, String> channel =
-        JRoutineStream.withStreamGet(constant("test")).immediate().immediate().call();
+        JRoutineStream.withStreamGet(constant("test")).immediate().immediate().invoke();
     assertThat(channel.abort()).isTrue();
     assertThat(channel.getError()).isInstanceOf(AbortException.class);
-    channel = JRoutineStream.withStreamGet(2, constant("test2")).immediate().call();
+    channel = JRoutineStream.withStreamGet(2, constant("test2")).immediate().invoke();
     assertThat(channel.abort()).isTrue();
     assertThat(channel.getError()).isInstanceOf(AbortException.class);
   }
@@ -1514,38 +1518,38 @@ public class StreamBuilderTest {
 
   @Test
   public void testStreamOf() {
-    assertThat(JRoutineStream.withStreamOf("test").immediate().close().all()).containsExactly(
+    assertThat(JRoutineStream.withStreamOf("test").immediate().call().all()).containsExactly(
         "test");
     assertThat(JRoutineStream.withStreamOf("test1", "test2", "test3")
                              .immediate()
-                             .close()
+                             .call()
                              .all()).containsExactly("test1", "test2", "test3");
     assertThat(JRoutineStream.withStreamOf(Arrays.asList("test1", "test2", "test3"))
                              .immediate()
-                             .close()
+                             .call()
                              .all()).containsExactly("test1", "test2", "test3");
     assertThat(
         JRoutineStream.withStreamOf(JRoutineCore.of("test1", "test2", "test3").buildChannel())
                       .immediate()
-                      .close()
+                      .call()
                       .all()).containsExactly("test1", "test2", "test3");
   }
 
   @Test
   public void testStreamOfAbort() {
-    Channel<String, String> channel = JRoutineStream.withStreamOf("test").immediate().call();
+    Channel<String, String> channel = JRoutineStream.withStreamOf("test").immediate().invoke();
     assertThat(channel.abort()).isTrue();
     assertThat(channel.getError()).isInstanceOf(AbortException.class);
-    channel = JRoutineStream.withStreamOf("test1", "test2", "test3").immediate().call();
+    channel = JRoutineStream.withStreamOf("test1", "test2", "test3").immediate().invoke();
     assertThat(channel.abort()).isTrue();
     assertThat(channel.getError()).isInstanceOf(AbortException.class);
     channel =
-        JRoutineStream.withStreamOf(Arrays.asList("test1", "test2", "test3")).immediate().call();
+        JRoutineStream.withStreamOf(Arrays.asList("test1", "test2", "test3")).immediate().invoke();
     assertThat(channel.abort()).isTrue();
     assertThat(channel.getError()).isInstanceOf(AbortException.class);
     channel = JRoutineStream.withStreamOf(JRoutineCore.of("test1", "test2", "test3").buildChannel())
                             .immediate()
-                            .call();
+                            .invoke();
     assertThat(channel.abort()).isTrue();
     assertThat(channel.getError()).isInstanceOf(AbortException.class);
   }
@@ -1577,7 +1581,7 @@ public class StreamBuilderTest {
     assertThat(JRoutineStream.withStreamOf(
         JRoutineCore.ofInputs().buildChannel().bind(new TemplateChannelConsumer<Object>() {}))
                              .immediate()
-                             .close()
+                             .call()
                              .getError()
                              .getCause()).isInstanceOf(IllegalStateException.class);
   }

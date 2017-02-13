@@ -313,7 +313,7 @@ public class RoutineMethodTest {
           public void onInput(final String input, @NotNull final Channel<Integer, ?> result) {
             result.pass(Integer.parseInt(input));
           }
-        }).call();
+        }).invoke();
     final Channel<Object, Object> outputChannel = JRoutineCore.ofInputs().buildChannel();
     new SumRoutine().call(channel, outputChannel);
     channel.pass("1", "2", "3", "4").close();

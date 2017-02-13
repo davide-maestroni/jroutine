@@ -68,7 +68,7 @@ public class ProviderAdapterFactoryTest {
       assertThat(factory2.isCalled()).isFalse();
       assertThat(defaultFactory.isCalled()).isFalse();
       factory1.setCalled(false);
-      service.streamRepos("octocat").close();
+      service.streamRepos("octocat").call();
       assertThat(factory1.isCalled()).isFalse();
       assertThat(factory2.isCalled()).isTrue();
       assertThat(defaultFactory.isCalled()).isFalse();
@@ -236,7 +236,7 @@ public class ProviderAdapterFactoryTest {
           final StreamBuilder<?, ?> builder =
               JRoutineStream.withStreamOf((Object) Collections.emptyList());
           if (((ParameterizedType) returnType).getRawType() == Channel.class) {
-            return builder.close();
+            return builder.call();
           }
 
           return builder;

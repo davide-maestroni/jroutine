@@ -350,7 +350,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
                     .withRunner(Runners.syncRunner())
                     .apply()
                     .buildRoutine();
-    routine.call().abort(reason);
+    routine.invoke().abort(reason);
     routine.clear();
   }
 

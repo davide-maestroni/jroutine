@@ -364,7 +364,7 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
 
     @Override
     public void onRestart() {
-      mChannel = mRoutine.call();
+      mChannel = mRoutine.invoke();
     }
   }
 
@@ -434,7 +434,7 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
 
     @Override
     public void onRestart() {
-      mChannel = mRoutine.call();
+      mChannel = mRoutine.invoke();
     }
 
     @Override

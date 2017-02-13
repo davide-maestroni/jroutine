@@ -118,20 +118,20 @@ public class SparseChannelsCompatTest extends ActivityInstrumentationTestCase2<T
                             .buildRoutine();
     SparseArrayCompat<? extends Channel<Object, ?>> channelMap;
     Channel<ParcelableFlow<Object>, ParcelableFlow<Object>> channel;
-    channel = routine.call();
+    channel = routine.invoke();
     channelMap =
         SparseChannelsCompat.parcelableFlowInput(channel, Arrays.asList(Sort.INTEGER, Sort.STRING))
                             .buildChannelArray();
     channelMap.get(Sort.INTEGER).pass(-11).close();
     channelMap.get(Sort.STRING).pass("test21").close();
     assertThat(channel.close().in(seconds(10)).all()).containsOnlyElementsOf(outputs);
-    channel = routine.call();
+    channel = routine.invoke();
     channelMap = SparseChannelsCompat.parcelableFlowInput(channel, Sort.INTEGER, Sort.STRING)
                                      .buildChannelArray();
     channelMap.get(Sort.INTEGER).pass(-11).close();
     channelMap.get(Sort.STRING).pass("test21").close();
     assertThat(channel.close().in(seconds(10)).all()).containsOnlyElementsOf(outputs);
-    channel = routine.call();
+    channel = routine.invoke();
     channelMap =
         SparseChannelsCompat.parcelableFlowInput(Math.min(Sort.INTEGER, Sort.STRING), 2, channel)
                             .buildChannelArray();
@@ -148,7 +148,7 @@ public class SparseChannelsCompatTest extends ActivityInstrumentationTestCase2<T
                             .buildRoutine();
     SparseArrayCompat<? extends Channel<Object, ?>> channelMap;
     Channel<ParcelableFlow<Object>, ParcelableFlow<Object>> channel;
-    channel = routine.call();
+    channel = routine.invoke();
     channelMap =
         SparseChannelsCompat.parcelableFlowInput(channel, Arrays.asList(Sort.INTEGER, Sort.STRING))
                             .buildChannelArray();
@@ -165,7 +165,7 @@ public class SparseChannelsCompatTest extends ActivityInstrumentationTestCase2<T
 
     }
 
-    channel = routine.call();
+    channel = routine.invoke();
     channelMap = SparseChannelsCompat.parcelableFlowInput(channel, Sort.INTEGER, Sort.STRING)
                                      .buildChannelArray();
     channelMap.get(Sort.INTEGER).abort();
@@ -181,7 +181,7 @@ public class SparseChannelsCompatTest extends ActivityInstrumentationTestCase2<T
 
     }
 
-    channel = routine.call();
+    channel = routine.invoke();
     channelMap =
         SparseChannelsCompat.parcelableFlowInput(Math.min(Sort.INTEGER, Sort.STRING), 2, channel)
                             .buildChannelArray();
@@ -204,7 +204,7 @@ public class SparseChannelsCompatTest extends ActivityInstrumentationTestCase2<T
     try {
 
       SparseChannelsCompat.parcelableFlowOutput(0, 0,
-          JRoutineLoaderCompat.on(loaderFrom(getActivity())).with(factoryOf(Sort.class)).call());
+          JRoutineLoaderCompat.on(loaderFrom(getActivity())).with(factoryOf(Sort.class)).invoke());
 
       fail();
 
@@ -317,12 +317,12 @@ public class SparseChannelsCompatTest extends ActivityInstrumentationTestCase2<T
     final Channel<String, String> channel1 = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                                                                  .with(
                                                                      factoryOf(PassingString.class))
-                                                                 .call()
+                                                                 .invoke()
                                                                  .sorted();
     final Channel<Integer, Integer> channel2 = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                                                                    .with(factoryOf(
                                                                        PassingInteger.class))
-                                                                   .call()
+                                                                   .invoke()
                                                                    .sorted();
     SparseChannelsCompat.mergeInput(channel1, channel2)
                         .buildChannel()
@@ -363,11 +363,11 @@ public class SparseChannelsCompatTest extends ActivityInstrumentationTestCase2<T
     Channel<Integer, Integer> channel2;
     channel1 = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                                    .with(factoryOf(PassingString.class))
-                                   .call()
+                                   .invoke()
                                    .sorted();
     channel2 = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                                    .with(factoryOf(PassingInteger.class))
-                                   .call()
+                                   .invoke()
                                    .sorted();
     SparseChannelsCompat.mergeInput(channel1, channel2).buildChannel().abort();
 
@@ -393,11 +393,11 @@ public class SparseChannelsCompatTest extends ActivityInstrumentationTestCase2<T
 
     channel1 = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                                    .with(factoryOf(PassingString.class))
-                                   .call()
+                                   .invoke()
                                    .sorted();
     channel2 = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                                    .with(factoryOf(PassingInteger.class))
-                                   .call()
+                                   .invoke()
                                    .sorted();
     SparseChannelsCompat.mergeInput(3, channel1, channel2).buildChannel().abort();
 
@@ -423,11 +423,11 @@ public class SparseChannelsCompatTest extends ActivityInstrumentationTestCase2<T
 
     channel1 = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                                    .with(factoryOf(PassingString.class))
-                                   .call()
+                                   .invoke()
                                    .sorted();
     channel2 = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                                    .with(factoryOf(PassingInteger.class))
-                                   .call()
+                                   .invoke()
                                    .sorted();
     SparseChannelsCompat.mergeInput(Arrays.<Channel<?, ?>>asList(channel1, channel2))
                         .buildChannel()
@@ -455,11 +455,11 @@ public class SparseChannelsCompatTest extends ActivityInstrumentationTestCase2<T
 
     channel1 = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                                    .with(factoryOf(PassingString.class))
-                                   .call()
+                                   .invoke()
                                    .sorted();
     channel2 = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                                    .with(factoryOf(PassingInteger.class))
-                                   .call()
+                                   .invoke()
                                    .sorted();
     SparseChannelsCompat.mergeInput(-5, Arrays.<Channel<?, ?>>asList(channel1, channel2))
                         .buildChannel()
@@ -487,11 +487,11 @@ public class SparseChannelsCompatTest extends ActivityInstrumentationTestCase2<T
 
     channel1 = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                                    .with(factoryOf(PassingString.class))
-                                   .call()
+                                   .invoke()
                                    .sorted();
     channel2 = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                                    .with(factoryOf(PassingInteger.class))
-                                   .call()
+                                   .invoke()
                                    .sorted();
     final SparseArrayCompat<Channel<?, ?>> map = new SparseArrayCompat<Channel<?, ?>>(2);
     map.put(31, channel1);
@@ -612,7 +612,7 @@ public class SparseChannelsCompatTest extends ActivityInstrumentationTestCase2<T
                             .buildRoutine();
     SparseArrayCompat<? extends Channel<?, Object>> channelMap;
     Channel<?, ParcelableFlow<Object>> channel;
-    channel = routine.call()
+    channel = routine.invoke()
                      .after(millis(100))
                      .pass(new ParcelableFlow<Object>(Sort.STRING, "test21"),
                          new ParcelableFlow<Object>(Sort.INTEGER, -11));
@@ -641,7 +641,7 @@ public class SparseChannelsCompatTest extends ActivityInstrumentationTestCase2<T
 
     }
 
-    channel = routine.call()
+    channel = routine.invoke()
                      .after(millis(100))
                      .pass(new ParcelableFlow<Object>(Sort.INTEGER, -11),
                          new ParcelableFlow<Object>(Sort.STRING, "test21"));
@@ -669,7 +669,7 @@ public class SparseChannelsCompatTest extends ActivityInstrumentationTestCase2<T
 
     }
 
-    channel = routine.call()
+    channel = routine.invoke()
                      .after(millis(100))
                      .pass(new ParcelableFlow<Object>(Sort.STRING, "test21"),
                          new ParcelableFlow<Object>(Sort.INTEGER, -11));
@@ -705,7 +705,7 @@ public class SparseChannelsCompatTest extends ActivityInstrumentationTestCase2<T
         JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                             .with(factoryOf(Sort.class))
                             .buildRoutine();
-    final Channel<?, ParcelableFlow<Object>> channel = routine.call();
+    final Channel<?, ParcelableFlow<Object>> channel = routine.invoke();
     final SparseArrayCompat<? extends Channel<?, Object>> channelMap =
         SparseChannelsCompat.parcelableFlowOutput(channel, Arrays.asList(Sort.INTEGER, Sort.STRING))
                             .buildChannelArray();
@@ -719,7 +719,7 @@ public class SparseChannelsCompatTest extends ActivityInstrumentationTestCase2<T
     try {
 
       SparseChannelsCompat.parcelableFlowOutput(0, 0,
-          JRoutineLoaderCompat.on(loaderFrom(getActivity())).with(factoryOf(Sort.class)).call());
+          JRoutineLoaderCompat.on(loaderFrom(getActivity())).with(factoryOf(Sort.class)).invoke());
 
       fail();
 

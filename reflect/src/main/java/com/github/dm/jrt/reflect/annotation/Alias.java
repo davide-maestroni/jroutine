@@ -41,7 +41,7 @@ import java.lang.annotation.Target;
  * allows to asynchronously call the method independently from its original name like:
  * <pre><code>
  * final MyClass myInstance = new MyClass();
- * JRoutineReflection.with(instance(myInstance)).method(MyClass.METHOD_NAME).call();
+ * JRoutineReflection.with(instance(myInstance)).method(MyClass.METHOD_NAME).invoke();
  * </code></pre>
  * <p>
  * The same considerations apply to static class methods.

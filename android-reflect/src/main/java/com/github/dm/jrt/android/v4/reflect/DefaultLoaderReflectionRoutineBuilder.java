@@ -293,7 +293,7 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
 
     @Override
     public void onRestart() {
-      mChannel = mRoutine.call();
+      mChannel = mRoutine.invoke();
     }
 
     @Override
@@ -403,7 +403,7 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
 
     @Override
     public void onRestart() {
-      mChannel = mRoutine.call();
+      mChannel = mRoutine.invoke();
     }
 
     @Override

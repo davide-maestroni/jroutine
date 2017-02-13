@@ -78,7 +78,7 @@ import java.util.Collections;
  * <p>
  * Or, in an equivalent way:
  * <pre><code>
- * routine1.close().bind(routine2.call()).close().in(seconds(20)).all();
+ * routine1.close().bind(routine2.invoke()).close().in(seconds(20)).all();
  * </code></pre>
  * <p>
  * <b>Example 4:</b> Asynchronously feed a routine from a different thread.
@@ -86,7 +86,7 @@ import java.util.Collections;
  * final Routine&lt;Result, Result&gt; routine =
  *     JRoutineCore.with(IdentityInvocation.&lt;Result&gt;factoryOf())
  *                 .buildRoutine();
- * final Channel&lt;Result, Result&gt; channel = routine.call();
+ * final Channel&lt;Result, Result&gt; channel = routine.invoke();
  *
  * new Thread() {
  *

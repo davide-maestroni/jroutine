@@ -114,18 +114,6 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
     mLogger = logger.subContextLogger(this);
   }
 
-  @NotNull
-  public Channel<IN, OUT> call() {
-    mLogger.dbg("invoking routine: %s", InvocationMode.ASYNC);
-    return invoke();
-  }
-
-  @NotNull
-  public Channel<IN, OUT> callParallel() {
-    mLogger.dbg("invoking routine: %s", InvocationMode.PARALLEL);
-    return getElementRoutine().call();
-  }
-
   @Override
   public void clear() {
     synchronized (mMutex) {
@@ -136,6 +124,18 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
 
       asyncInvocations.clear();
     }
+  }
+
+  @NotNull
+  public Channel<IN, OUT> invoke() {
+    mLogger.dbg("invoking routine: %s", InvocationMode.ASYNC);
+    return invokeRoutine();
+  }
+
+  @NotNull
+  public Channel<IN, OUT> invokeParallel() {
+    mLogger.dbg("invoking routine: %s", InvocationMode.PARALLEL);
+    return getElementRoutine().invoke();
   }
 
   /**
@@ -194,7 +194,7 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
   }
 
   @NotNull
-  private Channel<IN, OUT> invoke() {
+  private Channel<IN, OUT> invokeRoutine() {
     final SingleExecutionRunner runner = new SingleExecutionRunner(mRunner);
     return new InvocationChannel<IN, OUT>(mConfiguration, new DefaultInvocationManager(runner),
         runner, mLogger);
@@ -224,7 +224,7 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
     @Override
     public void onComplete(@NotNull final Channel<OUT, ?> result) {
       if (!mHasInputs) {
-        final Channel<IN, OUT> channel = mRoutine.call();
+        final Channel<IN, OUT> channel = mRoutine.invoke();
         channel.bind(result);
         channel.close();
       }
@@ -233,7 +233,7 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
     @Override
     public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) {
       mHasInputs = true;
-      final Channel<IN, OUT> channel = mRoutine.call();
+      final Channel<IN, OUT> channel = mRoutine.invoke();
       channel.bind(result);
       channel.pass(input).close();
     }

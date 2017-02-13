@@ -249,7 +249,7 @@ public class OperatorsTest {
 
   @Test
   public void testAverage() {
-    assertThat(JRoutineCore.with(Operators.average()).close().in(seconds(3)).next()).isEqualTo(0);
+    assertThat(JRoutineCore.with(Operators.average()).call().in(seconds(3)).next()).isEqualTo(0);
     assertThat(JRoutineCore.with(Operators.average())
                            .call(1L, 2L, 3L, 4L)
                            .in(seconds(3))
@@ -299,7 +299,7 @@ public class OperatorsTest {
   @Test
   public void testAverageByte() {
     assertThat(
-        JRoutineCore.with(Operators.average(Byte.class)).close().in(seconds(3)).next()).isEqualTo(
+        JRoutineCore.with(Operators.average(Byte.class)).call().in(seconds(3)).next()).isEqualTo(
         (byte) 0);
     assertThat(
         JRoutineCore.with(Operators.average(Byte.class)).call(1L, 2L, 3L, 4L).in(seconds(3)).next())
@@ -334,7 +334,7 @@ public class OperatorsTest {
                            .in(seconds(3))
                            .next()).isEqualTo((byte) 2);
     assertThat(JRoutineCore.with(Operators.average(Integer.class, Byte.class))
-                           .close()
+                           .call()
                            .in(seconds(3))
                            .next()).isEqualTo((byte) 0);
     assertThat(JRoutineCore.with(Operators.average(Float.class, Byte.class))
@@ -346,7 +346,7 @@ public class OperatorsTest {
   @Test
   public void testAverageDouble() {
     assertThat(
-        JRoutineCore.with(Operators.average(Double.class)).close().in(seconds(3)).next()).isEqualTo(
+        JRoutineCore.with(Operators.average(Double.class)).call().in(seconds(3)).next()).isEqualTo(
         0d);
     assertThat(JRoutineCore.with(Operators.average(Double.class))
                            .call(1L, 2L, 3L, 4L)
@@ -383,7 +383,7 @@ public class OperatorsTest {
                            .in(seconds(3))
                            .next()).isEqualTo(2.5);
     assertThat(JRoutineCore.with(Operators.average(Integer.class, Double.class))
-                           .close()
+                           .call()
                            .in(seconds(3))
                            .next()).isEqualTo(0d);
     assertThat(JRoutineCore.with(Operators.average(Long.class, Double.class))
@@ -395,7 +395,7 @@ public class OperatorsTest {
   @Test
   public void testAverageFloat() {
     assertThat(
-        JRoutineCore.with(Operators.average(Float.class)).close().in(seconds(3)).next()).isEqualTo(
+        JRoutineCore.with(Operators.average(Float.class)).call().in(seconds(3)).next()).isEqualTo(
         0f);
     assertThat(JRoutineCore.with(Operators.average(Float.class))
                            .call(1L, 2L, 3L, 4L)
@@ -431,10 +431,9 @@ public class OperatorsTest {
                                new BigDecimal(4))
                            .in(seconds(3))
                            .next()).isEqualTo(2.5f);
-    assertThat(JRoutineCore.with(Operators.average(Short.class, Float.class))
-                           .close()
-                           .in(seconds(3))
-                           .next()).isEqualTo(0f);
+    assertThat(
+        JRoutineCore.with(Operators.average(Short.class, Float.class)).call().in(seconds(3)).next())
+        .isEqualTo(0f);
     assertThat(JRoutineCore.with(Operators.average(Double.class, Float.class))
                            .call(1L, 2L, 3L, 4L)
                            .in(seconds(3))
@@ -443,10 +442,9 @@ public class OperatorsTest {
 
   @Test
   public void testAverageInteger() {
-    assertThat(JRoutineCore.with(Operators.average(Integer.class))
-                           .close()
-                           .in(seconds(3))
-                           .next()).isEqualTo(0);
+    assertThat(
+        JRoutineCore.with(Operators.average(Integer.class)).call().in(seconds(3)).next()).isEqualTo(
+        0);
     assertThat(JRoutineCore.with(Operators.average(Integer.class))
                            .call(1L, 2L, 3L, 4L)
                            .in(seconds(3))
@@ -482,7 +480,7 @@ public class OperatorsTest {
                            .in(seconds(3))
                            .next()).isEqualTo(2);
     assertThat(JRoutineCore.with(Operators.average(Float.class, Integer.class))
-                           .close()
+                           .call()
                            .in(seconds(3))
                            .next()).isEqualTo(0);
     assertThat(JRoutineCore.with(Operators.average(Byte.class, Integer.class))
@@ -494,7 +492,7 @@ public class OperatorsTest {
   @Test
   public void testAverageLong() {
     assertThat(
-        JRoutineCore.with(Operators.average(Long.class)).close().in(seconds(3)).next()).isEqualTo(
+        JRoutineCore.with(Operators.average(Long.class)).call().in(seconds(3)).next()).isEqualTo(
         0L);
     assertThat(
         JRoutineCore.with(Operators.average(Long.class)).call(1L, 2L, 3L, 4L).in(seconds(3)).next())
@@ -529,7 +527,7 @@ public class OperatorsTest {
                            .in(seconds(3))
                            .next()).isEqualTo(2L);
     assertThat(JRoutineCore.with(Operators.average(BigDecimal.class, Long.class))
-                           .close()
+                           .call()
                            .in(seconds(3))
                            .next()).isEqualTo(0L);
     assertThat(JRoutineCore.with(Operators.average(BigInteger.class, Long.class))
@@ -541,7 +539,7 @@ public class OperatorsTest {
   @Test
   public void testAverageShort() {
     assertThat(
-        JRoutineCore.with(Operators.average(Short.class)).close().in(seconds(3)).next()).isEqualTo(
+        JRoutineCore.with(Operators.average(Short.class)).call().in(seconds(3)).next()).isEqualTo(
         (short) 0);
     assertThat(JRoutineCore.with(Operators.average(Short.class))
                            .call(1L, 2L, 3L, 4L)
@@ -577,10 +575,9 @@ public class OperatorsTest {
                                new BigDecimal(4))
                            .in(seconds(3))
                            .next()).isEqualTo((short) 2);
-    assertThat(JRoutineCore.with(Operators.average(Short.class, Short.class))
-                           .close()
-                           .in(seconds(3))
-                           .next()).isEqualTo((short) 0);
+    assertThat(
+        JRoutineCore.with(Operators.average(Short.class, Short.class)).call().in(seconds(3)).next())
+        .isEqualTo((short) 0);
     assertThat(JRoutineCore.with(Operators.average(Short.class, Short.class))
                            .call(1L, 2L, 3L, 4L)
                            .in(seconds(3))
@@ -659,7 +656,7 @@ public class OperatorsTest {
       public List<String> get() {
         return new ArrayList<String>();
       }
-    })).close().in(seconds(3)).next()).isEmpty();
+    })).call().in(seconds(3)).next()).isEmpty();
     assertThat(JRoutineCore.with(collectInto(new Supplier<List<String>>() {
 
       public List<String> get() {
@@ -669,7 +666,7 @@ public class OperatorsTest {
                            .invocationConfiguration()
                            .withRunner(Runners.syncRunner())
                            .apply()
-                           .close()
+                           .call()
                            .in(seconds(3))
                            .next()).isEmpty();
   }
@@ -738,7 +735,7 @@ public class OperatorsTest {
       public void accept(final StringBuilder b, final String s) {
         b.append(s);
       }
-    })).close().in(seconds(3)).next().toString()).isEqualTo("");
+    })).call().in(seconds(3)).next().toString()).isEqualTo("");
     assertThat(JRoutineCore.with(collect(new Supplier<List<Object>>() {
 
       public List<Object> get() {
@@ -749,7 +746,7 @@ public class OperatorsTest {
       public void accept(final List<Object> l, final Object o) {
         l.add(o);
       }
-    })).close().in(seconds(3)).next()).isEmpty();
+    })).call().in(seconds(3)).next()).isEmpty();
   }
 
   @Test
@@ -782,7 +779,7 @@ public class OperatorsTest {
                            .call(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
                            .in(seconds(3))
                            .next()).isEqualTo(10);
-    assertThat(JRoutineCore.with(Operators.count()).close().in(seconds(3)).next()).isEqualTo(0);
+    assertThat(JRoutineCore.with(Operators.count()).call().in(seconds(3)).next()).isEqualTo(0);
   }
 
   @Test
@@ -839,7 +836,7 @@ public class OperatorsTest {
                            .call("test", "test1", "test")
                            .in(seconds(3))
                            .all()).containsExactly("test", "test");
-    assertThat(JRoutineCore.with(Operators.isEqualTo(0)).close().in(seconds(3)).all()).isEmpty();
+    assertThat(JRoutineCore.with(Operators.isEqualTo(0)).call().in(seconds(3)).all()).isEmpty();
     assertThat(Operators.isEqualTo("test")).isEqualTo(Operators.isEqualTo("test"));
     assertThat(Operators.isEqualTo(null)).isEqualTo(Operators.isEqualTo(null));
   }
@@ -1023,8 +1020,10 @@ public class OperatorsTest {
                            .call(3, "test")
                            .in(seconds(3))
                            .all()).containsExactly("test");
-    assertThat(JRoutineCore.with(Operators.isInstanceOf(Number.class)).close().in(seconds(3)).all())
-        .isEmpty();
+    assertThat(JRoutineCore.with(Operators.isInstanceOf(Number.class))
+                           .call()
+                           .in(seconds(3))
+                           .all()).isEmpty();
     assertThat(Operators.isInstanceOf(String.class)).isEqualTo(
         Operators.isInstanceOf(String.class));
     try {
@@ -1143,9 +1142,9 @@ public class OperatorsTest {
                            .call("Z TEST", "test")
                            .in(seconds(3))
                            .next()).isEqualTo("Z TEST");
-    assertThat(JRoutineCore.with(Operators.<Integer>max()).close().in(seconds(3)).all()).isEmpty();
+    assertThat(JRoutineCore.with(Operators.<Integer>max()).call().in(seconds(3)).all()).isEmpty();
     assertThat(JRoutineCore.with(Operators.maxBy(String.CASE_INSENSITIVE_ORDER))
-                           .close()
+                           .call()
                            .in(seconds(3))
                            .all()).isEmpty();
     assertThat(Operators.maxBy(Collections.reverseOrder())).isEqualTo(
@@ -1169,9 +1168,9 @@ public class OperatorsTest {
                            .call("Z TEST", "test")
                            .in(seconds(3))
                            .next()).isEqualTo("test");
-    assertThat(JRoutineCore.with(Operators.<Integer>min()).close().in(seconds(3)).all()).isEmpty();
+    assertThat(JRoutineCore.with(Operators.<Integer>min()).call().in(seconds(3)).all()).isEmpty();
     assertThat(JRoutineCore.with(Operators.minBy(String.CASE_INSENSITIVE_ORDER))
-                           .close()
+                           .call()
                            .in(seconds(3))
                            .all()).isEmpty();
     assertThat(Operators.minBy(Collections.reverseOrder())).isEqualTo(
@@ -1188,7 +1187,7 @@ public class OperatorsTest {
   public void testNone() {
     assertThat(
         JRoutineCore.with(Operators.none()).call("test1", null, 3).in(seconds(3)).all()).isEmpty();
-    assertThat(JRoutineCore.with(Operators.none()).close().in(seconds(3)).all()).isEmpty();
+    assertThat(JRoutineCore.with(Operators.none()).call().in(seconds(3)).all()).isEmpty();
   }
 
   @Test
@@ -1241,7 +1240,7 @@ public class OperatorsTest {
                            .call("test", "test1", "test")
                            .in(seconds(3))
                            .all()).containsExactly("test1");
-    assertThat(JRoutineCore.with(Operators.isNotEqualTo(0)).close().in(seconds(3)).all()).isEmpty();
+    assertThat(JRoutineCore.with(Operators.isNotEqualTo(0)).call().in(seconds(3)).all()).isEmpty();
     assertThat(Operators.isNotEqualTo("test")).isEqualTo(Operators.isNotEqualTo("test"));
     assertThat(Operators.isNotEqualTo(null)).isEqualTo(Operators.isNotEqualTo(null));
   }
@@ -1254,7 +1253,7 @@ public class OperatorsTest {
                            .in(seconds(3))
                            .all()).containsExactly(3);
     assertThat(JRoutineCore.with(Operators.isNotInstanceOf(Number.class))
-                           .close()
+                           .call()
                            .in(seconds(3))
                            .all()).isEmpty();
     assertThat(Operators.isNotInstanceOf(String.class)).isEqualTo(
@@ -1274,7 +1273,7 @@ public class OperatorsTest {
                            .call("test", "test1", ref)
                            .in(seconds(3))
                            .all()).containsExactly("test", "test1");
-    assertThat(JRoutineCore.with(Operators.isNotSameAs(0)).close().in(seconds(3)).all()).isEmpty();
+    assertThat(JRoutineCore.with(Operators.isNotSameAs(0)).call().in(seconds(3)).all()).isEmpty();
     assertThat(Operators.isNotSameAs(ref)).isNotSameAs(Operators.isEqualTo(ref));
     assertThat(Operators.isNotSameAs(null)).isNotSameAs(Operators.isEqualTo(null));
   }
@@ -1314,7 +1313,7 @@ public class OperatorsTest {
       public void accept(final Channel<String, ?> result) {
         result.pass("est");
       }
-    })).close().in(seconds(3)).all()).containsExactly("est", "est");
+    })).call().in(seconds(3)).all()).containsExactly("est", "est");
     assertThat(JRoutineCore.with(orElseGet(new Supplier<String>() {
 
       public String get() {
@@ -1326,7 +1325,7 @@ public class OperatorsTest {
       public String get() {
         return "est";
       }
-    })).close().in(seconds(3)).all()).containsExactly("est", "est");
+    })).call().in(seconds(3)).all()).containsExactly("est", "est");
     assertThat(JRoutineCore.with(orElse("est"))
                            .invocationConfiguration()
                            .withRunner(Runners.syncRunner())
@@ -1369,7 +1368,7 @@ public class OperatorsTest {
                            .invocationConfiguration()
                            .withRunner(Runners.syncRunner())
                            .apply()
-                           .close()
+                           .call()
                            .in(seconds(3))
                            .all()).containsExactly("est", "est");
     assertThat(JRoutineCore.with(orElseGet(new Supplier<String>() {
@@ -1393,7 +1392,7 @@ public class OperatorsTest {
                            .invocationConfiguration()
                            .withRunner(Runners.syncRunner())
                            .apply()
-                           .close()
+                           .call()
                            .in(seconds(3))
                            .all()).containsExactly("est", "est");
   }
@@ -1438,7 +1437,7 @@ public class OperatorsTest {
                            .in(seconds(3))
                            .all()).containsExactly("test");
     assertThat(JRoutineCore.with(orElseThrow(new IllegalStateException()))
-                           .close()
+                           .call()
                            .in(seconds(3))
                            .getError()
                            .getCause()).isExactlyInstanceOf(IllegalStateException.class);
@@ -1461,7 +1460,7 @@ public class OperatorsTest {
       public void perform() {
         isComplete.set(true);
       }
-    })).call();
+    })).invoke();
     channel.abort(new NoSuchElementException());
     assertThat(channel.in(seconds(3)).getError()).isExactlyInstanceOf(AbortException.class);
     assertThat(isComplete.get()).isFalse();
@@ -1476,7 +1475,7 @@ public class OperatorsTest {
           public void accept(final RoutineException e) {
             isError.set(true);
           }
-        })).call();
+        })).invoke();
     assertThat(channel.abort()).isTrue();
     assertThat(channel.in(seconds(3)).getError()).isExactlyInstanceOf(AbortException.class);
     assertThat(isError.get()).isTrue();
@@ -1799,7 +1798,7 @@ public class OperatorsTest {
                            .call("test", "test1", ref)
                            .in(seconds(3))
                            .all()).containsExactly(ref);
-    assertThat(JRoutineCore.with(Operators.isSameAs(0)).close().in(seconds(3)).all()).isEmpty();
+    assertThat(JRoutineCore.with(Operators.isSameAs(0)).call().in(seconds(3)).all()).isEmpty();
     assertThat(Operators.isSameAs(ref)).isEqualTo(Operators.isSameAs(ref));
     assertThat(Operators.isSameAs(null)).isEqualTo(Operators.isSameAs(null));
   }
@@ -1894,7 +1893,7 @@ public class OperatorsTest {
 
   @Test
   public void testSum() {
-    assertThat(JRoutineCore.with(Operators.sum()).close().in(seconds(3)).next()).isEqualTo(0);
+    assertThat(JRoutineCore.with(Operators.sum()).call().in(seconds(3)).next()).isEqualTo(0);
     assertThat(JRoutineCore.with(Operators.sum()).call(1, 2, 3, 4).in(seconds(3)).next()).isEqualTo(
         10);
   }
@@ -1909,8 +1908,7 @@ public class OperatorsTest {
 
   @Test
   public void testSumByte() {
-    assertThat(
-        JRoutineCore.with(Operators.sum(Byte.class)).close().in(seconds(3)).next()).isEqualTo(
+    assertThat(JRoutineCore.with(Operators.sum(Byte.class)).call().in(seconds(3)).next()).isEqualTo(
         (byte) 0);
     assertThat(JRoutineCore.with(Operators.sum(Byte.class))
                            .call(1, 2, 3, 4)
@@ -1921,7 +1919,7 @@ public class OperatorsTest {
   @Test
   public void testSumDouble() {
     assertThat(
-        JRoutineCore.with(Operators.sum(Double.class)).close().in(seconds(3)).next()).isEqualTo(0d);
+        JRoutineCore.with(Operators.sum(Double.class)).call().in(seconds(3)).next()).isEqualTo(0d);
     assertThat(JRoutineCore.with(Operators.sum(Double.class))
                            .call(1, 2, 3, 4)
                            .in(seconds(3))
@@ -1931,7 +1929,7 @@ public class OperatorsTest {
   @Test
   public void testSumFloat() {
     assertThat(
-        JRoutineCore.with(Operators.sum(Float.class)).close().in(seconds(3)).next()).isEqualTo(0f);
+        JRoutineCore.with(Operators.sum(Float.class)).call().in(seconds(3)).next()).isEqualTo(0f);
     assertThat(JRoutineCore.with(Operators.sum(Float.class)).call(1, 2, 3, 4).in(seconds(3)).next())
         .isEqualTo(10f);
   }
@@ -1939,7 +1937,7 @@ public class OperatorsTest {
   @Test
   public void testSumInteger() {
     assertThat(
-        JRoutineCore.with(Operators.sum(Integer.class)).close().in(seconds(3)).next()).isEqualTo(0);
+        JRoutineCore.with(Operators.sum(Integer.class)).call().in(seconds(3)).next()).isEqualTo(0);
     assertThat(JRoutineCore.with(Operators.sum(Integer.class))
                            .call(1, 2, 3, 4)
                            .in(seconds(3))
@@ -1948,8 +1946,8 @@ public class OperatorsTest {
 
   @Test
   public void testSumLong() {
-    assertThat(
-        JRoutineCore.with(Operators.sum(Long.class)).close().in(seconds(3)).next()).isEqualTo(0L);
+    assertThat(JRoutineCore.with(Operators.sum(Long.class)).call().in(seconds(3)).next()).isEqualTo(
+        0L);
     assertThat(JRoutineCore.with(Operators.sum(Long.class))
                            .call(1, 2, 3, 4)
                            .in(seconds(3))
@@ -1959,7 +1957,7 @@ public class OperatorsTest {
   @Test
   public void testSumShort() {
     assertThat(
-        JRoutineCore.with(Operators.sum(Short.class)).close().in(seconds(3)).next()).isEqualTo(
+        JRoutineCore.with(Operators.sum(Short.class)).call().in(seconds(3)).next()).isEqualTo(
         (short) 0);
     assertThat(JRoutineCore.with(Operators.sum(Short.class)).call(1, 2, 3, 4).in(seconds(3)).next())
         .isEqualTo((short) 10);
@@ -2167,7 +2165,7 @@ public class OperatorsTest {
   public void testUnfold() {
     assertThat(JRoutineCore.with(Operators.<Number>groupBy(3))
                            .call(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-                           .bind(JRoutineCore.with(Operators.<Number>unfold()).callParallel())
+                           .bind(JRoutineCore.with(Operators.<Number>unfold()).invokeParallel())
                            .close()
                            .in(seconds(3))
                            .all()).containsOnly(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);

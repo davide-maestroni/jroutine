@@ -424,18 +424,18 @@ public class ChannelsTest {
         JRoutineCore.with(new Sort()).buildRoutine();
     Map<Integer, ? extends Channel<Object, ?>> channelMap;
     Channel<Flow<Object>, Flow<Object>> channel;
-    channel = routine.call();
+    channel = routine.invoke();
     channelMap =
         Channels.flowInput(channel, Arrays.asList(Sort.INTEGER, Sort.STRING)).buildChannelMap();
     channelMap.get(Sort.INTEGER).pass(-11).close();
     channelMap.get(Sort.STRING).pass("test21").close();
     assertThat(channel.close().in(seconds(10)).all()).containsOnlyElementsOf(outputs);
-    channel = routine.call();
+    channel = routine.invoke();
     channelMap = Channels.flowInput(channel, Sort.INTEGER, Sort.STRING).buildChannelMap();
     channelMap.get(Sort.INTEGER).pass(-11).close();
     channelMap.get(Sort.STRING).pass("test21").close();
     assertThat(channel.close().in(seconds(10)).all()).containsOnlyElementsOf(outputs);
-    channel = routine.call();
+    channel = routine.invoke();
     channelMap =
         Channels.flowInput(Math.min(Sort.INTEGER, Sort.STRING), 2, channel).buildChannelMap();
     channelMap.get(Sort.INTEGER).pass(-11).close();
@@ -450,7 +450,7 @@ public class ChannelsTest {
         JRoutineCore.with(new Sort()).buildRoutine();
     Map<Integer, ? extends Channel<Object, ?>> channelMap;
     Channel<Flow<Object>, Flow<Object>> channel;
-    channel = routine.call();
+    channel = routine.invoke();
     channelMap =
         Channels.flowInput(channel, Arrays.asList(Sort.INTEGER, Sort.STRING)).buildChannelMap();
     channelMap.get(Sort.INTEGER).pass(-11).close();
@@ -466,7 +466,7 @@ public class ChannelsTest {
 
     }
 
-    channel = routine.call();
+    channel = routine.invoke();
     channelMap = Channels.flowInput(channel, Sort.INTEGER, Sort.STRING).buildChannelMap();
     channelMap.get(Sort.INTEGER).abort();
     channelMap.get(Sort.STRING).pass("test21").close();
@@ -481,7 +481,7 @@ public class ChannelsTest {
 
     }
 
-    channel = routine.call();
+    channel = routine.invoke();
     channelMap =
         Channels.flowInput(Math.min(Sort.INTEGER, Sort.STRING), 2, channel).buildChannelMap();
     channelMap.get(Sort.INTEGER).abort();
@@ -502,7 +502,7 @@ public class ChannelsTest {
   public void testInputMapError() {
 
     try {
-      Channels.flowInput(0, 0, JRoutineCore.with(new Sort()).call());
+      Channels.flowInput(0, 0, JRoutineCore.with(new Sort()).invoke());
       fail();
 
     } catch (final IllegalArgumentException ignored) {
@@ -718,9 +718,9 @@ public class ChannelsTest {
   public void testJoinInput() {
 
     final Channel<String, String> channel1 =
-        JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
+        JRoutineCore.with(IdentityInvocation.<String>factoryOf()).invoke().sorted();
     final Channel<String, String> channel2 =
-        JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
+        JRoutineCore.with(IdentityInvocation.<String>factoryOf()).invoke().sorted();
     Channels.joinInput(channel1, channel2)
             .buildChannel()
             .pass(Arrays.asList("test1-1", "test1-2"))
@@ -743,8 +743,8 @@ public class ChannelsTest {
 
     Channel<String, String> channel1;
     Channel<String, String> channel2;
-    channel1 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
-    channel2 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
+    channel1 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).invoke().sorted();
+    channel2 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).invoke().sorted();
     Channels.joinInput(channel1, channel2).buildChannel().abort();
 
     try {
@@ -767,8 +767,8 @@ public class ChannelsTest {
 
     }
 
-    channel1 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
-    channel2 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
+    channel1 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).invoke().sorted();
+    channel2 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).invoke().sorted();
     Channels.joinInput(Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannel().abort();
 
     try {
@@ -796,7 +796,7 @@ public class ChannelsTest {
   public void testJoinInputError() {
 
     final Channel<String, String> channel1 =
-        JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
+        JRoutineCore.with(IdentityInvocation.<String>factoryOf()).invoke().sorted();
     Channels.joinInput(channel1).buildChannel().pass(Arrays.asList("test1-1", "test1-2")).close();
 
     try {
@@ -854,7 +854,7 @@ public class ChannelsTest {
   public void testJoinInputPlaceHolderError() {
 
     final Channel<String, String> channel1 =
-        JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
+        JRoutineCore.with(IdentityInvocation.<String>factoryOf()).invoke().sorted();
     Channels.joinInput((Object) null, channel1)
             .buildChannel()
             .pass(Arrays.asList("test1-1", "test1-2"))
@@ -915,9 +915,9 @@ public class ChannelsTest {
   public void testJoinInputPlaceholder() {
 
     final Channel<String, String> channel1 =
-        JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
+        JRoutineCore.with(IdentityInvocation.<String>factoryOf()).invoke().sorted();
     final Channel<String, String> channel2 =
-        JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
+        JRoutineCore.with(IdentityInvocation.<String>factoryOf()).invoke().sorted();
     Channels.joinInput((Object) null, channel1, channel2)
             .buildChannel()
             .pass(Arrays.asList("test1-1", "test1-2"))
@@ -942,8 +942,8 @@ public class ChannelsTest {
 
     Channel<String, String> channel1;
     Channel<String, String> channel2;
-    channel1 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
-    channel2 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
+    channel1 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).invoke().sorted();
+    channel2 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).invoke().sorted();
     Channels.joinInput((Object) null, channel1, channel2).buildChannel().abort();
 
     try {
@@ -966,8 +966,8 @@ public class ChannelsTest {
 
     }
 
-    channel1 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
-    channel2 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
+    channel1 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).invoke().sorted();
+    channel2 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).invoke().sorted();
     Channels.joinInput(null, Arrays.<Channel<?, ?>>asList(channel1, channel2))
             .buildChannel()
             .abort();
@@ -1469,9 +1469,9 @@ public class ChannelsTest {
   public void testMergeInput() {
 
     final Channel<String, String> channel1 =
-        JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
+        JRoutineCore.with(IdentityInvocation.<String>factoryOf()).invoke().sorted();
     final Channel<Integer, Integer> channel2 =
-        JRoutineCore.with(IdentityInvocation.<Integer>factoryOf()).call().sorted();
+        JRoutineCore.with(IdentityInvocation.<Integer>factoryOf()).invoke().sorted();
     Channels.mergeInput(channel1, channel2)
             .buildChannel()
             .pass(new Flow<String>(0, "test1"))
@@ -1510,8 +1510,8 @@ public class ChannelsTest {
 
     Channel<String, String> channel1;
     Channel<Integer, Integer> channel2;
-    channel1 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
-    channel2 = JRoutineCore.with(IdentityInvocation.<Integer>factoryOf()).call().sorted();
+    channel1 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).invoke().sorted();
+    channel2 = JRoutineCore.with(IdentityInvocation.<Integer>factoryOf()).invoke().sorted();
     Channels.mergeInput(channel1, channel2).buildChannel().abort();
 
     try {
@@ -1534,8 +1534,8 @@ public class ChannelsTest {
 
     }
 
-    channel1 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
-    channel2 = JRoutineCore.with(IdentityInvocation.<Integer>factoryOf()).call().sorted();
+    channel1 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).invoke().sorted();
+    channel2 = JRoutineCore.with(IdentityInvocation.<Integer>factoryOf()).invoke().sorted();
     Channels.mergeInput(3, channel1, channel2).buildChannel().abort();
 
     try {
@@ -1558,8 +1558,8 @@ public class ChannelsTest {
 
     }
 
-    channel1 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
-    channel2 = JRoutineCore.with(IdentityInvocation.<Integer>factoryOf()).call().sorted();
+    channel1 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).invoke().sorted();
+    channel2 = JRoutineCore.with(IdentityInvocation.<Integer>factoryOf()).invoke().sorted();
     Channels.mergeInput(Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannel().abort();
 
     try {
@@ -1582,8 +1582,8 @@ public class ChannelsTest {
 
     }
 
-    channel1 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
-    channel2 = JRoutineCore.with(IdentityInvocation.<Integer>factoryOf()).call().sorted();
+    channel1 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).invoke().sorted();
+    channel2 = JRoutineCore.with(IdentityInvocation.<Integer>factoryOf()).invoke().sorted();
     Channels.mergeInput(-5, Arrays.<Channel<?, ?>>asList(channel1, channel2))
             .buildChannel()
             .abort();
@@ -1608,8 +1608,8 @@ public class ChannelsTest {
 
     }
 
-    channel1 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call().sorted();
-    channel2 = JRoutineCore.with(IdentityInvocation.<Integer>factoryOf()).call().sorted();
+    channel1 = JRoutineCore.with(IdentityInvocation.<String>factoryOf()).invoke().sorted();
+    channel2 = JRoutineCore.with(IdentityInvocation.<Integer>factoryOf()).invoke().sorted();
     final HashMap<Integer, Channel<?, ?>> map = new HashMap<Integer, Channel<?, ?>>(2);
     map.put(31, channel1);
     map.put(17, channel2);
@@ -1808,7 +1808,7 @@ public class ChannelsTest {
         JRoutineCore.with(new Sort()).buildRoutine();
     Map<Integer, ? extends Channel<?, Object>> channelMap;
     Channel<?, Flow<Object>> channel;
-    channel = routine.call()
+    channel = routine.invoke()
                      .after(millis(100))
                      .pass(new Flow<Object>(Sort.STRING, "test21"),
                          new Flow<Object>(Sort.INTEGER, -11));
@@ -1836,7 +1836,7 @@ public class ChannelsTest {
 
     }
 
-    channel = routine.call()
+    channel = routine.invoke()
                      .after(millis(100))
                      .pass(new Flow<Object>(Sort.INTEGER, -11),
                          new Flow<Object>(Sort.STRING, "test21"));
@@ -1863,7 +1863,7 @@ public class ChannelsTest {
 
     }
 
-    channel = routine.call()
+    channel = routine.invoke()
                      .after(millis(100))
                      .pass(new Flow<Object>(Sort.STRING, "test21"),
                          new Flow<Object>(Sort.INTEGER, -11));
@@ -1897,7 +1897,7 @@ public class ChannelsTest {
 
     final Routine<Flow<Object>, Flow<Object>> routine =
         JRoutineCore.with(factoryOf(Sort.class)).buildRoutine();
-    final Channel<?, Flow<Object>> channel = routine.call();
+    final Channel<?, Flow<Object>> channel = routine.invoke();
     final Map<Integer, ? extends Channel<?, Object>> channelMap =
         Channels.flowOutput(channel, Arrays.asList(Sort.INTEGER, Sort.STRING)).buildChannelMap();
     assertThat(channelMap).isEqualTo(
@@ -1908,7 +1908,7 @@ public class ChannelsTest {
   public void testOutputMapError() {
 
     try {
-      Channels.flowOutput(0, 0, JRoutineCore.with(new Sort()).call());
+      Channels.flowOutput(0, 0, JRoutineCore.with(new Sort()).invoke());
       fail();
 
     } catch (final IllegalArgumentException ignored) {

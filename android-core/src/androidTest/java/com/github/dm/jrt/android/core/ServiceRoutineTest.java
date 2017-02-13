@@ -98,7 +98,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
 
       JRoutineService.on(serviceFrom(getActivity()))
                      .with(factoryOf(Abort.class))
-                     .close()
+                     .call()
                      .in(timeout)
                      .next();
 
@@ -363,8 +363,8 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                                                           .withMaxInstances(2)
                                                           .apply()
                                                           .buildRoutine();
-    assertThat(routine4.close().in(timeout).all()).containsOnly("test1", "test2", "test3");
-    assertThat(routine4.callParallel().close().in(timeout).all()).containsOnly("test1", "test2",
+    assertThat(routine4.call().in(timeout).all()).containsOnly("test1", "test2", "test3");
+    assertThat(routine4.invokeParallel().close().in(timeout).all()).containsOnly("test1", "test2",
         "test3");
   }
 
@@ -397,7 +397,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
     final Channel<String, String> channel = JRoutineService.on(serviceFrom(getActivity()))
                                                            .with(factoryOf(
                                                                StringPassingInvocation.class))
-                                                           .call();
+                                                           .invoke();
     assertThat(channel.inputSize()).isEqualTo(0);
     channel.after(millis(500)).pass("test");
     assertThat(channel.inputSize()).isEqualTo(1);

@@ -189,7 +189,7 @@ public class RunnerTest extends AndroidTestCase {
                                                     .withRunner(AndroidRunners.handlerRunner(
                                                         new HandlerThread("test")))
                                                     .apply()
-                                                    .close();
+                                                    .call();
     assertThat(JRoutineCore.with(new HandlerInvocationFactory())
                            .call(channel)
                            .in(seconds(30))
@@ -211,7 +211,7 @@ public class RunnerTest extends AndroidTestCase {
                                                    .withRunner(AndroidRunners.handlerRunner(
                                                        new HandlerThread("test")))
                                                    .apply()
-                                                   .close();
+                                                   .call();
     assertThat(JRoutineCore.with(new LooperInvocationFactory())
                            .call(channel)
                            .in(seconds(30))

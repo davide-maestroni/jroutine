@@ -617,14 +617,14 @@ public class FunctionsTest {
   public void testCommand() {
 
     final Routine<Void, String> routine = JRoutineCore.with(createCommand()).buildRoutine();
-    assertThat(routine.close().in(seconds(1)).all()).containsOnly("test");
+    assertThat(routine.call().in(seconds(1)).all()).containsOnly("test");
   }
 
   @Test
   public void testCommand2() {
 
     final Routine<Void, String> routine = JRoutineCore.with(createCommand2()).buildRoutine();
-    assertThat(routine.close().in(seconds(1)).all()).containsOnly("test");
+    assertThat(routine.call().in(seconds(1)).all()).containsOnly("test");
   }
 
   @Test

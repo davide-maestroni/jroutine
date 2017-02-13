@@ -50,7 +50,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * final AsyncCallback callback = JRoutineReflection.with(instance(myCallback))
  *                                                  .buildProxy(AsyncCallback.class);
- * callback.onResults(routine1.call(), routine2.call());
+ * callback.onResults(routine1.invoke(), routine2.invoke());
  * </code></pre>
  * Where the object {@code myCallback} implements a method
  * {@code public void onResults(Result result1, Result result2)}.

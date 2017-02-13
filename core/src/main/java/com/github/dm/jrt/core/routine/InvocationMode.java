@@ -38,7 +38,7 @@ public enum InvocationMode {
 
     @NotNull
     public <IN, OUT> Channel<IN, OUT> invoke(@NotNull final Routine<IN, OUT> routine) {
-      return routine.call();
+      return routine.invoke();
     }
   }),
 
@@ -51,7 +51,7 @@ public enum InvocationMode {
 
     @NotNull
     public <IN, OUT> Channel<IN, OUT> invoke(@NotNull final Routine<IN, OUT> routine) {
-      return routine.callParallel();
+      return routine.invokeParallel();
     }
   });
 

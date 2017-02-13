@@ -89,7 +89,7 @@ import org.jetbrains.annotations.Nullable;
 public interface Routine<IN, OUT> {
 
   /**
-   * Short for {@code call().pass(input).close()}.
+   * Short for {@code invoke().pass(input).close()}.
    *
    * @param input the input.
    * @return the invocation channel.
@@ -98,7 +98,7 @@ public interface Routine<IN, OUT> {
   Channel<IN, OUT> call(@Nullable IN input);
 
   /**
-   * Short for {@code call().pass(inputs).close()}.
+   * Short for {@code invoke().pass(inputs).close()}.
    *
    * @param inputs the input data.
    * @return the invocation channel.
@@ -107,7 +107,7 @@ public interface Routine<IN, OUT> {
   Channel<IN, OUT> call(@Nullable IN... inputs);
 
   /**
-   * Short for {@code call().pass(inputs).close()}.
+   * Short for {@code invoke().pass(inputs).close()}.
    *
    * @param inputs the iterable returning the input data.
    * @return the invocation channel.
@@ -116,7 +116,7 @@ public interface Routine<IN, OUT> {
   Channel<IN, OUT> call(@Nullable Iterable<? extends IN> inputs);
 
   /**
-   * Short for {@code call().pass(inputs).close()}.
+   * Short for {@code invoke().pass(inputs).close()}.
    *
    * @param inputs the channel returning the input data.
    * @return the invocation channel.
@@ -125,7 +125,7 @@ public interface Routine<IN, OUT> {
   Channel<IN, OUT> call(@Nullable Channel<?, ? extends IN> inputs);
 
   /**
-   * Invokes the execution of this routine in asynchronous mode.
+   * Short for {@code invoke().close()}.
    *
    * @return the invocation channel.
    */
@@ -133,7 +133,7 @@ public interface Routine<IN, OUT> {
   Channel<IN, OUT> call();
 
   /**
-   * Short for {@code callParallel().pass(input).close()}.
+   * Short for {@code invokeParallel().pass(input).close()}.
    * <p>
    * (This method actually makes little sense, and should never need to be called, thought it is
    * here for completeness)
@@ -145,7 +145,7 @@ public interface Routine<IN, OUT> {
   Channel<IN, OUT> callParallel(@Nullable IN input);
 
   /**
-   * Short for {@code callParallel().pass(inputs).close()}.
+   * Short for {@code invokeParallel().pass(inputs).close()}.
    *
    * @param inputs the input data.
    * @return the invocation channel.
@@ -154,7 +154,7 @@ public interface Routine<IN, OUT> {
   Channel<IN, OUT> callParallel(@Nullable IN... inputs);
 
   /**
-   * Short for {@code callParallel().pass(inputs).close()}.
+   * Short for {@code invokeParallel().pass(inputs).close()}.
    *
    * @param inputs the iterable returning the input data.
    * @return the invocation channel.
@@ -163,21 +163,13 @@ public interface Routine<IN, OUT> {
   Channel<IN, OUT> callParallel(@Nullable Iterable<? extends IN> inputs);
 
   /**
-   * Short for {@code callParallel().pass(inputs).close()}.
+   * Short for {@code invokeParallel().pass(inputs).close()}.
    *
    * @param inputs the channel returning the input data.
    * @return the invocation channel.
    */
   @NotNull
   Channel<IN, OUT> callParallel(@Nullable Channel<?, ? extends IN> inputs);
-
-  /**
-   * Invokes the execution of this routine in parallel mode.
-   *
-   * @return the invocation channel.
-   */
-  @NotNull
-  Channel<IN, OUT> callParallel();
 
   /**
    * Makes the routine discard all the cached invocation instances.
@@ -188,10 +180,18 @@ public interface Routine<IN, OUT> {
   void clear();
 
   /**
-   * Short for {@code call().close()}.
+   * Invokes the execution of this routine in asynchronous mode.
    *
    * @return the invocation channel.
    */
   @NotNull
-  Channel<IN, OUT> close();
+  Channel<IN, OUT> invoke();
+
+  /**
+   * Invokes the execution of this routine in parallel mode.
+   *
+   * @return the invocation channel.
+   */
+  @NotNull
+  Channel<IN, OUT> invokeParallel();
 }

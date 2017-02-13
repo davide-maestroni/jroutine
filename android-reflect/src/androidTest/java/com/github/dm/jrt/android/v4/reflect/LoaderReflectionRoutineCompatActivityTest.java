@@ -183,7 +183,7 @@ public class LoaderReflectionRoutineCompatActivityTest
                                       .apply()
                                       .method(TestClass.GET);
 
-    assertThat(routine.close().in(timeout).all()).containsExactly(-77L);
+    assertThat(routine.call().in(timeout).all()).containsExactly(-77L);
   }
 
   public void testArgs() {
@@ -191,7 +191,7 @@ public class LoaderReflectionRoutineCompatActivityTest
     assertThat(JRoutineLoaderReflectionCompat.on(loaderFrom(getActivity()))
                                              .with(instanceOf(TestArgs.class, 17))
                                              .method("getId")
-                                             .close()
+                                             .call()
                                              .in(seconds(10))
                                              .next()).isEqualTo(17);
   }
@@ -341,7 +341,7 @@ public class LoaderReflectionRoutineCompatActivityTest
     assertThat(JRoutineLoaderReflectionCompat.on(loaderFrom(activity, contextWrapper))
                                              .with(instanceOf(String.class))
                                              .method("toString")
-                                             .close()
+                                             .call()
                                              .in(seconds(10))
                                              .next()).isEqualTo("test1");
   }
@@ -626,7 +626,7 @@ public class LoaderReflectionRoutineCompatActivityTest
                                       .apply()
                                       .method(TestClass.class.getMethod("getLong"));
 
-    assertThat(routine2.close().in(timeout).all()).containsExactly(-77L);
+    assertThat(routine2.call().in(timeout).all()).containsExactly(-77L);
 
   }
 
@@ -641,7 +641,7 @@ public class LoaderReflectionRoutineCompatActivityTest
                                       .apply()
                                       .method("getLong");
 
-    assertThat(routine1.close().in(timeout).all()).containsExactly(-77L);
+    assertThat(routine1.call().in(timeout).all()).containsExactly(-77L);
   }
 
   public void testMissingAliasMethodError() {
@@ -898,19 +898,19 @@ public class LoaderReflectionRoutineCompatActivityTest
     assertThat(itf.get0()).isEqualTo(31);
     assertThat(itf.get1().all()).containsExactly(31);
     assertThat(itf.get2().close().all()).containsExactly(31);
-    assertThat(itf.get4().close().all()).containsExactly(31);
+    assertThat(itf.get4().call().all()).containsExactly(31);
     assertThat(itf.getA0()).isEqualTo(new int[]{1, 2, 3});
     assertThat(itf.getA1().all()).containsExactly(1, 2, 3);
     assertThat(itf.getA2().close().all()).containsExactly(new int[]{1, 2, 3});
-    assertThat(itf.getA3().close().all()).containsExactly(new int[]{1, 2, 3});
+    assertThat(itf.getA3().call().all()).containsExactly(new int[]{1, 2, 3});
     assertThat(itf.getA4().close().all()).containsExactly(1, 2, 3);
-    assertThat(itf.getA5().close().all()).containsExactly(1, 2, 3);
+    assertThat(itf.getA5().call().all()).containsExactly(1, 2, 3);
     assertThat(itf.getL0()).isEqualTo(Arrays.asList(1, 2, 3));
     assertThat(itf.getL1().all()).containsExactly(1, 2, 3);
     assertThat(itf.getL2().close().all()).containsExactly(Arrays.asList(1, 2, 3));
-    assertThat(itf.getL3().close().all()).containsExactly(Arrays.asList(1, 2, 3));
+    assertThat(itf.getL3().call().all()).containsExactly(Arrays.asList(1, 2, 3));
     assertThat(itf.getL4().close().all()).containsExactly(1, 2, 3);
-    assertThat(itf.getL5().close().all()).containsExactly(1, 2, 3);
+    assertThat(itf.getL5().call().all()).containsExactly(1, 2, 3);
     itf.set0(-17);
     final Channel<Integer, Integer> channel35 = JRoutineCore.<Integer>ofInputs().buildChannel();
     channel35.pass(-17).close();
@@ -978,9 +978,9 @@ public class LoaderReflectionRoutineCompatActivityTest
     long startTime = System.currentTimeMillis();
 
     Channel<?, Object> getOne =
-        builder.wrapperConfiguration().withSharedFields("1").apply().method("getOne").close();
+        builder.wrapperConfiguration().withSharedFields("1").apply().method("getOne").call();
     Channel<?, Object> getTwo =
-        builder.wrapperConfiguration().withSharedFields("2").apply().method("getTwo").close();
+        builder.wrapperConfiguration().withSharedFields("2").apply().method("getTwo").call();
 
     assertThat(getOne.getComplete()).isTrue();
     assertThat(getTwo.getComplete()).isTrue();
@@ -988,8 +988,8 @@ public class LoaderReflectionRoutineCompatActivityTest
 
     startTime = System.currentTimeMillis();
 
-    getOne = builder.method("getOne").close();
-    getTwo = builder.method("getTwo").close();
+    getOne = builder.method("getOne").call();
+    getTwo = builder.method("getTwo").call();
 
     assertThat(getOne.getComplete()).isTrue();
     assertThat(getTwo.getComplete()).isTrue();
@@ -1007,7 +1007,7 @@ public class LoaderReflectionRoutineCompatActivityTest
                                              .withLoaderId(0)
                                              .apply()
                                              .method("test")
-                                             .close()
+                                             .call()
                                              .next()).isEqualTo(31);
 
     try {
@@ -1021,7 +1021,7 @@ public class LoaderReflectionRoutineCompatActivityTest
                                     .withLoaderId(1)
                                     .apply()
                                     .method("test")
-                                    .close()
+                                    .call()
                                     .next();
 
       fail();
@@ -1039,7 +1039,7 @@ public class LoaderReflectionRoutineCompatActivityTest
                                              .withLoaderId(2)
                                              .apply()
                                              .method("getInt")
-                                             .close()
+                                             .call()
                                              .next()).isEqualTo(31);
 
     try {
@@ -1053,7 +1053,7 @@ public class LoaderReflectionRoutineCompatActivityTest
                                     .withLoaderId(3)
                                     .apply()
                                     .method("getInt")
-                                    .close()
+                                    .call()
                                     .next();
 
       fail();
@@ -1071,7 +1071,7 @@ public class LoaderReflectionRoutineCompatActivityTest
                                              .withLoaderId(4)
                                              .apply()
                                              .method(TestTimeout.class.getMethod("getInt"))
-                                             .close()
+                                             .call()
                                              .next()).isEqualTo(31);
 
     try {
@@ -1085,7 +1085,7 @@ public class LoaderReflectionRoutineCompatActivityTest
                                     .withLoaderId(5)
                                     .apply()
                                     .method(TestTimeout.class.getMethod("getInt"))
-                                    .close()
+                                    .call()
                                     .next();
 
       fail();

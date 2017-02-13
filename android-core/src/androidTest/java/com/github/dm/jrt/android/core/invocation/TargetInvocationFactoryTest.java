@@ -86,7 +86,7 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
                        .with(factoryOf(PassingStringInvocation.class))
                        .buildRoutine();
     assertThat(
-        routine.call().after(millis(100)).pass("test").afterNoDelay().close().abort()).isTrue();
+        routine.invoke().after(millis(100)).pass("test").afterNoDelay().close().abort()).isTrue();
     routine.clear();
   }
 
@@ -97,7 +97,7 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
                        .with(factoryOf(PassingStringInvocation2.class))
                        .buildRoutine();
     assertThat(
-        routine.call().after(millis(100)).pass("test").afterNoDelay().close().abort()).isTrue();
+        routine.invoke().after(millis(100)).pass("test").afterNoDelay().close().abort()).isTrue();
     routine.clear();
   }
 
@@ -327,7 +327,7 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
                        .with(factoryOf(PassingStringInvocation.class))
                        .buildRoutine();
     assertThat(
-        routine.call().after(millis(100)).pass("test").afterNoDelay().close().abort()).isTrue();
+        routine.invoke().after(millis(100)).pass("test").afterNoDelay().close().abort()).isTrue();
     routine.clear();
   }
 
@@ -338,7 +338,7 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
                        .with(factoryOf(PassingStringInvocation2.class))
                        .buildRoutine();
     assertThat(
-        routine.call().after(millis(100)).pass("test").afterNoDelay().close().abort()).isTrue();
+        routine.invoke().after(millis(100)).pass("test").afterNoDelay().close().abort()).isTrue();
     routine.clear();
   }
 

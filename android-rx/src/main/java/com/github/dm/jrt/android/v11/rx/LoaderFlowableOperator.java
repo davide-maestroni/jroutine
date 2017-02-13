@@ -104,7 +104,7 @@ class LoaderFlowableOperator<DATA> implements FlowableOperator<DATA, DATA> {
 
     @Override
     public void onSubscribe(final Subscription s) {
-      mChannel = mRoutine.call();
+      mChannel = mRoutine.invoke();
       mSubscriber.onSubscribe(s);
     }
 

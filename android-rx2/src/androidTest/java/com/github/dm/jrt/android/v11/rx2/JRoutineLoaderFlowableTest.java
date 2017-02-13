@@ -31,7 +31,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
-import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
@@ -62,56 +61,6 @@ public class JRoutineLoaderFlowableTest extends ActivityInstrumentationTestCase2
     final AtomicBoolean isSuccess = new AtomicBoolean(true);
     JRoutineLoaderFlowable.with(
         Flowable.just("test1", "test2", "test3").map(new Function<String, String>() {
-
-          @Override
-          public String apply(final String s) {
-            return s.toUpperCase();
-          }
-        }))
-                          .flowableConfiguration()
-                          .withBackpressure(BackpressureStrategy.BUFFER)
-                          .apply()
-                          .invocationConfiguration()
-                          .withOutputTimeout(seconds(10))
-                          .apply()
-                          .loaderConfiguration()
-                          .withResultStaleTime(seconds(10))
-                          .apply()
-                          .observeOn(loaderFrom(getActivity()))
-                          .subscribe(new Consumer<String>() {
-
-                            @Override
-                            public void accept(final String s) {
-                              if (!expected.contains(s)) {
-                                isSuccess.set(false);
-                              }
-
-                              latch.countDown();
-                            }
-                          }, new Consumer<Throwable>() {
-
-                            @Override
-                            public void accept(final Throwable throwable) {
-                              isSuccess.set(false);
-                              while (latch.getCount() > 0) {
-                                latch.countDown();
-                              }
-                            }
-                          });
-    latch.await(10, TimeUnit.SECONDS);
-    assertThat(isSuccess.get()).isTrue();
-  }
-
-  public void testActivityObserveOn2() throws InterruptedException {
-    if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-      return;
-    }
-
-    final CountDownLatch latch = new CountDownLatch(3);
-    final List<String> expected = Arrays.asList("TEST1", "TEST2", "TEST3");
-    final AtomicBoolean isSuccess = new AtomicBoolean(true);
-    JRoutineLoaderFlowable.with(
-        Observable.just("test1", "test2", "test3").map(new Function<String, String>() {
 
           @Override
           public String apply(final String s) {
@@ -203,57 +152,6 @@ public class JRoutineLoaderFlowableTest extends ActivityInstrumentationTestCase2
     assertThat(isSuccess.get()).isTrue();
   }
 
-  public void testActivitySubscribeOn2() throws InterruptedException {
-    if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-      return;
-    }
-
-    final CountDownLatch latch = new CountDownLatch(3);
-    final List<String> expected = Arrays.asList("TEST1", "TEST2", "TEST3");
-    final AtomicBoolean isSuccess = new AtomicBoolean(true);
-    JRoutineLoaderFlowable.with(Observable.just("test1", "test2", "test3"))
-                          .flowableConfiguration()
-                          .withBackpressure(BackpressureStrategy.BUFFER)
-                          .apply()
-                          .invocationConfiguration()
-                          .withOutputTimeout(seconds(10))
-                          .apply()
-                          .loaderConfiguration()
-                          .withResultStaleTime(seconds(10))
-                          .apply()
-                          .subscribeOn(loaderFrom(getActivity()))
-                          .map(new Function<String, String>() {
-
-                            @Override
-                            public String apply(final String s) {
-                              return s.toUpperCase();
-                            }
-                          })
-                          .observeOn(AndroidSchedulers.mainThread())
-                          .subscribe(new Consumer<String>() {
-
-                            @Override
-                            public void accept(final String s) {
-                              if (!expected.contains(s)) {
-                                isSuccess.set(false);
-                              }
-
-                              latch.countDown();
-                            }
-                          }, new Consumer<Throwable>() {
-
-                            @Override
-                            public void accept(final Throwable throwable) {
-                              isSuccess.set(false);
-                              while (latch.getCount() > 0) {
-                                latch.countDown();
-                              }
-                            }
-                          });
-    latch.await(10, TimeUnit.SECONDS);
-    assertThat(isSuccess.get()).isTrue();
-  }
-
   public void testFragmentObserveOn() throws InterruptedException {
     if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
       return;
@@ -295,47 +193,6 @@ public class JRoutineLoaderFlowableTest extends ActivityInstrumentationTestCase2
     assertThat(isSuccess.get()).isTrue();
   }
 
-  public void testFragmentObserveOn2() throws InterruptedException {
-    if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-      return;
-    }
-
-    final TestFragment fragment =
-        (TestFragment) getActivity().getFragmentManager().findFragmentById(R.id.test_fragment);
-    final CountDownLatch latch = new CountDownLatch(3);
-    final List<String> expected = Arrays.asList("TEST1", "TEST2", "TEST3");
-    final AtomicBoolean isSuccess = new AtomicBoolean(true);
-    JRoutineLoaderFlowable.with(
-        Observable.just("test1", "test2", "test3").map(new Function<String, String>() {
-
-          @Override
-          public String apply(final String s) {
-            return s.toUpperCase();
-          }
-        })).observeOn(loaderFrom(fragment)).subscribe(new Consumer<String>() {
-
-      @Override
-      public void accept(final String s) {
-        if (!expected.contains(s)) {
-          isSuccess.set(false);
-        }
-
-        latch.countDown();
-      }
-    }, new Consumer<Throwable>() {
-
-      @Override
-      public void accept(final Throwable throwable) {
-        isSuccess.set(false);
-        while (latch.getCount() > 0) {
-          latch.countDown();
-        }
-      }
-    });
-    latch.await(10, TimeUnit.SECONDS);
-    assertThat(isSuccess.get()).isTrue();
-  }
-
   public void testFragmentSubscribeOn() throws InterruptedException {
     if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
       return;
@@ -347,50 +204,6 @@ public class JRoutineLoaderFlowableTest extends ActivityInstrumentationTestCase2
     final List<String> expected = Arrays.asList("TEST1", "TEST2", "TEST3");
     final AtomicBoolean isSuccess = new AtomicBoolean(true);
     JRoutineLoaderFlowable.with(Flowable.just("test1", "test2", "test3"))
-                          .subscribeOn(loaderFrom(fragment))
-                          .map(new Function<String, String>() {
-
-                            @Override
-                            public String apply(final String s) {
-                              return s.toUpperCase();
-                            }
-                          })
-                          .observeOn(AndroidSchedulers.mainThread())
-                          .subscribe(new Consumer<String>() {
-
-                            @Override
-                            public void accept(final String s) {
-                              if (!expected.contains(s)) {
-                                isSuccess.set(false);
-                              }
-
-                              latch.countDown();
-                            }
-                          }, new Consumer<Throwable>() {
-
-                            @Override
-                            public void accept(final Throwable throwable) {
-                              isSuccess.set(false);
-                              while (latch.getCount() > 0) {
-                                latch.countDown();
-                              }
-                            }
-                          });
-    latch.await(10, TimeUnit.SECONDS);
-    assertThat(isSuccess.get()).isTrue();
-  }
-
-  public void testFragmentSubscribeOn2() throws InterruptedException {
-    if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-      return;
-    }
-
-    final TestFragment fragment =
-        (TestFragment) getActivity().getFragmentManager().findFragmentById(R.id.test_fragment);
-    final CountDownLatch latch = new CountDownLatch(3);
-    final List<String> expected = Arrays.asList("TEST1", "TEST2", "TEST3");
-    final AtomicBoolean isSuccess = new AtomicBoolean(true);
-    JRoutineLoaderFlowable.with(Observable.just("test1", "test2", "test3"))
                           .subscribeOn(loaderFrom(fragment))
                           .map(new Function<String, String>() {
 

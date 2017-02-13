@@ -30,7 +30,6 @@ import com.github.dm.jrt.rx2.config.FlowableConfiguration;
 import org.jetbrains.annotations.NotNull;
 
 import io.reactivex.Flowable;
-import io.reactivex.Observable;
 
 /**
  * Utility class integrating the JRoutine Android classes with RxJava2 ones.
@@ -51,18 +50,6 @@ import io.reactivex.Observable;
  */
 @SuppressWarnings("WeakerAccess")
 public class JRoutineLoaderFlowableCompat {
-
-  /**
-   * Returns a Loader Observable instance wrapping the specified one.
-   *
-   * @param observable the Observable.
-   * @param <DATA>     the data type.
-   * @return the Loader Observable.
-   */
-  @NotNull
-  public static <DATA> LoaderObservable<DATA> with(@NotNull final Observable<DATA> observable) {
-    return new LoaderObservable<DATA>(observable);
-  }
 
   /**
    * Returns a Loader Flowable instance wrapping the specified one.
@@ -177,112 +164,6 @@ public class JRoutineLoaderFlowableCompat {
     public Flowable<DATA> subscribeOn(@NotNull final LoaderContextCompat context) {
       return mFlowable.lift(new LoaderFlowableOperator<DATA>(context, mInvocationConfiguration,
           mLoaderConfiguration));
-    }
-
-  }
-
-  /**
-   * Class wrapping an Observable so to enable it to dispatch data to a dedicated Loader.
-   *
-   * @param <DATA> the data type.
-   */
-  public static class LoaderObservable<DATA>
-      implements FlowableConfigurable<Void, LoaderObservable<DATA>>,
-      InvocationConfigurable<LoaderObservable<DATA>>, LoaderConfigurable<LoaderObservable<DATA>> {
-
-    private final Observable<DATA> mObservable;
-
-    private FlowableConfiguration<Void> mFlowableConfiguration =
-        FlowableConfiguration.defaultConfiguration();
-
-    private InvocationConfiguration mInvocationConfiguration =
-        InvocationConfiguration.defaultConfiguration();
-
-    private LoaderConfiguration mLoaderConfiguration = LoaderConfiguration.defaultConfiguration();
-
-    /**
-     * Constructor.
-     *
-     * @param observable the Observable.
-     */
-    private LoaderObservable(@NotNull final Observable<DATA> observable) {
-      mObservable = ConstantConditions.notNull("Observable instance", observable);
-    }
-
-    /**
-     * Returns an Observable performing its emissions and notifications in a dedicated Loader.
-     * <br>
-     * The returned Observable will asynchronously subscribe Observers on the main thread.
-     *
-     * @param context the Loader context.
-     * @return the Observable.
-     */
-    @NotNull
-    public Observable<DATA> observeOn(@NotNull final LoaderContextCompat context) {
-      final ObservableInvocationFactory<DATA> factory =
-          new ObservableInvocationFactory<DATA>(mObservable);
-      return JRoutineFlowable.from(JRoutineLoaderCompat.on(context)
-                                                       .with(factory)
-                                                       .apply(mInvocationConfiguration)
-                                                       .apply(mLoaderConfiguration))
-                             .apply(mFlowableConfiguration)
-                             .buildFlowable()
-                             .toObservable();
-    }
-
-    /**
-     * Returns an Observable asynchronously subscribing Observers in a dedicated Loader.
-     *
-     * @param context the Loader context.
-     * @return the Observable.
-     */
-    @NotNull
-    public Observable<DATA> subscribeOn(@NotNull final LoaderContextCompat context) {
-      return mObservable.lift(new LoaderObservableOperator<DATA>(context, mInvocationConfiguration,
-          mLoaderConfiguration));
-    }
-
-    @NotNull
-    @Override
-    public LoaderObservable<DATA> apply(@NotNull final LoaderConfiguration configuration) {
-      mLoaderConfiguration = ConstantConditions.notNull("Loader configuration", configuration);
-      return this;
-    }
-
-    @NotNull
-    @Override
-    public LoaderObservable<DATA> apply(@NotNull final InvocationConfiguration configuration) {
-      mInvocationConfiguration =
-          ConstantConditions.notNull("invocation configuration", configuration);
-      return this;
-    }
-
-    @NotNull
-    @Override
-    public LoaderObservable<DATA> apply(@NotNull final FlowableConfiguration<Void> configuration) {
-      mFlowableConfiguration = ConstantConditions.notNull("Flowable configuration", configuration);
-      return this;
-    }
-
-    @NotNull
-    @Override
-    public FlowableConfiguration.Builder<Void, LoaderObservable<DATA>> flowableConfiguration() {
-      return new FlowableConfiguration.Builder<Void, LoaderObservable<DATA>>(this,
-          mFlowableConfiguration);
-    }
-
-    @NotNull
-    @Override
-    public InvocationConfiguration.Builder<? extends LoaderObservable<DATA>>
-    invocationConfiguration() {
-      return new InvocationConfiguration.Builder<LoaderObservable<DATA>>(this,
-          mInvocationConfiguration);
-    }
-
-    @NotNull
-    @Override
-    public LoaderConfiguration.Builder<? extends LoaderObservable<DATA>> loaderConfiguration() {
-      return new LoaderConfiguration.Builder<LoaderObservable<DATA>>(this, mLoaderConfiguration);
     }
   }
 }

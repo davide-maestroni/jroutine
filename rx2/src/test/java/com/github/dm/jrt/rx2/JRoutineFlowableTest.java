@@ -33,8 +33,10 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
+import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
@@ -176,6 +178,17 @@ public class JRoutineFlowableTest {
   }
 
   @Test
+  public void testChannelAbortCompletable() {
+    final Channel<?, ?> channel =
+        JRoutineFlowable.with(Completable.complete().delay(1, TimeUnit.SECONDS))
+                        .channelConfiguration()
+                        .withMaxSize(2)
+                        .apply()
+                        .buildChannel();
+    assertThat(channel.abort()).isTrue();
+  }
+
+  @Test
   public void testChannelAbortFlowable() {
     final Channel<?, String> channel =
         JRoutineFlowable.with(Flowable.just("test1", "test2").delay(1, TimeUnit.SECONDS))
@@ -195,6 +208,27 @@ public class JRoutineFlowableTest {
                         .apply()
                         .buildChannel();
     assertThat(channel.abort()).isTrue();
+  }
+
+  @Test
+  public void testChannelAbortSingle() {
+    final Channel<?, String> channel =
+        JRoutineFlowable.with(Single.just("test1").delay(1, TimeUnit.SECONDS))
+                        .channelConfiguration()
+                        .withMaxSize(2)
+                        .apply()
+                        .buildChannel();
+    assertThat(channel.abort()).isTrue();
+  }
+
+  @Test
+  public void testChannelCompletable() {
+    final Channel<?, ?> channel = JRoutineFlowable.with(Completable.complete())
+                                                  .channelConfiguration()
+                                                  .withMaxSize(2)
+                                                  .apply()
+                                                  .buildChannel();
+    assertThat(channel.all()).isEmpty();
   }
 
   @Test
@@ -228,6 +262,21 @@ public class JRoutineFlowableTest {
   }
 
   @Test
+  @SuppressWarnings({"ThrowableResultOfMethodCallIgnored", "ConstantConditions"})
+  public void testChannelErrorSingle() {
+    final Channel<?, String> channel =
+        JRoutineFlowable.with(Single.just("test").map(new Function<String, String>() {
+
+          public String apply(final String s) {
+            throw new IllegalStateException(s);
+          }
+        })).buildChannel();
+    assertThat(channel.getError()).isExactlyInstanceOf(InvocationException.class);
+    assertThat(channel.getError().getCause()).isExactlyInstanceOf(IllegalStateException.class);
+    assertThat(channel.getError().getCause().getMessage()).isEqualTo("test");
+  }
+
+  @Test
   public void testChannelFlowable() {
     final Channel<?, String> channel = JRoutineFlowable.with(Flowable.just("test1", "test2"))
                                                        .channelConfiguration()
@@ -245,6 +294,16 @@ public class JRoutineFlowableTest {
                                                        .apply()
                                                        .buildChannel();
     assertThat(channel.all()).containsExactly("test1", "test2");
+  }
+
+  @Test
+  public void testChannelSingle() {
+    final Channel<?, String> channel = JRoutineFlowable.with(Single.just("test1"))
+                                                       .channelConfiguration()
+                                                       .withMaxSize(2)
+                                                       .apply()
+                                                       .buildChannel();
+    assertThat(channel.all()).containsExactly("test1");
   }
 
   @Test

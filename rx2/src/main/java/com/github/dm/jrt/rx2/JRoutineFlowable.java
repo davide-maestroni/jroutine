@@ -25,8 +25,11 @@ import com.github.dm.jrt.rx2.builder.FlowableBuilder;
 
 import org.jetbrains.annotations.NotNull;
 
+import io.reactivex.BackpressureStrategy;
+import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 
 /**
  * Utility class integrating the JRoutine classes with RxJava ones.
@@ -94,6 +97,17 @@ public class JRoutineFlowable {
   }
 
   /**
+   * Returns a builder of channels fed by the specified Completable.
+   *
+   * @param completable the Completable instance.
+   * @return the channel builder.
+   */
+  @NotNull
+  public static ChannelBuilder<?, ?> with(@NotNull final Completable completable) {
+    return new FlowableChannelBuilder<Object>(completable.toFlowable());
+  }
+
+  /**
    * Returns a builder of channels fed by the specified Flowable.
    *
    * @param flowable the Flowable instance.
@@ -114,6 +128,18 @@ public class JRoutineFlowable {
    */
   @NotNull
   public static <OUT> ChannelBuilder<?, OUT> with(@NotNull final Observable<OUT> observable) {
-    return new ObservableChannelBuilder<OUT>(observable);
+    return new FlowableChannelBuilder<OUT>(observable.toFlowable(BackpressureStrategy.MISSING));
+  }
+
+  /**
+   * Returns a builder of channels fed by the specified Single.
+   *
+   * @param single the Single instance.
+   * @param <OUT>  the output data type.
+   * @return the channel builder.
+   */
+  @NotNull
+  public static <OUT> ChannelBuilder<?, OUT> with(@NotNull final Single<OUT> single) {
+    return new FlowableChannelBuilder<OUT>(single.toFlowable());
   }
 }

@@ -252,7 +252,7 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * }.call(inputInts, inputStrings, outputChannel);
  * inputStrings.pass("Hello", "JRoutine", "!");
  * inputInts.pass(1, 2, 3);
- * outputChannel.bind(new TemplateChannelConsumer&lt;String&gt;() {
+ * outputChannel.consume(new TemplateChannelConsumer&lt;String&gt;() {
  *
  *   &#64;Override
  *   public void onOutput(final String out) {
@@ -744,7 +744,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
     final Map<Integer, ? extends Channel<?, Object>> channelMap =
         Channels.flowOutput(0, outputChannels.size(), outputChannel).buildChannelMap();
     for (final Entry<Integer, ? extends Channel<?, Object>> entry : channelMap.entrySet()) {
-      entry.getValue().bind((Channel<Object, Object>) outputChannels.get(entry.getKey())).close();
+      entry.getValue().pipe((Channel<Object, Object>) outputChannels.get(entry.getKey())).close();
     }
 
     return resultChannel;

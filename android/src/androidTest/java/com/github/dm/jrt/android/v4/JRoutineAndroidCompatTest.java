@@ -890,7 +890,7 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
                                     .getCause()).isInstanceOf(IllegalStateException.class);
     assertThat(JRoutineAndroidCompat.withStreamOf(JRoutineAndroidCompat.ofInputs()
                                                                        .buildChannel()
-                                                                       .bind(
+                                                                       .consume(
                                                                            new TemplateChannelConsumer<Object>() {}))
                                     .lift(
                                         LoaderTransformationsCompat.runOn(loaderFrom(getActivity()))

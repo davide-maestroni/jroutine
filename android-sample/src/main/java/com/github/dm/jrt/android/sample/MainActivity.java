@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
                                            .addConverterFactory(GsonConverterFactory.create())
                                            .build();
     final GitHubService service = retrofit.create(GitHubService.class);
-    service.listRepos("octocat").bind(new TemplateChannelConsumer<List<Repo>>() {
+    service.listRepos("octocat").consume(new TemplateChannelConsumer<List<Repo>>() {
 
       @Override
       public void onError(@NotNull final RoutineException error) {

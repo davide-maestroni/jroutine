@@ -54,8 +54,8 @@ import java.util.Collections;
  * <pre><code>
  * final Channel&lt;Result, Result&gt; channel =
  *     JRoutineCore.&lt;Result&gt;ofInputs().buildChannel();
- * channel.pass(routine1.close())
- *        .pass(routine2.close())
+ * channel.pass(routine1.call())
+ *        .pass(routine2.call())
  *        .close();
  *        .in(seconds(20))
  *        .allInto(results);
@@ -63,8 +63,8 @@ import java.util.Collections;
  * <p>
  * Or simply:
  * <pre><code>
- * final Channel&lt;Void, Result&gt; output1 = routine1.close();
- * final Channel&lt;Void, Result&gt; output2 = routine2.close();
+ * final Channel&lt;Void, Result&gt; output1 = routine1.call();
+ * final Channel&lt;Void, Result&gt; output2 = routine2.call();
  * output1.in(seconds(20)).allInto(results);
  * output2.in(seconds(20)).allInto(results);
  * </code></pre>
@@ -73,12 +73,12 @@ import java.util.Collections;
  * <p>
  * <b>Example 3:</b> Asynchronously concatenate the output of two routines.
  * <pre><code>
- * routine2.call(routine1.close()).in(seconds(20)).all();
+ * routine2.call(routine1.call()).in(seconds(20)).all();
  * </code></pre>
  * <p>
  * Or, in an equivalent way:
  * <pre><code>
- * routine1.close().bind(routine2.invoke()).close().in(seconds(20)).all();
+ * routine1.call().pipe(routine2.invoke()).close().in(seconds(20)).all();
  * </code></pre>
  * <p>
  * <b>Example 4:</b> Asynchronously feed a routine from a different thread.

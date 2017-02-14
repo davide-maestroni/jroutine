@@ -76,7 +76,7 @@ class FlowableInvocationFactory<DATA> extends ContextInvocationFactory<Void, DAT
 
     @Override
     public void onComplete(@NotNull final Channel<DATA, ?> result) {
-      JRoutineFlowable.with(mFlowable).buildChannel().bind(result);
+      JRoutineFlowable.with(mFlowable).buildChannel().pipe(result);
     }
 
     @Override

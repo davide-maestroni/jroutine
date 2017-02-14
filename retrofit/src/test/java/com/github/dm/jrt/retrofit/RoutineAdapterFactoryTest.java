@@ -167,7 +167,7 @@ public class RoutineAdapterFactoryTest {
         assertThat(service.streamRepos("octocat")
                           .map(Operators.<Repo>unfold())
                           .invoke()
-                          .bind(onOutput(new Consumer<Repo>() {
+                          .consume(onOutput(new Consumer<Repo>() {
 
                             public void accept(final Repo repo) throws Exception {
 
@@ -195,7 +195,7 @@ public class RoutineAdapterFactoryTest {
         assertThat(service.streamRepos("octocat")
                           .map(Operators.<Repo>unfold())
                           .invoke()
-                          .bind(onOutput(new Consumer<Repo>() {
+                          .consume(onOutput(new Consumer<Repo>() {
 
                             public void accept(final Repo repo) throws Exception {
 
@@ -223,7 +223,7 @@ public class RoutineAdapterFactoryTest {
         assertThat(service.streamRepos("octocat")
                           .map(Operators.<Repo>unfold())
                           .invoke()
-                          .bind(onOutput(new Consumer<Repo>() {
+                          .consume(onOutput(new Consumer<Repo>() {
 
                             public void accept(final Repo repo) throws Exception {
 

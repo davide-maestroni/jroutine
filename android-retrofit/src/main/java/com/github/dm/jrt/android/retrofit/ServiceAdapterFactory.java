@@ -309,7 +309,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
       final Channel<Object, Object> outputChannel =
           JRoutineCore.ofInputs().apply(mConfiguration).buildChannel();
       mRoutine.invoke()
-              .bind(new ConverterChannelConsumer(mConverter, outputChannel))
+              .consume(new ConverterChannelConsumer(mConverter, outputChannel))
               .pass(channel)
               .close();
       return outputChannel;
@@ -355,7 +355,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
       final Channel<Object, Object> outputChannel =
           JRoutineCore.ofInputs().apply(mChannelConfiguration).buildChannel();
       getRoutine().invoke()
-                  .bind(new ConverterChannelConsumer(mConverter, outputChannel))
+                  .consume(new ConverterChannelConsumer(mConverter, outputChannel))
                   .pass(invokeCall(call))
                   .close();
       return outputChannel;

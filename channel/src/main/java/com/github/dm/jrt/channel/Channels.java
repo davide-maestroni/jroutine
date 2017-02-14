@@ -1030,7 +1030,7 @@ public class Channels {
    * consumer, thus effectively supporting multiple bindings.
    * <p>
    * The {@link com.github.dm.jrt.core.channel.Channel#isBound()} method will always return false
-   * and the {@code bind()} methods will never fail.
+   * and the binding methods will never fail.
    * <br>
    * Note, however, that the implementation will silently prevent the same consumer or channel
    * instance to be bound twice.

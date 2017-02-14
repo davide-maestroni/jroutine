@@ -225,18 +225,6 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
   }
 
   @NotNull
-  public <AFTER> Channel<? super OUT, AFTER> bind(
-      @NotNull final Channel<? super OUT, AFTER> channel) {
-    return mResultChanel.bind(channel);
-  }
-
-  @NotNull
-  public Channel<IN, OUT> bind(@NotNull final ChannelConsumer<? super OUT> consumer) {
-    mResultChanel.bind(consumer);
-    return this;
-  }
-
-  @NotNull
   public Channel<IN, OUT> close() {
     final DurationMeasure delay = mInputDelay.get();
     final Execution execution;
@@ -248,6 +236,12 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
       mRunner.run(execution, delay.value, delay.unit);
     }
 
+    return this;
+  }
+
+  @NotNull
+  public Channel<IN, OUT> consume(@NotNull final ChannelConsumer<? super OUT> consumer) {
+    mResultChanel.consume(consumer);
     return this;
   }
 
@@ -357,7 +351,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
 
     if ((consumer != null) && (channel != null)) {
       try {
-        channel.bind(consumer);
+        channel.consume(consumer);
 
       } catch (final IllegalStateException e) {
         synchronized (mMutex) {
@@ -432,6 +426,12 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
     }
 
     return this;
+  }
+
+  @NotNull
+  public <AFTER> Channel<? super OUT, AFTER> pipe(
+      @NotNull final Channel<? super OUT, AFTER> channel) {
+    return mResultChanel.pipe(channel);
   }
 
   public int size() {

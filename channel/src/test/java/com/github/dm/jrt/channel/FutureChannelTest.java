@@ -261,7 +261,7 @@ public class FutureChannelTest {
         });
     final Channel<? super String, String> channel = Channels.fromFuture(future)
                                                             .buildChannel()
-                                                            .bind(
+                                                            .pipe(
                                                                 JRoutineCore.<String>ofInputs()
                                                                     .buildChannel());
     assertThat(channel.in(seconds(1)).next()).isEqualTo("test");
@@ -281,7 +281,7 @@ public class FutureChannelTest {
     final Channel<?, String> channel = Channels.fromFuture(future).buildChannel();
     assertThat(channel.isBound()).isFalse();
     final Channel<? super String, String> outputChannel =
-        channel.bind(JRoutineCore.<String>ofInputs().buildChannel());
+        channel.pipe(JRoutineCore.<String>ofInputs().buildChannel());
     assertThat(channel.isBound()).isTrue();
     channel.abort();
     assertThat(outputChannel.in(seconds(1)).getError()).isExactlyInstanceOf(AbortException.class);
@@ -298,9 +298,9 @@ public class FutureChannelTest {
           }
         }, 3, TimeUnit.SECONDS);
     final Channel<?, String> channel = Channels.fromFuture(future).buildChannel();
-    channel.bind(JRoutineCore.<String>ofInputs().buildChannel());
+    channel.pipe(JRoutineCore.<String>ofInputs().buildChannel());
     try {
-      channel.bind(JRoutineCore.<String>ofInputs().buildChannel());
+      channel.pipe(JRoutineCore.<String>ofInputs().buildChannel());
       fail();
 
     } catch (final IllegalStateException ignored) {

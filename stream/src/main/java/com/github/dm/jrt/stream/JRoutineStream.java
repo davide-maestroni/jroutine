@@ -120,7 +120,7 @@ public class JRoutineStream {
 
           public Channel<?, IN> apply(final Channel<?, IN> inputs) {
             final Channel<IN, IN> outputChannel = JRoutineCore.<IN>ofInputs().buildChannel();
-            inputs.bind(new ChannelConsumer<IN>() {
+            inputs.consume(new ChannelConsumer<IN>() {
 
               public void onComplete() {
                 try {
@@ -197,7 +197,7 @@ public class JRoutineStream {
 
           public Channel<?, IN> apply(final Channel<?, IN> inputs) {
             final Channel<IN, IN> outputChannel = JRoutineCore.<IN>ofInputs().buildChannel();
-            inputs.bind(new ChannelConsumer<IN>() {
+            inputs.consume(new ChannelConsumer<IN>() {
 
               public void onComplete() {
                 try {
@@ -311,7 +311,7 @@ public class JRoutineStream {
 
           public Channel<?, IN> apply(final Channel<?, IN> inputs) {
             final Channel<IN, IN> outputChannel = JRoutineCore.<IN>ofInputs().buildChannel();
-            inputs.bind(new ChannelConsumer<IN>() {
+            inputs.consume(new ChannelConsumer<IN>() {
 
               public void onComplete() {
                 try {

@@ -183,7 +183,7 @@ public class StreamBuilderTest {
                     .sync()
                     .map(append((Object) "test"))
                     .invoke()
-                    .bind(JRoutineCore.ofInputs().buildChannel())
+                    .pipe(JRoutineCore.ofInputs().buildChannel())
                     .next();
       fail();
 
@@ -193,7 +193,7 @@ public class StreamBuilderTest {
     assertThat(JRoutineStream.<String>withStream().sync()
                                                   .map(append("test"))
                                                   .invoke()
-                                                  .bind(onOutput(new Consumer<String>() {
+                                                  .consume(onOutput(new Consumer<String>() {
 
                                                     public void accept(final String s) {
                                                       assertThat(s).isEqualTo("test");
@@ -461,7 +461,7 @@ public class StreamBuilderTest {
                                                          .map(routine)
                                                          .lift(tryCatchAccept(this))
                                                          .call(o)
-                                                         .bind(channel);
+                                                         .pipe(channel);
 
                                          } else {
                                            throw e;
@@ -1579,7 +1579,7 @@ public class StreamBuilderTest {
                       .getError()
                       .getCause()).isInstanceOf(IllegalStateException.class);
     assertThat(JRoutineStream.withStreamOf(
-        JRoutineCore.ofInputs().buildChannel().bind(new TemplateChannelConsumer<Object>() {}))
+        JRoutineCore.ofInputs().buildChannel().consume(new TemplateChannelConsumer<Object>() {}))
                              .immediate()
                              .call()
                              .getError()

@@ -146,7 +146,7 @@ public class ServiceCallInvocation
         mRequestData.requestWithBody(new AsyncRequestBody(mMediaType, mInputChannel));
     final Channel<ParcelableFlow<Object>, ParcelableFlow<Object>> outputChannel =
         JRoutineCore.<ParcelableFlow<Object>>ofInputs().buildChannel();
-    outputChannel.bind(result);
+    outputChannel.pipe(result);
     getClient().newCall(request).enqueue(new Callback() {
 
       @Override

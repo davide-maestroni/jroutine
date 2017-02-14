@@ -60,7 +60,7 @@ class BindTimeout<OUT> implements Function<Channel<?, OUT>, Channel<?, OUT>> {
     final ChannelConfiguration configuration = mConfiguration;
     final Channel<OUT, OUT> outputChannel =
         JRoutineCore.<OUT>ofInputs().apply(configuration).buildChannel();
-    channel.bind(new TimeoutChannelConsumer<OUT>(mTimeout, mTimeoutUnit,
+    channel.consume(new TimeoutChannelConsumer<OUT>(mTimeout, mTimeoutUnit,
         configuration.getRunnerOrElse(Runners.sharedRunner()), outputChannel));
     return outputChannel;
   }

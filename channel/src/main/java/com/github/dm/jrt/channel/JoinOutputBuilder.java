@@ -85,7 +85,7 @@ class JoinOutputBuilder<OUT> extends AbstractChannelBuilder<List<OUT>, List<OUT>
     final Backoff backoff = configuration.getBackoffOrElse(null);
     final int maxSize = configuration.getMaxSizeOrElse(Integer.MAX_VALUE);
     for (final Channel<?, ? extends OUT> channel : channels) {
-      channel.bind(
+      channel.consume(
           new JoinChannelConsumer<OUT>(backoff, maxSize, mutex, i++, isFlush, closed, queues,
               placeholder, outputChannel));
     }

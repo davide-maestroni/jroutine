@@ -81,7 +81,7 @@ class ReplayOutputChannel<OUT> implements Channel<OUT, OUT>, ChannelConsumer<OUT
         (configuration != null) ? configuration : ChannelConfiguration.defaultConfiguration();
     mOutputChannel = createOutputChannel();
     mChannel = channel;
-    channel.bind((ChannelConsumer<? super OUT>) this);
+    channel.consume((ChannelConsumer<? super OUT>) this);
   }
 
   @NotNull
@@ -127,22 +127,12 @@ class ReplayOutputChannel<OUT> implements Channel<OUT, OUT>, ChannelConsumer<OUT
   }
 
   @NotNull
-  public <AFTER> Channel<? super OUT, AFTER> bind(
-      @NotNull final Channel<? super OUT, AFTER> channel) {
-    synchronized (mMutex) {
-      final IdentityHashMap<Channel<? super OUT, ?>, Void> channels = mChannels;
-      if (channels.containsKey(channel)) {
-        return channel;
-      }
-
-      channels.put(channel, null);
-    }
-
-    return channel.pass(this);
+  public Channel<OUT, OUT> close() {
+    return this;
   }
 
   @NotNull
-  public Channel<OUT, OUT> bind(@NotNull final ChannelConsumer<? super OUT> consumer) {
+  public Channel<OUT, OUT> consume(@NotNull final ChannelConsumer<? super OUT> consumer) {
     final boolean isComplete;
     final RoutineException abortException;
     final Channel<OUT, OUT> outputChannel;
@@ -176,12 +166,7 @@ class ReplayOutputChannel<OUT> implements Channel<OUT, OUT>, ChannelConsumer<OUT
       newChannel.close();
     }
 
-    outputChannel.bind(consumer);
-    return this;
-  }
-
-  @NotNull
-  public Channel<OUT, OUT> close() {
+    outputChannel.consume(consumer);
     return this;
   }
 
@@ -302,6 +287,21 @@ class ReplayOutputChannel<OUT> implements Channel<OUT, OUT>, ChannelConsumer<OUT
   @NotNull
   public Channel<OUT, OUT> pass(@Nullable final OUT... inputs) {
     throw illegalInput();
+  }
+
+  @NotNull
+  public <AFTER> Channel<? super OUT, AFTER> pipe(
+      @NotNull final Channel<? super OUT, AFTER> channel) {
+    synchronized (mMutex) {
+      final IdentityHashMap<Channel<? super OUT, ?>, Void> channels = mChannels;
+      if (channels.containsKey(channel)) {
+        return channel;
+      }
+
+      channels.put(channel, null);
+    }
+
+    return channel.pass(this);
   }
 
   public int size() {

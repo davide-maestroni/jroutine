@@ -84,13 +84,13 @@ class JoinInputBuilder<IN> extends AbstractChannelBuilder<List<? extends IN>, Li
     for (final Channel<? extends IN, ?> channel : channels) {
       final Channel<IN, IN> outputChannel =
           JRoutineCore.<IN>ofInputs().apply(configuration).buildChannel();
-      outputChannel.bind((Channel<IN, ?>) channel);
+      outputChannel.pipe((Channel<IN, ?>) channel);
       channelList.add(outputChannel);
     }
 
     final Channel<List<? extends IN>, ?> inputChannel =
         JRoutineCore.<List<? extends IN>>ofInputs().apply(configuration).buildChannel();
-    return inputChannel.bind(new DistributeChannelConsumer(mIsFlush, mPlaceholder, channelList));
+    return inputChannel.consume(new DistributeChannelConsumer(mIsFlush, mPlaceholder, channelList));
   }
 
   /**

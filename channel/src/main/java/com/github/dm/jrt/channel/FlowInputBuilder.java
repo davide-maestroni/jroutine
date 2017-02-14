@@ -54,7 +54,7 @@ class FlowInputBuilder<DATA, IN extends DATA> extends AbstractChannelBuilder<IN,
         JRoutineCore.<IN>ofInputs().apply(getConfiguration()).buildChannel();
     final Channel<Flow<DATA>, Flow<DATA>> flowChannel =
         JRoutineCore.<Flow<DATA>>ofInputs().buildChannel();
-    flowChannel.bind(mChannel);
-    return inputChannel.bind(new FlowChannelConsumer<DATA, IN>(flowChannel, mId));
+    flowChannel.pipe(mChannel);
+    return inputChannel.consume(new FlowChannelConsumer<DATA, IN>(flowChannel, mId));
   }
 }

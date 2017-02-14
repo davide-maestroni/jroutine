@@ -53,6 +53,6 @@ class ChannelOnSubscribe<OUT> implements FlowableOnSubscribe<OUT>, Cancellable {
 
   public void subscribe(final FlowableEmitter<OUT> emitter) {
     emitter.setCancellable(this);
-    mChannel.bind(new EmitterConsumer<OUT>(emitter));
+    mChannel.consume(new EmitterConsumer<OUT>(emitter));
   }
 }

@@ -193,25 +193,25 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
   Channel<IN, OUT> allInto(@NotNull Collection<? super OUT> results);
 
   /**
-   * Binds this channel to the specified one.
+   * Closes this channel and completes the invocation.
    * <br>
-   * After method exits, all the output will be passed only to the specified input channel.
-   * Attempting to read through the dedicated methods will cause an
-   * {@link java.lang.IllegalStateException} to be thrown.
+   * After channel is closed, attempting to pass additional input data through the dedicated
+   * methods will cause an {@link java.lang.IllegalStateException} to be thrown.
    * <br>
-   * If a delay has been set through the dedicated methods, the transfer of data will be
+   * If a delay has been set through the dedicated methods, the closing command will be
    * accordingly postponed.
+   * <p>
+   * Note that, even if calling this method is not strictly mandatory, some invocation
+   * implementations may rely on the completion notification to produce their results. So, it's
+   * always advisable to close the channel as soon as all the input data has been passed.
    *
-   * @param channel the input channel
-   * @param <AFTER> the channel output type.
-   * @return the passed channel.
-   * @throws java.lang.IllegalStateException if this channel is already bound.
+   * @return this channel.
    * @see #after(DurationMeasure)
    * @see #after(long, TimeUnit)
    * @see #afterNoDelay()
    */
   @NotNull
-  <AFTER> Channel<? super OUT, AFTER> bind(@NotNull Channel<? super OUT, AFTER> channel);
+  Channel<IN, OUT> close();
 
   /**
    * Binds this channel to the specified consumer.
@@ -233,28 +233,8 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
    * @see #afterNoDelay()
    */
   @NotNull
-  Channel<IN, OUT> bind(@NotNull ChannelConsumer<? super OUT> consumer);
-
-  /**
-   * Closes this channel and completes the invocation.
-   * <br>
-   * After channel is closed, attempting to pass additional input data through the dedicated
-   * methods will cause an {@link java.lang.IllegalStateException} to be thrown.
-   * <br>
-   * If a delay has been set through the dedicated methods, the closing command will be
-   * accordingly postponed.
-   * <p>
-   * Note that, even if calling this method is not strictly mandatory, some invocation
-   * implementations may rely on the completion notification to produce their results. So, it's
-   * always advisable to close the channel as soon as all the input data has been passed.
-   *
-   * @return this channel.
-   * @see #after(DurationMeasure)
-   * @see #after(long, TimeUnit)
-   * @see #afterNoDelay()
-   */
-  @NotNull
-  Channel<IN, OUT> close();
+  Channel<IN, OUT> consume(@NotNull ChannelConsumer<? super OUT> consumer);
+  // TODO: 12/02/2017 consume(channel) => bind(channel).close(); return this;
 
   /**
    * Tells the channel to abort the invocation execution in case, after a read method is invoked,
@@ -499,8 +479,8 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
    * Checks if this channel is bound to a consumer or another channel.
    *
    * @return whether the channel is bound.
-   * @see #bind bind(Channel)
-   * @see #bind(ChannelConsumer)
+   * @see #consume(ChannelConsumer)
+   * @see #pipe(Channel)
    */
   boolean isBound();
 
@@ -656,6 +636,27 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
    */
   @NotNull
   Channel<IN, OUT> pass(@Nullable IN... inputs);
+
+  /**
+   * Binds this channel to the specified one.
+   * <br>
+   * After method exits, all the output will be passed only to the specified input channel.
+   * Attempting to read through the dedicated methods will cause an
+   * {@link java.lang.IllegalStateException} to be thrown.
+   * <br>
+   * If a delay has been set through the dedicated methods, the transfer of data will be
+   * accordingly postponed.
+   *
+   * @param channel the input channel
+   * @param <AFTER> the channel output type.
+   * @return the passed channel.
+   * @throws java.lang.IllegalStateException if this channel is already bound.
+   * @see #after(DurationMeasure)
+   * @see #after(long, TimeUnit)
+   * @see #afterNoDelay()
+   */
+  @NotNull
+  <AFTER> Channel<? super OUT, AFTER> pipe(@NotNull Channel<? super OUT, AFTER> channel);
 
   /**
    * Returns the total number of data stored in the channel.

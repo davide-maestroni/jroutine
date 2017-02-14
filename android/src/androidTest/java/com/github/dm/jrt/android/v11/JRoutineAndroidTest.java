@@ -1014,7 +1014,7 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
                        .getError()
                        .getCause()).isInstanceOf(IllegalStateException.class);
     assertThat(JRoutineAndroid.withStreamOf(
-        JRoutineAndroid.ofInputs().buildChannel().bind(new TemplateChannelConsumer<Object>() {}))
+        JRoutineAndroid.ofInputs().buildChannel().consume(new TemplateChannelConsumer<Object>() {}))
                               .lift(LoaderTransformations.runOn(loaderFrom(getActivity()))
                                                          .buildFunction())
                               .call()

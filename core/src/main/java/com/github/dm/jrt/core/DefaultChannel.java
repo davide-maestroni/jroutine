@@ -119,20 +119,14 @@ class DefaultChannel<DATA> implements Channel<DATA, DATA> {
   }
 
   @NotNull
-  public <AFTER> Channel<? super DATA, AFTER> bind(
-      @NotNull final Channel<? super DATA, AFTER> channel) {
-    return mChannel.bind(channel);
-  }
-
-  @NotNull
-  public Channel<DATA, DATA> bind(@NotNull final ChannelConsumer<? super DATA> consumer) {
-    mChannel.bind(consumer);
+  public Channel<DATA, DATA> close() {
+    mChannel.close();
     return this;
   }
 
   @NotNull
-  public Channel<DATA, DATA> close() {
-    mChannel.close();
+  public Channel<DATA, DATA> consume(@NotNull final ChannelConsumer<? super DATA> consumer) {
+    mChannel.consume(consumer);
     return this;
   }
 
@@ -251,6 +245,12 @@ class DefaultChannel<DATA> implements Channel<DATA, DATA> {
   public Channel<DATA, DATA> pass(@Nullable final DATA... inputs) {
     mChannel.pass(inputs);
     return this;
+  }
+
+  @NotNull
+  public <AFTER> Channel<? super DATA, AFTER> pipe(
+      @NotNull final Channel<? super DATA, AFTER> channel) {
+    return mChannel.pipe(channel);
   }
 
   public int size() {

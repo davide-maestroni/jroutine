@@ -165,13 +165,12 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
   }
 
   @NotNull
-  public <AFTER> Channel<? super OUT, AFTER> bind(
-      @NotNull final Channel<? super OUT, AFTER> channel) {
-    return channel.pass(this);
+  public Channel<OUT, OUT> close() {
+    return this;
   }
 
   @NotNull
-  public Channel<OUT, OUT> bind(@NotNull final ChannelConsumer<? super OUT> consumer) {
+  public Channel<OUT, OUT> consume(@NotNull final ChannelConsumer<? super OUT> consumer) {
     if (mIsBound.getAndSet(true)) {
       mLogger.err("invalid call on bound channel");
       throw new IllegalStateException("the channel is already bound");
@@ -224,11 +223,6 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
       }, delay.value, delay.unit);
     }
 
-    return this;
-  }
-
-  @NotNull
-  public Channel<OUT, OUT> close() {
     return this;
   }
 
@@ -386,6 +380,12 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
   @NotNull
   public Channel<OUT, OUT> pass(@Nullable final OUT... inputs) {
     return failPass();
+  }
+
+  @NotNull
+  public <AFTER> Channel<? super OUT, AFTER> pipe(
+      @NotNull final Channel<? super OUT, AFTER> channel) {
+    return channel.pass(this);
   }
 
   public int size() {

@@ -150,7 +150,7 @@ public class JRoutineCodegenTest {
         assertThat(service.getReposStream("octocat", null, null, null)
                           .map(Operators.<Repo>unfold())
                           .invoke()
-                          .bind(onOutput(new Consumer<Repo>() {
+                          .consume(onOutput(new Consumer<Repo>() {
 
                             public void accept(final Repo repo) throws Exception {
                               final int id = repo.getId().intValue();
@@ -175,7 +175,7 @@ public class JRoutineCodegenTest {
         assertThat(service.getReposStream("octocat", null, null, null)
                           .map(Operators.<Repo>unfold())
                           .invoke()
-                          .bind(onOutput(new Consumer<Repo>() {
+                          .consume(onOutput(new Consumer<Repo>() {
 
                             public void accept(final Repo repo) throws Exception {
                               final int id = repo.getId().intValue();
@@ -200,7 +200,7 @@ public class JRoutineCodegenTest {
         assertThat(service.getReposStream("octocat", null, null, null)
                           .map(Operators.<Repo>unfold())
                           .invoke()
-                          .bind(onOutput(new Consumer<Repo>() {
+                          .consume(onOutput(new Consumer<Repo>() {
 
                             public void accept(final Repo repo) throws Exception {
                               final int id = repo.getId().intValue();

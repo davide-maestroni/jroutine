@@ -41,7 +41,7 @@ import io.reactivex.Single;
  * <p>
  * In a dual way, a channel can be created from an Flowable:
  * <pre><code>
- * JRoutineFlowable.with(myFlowable).buildChannel().bind(getConsumer());
+ * JRoutineFlowable.with(myFlowable).buildChannel().consume(getConsumer());
  * </code></pre>
  * <p>
  * Created by davide-maestroni on 02/09/2017.

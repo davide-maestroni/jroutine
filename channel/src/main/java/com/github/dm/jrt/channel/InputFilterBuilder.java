@@ -54,8 +54,8 @@ class InputFilterBuilder<IN> extends AbstractChannelBuilder<Flow<IN>, Flow<IN>> 
     final Channel<Flow<IN>, Flow<IN>> inputChannel =
         JRoutineCore.<Flow<IN>>ofInputs().apply(getConfiguration()).buildChannel();
     final Channel<IN, IN> outputChannel = JRoutineCore.<IN>ofInputs().buildChannel();
-    outputChannel.bind(mChannel);
-    return inputChannel.bind(new FilterChannelConsumer<IN>(outputChannel, mId));
+    outputChannel.pipe(mChannel);
+    return inputChannel.consume(new FilterChannelConsumer<IN>(outputChannel, mId));
   }
 
   /**

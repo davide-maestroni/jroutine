@@ -55,7 +55,7 @@ class FlowInputBuilder<DATA, IN extends DATA> extends AbstractChannelBuilder<IN,
         JRoutineCore.<IN>ofInputs().apply(getConfiguration()).buildChannel();
     final Channel<ParcelableFlow<DATA>, ParcelableFlow<DATA>> outputChannel =
         JRoutineCore.<ParcelableFlow<DATA>>ofInputs().buildChannel();
-    outputChannel.bind(mChannel);
-    return inputChannel.bind(new FlowChannelConsumer<DATA, IN>(outputChannel, mId));
+    outputChannel.pipe(mChannel);
+    return inputChannel.consume(new FlowChannelConsumer<DATA, IN>(outputChannel, mId));
   }
 }

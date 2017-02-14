@@ -54,7 +54,7 @@ import org.jetbrains.annotations.NotNull;
  *                      .with(factoryOf(LoadResourceUri.class))
  *                      .buildRoutine();
  *   routine.call(RESOURCE_URI)
- *          .bind(new TemplateChannelConsumer&lt;MyResource&gt;() {
+ *          .consume(new TemplateChannelConsumer&lt;MyResource&gt;() {
  *
  *              &#64;Override
  *              public void onError(&#64;NotNull final RoutineException error) {

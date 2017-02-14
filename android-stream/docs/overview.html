@@ -115,7 +115,7 @@
                                                          .apply()
                                                          .buildFunction())
                               .call(IMAGE_URI);
-                              .bind(onError(showToast(this)).andOnOutput(showImage(imageView)));
+                              .consume(onError(showToast(this)).andOnOutput(showImage(imageView)));
             }
         }
     </code>

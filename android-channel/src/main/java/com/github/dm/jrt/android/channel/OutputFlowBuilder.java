@@ -53,7 +53,7 @@ class OutputFlowBuilder<OUT>
   public Channel<ParcelableFlow<OUT>, ParcelableFlow<OUT>> buildChannel() {
     final Channel<ParcelableFlow<OUT>, ParcelableFlow<OUT>> outputChannel =
         JRoutineCore.<ParcelableFlow<OUT>>ofInputs().apply(getConfiguration()).buildChannel();
-    mChannel.bind(new FlowChannelConsumer<OUT, OUT>(outputChannel, mId));
+    mChannel.consume(new FlowChannelConsumer<OUT, OUT>(outputChannel, mId));
     return outputChannel;
   }
 }

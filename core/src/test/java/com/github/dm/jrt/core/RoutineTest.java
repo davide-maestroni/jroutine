@@ -269,7 +269,7 @@ public class RoutineTest {
     final TestChannelConsumer consumer = new TestChannelConsumer();
     final Channel<Object, Object> channel1 =
         JRoutineCore.with(IdentityInvocation.factoryOf()).invoke().after(seconds(1)).pass("test1");
-    channel1.bind(consumer);
+    channel1.consume(consumer);
     assertThat(channel1.isBound()).isTrue();
     assertThat(consumer.isOutput()).isFalse();
     final Channel<Object, Object> channel2 = JRoutineCore.with(IdentityInvocation.factoryOf())
@@ -278,7 +278,7 @@ public class RoutineTest {
                                                          .apply()
                                                          .invoke()
                                                          .pass("test2");
-    channel2.bind(consumer);
+    channel2.consume(consumer);
     assertThat(channel1.isBound()).isTrue();
     assertThat(channel2.isBound()).isTrue();
     assertThat(consumer.isOutput()).isTrue();
@@ -528,7 +528,7 @@ public class RoutineTest {
 
           @Override
           public void onInput(final Integer integer, @NotNull final Channel<Integer, ?> result) {
-            squareRoutine.call(integer).bind(mChannel);
+            squareRoutine.call(integer).pipe(mChannel);
           }
 
           @Override
@@ -1090,7 +1090,7 @@ public class RoutineTest {
       }
     };
     final Channel<String, String> channel =
-        JRoutineCore.with(producer).invoke().pass("test").bind(exceptionConsumer);
+        JRoutineCore.with(producer).invoke().pass("test").consume(exceptionConsumer);
     assertThat(channel.in(seconds(3)).getError()).isNotNull();
   }
 
@@ -1172,7 +1172,7 @@ public class RoutineTest {
     final Channel<Object, Object> invocationChannel =
         JRoutineCore.with(IdentityInvocation.factoryOf()).invoke();
     final Channel<Object, Object> channel = JRoutineCore.ofInputs().buildChannel();
-    channel.bind(new TemplateChannelConsumer<Object>() {});
+    channel.consume(new TemplateChannelConsumer<Object>() {});
     try {
       invocationChannel.pass(channel);
       fail();
@@ -1815,14 +1815,14 @@ public class RoutineTest {
     }
 
     try {
-      channel.bind((Channel<String, String>) null);
+      channel.pipe((Channel<String, String>) null);
       fail();
 
     } catch (final NullPointerException ignored) {
     }
 
     try {
-      channel.bind((ChannelConsumer<String>) null);
+      channel.consume((ChannelConsumer<String>) null);
       fail();
 
     } catch (final NullPointerException ignored) {
@@ -1837,7 +1837,7 @@ public class RoutineTest {
 
     final TemplateChannelConsumer<String> consumer = new TemplateChannelConsumer<String>() {};
     try {
-      channel.bind(consumer).bind(consumer);
+      channel.consume(consumer).consume(consumer);
       fail();
 
     } catch (final IllegalStateException ignored) {
@@ -2419,14 +2419,14 @@ public class RoutineTest {
     final String input = "test";
     final Routine<String, String> routine =
         JRoutineCore.with(factoryOf(DelayedInvocation.class, noTime())).buildRoutine();
-    assertThat(routine.call(input).bind(consumer).in(timeout).getComplete()).isTrue();
-    assertThat(routine.callParallel(input).bind(consumer).in(timeout).getComplete()).isTrue();
+    assertThat(routine.call(input).consume(consumer).in(timeout).getComplete()).isTrue();
+    assertThat(routine.callParallel(input).consume(consumer).in(timeout).getComplete()).isTrue();
     assertThat(
-        routine.invoke().pass(input).close().bind(consumer).in(timeout).getComplete()).isTrue();
+        routine.invoke().pass(input).close().consume(consumer).in(timeout).getComplete()).isTrue();
     assertThat(routine.invokeParallel()
                       .pass(input)
                       .close()
-                      .bind(consumer)
+                      .consume(consumer)
                       .in(timeout)
                       .getComplete()).isTrue();
   }

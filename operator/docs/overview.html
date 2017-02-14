@@ -77,11 +77,11 @@
                                     .apply()
                                     .buildRoutine();
                 final Double rms = parseRoutine.callParallel(args)
-                                               .bind(squareRoutine.invokeParallel())
+                                               .pipe(squareRoutine.invokeParallel())
                                                .close()
-                                               .bind(meanRoutine.invoke())
+                                               .pipe(meanRoutine.invoke())
                                                .close()
-                                               .bind(sqrtRoutine.invoke())
+                                               .pipe(sqrtRoutine.invoke())
                                                .close()
                                                .in(seconds(3))
                                                .next();

@@ -79,13 +79,13 @@ class MergeInputBuilder<IN> extends AbstractChannelBuilder<Flow<? extends IN>, F
     for (final Channel<? extends IN, ?> channel : channels) {
       final Channel<IN, IN> outputChannel =
           JRoutineCore.<IN>ofInputs().apply(configuration).buildChannel();
-      outputChannel.bind((Channel<IN, ?>) channel);
+      outputChannel.pipe((Channel<IN, ?>) channel);
       channelList.add(outputChannel);
     }
 
     final Channel<Flow<? extends IN>, ?> inputChannel =
         JRoutineCore.<Flow<? extends IN>>ofInputs().apply(configuration).buildChannel();
-    return inputChannel.bind(new SortingArrayChannelConsumer(mStartId, channelList));
+    return inputChannel.consume(new SortingArrayChannelConsumer(mStartId, channelList));
   }
 
   /**

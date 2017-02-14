@@ -722,7 +722,7 @@ public class JRoutineTest {
                        .getError()
                        .getCause()).isInstanceOf(IllegalStateException.class);
     assertThat(JRoutine.withStreamOf(
-        JRoutine.ofInputs().buildChannel().bind(new TemplateChannelConsumer<Object>() {}))
+        JRoutine.ofInputs().buildChannel().consume(new TemplateChannelConsumer<Object>() {}))
                        .immediate()
                        .call()
                        .getError()

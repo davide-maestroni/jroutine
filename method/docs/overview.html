@@ -71,7 +71,7 @@
                 }
             }
         }.call(inputInts, inputStrings, outputChannel);
-        outputChannel.bind(new TemplateChannelConsumer&lt;String&gt;() {
+        outputChannel.consume(new TemplateChannelConsumer&lt;String&gt;() {
 
             &#64;Override
             public void onOutput(final String out) {

@@ -311,7 +311,7 @@ public class ChannelTest {
     final Channel<Object, Object> invocationChannel =
         JRoutineCore.with(IdentityInvocation.factoryOf()).invoke();
     final Channel<Object, Object> channel = JRoutineCore.ofInputs().buildChannel();
-    invocationChannel.bind(new TemplateChannelConsumer<Object>() {});
+    invocationChannel.consume(new TemplateChannelConsumer<Object>() {});
     try {
       channel.pass(invocationChannel);
       fail();

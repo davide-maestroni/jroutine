@@ -697,7 +697,7 @@ public class InvocationService extends Service {
      *                                                        or already bound to a consumer.
      */
     void bind(@NotNull final ChannelConsumer<Object> consumer) {
-      mChannel.bind(consumer);
+      mChannel.consume(consumer);
     }
 
     /**

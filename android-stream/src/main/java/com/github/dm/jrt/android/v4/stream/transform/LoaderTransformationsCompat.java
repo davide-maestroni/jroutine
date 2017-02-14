@@ -61,8 +61,8 @@ public class LoaderTransformationsCompat {
    *                                                .withInvocationId(INVOCATION_ID)
    *                                                .apply()
    *                                                .buildFunction())
-   *               .close()
-   *               .bind(getConsumer());
+   *               .call()
+   *               .consume(getConsumer());
    * </code></pre>
    * Note that the Loader ID, by default, will only depend on the inputs, so that, in order to avoid
    * clashing, it is advisable to explicitly set the invocation ID like shown in the example.

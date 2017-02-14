@@ -297,28 +297,6 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
   }
 
   @NotNull
-  public <AFTER> Channel<? super OUT, AFTER> bind(
-      @NotNull final Channel<? super OUT, AFTER> channel) {
-    return channel.pass(this);
-  }
-
-  @NotNull
-  public Channel<OUT, OUT> bind(@NotNull final ChannelConsumer<? super OUT> consumer) {
-    final boolean forceClose;
-    final BindingHandler<OUT> handler;
-    synchronized (mMutex) {
-      verifyBound();
-      forceClose = mState.isDone();
-      handler = (mBindingHandler =
-          new ConsumerHandler(ConstantConditions.notNull("channel consumer", consumer)));
-      mMutex.notifyAll();
-    }
-
-    mFlusher.run(handler, forceClose);
-    return this;
-  }
-
-  @NotNull
   public Channel<OUT, OUT> close() {
     final DurationMeasure delay = mResultDelay.get();
     final boolean isOpen;
@@ -338,6 +316,22 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
       mFlusher.run(handler, false);
     }
 
+    return this;
+  }
+
+  @NotNull
+  public Channel<OUT, OUT> consume(@NotNull final ChannelConsumer<? super OUT> consumer) {
+    final boolean forceClose;
+    final BindingHandler<OUT> handler;
+    synchronized (mMutex) {
+      verifyBound();
+      forceClose = mState.isDone();
+      handler = (mBindingHandler =
+          new ConsumerHandler(ConstantConditions.notNull("channel consumer", consumer)));
+      mMutex.notifyAll();
+    }
+
+    mFlusher.run(handler, forceClose);
     return this;
   }
 
@@ -547,7 +541,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     }
 
     if ((consumer != null) && (channel != null)) {
-      channel.bind(consumer);
+      channel.consume(consumer);
     }
 
     return this;
@@ -629,6 +623,12 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     }
 
     return this;
+  }
+
+  @NotNull
+  public <AFTER> Channel<? super OUT, AFTER> pipe(
+      @NotNull final Channel<? super OUT, AFTER> channel) {
+    return channel.pass(this);
   }
 
   public int size() {

@@ -97,7 +97,7 @@ class Throttle<IN, OUT> implements LiftFunction<IN, OUT, IN, OUT> {
             public void run() {
               try {
                 mBindingFunction.apply(channel)
-                                .bind(new ThrottleChannelConsumer<OUT>(BindingFunction.this,
+                                .consume(new ThrottleChannelConsumer<OUT>(BindingFunction.this,
                                     outputChannel));
 
               } catch (final Throwable t) {
@@ -111,7 +111,8 @@ class Throttle<IN, OUT> implements LiftFunction<IN, OUT, IN, OUT> {
       }
 
       if (isBind) {
-        mBindingFunction.apply(channel).bind(new ThrottleChannelConsumer<OUT>(this, outputChannel));
+        mBindingFunction.apply(channel)
+                        .consume(new ThrottleChannelConsumer<OUT>(this, outputChannel));
       }
 
       return outputChannel;

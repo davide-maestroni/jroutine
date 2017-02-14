@@ -324,7 +324,7 @@ public class ParcelableByteChannel {
     public ChunkOutputStream buildOutputStream() {
       final Channel<ByteChunk, ByteChunk> outputChannel =
           JRoutineCore.<ByteChunk>ofInputs().buildChannel();
-      outputChannel.bind(new ChunkChannelConsumer(mChannel));
+      outputChannel.consume(new ChunkChannelConsumer(mChannel));
       return ByteChannel.withOutput(outputChannel).apply(mConfiguration).buildOutputStream();
     }
 

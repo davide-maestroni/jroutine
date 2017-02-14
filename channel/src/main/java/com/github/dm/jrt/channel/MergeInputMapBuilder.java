@@ -71,12 +71,12 @@ class MergeInputMapBuilder<IN>
     for (final Entry<Integer, Channel<? extends IN, ?>> entry : channelMap.entrySet()) {
       final Channel<IN, IN> outputChannel =
           JRoutineCore.<IN>ofInputs().apply(configuration).buildChannel();
-      outputChannel.bind((Channel<IN, ?>) entry.getValue());
+      outputChannel.pipe((Channel<IN, ?>) entry.getValue());
       inputChannelMap.put(entry.getKey(), outputChannel);
     }
 
     final Channel<Flow<? extends IN>, Flow<? extends IN>> inputChannel =
         JRoutineCore.<Flow<? extends IN>>ofInputs().apply(configuration).buildChannel();
-    return inputChannel.bind(new SortingMapChannelConsumer<IN>(inputChannelMap));
+    return inputChannel.consume(new SortingMapChannelConsumer<IN>(inputChannelMap));
   }
 }

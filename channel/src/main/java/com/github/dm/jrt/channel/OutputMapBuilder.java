@@ -109,7 +109,7 @@ class OutputMapBuilder<OUT> extends AbstractChannelMapBuilder<Integer, OUT, OUT>
           channels.put(id, outputChannel);
         }
 
-        channel.bind(new SortingMapChannelConsumer<OUT>(inputMap));
+        channel.consume(new SortingMapChannelConsumer<OUT>(inputMap));
         channelMaps.put(flowInfo, channels);
       }
 

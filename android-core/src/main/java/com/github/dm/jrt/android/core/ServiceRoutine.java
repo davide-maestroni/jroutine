@@ -350,7 +350,7 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
       message.replyTo = inMessenger;
       try {
         outMessenger.send(message);
-        mInputChannel.bind(
+        mInputChannel.consume(
             new ConnectionChannelConsumer<IN>(invocationId, inMessenger, outMessenger));
 
       } catch (final Throwable t) {
@@ -456,7 +456,7 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
     private void bind(@NotNull final Channel<OUT, ?> result) {
       final Channel<?, OUT> outputChannel = mOutputChannel;
       if (!outputChannel.isBound()) {
-        outputChannel.bind(result);
+        outputChannel.pipe(result);
       }
     }
 

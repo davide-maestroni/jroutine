@@ -347,7 +347,11 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
 
     @NotNull
     private Channel<?, ParcelableFlow<Object>> invokeCall(final Call<?> call) {
-      return JRoutineCore.with(sInvocation).apply(mInvocationConfiguration).call(call);
+      return JRoutineCore.with(sInvocation)
+                         .apply(mInvocationConfiguration)
+                         .invoke()
+                         .pass(call)
+                         .close();
     }
 
     @Override

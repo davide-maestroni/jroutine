@@ -53,7 +53,7 @@ import org.jetbrains.annotations.NotNull;
  *       JRoutineService.on(serviceFrom(this))
  *                      .with(factoryOf(LoadResourceUri.class))
  *                      .buildRoutine();
- *   routine.call(RESOURCE_URI)
+ *   routine.invoke()
  *          .consume(new TemplateChannelConsumer&lt;MyResource&gt;() {
  *
  *              &#64;Override
@@ -65,7 +65,9 @@ import org.jetbrains.annotations.NotNull;
  *              public void onOutput(final MyResource resource) {
  *                displayResource(resource);
  *              }
- *          });
+ *          })
+ *          .pass(RESOURCE_URI)
+ *          .close();
  * }
  * </code></pre>
  * <p>

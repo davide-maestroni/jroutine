@@ -19,7 +19,7 @@ package com.github.dm.jrt.core.builder;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
-import com.github.dm.jrt.core.routine.TemplateRoutine;
+import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
@@ -32,8 +32,8 @@ import org.jetbrains.annotations.NotNull;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-public abstract class AbstractRoutineBuilder<IN, OUT> extends TemplateRoutine<IN, OUT>
-    implements RoutineBuilder<IN, OUT> {
+public abstract class AbstractRoutineBuilder<IN, OUT>
+    implements RoutineBuilder<IN, OUT>, Routine<IN, OUT> {
 
   private InvocationConfiguration mConfiguration = InvocationConfiguration.defaultConfiguration();
 
@@ -43,9 +43,7 @@ public abstract class AbstractRoutineBuilder<IN, OUT> extends TemplateRoutine<IN
     return this;
   }
 
-  @NotNull
-  public Builder<? extends RoutineBuilder<IN, OUT>> invocationConfiguration() {
-    return new Builder<RoutineBuilder<IN, OUT>>(this, mConfiguration);
+  public void clear() {
   }
 
   @NotNull
@@ -56,6 +54,11 @@ public abstract class AbstractRoutineBuilder<IN, OUT> extends TemplateRoutine<IN
   @NotNull
   public Channel<IN, OUT> invokeParallel() {
     return buildRoutine().invokeParallel();
+  }
+
+  @NotNull
+  public Builder<? extends RoutineBuilder<IN, OUT>> invocationConfiguration() {
+    return new Builder<RoutineBuilder<IN, OUT>>(this, mConfiguration);
   }
 
   /**

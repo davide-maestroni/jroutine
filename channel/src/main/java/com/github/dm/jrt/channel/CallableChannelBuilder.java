@@ -59,7 +59,8 @@ class CallableChannelBuilder<OUT> extends AbstractChannelBuilder<Void, OUT> {
                        .withRunner(Runners.immediateRunner())
                        .with(configuration)
                        .apply()
-                       .call();
+                       .invoke()
+                       .close();
   }
 
   /**

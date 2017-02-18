@@ -185,7 +185,9 @@ public class RoutineTest {
                            .invocationConfiguration()
                            .withLogLevel(Level.SILENT)
                            .apply()
-                           .call("test")
+                           .invoke()
+                           .pass("test")
+                           .close()
                            .in(timeout)
                            .all()).isEmpty();
     semaphore.tryAcquire(1, 1, TimeUnit.SECONDS);
@@ -246,7 +248,8 @@ public class RoutineTest {
                                                          .withPriority(AgingPriority.HIGH_PRIORITY)
                                                          .apply()
                                                          .buildRoutine();
-    final Channel<Object, Object> output1 = routine1.call("test1").eventuallyContinue();
+    final Channel<Object, Object> output1 =
+        routine1.invoke().pass("test1").close().eventuallyContinue();
     final Channel<Object, Object> input2 = routine2.invoke();
     for (int i = 0; i < AgingPriority.HIGH_PRIORITY - 1; i++) {
       input2.pass("test2");
@@ -294,22 +297,36 @@ public class RoutineTest {
                     .withRunner(Runners.syncRunner())
                     .apply()
                     .buildRoutine();
-    assertThat(routine.call().in(timeout).all()).isEmpty();
-    assertThat(routine.call(Arrays.asList("test1", "test2")).in(timeout).all()).containsExactly(
+    assertThat(routine.invoke().close().in(timeout).all()).isEmpty();
+    assertThat(routine.invoke()
+                      .pass(Arrays.asList("test1", "test2"))
+                      .close()
+                      .in(timeout)
+                      .all()).containsExactly("test1", "test2");
+    assertThat(routine.invoke()
+                      .pass(routine.invoke().pass("test1", "test2").close())
+                      .close()
+                      .in(timeout)
+                      .all()).containsExactly("test1", "test2");
+    assertThat(routine.invoke().pass("test1").close().in(timeout).all()).containsExactly("test1");
+    assertThat(routine.invoke().pass("test1", "test2").close().in(timeout).all()).containsExactly(
         "test1", "test2");
-    assertThat(routine.call(routine.call("test1", "test2")).in(timeout).all()).containsExactly(
-        "test1", "test2");
-    assertThat(routine.call("test1").in(timeout).all()).containsExactly("test1");
-    assertThat(routine.call("test1", "test2").in(timeout).all()).containsExactly("test1", "test2");
     assertThat(routine.invokeParallel().close().in(timeout).all()).isEmpty();
+    assertThat(routine.invokeParallel()
+                      .pass(Arrays.asList("test1", "test2"))
+                      .close()
+                      .in(timeout)
+                      .all()).containsOnly("test1", "test2");
+    assertThat(routine.invokeParallel()
+                      .pass(routine.invoke().pass("test1", "test2").close())
+                      .close()
+                      .in(timeout)
+                      .all()).containsOnly("test1", "test2");
+    assertThat(routine.invokeParallel().pass("test1").close().in(timeout).all()).containsOnly(
+        "test1");
     assertThat(
-        routine.callParallel(Arrays.asList("test1", "test2")).in(timeout).all()).containsOnly(
+        routine.invokeParallel().pass("test1", "test2").close().in(timeout).all()).containsOnly(
         "test1", "test2");
-    assertThat(routine.callParallel(routine.call("test1", "test2")).in(timeout).all()).containsOnly(
-        "test1", "test2");
-    assertThat(routine.callParallel("test1").in(timeout).all()).containsOnly("test1");
-    assertThat(routine.callParallel("test1", "test2").in(timeout).all()).containsOnly("test1",
-        "test2");
 
     assertThat(routine.invoke().pass().close().in(timeout).all()).isEmpty();
     assertThat(routine.invoke()
@@ -318,7 +335,7 @@ public class RoutineTest {
                       .in(timeout)
                       .all()).containsExactly("test1", "test2");
     assertThat(routine.invoke()
-                      .pass(routine.call("test1", "test2"))
+                      .pass(routine.invoke().pass("test1", "test2").close())
                       .close()
                       .in(timeout)
                       .all()).containsExactly("test1", "test2");
@@ -332,7 +349,7 @@ public class RoutineTest {
                       .in(timeout)
                       .all()).containsOnly("test1", "test2");
     assertThat(routine.invokeParallel()
-                      .pass(routine.call("test1", "test2"))
+                      .pass(routine.invoke().pass("test1", "test2").close())
                       .close()
                       .in(timeout)
                       .all()).containsOnly("test1", "test2");
@@ -346,7 +363,14 @@ public class RoutineTest {
   @Test
   public void testChainedRoutine() {
     final DurationMeasure timeout = seconds(1);
-    final CallInvocation<Integer, Integer> execSum = new CallInvocation<Integer, Integer>() {
+    final MappingInvocation<String, Integer> parse = new MappingInvocation<String, Integer>(null) {
+
+      public void onInput(final String input, @NotNull final Channel<Integer, ?> result) {
+        result.pass(Integer.parseInt(input));
+      }
+    };
+    final Routine<String, Integer> parseRoutine = JRoutineCore.with(parse).buildRoutine();
+    final CallInvocation<Integer, Integer> sum = new CallInvocation<Integer, Integer>() {
 
       @Override
       protected void onCall(@NotNull final List<? extends Integer> integers,
@@ -359,18 +383,41 @@ public class RoutineTest {
         result.pass(sum);
       }
     };
-    final Routine<Integer, Integer> sumRoutine = JRoutineCore.with(factoryOf(execSum, this))
+    final Routine<Integer, Integer> sumRoutine = JRoutineCore.with(factoryOf(sum, this))
                                                              .invocationConfiguration()
                                                              .withRunner(Runners.syncRunner())
                                                              .apply()
                                                              .buildRoutine();
     final Routine<Integer, Integer> squareRoutine =
         JRoutineCore.with(new SquareInvocation()).buildRoutine();
-    assertThat(sumRoutine.call(squareRoutine.call(1, 2, 3, 4)).in(timeout).all()).containsExactly(
-        30);
-    assertThat(
-        sumRoutine.call(squareRoutine.callParallel(1, 2, 3, 4)).in(timeout).all()).containsExactly(
-        30);
+    assertThat(sumRoutine.invoke()
+                         .pass(squareRoutine.invoke().pass(1, 2, 3, 4).close())
+                         .close()
+                         .in(timeout)
+                         .all()).containsExactly(30);
+    assertThat(sumRoutine.invoke()
+                         .pass(squareRoutine.invokeParallel().pass(1, 2, 3, 4).close())
+                         .close()
+                         .in(timeout)
+                         .all()).containsExactly(30);
+    assertThat(sumRoutine.invoke()
+                         .pass(squareRoutine.invokeParallel()
+                                            .pass(parseRoutine.invokeParallel()
+                                                              .pass("1", "2", "3", "4")
+                                                              .close())
+                                            .close())
+                         .close()
+                         .in(timeout)
+                         .all()).containsExactly(30);
+    assertThat(parseRoutine.invokeParallel()
+                           .pass("1", "2", "3", "4")
+                           .close()
+                           .pipe(squareRoutine.invokeParallel())
+                           .close()
+                           .pipe(sumRoutine.invoke())
+                           .close()
+                           .in(timeout)
+                           .all()).containsExactly(30);
   }
 
   @Test
@@ -528,7 +575,7 @@ public class RoutineTest {
 
           @Override
           public void onInput(final Integer integer, @NotNull final Channel<Integer, ?> result) {
-            squareRoutine.call(integer).pipe(mChannel);
+            squareRoutine.invoke().pass(integer).close().pipe(mChannel);
           }
 
           @Override
@@ -539,7 +586,8 @@ public class RoutineTest {
     final Routine<Integer, Integer> squareSumRoutine =
         JRoutineCore.with(factoryOf(invokeSquareSum, this, sumRoutine, squareRoutine))
                     .buildRoutine();
-    assertThat(squareSumRoutine.call(1, 2, 3, 4).in(timeout).all()).containsExactly(30);
+    assertThat(
+        squareSumRoutine.invoke().pass(1, 2, 3, 4).close().in(timeout).all()).containsExactly(30);
   }
 
   @Test
@@ -570,7 +618,7 @@ public class RoutineTest {
   public void testDeadlockOnAll() {
     final Routine<Object, Object> routine2 = JRoutineCore.with(new AllInvocation()).buildRoutine();
     try {
-      routine2.call("test").in(seconds(1)).all();
+      routine2.invoke().pass("test").close().in(seconds(1)).all();
       fail();
 
     } catch (final DeadlockException ignored) {
@@ -582,7 +630,7 @@ public class RoutineTest {
     final Routine<Object, Object> routine1 =
         JRoutineCore.with(new CheckCompleteInvocation()).buildRoutine();
     try {
-      routine1.call("test").in(seconds(1)).all();
+      routine1.invoke().pass("test").close().in(seconds(1)).all();
       fail();
 
     } catch (final DeadlockException ignored) {
@@ -594,7 +642,7 @@ public class RoutineTest {
     final Routine<Object, Object> routine3 =
         JRoutineCore.with(new HasNextInvocation()).buildRoutine();
     try {
-      routine3.call("test").in(seconds(1)).all();
+      routine3.invoke().pass("test").close().in(seconds(1)).all();
       fail();
 
     } catch (final DeadlockException ignored) {
@@ -605,7 +653,7 @@ public class RoutineTest {
   public void testDeadlockOnNext() {
     final Routine<Object, Object> routine4 = JRoutineCore.with(new NextInvocation()).buildRoutine();
     try {
-      routine4.call("test").in(seconds(1)).all();
+      routine4.invoke().pass("test").close().in(seconds(1)).all();
       fail();
 
     } catch (final DeadlockException ignored) {
@@ -778,9 +826,9 @@ public class RoutineTest {
 
     final Routine<String, String> abortRoutine =
         JRoutineCore.with(factoryOf(DelayedAbortInvocation.class, millis(200))).buildRoutine();
-    assertThat(abortRoutine.call("test").in(timeout).next()).isEqualTo("test");
+    assertThat(abortRoutine.invoke().pass("test").close().in(timeout).next()).isEqualTo("test");
     try {
-      final Channel<String, String> channel = abortRoutine.call("test");
+      final Channel<String, String> channel = abortRoutine.invoke().pass("test").close();
       millis(500).sleepAtLeast();
       channel.in(timeout).all();
       fail();
@@ -799,7 +847,7 @@ public class RoutineTest {
     final long startTime = System.currentTimeMillis();
     assertThat(routine1.invoke()
                        .after(millis(500))
-                       .pass(routine2.call("test"))
+                       .pass(routine2.invoke().pass("test").close())
                        .afterNoDelay()
                        .close()
                        .in(timeout)
@@ -856,7 +904,7 @@ public class RoutineTest {
     final Routine<Object, Object> routine2 =
         JRoutineCore.with(RoutineInvocation.factoryFrom(routine1, InvocationMode.ASYNC))
                     .buildRoutine();
-    assertThat(routine2.call("test1").in(timeout).all()).containsExactly("test1");
+    assertThat(routine2.invoke().pass("test1").close().in(timeout).all()).containsExactly("test1");
     final Channel<Object, Object> channel = routine2.invoke().after(timeout).pass("test2");
     channel.afterNoDelay().abort(new IllegalArgumentException());
     try {
@@ -871,13 +919,13 @@ public class RoutineTest {
     final Routine<String, String> routine4 =
         JRoutineCore.with(RoutineInvocation.factoryFrom(routine3, InvocationMode.ASYNC))
                     .buildRoutine();
-    assertThat(routine4.call("test4").in(timeout).all()).containsExactly("test4");
+    assertThat(routine4.invoke().pass("test4").close().in(timeout).all()).containsExactly("test4");
     routine4.clear();
     assertThat(TestDiscard.getInstanceCount()).isZero();
     final Routine<String, String> routine5 =
         JRoutineCore.with(RoutineInvocation.factoryFrom(routine3, InvocationMode.PARALLEL))
                     .buildRoutine();
-    assertThat(routine5.call("test5").in(timeout).all()).containsExactly("test5");
+    assertThat(routine5.invoke().pass("test5").close().in(timeout).all()).containsExactly("test5");
     routine5.clear();
     assertThat(TestDiscard.getInstanceCount()).isZero();
   }
@@ -890,10 +938,14 @@ public class RoutineTest {
                                                          .withCoreInstances(0)
                                                          .apply()
                                                          .buildRoutine();
-    assertThat(routine1.call("1", "2", "3", "4", "5").in(timeout).all()).containsOnly("1", "2", "3",
-        "4", "5");
-    assertThat(routine1.callParallel("1", "2", "3", "4", "5").in(timeout).all()).containsOnly("1",
+    assertThat(
+        routine1.invoke().pass("1", "2", "3", "4", "5").close().in(timeout).all()).containsOnly("1",
         "2", "3", "4", "5");
+    assertThat(routine1.invokeParallel()
+                       .pass("1", "2", "3", "4", "5")
+                       .close()
+                       .in(timeout)
+                       .all()).containsOnly("1", "2", "3", "4", "5");
     assertThat(TestDiscard.getInstanceCount()).isZero();
 
     final Routine<String, String> routine3 =
@@ -908,20 +960,28 @@ public class RoutineTest {
 
     final Routine<String, String> routine5 =
         JRoutineCore.with(factoryOf(TestDiscard.class)).buildRoutine();
-    assertThat(routine5.call("1", "2", "3", "4", "5").in(timeout).all()).containsOnly("1", "2", "3",
-        "4", "5");
-    assertThat(routine5.callParallel("1", "2", "3", "4", "5").in(timeout).all()).containsOnly("1",
+    assertThat(
+        routine5.invoke().pass("1", "2", "3", "4", "5").close().in(timeout).all()).containsOnly("1",
         "2", "3", "4", "5");
+    assertThat(routine5.invokeParallel()
+                       .pass("1", "2", "3", "4", "5")
+                       .close()
+                       .in(timeout)
+                       .all()).containsOnly("1", "2", "3", "4", "5");
     routine5.clear();
     assertThat(TestDiscard.getInstanceCount()).isZero();
 
     final Routine<String, String> routine6 =
         JRoutineCore.with(factoryOf(TestDiscardException.class)).buildRoutine();
 
-    assertThat(routine6.call("1", "2", "3", "4", "5").in(timeout).all()).containsOnly("1", "2", "3",
-        "4", "5");
-    assertThat(routine6.callParallel("1", "2", "3", "4", "5").in(timeout).all()).containsOnly("1",
+    assertThat(
+        routine6.invoke().pass("1", "2", "3", "4", "5").close().in(timeout).all()).containsOnly("1",
         "2", "3", "4", "5");
+    assertThat(routine6.invokeParallel()
+                       .pass("1", "2", "3", "4", "5")
+                       .close()
+                       .in(timeout)
+                       .all()).containsOnly("1", "2", "3", "4", "5");
     routine6.clear();
     assertThat(TestDiscard.getInstanceCount()).isZero();
   }
@@ -974,7 +1034,8 @@ public class RoutineTest {
                   .withRunner(Runners.syncRunner())
                   .withLogLevel(Level.SILENT)
                   .apply()
-                  .call()
+                  .invoke()
+                  .close()
                   .all();
       fail();
 
@@ -1186,7 +1247,7 @@ public class RoutineTest {
     final ExceptionRoutine routine =
         new ExceptionRoutine(InvocationConfiguration.defaultConfiguration());
     try {
-      routine.call().in(seconds(1)).all();
+      routine.invoke().close().in(seconds(1)).all();
       fail();
 
     } catch (final InvocationException e) {
@@ -1198,7 +1259,7 @@ public class RoutineTest {
   public void testInitInvocationNull() {
     final NullRoutine routine = new NullRoutine(InvocationConfiguration.defaultConfiguration());
     try {
-      routine.call().in(seconds(1)).all();
+      routine.invoke().close().in(seconds(1)).all();
       fail();
 
     } catch (final InvocationException e) {
@@ -1213,7 +1274,9 @@ public class RoutineTest {
                   .invocationConfiguration()
                   .withInputMaxSize(1)
                   .apply()
-                  .call("test", "test")
+                  .invoke()
+                  .pass("test", "test")
+                  .close()
                   .all();
       fail();
 
@@ -1225,7 +1288,9 @@ public class RoutineTest {
                   .invocationConfiguration()
                   .withInputMaxSize(1)
                   .apply()
-                  .call(Arrays.asList("test", "test"))
+                  .invoke()
+                  .pass(Arrays.asList("test", "test"))
+                  .close()
                   .all();
       fail();
 
@@ -1317,28 +1382,48 @@ public class RoutineTest {
   @Test
   public void testInputRunnerDeadlock() {
     try {
-      JRoutineCore.with(new InputRunnerDeadlock()).call("test").in(seconds(1)).all();
+      JRoutineCore.with(new InputRunnerDeadlock())
+                  .invoke()
+                  .pass("test")
+                  .close()
+                  .in(seconds(1))
+                  .all();
       fail();
 
     } catch (final DeadlockException ignored) {
     }
 
     try {
-      JRoutineCore.with(new InputListRunnerDeadlock()).call("test").in(seconds(1)).all();
+      JRoutineCore.with(new InputListRunnerDeadlock())
+                  .invoke()
+                  .pass("test")
+                  .close()
+                  .in(seconds(1))
+                  .all();
       fail();
 
     } catch (final DeadlockException ignored) {
     }
 
     try {
-      JRoutineCore.with(new InputArrayRunnerDeadlock()).call("test").in(seconds(1)).all();
+      JRoutineCore.with(new InputArrayRunnerDeadlock())
+                  .invoke()
+                  .pass("test")
+                  .close()
+                  .in(seconds(1))
+                  .all();
       fail();
 
     } catch (final DeadlockException ignored) {
     }
 
     try {
-      JRoutineCore.with(new InputConsumerRunnerDeadlock()).call("test").in(seconds(1)).all();
+      JRoutineCore.with(new InputConsumerRunnerDeadlock())
+                  .invoke()
+                  .pass("test")
+                  .close()
+                  .in(seconds(1))
+                  .all();
       fail();
 
     } catch (final DeadlockException ignored) {
@@ -1374,7 +1459,7 @@ public class RoutineTest {
   @Test
   public void testInvocationLifecycle() throws InterruptedException {
     final Channel<String, String> outputChannel =
-        JRoutineCore.with(factoryOf(TestLifecycle.class)).call("test");
+        JRoutineCore.with(factoryOf(TestLifecycle.class)).invoke().pass("test").close();
     Thread.sleep(500);
     outputChannel.abort();
     outputChannel.in(indefiniteTime()).getComplete();
@@ -1391,7 +1476,7 @@ public class RoutineTest {
                                                     .buildRoutine();
     routine.invoke().pass((Void) null);
     try {
-      routine.call().in(seconds(1)).next();
+      routine.invoke().close().in(seconds(1)).next();
       fail();
 
     } catch (final InvocationDeadlockException ignored) {
@@ -1401,11 +1486,15 @@ public class RoutineTest {
   @Test
   public void testNextList() {
     assertThat(JRoutineCore.with(IdentityInvocation.factoryOf())
-                           .call("test1", "test2", "test3", "test4")
+                           .invoke()
+                           .pass("test1", "test2", "test3", "test4")
+                           .close()
                            .in(seconds(1))
                            .next(2)).containsExactly("test1", "test2");
     assertThat(JRoutineCore.with(IdentityInvocation.factoryOf())
-                           .call("test1")
+                           .invoke()
+                           .pass("test1")
+                           .close()
                            .eventuallyContinue()
                            .in(seconds(1))
                            .next(2)).containsExactly("test1");
@@ -1462,7 +1551,9 @@ public class RoutineTest {
   @Test
   public void testNextOr() {
     assertThat(JRoutineCore.with(IdentityInvocation.factoryOf())
-                           .call("test1")
+                           .invoke()
+                           .pass("test1")
+                           .close()
                            .in(seconds(1))
                            .nextOrElse(2)).isEqualTo("test1");
     assertThat(JRoutineCore.with(IdentityInvocation.factoryOf())
@@ -1472,7 +1563,9 @@ public class RoutineTest {
                            .nextOrElse(2)).isEqualTo(2);
     try {
       JRoutineCore.with(factoryOf(DelayedInvocation.class, millis(300)))
-                  .call("test1")
+                  .invoke()
+                  .pass("test1")
+                  .close()
                   .eventuallyAbort()
                   .in(millis(100))
                   .nextOrElse("test2");
@@ -1483,7 +1576,9 @@ public class RoutineTest {
 
     try {
       JRoutineCore.with(factoryOf(DelayedInvocation.class, millis(300)))
-                  .call("test1")
+                  .invoke()
+                  .pass("test1")
+                  .close()
                   .eventuallyAbort(new IllegalStateException())
                   .in(millis(100))
                   .nextOrElse("test2");
@@ -1495,7 +1590,9 @@ public class RoutineTest {
 
     try {
       JRoutineCore.with(factoryOf(DelayedInvocation.class, millis(300)))
-                  .call("test1")
+                  .invoke()
+                  .pass("test1")
+                  .close()
                   .eventuallyFail()
                   .in(millis(100))
                   .nextOrElse("test2");
@@ -1535,7 +1632,7 @@ public class RoutineTest {
           }
         }, this)).invocationConfiguration().withOutputMaxSize(1).apply().buildRoutine();
     try {
-      routine1.call("test1", "test2").in(seconds(1)).all();
+      routine1.invoke().pass("test1", "test2").close().in(seconds(1)).all();
       fail();
 
     } catch (final OutputDeadlockException ignored) {
@@ -1551,7 +1648,7 @@ public class RoutineTest {
           }
         }, this)).invocationConfiguration().withOutputMaxSize(1).apply().buildRoutine();
     try {
-      routine2.call("test1", "test2").in(seconds(1)).all();
+      routine2.invoke().pass("test1", "test2").close().in(seconds(1)).all();
       fail();
 
     } catch (final OutputDeadlockException ignored) {
@@ -1566,7 +1663,8 @@ public class RoutineTest {
                     .withOutputBackoff(afterCount(1).constantDelay(noTime()))
                     .apply()
                     .buildRoutine();
-    final Channel<String, String> outputChannel = routine.call("test1", "test2").in(seconds(1));
+    final Channel<String, String> outputChannel =
+        routine.invoke().pass("test1", "test2").close().in(seconds(1));
     outputChannel.getComplete();
     assertThat(outputChannel.all()).containsExactly("test1", "test2");
     final Channel<String, String> channel1 = JRoutineCore.<String>ofInputs().channelConfiguration()
@@ -1646,7 +1744,9 @@ public class RoutineTest {
       }
     };
     assertThat(JRoutineCore.with(factoryOf(invocation, this))
-                           .call("test")
+                           .invoke()
+                           .pass("test")
+                           .close()
                            .in(millis(500))
                            .all()).containsExactly("test");
   }
@@ -1822,7 +1922,7 @@ public class RoutineTest {
     }
 
     try {
-      channel.consume((ChannelConsumer<String>) null);
+      channel.consume(null);
       fail();
 
     } catch (final NullPointerException ignored) {
@@ -1858,7 +1958,7 @@ public class RoutineTest {
                     .apply()
                     .buildRoutine();
     final Iterator<String> iterator =
-        routine1.call("test").in(millis(500)).eventuallyContinue().iterator();
+        routine1.invoke().pass("test").close().in(millis(500)).eventuallyContinue().iterator();
     assertThat(iterator.next()).isEqualTo("test");
     try {
       iterator.remove();
@@ -1886,7 +1986,9 @@ public class RoutineTest {
                   .invocationConfiguration()
                   .withLogLevel(Level.SILENT)
                   .apply()
-                  .call("test")
+                  .invoke()
+                  .pass("test")
+                  .close()
                   .inNoTime()
                   .iterator()
                   .next();
@@ -1903,7 +2005,9 @@ public class RoutineTest {
                   .invocationConfiguration()
                   .withOutputMaxSize(1)
                   .apply()
-                  .call("test")
+                  .invoke()
+                  .pass("test")
+                  .close()
                   .in(seconds(1))
                   .all();
       fail();
@@ -1916,7 +2020,9 @@ public class RoutineTest {
                   .invocationConfiguration()
                   .withOutputMaxSize(1)
                   .apply()
-                  .call("test")
+                  .invoke()
+                  .pass("test")
+                  .close()
                   .in(seconds(1))
                   .all();
       fail();
@@ -1929,7 +2035,9 @@ public class RoutineTest {
                   .invocationConfiguration()
                   .withOutputMaxSize(1)
                   .apply()
-                  .call("test")
+                  .invoke()
+                  .pass("test")
+                  .close()
                   .in(seconds(1))
                   .all();
       fail();
@@ -1953,8 +2061,11 @@ public class RoutineTest {
 
     final Routine<Integer, Integer> squareRoutine =
         JRoutineCore.with(factoryOf(execSquare, this)).buildRoutine();
-    assertThat(squareRoutine.call(1, 2, 3, 4).in(timeout).all()).containsExactly(1, 4, 9, 16);
-    assertThat(squareRoutine.callParallel(1, 2, 3, 4).in(timeout).all()).containsOnly(1, 4, 9, 16);
+    assertThat(squareRoutine.invoke().pass(1, 2, 3, 4).close().in(timeout).all()).containsExactly(1,
+        4, 9, 16);
+    assertThat(
+        squareRoutine.invokeParallel().pass(1, 2, 3, 4).close().in(timeout).all()).containsOnly(1,
+        4, 9, 16);
   }
 
   @Test
@@ -1970,7 +2081,9 @@ public class RoutineTest {
                            .withOutputMaxSize(2)
                            .withOutputOrder(OrderType.SORTED)
                            .apply()
-                           .call("test1", "test2")
+                           .invoke()
+                           .pass("test1", "test2")
+                           .close()
                            .all()).containsExactly("test1", "test2");
 
     assertThat(JRoutineCore.with(factoryOf(new ClassToken<IdentityInvocation<String>>() {}))
@@ -1984,7 +2097,9 @@ public class RoutineTest {
                            .withOutputMaxSize(2)
                            .withOutputOrder(OrderType.SORTED)
                            .apply()
-                           .call("test1", "test2")
+                           .invoke()
+                           .pass("test1", "test2")
+                           .close()
                            .all()).containsExactly("test1", "test2");
   }
 
@@ -2018,7 +2133,7 @@ public class RoutineTest {
 
     final Routine<Integer, Integer> sumRoutine =
         JRoutineCore.with(factoryOf(execSum, this)).buildRoutine();
-    assertThat(sumRoutine.call(1, 2, 3, 4).in(timeout).all()).containsExactly(10);
+    assertThat(sumRoutine.invoke().pass(1, 2, 3, 4).close().in(timeout).all()).containsExactly(10);
   }
 
   @Test
@@ -2038,19 +2153,25 @@ public class RoutineTest {
   @Test
   public void testSkip() {
     assertThat(JRoutineCore.with(IdentityInvocation.factoryOf())
-                           .call("test1", "test2", "test3", "test4")
+                           .invoke()
+                           .pass("test1", "test2", "test3", "test4")
+                           .close()
                            .in(seconds(1))
                            .skipNext(2)
                            .all()).containsExactly("test3", "test4");
     assertThat(JRoutineCore.with(IdentityInvocation.factoryOf())
-                           .call("test1")
+                           .invoke()
+                           .pass("test1")
+                           .close()
                            .eventuallyContinue()
                            .in(seconds(1))
                            .skipNext(2)
                            .all()).isEmpty();
     try {
       JRoutineCore.with(IdentityInvocation.factoryOf())
-                  .call("test1")
+                  .invoke()
+                  .pass("test1")
+                  .close()
                   .eventuallyAbort()
                   .in(seconds(1))
                   .skipNext(2);
@@ -2061,7 +2182,9 @@ public class RoutineTest {
 
     try {
       JRoutineCore.with(IdentityInvocation.factoryOf())
-                  .call("test1")
+                  .invoke()
+                  .pass("test1")
+                  .close()
                   .eventuallyAbort(new IllegalStateException())
                   .in(seconds(1))
                   .skipNext(2);
@@ -2073,7 +2196,9 @@ public class RoutineTest {
 
     try {
       JRoutineCore.with(IdentityInvocation.factoryOf())
-                  .call("test1")
+                  .invoke()
+                  .pass("test1")
+                  .close()
                   .eventuallyFail()
                   .in(seconds(1))
                   .skipNext(2);
@@ -2092,14 +2217,14 @@ public class RoutineTest {
                     .apply()
                     .buildRoutine();
     try {
-      routine1.call("test1").next();
+      routine1.invoke().pass("test1").close().next();
       fail();
 
     } catch (final AbortException ignored) {
     }
 
     try {
-      routine1.call("test1").all();
+      routine1.invoke().pass("test1").close().all();
       fail();
 
     } catch (final AbortException ignored) {
@@ -2107,27 +2232,27 @@ public class RoutineTest {
 
     try {
       final ArrayList<String> results = new ArrayList<String>();
-      routine1.call("test1").allInto(results);
+      routine1.invoke().pass("test1").close().allInto(results);
       fail();
 
     } catch (final AbortException ignored) {
     }
 
     try {
-      routine1.call("test1").iterator().hasNext();
+      routine1.invoke().pass("test1").close().iterator().hasNext();
       fail();
 
     } catch (final AbortException ignored) {
     }
 
     try {
-      routine1.call("test1").iterator().next();
+      routine1.invoke().pass("test1").close().iterator().next();
       fail();
 
     } catch (final AbortException ignored) {
     }
 
-    assertThat(routine1.call("test1").getComplete()).isFalse();
+    assertThat(routine1.invoke().pass("test1").close().getComplete()).isFalse();
     final Routine<String, String> routine2 =
         JRoutineCore.with(factoryOf(DelayedInvocation.class, seconds(1)))
                     .invocationConfiguration()
@@ -2136,14 +2261,14 @@ public class RoutineTest {
                     .apply()
                     .buildRoutine();
     try {
-      routine2.call("test1").next();
+      routine2.invoke().pass("test1").close().next();
       fail();
 
     } catch (final AbortException ignored) {
     }
 
     try {
-      routine2.call("test1").all();
+      routine2.invoke().pass("test1").close().all();
       fail();
 
     } catch (final AbortException ignored) {
@@ -2151,34 +2276,34 @@ public class RoutineTest {
 
     try {
       final ArrayList<String> results = new ArrayList<String>();
-      routine2.call("test1").allInto(results);
+      routine2.invoke().pass("test1").close().allInto(results);
       fail();
 
     } catch (final AbortException ignored) {
     }
 
     try {
-      routine2.call("test1").iterator().hasNext();
+      routine2.invoke().pass("test1").close().iterator().hasNext();
       fail();
 
     } catch (final AbortException ignored) {
     }
 
     try {
-      routine2.call("test1").iterator().next();
+      routine2.invoke().pass("test1").close().iterator().next();
       fail();
 
     } catch (final AbortException ignored) {
     }
 
-    assertThat(routine2.call("test1").getComplete()).isFalse();
+    assertThat(routine2.invoke().pass("test1").close().getComplete()).isFalse();
     final Routine<String, String> routine3 =
         JRoutineCore.with(factoryOf(DelayedInvocation.class, seconds(1)))
                     .invocationConfiguration()
                     .withOutputTimeoutAction(TimeoutActionType.FAIL)
                     .apply()
                     .buildRoutine();
-    final Channel<String, String> channel3 = routine3.call("test1");
+    final Channel<String, String> channel3 = routine3.invoke().pass("test1").close();
     try {
       channel3.next();
       fail();
@@ -2260,7 +2385,7 @@ public class RoutineTest {
                     .withOutputTimeoutAction(TimeoutActionType.CONTINUE)
                     .apply()
                     .buildRoutine();
-    final Channel<String, String> channel4 = routine4.call("test1");
+    final Channel<String, String> channel4 = routine4.invoke().pass("test1").close();
     try {
       channel4.next();
       fail();
@@ -2308,7 +2433,10 @@ public class RoutineTest {
       final Routine<String, String> after, final String input, final String expected) {
     final DurationMeasure timeout = seconds(1);
     try {
-      for (final String s : before.call(after.call(input)).in(timeout)) {
+      for (final String s : before.invoke()
+                                  .pass(after.invoke().pass(input).close())
+                                  .close()
+                                  .in(timeout)) {
         assertThat(s).isNotEmpty();
       }
 
@@ -2319,7 +2447,7 @@ public class RoutineTest {
     }
 
     try {
-      before.callParallel(after.call(input)).in(timeout).all();
+      before.invokeParallel().pass(after.invoke().pass(input).close()).close().in(timeout).all();
       fail();
 
     } catch (final InvocationException e) {
@@ -2327,7 +2455,10 @@ public class RoutineTest {
     }
 
     try {
-      for (final String s : before.callParallel(after.call(input)).in(timeout)) {
+      for (final String s : before.invokeParallel()
+                                  .pass(after.invoke().pass(input).close())
+                                  .close()
+                                  .in(timeout)) {
         assertThat(s).isNotEmpty();
       }
 
@@ -2338,7 +2469,7 @@ public class RoutineTest {
     }
 
     try {
-      before.invoke().pass(after.call(input)).close().in(timeout).all();
+      before.invoke().pass(after.invoke().pass(input).close()).close().in(timeout).all();
       fail();
 
     } catch (final InvocationException e) {
@@ -2346,7 +2477,10 @@ public class RoutineTest {
     }
 
     try {
-      for (final String s : before.invoke().pass(after.call(input)).close().in(timeout)) {
+      for (final String s : before.invoke()
+                                  .pass(after.invoke().pass(input).close())
+                                  .close()
+                                  .in(timeout)) {
         assertThat(s).isNotEmpty();
       }
 
@@ -2357,7 +2491,7 @@ public class RoutineTest {
     }
 
     try {
-      before.invokeParallel().pass(after.call(input)).close().in(timeout).all();
+      before.invokeParallel().pass(after.invoke().pass(input).close()).close().in(timeout).all();
       fail();
 
     } catch (final InvocationException e) {
@@ -2365,7 +2499,10 @@ public class RoutineTest {
     }
 
     try {
-      for (final String s : before.invokeParallel().pass(after.call(input)).close().in(timeout)) {
+      for (final String s : before.invokeParallel()
+                                  .pass(after.invoke().pass(input).close())
+                                  .close()
+                                  .in(timeout)) {
         assertThat(s).isNotEmpty();
       }
 
@@ -2376,7 +2513,7 @@ public class RoutineTest {
     }
 
     try {
-      before.call(after.callParallel(input)).in(timeout).all();
+      before.invoke().pass(after.invokeParallel().pass(input).close()).close().in(timeout).all();
       fail();
 
     } catch (final InvocationException e) {
@@ -2384,7 +2521,10 @@ public class RoutineTest {
     }
 
     try {
-      for (final String s : before.call(after.callParallel(input)).in(timeout)) {
+      for (final String s : before.invoke()
+                                  .pass(after.invokeParallel().pass(input).close())
+                                  .close()
+                                  .in(timeout)) {
         assertThat(s).isNotEmpty();
       }
 
@@ -2395,7 +2535,7 @@ public class RoutineTest {
     }
 
     try {
-      before.invoke().pass(after.callParallel(input)).close().in(timeout).all();
+      before.invoke().pass(after.invokeParallel().pass(input).close()).close().in(timeout).all();
       fail();
 
     } catch (final InvocationException e) {
@@ -2403,7 +2543,10 @@ public class RoutineTest {
     }
 
     try {
-      for (final String s : before.invoke().pass(after.callParallel(input)).close().in(timeout)) {
+      for (final String s : before.invoke()
+                                  .pass(after.invokeParallel().pass(input).close())
+                                  .close()
+                                  .in(timeout)) {
         assertThat(s).isNotEmpty();
       }
 
@@ -2419,8 +2562,14 @@ public class RoutineTest {
     final String input = "test";
     final Routine<String, String> routine =
         JRoutineCore.with(factoryOf(DelayedInvocation.class, noTime())).buildRoutine();
-    assertThat(routine.call(input).consume(consumer).in(timeout).getComplete()).isTrue();
-    assertThat(routine.callParallel(input).consume(consumer).in(timeout).getComplete()).isTrue();
+    assertThat(
+        routine.invoke().pass(input).close().consume(consumer).in(timeout).getComplete()).isTrue();
+    assertThat(routine.invokeParallel()
+                      .pass(input)
+                      .consume(consumer)
+                      .close()
+                      .in(timeout)
+                      .getComplete()).isTrue();
     assertThat(
         routine.invoke().pass(input).close().consume(consumer).in(timeout).getComplete()).isTrue();
     assertThat(routine.invokeParallel()
@@ -2435,7 +2584,7 @@ public class RoutineTest {
       final String expected) {
     final DurationMeasure timeout = seconds(1);
     try {
-      routine.call(input).in(timeout).all();
+      routine.invoke().pass(input).close().in(timeout).all();
       fail();
 
     } catch (final InvocationException e) {
@@ -2443,7 +2592,7 @@ public class RoutineTest {
     }
 
     try {
-      for (final String s : routine.call(input).in(timeout)) {
+      for (final String s : routine.invoke().pass(input).close().in(timeout)) {
         assertThat(s).isNotEmpty();
       }
 
@@ -2454,7 +2603,7 @@ public class RoutineTest {
     }
 
     try {
-      routine.callParallel(input).in(timeout).all();
+      routine.invokeParallel().pass(input).close().in(timeout).all();
       fail();
 
     } catch (final InvocationException e) {
@@ -2462,7 +2611,7 @@ public class RoutineTest {
     }
 
     try {
-      for (final String s : routine.callParallel(input).in(timeout)) {
+      for (final String s : routine.invokeParallel().pass(input).close().in(timeout)) {
         assertThat(s).isNotEmpty();
       }
 
@@ -2589,7 +2738,9 @@ public class RoutineTest {
 
     public void onInput(final Object o, @NotNull final Channel<Object, ?> result) {
       JRoutineCore.with(factoryOf(DelayedInvocation.class, millis(100)))
-                  .call("test")
+                  .invoke()
+                  .pass("test")
+                  .close()
                   .in(seconds(1))
                   .all();
     }
@@ -2606,7 +2757,9 @@ public class RoutineTest {
 
     public void onInput(final Object o, @NotNull final Channel<Object, ?> result) {
       JRoutineCore.with(factoryOf(DelayedInvocation.class, millis(100)))
-                  .call("test")
+                  .invoke()
+                  .pass("test")
+                  .close()
                   .in(seconds(1))
                   .getComplete();
     }
@@ -2697,7 +2850,7 @@ public class RoutineTest {
         result.after(mDelay.value, mDelay.unit).pass((Channel<String, String>) null);
       }
 
-      result.pass(mRoutine.call(s));
+      result.pass(mRoutine.invoke().pass(s).close());
       mFlag = !mFlag;
     }
 
@@ -2809,7 +2962,9 @@ public class RoutineTest {
 
     public void onInput(final Object o, @NotNull final Channel<Object, ?> result) {
       JRoutineCore.with(factoryOf(DelayedInvocation.class, millis(100)))
-                  .call("test")
+                  .invoke()
+                  .pass("test")
+                  .close()
                   .in(seconds(1))
                   .iterator()
                   .hasNext();
@@ -2928,7 +3083,9 @@ public class RoutineTest {
 
     public void onInput(final Object o, @NotNull final Channel<Object, ?> result) {
       JRoutineCore.with(factoryOf(DelayedInvocation.class, millis(100)))
-                  .callParallel("test")
+                  .invokeParallel()
+                  .pass("test")
+                  .close()
                   .in(seconds(1))
                   .iterator()
                   .next();

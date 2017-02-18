@@ -51,8 +51,9 @@
                 final RepoApi service = new RepoApiClient().createService(RepoApi.class);
                 service.getReposBuilder(args[0])
                        .map(Operators.&lt;Repo&gt;unfold())
-                       .call()
+                       .invoke()
                        .consume(onOutput(System.out::println))
+                       .close()
                        .in(seconds(3))
                        .getComplete();
                 System.exit(0);
@@ -97,8 +98,9 @@
                                                            .createService(RepoApi.class);
                 service.getReposBuilder(USER_NAME)
                        .map(Operators.&lt;Repo&gt;unfold())
-                       .call()
-                       .consume(onOutput(addRepoTo(adapter)).andOnError(showToast(this)));
+                       .invoke()
+                       .consume(onOutput(addRepoTo(adapter)).andOnError(showToast(this)))
+                       .close();
             }
         }
     </code>
@@ -140,8 +142,9 @@
                                                            .createService(RepoApi.class);
                 service.getReposLoaderBuilder(USER_NAME)
                        .map(Operators.&lt;Repo&gt;unfold())
-                       .call()
-                       .consume(onOutput(addRepoTo(adapter)).andOnError(showToast(this)));
+                       .invoke()
+                       .consume(onOutput(addRepoTo(adapter)).andOnError(showToast(this)))
+                       .close();
             }
         }
     </code>
@@ -183,8 +186,9 @@
                                                            .createService(RepoApi.class);
                 service.getReposLoaderBuilderCompat(USER_NAME)
                        .map(Operators.&lt;Repo&gt;unfold())
-                       .call()
-                       .consume(onOutput(addRepoTo(adapter)).andOnError(showToast(this)));
+                       .invoke()
+                       .consume(onOutput(addRepoTo(adapter)).andOnError(showToast(this)))
+                       .close();
             }
         }
     </code>

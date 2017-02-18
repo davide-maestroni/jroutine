@@ -118,8 +118,9 @@
                 final GitHubService service = retrofit.create(GitHubService.class);
                 service.streamRepos(USER_NAME)
                        .map(Operators.&lt;Repo&gt;unfold())
-                       .call()
-                       .consume(onOutput(addRepoTo(adapter)).andOnError(showToast(this)));
+                       .invoke()
+                       .consume(onOutput(addRepoTo(adapter)).andOnError(showToast(this)))
+                       .close();
             }
 
             public interface GitHubService {
@@ -187,8 +188,9 @@
                 final GitHubService service = retrofit.create(GitHubService.class);
                 service.streamRepos(USER_NAME)
                        .map(Operators.&lt;Repo&gt;unfold())
-                       .call()
-                       .consume(onOutput(addRepoTo(adapter)).andOnError(showToast(this)));
+                       .invoke()
+                       .consume(onOutput(addRepoTo(adapter)).andOnError(showToast(this)))
+                       .close();
             }
 
             public interface GitHubService {
@@ -256,8 +258,9 @@
                 final GitHubService service = retrofit.create(GitHubService.class);
                 service.streamRepos(USER_NAME)
                        .map(Operators.&lt;Repo&gt;unfold())
-                       .call()
-                       .consume(onOutput(addRepoTo(adapter)).andOnError(showToast(this)));
+                       .invoke()
+                       .consume(onOutput(addRepoTo(adapter)).andOnError(showToast(this)))
+                       .close();
             }
 
             public interface GitHubService {

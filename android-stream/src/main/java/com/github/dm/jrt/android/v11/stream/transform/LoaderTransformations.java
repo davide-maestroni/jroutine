@@ -65,8 +65,9 @@ public class LoaderTransformations {
    *                                          .withInvocationId(INVOCATION_ID)
    *                                          .apply()
    *                                          .buildFunction())
-   *               .call()
-   *               .consume(getConsumer());
+   *               .invoke()
+   *               .consume(getConsumer())
+   *               .close();
    * </code></pre>
    * Note that the Loader ID, by default, will only depend on the inputs, so that, in order to avoid
    * clashing, it is advisable to explicitly set the invocation ID like shown in the example.
@@ -97,7 +98,9 @@ public class LoaderTransformations {
                                      decorate(function)))
                                  .apply(streamConfiguration.toInvocationConfiguration())
                                  .apply(loaderConfiguration)
-                                 .call(channel);
+                                 .invoke()
+                                 .pass(channel)
+                                 .close();
           }
         };
       }

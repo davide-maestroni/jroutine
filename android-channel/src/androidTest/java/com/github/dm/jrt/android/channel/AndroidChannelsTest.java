@@ -170,22 +170,28 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     channel2 = builder2.buildChannel();
     channel1.sorted().after(millis(100)).pass("testtest").pass("test2").close();
     channel2.sorted().after(millis(110)).pass(6).pass(4).close();
-    assertThat(routine.call(AndroidChannels.joinOutput(channel1, channel2).buildChannel())
+    assertThat(routine.invoke()
+                      .pass(AndroidChannels.joinOutput(channel1, channel2).buildChannel())
+                      .close()
                       .in(seconds(10))
                       .all()).containsExactly('s', '2');
     channel1 = builder1.buildChannel();
     channel2 = builder2.buildChannel();
     channel1.sorted().after(millis(100)).pass("testtest").pass("test2").close();
     channel2.sorted().after(millis(110)).pass(6).pass(4).close();
-    assertThat(routine.call(
-        AndroidChannels.joinOutput(Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannel())
+    assertThat(routine.invoke()
+                      .pass(AndroidChannels.joinOutput(
+                          Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannel())
+                      .close()
                       .in(seconds(10))
                       .all()).containsExactly('s', '2');
     channel1 = builder1.buildChannel();
     channel2 = builder2.buildChannel();
     channel1.sorted().after(millis(100)).pass("testtest").pass("test2").pass("test3").close();
     channel2.sorted().after(millis(110)).pass(6).pass(4).close();
-    assertThat(routine.call(AndroidChannels.joinOutput(channel1, channel2).buildChannel())
+    assertThat(routine.invoke()
+                      .pass(AndroidChannels.joinOutput(channel1, channel2).buildChannel())
+                      .close()
                       .in(seconds(10))
                       .all()).containsExactly('s', '2');
   }
@@ -205,7 +211,9 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      routine.call(AndroidChannels.joinOutput(channel1, channel2).buildChannel())
+      routine.invoke()
+             .pass(AndroidChannels.joinOutput(channel1, channel2).buildChannel())
+             .close()
              .in(seconds(10))
              .all();
 
@@ -222,8 +230,12 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      routine.call(AndroidChannels.joinOutput(Arrays.<Channel<?, ?>>asList(channel1, channel2))
-                                  .buildChannel()).in(seconds(10)).all();
+      routine.invoke()
+             .pass(AndroidChannels.joinOutput(Arrays.<Channel<?, ?>>asList(channel1, channel2))
+                                  .buildChannel())
+             .close()
+             .in(seconds(10))
+             .all();
 
       fail();
 
@@ -542,17 +554,22 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     channel2 = builder2.buildChannel();
     channel1.sorted().after(millis(100)).pass("testtest").pass("test2").close();
     channel2.sorted().after(millis(110)).pass(6).pass(4).close();
-    assertThat(
-        routine.call(AndroidChannels.joinOutput(new Object(), channel1, channel2).buildChannel())
-               .in(seconds(10))
-               .all()).containsExactly('s', '2');
+    assertThat(routine.invoke()
+                      .pass(AndroidChannels.joinOutput(new Object(), channel1, channel2)
+                                           .buildChannel())
+                      .close()
+                      .in(seconds(10))
+                      .all()).containsExactly('s', '2');
     channel1 = builder1.buildChannel();
     channel2 = builder2.buildChannel();
     channel1.sorted().after(millis(100)).pass("testtest").pass("test2").close();
     channel2.sorted().after(millis(110)).pass(6).pass(4).close();
-    assertThat(routine.call(
-        AndroidChannels.joinOutput(null, Arrays.<Channel<?, ?>>asList(channel1, channel2))
-                       .buildChannel()).in(seconds(10)).all()).containsExactly('s', '2');
+    assertThat(routine.invoke()
+                      .pass(AndroidChannels.joinOutput(null,
+                          Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannel())
+                      .close()
+                      .in(seconds(10))
+                      .all()).containsExactly('s', '2');
     channel1 = builder1.buildChannel();
     channel2 = builder2.buildChannel();
     channel1.sorted().after(millis(100)).pass("testtest").pass("test2").pass("test3").close();
@@ -560,7 +577,9 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      routine.call(AndroidChannels.joinOutput(new Object(), channel1, channel2).buildChannel())
+      routine.invoke()
+             .pass(AndroidChannels.joinOutput(new Object(), channel1, channel2).buildChannel())
+             .close()
              .in(seconds(10))
              .all();
 
@@ -586,7 +605,9 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      routine.call(AndroidChannels.joinOutput((Object) null, channel1, channel2).buildChannel())
+      routine.invoke()
+             .pass(AndroidChannels.joinOutput((Object) null, channel1, channel2).buildChannel())
+             .close()
              .in(seconds(10))
              .all();
 
@@ -603,9 +624,12 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      routine.call(
-          AndroidChannels.joinOutput(new Object(), Arrays.<Channel<?, ?>>asList(channel1, channel2))
-                         .buildChannel()).in(seconds(10)).all();
+      routine.invoke()
+             .pass(AndroidChannels.joinOutput(new Object(),
+                 Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannel())
+             .close()
+             .in(seconds(10))
+             .all();
 
       fail();
 
@@ -655,7 +679,9 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
                                                                      .withInputOrder(
                                                                          OrderType.SORTED)
                                                                      .apply()
-                                                                     .call(channel);
+                                                                     .invoke()
+                                                                     .pass(channel)
+                                                                     .close();
     final Map<Integer, ? extends Channel<?, Object>> channelMap =
         AndroidChannels.flowOutput(output, Sort.INTEGER, Sort.STRING).buildChannelMap();
 
@@ -729,9 +755,11 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     final Routine<ParcelableFlow<String>, String> routine =
         JRoutineCore.with(InvocationFactory.factoryOf(new ClassToken<Amb<String>>() {}))
                     .buildRoutine();
-    final Channel<?, String> outputChannel = routine.call(
-        AndroidChannels.mergeParcelableOutput(Arrays.asList(channel1, channel2, channel3, channel4))
-                       .buildChannel());
+    final Channel<?, String> outputChannel = routine.invoke()
+                                                    .pass(AndroidChannels.mergeParcelableOutput(
+                                                        Arrays.asList(channel1, channel2, channel3,
+                                                            channel4)).buildChannel())
+                                                    .close();
 
     for (int i = 0; i < 4; i++) {
 
@@ -1163,19 +1191,25 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
         JRoutineService.on(serviceFrom(getActivity())).with(factoryOf(Sort.class)).buildRoutine();
     Map<Integer, ? extends Channel<?, Object>> channelMap;
     Channel<?, ParcelableFlow<Object>> channel;
-    channel = routine.call(new ParcelableFlow<Object>(Sort.STRING, "test21"),
-        new ParcelableFlow<Object>(Sort.INTEGER, -11));
+    channel = routine.invoke()
+                     .pass(new ParcelableFlow<Object>(Sort.STRING, "test21"),
+                         new ParcelableFlow<Object>(Sort.INTEGER, -11))
+                     .close();
     channelMap = AndroidChannels.flowOutput(channel, Arrays.asList(Sort.INTEGER, Sort.STRING))
                                 .buildChannelMap();
     assertThat(channelMap.get(Sort.INTEGER).in(seconds(10)).all()).containsOnly(-11);
     assertThat(channelMap.get(Sort.STRING).in(seconds(10)).all()).containsOnly("test21");
-    channel = routine.call(new ParcelableFlow<Object>(Sort.INTEGER, -11),
-        new ParcelableFlow<Object>(Sort.STRING, "test21"));
+    channel = routine.invoke()
+                     .pass(new ParcelableFlow<Object>(Sort.INTEGER, -11),
+                         new ParcelableFlow<Object>(Sort.STRING, "test21"))
+                     .close();
     channelMap = AndroidChannels.flowOutput(channel, Sort.INTEGER, Sort.STRING).buildChannelMap();
     assertThat(channelMap.get(Sort.INTEGER).in(seconds(10)).all()).containsOnly(-11);
     assertThat(channelMap.get(Sort.STRING).in(seconds(10)).all()).containsOnly("test21");
-    channel = routine.call(new ParcelableFlow<Object>(Sort.STRING, "test21"),
-        new ParcelableFlow<Object>(Sort.INTEGER, -11));
+    channel = routine.invoke()
+                     .pass(new ParcelableFlow<Object>(Sort.STRING, "test21"),
+                         new ParcelableFlow<Object>(Sort.INTEGER, -11))
+                     .close();
     channelMap = AndroidChannels.flowOutput(Math.min(Sort.INTEGER, Sort.STRING), 2, channel)
                                 .buildChannelMap();
     assertThat(channelMap.get(Sort.INTEGER).in(seconds(10)).all()).containsOnly(-11);

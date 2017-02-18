@@ -114,8 +114,10 @@
                                                          .withInvocationId(11) // explicitly set the invocation ID so to make the invocation survive rotations
                                                          .apply()
                                                          .buildFunction())
-                              .call(IMAGE_URI);
-                              .consume(onError(showToast(this)).andOnOutput(showImage(imageView)));
+                              .invoke()
+                              .consume(onError(showToast(this)).andOnOutput(showImage(imageView)))
+                              .pass(URI.create(IMAGE_URI))
+                              .close();
             }
         }
     </code>

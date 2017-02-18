@@ -81,7 +81,7 @@ public class InvocationFactoryTest {
     final InvocationFactory<String, String> factory = IdentityInvocation.factoryOf();
     final TestInvocationFactory decoratedFactory = new TestInvocationFactory(factory);
     final Routine<String, String> routine = JRoutineCore.with(decoratedFactory).buildRoutine();
-    assertThat(routine.call("test").in(seconds(1)).all()).containsExactly("test");
+    assertThat(routine.invoke().pass("test").close().in(seconds(1)).all()).containsExactly("test");
   }
 
   private static class TestInvocationDecorator extends InvocationDecorator<String, String> {

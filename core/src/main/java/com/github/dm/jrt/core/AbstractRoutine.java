@@ -24,7 +24,6 @@ import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
-import com.github.dm.jrt.core.routine.TemplateRoutine;
 import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.Runners;
@@ -48,7 +47,7 @@ import java.util.concurrent.TimeUnit;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
+public abstract class AbstractRoutine<IN, OUT> implements Routine<IN, OUT> {
 
   private static final int DEFAULT_CORE_INVOCATIONS = 10;
 
@@ -114,7 +113,6 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
     mLogger = logger.subContextLogger(this);
   }
 
-  @Override
   public void clear() {
     synchronized (mMutex) {
       final SimpleQueue<Invocation<IN, OUT>> asyncInvocations = mInvocations;

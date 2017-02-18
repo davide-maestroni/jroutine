@@ -85,7 +85,9 @@
                                                  .map(Operators.average(Float.class))
                                                  .map(Math::sqrt)
                                                  .async()
-                                                 .call(args)
+                                                 .invoke()
+                                                 .pass(args)
+                                                 .close()
                                                  .in(seconds(1))
                                                  .next();
                 System.out.println(rms);

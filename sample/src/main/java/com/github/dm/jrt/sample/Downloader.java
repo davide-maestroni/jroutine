@@ -160,7 +160,8 @@ public class Downloader {
                       .withInputBackoff(afterCount(32).linearDelay(seconds(3)))
                       .apply()
                       .buildRoutine();
-      downloads.put(uri, writeFile.call(mReadConnection.call(uri)));
+      downloads.put(uri,
+          writeFile.invoke().pass(mReadConnection.invoke().pass(uri).close()).close());
     }
   }
 

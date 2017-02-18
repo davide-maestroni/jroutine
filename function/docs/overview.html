@@ -104,7 +104,11 @@
                                 return Math.sqrt((double) sum / integers.size());
                         })).buildRoutine();
                 final Double rms =
-                        meanRoutine.call(squareRoutine.callParallel(parseRoutine.callParallel(args)))
+                        meanRoutine.invoke()
+                                   .pass(squareRoutine.invokeParallel()
+                                                      .pass(parseRoutine.invokeParallel().pass(args).close())
+                                                      .close())
+                                   .close()
                                    .in(seconds(3))
                                    .next();
                 System.out.println(rms);

@@ -59,13 +59,15 @@ public class AccumulateConsumerInvocationTest {
                            .invocationConfiguration()
                            .withRunner(Runners.syncRunner())
                            .apply()
-                           .call(new ArrayList<String>() {{
+                           .invoke()
+                           .pass(new ArrayList<String>() {{
                              add("test1");
                            }}, new ArrayList<String>() {{
                              add("test2");
                            }}, new ArrayList<String>() {{
                              add("test3");
                            }})
+                           .close()
                            .next()).isEqualTo(Arrays.asList("test1", "test2", "test3"));
     assertThat(JRoutineCore.with(consumerFactory(new Supplier<List<String>>() {
 
@@ -79,13 +81,15 @@ public class AccumulateConsumerInvocationTest {
                            .invocationConfiguration()
                            .withRunner(Runners.syncRunner())
                            .apply()
-                           .call(new ArrayList<String>() {{
+                           .invoke()
+                           .pass(new ArrayList<String>() {{
                              add("test1");
                            }}, new ArrayList<String>() {{
                              add("test2");
                            }}, new ArrayList<String>() {{
                              add("test3");
                            }})
+                           .close()
                            .next()).isEqualTo(Arrays.asList("test0", "test1", "test2", "test3"));
   }
 

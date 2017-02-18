@@ -66,7 +66,8 @@ public class LoaderTransformationsCompatTest
                                                            .withInvocationId(12)
                                                            .apply()
                                                            .buildFunction())
-                             .call()
+                             .invoke()
+                             .close()
                              .in(seconds(10))
                              .next()).isEqualTo(10);
   }

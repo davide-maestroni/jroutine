@@ -97,7 +97,8 @@ public class StreamBuilderTest {
   @SuppressWarnings({"ConstantConditions", "ThrowableResultOfMethodCallIgnored"})
   public void testAbort() {
     final Channel<Object, Object> channel = JRoutineCore.ofInputs().buildChannel();
-    final Channel<Object, Object> streamChannel = JRoutineStream.withStream().call(channel);
+    final Channel<Object, Object> streamChannel =
+        JRoutineStream.withStream().invoke().pass(channel).close();
     channel.abort(new IllegalArgumentException());
     try {
       streamChannel.in(seconds(3)).throwError();
@@ -201,9 +202,12 @@ public class StreamBuilderTest {
                                                   }))
                                                   .close()
                                                   .getError()).isNull();
-    assertThat(
-        JRoutineStream.withStream().sync().map(append((Object) "test")).call().next()).isEqualTo(
-        "test");
+    assertThat(JRoutineStream.withStream()
+                             .sync()
+                             .map(append((Object) "test"))
+                             .invoke()
+                             .close()
+                             .next()).isEqualTo("test");
     try {
       JRoutineStream.withStream()
                     .sync()
@@ -322,7 +326,7 @@ public class StreamBuilderTest {
               final StreamBuilder<String, String> builder) {
             return builder.map(append("test2"));
           }
-        }).call("test1").in(seconds(3)).all()).containsExactly("test1", "test2");
+        }).invoke().pass("test1").close().in(seconds(3)).all()).containsExactly("test1", "test2");
 
     try {
       JRoutineStream.withStream().convert(new ConvertFunction<Object, Object, Object, Object>() {
@@ -345,7 +349,7 @@ public class StreamBuilderTest {
               final StreamBuilder<String, String> builder) {
             return builder.map(append("test2"));
           }
-        }).call("test1").in(seconds(3)).all()).containsExactly("test1", "test2");
+        }).invoke().pass("test1").close().in(seconds(3)).all()).containsExactly("test1", "test2");
 
     try {
       JRoutineStream.withStream().convert(new ConvertFunction<Object, Object, Object, Object>() {
@@ -370,37 +374,55 @@ public class StreamBuilderTest {
           public Channel<?, String> apply(final String s) {
             return JRoutineStream.<String>withStream().sync()
                                                       .map(filter(Functions.<String>isNotNull()))
-                                                      .call(s);
+                                                      .invoke()
+                                                      .pass(s)
+                                                      .close();
           }
-        }).call("test1", null, "test2", null).all()).containsExactly("test1", "test2");
-    assertThat(JRoutineStream //
-        .<String>withStream().async().flatMap(new Function<String, Channel<?, String>>() {
-
-          public Channel<?, String> apply(final String s) {
-            return JRoutineStream.<String>withStream().sync()
-                                                      .map(filter(Functions.<String>isNotNull()))
-                                                      .call(s);
-          }
-        }).call("test1", null, "test2", null).in(seconds(3)).all()).containsExactly("test1",
+        }).invoke().pass("test1", null, "test2", null).close().all()).containsExactly("test1",
         "test2");
+    assertThat(JRoutineStream //
+        .<String>withStream().async()
+                             .flatMap(new Function<String, Channel<?, String>>() {
+
+                               public Channel<?, String> apply(final String s) {
+                                 return JRoutineStream.<String>withStream().sync()
+                                                                           .map(filter(
+                                                                               Functions
+                                                                                   .<String>isNotNull()))
+                                                                           .invoke()
+                                                                           .pass(s)
+                                                                           .close();
+                               }
+                             })
+                             .invoke()
+                             .pass("test1", null, "test2", null)
+                             .close()
+                             .in(seconds(3))
+                             .all()).containsExactly("test1", "test2");
     assertThat(JRoutineStream //
         .<String>withStream().asyncParallel().flatMap(new Function<String, Channel<?, String>>() {
 
           public Channel<?, String> apply(final String s) {
             return JRoutineStream.<String>withStream().sync()
                                                       .map(filter(Functions.<String>isNotNull()))
-                                                      .call(s);
+                                                      .invoke()
+                                                      .pass(s)
+                                                      .close();
           }
-        }).call("test1", null, "test2", null).in(seconds(3)).all()).containsOnly("test1", "test2");
+        }).invoke().pass("test1", null, "test2", null).close().in(seconds(3)).all()).containsOnly(
+        "test1", "test2");
     assertThat(JRoutineStream //
         .<String>withStream().syncParallel().flatMap(new Function<String, Channel<?, String>>() {
 
           public Channel<?, String> apply(final String s) {
             return JRoutineStream.<String>withStream().sync()
                                                       .map(filter(Functions.<String>isNotNull()))
-                                                      .call(s);
+                                                      .invoke()
+                                                      .pass(s)
+                                                      .close();
           }
-        }).call("test1", null, "test2", null).in(seconds(3)).all()).containsOnly("test1", "test2");
+        }).invoke().pass("test1", null, "test2", null).close().in(seconds(3)).all()).containsOnly(
+        "test1", "test2");
   }
 
   @Test
@@ -460,7 +482,9 @@ public class StreamBuilderTest {
                                            JRoutineStream.withStream()
                                                          .map(routine)
                                                          .lift(tryCatchAccept(this))
-                                                         .call(o)
+                                                         .invoke()
+                                                         .pass(o)
+                                                         .close()
                                                          .pipe(channel);
 
                                          } else {
@@ -468,7 +492,9 @@ public class StreamBuilderTest {
                                          }
                                        }
                                      }))
-                                 .call(o);
+                                 .invoke()
+                                 .pass(o)
+                                 .close();
 
           }
         };
@@ -477,7 +503,9 @@ public class StreamBuilderTest {
       JRoutineStream.withStream()
                     .async()
                     .flatMap(retryFunction)
-                    .call((Object) null)
+                    .invoke()
+                    .pass((Object) null)
+                    .close()
                     .in(seconds(3))
                     .all();
       fail();
@@ -502,7 +530,8 @@ public class StreamBuilderTest {
                                                      }
                                                    })
                                                    .map(Operators.average(Double.class))
-                                                   .call()
+                                                   .invoke()
+                                                   .close()
                                                    .next()).isCloseTo(21, Offset.offset(0.1));
     assertThat(JRoutineStream.<Integer>withStream().immediateParallel()
                                                    .map(appendAccept(range(1, 1000)))
@@ -518,7 +547,8 @@ public class StreamBuilderTest {
                                                    })
                                                    .immediate()
                                                    .map(Operators.average(Double.class))
-                                                   .call()
+                                                   .invoke()
+                                                   .close()
                                                    .next()).isCloseTo(21, Offset.offset(0.1));
   }
 
@@ -530,7 +560,7 @@ public class StreamBuilderTest {
           public Integer apply(final Integer integer) {
             return integer << 1;
           }
-        }).call(1, 2, 3).all()).containsExactly(2, 4, 6);
+        }).invoke().pass(1, 2, 3).close().all()).containsExactly(2, 4, 6);
     assertThat(JRoutineStream.<Integer>withStream().immediateParallel()
                                                    .map(new Function<Integer, Integer>() {
 
@@ -538,7 +568,9 @@ public class StreamBuilderTest {
                                                        return integer << 1;
                                                      }
                                                    })
-                                                   .call(1, 2, 3)
+                                                   .invoke()
+                                                   .pass(1, 2, 3)
+                                                   .close()
                                                    .all()).containsExactly(2, 4, 6);
     assertThat(JRoutineStream.<Integer>withStream().immediate()
                                                    .mapAccept(
@@ -550,7 +582,9 @@ public class StreamBuilderTest {
                                                            result.pass(integer << 1);
                                                          }
                                                        })
-                                                   .call(1, 2, 3)
+                                                   .invoke()
+                                                   .pass(1, 2, 3)
+                                                   .close()
                                                    .all()).containsExactly(2, 4, 6);
     assertThat(JRoutineStream.<Integer>withStream().immediateParallel()
                                                    .mapAccept(
@@ -562,7 +596,9 @@ public class StreamBuilderTest {
                                                            result.pass(integer << 1);
                                                          }
                                                        })
-                                                   .call(1, 2, 3)
+                                                   .invoke()
+                                                   .pass(1, 2, 3)
+                                                   .close()
                                                    .all()).containsExactly(2, 4, 6);
     assertThat(JRoutineStream.<Integer>withStream().immediate()
                                                    .mapAll(new Function<List<Integer>, Integer>() {
@@ -577,7 +613,9 @@ public class StreamBuilderTest {
                                                        return sum;
                                                      }
                                                    })
-                                                   .call(1, 2, 3)
+                                                   .invoke()
+                                                   .pass(1, 2, 3)
+                                                   .close()
                                                    .all()).containsExactly(6);
     assertThat(JRoutineStream.<Integer>withStream().immediateParallel()
                                                    .mapAll(new Function<List<Integer>, Integer>() {
@@ -592,7 +630,9 @@ public class StreamBuilderTest {
                                                        return sum;
                                                      }
                                                    })
-                                                   .call(1, 2, 3)
+                                                   .invoke()
+                                                   .pass(1, 2, 3)
+                                                   .close()
                                                    .all()).containsExactly(1, 2, 3);
     assertThat(JRoutineStream.<Integer>withStream().immediate()
                                                    .mapAllAccept(
@@ -610,7 +650,9 @@ public class StreamBuilderTest {
                                                            result.pass(sum);
                                                          }
                                                        })
-                                                   .call(1, 2, 3)
+                                                   .invoke()
+                                                   .pass(1, 2, 3)
+                                                   .close()
                                                    .all()).containsExactly(6);
     assertThat(JRoutineStream.<Integer>withStream().immediateParallel()
                                                    .mapAllAccept(
@@ -628,7 +670,9 @@ public class StreamBuilderTest {
                                                            result.pass(sum);
                                                          }
                                                        })
-                                                   .call(1, 2, 3)
+                                                   .invoke()
+                                                   .pass(1, 2, 3)
+                                                   .close()
                                                    .all()).containsExactly(1, 2, 3);
   }
 
@@ -756,7 +800,9 @@ public class StreamBuilderTest {
                                                     .withRunner(runner2)
                                                     .apply()
                                                     .map(Functions.identity())
-                                                    .call(s)
+                                                    .invoke()
+                                                    .pass(s)
+                                                    .close()
                                                     .in(minutes(3))
                                                     .next();
         }
@@ -765,7 +811,9 @@ public class StreamBuilderTest {
                                          .withRunner(runner1)
                                          .apply()
                                          .map(function)
-                                         .call("test")
+                                         .invoke()
+                                         .pass("test")
+                                         .close()
                                          .in(minutes(3))
                                          .next();
       fail();
@@ -779,28 +827,34 @@ public class StreamBuilderTest {
     long startTime = System.currentTimeMillis();
     assertThat(JRoutineStream.<String>withStream().lift(
         Transformations.<String, String>lag(1, TimeUnit.SECONDS))
-                                                  .call("test")
+                                                  .invoke()
+                                                  .pass("test")
+                                                  .close()
                                                   .in(seconds(3))
                                                   .next()).isEqualTo("test");
     assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
     startTime = System.currentTimeMillis();
     assertThat(
         JRoutineStream.<String>withStream().lift(Transformations.<String, String>lag(seconds(1)))
-                                           .call("test")
+                                           .invoke()
+                                           .pass("test")
+                                           .close()
                                            .in(seconds(3))
                                            .next()).isEqualTo("test");
     assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
     startTime = System.currentTimeMillis();
     assertThat(JRoutineStream.<String>withStream().lift(
         Transformations.<String, String>lag(1, TimeUnit.SECONDS))
-                                                  .call()
+                                                  .invoke()
+                                                  .close()
                                                   .in(seconds(3))
                                                   .all()).isEmpty();
     assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
     startTime = System.currentTimeMillis();
     assertThat(
         JRoutineStream.<String>withStream().lift(Transformations.<String, String>lag(seconds(1)))
-                                           .call()
+                                           .invoke()
+                                           .close()
                                            .in(seconds(3))
                                            .all()).isEmpty();
     assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
@@ -824,11 +878,14 @@ public class StreamBuilderTest {
                             .andThen(new Function<Channel<?, String>, Channel<?, String>>() {
 
                               public Channel<?, String> apply(final Channel<?, String> channel) {
-                                return JRoutineCore.with(new UpperCase()).call(channel);
+                                return JRoutineCore.with(new UpperCase())
+                                                   .invoke()
+                                                   .pass(channel)
+                                                   .close();
                               }
                             });
           }
-        }).call("test").in(seconds(3)).next()).isEqualTo("TEST");
+        }).invoke().pass("test").close().in(seconds(3)).next()).isEqualTo("TEST");
     assertThat(JRoutineStream.<String>withStream().lift(
         new BiFunction<StreamConfiguration, Function<Channel<?, String>, Channel<?, String>>,
             Function<Channel<?, String>, Channel<?, String>>>() {
@@ -840,11 +897,14 @@ public class StreamBuilderTest {
                             .andThen(new Function<Channel<?, String>, Channel<?, String>>() {
 
                               public Channel<?, String> apply(final Channel<?, String> channel) {
-                                return JRoutineCore.with(new UpperCase()).call(channel);
+                                return JRoutineCore.with(new UpperCase())
+                                                   .invoke()
+                                                   .pass(channel)
+                                                   .close();
                               }
                             });
           }
-        }).call("test").in(seconds(3)).next()).isEqualTo("TEST");
+        }).invoke().pass("test").close().in(seconds(3)).next()).isEqualTo("TEST");
     try {
       JRoutineStream.withStream()
                     .lift(
@@ -902,7 +962,7 @@ public class StreamBuilderTest {
                             }
                           });
     try {
-      builder.sync().call().throwError();
+      builder.sync().invoke().close().throwError();
       fail();
 
     } catch (final InvocationException e) {
@@ -925,7 +985,8 @@ public class StreamBuilderTest {
 
         result.pass(builder.toString());
       }
-    }).call("test1", "test2", "test3").in(seconds(3)).all()).containsExactly("test1test2test3");
+    }).invoke().pass("test1", "test2", "test3").close().in(seconds(3)).all()).containsExactly(
+        "test1test2test3");
     assertThat(JRoutineStream.<String>withStream().sync().mapAllAccept(new BiConsumer<List<? extends
         String>, Channel<String, ?>>() {
 
@@ -938,7 +999,7 @@ public class StreamBuilderTest {
 
         result.pass(builder.toString());
       }
-    }).call("test1", "test2", "test3").all()).containsExactly("test1test2test3");
+    }).invoke().pass("test1", "test2", "test3").close().all()).containsExactly("test1test2test3");
   }
 
   @Test
@@ -965,7 +1026,8 @@ public class StreamBuilderTest {
 
         return builder.toString();
       }
-    }).call("test1", "test2", "test3").in(seconds(3)).all()).containsExactly("test1test2test3");
+    }).invoke().pass("test1", "test2", "test3").close().in(seconds(3)).all()).containsExactly(
+        "test1test2test3");
     assertThat(JRoutineStream.<String>withStream().sync().mapAll(new Function<List<? extends
         String>, String>() {
 
@@ -977,7 +1039,7 @@ public class StreamBuilderTest {
 
         return builder.toString();
       }
-    }).call("test1", "test2", "test3").all()).containsExactly("test1test2test3");
+    }).invoke().pass("test1", "test2", "test3").close().all()).containsExactly("test1test2test3");
   }
 
   @Test
@@ -999,7 +1061,8 @@ public class StreamBuilderTest {
           public void accept(final String s, final Channel<String, ?> result) {
             result.pass(s.toUpperCase());
           }
-        }).call("test1", "test2").in(seconds(3)).all()).containsExactly("TEST1", "TEST2");
+        }).invoke().pass("test1", "test2").close().in(seconds(3)).all()).containsExactly("TEST1",
+        "TEST2");
     assertThat(JRoutineStream //
         .<String>withStream().sorted()
                              .asyncParallel()
@@ -1009,7 +1072,9 @@ public class StreamBuilderTest {
                                  result.pass(s.toUpperCase());
                                }
                              })
-                             .call("test1", "test2")
+                             .invoke()
+                             .pass("test1", "test2")
+                             .close()
                              .in(seconds(3))
                              .all()).containsExactly("TEST1", "TEST2");
     assertThat(JRoutineStream//
@@ -1018,7 +1083,7 @@ public class StreamBuilderTest {
           public void accept(final String s, final Channel<String, ?> result) {
             result.pass(s.toUpperCase());
           }
-        }).call("test1", "test2").all()).containsExactly("TEST1", "TEST2");
+        }).invoke().pass("test1", "test2").close().all()).containsExactly("TEST1", "TEST2");
     assertThat(JRoutineStream//
         .<String>withStream().syncParallel()
                              .mapAccept(new BiConsumer<String, Channel<String, ?>>() {
@@ -1027,7 +1092,9 @@ public class StreamBuilderTest {
                                  result.pass(s.toUpperCase());
                                }
                              })
-                             .call("test1", "test2")
+                             .invoke()
+                             .pass("test1", "test2")
+                             .close()
                              .all()).containsExactly("TEST1", "TEST2");
   }
 
@@ -1047,20 +1114,30 @@ public class StreamBuilderTest {
     final InvocationFactory<String, String> factory = factoryOf(UpperCase.class);
     assertThat(JRoutineStream.<String>withStream().async()
                                                   .map(factory)
-                                                  .call("test1", "test2")
+                                                  .invoke()
+                                                  .pass("test1", "test2")
+                                                  .close()
                                                   .in(seconds(3))
                                                   .all()).containsExactly("TEST1", "TEST2");
     assertThat(JRoutineStream.<String>withStream().sorted()
                                                   .asyncParallel()
                                                   .map(factory)
-                                                  .call("test1", "test2")
+                                                  .invoke()
+                                                  .pass("test1", "test2")
+                                                  .close()
                                                   .in(seconds(3))
                                                   .all()).containsExactly("TEST1", "TEST2");
-    assertThat(JRoutineStream.<String>withStream().sync().map(factory).call("test1", "test2").all())
-        .containsExactly("TEST1", "TEST2");
+    assertThat(JRoutineStream.<String>withStream().sync()
+                                                  .map(factory)
+                                                  .invoke()
+                                                  .pass("test1", "test2")
+                                                  .close()
+                                                  .all()).containsExactly("TEST1", "TEST2");
     assertThat(JRoutineStream.<String>withStream().syncParallel()
                                                   .map(factory)
-                                                  .call("test1", "test2")
+                                                  .invoke()
+                                                  .pass("test1", "test2")
+                                                  .close()
                                                   .all()).containsExactly("TEST1", "TEST2");
   }
 
@@ -1100,22 +1177,30 @@ public class StreamBuilderTest {
   public void testMapFilter() {
     assertThat(JRoutineStream.<String>withStream().async()
                                                   .map(new UpperCase())
-                                                  .call("test1", "test2")
+                                                  .invoke()
+                                                  .pass("test1", "test2")
+                                                  .close()
                                                   .in(seconds(3))
                                                   .all()).containsExactly("TEST1", "TEST2");
     assertThat(JRoutineStream.<String>withStream().sorted()
                                                   .asyncParallel()
                                                   .map(new UpperCase())
-                                                  .call("test1", "test2")
+                                                  .invoke()
+                                                  .pass("test1", "test2")
+                                                  .close()
                                                   .in(seconds(3))
                                                   .all()).containsExactly("TEST1", "TEST2");
     assertThat(JRoutineStream.<String>withStream().sync()
                                                   .map(new UpperCase())
-                                                  .call("test1", "test2")
+                                                  .invoke()
+                                                  .pass("test1", "test2")
+                                                  .close()
                                                   .all()).containsExactly("TEST1", "TEST2");
     assertThat(JRoutineStream.<String>withStream().syncParallel()
                                                   .map(new UpperCase())
-                                                  .call("test1", "test2")
+                                                  .invoke()
+                                                  .pass("test1", "test2")
+                                                  .close()
                                                   .all()).containsExactly("TEST1", "TEST2");
   }
 
@@ -1158,7 +1243,8 @@ public class StreamBuilderTest {
       public String apply(final String s) {
         return s.toUpperCase();
       }
-    }).call("test1", "test2").in(seconds(3)).all()).containsExactly("TEST1", "TEST2");
+    }).invoke().pass("test1", "test2").close().in(seconds(3)).all()).containsExactly("TEST1",
+        "TEST2");
     assertThat(JRoutineStream.<String>withStream().sorted()
                                                   .asyncParallel()
                                                   .map(new Function<String, String>() {
@@ -1167,7 +1253,9 @@ public class StreamBuilderTest {
                                                       return s.toUpperCase();
                                                     }
                                                   })
-                                                  .call("test1", "test2")
+                                                  .invoke()
+                                                  .pass("test1", "test2")
+                                                  .close()
                                                   .in(seconds(3))
                                                   .all()).containsExactly("TEST1", "TEST2");
     assertThat(JRoutineStream.<String>withStream().sync().map(new Function<String, String>() {
@@ -1175,14 +1263,14 @@ public class StreamBuilderTest {
       public String apply(final String s) {
         return s.toUpperCase();
       }
-    }).call("test1", "test2").all()).containsExactly("TEST1", "TEST2");
+    }).invoke().pass("test1", "test2").close().all()).containsExactly("TEST1", "TEST2");
     assertThat(
         JRoutineStream.<String>withStream().syncParallel().map(new Function<String, String>() {
 
           public String apply(final String s) {
             return s.toUpperCase();
           }
-        }).call("test1", "test2").all()).containsExactly("TEST1", "TEST2");
+        }).invoke().pass("test1", "test2").close().all()).containsExactly("TEST1", "TEST2");
   }
 
   @Test
@@ -1231,7 +1319,9 @@ public class StreamBuilderTest {
     };
     assertThat(JRoutineStream.<String>withStream().unsorted()
                                                   .mapOn(testRunner)
-                                                  .call("test")
+                                                  .invoke()
+                                                  .pass("test")
+                                                  .close()
                                                   .in(seconds(1))
                                                   .all()).containsExactly("test");
     assertThat(isCalled.get()).isTrue();
@@ -1246,22 +1336,30 @@ public class StreamBuilderTest {
                                                         .buildRoutine();
     assertThat(JRoutineStream.<String>withStream().async()
                                                   .map(routine)
-                                                  .call("test1", "test2")
+                                                  .invoke()
+                                                  .pass("test1", "test2")
+                                                  .close()
                                                   .in(seconds(3))
                                                   .all()).containsExactly("TEST1", "TEST2");
     assertThat(JRoutineStream.<String>withStream().asyncParallel()
                                                   .map(routine)
-                                                  .call("test1", "test2")
+                                                  .invoke()
+                                                  .pass("test1", "test2")
+                                                  .close()
                                                   .in(seconds(3))
                                                   .all()).containsExactly("TEST1", "TEST2");
     assertThat(JRoutineStream.<String>withStream().sync()
                                                   .map(routine)
-                                                  .call("test1", "test2")
+                                                  .invoke()
+                                                  .pass("test1", "test2")
+                                                  .close()
                                                   .in(seconds(3))
                                                   .all()).containsExactly("TEST1", "TEST2");
     assertThat(JRoutineStream.<String>withStream().syncParallel()
                                                   .map(routine)
-                                                  .call("test1", "test2")
+                                                  .invoke()
+                                                  .pass("test1", "test2")
+                                                  .close()
                                                   .in(seconds(3))
                                                   .all()).containsExactly("TEST1", "TEST2");
   }
@@ -1271,19 +1369,29 @@ public class StreamBuilderTest {
     final RoutineBuilder<String, String> builder = JRoutineCore.with(new UpperCase());
     assertThat(JRoutineStream.<String>withStream().async()
                                                   .map(builder)
-                                                  .call("test1", "test2")
+                                                  .invoke()
+                                                  .pass("test1", "test2")
+                                                  .close()
                                                   .in(seconds(3))
                                                   .all()).containsExactly("TEST1", "TEST2");
     assertThat(JRoutineStream.<String>withStream().asyncParallel()
                                                   .map(builder)
-                                                  .call("test1", "test2")
+                                                  .invoke()
+                                                  .pass("test1", "test2")
+                                                  .close()
                                                   .in(seconds(3))
                                                   .all()).containsOnly("TEST1", "TEST2");
-    assertThat(JRoutineStream.<String>withStream().sync().map(builder).call("test1", "test2").all())
-        .containsExactly("TEST1", "TEST2");
+    assertThat(JRoutineStream.<String>withStream().sync()
+                                                  .map(builder)
+                                                  .invoke()
+                                                  .pass("test1", "test2")
+                                                  .close()
+                                                  .all()).containsExactly("TEST1", "TEST2");
     assertThat(JRoutineStream.<String>withStream().syncParallel()
                                                   .map(builder)
-                                                  .call("test1", "test2")
+                                                  .invoke()
+                                                  .pass("test1", "test2")
+                                                  .close()
                                                   .all()).containsExactly("TEST1", "TEST2");
   }
 
@@ -1391,7 +1499,8 @@ public class StreamBuilderTest {
                                     return data.sum / data.count;
                                   }
                                 })
-                                .call()
+                                .invoke()
+                                .close()
                                 .in(minutes(3))
                                 .next()).isCloseTo(21, Offset.offset(0.1));
       fail();
@@ -1436,7 +1545,8 @@ public class StreamBuilderTest {
                                     return data.sum / data.count;
                                   }
                                 })
-                                .call()
+                                .invoke()
+                                .close()
                                 .in(minutes(3))
                                 .next()).isCloseTo(21, Offset.offset(0.1));
       fail();
@@ -1447,12 +1557,16 @@ public class StreamBuilderTest {
 
   @Test
   public void testStreamAccept() {
-    assertThat(
-        JRoutineStream.withStreamAccept(range(0, 3)).immediate().call().all()).containsExactly(0, 1,
-        2, 3);
-    assertThat(
-        JRoutineStream.withStreamAccept(2, range(1, 0)).immediate().call().all()).containsExactly(1,
-        0, 1, 0);
+    assertThat(JRoutineStream.withStreamAccept(range(0, 3))
+                             .immediate()
+                             .invoke()
+                             .close()
+                             .all()).containsExactly(0, 1, 2, 3);
+    assertThat(JRoutineStream.withStreamAccept(2, range(1, 0))
+                             .immediate()
+                             .invoke()
+                             .close()
+                             .all()).containsExactly(1, 0, 1, 0);
   }
 
   @Test
@@ -1471,22 +1585,31 @@ public class StreamBuilderTest {
   public void testStreamAcceptError() {
     assertThat(JRoutineStream.withStreamAccept(range(0, 3))
                              .immediate()
-                             .call(31)
+                             .invoke()
+                             .pass(31)
+                             .close()
                              .getError()
                              .getCause()).isInstanceOf(IllegalStateException.class);
-    assertThat(
-        JRoutineStream.withStreamAccept(2, range(1, 0)).immediate().call(-17).getError().getCause())
-        .isInstanceOf(IllegalStateException.class);
+    assertThat(JRoutineStream.withStreamAccept(2, range(1, 0))
+                             .immediate()
+                             .invoke()
+                             .pass(-17)
+                             .close()
+                             .getError()
+                             .getCause()).isInstanceOf(IllegalStateException.class);
   }
 
   @Test
   public void testStreamGet() {
-    assertThat(
-        JRoutineStream.withStreamGet(constant("test")).immediate().call().all()).containsExactly(
-        "test");
+    assertThat(JRoutineStream.withStreamGet(constant("test"))
+                             .immediate()
+                             .invoke()
+                             .close()
+                             .all()).containsExactly("test");
     assertThat(JRoutineStream.withStreamGet(2, constant("test2"))
                              .immediate()
-                             .call()
+                             .invoke()
+                             .close()
                              .all()).containsExactly("test2", "test2");
   }
 
@@ -1506,32 +1629,40 @@ public class StreamBuilderTest {
   public void testStreamGetError() {
     assertThat(JRoutineStream.withStreamGet(constant("test"))
                              .immediate()
-                             .call("test")
+                             .invoke()
+                             .pass("test")
+                             .close()
                              .getError()
                              .getCause()).isInstanceOf(IllegalStateException.class);
     assertThat(JRoutineStream.withStreamGet(2, constant("test2"))
                              .immediate()
-                             .call("test")
+                             .invoke()
+                             .pass("test")
+                             .close()
                              .getError()
                              .getCause()).isInstanceOf(IllegalStateException.class);
   }
 
   @Test
   public void testStreamOf() {
-    assertThat(JRoutineStream.withStreamOf("test").immediate().call().all()).containsExactly(
+    assertThat(
+        JRoutineStream.withStreamOf("test").immediate().invoke().close().all()).containsExactly(
         "test");
     assertThat(JRoutineStream.withStreamOf("test1", "test2", "test3")
                              .immediate()
-                             .call()
+                             .invoke()
+                             .close()
                              .all()).containsExactly("test1", "test2", "test3");
     assertThat(JRoutineStream.withStreamOf(Arrays.asList("test1", "test2", "test3"))
                              .immediate()
-                             .call()
+                             .invoke()
+                             .close()
                              .all()).containsExactly("test1", "test2", "test3");
     assertThat(
         JRoutineStream.withStreamOf(JRoutineCore.of("test1", "test2", "test3").buildChannel())
                       .immediate()
-                      .call()
+                      .invoke()
+                      .close()
                       .all()).containsExactly("test1", "test2", "test3");
   }
 
@@ -1559,29 +1690,38 @@ public class StreamBuilderTest {
   public void testStreamOfError() {
     assertThat(JRoutineStream.withStreamOf("test")
                              .immediate()
-                             .call("test")
+                             .invoke()
+                             .pass("test")
+                             .close()
                              .getError()
                              .getCause()).isInstanceOf(IllegalStateException.class);
     assertThat(JRoutineStream.withStreamOf("test1", "test2", "test3")
                              .immediate()
-                             .call("test")
+                             .invoke()
+                             .pass("test")
+                             .close()
                              .getError()
                              .getCause()).isInstanceOf(IllegalStateException.class);
     assertThat(JRoutineStream.withStreamOf(Arrays.asList("test1", "test2", "test3"))
                              .immediate()
-                             .call("test")
+                             .invoke()
+                             .pass("test")
+                             .close()
                              .getError()
                              .getCause()).isInstanceOf(IllegalStateException.class);
     assertThat(
         JRoutineStream.withStreamOf(JRoutineCore.of("test1", "test2", "test3").buildChannel())
                       .immediate()
-                      .call("test")
+                      .invoke()
+                      .pass("test")
+                      .close()
                       .getError()
                       .getCause()).isInstanceOf(IllegalStateException.class);
     assertThat(JRoutineStream.withStreamOf(
         JRoutineCore.ofInputs().buildChannel().consume(new TemplateChannelConsumer<Object>() {}))
                              .immediate()
-                             .call()
+                             .invoke()
+                             .close()
                              .getError()
                              .getCause()).isInstanceOf(IllegalStateException.class);
   }

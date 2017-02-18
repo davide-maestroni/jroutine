@@ -245,7 +245,7 @@ public class FutureChannelTest {
         }, 500, TimeUnit.MILLISECONDS);
     final Channel<?, String> channel = Channels.fromFuture(future).buildChannel();
     final Channel<String, String> outputChannel =
-        JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call(channel);
+        JRoutineCore.with(IdentityInvocation.<String>factoryOf()).invoke().pass(channel).close();
     assertThat(outputChannel.in(seconds(1)).next()).isEqualTo("test");
     assertThat(outputChannel.getComplete()).isTrue();
   }

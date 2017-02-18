@@ -306,7 +306,7 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * for instance, a routine parsing strings into integers has already been implemented, it can be
  * concatenated to the sum routine method as shown below:
  * <pre><code>
- * final Channel&lt;String, Integer&gt; channel = parseRoutine.call();
+ * final Channel&lt;String, Integer&gt; channel = parseRoutine.invoke();
  * final Channel&lt;Integer, Integer&gt; outputChannel =
  *     JRoutineCore.&lt;Integer&gt;ofInputs().buildChannel();
  * new RoutineMethod() {
@@ -393,8 +393,7 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * final Channel&lt;String, String&gt; channel =
  *     JRoutineCore.&lt;String&gt;ofInputs().buildChannel();
  * RoutineMethod.from(MyClass.class.getMethod("run", Channel.class))
- *              .call(JRoutineCore.&lt;Channel&lt;String, String&gt;&gt;of(channel)
- *                                .buildChannel());
+ *              .call(JRoutineCore.of(channel).buildChannel());
  * </code></pre>
  * <p>
  * Created by davide-maestroni on 08/10/2016.

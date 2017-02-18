@@ -178,7 +178,7 @@ public class ChannelTest {
       }
     }.start();
     final Channel<String, String> outputChannel =
-        JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call(channel);
+        JRoutineCore.with(IdentityInvocation.<String>factoryOf()).invoke().pass(channel).close();
     assertThat(outputChannel.in(timeout).next()).isEqualTo("test");
     assertThat(outputChannel.getComplete()).isTrue();
   }
@@ -204,7 +204,7 @@ public class ChannelTest {
       }
     }.start();
     final Channel<String, String> outputChannel1 =
-        JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call(channel1);
+        JRoutineCore.with(IdentityInvocation.<String>factoryOf()).invoke().pass(channel1).close();
     assertThat(outputChannel1.in(timeout).all()).containsExactly("test1", "test2", "test3");
   }
 
@@ -535,7 +535,9 @@ public class ChannelTest {
     final long startTime = System.currentTimeMillis();
     final Channel<String, String> outputChannel =
         JRoutineCore.with(IdentityInvocation.<String>factoryOf())
-                    .call(channel)
+                    .invoke()
+                    .pass(channel)
+                    .close()
                     .eventuallyContinue();
     assertThat(outputChannel.in(millis(500)).all()).containsExactly("test");
     assertThat(System.currentTimeMillis() - startTime).isLessThan(2000);
@@ -629,7 +631,7 @@ public class ChannelTest {
     final Channel<String, String> channel = JRoutineCore.<String>ofInputs().buildChannel();
     new WeakThread(channel).start();
     final Channel<String, String> outputChannel =
-        JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call(channel);
+        JRoutineCore.with(IdentityInvocation.<String>factoryOf()).invoke().pass(channel).close();
     assertThat(outputChannel.in(timeout).next()).isEqualTo("test");
   }
 

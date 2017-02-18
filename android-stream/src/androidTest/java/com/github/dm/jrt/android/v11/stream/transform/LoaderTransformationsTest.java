@@ -70,7 +70,8 @@ public class LoaderTransformationsTest extends ActivityInstrumentationTestCase2<
                                                            .withInvocationId(12)
                                                            .apply()
                                                            .buildFunction())
-                             .call()
+                             .invoke()
+                             .close()
                              .in(seconds(10))
                              .next()).isEqualTo(10);
   }

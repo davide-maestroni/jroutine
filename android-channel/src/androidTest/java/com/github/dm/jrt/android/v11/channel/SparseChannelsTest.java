@@ -246,7 +246,9 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
                                                                     .withInputOrder(
                                                                         OrderType.SORTED)
                                                                     .apply()
-                                                                    .call(channel);
+                                                                    .invoke()
+                                                                    .pass(channel)
+                                                                    .close();
     final SparseArray<? extends Channel<?, Object>> channelMap =
         SparseChannels.parcelableFlowOutput(output, Sort.INTEGER, Sort.STRING).buildChannelArray();
 
@@ -626,21 +628,27 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
         JRoutineLoader.on(loaderFrom(getActivity())).with(factoryOf(Sort.class)).buildRoutine();
     SparseArray<? extends Channel<?, Object>> channelMap;
     Channel<?, ParcelableFlow<Object>> channel;
-    channel = routine.call(new ParcelableFlow<Object>(Sort.STRING, "test21"),
-        new ParcelableFlow<Object>(Sort.INTEGER, -11));
+    channel = routine.invoke()
+                     .pass(new ParcelableFlow<Object>(Sort.STRING, "test21"),
+                         new ParcelableFlow<Object>(Sort.INTEGER, -11))
+                     .close();
     channelMap =
         SparseChannels.parcelableFlowOutput(channel, Arrays.asList(Sort.INTEGER, Sort.STRING))
                       .buildChannelArray();
     assertThat(channelMap.get(Sort.INTEGER).in(seconds(10)).all()).containsOnly(-11);
     assertThat(channelMap.get(Sort.STRING).in(seconds(10)).all()).containsOnly("test21");
-    channel = routine.call(new ParcelableFlow<Object>(Sort.INTEGER, -11),
-        new ParcelableFlow<Object>(Sort.STRING, "test21"));
+    channel = routine.invoke()
+                     .pass(new ParcelableFlow<Object>(Sort.INTEGER, -11),
+                         new ParcelableFlow<Object>(Sort.STRING, "test21"))
+                     .close();
     channelMap =
         SparseChannels.parcelableFlowOutput(channel, Sort.INTEGER, Sort.STRING).buildChannelArray();
     assertThat(channelMap.get(Sort.INTEGER).in(seconds(10)).all()).containsOnly(-11);
     assertThat(channelMap.get(Sort.STRING).in(seconds(10)).all()).containsOnly("test21");
-    channel = routine.call(new ParcelableFlow<Object>(Sort.STRING, "test21"),
-        new ParcelableFlow<Object>(Sort.INTEGER, -11));
+    channel = routine.invoke()
+                     .pass(new ParcelableFlow<Object>(Sort.STRING, "test21"),
+                         new ParcelableFlow<Object>(Sort.INTEGER, -11))
+                     .close();
     channelMap =
         SparseChannels.parcelableFlowOutput(Math.min(Sort.INTEGER, Sort.STRING), 2, channel)
                       .buildChannelArray();

@@ -54,7 +54,9 @@ public class AccumulateFunctionInvocationTest {
                            .invocationConfiguration()
                            .withRunner(Runners.syncRunner())
                            .apply()
-                           .call("test1", "test2", "test3")
+                           .invoke()
+                           .pass("test1", "test2", "test3")
+                           .close()
                            .next()).isEqualTo("test1test2test3");
     assertThat(JRoutineCore.with(functionFactory(new Supplier<String>() {
 
@@ -66,7 +68,9 @@ public class AccumulateFunctionInvocationTest {
                            .invocationConfiguration()
                            .withRunner(Runners.syncRunner())
                            .apply()
-                           .call("test1", "test2", "test3")
+                           .invoke()
+                           .pass("test1", "test2", "test3")
+                           .close()
                            .next()).isEqualTo("test0test1test2test3");
   }
 

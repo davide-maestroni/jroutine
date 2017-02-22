@@ -48,6 +48,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
+import static com.github.dm.jrt.core.util.DurationMeasure.indefiniteTime;
 import static com.github.dm.jrt.core.util.DurationMeasure.millis;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static com.github.dm.jrt.operator.Operators.appendAccept;
@@ -542,9 +543,18 @@ public class TransformationsTest {
                              .close()
                              .in(seconds(1))
                              .all()).containsExactly("test");
-    final Channel<Object, Object> channel =
-        JRoutineStream.withStream().lift(timeoutAfter(millis(1))).invoke().pass("test");
-    assertThat(channel.in(seconds(1)).getError()).isExactlyInstanceOf(ResultTimeoutException.class);
+    assertThat(JRoutineStream.withStream()
+                             .lift(timeoutAfter(millis(1)))
+                             .invoke()
+                             .pass("test")
+                             .in(seconds(1))
+                             .getError()).isExactlyInstanceOf(ResultTimeoutException.class);
+    assertThat(JRoutineStream.withStream()
+                             .lift(timeoutAfter(indefiniteTime(), millis(1)))
+                             .invoke()
+                             .pass("test")
+                             .in(seconds(1))
+                             .getError()).isExactlyInstanceOf(ResultTimeoutException.class);
   }
 
   @Test

@@ -456,7 +456,7 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
     private void bind(@NotNull final Channel<OUT, ?> result) {
       final Channel<?, OUT> outputChannel = mOutputChannel;
       if (!outputChannel.isBound()) {
-        outputChannel.pipe(result);
+        result.pass(outputChannel);
       }
     }
 

@@ -51,7 +51,7 @@ class MapInvocation<IN, OUT> extends MappingInvocation<IN, OUT> {
   public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) throws Exception {
     final Channel<?, ? extends OUT> channel = mFunction.apply(input);
     if (channel != null) {
-      channel.pipe(result);
+      result.pass(channel);
     }
   }
 }

@@ -121,7 +121,7 @@ class TimeThrottle<IN, OUT> implements LiftFunction<IN, OUT, IN, OUT> {
 
             public void run() {
               try {
-                mBindingFunction.apply(channel).pipe(outputChannel);
+                outputChannel.pass(mBindingFunction.apply(channel));
 
               } catch (final Throwable t) {
                 outputChannel.abort(t);
@@ -138,7 +138,7 @@ class TimeThrottle<IN, OUT> implements LiftFunction<IN, OUT, IN, OUT> {
       }
 
       if (isBind) {
-        mBindingFunction.apply(channel).pipe(outputChannel);
+        outputChannel.pass(mBindingFunction.apply(channel));
 
       } else {
         runner.run(this, delay, TimeUnit.MILLISECONDS);

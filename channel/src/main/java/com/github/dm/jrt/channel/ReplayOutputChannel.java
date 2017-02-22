@@ -19,6 +19,7 @@ package com.github.dm.jrt.channel;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ChannelConsumer;
+import com.github.dm.jrt.core.channel.PipeChannel;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
@@ -53,8 +54,8 @@ class ReplayOutputChannel<OUT> implements Channel<OUT, OUT>, ChannelConsumer<OUT
 
   private final Channel<?, OUT> mChannel;
 
-  private final IdentityHashMap<Channel<? super OUT, ?>, Void> mChannels =
-      new IdentityHashMap<Channel<? super OUT, ?>, Void>();
+  private final IdentityHashMap<Channel<? super OUT, ?>, PipeChannel<OUT, OUT, ?>> mChannels =
+      new IdentityHashMap<Channel<? super OUT, ?>, PipeChannel<OUT, OUT, ?>>();
 
   private final ChannelConfiguration mConfiguration;
 
@@ -290,18 +291,19 @@ class ReplayOutputChannel<OUT> implements Channel<OUT, OUT>, ChannelConsumer<OUT
   }
 
   @NotNull
-  public <AFTER> Channel<? super OUT, AFTER> pipe(
-      @NotNull final Channel<? super OUT, AFTER> channel) {
+  @SuppressWarnings("unchecked")
+  public <AFTER> Channel<OUT, AFTER> pipe(@NotNull final Channel<? super OUT, AFTER> channel) {
+    PipeChannel<OUT, OUT, ?> pipeChannel;
     synchronized (mMutex) {
-      final IdentityHashMap<Channel<? super OUT, ?>, Void> channels = mChannels;
-      if (channels.containsKey(channel)) {
-        return channel;
+      final IdentityHashMap<Channel<? super OUT, ?>, PipeChannel<OUT, OUT, ?>> channels = mChannels;
+      pipeChannel = channels.get(channel);
+      if (pipeChannel == null) {
+        pipeChannel = new PipeChannel<OUT, OUT, AFTER>(this, channel);
+        channels.put(channel, pipeChannel);
       }
-
-      channels.put(channel, null);
     }
 
-    return channel.pass(this);
+    return (Channel<OUT, AFTER>) pipeChannel;
   }
 
   public int size() {

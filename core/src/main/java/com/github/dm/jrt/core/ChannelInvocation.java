@@ -84,7 +84,7 @@ public abstract class ChannelInvocation<IN, OUT> implements Invocation<IN, OUT> 
   private void bind(@NotNull final Channel<OUT, ?> result) {
     final Channel<?, OUT> outputChannel = mOutputChannel;
     if (!outputChannel.isBound()) {
-      outputChannel.pipe(result);
+      result.pass(outputChannel);
     }
   }
 }

@@ -37,6 +37,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.TimeUnit;
 
+import static com.github.dm.jrt.core.util.DurationMeasure.indefiniteTime;
 import static com.github.dm.jrt.function.Functions.decorate;
 
 /**
@@ -52,6 +53,23 @@ public class Transformations {
    */
   protected Transformations() {
     ConstantConditions.avoid();
+  }
+
+  /**
+   * Returns a function adding a delay at the end of the stream, so that any data, exception or
+   * completion notification will be dispatched to the next concatenated routine after the
+   * specified time.
+   *
+   * @param delay the delay.
+   * @param <IN>  the input data type.
+   * @param <OUT> the output data type.
+   * @return the lifting function.
+   * @see StreamBuilder#lift(BiFunction)
+   */
+  @NotNull
+  public static <IN, OUT> LiftFunction<IN, OUT, IN, OUT> delay(
+      @NotNull final DurationMeasure delay) {
+    return delay(delay.value, delay.unit);
   }
 
   /**
@@ -84,8 +102,8 @@ public class Transformations {
   }
 
   /**
-   * Returns a function adding a delay at the end of the stream, so that any data, exception or
-   * completion notification will be dispatched to the next concatenated routine after the
+   * Returns a function adding a delay at the beginning of the stream, so that any data, exception
+   * or completion notification coming from the source will be dispatched to the stream after the
    * specified time.
    *
    * @param delay the delay.
@@ -95,9 +113,8 @@ public class Transformations {
    * @see StreamBuilder#lift(BiFunction)
    */
   @NotNull
-  public static <IN, OUT> LiftFunction<IN, OUT, IN, OUT> delay(
-      @NotNull final DurationMeasure delay) {
-    return delay(delay.value, delay.unit);
+  public static <IN, OUT> LiftFunction<IN, OUT, IN, OUT> lag(@NotNull final DurationMeasure delay) {
+    return lag(delay.value, delay.unit);
   }
 
   /**
@@ -130,39 +147,24 @@ public class Transformations {
   }
 
   /**
-   * Returns a function adding a delay at the beginning of the stream, so that any data, exception
-   * or completion notification coming from the source will be dispatched to the stream after the
-   * specified time.
-   *
-   * @param delay the delay.
-   * @param <IN>  the input data type.
-   * @param <OUT> the output data type.
-   * @return the lifting function.
-   * @see StreamBuilder#lift(BiFunction)
-   */
-  @NotNull
-  public static <IN, OUT> LiftFunction<IN, OUT, IN, OUT> lag(@NotNull final DurationMeasure delay) {
-    return lag(delay.value, delay.unit);
-  }
-
-  /**
-   * Returns a function splitting the outputs produced by the stream, so that each group will be
+   * Returns a function splitting the outputs produced by the stream, so that each subset will be
    * processed by a different routine invocation.
    * <br>
-   * Each output will be assigned to a specific group based on the load of the available
+   * Each output will be assigned to a specific invocation based on the load of the available
    * invocations.
    *
-   * @param groupCount the number of groups.
-   * @param factory    the invocation factory.
-   * @param <IN>       the input data type.
-   * @param <OUT>      the output data type.
-   * @param <AFTER>    the new output type.
+   * @param invocationCount the number of processing invocations.
+   * @param factory         the invocation factory.
+   * @param <IN>            the input data type.
+   * @param <OUT>           the output data type.
+   * @param <AFTER>         the new output type.
    * @return the lifting function.
    * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
    * @see StreamBuilder#lift(BiFunction)
    */
   @NotNull
-  public static <IN, OUT, AFTER> LiftFunction<IN, OUT, IN, AFTER> parallel(final int groupCount,
+  public static <IN, OUT, AFTER> LiftFunction<IN, OUT, IN, AFTER> parallel(
+      final int invocationCount,
       @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
     ConstantConditions.notNull("invocation factory", factory);
     return new LiftFunction<IN, OUT, IN, AFTER>() {
@@ -172,7 +174,7 @@ public class Transformations {
           final Function<Channel<?, IN>, Channel<?, OUT>> function) {
         return decorate(function).andThen(
             new BindParallelCount<OUT, AFTER>(streamConfiguration.toChannelConfiguration(),
-                groupCount,
+                invocationCount,
                 JRoutineCore.with(factory).apply(streamConfiguration.toInvocationConfiguration()),
                 streamConfiguration.getInvocationMode()));
       }
@@ -180,24 +182,24 @@ public class Transformations {
   }
 
   /**
-   * Returns a function splitting the outputs produced by the stream, so that each group will be
+   * Returns a function splitting the outputs produced by the stream, so that each subset will be
    * processed by a different routine invocation.
    * <br>
-   * Each output will be assigned to a specific group based on the load of the available
+   * Each output will be assigned to a specific invocation based on the load of the available
    * invocations.
    *
-   * @param groupCount the number of groups.
-   * @param routine    the processing routine instance.
-   * @param <IN>       the input data type.
-   * @param <OUT>      the output data type.
-   * @param <AFTER>    the new output type.
+   * @param invocationCount the number of processing invocations.
+   * @param routine         the processing routine instance.
+   * @param <IN>            the input data type.
+   * @param <OUT>           the output data type.
+   * @param <AFTER>         the new output type.
    * @return the lifting function.
    * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
    * @see StreamBuilder#lift(BiFunction)
    */
   @NotNull
-  public static <IN, OUT, AFTER> LiftFunction<IN, OUT, IN, AFTER> parallel(final int groupCount,
-      @NotNull final Routine<? super OUT, ? extends AFTER> routine) {
+  public static <IN, OUT, AFTER> LiftFunction<IN, OUT, IN, AFTER> parallel(
+      final int invocationCount, @NotNull final Routine<? super OUT, ? extends AFTER> routine) {
     ConstantConditions.notNull("routine instance", routine);
     return new LiftFunction<IN, OUT, IN, AFTER>() {
 
@@ -206,38 +208,39 @@ public class Transformations {
           final Function<Channel<?, IN>, Channel<?, OUT>> function) {
         return decorate(function).andThen(
             new BindParallelCount<OUT, AFTER>(streamConfiguration.toChannelConfiguration(),
-                groupCount, routine, streamConfiguration.getInvocationMode()));
+                invocationCount, routine, streamConfiguration.getInvocationMode()));
       }
     };
   }
 
   /**
-   * Returns a function splitting the outputs produced by the stream, so that each group will be
+   * Returns a function splitting the outputs produced by the stream, so that each subset will be
    * processed by a different routine invocation.
    * <br>
-   * Each output will be assigned to a specific group based on the load of the available
+   * Each output will be assigned to a specific invocation based on the load of the available
    * invocations.
    *
-   * @param groupCount the number of groups.
-   * @param builder    the builder of processing routine instances.
-   * @param <IN>       the input data type.
-   * @param <OUT>      the output data type.
-   * @param <AFTER>    the new output type.
+   * @param invocationCount the number of processing invocations.
+   * @param builder         the builder of processing routine instances.
+   * @param <IN>            the input data type.
+   * @param <OUT>           the output data type.
+   * @param <AFTER>         the new output type.
    * @return the lifting function.
    * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
    * @see StreamBuilder#lift(BiFunction)
    */
   @NotNull
-  public static <IN, OUT, AFTER> LiftFunction<IN, OUT, IN, AFTER> parallel(final int groupCount,
+  public static <IN, OUT, AFTER> LiftFunction<IN, OUT, IN, AFTER> parallel(
+      final int invocationCount,
       @NotNull final RoutineBuilder<? super OUT, ? extends AFTER> builder) {
-    return parallel(groupCount, builder.buildRoutine());
+    return parallel(invocationCount, builder.buildRoutine());
   }
 
   /**
-   * Returns a function splitting the outputs produced by the stream, so that each group will be
+   * Returns a function splitting the outputs produced by the stream, so that each subset will be
    * processed by a different routine invocation.
    * <br>
-   * Each output will be assigned to a specific group based on the key returned by the specified
+   * Each output will be assigned to a specific set based on the key returned by the specified
    * function.
    *
    * @param keyFunction the function assigning a key to each output.
@@ -269,10 +272,10 @@ public class Transformations {
   }
 
   /**
-   * Returns a function splitting the outputs produced by the stream, so that each group will be
+   * Returns a function splitting the outputs produced by the stream, so that each subset will be
    * processed by a different routine invocation.
    * <br>
-   * Each output will be assigned to a specific group based on the key returned by the specified
+   * Each output will be assigned to a specific set based on the key returned by the specified
    * function.
    *
    * @param keyFunction the function assigning a key to each output.
@@ -302,10 +305,10 @@ public class Transformations {
   }
 
   /**
-   * Returns a function splitting the outputs produced by the stream, so that each group will be
+   * Returns a function splitting the outputs produced by the stream, so that each subset will be
    * processed by a different routine invocation.
    * <br>
-   * Each output will be assigned to a specific group based on the key returned by the specified
+   * Each output will be assigned to a specific set based on the key returned by the specified
    * function.
    *
    * @param keyFunction the function assigning a key to each output.
@@ -321,6 +324,40 @@ public class Transformations {
       @NotNull final Function<? super OUT, ?> keyFunction,
       @NotNull final RoutineBuilder<? super OUT, ? extends AFTER> builder) {
     return parallelBy(keyFunction, builder.buildRoutine());
+  }
+
+  /**
+   * Returns a function making the stream retry the whole flow of data until the specified function
+   * does not return a null value.
+   * <br>
+   * For each retry the function is called passing the retry count (starting from 1) and the error
+   * which caused the failure. If the function returns a non-null value, it will represent the
+   * number of milliseconds to wait before a further retry. While, in case the function returns
+   * null, the flow of data will be aborted with the passed error as reason.
+   * <p>
+   * Note that no retry will be attempted in case of an explicit abortion, that is, if the error
+   * is an instance of {@link com.github.dm.jrt.core.channel.AbortException}.
+   *
+   * @param backoffFunction the retry function.
+   * @param <IN>            the input data type.
+   * @param <OUT>           the output data type.
+   * @return the lifting function.
+   * @see StreamBuilder#lift(BiFunction)
+   */
+  @NotNull
+  public static <IN, OUT> LiftFunction<IN, OUT, IN, OUT> retry(
+      @NotNull final BiFunction<? super Integer, ? super RoutineException, ? extends Long>
+          backoffFunction) {
+    ConstantConditions.notNull("function instance", backoffFunction);
+    return new LiftFunction<IN, OUT, IN, OUT>() {
+
+      public Function<Channel<?, IN>, Channel<?, OUT>> apply(
+          final StreamConfiguration streamConfiguration,
+          final Function<Channel<?, IN>, Channel<?, OUT>> function) {
+        return new BindRetry<IN, OUT>(streamConfiguration.toChannelConfiguration(), function,
+            backoffFunction);
+      }
+    };
   }
 
   /**
@@ -357,40 +394,6 @@ public class Transformations {
   public static <IN, OUT> LiftFunction<IN, OUT, IN, OUT> retry(final int maxCount,
       @NotNull final Backoff backoff) {
     return retry(new RetryBackoff(maxCount, backoff));
-  }
-
-  /**
-   * Returns a function making the stream retry the whole flow of data until the specified function
-   * does not return a null value.
-   * <br>
-   * For each retry the function is called passing the retry count (starting from 1) and the error
-   * which caused the failure. If the function returns a non-null value, it will represent the
-   * number of milliseconds to wait before a further retry. While, in case the function returns
-   * null, the flow of data will be aborted with the passed error as reason.
-   * <p>
-   * Note that no retry will be attempted in case of an explicit abortion, that is, if the error
-   * is an instance of {@link com.github.dm.jrt.core.channel.AbortException}.
-   *
-   * @param backoffFunction the retry function.
-   * @param <IN>            the input data type.
-   * @param <OUT>           the output data type.
-   * @return the lifting function.
-   * @see StreamBuilder#lift(BiFunction)
-   */
-  @NotNull
-  public static <IN, OUT> LiftFunction<IN, OUT, IN, OUT> retry(
-      @NotNull final BiFunction<? super Integer, ? super RoutineException, ? extends Long>
-          backoffFunction) {
-    ConstantConditions.notNull("function instance", backoffFunction);
-    return new LiftFunction<IN, OUT, IN, OUT>() {
-
-      public Function<Channel<?, IN>, Channel<?, OUT>> apply(
-          final StreamConfiguration streamConfiguration,
-          final Function<Channel<?, IN>, Channel<?, OUT>> function) {
-        return new BindRetry<IN, OUT>(streamConfiguration.toChannelConfiguration(), function,
-            backoffFunction);
-      }
-    };
   }
 
   /**
@@ -455,48 +458,90 @@ public class Transformations {
   /**
    * Returns a function making the stream abort with a
    * {@link com.github.dm.jrt.stream.transform.ResultTimeoutException ResultTimeoutException} if
-   * a new result is not produced before the specified timeout elapses.
-   * <br>
-   * Note that the execution will not be aborted if no output is produced.
+   * a new result is not produced before the specified timeout elapsed.
    *
-   * @param timeout the timeout.
-   * @param <IN>    the input data type.
-   * @param <OUT>   the output data type.
+   * @param outputTimeout the new output timeout.
+   * @param <IN>          the input data type.
+   * @param <OUT>         the output data type.
    * @return the lifting function.
    * @see StreamBuilder#lift(BiFunction)
    */
   @NotNull
   public static <IN, OUT> LiftFunction<IN, OUT, IN, OUT> timeoutAfter(
-      @NotNull final DurationMeasure timeout) {
-    return timeoutAfter(timeout.value, timeout.unit);
+      @NotNull final DurationMeasure outputTimeout) {
+    return timeoutAfter(outputTimeout.value, outputTimeout.unit);
+  }
+
+  /**
+   * Returns a function making the stream abort with a
+   * {@link com.github.dm.jrt.stream.transform.ResultTimeoutException ResultTimeoutException} if
+   * a new result is not produced, or the invocation does not complete, before the specified
+   * timeouts elapse.
+   *
+   * @param outputTimeout the new output timeout.
+   * @param totalTimeout  the total timeout.
+   * @param <IN>          the input data type.
+   * @param <OUT>         the output data type.
+   * @return the lifting function.
+   * @see StreamBuilder#lift(BiFunction)
+   */
+  @NotNull
+  public static <IN, OUT> LiftFunction<IN, OUT, IN, OUT> timeoutAfter(
+      @NotNull final DurationMeasure outputTimeout, @NotNull final DurationMeasure totalTimeout) {
+    return timeoutAfter(outputTimeout.value, outputTimeout.unit, totalTimeout.value,
+        totalTimeout.unit);
   }
 
   /**
    * Returns a function making the stream abort with a
    * {@link com.github.dm.jrt.stream.transform.ResultTimeoutException ResultTimeoutException} if
    * a new result is not produced before the specified timeout elapses.
-   * <br>
-   * Note that the execution will not be aborted if no output is produced.
    *
-   * @param timeout  the timeout value.
-   * @param timeUnit the timeout unit.
-   * @param <IN>     the input data type.
-   * @param <OUT>    the output data type.
+   * @param outputTimeout  the new output timeout value.
+   * @param outputTimeUnit the new output timeout unit.
+   * @param <IN>           the input data type.
+   * @param <OUT>          the output data type.
    * @return the lifting function.
    * @see StreamBuilder#lift(BiFunction)
    */
   @NotNull
-  public static <IN, OUT> LiftFunction<IN, OUT, IN, OUT> timeoutAfter(final long timeout,
-      @NotNull final TimeUnit timeUnit) {
-    ConstantConditions.notNull("time unit", timeUnit);
-    ConstantConditions.notNegative("timeout value", timeout);
+  public static <IN, OUT> LiftFunction<IN, OUT, IN, OUT> timeoutAfter(final long outputTimeout,
+      @NotNull final TimeUnit outputTimeUnit) {
+    final DurationMeasure indefiniteTime = indefiniteTime();
+    return timeoutAfter(outputTimeout, outputTimeUnit, indefiniteTime.value, indefiniteTime.unit);
+  }
+
+  /**
+   * Returns a function making the stream abort with a
+   * {@link com.github.dm.jrt.stream.transform.ResultTimeoutException ResultTimeoutException} if
+   * a new result is not produced, or the invocation does not complete, before the specified
+   * timeouts elapse.
+   *
+   * @param outputTimeout  the new output timeout value.
+   * @param outputTimeUnit the new output timeout unit.
+   * @param totalTimeout   the total timeout value.
+   * @param totalTimeUnit  the total timeout unit.
+   * @param <IN>           the input data type.
+   * @param <OUT>          the output data type.
+   * @return the lifting function.
+   * @see StreamBuilder#lift(BiFunction)
+   */
+  @NotNull
+  public static <IN, OUT> LiftFunction<IN, OUT, IN, OUT> timeoutAfter(final long outputTimeout,
+      @NotNull final TimeUnit outputTimeUnit, final long totalTimeout,
+      @NotNull final TimeUnit totalTimeUnit) {
+    ConstantConditions.notNull("total time unit", totalTimeUnit);
+    ConstantConditions.notNull("output time unit", outputTimeUnit);
+    ConstantConditions.notNegative("total timeout value", totalTimeout);
+    ConstantConditions.notNegative("output timeout value", outputTimeout);
     return new LiftFunction<IN, OUT, IN, OUT>() {
 
       public Function<Channel<?, IN>, Channel<?, OUT>> apply(
           final StreamConfiguration streamConfiguration,
           final Function<Channel<?, IN>, Channel<?, OUT>> function) {
         return decorate(function).andThen(
-            new BindTimeout<OUT>(streamConfiguration.toChannelConfiguration(), timeout, timeUnit));
+            new BindTimeout<OUT>(streamConfiguration.toChannelConfiguration(), outputTimeout,
+                outputTimeUnit, totalTimeout, totalTimeUnit));
       }
     };
   }

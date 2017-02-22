@@ -43,29 +43,17 @@ public class StreamConfiguration {
   /**
    * Constructor.
    *
-   * @param streamConfiguration  the stream invocation configuration.
-   * @param currentConfiguration the current invocation configuration.
-   * @param invocationMode       the invocation mode.
+   * @param streamConfiguration the stream invocation configuration.
+   * @param nextConfiguration   the next invocation configuration.
+   * @param invocationMode      the invocation mode.
    */
   public StreamConfiguration(@NotNull final InvocationConfiguration streamConfiguration,
-      @NotNull final InvocationConfiguration currentConfiguration,
+      @NotNull final InvocationConfiguration nextConfiguration,
       @NotNull final InvocationMode invocationMode) {
     mStreamConfiguration =
         ConstantConditions.notNull("stream invocation configuration", streamConfiguration);
-    mConfiguration =
-        ConstantConditions.notNull("current invocation configuration", currentConfiguration);
+    mConfiguration = ConstantConditions.notNull("next invocation configuration", nextConfiguration);
     mInvocationMode = ConstantConditions.notNull("invocation mode", invocationMode);
-  }
-
-  /**
-   * Gets the configuration that will override the stream one only for the next concatenated
-   * routine.
-   *
-   * @return the invocation configuration.
-   */
-  @NotNull
-  public InvocationConfiguration getCurrentInvocationConfiguration() {
-    return mConfiguration;
   }
 
   /**
@@ -76,6 +64,17 @@ public class StreamConfiguration {
   @NotNull
   public InvocationMode getInvocationMode() {
     return mInvocationMode;
+  }
+
+  /**
+   * Gets the configuration that will override the stream one only for the next concatenated
+   * routine.
+   *
+   * @return the invocation configuration.
+   */
+  @NotNull
+  public InvocationConfiguration getNextInvocationConfiguration() {
+    return mConfiguration;
   }
 
   /**

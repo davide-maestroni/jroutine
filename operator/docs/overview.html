@@ -76,12 +76,11 @@
                                     .withRunner(syncRunner())
                                     .apply()
                                     .buildRoutine();
-                final Double rms = parseRoutine.callParallel(args)
+                final Double rms = parseRoutine.invokeParallel()
                                                .pipe(squareRoutine.invokeParallel())
-                                               .close()
                                                .pipe(meanRoutine.invoke())
-                                               .close()
                                                .pipe(sqrtRoutine.invoke())
+                                               .pass(args)
                                                .close()
                                                .in(seconds(3))
                                                .next();

@@ -50,68 +50,93 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
 
   /**
    * {@inheritDoc}
+   * <p>
+   * The specified configuration will be applied only to the built routine implementing the whole
+   * stream, and will override the stream one.
+   *
+   * @see #buildRoutine()
    */
   @NotNull
   StreamBuilder<IN, OUT> apply(@NotNull InvocationConfiguration configuration);
 
   /**
-   * Sets the specified configuration as the stream one.
-   *
-   * @param configuration the configuration.
-   * @return this builder.
-   */
-  @NotNull
-  StreamBuilder<IN, OUT> applyStream(@NotNull InvocationConfiguration configuration);
-
-  /**
-   * Modifies the stream configuration, so that the concatenated routines will be invoked in
-   * asynchronous mode employing the configured stream runner.
+   * Returns a stream builder where the concatenated routines will be invoked in asynchronous mode
+   * employing the shared asynchronous runner.
    * <br>
-   * Note, however, that the runner will still be overridden by the configured current one.
+   * Note, however, that the current configuration runner will still override the stream one.
    *
-   * @return this builder.
+   * @return the new builder.
    * @see com.github.dm.jrt.core.routine.Routine Routine
    */
   @NotNull
   StreamBuilder<IN, OUT> async();
 
   /**
-   * Modifies the stream configuration, so that the concatenated routines will be invoked in
-   * asynchronous mode employing the specified runner.
+   * Returns a stream builder where the concatenated routines will be invoked in asynchronous mode
+   * employing the specified runner.
    * <br>
-   * Note, however, that the runner will still be overridden by the configured current one.
+   * Note, however, that the current configuration runner will still override the stream one.
    *
    * @param runner the runner instance.
-   * @return this builder.
+   * @return the new builder.
    * @see com.github.dm.jrt.core.routine.Routine Routine
    */
   @NotNull
   StreamBuilder<IN, OUT> async(@Nullable Runner runner);
 
   /**
-   * Modifies the stream configuration, so that the concatenated routines will be invoked in
-   * parallel mode employing the configured stream runner.
+   * Returns a stream builder where the concatenated routines will be invoked in parallel mode
+   * employing the shared asynchronous runner.
    * <br>
-   * Note, however, that the runner will still be overridden by the configured current one.
+   * Note, however, that the current configuration runner will still override the stream one.
    *
-   * @return this builder.
+   * @return the new builder.
    * @see com.github.dm.jrt.core.routine.Routine Routine
    */
   @NotNull
   StreamBuilder<IN, OUT> asyncParallel();
 
   /**
-   * Modifies the stream configuration, so that the concatenated routines will be invoked in
-   * parallel mode employing the specified runner.
+   * Returns a stream builder where the concatenated routines will be invoked in parallel mode
+   * employing the shared asynchronous runner, and the maximum allowed number of concurrent
+   * invocations is the specified one.
    * <br>
-   * Note, however, that the runner will still be overridden by the configured current one.
+   * Note, however, that the current configuration runner will still override the stream one.
+   *
+   * @param maxInvocations the maximum number of invocations.
+   * @return the new builder.
+   * @see com.github.dm.jrt.core.routine.Routine Routine
+   */
+  @NotNull
+  StreamBuilder<IN, OUT> asyncParallel(int maxInvocations);
+
+  /**
+   * Returns a stream builder where the concatenated routines will be invoked in parallel mode
+   * employing the specified runner.
+   * <br>
+   * Note, however, that the current configuration runner will still override the stream one.
    *
    * @param runner the runner instance.
-   * @return this builder.
+   * @return the new builder.
    * @see com.github.dm.jrt.core.routine.Routine Routine
    */
   @NotNull
   StreamBuilder<IN, OUT> asyncParallel(@Nullable Runner runner);
+
+  /**
+   * Returns a stream builder where the concatenated routines will be invoked in parallel mode
+   * employing the specified runner, and the maximum allowed number of concurrent invocations is the
+   * specified one.
+   * <br>
+   * Note, however, that the current configuration runner will still override the stream one.
+   *
+   * @param maxInvocations the maximum number of invocations.
+   * @param runner         the runner instance.
+   * @return the new builder.
+   * @see com.github.dm.jrt.core.routine.Routine Routine
+   */
+  @NotNull
+  StreamBuilder<IN, OUT> asyncParallel(@Nullable Runner runner, int maxInvocations);
 
   /**
    * Builds a new invocation factory instance.
@@ -130,6 +155,15 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
   Routine<IN, OUT> buildRoutine();
 
   /**
+   * Concatenates a routine dispatching this stream outputs through the specified runner.
+   *
+   * @param runner the runner instance.
+   * @return the new builder.
+   */
+  @NotNull
+  StreamBuilder<IN, OUT> consumeOn(@Nullable Runner runner);
+
+  /**
    * Transforms this stream by applying the specified function.
    * <br>
    * The current configuration of the stream will be passed as the first parameter.
@@ -140,7 +174,7 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
    * @param transformingFunction the function modifying the stream.
    * @param <BEFORE>             the input type after the conversion.
    * @param <AFTER>              the output type after the conversion.
-   * @return the lifted builder.
+   * @return the converted builder.
    * @throws com.github.dm.jrt.stream.builder.StreamBuildingException if an unexpected error
    *                                                                  occurred.
    */
@@ -157,17 +191,17 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
    *
    * @param mappingFunction the function instance.
    * @param <AFTER>         the concatenation output type.
-   * @return this builder.
+   * @return the new builder.
    */
   @NotNull
   <AFTER> StreamBuilder<IN, AFTER> flatMap(
       @NotNull Function<? super OUT, ? extends Channel<?, ? extends AFTER>> mappingFunction);
 
   /**
-   * Modifies the stream configuration, so that the concatenated routines will be invoked in
-   * asynchronous mode employing the shared immediate runner.
+   * Returns a stream builder where the concatenated routines will be invoked in asynchronous mode
+   * employing the shared immediate runner.
    * <br>
-   * Note, however, that the runner will still be overridden by the configured current one.
+   * Note, however, that the current configuration runner will still override the stream one.
    * <p>
    * Unlike the default synchronous runner, the employed one makes so that each routine in the
    * chain is passed any input as soon as it is produced by the previous one. Such behavior
@@ -176,17 +210,17 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
    * the latter approach is that all input data might be accumulated before actually being
    * processed by the next routine invocation.
    *
-   * @return this builder.
+   * @return the new builder.
    * @see com.github.dm.jrt.core.runner.Runners#immediateRunner() Runners.immediateRunner()
    */
   @NotNull
   StreamBuilder<IN, OUT> immediate();
 
   /**
-   * Modifies the stream configuration, so that the concatenated routines will be invoked in
-   * parallel mode employing the shared immediate runner.
+   * Returns a stream builder where the concatenated routines will be invoked in parallel mode
+   * employing the shared immediate runner.
    * <br>
-   * Note, however, that the runner will still be overridden by the configured current one.
+   * Note, however, that the current configuration runner will still override the stream one.
    * <p>
    * Unlike the default synchronous runner, the employed one makes so that each routine in the
    * chain is passed any input as soon as it is produced by the previous one. Such behavior
@@ -195,14 +229,40 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
    * the latter approach is that all input data might be accumulated before actually being
    * processed by the next routine invocation.
    *
-   * @return this builder.
+   * @return the new builder.
    * @see com.github.dm.jrt.core.runner.Runners#immediateRunner() Runners.immediateRunner()
    */
   @NotNull
   StreamBuilder<IN, OUT> immediateParallel();
 
   /**
+   * Returns a stream builder where the concatenated routines will be invoked in parallel mode
+   * employing the shared immediate runner, and the maximum allowed number of concurrent
+   * invocations is the specified one.
+   * <br>
+   * Note, however, that the current configuration runner will still override the stream one.
+   * <p>
+   * Unlike the default synchronous runner, the employed one makes so that each routine in the
+   * chain is passed any input as soon as it is produced by the previous one. Such behavior
+   * decreases memory demands at the expense of a deeper stack of calls. In fact, the default
+   * synchronous runner breaks up routine calls so to perform them in a loop. The main drawback of
+   * the latter approach is that all input data might be accumulated before actually being
+   * processed by the next routine invocation.
+   *
+   * @param maxInvocations the maximum number of invocations.
+   * @return the new builder.
+   * @see com.github.dm.jrt.core.runner.Runners#immediateRunner() Runners.immediateRunner()
+   */
+  @NotNull
+  StreamBuilder<IN, OUT> immediateParallel(int maxInvocations);
+
+  /**
    * {@inheritDoc}
+   * <p>
+   * The specified configuration will be applied only to the built routine implementing the whole
+   * stream, and will override the stream one.
+   *
+   * @see #buildRoutine()
    */
   @NotNull
   Builder<? extends StreamBuilder<IN, OUT>> invocationConfiguration();
@@ -218,7 +278,7 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
    * @param liftingFunction the bi-function modifying the chain building one.
    * @param <BEFORE>        the input type after the lifting.
    * @param <AFTER>         the output type after the lifting.
-   * @return this builder.
+   * @return the lifted builder.
    * @throws com.github.dm.jrt.stream.builder.StreamBuildingException if an unexpected error
    *                                                                  occurred.
    */
@@ -235,7 +295,7 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
    *
    * @param mappingFunction the function instance.
    * @param <AFTER>         the concatenation output type.
-   * @return this builder.
+   * @return the new builder.
    */
   @NotNull
   <AFTER> StreamBuilder<IN, AFTER> map(
@@ -248,7 +308,7 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
    *
    * @param factory the invocation factory.
    * @param <AFTER> the concatenation output type.
-   * @return this builder.
+   * @return the new builder.
    */
   @NotNull
   <AFTER> StreamBuilder<IN, AFTER> map(
@@ -261,7 +321,7 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
    *
    * @param routine the routine instance.
    * @param <AFTER> the concatenation output type.
-   * @return this builder.
+   * @return the new builder.
    */
   @NotNull
   <AFTER> StreamBuilder<IN, AFTER> map(@NotNull Routine<? super OUT, ? extends AFTER> routine);
@@ -273,7 +333,7 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
    *
    * @param builder the routine builder instance.
    * @param <AFTER> the concatenation output type.
-   * @return this builder.
+   * @return the new builder.
    */
   @NotNull
   <AFTER> StreamBuilder<IN, AFTER> map(
@@ -289,7 +349,7 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
    *
    * @param mappingConsumer the bi-consumer instance.
    * @param <AFTER>         the concatenation output type.
-   * @return this builder.
+   * @return the new builder.
    */
   @NotNull
   <AFTER> StreamBuilder<IN, AFTER> mapAccept(
@@ -303,7 +363,7 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
    *
    * @param mappingFunction the function instance.
    * @param <AFTER>         the concatenation output type.
-   * @return this builder.
+   * @return the new builder.
    */
   @NotNull
   <AFTER> StreamBuilder<IN, AFTER> mapAll(
@@ -319,37 +379,51 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
    *
    * @param mappingConsumer the bi-consumer instance.
    * @param <AFTER>         the concatenation output type.
-   * @return this builder.
+   * @return the new builder.
    */
   @NotNull
   <AFTER> StreamBuilder<IN, AFTER> mapAllAccept(
       @NotNull BiConsumer<? super List<OUT>, ? super Channel<AFTER, ?>> mappingConsumer);
 
   /**
-   * Short for {@code async().streamInvocationConfiguration().withRunner(runner).apply()
-   * .map(IdentityInvocation.&lt;OUT&gt;factoryOf())}.
-   * <br>
-   * This method is useful to easily make the stream run on the specified runner.
-   * <p>
-   * Note that it is not necessary to explicitly concatenate a routine to have a stream delivering
-   * the output data through the specified runner.
+   * Returns a stream builder with the specified configuration overriding the stream one.
    *
-   * @param runner the runner instance.
-   * @return this builder.
+   * @param configuration the configuration.
+   * @return the new builder.
    */
   @NotNull
-  StreamBuilder<IN, OUT> mapOn(@Nullable Runner runner);
+  StreamBuilder<IN, OUT> nextApply(@NotNull InvocationConfiguration configuration);
 
   /**
-   * Makes the outputs of this stream sorted by the order they are passed to the result channel.
-   * <br>
-   * Note, however, that the modified options will still be overridden by the configured current
-   * ones.
+   * Gets the invocation configuration builder related to the next concatenated routine.
+   * <p>
+   * Note that the configuration builder will be initialized with the current stream
+   * configuration.
    *
-   * @return this builder.
+   * @return the invocation configuration builder.
+   */
+  @NotNull
+  Builder<? extends StreamBuilder<IN, OUT>> nextInvocationConfiguration();
+
+  /**
+   * Returns a stream builder sorting its outputs by the order they are passed to the result
+   * channel.
+   * <br>
+   * Note, however, that the current configuration option will still be override the stream one.
+   *
+   * @return the new builder.
    */
   @NotNull
   StreamBuilder<IN, OUT> sorted();
+
+  /**
+   * Returns a stream builder with the specified configuration as the stream one.
+   *
+   * @param configuration the configuration.
+   * @return the new builder.
+   */
+  @NotNull
+  StreamBuilder<IN, OUT> streamApply(@NotNull InvocationConfiguration configuration);
 
   /**
    * Gets the invocation configuration builder related to the whole stream.
@@ -361,41 +435,55 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
    * configuration.
    *
    * @return the invocation configuration builder.
+   * @see #nextInvocationConfiguration()
    */
   @NotNull
   Builder<? extends StreamBuilder<IN, OUT>> streamInvocationConfiguration();
 
   /**
-   * Modifies the stream configuration, so that the concatenated routines will be invoked in
-   * asynchronous mode employing the shared synchronous runner.
+   * Returns a stream builder where the concatenated routines will be invoked in asynchronous mode
+   * employing the shared synchronous runner.
    * <br>
-   * Note, however, that the runner will still be overridden by the configured current one.
+   * Note, however, that the current configuration runner will still override the stream one.
    *
-   * @return this builder.
+   * @return the new builder.
    * @see com.github.dm.jrt.core.runner.Runners#syncRunner() Runners.syncRunner()
    */
   @NotNull
   StreamBuilder<IN, OUT> sync();
 
   /**
-   * Modifies the stream configuration, so that the concatenated routines will be invoked in
-   * parallel mode employing the shared synchronous runner.
+   * Returns a stream builder where the concatenated routines will be invoked in parallel mode
+   * employing the shared asynchronous runner.
    * <br>
-   * Note, however, that the runner will still be overridden by the configured current one.
+   * Note, however, that the current configuration runner will still override the stream one.
    *
-   * @return this builder.
+   * @return the new builder.
    * @see com.github.dm.jrt.core.runner.Runners#syncRunner() Runners.syncRunner()
    */
   @NotNull
   StreamBuilder<IN, OUT> syncParallel();
 
   /**
-   * Makes the outputs of this stream unsorted.
+   * Returns a stream builder where the concatenated routines will be invoked in parallel mode
+   * employing the shared asynchronous runner, and the maximum allowed number of concurrent
+   * invocations is the specified one.
    * <br>
-   * Note, however, that the modified options will still be overridden by the configured current
-   * ones.
+   * Note, however, that the current configuration runner will still override the stream one.
    *
-   * @return this builder.
+   * @param maxInvocations the maximum number of invocations.
+   * @return the new builder.
+   * @see com.github.dm.jrt.core.runner.Runners#syncRunner() Runners.syncRunner()
+   */
+  @NotNull
+  StreamBuilder<IN, OUT> syncParallel(int maxInvocations);
+
+  /**
+   * Returns a stream builder not sorting its outputs.
+   * <br>
+   * Note, however, that the current configuration option will still be override the stream one.
+   *
+   * @return the new builder.
    */
   @NotNull
   StreamBuilder<IN, OUT> unsorted();

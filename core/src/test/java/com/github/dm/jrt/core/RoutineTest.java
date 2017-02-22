@@ -410,11 +410,9 @@ public class RoutineTest {
                          .in(timeout)
                          .all()).containsExactly(30);
     assertThat(parseRoutine.invokeParallel()
-                           .pass("1", "2", "3", "4")
-                           .close()
                            .pipe(squareRoutine.invokeParallel())
-                           .close()
                            .pipe(sumRoutine.invoke())
+                           .pass("1", "2", "3", "4")
                            .close()
                            .in(timeout)
                            .all()).containsExactly(30);

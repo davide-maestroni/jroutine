@@ -400,7 +400,7 @@ public class StreamBuilderTest {
                              .in(seconds(3))
                              .all()).containsExactly("test1", "test2");
     assertThat(JRoutineStream //
-        .<String>withStream().asyncParallel().flatMap(new Function<String, Channel<?, String>>() {
+        .<String>withStream().asyncParallel(2).flatMap(new Function<String, Channel<?, String>>() {
 
           public Channel<?, String> apply(final String s) {
             return JRoutineStream.<String>withStream().sync()
@@ -412,7 +412,7 @@ public class StreamBuilderTest {
         }).invoke().pass("test1", null, "test2", null).close().in(seconds(3)).all()).containsOnly(
         "test1", "test2");
     assertThat(JRoutineStream //
-        .<String>withStream().syncParallel().flatMap(new Function<String, Channel<?, String>>() {
+        .<String>withStream().syncParallel(2).flatMap(new Function<String, Channel<?, String>>() {
 
           public Channel<?, String> apply(final String s) {
             return JRoutineStream.<String>withStream().sync()
@@ -423,6 +423,25 @@ public class StreamBuilderTest {
           }
         }).invoke().pass("test1", null, "test2", null).close().in(seconds(3)).all()).containsOnly(
         "test1", "test2");
+    assertThat(JRoutineStream //
+        .<String>withStream().immediateParallel(2)
+                             .flatMap(new Function<String, Channel<?, String>>() {
+
+                               public Channel<?, String> apply(final String s) {
+                                 return JRoutineStream.<String>withStream().immediate()
+                                                                           .map(filter(
+                                                                               Functions
+                                                                                   .<String>isNotNull()))
+                                                                           .invoke()
+                                                                           .pass(s)
+                                                                           .close();
+                               }
+                             })
+                             .invoke()
+                             .pass("test1", null, "test2", null)
+                             .close()
+                             .in(seconds(3))
+                             .all()).containsOnly("test1", "test2");
   }
 
   @Test
@@ -792,22 +811,24 @@ public class StreamBuilderTest {
       final Function<String, Object> function = new Function<String, Object>() {
 
         public Object apply(final String s) {
-          return JRoutineStream.<String>withStream().invocationConfiguration()
+          return JRoutineStream.<String>withStream().nextInvocationConfiguration()
                                                     .withRunner(runner1)
                                                     .apply()
                                                     .map(Functions.identity())
-                                                    .invocationConfiguration()
+                                                    .nextInvocationConfiguration()
                                                     .withRunner(runner2)
                                                     .apply()
                                                     .map(Functions.identity())
+                                                    .invocationConfiguration()
+                                                    .withOutputTimeout(minutes(3))
+                                                    .apply()
                                                     .invoke()
                                                     .pass(s)
                                                     .close()
-                                                    .in(minutes(3))
                                                     .next();
         }
       };
-      JRoutineStream.<String>withStream().invocationConfiguration()
+      JRoutineStream.<String>withStream().nextInvocationConfiguration()
                                          .withRunner(runner1)
                                          .apply()
                                          .map(function)
@@ -1318,7 +1339,7 @@ public class StreamBuilderTest {
       }
     };
     assertThat(JRoutineStream.<String>withStream().unsorted()
-                                                  .mapOn(testRunner)
+                                                  .consumeOn(testRunner)
                                                   .invoke()
                                                   .pass("test")
                                                   .close()
@@ -1744,7 +1765,7 @@ public class StreamBuilderTest {
     /**
      * Constructor.
      */
-    protected UpperCase() {
+    UpperCase() {
       super(null);
     }
 

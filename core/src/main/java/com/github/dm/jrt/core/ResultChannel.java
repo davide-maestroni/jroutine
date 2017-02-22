@@ -22,6 +22,7 @@ import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.channel.ExecutionDeadlockException;
 import com.github.dm.jrt.core.channel.OutputDeadlockException;
 import com.github.dm.jrt.core.channel.OutputTimeoutException;
+import com.github.dm.jrt.core.channel.PipeChannel;
 import com.github.dm.jrt.core.common.Backoff;
 import com.github.dm.jrt.core.common.BackoffBuilder;
 import com.github.dm.jrt.core.common.RoutineException;
@@ -626,9 +627,8 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
   }
 
   @NotNull
-  public <AFTER> Channel<? super OUT, AFTER> pipe(
-      @NotNull final Channel<? super OUT, AFTER> channel) {
-    return channel.pass(this);
+  public <AFTER> Channel<OUT, AFTER> pipe(@NotNull final Channel<? super OUT, AFTER> channel) {
+    return new PipeChannel<OUT, OUT, AFTER>(this, channel);
   }
 
   public int size() {

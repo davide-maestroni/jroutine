@@ -259,14 +259,12 @@ public class FutureChannelTest {
             return "test";
           }
         });
-    final Channel<? super String, String> channel = Channels.fromFuture(future)
-                                                            .buildChannel()
-                                                            .pipe(
-                                                                JRoutineCore.<String>ofInputs()
-                                                                    .buildChannel());
+    final Channel<?, String> channel = Channels.fromFuture(future)
+                                               .buildChannel()
+                                               .pipe(
+                                                   JRoutineCore.<String>ofInputs().buildChannel());
     assertThat(channel.in(seconds(1)).next()).isEqualTo("test");
-    assertThat(channel.isOpen()).isTrue();
-    assertThat(channel.afterNoDelay().close().isOpen()).isFalse();
+    assertThat(channel.isOpen()).isFalse();
   }
 
   @Test
@@ -280,7 +278,7 @@ public class FutureChannelTest {
         }, 3, TimeUnit.SECONDS);
     final Channel<?, String> channel = Channels.fromFuture(future).buildChannel();
     assertThat(channel.isBound()).isFalse();
-    final Channel<? super String, String> outputChannel =
+    final Channel<?, String> outputChannel =
         channel.pipe(JRoutineCore.<String>ofInputs().buildChannel());
     assertThat(channel.isBound()).isTrue();
     channel.abort();

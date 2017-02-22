@@ -77,6 +77,11 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends AbstractRoutineBuilder<IN, OU
     return this;
   }
 
+  @Override
+  public void clear() {
+    buildRoutine().clear();
+  }
+
   @NotNull
   @Override
   @SuppressWarnings("unchecked")
@@ -106,11 +111,6 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends AbstractRoutineBuilder<IN, OU
         configuration.builderFrom().withRunner(zeroDelayRunner(mainRunner()));
     return new DefaultLoaderRoutine<IN, OUT>(mContext, mFactory, builder.apply(),
         mLoaderConfiguration);
-  }
-
-  @Override
-  public void clear() {
-    buildRoutine().clear();
   }
 
   @Override

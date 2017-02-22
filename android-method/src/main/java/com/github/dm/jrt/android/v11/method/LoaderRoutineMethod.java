@@ -417,7 +417,7 @@ public class LoaderRoutineMethod extends RoutineMethod
     final Map<Integer, ? extends Channel<?, Object>> channelMap =
         AndroidChannels.flowOutput(0, outputChannels.size(), outputChannel).buildChannelMap();
     for (final Entry<Integer, ? extends Channel<?, Object>> entry : channelMap.entrySet()) {
-      entry.getValue().pipe((Channel<Object, Object>) outputChannels.get(entry.getKey())).close();
+      ((Channel<Object, Object>) outputChannels.get(entry.getKey())).pass(entry.getValue()).close();
     }
 
     return resultChannel;

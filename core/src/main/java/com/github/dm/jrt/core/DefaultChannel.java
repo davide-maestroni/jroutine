@@ -248,8 +248,7 @@ class DefaultChannel<DATA> implements Channel<DATA, DATA> {
   }
 
   @NotNull
-  public <AFTER> Channel<? super DATA, AFTER> pipe(
-      @NotNull final Channel<? super DATA, AFTER> channel) {
+  public <AFTER> Channel<DATA, AFTER> pipe(@NotNull final Channel<? super DATA, AFTER> channel) {
     return mChannel.pipe(channel);
   }
 

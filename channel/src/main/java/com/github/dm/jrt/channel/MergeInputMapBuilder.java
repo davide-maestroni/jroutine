@@ -71,7 +71,7 @@ class MergeInputMapBuilder<IN>
     for (final Entry<Integer, Channel<? extends IN, ?>> entry : channelMap.entrySet()) {
       final Channel<IN, IN> outputChannel =
           JRoutineCore.<IN>ofInputs().apply(configuration).buildChannel();
-      outputChannel.pipe((Channel<IN, ?>) entry.getValue());
+      ((Channel<IN, ?>) entry.getValue()).pass(outputChannel);
       inputChannelMap.put(entry.getKey(), outputChannel);
     }
 

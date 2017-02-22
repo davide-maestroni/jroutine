@@ -223,7 +223,7 @@ public abstract class AbstractRoutine<IN, OUT> implements Routine<IN, OUT> {
     public void onComplete(@NotNull final Channel<OUT, ?> result) {
       if (!mHasInputs) {
         final Channel<IN, OUT> channel = mRoutine.invoke();
-        channel.pipe(result);
+        result.pass(channel);
         channel.close();
       }
     }
@@ -232,7 +232,7 @@ public abstract class AbstractRoutine<IN, OUT> implements Routine<IN, OUT> {
     public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) {
       mHasInputs = true;
       final Channel<IN, OUT> channel = mRoutine.invoke();
-      channel.pipe(result);
+      result.pass(channel);
       channel.pass(input).close();
     }
 

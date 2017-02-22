@@ -38,30 +38,41 @@ class BindTimeout<OUT> implements Function<Channel<?, OUT>, Channel<?, OUT>> {
 
   private final ChannelConfiguration mConfiguration;
 
-  private final long mTimeout;
+  private final long mOutputTimeout;
 
-  private final TimeUnit mTimeoutUnit;
+  private final TimeUnit mOutputTimeoutUnit;
+
+  private final long mTotalTimeout;
+
+  private final TimeUnit mTotalTimeoutUnit;
 
   /**
    * Constructor.
    *
-   * @param configuration the channel configuration.
-   * @param timeout       the timeout value.
-   * @param timeUnit      the timeout unit.
+   * @param configuration  the channel configuration.
+   * @param outputTimeout  the new output timeout value.
+   * @param outputTimeUnit the new output timeout unit.
+   * @param totalTimeout   the total timeout value.
+   * @param totalTimeUnit  the total timeout unit.
    */
-  BindTimeout(@NotNull final ChannelConfiguration configuration, final long timeout,
-      @NotNull final TimeUnit timeUnit) {
+  BindTimeout(@NotNull final ChannelConfiguration configuration, final long outputTimeout,
+      @NotNull final TimeUnit outputTimeUnit, final long totalTimeout,
+      @NotNull final TimeUnit totalTimeUnit) {
     mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
-    mTimeout = ConstantConditions.notNegative("timeout value", timeout);
-    mTimeoutUnit = ConstantConditions.notNull("timeout unit", timeUnit);
+    mOutputTimeout = ConstantConditions.notNegative("output timeout value", outputTimeout);
+    mOutputTimeoutUnit = ConstantConditions.notNull("output time unit", outputTimeUnit);
+    mTotalTimeout = ConstantConditions.notNegative("total timeout value", totalTimeout);
+    mTotalTimeoutUnit = ConstantConditions.notNull("total time unit", totalTimeUnit);
   }
 
   public Channel<?, OUT> apply(final Channel<?, OUT> channel) {
     final ChannelConfiguration configuration = mConfiguration;
     final Channel<OUT, OUT> outputChannel =
         JRoutineCore.<OUT>ofInputs().apply(configuration).buildChannel();
-    channel.consume(new TimeoutChannelConsumer<OUT>(mTimeout, mTimeoutUnit,
-        configuration.getRunnerOrElse(Runners.sharedRunner()), outputChannel));
+    channel.consume(
+        new TimeoutChannelConsumer<OUT>(mOutputTimeout, mOutputTimeoutUnit, mTotalTimeout,
+            mTotalTimeoutUnit, configuration.getRunnerOrElse(Runners.sharedRunner()),
+            outputChannel));
     return outputChannel;
   }
 }

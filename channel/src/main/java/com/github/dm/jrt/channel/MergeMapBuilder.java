@@ -46,7 +46,7 @@ class MergeMapBuilder<OUT> extends AbstractChannelBuilder<Flow<OUT>, Flow<OUT>> 
   @NotNull
   public Channel<Flow<OUT>, Flow<OUT>> buildChannel() {
     final Channel<Flow<OUT>, Flow<OUT>> outputChannel =
-        JRoutineCore.<Flow<OUT>>ofInputs().apply(getConfiguration()).buildChannel();
+        JRoutineCore.<Flow<OUT>>ofData().apply(getConfiguration()).buildChannel();
     for (final Entry<Integer, ? extends Channel<?, ? extends OUT>> entry : mChannelMap.entrySet()) {
       outputChannel.pass(
           new OutputFlowBuilder<OUT>(entry.getValue(), entry.getKey()).buildChannel());

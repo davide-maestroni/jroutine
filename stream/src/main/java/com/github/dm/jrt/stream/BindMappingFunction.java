@@ -22,7 +22,7 @@ import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.Function;
+import com.github.dm.jrt.function.lambda.Function;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -54,7 +54,7 @@ class BindMappingFunction<IN, OUT> implements Function<Channel<?, IN>, Channel<?
 
   public Channel<?, OUT> apply(final Channel<?, IN> channel) {
     final Channel<OUT, OUT> outputChannel =
-        JRoutineCore.<OUT>ofInputs().apply(mConfiguration).buildChannel();
+        JRoutineCore.<OUT>ofData().apply(mConfiguration).buildChannel();
     channel.consume(new MappingFunctionConsumer<IN, OUT>(mMappingFunction, outputChannel));
     return outputChannel;
   }

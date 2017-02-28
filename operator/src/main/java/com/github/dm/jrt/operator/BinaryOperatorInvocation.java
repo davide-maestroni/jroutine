@@ -20,9 +20,9 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
-import com.github.dm.jrt.function.BiFunction;
-import com.github.dm.jrt.function.BiFunctionDecorator;
 import com.github.dm.jrt.function.Functions;
+import com.github.dm.jrt.function.lambda.BiFunction;
+import com.github.dm.jrt.function.lambda.BiFunctionDecorator;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -85,7 +85,7 @@ class BinaryOperatorInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
   }
 
   @Override
-  public boolean onRecycle(final boolean isReused) {
+  public boolean onRecycle() {
     mResult = null;
     return true;
   }

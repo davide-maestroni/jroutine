@@ -26,10 +26,10 @@ import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DurationMeasure;
-import com.github.dm.jrt.function.Action;
-import com.github.dm.jrt.function.BiConsumer;
-import com.github.dm.jrt.function.BiFunction;
-import com.github.dm.jrt.function.Function;
+import com.github.dm.jrt.function.lambda.Action;
+import com.github.dm.jrt.function.lambda.BiConsumer;
+import com.github.dm.jrt.function.lambda.BiFunction;
+import com.github.dm.jrt.function.lambda.Function;
 import com.github.dm.jrt.stream.builder.StreamBuilder;
 import com.github.dm.jrt.stream.builder.StreamConfiguration;
 

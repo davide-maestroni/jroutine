@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Davide Maestroni
+ * Copyright 2017 Davide Maestroni
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.function;
+package com.github.dm.jrt.function.lambda;
 
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DeepEqualObject;
@@ -86,7 +86,7 @@ public class BiFunctionDecorator<IN1, IN2, OUT> extends DeepEqualObject
   /**
    * Constructor.
    *
-   * @param biFunction the wrapped supplier.
+   * @param biFunction the wrapped bi-function.
    */
   private BiFunctionDecorator(@NotNull final BiFunction<IN1, IN2, ?> biFunction) {
     this(ConstantConditions.notNull("bi-function instance", biFunction),
@@ -96,7 +96,7 @@ public class BiFunctionDecorator<IN1, IN2, OUT> extends DeepEqualObject
   /**
    * Constructor.
    *
-   * @param biFunction the initial wrapped supplier.
+   * @param biFunction the initial wrapped bi-function.
    * @param function   the concatenated function chain.
    */
   private BiFunctionDecorator(@NotNull final BiFunction<IN1, IN2, ?> biFunction,

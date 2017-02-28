@@ -76,7 +76,7 @@ class ToSetInvocation<DATA> extends TemplateInvocation<DATA, Set<DATA>> {
   }
 
   @Override
-  public boolean onRecycle(final boolean isReused) {
+  public boolean onRecycle() {
     mSet = null;
     return true;
   }

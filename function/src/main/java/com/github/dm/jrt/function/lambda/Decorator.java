@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Davide Maestroni
+ * Copyright 2017 Davide Maestroni
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,24 +14,19 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.function;
+package com.github.dm.jrt.function.lambda;
 
 /**
- * Interface representing a function that accepts one argument and produces a result.
+ * Interface defining a decorator of functions.
  * <p>
- * Created by davide-maestroni on 09/21/2015.
- *
- * @param <IN>  the input data type.
- * @param <OUT> the output data type.
+ * Created by davide-maestroni on 02/13/2016.
  */
-public interface Function<IN, OUT> {
+public interface Decorator {
 
   /**
-   * Applies this function to the given argument.
+   * Checks if the class of the wrapped functions are static or top level.
    *
-   * @param in the input argument.
-   * @return the function result.
-   * @throws java.lang.Exception if an unexpected error occurs.
+   * @return whether this decorator has a static scope.
    */
-  OUT apply(IN in) throws Exception;
+  boolean hasStaticScope();
 }

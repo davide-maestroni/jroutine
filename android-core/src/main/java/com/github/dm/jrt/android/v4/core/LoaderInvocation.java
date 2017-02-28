@@ -788,12 +788,12 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
       logger.dbg("creating new result channel");
       final InvocationLoader<?, OUT> internalLoader = mLoader;
       final ArrayList<Channel<OUT, ?>> channels = mNewChannels;
-      final Channel<OUT, OUT> channel = JRoutineCore.<OUT>ofInputs().channelConfiguration()
-                                                                    .withLog(logger.getLog())
-                                                                    .withLogLevel(
+      final Channel<OUT, OUT> channel = JRoutineCore.<OUT>ofData().channelConfiguration()
+                                                                  .withLog(logger.getLog())
+                                                                  .withLogLevel(
                                                                         logger.getLogLevel())
-                                                                    .apply()
-                                                                    .buildChannel();
+                                                                  .apply()
+                                                                  .buildChannel();
       channels.add(channel);
       internalLoader.setInvocationCount(
           Math.max(channels.size() + mAbortedChannels.size(), internalLoader.getInvocationCount()));

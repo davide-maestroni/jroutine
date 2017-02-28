@@ -37,11 +37,11 @@ import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.runner.SyncRunner;
-import com.github.dm.jrt.function.BiConsumer;
-import com.github.dm.jrt.function.BiFunction;
-import com.github.dm.jrt.function.Consumer;
-import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Functions;
+import com.github.dm.jrt.function.lambda.BiConsumer;
+import com.github.dm.jrt.function.lambda.BiFunction;
+import com.github.dm.jrt.function.lambda.Consumer;
+import com.github.dm.jrt.function.lambda.Function;
 import com.github.dm.jrt.operator.Operators;
 import com.github.dm.jrt.stream.builder.StreamBuilder;
 import com.github.dm.jrt.stream.builder.StreamBuildingException;
@@ -65,7 +65,7 @@ import static com.github.dm.jrt.core.util.DurationMeasure.minutes;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static com.github.dm.jrt.function.Functions.constant;
 import static com.github.dm.jrt.function.Functions.functionMapping;
-import static com.github.dm.jrt.function.Functions.onOutput;
+import static com.github.dm.jrt.function.JRoutineFunction.onOutput;
 import static com.github.dm.jrt.operator.Operators.append;
 import static com.github.dm.jrt.operator.Operators.appendAccept;
 import static com.github.dm.jrt.operator.Operators.filter;
@@ -96,7 +96,7 @@ public class StreamBuilderTest {
   @Test
   @SuppressWarnings({"ConstantConditions", "ThrowableResultOfMethodCallIgnored"})
   public void testAbort() {
-    final Channel<Object, Object> channel = JRoutineCore.ofInputs().buildChannel();
+    final Channel<Object, Object> channel = JRoutineCore.ofData().buildChannel();
     final Channel<Object, Object> streamChannel =
         JRoutineStream.withStream().invoke().pass(channel).close();
     channel.abort(new IllegalArgumentException());
@@ -184,7 +184,7 @@ public class StreamBuilderTest {
                     .sync()
                     .map(append((Object) "test"))
                     .invoke()
-                    .pipe(JRoutineCore.ofInputs().buildChannel())
+                    .pipe(JRoutineCore.ofData().buildChannel())
                     .next();
       fail();
 
@@ -1739,7 +1739,7 @@ public class StreamBuilderTest {
                       .getError()
                       .getCause()).isInstanceOf(IllegalStateException.class);
     assertThat(JRoutineStream.withStreamOf(
-        JRoutineCore.ofInputs().buildChannel().consume(new TemplateChannelConsumer<Object>() {}))
+        JRoutineCore.ofData().buildChannel().consume(new TemplateChannelConsumer<Object>() {}))
                              .immediate()
                              .invoke()
                              .close()

@@ -36,11 +36,11 @@ import com.github.dm.jrt.core.log.NullLog;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.DurationMeasure;
-import com.github.dm.jrt.function.BiConsumer;
-import com.github.dm.jrt.function.Consumer;
-import com.github.dm.jrt.function.Function;
-import com.github.dm.jrt.function.Predicate;
-import com.github.dm.jrt.function.Supplier;
+import com.github.dm.jrt.function.lambda.BiConsumer;
+import com.github.dm.jrt.function.lambda.Consumer;
+import com.github.dm.jrt.function.lambda.Function;
+import com.github.dm.jrt.function.lambda.Predicate;
+import com.github.dm.jrt.function.lambda.Supplier;
 import com.github.dm.jrt.operator.Operators;
 import com.github.dm.jrt.proxy.annotation.Proxy;
 import com.github.dm.jrt.reflect.annotation.Alias;
@@ -184,7 +184,7 @@ public class JRoutineTest {
   @Test
   public void testConcatReadOutput() throws IOException {
 
-    final Channel<ByteChunk, ByteChunk> channel = JRoutine.<ByteChunk>ofInputs().buildChannel();
+    final Channel<ByteChunk, ByteChunk> channel = JRoutine.<ByteChunk>ofData().buildChannel();
     final ChunkOutputStream stream = JRoutine.withOutput(channel)
                                              .chunkStreamConfiguration()
                                              .withChunkSize(3)
@@ -211,7 +211,7 @@ public class JRoutineTest {
   @Test
   public void testConcatReadOutput2() throws IOException {
 
-    final Channel<ByteChunk, ByteChunk> channel = JRoutine.<ByteChunk>ofInputs().buildChannel();
+    final Channel<ByteChunk, ByteChunk> channel = JRoutine.<ByteChunk>ofData().buildChannel();
     final ChunkOutputStream stream = JRoutine.withOutput(channel)
                                              .chunkStreamConfiguration()
                                              .withChunkSize(3)
@@ -522,7 +522,7 @@ public class JRoutineTest {
     assertThat(channel.isOpen()).isTrue();
     channel.after(millis(500)).pass("test");
     assertThat(channel.isOpen()).isTrue();
-    final Channel<Object, Object> outputChannel = JRoutine.ofInputs().buildChannel();
+    final Channel<Object, Object> outputChannel = JRoutine.ofData().buildChannel();
     channel.afterNoDelay().pass(outputChannel);
     assertThat(channel.isOpen()).isTrue();
     channel.close();
@@ -577,7 +577,7 @@ public class JRoutineTest {
   @Test
   public void testReadAll() throws IOException {
 
-    final Channel<ByteChunk, ByteChunk> channel = JRoutine.<ByteChunk>ofInputs().buildChannel();
+    final Channel<ByteChunk, ByteChunk> channel = JRoutine.<ByteChunk>ofData().buildChannel();
     final ChunkOutputStream stream = JRoutine.withOutput(channel).buildOutputStream();
     stream.write(new byte[]{31, 17, (byte) 155, 13});
     stream.flush();
@@ -766,7 +766,7 @@ public class JRoutineTest {
                        .getError()
                        .getCause()).isInstanceOf(IllegalStateException.class);
     assertThat(JRoutine.withStreamOf(
-        JRoutine.ofInputs().buildChannel().consume(new TemplateChannelConsumer<Object>() {}))
+        JRoutine.ofData().buildChannel().consume(new TemplateChannelConsumer<Object>() {}))
                        .immediate()
                        .invoke()
                        .close()

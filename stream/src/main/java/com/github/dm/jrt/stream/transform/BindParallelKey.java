@@ -22,7 +22,7 @@ import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.Function;
+import com.github.dm.jrt.function.lambda.Function;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -64,7 +64,7 @@ class BindParallelKey<IN, OUT> implements Function<Channel<?, IN>, Channel<?, OU
 
   public Channel<?, OUT> apply(final Channel<?, IN> channel) {
     final Channel<OUT, OUT> outputChannel =
-        JRoutineCore.<OUT>ofInputs().apply(mConfiguration).buildChannel();
+        JRoutineCore.<OUT>ofData().apply(mConfiguration).buildChannel();
     channel.consume(new ParallelKeyChannelConsumer<IN, OUT>(outputChannel, mKeyFunction, mRoutine,
         mInvocationMode));
     return outputChannel;

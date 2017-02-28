@@ -184,7 +184,7 @@ public class ParcelableByteChannel {
       public ParcelableByteChunk createFromParcel(final Parcel in) {
         final byte[] data = in.createByteArray();
         final Channel<ByteChunk, ByteChunk> channel =
-            JRoutineCore.<ByteChunk>ofInputs().buildChannel();
+            JRoutineCore.<ByteChunk>ofData().buildChannel();
         final ChunkOutputStream outputStream = ByteChannel.withOutput(channel)
                                                           .chunkStreamConfiguration()
                                                           .withChunkSize(Math.max(data.length, 1))
@@ -323,7 +323,7 @@ public class ParcelableByteChannel {
     @NotNull
     public ChunkOutputStream buildOutputStream() {
       final Channel<ByteChunk, ByteChunk> outputChannel =
-          JRoutineCore.<ByteChunk>ofInputs().buildChannel();
+          JRoutineCore.<ByteChunk>ofData().buildChannel();
       outputChannel.consume(new ChunkChannelConsumer(mChannel));
       return ByteChannel.withOutput(outputChannel).apply(mConfiguration).buildOutputStream();
     }

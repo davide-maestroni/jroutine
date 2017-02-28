@@ -70,7 +70,7 @@ class JoinOutputBuilder<OUT> extends AbstractChannelBuilder<List<OUT>, List<OUT>
     final ArrayList<Channel<?, ? extends OUT>> channels = mChannels;
     final ChannelConfiguration configuration = getConfiguration();
     final Channel<List<OUT>, List<OUT>> outputChannel =
-        JRoutineCore.<List<OUT>>ofInputs().apply(configuration).buildChannel();
+        JRoutineCore.<List<OUT>>ofData().apply(configuration).buildChannel();
     final Object mutex = new Object();
     final int size = channels.size();
     final boolean[] closed = new boolean[size];

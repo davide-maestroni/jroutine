@@ -466,7 +466,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       return true;
     }
   }
@@ -547,7 +547,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       return true;
     }
   }
@@ -627,7 +627,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       return true;
     }
   }
@@ -658,7 +658,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       return true;
     }
   }
@@ -671,7 +671,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       return true;
     }
   }
@@ -694,7 +694,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       return true;
     }
   }

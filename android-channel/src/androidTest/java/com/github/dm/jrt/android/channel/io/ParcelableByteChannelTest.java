@@ -86,7 +86,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
   public void testBufferEquals() throws IOException {
 
     final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
-        JRoutineCore.<ParcelableByteChunk>ofInputs().buildChannel();
+        JRoutineCore.<ParcelableByteChunk>ofData().buildChannel();
     final Channel<?, ParcelableByteChunk> result = JRoutineService.on(serviceFrom(getActivity()))
                                                                   .with(factoryOf(
                                                                       PassingInvocation.class))
@@ -592,7 +592,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
   public void testReadAll() throws IOException {
 
     final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
-        JRoutineCore.<ParcelableByteChunk>ofInputs().buildChannel();
+        JRoutineCore.<ParcelableByteChunk>ofData().buildChannel();
     final ChunkOutputStream stream = ParcelableByteChannel.withOutput(channel).buildOutputStream();
     stream.write(new byte[]{31, 17, (byte) 155, 13});
     stream.flush();
@@ -611,7 +611,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
   public void testReadByte() throws IOException {
 
     final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
-        JRoutineCore.<ParcelableByteChunk>ofInputs().buildChannel();
+        JRoutineCore.<ParcelableByteChunk>ofData().buildChannel();
     final Channel<?, ParcelableByteChunk> result = JRoutineService.on(serviceFrom(getActivity()))
                                                                   .with(factoryOf(
                                                                       PassingInvocation.class))
@@ -642,7 +642,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
   public void testReadByteArray() throws IOException {
 
     final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
-        JRoutineCore.<ParcelableByteChunk>ofInputs().buildChannel();
+        JRoutineCore.<ParcelableByteChunk>ofData().buildChannel();
     final Channel<?, ParcelableByteChunk> result = JRoutineService.on(serviceFrom(getActivity()))
                                                                   .with(factoryOf(
                                                                       PassingInvocation.class))
@@ -693,7 +693,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
   public void testReadBytes() throws IOException {
 
     final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
-        JRoutineCore.<ParcelableByteChunk>ofInputs().buildChannel();
+        JRoutineCore.<ParcelableByteChunk>ofData().buildChannel();
     final Channel<?, ParcelableByteChunk> result = JRoutineService.on(serviceFrom(getActivity()))
                                                                   .with(factoryOf(
                                                                       PassingInvocation.class))
@@ -841,7 +841,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
   public void testReadOutput() throws IOException {
 
     final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
-        JRoutineCore.<ParcelableByteChunk>ofInputs().buildChannel();
+        JRoutineCore.<ParcelableByteChunk>ofData().buildChannel();
     final Channel<?, ParcelableByteChunk> result = JRoutineService.on(serviceFrom(getActivity()))
                                                                   .with(factoryOf(
                                                                       PassingInvocation.class))
@@ -943,7 +943,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
   public void testTransferFrom() throws IOException {
 
     final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
-        JRoutineCore.<ParcelableByteChunk>ofInputs().buildChannel();
+        JRoutineCore.<ParcelableByteChunk>ofData().buildChannel();
     final ChunkOutputStream stream = ParcelableByteChannel.withOutput(channel)
                                                           .chunkStreamConfiguration()
                                                           .withChunkSize(4)
@@ -962,7 +962,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
   public void testTransferTo() throws IOException {
 
     final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
-        JRoutineCore.<ParcelableByteChunk>ofInputs().buildChannel();
+        JRoutineCore.<ParcelableByteChunk>ofData().buildChannel();
     final ChunkOutputStream stream = ParcelableByteChannel.withOutput(channel).buildOutputStream();
     stream.write(new byte[]{31, 17, (byte) 155, 13});
     stream.flush();
@@ -981,7 +981,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
   public void testWriteAll() throws IOException {
 
     final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
-        JRoutineCore.<ParcelableByteChunk>ofInputs().buildChannel();
+        JRoutineCore.<ParcelableByteChunk>ofData().buildChannel();
     final ChunkOutputStream stream = ParcelableByteChannel.withOutput(channel)
                                                           .chunkStreamConfiguration()
                                                           .withChunkSize(4)
@@ -1000,7 +1000,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
   public void testWriteByte() throws IOException {
 
     final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
-        JRoutineCore.<ParcelableByteChunk>ofInputs().buildChannel();
+        JRoutineCore.<ParcelableByteChunk>ofData().buildChannel();
     final Channel<?, ParcelableByteChunk> result = JRoutineService.on(serviceFrom(getActivity()))
                                                                   .with(factoryOf(
                                                                       PassingInvocation.class))
@@ -1037,7 +1037,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
   public void testWriteByteArray() throws IOException {
 
     final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
-        JRoutineCore.<ParcelableByteChunk>ofInputs().buildChannel();
+        JRoutineCore.<ParcelableByteChunk>ofData().buildChannel();
     final Channel<?, ParcelableByteChunk> result = JRoutineService.on(serviceFrom(getActivity()))
                                                                   .with(factoryOf(
                                                                       PassingInvocation.class))
@@ -1078,7 +1078,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
   public void testWriteBytes() throws IOException {
 
     final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
-        JRoutineCore.<ParcelableByteChunk>ofInputs().buildChannel();
+        JRoutineCore.<ParcelableByteChunk>ofData().buildChannel();
     final Channel<?, ParcelableByteChunk> result = JRoutineService.on(serviceFrom(getActivity()))
                                                                   .with(factoryOf(
                                                                       PassingInvocation.class))
@@ -1192,7 +1192,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
   public void testWriteInput() throws IOException {
 
     final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
-        JRoutineCore.<ParcelableByteChunk>ofInputs().buildChannel();
+        JRoutineCore.<ParcelableByteChunk>ofData().buildChannel();
     final Channel<?, ParcelableByteChunk> result = JRoutineService.on(serviceFrom(getActivity()))
                                                                   .with(factoryOf(
                                                                       PassingInvocation.class))
@@ -1243,7 +1243,7 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       return true;
     }
   }

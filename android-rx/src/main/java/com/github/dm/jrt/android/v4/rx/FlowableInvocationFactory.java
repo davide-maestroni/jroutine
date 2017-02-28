@@ -80,7 +80,7 @@ class FlowableInvocationFactory<DATA> extends ContextInvocationFactory<Void, DAT
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       return true;
     }
   }

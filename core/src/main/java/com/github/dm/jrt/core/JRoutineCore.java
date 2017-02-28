@@ -53,7 +53,7 @@ import java.util.Collections;
  * <b>Example 2:</b> Asynchronously merge the output of two routines.
  * <pre><code>
  * final Channel&lt;Result, Result&gt; channel =
- *     JRoutineCore.&lt;Result&gt;ofInputs().buildChannel();
+ *     JRoutineCore.&lt;Result&gt;ofData().buildChannel();
  * channel.pass(routine1.invoke().close())
  *        .pass(routine2.invoke().close())
  *        .close();
@@ -182,7 +182,7 @@ public class JRoutineCore {
    * @return the channel builder instance.
    */
   @NotNull
-  public static <DATA> ChannelBuilder<DATA, DATA> ofInputs() {
+  public static <DATA> ChannelBuilder<DATA, DATA> ofData() {
     return new DefaultChannelBuilder<DATA>();
   }
 

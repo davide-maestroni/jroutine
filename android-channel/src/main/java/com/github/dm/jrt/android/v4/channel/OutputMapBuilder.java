@@ -106,7 +106,7 @@ class OutputMapBuilder<OUT> extends AbstractChannelArrayCompatBuilder<OUT, OUT> 
         channels = new SparseArrayCompat<Channel<?, ?>>(size);
         for (final Integer id : ids) {
           final Channel<OUT, OUT> outputChannel =
-              JRoutineCore.<OUT>ofInputs().apply(configuration).buildChannel();
+              JRoutineCore.<OUT>ofData().apply(configuration).buildChannel();
           inputMap.append(id, outputChannel);
           channelMap.append(id, outputChannel);
           channels.append(id, outputChannel);

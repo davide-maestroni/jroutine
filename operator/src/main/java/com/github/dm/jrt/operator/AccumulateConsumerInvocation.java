@@ -20,10 +20,10 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
-import com.github.dm.jrt.function.BiConsumer;
-import com.github.dm.jrt.function.BiConsumerDecorator;
-import com.github.dm.jrt.function.Supplier;
-import com.github.dm.jrt.function.SupplierDecorator;
+import com.github.dm.jrt.function.lambda.BiConsumer;
+import com.github.dm.jrt.function.lambda.BiConsumerDecorator;
+import com.github.dm.jrt.function.lambda.Supplier;
+import com.github.dm.jrt.function.lambda.SupplierDecorator;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -127,7 +127,7 @@ class AccumulateConsumerInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> 
   }
 
   @Override
-  public boolean onRecycle(final boolean isReused) {
+  public boolean onRecycle() {
     mAccumulated = null;
     return true;
   }

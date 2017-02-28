@@ -25,7 +25,7 @@ import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.SimpleQueue;
-import com.github.dm.jrt.function.Function;
+import com.github.dm.jrt.function.lambda.Function;
 import com.github.dm.jrt.stream.builder.StreamConfiguration;
 
 import org.jetbrains.annotations.NotNull;
@@ -100,7 +100,7 @@ class TimeThrottle<IN, OUT> implements LiftFunction<IN, OUT, IN, OUT> {
     public Channel<?, OUT> apply(final Channel<?, IN> channel) throws Exception {
       final ChannelConfiguration configuration = mConfiguration;
       final Channel<OUT, OUT> outputChannel =
-          JRoutineCore.<OUT>ofInputs().apply(configuration).buildChannel();
+          JRoutineCore.<OUT>ofData().apply(configuration).buildChannel();
       final long delay;
       final boolean isBind;
       final Runner runner = mRunner;

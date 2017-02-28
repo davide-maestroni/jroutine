@@ -15,7 +15,7 @@
  */
 
 /**
- * Functional interfaces and utility classes.
+ * Functional routine and invocation factory builders.
  * <p>
  * Created by davide-maestroni on 09/22/2015.
  */

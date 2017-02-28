@@ -58,9 +58,9 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
   }
 
   private static void testAbort2(@NotNull final FragmentActivity activity) {
-    final Channel<Integer, Integer> inputChannel1 = JRoutineCore.<Integer>ofInputs().buildChannel();
-    final Channel<Integer, Integer> inputChannel2 = JRoutineCore.<Integer>ofInputs().buildChannel();
-    final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
+    final Channel<Integer, Integer> inputChannel1 = JRoutineCore.<Integer>ofData().buildChannel();
+    final Channel<Integer, Integer> inputChannel2 = JRoutineCore.<Integer>ofData().buildChannel();
+    final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     new LoaderRoutineMethodCompat(loaderFrom(activity)) {
 
       private int mSum;
@@ -82,9 +82,9 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
   }
 
   private static void testAbort3(@NotNull final FragmentActivity activity) {
-    final Channel<Integer, Integer> inputChannel1 = JRoutineCore.<Integer>ofInputs().buildChannel();
-    final Channel<Integer, Integer> inputChannel2 = JRoutineCore.<Integer>ofInputs().buildChannel();
-    final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
+    final Channel<Integer, Integer> inputChannel1 = JRoutineCore.<Integer>ofData().buildChannel();
+    final Channel<Integer, Integer> inputChannel2 = JRoutineCore.<Integer>ofData().buildChannel();
+    final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     new LoaderRoutineMethodCompat(loaderFrom(activity)) {
 
       private int mSum;
@@ -107,7 +107,7 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
   }
 
   private static void testContext(@NotNull final FragmentActivity activity) {
-    final Channel<Boolean, Boolean> outputChannel = JRoutineCore.<Boolean>ofInputs().buildChannel();
+    final Channel<Boolean, Boolean> outputChannel = JRoutineCore.<Boolean>ofData().buildChannel();
     new LoaderRoutineMethodCompat(loaderFrom(activity)) {
 
       void test(@Output final Channel<Boolean, ?> output) {
@@ -125,7 +125,7 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
         return "test";
       }
     }.call().in(seconds(10)).all()).containsExactly("test");
-    final Channel<String, String> outputChannel = JRoutineCore.<String>ofInputs().buildChannel();
+    final Channel<String, String> outputChannel = JRoutineCore.<String>ofData().buildChannel();
     new LoaderRoutineMethodCompat(context) {
 
       void get(@Output final Channel<String, ?> outputChannel) {
@@ -149,10 +149,10 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
           }
         };
     Channel<Object, Object> inputChannel =
-        JRoutineCore.ofInputs().buildChannel().pass("test").close();
+        JRoutineCore.ofData().buildChannel().pass("test").close();
     Channel<?, String> outputChannel = method.call(inputChannel, true);
     assertThat(outputChannel.in(seconds(10)).next()).isEqualTo("TEST");
-    inputChannel = JRoutineCore.ofInputs().buildChannel().pass("TEST").close();
+    inputChannel = JRoutineCore.ofData().buildChannel().pass("TEST").close();
     outputChannel = method.call(inputChannel, false);
     assertThat(outputChannel.in(seconds(10)).next()).isEqualTo("test");
   }
@@ -182,7 +182,7 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
   }
 
   private static void testReturnValue(@NotNull final FragmentActivity activity) {
-    final Channel<String, String> inputStrings = JRoutineCore.<String>ofInputs().buildChannel();
+    final Channel<String, String> inputStrings = JRoutineCore.<String>ofData().buildChannel();
     final Channel<?, Object> outputChannel = new LoaderRoutineMethodCompat(loaderFrom(activity)) {
 
       int length(@Input final Channel<?, String> input) {
@@ -197,9 +197,9 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
   }
 
   private static void testSwitchInput(@NotNull final FragmentActivity activity) {
-    final Channel<Integer, Integer> inputInts = JRoutineCore.<Integer>ofInputs().buildChannel();
-    final Channel<String, String> inputStrings = JRoutineCore.<String>ofInputs().buildChannel();
-    final Channel<String, String> outputChannel = JRoutineCore.<String>ofInputs().buildChannel();
+    final Channel<Integer, Integer> inputInts = JRoutineCore.<Integer>ofData().buildChannel();
+    final Channel<String, String> inputStrings = JRoutineCore.<String>ofData().buildChannel();
+    final Channel<String, String> outputChannel = JRoutineCore.<String>ofData().buildChannel();
     new LoaderRoutineMethodCompat(loaderFrom(activity)) {
 
       void run(@Input final Channel<?, Integer> inputInts,
@@ -216,9 +216,9 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
   }
 
   private static void testSwitchInput2(@NotNull final FragmentActivity activity) {
-    final Channel<Integer, Integer> inputInts = JRoutineCore.<Integer>ofInputs().buildChannel();
-    final Channel<String, String> inputStrings = JRoutineCore.<String>ofInputs().buildChannel();
-    final Channel<String, String> outputChannel = JRoutineCore.<String>ofInputs().buildChannel();
+    final Channel<Integer, Integer> inputInts = JRoutineCore.<Integer>ofData().buildChannel();
+    final Channel<String, String> inputStrings = JRoutineCore.<String>ofData().buildChannel();
+    final Channel<String, String> outputChannel = JRoutineCore.<String>ofData().buildChannel();
     new LoaderRoutineMethodCompat(loaderFrom(activity)) {
 
       void run(@Input final Channel<?, Integer> inputInts,
@@ -235,8 +235,8 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
   }
 
   public void testAbort() {
-    final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
-    final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
+    final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofData().buildChannel();
+    final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     new SumRoutine(loaderFrom(getActivity())).call(inputChannel, outputChannel);
     inputChannel.pass(1, 2, 3, 4).abort();
     assertThat(outputChannel.in(seconds(10)).getError()).isExactlyInstanceOf(AbortException.class);
@@ -252,18 +252,18 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
 
   public void testBind() {
     final LoaderContextCompat context = loaderFrom(getActivity());
-    final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
-    final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
+    final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofData().buildChannel();
+    final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     new SquareRoutine(context).call(inputChannel, outputChannel);
-    final Channel<Integer, Integer> resultChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
+    final Channel<Integer, Integer> resultChannel = JRoutineCore.<Integer>ofData().buildChannel();
     new SumRoutine(context).call(outputChannel, resultChannel);
     inputChannel.pass(1, 2, 3, 4, 5).close();
     assertThat(resultChannel.in(seconds(10)).all()).containsExactly(55);
   }
 
   public void testCall() {
-    final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
-    final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
+    final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofData().buildChannel();
+    final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     new SumRoutine(loaderFrom(getActivity())).call(inputChannel, outputChannel);
     inputChannel.pass(1, 2, 3, 4, 5).close();
     assertThat(outputChannel.in(seconds(10)).all()).containsExactly(15);
@@ -284,7 +284,7 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
                                         .call(JRoutineCore.of("test").buildChannel())
                                         .in(seconds(10))
                                         .next()).isEqualTo(4);
-    final Channel<String, String> inputChannel = JRoutineCore.<String>ofInputs().buildChannel();
+    final Channel<String, String> inputChannel = JRoutineCore.<String>ofData().buildChannel();
     final Channel<?, Object> outputChannel =
         LoaderRoutineMethodCompat.from(loaderFrom(getActivity()),
             LoaderRoutineMethodCompatTest.class.getMethod("length", String.class))
@@ -304,7 +304,7 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
                                         .call(JRoutineCore.of("test").buildChannel())
                                         .in(seconds(10))
                                         .next()).isEqualTo(4);
-    final Channel<String, String> inputChannel = JRoutineCore.<String>ofInputs().buildChannel();
+    final Channel<String, String> inputChannel = JRoutineCore.<String>ofData().buildChannel();
     final Channel<?, Object> outputChannel =
         LoaderRoutineMethodCompat.from(loaderFrom(getActivity()),
             classOfType(LoaderRoutineMethodCompatTest.class), "length", String.class)
@@ -367,8 +367,8 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
   }
 
   public void testParallel() {
-    final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
-    final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
+    final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofData().buildChannel();
+    final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     new SumRoutine(loaderFrom(getActivity())).invocationConfiguration()
                                              .withOutputOrder(OrderType.SORTED)
                                              .apply()
@@ -380,10 +380,10 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
   public void testParams() {
     final SwitchCase method = new SwitchCase(loaderFrom(getActivity()));
     Channel<Object, Object> inputChannel =
-        JRoutineCore.ofInputs().buildChannel().pass("test").close();
+        JRoutineCore.ofData().buildChannel().pass("test").close();
     Channel<?, String> outputChannel = method.call(inputChannel, true);
     assertThat(outputChannel.in(seconds(10)).next()).isEqualTo("TEST");
-    inputChannel = JRoutineCore.ofInputs().buildChannel().pass("TEST").close();
+    inputChannel = JRoutineCore.ofData().buildChannel().pass("TEST").close();
     outputChannel = method.call(inputChannel, false);
     assertThat(outputChannel.in(seconds(10)).next()).isEqualTo("test");
   }

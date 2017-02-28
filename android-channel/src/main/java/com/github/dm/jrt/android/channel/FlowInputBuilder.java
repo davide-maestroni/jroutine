@@ -53,9 +53,9 @@ class FlowInputBuilder<DATA, IN extends DATA> extends AbstractChannelBuilder<IN,
   @SuppressWarnings("unchecked")
   public Channel<IN, IN> buildChannel() {
     final Channel<IN, IN> inputChannel =
-        JRoutineCore.<IN>ofInputs().apply(getConfiguration()).buildChannel();
+        JRoutineCore.<IN>ofData().apply(getConfiguration()).buildChannel();
     final Channel<ParcelableFlow<DATA>, ParcelableFlow<DATA>> outputChannel =
-        JRoutineCore.<ParcelableFlow<DATA>>ofInputs().buildChannel();
+        JRoutineCore.<ParcelableFlow<DATA>>ofData().buildChannel();
     ((Channel<ParcelableFlow<DATA>, ?>) mChannel).pass(outputChannel);
     return inputChannel.consume(new FlowChannelConsumer<DATA, IN>(outputChannel, mId));
   }

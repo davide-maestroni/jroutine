@@ -113,7 +113,7 @@ public class ServiceCallInvocation
 
       case BYTES_ID:
         if (mInputChannel == null) {
-          mInputChannel = JRoutineCore.<ParcelableByteChunk>ofInputs().buildChannel();
+          mInputChannel = JRoutineCore.<ParcelableByteChunk>ofData().buildChannel();
         }
 
         final ParcelableByteChunk chunk = input.data();
@@ -131,7 +131,7 @@ public class ServiceCallInvocation
   }
 
   @Override
-  public boolean onRecycle(final boolean isReused) {
+  public boolean onRecycle() {
     mRequestData = null;
     mMediaType = null;
     mInputChannel = null;
@@ -145,7 +145,7 @@ public class ServiceCallInvocation
     final Request request =
         mRequestData.requestWithBody(new AsyncRequestBody(mMediaType, mInputChannel));
     final Channel<ParcelableFlow<Object>, ParcelableFlow<Object>> outputChannel =
-        JRoutineCore.<ParcelableFlow<Object>>ofInputs().buildChannel();
+        JRoutineCore.<ParcelableFlow<Object>>ofData().buildChannel();
     result.pass(outputChannel);
     getClient().newCall(request).enqueue(new Callback() {
 

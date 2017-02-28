@@ -64,7 +64,7 @@ class BlendOutputBuilder<OUT> extends AbstractChannelBuilder<OUT, OUT> {
   @NotNull
   public Channel<OUT, OUT> buildChannel() {
     final Channel<OUT, OUT> outputChannel =
-        JRoutineCore.<OUT>ofInputs().apply(getConfiguration()).buildChannel();
+        JRoutineCore.<OUT>ofData().apply(getConfiguration()).buildChannel();
     for (final Channel<?, ? extends OUT> channel : mChannels) {
       outputChannel.pass(channel);
     }

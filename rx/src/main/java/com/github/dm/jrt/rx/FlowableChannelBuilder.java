@@ -61,7 +61,7 @@ class FlowableChannelBuilder<OUT> implements ChannelBuilder<OUT, OUT> {
   @NotNull
   public Channel<OUT, OUT> buildChannel() {
     final Channel<OUT, OUT> channel =
-        JRoutineCore.<OUT>ofInputs().apply(mConfiguration).buildChannel();
+        JRoutineCore.<OUT>ofData().apply(mConfiguration).buildChannel();
     mFlowable.subscribe(new ChannelSubscriber<OUT>(channel));
     return channel;
   }

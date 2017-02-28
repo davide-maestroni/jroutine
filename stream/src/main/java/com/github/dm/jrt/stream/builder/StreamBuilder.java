@@ -23,9 +23,9 @@ import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runner;
-import com.github.dm.jrt.function.BiConsumer;
-import com.github.dm.jrt.function.BiFunction;
-import com.github.dm.jrt.function.Function;
+import com.github.dm.jrt.function.lambda.BiConsumer;
+import com.github.dm.jrt.function.lambda.BiFunction;
+import com.github.dm.jrt.function.lambda.Function;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

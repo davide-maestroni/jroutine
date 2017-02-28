@@ -52,7 +52,7 @@ class InstanceChannelListBuilder<DATA> extends AbstractChannelListBuilder<DATA, 
     final int count = mCount;
     final ArrayList<Channel<DATA, DATA>> list = new ArrayList<Channel<DATA, DATA>>(count);
     final ChannelBuilder<DATA, DATA> channelBuilder =
-        JRoutineCore.<DATA>ofInputs().apply(getConfiguration());
+        JRoutineCore.<DATA>ofData().apply(getConfiguration());
     for (int i = 0; i < count; ++i) {
       list.add(channelBuilder.buildChannel());
     }

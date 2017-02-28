@@ -23,14 +23,14 @@ import com.github.dm.jrt.core.common.BackoffBuilder;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.runner.Runners;
-import com.github.dm.jrt.function.Action;
-import com.github.dm.jrt.function.BiConsumer;
-import com.github.dm.jrt.function.BiFunction;
-import com.github.dm.jrt.function.Consumer;
-import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Functions;
-import com.github.dm.jrt.function.Predicate;
-import com.github.dm.jrt.function.Supplier;
+import com.github.dm.jrt.function.lambda.Action;
+import com.github.dm.jrt.function.lambda.BiConsumer;
+import com.github.dm.jrt.function.lambda.BiFunction;
+import com.github.dm.jrt.function.lambda.Consumer;
+import com.github.dm.jrt.function.lambda.Function;
+import com.github.dm.jrt.function.lambda.Predicate;
+import com.github.dm.jrt.function.lambda.Supplier;
 
 import org.junit.Test;
 

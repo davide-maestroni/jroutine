@@ -81,9 +81,9 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * For example, a routine computing the square of integers can be implemented as follows:
  * <pre><code>
  * final Channel&lt;Integer, Integer&gt; inputChannel =
- *     JRoutineCore.&lt;Integer&gt;ofInputs().buildChannel();
+ *     JRoutineCore.&lt;Integer&gt;ofData().buildChannel();
  * final Channel&lt;Integer, Integer&gt; outputChannel =
- *     JRoutineCore.&lt;Integer&gt;ofInputs().buildChannel();
+ *     JRoutineCore.&lt;Integer&gt;ofData().buildChannel();
  * new RoutineMethod() {
  *
  *   public void square(&#64;Input final Channel&lt;?, Integer&gt; input,
@@ -111,7 +111,7 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * For example, a routine transforming the case of a string can be implemented as follows:
  * <pre><code>
  * final Channel&lt;String, String&gt; inputChannel =
- *     JRoutineCore.&lt;String&gt;ofInputs().buildChannel();
+ *     JRoutineCore.&lt;String&gt;ofData().buildChannel();
  * final Channel&lt;?, String&gt; outputChannel = new RoutineMethod() {
  *
  *   public String switchCase(&#64;Input final Channel&lt;?, String&gt; input,
@@ -136,7 +136,7 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * sufficient to avoid in/out annotations, like shown below:
  * <pre><code>
  * final Channel&lt;String, String&gt; outputChannel =
- *     JRoutineCore.&lt;String&gt;ofInputs().buildChannel();
+ *     JRoutineCore.&lt;String&gt;ofData().buildChannel();
  * new MyRoutine() {
  *
  *   void run(final Channel&lt;String, ?&gt; output) {
@@ -158,7 +158,7 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * <pre><code>
  * final Locale locale = Locale.getDefault();
  * final Channel&lt;String, String&gt; inputChannel =
- *     JRoutineCore.&lt;String&gt;ofInputs().buildChannel();
+ *     JRoutineCore.&lt;String&gt;ofData().buildChannel();
  * final Channel&lt;?, String&gt; outputChannel = new RoutineMethod(this, locale) {
  *
  *   public String switchCase(&#64;Input final Channel&lt;?, String&gt; input,
@@ -230,11 +230,11 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * For example, a routine printing the inputs of different types can be implemented as follows:
  * <pre><code>
  * final Channel&lt;Integer, Integer&gt; inputInts =
- *     JRoutineCore.&lt;Integer&gt;ofInputs().buildChannel();
+ *     JRoutineCore.&lt;Integer&gt;ofData().buildChannel();
  * final Channel&lt;String, String&gt; inputStrings =
- *     JRoutineCore.&lt;String&gt;ofInputs().buildChannel();
+ *     JRoutineCore.&lt;String&gt;ofData().buildChannel();
  * final Channel&lt;String, String&gt; outputChannel =
- *     JRoutineCore.&lt;String&gt;ofInputs().buildChannel();
+ *     JRoutineCore.&lt;String&gt;ofData().buildChannel();
  * new RoutineMethod() {
  *
  *   void run(&#64;Input final Channel&lt;?, Integer&gt; inputInts,
@@ -268,9 +268,9 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * in the following example:
  * <pre><code>
  * final Channel&lt;Integer, Integer&gt; inputChannel =
- *     JRoutineCore.&lt;Integer&gt;ofInputs().buildChannel();
+ *     JRoutineCore.&lt;Integer&gt;ofData().buildChannel();
  * final Channel&lt;Integer, Integer&gt; outputChannel =
- *     JRoutineCore.&lt;Integer&gt;ofInputs().buildChannel();
+ *     JRoutineCore.&lt;Integer&gt;ofData().buildChannel();
  * new RoutineMethod() {
  *
  *   public void square(&#64;Input final Channel&lt;?, Integer&gt; input,
@@ -282,7 +282,7 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  *   }
  * }.call(inputChannel, outputChannel);
  * final Channel&lt;Integer, Integer&gt; resultChannel =
- *     JRoutineCore.&lt;Integer&gt;ofInputs().buildChannel();
+ *     JRoutineCore.&lt;Integer&gt;ofData().buildChannel();
  * new RoutineMethod() {
  *
  *   private int mSum;
@@ -308,7 +308,7 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * <pre><code>
  * final Channel&lt;String, Integer&gt; channel = parseRoutine.invoke();
  * final Channel&lt;Integer, Integer&gt; outputChannel =
- *     JRoutineCore.&lt;Integer&gt;ofInputs().buildChannel();
+ *     JRoutineCore.&lt;Integer&gt;ofData().buildChannel();
  * new RoutineMethod() {
  *
  *   private int mSum;
@@ -340,7 +340,7 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * <pre><code>
  * final ExternalStorage storage = ExternalStorage.create();
  * final Channel&lt;String, String&gt; inputChannel =
- *     JRoutineCore.&lt;String&gt;ofInputs().buildChannel();
+ *     JRoutineCore.&lt;String&gt;ofData().buildChannel();
  * new RoutineMethod(this, storage) {
  *
  *   private final StorageConnection mConnection = storage.openConnection();
@@ -379,7 +379,7 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * For example, a routine wrapping the {@code String.format()} method can be built as shown below:
  * <pre><code>
  * final Channel&lt;Object[], Object[]&gt; inputChannel =
- *     JRoutineCore.&lt;Object[]&gt;ofInputs().buildChannel();
+ *     JRoutineCore.&lt;Object[]&gt;ofData().buildChannel();
  * final Channel&lt;?, String&gt; outputChannel =
  *     RoutineMethod.from(String.class.getMethod("format", String.class, Object[].class))
  *                  .call("%s %s!", inputChannel);
@@ -391,7 +391,7 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * be wrapped in another input channel, like shown below:
  * <pre><code>
  * final Channel&lt;String, String&gt; channel =
- *     JRoutineCore.&lt;String&gt;ofInputs().buildChannel();
+ *     JRoutineCore.&lt;String&gt;ofData().buildChannel();
  * RoutineMethod.from(MyClass.class.getMethod("run", Channel.class))
  *              .call(JRoutineCore.of(channel).buildChannel());
  * </code></pre>
@@ -566,7 +566,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
     final Annotation[][] annotations = method.getParameterAnnotations();
     final int length = params.length;
     final ArrayList<Object> parameters = new ArrayList<Object>(length);
-    final ChannelBuilder<Object, Object> channelBuilder = JRoutineCore.ofInputs();
+    final ChannelBuilder<Object, Object> channelBuilder = JRoutineCore.ofData();
     for (int i = 0; i < length; ++i) {
       final Object param = params[i];
       final Class<? extends Annotation> annotationType = getAnnotationType(param, annotations[i]);
@@ -731,7 +731,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
       }
     }
 
-    final Channel<OUT, OUT> resultChannel = JRoutineCore.<OUT>ofInputs().buildChannel();
+    final Channel<OUT, OUT> resultChannel = JRoutineCore.<OUT>ofData().buildChannel();
     outputChannels.add(resultChannel);
     final Channel<?, ? extends Flow<Object>> inputChannel =
         (!inputChannels.isEmpty()) ? Channels.mergeOutput(inputChannels).buildChannel()
@@ -925,6 +925,9 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
       }
     }
 
+    public void onDestroy() {
+    }
+
     public void onInput(final Flow<Object> input,
         @NotNull final Channel<Flow<Object>, ?> result) throws Exception {
       bind(result);
@@ -1062,7 +1065,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
       mParams = replaceChannels(method, mOrigParams, mInputChannels, mOutputChannels);
     }
 
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       mInputChannels.clear();
       mOutputChannels.clear();
       return true;
@@ -1175,6 +1178,10 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
       mParams = params;
     }
 
+    public boolean onRecycle() {
+      return true;
+    }
+
     @Override
     protected Object invokeMethod(@Nullable final Channel<?, ?> inputChannel) throws
         InvocationTargetException, IllegalAccessException {
@@ -1186,10 +1193,6 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
       } finally {
         instance.setLocalInput(null);
       }
-    }
-
-    public boolean onRecycle(final boolean isReused) {
-      return true;
     }
 
     @NotNull

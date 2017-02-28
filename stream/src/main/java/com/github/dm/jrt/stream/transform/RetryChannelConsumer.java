@@ -26,8 +26,8 @@ import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.BiFunction;
-import com.github.dm.jrt.function.Function;
+import com.github.dm.jrt.function.lambda.BiFunction;
+import com.github.dm.jrt.function.lambda.Function;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -92,7 +92,7 @@ class RetryChannelConsumer<IN, OUT> implements Execution, ChannelConsumer<OUT> {
   }
 
   public void run() {
-    final Channel<IN, IN> channel = JRoutineCore.<IN>ofInputs().buildChannel();
+    final Channel<IN, IN> channel = JRoutineCore.<IN>ofData().buildChannel();
     mInputChannel.consume(new SafeChannelConsumer<IN>(channel));
     try {
       mBindingFunction.apply(channel).consume(this);

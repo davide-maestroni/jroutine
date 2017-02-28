@@ -21,7 +21,7 @@ import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.ConsumerDecorator;
+import com.github.dm.jrt.function.lambda.ConsumerDecorator;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -97,7 +97,7 @@ class PrependConsumerInvocationFactory<OUT> extends InvocationFactory<OUT, OUT> 
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       return true;
     }
 

@@ -50,7 +50,7 @@ class OutputFlowBuilder<OUT> extends AbstractChannelBuilder<Flow<OUT>, Flow<OUT>
   @NotNull
   public Channel<Flow<OUT>, Flow<OUT>> buildChannel() {
     final Channel<Flow<OUT>, Flow<OUT>> outputChannel =
-        JRoutineCore.<Flow<OUT>>ofInputs().apply(getConfiguration()).buildChannel();
+        JRoutineCore.<Flow<OUT>>ofData().apply(getConfiguration()).buildChannel();
     mChannel.consume(new FlowChannelConsumer<OUT, OUT>(outputChannel, mId));
     return outputChannel;
   }

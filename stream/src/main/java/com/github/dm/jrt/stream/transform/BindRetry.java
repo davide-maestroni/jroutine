@@ -23,8 +23,8 @@ import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.BiFunction;
-import com.github.dm.jrt.function.Function;
+import com.github.dm.jrt.function.lambda.BiFunction;
+import com.github.dm.jrt.function.lambda.Function;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -65,7 +65,7 @@ class BindRetry<IN, OUT> implements Function<Channel<?, IN>, Channel<?, OUT>> {
     final ChannelConfiguration configuration = mConfiguration;
     final Channel<?, IN> inputChannel = Channels.replayOutput(channel).buildChannel();
     final Channel<OUT, OUT> outputChannel =
-        JRoutineCore.<OUT>ofInputs().apply(configuration).buildChannel();
+        JRoutineCore.<OUT>ofData().apply(configuration).buildChannel();
     new RetryChannelConsumer<IN, OUT>(inputChannel, outputChannel,
         configuration.getRunnerOrElse(Runners.sharedRunner()), mBindingFunction,
         mBackoffFunction).run();

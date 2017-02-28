@@ -17,13 +17,26 @@
 package com.github.dm.jrt.function;
 
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.invocation.CommandInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.function.lambda.Action;
+import com.github.dm.jrt.function.lambda.ActionDecorator;
+import com.github.dm.jrt.function.lambda.BiConsumer;
+import com.github.dm.jrt.function.lambda.BiConsumerDecorator;
+import com.github.dm.jrt.function.lambda.BiFunction;
+import com.github.dm.jrt.function.lambda.BiFunctionDecorator;
+import com.github.dm.jrt.function.lambda.Consumer;
+import com.github.dm.jrt.function.lambda.ConsumerDecorator;
+import com.github.dm.jrt.function.lambda.Function;
+import com.github.dm.jrt.function.lambda.FunctionDecorator;
+import com.github.dm.jrt.function.lambda.Predicate;
+import com.github.dm.jrt.function.lambda.PredicateDecorator;
+import com.github.dm.jrt.function.lambda.Supplier;
+import com.github.dm.jrt.function.lambda.SupplierDecorator;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -559,78 +572,6 @@ public class Functions {
   @NotNull
   public static ActionDecorator noOp() {
     return ActionDecorator.noOp();
-  }
-
-  /**
-   * Returns a channel consumer builder employing the specified action to handle the invocation
-   * completion.
-   *
-   * @param onComplete the action instance.
-   * @return the builder instance.
-   */
-  @NotNull
-  public static ChannelConsumerBuilder<Object> onComplete(@NotNull final Action onComplete) {
-    return ChannelConsumerBuilder.onComplete(onComplete);
-  }
-
-  /**
-   * Returns a channel consumer builder employing the specified consumer function to handle the
-   * invocation errors.
-   *
-   * @param onError the consumer function.
-   * @return the builder instance.
-   */
-  @NotNull
-  public static ChannelConsumerBuilder<Object> onError(
-      @NotNull final Consumer<? super RoutineException> onError) {
-    return ChannelConsumerBuilder.onError(onError);
-  }
-
-  /**
-   * Returns a channel consumer builder employing the specified consumer function to handle the
-   * invocation outputs.
-   *
-   * @param onOutput the consumer function.
-   * @param <OUT>    the output data type.
-   * @return the builder instance.
-   */
-  @NotNull
-  public static <OUT> ChannelConsumerBuilder<OUT> onOutput(
-      @NotNull final Consumer<? super OUT> onOutput) {
-    return ChannelConsumerBuilder.onOutput(onOutput);
-  }
-
-  /**
-   * Returns a channel consumer builder employing the specified consumer function to handle the
-   * invocation outputs.
-   *
-   * @param onOutput the consumer function.
-   * @param onError  the consumer function.
-   * @param <OUT>    the output data type.
-   * @return the builder instance.
-   */
-  @NotNull
-  public static <OUT> ChannelConsumerBuilder<OUT> onOutput(
-      @NotNull final Consumer<? super OUT> onOutput,
-      @NotNull final Consumer<? super RoutineException> onError) {
-    return ChannelConsumerBuilder.onOutput(onOutput, onError);
-  }
-
-  /**
-   * Returns a channel consumer builder employing the specified functions to handle the invocation
-   * outputs, errors adn completion.
-   *
-   * @param onOutput   the consumer function.
-   * @param onError    the consumer function.
-   * @param onComplete the action instance.
-   * @param <OUT>      the output data type.
-   * @return the builder instance.
-   */
-  @NotNull
-  public static <OUT> ChannelConsumerBuilder<OUT> onOutput(
-      @NotNull final Consumer<? super OUT> onOutput,
-      @NotNull final Consumer<? super RoutineException> onError, @NotNull final Action onComplete) {
-    return ChannelConsumerBuilder.onOutput(onOutput, onError, onComplete);
   }
 
   /**

@@ -56,7 +56,10 @@ public abstract class MappingInvocation<IN, OUT> extends InvocationFactory<IN, O
   public final void onComplete(@NotNull final Channel<OUT, ?> result) {
   }
 
-  public final boolean onRecycle(final boolean isReused) {
+  public final void onDestroy() {
+  }
+
+  public final boolean onRecycle() {
     return true;
   }
 

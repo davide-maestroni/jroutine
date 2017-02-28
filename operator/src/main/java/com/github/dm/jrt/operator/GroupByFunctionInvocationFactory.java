@@ -21,7 +21,7 @@ import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.FunctionDecorator;
+import com.github.dm.jrt.function.lambda.FunctionDecorator;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -101,7 +101,7 @@ class GroupByFunctionInvocationFactory<DATA> extends InvocationFactory<DATA, Lis
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       mGroups = null;
       return true;
     }

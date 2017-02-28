@@ -21,7 +21,7 @@ import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.BiConsumer;
+import com.github.dm.jrt.function.lambda.BiConsumer;
 
 import org.jetbrains.annotations.NotNull;
 

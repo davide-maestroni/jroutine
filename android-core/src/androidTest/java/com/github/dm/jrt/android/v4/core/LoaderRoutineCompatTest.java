@@ -1707,13 +1707,8 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) throws Exception {
-      final boolean canRecycle = super.onRecycle(isReused);
-      if (!isReused) {
-        sSemaphore.release();
-      }
-
-      return canRecycle;
+    public void onDestroy() {
+      sSemaphore.release();
     }
 
     @Override

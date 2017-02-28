@@ -347,13 +347,14 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
-      mChannel = null;
-      if (!isReused) {
-        mRoutine = null;
-        mInstance = null;
-      }
+    public void onDestroy() {
+      mRoutine = null;
+      mInstance = null;
+    }
 
+    @Override
+    public boolean onRecycle() {
+      mChannel = null;
       return true;
     }
 
@@ -417,13 +418,14 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
-      mChannel = null;
-      if (!isReused) {
-        mRoutine = null;
-        mInstance = null;
-      }
+    public void onDestroy() {
+      mRoutine = null;
+      mInstance = null;
+    }
 
+    @Override
+    public boolean onRecycle() {
+      mChannel = null;
       return true;
     }
 

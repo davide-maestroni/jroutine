@@ -22,8 +22,9 @@ import com.github.dm.jrt.core.util.DeepEqualObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import io.reactivex.BackpressureStrategy;
 
@@ -53,7 +54,7 @@ public class FlowableConfiguration<IN> extends DeepEqualObject {
 
   private final BackpressureStrategy mBackpressure;
 
-  private final Iterable<? extends IN> mInputs;
+  private final List<IN> mInputs;
 
   /**
    * Constructor.
@@ -62,7 +63,7 @@ public class FlowableConfiguration<IN> extends DeepEqualObject {
    * @param inputs               the input data.
    */
   private FlowableConfiguration(@Nullable final BackpressureStrategy backpressureStrategy,
-      @Nullable final Iterable<? extends IN> inputs) {
+      @Nullable final List<IN> inputs) {
     super(asArgs(backpressureStrategy, inputs));
     mBackpressure = backpressureStrategy;
     mInputs = inputs;
@@ -139,7 +140,7 @@ public class FlowableConfiguration<IN> extends DeepEqualObject {
    */
   public Iterable<? extends IN> getInputsOrElse(
       @Nullable final Iterable<? extends IN> valueIfNotSet) {
-    final Iterable<? extends IN> inputs = mInputs;
+    final List<IN> inputs = mInputs;
     return (inputs != null) ? inputs : valueIfNotSet;
   }
 
@@ -173,7 +174,7 @@ public class FlowableConfiguration<IN> extends DeepEqualObject {
 
     private BackpressureStrategy mBackpressure;
 
-    private Iterable<? extends IN> mInputs;
+    private List<IN> mInputs;
 
     /**
      * Constructor.
@@ -254,7 +255,7 @@ public class FlowableConfiguration<IN> extends DeepEqualObject {
      */
     @NotNull
     public Builder<IN, TYPE> withInput(@Nullable final IN input) {
-      mInputs = Collections.singleton(input);
+      mInputs = Collections.singletonList(input);
       return this;
     }
 
@@ -266,7 +267,15 @@ public class FlowableConfiguration<IN> extends DeepEqualObject {
      */
     @NotNull
     public Builder<IN, TYPE> withInputs(@Nullable final IN... inputs) {
-      mInputs = (inputs != null) ? Arrays.asList(inputs) : null;
+      if (inputs != null) {
+        final ArrayList<IN> inputList = new ArrayList<IN>();
+        Collections.addAll(inputList, inputs);
+        mInputs = inputList;
+
+      } else {
+        mInputs = null;
+      }
+
       return this;
     }
 
@@ -278,7 +287,18 @@ public class FlowableConfiguration<IN> extends DeepEqualObject {
      */
     @NotNull
     public Builder<IN, TYPE> withInputs(@Nullable final Iterable<? extends IN> inputs) {
-      mInputs = inputs;
+      if (inputs != null) {
+        final ArrayList<IN> inputList = new ArrayList<IN>();
+        for (final IN input : inputs) {
+          inputList.add(input);
+        }
+
+        mInputs = inputList;
+
+      } else {
+        mInputs = null;
+      }
+
       return this;
     }
 

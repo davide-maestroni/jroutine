@@ -22,7 +22,7 @@ import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
-import com.github.dm.jrt.function.FunctionDecorator;
+import com.github.dm.jrt.function.lambda.FunctionDecorator;
 import com.github.dm.jrt.stream.builder.StreamBuilder;
 import com.github.dm.jrt.stream.builder.StreamConfiguration;
 

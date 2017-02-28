@@ -45,11 +45,11 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.TemplateChannelConsumer;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ClassToken;
-import com.github.dm.jrt.function.BiConsumer;
-import com.github.dm.jrt.function.Consumer;
-import com.github.dm.jrt.function.Function;
-import com.github.dm.jrt.function.Predicate;
-import com.github.dm.jrt.function.Supplier;
+import com.github.dm.jrt.function.lambda.BiConsumer;
+import com.github.dm.jrt.function.lambda.Consumer;
+import com.github.dm.jrt.function.lambda.Function;
+import com.github.dm.jrt.function.lambda.Predicate;
+import com.github.dm.jrt.function.lambda.Supplier;
 import com.github.dm.jrt.operator.Operators;
 import com.github.dm.jrt.reflect.annotation.Alias;
 import com.github.dm.jrt.reflect.annotation.AsyncOutput;
@@ -71,7 +71,7 @@ import static com.github.dm.jrt.android.reflect.ContextInvocationTarget.instance
 import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
 import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
-import static com.github.dm.jrt.function.SupplierDecorator.constant;
+import static com.github.dm.jrt.function.lambda.SupplierDecorator.constant;
 import static com.github.dm.jrt.operator.Operators.appendAccept;
 import static com.github.dm.jrt.operator.sequence.Sequences.range;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -247,7 +247,7 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
     }
 
     final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
-        JRoutineAndroid.<ParcelableByteChunk>ofInputs().buildChannel();
+        JRoutineAndroid.<ParcelableByteChunk>ofData().buildChannel();
     final ChunkOutputStream stream = JRoutineAndroid.withOutput(channel)
                                                     .chunkStreamConfiguration()
                                                     .withChunkSize(3)
@@ -278,7 +278,7 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
     }
 
     final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
-        JRoutineAndroid.<ParcelableByteChunk>ofInputs().buildChannel();
+        JRoutineAndroid.<ParcelableByteChunk>ofData().buildChannel();
     final ChunkOutputStream stream = JRoutineAndroid.withOutput(channel)
                                                     .chunkStreamConfiguration()
                                                     .withChunkSize(3)
@@ -638,7 +638,7 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
     }
 
     final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
-        JRoutineAndroid.<ParcelableByteChunk>ofInputs().buildChannel();
+        JRoutineAndroid.<ParcelableByteChunk>ofData().buildChannel();
     final ChunkOutputStream stream = JRoutineAndroid.withOutput(channel).buildOutputStream();
     stream.write(new byte[]{31, 17, (byte) 155, 13});
     stream.flush();
@@ -1104,7 +1104,7 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
                        .getError()
                        .getCause()).isInstanceOf(IllegalStateException.class);
     assertThat(JRoutineAndroid.withStreamOf(
-        JRoutineAndroid.ofInputs().buildChannel().consume(new TemplateChannelConsumer<Object>() {}))
+        JRoutineAndroid.ofData().buildChannel().consume(new TemplateChannelConsumer<Object>() {}))
                               .lift(LoaderTransformations.runOn(loaderFrom(getActivity()))
                                                          .buildFunction())
                               .invoke()
@@ -1212,7 +1212,7 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       return true;
     }
   }

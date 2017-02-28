@@ -461,7 +461,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       return true;
     }
   }
@@ -542,7 +542,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       return true;
     }
   }
@@ -622,7 +622,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       return true;
     }
   }
@@ -652,7 +652,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       return true;
     }
   }
@@ -665,7 +665,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       return true;
     }
   }
@@ -688,7 +688,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       return true;
     }
   }

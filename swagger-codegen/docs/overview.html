@@ -69,13 +69,13 @@
             private static final String USER_NAME = "...";
 
             private static Consumer&lt;Repo&gt; addRepoTo(final ArrayAdapter adapter) {
-                return repo -> {
+                return repo -&gt; {
                     adapter.add(repo);
                 };
             }
 
             private static Consumer&lt;RoutineException&gt; showToast(final Activity activity) {
-                return error -> {
+                return error -&gt; {
                     final Throwable cause = error.getCause();
                     Toast.makeText(activity, (cause != null) ? cause.getMessage() :
                             "Cannot load repositories", Toast.LENGTH_LONG).show();
@@ -113,13 +113,13 @@
             private static final String USER_NAME = "...";
 
             private static Consumer&lt;Repo&gt; addRepoTo(final ArrayAdapter adapter) {
-                return repo -> {
+                return repo -&gt; {
                     adapter.add(repo);
                 };
             }
 
             private static Consumer&lt;RoutineException&gt; showToast(final Activity activity) {
-                return error -> {
+                return error -&gt; {
                     final Throwable cause = error.getCause();
                     Toast.makeText(activity, (cause != null) ? cause.getMessage() :
                             "Cannot load repositories", Toast.LENGTH_LONG).show();
@@ -157,13 +157,13 @@
             private static final String USER_NAME = "...";
 
             private static Consumer&lt;Repo&gt; addRepoTo(final ArrayAdapter adapter) {
-                return repo -> {
+                return repo -&gt; {
                     adapter.add(repo);
                 };
             }
 
             private static Consumer&lt;RoutineException&gt; showToast(final Activity activity) {
-                return error -> {
+                return error -&gt; {
                     final Throwable cause = error.getCause();
                     Toast.makeText(activity, (cause != null) ? cause.getMessage() :
                             "Cannot load repositories", Toast.LENGTH_LONG).show();

@@ -30,11 +30,11 @@ import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.Runners;
-import com.github.dm.jrt.function.Action;
-import com.github.dm.jrt.function.BiConsumer;
-import com.github.dm.jrt.function.BiFunction;
-import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Functions;
+import com.github.dm.jrt.function.lambda.Action;
+import com.github.dm.jrt.function.lambda.BiConsumer;
+import com.github.dm.jrt.function.lambda.BiFunction;
+import com.github.dm.jrt.function.lambda.Function;
 import com.github.dm.jrt.stream.JRoutineStream;
 import com.github.dm.jrt.stream.builder.StreamBuilder;
 
@@ -437,8 +437,8 @@ public class TransformationsTest {
 
   @Test
   public void testRetryConsumerError() {
-    final Channel<Object, Object> inputChannel = JRoutineCore.ofInputs().buildChannel();
-    final Channel<Object, Object> outputChannel = JRoutineCore.ofInputs().buildChannel();
+    final Channel<Object, Object> inputChannel = JRoutineCore.ofData().buildChannel();
+    final Channel<Object, Object> outputChannel = JRoutineCore.ofData().buildChannel();
     new RetryChannelConsumer<Object, Object>(inputChannel, outputChannel, Runners.syncRunner(),
         new Function<Channel<?, Object>, Channel<?, Object>>() {
 
@@ -457,8 +457,8 @@ public class TransformationsTest {
 
   @Test
   public void testRetryConsumerError2() {
-    final Channel<Object, Object> inputChannel = JRoutineCore.ofInputs().buildChannel();
-    final Channel<Object, Object> outputChannel = JRoutineCore.ofInputs().buildChannel();
+    final Channel<Object, Object> inputChannel = JRoutineCore.ofData().buildChannel();
+    final Channel<Object, Object> outputChannel = JRoutineCore.ofData().buildChannel();
     new RetryChannelConsumer<Object, Object>(inputChannel, outputChannel, Runners.syncRunner(),
         new Function<Channel<?, Object>, Channel<?, Object>>() {
 
@@ -730,7 +730,7 @@ public class TransformationsTest {
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       return true;
     }
   }

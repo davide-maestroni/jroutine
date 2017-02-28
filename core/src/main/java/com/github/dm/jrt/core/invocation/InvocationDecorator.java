@@ -51,12 +51,16 @@ public class InvocationDecorator<IN, OUT> implements Invocation<IN, OUT> {
     mInvocation.onComplete(result);
   }
 
+  public void onDestroy() throws Exception {
+    mInvocation.onDestroy();
+  }
+
   public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) throws Exception {
     mInvocation.onInput(input, result);
   }
 
-  public boolean onRecycle(final boolean isReused) throws Exception {
-    return mInvocation.onRecycle(isReused);
+  public boolean onRecycle() throws Exception {
+    return mInvocation.onRecycle();
   }
 
   public void onRestart() throws Exception {

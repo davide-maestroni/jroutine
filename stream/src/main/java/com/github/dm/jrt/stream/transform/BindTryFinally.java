@@ -20,8 +20,8 @@ import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.Action;
-import com.github.dm.jrt.function.Function;
+import com.github.dm.jrt.function.lambda.Action;
+import com.github.dm.jrt.function.lambda.Function;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -52,7 +52,7 @@ class BindTryFinally<OUT> implements Function<Channel<?, OUT>, Channel<?, OUT>> 
 
   public Channel<?, OUT> apply(final Channel<?, OUT> channel) {
     final Channel<OUT, OUT> outputChannel =
-        JRoutineCore.<OUT>ofInputs().apply(mConfiguration).buildChannel();
+        JRoutineCore.<OUT>ofData().apply(mConfiguration).buildChannel();
     channel.consume(new TryFinallyChannelConsumer<OUT>(mFinally, outputChannel));
     return outputChannel;
   }

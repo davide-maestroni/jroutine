@@ -390,7 +390,7 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       return true;
     }
   }
@@ -416,7 +416,7 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       return true;
     }
   }

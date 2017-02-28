@@ -54,20 +54,22 @@ public abstract class ChannelInvocation<IN, OUT> implements Invocation<IN, OUT> 
     mInputChannel.close();
   }
 
+  public void onDestroy() {
+  }
+
   public final void onInput(final IN input, @NotNull final Channel<OUT, ?> result) {
     bind(result);
     mInputChannel.pass(input);
   }
 
-  public boolean onRecycle(final boolean isReused) throws Exception {
+  public boolean onRecycle() throws Exception {
     mInputChannel = null;
     mOutputChannel = null;
     return true;
   }
 
   public final void onRestart() throws Exception {
-    final Channel<IN, IN> inputChannel =
-        (mInputChannel = JRoutineCore.<IN>ofInputs().buildChannel());
+    final Channel<IN, IN> inputChannel = (mInputChannel = JRoutineCore.<IN>ofData().buildChannel());
     mOutputChannel = ConstantConditions.notNull("stream channel", onChannel(inputChannel));
   }
 

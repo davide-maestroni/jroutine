@@ -42,10 +42,13 @@ public abstract class TemplateInvocation<IN, OUT> implements Invocation<IN, OUT>
   public void onComplete(@NotNull final Channel<OUT, ?> result) throws Exception {
   }
 
+  public void onDestroy() throws Exception {
+  }
+
   public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) throws Exception {
   }
 
-  public boolean onRecycle(final boolean isReused) throws Exception {
+  public boolean onRecycle() throws Exception {
     return false;
   }
 

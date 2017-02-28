@@ -1909,13 +1909,8 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) throws Exception {
-      final boolean canRecycle = super.onRecycle(isReused);
-      if (!isReused) {
-        sSemaphore.release();
-      }
-
-      return canRecycle;
+    public void onDestroy() {
+      sSemaphore.release();
     }
 
     @Override

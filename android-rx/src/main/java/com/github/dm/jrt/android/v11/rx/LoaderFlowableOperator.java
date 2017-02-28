@@ -153,12 +153,16 @@ class LoaderFlowableOperator<DATA> implements FlowableOperator<DATA, DATA> {
     }
 
     @Override
+    public void onDestroy() {
+    }
+
+    @Override
     public void onInput(final DATA input, @NotNull final Channel<Void, ?> result) {
       mSubscriber.onNext(input);
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       return true;
     }
 

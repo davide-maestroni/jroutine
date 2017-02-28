@@ -62,7 +62,7 @@ public abstract class ContextAdapterFactory extends AbstractAdapterFactory {
         }
 
         @Override
-        public boolean onRecycle(final boolean isReused) {
+        public boolean onRecycle() {
           return true;
         }
       };
@@ -153,7 +153,7 @@ public abstract class ContextAdapterFactory extends AbstractAdapterFactory {
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       return true;
     }
   }
@@ -208,7 +208,7 @@ public abstract class ContextAdapterFactory extends AbstractAdapterFactory {
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       return true;
     }
   }

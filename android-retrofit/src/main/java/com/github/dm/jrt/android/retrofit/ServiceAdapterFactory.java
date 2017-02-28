@@ -29,8 +29,8 @@ import com.github.dm.jrt.core.config.InvocationConfigurable;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.BiFunction;
-import com.github.dm.jrt.function.Function;
+import com.github.dm.jrt.function.lambda.BiFunction;
+import com.github.dm.jrt.function.lambda.Function;
 import com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilders;
 import com.github.dm.jrt.stream.JRoutineStream;
 import com.github.dm.jrt.stream.builder.StreamBuilder;
@@ -307,7 +307,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
     @Override
     public Channel<?, Object> apply(final Channel<?, ParcelableFlow<Object>> channel) {
       final Channel<Object, Object> outputChannel =
-          JRoutineCore.ofInputs().apply(mConfiguration).buildChannel();
+          JRoutineCore.ofData().apply(mConfiguration).buildChannel();
       mRoutine.invoke()
               .consume(new ConverterChannelConsumer(mConverter, outputChannel))
               .pass(channel)
@@ -357,7 +357,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
     @Override
     public <OUT> Channel adapt(final Call<OUT> call) {
       final Channel<Object, Object> outputChannel =
-          JRoutineCore.ofInputs().apply(mChannelConfiguration).buildChannel();
+          JRoutineCore.ofData().apply(mChannelConfiguration).buildChannel();
       getRoutine().invoke()
                   .consume(new ConverterChannelConsumer(mConverter, outputChannel))
                   .pass(invokeCall(call))

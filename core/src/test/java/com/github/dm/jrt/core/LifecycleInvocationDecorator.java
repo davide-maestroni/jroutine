@@ -25,6 +25,7 @@ import com.github.dm.jrt.core.invocation.InvocationDecorator;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -40,6 +41,8 @@ public class LifecycleInvocationDecorator<IN, OUT> extends InvocationDecorator<I
 
   private static final List<State> TO_ABORT_STATES =
       Arrays.asList(State.START, State.INPUT, State.COMPLETE);
+
+  private static final List<State> TO_DESTROY_STATES = Collections.singletonList(State.RECYCLE);
 
   private static final List<State> TO_INPUT_STATES = Arrays.asList(State.START, State.INPUT);
 
@@ -60,11 +63,6 @@ public class LifecycleInvocationDecorator<IN, OUT> extends InvocationDecorator<I
    */
   public LifecycleInvocationDecorator(@NotNull final Invocation<IN, OUT> wrapped) {
     super(wrapped);
-  }
-
-  @NotNull
-  private static String getMethodName() {
-    return Thread.currentThread().getStackTrace()[2].getMethodName();
   }
 
   private static void throwInvalidState(final State state) {
@@ -94,6 +92,16 @@ public class LifecycleInvocationDecorator<IN, OUT> extends InvocationDecorator<I
   }
 
   @Override
+  public void onDestroy() throws Exception {
+    if (!TO_DESTROY_STATES.contains(mState)) {
+      throwInvalidState(mState);
+    }
+
+    mState = State.DESTROY;
+    super.onDestroy();
+  }
+
+  @Override
   public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) throws Exception {
     if (!TO_INPUT_STATES.contains(mState)) {
       throwInvalidState(mState);
@@ -104,17 +112,13 @@ public class LifecycleInvocationDecorator<IN, OUT> extends InvocationDecorator<I
   }
 
   @Override
-  public boolean onRecycle(final boolean isReused) throws Exception {
+  public boolean onRecycle() throws Exception {
     if (!TO_RECYCLE_STATES.contains(mState)) {
       throwInvalidState(mState);
     }
 
-    if (isReused && (mState == State.RECYCLE)) {
-      throw new LifecycleInterruptedException(getMethodName() + "() called twice with true");
-    }
-
     mState = State.RECYCLE;
-    return super.onRecycle(isReused);
+    return super.onRecycle();
   }
 
   @Override
@@ -133,6 +137,7 @@ public class LifecycleInvocationDecorator<IN, OUT> extends InvocationDecorator<I
     COMPLETE,
     ABORT,
     RECYCLE,
+    DESTROY
   }
 
   /**

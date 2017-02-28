@@ -428,7 +428,7 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       mInputChannel = null;
       mOutputChannel = null;
       return true;
@@ -437,16 +437,16 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
     @Override
     public void onRestart() {
       final Logger logger = mLogger;
-      mInputChannel = JRoutineCore.<IN>ofInputs().channelConfiguration()
+      mInputChannel = JRoutineCore.<IN>ofData().channelConfiguration()
+                                               .withLog(logger.getLog())
+                                               .withLogLevel(logger.getLogLevel())
+                                               .apply()
+                                               .buildChannel();
+      mOutputChannel = JRoutineCore.<OUT>ofData().channelConfiguration()
                                                  .withLog(logger.getLog())
                                                  .withLogLevel(logger.getLogLevel())
                                                  .apply()
                                                  .buildChannel();
-      mOutputChannel = JRoutineCore.<OUT>ofInputs().channelConfiguration()
-                                                   .withLog(logger.getLog())
-                                                   .withLogLevel(logger.getLogLevel())
-                                                   .apply()
-                                                   .buildChannel();
       final Looper looper = mServiceConfiguration.getMessageLooperOrElse(Looper.getMainLooper());
       final IncomingHandler<OUT> handler =
           new IncomingHandler<OUT>(looper, mContext, mOutputChannel, logger);

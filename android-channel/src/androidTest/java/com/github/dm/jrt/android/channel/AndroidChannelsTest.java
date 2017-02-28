@@ -93,7 +93,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
   @SuppressWarnings("unchecked")
   public void testInputFlow() {
 
-    final Channel<String, String> channel = JRoutineCore.<String>ofInputs().buildChannel();
+    final Channel<String, String> channel = JRoutineCore.<String>ofData().buildChannel();
     AndroidChannels.inputFlow(channel, 33)
                    .buildChannel()
                    .pass(new ParcelableFlow<String>(33, "test1"),
@@ -107,7 +107,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
   public void testInputFlowAbort() {
 
-    final Channel<String, String> channel = JRoutineCore.<String>ofInputs().buildChannel();
+    final Channel<String, String> channel = JRoutineCore.<String>ofData().buildChannel();
     AndroidChannels.inputFlow(channel, 33).buildChannel().abort();
     channel.close();
 
@@ -126,7 +126,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
   public void testInputSelect() {
 
     final Channel<ParcelableFlow<String>, ParcelableFlow<String>> channel =
-        JRoutineCore.<ParcelableFlow<String>>ofInputs().buildChannel();
+        JRoutineCore.<ParcelableFlow<String>>ofData().buildChannel();
     AndroidChannels.parcelableFlowInput(channel, 33)
                    .buildChannel()
                    .pass("test1", "test2", "test3")
@@ -140,7 +140,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
   public void testInputSelectAbort() {
 
     final Channel<ParcelableFlow<String>, ParcelableFlow<String>> channel =
-        JRoutineCore.<ParcelableFlow<String>>ofInputs().buildChannel();
+        JRoutineCore.<ParcelableFlow<String>>ofData().buildChannel();
     AndroidChannels.parcelableFlowInput(channel, 33)
                    .buildChannel()
                    .pass("test1", "test2", "test3")
@@ -160,8 +160,8 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
   public void testJoin() {
 
-    final ChannelBuilder<String, String> builder1 = JRoutineCore.ofInputs();
-    final ChannelBuilder<Integer, Integer> builder2 = JRoutineCore.ofInputs();
+    final ChannelBuilder<String, String> builder1 = JRoutineCore.ofData();
+    final ChannelBuilder<Integer, Integer> builder2 = JRoutineCore.ofData();
     final Routine<List<?>, Character> routine =
         JRoutineService.on(serviceFrom(getActivity())).with(factoryOf(CharAt.class)).buildRoutine();
     Channel<String, String> channel1;
@@ -198,8 +198,8 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
   public void testJoinAbort() {
 
-    final ChannelBuilder<String, String> builder1 = JRoutineCore.ofInputs();
-    final ChannelBuilder<Integer, Integer> builder2 = JRoutineCore.ofInputs();
+    final ChannelBuilder<String, String> builder1 = JRoutineCore.ofData();
+    final ChannelBuilder<Integer, Integer> builder2 = JRoutineCore.ofData();
     final Routine<List<?>, Character> routine =
         JRoutineService.on(serviceFrom(getActivity())).with(factoryOf(CharAt.class)).buildRoutine();
     Channel<String, String> channel1;
@@ -544,8 +544,8 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
   public void testJoinPlaceholder() {
 
-    final ChannelBuilder<String, String> builder1 = JRoutineCore.ofInputs();
-    final ChannelBuilder<Integer, Integer> builder2 = JRoutineCore.ofInputs();
+    final ChannelBuilder<String, String> builder1 = JRoutineCore.ofData();
+    final ChannelBuilder<Integer, Integer> builder2 = JRoutineCore.ofData();
     final Routine<List<?>, Character> routine =
         JRoutineService.on(serviceFrom(getActivity())).with(factoryOf(CharAt.class)).buildRoutine();
     Channel<String, String> channel1;
@@ -592,8 +592,8 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
   public void testJoinPlaceholderAbort() {
 
-    final ChannelBuilder<String, String> builder1 = JRoutineCore.ofInputs();
-    final ChannelBuilder<Integer, Integer> builder2 = JRoutineCore.ofInputs();
+    final ChannelBuilder<String, String> builder1 = JRoutineCore.ofData();
+    final ChannelBuilder<Integer, Integer> builder2 = JRoutineCore.ofData();
     final Routine<List<?>, Character> routine =
         JRoutineService.on(serviceFrom(getActivity())).with(factoryOf(CharAt.class)).buildRoutine();
     Channel<String, String> channel1;
@@ -664,9 +664,9 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
   public void testMap() {
 
     final ChannelBuilder<String, String> builder1 =
-        JRoutineCore.<String>ofInputs().channelConfiguration().withOrder(OrderType.SORTED).apply();
+        JRoutineCore.<String>ofData().channelConfiguration().withOrder(OrderType.SORTED).apply();
     final ChannelBuilder<Integer, Integer> builder2 =
-        JRoutineCore.<Integer>ofInputs().channelConfiguration().withOrder(OrderType.SORTED).apply();
+        JRoutineCore.<Integer>ofData().channelConfiguration().withOrder(OrderType.SORTED).apply();
     final Channel<String, String> channel1 = builder1.buildChannel();
     final Channel<Integer, Integer> channel2 = builder2.buildChannel();
 
@@ -704,9 +704,9 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
   public void testMerge() {
 
     final ChannelBuilder<String, String> builder1 =
-        JRoutineCore.<String>ofInputs().channelConfiguration().withOrder(OrderType.SORTED).apply();
+        JRoutineCore.<String>ofData().channelConfiguration().withOrder(OrderType.SORTED).apply();
     final ChannelBuilder<Integer, Integer> builder2 =
-        JRoutineCore.<Integer>ofInputs().channelConfiguration().withOrder(OrderType.SORTED).apply();
+        JRoutineCore.<Integer>ofData().channelConfiguration().withOrder(OrderType.SORTED).apply();
     Channel<String, String> channel1;
     Channel<Integer, Integer> channel2;
     Channel<?, ? extends ParcelableFlow<?>> outputChannel;
@@ -746,7 +746,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
   public void testMerge4() {
 
     final ChannelBuilder<String, String> builder =
-        JRoutineCore.<String>ofInputs().channelConfiguration().withOrder(OrderType.SORTED).apply();
+        JRoutineCore.<String>ofData().channelConfiguration().withOrder(OrderType.SORTED).apply();
     final Channel<String, String> channel1 = builder.buildChannel();
     final Channel<String, String> channel2 = builder.buildChannel();
     final Channel<String, String> channel3 = builder.buildChannel();
@@ -782,9 +782,9 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
   public void testMergeAbort() {
 
     final ChannelBuilder<String, String> builder1 =
-        JRoutineCore.<String>ofInputs().channelConfiguration().withOrder(OrderType.SORTED).apply();
+        JRoutineCore.<String>ofData().channelConfiguration().withOrder(OrderType.SORTED).apply();
     final ChannelBuilder<Integer, Integer> builder2 =
-        JRoutineCore.<Integer>ofInputs().channelConfiguration().withOrder(OrderType.SORTED).apply();
+        JRoutineCore.<Integer>ofData().channelConfiguration().withOrder(OrderType.SORTED).apply();
     Channel<String, String> channel1;
     Channel<Integer, Integer> channel2;
     Channel<?, ? extends ParcelableFlow<?>> outputChannel;
@@ -1159,7 +1159,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
   @SuppressWarnings("unchecked")
   public void testOutputFlow() {
 
-    final Channel<String, String> channel = JRoutineCore.<String>ofInputs().buildChannel();
+    final Channel<String, String> channel = JRoutineCore.<String>ofData().buildChannel();
     channel.pass("test1", "test2", "test3").close();
     assertThat(AndroidChannels.outputParcelableFlow(channel, 33)
                               .buildChannel()
@@ -1170,7 +1170,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
   public void testOutputFlowAbort() {
 
-    final Channel<String, String> channel = JRoutineCore.<String>ofInputs().buildChannel();
+    final Channel<String, String> channel = JRoutineCore.<String>ofData().buildChannel();
     channel.pass("test1", "test2", "test3").abort();
 
     try {
@@ -1337,7 +1337,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
   public void testOutputSelect() {
 
     final Channel<ParcelableFlow<String>, ParcelableFlow<String>> channel =
-        JRoutineCore.<ParcelableFlow<String>>ofInputs().buildChannel();
+        JRoutineCore.<ParcelableFlow<String>>ofData().buildChannel();
     final Channel<?, String> outputChannel =
         AndroidChannels.flowOutput(channel, 33).buildChannelMap().get(33);
     channel.pass(new ParcelableFlow<String>(33, "test1"), new ParcelableFlow<String>(-33, "test2"),
@@ -1349,7 +1349,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
   public void testOutputSelectAbort() {
 
     final Channel<ParcelableFlow<String>, ParcelableFlow<String>> channel =
-        JRoutineCore.<ParcelableFlow<String>>ofInputs().buildChannel();
+        JRoutineCore.<ParcelableFlow<String>>ofData().buildChannel();
     final Channel<?, String> outputChannel =
         AndroidChannels.flowOutput(channel, 33).buildChannelMap().get(33);
     channel.abort();
@@ -1383,7 +1383,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       return true;
     }
 
@@ -1403,7 +1403,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       return true;
     }
   }
@@ -1416,7 +1416,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       return true;
     }
   }
@@ -1429,7 +1429,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       return true;
     }
   }
@@ -1463,7 +1463,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       return true;
     }
   }

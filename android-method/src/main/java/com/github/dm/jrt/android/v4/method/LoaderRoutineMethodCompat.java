@@ -401,7 +401,7 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
       }
     }
 
-    final Channel<?, OUT> resultChannel = JRoutineCore.<OUT>ofInputs().buildChannel();
+    final Channel<?, OUT> resultChannel = JRoutineCore.<OUT>ofData().buildChannel();
     outputChannels.add(resultChannel);
     final Channel<?, ? extends Flow<Object>> inputChannel =
         (!inputChannels.isEmpty()) ? AndroidChannels.mergeParcelableOutput(inputChannels)
@@ -635,6 +635,10 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
     }
 
     @Override
+    public void onDestroy() {
+    }
+
+    @Override
     public void onInput(final Flow<Object> input,
         @NotNull final Channel<Flow<Object>, ?> result) throws Exception {
       bind(result);
@@ -782,7 +786,7 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       mInputChannels.clear();
       mOutputChannels.clear();
       return true;
@@ -920,7 +924,7 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       return true;
     }
 

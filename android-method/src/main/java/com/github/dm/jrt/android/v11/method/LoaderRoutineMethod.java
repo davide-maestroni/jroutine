@@ -403,7 +403,7 @@ public class LoaderRoutineMethod extends RoutineMethod
       }
     }
 
-    final Channel<?, OUT> resultChannel = JRoutineCore.<OUT>ofInputs().buildChannel();
+    final Channel<?, OUT> resultChannel = JRoutineCore.<OUT>ofData().buildChannel();
     outputChannels.add(resultChannel);
     final Channel<?, ? extends Flow<Object>> inputChannel =
         (!inputChannels.isEmpty()) ? AndroidChannels.mergeParcelableOutput(inputChannels)
@@ -633,6 +633,10 @@ public class LoaderRoutineMethod extends RoutineMethod
     }
 
     @Override
+    public void onDestroy() {
+    }
+
+    @Override
     public void onInput(final Flow<Object> input,
         @NotNull final Channel<Flow<Object>, ?> result) throws Exception {
       bind(result);
@@ -779,7 +783,7 @@ public class LoaderRoutineMethod extends RoutineMethod
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       mInputChannels.clear();
       mOutputChannels.clear();
       return true;
@@ -897,6 +901,11 @@ public class LoaderRoutineMethod extends RoutineMethod
     }
 
     @Override
+    public boolean onRecycle() {
+      return true;
+    }
+
+    @Override
     protected Object invokeMethod(@Nullable final Channel<?, ?> inputChannel) throws
         InvocationTargetException, IllegalAccessException {
       final LoaderRoutineMethod instance = mInstance;
@@ -914,11 +923,6 @@ public class LoaderRoutineMethod extends RoutineMethod
     @Override
     public void onContext(@NotNull final Context context) {
       mContext = context;
-    }
-
-    @Override
-    public boolean onRecycle(final boolean isReused) {
-      return true;
     }
 
     @NotNull

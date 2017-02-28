@@ -30,7 +30,7 @@ import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.Consumer;
+import com.github.dm.jrt.function.lambda.Consumer;
 import com.github.dm.jrt.operator.Operators;
 
 import org.jetbrains.annotations.NotNull;
@@ -52,7 +52,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import static com.github.dm.jrt.android.core.ServiceContext.serviceFrom;
 import static com.github.dm.jrt.android.v4.core.LoaderContextCompat.loaderFrom;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
-import static com.github.dm.jrt.function.Functions.onOutput;
+import static com.github.dm.jrt.function.JRoutineFunction.onOutput;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**

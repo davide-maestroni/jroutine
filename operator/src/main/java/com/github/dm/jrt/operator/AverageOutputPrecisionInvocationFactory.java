@@ -97,7 +97,7 @@ class AverageOutputPrecisionInvocationFactory<N extends Number>
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       return true;
     }
 

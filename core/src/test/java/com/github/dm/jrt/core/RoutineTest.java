@@ -874,14 +874,14 @@ public class RoutineTest {
   public void testDelayedConsumer() {
     final Routine<String, String> passingRoutine =
         JRoutineCore.with(IdentityInvocation.<String>factoryOf()).buildRoutine();
-    final Channel<String, String> channel1 = JRoutineCore.<String>ofInputs().buildChannel();
+    final Channel<String, String> channel1 = JRoutineCore.<String>ofData().buildChannel();
     final Channel<String, String> channel2 = passingRoutine.invoke();
     channel2.after(millis(300)).pass(channel1).afterNoDelay().close();
     channel1.pass("test").close();
     long startTime = System.currentTimeMillis();
     assertThat(channel2.in(seconds(1)).all()).containsExactly("test");
     assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(300);
-    final Channel<String, String> channel3 = JRoutineCore.<String>ofInputs().buildChannel();
+    final Channel<String, String> channel3 = JRoutineCore.<String>ofData().buildChannel();
     final Channel<String, String> channel4 = passingRoutine.invoke();
     channel4.after(millis(300)).pass(channel3).afterNoDelay().close();
     startTime = System.currentTimeMillis();
@@ -1230,7 +1230,7 @@ public class RoutineTest {
   public void testIllegalBind() {
     final Channel<Object, Object> invocationChannel =
         JRoutineCore.with(IdentityInvocation.factoryOf()).invoke();
-    final Channel<Object, Object> channel = JRoutineCore.ofInputs().buildChannel();
+    final Channel<Object, Object> channel = JRoutineCore.ofData().buildChannel();
     channel.consume(new TemplateChannelConsumer<Object>() {});
     try {
       invocationChannel.pass(channel);
@@ -1359,7 +1359,7 @@ public class RoutineTest {
                            .in(seconds(1))
                            .all()).containsExactly("test1", "test2");
 
-    final Channel<Object, Object> channel = JRoutineCore.ofInputs().buildChannel();
+    final Channel<Object, Object> channel = JRoutineCore.ofData().buildChannel();
     channel.pass("test2").close();
     assertThat(JRoutineCore.with(IdentityInvocation.factoryOf())
                            .invocationConfiguration()
@@ -1431,7 +1431,7 @@ public class RoutineTest {
   @Test
   public void testInputTimeoutIssue() {
     try {
-      final Channel<Object, Object> channel = JRoutineCore.ofInputs().buildChannel();
+      final Channel<Object, Object> channel = JRoutineCore.ofData().buildChannel();
       channel.pass("test2").close();
       JRoutineCore.with(IdentityInvocation.factoryOf())
                   .invocationConfiguration()
@@ -1665,12 +1665,12 @@ public class RoutineTest {
         routine.invoke().pass("test1", "test2").close().in(seconds(1));
     outputChannel.getComplete();
     assertThat(outputChannel.all()).containsExactly("test1", "test2");
-    final Channel<String, String> channel1 = JRoutineCore.<String>ofInputs().channelConfiguration()
-                                                                            .withBackoff(afterCount(
-                                                                                1).constantDelay(
-                                                                                millis(1000)))
-                                                                            .apply()
-                                                                            .buildChannel();
+    final Channel<String, String> channel1 = JRoutineCore.<String>ofData().channelConfiguration()
+                                                                          .withBackoff(afterCount(1)
+                                                                              .constantDelay(
+                                                                                  millis(1000)))
+                                                                          .apply()
+                                                                          .buildChannel();
     new Thread() {
 
       @Override
@@ -1681,12 +1681,12 @@ public class RoutineTest {
     millis(100).sleepAtLeast();
     assertThat(channel1.in(seconds(10)).all()).containsOnly("test1", "test2");
 
-    final Channel<String, String> channel2 = JRoutineCore.<String>ofInputs().channelConfiguration()
-                                                                            .withBackoff(afterCount(
-                                                                                1).constantDelay(
-                                                                                millis(1000)))
-                                                                            .apply()
-                                                                            .buildChannel();
+    final Channel<String, String> channel2 = JRoutineCore.<String>ofData().channelConfiguration()
+                                                                          .withBackoff(afterCount(1)
+                                                                              .constantDelay(
+                                                                                  millis(1000)))
+                                                                          .apply()
+                                                                          .buildChannel();
     new Thread() {
 
       @Override
@@ -1697,12 +1697,12 @@ public class RoutineTest {
     millis(100).sleepAtLeast();
     assertThat(channel2.in(seconds(10)).all()).containsOnly("test1", "test2");
 
-    final Channel<String, String> channel3 = JRoutineCore.<String>ofInputs().channelConfiguration()
-                                                                            .withBackoff(afterCount(
-                                                                                1).constantDelay(
-                                                                                millis(1000)))
-                                                                            .apply()
-                                                                            .buildChannel();
+    final Channel<String, String> channel3 = JRoutineCore.<String>ofData().channelConfiguration()
+                                                                          .withBackoff(afterCount(1)
+                                                                              .constantDelay(
+                                                                                  millis(1000)))
+                                                                          .apply()
+                                                                          .buildChannel();
     new Thread() {
 
       @Override
@@ -1713,17 +1713,17 @@ public class RoutineTest {
     millis(100).sleepAtLeast();
     assertThat(channel3.in(seconds(10)).all()).containsOnly("test1", "test2");
 
-    final Channel<String, String> channel4 = JRoutineCore.<String>ofInputs().channelConfiguration()
-                                                                            .withBackoff(afterCount(
-                                                                                1).constantDelay(
-                                                                                millis(1000)))
-                                                                            .apply()
-                                                                            .buildChannel();
+    final Channel<String, String> channel4 = JRoutineCore.<String>ofData().channelConfiguration()
+                                                                          .withBackoff(afterCount(1)
+                                                                              .constantDelay(
+                                                                                  millis(1000)))
+                                                                          .apply()
+                                                                          .buildChannel();
     new Thread() {
 
       @Override
       public void run() {
-        final Channel<String, String> channel = JRoutineCore.<String>ofInputs().buildChannel();
+        final Channel<String, String> channel = JRoutineCore.<String>ofData().buildChannel();
         channel.pass("test1", "test2").close();
         channel4.pass(channel).close();
       }
@@ -1758,7 +1758,7 @@ public class RoutineTest {
     assertThat(channel.isOpen()).isTrue();
     channel.after(millis(500)).pass("test");
     assertThat(channel.isOpen()).isTrue();
-    final Channel<Object, Object> outputChannel = JRoutineCore.ofInputs().buildChannel();
+    final Channel<Object, Object> outputChannel = JRoutineCore.ofData().buildChannel();
     channel.pass(outputChannel);
     assertThat(channel.isOpen()).isTrue();
     channel.afterNoDelay().close();
@@ -1776,7 +1776,7 @@ public class RoutineTest {
     assertThat(channel.isOpen()).isTrue();
     channel.after(millis(500)).pass("test");
     assertThat(channel.isOpen()).isTrue();
-    final Channel<Object, Object> outputChannel = JRoutineCore.ofInputs().buildChannel();
+    final Channel<Object, Object> outputChannel = JRoutineCore.ofData().buildChannel();
     channel.pass(outputChannel);
     assertThat(channel.isOpen()).isTrue();
     channel.afterNoDelay().abort();
@@ -2821,7 +2821,7 @@ public class RoutineTest {
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       return true;
     }
   }
@@ -2853,7 +2853,7 @@ public class RoutineTest {
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       return true;
     }
   }
@@ -2882,7 +2882,7 @@ public class RoutineTest {
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       return true;
     }
   }
@@ -2931,7 +2931,7 @@ public class RoutineTest {
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       return true;
     }
   }
@@ -3004,7 +3004,7 @@ public class RoutineTest {
     }
 
     public void onInput(final String s, @NotNull final Channel<String, ?> result) {
-      final Channel<String, String> channel = JRoutineCore.<String>ofInputs().buildChannel();
+      final Channel<String, String> channel = JRoutineCore.<String>ofData().buildChannel();
       result.pass(JRoutineCore.with(IdentityInvocation.<String>factoryOf())
                               .invocationConfiguration()
                               .withInputMaxSize(1)
@@ -3243,11 +3243,12 @@ public class RoutineTest {
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
-      if (!isReused) {
-        sInstanceCount.decrementAndGet();
-      }
+    public void onDestroy() {
+      sInstanceCount.decrementAndGet();
+    }
 
+    @Override
+    public boolean onRecycle() {
       return true;
     }
   }
@@ -3255,8 +3256,8 @@ public class RoutineTest {
   private static class TestDiscardException extends TestDiscard {
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
-      super.onRecycle(isReused);
+    public boolean onRecycle() {
+      super.onRecycle();
       throw new IllegalArgumentException("test");
     }
   }
@@ -3328,7 +3329,7 @@ public class RoutineTest {
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       return true;
     }
 

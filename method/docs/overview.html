@@ -53,9 +53,9 @@
 <b>Example 1:</b> via routine method implementation.
 <pre>
     <code>
-        final Channel&lt;Integer, Integer&gt; inputInts = JRoutineCore.&lt;Integer&gt;ofInputs().buildChannel();
-        final Channel&lt;String, String&gt; inputStrings = JRoutineCore.&lt;String&gt;ofInputs().buildChannel();
-        final Channel&lt;String, String&gt; outputChannel = JRoutineCore.&lt;String&gt;ofInputs().buildChannel();
+        final Channel&lt;Integer, Integer&gt; inputInts = JRoutineCore.&lt;Integer&gt;ofData().buildChannel();
+        final Channel&lt;String, String&gt; inputStrings = JRoutineCore.&lt;String&gt;ofData().buildChannel();
+        final Channel&lt;String, String&gt; outputChannel = JRoutineCore.&lt;String&gt;ofData().buildChannel();
         new RoutineMethod() {
 
             void print(&commat;Input final Channel&lt;?, Integer&gt; inputInts,

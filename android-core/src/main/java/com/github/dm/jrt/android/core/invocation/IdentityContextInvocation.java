@@ -63,7 +63,7 @@ public class IdentityContextInvocation<DATA> extends TemplateContextInvocation<D
   }
 
   @Override
-  public boolean onRecycle(final boolean isReused) {
+  public boolean onRecycle() {
     return true;
   }
 }

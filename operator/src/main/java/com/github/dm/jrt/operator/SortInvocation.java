@@ -78,7 +78,7 @@ class SortInvocation<DATA extends Comparable<? super DATA>> extends TemplateInvo
   }
 
   @Override
-  public boolean onRecycle(final boolean isReused) {
+  public boolean onRecycle() {
     mList = null;
     return true;
   }

@@ -19,6 +19,7 @@ package com.github.dm.jrt.function;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.function.lambda.BiConsumerDecorator;
 
 import org.jetbrains.annotations.NotNull;
 

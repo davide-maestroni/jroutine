@@ -365,7 +365,7 @@ public class JRoutineFlowableTest {
   public void testFlowableError2() {
     final AtomicReference<String> reference = new AtomicReference<String>();
     final AtomicReference<Throwable> errorReference = new AtomicReference<Throwable>();
-    final Channel<String, String> channel = JRoutineCore.<String>ofInputs().buildChannel();
+    final Channel<String, String> channel = JRoutineCore.<String>ofData().buildChannel();
     channel.abort();
     JRoutineFlowable.from(channel).buildFlowable().map(new Function<String, String>() {
 
@@ -397,7 +397,7 @@ public class JRoutineFlowableTest {
   public void testFlowableUnsubscribe() throws InterruptedException {
     final AtomicReference<String> reference = new AtomicReference<String>();
     final AtomicReference<Throwable> errorReference = new AtomicReference<Throwable>();
-    final Channel<String, String> channel = JRoutineCore.<String>ofInputs().buildChannel();
+    final Channel<String, String> channel = JRoutineCore.<String>ofData().buildChannel();
     final Disposable disposable = JRoutineFlowable.from(channel.after(seconds(2)).pass("test"))
                                                   .buildFlowable()
                                                   .map(new Function<String, String>() {

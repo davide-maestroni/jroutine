@@ -53,8 +53,8 @@ class InputFilterBuilder<IN> extends AbstractChannelBuilder<Flow<IN>, Flow<IN>> 
   @SuppressWarnings("unchecked")
   public Channel<Flow<IN>, Flow<IN>> buildChannel() {
     final Channel<Flow<IN>, Flow<IN>> inputChannel =
-        JRoutineCore.<Flow<IN>>ofInputs().apply(getConfiguration()).buildChannel();
-    final Channel<IN, IN> outputChannel = JRoutineCore.<IN>ofInputs().buildChannel();
+        JRoutineCore.<Flow<IN>>ofData().apply(getConfiguration()).buildChannel();
+    final Channel<IN, IN> outputChannel = JRoutineCore.<IN>ofData().buildChannel();
     ((Channel<IN, ?>) mChannel).pass(outputChannel);
     return inputChannel.consume(new FilterChannelConsumer<IN>(outputChannel, mId));
   }

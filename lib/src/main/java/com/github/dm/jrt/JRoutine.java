@@ -31,11 +31,11 @@ import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.BiConsumer;
-import com.github.dm.jrt.function.Consumer;
-import com.github.dm.jrt.function.Function;
-import com.github.dm.jrt.function.Predicate;
-import com.github.dm.jrt.function.Supplier;
+import com.github.dm.jrt.function.lambda.BiConsumer;
+import com.github.dm.jrt.function.lambda.Consumer;
+import com.github.dm.jrt.function.lambda.Function;
+import com.github.dm.jrt.function.lambda.Predicate;
+import com.github.dm.jrt.function.lambda.Supplier;
 import com.github.dm.jrt.reflect.InvocationTarget;
 import com.github.dm.jrt.stream.JRoutineStream;
 import com.github.dm.jrt.stream.builder.StreamBuilder;
@@ -182,8 +182,8 @@ public class JRoutine extends Channels {
    * @return the channel builder instance.
    */
   @NotNull
-  public static <DATA> ChannelBuilder<DATA, DATA> ofInputs() {
-    return JRoutineCore.ofInputs();
+  public static <DATA> ChannelBuilder<DATA, DATA> ofData() {
+    return JRoutineCore.ofData();
   }
 
   /**

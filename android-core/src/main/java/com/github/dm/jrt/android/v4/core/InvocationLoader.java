@@ -107,7 +107,7 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
   @Override
   protected void onReset() {
     try {
-      mInvocation.onRecycle(false);
+      mInvocation.onDestroy();
 
     } catch (final Throwable t) {
       InterruptedInvocationException.throwIfInterrupt(t);

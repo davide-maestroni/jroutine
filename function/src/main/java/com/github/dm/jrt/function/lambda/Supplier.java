@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Davide Maestroni
+ * Copyright 2017 Davide Maestroni
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,22 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.function;
+package com.github.dm.jrt.function.lambda;
 
 /**
- * Interface representing an action.
+ * Interface representing a supplier of results.
  * <p>
- * Created by davide-maestroni on 06/29/2016.
+ * Created by davide-maestroni on 09/21/2015.
+ *
+ * @param <OUT> the output data type.
  */
-public interface Action {
+public interface Supplier<OUT> {
 
   /**
-   * Performs the action.
+   * Gets a result.
    *
+   * @return a result.
    * @throws java.lang.Exception if an unexpected error occurs.
    */
-  void perform() throws Exception;
+  OUT get() throws Exception;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Davide Maestroni
+ * Copyright 2017 Davide Maestroni
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,9 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.function;
-
 /**
- * Interface representing a predicate (boolean-valued function) of one argument.
+ * Functional consumer and routine builders.
  * <p>
- * Created by davide-maestroni on 10/16/2015.
- *
- * @param <IN> the input data type.
+ * Created by davide-maestroni on 02/25/2017.
  */
-public interface Predicate<IN> {
-
-  /**
-   * Evaluates this predicate on the given argument.
-   *
-   * @param in the input argument.
-   * @return true if the input argument matches the predicate, otherwise false.
-   * @throws java.lang.Exception if an unexpected error occurs.
-   */
-  boolean test(IN in) throws Exception;
-}
+package com.github.dm.jrt.function.builder;

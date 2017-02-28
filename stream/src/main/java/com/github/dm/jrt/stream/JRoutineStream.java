@@ -23,9 +23,9 @@ import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.Consumer;
-import com.github.dm.jrt.function.Function;
-import com.github.dm.jrt.function.Supplier;
+import com.github.dm.jrt.function.lambda.Consumer;
+import com.github.dm.jrt.function.lambda.Function;
+import com.github.dm.jrt.function.lambda.Supplier;
 import com.github.dm.jrt.stream.builder.StreamBuilder;
 import com.github.dm.jrt.stream.builder.StreamConfiguration;
 import com.github.dm.jrt.stream.transform.LiftFunction;
@@ -33,7 +33,7 @@ import com.github.dm.jrt.stream.transform.LiftFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static com.github.dm.jrt.function.FunctionDecorator.decorate;
+import static com.github.dm.jrt.function.lambda.FunctionDecorator.decorate;
 
 /**
  * Utility class acting as a factory of stream routine builders.
@@ -119,7 +119,7 @@ public class JRoutineStream {
         return decorate(function).andThen(new Function<Channel<?, IN>, Channel<?, IN>>() {
 
           public Channel<?, IN> apply(final Channel<?, IN> inputs) {
-            final Channel<IN, IN> outputChannel = JRoutineCore.<IN>ofInputs().buildChannel();
+            final Channel<IN, IN> outputChannel = JRoutineCore.<IN>ofData().buildChannel();
             inputs.consume(new ChannelConsumer<IN>() {
 
               public void onComplete() {
@@ -196,7 +196,7 @@ public class JRoutineStream {
         return decorate(function).andThen(new Function<Channel<?, IN>, Channel<?, IN>>() {
 
           public Channel<?, IN> apply(final Channel<?, IN> inputs) {
-            final Channel<IN, IN> outputChannel = JRoutineCore.<IN>ofInputs().buildChannel();
+            final Channel<IN, IN> outputChannel = JRoutineCore.<IN>ofData().buildChannel();
             inputs.consume(new ChannelConsumer<IN>() {
 
               public void onComplete() {
@@ -310,7 +310,7 @@ public class JRoutineStream {
         return decorate(function).andThen(new Function<Channel<?, IN>, Channel<?, IN>>() {
 
           public Channel<?, IN> apply(final Channel<?, IN> inputs) {
-            final Channel<IN, IN> outputChannel = JRoutineCore.<IN>ofInputs().buildChannel();
+            final Channel<IN, IN> outputChannel = JRoutineCore.<IN>ofData().buildChannel();
             inputs.consume(new ChannelConsumer<IN>() {
 
               public void onComplete() {

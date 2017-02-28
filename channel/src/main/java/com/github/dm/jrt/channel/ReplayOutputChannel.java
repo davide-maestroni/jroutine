@@ -154,7 +154,7 @@ class ReplayOutputChannel<OUT> implements Channel<OUT, OUT>, ChannelConsumer<OUT
       }
 
       mOutputChannel = (newChannel = createOutputChannel());
-      inputChannel = JRoutineCore.<OUT>ofInputs().buildChannel();
+      inputChannel = JRoutineCore.<OUT>ofData().buildChannel();
       newChannel.pass(inputChannel);
       cachedOutputs = new ArrayList<OUT>(mCached);
     }
@@ -387,10 +387,10 @@ class ReplayOutputChannel<OUT> implements Channel<OUT, OUT>, ChannelConsumer<OUT
 
   @NotNull
   private Channel<OUT, OUT> createOutputChannel() {
-    return JRoutineCore.<OUT>ofInputs().channelConfiguration()
-                                       .with(mConfiguration)
-                                       .withOrder(OrderType.SORTED)
-                                       .apply()
-                                       .buildChannel();
+    return JRoutineCore.<OUT>ofData().channelConfiguration()
+                                     .with(mConfiguration)
+                                     .withOrder(OrderType.SORTED)
+                                     .apply()
+                                     .buildChannel();
   }
 }

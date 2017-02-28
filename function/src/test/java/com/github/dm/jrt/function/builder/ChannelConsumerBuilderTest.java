@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Davide Maestroni
+ * Copyright 2017 Davide Maestroni
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,20 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.function;
+package com.github.dm.jrt.function.builder;
 
 import com.github.dm.jrt.core.common.RoutineException;
+import com.github.dm.jrt.function.Functions;
+import com.github.dm.jrt.function.lambda.Action;
+import com.github.dm.jrt.function.lambda.Consumer;
 
 import org.junit.Test;
 
-import static com.github.dm.jrt.function.ActionDecorator.decorate;
-import static com.github.dm.jrt.function.Functions.onComplete;
-import static com.github.dm.jrt.function.Functions.onError;
-import static com.github.dm.jrt.function.Functions.onOutput;
 import static com.github.dm.jrt.function.Functions.sink;
+import static com.github.dm.jrt.function.JRoutineFunction.onComplete;
+import static com.github.dm.jrt.function.JRoutineFunction.onError;
+import static com.github.dm.jrt.function.JRoutineFunction.onOutput;
+import static com.github.dm.jrt.function.lambda.ActionDecorator.decorate;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -41,7 +44,7 @@ public class ChannelConsumerBuilderTest {
 
     try {
 
-      ChannelConsumerBuilder.onOutput(null, Functions.<RoutineException>sink(), Functions.noOp());
+      onOutput(null, Functions.<RoutineException>sink(), Functions.noOp());
 
       fail();
 
@@ -51,7 +54,7 @@ public class ChannelConsumerBuilderTest {
 
     try {
 
-      ChannelConsumerBuilder.onOutput(sink(), null, Functions.noOp());
+      onOutput(sink(), null, Functions.noOp());
 
       fail();
 
@@ -61,7 +64,7 @@ public class ChannelConsumerBuilderTest {
 
     try {
 
-      ChannelConsumerBuilder.onOutput(sink(), Functions.<RoutineException>sink(), null);
+      onOutput(sink(), Functions.<RoutineException>sink(), null);
 
       fail();
 

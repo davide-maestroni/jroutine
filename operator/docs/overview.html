@@ -52,8 +52,7 @@
 <b>Example 1:</b> via lambda notation.
 <p>
     In this case, the mean computation must actually wait for all the input data to be available before being invoked. Thus, it cannot really happen in a parallel way.<br>
-    The lambda notation used in the example is just for demonstration purpose. In order to compile with Java 7 or below, explicit object creation must be employed.<br>
-    In fact, the interfaces defined in the "function" package are conceptually <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/FunctionalInterface.html" target="_blank">functional interfaces</a>.
+    The lambda notation used in the example is just for demonstration purpose. In order to compile with Java 7 or below, explicit object creation must be employed.
 </p>
 <pre>
     <code>
@@ -64,7 +63,7 @@
                         JRoutineCore.with(Functions.&lt;String, Integer&gt;functionMapping(Integer::parseInt))
                                     .buildRoutine();
                 final Routine&lt;Integer, Integer&gt; squareRoutine =
-                        JRoutineCore.with(Functions.&lt;Integer, Integer&gt;functionMapping(integer -> {
+                        JRoutineCore.with(Functions.&lt;Integer, Integer&gt;functionMapping(integer -&gt; {
                                 final int input = integer;
                                 return (input * input);
                         })).buildRoutine();

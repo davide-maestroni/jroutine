@@ -359,7 +359,7 @@ public class ServiceRoutineMethod extends RoutineMethod
       }
     }
 
-    final Channel<OUT, OUT> resultChannel = JRoutineCore.<OUT>ofInputs().buildChannel();
+    final Channel<OUT, OUT> resultChannel = JRoutineCore.<OUT>ofData().buildChannel();
     outputChannels.add(resultChannel);
     final Channel<?, ? extends ParcelableFlow<Object>> inputChannel =
         (!inputChannels.isEmpty()) ? AndroidChannels.mergeParcelableOutput(inputChannels)
@@ -570,7 +570,7 @@ public class ServiceRoutineMethod extends RoutineMethod
      */
     private ServiceInvocation(@NotNull final Class<? extends ServiceRoutineMethod> type,
         @NotNull final Object[] args, @NotNull final Object[] params) {
-      final ChannelBuilder<?, ?> channelBuilder = JRoutineCore.ofInputs();
+      final ChannelBuilder<?, ?> channelBuilder = JRoutineCore.ofData();
       for (int i = 0; i < params.length; ++i) {
         final Object param = params[i];
         if (param == InputChannelPlaceHolder.class) {
@@ -645,6 +645,10 @@ public class ServiceRoutineMethod extends RoutineMethod
     }
 
     @Override
+    public void onDestroy() {
+    }
+
+    @Override
     public void onInput(final ParcelableFlow<Object> input,
         @NotNull final Channel<ParcelableFlow<Object>, ?> result) throws Exception {
       bind(result);
@@ -666,7 +670,7 @@ public class ServiceRoutineMethod extends RoutineMethod
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       mInputChannels.clear();
       mOutputChannels.clear();
       return true;

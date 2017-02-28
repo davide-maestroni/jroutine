@@ -64,7 +64,7 @@ class MergeOutputMapBuilder<OUT>
   public Channel<ParcelableFlow<OUT>, ParcelableFlow<OUT>> buildChannel() {
     final SparseArray<? extends Channel<?, ? extends OUT>> channelMap = mChannelMap;
     final Channel<ParcelableFlow<OUT>, ParcelableFlow<OUT>> outputChannel =
-        JRoutineCore.<ParcelableFlow<OUT>>ofInputs().apply(getConfiguration()).buildChannel();
+        JRoutineCore.<ParcelableFlow<OUT>>ofData().apply(getConfiguration()).buildChannel();
     final int size = channelMap.size();
     for (int i = 0; i < size; ++i) {
       outputChannel.pass(

@@ -184,7 +184,7 @@ public class ChannelTest {
     final DurationMeasure timeout = seconds(1);
     final Channel<String, String> channel1 = JRoutineCore.<String>ofData().channelConfiguration()
                                                                           .withOrder(
-                                                                                OrderType.SORTED)
+                                                                              OrderType.SORTED)
                                                                           .apply()
                                                                           .buildChannel();
     new Thread() {
@@ -408,11 +408,9 @@ public class ChannelTest {
 
   @Test
   public void testNextOr() {
-    assertThat(JRoutineCore.ofData()
-                           .buildChannel()
-                           .pass("test1")
-                           .in(seconds(1))
-                           .nextOrElse(2)).isEqualTo("test1");
+    assertThat(
+        JRoutineCore.ofData().buildChannel().pass("test1").in(seconds(1)).nextOrElse(2)).isEqualTo(
+        "test1");
     assertThat(JRoutineCore.ofData()
                            .buildChannel()
                            .eventuallyContinue()

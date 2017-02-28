@@ -261,8 +261,7 @@ public class FutureChannelTest {
         });
     final Channel<?, String> channel = Channels.fromFuture(future)
                                                .buildChannel()
-                                               .pipe(
-                                                   JRoutineCore.<String>ofData().buildChannel());
+                                               .pipe(JRoutineCore.<String>ofData().buildChannel());
     assertThat(channel.in(seconds(1)).next()).isEqualTo("test");
     assertThat(channel.isOpen()).isFalse();
   }

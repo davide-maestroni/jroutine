@@ -792,7 +792,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
       final Channel<OUT, OUT> channel = JRoutineCore.<OUT>ofData().channelConfiguration()
                                                                   .withLog(logger.getLog())
                                                                   .withLogLevel(
-                                                                        logger.getLogLevel())
+                                                                      logger.getLogLevel())
                                                                   .apply()
                                                                   .buildChannel();
       channels.add(channel);

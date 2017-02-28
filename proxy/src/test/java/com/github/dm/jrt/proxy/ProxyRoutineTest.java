@@ -409,21 +409,17 @@ public class ProxyRoutineTest {
                                  .buildProxy(Itf.class);
 
     assertThat(itf.add0('c')).isEqualTo((int) 'c');
-    final Channel<Character, Character> channel1 =
-        JRoutineCore.<Character>ofData().buildChannel();
+    final Channel<Character, Character> channel1 = JRoutineCore.<Character>ofData().buildChannel();
     channel1.pass('a').close();
     assertThat(itf.add1(channel1)).isEqualTo((int) 'a');
-    final Channel<Character, Character> channel2 =
-        JRoutineCore.<Character>ofData().buildChannel();
+    final Channel<Character, Character> channel2 = JRoutineCore.<Character>ofData().buildChannel();
     channel2.pass('d', 'e', 'f').close();
     assertThat(itf.add2(channel2)).isIn((int) 'd', (int) 'e', (int) 'f');
     assertThat(itf.add3('c').all()).containsExactly((int) 'c');
-    final Channel<Character, Character> channel3 =
-        JRoutineCore.<Character>ofData().buildChannel();
+    final Channel<Character, Character> channel3 = JRoutineCore.<Character>ofData().buildChannel();
     channel3.pass('a').close();
     assertThat(itf.add4(channel3).all()).containsExactly((int) 'a');
-    final Channel<Character, Character> channel4 =
-        JRoutineCore.<Character>ofData().buildChannel();
+    final Channel<Character, Character> channel4 = JRoutineCore.<Character>ofData().buildChannel();
     channel4.pass('d', 'e', 'f').close();
     assertThat(itf.add5(channel4).all()).containsOnly((int) 'd', (int) 'e', (int) 'f');
     assertThat(itf.add6().pass('d').close().all()).containsOnly((int) 'd');
@@ -436,8 +432,7 @@ public class ProxyRoutineTest {
     final Channel<char[], char[]> channel5 = JRoutineCore.<char[]>ofData().buildChannel();
     channel5.pass(new char[]{'a', 'z'}).close();
     assertThat(itf.addA01(channel5)).isEqualTo(new int[]{'a', 'z'});
-    final Channel<Character, Character> channel6 =
-        JRoutineCore.<Character>ofData().buildChannel();
+    final Channel<Character, Character> channel6 = JRoutineCore.<Character>ofData().buildChannel();
     channel6.pass('d', 'e', 'f').close();
     assertThat(itf.addA02(channel6)).isEqualTo(new int[]{'d', 'e', 'f'});
     final Channel<char[], char[]> channel7 = JRoutineCore.<char[]>ofData().buildChannel();
@@ -448,8 +443,7 @@ public class ProxyRoutineTest {
     final Channel<char[], char[]> channel8 = JRoutineCore.<char[]>ofData().buildChannel();
     channel8.pass(new char[]{'a', 'z'}).close();
     assertThat(itf.addA05(channel8).all()).containsExactly(new int[]{'a', 'z'});
-    final Channel<Character, Character> channel9 =
-        JRoutineCore.<Character>ofData().buildChannel();
+    final Channel<Character, Character> channel9 = JRoutineCore.<Character>ofData().buildChannel();
     channel9.pass('d', 'e', 'f').close();
     assertThat(itf.addA06(channel9).all()).containsExactly(new int[]{'d', 'e', 'f'});
     final Channel<char[], char[]> channel10 = JRoutineCore.<char[]>ofData().buildChannel();
@@ -460,8 +454,7 @@ public class ProxyRoutineTest {
     final Channel<char[], char[]> channel11 = JRoutineCore.<char[]>ofData().buildChannel();
     channel11.pass(new char[]{'a', 'z'}).close();
     assertThat(itf.addA09(channel11).all()).containsExactly((int) 'a', (int) 'z');
-    final Channel<Character, Character> channel12 =
-        JRoutineCore.<Character>ofData().buildChannel();
+    final Channel<Character, Character> channel12 = JRoutineCore.<Character>ofData().buildChannel();
     channel12.pass('d', 'e', 'f').close();
     assertThat(itf.addA10(channel12).all()).containsExactly((int) 'd', (int) 'e', (int) 'f');
     final Channel<char[], char[]> channel13 = JRoutineCore.<char[]>ofData().buildChannel();
@@ -503,8 +496,7 @@ public class ProxyRoutineTest {
         JRoutineCore.<List<Character>>ofData().buildChannel();
     channel20.pass(Arrays.asList('a', 'z')).close();
     assertThat(itf.addL01(channel20)).isEqualTo(Arrays.asList((int) 'a', (int) 'z'));
-    final Channel<Character, Character> channel21 =
-        JRoutineCore.<Character>ofData().buildChannel();
+    final Channel<Character, Character> channel21 = JRoutineCore.<Character>ofData().buildChannel();
     channel21.pass('d', 'e', 'f').close();
     assertThat(itf.addL02(channel21)).isEqualTo(Arrays.asList((int) 'd', (int) 'e', (int) 'f'));
     final Channel<List<Character>, List<Character>> channel22 =
@@ -519,8 +511,7 @@ public class ProxyRoutineTest {
         JRoutineCore.<List<Character>>ofData().buildChannel();
     channel23.pass(Arrays.asList('a', 'z')).close();
     assertThat(itf.addL05(channel23).all()).containsExactly(Arrays.asList((int) 'a', (int) 'z'));
-    final Channel<Character, Character> channel24 =
-        JRoutineCore.<Character>ofData().buildChannel();
+    final Channel<Character, Character> channel24 = JRoutineCore.<Character>ofData().buildChannel();
     channel24.pass('d', 'e', 'f').close();
     assertThat(itf.addL06(channel24).all()).containsExactly(
         Arrays.asList((int) 'd', (int) 'e', (int) 'f'));
@@ -535,8 +526,7 @@ public class ProxyRoutineTest {
         JRoutineCore.<List<Character>>ofData().buildChannel();
     channel26.pass(Arrays.asList('a', 'z')).close();
     assertThat(itf.addL09(channel26).all()).containsExactly((int) 'a', (int) 'z');
-    final Channel<Character, Character> channel27 =
-        JRoutineCore.<Character>ofData().buildChannel();
+    final Channel<Character, Character> channel27 = JRoutineCore.<Character>ofData().buildChannel();
     channel27.pass('d', 'e', 'f').close();
     assertThat(itf.addL10(channel27).all()).containsExactly((int) 'd', (int) 'e', (int) 'f');
     final Channel<List<Character>, List<Character>> channel28 =

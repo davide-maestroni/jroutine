@@ -142,8 +142,7 @@ public class ReplayOutputChannelTest {
     }
 
     channel = Channels.replayOutput(
-        JRoutineCore.<String>ofData().buildChannel().after(seconds(1)).pass("test"))
-                      .buildChannel();
+        JRoutineCore.<String>ofData().buildChannel().after(seconds(1)).pass("test")).buildChannel();
 
     try {
       channel.eventuallyAbort(new IllegalArgumentException()).next();

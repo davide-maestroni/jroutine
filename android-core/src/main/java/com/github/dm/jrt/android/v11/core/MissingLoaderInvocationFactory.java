@@ -77,7 +77,7 @@ final class MissingLoaderInvocationFactory<OUT> extends ContextInvocationFactory
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       return true;
     }
   }

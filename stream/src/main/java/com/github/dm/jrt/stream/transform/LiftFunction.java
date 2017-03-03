@@ -17,8 +17,8 @@
 package com.github.dm.jrt.stream.transform;
 
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.function.BiFunction;
-import com.github.dm.jrt.function.Function;
+import com.github.dm.jrt.function.util.BiFunction;
+import com.github.dm.jrt.function.util.Function;
 import com.github.dm.jrt.stream.builder.StreamConfiguration;
 
 /**

@@ -36,11 +36,11 @@ import com.github.dm.jrt.core.log.NullLog;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.DurationMeasure;
-import com.github.dm.jrt.function.BiConsumer;
-import com.github.dm.jrt.function.Consumer;
-import com.github.dm.jrt.function.Function;
-import com.github.dm.jrt.function.Predicate;
-import com.github.dm.jrt.function.Supplier;
+import com.github.dm.jrt.function.util.BiConsumer;
+import com.github.dm.jrt.function.util.Consumer;
+import com.github.dm.jrt.function.util.Function;
+import com.github.dm.jrt.function.util.Predicate;
+import com.github.dm.jrt.function.util.Supplier;
 import com.github.dm.jrt.operator.Operators;
 import com.github.dm.jrt.proxy.annotation.Proxy;
 import com.github.dm.jrt.reflect.annotation.Alias;
@@ -92,7 +92,7 @@ public class JRoutineTest {
                                                     .withLog(new NullLog())
                                                     .apply()
                                                     .method(TestClass.GET);
-    assertThat(routine.call().in(timeout).all()).containsExactly(-77L);
+    assertThat(routine.invoke().close().in(timeout).all()).containsExactly(-77L);
   }
 
   @Test
@@ -110,7 +110,8 @@ public class JRoutineTest {
         return builder.toString();
       }
     }).buildRoutine();
-    assertThat(routine.call("test", "1").in(seconds(1)).all()).containsOnly("test1");
+    assertThat(routine.invoke().pass("test", "1").close().in(seconds(1)).all()).containsOnly(
+        "test1");
   }
 
   @Test
@@ -145,8 +146,11 @@ public class JRoutineTest {
           }
         })).buildRoutine();
 
-    assertThat(sumRoutine.call(squareRoutine.call(1, 2, 3, 4)).in(timeout).all()).containsExactly(
-        30);
+    assertThat(sumRoutine.invoke()
+                         .pass(squareRoutine.invoke().pass(1, 2, 3, 4).close())
+                         .close()
+                         .in(timeout)
+                         .all()).containsExactly(30);
   }
 
   @Test
@@ -174,13 +178,13 @@ public class JRoutineTest {
   public void testCommandInvocation() {
 
     final Routine<Void, String> routine = JRoutine.with(new GetString()).buildRoutine();
-    assertThat(routine.call().in(seconds(1)).all()).containsOnly("test");
+    assertThat(routine.invoke().close().in(seconds(1)).all()).containsOnly("test");
   }
 
   @Test
   public void testConcatReadOutput() throws IOException {
 
-    final Channel<ByteChunk, ByteChunk> channel = JRoutine.<ByteChunk>ofInputs().buildChannel();
+    final Channel<ByteChunk, ByteChunk> channel = JRoutine.<ByteChunk>ofData().buildChannel();
     final ChunkOutputStream stream = JRoutine.withOutput(channel)
                                              .chunkStreamConfiguration()
                                              .withChunkSize(3)
@@ -207,7 +211,7 @@ public class JRoutineTest {
   @Test
   public void testConcatReadOutput2() throws IOException {
 
-    final Channel<ByteChunk, ByteChunk> channel = JRoutine.<ByteChunk>ofInputs().buildChannel();
+    final Channel<ByteChunk, ByteChunk> channel = JRoutine.<ByteChunk>ofData().buildChannel();
     final ChunkOutputStream stream = JRoutine.withOutput(channel)
                                              .chunkStreamConfiguration()
                                              .withChunkSize(3)
@@ -258,7 +262,7 @@ public class JRoutineTest {
             result.pass("test", "1");
           }
         }).buildRoutine();
-    assertThat(routine.call().in(seconds(1)).all()).containsOnly("test", "1");
+    assertThat(routine.invoke().close().in(seconds(1)).all()).containsOnly("test", "1");
   }
 
   @Test
@@ -277,7 +281,8 @@ public class JRoutineTest {
             result.pass(builder.toString());
           }
         }).buildRoutine();
-    assertThat(routine.call("test", "1").in(seconds(1)).all()).containsOnly("test1");
+    assertThat(routine.invoke().pass("test", "1").close().in(seconds(1)).all()).containsOnly(
+        "test1");
   }
 
   @Test
@@ -291,7 +296,8 @@ public class JRoutineTest {
             result.pass(o.toString());
           }
         }).buildRoutine();
-    assertThat(routine.call("test", 1).in(seconds(1)).all()).containsOnly("test", "1");
+    assertThat(routine.invoke().pass("test", 1).close().in(seconds(1)).all()).containsOnly("test",
+        "1");
   }
 
   @Test
@@ -304,14 +310,16 @@ public class JRoutineTest {
         return o.toString();
       }
     }).buildRoutine();
-    assertThat(routine.call("test", 1).in(seconds(1)).all()).containsOnly("test", "1");
+    assertThat(routine.invoke().pass("test", 1).close().in(seconds(1)).all()).containsOnly("test",
+        "1");
   }
 
   @Test
   public void testInstance() {
     assertThat(JRoutine.withInstance("test")
                        .method("toString")
-                       .call()
+                       .invoke()
+                       .close()
                        .in(seconds(1))
                        .all()).containsExactly("test");
   }
@@ -321,28 +329,28 @@ public class JRoutineTest {
 
     final Routine<String, String> routine =
         JRoutine.with((Invocation<String, String>) new ToCase()).buildRoutine();
-    assertThat(routine.call("TEST").in(seconds(1)).all()).containsOnly("test");
+    assertThat(routine.invoke().pass("TEST").close().in(seconds(1)).all()).containsOnly("test");
   }
 
   @Test
   public void testInvocationAndArgs() {
 
     final Routine<String, String> routine = JRoutine.with(new ToCase(), true).buildRoutine();
-    assertThat(routine.call("test").in(seconds(1)).all()).containsOnly("TEST");
+    assertThat(routine.invoke().pass("test").close().in(seconds(1)).all()).containsOnly("TEST");
   }
 
   @Test
   public void testInvocationClass() {
 
     final Routine<String, String> routine = JRoutine.with(ToCase.class).buildRoutine();
-    assertThat(routine.call("TEST").in(seconds(1)).all()).containsOnly("test");
+    assertThat(routine.invoke().pass("TEST").close().in(seconds(1)).all()).containsOnly("test");
   }
 
   @Test
   public void testInvocationClassAndArgs() {
 
     final Routine<String, String> routine = JRoutine.with(ToCase.class, true).buildRoutine();
-    assertThat(routine.call("test").in(seconds(1)).all()).containsOnly("TEST");
+    assertThat(routine.invoke().pass("test").close().in(seconds(1)).all()).containsOnly("TEST");
   }
 
   @Test
@@ -350,14 +358,14 @@ public class JRoutineTest {
 
     final Routine<String, String> routine =
         JRoutine.with((InvocationFactory<String, String>) new ToCase()).buildRoutine();
-    assertThat(routine.call("TEST").in(seconds(1)).all()).containsOnly("test");
+    assertThat(routine.invoke().pass("TEST").close().in(seconds(1)).all()).containsOnly("test");
   }
 
   @Test
   public void testInvocationToken() {
 
     final Routine<String, String> routine = JRoutine.with(tokenOf(ToCase.class)).buildRoutine();
-    assertThat(routine.call("TEST").in(seconds(1)).all()).containsOnly("test");
+    assertThat(routine.invoke().pass("TEST").close().in(seconds(1)).all()).containsOnly("test");
   }
 
   @Test
@@ -365,14 +373,14 @@ public class JRoutineTest {
 
     final Routine<String, String> routine =
         JRoutine.with(tokenOf(ToCase.class), true).buildRoutine();
-    assertThat(routine.call("test").in(seconds(1)).all()).containsOnly("TEST");
+    assertThat(routine.invoke().pass("test").close().in(seconds(1)).all()).containsOnly("TEST");
   }
 
   @Test
   public void testMappingInvocation() {
 
     final Routine<String, String> routine = JRoutine.with(new ToCase()).buildRoutine();
-    assertThat(routine.call("TEST").in(seconds(1)).all()).containsOnly("test");
+    assertThat(routine.invoke().pass("TEST").close().in(seconds(1)).all()).containsOnly("test");
   }
 
   @Test
@@ -402,7 +410,7 @@ public class JRoutineTest {
                                                     .withLog(new NullLog())
                                                     .apply()
                                                     .method(TestClass.GET);
-    assertThat(routine.call().all()).containsExactly(-77L);
+    assertThat(routine.invoke().close().all()).containsExactly(-77L);
   }
 
   @Test
@@ -446,7 +454,7 @@ public class JRoutineTest {
                                                     .withSharedFields()
                                                     .apply()
                                                     .method(TestClass.class.getMethod("getLong"));
-    assertThat(routine.call().all()).containsExactly(-77L);
+    assertThat(routine.invoke().close().all()).containsExactly(-77L);
   }
 
   @Test
@@ -460,7 +468,7 @@ public class JRoutineTest {
                                                     .withLog(new NullLog())
                                                     .apply()
                                                     .method("getLong");
-    assertThat(routine.call().all()).containsExactly(-77L);
+    assertThat(routine.invoke().close().all()).containsExactly(-77L);
   }
 
   @Test
@@ -514,7 +522,7 @@ public class JRoutineTest {
     assertThat(channel.isOpen()).isTrue();
     channel.after(millis(500)).pass("test");
     assertThat(channel.isOpen()).isTrue();
-    final Channel<Object, Object> outputChannel = JRoutine.ofInputs().buildChannel();
+    final Channel<Object, Object> outputChannel = JRoutine.ofData().buildChannel();
     channel.afterNoDelay().pass(outputChannel);
     assertThat(channel.isOpen()).isTrue();
     channel.close();
@@ -533,7 +541,8 @@ public class JRoutineTest {
         return s.length() > 1;
       }
     }).buildRoutine();
-    assertThat(routine.call("test", "1").in(seconds(1)).all()).containsOnly("test");
+    assertThat(routine.invoke().pass("test", "1").close().in(seconds(1)).all()).containsOnly(
+        "test");
   }
 
   @Test
@@ -568,7 +577,7 @@ public class JRoutineTest {
   @Test
   public void testReadAll() throws IOException {
 
-    final Channel<ByteChunk, ByteChunk> channel = JRoutine.<ByteChunk>ofInputs().buildChannel();
+    final Channel<ByteChunk, ByteChunk> channel = JRoutine.<ByteChunk>ofData().buildChannel();
     final ChunkOutputStream stream = JRoutine.withOutput(channel).buildOutputStream();
     stream.write(new byte[]{31, 17, (byte) 155, 13});
     stream.flush();
@@ -595,17 +604,22 @@ public class JRoutineTest {
                                              })
                                              .sync()
                                              .map(Operators.average(Double.class))
-                                             .call()
+                                             .invoke()
+                                             .close()
                                              .in(seconds(3))
                                              .next()).isCloseTo(21, Offset.offset(0.1));
   }
 
   @Test
   public void testStreamAccept() {
-    assertThat(JRoutine.withStreamAccept(range(0, 3)).immediate().call().all()).containsExactly(0,
-        1, 2, 3);
-    assertThat(JRoutine.withStreamAccept(2, range(1, 0)).immediate().call().all()).containsExactly(
-        1, 0, 1, 0);
+    assertThat(
+        JRoutine.withStreamAccept(range(0, 3)).immediate().invoke().close().all()).containsExactly(
+        0, 1, 2, 3);
+    assertThat(JRoutine.withStreamAccept(2, range(1, 0))
+                       .immediate()
+                       .invoke()
+                       .close()
+                       .all()).containsExactly(1, 0, 1, 0);
   }
 
   @Test
@@ -623,23 +637,32 @@ public class JRoutineTest {
   public void testStreamAcceptError() {
     assertThat(JRoutine.withStreamAccept(range(0, 3))
                        .immediate()
-                       .call(31)
+                       .invoke()
+                       .pass(31)
+                       .close()
                        .getError()
                        .getCause()).isInstanceOf(IllegalStateException.class);
     assertThat(JRoutine.withStreamAccept(2, range(1, 0))
                        .immediate()
-                       .call(-17)
+                       .invoke()
+                       .pass(-17)
+                       .close()
                        .getError()
                        .getCause()).isInstanceOf(IllegalStateException.class);
   }
 
   @Test
   public void testStreamGet() {
-    assertThat(JRoutine.withStreamGet(constant("test")).immediate().call().all()).containsExactly(
-        "test");
-    assertThat(
-        JRoutine.withStreamGet(2, constant("test2")).immediate().call().all()).containsExactly(
-        "test2", "test2");
+    assertThat(JRoutine.withStreamGet(constant("test"))
+                       .immediate()
+                       .invoke()
+                       .close()
+                       .all()).containsExactly("test");
+    assertThat(JRoutine.withStreamGet(2, constant("test2"))
+                       .immediate()
+                       .invoke()
+                       .close()
+                       .all()).containsExactly("test2", "test2");
   }
 
   @Test
@@ -658,27 +681,38 @@ public class JRoutineTest {
   public void testStreamGetError() {
     assertThat(JRoutine.withStreamGet(constant("test"))
                        .immediate()
-                       .call("test")
+                       .invoke()
+                       .pass("test")
+                       .close()
                        .getError()
                        .getCause()).isInstanceOf(IllegalStateException.class);
-    assertThat(
-        JRoutine.withStreamGet(2, constant("test2")).immediate().call("test").getError().getCause())
-        .isInstanceOf(IllegalStateException.class);
+    assertThat(JRoutine.withStreamGet(2, constant("test2"))
+                       .immediate()
+                       .invoke()
+                       .pass("test")
+                       .close()
+                       .getError()
+                       .getCause()).isInstanceOf(IllegalStateException.class);
   }
 
   @Test
   public void testStreamOf() {
-    assertThat(JRoutine.withStreamOf("test").immediate().call().all()).containsExactly("test");
-    assertThat(
-        JRoutine.withStreamOf("test1", "test2", "test3").immediate().call().all()).containsExactly(
-        "test1", "test2", "test3");
+    assertThat(JRoutine.withStreamOf("test").immediate().invoke().close().all()).containsExactly(
+        "test");
+    assertThat(JRoutine.withStreamOf("test1", "test2", "test3")
+                       .immediate()
+                       .invoke()
+                       .close()
+                       .all()).containsExactly("test1", "test2", "test3");
     assertThat(JRoutine.withStreamOf(Arrays.asList("test1", "test2", "test3"))
                        .immediate()
-                       .call()
+                       .invoke()
+                       .close()
                        .all()).containsExactly("test1", "test2", "test3");
     assertThat(JRoutine.withStreamOf(JRoutine.of("test1", "test2", "test3").buildChannel())
                        .immediate()
-                       .call()
+                       .invoke()
+                       .close()
                        .all()).containsExactly("test1", "test2", "test3");
   }
 
@@ -703,28 +737,39 @@ public class JRoutineTest {
   @Test
   @SuppressWarnings({"ConstantConditions", "ThrowableResultOfMethodCallIgnored"})
   public void testStreamOfError() {
-    assertThat(
-        JRoutine.withStreamOf("test").immediate().call("test").getError().getCause()).isInstanceOf(
-        IllegalStateException.class);
+    assertThat(JRoutine.withStreamOf("test")
+                       .immediate()
+                       .invoke()
+                       .pass("test")
+                       .close()
+                       .getError()
+                       .getCause()).isInstanceOf(IllegalStateException.class);
     assertThat(JRoutine.withStreamOf("test1", "test2", "test3")
                        .immediate()
-                       .call("test")
+                       .invoke()
+                       .pass("test")
+                       .close()
                        .getError()
                        .getCause()).isInstanceOf(IllegalStateException.class);
     assertThat(JRoutine.withStreamOf(Arrays.asList("test1", "test2", "test3"))
                        .immediate()
-                       .call("test")
+                       .invoke()
+                       .pass("test")
+                       .close()
                        .getError()
                        .getCause()).isInstanceOf(IllegalStateException.class);
     assertThat(JRoutine.withStreamOf(JRoutine.of("test1", "test2", "test3").buildChannel())
                        .immediate()
-                       .call("test")
+                       .invoke()
+                       .pass("test")
+                       .close()
                        .getError()
                        .getCause()).isInstanceOf(IllegalStateException.class);
     assertThat(JRoutine.withStreamOf(
-        JRoutine.ofInputs().buildChannel().consume(new TemplateChannelConsumer<Object>() {}))
+        JRoutine.ofData().buildChannel().consume(new TemplateChannelConsumer<Object>() {}))
                        .immediate()
-                       .call()
+                       .invoke()
+                       .close()
                        .getError()
                        .getCause()).isInstanceOf(IllegalStateException.class);
   }
@@ -739,7 +784,7 @@ public class JRoutineTest {
         return "test";
       }
     }).buildRoutine();
-    assertThat(routine.call().in(seconds(1)).all()).containsOnly("test");
+    assertThat(routine.invoke().close().in(seconds(1)).all()).containsOnly("test");
   }
 
   @Test
@@ -752,7 +797,7 @@ public class JRoutineTest {
         return new ToCase();
       }
     }).buildRoutine();
-    assertThat(routine.call("TEST").in(seconds(1)).all()).containsOnly("test");
+    assertThat(routine.invoke().pass("TEST").close().in(seconds(1)).all()).containsOnly("test");
   }
 
   public interface TestItf {

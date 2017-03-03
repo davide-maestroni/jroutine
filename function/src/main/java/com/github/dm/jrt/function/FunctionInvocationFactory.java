@@ -21,6 +21,7 @@ import com.github.dm.jrt.core.invocation.CallInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.function.util.FunctionDecorator;
 
 import org.jetbrains.annotations.NotNull;
 

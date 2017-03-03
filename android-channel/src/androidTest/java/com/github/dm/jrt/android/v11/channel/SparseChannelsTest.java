@@ -79,7 +79,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
   @SuppressWarnings("unchecked")
   public void testConfiguration() {
     final Channel<ParcelableFlow<String>, ParcelableFlow<String>> channel =
-        JRoutineCore.<ParcelableFlow<String>>ofInputs().buildChannel();
+        JRoutineCore.<ParcelableFlow<String>>ofData().buildChannel();
     final TestLog testLog = new TestLog();
     SparseChannels.parcelableFlowInput(3, 1, channel)
                   .channelConfiguration()
@@ -231,9 +231,9 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
     }
 
     final ChannelBuilder<String, String> builder1 =
-        JRoutineCore.<String>ofInputs().channelConfiguration().withOrder(OrderType.SORTED).apply();
+        JRoutineCore.<String>ofData().channelConfiguration().withOrder(OrderType.SORTED).apply();
     final ChannelBuilder<Integer, Integer> builder2 =
-        JRoutineCore.<Integer>ofInputs().channelConfiguration().withOrder(OrderType.SORTED).apply();
+        JRoutineCore.<Integer>ofData().channelConfiguration().withOrder(OrderType.SORTED).apply();
     final Channel<String, String> channel1 = builder1.buildChannel();
     final Channel<Integer, Integer> channel2 = builder2.buildChannel();
 
@@ -246,7 +246,9 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
                                                                     .withInputOrder(
                                                                         OrderType.SORTED)
                                                                     .apply()
-                                                                    .call(channel);
+                                                                    .invoke()
+                                                                    .pass(channel)
+                                                                    .close();
     final SparseArray<? extends Channel<?, Object>> channelMap =
         SparseChannels.parcelableFlowOutput(output, Sort.INTEGER, Sort.STRING).buildChannelArray();
 
@@ -274,9 +276,9 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
     }
 
     final ChannelBuilder<String, String> builder1 =
-        JRoutineCore.<String>ofInputs().channelConfiguration().withOrder(OrderType.SORTED).apply();
+        JRoutineCore.<String>ofData().channelConfiguration().withOrder(OrderType.SORTED).apply();
     final ChannelBuilder<Integer, Integer> builder2 =
-        JRoutineCore.<Integer>ofInputs().channelConfiguration().withOrder(OrderType.SORTED).apply();
+        JRoutineCore.<Integer>ofData().channelConfiguration().withOrder(OrderType.SORTED).apply();
     final Channel<String, String> channel1 = builder1.buildChannel();
     final Channel<Integer, Integer> channel2 = builder2.buildChannel();
     final SparseArray<Channel<?, ?>> channelMap = new SparseArray<Channel<?, ?>>(2);
@@ -299,9 +301,9 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
     }
 
     final ChannelBuilder<String, String> builder1 =
-        JRoutineCore.<String>ofInputs().channelConfiguration().withOrder(OrderType.SORTED).apply();
+        JRoutineCore.<String>ofData().channelConfiguration().withOrder(OrderType.SORTED).apply();
     final ChannelBuilder<Integer, Integer> builder2 =
-        JRoutineCore.<Integer>ofInputs().channelConfiguration().withOrder(OrderType.SORTED).apply();
+        JRoutineCore.<Integer>ofData().channelConfiguration().withOrder(OrderType.SORTED).apply();
     final Channel<String, String> channel1 = builder1.buildChannel();
     final Channel<Integer, Integer> channel2 = builder2.buildChannel();
     final SparseArray<Channel<?, ?>> channelMap = new SparseArray<Channel<?, ?>>(2);
@@ -626,21 +628,27 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
         JRoutineLoader.on(loaderFrom(getActivity())).with(factoryOf(Sort.class)).buildRoutine();
     SparseArray<? extends Channel<?, Object>> channelMap;
     Channel<?, ParcelableFlow<Object>> channel;
-    channel = routine.call(new ParcelableFlow<Object>(Sort.STRING, "test21"),
-        new ParcelableFlow<Object>(Sort.INTEGER, -11));
+    channel = routine.invoke()
+                     .pass(new ParcelableFlow<Object>(Sort.STRING, "test21"),
+                         new ParcelableFlow<Object>(Sort.INTEGER, -11))
+                     .close();
     channelMap =
         SparseChannels.parcelableFlowOutput(channel, Arrays.asList(Sort.INTEGER, Sort.STRING))
                       .buildChannelArray();
     assertThat(channelMap.get(Sort.INTEGER).in(seconds(10)).all()).containsOnly(-11);
     assertThat(channelMap.get(Sort.STRING).in(seconds(10)).all()).containsOnly("test21");
-    channel = routine.call(new ParcelableFlow<Object>(Sort.INTEGER, -11),
-        new ParcelableFlow<Object>(Sort.STRING, "test21"));
+    channel = routine.invoke()
+                     .pass(new ParcelableFlow<Object>(Sort.INTEGER, -11),
+                         new ParcelableFlow<Object>(Sort.STRING, "test21"))
+                     .close();
     channelMap =
         SparseChannels.parcelableFlowOutput(channel, Sort.INTEGER, Sort.STRING).buildChannelArray();
     assertThat(channelMap.get(Sort.INTEGER).in(seconds(10)).all()).containsOnly(-11);
     assertThat(channelMap.get(Sort.STRING).in(seconds(10)).all()).containsOnly("test21");
-    channel = routine.call(new ParcelableFlow<Object>(Sort.STRING, "test21"),
-        new ParcelableFlow<Object>(Sort.INTEGER, -11));
+    channel = routine.invoke()
+                     .pass(new ParcelableFlow<Object>(Sort.STRING, "test21"),
+                         new ParcelableFlow<Object>(Sort.INTEGER, -11))
+                     .close();
     channelMap =
         SparseChannels.parcelableFlowOutput(Math.min(Sort.INTEGER, Sort.STRING), 2, channel)
                       .buildChannelArray();
@@ -792,7 +800,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
     }
 
     final Channel<ParcelableFlow<String>, ParcelableFlow<String>> channel =
-        JRoutineCore.<ParcelableFlow<String>>ofInputs().buildChannel();
+        JRoutineCore.<ParcelableFlow<String>>ofData().buildChannel();
     final Channel<?, String> outputChannel =
         SparseChannels.parcelableFlowOutput(channel, 33).buildChannelArray().get(33);
     channel.pass(new ParcelableFlow<String>(33, "test1"), new ParcelableFlow<String>(-33, "test2"),
@@ -809,7 +817,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
     }
 
     final Channel<ParcelableFlow<String>, ParcelableFlow<String>> channel =
-        JRoutineCore.<ParcelableFlow<String>>ofInputs().buildChannel();
+        JRoutineCore.<ParcelableFlow<String>>ofData().buildChannel();
     final Channel<?, String> outputChannel =
         SparseChannels.parcelableFlowOutput(channel, 33).buildChannelArray().get(33);
     channel.abort();
@@ -833,7 +841,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       return true;
     }
   }
@@ -846,7 +854,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       return true;
     }
   }
@@ -880,7 +888,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       return true;
     }
   }

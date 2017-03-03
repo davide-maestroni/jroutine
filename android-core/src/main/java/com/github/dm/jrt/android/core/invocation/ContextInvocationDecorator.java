@@ -56,13 +56,18 @@ public class ContextInvocationDecorator<IN, OUT> implements ContextInvocation<IN
   }
 
   @Override
+  public void onDestroy() throws Exception {
+    mInvocation.onDestroy();
+  }
+
+  @Override
   public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) throws Exception {
     mInvocation.onInput(input, result);
   }
 
   @Override
-  public boolean onRecycle(final boolean isReused) throws Exception {
-    return mInvocation.onRecycle(isReused);
+  public boolean onRecycle() throws Exception {
+    return mInvocation.onRecycle();
   }
 
   @Override

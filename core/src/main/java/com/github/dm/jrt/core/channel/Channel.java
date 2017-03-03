@@ -234,7 +234,6 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
    */
   @NotNull
   Channel<IN, OUT> consume(@NotNull ChannelConsumer<? super OUT> consumer);
-  // TODO: 12/02/2017 consume(channel) => bind(channel).close(); return this;
 
   /**
    * Tells the channel to abort the invocation execution in case, after a read method is invoked,
@@ -638,7 +637,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
   Channel<IN, OUT> pass(@Nullable IN... inputs);
 
   /**
-   * Binds this channel to the specified one.
+   * Creates a new channel piping the output data into the specified one.
    * <br>
    * After method exits, all the output will be passed only to the specified input channel.
    * Attempting to read through the dedicated methods will cause an
@@ -649,14 +648,14 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
    *
    * @param channel the input channel
    * @param <AFTER> the channel output type.
-   * @return the passed channel.
+   * @return the newly created pipe channel.
    * @throws java.lang.IllegalStateException if this channel is already bound.
    * @see #after(DurationMeasure)
    * @see #after(long, TimeUnit)
    * @see #afterNoDelay()
    */
   @NotNull
-  <AFTER> Channel<? super OUT, AFTER> pipe(@NotNull Channel<? super OUT, AFTER> channel);
+  <AFTER> Channel<IN, AFTER> pipe(@NotNull Channel<? super OUT, AFTER> channel);
 
   /**
    * Returns the total number of data stored in the channel.

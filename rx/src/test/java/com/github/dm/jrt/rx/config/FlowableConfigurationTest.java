@@ -80,10 +80,10 @@ public class FlowableConfigurationTest {
   public void testBuilderFromEquals() {
     final FlowableConfiguration<String> configuration =
         FlowableConfiguration.<String>builder().withInput("test").apply();
-    assertThat(FlowableConfiguration.<String>builder().with(configuration).apply()).isEqualTo(
+    assertThat(FlowableConfiguration.<String>builder().withPatch(configuration).apply()).isEqualTo(
         configuration);
     assertThat(configuration.builderFrom().apply()).isEqualTo(configuration);
-    assertThat(configuration.builderFrom().with(null).apply()).isEqualTo(
+    assertThat(configuration.builderFrom().withPatch(null).apply()).isEqualTo(
         FlowableConfiguration.defaultConfiguration());
   }
 

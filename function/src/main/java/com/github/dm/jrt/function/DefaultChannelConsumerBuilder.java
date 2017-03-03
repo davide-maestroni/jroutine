@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Davide Maestroni
+ * Copyright 2017 Davide Maestroni
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,12 @@
 
 package com.github.dm.jrt.function;
 
-import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.common.RoutineException;
+import com.github.dm.jrt.function.builder.ChannelConsumerBuilder;
+import com.github.dm.jrt.function.util.Action;
+import com.github.dm.jrt.function.util.ActionDecorator;
+import com.github.dm.jrt.function.util.Consumer;
+import com.github.dm.jrt.function.util.ConsumerDecorator;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -28,8 +32,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <OUT> the output data type.
  */
-@SuppressWarnings("WeakerAccess")
-public class ChannelConsumerBuilder<OUT> implements ChannelConsumer<OUT> {
+class DefaultChannelConsumerBuilder<OUT> implements ChannelConsumerBuilder<OUT> {
 
   private final ActionDecorator mOnComplete;
 
@@ -45,7 +48,7 @@ public class ChannelConsumerBuilder<OUT> implements ChannelConsumer<OUT> {
    * @param onComplete the complete action.
    */
   @SuppressWarnings("unchecked")
-  private ChannelConsumerBuilder(@NotNull final ConsumerDecorator<? super OUT> onOutput,
+  private DefaultChannelConsumerBuilder(@NotNull final ConsumerDecorator<? super OUT> onOutput,
       @NotNull final ConsumerDecorator<? super RoutineException> onError,
       @NotNull final ActionDecorator onComplete) {
     mOnOutput = (ConsumerDecorator<OUT>) onOutput;
@@ -61,8 +64,8 @@ public class ChannelConsumerBuilder<OUT> implements ChannelConsumer<OUT> {
    * @return the builder instance.
    */
   @NotNull
-  public static ChannelConsumerBuilder<Object> onComplete(@NotNull final Action onComplete) {
-    return new ChannelConsumerBuilder<Object>(ConsumerDecorator.sink(),
+  static ChannelConsumerBuilder<Object> onComplete(@NotNull final Action onComplete) {
+    return new DefaultChannelConsumerBuilder<Object>(ConsumerDecorator.sink(),
         ConsumerDecorator.<RoutineException>sink(), ActionDecorator.decorate(onComplete));
   }
 
@@ -74,9 +77,9 @@ public class ChannelConsumerBuilder<OUT> implements ChannelConsumer<OUT> {
    * @return the builder instance.
    */
   @NotNull
-  public static ChannelConsumerBuilder<Object> onError(
+  static ChannelConsumerBuilder<Object> onError(
       @NotNull final Consumer<? super RoutineException> onError) {
-    return new ChannelConsumerBuilder<Object>(ConsumerDecorator.sink(),
+    return new DefaultChannelConsumerBuilder<Object>(ConsumerDecorator.sink(),
         ConsumerDecorator.decorate(onError), ActionDecorator.noOp());
   }
 
@@ -89,9 +92,8 @@ public class ChannelConsumerBuilder<OUT> implements ChannelConsumer<OUT> {
    * @return the builder instance.
    */
   @NotNull
-  public static <OUT> ChannelConsumerBuilder<OUT> onOutput(
-      @NotNull final Consumer<? super OUT> onOutput) {
-    return new ChannelConsumerBuilder<OUT>(ConsumerDecorator.decorate(onOutput),
+  static <OUT> ChannelConsumerBuilder<OUT> onOutput(@NotNull final Consumer<? super OUT> onOutput) {
+    return new DefaultChannelConsumerBuilder<OUT>(ConsumerDecorator.decorate(onOutput),
         ConsumerDecorator.<RoutineException>sink(), ActionDecorator.noOp());
   }
 
@@ -105,10 +107,9 @@ public class ChannelConsumerBuilder<OUT> implements ChannelConsumer<OUT> {
    * @return the builder instance.
    */
   @NotNull
-  public static <OUT> ChannelConsumerBuilder<OUT> onOutput(
-      @NotNull final Consumer<? super OUT> onOutput,
+  static <OUT> ChannelConsumerBuilder<OUT> onOutput(@NotNull final Consumer<? super OUT> onOutput,
       @NotNull final Consumer<? super RoutineException> onError) {
-    return new ChannelConsumerBuilder<OUT>(ConsumerDecorator.decorate(onOutput),
+    return new DefaultChannelConsumerBuilder<OUT>(ConsumerDecorator.decorate(onOutput),
         ConsumerDecorator.decorate(onError), ActionDecorator.noOp());
   }
 
@@ -123,48 +124,29 @@ public class ChannelConsumerBuilder<OUT> implements ChannelConsumer<OUT> {
    * @return the builder instance.
    */
   @NotNull
-  public static <OUT> ChannelConsumerBuilder<OUT> onOutput(
-      @NotNull final Consumer<? super OUT> onOutput,
+  static <OUT> ChannelConsumerBuilder<OUT> onOutput(@NotNull final Consumer<? super OUT> onOutput,
       @NotNull final Consumer<? super RoutineException> onError, @NotNull final Action onComplete) {
-    return new ChannelConsumerBuilder<OUT>(ConsumerDecorator.decorate(onOutput),
+    return new DefaultChannelConsumerBuilder<OUT>(ConsumerDecorator.decorate(onOutput),
         ConsumerDecorator.decorate(onError), ActionDecorator.decorate(onComplete));
   }
 
-  /**
-   * Returns a new channel consumer builder employing also the specified consumer function to
-   * handle the invocation completion.
-   *
-   * @param onComplete the action instance.
-   * @return the builder instance.
-   */
   @NotNull
   public ChannelConsumerBuilder<OUT> andOnComplete(@NotNull final Action onComplete) {
-    return new ChannelConsumerBuilder<OUT>(mOnOutput, mOnError, mOnComplete.andThen(onComplete));
+    return new DefaultChannelConsumerBuilder<OUT>(mOnOutput, mOnError,
+        mOnComplete.andThen(onComplete));
   }
 
-  /**
-   * Returns a new channel consumer builder employing also the specified consumer function to
-   * handle the invocation errors.
-   *
-   * @param onError the consumer function.
-   * @return the builder instance.
-   */
   @NotNull
   public ChannelConsumerBuilder<OUT> andOnError(
       @NotNull final Consumer<? super RoutineException> onError) {
-    return new ChannelConsumerBuilder<OUT>(mOnOutput, mOnError.andThen(onError), mOnComplete);
+    return new DefaultChannelConsumerBuilder<OUT>(mOnOutput, mOnError.andThen(onError),
+        mOnComplete);
   }
 
-  /**
-   * Returns a new channel consumer builder employing also the specified consumer function to
-   * handle the invocation outputs.
-   *
-   * @param onOutput the consumer function.
-   * @return the builder instance.
-   */
   @NotNull
   public ChannelConsumerBuilder<OUT> andOnOutput(@NotNull final Consumer<? super OUT> onOutput) {
-    return new ChannelConsumerBuilder<OUT>(mOnOutput.andThen(onOutput), mOnError, mOnComplete);
+    return new DefaultChannelConsumerBuilder<OUT>(mOnOutput.andThen(onOutput), mOnError,
+        mOnComplete);
   }
 
   public void onComplete() throws Exception {

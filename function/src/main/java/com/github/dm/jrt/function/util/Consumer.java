@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Davide Maestroni
+ * Copyright 2017 Davide Maestroni
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,22 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.function;
+package com.github.dm.jrt.function.util;
 
 /**
- * Interface representing a predicate (boolean-valued function) of one argument.
+ * Interface representing an operation that accepts an input argument and returns no result.
  * <p>
- * Created by davide-maestroni on 10/16/2015.
+ * Created by davide-maestroni on 09/21/2015.
  *
  * @param <IN> the input data type.
  */
-public interface Predicate<IN> {
+public interface Consumer<IN> {
 
   /**
-   * Evaluates this predicate on the given argument.
+   * Performs this operation on the given argument.
    *
    * @param in the input argument.
-   * @return true if the input argument matches the predicate, otherwise false.
    * @throws java.lang.Exception if an unexpected error occurs.
    */
-  boolean test(IN in) throws Exception;
+  void accept(IN in) throws Exception;
 }

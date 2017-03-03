@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Davide Maestroni
+ * Copyright 2017 Davide Maestroni
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.android.core.builder;
+package com.github.dm.jrt.android.core.config;
 
 import android.os.Looper;
 import android.test.AndroidTestCase;
 
-import com.github.dm.jrt.android.core.config.ServiceConfiguration;
 import com.github.dm.jrt.android.core.config.ServiceConfiguration.Builder;
 import com.github.dm.jrt.android.core.log.AndroidLog;
 import com.github.dm.jrt.android.core.runner.MainRunner;
@@ -82,9 +81,9 @@ public class ServiceConfigurationTest extends AndroidTestCase {
                                                         .withLogClass(AndroidLog.class)
                                                         .withLogArgs("test")
                                                         .apply();
-    assertThat(builder().with(configuration).apply()).isEqualTo(configuration);
+    assertThat(builder().withPatch(configuration).apply()).isEqualTo(configuration);
     assertThat(configuration.builderFrom().apply()).isEqualTo(configuration);
-    assertThat(configuration.builderFrom().with(null).apply()).isEqualTo(
+    assertThat(configuration.builderFrom().withPatch(null).apply()).isEqualTo(
         ServiceConfiguration.defaultConfiguration());
   }
 

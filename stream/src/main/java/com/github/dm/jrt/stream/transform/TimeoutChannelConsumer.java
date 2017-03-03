@@ -41,28 +41,41 @@ class TimeoutChannelConsumer<OUT> implements ChannelConsumer<OUT> {
 
   private final Channel<OUT, ?> mOutputChannel;
 
+  private final long mOutputTimeout;
+
+  private final TimeUnit mOutputTimeoutUnit;
+
   private final Runner mRunner;
-
-  private final long mTimeout;
-
-  private final TimeUnit mTimeoutUnit;
 
   private AbortExecution mExecution = new AbortExecution();
 
   /**
    * Constructor.
    *
-   * @param timeout       the timeout value.
-   * @param timeUnit      the timeout unit.
-   * @param runner        the runner instance.
-   * @param outputChannel the output channel.
+   * @param outputTimeout  the new output timeout value.
+   * @param outputTimeUnit the new output timeout unit.
+   * @param totalTimeout   the total timeout value.
+   * @param totalTimeUnit  the total timeout unit.
+   * @param runner         the runner instance.
+   * @param outputChannel  the output channel.
    */
-  TimeoutChannelConsumer(final long timeout, @NotNull final TimeUnit timeUnit,
-      @NotNull final Runner runner, @NotNull final Channel<OUT, ?> outputChannel) {
-    mTimeout = ConstantConditions.notNegative("timeout value", timeout);
-    mTimeoutUnit = ConstantConditions.notNull("timeout unit", timeUnit);
+  TimeoutChannelConsumer(final long outputTimeout, @NotNull final TimeUnit outputTimeUnit,
+      final long totalTimeout, @NotNull final TimeUnit totalTimeUnit, @NotNull final Runner runner,
+      @NotNull final Channel<OUT, ?> outputChannel) {
+    ConstantConditions.notNegative("total timeout value", totalTimeout);
+    ConstantConditions.notNull("total time unit", totalTimeUnit);
+    mOutputTimeout = ConstantConditions.notNegative("output timeout value", outputTimeout);
+    mOutputTimeoutUnit = ConstantConditions.notNull("output time unit", outputTimeUnit);
     mRunner = ConstantConditions.notNull("runner instance", runner);
     mOutputChannel = ConstantConditions.notNull("output channel", outputChannel);
+    runner.run(mExecution, outputTimeout, outputTimeUnit);
+    runner.run(new Execution() {
+
+      public void run() {
+        mOutputChannel.abort(new ResultTimeoutException(
+            "timeout while waiting for completion: [" + totalTimeUnit + " " + totalTimeout + "]"));
+      }
+    }, totalTimeout, totalTimeUnit);
   }
 
   public void onComplete() {
@@ -80,9 +93,10 @@ class TimeoutChannelConsumer<OUT> implements ChannelConsumer<OUT> {
 
   private void restartTimeout() {
     final Runner runner = mRunner;
+    final AbortExecution execution = new AbortExecution();
     runner.cancel(mExecution);
-    final AbortExecution execution = (mExecution = new AbortExecution());
-    runner.run(execution, mTimeout, mTimeoutUnit);
+    mExecution = execution;
+    runner.run(execution, mOutputTimeout, mOutputTimeoutUnit);
   }
 
   /**
@@ -102,7 +116,8 @@ class TimeoutChannelConsumer<OUT> implements ChannelConsumer<OUT> {
     public void run() {
       if (mExecutionCount == mCount.get()) {
         mOutputChannel.abort(new ResultTimeoutException(
-            "timeout while waiting for inputs: [" + mTimeout + " " + mTimeout + "]"));
+            "timeout while waiting for outputs: [" + mOutputTimeoutUnit + " " + mOutputTimeout
+                + "]"));
       }
     }
   }

@@ -18,7 +18,7 @@ package com.github.dm.jrt.swagger.generator;
 
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.InvocationException;
-import com.github.dm.jrt.function.Consumer;
+import com.github.dm.jrt.function.util.Consumer;
 import com.github.dm.jrt.operator.Operators;
 import com.github.dm.jrt.retrofit.RoutineAdapterFactory;
 import com.github.dm.jrt.swagger.client.UsersApiClient;
@@ -40,7 +40,7 @@ import retrofit2.CallAdapter;
 import retrofit2.Retrofit;
 
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
-import static com.github.dm.jrt.function.Functions.onOutput;
+import static com.github.dm.jrt.function.JRoutineFunction.onOutput;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**

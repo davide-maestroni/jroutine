@@ -25,6 +25,20 @@ import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ClassToken;
+import com.github.dm.jrt.function.util.Action;
+import com.github.dm.jrt.function.util.ActionDecorator;
+import com.github.dm.jrt.function.util.BiConsumer;
+import com.github.dm.jrt.function.util.BiConsumerDecorator;
+import com.github.dm.jrt.function.util.BiFunction;
+import com.github.dm.jrt.function.util.BiFunctionDecorator;
+import com.github.dm.jrt.function.util.Consumer;
+import com.github.dm.jrt.function.util.ConsumerDecorator;
+import com.github.dm.jrt.function.util.Function;
+import com.github.dm.jrt.function.util.FunctionDecorator;
+import com.github.dm.jrt.function.util.Predicate;
+import com.github.dm.jrt.function.util.PredicateDecorator;
+import com.github.dm.jrt.function.util.Supplier;
+import com.github.dm.jrt.function.util.SupplierDecorator;
 
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
@@ -617,14 +631,14 @@ public class FunctionsTest {
   public void testCommand() {
 
     final Routine<Void, String> routine = JRoutineCore.with(createCommand()).buildRoutine();
-    assertThat(routine.call().in(seconds(1)).all()).containsOnly("test");
+    assertThat(routine.invoke().close().in(seconds(1)).all()).containsOnly("test");
   }
 
   @Test
   public void testCommand2() {
 
     final Routine<Void, String> routine = JRoutineCore.with(createCommand2()).buildRoutine();
-    assertThat(routine.call().in(seconds(1)).all()).containsOnly("test");
+    assertThat(routine.invoke().close().in(seconds(1)).all()).containsOnly("test");
   }
 
   @Test
@@ -848,7 +862,8 @@ public class FunctionsTest {
   public void testFactory() {
 
     final Routine<Object, String> routine = JRoutineCore.with(createFactory()).buildRoutine();
-    assertThat(routine.call("test", 1).in(seconds(1)).all()).containsOnly("test", "1");
+    assertThat(routine.invoke().pass("test", 1).close().in(seconds(1)).all()).containsOnly("test",
+        "1");
   }
 
   @Test
@@ -1040,14 +1055,15 @@ public class FunctionsTest {
   public void testFunctionFactory() {
 
     final Routine<Object, String> routine = JRoutineCore.with(createFunction()).buildRoutine();
-    assertThat(routine.call("test", 1).in(seconds(1)).all()).containsOnly("test", "1");
+    assertThat(routine.invoke().pass("test", 1).close().in(seconds(1)).all()).containsOnly("test",
+        "1");
   }
 
   @Test
   public void testFunctionFactory2() {
 
     final Routine<Object, String> routine = JRoutineCore.with(createFunction2()).buildRoutine();
-    assertThat(routine.call("test", 1).in(seconds(1)).all()).containsOnly("test1");
+    assertThat(routine.invoke().pass("test", 1).close().in(seconds(1)).all()).containsOnly("test1");
   }
 
   @Test
@@ -1157,14 +1173,16 @@ public class FunctionsTest {
   public void testMapping() {
 
     final Routine<Object, String> routine = JRoutineCore.with(createMapping()).buildRoutine();
-    assertThat(routine.call("test", 1).in(seconds(1)).all()).containsOnly("test", "1");
+    assertThat(routine.invoke().pass("test", 1).close().in(seconds(1)).all()).containsOnly("test",
+        "1");
   }
 
   @Test
   public void testMapping2() {
 
     final Routine<Object, String> routine = JRoutineCore.with(createMapping2()).buildRoutine();
-    assertThat(routine.call("test", 1).in(seconds(1)).all()).containsOnly("test", "1");
+    assertThat(routine.invoke().pass("test", 1).close().in(seconds(1)).all()).containsOnly("test",
+        "1");
   }
 
   @Test
@@ -1201,7 +1219,7 @@ public class FunctionsTest {
   public void testMapping3() {
 
     final Routine<String, String> routine = JRoutineCore.with(createMapping3()).buildRoutine();
-    assertThat(routine.call("test", "").in(seconds(1)).all()).containsOnly("test");
+    assertThat(routine.invoke().pass("test", "").close().in(seconds(1)).all()).containsOnly("test");
   }
 
   @Test

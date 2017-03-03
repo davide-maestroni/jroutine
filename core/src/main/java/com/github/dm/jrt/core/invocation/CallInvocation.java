@@ -55,7 +55,7 @@ public abstract class CallInvocation<IN, OUT> extends TemplateInvocation<IN, OUT
   }
 
   @Override
-  public boolean onRecycle(final boolean isReused) throws Exception {
+  public boolean onRecycle() throws Exception {
     mInputs = null;
     return true;
   }

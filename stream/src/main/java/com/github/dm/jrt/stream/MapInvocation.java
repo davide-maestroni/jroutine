@@ -19,7 +19,7 @@ package com.github.dm.jrt.stream;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.FunctionDecorator;
+import com.github.dm.jrt.function.util.FunctionDecorator;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -51,7 +51,7 @@ class MapInvocation<IN, OUT> extends MappingInvocation<IN, OUT> {
   public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) throws Exception {
     final Channel<?, ? extends OUT> channel = mFunction.apply(input);
     if (channel != null) {
-      channel.pipe(result);
+      result.pass(channel);
     }
   }
 }

@@ -255,6 +255,17 @@ public final class InvocationConfiguration extends DeepEqualObject {
   }
 
   /**
+   * Returns a configuration with just the specified runner set as option.
+   *
+   * @param runner the runner instance.
+   * @return the configuration instance.
+   */
+  @NotNull
+  public static InvocationConfiguration withRunner(@Nullable final Runner runner) {
+    return builder().withRunner(runner).apply();
+  }
+
+  /**
    * Returns an invocation configuration builder initialized with this configuration.
    *
    * @return the builder.
@@ -632,27 +643,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
     }
 
     /**
-     * Applies the specified configuration to this builder. A null value means that all the
-     * configuration options will be reset to their default, otherwise only the non-default
-     * options will be applied.
-     *
-     * @param configuration the invocation configuration.
-     * @return this builder.
-     */
-    @NotNull
-    public Builder<TYPE> with(@Nullable final InvocationConfiguration configuration) {
-      if (configuration == null) {
-        setConfiguration(defaultConfiguration());
-        return this;
-      }
-
-      applyBaseConfiguration(configuration);
-      applyChannelConfiguration(configuration);
-      applyLogConfiguration(configuration);
-      return this;
-    }
-
-    /**
      * Sets the number of invocation instances, which represents the core pool of reusable
      * invocations. A {@link InvocationConfiguration#DEFAULT DEFAULT} value means that it is
      * up to the specific implementation to choose a default one.
@@ -881,6 +871,27 @@ public final class InvocationConfiguration extends DeepEqualObject {
     @NotNull
     public Builder<TYPE> withOutputTimeoutAction(@Nullable final TimeoutActionType actionType) {
       mTimeoutActionType = actionType;
+      return this;
+    }
+
+    /**
+     * Applies the specified patch configuration to this builder. A null value means that all the
+     * configuration options will be reset to their default, otherwise only the non-default
+     * options will be applied.
+     *
+     * @param configuration the invocation configuration.
+     * @return this builder.
+     */
+    @NotNull
+    public Builder<TYPE> withPatch(@Nullable final InvocationConfiguration configuration) {
+      if (configuration == null) {
+        setConfiguration(defaultConfiguration());
+        return this;
+      }
+
+      applyBaseConfiguration(configuration);
+      applyChannelConfiguration(configuration);
+      applyLogConfiguration(configuration);
       return this;
     }
 

@@ -109,7 +109,7 @@ class AverageInputPrecisionInvocationFactory<IN extends Number, OUT extends Numb
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       return true;
     }
 

@@ -22,8 +22,8 @@ import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.github.dm.jrt.android.v11.stream.TestActivity;
-import com.github.dm.jrt.function.Function;
-import com.github.dm.jrt.function.Predicate;
+import com.github.dm.jrt.function.util.Function;
+import com.github.dm.jrt.function.util.Predicate;
 import com.github.dm.jrt.operator.Operators;
 import com.github.dm.jrt.stream.JRoutineStream;
 
@@ -70,7 +70,8 @@ public class LoaderTransformationsTest extends ActivityInstrumentationTestCase2<
                                                            .withInvocationId(12)
                                                            .apply()
                                                            .buildFunction())
-                             .call()
+                             .invoke()
+                             .close()
                              .in(seconds(10))
                              .next()).isEqualTo(10);
   }

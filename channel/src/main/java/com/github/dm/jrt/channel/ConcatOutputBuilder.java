@@ -64,13 +64,13 @@ class ConcatOutputBuilder<OUT> extends AbstractChannelBuilder<OUT, OUT> {
 
   @NotNull
   public Channel<OUT, OUT> buildChannel() {
-    final Channel<OUT, OUT> outputChannel = JRoutineCore.<OUT>ofInputs().channelConfiguration()
-                                                                        .with(getConfiguration())
-                                                                        .withOrder(OrderType.SORTED)
-                                                                        .apply()
-                                                                        .buildChannel();
+    final Channel<OUT, OUT> outputChannel = JRoutineCore.<OUT>ofData().channelConfiguration()
+                                                                      .withPatch(getConfiguration())
+                                                                      .withOrder(OrderType.SORTED)
+                                                                      .apply()
+                                                                      .buildChannel();
     for (final Channel<?, ? extends OUT> channel : mChannels) {
-      channel.pipe(outputChannel);
+      outputChannel.pass(channel);
     }
 
     return outputChannel.close();

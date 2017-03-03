@@ -49,12 +49,13 @@ class FlowInputBuilder<DATA, IN extends DATA> extends AbstractChannelBuilder<IN,
   }
 
   @NotNull
+  @SuppressWarnings("unchecked")
   public Channel<IN, IN> buildChannel() {
     final Channel<IN, IN> inputChannel =
-        JRoutineCore.<IN>ofInputs().apply(getConfiguration()).buildChannel();
+        JRoutineCore.<IN>ofData().apply(getConfiguration()).buildChannel();
     final Channel<Flow<DATA>, Flow<DATA>> flowChannel =
-        JRoutineCore.<Flow<DATA>>ofInputs().buildChannel();
-    flowChannel.pipe(mChannel);
+        JRoutineCore.<Flow<DATA>>ofData().buildChannel();
+    ((Channel<Flow<DATA>, ?>) mChannel).pass(flowChannel);
     return inputChannel.consume(new FlowChannelConsumer<DATA, IN>(flowChannel, mId));
   }
 }

@@ -19,8 +19,8 @@ package com.github.dm.jrt.operator;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.runner.Runners;
-import com.github.dm.jrt.function.BiConsumer;
-import com.github.dm.jrt.function.Supplier;
+import com.github.dm.jrt.function.util.BiConsumer;
+import com.github.dm.jrt.function.util.Supplier;
 
 import org.junit.Test;
 
@@ -59,13 +59,15 @@ public class AccumulateConsumerInvocationTest {
                            .invocationConfiguration()
                            .withRunner(Runners.syncRunner())
                            .apply()
-                           .call(new ArrayList<String>() {{
+                           .invoke()
+                           .pass(new ArrayList<String>() {{
                              add("test1");
                            }}, new ArrayList<String>() {{
                              add("test2");
                            }}, new ArrayList<String>() {{
                              add("test3");
                            }})
+                           .close()
                            .next()).isEqualTo(Arrays.asList("test1", "test2", "test3"));
     assertThat(JRoutineCore.with(consumerFactory(new Supplier<List<String>>() {
 
@@ -79,13 +81,15 @@ public class AccumulateConsumerInvocationTest {
                            .invocationConfiguration()
                            .withRunner(Runners.syncRunner())
                            .apply()
-                           .call(new ArrayList<String>() {{
+                           .invoke()
+                           .pass(new ArrayList<String>() {{
                              add("test1");
                            }}, new ArrayList<String>() {{
                              add("test2");
                            }}, new ArrayList<String>() {{
                              add("test3");
                            }})
+                           .close()
                            .next()).isEqualTo(Arrays.asList("test0", "test1", "test2", "test3"));
   }
 

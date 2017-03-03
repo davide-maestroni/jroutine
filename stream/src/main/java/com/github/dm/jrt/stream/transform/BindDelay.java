@@ -20,7 +20,7 @@ import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.Function;
+import com.github.dm.jrt.function.util.Function;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -58,7 +58,7 @@ class BindDelay<OUT> implements Function<Channel<?, OUT>, Channel<?, OUT>> {
   public Channel<?, OUT> apply(final Channel<?, OUT> channel) {
     final ChannelConfiguration configuration = mConfiguration;
     final Channel<OUT, OUT> outputChannel =
-        JRoutineCore.<OUT>ofInputs().apply(configuration).buildChannel();
+        JRoutineCore.<OUT>ofData().apply(configuration).buildChannel();
     return outputChannel.after(mDelay, mDelayUnit).pass(channel).afterNoDelay().close();
   }
 }

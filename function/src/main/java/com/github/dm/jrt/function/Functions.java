@@ -17,13 +17,26 @@
 package com.github.dm.jrt.function;
 
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.invocation.CommandInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.function.util.Action;
+import com.github.dm.jrt.function.util.ActionDecorator;
+import com.github.dm.jrt.function.util.BiConsumer;
+import com.github.dm.jrt.function.util.BiConsumerDecorator;
+import com.github.dm.jrt.function.util.BiFunction;
+import com.github.dm.jrt.function.util.BiFunctionDecorator;
+import com.github.dm.jrt.function.util.Consumer;
+import com.github.dm.jrt.function.util.ConsumerDecorator;
+import com.github.dm.jrt.function.util.Function;
+import com.github.dm.jrt.function.util.FunctionDecorator;
+import com.github.dm.jrt.function.util.Predicate;
+import com.github.dm.jrt.function.util.PredicateDecorator;
+import com.github.dm.jrt.function.util.Supplier;
+import com.github.dm.jrt.function.util.SupplierDecorator;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -125,6 +138,7 @@ public class Functions {
   @NotNull
   public static <IN, OUT> InvocationFactory<IN, OUT> consumerCall(
       @NotNull final BiConsumer<? super List<IN>, ? super Channel<OUT, ?>> consumer) {
+    // TODO: 01/03/2017 remove
     return new ConsumerInvocationFactory<IN, OUT>(decorate(consumer));
   }
 
@@ -146,6 +160,7 @@ public class Functions {
   @NotNull
   public static <OUT> CommandInvocation<OUT> consumerCommand(
       @NotNull final Consumer<? super Channel<OUT, ?>> consumer) {
+    // TODO: 01/03/2017 remove
     return new ConsumerCommandInvocation<OUT>(decorate(consumer));
   }
 
@@ -168,6 +183,7 @@ public class Functions {
   @NotNull
   public static <IN, OUT> MappingInvocation<IN, OUT> consumerMapping(
       @NotNull final BiConsumer<? super IN, ? super Channel<OUT, ?>> consumer) {
+    // TODO: 01/03/2017 remove
     return new ConsumerMappingInvocation<IN, OUT>(decorate(consumer));
   }
 
@@ -369,6 +385,7 @@ public class Functions {
   @NotNull
   public static <IN, OUT> InvocationFactory<IN, OUT> functionCall(
       @NotNull final Function<? super List<IN>, ? extends OUT> function) {
+    // TODO: 01/03/2017 remove
     return new FunctionInvocationFactory<IN, OUT>(decorate(function));
   }
 
@@ -391,6 +408,7 @@ public class Functions {
   @NotNull
   public static <IN, OUT> MappingInvocation<IN, OUT> functionMapping(
       @NotNull final Function<? super IN, ? extends OUT> function) {
+    // TODO: 01/03/2017 remove
     return new FunctionMappingInvocation<IN, OUT>(decorate(function));
   }
 
@@ -562,78 +580,6 @@ public class Functions {
   }
 
   /**
-   * Returns a channel consumer builder employing the specified action to handle the invocation
-   * completion.
-   *
-   * @param onComplete the action instance.
-   * @return the builder instance.
-   */
-  @NotNull
-  public static ChannelConsumerBuilder<Object> onComplete(@NotNull final Action onComplete) {
-    return ChannelConsumerBuilder.onComplete(onComplete);
-  }
-
-  /**
-   * Returns a channel consumer builder employing the specified consumer function to handle the
-   * invocation errors.
-   *
-   * @param onError the consumer function.
-   * @return the builder instance.
-   */
-  @NotNull
-  public static ChannelConsumerBuilder<Object> onError(
-      @NotNull final Consumer<? super RoutineException> onError) {
-    return ChannelConsumerBuilder.onError(onError);
-  }
-
-  /**
-   * Returns a channel consumer builder employing the specified consumer function to handle the
-   * invocation outputs.
-   *
-   * @param onOutput the consumer function.
-   * @param <OUT>    the output data type.
-   * @return the builder instance.
-   */
-  @NotNull
-  public static <OUT> ChannelConsumerBuilder<OUT> onOutput(
-      @NotNull final Consumer<? super OUT> onOutput) {
-    return ChannelConsumerBuilder.onOutput(onOutput);
-  }
-
-  /**
-   * Returns a channel consumer builder employing the specified consumer function to handle the
-   * invocation outputs.
-   *
-   * @param onOutput the consumer function.
-   * @param onError  the consumer function.
-   * @param <OUT>    the output data type.
-   * @return the builder instance.
-   */
-  @NotNull
-  public static <OUT> ChannelConsumerBuilder<OUT> onOutput(
-      @NotNull final Consumer<? super OUT> onOutput,
-      @NotNull final Consumer<? super RoutineException> onError) {
-    return ChannelConsumerBuilder.onOutput(onOutput, onError);
-  }
-
-  /**
-   * Returns a channel consumer builder employing the specified functions to handle the invocation
-   * outputs, errors adn completion.
-   *
-   * @param onOutput   the consumer function.
-   * @param onError    the consumer function.
-   * @param onComplete the action instance.
-   * @param <OUT>      the output data type.
-   * @return the builder instance.
-   */
-  @NotNull
-  public static <OUT> ChannelConsumerBuilder<OUT> onOutput(
-      @NotNull final Consumer<? super OUT> onOutput,
-      @NotNull final Consumer<? super RoutineException> onError, @NotNull final Action onComplete) {
-    return ChannelConsumerBuilder.onOutput(onOutput, onError, onComplete);
-  }
-
-  /**
    * Returns a predicate decorator always returning true.
    * <br>
    * The returned object will support concatenation and comparison.
@@ -667,6 +613,7 @@ public class Functions {
   @NotNull
   public static <IN> MappingInvocation<IN, IN> predicateFilter(
       @NotNull final Predicate<? super IN> predicate) {
+    // TODO: 03/03/2017 move to operator?
     return new PredicateMappingInvocation<IN>(decorate(predicate));
   }
 
@@ -715,6 +662,7 @@ public class Functions {
   @NotNull
   public static <OUT> CommandInvocation<OUT> supplierCommand(
       @NotNull final Supplier<? extends OUT> supplier) {
+    // TODO: 01/03/2017 remove
     return new SupplierCommandInvocation<OUT>(decorate(supplier));
   }
 

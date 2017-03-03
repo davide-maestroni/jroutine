@@ -71,7 +71,7 @@ class MergeOutputBuilder<OUT>
   @Override
   public Channel<ParcelableFlow<OUT>, ParcelableFlow<OUT>> buildChannel() {
     final Channel<ParcelableFlow<OUT>, ParcelableFlow<OUT>> outputChannel =
-        JRoutineCore.<ParcelableFlow<OUT>>ofInputs().apply(getConfiguration()).buildChannel();
+        JRoutineCore.<ParcelableFlow<OUT>>ofData().apply(getConfiguration()).buildChannel();
     int i = mStartId;
     for (final Channel<?, ? extends OUT> channel : mChannels) {
       outputChannel.pass(AndroidChannels.outputParcelableFlow(channel, i++).buildChannel());

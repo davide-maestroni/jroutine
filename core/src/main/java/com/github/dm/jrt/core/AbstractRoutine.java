@@ -24,7 +24,6 @@ import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
-import com.github.dm.jrt.core.routine.TemplateRoutine;
 import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.Runners;
@@ -48,7 +47,7 @@ import java.util.concurrent.TimeUnit;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
+public abstract class AbstractRoutine<IN, OUT> implements Routine<IN, OUT> {
 
   private static final int DEFAULT_CORE_INVOCATIONS = 10;
 
@@ -114,7 +113,6 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
     mLogger = logger.subContextLogger(this);
   }
 
-  @Override
   public void clear() {
     synchronized (mMutex) {
       final SimpleQueue<Invocation<IN, OUT>> asyncInvocations = mInvocations;
@@ -169,7 +167,7 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
 
   private void discard(final @NotNull Invocation<IN, OUT> invocation) {
     try {
-      invocation.onRecycle(false);
+      invocation.onDestroy();
 
     } catch (final Throwable t) {
       InterruptedInvocationException.throwIfInterrupt(t);
@@ -225,7 +223,7 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
     public void onComplete(@NotNull final Channel<OUT, ?> result) {
       if (!mHasInputs) {
         final Channel<IN, OUT> channel = mRoutine.invoke();
-        channel.pipe(result);
+        result.pass(channel);
         channel.close();
       }
     }
@@ -234,12 +232,12 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
     public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) {
       mHasInputs = true;
       final Channel<IN, OUT> channel = mRoutine.invoke();
-      channel.pipe(result);
+      result.pass(channel);
       channel.pass(input).close();
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       return true;
     }
 
@@ -294,35 +292,35 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
     }
 
     public void discard(@NotNull final Invocation<IN, OUT> invocation) {
-      final boolean hasDelayed;
-      synchronized (mMutex) {
-        final Logger logger = mLogger;
-        logger.wrn("discarding invocation instance after error: %s", invocation);
-        AbstractRoutine.this.discard(invocation);
-        hasDelayed = !mObservers.isEmpty();
-        --mRunningCount;
+      mLogger.wrn("discarding invocation instance after error: %s", invocation);
+      try {
+        invocation.onRecycle();
+
+      } catch (final Throwable t) {
+        internalDiscard(invocation);
+        InterruptedInvocationException.throwIfInterrupt(t);
+        return;
       }
 
-      if (hasDelayed) {
-        mManagerRunner.run(mCreateExecution, 0, TimeUnit.MILLISECONDS);
-      }
+      internalDiscard(invocation);
     }
 
     public void recycle(@NotNull final Invocation<IN, OUT> invocation) {
       final Logger logger = mLogger;
       final boolean canRecycle;
       try {
-        canRecycle = invocation.onRecycle(true);
+        canRecycle = invocation.onRecycle();
 
       } catch (final Throwable t) {
         logger.wrn(t, "Discarding invocation since it failed to be recycled");
-        discard(invocation);
+        internalDiscard(invocation);
         InterruptedInvocationException.throwIfInterrupt(t);
         return;
       }
 
       if (!canRecycle) {
-        discard(invocation);
+        logger.dbg("Discarding invocation since it cannot be recycled");
+        internalDiscard(invocation);
         return;
       }
 
@@ -408,6 +406,19 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
       }
 
       return true;
+    }
+
+    private void internalDiscard(@NotNull final Invocation<IN, OUT> invocation) {
+      final boolean hasDelayed;
+      synchronized (mMutex) {
+        AbstractRoutine.this.discard(invocation);
+        hasDelayed = !mObservers.isEmpty();
+        --mRunningCount;
+      }
+
+      if (hasDelayed) {
+        mManagerRunner.run(mCreateExecution, 0, TimeUnit.MILLISECONDS);
+      }
     }
   }
 }

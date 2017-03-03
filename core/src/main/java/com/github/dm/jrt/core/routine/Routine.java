@@ -19,7 +19,6 @@ package com.github.dm.jrt.core.routine;
 import com.github.dm.jrt.core.channel.Channel;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * This interface defines the main component of the library architecture.
@@ -87,89 +86,6 @@ import org.jetbrains.annotations.Nullable;
  * @param <OUT> the output data type.
  */
 public interface Routine<IN, OUT> {
-
-  /**
-   * Short for {@code invoke().pass(input).close()}.
-   *
-   * @param input the input.
-   * @return the invocation channel.
-   */
-  @NotNull
-  Channel<IN, OUT> call(@Nullable IN input);
-
-  /**
-   * Short for {@code invoke().pass(inputs).close()}.
-   *
-   * @param inputs the input data.
-   * @return the invocation channel.
-   */
-  @NotNull
-  Channel<IN, OUT> call(@Nullable IN... inputs);
-
-  /**
-   * Short for {@code invoke().pass(inputs).close()}.
-   *
-   * @param inputs the iterable returning the input data.
-   * @return the invocation channel.
-   */
-  @NotNull
-  Channel<IN, OUT> call(@Nullable Iterable<? extends IN> inputs);
-
-  /**
-   * Short for {@code invoke().pass(inputs).close()}.
-   *
-   * @param inputs the channel returning the input data.
-   * @return the invocation channel.
-   */
-  @NotNull
-  Channel<IN, OUT> call(@Nullable Channel<?, ? extends IN> inputs);
-
-  /**
-   * Short for {@code invoke().close()}.
-   *
-   * @return the invocation channel.
-   */
-  @NotNull
-  Channel<IN, OUT> call();
-
-  /**
-   * Short for {@code invokeParallel().pass(input).close()}.
-   * <p>
-   * (This method actually makes little sense, and should never need to be called, thought it is
-   * here for completeness)
-   *
-   * @param input the input.
-   * @return the invocation channel.
-   */
-  @NotNull
-  Channel<IN, OUT> callParallel(@Nullable IN input);
-
-  /**
-   * Short for {@code invokeParallel().pass(inputs).close()}.
-   *
-   * @param inputs the input data.
-   * @return the invocation channel.
-   */
-  @NotNull
-  Channel<IN, OUT> callParallel(@Nullable IN... inputs);
-
-  /**
-   * Short for {@code invokeParallel().pass(inputs).close()}.
-   *
-   * @param inputs the iterable returning the input data.
-   * @return the invocation channel.
-   */
-  @NotNull
-  Channel<IN, OUT> callParallel(@Nullable Iterable<? extends IN> inputs);
-
-  /**
-   * Short for {@code invokeParallel().pass(inputs).close()}.
-   *
-   * @param inputs the channel returning the input data.
-   * @return the invocation channel.
-   */
-  @NotNull
-  Channel<IN, OUT> callParallel(@Nullable Channel<?, ? extends IN> inputs);
 
   /**
    * Makes the routine discard all the cached invocation instances.

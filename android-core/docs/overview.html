@@ -158,7 +158,7 @@
                               .loaderConfiguration()
                               .withCacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
                               .apply()
-                              .call(URI.create(IMAGE_URI))
+                              .invoke()
                               .consume(new TemplateChannelConsumer&lt;Bitmap&gt;() {
 
                                   &commat;Override
@@ -173,7 +173,9 @@
                                   public void onOutput(final Bitmap bitmap) {
                                       imageView.setImageBitmap(bitmap);
                                   }
-                              });
+                              })
+                              .pass(URI.create(IMAGE_URI))
+                              .close();
             }
 
             public static class LoadBitmap extends TemplateContextInvocation&lt;URI, Bitmap&gt; {
@@ -220,7 +222,7 @@
                               .loaderConfiguration()
                               .withCacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
                               .apply()
-                              .call(URI.create(IMAGE_URI))
+                              .invoke()
                               .consume(new TemplateChannelConsumer&lt;Bitmap&gt;() {
 
                                   &commat;Override
@@ -235,7 +237,9 @@
                                   public void onOutput(final Bitmap bitmap) {
                                       imageView.setImageBitmap(bitmap);
                                   }
-                              });
+                              })
+                              .pass(URI.create(IMAGE_URI))
+                              .close();
             }
 
             public static class LoadBitmap extends TemplateContextInvocation&lt;URI, Bitmap&gt; {
@@ -272,7 +276,7 @@
 
                 &commat;Override
                 public void onInput(final URI uri, &commat;NotNull final Channel&lt;Bitmap, ?&gt; result) {
-                    result.pass(mRoutine.call(uri));
+                    result.pass(mRoutine.invoke().pass(uri).close());
                 }
             }
         }

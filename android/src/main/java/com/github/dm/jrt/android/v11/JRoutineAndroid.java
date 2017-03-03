@@ -35,8 +35,8 @@ import com.github.dm.jrt.channel.io.ChunkOutputStreamBuilder;
 import com.github.dm.jrt.core.builder.ChannelBuilder;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.Consumer;
-import com.github.dm.jrt.function.Supplier;
+import com.github.dm.jrt.function.util.Consumer;
+import com.github.dm.jrt.function.util.Supplier;
 import com.github.dm.jrt.stream.JRoutineStream;
 import com.github.dm.jrt.stream.builder.StreamBuilder;
 
@@ -175,8 +175,8 @@ public class JRoutineAndroid extends SparseChannels {
    * @return the channel builder instance.
    */
   @NotNull
-  public static <DATA> ChannelBuilder<DATA, DATA> ofInputs() {
-    return JRoutine.ofInputs();
+  public static <DATA> ChannelBuilder<DATA, DATA> ofData() {
+    return JRoutine.ofData();
   }
 
   /**

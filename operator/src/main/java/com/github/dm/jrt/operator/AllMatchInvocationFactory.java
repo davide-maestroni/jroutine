@@ -21,7 +21,7 @@ import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.PredicateDecorator;
+import com.github.dm.jrt.function.util.PredicateDecorator;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -91,7 +91,7 @@ class AllMatchInvocationFactory<IN> extends InvocationFactory<IN, Boolean> {
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       return true;
     }
 

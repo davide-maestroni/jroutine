@@ -159,21 +159,18 @@ public class ChunkStreamConfiguration extends DeepEqualObject {
      * <br>
      * As soon as the output stream is closed, the fed channel is closed as well.
      */
-    CLOSE_CHANNEL,
-    /**
+    CLOSE_CHANNEL, /**
      * Close output stream.
      * <br>
      * When the output stream is closed, the fed channel is left open.
      */
-    CLOSE_STREAM,
-    /**
+    CLOSE_STREAM, /**
      * Flush output stream.
      * <br>
      * The output stream is just flushed but not closed, so that it can be used to transfer
      * additional data.
      */
-    FLUSH_STREAM,
-    /**
+    FLUSH_STREAM, /**
      * Ignore the command.
      * <br>
      * The close method just do nothing.
@@ -247,39 +244,6 @@ public class ChunkStreamConfiguration extends DeepEqualObject {
     }
 
     /**
-     * Applies the specified configuration to this builder. A null value means that all the
-     * configuration options will be reset to their default, otherwise only the non-default
-     * options will be applied.
-     *
-     * @param configuration the output stream configuration.
-     * @return this builder.
-     */
-    @NotNull
-    public Builder<TYPE> with(@Nullable final ChunkStreamConfiguration configuration) {
-      if (configuration == null) {
-        setConfiguration(defaultConfiguration());
-        return this;
-      }
-
-      final int chunkSize = configuration.mChunkSize;
-      if (chunkSize != DEFAULT) {
-        withChunkSize(chunkSize);
-      }
-
-      final int poolSize = configuration.mCorePoolSize;
-      if (poolSize != DEFAULT) {
-        withCorePoolSize(poolSize);
-      }
-
-      final CloseActionType closeAction = configuration.mCloseAction;
-      if (closeAction != null) {
-        withOnClose(closeAction);
-      }
-
-      return this;
-    }
-
-    /**
      * Sets the size of the data chunks used to transfer bytes through the routine channels.
      *
      * @param chunkSize the chunk size.
@@ -324,6 +288,39 @@ public class ChunkStreamConfiguration extends DeepEqualObject {
     @NotNull
     public Builder<TYPE> withOnClose(@Nullable final CloseActionType closeAction) {
       mCloseAction = closeAction;
+      return this;
+    }
+
+    /**
+     * Applies the specified patch configuration to this builder. A null value means that all the
+     * configuration options will be reset to their default, otherwise only the non-default
+     * options will be applied.
+     *
+     * @param configuration the output stream configuration.
+     * @return this builder.
+     */
+    @NotNull
+    public Builder<TYPE> withPatch(@Nullable final ChunkStreamConfiguration configuration) {
+      if (configuration == null) {
+        setConfiguration(defaultConfiguration());
+        return this;
+      }
+
+      final int chunkSize = configuration.mChunkSize;
+      if (chunkSize != DEFAULT) {
+        withChunkSize(chunkSize);
+      }
+
+      final int poolSize = configuration.mCorePoolSize;
+      if (poolSize != DEFAULT) {
+        withCorePoolSize(poolSize);
+      }
+
+      final CloseActionType closeAction = configuration.mCloseAction;
+      if (closeAction != null) {
+        withOnClose(closeAction);
+      }
+
       return this;
     }
 

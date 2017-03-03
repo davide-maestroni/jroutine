@@ -70,7 +70,7 @@
             private static final String IMAGE_URI = "http://...";
 
             private static Function&lt;URI, Bitmap&gt; loadUri() {
-                return uri -> {
+                return uri -&gt; {
                     final URLConnection urlConnection = uri.toURL().openConnection();
                     final InputStream inputStream = urlConnection.getInputStream();
                     try {
@@ -88,13 +88,13 @@
             }
             
             private static Consumer&lt;Bitmap&gt; showImage(final ImageView view) {
-                return bitmap -> {
+                return bitmap -&gt; {
                     view.setImageBitmap(bitmap);
                 };
             }
             
             private static Consumer&lt;RoutineException&gt; showToast(final Activity activity) {
-                return error -> {
+                return error -&gt; {
                     final Throwable cause = error.getCause();
                     Toast.makeText(activity, (cause != null) ? cause.getMessage() : 
                             "Cannot load image", Toast.LENGTH_LONG).show();
@@ -114,8 +114,10 @@
                                                          .withInvocationId(11) // explicitly set the invocation ID so to make the invocation survive rotations
                                                          .apply()
                                                          .buildFunction())
-                              .call(IMAGE_URI);
-                              .consume(onError(showToast(this)).andOnOutput(showImage(imageView)));
+                              .invoke()
+                              .consume(onError(showToast(this)).andOnOutput(showImage(imageView)))
+                              .pass(URI.create(IMAGE_URI))
+                              .close();
             }
         }
     </code>

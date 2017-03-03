@@ -288,7 +288,7 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
     }
 
     public <OUT> Channel adapt(final Call<OUT> call) {
-      return getRoutine().call(call);
+      return getRoutine().invoke().pass(call).close();
     }
   }
 

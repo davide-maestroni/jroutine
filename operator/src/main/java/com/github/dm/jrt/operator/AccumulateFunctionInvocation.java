@@ -20,10 +20,10 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
-import com.github.dm.jrt.function.BiFunction;
-import com.github.dm.jrt.function.BiFunctionDecorator;
-import com.github.dm.jrt.function.Supplier;
-import com.github.dm.jrt.function.SupplierDecorator;
+import com.github.dm.jrt.function.util.BiFunction;
+import com.github.dm.jrt.function.util.BiFunctionDecorator;
+import com.github.dm.jrt.function.util.Supplier;
+import com.github.dm.jrt.function.util.SupplierDecorator;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -120,7 +120,7 @@ class AccumulateFunctionInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> 
   }
 
   @Override
-  public boolean onRecycle(final boolean isReused) {
+  public boolean onRecycle() {
     mAccumulated = null;
     return true;
   }

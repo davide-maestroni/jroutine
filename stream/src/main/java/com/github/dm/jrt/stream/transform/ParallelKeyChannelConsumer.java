@@ -23,7 +23,7 @@ import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.Function;
+import com.github.dm.jrt.function.util.Function;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -79,7 +79,7 @@ class ParallelKeyChannelConsumer<IN, OUT> extends BindMap<IN, OUT> implements Ch
     final Object key = mKeyFunction.apply(output);
     Channel<IN, IN> inputChannel = channels.get(key);
     if (inputChannel == null) {
-      inputChannel = JRoutineCore.<IN>ofInputs().buildChannel();
+      inputChannel = JRoutineCore.<IN>ofData().buildChannel();
       mOutputChannel.pass(super.apply(inputChannel));
       channels.put(key, inputChannel);
     }

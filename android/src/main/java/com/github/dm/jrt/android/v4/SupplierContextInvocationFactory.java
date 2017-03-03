@@ -19,7 +19,7 @@ package com.github.dm.jrt.android.v4;
 import com.github.dm.jrt.android.core.invocation.ContextInvocation;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.SupplierDecorator;
+import com.github.dm.jrt.function.util.SupplierDecorator;
 
 import org.jetbrains.annotations.NotNull;
 

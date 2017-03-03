@@ -156,7 +156,7 @@ class GroupByInvocationFactory<DATA> extends InvocationFactory<DATA, List<DATA>>
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       return true;
     }
   }

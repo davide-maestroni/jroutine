@@ -113,7 +113,7 @@
                                         .withCacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
                                         .apply()
                                         .method(LOAD_BITMAP)
-                                        .call(URI.create(IMAGE_URI))
+                                        .invoke()
                                         .consume(new TemplateChannelConsumer&lt;Bitmap&gt;() {
 
                                             &commat;Override
@@ -128,7 +128,9 @@
                                             public void onOutput(final Bitmap bitmap) {
                                                 imageView.setImageBitmap(bitmap);
                                             }
-                                        });
+                                        })
+                                        .pass(URI.create(IMAGE_URI))
+                                        .close();
             }
 
             public static class BitmapLoader {

@@ -245,7 +245,7 @@ public class FutureChannelTest {
         }, 500, TimeUnit.MILLISECONDS);
     final Channel<?, String> channel = Channels.fromFuture(future).buildChannel();
     final Channel<String, String> outputChannel =
-        JRoutineCore.with(IdentityInvocation.<String>factoryOf()).call(channel);
+        JRoutineCore.with(IdentityInvocation.<String>factoryOf()).invoke().pass(channel).close();
     assertThat(outputChannel.in(seconds(1)).next()).isEqualTo("test");
     assertThat(outputChannel.getComplete()).isTrue();
   }
@@ -259,14 +259,11 @@ public class FutureChannelTest {
             return "test";
           }
         });
-    final Channel<? super String, String> channel = Channels.fromFuture(future)
-                                                            .buildChannel()
-                                                            .pipe(
-                                                                JRoutineCore.<String>ofInputs()
-                                                                    .buildChannel());
+    final Channel<?, String> channel = Channels.fromFuture(future)
+                                               .buildChannel()
+                                               .pipe(JRoutineCore.<String>ofData().buildChannel());
     assertThat(channel.in(seconds(1)).next()).isEqualTo("test");
-    assertThat(channel.isOpen()).isTrue();
-    assertThat(channel.afterNoDelay().close().isOpen()).isFalse();
+    assertThat(channel.isOpen()).isFalse();
   }
 
   @Test
@@ -280,8 +277,8 @@ public class FutureChannelTest {
         }, 3, TimeUnit.SECONDS);
     final Channel<?, String> channel = Channels.fromFuture(future).buildChannel();
     assertThat(channel.isBound()).isFalse();
-    final Channel<? super String, String> outputChannel =
-        channel.pipe(JRoutineCore.<String>ofInputs().buildChannel());
+    final Channel<?, String> outputChannel =
+        channel.pipe(JRoutineCore.<String>ofData().buildChannel());
     assertThat(channel.isBound()).isTrue();
     channel.abort();
     assertThat(outputChannel.in(seconds(1)).getError()).isExactlyInstanceOf(AbortException.class);
@@ -298,9 +295,9 @@ public class FutureChannelTest {
           }
         }, 3, TimeUnit.SECONDS);
     final Channel<?, String> channel = Channels.fromFuture(future).buildChannel();
-    channel.pipe(JRoutineCore.<String>ofInputs().buildChannel());
+    channel.pipe(JRoutineCore.<String>ofData().buildChannel());
     try {
-      channel.pipe(JRoutineCore.<String>ofInputs().buildChannel());
+      channel.pipe(JRoutineCore.<String>ofData().buildChannel());
       fail();
 
     } catch (final IllegalStateException ignored) {
@@ -671,7 +668,7 @@ public class FutureChannelTest {
     }
 
     try {
-      channel.unsorted().pass(JRoutineCore.ofInputs().buildChannel());
+      channel.unsorted().pass(JRoutineCore.ofData().buildChannel());
       fail();
 
     } catch (final IllegalStateException ignored) {
@@ -712,7 +709,7 @@ public class FutureChannelTest {
     }
 
     try {
-      channel.unsorted().pass(JRoutineCore.ofInputs().buildChannel());
+      channel.unsorted().pass(JRoutineCore.ofData().buildChannel());
       fail();
 
     } catch (final AbortException ignored) {

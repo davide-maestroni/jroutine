@@ -72,7 +72,7 @@ import org.jetbrains.annotations.NotNull;
  *         JRoutineLoaderCompat.on(loaderFrom(this))
  *                             .with(factoryOf(LoadResource.class))
  *                             .buildRoutine();
- *     routine.call(RESOURCE_URI)
+ *     routine.invoke()
  *            .consume(new TemplateChannelConsumer&lt;MyResource&gt;() {
  *
  *                &#64;Override
@@ -85,7 +85,9 @@ import org.jetbrains.annotations.NotNull;
  *                  mResource = resource;
  *                  displayResource(resource);
  *                }
- *            });
+ *            })
+ *            .pass(RESOURCE_URI)
+ *            .close();
  *   }
  * }
  *
@@ -114,7 +116,7 @@ import org.jetbrains.annotations.NotNull;
  *   &#64;Override
  *   protected void onCall(final List&lt;? extends URI&gt; uris,
  *       &#64;Nonnull final Channel&lt;MyResource, ?&gt; result) {
- *     result.pass(mRoutine.call(uris));
+ *     result.pass(mRoutine.invoke().pass(uris).close());
  *   }
  * }
  * </code></pre>

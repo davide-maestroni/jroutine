@@ -77,7 +77,7 @@ class DefaultLoaderChannelBuilder implements LoaderChannelBuilder {
     final LoaderContext context = mContext;
     final Object component = context.getComponent();
     if (component == null) {
-      final Channel<OUT, OUT> channel = JRoutineCore.<OUT>ofInputs().buildChannel();
+      final Channel<OUT, OUT> channel = JRoutineCore.<OUT>ofData().buildChannel();
       channel.abort(new MissingLoaderException(loaderId));
       return channel.close();
     }
@@ -90,9 +90,10 @@ class DefaultLoaderChannelBuilder implements LoaderChannelBuilder {
                   .loaderConfiguration()
                   .withClashResolution(ClashResolutionType.JOIN)
                   .withMatchResolution(ClashResolutionType.JOIN)
-                  .with(loaderConfiguration)
+                  .withPatch(loaderConfiguration)
                   .apply()
-                  .call();
+                  .invoke()
+                  .close();
   }
 
   @Override

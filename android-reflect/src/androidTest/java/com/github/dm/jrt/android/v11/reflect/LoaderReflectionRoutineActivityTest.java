@@ -193,7 +193,7 @@ public class LoaderReflectionRoutineActivityTest
                                                                     .apply()
                                                                     .method(TestClass.GET);
 
-    assertThat(routine.call().in(timeout).all()).containsExactly(-77L);
+    assertThat(routine.invoke().close().in(timeout).all()).containsExactly(-77L);
   }
 
   public void testArgs() {
@@ -206,7 +206,8 @@ public class LoaderReflectionRoutineActivityTest
     assertThat(JRoutineLoaderReflection.on(loaderFrom(getActivity()))
                                        .with(instanceOf(TestArgs.class, 17))
                                        .method("getId")
-                                       .call()
+                                       .invoke()
+                                       .close()
                                        .in(seconds(10))
                                        .next()).isEqualTo(17);
   }
@@ -225,23 +226,23 @@ public class LoaderReflectionRoutineActivityTest
                                                     .withOutputTimeout(timeout)
                                                     .apply()
                                                     .buildProxy(SumItf.class);
-    final Channel<Integer, Integer> channel3 = JRoutineCore.<Integer>ofInputs().buildChannel();
+    final Channel<Integer, Integer> channel3 = JRoutineCore.<Integer>ofData().buildChannel();
     channel3.pass(7).close();
     assertThat(sumAsync.compute(3, channel3)).isEqualTo(10);
 
-    final Channel<Integer, Integer> channel4 = JRoutineCore.<Integer>ofInputs().buildChannel();
+    final Channel<Integer, Integer> channel4 = JRoutineCore.<Integer>ofData().buildChannel();
     channel4.pass(1, 2, 3, 4).close();
     assertThat(sumAsync.compute(channel4)).isEqualTo(10);
 
-    final Channel<int[], int[]> channel5 = JRoutineCore.<int[]>ofInputs().buildChannel();
+    final Channel<int[], int[]> channel5 = JRoutineCore.<int[]>ofData().buildChannel();
     channel5.pass(new int[]{1, 2, 3, 4}).close();
     assertThat(sumAsync.compute1(channel5)).isEqualTo(10);
 
-    final Channel<Integer, Integer> channel6 = JRoutineCore.<Integer>ofInputs().buildChannel();
+    final Channel<Integer, Integer> channel6 = JRoutineCore.<Integer>ofData().buildChannel();
     channel6.pass(1, 2, 3, 4).close();
     assertThat(sumAsync.computeList(channel6)).isEqualTo(10);
 
-    final Channel<Integer, Integer> channel7 = JRoutineCore.<Integer>ofInputs().buildChannel();
+    final Channel<Integer, Integer> channel7 = JRoutineCore.<Integer>ofData().buildChannel();
     channel7.pass(1, 2, 3, 4).close();
     assertThat(sumAsync.computeList1(channel7)).isEqualTo(10);
   }
@@ -334,7 +335,7 @@ public class LoaderReflectionRoutineActivityTest
     JRoutineLoaderReflection.on(loaderFrom(getActivity()))
                             .with(instanceOf(TestClass.class))
                             .invocationConfiguration()
-                            .with(configuration)
+                            .withPatch(configuration)
                             .apply()
                             .wrapperConfiguration()
                             .withSharedFields("test")
@@ -345,7 +346,7 @@ public class LoaderReflectionRoutineActivityTest
     JRoutineLoaderReflection.on(loaderFrom(getActivity()))
                             .with(instanceOf(Square.class))
                             .invocationConfiguration()
-                            .with(configuration)
+                            .withPatch(configuration)
                             .apply()
                             .wrapperConfiguration()
                             .withSharedFields("test")
@@ -381,7 +382,8 @@ public class LoaderReflectionRoutineActivityTest
     assertThat(JRoutineLoaderReflection.on(loaderFrom(activity, contextWrapper))
                                        .with(instanceOf(String.class))
                                        .method("toString")
-                                       .call()
+                                       .invoke()
+                                       .close()
                                        .in(seconds(10))
                                        .next()).isEqualTo("test1");
   }
@@ -421,7 +423,7 @@ public class LoaderReflectionRoutineActivityTest
 
     try {
 
-      routine3.call(new IllegalArgumentException("test")).in(timeout).all();
+      routine3.invoke().pass(new IllegalArgumentException("test")).close().in(timeout).all();
 
       fail();
 
@@ -523,7 +525,7 @@ public class LoaderReflectionRoutineActivityTest
 
     }
 
-    final Channel<Integer, Integer> channel = JRoutineCore.<Integer>ofInputs().buildChannel();
+    final Channel<Integer, Integer> channel = JRoutineCore.<Integer>ofData().buildChannel();
 
     try {
 
@@ -704,7 +706,7 @@ public class LoaderReflectionRoutineActivityTest
                                                                          TestClass.class.getMethod(
                                                                              "getLong"));
 
-    assertThat(routine2.call().in(timeout).all()).containsExactly(-77L);
+    assertThat(routine2.invoke().close().in(timeout).all()).containsExactly(-77L);
 
   }
 
@@ -725,7 +727,7 @@ public class LoaderReflectionRoutineActivityTest
                                                                      .apply()
                                                                      .method("getLong");
 
-    assertThat(routine1.call().in(timeout).all()).containsExactly(-77L);
+    assertThat(routine1.invoke().close().in(timeout).all()).containsExactly(-77L);
   }
 
   public void testMissingAliasMethodError() {
@@ -846,62 +848,55 @@ public class LoaderReflectionRoutineActivityTest
                                             .buildProxy(Itf.class);
 
     assertThat(itf.add0('c')).isEqualTo((int) 'c');
-    final Channel<Character, Character> channel1 =
-        JRoutineCore.<Character>ofInputs().buildChannel();
+    final Channel<Character, Character> channel1 = JRoutineCore.<Character>ofData().buildChannel();
     channel1.pass('a').close();
     assertThat(itf.add1(channel1)).isEqualTo((int) 'a');
-    final Channel<Character, Character> channel2 =
-        JRoutineCore.<Character>ofInputs().buildChannel();
+    final Channel<Character, Character> channel2 = JRoutineCore.<Character>ofData().buildChannel();
     channel2.pass('d', 'e', 'f').close();
     assertThat(itf.add2(channel2)).isIn((int) 'd', (int) 'e', (int) 'f');
     assertThat(itf.add3('c').all()).containsExactly((int) 'c');
-    final Channel<Character, Character> channel3 =
-        JRoutineCore.<Character>ofInputs().buildChannel();
+    final Channel<Character, Character> channel3 = JRoutineCore.<Character>ofData().buildChannel();
     channel3.pass('a').close();
     assertThat(itf.add4(channel3).all()).containsExactly((int) 'a');
-    final Channel<Character, Character> channel4 =
-        JRoutineCore.<Character>ofInputs().buildChannel();
+    final Channel<Character, Character> channel4 = JRoutineCore.<Character>ofData().buildChannel();
     channel4.pass('d', 'e', 'f').close();
     assertThat(itf.add5(channel4).all()).containsOnly((int) 'd', (int) 'e', (int) 'f');
     assertThat(itf.add6().pass('d').close().all()).containsOnly((int) 'd');
     assertThat(itf.add7().pass('d', 'e', 'f').close().all()).containsOnly((int) 'd', (int) 'e',
         (int) 'f');
-    assertThat(itf.add10().call('d').all()).containsOnly((int) 'd');
-    assertThat(itf.add11().callParallel('d', 'e', 'f').all()).containsOnly((int) 'd', (int) 'e',
-        (int) 'f');
+    assertThat(itf.add10().invoke().pass('d').close().all()).containsOnly((int) 'd');
+    assertThat(itf.add11().invokeParallel().pass('d', 'e', 'f').close().all()).containsOnly(
+        (int) 'd', (int) 'e', (int) 'f');
     assertThat(itf.addA00(new char[]{'c', 'z'})).isEqualTo(new int[]{'c', 'z'});
-    final Channel<char[], char[]> channel5 = JRoutineCore.<char[]>ofInputs().buildChannel();
+    final Channel<char[], char[]> channel5 = JRoutineCore.<char[]>ofData().buildChannel();
     channel5.pass(new char[]{'a', 'z'}).close();
     assertThat(itf.addA01(channel5)).isEqualTo(new int[]{'a', 'z'});
-    final Channel<Character, Character> channel6 =
-        JRoutineCore.<Character>ofInputs().buildChannel();
+    final Channel<Character, Character> channel6 = JRoutineCore.<Character>ofData().buildChannel();
     channel6.pass('d', 'e', 'f').close();
     assertThat(itf.addA02(channel6)).isEqualTo(new int[]{'d', 'e', 'f'});
-    final Channel<char[], char[]> channel7 = JRoutineCore.<char[]>ofInputs().buildChannel();
+    final Channel<char[], char[]> channel7 = JRoutineCore.<char[]>ofData().buildChannel();
     channel7.pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'}).close();
     assertThat(itf.addA03(channel7)).isIn(new int[]{'d', 'z'}, new int[]{'e', 'z'},
         new int[]{'f', 'z'});
     assertThat(itf.addA04(new char[]{'c', 'z'}).all()).containsExactly(new int[]{'c', 'z'});
-    final Channel<char[], char[]> channel8 = JRoutineCore.<char[]>ofInputs().buildChannel();
+    final Channel<char[], char[]> channel8 = JRoutineCore.<char[]>ofData().buildChannel();
     channel8.pass(new char[]{'a', 'z'}).close();
     assertThat(itf.addA05(channel8).all()).containsExactly(new int[]{'a', 'z'});
-    final Channel<Character, Character> channel9 =
-        JRoutineCore.<Character>ofInputs().buildChannel();
+    final Channel<Character, Character> channel9 = JRoutineCore.<Character>ofData().buildChannel();
     channel9.pass('d', 'e', 'f').close();
     assertThat(itf.addA06(channel9).all()).containsExactly(new int[]{'d', 'e', 'f'});
-    final Channel<char[], char[]> channel10 = JRoutineCore.<char[]>ofInputs().buildChannel();
+    final Channel<char[], char[]> channel10 = JRoutineCore.<char[]>ofData().buildChannel();
     channel10.pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'}).close();
     assertThat(itf.addA07(channel10).all()).containsOnly(new int[]{'d', 'z'}, new int[]{'e', 'z'},
         new int[]{'f', 'z'});
     assertThat(itf.addA08(new char[]{'c', 'z'}).all()).containsExactly((int) 'c', (int) 'z');
-    final Channel<char[], char[]> channel11 = JRoutineCore.<char[]>ofInputs().buildChannel();
+    final Channel<char[], char[]> channel11 = JRoutineCore.<char[]>ofData().buildChannel();
     channel11.pass(new char[]{'a', 'z'}).close();
     assertThat(itf.addA09(channel11).all()).containsExactly((int) 'a', (int) 'z');
-    final Channel<Character, Character> channel12 =
-        JRoutineCore.<Character>ofInputs().buildChannel();
+    final Channel<Character, Character> channel12 = JRoutineCore.<Character>ofData().buildChannel();
     channel12.pass('d', 'e', 'f').close();
     assertThat(itf.addA10(channel12).all()).containsExactly((int) 'd', (int) 'e', (int) 'f');
-    final Channel<char[], char[]> channel13 = JRoutineCore.<char[]>ofInputs().buildChannel();
+    final Channel<char[], char[]> channel13 = JRoutineCore.<char[]>ofData().buildChannel();
     channel13.pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'}).close();
     assertThat(itf.addA11(channel13).all()).containsOnly((int) 'd', (int) 'e', (int) 'f',
         (int) 'z');
@@ -912,9 +907,12 @@ public class LoaderReflectionRoutineActivityTest
                   .close()
                   .all()).containsOnly(new int[]{'d', 'z'}, new int[]{'e', 'z'},
         new int[]{'f', 'z'});
-    assertThat(itf.addA14().call(new char[]{'c', 'z'}).all()).containsOnly(new int[]{'c', 'z'});
+    assertThat(itf.addA14().invoke().pass(new char[]{'c', 'z'}).close().all()).containsOnly(
+        new int[]{'c', 'z'});
     assertThat(itf.addA15()
-                  .callParallel(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'})
+                  .invokeParallel()
+                  .pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'})
+                  .close()
                   .all()).containsOnly(new int[]{'d', 'z'}, new int[]{'e', 'z'},
         new int[]{'f', 'z'});
     assertThat(itf.addA16().pass(new char[]{'c', 'z'}).close().all()).containsExactly((int) 'c',
@@ -924,22 +922,24 @@ public class LoaderReflectionRoutineActivityTest
                   .close()
                   .all()).containsOnly((int) 'd', (int) 'z', (int) 'e', (int) 'z', (int) 'f',
         (int) 'z');
-    assertThat(itf.addA18().call(new char[]{'c', 'z'}).all()).containsExactly((int) 'c', (int) 'z');
+    assertThat(itf.addA18().invoke().pass(new char[]{'c', 'z'}).close().all()).containsExactly(
+        (int) 'c', (int) 'z');
     assertThat(itf.addA19()
-                  .callParallel(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'})
+                  .invokeParallel()
+                  .pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'})
+                  .close()
                   .all()).containsOnly((int) 'd', (int) 'z', (int) 'e', (int) 'z', (int) 'f',
         (int) 'z');
     assertThat(itf.addL00(Arrays.asList('c', 'z'))).isEqualTo(Arrays.asList((int) 'c', (int) 'z'));
     final Channel<List<Character>, List<Character>> channel20 =
-        JRoutineCore.<List<Character>>ofInputs().buildChannel();
+        JRoutineCore.<List<Character>>ofData().buildChannel();
     channel20.pass(Arrays.asList('a', 'z')).close();
     assertThat(itf.addL01(channel20)).isEqualTo(Arrays.asList((int) 'a', (int) 'z'));
-    final Channel<Character, Character> channel21 =
-        JRoutineCore.<Character>ofInputs().buildChannel();
+    final Channel<Character, Character> channel21 = JRoutineCore.<Character>ofData().buildChannel();
     channel21.pass('d', 'e', 'f').close();
     assertThat(itf.addL02(channel21)).isEqualTo(Arrays.asList((int) 'd', (int) 'e', (int) 'f'));
     final Channel<List<Character>, List<Character>> channel22 =
-        JRoutineCore.<List<Character>>ofInputs().buildChannel();
+        JRoutineCore.<List<Character>>ofData().buildChannel();
     channel22.pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'), Arrays.asList('f', 'z'))
              .close();
     assertThat(itf.addL03(channel22)).isIn(Arrays.asList((int) 'd', (int) 'z'),
@@ -947,31 +947,29 @@ public class LoaderReflectionRoutineActivityTest
     assertThat(itf.addL04(Arrays.asList('c', 'z')).all()).containsExactly(
         Arrays.asList((int) 'c', (int) 'z'));
     final Channel<List<Character>, List<Character>> channel23 =
-        JRoutineCore.<List<Character>>ofInputs().buildChannel();
+        JRoutineCore.<List<Character>>ofData().buildChannel();
     channel23.pass(Arrays.asList('a', 'z')).close();
     assertThat(itf.addL05(channel23).all()).containsExactly(Arrays.asList((int) 'a', (int) 'z'));
-    final Channel<Character, Character> channel24 =
-        JRoutineCore.<Character>ofInputs().buildChannel();
+    final Channel<Character, Character> channel24 = JRoutineCore.<Character>ofData().buildChannel();
     channel24.pass('d', 'e', 'f').close();
     assertThat(itf.addL06(channel24).all()).containsExactly(
         Arrays.asList((int) 'd', (int) 'e', (int) 'f'));
     final Channel<List<Character>, List<Character>> channel25 =
-        JRoutineCore.<List<Character>>ofInputs().buildChannel();
+        JRoutineCore.<List<Character>>ofData().buildChannel();
     channel25.pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'), Arrays.asList('f', 'z'))
              .close();
     assertThat(itf.addL07(channel25).all()).containsOnly(Arrays.asList((int) 'd', (int) 'z'),
         Arrays.asList((int) 'e', (int) 'z'), Arrays.asList((int) 'f', (int) 'z'));
     assertThat(itf.addL08(Arrays.asList('c', 'z')).all()).containsExactly((int) 'c', (int) 'z');
     final Channel<List<Character>, List<Character>> channel26 =
-        JRoutineCore.<List<Character>>ofInputs().buildChannel();
+        JRoutineCore.<List<Character>>ofData().buildChannel();
     channel26.pass(Arrays.asList('a', 'z')).close();
     assertThat(itf.addL09(channel26).all()).containsExactly((int) 'a', (int) 'z');
-    final Channel<Character, Character> channel27 =
-        JRoutineCore.<Character>ofInputs().buildChannel();
+    final Channel<Character, Character> channel27 = JRoutineCore.<Character>ofData().buildChannel();
     channel27.pass('d', 'e', 'f').close();
     assertThat(itf.addL10(channel27).all()).containsExactly((int) 'd', (int) 'e', (int) 'f');
     final Channel<List<Character>, List<Character>> channel28 =
-        JRoutineCore.<List<Character>>ofInputs().buildChannel();
+        JRoutineCore.<List<Character>>ofData().buildChannel();
     channel28.pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'), Arrays.asList('f', 'z'))
              .close();
     assertThat(itf.addL11(channel28).all()).containsOnly((int) 'd', (int) 'e', (int) 'f',
@@ -983,11 +981,12 @@ public class LoaderReflectionRoutineActivityTest
                   .close()
                   .all()).containsOnly(Arrays.asList((int) 'd', (int) 'z'),
         Arrays.asList((int) 'e', (int) 'z'), Arrays.asList((int) 'f', (int) 'z'));
-    assertThat(itf.addL14().call(Arrays.asList('c', 'z')).all()).containsOnly(
+    assertThat(itf.addL14().invoke().pass(Arrays.asList('c', 'z')).close().all()).containsOnly(
         Arrays.asList((int) 'c', (int) 'z'));
     assertThat(itf.addL15()
-                  .callParallel(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'),
-                      Arrays.asList('f', 'z'))
+                  .invokeParallel()
+                  .pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'), Arrays.asList('f', 'z'))
+                  .close()
                   .all()).containsOnly(Arrays.asList((int) 'd', (int) 'z'),
         Arrays.asList((int) 'e', (int) 'z'), Arrays.asList((int) 'f', (int) 'z'));
     assertThat(itf.addL16().pass(Arrays.asList('c', 'z')).close().all()).containsExactly((int) 'c',
@@ -997,64 +996,65 @@ public class LoaderReflectionRoutineActivityTest
                   .close()
                   .all()).containsOnly((int) 'd', (int) 'z', (int) 'e', (int) 'z', (int) 'f',
         (int) 'z');
-    assertThat(itf.addL18().call(Arrays.asList('c', 'z')).all()).containsExactly((int) 'c',
-        (int) 'z');
+    assertThat(itf.addL18().invoke().pass(Arrays.asList('c', 'z')).close().all()).containsExactly(
+        (int) 'c', (int) 'z');
     assertThat(itf.addL19()
-                  .callParallel(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'),
-                      Arrays.asList('f', 'z'))
+                  .invokeParallel()
+                  .pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'), Arrays.asList('f', 'z'))
+                  .close()
                   .all()).containsOnly((int) 'd', (int) 'z', (int) 'e', (int) 'z', (int) 'f',
         (int) 'z');
     assertThat(itf.get0()).isEqualTo(31);
     assertThat(itf.get1().all()).containsExactly(31);
     assertThat(itf.get2().close().all()).containsExactly(31);
-    assertThat(itf.get4().call().all()).containsExactly(31);
+    assertThat(itf.get4().invoke().close().all()).containsExactly(31);
     assertThat(itf.getA0()).isEqualTo(new int[]{1, 2, 3});
     assertThat(itf.getA1().all()).containsExactly(1, 2, 3);
     assertThat(itf.getA2().close().all()).containsExactly(new int[]{1, 2, 3});
-    assertThat(itf.getA3().call().all()).containsExactly(new int[]{1, 2, 3});
+    assertThat(itf.getA3().invoke().close().all()).containsExactly(new int[]{1, 2, 3});
     assertThat(itf.getA4().close().all()).containsExactly(1, 2, 3);
-    assertThat(itf.getA5().call().all()).containsExactly(1, 2, 3);
+    assertThat(itf.getA5().invoke().close().all()).containsExactly(1, 2, 3);
     assertThat(itf.getL0()).isEqualTo(Arrays.asList(1, 2, 3));
     assertThat(itf.getL1().all()).containsExactly(1, 2, 3);
     assertThat(itf.getL2().close().all()).containsExactly(Arrays.asList(1, 2, 3));
-    assertThat(itf.getL3().call().all()).containsExactly(Arrays.asList(1, 2, 3));
+    assertThat(itf.getL3().invoke().close().all()).containsExactly(Arrays.asList(1, 2, 3));
     assertThat(itf.getL4().close().all()).containsExactly(1, 2, 3);
-    assertThat(itf.getL5().call().all()).containsExactly(1, 2, 3);
+    assertThat(itf.getL5().invoke().close().all()).containsExactly(1, 2, 3);
     itf.set0(-17);
-    final Channel<Integer, Integer> channel35 = JRoutineCore.<Integer>ofInputs().buildChannel();
+    final Channel<Integer, Integer> channel35 = JRoutineCore.<Integer>ofData().buildChannel();
     channel35.pass(-17).close();
     itf.set1(channel35);
-    final Channel<Integer, Integer> channel36 = JRoutineCore.<Integer>ofInputs().buildChannel();
+    final Channel<Integer, Integer> channel36 = JRoutineCore.<Integer>ofData().buildChannel();
     channel36.pass(-17).close();
     itf.set2(channel36);
     itf.set3().pass(-17).close().getComplete();
-    itf.set5().call(-17).getComplete();
+    itf.set5().invoke().pass(-17).close().getComplete();
     itf.setA0(new int[]{1, 2, 3});
-    final Channel<int[], int[]> channel37 = JRoutineCore.<int[]>ofInputs().buildChannel();
+    final Channel<int[], int[]> channel37 = JRoutineCore.<int[]>ofData().buildChannel();
     channel37.pass(new int[]{1, 2, 3}).close();
     itf.setA1(channel37);
-    final Channel<Integer, Integer> channel38 = JRoutineCore.<Integer>ofInputs().buildChannel();
+    final Channel<Integer, Integer> channel38 = JRoutineCore.<Integer>ofData().buildChannel();
     channel38.pass(1, 2, 3).close();
     itf.setA2(channel38);
-    final Channel<int[], int[]> channel39 = JRoutineCore.<int[]>ofInputs().buildChannel();
+    final Channel<int[], int[]> channel39 = JRoutineCore.<int[]>ofData().buildChannel();
     channel39.pass(new int[]{1, 2, 3}).close();
     itf.setA3(channel39);
     itf.setA4().pass(new int[]{1, 2, 3}).close().getComplete();
-    itf.setA6().call(new int[]{1, 2, 3}).getComplete();
+    itf.setA6().invoke().pass(new int[]{1, 2, 3}).close().getComplete();
     itf.setL0(Arrays.asList(1, 2, 3));
     final Channel<List<Integer>, List<Integer>> channel40 =
-        JRoutineCore.<List<Integer>>ofInputs().buildChannel();
+        JRoutineCore.<List<Integer>>ofData().buildChannel();
     channel40.pass(Arrays.asList(1, 2, 3)).close();
     itf.setL1(channel40);
-    final Channel<Integer, Integer> channel41 = JRoutineCore.<Integer>ofInputs().buildChannel();
+    final Channel<Integer, Integer> channel41 = JRoutineCore.<Integer>ofData().buildChannel();
     channel41.pass(1, 2, 3).close();
     itf.setL2(channel41);
     final Channel<List<Integer>, List<Integer>> channel42 =
-        JRoutineCore.<List<Integer>>ofInputs().buildChannel();
+        JRoutineCore.<List<Integer>>ofData().buildChannel();
     channel42.pass(Arrays.asList(1, 2, 3)).close();
     itf.setL3(channel42);
     itf.setL4().pass(Arrays.asList(1, 2, 3)).close().getComplete();
-    itf.setL6().call(Arrays.asList(1, 2, 3)).getComplete();
+    itf.setL6().invoke().pass(Arrays.asList(1, 2, 3)).close().getComplete();
   }
 
   public void testProxyRoutine() {
@@ -1071,11 +1071,11 @@ public class LoaderReflectionRoutineActivityTest
 
     assertThat(squareAsync.compute(3)).isEqualTo(9);
 
-    final Channel<Integer, Integer> channel1 = JRoutineCore.<Integer>ofInputs().buildChannel();
+    final Channel<Integer, Integer> channel1 = JRoutineCore.<Integer>ofData().buildChannel();
     channel1.pass(4).close();
     assertThat(squareAsync.computeAsync(channel1)).isEqualTo(16);
 
-    final Channel<Integer, Integer> channel2 = JRoutineCore.<Integer>ofInputs().buildChannel();
+    final Channel<Integer, Integer> channel2 = JRoutineCore.<Integer>ofData().buildChannel();
     channel2.pass(1, 2, 3).close();
     assertThat(squareAsync.computeParallel(channel2).in(timeout).all()).containsOnly(1, 4, 9);
   }
@@ -1096,10 +1096,18 @@ public class LoaderReflectionRoutineActivityTest
 
     long startTime = System.currentTimeMillis();
 
-    Channel<?, Object> getOne =
-        builder.wrapperConfiguration().withSharedFields("1").apply().method("getOne").call();
-    Channel<?, Object> getTwo =
-        builder.wrapperConfiguration().withSharedFields("2").apply().method("getTwo").call();
+    Channel<?, Object> getOne = builder.wrapperConfiguration()
+                                       .withSharedFields("1")
+                                       .apply()
+                                       .method("getOne")
+                                       .invoke()
+                                       .close();
+    Channel<?, Object> getTwo = builder.wrapperConfiguration()
+                                       .withSharedFields("2")
+                                       .apply()
+                                       .method("getTwo")
+                                       .invoke()
+                                       .close();
 
     assertThat(getOne.getComplete()).isTrue();
     assertThat(getTwo.getComplete()).isTrue();
@@ -1107,8 +1115,8 @@ public class LoaderReflectionRoutineActivityTest
 
     startTime = System.currentTimeMillis();
 
-    getOne = builder.method("getOne").call();
-    getTwo = builder.method("getTwo").call();
+    getOne = builder.method("getOne").invoke().close();
+    getTwo = builder.method("getTwo").invoke().close();
 
     assertThat(getOne.getComplete()).isTrue();
     assertThat(getTwo.getComplete()).isTrue();
@@ -1131,7 +1139,8 @@ public class LoaderReflectionRoutineActivityTest
                                        .withLoaderId(0)
                                        .apply()
                                        .method("test")
-                                       .call()
+                                       .invoke()
+                                       .close()
                                        .next()).isEqualTo(31);
 
     try {
@@ -1145,7 +1154,8 @@ public class LoaderReflectionRoutineActivityTest
                               .withLoaderId(1)
                               .apply()
                               .method("test")
-                              .call()
+                              .invoke()
+                              .close()
                               .next();
 
       fail();
@@ -1163,7 +1173,8 @@ public class LoaderReflectionRoutineActivityTest
                                        .withLoaderId(2)
                                        .apply()
                                        .method("getInt")
-                                       .call()
+                                       .invoke()
+                                       .close()
                                        .next()).isEqualTo(31);
 
     try {
@@ -1177,7 +1188,8 @@ public class LoaderReflectionRoutineActivityTest
                               .withLoaderId(3)
                               .apply()
                               .method("getInt")
-                              .call()
+                              .invoke()
+                              .close()
                               .next();
 
       fail();
@@ -1195,7 +1207,8 @@ public class LoaderReflectionRoutineActivityTest
                                        .withLoaderId(4)
                                        .apply()
                                        .method(TestTimeout.class.getMethod("getInt"))
-                                       .call()
+                                       .invoke()
+                                       .close()
                                        .next()).isEqualTo(31);
 
     try {
@@ -1209,7 +1222,8 @@ public class LoaderReflectionRoutineActivityTest
                               .withLoaderId(5)
                               .apply()
                               .method(TestTimeout.class.getMethod("getInt"))
-                              .call()
+                              .invoke()
+                              .close()
                               .next();
 
       fail();

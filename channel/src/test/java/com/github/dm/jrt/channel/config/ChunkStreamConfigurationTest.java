@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.channel.builder;
+package com.github.dm.jrt.channel.config;
 
 import com.github.dm.jrt.channel.config.ChunkStreamConfiguration.Builder;
 import com.github.dm.jrt.channel.config.ChunkStreamConfiguration.CloseActionType;
@@ -104,9 +104,9 @@ public class ChunkStreamConfigurationTest {
                  .withCorePoolSize(17)
                  .withOnClose(CloseActionType.CLOSE_CHANNEL)
                  .apply();
-    assertThat(builder().with(configuration).apply()).isEqualTo(configuration);
+    assertThat(builder().withPatch(configuration).apply()).isEqualTo(configuration);
     assertThat(configuration.builderFrom().apply()).isEqualTo(configuration);
-    assertThat(configuration.builderFrom().with(null).apply()).isEqualTo(
+    assertThat(configuration.builderFrom().withPatch(null).apply()).isEqualTo(
         com.github.dm.jrt.channel.config.ChunkStreamConfiguration.defaultConfiguration());
   }
 

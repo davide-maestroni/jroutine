@@ -87,7 +87,7 @@ class SumPrecisionInvocationFactory<N extends Number> extends InvocationFactory<
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       return true;
     }
 

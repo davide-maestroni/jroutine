@@ -45,7 +45,7 @@ public class ByteChannelTest {
   @Test
   public void testAvailable() throws IOException {
 
-    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofInputs().buildChannel();
+    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofData().buildChannel();
     final ChunkOutputStream stream = ByteChannel.withOutput(channel)
                                                 .chunkStreamConfiguration()
                                                 .withOnClose(CloseActionType.CLOSE_CHANNEL)
@@ -67,7 +67,7 @@ public class ByteChannelTest {
   @Test
   public void testBufferEquals() throws IOException {
 
-    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofInputs().buildChannel();
+    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofData().buildChannel();
     final ChunkOutputStream stream = ByteChannel.withOutput(channel).buildOutputStream();
     stream.write(new byte[]{31, 17, (byte) 155, 13});
     stream.flush();
@@ -95,7 +95,7 @@ public class ByteChannelTest {
   @Test
   public void testConcatAvailable() throws IOException {
 
-    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofInputs().buildChannel();
+    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofData().buildChannel();
     final ChunkOutputStream stream = ByteChannel.withOutput(channel)
                                                 .chunkStreamConfiguration()
                                                 .withChunkSize(8)
@@ -119,7 +119,7 @@ public class ByteChannelTest {
   @SuppressWarnings("ResultOfMethodCallIgnored")
   public void testConcatClose() throws IOException {
 
-    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofInputs().buildChannel();
+    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofData().buildChannel();
     final ChunkOutputStream stream = ByteChannel.withOutput(channel)
                                                 .chunkStreamConfiguration()
                                                 .withChunkSize(2)
@@ -135,7 +135,7 @@ public class ByteChannelTest {
   @Test
   public void testConcatMark() throws IOException {
 
-    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofInputs().buildChannel();
+    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofData().buildChannel();
     final ChunkOutputStream stream = ByteChannel.withOutput(channel)
                                                 .chunkStreamConfiguration()
                                                 .withChunkSize(4)
@@ -164,7 +164,7 @@ public class ByteChannelTest {
   @Test
   public void testConcatReadByte() throws IOException {
 
-    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofInputs().buildChannel();
+    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofData().buildChannel();
     final ChunkOutputStream stream = ByteChannel.withOutput(channel)
                                                 .chunkStreamConfiguration()
                                                 .withChunkSize(2)
@@ -183,7 +183,7 @@ public class ByteChannelTest {
   @Test
   public void testConcatReadByteArray() throws IOException {
 
-    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofInputs().buildChannel();
+    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofData().buildChannel();
     final ChunkOutputStream stream = ByteChannel.withOutput(channel)
                                                 .chunkStreamConfiguration()
                                                 .withChunkSize(2)
@@ -207,7 +207,7 @@ public class ByteChannelTest {
   @Test
   public void testConcatReadBytes() throws IOException {
 
-    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofInputs().buildChannel();
+    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofData().buildChannel();
     final ChunkOutputStream stream = ByteChannel.withOutput(channel)
                                                 .chunkStreamConfiguration()
                                                 .withChunkSize(3)
@@ -233,7 +233,7 @@ public class ByteChannelTest {
   @Test
   @SuppressWarnings({"ConstantConditions", "ResultOfMethodCallIgnored"})
   public void testConcatReadError() throws IOException {
-    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofInputs().buildChannel();
+    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofData().buildChannel();
     final ChunkOutputStream stream = ByteChannel.withOutput(channel)
                                                 .chunkStreamConfiguration()
                                                 .withChunkSize(2)
@@ -308,7 +308,7 @@ public class ByteChannelTest {
   @Test
   public void testConcatReadOutput() throws IOException {
 
-    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofInputs().buildChannel();
+    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofData().buildChannel();
     final ChunkOutputStream stream = ByteChannel.withOutput(channel)
                                                 .chunkStreamConfiguration()
                                                 .withChunkSize(3)
@@ -334,7 +334,7 @@ public class ByteChannelTest {
 
   @Test
   public void testConcatReadOutput2() throws IOException {
-    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofInputs().buildChannel();
+    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofData().buildChannel();
     final ChunkOutputStream stream = ByteChannel.withOutput(channel)
                                                 .chunkStreamConfiguration()
                                                 .withChunkSize(3)
@@ -354,7 +354,7 @@ public class ByteChannelTest {
   @Test
   public void testConcatSkip() throws IOException {
 
-    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofInputs().buildChannel();
+    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofData().buildChannel();
     final ChunkOutputStream stream = ByteChannel.withOutput(channel)
                                                 .chunkStreamConfiguration()
                                                 .withChunkSize(4)
@@ -383,7 +383,7 @@ public class ByteChannelTest {
   @Test
   public void testDataPoolZero() throws IOException {
 
-    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofInputs().buildChannel();
+    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofData().buildChannel();
     final ChunkOutputStream stream = ByteChannel.withOutput(channel)
                                                 .chunkStreamConfiguration()
                                                 .withCorePoolSize(0)
@@ -402,7 +402,7 @@ public class ByteChannelTest {
   @Test
   public void testInputClose() throws IOException {
 
-    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofInputs().buildChannel();
+    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofData().buildChannel();
     final ChunkOutputStream stream = ByteChannel.withOutput(channel).buildOutputStream();
     stream.write(31);
     stream.flush();
@@ -442,7 +442,7 @@ public class ByteChannelTest {
   @Test
   public void testMark() throws IOException {
 
-    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofInputs().buildChannel();
+    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofData().buildChannel();
     final ChunkOutputStream stream = ByteChannel.withOutput(channel)
                                                 .chunkStreamConfiguration()
                                                 .withOnClose(CloseActionType.CLOSE_CHANNEL)
@@ -470,7 +470,7 @@ public class ByteChannelTest {
   @Test
   public void testOutputClose() {
 
-    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofInputs().buildChannel();
+    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofData().buildChannel();
     final ChunkOutputStream stream = ByteChannel.withOutput(channel)
                                                 .chunkStreamConfiguration()
                                                 .withOnClose(CloseActionType.CLOSE_CHANNEL)
@@ -529,7 +529,7 @@ public class ByteChannelTest {
   @Test
   public void testReadAll() throws IOException {
 
-    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofInputs().buildChannel();
+    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofData().buildChannel();
     final ChunkOutputStream stream = ByteChannel.withOutput(channel).buildOutputStream();
     stream.write(new byte[]{31, 17, (byte) 155, 13});
     stream.flush();
@@ -548,7 +548,7 @@ public class ByteChannelTest {
   @Test
   public void testReadByte() throws IOException {
 
-    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofInputs().buildChannel();
+    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofData().buildChannel();
     final ChunkOutputStream stream = ByteChannel.withOutput(channel).buildOutputStream();
     stream.write(77);
     stream.flush();
@@ -570,7 +570,7 @@ public class ByteChannelTest {
   @Test
   public void testReadByteArray() throws IOException {
 
-    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofInputs().buildChannel();
+    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofData().buildChannel();
     final ChunkOutputStream stream = ByteChannel.withOutput(channel).buildOutputStream();
     stream.write(77);
     stream.flush();
@@ -613,7 +613,7 @@ public class ByteChannelTest {
   @Test
   public void testReadBytes() throws IOException {
 
-    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofInputs().buildChannel();
+    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofData().buildChannel();
     final ChunkOutputStream stream = ByteChannel.withOutput(channel).buildOutputStream();
     stream.write(77);
     stream.flush();
@@ -665,7 +665,7 @@ public class ByteChannelTest {
   @Test
   @SuppressWarnings({"ConstantConditions", "ResultOfMethodCallIgnored"})
   public void testReadError() throws IOException {
-    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofInputs().buildChannel();
+    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofData().buildChannel();
     final ChunkOutputStream stream = ByteChannel.withOutput(channel).buildOutputStream();
     stream.write(77);
     stream.flush();
@@ -736,7 +736,7 @@ public class ByteChannelTest {
   @Test
   public void testReadOutput() throws IOException {
 
-    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofInputs().buildChannel();
+    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofData().buildChannel();
     final ChunkOutputStream stream = ByteChannel.withOutput(channel).buildOutputStream();
     stream.write(77);
     stream.flush();
@@ -773,7 +773,7 @@ public class ByteChannelTest {
   @Test
   public void testSkip() throws IOException {
 
-    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofInputs().buildChannel();
+    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofData().buildChannel();
     final ChunkOutputStream stream = ByteChannel.withOutput(channel)
                                                 .chunkStreamConfiguration()
                                                 .withOnClose(CloseActionType.CLOSE_CHANNEL)
@@ -802,7 +802,7 @@ public class ByteChannelTest {
   @Test
   public void testStream() throws IOException {
 
-    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofInputs().buildChannel();
+    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofData().buildChannel();
     final ChunkOutputStream stream = ByteChannel.withOutput(channel)
                                                 .chunkStreamConfiguration()
                                                 .withChunkSize(2)
@@ -825,7 +825,7 @@ public class ByteChannelTest {
   @Test
   public void testTransferFrom() throws IOException {
 
-    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofInputs().buildChannel();
+    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofData().buildChannel();
     final ChunkOutputStream stream = ByteChannel.withOutput(channel)
                                                 .chunkStreamConfiguration()
                                                 .withChunkSize(4)
@@ -844,7 +844,7 @@ public class ByteChannelTest {
   @Test
   public void testTransferTo() throws IOException {
 
-    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofInputs().buildChannel();
+    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofData().buildChannel();
     final ChunkOutputStream stream = ByteChannel.withOutput(channel).buildOutputStream();
     stream.write(new byte[]{31, 17, (byte) 155, 13});
     stream.flush();
@@ -863,7 +863,7 @@ public class ByteChannelTest {
   @Test
   public void testWriteAll() throws IOException {
 
-    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofInputs().buildChannel();
+    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofData().buildChannel();
     final ChunkOutputStream stream = ByteChannel.withOutput(channel)
                                                 .chunkStreamConfiguration()
                                                 .withChunkSize(4)
@@ -882,7 +882,7 @@ public class ByteChannelTest {
   @Test
   public void testWriteByte() throws IOException {
 
-    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofInputs().buildChannel();
+    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofData().buildChannel();
     final ChunkOutputStream stream = ByteChannel.withOutput(channel).buildOutputStream();
     stream.write(77);
     stream.flush();
@@ -910,7 +910,7 @@ public class ByteChannelTest {
   @Test
   public void testWriteByteArray() throws IOException {
 
-    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofInputs().buildChannel();
+    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofData().buildChannel();
     final ChunkOutputStream stream = ByteChannel.withOutput(channel).buildOutputStream();
     stream.write(new byte[]{77, 33});
     stream.flush();
@@ -943,7 +943,7 @@ public class ByteChannelTest {
   @Test
   public void testWriteBytes() throws IOException {
 
-    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofInputs().buildChannel();
+    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofData().buildChannel();
     final ChunkOutputStream stream = ByteChannel.withOutput(channel).buildOutputStream();
     stream.write(new byte[]{1, 77, 33}, 1, 1);
     stream.flush();
@@ -986,7 +986,7 @@ public class ByteChannelTest {
 
     }
 
-    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofInputs().buildChannel();
+    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofData().buildChannel();
     final ChunkOutputStream stream = ByteChannel.withOutput(channel).buildOutputStream();
     final byte[] b = new byte[16];
 
@@ -1076,7 +1076,7 @@ public class ByteChannelTest {
 
   @Test
   public void testWriteInput() throws IOException {
-    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofInputs().buildChannel();
+    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofData().buildChannel();
     final ChunkOutputStream stream = ByteChannel.withOutput(channel)
                                                 .chunkStreamConfiguration()
                                                 .withChunkSize(4)
@@ -1112,7 +1112,7 @@ public class ByteChannelTest {
 
   @Test
   public void testWriteInput2() throws IOException {
-    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofInputs().buildChannel();
+    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.<ByteChunk>ofData().buildChannel();
     final ChunkOutputStream stream = ByteChannel.withOutput(channel)
                                                 .chunkStreamConfiguration()
                                                 .withChunkSize(4)

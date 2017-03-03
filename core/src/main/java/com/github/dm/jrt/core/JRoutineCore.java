@@ -24,6 +24,7 @@ import com.github.dm.jrt.core.util.ConstantConditions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -53,9 +54,9 @@ import java.util.Collections;
  * <b>Example 2:</b> Asynchronously merge the output of two routines.
  * <pre><code>
  * final Channel&lt;Result, Result&gt; channel =
- *     JRoutineCore.&lt;Result&gt;ofInputs().buildChannel();
- * channel.pass(routine1.call())
- *        .pass(routine2.call())
+ *     JRoutineCore.&lt;Result&gt;ofData().buildChannel();
+ * channel.pass(routine1.invoke().close())
+ *        .pass(routine2.invoke().close())
  *        .close();
  *        .in(seconds(20))
  *        .allInto(results);
@@ -63,8 +64,8 @@ import java.util.Collections;
  * <p>
  * Or simply:
  * <pre><code>
- * final Channel&lt;Void, Result&gt; output1 = routine1.call();
- * final Channel&lt;Void, Result&gt; output2 = routine2.call();
+ * final Channel&lt;Void, Result&gt; output1 = routine1.invoke().close();
+ * final Channel&lt;Void, Result&gt; output2 = routine2.invoke().close();
  * output1.in(seconds(20)).allInto(results);
  * output2.in(seconds(20)).allInto(results);
  * </code></pre>
@@ -73,12 +74,12 @@ import java.util.Collections;
  * <p>
  * <b>Example 3:</b> Asynchronously concatenate the output of two routines.
  * <pre><code>
- * routine2.call(routine1.call()).in(seconds(20)).all();
+ * routine2.invoke().pass(routine1.invoke().close()).close().in(seconds(20)).all();
  * </code></pre>
  * <p>
  * Or, in an equivalent way:
  * <pre><code>
- * routine1.call().pipe(routine2.invoke()).close().in(seconds(20)).all();
+ * routine1.invoke().close().pipe(routine2.invoke()).close().in(seconds(20)).all();
  * </code></pre>
  * <p>
  * <b>Example 4:</b> Asynchronously feed a routine from a different thread.
@@ -135,7 +136,7 @@ public class JRoutineCore {
    * @return the channel builder instance.
    */
   @NotNull
-  public static <OUT> ChannelBuilder<?, OUT> of(@Nullable OUT output) {
+  public static <OUT> ChannelBuilder<?, OUT> of(@Nullable final OUT output) {
     return of(Collections.singleton(output));
   }
 
@@ -149,7 +150,7 @@ public class JRoutineCore {
    * @return the channel builder instance.
    */
   @NotNull
-  public static <OUT> ChannelBuilder<?, OUT> of(@Nullable OUT... outputs) {
+  public static <OUT> ChannelBuilder<?, OUT> of(@Nullable final OUT... outputs) {
     if (outputs == null) {
       return of();
     }
@@ -167,12 +168,17 @@ public class JRoutineCore {
    * @return the channel builder instance.
    */
   @NotNull
-  public static <OUT> ChannelBuilder<?, OUT> of(@Nullable Iterable<OUT> outputs) {
+  public static <OUT> ChannelBuilder<?, OUT> of(@Nullable final Iterable<OUT> outputs) {
     if (outputs == null) {
       return of();
     }
 
-    return new DefaultChannelBuilder<OUT>(outputs);
+    final ArrayList<OUT> list = new ArrayList<OUT>();
+    for (final OUT output : outputs) {
+      list.add(output);
+    }
+
+    return new DefaultChannelBuilder<OUT>(list);
   }
 
   /**
@@ -182,7 +188,7 @@ public class JRoutineCore {
    * @return the channel builder instance.
    */
   @NotNull
-  public static <DATA> ChannelBuilder<DATA, DATA> ofInputs() {
+  public static <DATA> ChannelBuilder<DATA, DATA> ofData() {
     return new DefaultChannelBuilder<DATA>();
   }
 

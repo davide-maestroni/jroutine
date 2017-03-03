@@ -18,7 +18,7 @@ package com.github.dm.jrt.operator;
 
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.ActionDecorator;
+import com.github.dm.jrt.function.util.ActionDecorator;
 
 import org.jetbrains.annotations.NotNull;
 

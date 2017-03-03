@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Davide Maestroni
+ * Copyright 2017 Davide Maestroni
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.function;
+package com.github.dm.jrt.function.util;
 
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DeepEqualObject;
@@ -31,20 +31,21 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  *
  * @param <OUT> the output data type.
  */
-public class SupplierDecorator<OUT> extends DeepEqualObject implements Supplier<OUT>, Decorator {
+public class SupplierDecorator<OUT> extends DeepEqualObject implements
+    com.github.dm.jrt.function.util.Supplier<OUT>, Decorator {
 
-  private final FunctionDecorator<?, OUT> mFunction;
+  private final com.github.dm.jrt.function.util.FunctionDecorator<?, OUT> mFunction;
 
-  private final Supplier<?> mSupplier;
+  private final com.github.dm.jrt.function.util.Supplier<?> mSupplier;
 
   /**
    * Constructor.
    *
    * @param supplier the initial wrapped supplier.
    */
-  private SupplierDecorator(@NotNull final Supplier<?> supplier) {
+  private SupplierDecorator(@NotNull final com.github.dm.jrt.function.util.Supplier<?> supplier) {
     this(ConstantConditions.notNull("supplier instance", supplier),
-        FunctionDecorator.<OUT>identity());
+        com.github.dm.jrt.function.util.FunctionDecorator.<OUT>identity());
   }
 
   /**
@@ -53,8 +54,8 @@ public class SupplierDecorator<OUT> extends DeepEqualObject implements Supplier<
    * @param supplier the initial wrapped supplier.
    * @param function the concatenated function chain.
    */
-  private SupplierDecorator(@NotNull final Supplier<?> supplier,
-      @NotNull final FunctionDecorator<?, OUT> function) {
+  private SupplierDecorator(@NotNull final com.github.dm.jrt.function.util.Supplier<?> supplier,
+      @NotNull final com.github.dm.jrt.function.util.FunctionDecorator<?, OUT> function) {
     super(asArgs(supplier, function));
     mSupplier = supplier;
     mFunction = function;
@@ -90,7 +91,7 @@ public class SupplierDecorator<OUT> extends DeepEqualObject implements Supplier<
    * @return the decorated supplier.
    */
   @NotNull
-  public static <OUT> SupplierDecorator<OUT> decorate(@NotNull final Supplier<OUT> supplier) {
+  public static <OUT> SupplierDecorator<OUT> decorate(@NotNull final com.github.dm.jrt.function.util.Supplier<OUT> supplier) {
     if (supplier instanceof SupplierDecorator) {
       return (SupplierDecorator<OUT>) supplier;
     }
@@ -108,13 +109,13 @@ public class SupplierDecorator<OUT> extends DeepEqualObject implements Supplier<
    */
   @NotNull
   public <AFTER> SupplierDecorator<AFTER> andThen(
-      @NotNull final Function<? super OUT, ? extends AFTER> after) {
+      @NotNull final com.github.dm.jrt.function.util.Function<? super OUT, ? extends AFTER> after) {
     return new SupplierDecorator<AFTER>(mSupplier, mFunction.andThen(after));
   }
 
   @SuppressWarnings("unchecked")
   public OUT get() throws Exception {
-    return ((Function<Object, OUT>) mFunction).apply(mSupplier.get());
+    return ((com.github.dm.jrt.function.util.Function<Object, OUT>) mFunction).apply(mSupplier.get());
   }
 
   public boolean hasStaticScope() {
@@ -126,7 +127,8 @@ public class SupplierDecorator<OUT> extends DeepEqualObject implements Supplier<
    *
    * @param <OUT> the output data type.
    */
-  private static class ConstantSupplier<OUT> extends DeepEqualObject implements Supplier<OUT> {
+  private static class ConstantSupplier<OUT> extends DeepEqualObject implements
+      com.github.dm.jrt.function.util.Supplier<OUT> {
 
     private final OUT mResult;
 

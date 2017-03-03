@@ -26,44 +26,47 @@ import org.jetbrains.annotations.NotNull;
  * <p>
  * The typical lifecycle of an invocation object is the one depicted below:
  * <pre><code>
- *                        |    -----(*)-----------------------------------
- *                        |   |                                           |
- *     ---------------    |   |    -----------------------------------    |
- *    |               |   |   |   |                                   |   |
- *    |               V   V   |   V                                   |   |
- *    |             -----------------                                 |   |
- *    |             |  onRestart()  |                                 |   |
- *    |             -----------------                                 |   |
- *    |               |     |     |                                   |   |
- *    |    -----------      |     |                                   |   |
- *    |   |                 |      ---------------------------        |   |
- *    |   |    -------      |                                 |       |   |
- *    |   |   |       |     |                                 |       |   |
- *    |   |   |       V     V                                 |       |   |
- *    |   |   |     -----------------                         |       |   |
- *    |   |    -----|   onInput()   |-------------------      |       |   |
- *    |   |         -----------------                   |     |       |   |
- *    |   |                 |              -------      |     |       |   |
- *    |   |                 |             |       |     |     |       |   |
- *    |   |                 |             |       V     V     V       |   |
- *    |    -----------      |             |     -----------------     |   |
- *    |               |     |            (*)    |   onAbort()   |-----    |
- *    |               V     V             |     -----------------         |
- *    |             -----------------     |             |                 |
- *    |             |  onComplete() |-----              |                 |
- *    |             -----------------                   |                 |
- *    |                   |                             |                 |
- *    |                   |    -------------------------                  |
- *    |                   |   |                                           |
- *    |        -------    |   |    ---------------------------------------
- *    |       |       |   |   |   |
- *    |       |       V   V   V   V
- *    |       |     -----------------
- *    |        -----|  onRecycle()  |
+ *                          |
+ *                          |
+ *     ---------------      |      -----(*)---------------------------
+ *    |               |     |     |                                   |
+ *    |               V     V     |                                   |
+ *    |             -----------------                                 |
+ *    |             |  onRestart()  |                                 |
+ *    |             -----------------                                 |
+ *    |               |     |     |                                   |
+ *    |    -----------      |     |                                   |
+ *    |   |                 |      ---------------------------        |
+ *    |   |    -------      |                                 |       |
+ *    |   |   |       |     |                                 |       |
+ *    |   |   |       V     V                                 |       |
+ *    |   |   |     -----------------                         |       |
+ *    |   |    -----|   onInput()   |-------------------      |       |
+ *    |   |         -----------------                   |     |       |
+ *    |   |                 |              -------      |     |       |
+ *    |   |                 |             |       |     |     |       |
+ *    |   |                 |             |       V     V     V       |
+ *    |    -----------      |             |     -----------------     |
+ *    |               |     |            (*)    |   onAbort()   |     |
+ *    |               V     V             |     -----------------     |
+ *    |             -----------------     |             |             |
+ *    |             |  onComplete() |-----              |             |
+ *    |             -----------------                   |             |
+ *    |               |                                 |             |
+ *    |               |      ---------------------------              |
+ *    |               |     |                                         |
+ *    |               |     |      -----------------------------------
+ *    |               |     |     |
+ *    |               V     V     V
  *    |             -----------------
- *    |                     |
- *    |                     |
- *     ---------------------
+ *     -------------|  onRecycle()  |
+ *                  -----------------
+ *                          |
+ *                          |
+ *                          V
+ *                  -----------------
+ *                  |  onDestroy()  |
+ *                  -----------------
  *
  * (*) only when an exception escapes the method
  * </code></pre>
@@ -82,12 +85,14 @@ import org.jetbrains.annotations.NotNull;
  * <br>
  * Note that the method will be called also right after the object instantiation.
  * <p>
- * The {@code onRecycle()} method is meant to indicate that the invocation instance has completed
- * its lifecycle, so any associated resource can be released. The input flag indicates if the same
- * instance is going to be re-used or not. Note, however, that this method may never get called
- * with {@code false} if the routine {@link com.github.dm.jrt.core.routine.Routine#clear() clear()}
- * method is not invoked. Note also that, in case {@code false} is returned, the invocation will be
- * immediately discarded.
+ * The {@code onRecycle()} method is meant to indicate that the invocation instance is going to be
+ * recycled, so the needed clean-up should be applied. Note however that, in case {@code false} is
+ * returned, the invocation will be immediately discarded.
+ * <p>
+ * Finally the {@code onDestroy()} method is meant to indicate that the invocation instance has
+ * completed its lifecycle, so any associated resource can be released. Note, however, that this
+ * method may never get called if the routine
+ * {@link com.github.dm.jrt.core.routine.Routine#clear() clear()} method is not invoked.
  * <p>
  * Keep in mind, when implementing an invocation class, that the result channel passed to the
  * {@code onInput()} and {@code onComplete()} methods will be closed as soon as the latter exits.
@@ -137,6 +142,13 @@ public interface Invocation<IN, OUT> {
   void onComplete(@NotNull Channel<OUT, ?> result) throws Exception;
 
   /**
+   * Called when the routine invocation has completed its lifecycle and it's about to be destroyed.
+   *
+   * @throws java.lang.Exception if an unexpected error occurs.
+   */
+  void onDestroy() throws Exception;
+
+  /**
    * Called when an input is passed to the routine.
    * <br>
    * This method is called once for each input object.
@@ -152,11 +164,10 @@ public interface Invocation<IN, OUT> {
    * <br>
    * In case {@code false} is returned, the invocation will be immediately discarded.
    *
-   * @param isReused whether the invocation is going to be reused.
    * @return whether the invocation can be recycled.
    * @throws java.lang.Exception if an unexpected error occurs.
    */
-  boolean onRecycle(boolean isReused) throws Exception;
+  boolean onRecycle() throws Exception;
 
   /**
    * Called when the routine invocation is initialized.

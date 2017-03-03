@@ -70,8 +70,7 @@
 <p>
     The library provides an additional fluent notation to compose routines.<br>
     Note that the passed instances are expected to behave like functions (that is, no variable state and no side effects).<br>
-    The lambda notation used in the example is just for demonstration purpose. In order to compile with Java 7 or below, explicit object creation must be employed.<br>
-    In fact, the interfaces defined in the "function" package are conceptually <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/FunctionalInterface.html" target="_blank">functional interfaces</a>.
+    The lambda notation used in the example is just for demonstration purpose. In order to compile with Java 7 or below, explicit object creation must be employed.
 </p>
 <pre>
     <code>
@@ -85,7 +84,9 @@
                                                  .map(Operators.average(Float.class))
                                                  .map(Math::sqrt)
                                                  .async()
-                                                 .call(args)
+                                                 .invoke()
+                                                 .pass(args)
+                                                 .close()
                                                  .in(seconds(1))
                                                  .next();
                 System.out.println(rms);

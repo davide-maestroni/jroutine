@@ -45,7 +45,7 @@ class DefaultChannelBuilder<DATA> extends AbstractChannelBuilder<DATA, DATA> {
    *
    * @param data the output data.
    */
-  DefaultChannelBuilder(@NotNull Iterable<DATA> data) {
+  DefaultChannelBuilder(@NotNull final Iterable<DATA> data) {
     mData = ConstantConditions.notNull("data", data);
   }
 

@@ -24,8 +24,8 @@ import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.BiConsumer;
-import com.github.dm.jrt.function.Function;
+import com.github.dm.jrt.function.util.BiConsumer;
+import com.github.dm.jrt.function.util.Function;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -65,7 +65,7 @@ class BindMappingAllConsumer<IN, OUT> implements Function<Channel<?, IN>, Channe
 
   public Channel<?, OUT> apply(final Channel<?, IN> channel) {
     final Channel<OUT, OUT> outputChannel =
-        JRoutineCore.<OUT>ofInputs().apply(mConfiguration).buildChannel();
+        JRoutineCore.<OUT>ofData().apply(mConfiguration).buildChannel();
     channel.consume(
         (mInvocationMode == InvocationMode.ASYNC) ? new MappingConsumerConsumer<IN, OUT>(
             mMappingConsumer, outputChannel)

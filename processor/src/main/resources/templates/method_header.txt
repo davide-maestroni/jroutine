@@ -46,7 +46,7 @@
       @org.jetbrains.annotations.NotNull final com.github.dm.jrt.reflect.config.WrapperConfiguration wrapperConfiguration) {
     return com.github.dm.jrt.core.JRoutineCore.with(new InvocationFactory${methodCount}${genericTypes}(wrapperConfiguration, target))
                                               .invocationConfiguration()
-                                              .with(invocationConfiguration)
+                                              .withPatch(invocationConfiguration)
                                               ${routineBuilderOptions}
                                               .apply()
                                               .buildRoutine();

@@ -26,14 +26,14 @@ import com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.Function;
-import com.github.dm.jrt.function.FunctionDecorator;
+import com.github.dm.jrt.function.util.Function;
+import com.github.dm.jrt.function.util.FunctionDecorator;
 import com.github.dm.jrt.stream.builder.StreamConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
-import static com.github.dm.jrt.function.FunctionDecorator.decorate;
+import static com.github.dm.jrt.function.util.FunctionDecorator.decorate;
 
 /**
  * Utility class providing transformation functions based on Loader instances.
@@ -61,8 +61,9 @@ public class LoaderTransformationsCompat {
    *                                                .withInvocationId(INVOCATION_ID)
    *                                                .apply()
    *                                                .buildFunction())
-   *               .call()
-   *               .consume(getConsumer());
+   *               .invoke()
+   *               .consume(getConsumer())
+   *               .close();
    * </code></pre>
    * Note that the Loader ID, by default, will only depend on the inputs, so that, in order to avoid
    * clashing, it is advisable to explicitly set the invocation ID like shown in the example.
@@ -93,7 +94,9 @@ public class LoaderTransformationsCompat {
                                            decorate(function)))
                                        .apply(streamConfiguration.toInvocationConfiguration())
                                        .apply(loaderConfiguration)
-                                       .call(channel);
+                                       .invoke()
+                                       .pass(channel)
+                                       .close();
           }
         };
       }

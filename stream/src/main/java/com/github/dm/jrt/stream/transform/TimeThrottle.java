@@ -25,7 +25,7 @@ import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.SimpleQueue;
-import com.github.dm.jrt.function.Function;
+import com.github.dm.jrt.function.util.Function;
 import com.github.dm.jrt.stream.builder.StreamConfiguration;
 
 import org.jetbrains.annotations.NotNull;
@@ -100,7 +100,7 @@ class TimeThrottle<IN, OUT> implements LiftFunction<IN, OUT, IN, OUT> {
     public Channel<?, OUT> apply(final Channel<?, IN> channel) throws Exception {
       final ChannelConfiguration configuration = mConfiguration;
       final Channel<OUT, OUT> outputChannel =
-          JRoutineCore.<OUT>ofInputs().apply(configuration).buildChannel();
+          JRoutineCore.<OUT>ofData().apply(configuration).buildChannel();
       final long delay;
       final boolean isBind;
       final Runner runner = mRunner;
@@ -121,7 +121,7 @@ class TimeThrottle<IN, OUT> implements LiftFunction<IN, OUT, IN, OUT> {
 
             public void run() {
               try {
-                mBindingFunction.apply(channel).pipe(outputChannel);
+                outputChannel.pass(mBindingFunction.apply(channel));
 
               } catch (final Throwable t) {
                 outputChannel.abort(t);
@@ -138,7 +138,7 @@ class TimeThrottle<IN, OUT> implements LiftFunction<IN, OUT, IN, OUT> {
       }
 
       if (isBind) {
-        mBindingFunction.apply(channel).pipe(outputChannel);
+        outputChannel.pass(mBindingFunction.apply(channel));
 
       } else {
         runner.run(this, delay, TimeUnit.MILLISECONDS);

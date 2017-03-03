@@ -138,7 +138,7 @@ class ConverterChannelConsumer implements ChannelConsumer<ParcelableFlow<Object>
       case BYTES_ID:
         final ParcelableByteChunk chunk = output.data();
         if (mChunkChannel == null) {
-          mChunkChannel = JRoutineCore.<ParcelableByteChunk>ofInputs().buildChannel();
+          mChunkChannel = JRoutineCore.<ParcelableByteChunk>ofData().buildChannel();
         }
 
         mChunkChannel.pass(chunk);

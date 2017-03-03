@@ -57,11 +57,15 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
         InvocationConfiguration.builder().withRunner(Runners.syncRunner()).apply();
     assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(Case.class)))
                            .apply(configuration)
-                           .call("TEST")
+                           .invoke()
+                           .pass("TEST")
+                           .close()
                            .all()).containsExactly("test");
     assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(Case.class, true)))
                            .apply(configuration)
-                           .call("test")
+                           .invoke()
+                           .pass("test")
+                           .close()
                            .all()).containsExactly("TEST");
   }
 
@@ -93,7 +97,9 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
                            .invocationConfiguration()
                            .withRunner(Runners.syncRunner())
                            .apply()
-                           .call("TEST")
+                           .invoke()
+                           .pass("TEST")
+                           .close()
                            .all()).containsExactly("test");
   }
 
@@ -144,11 +150,13 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
         InvocationConfiguration.builder().withRunner(Runners.syncRunner()).apply();
     assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(ContextTest.class)))
                            .apply(configuration)
-                           .call()
+                           .invoke()
+                           .close()
                            .getError()).isNull();
     assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(ChannelContextTest.class)))
                            .apply(configuration)
-                           .call()
+                           .invoke()
+                           .close()
                            .getError()).isNull();
   }
 
@@ -157,11 +165,15 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
         InvocationConfiguration.builder().withRunner(Runners.syncRunner()).apply();
     assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(tokenOf(Case.class))))
                            .apply(configuration)
-                           .call("TEST")
+                           .invoke()
+                           .pass("TEST")
+                           .close()
                            .all()).containsExactly("test");
     assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(tokenOf(Case.class), true)))
                            .apply(configuration)
-                           .call("test")
+                           .invoke()
+                           .pass("test")
+                           .close()
                            .all()).containsExactly("TEST");
   }
 
@@ -190,11 +202,15 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
         InvocationConfiguration.builder().withRunner(Runners.syncRunner()).apply();
     assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(CaseWrapper.class)))
                            .apply(configuration)
-                           .call("TEST")
+                           .invoke()
+                           .pass("TEST")
+                           .close()
                            .all()).containsExactly("test");
     assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(CaseWrapper.class, true)))
                            .apply(configuration)
-                           .call("test")
+                           .invoke()
+                           .pass("test")
+                           .close()
                            .all()).containsExactly("TEST");
   }
 
@@ -217,7 +233,7 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       return true;
     }
   }

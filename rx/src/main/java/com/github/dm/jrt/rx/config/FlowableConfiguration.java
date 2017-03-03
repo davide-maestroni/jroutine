@@ -22,8 +22,10 @@ import com.github.dm.jrt.core.util.DeepEqualObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import io.reactivex.BackpressureStrategy;
 
@@ -53,7 +55,7 @@ public class FlowableConfiguration<IN> extends DeepEqualObject {
 
   private final BackpressureStrategy mBackpressure;
 
-  private final Iterable<? extends IN> mInputs;
+  private final List<IN> mInputs;
 
   /**
    * Constructor.
@@ -62,7 +64,7 @@ public class FlowableConfiguration<IN> extends DeepEqualObject {
    * @param inputs               the input data.
    */
   private FlowableConfiguration(@Nullable final BackpressureStrategy backpressureStrategy,
-      @Nullable final Iterable<? extends IN> inputs) {
+      @Nullable final List<IN> inputs) {
     super(asArgs(backpressureStrategy, inputs));
     mBackpressure = backpressureStrategy;
     mInputs = inputs;
@@ -137,9 +139,9 @@ public class FlowableConfiguration<IN> extends DeepEqualObject {
    * @param valueIfNotSet the default value if none was set.
    * @return the inputs.
    */
-  public Iterable<? extends IN> getInputsOrElse(
-      @Nullable final Iterable<? extends IN> valueIfNotSet) {
-    final Iterable<? extends IN> inputs = mInputs;
+  public Collection<? extends IN> getInputsOrElse(
+      @Nullable final Collection<? extends IN> valueIfNotSet) {
+    final List<IN> inputs = mInputs;
     return (inputs != null) ? inputs : valueIfNotSet;
   }
 
@@ -173,7 +175,7 @@ public class FlowableConfiguration<IN> extends DeepEqualObject {
 
     private BackpressureStrategy mBackpressure;
 
-    private Iterable<? extends IN> mInputs;
+    private List<IN> mInputs;
 
     /**
      * Constructor.
@@ -207,34 +209,6 @@ public class FlowableConfiguration<IN> extends DeepEqualObject {
     }
 
     /**
-     * Applies the specified configuration to this builder. A null value means that all the
-     * configuration options will be reset to their default, otherwise only the non-default
-     * options will be applied.
-     *
-     * @param configuration the Flowable configuration.
-     * @return this builder.
-     */
-    @NotNull
-    public Builder<IN, TYPE> with(@Nullable final FlowableConfiguration<IN> configuration) {
-      if (configuration == null) {
-        setConfiguration(FlowableConfiguration.<IN>defaultConfiguration());
-        return this;
-      }
-
-      final BackpressureStrategy backpressure = configuration.mBackpressure;
-      if (backpressure != null) {
-        withBackpressure(backpressure);
-      }
-
-      final Iterable<? extends IN> inputs = configuration.mInputs;
-      if (inputs != null) {
-        withInputs(inputs);
-      }
-
-      return this;
-    }
-
-    /**
      * Sets the back-pressure strategy to be applied.
      *
      * @param backpressure the back-pressure strategy.
@@ -254,7 +228,7 @@ public class FlowableConfiguration<IN> extends DeepEqualObject {
      */
     @NotNull
     public Builder<IN, TYPE> withInput(@Nullable final IN input) {
-      mInputs = Collections.singleton(input);
+      mInputs = Collections.singletonList(input);
       return this;
     }
 
@@ -266,7 +240,15 @@ public class FlowableConfiguration<IN> extends DeepEqualObject {
      */
     @NotNull
     public Builder<IN, TYPE> withInputs(@Nullable final IN... inputs) {
-      mInputs = (inputs != null) ? Arrays.asList(inputs) : null;
+      if (inputs != null) {
+        final ArrayList<IN> inputList = new ArrayList<IN>();
+        Collections.addAll(inputList, inputs);
+        mInputs = Collections.unmodifiableList(inputList);
+
+      } else {
+        mInputs = null;
+      }
+
       return this;
     }
 
@@ -278,7 +260,46 @@ public class FlowableConfiguration<IN> extends DeepEqualObject {
      */
     @NotNull
     public Builder<IN, TYPE> withInputs(@Nullable final Iterable<? extends IN> inputs) {
-      mInputs = inputs;
+      if (inputs != null) {
+        final ArrayList<IN> inputList = new ArrayList<IN>();
+        for (final IN input : inputs) {
+          inputList.add(input);
+        }
+
+        mInputs = Collections.unmodifiableList(inputList);
+
+      } else {
+        mInputs = null;
+      }
+
+      return this;
+    }
+
+    /**
+     * Applies the specified patch configuration to this builder. A null value means that all the
+     * configuration options will be reset to their default, otherwise only the non-default
+     * options will be applied.
+     *
+     * @param configuration the Flowable configuration.
+     * @return this builder.
+     */
+    @NotNull
+    public Builder<IN, TYPE> withPatch(@Nullable final FlowableConfiguration<IN> configuration) {
+      if (configuration == null) {
+        setConfiguration(FlowableConfiguration.<IN>defaultConfiguration());
+        return this;
+      }
+
+      final BackpressureStrategy backpressure = configuration.mBackpressure;
+      if (backpressure != null) {
+        withBackpressure(backpressure);
+      }
+
+      final Iterable<? extends IN> inputs = configuration.mInputs;
+      if (inputs != null) {
+        withInputs(inputs);
+      }
+
       return this;
     }
 

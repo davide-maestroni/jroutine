@@ -68,13 +68,13 @@ class MergeInputMapBuilder<IN>
     final SparseArrayCompat<Channel<IN, ?>> inputChannelMap =
         new SparseArrayCompat<Channel<IN, ?>>(size);
     for (int i = 0; i < size; ++i) {
-      final Channel<IN, IN> outputChannel = JRoutineCore.<IN>ofInputs().buildChannel();
-      outputChannel.pipe((Channel<IN, ?>) channelMap.valueAt(i));
+      final Channel<IN, IN> outputChannel = JRoutineCore.<IN>ofData().buildChannel();
+      ((Channel<IN, ?>) channelMap.valueAt(i)).pass(outputChannel);
       inputChannelMap.put(channelMap.keyAt(i), outputChannel);
     }
 
     final Channel<Flow<? extends IN>, Flow<? extends IN>> inputChannel =
-        JRoutineCore.<Flow<? extends IN>>ofInputs().apply(getConfiguration()).buildChannel();
+        JRoutineCore.<Flow<? extends IN>>ofData().apply(getConfiguration()).buildChannel();
     inputChannel.consume(new SortingMapChannelConsumer<IN>(inputChannelMap));
     return inputChannel;
   }

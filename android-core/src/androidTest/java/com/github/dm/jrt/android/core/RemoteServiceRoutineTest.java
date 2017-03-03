@@ -81,7 +81,9 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
                        .serviceConfiguration()
                        .withRunnerClass(MainRunner.class)
                        .apply()
-                       .call(data);
+                       .invoke()
+                       .pass(data)
+                       .close();
     assertThat(channel.abort(new IllegalArgumentException("test"))).isTrue();
 
     try {
@@ -99,7 +101,8 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
 
       JRoutineService.on(serviceFrom(getActivity(), RemoteInvocationService.class))
                      .with(factoryOf(Abort.class))
-                     .call()
+                     .invoke()
+                     .close()
                      .in(timeout)
                      .next();
 
@@ -198,8 +201,9 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
                        .withLogClass(AndroidLog.class)
                        .apply()
                        .buildRoutine();
-    assertThat(routine.call("1", "2", "3", "4", "5").in(timeout).all()).containsOnly("1", "2", "3",
-        "4", "5");
+    assertThat(
+        routine.invoke().pass("1", "2", "3", "4", "5").close().in(timeout).all()).containsOnly("1",
+        "2", "3", "4", "5");
   }
 
   public void testExecutionTimeout() {
@@ -211,7 +215,9 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
                        .withOutputTimeout(millis(10))
                        .withOutputTimeoutAction(TimeoutActionType.CONTINUE)
                        .apply()
-                       .call("test1");
+                       .invoke()
+                       .pass("test1")
+                       .close();
     assertThat(channel.all()).isEmpty();
     assertThat(channel.in(seconds(10)).getComplete()).isTrue();
   }
@@ -225,7 +231,9 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
                        .withOutputTimeout(millis(10))
                        .withOutputTimeoutAction(TimeoutActionType.ABORT)
                        .apply()
-                       .call("test2");
+                       .invoke()
+                       .pass("test2")
+                       .close();
 
     try {
 
@@ -249,7 +257,9 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
                        .withOutputTimeout(millis(10))
                        .withOutputTimeoutAction(TimeoutActionType.FAIL)
                        .apply()
-                       .call("test3");
+                       .invoke()
+                       .pass("test3")
+                       .close();
 
     try {
 
@@ -280,10 +290,14 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
                        .withLogClass(AndroidLog.class)
                        .apply()
                        .buildRoutine();
-    assertThat(routine1.call("1", "2", "3", "4", "5").in(timeout).all()).containsOnly("1", "2", "3",
-        "4", "5");
-    assertThat(routine1.callParallel("1", "2", "3", "4", "5").in(timeout).all()).containsOnly("1",
+    assertThat(
+        routine1.invoke().pass("1", "2", "3", "4", "5").close().in(timeout).all()).containsOnly("1",
         "2", "3", "4", "5");
+    assertThat(routine1.invokeParallel()
+                       .pass("1", "2", "3", "4", "5")
+                       .close()
+                       .in(timeout)
+                       .all()).containsOnly("1", "2", "3", "4", "5");
   }
 
   public void testInvocations2() throws InterruptedException {
@@ -301,10 +315,14 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
                        .withLogClass(AndroidLog.class)
                        .apply()
                        .buildRoutine();
-    assertThat(routine2.call("1", "2", "3", "4", "5").in(timeout).all()).containsExactly("1", "2",
-        "3", "4", "5");
-    assertThat(routine2.callParallel("1", "2", "3", "4", "5").in(timeout).all()).containsOnly("1",
-        "2", "3", "4", "5");
+    assertThat(
+        routine2.invoke().pass("1", "2", "3", "4", "5").close().in(timeout).all()).containsExactly(
+        "1", "2", "3", "4", "5");
+    assertThat(routine2.invokeParallel()
+                       .pass("1", "2", "3", "4", "5")
+                       .close()
+                       .in(timeout)
+                       .all()).containsOnly("1", "2", "3", "4", "5");
   }
 
   public void testInvocations3() throws InterruptedException {
@@ -320,10 +338,14 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
                        .withOutputOrder(OrderType.SORTED)
                        .apply()
                        .buildRoutine();
-    assertThat(routine3.call("1", "2", "3", "4", "5").in(timeout).all()).containsExactly("1", "2",
-        "3", "4", "5");
-    assertThat(routine3.callParallel("1", "2", "3", "4", "5").in(timeout).all()).containsExactly(
+    assertThat(
+        routine3.invoke().pass("1", "2", "3", "4", "5").close().in(timeout).all()).containsExactly(
         "1", "2", "3", "4", "5");
+    assertThat(routine3.invokeParallel()
+                       .pass("1", "2", "3", "4", "5")
+                       .close()
+                       .in(timeout)
+                       .all()).containsExactly("1", "2", "3", "4", "5");
   }
 
   public void testInvocations4() throws InterruptedException {
@@ -339,10 +361,14 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
                        .withMaxInstances(2)
                        .apply()
                        .buildRoutine();
-    assertThat(routine4.call("1", "2", "3", "4", "5").in(timeout).all()).containsOnly("1", "2", "3",
-        "4", "5");
-    assertThat(routine4.callParallel("1", "2", "3", "4", "5").in(timeout).all()).containsOnly("1",
+    assertThat(
+        routine4.invoke().pass("1", "2", "3", "4", "5").close().in(timeout).all()).containsOnly("1",
         "2", "3", "4", "5");
+    assertThat(routine4.invokeParallel()
+                       .pass("1", "2", "3", "4", "5")
+                       .close()
+                       .in(timeout)
+                       .all()).containsOnly("1", "2", "3", "4", "5");
   }
 
   public void testInvocations5() throws InterruptedException {
@@ -358,7 +384,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
                        .withMaxInstances(2)
                        .apply()
                        .buildRoutine();
-    assertThat(routine4.call().in(timeout).all()).containsOnly("test1", "test2", "test3");
+    assertThat(routine4.invoke().close().in(timeout).all()).containsOnly("test1", "test2", "test3");
     assertThat(routine4.invokeParallel().close().in(timeout).all()).containsOnly("test1", "test2",
         "test3");
   }
@@ -369,7 +395,9 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
     final MyParcelable p = new MyParcelable(33, -17);
     assertThat(JRoutineService.on(serviceFrom(getActivity(), RemoteInvocationService.class))
                               .with(factoryOf(MyParcelableInvocation.class))
-                              .call(p)
+                              .invoke()
+                              .pass(p)
+                              .close()
                               .in(timeout)
                               .next()).isEqualTo(p);
   }
@@ -381,10 +409,14 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
         JRoutineService.on(serviceFrom(getActivity(), RemoteTestService.class))
                        .with(factoryOf(StringPassingInvocation.class))
                        .buildRoutine();
-    assertThat(routine.call("1", "2", "3", "4", "5").in(timeout).all()).containsOnly("1", "2", "3",
-        "4", "5");
-    assertThat(routine.callParallel("1", "2", "3", "4", "5").in(timeout).all()).containsOnly("1",
+    assertThat(
+        routine.invoke().pass("1", "2", "3", "4", "5").close().in(timeout).all()).containsOnly("1",
         "2", "3", "4", "5");
+    assertThat(routine.invokeParallel()
+                      .pass("1", "2", "3", "4", "5")
+                      .close()
+                      .in(timeout)
+                      .all()).containsOnly("1", "2", "3", "4", "5");
   }
 
   public void testSize() {
@@ -407,7 +439,9 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
 
     assertThat(JRoutineService.on(serviceFrom(getActivity(), RemoteTestService.class))
                               .with(factoryOf(TestTransform.class))
-                              .call("test1", "test2", "test3")
+                              .invoke()
+                              .pass("test1", "test2", "test3")
+                              .close()
                               .in(seconds(10))
                               .all()).containsExactly("TEST1", "TEST2", "TEST3");
   }
@@ -427,7 +461,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       return true;
     }
   }
@@ -508,7 +542,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       return true;
     }
   }
@@ -588,7 +622,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       return true;
     }
   }
@@ -618,7 +652,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       return true;
     }
   }
@@ -631,7 +665,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       return true;
     }
   }
@@ -642,7 +676,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
     @Override
     protected Channel<?, String> onChannel(@NotNull final Channel<?, String> channel) {
 
-      return JRoutineCore.with(new UpperCaseInvocation()).call(channel);
+      return JRoutineCore.with(new UpperCaseInvocation()).invoke().pass(channel).close();
     }
   }
 
@@ -654,7 +688,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       return true;
     }
   }

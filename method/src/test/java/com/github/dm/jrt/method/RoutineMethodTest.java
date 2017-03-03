@@ -49,8 +49,8 @@ public class RoutineMethodTest {
   }
 
   private static void testStaticInternal() {
-    final Channel<String, String> inputStrings = JRoutineCore.<String>ofInputs().buildChannel();
-    final Channel<Integer, Integer> outputLengths = JRoutineCore.<Integer>ofInputs().buildChannel();
+    final Channel<String, String> inputStrings = JRoutineCore.<String>ofData().buildChannel();
+    final Channel<Integer, Integer> outputLengths = JRoutineCore.<Integer>ofData().buildChannel();
     new RoutineMethod() {
 
       void length(@Input final Channel<?, String> input, @Output final Channel<Integer, ?> output) {
@@ -72,16 +72,16 @@ public class RoutineMethodTest {
         return (isUpper) ? str.toUpperCase(locale) : str.toLowerCase(locale);
       }
     };
-    Channel<Object, Object> inputChannel = JRoutineCore.ofInputs().buildChannel().pass("test");
+    Channel<Object, Object> inputChannel = JRoutineCore.ofData().buildChannel().pass("test");
     assertThat(method.call(inputChannel, true).in(seconds(1)).next()).isEqualTo("TEST");
-    inputChannel = JRoutineCore.ofInputs().buildChannel().pass("TEST");
+    inputChannel = JRoutineCore.ofData().buildChannel().pass("TEST");
     assertThat(method.call(inputChannel, false).in(seconds(1)).next()).isEqualTo("test");
   }
 
   @Test
   public void testAbort() {
-    final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
-    final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
+    final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofData().buildChannel();
+    final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     new RoutineMethod() {
 
       private int mSum;
@@ -101,9 +101,9 @@ public class RoutineMethodTest {
 
   @Test
   public void testAbort2() {
-    final Channel<Integer, Integer> inputChannel1 = JRoutineCore.<Integer>ofInputs().buildChannel();
-    final Channel<Integer, Integer> inputChannel2 = JRoutineCore.<Integer>ofInputs().buildChannel();
-    final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
+    final Channel<Integer, Integer> inputChannel1 = JRoutineCore.<Integer>ofData().buildChannel();
+    final Channel<Integer, Integer> inputChannel2 = JRoutineCore.<Integer>ofData().buildChannel();
+    final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     new RoutineMethod() {
 
       private int mSum;
@@ -126,9 +126,9 @@ public class RoutineMethodTest {
 
   @Test
   public void testAbort3() {
-    final Channel<Integer, Integer> inputChannel1 = JRoutineCore.<Integer>ofInputs().buildChannel();
-    final Channel<Integer, Integer> inputChannel2 = JRoutineCore.<Integer>ofInputs().buildChannel();
-    final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
+    final Channel<Integer, Integer> inputChannel1 = JRoutineCore.<Integer>ofData().buildChannel();
+    final Channel<Integer, Integer> inputChannel2 = JRoutineCore.<Integer>ofData().buildChannel();
+    final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     new RoutineMethod() {
 
       private int mSum;
@@ -152,8 +152,8 @@ public class RoutineMethodTest {
 
   @Test
   public void testBind() {
-    final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
-    final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
+    final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofData().buildChannel();
+    final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     new RoutineMethod() {
 
       public void square(@Input final Channel<?, Integer> input,
@@ -164,7 +164,7 @@ public class RoutineMethodTest {
         }
       }
     }.call(inputChannel, outputChannel);
-    final Channel<Integer, Integer> resultChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
+    final Channel<Integer, Integer> resultChannel = JRoutineCore.<Integer>ofData().buildChannel();
     new SumRoutine().call(outputChannel, resultChannel);
     inputChannel.pass(1, 2, 3, 4, 5).close();
     assertThat(resultChannel.in(seconds(1)).next()).isEqualTo(55);
@@ -172,8 +172,8 @@ public class RoutineMethodTest {
 
   @Test
   public void testCall() {
-    final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
-    final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
+    final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofData().buildChannel();
+    final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     new RoutineMethod() {
 
       private int mSum;
@@ -206,8 +206,8 @@ public class RoutineMethodTest {
 
   @Test
   public void testCallSync() {
-    final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
-    final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
+    final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofData().buildChannel();
+    final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     new SumRoutine().invocationConfiguration()
                     .withRunner(Runners.syncRunner())
                     .apply()
@@ -226,7 +226,7 @@ public class RoutineMethodTest {
                             .call(JRoutineCore.of("test").buildChannel())
                             .in(seconds(1))
                             .next()).isEqualTo(4);
-    final Channel<String, String> inputChannel = JRoutineCore.<String>ofInputs().buildChannel();
+    final Channel<String, String> inputChannel = JRoutineCore.<String>ofData().buildChannel();
     final Channel<?, Object> outputChannel =
         RoutineMethod.from(RoutineMethodTest.class.getMethod("length", String.class))
                      .callParallel(inputChannel);
@@ -244,7 +244,7 @@ public class RoutineMethodTest {
                             .call(JRoutineCore.of("test").buildChannel())
                             .in(seconds(1))
                             .next()).isEqualTo(4);
-    final Channel<String, String> inputChannel = JRoutineCore.<String>ofInputs().buildChannel();
+    final Channel<String, String> inputChannel = JRoutineCore.<String>ofData().buildChannel();
     final Channel<?, Object> outputChannel =
         RoutineMethod.from(classOfType(RoutineMethodTest.class), "length", String.class)
                      .call(inputChannel);
@@ -314,7 +314,7 @@ public class RoutineMethodTest {
             result.pass(Integer.parseInt(input));
           }
         }).invoke();
-    final Channel<Object, Object> outputChannel = JRoutineCore.ofInputs().buildChannel();
+    final Channel<Object, Object> outputChannel = JRoutineCore.ofData().buildChannel();
     new SumRoutine().call(channel, outputChannel);
     channel.pass("1", "2", "3", "4").close();
     assertThat(outputChannel.in(seconds(1)).next()).isEqualTo(10);
@@ -322,16 +322,16 @@ public class RoutineMethodTest {
 
   @Test
   public void testInputs() {
-    Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
+    Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     new SumRoutine().call(JRoutineCore.of().buildChannel(), outputChannel);
     assertThat(outputChannel.in(seconds(1)).next()).isEqualTo(0);
-    outputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
+    outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     new SumRoutine().call(JRoutineCore.of(1).buildChannel(), outputChannel);
     assertThat(outputChannel.in(seconds(1)).next()).isEqualTo(1);
-    outputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
+    outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     new SumRoutine().call(JRoutineCore.of(1, 2, 3, 4, 5).buildChannel(), outputChannel);
     assertThat(outputChannel.in(seconds(1)).next()).isEqualTo(15);
-    outputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
+    outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     new SumRoutine().call(JRoutineCore.of(Arrays.asList(1, 2, 3, 4, 5)).buildChannel(),
         outputChannel);
     assertThat(outputChannel.in(seconds(1)).next()).isEqualTo(15);
@@ -385,8 +385,8 @@ public class RoutineMethodTest {
       }
     }
 
-    final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
-    final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
+    final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofData().buildChannel();
+    final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     new SumRoutine(0).invocationConfiguration()
                      .withRunner(Runners.syncRunner())
                      .apply()
@@ -418,8 +418,8 @@ public class RoutineMethodTest {
     }
 
     i[0] = 1;
-    final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
-    final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
+    final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofData().buildChannel();
+    final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     new SumRoutine().invocationConfiguration()
                     .withRunner(Runners.syncRunner())
                     .apply()
@@ -436,7 +436,7 @@ public class RoutineMethodTest {
         return "test";
       }
     }.call().in(seconds(1)).next()).isEqualTo("test");
-    final Channel<String, String> outputChannel = JRoutineCore.<String>ofInputs().buildChannel();
+    final Channel<String, String> outputChannel = JRoutineCore.<String>ofData().buildChannel();
     new RoutineMethod() {
 
       void get(@Output final Channel<String, ?> outputChannel) {
@@ -448,8 +448,8 @@ public class RoutineMethodTest {
 
   @Test
   public void testParallel() {
-    final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
-    final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
+    final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofData().buildChannel();
+    final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     new SumRoutine().invocationConfiguration()
                     .withRunner(Runners.syncRunner())
                     .apply()
@@ -460,7 +460,7 @@ public class RoutineMethodTest {
 
   @Test
   public void testParallel2() {
-    final Channel<String, String> inputStrings = JRoutineCore.<String>ofInputs().buildChannel();
+    final Channel<String, String> inputStrings = JRoutineCore.<String>ofData().buildChannel();
     final Channel<?, Object> outputChannel = new RoutineMethod(this) {
 
       int length(@Input final Channel<String, String> input) {
@@ -476,8 +476,8 @@ public class RoutineMethodTest {
 
   @Test
   public void testParallel3() {
-    final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
-    final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
+    final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofData().buildChannel();
+    final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     new SumRoutineInner(0).invocationConfiguration()
                           .withRunner(Runners.syncRunner())
                           .apply()
@@ -505,9 +505,9 @@ public class RoutineMethodTest {
         return (isUpper) ? str.toUpperCase() : str.toLowerCase();
       }
     };
-    Channel<Object, Object> inputChannel = JRoutineCore.ofInputs().buildChannel().pass("test");
+    Channel<Object, Object> inputChannel = JRoutineCore.ofData().buildChannel().pass("test");
     assertThat(method.call(inputChannel, true).in(seconds(1)).next()).isEqualTo("TEST");
-    inputChannel = JRoutineCore.ofInputs().buildChannel().pass("TEST");
+    inputChannel = JRoutineCore.ofData().buildChannel().pass("TEST");
     assertThat(method.call(inputChannel, false).in(seconds(1)).next()).isEqualTo("test");
   }
 
@@ -521,15 +521,15 @@ public class RoutineMethodTest {
         return (isUpper) ? str.toUpperCase(locale) : str.toLowerCase(locale);
       }
     };
-    Channel<Object, Object> inputChannel = JRoutineCore.ofInputs().buildChannel().pass("test");
+    Channel<Object, Object> inputChannel = JRoutineCore.ofData().buildChannel().pass("test");
     assertThat(method.call(inputChannel, true).in(seconds(1)).next()).isEqualTo("TEST");
-    inputChannel = JRoutineCore.ofInputs().buildChannel().pass("TEST");
+    inputChannel = JRoutineCore.ofData().buildChannel().pass("TEST");
     assertThat(method.call(inputChannel, false).in(seconds(1)).next()).isEqualTo("test");
   }
 
   @Test
   public void testReturnValue() {
-    final Channel<String, String> inputStrings = JRoutineCore.<String>ofInputs().buildChannel();
+    final Channel<String, String> inputStrings = JRoutineCore.<String>ofData().buildChannel();
     final Channel<?, Object> outputChannel = new RoutineMethod() {
 
       int length(@Input final Channel<?, String> input) {
@@ -555,9 +555,9 @@ public class RoutineMethodTest {
 
   @Test
   public void testSwitchInput() {
-    final Channel<Integer, Integer> inputInts = JRoutineCore.<Integer>ofInputs().buildChannel();
-    final Channel<String, String> inputStrings = JRoutineCore.<String>ofInputs().buildChannel();
-    final Channel<String, String> outputChannel = JRoutineCore.<String>ofInputs().buildChannel();
+    final Channel<Integer, Integer> inputInts = JRoutineCore.<Integer>ofData().buildChannel();
+    final Channel<String, String> inputStrings = JRoutineCore.<String>ofData().buildChannel();
+    final Channel<String, String> outputChannel = JRoutineCore.<String>ofData().buildChannel();
     new RoutineMethod() {
 
       void run(@Input final Channel<?, Integer> inputInts,
@@ -572,9 +572,9 @@ public class RoutineMethodTest {
 
   @Test
   public void testSwitchInput2() {
-    final Channel<Integer, Integer> inputInts = JRoutineCore.<Integer>ofInputs().buildChannel();
-    final Channel<String, String> inputStrings = JRoutineCore.<String>ofInputs().buildChannel();
-    final Channel<String, String> outputChannel = JRoutineCore.<String>ofInputs().buildChannel();
+    final Channel<Integer, Integer> inputInts = JRoutineCore.<Integer>ofData().buildChannel();
+    final Channel<String, String> inputStrings = JRoutineCore.<String>ofData().buildChannel();
+    final Channel<String, String> outputChannel = JRoutineCore.<String>ofData().buildChannel();
     new RoutineMethod() {
 
       void run(@Input final Channel<?, Integer> inputInts,
@@ -593,8 +593,8 @@ public class RoutineMethodTest {
   @Test
   public void testWrap() {
     final SumRoutineInner routine = new SumRoutineInner(0);
-    final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
-    final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofInputs().buildChannel();
+    final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofData().buildChannel();
+    final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     new RoutineMethod() {
 
       void run(final SumRoutineInner routine, @Input final Channel<?, Integer> input,

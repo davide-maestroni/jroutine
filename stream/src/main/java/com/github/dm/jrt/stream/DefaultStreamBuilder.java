@@ -17,10 +17,13 @@
 package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.core.JRoutineCore;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
+import com.github.dm.jrt.function.util.FunctionDecorator;
+import com.github.dm.jrt.stream.builder.StreamBuilder;
 import com.github.dm.jrt.stream.builder.StreamConfiguration;
 
 import org.jetbrains.annotations.NotNull;
@@ -55,11 +58,36 @@ class DefaultStreamBuilder<IN, OUT> extends AbstractStreamBuilder<IN, OUT> {
     super(streamConfiguration);
   }
 
+  /**
+   * Constructor.
+   *
+   * @param invocationConfiguration the invocation configuration.
+   * @param streamConfiguration     the stream configuration.
+   * @param bindingFunction         the binding function.
+   */
+  private DefaultStreamBuilder(@NotNull final InvocationConfiguration invocationConfiguration,
+      @NotNull final StreamConfiguration streamConfiguration,
+      @NotNull final FunctionDecorator<? super Channel<?, IN>, ? extends Channel<?, OUT>>
+          bindingFunction) {
+    super(invocationConfiguration, streamConfiguration, bindingFunction);
+  }
+
+  @NotNull
+  @Override
+  protected <BEFORE, AFTER> StreamBuilder<BEFORE, AFTER> newBuilder(
+      @NotNull final InvocationConfiguration invocationConfiguration,
+      @NotNull final StreamConfiguration streamConfiguration,
+      @NotNull final FunctionDecorator<? super Channel<?, BEFORE>, ? extends Channel<?, AFTER>>
+          bindingFunction) {
+    return new DefaultStreamBuilder<BEFORE, AFTER>(invocationConfiguration, streamConfiguration,
+        bindingFunction);
+  }
+
   @NotNull
   @Override
   protected <BEFORE, AFTER> Routine<? super BEFORE, ? extends AFTER> newRoutine(
-      @NotNull final StreamConfiguration streamConfiguration,
+      @NotNull final InvocationConfiguration invocationConfiguration,
       @NotNull final InvocationFactory<? super BEFORE, ? extends AFTER> factory) {
-    return newRoutine(streamConfiguration, JRoutineCore.with(factory));
+    return JRoutineCore.with(factory).apply(invocationConfiguration).buildRoutine();
   }
 }

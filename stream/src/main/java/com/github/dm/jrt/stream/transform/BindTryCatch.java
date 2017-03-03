@@ -21,8 +21,8 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.BiConsumer;
-import com.github.dm.jrt.function.Function;
+import com.github.dm.jrt.function.util.BiConsumer;
+import com.github.dm.jrt.function.util.Function;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -54,7 +54,7 @@ class BindTryCatch<OUT> implements Function<Channel<?, OUT>, Channel<?, OUT>> {
 
   public Channel<?, OUT> apply(final Channel<?, OUT> channel) {
     final Channel<OUT, OUT> outputChannel =
-        JRoutineCore.<OUT>ofInputs().apply(mConfiguration).buildChannel();
+        JRoutineCore.<OUT>ofData().apply(mConfiguration).buildChannel();
     channel.consume(new TryCatchChannelConsumer<OUT>(mCatchConsumer, outputChannel));
     return outputChannel;
   }

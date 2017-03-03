@@ -28,7 +28,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashMap;
 
 /**
- * Parallel by count binding function.
+ * Parallel invocations binding function.
  * <p>
  * Created by davide-maestroni on 05/07/2016.
  *
@@ -45,27 +45,27 @@ class BindParallelCount<IN, OUT> extends BindMap<IN, OUT> {
    * Constructor.
    *
    * @param configuration  the channel configuration.
-   * @param count          the channel count.
+   * @param count          the invocation count.
    * @param routine        the routine instance.
    * @param invocationMode the invocation mode.
-   * @throws java.lang.IllegalArgumentException if the channel count is not positive.
+   * @throws java.lang.IllegalArgumentException if the invocation count is not positive.
    */
   BindParallelCount(@NotNull final ChannelConfiguration configuration, final int count,
       @NotNull final Routine<? super IN, ? extends OUT> routine,
       @NotNull final InvocationMode invocationMode) {
     super(routine, invocationMode);
     mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
-    mCount = ConstantConditions.positive("channel count", count);
+    mCount = ConstantConditions.positive("invocation count", count);
   }
 
   public Channel<?, OUT> apply(final Channel<?, IN> channel) {
     final int count = mCount;
     final Channel<OUT, OUT> outputChannel =
-        JRoutineCore.<OUT>ofInputs().apply(mConfiguration).buildChannel();
+        JRoutineCore.<OUT>ofData().apply(mConfiguration).buildChannel();
     final HashMap<Channel<IN, IN>, Channel<?, OUT>> channels =
         new HashMap<Channel<IN, IN>, Channel<?, OUT>>(count);
     for (int i = 0; i < count; ++i) {
-      final Channel<IN, IN> inputChannel = JRoutineCore.<IN>ofInputs().buildChannel();
+      final Channel<IN, IN> inputChannel = JRoutineCore.<IN>ofData().buildChannel();
       final Channel<?, OUT> invocationChannel = super.apply(inputChannel);
       outputChannel.pass(invocationChannel);
       channels.put(inputChannel, invocationChannel);

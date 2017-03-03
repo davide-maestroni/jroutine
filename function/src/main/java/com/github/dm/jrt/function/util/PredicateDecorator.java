@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Davide Maestroni
+ * Copyright 2017 Davide Maestroni
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.function;
+package com.github.dm.jrt.function.util;
 
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DeepEqualObject;
@@ -36,7 +36,8 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  *
  * @param <IN> the input data type.
  */
-public class PredicateDecorator<IN> extends DeepEqualObject implements Predicate<IN>, Decorator {
+public class PredicateDecorator<IN> extends DeepEqualObject implements
+    com.github.dm.jrt.function.util.Predicate<IN>, Decorator {
 
   private static final LogicalPredicate AND_PREDICATE = new LogicalPredicate();
 
@@ -49,7 +50,7 @@ public class PredicateDecorator<IN> extends DeepEqualObject implements Predicate
   private static final LogicalPredicate OR_PREDICATE = new LogicalPredicate();
 
   private static final PredicateDecorator<Object> sNegative =
-      new PredicateDecorator<Object>(new Predicate<Object>() {
+      new PredicateDecorator<Object>(new com.github.dm.jrt.function.util.Predicate<Object>() {
 
         public boolean test(final Object o) {
           return false;
@@ -57,7 +58,7 @@ public class PredicateDecorator<IN> extends DeepEqualObject implements Predicate
       });
 
   private static final PredicateDecorator<Object> sNotNull =
-      new PredicateDecorator<Object>(new Predicate<Object>() {
+      new PredicateDecorator<Object>(new com.github.dm.jrt.function.util.Predicate<Object>() {
 
         public boolean test(final Object o) {
           return (o != null);
@@ -68,17 +69,17 @@ public class PredicateDecorator<IN> extends DeepEqualObject implements Predicate
 
   private static final PredicateDecorator<Object> sPositive = sNegative.negate();
 
-  private final Predicate<? super IN> mPredicate;
+  private final com.github.dm.jrt.function.util.Predicate<? super IN> mPredicate;
 
-  private final List<Predicate<?>> mPredicates;
+  private final List<com.github.dm.jrt.function.util.Predicate<?>> mPredicates;
 
   /**
    * Constructor.
    *
    * @param predicate the core predicate.
    */
-  private PredicateDecorator(@NotNull final Predicate<? super IN> predicate) {
-    this(predicate, Collections.<Predicate<?>>singletonList(
+  private PredicateDecorator(@NotNull final com.github.dm.jrt.function.util.Predicate<? super IN> predicate) {
+    this(predicate, Collections.<com.github.dm.jrt.function.util.Predicate<?>>singletonList(
         ConstantConditions.notNull("predicate instance", predicate)));
   }
 
@@ -88,8 +89,8 @@ public class PredicateDecorator<IN> extends DeepEqualObject implements Predicate
    * @param predicate  the core predicate.
    * @param predicates the list of wrapped predicates.
    */
-  private PredicateDecorator(@NotNull final Predicate<? super IN> predicate,
-      @NotNull final List<Predicate<?>> predicates) {
+  private PredicateDecorator(@NotNull final com.github.dm.jrt.function.util.Predicate<? super IN> predicate,
+      @NotNull final List<com.github.dm.jrt.function.util.Predicate<?>> predicates) {
     super(asArgs(predicates));
     mPredicate = predicate;
     mPredicates = predicates;
@@ -111,7 +112,7 @@ public class PredicateDecorator<IN> extends DeepEqualObject implements Predicate
    * @return the decorated predicate.
    */
   @NotNull
-  public static <IN> PredicateDecorator<IN> decorate(@NotNull final Predicate<IN> predicate) {
+  public static <IN> PredicateDecorator<IN> decorate(@NotNull final com.github.dm.jrt.function.util.Predicate<IN> predicate) {
     if (predicate instanceof PredicateDecorator) {
       return (PredicateDecorator<IN>) predicate;
     }
@@ -235,11 +236,11 @@ public class PredicateDecorator<IN> extends DeepEqualObject implements Predicate
    * @return the composed predicate.
    */
   @NotNull
-  public PredicateDecorator<IN> and(@NotNull final Predicate<? super IN> other) {
+  public PredicateDecorator<IN> and(@NotNull final com.github.dm.jrt.function.util.Predicate<? super IN> other) {
     ConstantConditions.notNull("predicate instance", other);
-    final List<Predicate<?>> predicates = mPredicates;
-    final ArrayList<Predicate<?>> newPredicates =
-        new ArrayList<Predicate<?>>(predicates.size() + 4);
+    final List<com.github.dm.jrt.function.util.Predicate<?>> predicates = mPredicates;
+    final ArrayList<com.github.dm.jrt.function.util.Predicate<?>> newPredicates =
+        new ArrayList<com.github.dm.jrt.function.util.Predicate<?>>(predicates.size() + 4);
     newPredicates.add(OPEN_PREDICATE);
     newPredicates.addAll(predicates);
     newPredicates.add(AND_PREDICATE);
@@ -255,7 +256,7 @@ public class PredicateDecorator<IN> extends DeepEqualObject implements Predicate
   }
 
   public boolean hasStaticScope() {
-    for (final Predicate<?> predicate : mPredicates) {
+    for (final com.github.dm.jrt.function.util.Predicate<?> predicate : mPredicates) {
       if (!Reflection.hasStaticScope(predicate)) {
         return false;
       }
@@ -272,22 +273,22 @@ public class PredicateDecorator<IN> extends DeepEqualObject implements Predicate
   @NotNull
   @SuppressWarnings("unchecked")
   public PredicateDecorator<IN> negate() {
-    final List<Predicate<?>> predicates = mPredicates;
+    final List<com.github.dm.jrt.function.util.Predicate<?>> predicates = mPredicates;
     final int size = predicates.size();
-    final ArrayList<Predicate<?>> newPredicates = new ArrayList<Predicate<?>>(size + 1);
+    final ArrayList<com.github.dm.jrt.function.util.Predicate<?>> newPredicates = new ArrayList<com.github.dm.jrt.function.util.Predicate<?>>(size + 1);
     if (size == 1) {
       newPredicates.add(NEGATE_PREDICATE);
       newPredicates.add(predicates.get(0));
 
     } else {
-      final Predicate<?> first = predicates.get(0);
+      final com.github.dm.jrt.function.util.Predicate<?> first = predicates.get(0);
       if (first == NEGATE_PREDICATE) {
         newPredicates.add(predicates.get(1));
 
       } else {
         newPredicates.add(first);
         for (int i = 1; i < size; ++i) {
-          final Predicate<?> predicate = predicates.get(i);
+          final com.github.dm.jrt.function.util.Predicate<?> predicate = predicates.get(i);
           if (predicate == NEGATE_PREDICATE) {
             ++i;
 
@@ -308,7 +309,7 @@ public class PredicateDecorator<IN> extends DeepEqualObject implements Predicate
       }
     }
 
-    final Predicate<? super IN> predicate = mPredicate;
+    final com.github.dm.jrt.function.util.Predicate<? super IN> predicate = mPredicate;
     if (predicate instanceof NegatePredicate) {
       return new PredicateDecorator<IN>(((NegatePredicate<? super IN>) predicate).mPredicate,
           newPredicates);
@@ -325,11 +326,11 @@ public class PredicateDecorator<IN> extends DeepEqualObject implements Predicate
    * @return the composed predicate.
    */
   @NotNull
-  public PredicateDecorator<IN> or(@NotNull final Predicate<? super IN> other) {
+  public PredicateDecorator<IN> or(@NotNull final com.github.dm.jrt.function.util.Predicate<? super IN> other) {
     ConstantConditions.notNull("predicate instance", other);
-    final List<Predicate<?>> predicates = mPredicates;
-    final ArrayList<Predicate<?>> newPredicates =
-        new ArrayList<Predicate<?>>(predicates.size() + 4);
+    final List<com.github.dm.jrt.function.util.Predicate<?>> predicates = mPredicates;
+    final ArrayList<com.github.dm.jrt.function.util.Predicate<?>> newPredicates =
+        new ArrayList<com.github.dm.jrt.function.util.Predicate<?>>(predicates.size() + 4);
     newPredicates.add(OPEN_PREDICATE);
     newPredicates.addAll(predicates);
     newPredicates.add(OR_PREDICATE);
@@ -349,11 +350,12 @@ public class PredicateDecorator<IN> extends DeepEqualObject implements Predicate
    *
    * @param <IN> the input data type.
    */
-  private static final class AndPredicate<IN> implements Predicate<IN> {
+  private static final class AndPredicate<IN> implements
+      com.github.dm.jrt.function.util.Predicate<IN> {
 
-    private final Predicate<? super IN> mOther;
+    private final com.github.dm.jrt.function.util.Predicate<? super IN> mOther;
 
-    private final Predicate<? super IN> mPredicate;
+    private final com.github.dm.jrt.function.util.Predicate<? super IN> mPredicate;
 
     /**
      * Constructor.
@@ -361,8 +363,8 @@ public class PredicateDecorator<IN> extends DeepEqualObject implements Predicate
      * @param predicate the wrapped predicate.
      * @param other     the other predicate to be logically-ANDed.
      */
-    private AndPredicate(@NotNull final Predicate<? super IN> predicate,
-        @NotNull final Predicate<? super IN> other) {
+    private AndPredicate(@NotNull final com.github.dm.jrt.function.util.Predicate<? super IN> predicate,
+        @NotNull final com.github.dm.jrt.function.util.Predicate<? super IN> other) {
       mPredicate = predicate;
       mOther = other;
     }
@@ -377,7 +379,8 @@ public class PredicateDecorator<IN> extends DeepEqualObject implements Predicate
    *
    * @param <IN> the input data type.
    */
-  private static class EqualToPredicate<IN> extends DeepEqualObject implements Predicate<IN> {
+  private static class EqualToPredicate<IN> extends DeepEqualObject implements
+      com.github.dm.jrt.function.util.Predicate<IN> {
 
     private final Object mOther;
 
@@ -401,7 +404,8 @@ public class PredicateDecorator<IN> extends DeepEqualObject implements Predicate
    *
    * @param <IN> the input data type.
    */
-  private static class InstanceOfPredicate<IN> extends DeepEqualObject implements Predicate<IN> {
+  private static class InstanceOfPredicate<IN> extends DeepEqualObject implements
+      com.github.dm.jrt.function.util.Predicate<IN> {
 
     private final Class<?> mType;
 
@@ -423,7 +427,8 @@ public class PredicateDecorator<IN> extends DeepEqualObject implements Predicate
   /**
    * Class indicating a logical operation (like AND and OR).
    */
-  private static class LogicalPredicate implements Predicate<Object> {
+  private static class LogicalPredicate implements
+      com.github.dm.jrt.function.util.Predicate<Object> {
 
     public boolean test(final Object o) {
       throw new UnsupportedOperationException("should never be called");
@@ -435,16 +440,17 @@ public class PredicateDecorator<IN> extends DeepEqualObject implements Predicate
    *
    * @param <IN> the input data type.
    */
-  private static final class NegatePredicate<IN> implements Predicate<IN> {
+  private static final class NegatePredicate<IN> implements
+      com.github.dm.jrt.function.util.Predicate<IN> {
 
-    private final Predicate<? super IN> mPredicate;
+    private final com.github.dm.jrt.function.util.Predicate<? super IN> mPredicate;
 
     /**
      * Constructor.
      *
      * @param predicate the wrapped predicate.
      */
-    private NegatePredicate(@NotNull final Predicate<? super IN> predicate) {
+    private NegatePredicate(@NotNull final com.github.dm.jrt.function.util.Predicate<? super IN> predicate) {
       mPredicate = predicate;
     }
 
@@ -458,11 +464,12 @@ public class PredicateDecorator<IN> extends DeepEqualObject implements Predicate
    *
    * @param <IN> the input data type.
    */
-  private static final class OrPredicate<IN> implements Predicate<IN> {
+  private static final class OrPredicate<IN> implements
+      com.github.dm.jrt.function.util.Predicate<IN> {
 
-    private final Predicate<? super IN> mOther;
+    private final com.github.dm.jrt.function.util.Predicate<? super IN> mOther;
 
-    private final Predicate<? super IN> mPredicate;
+    private final com.github.dm.jrt.function.util.Predicate<? super IN> mPredicate;
 
     /**
      * Constructor.
@@ -470,8 +477,8 @@ public class PredicateDecorator<IN> extends DeepEqualObject implements Predicate
      * @param predicate the wrapped predicate.
      * @param other     the other predicate to be logically-ORed.
      */
-    private OrPredicate(@NotNull final Predicate<? super IN> predicate,
-        @NotNull final Predicate<? super IN> other) {
+    private OrPredicate(@NotNull final com.github.dm.jrt.function.util.Predicate<? super IN> predicate,
+        @NotNull final com.github.dm.jrt.function.util.Predicate<? super IN> other) {
       mPredicate = predicate;
       mOther = other;
     }
@@ -486,7 +493,8 @@ public class PredicateDecorator<IN> extends DeepEqualObject implements Predicate
    *
    * @param <IN> the input data type.
    */
-  private static class SameAsPredicate<IN> implements Predicate<IN> {
+  private static class SameAsPredicate<IN> implements
+      com.github.dm.jrt.function.util.Predicate<IN> {
 
     private final Object mOther;
 

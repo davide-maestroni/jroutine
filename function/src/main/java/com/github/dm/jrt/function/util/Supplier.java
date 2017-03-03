@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Davide Maestroni
+ * Copyright 2017 Davide Maestroni
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,22 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.function;
+package com.github.dm.jrt.function.util;
 
 /**
- * Interface defining a decorator of functions.
+ * Interface representing a supplier of results.
  * <p>
- * Created by davide-maestroni on 02/13/2016.
+ * Created by davide-maestroni on 09/21/2015.
+ *
+ * @param <OUT> the output data type.
  */
-public interface Decorator {
+public interface Supplier<OUT> {
 
   /**
-   * Checks if the class of the wrapped functions are static or top level.
+   * Gets a result.
    *
-   * @return whether this decorator has a static scope.
+   * @return a result.
+   * @throws java.lang.Exception if an unexpected error occurs.
    */
-  boolean hasStaticScope();
+  OUT get() throws Exception;
 }

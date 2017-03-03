@@ -281,13 +281,14 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
-      mChannel = null;
-      if (!isReused) {
-        mRoutine = null;
-        mInstance = null;
-      }
+    public void onDestroy() {
+      mRoutine = null;
+      mInstance = null;
+    }
 
+    @Override
+    public boolean onRecycle() {
+      mChannel = null;
       return true;
     }
 
@@ -391,13 +392,14 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
-      mChannel = null;
-      if (!isReused) {
-        mRoutine = null;
-        mInstance = null;
-      }
+    public void onDestroy() {
+      mRoutine = null;
+      mInstance = null;
+    }
 
+    @Override
+    public boolean onRecycle() {
+      mChannel = null;
       return true;
     }
 
@@ -524,11 +526,12 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
-      if (!isReused) {
-        mInstance = null;
-      }
+    public void onDestroy() {
+      mInstance = null;
+    }
 
+    @Override
+    public boolean onRecycle() {
       return true;
     }
 

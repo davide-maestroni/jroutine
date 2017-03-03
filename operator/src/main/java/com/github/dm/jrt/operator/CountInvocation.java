@@ -69,7 +69,7 @@ class CountInvocation extends TemplateInvocation<Object, Long> {
   }
 
   @Override
-  public boolean onRecycle(final boolean isReused) {
+  public boolean onRecycle() {
     return true;
   }
 

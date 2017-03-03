@@ -30,11 +30,11 @@ import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.Runners;
-import com.github.dm.jrt.function.Action;
-import com.github.dm.jrt.function.BiConsumer;
-import com.github.dm.jrt.function.BiFunction;
-import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Functions;
+import com.github.dm.jrt.function.util.Action;
+import com.github.dm.jrt.function.util.BiConsumer;
+import com.github.dm.jrt.function.util.BiFunction;
+import com.github.dm.jrt.function.util.Function;
 import com.github.dm.jrt.stream.JRoutineStream;
 import com.github.dm.jrt.stream.builder.StreamBuilder;
 
@@ -48,6 +48,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
+import static com.github.dm.jrt.core.util.DurationMeasure.indefiniteTime;
 import static com.github.dm.jrt.core.util.DurationMeasure.millis;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static com.github.dm.jrt.operator.Operators.appendAccept;
@@ -113,7 +114,8 @@ public class TransformationsTest {
                                   return data.sum / data.count;
                                 }
                               })
-                              .call()
+                              .invoke()
+                              .close()
                               .in(seconds(3))
                               .next()).isCloseTo(21, Offset.offset(0.1));
     Assertions.assertThat(JRoutineStream //
@@ -151,7 +153,8 @@ public class TransformationsTest {
                                   return data.sum / data.count;
                                 }
                               })
-                              .call()
+                              .invoke()
+                              .close()
                               .in(seconds(3))
                               .next()).isCloseTo(21, Offset.offset(0.1));
   }
@@ -174,28 +177,34 @@ public class TransformationsTest {
     long startTime = System.currentTimeMillis();
     assertThat(JRoutineStream.withStream()
                              .lift(Transformations.delay(1, TimeUnit.SECONDS))
-                             .call("test")
+                             .invoke()
+                             .pass("test")
+                             .close()
                              .in(seconds(3))
                              .next()).isEqualTo("test");
     assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
     startTime = System.currentTimeMillis();
     assertThat(JRoutineStream.withStream()
                              .lift(Transformations.delay(seconds(1)))
-                             .call("test")
+                             .invoke()
+                             .pass("test")
+                             .close()
                              .in(seconds(3))
                              .next()).isEqualTo("test");
     assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
     startTime = System.currentTimeMillis();
     assertThat(JRoutineStream.withStream()
                              .lift(Transformations.delay(1, TimeUnit.SECONDS))
-                             .call()
+                             .invoke()
+                             .close()
                              .in(seconds(3))
                              .all()).isEmpty();
     assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
     startTime = System.currentTimeMillis();
     assertThat(JRoutineStream.withStream()
                              .lift(Transformations.delay(seconds(1)))
-                             .call()
+                             .invoke()
+                             .close()
                              .in(seconds(3))
                              .all()).isEmpty();
     assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
@@ -217,28 +226,34 @@ public class TransformationsTest {
     long startTime = System.currentTimeMillis();
     assertThat(JRoutineStream.withStream()
                              .lift(Transformations.lag(1, TimeUnit.SECONDS))
-                             .call("test")
+                             .invoke()
+                             .pass("test")
+                             .close()
                              .in(seconds(3))
                              .next()).isEqualTo("test");
     assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
     startTime = System.currentTimeMillis();
     assertThat(JRoutineStream.withStream()
                              .lift(Transformations.lag(seconds(1)))
-                             .call("test")
+                             .invoke()
+                             .pass("test")
+                             .close()
                              .in(seconds(3))
                              .next()).isEqualTo("test");
     assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
     startTime = System.currentTimeMillis();
     assertThat(JRoutineStream.withStream()
                              .lift(Transformations.lag(1, TimeUnit.SECONDS))
-                             .call()
+                             .invoke()
+                             .close()
                              .in(seconds(3))
                              .all()).isEmpty();
     assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
     startTime = System.currentTimeMillis();
     assertThat(JRoutineStream.withStream()
                              .lift(Transformations.lag(seconds(1)))
-                             .call()
+                             .invoke()
+                             .close()
                              .in(seconds(3))
                              .all()).isEmpty();
     assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
@@ -269,34 +284,39 @@ public class TransformationsTest {
         .<Integer>withStream().map(appendAccept(range(1, 3)))
                               .lift(Transformations.<Integer, Integer, Long>parallel(2,
                                   sqr.buildFactory()))
-                              .call()
+                              .invoke()
+                              .close()
                               .in(seconds(3))
                               .all()).containsOnly(1L, 4L, 9L);
     assertThat(JRoutineStream //
         .<Integer>withStream().map(appendAccept(range(1, 3)))
                               .lift(Transformations.<Integer, Integer, Long>parallel(2, sqr))
-                              .call()
+                              .invoke()
+                              .close()
                               .in(seconds(3))
                               .all()).containsOnly(1L, 4L, 9L);
     assertThat(JRoutineStream //
         .<Integer>withStream().map(appendAccept(range(1, 3)))
                               .lift(Transformations.<Integer, Integer, Integer>parallel(2,
                                   JRoutineCore.with(IdentityInvocation.<Integer>factoryOf())))
-                              .call()
+                              .invoke()
+                              .close()
                               .in(seconds(3))
                               .all()).containsOnly(1, 2, 3);
     assertThat(JRoutineStream //
         .<Integer>withStream().map(appendAccept(range(1, 3)))
                               .lift(Transformations.<Integer, Integer, Long>parallelBy(
                                   Functions.<Integer>identity(), sqr.buildFactory()))
-                              .call()
+                              .invoke()
+                              .close()
                               .in(seconds(3))
                               .all()).containsOnly(1L, 4L, 9L);
     assertThat(JRoutineStream //
         .<Integer>withStream().map(appendAccept(range(1, 3)))
                               .lift(Transformations.<Integer, Integer, Long>parallelBy(
                                   Functions.<Integer>identity(), sqr))
-                              .call()
+                              .invoke()
+                              .close()
                               .in(seconds(3))
                               .all()).containsOnly(1L, 4L, 9L);
     assertThat(JRoutineStream //
@@ -304,7 +324,8 @@ public class TransformationsTest {
                               .lift(Transformations.<Integer, Integer, Integer>parallelBy(
                                   Functions.<Integer>identity(),
                                   JRoutineCore.with(IdentityInvocation.<Integer>factoryOf())))
-                              .call()
+                              .invoke()
+                              .close()
                               .in(seconds(3))
                               .all()).containsOnly(1, 2, 3);
   }
@@ -376,7 +397,9 @@ public class TransformationsTest {
       JRoutineStream.<String>withStream().map(new UpperCase())
                                          .map(factoryOf(ThrowException.class, count1))
                                          .lift(Transformations.<String, Object>retry(2))
-                                         .call("test")
+                                         .invoke()
+                                         .pass("test")
+                                         .close()
                                          .in(seconds(3))
                                          .throwError();
       fail();
@@ -389,7 +412,9 @@ public class TransformationsTest {
     assertThat(JRoutineStream.<String>withStream().map(new UpperCase())
                                                   .map(factoryOf(ThrowException.class, count2, 1))
                                                   .lift(Transformations.<String, Object>retry(1))
-                                                  .call("test")
+                                                  .invoke()
+                                                  .pass("test")
+                                                  .close()
                                                   .in(seconds(3))
                                                   .all()).containsExactly("TEST");
 
@@ -398,7 +423,9 @@ public class TransformationsTest {
       JRoutineStream.<String>withStream().map(new AbortInvocation())
                                          .map(factoryOf(ThrowException.class, count3))
                                          .lift(Transformations.<String, Object>retry(2))
-                                         .call("test")
+                                         .invoke()
+                                         .pass("test")
+                                         .close()
                                          .in(seconds(3))
                                          .throwError();
       fail();
@@ -410,8 +437,8 @@ public class TransformationsTest {
 
   @Test
   public void testRetryConsumerError() {
-    final Channel<Object, Object> inputChannel = JRoutineCore.ofInputs().buildChannel();
-    final Channel<Object, Object> outputChannel = JRoutineCore.ofInputs().buildChannel();
+    final Channel<Object, Object> inputChannel = JRoutineCore.ofData().buildChannel();
+    final Channel<Object, Object> outputChannel = JRoutineCore.ofData().buildChannel();
     new RetryChannelConsumer<Object, Object>(inputChannel, outputChannel, Runners.syncRunner(),
         new Function<Channel<?, Object>, Channel<?, Object>>() {
 
@@ -430,8 +457,8 @@ public class TransformationsTest {
 
   @Test
   public void testRetryConsumerError2() {
-    final Channel<Object, Object> inputChannel = JRoutineCore.ofInputs().buildChannel();
-    final Channel<Object, Object> outputChannel = JRoutineCore.ofInputs().buildChannel();
+    final Channel<Object, Object> inputChannel = JRoutineCore.ofData().buildChannel();
+    final Channel<Object, Object> outputChannel = JRoutineCore.ofData().buildChannel();
     new RetryChannelConsumer<Object, Object>(inputChannel, outputChannel, Runners.syncRunner(),
         new Function<Channel<?, Object>, Channel<?, Object>>() {
 
@@ -501,8 +528,8 @@ public class TransformationsTest {
   public void testTimeThrottle() {
     final Routine<Object, Object> routine =
         JRoutineStream.withStream().lift(throttle(1, seconds(1))).buildRoutine();
-    final Channel<Object, Object> channel1 = routine.call("test1");
-    final Channel<Object, Object> channel2 = routine.call("test2");
+    final Channel<Object, Object> channel1 = routine.invoke().pass("test1").close();
+    final Channel<Object, Object> channel2 = routine.invoke().pass("test2").close();
     assertThat(channel1.in(seconds(1.5)).next()).isEqualTo("test1");
     assertThat(channel2.in(seconds(1.5)).next()).isEqualTo("test2");
   }
@@ -511,12 +538,23 @@ public class TransformationsTest {
   public void testTimeout() {
     assertThat(JRoutineStream.withStream()
                              .lift(timeoutAfter(seconds(1)))
-                             .call("test")
+                             .invoke()
+                             .pass("test")
+                             .close()
                              .in(seconds(1))
                              .all()).containsExactly("test");
-    final Channel<Object, Object> channel =
-        JRoutineStream.withStream().lift(timeoutAfter(millis(1))).invoke().pass("test");
-    assertThat(channel.in(seconds(1)).getError()).isExactlyInstanceOf(ResultTimeoutException.class);
+    assertThat(JRoutineStream.withStream()
+                             .lift(timeoutAfter(millis(1)))
+                             .invoke()
+                             .pass("test")
+                             .in(seconds(1))
+                             .getError()).isExactlyInstanceOf(ResultTimeoutException.class);
+    assertThat(JRoutineStream.withStream()
+                             .lift(timeoutAfter(indefiniteTime(), millis(1)))
+                             .invoke()
+                             .pass("test")
+                             .in(seconds(1))
+                             .getError()).isExactlyInstanceOf(ResultTimeoutException.class);
   }
 
   @Test
@@ -540,7 +578,9 @@ public class TransformationsTest {
                                                               channel.pass("exception");
                                                             }
                                                           }))
-                                                  .call("test")
+                                                  .invoke()
+                                                  .pass("test")
+                                                  .close()
                                                   .next()).isEqualTo("exception");
     assertThat(JRoutineStream.<String>withStream().sync()
                                                   .map(new Function<Object, Object>() {
@@ -561,7 +601,9 @@ public class TransformationsTest {
                                                               channel.pass("exception");
                                                             }
                                                           }))
-                                                  .call("test")
+                                                  .invoke()
+                                                  .pass("test")
+                                                  .close()
                                                   .next()).isEqualTo("test");
     assertThat(JRoutineStream.<String>withStream().sync().map(new Function<Object, Object>() {
 
@@ -573,7 +615,7 @@ public class TransformationsTest {
       public Object apply(final RoutineException e) {
         return "exception";
       }
-    })).call("test").next()).isEqualTo("exception");
+    })).invoke().pass("test").close().next()).isEqualTo("exception");
   }
 
   @Test
@@ -608,7 +650,7 @@ public class TransformationsTest {
         public void perform() {
           isRun.set(true);
         }
-      })).call("test").next();
+      })).invoke().pass("test").close().next();
 
     } catch (final RoutineException ignored) {
     }
@@ -624,7 +666,7 @@ public class TransformationsTest {
       public void perform() {
         isRun.set(true);
       }
-    })).call("test").next()).isEqualTo("test");
+    })).invoke().pass("test").close().next()).isEqualTo("test");
     assertThat(isRun.getAndSet(false)).isTrue();
   }
 
@@ -688,7 +730,7 @@ public class TransformationsTest {
     }
 
     @Override
-    public boolean onRecycle(final boolean isReused) {
+    public boolean onRecycle() {
       return true;
     }
   }

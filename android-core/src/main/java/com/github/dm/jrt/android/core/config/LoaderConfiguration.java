@@ -221,16 +221,13 @@ public final class LoaderConfiguration extends DeepEqualObject {
     /**
      * On completion the invocation results are cleared.
      */
-    CLEAR,
-    /**
+    CLEAR, /**
      * Only in case of error the results are cleared, otherwise they are retained.
      */
-    CACHE_IF_SUCCESS,
-    /**
+    CACHE_IF_SUCCESS, /**
      * Only in case of successful completion the results are cleared, otherwise they are retained.
      */
-    CACHE_IF_ERROR,
-    /**
+    CACHE_IF_ERROR, /**
      * On completion the invocation results are retained.
      */
     CACHE
@@ -255,18 +252,15 @@ public final class LoaderConfiguration extends DeepEqualObject {
     /**
      * The clash is resolved by joining the two invocations.
      */
-    JOIN,
-    /**
+    JOIN, /**
      * The clash is resolved by aborting the running invocation.
      */
-    ABORT_OTHER,
-    /**
+    ABORT_OTHER, /**
      * The clash is resolved by aborting the invocation with an
      * {@link com.github.dm.jrt.android.core.invocation.InvocationClashException
      * InvocationClashException}.
      */
-    ABORT_THIS,
-    /**
+    ABORT_THIS, /**
      * The clash is resolved by aborting both the invocations.
      */
     ABORT_BOTH
@@ -344,54 +338,6 @@ public final class LoaderConfiguration extends DeepEqualObject {
     }
 
     /**
-     * Applies the specified configuration to this builder. A null value means that all the
-     * configuration options will be reset to their default, otherwise only the non-default
-     * options will be applied.
-     *
-     * @param configuration the Loader configuration.
-     * @return this builder.
-     */
-    @NotNull
-    public Builder<TYPE> with(@Nullable final LoaderConfiguration configuration) {
-      if (configuration == null) {
-        setConfiguration(defaultConfiguration());
-        return this;
-      }
-
-      final int loaderId = configuration.mLoaderId;
-      if (loaderId != AUTO) {
-        withLoaderId(loaderId);
-      }
-
-      final int invocationId = configuration.mInvocationId;
-      if (invocationId != AUTO) {
-        withInvocationId(invocationId);
-      }
-
-      final ClashResolutionType clashResolutionType = configuration.mClashResolutionType;
-      if (clashResolutionType != null) {
-        withClashResolution(clashResolutionType);
-      }
-
-      final ClashResolutionType matchResolutionType = configuration.mMatchResolutionType;
-      if (matchResolutionType != null) {
-        withMatchResolution(matchResolutionType);
-      }
-
-      final CacheStrategyType strategyType = configuration.mStrategyType;
-      if (strategyType != null) {
-        withCacheStrategy(strategyType);
-      }
-
-      final DurationMeasure staleTime = configuration.mStaleTime;
-      if (staleTime != null) {
-        withResultStaleTime(staleTime);
-      }
-
-      return this;
-    }
-
-    /**
      * Tells the builder how to cache the invocation result after its completion. A null value
      * means that it is up to the specific implementation to choose a default strategy.
      *
@@ -453,6 +399,54 @@ public final class LoaderConfiguration extends DeepEqualObject {
     @NotNull
     public Builder<TYPE> withMatchResolution(@Nullable final ClashResolutionType resolutionType) {
       mMatchResolutionType = resolutionType;
+      return this;
+    }
+
+    /**
+     * Applies the specified patch configuration to this builder. A null value means that all the
+     * configuration options will be reset to their default, otherwise only the non-default
+     * options will be applied.
+     *
+     * @param configuration the Loader configuration.
+     * @return this builder.
+     */
+    @NotNull
+    public Builder<TYPE> withPatch(@Nullable final LoaderConfiguration configuration) {
+      if (configuration == null) {
+        setConfiguration(defaultConfiguration());
+        return this;
+      }
+
+      final int loaderId = configuration.mLoaderId;
+      if (loaderId != AUTO) {
+        withLoaderId(loaderId);
+      }
+
+      final int invocationId = configuration.mInvocationId;
+      if (invocationId != AUTO) {
+        withInvocationId(invocationId);
+      }
+
+      final ClashResolutionType clashResolutionType = configuration.mClashResolutionType;
+      if (clashResolutionType != null) {
+        withClashResolution(clashResolutionType);
+      }
+
+      final ClashResolutionType matchResolutionType = configuration.mMatchResolutionType;
+      if (matchResolutionType != null) {
+        withMatchResolution(matchResolutionType);
+      }
+
+      final CacheStrategyType strategyType = configuration.mStrategyType;
+      if (strategyType != null) {
+        withCacheStrategy(strategyType);
+      }
+
+      final DurationMeasure staleTime = configuration.mStaleTime;
+      if (staleTime != null) {
+        withResultStaleTime(staleTime);
+      }
+
       return this;
     }
 

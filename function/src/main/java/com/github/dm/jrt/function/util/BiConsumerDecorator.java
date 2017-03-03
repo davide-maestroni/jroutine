@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Davide Maestroni
+ * Copyright 2017 Davide Maestroni
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.function;
+package com.github.dm.jrt.function.util;
 
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DeepEqualObject;
@@ -51,17 +51,17 @@ public class BiConsumerDecorator<IN1, IN2> extends DeepEqualObject
   /**
    * Constructor.
    *
-   * @param consumer the wrapped consumer.
+   * @param consumer the wrapped bi-consumer.
    */
   private BiConsumerDecorator(@NotNull final BiConsumer<?, ?> consumer) {
     this(Collections.<BiConsumer<?, ?>>singletonList(
-        ConstantConditions.notNull("consumer instance", consumer)));
+        ConstantConditions.notNull("bi-consumer instance", consumer)));
   }
 
   /**
    * Constructor.
    *
-   * @param consumers the list of wrapped consumers.
+   * @param consumers the list of wrapped bi-consumers.
    */
   private BiConsumerDecorator(@NotNull final List<BiConsumer<?, ?>> consumers) {
     super(asArgs(consumers));

@@ -22,7 +22,7 @@ import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.SimpleQueue;
-import com.github.dm.jrt.function.Function;
+import com.github.dm.jrt.function.util.Function;
 import com.github.dm.jrt.stream.builder.StreamConfiguration;
 import com.github.dm.jrt.stream.transform.ThrottleChannelConsumer.CompletionHandler;
 
@@ -87,7 +87,7 @@ class Throttle<IN, OUT> implements LiftFunction<IN, OUT, IN, OUT> {
     public Channel<?, OUT> apply(final Channel<?, IN> channel) throws Exception {
       final ChannelConfiguration configuration = mConfiguration;
       final Channel<OUT, OUT> outputChannel =
-          JRoutineCore.<OUT>ofInputs().apply(configuration).buildChannel();
+          JRoutineCore.<OUT>ofData().apply(configuration).buildChannel();
       final boolean isBind;
       synchronized (mMutex) {
         isBind = (++mCount <= mMaxCount);

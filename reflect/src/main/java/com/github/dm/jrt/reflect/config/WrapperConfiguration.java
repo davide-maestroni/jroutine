@@ -22,7 +22,6 @@ import com.github.dm.jrt.core.util.DeepEqualObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -165,13 +164,6 @@ public final class WrapperConfiguration extends DeepEqualObject {
       setConfiguration(initialConfiguration);
     }
 
-    @NotNull
-    private static Set<String> toSet(@NotNull final String[] values) {
-      final HashSet<String> set = new HashSet<String>();
-      Collections.addAll(set, values);
-      return set;
-    }
-
     /**
      * Applies this configuration and returns the configured object.
      *
@@ -183,7 +175,7 @@ public final class WrapperConfiguration extends DeepEqualObject {
     }
 
     /**
-     * Applies the specified configuration to this builder. A null value means that all the
+     * Applies the specified patch configuration to this builder. A null value means that all the
      * configuration options will be reset to their default, otherwise only the non-default
      * options will be applied.
      *
@@ -191,7 +183,7 @@ public final class WrapperConfiguration extends DeepEqualObject {
      * @return this builder.
      */
     @NotNull
-    public Builder<TYPE> with(@Nullable final WrapperConfiguration configuration) {
+    public Builder<TYPE> withPatch(@Nullable final WrapperConfiguration configuration) {
       if (configuration == null) {
         setConfiguration(defaultConfiguration());
         return this;
@@ -224,7 +216,15 @@ public final class WrapperConfiguration extends DeepEqualObject {
      */
     @NotNull
     public Builder<TYPE> withSharedFields(@Nullable final String... fieldNames) {
-      mFieldNames = (fieldNames != null) ? toSet(fieldNames) : null;
+      if (fieldNames != null) {
+        final HashSet<String> set = new HashSet<String>();
+        Collections.addAll(set, fieldNames);
+        mFieldNames = Collections.unmodifiableSet(set);
+
+      } else {
+        mFieldNames = null;
+      }
+
       return this;
     }
 
@@ -235,8 +235,19 @@ public final class WrapperConfiguration extends DeepEqualObject {
      * @return this builder.
      */
     @NotNull
-    public Builder<TYPE> withSharedFields(@Nullable final Collection<String> fieldNames) {
-      mFieldNames = (fieldNames != null) ? new HashSet<String>(fieldNames) : null;
+    public Builder<TYPE> withSharedFields(@Nullable final Iterable<? extends String> fieldNames) {
+      if (fieldNames != null) {
+        final HashSet<String> set = new HashSet<String>();
+        for (final String fieldName : fieldNames) {
+          set.add(fieldName);
+        }
+
+        mFieldNames = Collections.unmodifiableSet(set);
+
+      } else {
+        mFieldNames = null;
+      }
+
       return this;
     }
 

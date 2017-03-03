@@ -53,7 +53,7 @@ class MergeOutputBuilder<OUT> extends AbstractChannelBuilder<Flow<OUT>, Flow<OUT
   @NotNull
   public Channel<Flow<OUT>, Flow<OUT>> buildChannel() {
     final Channel<Flow<OUT>, Flow<OUT>> outputChannel =
-        JRoutineCore.<Flow<OUT>>ofInputs().apply(getConfiguration()).buildChannel();
+        JRoutineCore.<Flow<OUT>>ofData().apply(getConfiguration()).buildChannel();
     int i = mStartId;
     for (final Channel<?, ? extends OUT> channel : mChannels) {
       outputChannel.pass(new OutputFlowBuilder<OUT>(channel, i++).buildChannel());

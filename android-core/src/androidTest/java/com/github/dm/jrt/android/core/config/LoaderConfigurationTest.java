@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Davide Maestroni
+ * Copyright 2017 Davide Maestroni
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.android.core.builder;
+package com.github.dm.jrt.android.core.config;
 
 import android.test.AndroidTestCase;
 
-import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.Builder;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.CacheStrategyType;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.ClashResolutionType;
@@ -87,9 +86,9 @@ public class LoaderConfigurationTest extends AndroidTestCase {
                                                        .withCacheStrategy(strategyType)
                                                        .withResultStaleTime(1, TimeUnit.SECONDS)
                                                        .apply();
-    assertThat(builder().with(configuration).apply()).isEqualTo(configuration);
+    assertThat(builder().withPatch(configuration).apply()).isEqualTo(configuration);
     assertThat(configuration.builderFrom().apply()).isEqualTo(configuration);
-    assertThat(configuration.builderFrom().with(null).apply()).isEqualTo(
+    assertThat(configuration.builderFrom().withPatch(null).apply()).isEqualTo(
         LoaderConfiguration.defaultConfiguration());
   }
 

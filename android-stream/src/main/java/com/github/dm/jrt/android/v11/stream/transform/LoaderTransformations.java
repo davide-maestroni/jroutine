@@ -26,14 +26,14 @@ import com.github.dm.jrt.android.v11.core.JRoutineLoader;
 import com.github.dm.jrt.android.v11.core.LoaderContext;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.lambda.Function;
-import com.github.dm.jrt.function.lambda.FunctionDecorator;
+import com.github.dm.jrt.function.util.Function;
+import com.github.dm.jrt.function.util.FunctionDecorator;
 import com.github.dm.jrt.stream.builder.StreamConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
-import static com.github.dm.jrt.function.lambda.FunctionDecorator.decorate;
+import static com.github.dm.jrt.function.util.FunctionDecorator.decorate;
 
 /**
  * Utility class providing transformation functions based on Loader instances.

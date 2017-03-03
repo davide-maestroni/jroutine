@@ -23,20 +23,20 @@ import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.lambda.Action;
-import com.github.dm.jrt.function.lambda.ActionDecorator;
-import com.github.dm.jrt.function.lambda.BiConsumer;
-import com.github.dm.jrt.function.lambda.BiConsumerDecorator;
-import com.github.dm.jrt.function.lambda.BiFunction;
-import com.github.dm.jrt.function.lambda.BiFunctionDecorator;
-import com.github.dm.jrt.function.lambda.Consumer;
-import com.github.dm.jrt.function.lambda.ConsumerDecorator;
-import com.github.dm.jrt.function.lambda.Function;
-import com.github.dm.jrt.function.lambda.FunctionDecorator;
-import com.github.dm.jrt.function.lambda.Predicate;
-import com.github.dm.jrt.function.lambda.PredicateDecorator;
-import com.github.dm.jrt.function.lambda.Supplier;
-import com.github.dm.jrt.function.lambda.SupplierDecorator;
+import com.github.dm.jrt.function.util.Action;
+import com.github.dm.jrt.function.util.ActionDecorator;
+import com.github.dm.jrt.function.util.BiConsumer;
+import com.github.dm.jrt.function.util.BiConsumerDecorator;
+import com.github.dm.jrt.function.util.BiFunction;
+import com.github.dm.jrt.function.util.BiFunctionDecorator;
+import com.github.dm.jrt.function.util.Consumer;
+import com.github.dm.jrt.function.util.ConsumerDecorator;
+import com.github.dm.jrt.function.util.Function;
+import com.github.dm.jrt.function.util.FunctionDecorator;
+import com.github.dm.jrt.function.util.Predicate;
+import com.github.dm.jrt.function.util.PredicateDecorator;
+import com.github.dm.jrt.function.util.Supplier;
+import com.github.dm.jrt.function.util.SupplierDecorator;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -138,6 +138,7 @@ public class Functions {
   @NotNull
   public static <IN, OUT> InvocationFactory<IN, OUT> consumerCall(
       @NotNull final BiConsumer<? super List<IN>, ? super Channel<OUT, ?>> consumer) {
+    // TODO: 01/03/2017 remove
     return new ConsumerInvocationFactory<IN, OUT>(decorate(consumer));
   }
 
@@ -159,6 +160,7 @@ public class Functions {
   @NotNull
   public static <OUT> CommandInvocation<OUT> consumerCommand(
       @NotNull final Consumer<? super Channel<OUT, ?>> consumer) {
+    // TODO: 01/03/2017 remove
     return new ConsumerCommandInvocation<OUT>(decorate(consumer));
   }
 
@@ -181,6 +183,7 @@ public class Functions {
   @NotNull
   public static <IN, OUT> MappingInvocation<IN, OUT> consumerMapping(
       @NotNull final BiConsumer<? super IN, ? super Channel<OUT, ?>> consumer) {
+    // TODO: 01/03/2017 remove
     return new ConsumerMappingInvocation<IN, OUT>(decorate(consumer));
   }
 
@@ -382,6 +385,7 @@ public class Functions {
   @NotNull
   public static <IN, OUT> InvocationFactory<IN, OUT> functionCall(
       @NotNull final Function<? super List<IN>, ? extends OUT> function) {
+    // TODO: 01/03/2017 remove
     return new FunctionInvocationFactory<IN, OUT>(decorate(function));
   }
 
@@ -404,6 +408,7 @@ public class Functions {
   @NotNull
   public static <IN, OUT> MappingInvocation<IN, OUT> functionMapping(
       @NotNull final Function<? super IN, ? extends OUT> function) {
+    // TODO: 01/03/2017 remove
     return new FunctionMappingInvocation<IN, OUT>(decorate(function));
   }
 
@@ -608,6 +613,7 @@ public class Functions {
   @NotNull
   public static <IN> MappingInvocation<IN, IN> predicateFilter(
       @NotNull final Predicate<? super IN> predicate) {
+    // TODO: 03/03/2017 move to operator?
     return new PredicateMappingInvocation<IN>(decorate(predicate));
   }
 
@@ -656,6 +662,7 @@ public class Functions {
   @NotNull
   public static <OUT> CommandInvocation<OUT> supplierCommand(
       @NotNull final Supplier<? extends OUT> supplier) {
+    // TODO: 01/03/2017 remove
     return new SupplierCommandInvocation<OUT>(decorate(supplier));
   }
 

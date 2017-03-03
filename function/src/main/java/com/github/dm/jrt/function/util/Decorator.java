@@ -14,22 +14,19 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.function.lambda;
+package com.github.dm.jrt.function.util;
 
 /**
- * Interface representing a supplier of results.
+ * Interface defining a decorator of functions.
  * <p>
- * Created by davide-maestroni on 09/21/2015.
- *
- * @param <OUT> the output data type.
+ * Created by davide-maestroni on 02/13/2016.
  */
-public interface Supplier<OUT> {
+public interface Decorator {
 
   /**
-   * Gets a result.
+   * Checks if the class of the wrapped functions are static or top level.
    *
-   * @return a result.
-   * @throws java.lang.Exception if an unexpected error occurs.
+   * @return whether this decorator has a static scope.
    */
-  OUT get() throws Exception;
+  boolean hasStaticScope();
 }

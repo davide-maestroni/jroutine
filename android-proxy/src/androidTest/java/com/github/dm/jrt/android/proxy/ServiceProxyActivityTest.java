@@ -243,7 +243,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
         com.github.dm.jrt.android.proxy.ServiceProxy_Test.on(serviceContext)
                                                          .with(instanceOf(TestClass.class));
     final TestProxy testProxy = builder.invocationConfiguration()
-                                       .with(configuration)
+                                       .withPatch(configuration)
                                        .apply()
                                        .serviceConfiguration()
                                        .withRunnerClass(MyRunner.class)
@@ -270,7 +270,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
     assertThat(JRoutineServiceProxy.on(serviceFrom(getActivity(), TestService.class))
                                    .with(instanceOf(TestClass.class))
                                    .invocationConfiguration()
-                                   .with(configuration)
+                                   .withPatch(configuration)
                                    .apply()
                                    .serviceConfiguration()
                                    .withRunnerClass(MyRunner.class)
@@ -292,14 +292,14 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
         JRoutineServiceProxy.on(serviceFrom(getActivity(), TestService.class))
                             .with(instanceOf(TestClass.class))
                             .invocationConfiguration()
-                            .with(configuration)
+                            .withPatch(configuration)
                             .apply()
                             .buildProxy(ClassToken.tokenOf(TestProxy.class));
 
     assertThat(JRoutineServiceProxy.on(serviceFrom(getActivity(), TestService.class))
                                    .with(instanceOf(TestClass.class))
                                    .invocationConfiguration()
-                                   .with(configuration)
+                                   .withPatch(configuration)
                                    .apply()
                                    .buildProxy(ClassToken.tokenOf(TestProxy.class))).isSameAs(
         testProxy);

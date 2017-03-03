@@ -109,7 +109,7 @@ public class StreamConfiguration {
   @NotNull
   public InvocationConfiguration toInvocationConfiguration() {
     if (mInvocationConfiguration == null) {
-      mInvocationConfiguration = mStreamConfiguration.builderFrom().with(mConfiguration).apply();
+      mInvocationConfiguration = mStreamConfiguration.builderFrom().withPatch(mConfiguration).apply();
     }
 
     return mInvocationConfiguration;

@@ -235,7 +235,7 @@ public class LoaderProxyCompatActivityTest extends ActivityInstrumentationTestCa
                                                                       .with(instanceOf(
                                                                           TestClass.class));
     final TestProxy testProxy = builder.invocationConfiguration()
-                                       .with(configuration)
+                                       .withPatch(configuration)
                                        .apply()
                                        .wrapperConfiguration()
                                        .withSharedFields()
@@ -262,7 +262,7 @@ public class LoaderProxyCompatActivityTest extends ActivityInstrumentationTestCa
     assertThat(JRoutineLoaderProxyCompat.on(loaderFrom(getActivity()))
                                         .with(instanceOf(TestClass.class))
                                         .invocationConfiguration()
-                                        .with(configuration)
+                                        .withPatch(configuration)
                                         .apply()
                                         .wrapperConfiguration()
                                         .withSharedFields()
@@ -283,7 +283,7 @@ public class LoaderProxyCompatActivityTest extends ActivityInstrumentationTestCa
     final TestProxy testProxy = JRoutineLoaderProxyCompat.on(loaderFrom(getActivity()))
                                                          .with(instanceOf(TestClass.class))
                                                          .invocationConfiguration()
-                                                         .with(configuration)
+                                                         .withPatch(configuration)
                                                          .apply()
                                                          .buildProxy(
                                                              ClassToken.tokenOf(TestProxy.class));
@@ -291,7 +291,7 @@ public class LoaderProxyCompatActivityTest extends ActivityInstrumentationTestCa
     assertThat(JRoutineLoaderProxyCompat.on(loaderFrom(getActivity()))
                                         .with(instanceOf(TestClass.class))
                                         .invocationConfiguration()
-                                        .with(configuration)
+                                        .withPatch(configuration)
                                         .apply()
                                         .buildProxy(ClassToken.tokenOf(TestProxy.class))).isSameAs(
         testProxy);

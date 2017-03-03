@@ -49,7 +49,7 @@
 <p>
     The code below shows how it is possible to implement the computation of the root mean square of some input data, by distributing it in a number of background threads.
 </p>
-<b>Example 1:</b> via lambda notation.
+<b>Example 1:</b> via functional interfaces.
 <p>
     In this case, the mean computation must actually wait for all the input data to be available before being invoked. Thus, it cannot really happen in a parallel way.<br>
     The lambda notation used in the example is just for demonstration purpose. In order to compile with Java 7 or below, explicit object creation must be employed.

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.function.lambda;
+package com.github.dm.jrt.function.util;
 
 /**
  * Interface representing a function that accepts one argument and produces a result.

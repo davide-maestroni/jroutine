@@ -14,19 +14,24 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.function.lambda;
+package com.github.dm.jrt.function.util;
 
 /**
- * Interface representing an action.
+ * Interface representing an operation that accepts two input arguments and returns no result.
  * <p>
- * Created by davide-maestroni on 06/29/2016.
+ * Created by davide-maestroni on 09/21/2015.
+ *
+ * @param <IN1> the first input data type.
+ * @param <IN2> the second input data type.
  */
-public interface Action {
+public interface BiConsumer<IN1, IN2> {
 
   /**
-   * Performs the action.
+   * Performs this operation on the given arguments.
    *
+   * @param in1 the first input argument.
+   * @param in2 the second input argument.
    * @throws java.lang.Exception if an unexpected error occurs.
    */
-  void perform() throws Exception;
+  void accept(IN1 in1, IN2 in2) throws Exception;
 }

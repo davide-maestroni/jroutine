@@ -388,7 +388,7 @@ class ReplayOutputChannel<OUT> implements Channel<OUT, OUT>, ChannelConsumer<OUT
   @NotNull
   private Channel<OUT, OUT> createOutputChannel() {
     return JRoutineCore.<OUT>ofData().channelConfiguration()
-                                     .with(mConfiguration)
+                                     .withPatch(mConfiguration)
                                      .withOrder(OrderType.SORTED)
                                      .apply()
                                      .buildChannel();

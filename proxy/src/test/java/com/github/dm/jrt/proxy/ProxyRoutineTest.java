@@ -283,7 +283,7 @@ public class ProxyRoutineTest {
     final ProxyObjectBuilder<TestProxy> builder =
         com.github.dm.jrt.proxy.Proxy_Test.with(instance(test));
     final TestProxy testProxy = builder.invocationConfiguration()
-                                       .with(configuration)
+                                       .withPatch(configuration)
                                        .apply()
                                        .wrapperConfiguration()
                                        .withSharedFields()
@@ -306,7 +306,7 @@ public class ProxyRoutineTest {
 
     assertThat(JRoutineProxy.with(instance(test))
                             .invocationConfiguration()
-                            .with(configuration)
+                            .withPatch(configuration)
                             .apply()
                             .wrapperConfiguration()
                             .withSharedFields()
@@ -324,13 +324,13 @@ public class ProxyRoutineTest {
         builder().withRunner(runner).withLogLevel(Level.DEBUG).withLog(log).apply();
     final TestProxy testProxy = JRoutineProxy.with(instance(test))
                                              .invocationConfiguration()
-                                             .with(configuration)
+                                             .withPatch(configuration)
                                              .apply()
                                              .buildProxy(tokenOf(TestProxy.class));
 
     assertThat(JRoutineProxy.with(instance(test))
                             .invocationConfiguration()
-                            .with(configuration)
+                            .withPatch(configuration)
                             .apply()
                             .buildProxy(tokenOf(TestProxy.class))).isSameAs(testProxy);
   }

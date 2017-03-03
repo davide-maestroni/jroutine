@@ -57,7 +57,7 @@ class CallableChannelBuilder<OUT> extends AbstractChannelBuilder<Void, OUT> {
     return JRoutineCore.with(new CallableInvocation<OUT>(mCallable))
                        .invocationConfiguration()
                        .withRunner(Runners.immediateRunner())
-                       .with(configuration)
+                       .withPatch(configuration)
                        .apply()
                        .invoke()
                        .close();

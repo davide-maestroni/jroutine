@@ -28,14 +28,14 @@ import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.function.builder.StatelessRoutineBuilder;
-import com.github.dm.jrt.function.lambda.BiConsumer;
-import com.github.dm.jrt.function.lambda.BiConsumerDecorator;
-import com.github.dm.jrt.function.lambda.Consumer;
-import com.github.dm.jrt.function.lambda.ConsumerDecorator;
-import com.github.dm.jrt.function.lambda.Function;
-import com.github.dm.jrt.function.lambda.FunctionDecorator;
-import com.github.dm.jrt.function.lambda.Supplier;
-import com.github.dm.jrt.function.lambda.SupplierDecorator;
+import com.github.dm.jrt.function.util.BiConsumer;
+import com.github.dm.jrt.function.util.BiConsumerDecorator;
+import com.github.dm.jrt.function.util.Consumer;
+import com.github.dm.jrt.function.util.ConsumerDecorator;
+import com.github.dm.jrt.function.util.Function;
+import com.github.dm.jrt.function.util.FunctionDecorator;
+import com.github.dm.jrt.function.util.Supplier;
+import com.github.dm.jrt.function.util.SupplierDecorator;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -113,7 +113,7 @@ class DefaultStatelessRoutineBuilder<IN, OUT> implements StatelessRoutineBuilder
 
   @NotNull
   public StatelessRoutineBuilder<IN, OUT> onCompleteOutput(
-      @NotNull final Supplier<OUT> onComplete) {
+      @NotNull final Supplier<? extends OUT> onComplete) {
     mOnComplete = ConsumerDecorator.decorate(new CompleteOutputSupplier<OUT>(onComplete));
     return this;
   }
@@ -196,8 +196,7 @@ class DefaultStatelessRoutineBuilder<IN, OUT> implements StatelessRoutineBuilder
      *
      * @param onComplete the supplier instance.
      */
-    private CompleteArraySupplier(
-        @NotNull final com.github.dm.jrt.function.lambda.Supplier<OUT[]> onComplete) {
+    private CompleteArraySupplier(@NotNull final Supplier<OUT[]> onComplete) {
       super(asArgs(SupplierDecorator.decorate(onComplete)));
       mOnComplete = onComplete;
     }
@@ -241,14 +240,14 @@ class DefaultStatelessRoutineBuilder<IN, OUT> implements StatelessRoutineBuilder
   private static class CompleteOutputSupplier<OUT> extends DeepEqualObject
       implements Consumer<Channel<OUT, ?>> {
 
-    private final Supplier<OUT> mOnComplete;
+    private final Supplier<? extends OUT> mOnComplete;
 
     /**
      * Constructor.
      *
      * @param onComplete the supplier instance.
      */
-    private CompleteOutputSupplier(@NotNull final Supplier<OUT> onComplete) {
+    private CompleteOutputSupplier(@NotNull final Supplier<? extends OUT> onComplete) {
       super(asArgs(SupplierDecorator.decorate(onComplete)));
       mOnComplete = onComplete;
     }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.function.lambda;
+package com.github.dm.jrt.function.util;
 
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DeepEqualObject;
@@ -37,10 +37,10 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 @SuppressWarnings("WeakerAccess")
 public class BiFunctionDecorator<IN1, IN2, OUT> extends DeepEqualObject
-    implements BiFunction<IN1, IN2, OUT>, Decorator {
+    implements com.github.dm.jrt.function.util.BiFunction<IN1, IN2, OUT>, Decorator {
 
   private static final BiFunctionDecorator<Object, Object, Object> sFirst =
-      new BiFunctionDecorator<Object, Object, Object>(new BiFunction<Object, Object, Object>() {
+      new BiFunctionDecorator<Object, Object, Object>(new com.github.dm.jrt.function.util.BiFunction<Object, Object, Object>() {
 
         public Object apply(final Object in1, final Object in2) {
           return in1;
@@ -51,7 +51,7 @@ public class BiFunctionDecorator<IN1, IN2, OUT> extends DeepEqualObject
       extends
       Comparable<?>> sMax =
       new BiFunctionDecorator<Comparable<Object>, Comparable<Object>, Comparable<Object>>(
-          new BiFunction<Comparable<Object>, Comparable<Object>, Comparable<Object>>() {
+          new com.github.dm.jrt.function.util.BiFunction<Comparable<Object>, Comparable<Object>, Comparable<Object>>() {
 
             public Comparable<Object> apply(final Comparable<Object> in1,
                 final Comparable<Object> in2) {
@@ -63,7 +63,7 @@ public class BiFunctionDecorator<IN1, IN2, OUT> extends DeepEqualObject
       extends
       Comparable<?>> sMin =
       new BiFunctionDecorator<Comparable<Object>, Comparable<Object>, Comparable<Object>>(
-          new BiFunction<Comparable<Object>, Comparable<Object>, Comparable<Object>>() {
+          new com.github.dm.jrt.function.util.BiFunction<Comparable<Object>, Comparable<Object>, Comparable<Object>>() {
 
             public Comparable<Object> apply(final Comparable<Object> in1,
                 final Comparable<Object> in2) {
@@ -72,14 +72,14 @@ public class BiFunctionDecorator<IN1, IN2, OUT> extends DeepEqualObject
           });
 
   private static final BiFunctionDecorator<Object, Object, Object> sSecond =
-      new BiFunctionDecorator<Object, Object, Object>(new BiFunction<Object, Object, Object>() {
+      new BiFunctionDecorator<Object, Object, Object>(new com.github.dm.jrt.function.util.BiFunction<Object, Object, Object>() {
 
         public Object apply(final Object in1, final Object in2) {
           return in2;
         }
       });
 
-  private final BiFunction<IN1, IN2, ?> mBiFunction;
+  private final com.github.dm.jrt.function.util.BiFunction<IN1, IN2, ?> mBiFunction;
 
   private final FunctionDecorator<?, ? extends OUT> mFunction;
 
@@ -88,7 +88,7 @@ public class BiFunctionDecorator<IN1, IN2, OUT> extends DeepEqualObject
    *
    * @param biFunction the wrapped bi-function.
    */
-  private BiFunctionDecorator(@NotNull final BiFunction<IN1, IN2, ?> biFunction) {
+  private BiFunctionDecorator(@NotNull final com.github.dm.jrt.function.util.BiFunction<IN1, IN2, ?> biFunction) {
     this(ConstantConditions.notNull("bi-function instance", biFunction),
         FunctionDecorator.<OUT>identity());
   }
@@ -99,7 +99,7 @@ public class BiFunctionDecorator<IN1, IN2, OUT> extends DeepEqualObject
    * @param biFunction the initial wrapped bi-function.
    * @param function   the concatenated function chain.
    */
-  private BiFunctionDecorator(@NotNull final BiFunction<IN1, IN2, ?> biFunction,
+  private BiFunctionDecorator(@NotNull final com.github.dm.jrt.function.util.BiFunction<IN1, IN2, ?> biFunction,
       @NotNull final FunctionDecorator<?, ? extends OUT> function) {
     super(asArgs(biFunction, function));
     mBiFunction = biFunction;
@@ -125,7 +125,7 @@ public class BiFunctionDecorator<IN1, IN2, OUT> extends DeepEqualObject
    */
   @NotNull
   public static <IN1, IN2, OUT> BiFunctionDecorator<IN1, IN2, OUT> decorate(
-      @NotNull final BiFunction<IN1, IN2, OUT> function) {
+      @NotNull final com.github.dm.jrt.function.util.BiFunction<IN1, IN2, OUT> function) {
     if (function instanceof BiFunctionDecorator) {
       return (BiFunctionDecorator<IN1, IN2, OUT>) function;
     }
@@ -235,7 +235,7 @@ public class BiFunctionDecorator<IN1, IN2, OUT> extends DeepEqualObject
    */
   @NotNull
   public <AFTER> BiFunctionDecorator<IN1, IN2, AFTER> andThen(
-      @NotNull final Function<? super OUT, ? extends AFTER> after) {
+      @NotNull final com.github.dm.jrt.function.util.Function<? super OUT, ? extends AFTER> after) {
     return new BiFunctionDecorator<IN1, IN2, AFTER>(mBiFunction, mFunction.andThen(after));
   }
 
@@ -248,7 +248,8 @@ public class BiFunctionDecorator<IN1, IN2, OUT> extends DeepEqualObject
    *
    * @param <IN> the input data type.
    */
-  private static class MaxByFunction<IN> extends DeepEqualObject implements BiFunction<IN, IN, IN> {
+  private static class MaxByFunction<IN> extends DeepEqualObject implements
+      com.github.dm.jrt.function.util.BiFunction<IN, IN, IN> {
 
     private final Comparator<? super IN> mComparator;
 
@@ -272,7 +273,8 @@ public class BiFunctionDecorator<IN1, IN2, OUT> extends DeepEqualObject
    *
    * @param <IN> the input data type.
    */
-  private static class MinByFunction<IN> extends DeepEqualObject implements BiFunction<IN, IN, IN> {
+  private static class MinByFunction<IN> extends DeepEqualObject implements
+      com.github.dm.jrt.function.util.BiFunction<IN, IN, IN> {
 
     private final Comparator<? super IN> mComparator;
 

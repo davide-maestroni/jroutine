@@ -18,7 +18,7 @@ package com.github.dm.jrt.retrofit;
 
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.InvocationException;
-import com.github.dm.jrt.function.lambda.Consumer;
+import com.github.dm.jrt.function.util.Consumer;
 import com.github.dm.jrt.operator.Operators;
 
 import org.junit.Test;

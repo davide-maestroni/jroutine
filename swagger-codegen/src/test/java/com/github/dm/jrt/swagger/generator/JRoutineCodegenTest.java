@@ -18,7 +18,7 @@ package com.github.dm.jrt.swagger.generator;
 
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.InvocationException;
-import com.github.dm.jrt.function.lambda.Consumer;
+import com.github.dm.jrt.function.util.Consumer;
 import com.github.dm.jrt.operator.Operators;
 import com.github.dm.jrt.retrofit.RoutineAdapterFactory;
 import com.github.dm.jrt.swagger.client.UsersApiClient;

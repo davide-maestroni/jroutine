@@ -19,7 +19,7 @@ package com.github.dm.jrt.stream;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.lambda.FunctionDecorator;
+import com.github.dm.jrt.function.util.FunctionDecorator;
 
 import org.jetbrains.annotations.NotNull;
 

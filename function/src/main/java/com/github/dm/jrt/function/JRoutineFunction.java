@@ -21,10 +21,17 @@ import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.builder.ChannelConsumerBuilder;
 import com.github.dm.jrt.function.builder.StatefulRoutineBuilder;
 import com.github.dm.jrt.function.builder.StatelessRoutineBuilder;
-import com.github.dm.jrt.function.lambda.Action;
-import com.github.dm.jrt.function.lambda.Consumer;
+import com.github.dm.jrt.function.util.Action;
+import com.github.dm.jrt.function.util.BiConsumer;
+import com.github.dm.jrt.function.util.BiConsumerDecorator;
+import com.github.dm.jrt.function.util.Consumer;
+import com.github.dm.jrt.function.util.Supplier;
+import com.github.dm.jrt.function.util.SupplierDecorator;
 
 import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This utility class provides a few way to easily implement routines and channel consumer through
@@ -50,6 +57,22 @@ import org.jetbrains.annotations.NotNull;
  * Created by davide-maestroni on 02/27/2017.
  */
 public class JRoutineFunction {
+
+  private static final BiConsumerDecorator<? extends List<?>, ?> sListConsumer =
+      BiConsumerDecorator.decorate(new BiConsumer<List<Object>, Object>() {
+
+        public void accept(final List<Object> list, final Object input) {
+          list.add(input);
+        }
+      });
+
+  private static final SupplierDecorator<? extends List<?>> sListSupplier =
+      SupplierDecorator.decorate(new Supplier<List<?>>() {
+
+        public List<?> get() {
+          return new ArrayList<Object>();
+        }
+      });
 
   /**
    * Avoid explicit instantiation.
@@ -145,8 +168,28 @@ public class JRoutineFunction {
    * @return the routine builder.
    */
   @NotNull
-  public static <IN, OUT, STATE> StatefulRoutineBuilder<IN, OUT, STATE> withStateful() {
+  public static <IN, OUT, STATE> StatefulRoutineBuilder<IN, OUT, STATE> stateful() {
     return new DefaultStatefulRoutineBuilder<IN, OUT, STATE>();
+  }
+
+  /**
+   * Returns a builder of stateful routines already configured to accumulate the inputs into a list.
+   * <br>
+   * In order to finalize the invocation implementation, it will be sufficient to set the function
+   * to call when the invocation completes by calling the proper {@code onComplete} method.
+   *
+   * @param <IN>  the input data type.
+   * @param <OUT> the output data type.
+   * @return the routine builder.
+   */
+  @NotNull
+  @SuppressWarnings("unchecked")
+  public static <IN, OUT> StatefulRoutineBuilder<IN, OUT, ? extends List<IN>> statefulList() {
+    return JRoutineFunction.<IN, OUT, List<IN>>stateful().onCreate(
+        (Supplier<? extends List<IN>>) sListSupplier)
+                                                         .onNextConsume(
+                                                             (BiConsumer<? super List<IN>, ?
+                                                                 super IN>) sListConsumer);
   }
 
   /**
@@ -162,7 +205,7 @@ public class JRoutineFunction {
    * @return the routine builder.
    */
   @NotNull
-  public static <IN, OUT> StatelessRoutineBuilder<IN, OUT> withStateless() {
+  public static <IN, OUT> StatelessRoutineBuilder<IN, OUT> stateless() {
     return new DefaultStatelessRoutineBuilder<IN, OUT>();
   }
 }

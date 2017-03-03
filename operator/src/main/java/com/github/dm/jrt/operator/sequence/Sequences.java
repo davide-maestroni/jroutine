@@ -19,11 +19,11 @@ package com.github.dm.jrt.operator.sequence;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DeepEqualObject;
-import com.github.dm.jrt.function.lambda.BiFunction;
-import com.github.dm.jrt.function.lambda.BiFunctionDecorator;
-import com.github.dm.jrt.function.lambda.Consumer;
-import com.github.dm.jrt.function.lambda.Function;
-import com.github.dm.jrt.function.lambda.FunctionDecorator;
+import com.github.dm.jrt.function.util.BiFunction;
+import com.github.dm.jrt.function.util.BiFunctionDecorator;
+import com.github.dm.jrt.function.util.Consumer;
+import com.github.dm.jrt.function.util.Function;
+import com.github.dm.jrt.function.util.FunctionDecorator;
 import com.github.dm.jrt.operator.math.Operation;
 
 import org.jetbrains.annotations.NotNull;

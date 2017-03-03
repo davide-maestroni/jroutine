@@ -254,49 +254,6 @@ public final class ServiceConfiguration extends DeepEqualObject {
     }
 
     /**
-     * Applies the specified configuration to this builder. A null value means that all the
-     * configuration options will be reset to their default, otherwise only the non-default
-     * options will be applied.
-     *
-     * @param configuration the Service configuration.
-     * @return this builder.
-     */
-    @NotNull
-    public Builder<TYPE> with(@Nullable final ServiceConfiguration configuration) {
-      if (configuration == null) {
-        setConfiguration(defaultConfiguration());
-        return this;
-      }
-
-      final Looper looper = configuration.mLooper;
-      if (looper != null) {
-        withMessageLooper(looper);
-      }
-
-      final Class<? extends Runner> runnerClass = configuration.mRunnerClass;
-      if (runnerClass != null) {
-        withRunnerClass(runnerClass);
-      }
-
-      final Object[] runnerArgs = configuration.mRunnerArgs;
-      if (runnerArgs != null) {
-        withRunnerArgs(runnerArgs);
-      }
-
-      final Class<? extends Log> logClass = configuration.mLogClass;
-      if (logClass != null) {
-        withLogClass(logClass);
-      }
-
-      final Object[] logArgs = configuration.mLogArgs;
-      if (logArgs != null) {
-        withLogArgs(logArgs);
-      }
-
-      return this;
-    }
-
-    /**
      * Sets the arguments to be passed to the log constructor.
      *
      * @param args the argument objects.
@@ -331,6 +288,49 @@ public final class ServiceConfiguration extends DeepEqualObject {
     @NotNull
     public Builder<TYPE> withMessageLooper(@Nullable final Looper looper) {
       mLooper = looper;
+      return this;
+    }
+
+    /**
+     * Applies the specified patch configuration to this builder. A null value means that all the
+     * configuration options will be reset to their default, otherwise only the non-default
+     * options will be applied.
+     *
+     * @param configuration the Service configuration.
+     * @return this builder.
+     */
+    @NotNull
+    public Builder<TYPE> withPatch(@Nullable final ServiceConfiguration configuration) {
+      if (configuration == null) {
+        setConfiguration(defaultConfiguration());
+        return this;
+      }
+
+      final Looper looper = configuration.mLooper;
+      if (looper != null) {
+        withMessageLooper(looper);
+      }
+
+      final Class<? extends Runner> runnerClass = configuration.mRunnerClass;
+      if (runnerClass != null) {
+        withRunnerClass(runnerClass);
+      }
+
+      final Object[] runnerArgs = configuration.mRunnerArgs;
+      if (runnerArgs != null) {
+        withRunnerArgs(runnerArgs);
+      }
+
+      final Class<? extends Log> logClass = configuration.mLogClass;
+      if (logClass != null) {
+        withLogClass(logClass);
+      }
+
+      final Object[] logArgs = configuration.mLogArgs;
+      if (logArgs != null) {
+        withLogArgs(logArgs);
+      }
+
       return this;
     }
 

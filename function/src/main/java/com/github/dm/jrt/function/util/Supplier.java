@@ -14,9 +14,22 @@
  * limitations under the License.
  */
 
+package com.github.dm.jrt.function.util;
+
 /**
- * Functional interfaces and utility classes.
+ * Interface representing a supplier of results.
  * <p>
- * Created by davide-maestroni on 02/28/2017.
+ * Created by davide-maestroni on 09/21/2015.
+ *
+ * @param <OUT> the output data type.
  */
-package com.github.dm.jrt.function.lambda;
+public interface Supplier<OUT> {
+
+  /**
+   * Gets a result.
+   *
+   * @return a result.
+   * @throws java.lang.Exception if an unexpected error occurs.
+   */
+  OUT get() throws Exception;
+}

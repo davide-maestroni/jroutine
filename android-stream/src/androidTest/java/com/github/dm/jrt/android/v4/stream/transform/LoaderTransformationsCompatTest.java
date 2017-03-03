@@ -21,8 +21,8 @@ import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.github.dm.jrt.android.v4.stream.TestActivity;
-import com.github.dm.jrt.function.lambda.Function;
-import com.github.dm.jrt.function.lambda.Predicate;
+import com.github.dm.jrt.function.util.Function;
+import com.github.dm.jrt.function.util.Predicate;
 import com.github.dm.jrt.operator.Operators;
 import com.github.dm.jrt.stream.JRoutineStream;
 

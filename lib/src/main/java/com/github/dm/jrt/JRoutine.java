@@ -31,11 +31,11 @@ import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.lambda.BiConsumer;
-import com.github.dm.jrt.function.lambda.Consumer;
-import com.github.dm.jrt.function.lambda.Function;
-import com.github.dm.jrt.function.lambda.Predicate;
-import com.github.dm.jrt.function.lambda.Supplier;
+import com.github.dm.jrt.function.util.BiConsumer;
+import com.github.dm.jrt.function.util.Consumer;
+import com.github.dm.jrt.function.util.Function;
+import com.github.dm.jrt.function.util.Predicate;
+import com.github.dm.jrt.function.util.Supplier;
 import com.github.dm.jrt.reflect.InvocationTarget;
 import com.github.dm.jrt.stream.JRoutineStream;
 import com.github.dm.jrt.stream.builder.StreamBuilder;
@@ -185,6 +185,8 @@ public class JRoutine extends Channels {
   public static <DATA> ChannelBuilder<DATA, DATA> ofData() {
     return JRoutineCore.ofData();
   }
+
+  // TODO: 28/02/2017 onOutput, stateful, stateless
 
   /**
    * Returns a routine builder based on an invocation factory creating instances of the specified

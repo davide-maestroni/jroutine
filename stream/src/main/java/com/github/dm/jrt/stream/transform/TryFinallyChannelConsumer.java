@@ -20,7 +20,7 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.lambda.Action;
+import com.github.dm.jrt.function.util.Action;
 
 import org.jetbrains.annotations.NotNull;
 

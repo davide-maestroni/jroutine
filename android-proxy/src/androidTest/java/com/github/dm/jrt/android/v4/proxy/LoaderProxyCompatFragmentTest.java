@@ -238,7 +238,7 @@ public class LoaderProxyCompatFragmentTest extends ActivityInstrumentationTestCa
                                                                       .with(instanceOf(
                                                                           TestClass.class));
     final TestProxy testProxy = builder.invocationConfiguration()
-                                       .with(configuration)
+                                       .withPatch(configuration)
                                        .apply()
                                        .wrapperConfiguration()
                                        .withSharedFields()
@@ -265,7 +265,7 @@ public class LoaderProxyCompatFragmentTest extends ActivityInstrumentationTestCa
     assertThat(JRoutineLoaderProxyCompat.on(loaderFrom(fragment))
                                         .with(instanceOf(TestClass.class))
                                         .invocationConfiguration()
-                                        .with(configuration)
+                                        .withPatch(configuration)
                                         .apply()
                                         .wrapperConfiguration()
                                         .withSharedFields()
@@ -288,7 +288,7 @@ public class LoaderProxyCompatFragmentTest extends ActivityInstrumentationTestCa
     final TestProxy testProxy = JRoutineLoaderProxyCompat.on(loaderFrom(fragment))
                                                          .with(instanceOf(TestClass.class))
                                                          .invocationConfiguration()
-                                                         .with(configuration)
+                                                         .withPatch(configuration)
                                                          .apply()
                                                          .buildProxy(
                                                              ClassToken.tokenOf(TestProxy.class));
@@ -296,7 +296,7 @@ public class LoaderProxyCompatFragmentTest extends ActivityInstrumentationTestCa
     assertThat(JRoutineLoaderProxyCompat.on(loaderFrom(fragment))
                                         .with(instanceOf(TestClass.class))
                                         .invocationConfiguration()
-                                        .with(configuration)
+                                        .withPatch(configuration)
                                         .apply()
                                         .buildProxy(ClassToken.tokenOf(TestProxy.class))).isSameAs(
         testProxy);

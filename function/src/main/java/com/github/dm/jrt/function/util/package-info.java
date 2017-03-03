@@ -14,22 +14,9 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.function.lambda;
-
 /**
- * Interface representing an operation that accepts an input argument and returns no result.
+ * Functional interfaces and utility classes.
  * <p>
- * Created by davide-maestroni on 09/21/2015.
- *
- * @param <IN> the input data type.
+ * Created by davide-maestroni on 02/28/2017.
  */
-public interface Consumer<IN> {
-
-  /**
-   * Performs this operation on the given argument.
-   *
-   * @param in the input argument.
-   * @throws java.lang.Exception if an unexpected error occurs.
-   */
-  void accept(IN in) throws Exception;
-}
+package com.github.dm.jrt.function.util;

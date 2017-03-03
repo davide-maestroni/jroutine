@@ -21,12 +21,12 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
-import com.github.dm.jrt.function.lambda.BiConsumer;
-import com.github.dm.jrt.function.lambda.BiFunction;
-import com.github.dm.jrt.function.lambda.Consumer;
-import com.github.dm.jrt.function.lambda.Function;
-import com.github.dm.jrt.function.lambda.Supplier;
-import com.github.dm.jrt.function.lambda.TriFunction;
+import com.github.dm.jrt.function.util.BiConsumer;
+import com.github.dm.jrt.function.util.BiFunction;
+import com.github.dm.jrt.function.util.Consumer;
+import com.github.dm.jrt.function.util.Function;
+import com.github.dm.jrt.function.util.Supplier;
+import com.github.dm.jrt.function.util.TriFunction;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -35,8 +35,13 @@ import org.jetbrains.annotations.NotNull;
  * <p>
  * The state object is created when the invocation starts and modified during the execution.
  * <br>
- * The last instance returned when the invocation completes or is aborted, is retained and re-used
- * during the next invocation execution unless null, in which case is a new instance is created.
+ * The last instance returned by the finalization function is retained and re-used during the next
+ * invocation execution, unless null, in which case a new instance is created.
+ * <p>
+ * By default, the same state is retained through the whole invocation lifecycle and automatically
+ * nulled during the finalization step. Hence, it is advisable to call the
+ * {@link #onFinalizeRetain()} method, or to customize the finalization function, in order to be
+ * able to re-use the same state instances through successive invocation executions.
  * <p>
  * For example, a routine concatenating strings through a {@code StringBuilder} can be implemented
  * as follows:
@@ -46,6 +51,12 @@ import org.jetbrains.annotations.NotNull;
  *        .onCompleteOutput(StringBuilder::toString)
  *        .buildRoutine();
  * </code></pre>
+ * <p>
+ * Note that the passed instances are expected to behave like a function, that is, they must not
+ * retain a mutable internal state.
+ * <br>
+ * Note also that any external object used inside the function must be synchronized in order to
+ * avoid concurrency issues.
  * <p>
  * Created by davide-maestroni on 02/23/2017.
  *
@@ -66,34 +77,6 @@ public interface StatefulRoutineBuilder<IN, OUT, STATE> extends RoutineBuilder<I
    */
   @NotNull
   Builder<? extends StatefulRoutineBuilder<IN, OUT, STATE>> invocationConfiguration();
-
-  /**
-   * Sets the function to call after the invocation has completed.
-   * <br>
-   * The returned state object is stored for the next invocation unless null is returned.
-   * <br>
-   * The function is called even if the stored state is null.
-   *
-   * @param onCleanup the function instance.
-   * @return this builder.
-   * @see com.github.dm.jrt.core.invocation.Invocation#onRecycle() onRecycle()
-   */
-  @NotNull
-  StatefulRoutineBuilder<IN, OUT, STATE> onCleanup(
-      @NotNull Function<? super STATE, ? extends STATE> onCleanup);
-
-  /**
-   * Sets the consumer to call after the invocation has completed.
-   * <br>
-   * The state object is automatically set to null.
-   *
-   * @param onCleanup the consumer instance.
-   * @return this builder.
-   * @see com.github.dm.jrt.core.invocation.Invocation#onRecycle() onRecycle()
-   */
-  @NotNull
-  StatefulRoutineBuilder<IN, OUT, STATE> onCleanupConsume(
-      @NotNull Consumer<? super STATE> onCleanup);
 
   /**
    * Sets the function to call when the invocation completes.
@@ -119,6 +102,19 @@ public interface StatefulRoutineBuilder<IN, OUT, STATE> extends RoutineBuilder<I
   @NotNull
   StatefulRoutineBuilder<IN, OUT, STATE> onCompleteArray(
       @NotNull Function<? super STATE, OUT[]> onComplete);
+
+  /**
+   * Sets the consumer to call when the invocation completes.
+   * <br>
+   * The state object is automatically retained.
+   *
+   * @param onComplete the consumer instance.
+   * @return this builder.
+   * @see com.github.dm.jrt.core.invocation.Invocation#onComplete(Channel) onComplete(Channel)
+   */
+  @NotNull
+  StatefulRoutineBuilder<IN, OUT, STATE> onCompleteConsume(
+      @NotNull BiConsumer<? super STATE, ? super Channel<OUT, ?>> onComplete);
 
   /**
    * Sets the function to call when the invocation completes.
@@ -218,6 +214,43 @@ public interface StatefulRoutineBuilder<IN, OUT, STATE> extends RoutineBuilder<I
   @NotNull
   StatefulRoutineBuilder<IN, OUT, STATE> onErrorState(
       @NotNull Function<? super STATE, ? extends STATE> onError);
+
+  /**
+   * Sets the function to call after the invocation has completed.
+   * <br>
+   * The returned state object is stored for the next invocation unless null is returned.
+   * <br>
+   * The function is called even if the stored state is null.
+   *
+   * @param onFinalize the function instance.
+   * @return this builder.
+   * @see com.github.dm.jrt.core.invocation.Invocation#onRecycle() onRecycle()
+   */
+  @NotNull
+  StatefulRoutineBuilder<IN, OUT, STATE> onFinalize(
+      @NotNull Function<? super STATE, ? extends STATE> onFinalize);
+
+  /**
+   * Sets the consumer to call after the invocation has completed.
+   * <br>
+   * The state object is automatically set to null.
+   *
+   * @param onFinalize the consumer instance.
+   * @return this builder.
+   * @see com.github.dm.jrt.core.invocation.Invocation#onRecycle() onRecycle()
+   */
+  @NotNull
+  StatefulRoutineBuilder<IN, OUT, STATE> onFinalizeConsume(
+      @NotNull Consumer<? super STATE> onFinalize);
+
+  /**
+   * Sets the function to call after the invocation has completed, so to retain the last state
+   * instance.
+   *
+   * @return this builder.
+   */
+  @NotNull
+  StatefulRoutineBuilder<IN, OUT, STATE> onFinalizeRetain();
 
   /**
    * Sets the function to call when a new input is received.

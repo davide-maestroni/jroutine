@@ -65,7 +65,7 @@ class ConcatOutputBuilder<OUT> extends AbstractChannelBuilder<OUT, OUT> {
   @NotNull
   public Channel<OUT, OUT> buildChannel() {
     final Channel<OUT, OUT> outputChannel = JRoutineCore.<OUT>ofData().channelConfiguration()
-                                                                      .with(getConfiguration())
+                                                                      .withPatch(getConfiguration())
                                                                       .withOrder(OrderType.SORTED)
                                                                       .apply()
                                                                       .buildChannel();

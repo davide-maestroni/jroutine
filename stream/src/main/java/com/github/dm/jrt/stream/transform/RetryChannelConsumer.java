@@ -26,8 +26,8 @@ import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.lambda.BiFunction;
-import com.github.dm.jrt.function.lambda.Function;
+import com.github.dm.jrt.function.util.BiFunction;
+import com.github.dm.jrt.function.util.Function;
 
 import org.jetbrains.annotations.NotNull;
 

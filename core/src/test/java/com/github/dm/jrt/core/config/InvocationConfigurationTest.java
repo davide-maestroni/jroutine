@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Davide Maestroni
+ * Copyright 2017 Davide Maestroni
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.core.builder;
+package com.github.dm.jrt.core.config;
 
-import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.ChannelConfiguration.TimeoutActionType;
-import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.Logs;
@@ -36,6 +34,7 @@ import static com.github.dm.jrt.core.config.InvocationConfiguration.builder;
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builderFrom;
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builderFromInput;
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builderFromOutput;
+import static com.github.dm.jrt.core.config.InvocationConfiguration.withRunner;
 import static com.github.dm.jrt.core.util.DurationMeasure.millis;
 import static com.github.dm.jrt.core.util.DurationMeasure.noTime;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -98,9 +97,9 @@ public class InvocationConfigurationTest {
                                                            .withLog(new NullLog())
                                                            .withOutputMaxSize(100)
                                                            .apply();
-    assertThat(builder().with(configuration).apply()).isEqualTo(configuration);
+    assertThat(builder().withPatch(configuration).apply()).isEqualTo(configuration);
     assertThat(configuration.builderFrom().apply()).isEqualTo(configuration);
-    assertThat(configuration.builderFrom().with(null).apply()).isEqualTo(
+    assertThat(configuration.builderFrom().withPatch(null).apply()).isEqualTo(
         InvocationConfiguration.defaultConfiguration());
   }
 
@@ -485,6 +484,12 @@ public class InvocationConfigurationTest {
     assertThat(configuration).isNotEqualTo(builder().withPriority(3).apply());
     assertThat(configuration.builderFrom().withPriority(17).apply()).isNotEqualTo(
         builder().withPriority(17).apply());
+  }
+
+  @Test
+  public void testRunnerConfig() {
+    assertThat(withRunner(Runners.syncRunner())).isEqualTo(
+        builder().withRunner(Runners.syncRunner()).apply());
   }
 
   @Test

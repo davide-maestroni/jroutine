@@ -21,7 +21,7 @@ import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.lambda.FunctionDecorator;
+import com.github.dm.jrt.function.util.FunctionDecorator;
 
 import org.jetbrains.annotations.NotNull;
 

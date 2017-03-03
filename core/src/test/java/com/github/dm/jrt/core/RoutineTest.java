@@ -708,7 +708,7 @@ public class RoutineTest {
     final Channel<String, String> channel3 =
         JRoutineCore.with(factoryOf(DelayedListInvocation.class, millis(10), 2))
                     .invocationConfiguration()
-                    .with(configuration)
+                    .withPatch(configuration)
                     .apply()
                     .invoke();
     channel3.after(100, TimeUnit.MILLISECONDS).pass("test1");
@@ -736,7 +736,7 @@ public class RoutineTest {
     final Channel<String, String> channel5 =
         JRoutineCore.with(factoryOf(DelayedListInvocation.class, noTime(), 2))
                     .invocationConfiguration()
-                    .with(configuration)
+                    .withPatch(configuration)
                     .apply()
                     .invoke();
     channel5.after(100, TimeUnit.MILLISECONDS).pass("test1");
@@ -764,7 +764,7 @@ public class RoutineTest {
     final Channel<String, String> channel7 =
         JRoutineCore.with(factoryOf(DelayedChannelInvocation.class, millis(10)))
                     .invocationConfiguration()
-                    .with(configuration)
+                    .withPatch(configuration)
                     .apply()
                     .invoke();
     channel7.after(100, TimeUnit.MILLISECONDS).pass("test1");
@@ -792,7 +792,7 @@ public class RoutineTest {
     final Channel<String, String> channel9 =
         JRoutineCore.with(factoryOf(DelayedChannelInvocation.class, noTime()))
                     .invocationConfiguration()
-                    .with(configuration)
+                    .withPatch(configuration)
                     .apply()
                     .invoke();
     channel9.after(100, TimeUnit.MILLISECONDS).pass("test1");

@@ -18,8 +18,8 @@ package com.github.dm.jrt.function.builder;
 
 import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.common.RoutineException;
-import com.github.dm.jrt.function.lambda.Action;
-import com.github.dm.jrt.function.lambda.Consumer;
+import com.github.dm.jrt.function.util.Action;
+import com.github.dm.jrt.function.util.Consumer;
 
 import org.jetbrains.annotations.NotNull;
 

@@ -14,19 +14,22 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.function.lambda;
+package com.github.dm.jrt.function.util;
 
 /**
- * Interface defining a decorator of functions.
+ * Interface representing an operation that accepts an input argument and returns no result.
  * <p>
- * Created by davide-maestroni on 02/13/2016.
+ * Created by davide-maestroni on 09/21/2015.
+ *
+ * @param <IN> the input data type.
  */
-public interface Decorator {
+public interface Consumer<IN> {
 
   /**
-   * Checks if the class of the wrapped functions are static or top level.
+   * Performs this operation on the given argument.
    *
-   * @return whether this decorator has a static scope.
+   * @param in the input argument.
+   * @throws java.lang.Exception if an unexpected error occurs.
    */
-  boolean hasStaticScope();
+  void accept(IN in) throws Exception;
 }

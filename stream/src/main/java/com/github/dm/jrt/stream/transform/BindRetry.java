@@ -23,8 +23,8 @@ import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.lambda.BiFunction;
-import com.github.dm.jrt.function.lambda.Function;
+import com.github.dm.jrt.function.util.BiFunction;
+import com.github.dm.jrt.function.util.Function;
 
 import org.jetbrains.annotations.NotNull;
 

@@ -18,10 +18,10 @@ package com.github.dm.jrt.function;
 
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.function.builder.ChannelConsumerBuilder;
-import com.github.dm.jrt.function.lambda.Action;
-import com.github.dm.jrt.function.lambda.ActionDecorator;
-import com.github.dm.jrt.function.lambda.Consumer;
-import com.github.dm.jrt.function.lambda.ConsumerDecorator;
+import com.github.dm.jrt.function.util.Action;
+import com.github.dm.jrt.function.util.ActionDecorator;
+import com.github.dm.jrt.function.util.Consumer;
+import com.github.dm.jrt.function.util.ConsumerDecorator;
 
 import org.jetbrains.annotations.NotNull;
 

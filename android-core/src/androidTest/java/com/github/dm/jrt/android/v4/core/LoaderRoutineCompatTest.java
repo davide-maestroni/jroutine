@@ -150,7 +150,7 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
                                                                           ClearContextInvocation
                                                                               .class))
                                                                       .invocationConfiguration()
-                                                                      .with(invocationConfiguration)
+                                                                      .withPatch(invocationConfiguration)
                                                                       .withOutputTimeout(
                                                                           seconds(10))
                                                                       .apply()
@@ -186,7 +186,7 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
                                                                           ClearContextInvocation
                                                                               .class))
                                                                       .invocationConfiguration()
-                                                                      .with(invocationConfiguration)
+                                                                      .withPatch(invocationConfiguration)
                                                                       .withOutputTimeout(
                                                                           seconds(10))
                                                                       .apply()
@@ -725,7 +725,7 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
                                                                           ClearContextInvocation
                                                                               .class))
                                                                       .invocationConfiguration()
-                                                                      .with(invocationConfiguration)
+                                                                      .withPatch(invocationConfiguration)
                                                                       .withOutputTimeout(
                                                                           seconds(10))
                                                                       .apply()
@@ -1595,7 +1595,7 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
     JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                         .with(factoryOf(ToUpperCase.class))
                         .invocationConfiguration()
-                        .with(configuration)
+                        .withPatch(configuration)
                         .apply()
                         .loaderConfiguration()
                         .withLoaderId(0)
@@ -1609,7 +1609,7 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
     JRoutineLoaderCompat.on(loaderFrom(fragment))
                         .with(factoryOf(ToUpperCase.class))
                         .invocationConfiguration()
-                        .with(configuration)
+                        .withPatch(configuration)
                         .apply()
                         .loaderConfiguration()
                         .withLoaderId(0)

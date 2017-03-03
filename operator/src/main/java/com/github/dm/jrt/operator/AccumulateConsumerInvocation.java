@@ -20,10 +20,10 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
-import com.github.dm.jrt.function.lambda.BiConsumer;
-import com.github.dm.jrt.function.lambda.BiConsumerDecorator;
-import com.github.dm.jrt.function.lambda.Supplier;
-import com.github.dm.jrt.function.lambda.SupplierDecorator;
+import com.github.dm.jrt.function.util.BiConsumer;
+import com.github.dm.jrt.function.util.BiConsumerDecorator;
+import com.github.dm.jrt.function.util.Supplier;
+import com.github.dm.jrt.function.util.SupplierDecorator;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

@@ -22,7 +22,7 @@ import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.SimpleQueue;
-import com.github.dm.jrt.function.lambda.Function;
+import com.github.dm.jrt.function.util.Function;
 import com.github.dm.jrt.stream.builder.StreamConfiguration;
 import com.github.dm.jrt.stream.transform.ThrottleChannelConsumer.CompletionHandler;
 

@@ -24,6 +24,7 @@ import com.github.dm.jrt.core.util.ConstantConditions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -135,7 +136,7 @@ public class JRoutineCore {
    * @return the channel builder instance.
    */
   @NotNull
-  public static <OUT> ChannelBuilder<?, OUT> of(@Nullable OUT output) {
+  public static <OUT> ChannelBuilder<?, OUT> of(@Nullable final OUT output) {
     return of(Collections.singleton(output));
   }
 
@@ -149,7 +150,7 @@ public class JRoutineCore {
    * @return the channel builder instance.
    */
   @NotNull
-  public static <OUT> ChannelBuilder<?, OUT> of(@Nullable OUT... outputs) {
+  public static <OUT> ChannelBuilder<?, OUT> of(@Nullable final OUT... outputs) {
     if (outputs == null) {
       return of();
     }
@@ -167,12 +168,17 @@ public class JRoutineCore {
    * @return the channel builder instance.
    */
   @NotNull
-  public static <OUT> ChannelBuilder<?, OUT> of(@Nullable Iterable<OUT> outputs) {
+  public static <OUT> ChannelBuilder<?, OUT> of(@Nullable final Iterable<OUT> outputs) {
     if (outputs == null) {
       return of();
     }
 
-    return new DefaultChannelBuilder<OUT>(outputs);
+    final ArrayList<OUT> list = new ArrayList<OUT>();
+    for (final OUT output : outputs) {
+      list.add(output);
+    }
+
+    return new DefaultChannelBuilder<OUT>(list);
   }
 
   /**

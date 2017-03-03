@@ -23,9 +23,9 @@ import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.lambda.Consumer;
-import com.github.dm.jrt.function.lambda.Function;
-import com.github.dm.jrt.function.lambda.Supplier;
+import com.github.dm.jrt.function.util.Consumer;
+import com.github.dm.jrt.function.util.Function;
+import com.github.dm.jrt.function.util.Supplier;
 import com.github.dm.jrt.stream.builder.StreamBuilder;
 import com.github.dm.jrt.stream.builder.StreamConfiguration;
 import com.github.dm.jrt.stream.transform.LiftFunction;
@@ -33,7 +33,7 @@ import com.github.dm.jrt.stream.transform.LiftFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static com.github.dm.jrt.function.lambda.FunctionDecorator.decorate;
+import static com.github.dm.jrt.function.util.FunctionDecorator.decorate;
 
 /**
  * Utility class acting as a factory of stream routine builders.

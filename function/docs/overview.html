@@ -30,25 +30,25 @@
 <h2>Main concepts</h2>
 <ul>
     <li>
-        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/function/com/github/dm/jrt/function/lambda/Action.html">Action</a>,
-        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/function/com/github/dm/jrt/function/lambda/BiConsumer.html">BiConsumer</a>,
-        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/function/com/github/dm/jrt/function/lambda/BiFunction.html">BiFunction</a>,
-        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/function/com/github/dm/jrt/function/lambda/Consumer.html">Consumer</a>,
-        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/function/com/github/dm/jrt/function/lambda/Function.html">Function</a>,
-        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/function/com/github/dm/jrt/function/lambda/Predicate.html">Predicate</a>,
-        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/function/com/github/dm/jrt/function/lambda/Supplier.html">Supplier</a>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/function/com/github/dm/jrt/function/util/Action.html">Action</a>,
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/function/com/github/dm/jrt/function/util/BiConsumer.html">BiConsumer</a>,
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/function/com/github/dm/jrt/function/util/BiFunction.html">BiFunction</a>,
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/function/com/github/dm/jrt/function/util/Consumer.html">Consumer</a>,
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/function/com/github/dm/jrt/function/util/Function.html">Function</a>,
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/function/com/github/dm/jrt/function/util/Predicate.html">Predicate</a>,
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/function/com/github/dm/jrt/function/util/Supplier.html">Supplier</a>
         <p>
             Functional interfaces.
         </p>
     </li>
     <li>
-        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/function/com/github/dm/jrt/function/lambda/ActionDecorator.html">ActionDecorator</a>,
-        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/function/com/github/dm/jrt/function/lambda/BiConsumerDecorator.html">BiConsumerDecorator</a>,
-        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/function/com/github/dm/jrt/function/lambda/BiFunctionDecorator.html">BiFunctionDecorator</a>,
-        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/function/com/github/dm/jrt/function/lambda/ConsumerDecorator.html">ConsumerDecorator</a>,
-        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/function/com/github/dm/jrt/function/lambda/FunctionDecorator.html">FunctionDecorator</a>,
-        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/function/com/github/dm/jrt/function/lambda/PredicateDecorator.html">PredicateDecorator</a>,
-        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/function/com/github/dm/jrt/function/lambda/SupplierDecorator.html">SupplierDecorator</a>
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/function/com/github/dm/jrt/function/util/ActionDecorator.html">ActionDecorator</a>,
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/function/com/github/dm/jrt/function/util/BiConsumerDecorator.html">BiConsumerDecorator</a>,
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/function/com/github/dm/jrt/function/util/BiFunctionDecorator.html">BiFunctionDecorator</a>,
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/function/com/github/dm/jrt/function/util/ConsumerDecorator.html">ConsumerDecorator</a>,
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/function/com/github/dm/jrt/function/util/FunctionDecorator.html">FunctionDecorator</a>,
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/function/com/github/dm/jrt/function/util/PredicateDecorator.html">PredicateDecorator</a>,
+        <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/function/com/github/dm/jrt/function/util/SupplierDecorator.html">SupplierDecorator</a>
         <p>
             Each functional interface has a corresponding decorator class enabling comparison and composition.
         </p>
@@ -84,7 +84,7 @@
 <b>Example 1:</b> via routine builders.
 <p>
     The lambda notation used in the example is just for demonstration purpose. In order to compile with Java 7 or below, explicit object creation must be employed.<br>
-    In fact, the interfaces defined in the "lambda" package are conceptually <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/FunctionalInterface.html" target="_blank">functional interfaces</a>.
+    In fact, the interfaces defined in the "util" package are conceptually <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/FunctionalInterface.html" target="_blank">functional interfaces</a>.
 </p>
 <pre>
     <code>
@@ -102,10 +102,10 @@
                                             return (input * input);
                                         })).buildRoutine();
                 final Routine&lt;Integer, Double&gt; meanRoutine =
-                        JRoutineFunction.&lt;Integer, Double, SumState&gt;withStateful()
-                                        .onCreate(SumState::new)
-                                        .onNextConsume(SumState::add)
-                                        .onCompleteOutput(SumState::mean)
+                        JRoutineFunction.&lt;Integer, Double, MeanState&gt;withStateful()
+                                        .onCreate(MeanState::new)
+                                        .onNextConsume(MeanState::add)
+                                        .onCompleteOutput(MeanState::mean)
                                         .buildRoutine();
                 final Double rms =
                         meanRoutine.invoke()
@@ -119,7 +119,7 @@
                 System.exit(0);
             }
 
-            private static class SumState {
+            private static class MeanState {
 
                 private int sum;
 
@@ -137,7 +137,7 @@
         }
     </code>
 </pre>
-<b>Example 2:</b> via lambda notation.
+<b>Example 2:</b> via functional interfaces.
 <p>
     In this case, the mean computation must actually wait for all the input data to be available before being invoked. Thus, it cannot really happen in a parallel way.<br>
     The lambda notation used in the example is just for demonstration purpose. In order to compile with Java 7 or below, explicit object creation must be employed.<br>

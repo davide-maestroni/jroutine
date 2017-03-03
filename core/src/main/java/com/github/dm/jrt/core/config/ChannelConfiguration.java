@@ -274,8 +274,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
      * Data are passed to the invocation or the channel consumer in the same order as they are
      * passed to the channel, independently from the specific delay.
      */
-    SORTED,
-    /**
+    SORTED, /**
      * Unsorted.
      * <br>
      * Data are passed to the invocation or the channel consumer as soon as they are available.
@@ -294,15 +293,13 @@ public final class ChannelConfiguration extends DeepEqualObject {
      * If no result is available after the specified timeout, the called method will throw an
      * {@link com.github.dm.jrt.core.channel.OutputTimeoutException OutputTimeoutException}.
      */
-    FAIL,
-    /**
+    FAIL, /**
      * Continue execution.
      * <br>
      * If no result is available after the specified timeout, the called method will continue
      * its execution and eventually exit.
      */
-    CONTINUE,
-    /**
+    CONTINUE, /**
      * Abort invocation.
      * <br>
      * If no result is available after the specified timeout, the invocation will be aborted and
@@ -383,64 +380,6 @@ public final class ChannelConfiguration extends DeepEqualObject {
     @NotNull
     public TYPE apply() {
       return mConfigurable.apply(buildConfiguration());
-    }
-
-    /**
-     * Applies the specified configuration to this builder. A null value means that all the
-     * configuration options will be reset to their default, otherwise only the non-default
-     * options will be applied.
-     *
-     * @param configuration the channel configuration.
-     * @return this builder.
-     */
-    @NotNull
-    public Builder<TYPE> with(@Nullable final ChannelConfiguration configuration) {
-      if (configuration == null) {
-        setConfiguration(defaultConfiguration());
-        return this;
-      }
-
-      final Runner runner = configuration.mRunner;
-      if (runner != null) {
-        withRunner(runner);
-      }
-
-      final DurationMeasure outputTimeout = configuration.mOutputTimeout;
-      if (outputTimeout != null) {
-        withOutputTimeout(outputTimeout);
-      }
-
-      final TimeoutActionType timeoutActionType = configuration.mTimeoutActionType;
-      if (timeoutActionType != null) {
-        withOutputTimeoutAction(timeoutActionType);
-      }
-
-      final OrderType orderType = configuration.mChannelOrderType;
-      if (orderType != null) {
-        withOrder(orderType);
-      }
-
-      final Backoff channelBackoff = configuration.mChannelBackoff;
-      if (channelBackoff != null) {
-        withBackoff(channelBackoff);
-      }
-
-      final int maxSize = configuration.mChannelMaxSize;
-      if (maxSize != DEFAULT) {
-        withMaxSize(maxSize);
-      }
-
-      final Log log = configuration.mLog;
-      if (log != null) {
-        withLog(log);
-      }
-
-      final Level logLevel = configuration.mLogLevel;
-      if (logLevel != null) {
-        withLogLevel(logLevel);
-      }
-
-      return this;
     }
 
     /**
@@ -570,6 +509,64 @@ public final class ChannelConfiguration extends DeepEqualObject {
     @NotNull
     public Builder<TYPE> withOutputTimeoutAction(@Nullable final TimeoutActionType actionType) {
       mTimeoutActionType = actionType;
+      return this;
+    }
+
+    /**
+     * Applies the specified patch configuration to this builder. A null value means that all the
+     * configuration options will be reset to their default, otherwise only the non-default
+     * options will be applied.
+     *
+     * @param configuration the channel configuration.
+     * @return this builder.
+     */
+    @NotNull
+    public Builder<TYPE> withPatch(@Nullable final ChannelConfiguration configuration) {
+      if (configuration == null) {
+        setConfiguration(defaultConfiguration());
+        return this;
+      }
+
+      final Runner runner = configuration.mRunner;
+      if (runner != null) {
+        withRunner(runner);
+      }
+
+      final DurationMeasure outputTimeout = configuration.mOutputTimeout;
+      if (outputTimeout != null) {
+        withOutputTimeout(outputTimeout);
+      }
+
+      final TimeoutActionType timeoutActionType = configuration.mTimeoutActionType;
+      if (timeoutActionType != null) {
+        withOutputTimeoutAction(timeoutActionType);
+      }
+
+      final OrderType orderType = configuration.mChannelOrderType;
+      if (orderType != null) {
+        withOrder(orderType);
+      }
+
+      final Backoff channelBackoff = configuration.mChannelBackoff;
+      if (channelBackoff != null) {
+        withBackoff(channelBackoff);
+      }
+
+      final int maxSize = configuration.mChannelMaxSize;
+      if (maxSize != DEFAULT) {
+        withMaxSize(maxSize);
+      }
+
+      final Log log = configuration.mLog;
+      if (log != null) {
+        withLog(log);
+      }
+
+      final Level logLevel = configuration.mLogLevel;
+      if (logLevel != null) {
+        withLogLevel(logLevel);
+      }
+
       return this;
     }
 

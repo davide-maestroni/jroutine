@@ -21,10 +21,10 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
-import com.github.dm.jrt.function.lambda.BiConsumer;
-import com.github.dm.jrt.function.lambda.Consumer;
-import com.github.dm.jrt.function.lambda.Function;
-import com.github.dm.jrt.function.lambda.Supplier;
+import com.github.dm.jrt.function.util.BiConsumer;
+import com.github.dm.jrt.function.util.Consumer;
+import com.github.dm.jrt.function.util.Function;
+import com.github.dm.jrt.function.util.Supplier;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -36,6 +36,12 @@ import org.jetbrains.annotations.NotNull;
  * builder.onNextOutput(String::toUpperCase)
  *        .buildRoutine();
  * </code></pre>
+ * <p>
+ * Note that the passed instances are expected to behave like a function, that is, they must not
+ * retain a mutable internal state.
+ * <br>
+ * Note also that any external object used inside the function must be synchronized in order to
+ * avoid concurrency issues.
  * <p>
  * Created by davide-maestroni on 02/24/2017.
  *
@@ -98,7 +104,7 @@ public interface StatelessRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT
    * @return this builder.
    */
   @NotNull
-  StatelessRoutineBuilder<IN, OUT> onCompleteOutput(@NotNull Supplier<OUT> onComplete);
+  StatelessRoutineBuilder<IN, OUT> onCompleteOutput(@NotNull Supplier<? extends OUT> onComplete);
 
   /**
    * Sets the consumer to call when the invocation is aborted with an error.

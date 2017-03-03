@@ -23,7 +23,7 @@ import android.test.ActivityInstrumentationTestCase2;
 import com.github.dm.jrt.android.core.ServiceContext;
 import com.github.dm.jrt.android.retrofit.service.RemoteTestService;
 import com.github.dm.jrt.android.retrofit.service.TestService;
-import com.github.dm.jrt.function.lambda.Consumer;
+import com.github.dm.jrt.function.util.Consumer;
 import com.github.dm.jrt.operator.Operators;
 import com.google.gson.Gson;
 

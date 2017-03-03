@@ -35,8 +35,8 @@ import com.github.dm.jrt.channel.io.ChunkOutputStreamBuilder;
 import com.github.dm.jrt.core.builder.ChannelBuilder;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.lambda.Consumer;
-import com.github.dm.jrt.function.lambda.Supplier;
+import com.github.dm.jrt.function.util.Consumer;
+import com.github.dm.jrt.function.util.Supplier;
 import com.github.dm.jrt.stream.JRoutineStream;
 import com.github.dm.jrt.stream.builder.StreamBuilder;
 

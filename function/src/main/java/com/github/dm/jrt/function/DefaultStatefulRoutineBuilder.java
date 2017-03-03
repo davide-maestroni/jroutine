@@ -28,18 +28,18 @@ import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.function.builder.StatefulRoutineBuilder;
-import com.github.dm.jrt.function.lambda.BiConsumer;
-import com.github.dm.jrt.function.lambda.BiConsumerDecorator;
-import com.github.dm.jrt.function.lambda.BiFunction;
-import com.github.dm.jrt.function.lambda.BiFunctionDecorator;
-import com.github.dm.jrt.function.lambda.Consumer;
-import com.github.dm.jrt.function.lambda.ConsumerDecorator;
-import com.github.dm.jrt.function.lambda.Function;
-import com.github.dm.jrt.function.lambda.FunctionDecorator;
-import com.github.dm.jrt.function.lambda.Supplier;
-import com.github.dm.jrt.function.lambda.SupplierDecorator;
-import com.github.dm.jrt.function.lambda.TriFunction;
-import com.github.dm.jrt.function.lambda.TriFunctionDecorator;
+import com.github.dm.jrt.function.util.BiConsumer;
+import com.github.dm.jrt.function.util.BiConsumerDecorator;
+import com.github.dm.jrt.function.util.BiFunction;
+import com.github.dm.jrt.function.util.BiFunctionDecorator;
+import com.github.dm.jrt.function.util.Consumer;
+import com.github.dm.jrt.function.util.ConsumerDecorator;
+import com.github.dm.jrt.function.util.Function;
+import com.github.dm.jrt.function.util.FunctionDecorator;
+import com.github.dm.jrt.function.util.Supplier;
+import com.github.dm.jrt.function.util.SupplierDecorator;
+import com.github.dm.jrt.function.util.TriFunction;
+import com.github.dm.jrt.function.util.TriFunctionDecorator;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -69,14 +69,6 @@ class DefaultStatefulRoutineBuilder<IN, OUT, STATE>
         }
       };
 
-  private FunctionDecorator<? super STATE, ? extends STATE> mOnCleanup =
-      FunctionDecorator.decorate(new com.github.dm.jrt.function.lambda.Function<STATE, STATE>() {
-
-        public STATE apply(final STATE state) {
-          return null;
-        }
-      });
-
   private BiFunctionDecorator<? super STATE, ? super
       Channel<OUT, ?>, ? extends STATE> mOnComplete =
       BiFunctionDecorator.<STATE, Channel<OUT, ?>>first();
@@ -88,6 +80,14 @@ class DefaultStatefulRoutineBuilder<IN, OUT, STATE>
   private BiFunctionDecorator<? super STATE, ? super
       RoutineException, ? extends STATE> mOnError =
       BiFunctionDecorator.<STATE, RoutineException>first();
+
+  private FunctionDecorator<? super STATE, ? extends STATE> mOnFinalize =
+      FunctionDecorator.decorate(new Function<STATE, STATE>() {
+
+        public STATE apply(final STATE state) {
+          return null;
+        }
+      });
 
   private TriFunctionDecorator<? super STATE, ? super IN, ?
       super Channel<OUT, ?>, ? extends STATE> mOnNext =
@@ -118,20 +118,6 @@ class DefaultStatefulRoutineBuilder<IN, OUT, STATE>
   }
 
   @NotNull
-  public StatefulRoutineBuilder<IN, OUT, STATE> onCleanup(
-      @NotNull final Function<? super STATE, ? extends STATE> onCleanup) {
-    mOnCleanup = FunctionDecorator.decorate(onCleanup);
-    return this;
-  }
-
-  @NotNull
-  public StatefulRoutineBuilder<IN, OUT, STATE> onCleanupConsume(
-      @NotNull final Consumer<? super STATE> onCleanup) {
-    mOnCleanup = FunctionDecorator.decorate(new CleanupConsumer<STATE>(onCleanup));
-    return this;
-  }
-
-  @NotNull
   public StatefulRoutineBuilder<IN, OUT, STATE> onComplete(
       @NotNull final BiFunction<? super STATE, ? super
           Channel<OUT, ?>, ? extends STATE> onComplete) {
@@ -143,6 +129,13 @@ class DefaultStatefulRoutineBuilder<IN, OUT, STATE>
   public StatefulRoutineBuilder<IN, OUT, STATE> onCompleteArray(
       @NotNull final Function<? super STATE, OUT[]> onComplete) {
     mOnComplete = BiFunctionDecorator.decorate(new CompleteArrayFunction<OUT, STATE>(onComplete));
+    return this;
+  }
+
+  @NotNull
+  public StatefulRoutineBuilder<IN, OUT, STATE> onCompleteConsume(
+      @NotNull final BiConsumer<? super STATE, ? super Channel<OUT, ?>> onComplete) {
+    mOnComplete = BiFunctionDecorator.decorate(new CompleteConsumer<OUT, STATE>(onComplete));
     return this;
   }
 
@@ -207,6 +200,26 @@ class DefaultStatefulRoutineBuilder<IN, OUT, STATE>
   }
 
   @NotNull
+  public StatefulRoutineBuilder<IN, OUT, STATE> onFinalize(
+      @NotNull final Function<? super STATE, ? extends STATE> onFinalize) {
+    mOnFinalize = FunctionDecorator.decorate(onFinalize);
+    return this;
+  }
+
+  @NotNull
+  public StatefulRoutineBuilder<IN, OUT, STATE> onFinalizeConsume(
+      @NotNull final Consumer<? super STATE> onFinalize) {
+    mOnFinalize = FunctionDecorator.decorate(new FinalizeConsumer<STATE>(onFinalize));
+    return this;
+  }
+
+  @NotNull
+  public StatefulRoutineBuilder<IN, OUT, STATE> onFinalizeRetain() {
+    mOnFinalize = FunctionDecorator.<STATE>identity();
+    return this;
+  }
+
+  @NotNull
   public StatefulRoutineBuilder<IN, OUT, STATE> onNext(
       @NotNull final TriFunction<? super STATE, ? super IN, ?
           super Channel<OUT, ?>, ? extends
@@ -258,7 +271,7 @@ class DefaultStatefulRoutineBuilder<IN, OUT, STATE>
   public Routine<IN, OUT> buildRoutine() {
     return JRoutineCore.with(
         new StatefulInvocationFactory<IN, OUT, STATE>(mOnCreate, mOnNext, mOnError, mOnComplete,
-            mOnCleanup, mOnDestroy)).apply(mConfiguration).buildRoutine();
+            mOnFinalize, mOnDestroy)).apply(mConfiguration).buildRoutine();
   }
 
   public void clear() {
@@ -275,33 +288,7 @@ class DefaultStatefulRoutineBuilder<IN, OUT, STATE>
   }
 
   /**
-   * Function wrapping a cleanup consumer taking a state object as parameter.
-   *
-   * @param <STATE> the state data type.
-   */
-  private static class CleanupConsumer<STATE> extends DeepEqualObject
-      implements Function<STATE, STATE> {
-
-    private final Consumer<? super STATE> mOnCleanup;
-
-    /**
-     * Constructor.
-     *
-     * @param onCleanup the consumer instance.
-     */
-    private CleanupConsumer(@NotNull final Consumer<? super STATE> onCleanup) {
-      super(asArgs(ConsumerDecorator.decorate(onCleanup)));
-      mOnCleanup = onCleanup;
-    }
-
-    public STATE apply(final STATE state) throws Exception {
-      mOnCleanup.accept(state);
-      return null;
-    }
-  }
-
-  /**
-   * Function wrapping a complete one returning an array of outputs.
+   * Function wrapping a completion one returning an array of outputs.
    *
    * @param <OUT>   the output data type.
    * @param <STATE> the state data type.
@@ -328,7 +315,36 @@ class DefaultStatefulRoutineBuilder<IN, OUT, STATE>
   }
 
   /**
-   * Function wrapping a complete one returning an iterable of outputs.
+   * Function wrapping a completion consumer taking only a state object and the result channel as
+   * parameters.
+   *
+   * @param <OUT>   the output data type.
+   * @param <STATE> the state data type.
+   */
+  private static class CompleteConsumer<OUT, STATE> extends DeepEqualObject
+      implements BiFunction<STATE, Channel<OUT, ?>, STATE> {
+
+    private final BiConsumer<? super STATE, ? super Channel<OUT, ?>> mOnComplete;
+
+    /**
+     * Constructor.
+     *
+     * @param onComplete the consumer instance.
+     */
+    private CompleteConsumer(
+        @NotNull final BiConsumer<? super STATE, ? super Channel<OUT, ?>> onComplete) {
+      super(asArgs(BiConsumerDecorator.decorate(onComplete)));
+      mOnComplete = onComplete;
+    }
+
+    public STATE apply(final STATE state, final Channel<OUT, ?> result) throws Exception {
+      mOnComplete.accept(state, result);
+      return state;
+    }
+  }
+
+  /**
+   * Function wrapping a completion one returning an iterable of outputs.
    *
    * @param <OUT>   the output data type.
    * @param <STATE> the state data type.
@@ -357,7 +373,7 @@ class DefaultStatefulRoutineBuilder<IN, OUT, STATE>
   }
 
   /**
-   * Function wrapping a complete one returning an output.
+   * Function wrapping a completion one returning an output.
    *
    * @param <OUT>   the output data type.
    * @param <STATE> the state data type.
@@ -385,7 +401,7 @@ class DefaultStatefulRoutineBuilder<IN, OUT, STATE>
   }
 
   /**
-   * Function wrapping a complete one taking only a state object as parameter.
+   * Function wrapping a completion one taking only a state object as parameter.
    *
    * @param <OUT>   the output data type.
    * @param <STATE> the state data type.
@@ -460,6 +476,32 @@ class DefaultStatefulRoutineBuilder<IN, OUT, STATE>
 
     public STATE apply(final STATE state, final RoutineException e) throws Exception {
       return mOnError.apply(state);
+    }
+  }
+
+  /**
+   * Function wrapping a finalization consumer taking a state object as parameter.
+   *
+   * @param <STATE> the state data type.
+   */
+  private static class FinalizeConsumer<STATE> extends DeepEqualObject
+      implements Function<STATE, STATE> {
+
+    private final Consumer<? super STATE> mOnFinalize;
+
+    /**
+     * Constructor.
+     *
+     * @param onFinalize the consumer instance.
+     */
+    private FinalizeConsumer(@NotNull final Consumer<? super STATE> onFinalize) {
+      super(asArgs(ConsumerDecorator.decorate(onFinalize)));
+      mOnFinalize = onFinalize;
+    }
+
+    public STATE apply(final STATE state) throws Exception {
+      mOnFinalize.accept(state);
+      return null;
     }
   }
 
@@ -622,8 +664,6 @@ class DefaultStatefulRoutineBuilder<IN, OUT, STATE>
    */
   private static class StatefulInvocation<IN, OUT, STATE> implements Invocation<IN, OUT> {
 
-    private final FunctionDecorator<? super STATE, ? extends STATE> mOnCleanup;
-
     private final BiFunctionDecorator<? super STATE, ? super
         Channel<OUT, ?>, ? extends STATE> mOnComplete;
 
@@ -633,6 +673,8 @@ class DefaultStatefulRoutineBuilder<IN, OUT, STATE>
 
     private final BiFunctionDecorator<? super STATE, ? super
         RoutineException, ? extends STATE> mOnError;
+
+    private final FunctionDecorator<? super STATE, ? extends STATE> mOnFinalize;
 
     private final TriFunctionDecorator<? super STATE, ? super
         IN, ? super Channel<OUT, ?>, ?
@@ -646,7 +688,8 @@ class DefaultStatefulRoutineBuilder<IN, OUT, STATE>
      * @param onCreate   the state supplier.
      * @param onNext     the next function.
      * @param onError    the error function.
-     * @param onComplete the complete function.
+     * @param onComplete the completion function.
+     * @param onFinalize the finalization function.
      * @param onDestroy  the destroy consumer.
      */
     private StatefulInvocation(@NotNull final SupplierDecorator<? extends STATE> onCreate,
@@ -657,13 +700,13 @@ class DefaultStatefulRoutineBuilder<IN, OUT, STATE>
         STATE> onError, @NotNull final BiFunctionDecorator<? super STATE, ?
         super Channel<OUT, ?>, ? extends
         STATE> onComplete,
-        @NotNull final FunctionDecorator<? super STATE, ? extends STATE> onCleanup,
+        @NotNull final FunctionDecorator<? super STATE, ? extends STATE> onFinalize,
         @NotNull final ConsumerDecorator<? super STATE> onDestroy) {
       mOnCreate = onCreate;
       mOnNext = onNext;
       mOnError = onError;
       mOnComplete = onComplete;
-      mOnCleanup = onCleanup;
+      mOnFinalize = onFinalize;
       mOnDestroy = onDestroy;
     }
 
@@ -684,7 +727,7 @@ class DefaultStatefulRoutineBuilder<IN, OUT, STATE>
     }
 
     public boolean onRecycle() throws Exception {
-      mState = mOnCleanup.apply(mState);
+      mState = mOnFinalize.apply(mState);
       return true;
     }
 
@@ -705,8 +748,6 @@ class DefaultStatefulRoutineBuilder<IN, OUT, STATE>
   private static class StatefulInvocationFactory<IN, OUT, STATE>
       extends InvocationFactory<IN, OUT> {
 
-    private final FunctionDecorator<? super STATE, ? extends STATE> mOnCleanup;
-
     private final BiFunctionDecorator<? super STATE, ? super
         Channel<OUT, ?>, ? extends STATE> mOnComplete;
 
@@ -716,6 +757,8 @@ class DefaultStatefulRoutineBuilder<IN, OUT, STATE>
 
     private final BiFunctionDecorator<? super STATE, ? super
         RoutineException, ? extends STATE> mOnError;
+
+    private final FunctionDecorator<? super STATE, ? extends STATE> mOnFinalize;
 
     private final TriFunctionDecorator<? super STATE, ? super
         IN, ? super Channel<OUT, ?>, ?
@@ -727,7 +770,8 @@ class DefaultStatefulRoutineBuilder<IN, OUT, STATE>
      * @param onCreate   the state supplier.
      * @param onNext     the next function.
      * @param onError    the error function.
-     * @param onComplete the complete function.
+     * @param onComplete the completion function.
+     * @param onFinalize the finalization function.
      * @param onDestroy  the destroy consumer.
      */
     private StatefulInvocationFactory(@NotNull final SupplierDecorator<? extends STATE> onCreate,
@@ -737,21 +781,21 @@ class DefaultStatefulRoutineBuilder<IN, OUT, STATE>
         STATE> onError,
         @NotNull final BiFunctionDecorator<? super STATE, ? super Channel<OUT, ?>, ? extends
             STATE> onComplete,
-        @NotNull final FunctionDecorator<? super STATE, ? extends STATE> onCleanup,
+        @NotNull final FunctionDecorator<? super STATE, ? extends STATE> onFinalize,
         @NotNull final ConsumerDecorator<? super STATE> onDestroy) {
-      super(asArgs(onCreate, onNext, onError, onComplete, onCleanup, onDestroy));
+      super(asArgs(onCreate, onNext, onError, onComplete, onFinalize, onDestroy));
       mOnCreate = onCreate;
       mOnNext = onNext;
       mOnError = onError;
       mOnComplete = onComplete;
-      mOnCleanup = onCleanup;
+      mOnFinalize = onFinalize;
       mOnDestroy = onDestroy;
     }
 
     @NotNull
     public Invocation<IN, OUT> newInvocation() {
       return new StatefulInvocation<IN, OUT, STATE>(mOnCreate, mOnNext, mOnError, mOnComplete,
-          mOnCleanup, mOnDestroy);
+          mOnFinalize, mOnDestroy);
     }
   }
 }

@@ -19,8 +19,8 @@ package com.github.dm.jrt.operator;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.runner.Runners;
-import com.github.dm.jrt.function.lambda.BiFunction;
-import com.github.dm.jrt.function.lambda.Supplier;
+import com.github.dm.jrt.function.util.BiFunction;
+import com.github.dm.jrt.function.util.Supplier;
 
 import org.junit.Test;
 

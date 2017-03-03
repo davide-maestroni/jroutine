@@ -71,9 +71,9 @@ public class WrapperConfigurationTest {
   public void testBuilderFromEquals() {
 
     final WrapperConfiguration configuration = builder().withSharedFields("test").apply();
-    assertThat(builder().with(configuration).apply()).isEqualTo(configuration);
+    assertThat(builder().withPatch(configuration).apply()).isEqualTo(configuration);
     assertThat(configuration.builderFrom().apply()).isEqualTo(configuration);
-    assertThat(configuration.builderFrom().with(null).apply()).isEqualTo(
+    assertThat(configuration.builderFrom().withPatch(null).apply()).isEqualTo(
         WrapperConfiguration.defaultConfiguration());
   }
 

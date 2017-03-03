@@ -21,8 +21,8 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.lambda.BiConsumer;
-import com.github.dm.jrt.function.lambda.Function;
+import com.github.dm.jrt.function.util.BiConsumer;
+import com.github.dm.jrt.function.util.Function;
 
 import org.jetbrains.annotations.NotNull;
 

@@ -18,7 +18,6 @@ package com.github.dm.jrt.android.v4.core;
 
 import com.github.dm.jrt.android.core.builder.LoaderChannelBuilder;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
-import com.github.dm.jrt.android.core.config.LoaderConfiguration.ClashResolutionType;
 import com.github.dm.jrt.android.core.invocation.MissingLoaderException;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
@@ -87,11 +86,7 @@ class DefaultLoaderChannelBuilder implements LoaderChannelBuilder {
     final DefaultLoaderRoutineBuilder<Void, OUT> builder =
         new DefaultLoaderRoutineBuilder<Void, OUT>(context, factory);
     return builder.apply(builderFromOutput(mChannelConfiguration).apply())
-                  .loaderConfiguration()
-                  .withClashResolution(ClashResolutionType.JOIN)
-                  .withMatchResolution(ClashResolutionType.JOIN)
-                  .withPatch(loaderConfiguration)
-                  .apply()
+                  .apply(loaderConfiguration)
                   .invoke()
                   .close();
   }

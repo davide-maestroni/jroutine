@@ -116,8 +116,8 @@ public abstract class ServiceContext {
     for (final String key : bundle1.keySet()) {
       final Object value1 = bundle1.get(key);
       final Object value2 = bundle2.get(key);
-      if ((value1 instanceof Bundle) && (value2 instanceof Bundle) &&
-          !bundleEquals((Bundle) value1, (Bundle) value2)) {
+      if ((value1 instanceof Bundle) && (value2 instanceof Bundle) && !bundleEquals((Bundle) value1,
+          (Bundle) value2)) {
         return false;
 
       } else if (value1 == null) {

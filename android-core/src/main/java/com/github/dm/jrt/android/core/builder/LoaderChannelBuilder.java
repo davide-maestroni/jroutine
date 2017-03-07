@@ -40,8 +40,6 @@ public interface LoaderChannelBuilder
 
   /**
    * {@inheritDoc}
-   * <p>
-   * The clash resolution types will be ignored.
    */
   @NotNull
   @Override
@@ -85,8 +83,6 @@ public interface LoaderChannelBuilder
 
   /**
    * {@inheritDoc}
-   * <p>
-   * The clash resolution types will be ignored.
    */
   @NotNull
   @Override

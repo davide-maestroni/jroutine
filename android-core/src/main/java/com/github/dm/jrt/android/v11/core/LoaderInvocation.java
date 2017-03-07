@@ -94,19 +94,22 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
 
   private final long mResultStaleTimeMillis;
 
+  private final Runner mRunner;
+
   /**
    * Constructor.
    *
    * @param context       the context instance.
    * @param factory       the invocation factory.
    * @param configuration the Loader configuration.
+   * @param runner        the invocation runner.
    * @param order         the input data order.
    * @param logger        the logger instance.
    */
   LoaderInvocation(@NotNull final LoaderContext context,
       @NotNull final ContextInvocationFactory<IN, OUT> factory,
-      @NotNull final LoaderConfiguration configuration, @Nullable final OrderType order,
-      @NotNull final Logger logger) {
+      @NotNull final LoaderConfiguration configuration, @Nullable final Runner runner,
+      @Nullable final OrderType order, @NotNull final Logger logger) {
     mContext = ConstantConditions.notNull("Loader context", context);
     mFactory = ConstantConditions.notNull("Context invocation factory", factory);
     mLoaderId = configuration.getLoaderIdOrElse(LoaderConfiguration.AUTO);
@@ -115,6 +118,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
     mMatchResolutionType = configuration.getMatchResolutionTypeOrElse(ClashResolutionType.JOIN);
     mCacheStrategyType = configuration.getCacheStrategyTypeOrElse(CacheStrategyType.CLEAR);
     mResultStaleTimeMillis = configuration.getResultStaleTimeOrElse(indefiniteTime()).toMillis();
+    mRunner = runner;
     mOrderType = order;
     mLogger = logger.subContextLogger(this);
   }
@@ -445,26 +449,22 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
       @NotNull final List<? extends IN> inputs, final int loaderId) throws Exception {
     final Logger logger = mLogger;
     final InvocationLoader<IN, OUT> callbacksLoader = (loader != null) ? loader
-        : new InvocationLoader<IN, OUT>(loaderContext, createInvocation(loaderId), mFactory, inputs,
-            mOrderType, logger);
+        : new InvocationLoader<IN, OUT>(loaderContext, inputs, createInvocation(loaderId), mFactory,
+            mRunner, mOrderType, logger);
     return new RoutineLoaderCallbacks<OUT>(loaderManager, callbacksLoader, logger);
   }
 
   @NotNull
   private ContextInvocation<IN, OUT> createInvocation(final int loaderId) throws Exception {
     final Logger logger = mLogger;
-    final ContextInvocationFactory<IN, OUT> factory = mFactory;
-    final ContextInvocation<IN, OUT> invocation;
     try {
       logger.dbg("creating a new invocation instance [%d]", loaderId);
-      invocation = factory.newInvocation();
+      return mFactory.newInvocation();
 
     } catch (final Exception e) {
       logger.err(e, "error creating the invocation instance [%d]", loaderId);
       throw e;
     }
-
-    return invocation;
   }
 
   @NotNull
@@ -481,26 +481,21 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
     }
 
     final ContextInvocationFactory<IN, OUT> factory = mFactory;
-    if (factory instanceof MissingLoaderInvocationFactory) {
-      logger.dbg("joining existing invocation [%d]", loaderId);
-      return ClashType.NONE;
-    }
-
     @SuppressWarnings("unchecked") final InvocationLoader<IN, OUT> invocationLoader =
         (InvocationLoader<IN, OUT>) loader;
-    final ClashResolutionType resolution =
-        (invocationLoader.getInvocationFactory().equals(factory) && invocationLoader.areSameInputs(
-            inputs)) ? mMatchResolutionType : mClashResolutionType;
+    final ClashResolutionType resolution = (factory instanceof MissingLoaderInvocationFactory) || ((
+        invocationLoader.getInvocationFactory().equals(factory) && invocationLoader.areSameInputs(
+            inputs))) ? mMatchResolutionType : mClashResolutionType;
     if (resolution == ClashResolutionType.JOIN) {
-      logger.dbg("keeping existing invocation [%d]", loaderId);
+      logger.dbg("joining existing invocation [%d]", loaderId);
       return ClashType.NONE;
 
     } else if (resolution == ClashResolutionType.ABORT_BOTH) {
-      logger.dbg("restarting existing invocation [%d]", loaderId);
+      logger.dbg("aborting existing invocation [%d]", loaderId);
       return ClashType.ABORT_BOTH;
 
     } else if (resolution == ClashResolutionType.ABORT_OTHER) {
-      logger.dbg("restarting existing invocation [%d]", loaderId);
+      logger.dbg("aborting existing invocation [%d]", loaderId);
       return ClashType.ABORT_OTHER;
 
     } else if (resolution == ClashResolutionType.ABORT_THIS) {

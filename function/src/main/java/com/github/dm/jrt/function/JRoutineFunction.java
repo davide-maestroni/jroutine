@@ -185,11 +185,9 @@ public class JRoutineFunction {
   @NotNull
   @SuppressWarnings("unchecked")
   public static <IN, OUT> StatefulRoutineBuilder<IN, OUT, ? extends List<IN>> statefulList() {
-    return JRoutineFunction.<IN, OUT, List<IN>>stateful().onCreate(
-        (Supplier<? extends List<IN>>) sListSupplier)
-                                                         .onNextConsume(
-                                                             (BiConsumer<? super List<IN>, ?
-                                                                 super IN>) sListConsumer);
+    final Supplier<? extends List<IN>> onCreate = listSupplier();
+    final BiConsumer<? super List<IN>, ? super IN> onNext = listConsumer();
+    return JRoutineFunction.<IN, OUT, List<IN>>stateful().onCreate(onCreate).onNextConsume(onNext);
   }
 
   /**
@@ -207,5 +205,17 @@ public class JRoutineFunction {
   @NotNull
   public static <IN, OUT> StatelessRoutineBuilder<IN, OUT> stateless() {
     return new DefaultStatelessRoutineBuilder<IN, OUT>();
+  }
+
+  @NotNull
+  @SuppressWarnings("unchecked")
+  private static <IN> BiConsumer<? super List<IN>, ? super IN> listConsumer() {
+    return (BiConsumer<? super List<IN>, ? super IN>) sListConsumer;
+  }
+
+  @NotNull
+  @SuppressWarnings("unchecked")
+  private static <IN> Supplier<? extends List<IN>> listSupplier() {
+    return (Supplier<? extends List<IN>>) sListSupplier;
   }
 }

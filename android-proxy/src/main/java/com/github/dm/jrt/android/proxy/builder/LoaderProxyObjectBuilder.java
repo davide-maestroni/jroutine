@@ -35,8 +35,6 @@ public interface LoaderProxyObjectBuilder<TYPE>
 
   /**
    * {@inheritDoc}
-   * <p>
-   * The configured runner will be ignored.
    */
   @NotNull
   @Override
@@ -75,8 +73,6 @@ public interface LoaderProxyObjectBuilder<TYPE>
 
   /**
    * {@inheritDoc}
-   * <p>
-   * The configured runner will be ignored.
    */
   @NotNull
   @Override

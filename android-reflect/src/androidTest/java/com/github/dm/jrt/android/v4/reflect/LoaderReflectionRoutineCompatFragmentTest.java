@@ -31,7 +31,6 @@ import com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.ChannelConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.invocation.InvocationException;
@@ -70,8 +69,6 @@ import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory
 import static com.github.dm.jrt.android.reflect.ContextInvocationTarget.classOfType;
 import static com.github.dm.jrt.android.reflect.ContextInvocationTarget.instanceOf;
 import static com.github.dm.jrt.android.v4.core.LoaderContextCompat.loaderFrom;
-import static com.github.dm.jrt.core.common.BackoffBuilder.afterCount;
-import static com.github.dm.jrt.core.config.InvocationConfiguration.builder;
 import static com.github.dm.jrt.core.util.DurationMeasure.indefiniteTime;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -215,49 +212,6 @@ public class LoaderReflectionRoutineCompatFragmentTest
     } catch (final NullPointerException ignored) {
 
     }
-  }
-
-  public void testConfigurationWarnings() {
-
-    final CountLog countLog = new CountLog();
-    final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
-                                                              .findFragmentById(R.id.test_fragment);
-    final InvocationConfiguration configuration = builder().withRunner(Runners.poolRunner())
-                                                           .withInputOrder(OrderType.UNSORTED)
-                                                           .withInputBackoff(
-                                                               afterCount(3).constantDelay(
-                                                                   seconds(10)))
-                                                           .withInputMaxSize(33)
-                                                           .withOutputOrder(OrderType.UNSORTED)
-                                                           .withOutputBackoff(
-                                                               afterCount(3).constantDelay(
-                                                                   seconds(10)))
-                                                           .withOutputMaxSize(33)
-                                                           .withLogLevel(Level.DEBUG)
-                                                           .withLog(countLog)
-                                                           .apply();
-    JRoutineLoaderReflectionCompat.on(loaderFrom(fragment))
-                                  .with(instanceOf(TestClass.class))
-                                  .invocationConfiguration()
-                                  .withPatch(configuration)
-                                  .apply()
-                                  .wrapperConfiguration()
-                                  .withSharedFields("test")
-                                  .apply()
-                                  .method(TestClass.GET);
-    assertThat(countLog.getWrnCount()).isEqualTo(1);
-
-    JRoutineLoaderReflectionCompat.on(loaderFrom(fragment))
-                                  .with(instanceOf(Square.class))
-                                  .invocationConfiguration()
-                                  .withPatch(configuration)
-                                  .apply()
-                                  .wrapperConfiguration()
-                                  .withSharedFields("test")
-                                  .apply()
-                                  .buildProxy(SquareItf.class)
-                                  .compute(3);
-    assertThat(countLog.getWrnCount()).isEqualTo(2);
   }
 
   public void testContextWrapper() {
@@ -1239,17 +1193,15 @@ public class LoaderReflectionRoutineCompatFragmentTest
     int[] addA00(char[] c);
 
     @Alias("aa")
-    int[] addA01(@AsyncInput(value = char[].class,
-        mode = InputMode.VALUE) Channel<?, char[]> c);
+    int[] addA01(@AsyncInput(value = char[].class, mode = InputMode.VALUE) Channel<?, char[]> c);
 
     @Alias("aa")
-    int[] addA02(@AsyncInput(value = char[].class,
-        mode = InputMode.COLLECTION) Channel<?, Character> c);
+    int[] addA02(
+        @AsyncInput(value = char[].class, mode = InputMode.COLLECTION) Channel<?, Character> c);
 
     @Alias("aa")
     @Invoke(InvocationMode.PARALLEL)
-    int[] addA03(@AsyncInput(value = char[].class,
-        mode = InputMode.VALUE) Channel<?, char[]> c);
+    int[] addA03(@AsyncInput(value = char[].class, mode = InputMode.VALUE) Channel<?, char[]> c);
 
     @Alias("aa")
     @AsyncOutput(OutputMode.VALUE)
@@ -1262,14 +1214,14 @@ public class LoaderReflectionRoutineCompatFragmentTest
 
     @Alias("aa")
     @AsyncOutput(OutputMode.VALUE)
-    Channel<?, int[]> addA06(@AsyncInput(value = char[].class,
-        mode = InputMode.COLLECTION) Channel<?, Character> c);
+    Channel<?, int[]> addA06(
+        @AsyncInput(value = char[].class, mode = InputMode.COLLECTION) Channel<?, Character> c);
 
     @Alias("aa")
     @Invoke(InvocationMode.PARALLEL)
     @AsyncOutput(OutputMode.VALUE)
-    Channel<?, int[]> addA07(@AsyncInput(value = char[].class,
-        mode = InputMode.VALUE) Channel<?, char[]> c);
+    Channel<?, int[]> addA07(
+        @AsyncInput(value = char[].class, mode = InputMode.VALUE) Channel<?, char[]> c);
 
     @Alias("aa")
     @AsyncOutput(OutputMode.ELEMENT)
@@ -1282,14 +1234,14 @@ public class LoaderReflectionRoutineCompatFragmentTest
 
     @Alias("aa")
     @AsyncOutput(OutputMode.ELEMENT)
-    Channel<?, Integer> addA10(@AsyncInput(value = char[].class,
-        mode = InputMode.COLLECTION) Channel<?, Character> c);
+    Channel<?, Integer> addA10(
+        @AsyncInput(value = char[].class, mode = InputMode.COLLECTION) Channel<?, Character> c);
 
     @Alias("aa")
     @Invoke(InvocationMode.PARALLEL)
     @AsyncOutput(OutputMode.ELEMENT)
-    Channel<?, Integer> addA11(@AsyncInput(value = char[].class,
-        mode = InputMode.VALUE) Channel<?, char[]> c);
+    Channel<?, Integer> addA11(
+        @AsyncInput(value = char[].class, mode = InputMode.VALUE) Channel<?, char[]> c);
 
     @Alias("aa")
     @AsyncMethod(char[].class)
@@ -1331,17 +1283,17 @@ public class LoaderReflectionRoutineCompatFragmentTest
     List<Integer> addL00(List<Character> c);
 
     @Alias("al")
-    List<Integer> addL01(@AsyncInput(value = List.class,
-        mode = InputMode.VALUE) Channel<?, List<Character>> c);
+    List<Integer> addL01(
+        @AsyncInput(value = List.class, mode = InputMode.VALUE) Channel<?, List<Character>> c);
 
     @Alias("al")
-    List<Integer> addL02(@AsyncInput(value = List.class,
-        mode = InputMode.COLLECTION) Channel<?, Character> c);
+    List<Integer> addL02(
+        @AsyncInput(value = List.class, mode = InputMode.COLLECTION) Channel<?, Character> c);
 
     @Alias("al")
     @Invoke(InvocationMode.PARALLEL)
-    List<Integer> addL03(@AsyncInput(value = List.class,
-        mode = InputMode.VALUE) Channel<?, List<Character>> c);
+    List<Integer> addL03(
+        @AsyncInput(value = List.class, mode = InputMode.VALUE) Channel<?, List<Character>> c);
 
     @Alias("al")
     @AsyncOutput(OutputMode.VALUE)
@@ -1349,19 +1301,19 @@ public class LoaderReflectionRoutineCompatFragmentTest
 
     @Alias("al")
     @AsyncOutput(OutputMode.VALUE)
-    Channel<?, List<Integer>> addL05(@AsyncInput(value = List.class,
-        mode = InputMode.VALUE) Channel<?, List<Character>> c);
+    Channel<?, List<Integer>> addL05(
+        @AsyncInput(value = List.class, mode = InputMode.VALUE) Channel<?, List<Character>> c);
 
     @Alias("al")
     @AsyncOutput(OutputMode.VALUE)
-    Channel<?, List<Integer>> addL06(@AsyncInput(value = List.class,
-        mode = InputMode.COLLECTION) Channel<?, Character> c);
+    Channel<?, List<Integer>> addL06(
+        @AsyncInput(value = List.class, mode = InputMode.COLLECTION) Channel<?, Character> c);
 
     @Alias("al")
     @Invoke(InvocationMode.PARALLEL)
     @AsyncOutput(OutputMode.VALUE)
-    Channel<?, List<Integer>> addL07(@AsyncInput(value = List.class,
-        mode = InputMode.VALUE) Channel<?, List<Character>> c);
+    Channel<?, List<Integer>> addL07(
+        @AsyncInput(value = List.class, mode = InputMode.VALUE) Channel<?, List<Character>> c);
 
     @Alias("al")
     @AsyncOutput(OutputMode.ELEMENT)
@@ -1369,19 +1321,19 @@ public class LoaderReflectionRoutineCompatFragmentTest
 
     @Alias("al")
     @AsyncOutput(OutputMode.ELEMENT)
-    Channel<?, Integer> addL09(@AsyncInput(value = List.class,
-        mode = InputMode.VALUE) Channel<?, List<Character>> c);
+    Channel<?, Integer> addL09(
+        @AsyncInput(value = List.class, mode = InputMode.VALUE) Channel<?, List<Character>> c);
 
     @Alias("al")
     @AsyncOutput(OutputMode.ELEMENT)
-    Channel<?, Integer> addL10(@AsyncInput(value = List.class,
-        mode = InputMode.COLLECTION) Channel<?, Character> c);
+    Channel<?, Integer> addL10(
+        @AsyncInput(value = List.class, mode = InputMode.COLLECTION) Channel<?, Character> c);
 
     @Alias("al")
     @Invoke(InvocationMode.PARALLEL)
     @AsyncOutput(OutputMode.ELEMENT)
-    Channel<?, Integer> addL11(@AsyncInput(value = List.class,
-        mode = InputMode.VALUE) Channel<?, List<Character>> c);
+    Channel<?, Integer> addL11(
+        @AsyncInput(value = List.class, mode = InputMode.VALUE) Channel<?, List<Character>> c);
 
     @Alias("al")
     @AsyncMethod(List.class)
@@ -1462,8 +1414,7 @@ public class LoaderReflectionRoutineCompatFragmentTest
     Channel<Void, int[]> getA2();
 
     @Alias("sa")
-    void setA2(@AsyncInput(value = int[].class,
-        mode = InputMode.COLLECTION) Channel<?, Integer> i);
+    void setA2(@AsyncInput(value = int[].class, mode = InputMode.COLLECTION) Channel<?, Integer> i);
 
     @Alias("ga")
     @AsyncMethod({})
@@ -1492,8 +1443,7 @@ public class LoaderReflectionRoutineCompatFragmentTest
     Channel<?, Integer> getL1();
 
     @Alias("sl")
-    void setL1(@AsyncInput(value = List.class,
-        mode = InputMode.VALUE) Channel<?, List<Integer>> i);
+    void setL1(@AsyncInput(value = List.class, mode = InputMode.VALUE) Channel<?, List<Integer>> i);
 
     @Alias("gl")
     @AsyncMethod({})
@@ -1508,8 +1458,7 @@ public class LoaderReflectionRoutineCompatFragmentTest
 
     @Alias("sl")
     @Invoke(InvocationMode.PARALLEL)
-    void setL3(@AsyncInput(value = List.class,
-        mode = InputMode.VALUE) Channel<?, List<Integer>> i);
+    void setL3(@AsyncInput(value = List.class, mode = InputMode.VALUE) Channel<?, List<Integer>> i);
 
     @Alias("gl")
     @AsyncMethod(value = {}, mode = OutputMode.ELEMENT)
@@ -1609,11 +1558,11 @@ public class LoaderReflectionRoutineCompatFragmentTest
 
     int compute(@AsyncInput(value = int.class, mode = InputMode.COLLECTION) Iterable<Integer> ints);
 
-    int compute(@AsyncInput(value = int.class,
-        mode = InputMode.COLLECTION) Channel<?, Integer> ints);
+    int compute(
+        @AsyncInput(value = int.class, mode = InputMode.COLLECTION) Channel<?, Integer> ints);
 
-    int compute(int a, @AsyncInput(value = int[].class,
-        mode = InputMode.COLLECTION) Channel<?, Integer> b);
+    int compute(int a,
+        @AsyncInput(value = int[].class, mode = InputMode.COLLECTION) Channel<?, Integer> b);
 
     @Invoke(InvocationMode.PARALLEL)
     int compute(String text,
@@ -1624,19 +1573,19 @@ public class LoaderReflectionRoutineCompatFragmentTest
 
     int compute(int a, @AsyncInput(int.class) Channel<?, Integer> b);
 
-    int compute(@AsyncInput(value = int[].class,
-        mode = InputMode.COLLECTION) Channel<?, Integer> ints);
+    int compute(
+        @AsyncInput(value = int[].class, mode = InputMode.COLLECTION) Channel<?, Integer> ints);
 
     @Alias("compute")
     int compute1(@AsyncInput(int[].class) Channel<?, int[]> ints);
 
     @Alias("compute")
-    int computeList(@AsyncInput(value = List.class,
-        mode = InputMode.COLLECTION) Channel<?, Integer> ints);
+    int computeList(
+        @AsyncInput(value = List.class, mode = InputMode.COLLECTION) Channel<?, Integer> ints);
 
     @Alias("compute")
-    int computeList1(@AsyncInput(value = List.class,
-        mode = InputMode.COLLECTION) Channel<?, Integer> ints);
+    int computeList1(
+        @AsyncInput(value = List.class, mode = InputMode.COLLECTION) Channel<?, Integer> ints);
   }
 
   @SuppressWarnings("unused")

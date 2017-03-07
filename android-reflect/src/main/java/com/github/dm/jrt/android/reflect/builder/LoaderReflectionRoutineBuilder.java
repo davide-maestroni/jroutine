@@ -40,8 +40,6 @@ public interface LoaderReflectionRoutineBuilder
 
   /**
    * {@inheritDoc}
-   * <p>
-   * The configured runner will be ignored.
    */
   @NotNull
   @Override
@@ -175,8 +173,6 @@ public interface LoaderReflectionRoutineBuilder
 
   /**
    * {@inheritDoc}
-   * <p>
-   * The configured runner will be ignored.
    */
   @NotNull
   @Override

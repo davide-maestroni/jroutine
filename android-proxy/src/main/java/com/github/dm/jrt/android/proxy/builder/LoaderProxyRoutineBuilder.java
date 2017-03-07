@@ -35,8 +35,6 @@ public interface LoaderProxyRoutineBuilder
 
   /**
    * {@inheritDoc}
-   * <p>
-   * The configured runner will be ignored.
    */
   @NotNull
   @Override
@@ -115,8 +113,6 @@ public interface LoaderProxyRoutineBuilder
 
   /**
    * {@inheritDoc}
-   * <p>
-   * The configured runner will be ignored.
    */
   @NotNull
   @Override

@@ -52,8 +52,6 @@ public interface LoaderRoutineBuilder<IN, OUT>
 
   /**
    * {@inheritDoc}
-   * <p>
-   * The configured runner will be ignored.
    */
   @NotNull
   @Override
@@ -68,8 +66,6 @@ public interface LoaderRoutineBuilder<IN, OUT>
 
   /**
    * {@inheritDoc}
-   * <p>
-   * The configured runner will be ignored.
    */
   @NotNull
   @Override

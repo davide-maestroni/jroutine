@@ -43,8 +43,6 @@ import com.github.dm.jrt.android.core.runner.AndroidRunners;
 import com.github.dm.jrt.android.core.test.R;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.config.ChannelConfiguration;
-import com.github.dm.jrt.core.config.ChannelConfiguration.Builder;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.log.Log;
@@ -66,7 +64,6 @@ import java.util.concurrent.TimeUnit;
 import static com.github.dm.jrt.android.core.RoutineContextInvocation.factoryFrom;
 import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.factoryOf;
 import static com.github.dm.jrt.android.v4.core.LoaderContextCompat.loaderFrom;
-import static com.github.dm.jrt.core.common.BackoffBuilder.afterCount;
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builder;
 import static com.github.dm.jrt.core.util.DurationMeasure.millis;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
@@ -150,7 +147,8 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
                                                                           ClearContextInvocation
                                                                               .class))
                                                                       .invocationConfiguration()
-                                                                      .withPatch(invocationConfiguration)
+                                                                      .withPatch(
+                                                                          invocationConfiguration)
                                                                       .withOutputTimeout(
                                                                           seconds(10))
                                                                       .apply()
@@ -186,7 +184,8 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
                                                                           ClearContextInvocation
                                                                               .class))
                                                                       .invocationConfiguration()
-                                                                      .withPatch(invocationConfiguration)
+                                                                      .withPatch(
+                                                                          invocationConfiguration)
                                                                       .withOutputTimeout(
                                                                           seconds(10))
                                                                       .apply()
@@ -725,7 +724,8 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
                                                                           ClearContextInvocation
                                                                               .class))
                                                                       .invocationConfiguration()
-                                                                      .withPatch(invocationConfiguration)
+                                                                      .withPatch(
+                                                                          invocationConfiguration)
                                                                       .withOutputTimeout(
                                                                           seconds(10))
                                                                       .apply()
@@ -793,27 +793,6 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
 
     assertThat(result1.next()).isSameAs(data1);
     assertThat(result2.next()).isSameAs(data1);
-  }
-
-  public void testChannelBuilderWarnings() {
-
-    final CountLog countLog = new CountLog();
-    final Builder<ChannelConfiguration> builder = ChannelConfiguration.builder();
-    final ChannelConfiguration configuration = builder.withRunner(AndroidRunners.taskRunner())
-                                                      .withMaxSize(3)
-                                                      .withLogLevel(Level.DEBUG)
-                                                      .withLog(countLog)
-                                                      .apply();
-    JRoutineLoaderCompat.on(loaderFrom(getActivity()))
-                        .withId(0)
-                        .apply(configuration)
-                        .buildChannel();
-    assertThat(countLog.getWrnCount()).isEqualTo(1);
-
-    final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
-                                                              .findFragmentById(R.id.test_fragment);
-    JRoutineLoaderCompat.on(loaderFrom(fragment)).withId(0).apply(configuration).buildChannel();
-    assertThat(countLog.getWrnCount()).isEqualTo(2);
   }
 
   public void testClash() {
@@ -1536,7 +1515,7 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
     try {
 
       new LoaderInvocation<String, String>(null, factoryOf(ToUpperCase.class), configuration, null,
-          logger);
+          null, logger);
 
       fail();
 
@@ -1546,7 +1525,7 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
 
     try {
 
-      new LoaderInvocation<String, String>(context, null, configuration, null, logger);
+      new LoaderInvocation<String, String>(context, null, configuration, null, null, logger);
 
       fail();
 
@@ -1556,7 +1535,7 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
 
     try {
 
-      new LoaderInvocation<String, String>(context, factoryOf(ToUpperCase.class), null, null,
+      new LoaderInvocation<String, String>(context, factoryOf(ToUpperCase.class), null, null, null,
           logger);
 
       fail();
@@ -1568,55 +1547,13 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
     try {
 
       new LoaderInvocation<String, String>(context, factoryOf(ToUpperCase.class), configuration,
-          null, null);
+          null, null, null);
 
       fail();
 
     } catch (final NullPointerException ignored) {
 
     }
-  }
-
-  public void testRoutineBuilderWarnings() {
-
-    final CountLog countLog = new CountLog();
-    final InvocationConfiguration configuration = builder().withRunner(AndroidRunners.taskRunner())
-                                                           .withInputBackoff(
-                                                               afterCount(3).constantDelay(
-                                                                   seconds(10)))
-                                                           .withInputMaxSize(33)
-                                                           .withOutputBackoff(
-                                                               afterCount(3).constantDelay(
-                                                                   seconds(10)))
-                                                           .withOutputMaxSize(33)
-                                                           .withLogLevel(Level.DEBUG)
-                                                           .withLog(countLog)
-                                                           .apply();
-    JRoutineLoaderCompat.on(loaderFrom(getActivity()))
-                        .with(factoryOf(ToUpperCase.class))
-                        .invocationConfiguration()
-                        .withPatch(configuration)
-                        .apply()
-                        .loaderConfiguration()
-                        .withLoaderId(0)
-                        .withMatchResolution(ClashResolutionType.JOIN)
-                        .apply()
-                        .buildRoutine();
-    assertThat(countLog.getWrnCount()).isEqualTo(1);
-
-    final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
-                                                              .findFragmentById(R.id.test_fragment);
-    JRoutineLoaderCompat.on(loaderFrom(fragment))
-                        .with(factoryOf(ToUpperCase.class))
-                        .invocationConfiguration()
-                        .withPatch(configuration)
-                        .apply()
-                        .loaderConfiguration()
-                        .withLoaderId(0)
-                        .withMatchResolution(ClashResolutionType.JOIN)
-                        .apply()
-                        .buildRoutine();
-    assertThat(countLog.getWrnCount()).isEqualTo(2);
   }
 
   @SuppressWarnings("ConstantConditions")
@@ -1628,7 +1565,7 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
     try {
 
       new DefaultLoaderRoutine<String, String>(null, factoryOf(ToUpperCase.class),
-          InvocationConfiguration.defaultConfiguration(), configuration);
+          InvocationConfiguration.defaultConfiguration(), configuration, null);
 
       fail();
 
@@ -1639,7 +1576,7 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
     try {
 
       new DefaultLoaderRoutine<String, String>(context, null,
-          InvocationConfiguration.defaultConfiguration(), configuration);
+          InvocationConfiguration.defaultConfiguration(), configuration, null);
 
       fail();
 
@@ -1650,7 +1587,7 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
     try {
 
       new DefaultLoaderRoutine<String, String>(context, factoryOf(ToUpperCase.class), null,
-          configuration);
+          configuration, null);
 
       fail();
 
@@ -1661,7 +1598,7 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
     try {
 
       new DefaultLoaderRoutine<String, String>(context, factoryOf(ToUpperCase.class),
-          InvocationConfiguration.defaultConfiguration(), null);
+          InvocationConfiguration.defaultConfiguration(), null, null);
 
       fail();
 

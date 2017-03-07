@@ -42,6 +42,9 @@ import org.jetbrains.annotations.NotNull;
  * nulled during the finalization step. Hence, it is advisable to call the
  * {@link #onFinalizeRetain()} method, or to customize the finalization function, in order to be
  * able to re-use the same state instances through successive invocation executions.
+ * <br>
+ * Note, however, that the state object should be reset on finalization in order to avoid
+ * unpredictable behaviors during different invocations.
  * <p>
  * For example, a routine concatenating strings through a {@code StringBuilder} can be implemented
  * as follows:
@@ -193,6 +196,20 @@ public interface StatefulRoutineBuilder<IN, OUT, STATE> extends RoutineBuilder<I
 
   /**
    * Sets the function to call when the invocation is aborted with an error.
+   * <br>
+   * The state object is automatically retained.
+   *
+   * @param onError the consumer instance.
+   * @return this builder.
+   * @see com.github.dm.jrt.core.invocation.Invocation#onAbort(RoutineException)
+   * onAbort(RoutineException)
+   */
+  @NotNull
+  StatefulRoutineBuilder<IN, OUT, STATE> onErrorConsume(
+      @NotNull BiConsumer<? super STATE, ? super RoutineException> onError);
+
+  /**
+   * Sets the function to call when the invocation is aborted with an error.
    *
    * @param onError the function instance.
    * @return this builder.
@@ -264,8 +281,8 @@ public interface StatefulRoutineBuilder<IN, OUT, STATE> extends RoutineBuilder<I
    */
   @NotNull
   StatefulRoutineBuilder<IN, OUT, STATE> onNext(
-      @NotNull TriFunction<? super STATE, ? super IN, ? super Channel<OUT, ?>, ? extends
-          STATE> onNext);
+      @NotNull TriFunction<? super STATE, ? super IN, ? super Channel<OUT, ?>, ? extends STATE>
+          onNext);
 
   /**
    * Sets the function to call when a new input is received.
@@ -338,6 +355,5 @@ public interface StatefulRoutineBuilder<IN, OUT, STATE> extends RoutineBuilder<I
    */
   @NotNull
   StatefulRoutineBuilder<IN, OUT, STATE> onNextState(
-      @NotNull BiFunction<? super STATE, ? super IN, ? extends
-          STATE> onNext);
+      @NotNull BiFunction<? super STATE, ? super IN, ? extends STATE> onNext);
 }

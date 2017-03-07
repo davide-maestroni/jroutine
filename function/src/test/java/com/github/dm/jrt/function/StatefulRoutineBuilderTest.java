@@ -120,6 +120,24 @@ public class StatefulRoutineBuilderTest {
 
   @Test
   @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
+  public void testErrorConsume() {
+    final AtomicReference<RoutineException> reference = new AtomicReference<RoutineException>();
+    final Channel<Void, Void> channel =
+        JRoutineFunction.<Void, Void, RoutineException>stateful().onErrorConsume(
+            new BiConsumer<RoutineException, RoutineException>() {
+
+              public void accept(final RoutineException state, final RoutineException e) {
+                reference.set(e);
+              }
+            }).invocationConfiguration().withRunner(Runners.immediateRunner()).apply().invoke();
+    assertThat(reference.get()).isNull();
+    channel.abort(new IOException());
+    assertThat(reference.get()).isExactlyInstanceOf(AbortException.class);
+    assertThat(reference.get().getCause()).isExactlyInstanceOf(IOException.class);
+  }
+
+  @Test
+  @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
   public void testErrorException() {
     final AtomicReference<RoutineException> reference = new AtomicReference<RoutineException>();
     final Channel<Void, Void> channel =

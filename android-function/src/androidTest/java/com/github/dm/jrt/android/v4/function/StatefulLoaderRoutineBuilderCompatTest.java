@@ -257,39 +257,6 @@ public class StatefulLoaderRoutineBuilderCompatTest
     assertThat(state.get()).isFalse();
   }
 
-  @SuppressWarnings("unchecked")
-  private static void testFinalizeRetain(final FragmentActivity activity) {
-    final LoaderRoutine<String, List<String>> routine =
-        JRoutineLoaderFunctionCompat.<String, List<String>, List<String>>stateful(
-            loaderFrom(activity), 0).onCreate(new Supplier<List<String>>() {
-
-          public List<String> get() {
-            return new ArrayList<String>();
-          }
-        })
-                                    .onNextConsume(new BiConsumer<List<String>, String>() {
-
-                                      public void accept(final List<String> list, final String s) {
-                                        list.add(s);
-                                      }
-                                    })
-                                    .onCompleteOutput(new Function<List<String>, List<String>>() {
-
-                                      public List<String> apply(final List<String> list) {
-                                        return new ArrayList<String>(list);
-                                      }
-                                    })
-                                    .onFinalizeRetain()
-                                    .loaderConfiguration()
-                                    .withCacheStrategy(CacheStrategyType.CACHE)
-                                    .apply()
-                                    .buildRoutine();
-    assertThat(routine.invoke().pass("test1", "test2").close().in(seconds(10)).all()).containsOnly(
-        Arrays.asList("test1", "test2"));
-    assertThat(routine.invoke().pass("test3").close().in(seconds(10)).all()).containsOnly(
-        Collections.singletonList("test3"));
-  }
-
   private static void testIncrementArray(final FragmentActivity activity) {
     final StatefulLoaderRoutineBuilder<Integer, Integer, Integer> routine =
         JRoutineLoaderFunctionCompat.<Integer, Integer, Integer>stateful(loaderFrom(activity),
@@ -644,10 +611,6 @@ public class StatefulLoaderRoutineBuilderCompatTest
 
   public void testFinalizeConsume() {
     testFinalizeConsume(getActivity());
-  }
-
-  public void testFinalizeRetain() {
-    testFinalizeRetain(getActivity());
   }
 
   public void testIncrementArray() {

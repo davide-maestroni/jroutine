@@ -197,33 +197,6 @@ public class StatefulRoutineBuilderTest {
   }
 
   @Test
-  @SuppressWarnings("unchecked")
-  public void testFinalizeRetain() {
-    final Routine<String, List<String>> routine =
-        JRoutineFunction.<String, List<String>, List<String>>stateful().onCreate(
-            new Supplier<List<String>>() {
-
-              public List<String> get() {
-                return new ArrayList<String>();
-              }
-            }).onNextConsume(new BiConsumer<List<String>, String>() {
-
-          public void accept(final List<String> list, final String s) {
-            list.add(s);
-          }
-        }).onCompleteOutput(new Function<List<String>, List<String>>() {
-
-          public List<String> apply(final List<String> list) {
-            return new ArrayList<String>(list);
-          }
-        }).onFinalizeRetain().buildRoutine();
-    assertThat(routine.invoke().pass("test1", "test2").close().in(seconds(1)).all()).containsOnly(
-        Arrays.asList("test1", "test2"));
-    assertThat(routine.invoke().pass("test3").close().in(seconds(1)).all()).containsOnly(
-        Arrays.asList("test1", "test2", "test3"));
-  }
-
-  @Test
   public void testIncrementArray() {
     final StatefulRoutineBuilder<Integer, Integer, Integer> routine =
         JRoutineFunction.<Integer, Integer, Integer>stateful().onCreate(new Supplier<Integer>() {

@@ -1565,7 +1565,7 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
     try {
 
       new DefaultLoaderRoutine<String, String>(null, factoryOf(ToUpperCase.class),
-          InvocationConfiguration.defaultConfiguration(), configuration, null);
+          InvocationConfiguration.defaultConfiguration(), configuration);
 
       fail();
 
@@ -1576,7 +1576,7 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
     try {
 
       new DefaultLoaderRoutine<String, String>(context, null,
-          InvocationConfiguration.defaultConfiguration(), configuration, null);
+          InvocationConfiguration.defaultConfiguration(), configuration);
 
       fail();
 
@@ -1587,7 +1587,7 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
     try {
 
       new DefaultLoaderRoutine<String, String>(context, factoryOf(ToUpperCase.class), null,
-          configuration, null);
+          configuration);
 
       fail();
 
@@ -1598,7 +1598,7 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
     try {
 
       new DefaultLoaderRoutine<String, String>(context, factoryOf(ToUpperCase.class),
-          InvocationConfiguration.defaultConfiguration(), null, null);
+          InvocationConfiguration.defaultConfiguration(), null);
 
       fail();
 

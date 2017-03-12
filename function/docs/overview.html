@@ -19,13 +19,17 @@
     <title>jroutine-function</title>
 </head>
 <body>
-<a href="https://github.com/davide-maestroni/jroutine" target="_blank">Parallel programming on the go.</a>
+<a href="https://github.com/davide-maestroni/jroutine" target="_blank">Parallel programming on the
+    go.</a>
 <h1>Overview</h1>
 <p>
-    Java functional programming based on the <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/core" target="_blank">jroutine-core</a> library.
+    Java functional programming based on the <a
+        href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/core" target="_blank">jroutine-core</a>
+    library.
 </p>
 <p>
-    This module provides classes back-porting Java 8 functional interfaces. Moreover, utility classes allow the creation of invocation factories based on implementations of such interfaces.
+    This module provides classes back-porting Java 8 functional interfaces. Moreover, utility
+    classes allow the creation of invocation factories based on implementations of such interfaces.
 </p>
 <h2>Main concepts</h2>
 <ul>
@@ -50,7 +54,8 @@
         <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/function/com/github/dm/jrt/function/util/PredicateDecorator.html">PredicateDecorator</a>,
         <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/function/com/github/dm/jrt/function/util/SupplierDecorator.html">SupplierDecorator</a>
         <p>
-            Each functional interface has a corresponding decorator class enabling comparison and composition.
+            Each functional interface has a corresponding decorator class enabling comparison and
+            composition.
         </p>
     </li>
 </ul>
@@ -59,14 +64,17 @@
     <li>
         <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/function/com/github/dm/jrt/function/JRoutineFunction.html">JRoutineFunction</a>
         <p>
-            Utility class acting as a factory of functional builders of routines and channel consumers.
+            Utility class acting as a factory of functional builders of routines and channel
+            consumers.
         </p>
     </li>
     <li>
         <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/function/com/github/dm/jrt/function/Functions.html">Functions</a>
         <p>
-            This utility class exposes several methods to decorate functional interfaces so to add composition and comparison features.
-            Moreover, it provides methods to create invocation factories starting from one of the functional interfaces defined in the package.
+            This utility class exposes several methods to decorate functional interfaces so to add
+            composition and comparison features.
+            Moreover, it provides methods to create invocation factories starting from one of the
+            functional interfaces defined in the package.
         </p>
     </li>
 </ul>
@@ -75,16 +83,22 @@
     Below a full list of the included modules:
 </p>
 <ul>
-    <li><a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/core" target="_blank">jroutine-core</a> &mdash; core routine and channel classes</li>
+    <li><a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/core" target="_blank">jroutine-core</a> &mdash;
+        core routine and channel classes
+    </li>
 </ul>
 <h2>Usage examples</h2>
 <p>
-    The code below shows how it is possible to implement the computation of the root mean square of some input data, by distributing it in a number of background threads.
+    The code below shows how it is possible to implement the computation of the root mean square of
+    some input data, by distributing it in a number of background threads.
 </p>
 <b>Example 1:</b> via routine builders.
 <p>
-    The lambda notation used in the example is just for demonstration purpose. In order to compile with Java 7 or below, explicit object creation must be employed.<br>
-    In fact, the interfaces defined in the "util" package are conceptually <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/FunctionalInterface.html" target="_blank">functional interfaces</a>.
+    The lambda notation used in the example is just for demonstration purpose. In order to compile
+    with Java 7 or below, explicit object creation must be employed.<br>
+    In fact, the interfaces defined in the "util" package are conceptually <a
+        href="https://docs.oracle.com/javase/8/docs/api/java/lang/FunctionalInterface.html"
+        target="_blank">functional interfaces</a>.
 </p>
 <pre>
     <code>
@@ -92,17 +106,17 @@
 
             public static void main(final String[] args) {
                 final Routine&lt;String, Integer&gt; parseRoutine =
-                        JRoutineFunction.&lt;String, Integer&gt;withStateless()
+                        JRoutineFunction.&lt;String, Integer&gt;stateless()
                                         .onNextOutput(Integer::parseInt)
                                         .buildRoutine();
                 final Routine&lt;Integer, Integer&gt; squareRoutine =
-                        JRoutineFunction.&lt;Integer, Integer&gt;withStateless()
+                        JRoutineFunction.&lt;Integer, Integer&gt;stateless()
                                         .onNextOutput(integer -&gt; {
                                             final int input = integer;
                                             return (input * input);
                                         })).buildRoutine();
                 final Routine&lt;Integer, Double&gt; meanRoutine =
-                        JRoutineFunction.&lt;Integer, Double, MeanState&gt;withStateful()
+                        JRoutineFunction.&lt;Integer, Double, MeanState&gt;stateful()
                                         .onCreate(MeanState::new)
                                         .onNextConsume(MeanState::add)
                                         .onCompleteOutput(MeanState::mean)
@@ -133,48 +147,6 @@
                 private double mean() {
                     return (count > 0) ? Math.sqrt((double) sum / count) : 0;
                 }
-            }
-        }
-    </code>
-</pre>
-<b>Example 2:</b> via functional interfaces.
-<p>
-    In this case, the mean computation must actually wait for all the input data to be available before being invoked. Thus, it cannot really happen in a parallel way.<br>
-    The lambda notation used in the example is just for demonstration purpose. In order to compile with Java 7 or below, explicit object creation must be employed.<br>
-    In fact, the interfaces defined in the "lambda" package are conceptually <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/FunctionalInterface.html" target="_blank">functional interfaces</a>.
-</p>
-<pre>
-    <code>
-        public class Main {
-
-            public static void main(final String[] args) {
-                final Routine&lt;String, Integer&gt; parseRoutine =
-                        JRoutineCore.with(Functions.&lt;String, Integer&gt;functionMapping(Integer::parseInt))
-                                    .buildRoutine();
-                final Routine&lt;Integer, Integer&gt; squareRoutine =
-                        JRoutineCore.with(Functions.&lt;Integer, Integer&gt;functionMapping(integer -&gt; {
-                                final int input = integer;
-                                return (input * input);
-                        })).buildRoutine();
-                final Routine&lt;Integer, Double&gt; meanRoutine =
-                        JRoutineCore.with(Functions.&lt;Integer, Double&gt;functionCall(integers -&gt; {
-                                int sum = 0;
-                                for (final Integer integer : integers) {
-                                    sum += integer;
-                                }
-
-                                return Math.sqrt((double) sum / integers.size());
-                        })).buildRoutine();
-                final Double rms =
-                        meanRoutine.invoke()
-                                   .pass(squareRoutine.invokeParallel()
-                                                      .pass(parseRoutine.invokeParallel().pass(args).close())
-                                                      .close())
-                                   .close()
-                                   .in(seconds(3))
-                                   .next();
-                System.out.println(rms);
-                System.exit(0);
             }
         }
     </code>

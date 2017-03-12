@@ -211,13 +211,6 @@ public abstract class AbstractStatefulRoutineBuilder<IN, OUT, STATE, TYPE extend
 
   @NotNull
   @SuppressWarnings("unchecked")
-  public TYPE onFinalizeRetain() {
-    mOnFinalize = FunctionDecorator.<STATE>identity();
-    return (TYPE) this;
-  }
-
-  @NotNull
-  @SuppressWarnings("unchecked")
   public TYPE onNext(
       @NotNull final TriFunction<? super STATE, ? super IN, ? super Channel<OUT, ?>, ? extends
           STATE> onNext) {

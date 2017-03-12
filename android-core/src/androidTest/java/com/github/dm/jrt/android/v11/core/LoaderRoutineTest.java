@@ -1754,7 +1754,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
     try {
 
       new DefaultLoaderRoutine<String, String>(null, factoryOf(ToUpperCase.class),
-          InvocationConfiguration.defaultConfiguration(), configuration, null);
+          InvocationConfiguration.defaultConfiguration(), configuration);
 
       fail();
 
@@ -1765,7 +1765,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
     try {
 
       new DefaultLoaderRoutine<String, String>(context, null,
-          InvocationConfiguration.defaultConfiguration(), configuration, null);
+          InvocationConfiguration.defaultConfiguration(), configuration);
 
       fail();
 
@@ -1776,7 +1776,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
     try {
 
       new DefaultLoaderRoutine<String, String>(context, factoryOf(ToUpperCase.class), null,
-          configuration, null);
+          configuration);
 
       fail();
 
@@ -1787,7 +1787,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
     try {
 
       new DefaultLoaderRoutine<String, String>(context, factoryOf(ToUpperCase.class),
-          InvocationConfiguration.defaultConfiguration(), null, null);
+          InvocationConfiguration.defaultConfiguration(), null);
 
       fail();
 

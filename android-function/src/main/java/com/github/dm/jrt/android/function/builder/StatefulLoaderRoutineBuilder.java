@@ -34,7 +34,7 @@ import com.github.dm.jrt.function.util.TriFunction;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * TODO
+ * TODO: explain Loader invocations lifecycle
  * <p>
  * Created by davide-maestroni on 03/04/2017.
  *
@@ -172,13 +172,6 @@ public interface StatefulLoaderRoutineBuilder<IN, OUT, STATE>
   @Override
   StatefulLoaderRoutineBuilder<IN, OUT, STATE> onFinalizeConsume(
       @NotNull Consumer<? super STATE> onFinalize);
-
-  /**
-   * {@inheritDoc}
-   */
-  @NotNull
-  @Override
-  StatefulLoaderRoutineBuilder<IN, OUT, STATE> onFinalizeRetain();
 
   /**
    * {@inheritDoc}

@@ -248,36 +248,6 @@ public class StatefulLoaderRoutineBuilderTest
     assertThat(state.get()).isFalse();
   }
 
-  @SuppressWarnings("unchecked")
-  private static void testFinalizeRetain(final Activity activity) {
-    final LoaderRoutine<String, List<String>> routine =
-        JRoutineLoaderFunction.<String, List<String>, List<String>>stateful(loaderFrom(activity), 0)
-            .onCreate(new Supplier<List<String>>() {
-
-              public List<String> get() {
-                return new ArrayList<String>();
-              }
-            })
-            .onNextConsume(new BiConsumer<List<String>, String>() {
-
-              public void accept(final List<String> list, final String s) {
-                list.add(s);
-              }
-            })
-            .onCompleteOutput(new Function<List<String>, List<String>>() {
-
-              public List<String> apply(final List<String> list) {
-                return new ArrayList<String>(list);
-              }
-            })
-            .onFinalizeRetain()
-            .buildRoutine();
-    assertThat(routine.invoke().pass("test1", "test2").close().in(seconds(10)).all()).containsOnly(
-        Arrays.asList("test1", "test2"));
-    assertThat(routine.invoke().pass("test3").close().in(seconds(10)).all()).containsOnly(
-        Collections.singletonList("test3"));
-  }
-
   private static void testIncrementArray(final Activity activity) {
     final StatefulLoaderRoutineBuilder<Integer, Integer, Integer> routine =
         JRoutineLoaderFunction.<Integer, Integer, Integer>stateful(loaderFrom(activity),
@@ -664,14 +634,6 @@ public class StatefulLoaderRoutineBuilderTest
     }
 
     testFinalizeConsume(getActivity());
-  }
-
-  public void testFinalizeRetain() {
-    if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-      return;
-    }
-
-    testFinalizeRetain(getActivity());
   }
 
   public void testIncrementArray() {

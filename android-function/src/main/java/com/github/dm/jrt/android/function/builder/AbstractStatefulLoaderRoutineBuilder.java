@@ -132,14 +132,17 @@ public abstract class AbstractStatefulLoaderRoutineBuilder<IN, OUT, STATE, TYPE 
 
   @Override
   public void clear(@Nullable final IN input) {
+    buildRoutine().clear(input);
   }
 
   @Override
   public void clear(@Nullable final IN... inputs) {
+    buildRoutine().clear(inputs);
   }
 
   @Override
   public void clear(@Nullable final Iterable<? extends IN> inputs) {
+    buildRoutine().clear(inputs);
   }
 
   @NotNull
@@ -268,6 +271,11 @@ public abstract class AbstractStatefulLoaderRoutineBuilder<IN, OUT, STATE, TYPE 
   public TYPE onNextState(
       @NotNull final BiFunction<? super STATE, ? super IN, ? extends STATE> onNext) {
     return super.onNextState(checkStaticScope(BiFunctionDecorator.decorate(onNext)));
+  }
+
+  @Override
+  public void clear() {
+    buildRoutine().clear();
   }
 
   /**

@@ -183,7 +183,6 @@ public class JRoutineFunction {
    * @return the routine builder.
    */
   @NotNull
-  @SuppressWarnings("unchecked")
   public static <IN, OUT> StatefulRoutineBuilder<IN, OUT, ? extends List<IN>> statefulList() {
     final Supplier<? extends List<IN>> onCreate = listSupplier();
     final BiConsumer<? super List<IN>, ? super IN> onNext = listConsumer();

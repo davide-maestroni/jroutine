@@ -18,8 +18,8 @@ package com.github.dm.jrt.reflect.builder;
 
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.config.InvocationConfiguration.InvocationModeType;
 import com.github.dm.jrt.core.invocation.InvocationException;
-import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.LruHashMap;
@@ -31,21 +31,21 @@ import com.github.dm.jrt.reflect.annotation.AsyncInput.InputMode;
 import com.github.dm.jrt.reflect.annotation.AsyncMethod;
 import com.github.dm.jrt.reflect.annotation.AsyncOutput;
 import com.github.dm.jrt.reflect.annotation.AsyncOutput.OutputMode;
-import com.github.dm.jrt.reflect.annotation.CoreInstances;
+import com.github.dm.jrt.reflect.annotation.CoreInvocations;
 import com.github.dm.jrt.reflect.annotation.InputBackoff;
 import com.github.dm.jrt.reflect.annotation.InputMaxSize;
 import com.github.dm.jrt.reflect.annotation.InputOrder;
-import com.github.dm.jrt.reflect.annotation.InvocationRunner;
-import com.github.dm.jrt.reflect.annotation.Invoke;
+import com.github.dm.jrt.reflect.annotation.InvocationMode;
 import com.github.dm.jrt.reflect.annotation.LogLevel;
 import com.github.dm.jrt.reflect.annotation.LogType;
-import com.github.dm.jrt.reflect.annotation.MaxInstances;
+import com.github.dm.jrt.reflect.annotation.MaxInvocations;
 import com.github.dm.jrt.reflect.annotation.OutputBackoff;
 import com.github.dm.jrt.reflect.annotation.OutputMaxSize;
 import com.github.dm.jrt.reflect.annotation.OutputOrder;
 import com.github.dm.jrt.reflect.annotation.OutputTimeout;
 import com.github.dm.jrt.reflect.annotation.OutputTimeoutAction;
 import com.github.dm.jrt.reflect.annotation.Priority;
+import com.github.dm.jrt.reflect.annotation.RunnerType;
 import com.github.dm.jrt.reflect.annotation.SharedFields;
 import com.github.dm.jrt.reflect.common.Mutex;
 import com.github.dm.jrt.reflect.config.WrapperConfiguration;
@@ -262,39 +262,12 @@ public class ReflectionRoutineBuilders {
       final int length = parameterTypes.length;
       if (length > 1) {
         throw new IllegalArgumentException(
-            "[" + method + "] an async input with mode " + InputMode.COLLECTION +
-                " cannot be applied to a method taking " + length + " input parameters");
+            "[" + method + "] an async input with mode " + InputMode.COLLECTION
+                + " cannot be applied to a method taking " + length + " input parameters");
       }
     }
 
     return inputMode;
-  }
-
-  /**
-   * Gets the routine invocation mode associated to the specified method, while also validating
-   * the use of the {@link com.github.dm.jrt.reflect.annotation.Invoke Invoke} annotation.
-   * <br>
-   * In case no annotation is present, the function will return with null.
-   *
-   * @param method the proxy method.
-   * @return the input mode.
-   * @throws java.lang.IllegalArgumentException if the method has been incorrectly annotated.
-   * @see com.github.dm.jrt.reflect.annotation.Invoke Invoke
-   */
-  @Nullable
-  public static InvocationMode getInvocationMode(@NotNull final Method method) {
-    final Invoke invokeAnnotation = method.getAnnotation(Invoke.class);
-    if (invokeAnnotation == null) {
-      return null;
-    }
-
-    final InvocationMode invocationMode = invokeAnnotation.value();
-    if ((invocationMode == InvocationMode.PARALLEL) && (method.getParameterTypes().length > 1)) {
-      throw new IllegalArgumentException("methods annotated with invocation mode " + invocationMode
-          + " must have at maximum one input parameter: " + method);
-    }
-
-    return invocationMode;
   }
 
   /**
@@ -417,7 +390,6 @@ public class ReflectionRoutineBuilders {
 
       methodInfo = methodMap.get(proxyMethod);
       if (methodInfo == null) {
-        final InvocationMode invocationMode = getInvocationMode(proxyMethod);
         final Class<?>[] targetParameterTypes;
         final AsyncMethod asyncMethodAnnotation = proxyMethod.getAnnotation(AsyncMethod.class);
         InputMode inputMode = null;
@@ -458,10 +430,16 @@ public class ReflectionRoutineBuilders {
           }
         }
 
-        if ((invocationMode == InvocationMode.PARALLEL) && (targetParameterTypes.length > 1)) {
-          throw new IllegalArgumentException(
-              "methods annotated with invocation mode " + invocationMode
-                  + " must have no input parameters: " + proxyMethod);
+        final InvocationMode invocationModeAnnotation =
+            proxyMethod.getAnnotation(InvocationMode.class);
+        if (invocationModeAnnotation != null) {
+          final InvocationModeType invocationMode = invocationModeAnnotation.value();
+          if ((invocationMode == InvocationModeType.PARALLEL) && (targetParameterTypes.length
+              > 1)) {
+            throw new IllegalArgumentException(
+                "methods annotated with invocation mode " + invocationMode
+                    + " must have no input parameters: " + proxyMethod);
+          }
         }
 
         final Method targetMethod = getTargetMethod(proxyMethod, targetClass, targetParameterTypes);
@@ -477,7 +455,7 @@ public class ReflectionRoutineBuilders {
               "the proxy method has incompatible return type: " + proxyMethod);
         }
 
-        methodInfo = new MethodInfo(targetMethod, invocationMode, inputMode, outputMode);
+        methodInfo = new MethodInfo(targetMethod, inputMode, outputMode);
         methodMap.put(proxyMethod, methodInfo);
       }
     }
@@ -488,12 +466,11 @@ public class ReflectionRoutineBuilders {
   /**
    * Invokes the routine wrapping the specified method.
    *
-   * @param routine        the routine to be called.
-   * @param method         the target method.
-   * @param args           the method arguments.
-   * @param invocationMode the routine invocation mode.
-   * @param inputMode      the input transfer mode.
-   * @param outputMode     the output transfer mode.
+   * @param routine    the routine to be called.
+   * @param method     the target method.
+   * @param args       the method arguments.
+   * @param inputMode  the input transfer mode.
+   * @param outputMode the output transfer mode.
    * @return the invocation output.
    * @throws com.github.dm.jrt.core.common.RoutineException in case of errors.
    */
@@ -501,19 +478,18 @@ public class ReflectionRoutineBuilders {
   @SuppressWarnings("unchecked")
   public static Object invokeRoutine(@NotNull final Routine<Object, Object> routine,
       @NotNull final Method method, @NotNull final Object[] args,
-      @Nullable final InvocationMode invocationMode, @Nullable final InputMode inputMode,
-      @Nullable final OutputMode outputMode) {
+      @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
     final Class<?> returnType = method.getReturnType();
     if (method.isAnnotationPresent(AsyncMethod.class)) {
       if (returnType.isAssignableFrom(Channel.class)) {
-        return invokeRoutine(routine, invocationMode);
+        return routine.invoke();
       }
 
       return routine;
     }
 
     final Channel<Object, Object> outputChannel;
-    final Channel<Object, Object> invocationChannel = invokeRoutine(routine, invocationMode);
+    final Channel<Object, Object> invocationChannel = routine.invoke();
     if (inputMode == InputMode.VALUE) {
       invocationChannel.sorted();
       final Class<?>[] parameterTypes = method.getParameterTypes();
@@ -556,20 +532,21 @@ public class ReflectionRoutineBuilders {
    * @param annotations   the annotations.
    * @return the modified configuration.
    * @throws java.lang.IllegalArgumentException if an unexpected error occurs.
-   * @see com.github.dm.jrt.reflect.annotation.CoreInstances CoreInstances
+   * @see com.github.dm.jrt.reflect.annotation.CoreInvocations CoreInvocations
    * @see com.github.dm.jrt.reflect.annotation.InputBackoff InputBackoff
    * @see com.github.dm.jrt.reflect.annotation.InputMaxSize InputMaxSize
    * @see com.github.dm.jrt.reflect.annotation.InputOrder InputOrder
-   * @see com.github.dm.jrt.reflect.annotation.InvocationRunner InvocationRunner
+   * @see com.github.dm.jrt.reflect.annotation.InvocationMode InvocationMode
    * @see com.github.dm.jrt.reflect.annotation.LogLevel LogLevel
    * @see com.github.dm.jrt.reflect.annotation.LogType LogType
-   * @see com.github.dm.jrt.reflect.annotation.MaxInstances MaxInstances
+   * @see com.github.dm.jrt.reflect.annotation.MaxInvocations MaxInvocations
    * @see com.github.dm.jrt.reflect.annotation.OutputBackoff OutputBackoff
    * @see com.github.dm.jrt.reflect.annotation.OutputMaxSize OutputMaxSize
    * @see com.github.dm.jrt.reflect.annotation.OutputOrder OutputOrder
    * @see com.github.dm.jrt.reflect.annotation.OutputTimeout OutputTimeout
    * @see com.github.dm.jrt.reflect.annotation.OutputTimeoutAction OutputTimeoutAction
    * @see com.github.dm.jrt.reflect.annotation.Priority Priority
+   * @see com.github.dm.jrt.reflect.annotation.RunnerType RunnerType
    */
   @NotNull
   public static InvocationConfiguration withAnnotations(
@@ -583,8 +560,8 @@ public class ReflectionRoutineBuilders {
 
     for (final Annotation annotation : annotations) {
       final Class<? extends Annotation> annotationType = annotation.annotationType();
-      if (annotationType == CoreInstances.class) {
-        builder.withCoreInstances(((CoreInstances) annotation).value());
+      if (annotationType == CoreInvocations.class) {
+        builder.withCoreInvocations(((CoreInvocations) annotation).value());
 
       } else if (annotationType == InputBackoff.class) {
         builder.withInputBackoff(newInstanceOf(((InputBackoff) annotation).value()));
@@ -595,8 +572,8 @@ public class ReflectionRoutineBuilders {
       } else if (annotationType == InputOrder.class) {
         builder.withInputOrder(((InputOrder) annotation).value());
 
-      } else if (annotationType == InvocationRunner.class) {
-        builder.withRunner(newInstanceOf(((InvocationRunner) annotation).value()));
+      } else if (annotationType == InvocationMode.class) {
+        builder.withInvocationMode(((InvocationMode) annotation).value());
 
       } else if (annotationType == LogLevel.class) {
         builder.withLogLevel(((LogLevel) annotation).value());
@@ -604,8 +581,8 @@ public class ReflectionRoutineBuilders {
       } else if (annotationType == LogType.class) {
         builder.withLog(newInstanceOf(((LogType) annotation).value()));
 
-      } else if (annotationType == MaxInstances.class) {
-        builder.withMaxInstances(((MaxInstances) annotation).value());
+      } else if (annotationType == MaxInvocations.class) {
+        builder.withMaxInvocations(((MaxInvocations) annotation).value());
 
       } else if (annotationType == OutputBackoff.class) {
         builder.withOutputBackoff(newInstanceOf(((OutputBackoff) annotation).value()));
@@ -625,6 +602,9 @@ public class ReflectionRoutineBuilders {
 
       } else if (annotationType == Priority.class) {
         builder.withPriority(((Priority) annotation).value());
+
+      } else if (annotationType == RunnerType.class) {
+        builder.withRunner(newInstanceOf(((RunnerType) annotation).value()));
       }
     }
 
@@ -639,20 +619,21 @@ public class ReflectionRoutineBuilders {
    * @param method        the target method.
    * @return the modified configuration.
    * @throws java.lang.IllegalArgumentException if an unexpected error occurs.
-   * @see com.github.dm.jrt.reflect.annotation.CoreInstances CoreInstances
+   * @see com.github.dm.jrt.reflect.annotation.CoreInvocations CoreInvocations
    * @see com.github.dm.jrt.reflect.annotation.InputBackoff InputBackoff
    * @see com.github.dm.jrt.reflect.annotation.InputMaxSize InputMaxSize
    * @see com.github.dm.jrt.reflect.annotation.InputOrder InputOrder
-   * @see com.github.dm.jrt.reflect.annotation.InvocationRunner InvocationRunner
+   * @see com.github.dm.jrt.reflect.annotation.InvocationMode InvocationMode
    * @see com.github.dm.jrt.reflect.annotation.LogLevel LogLevel
    * @see com.github.dm.jrt.reflect.annotation.LogType LogType
-   * @see com.github.dm.jrt.reflect.annotation.MaxInstances MaxInstances
+   * @see com.github.dm.jrt.reflect.annotation.MaxInvocations MaxInvocations
    * @see com.github.dm.jrt.reflect.annotation.OutputBackoff OutputBackoff
    * @see com.github.dm.jrt.reflect.annotation.OutputMaxSize OutputMaxSize
    * @see com.github.dm.jrt.reflect.annotation.OutputOrder OutputOrder
    * @see com.github.dm.jrt.reflect.annotation.OutputTimeout OutputTimeout
    * @see com.github.dm.jrt.reflect.annotation.OutputTimeoutAction OutputTimeoutAction
    * @see com.github.dm.jrt.reflect.annotation.Priority Priority
+   * @see com.github.dm.jrt.reflect.annotation.RunnerType RunnerType
    */
   @NotNull
   public static InvocationConfiguration withAnnotations(
@@ -745,13 +726,6 @@ public class ReflectionRoutineBuilders {
     return targetMethod;
   }
 
-  @NotNull
-  private static Channel<Object, Object> invokeRoutine(
-      @NotNull final Routine<Object, Object> routine,
-      @Nullable final InvocationMode invocationMode) {
-    return ((invocationMode != null) ? invocationMode : InvocationMode.ASYNC).invoke(routine);
-  }
-
   /**
    * Data class storing information about the target method.
    */
@@ -761,11 +735,6 @@ public class ReflectionRoutineBuilders {
      * The input transfer mode.
      */
     public final InputMode inputMode;
-
-    /**
-     * The routine invocation mode.
-     */
-    public final InvocationMode invocationMode;
 
     /**
      * The target method.
@@ -780,15 +749,13 @@ public class ReflectionRoutineBuilders {
     /**
      * Constructor.
      *
-     * @param method         the target method.
-     * @param invocationMode the invocation mode.
-     * @param inputMode      the input mode.
-     * @param outputMode     the output mode.
+     * @param method     the target method.
+     * @param inputMode  the input mode.
+     * @param outputMode the output mode.
      */
-    private MethodInfo(@NotNull final Method method, @Nullable final InvocationMode invocationMode,
-        @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
+    private MethodInfo(@NotNull final Method method, @Nullable final InputMode inputMode,
+        @Nullable final OutputMode outputMode) {
       this.method = method;
-      this.invocationMode = invocationMode;
       this.inputMode = inputMode;
       this.outputMode = outputMode;
     }

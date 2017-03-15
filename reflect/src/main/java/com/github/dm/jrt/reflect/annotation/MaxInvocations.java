@@ -43,7 +43,7 @@ import java.lang.annotation.Target;
  * <pre><code>
  * -keepattributes RuntimeVisibleAnnotations
  * -keepclassmembers class ** {
- *   &#64;com.github.dm.jrt.reflect.annotation.MaxInstances *;
+ *   &#64;com.github.dm.jrt.reflect.annotation.MaxInvocations *;
  * }
  * </code></pre>
  * <p>
@@ -53,7 +53,7 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface MaxInstances {
+public @interface MaxInvocations {
 
   /**
    * The max number of concurrently running invocation instances.

@@ -52,11 +52,6 @@ public abstract class AbstractRoutineBuilder<IN, OUT>
   }
 
   @NotNull
-  public Channel<IN, OUT> invokeParallel() {
-    return buildRoutine().invokeParallel();
-  }
-
-  @NotNull
   public Builder<? extends RoutineBuilder<IN, OUT>> invocationConfiguration() {
     return new Builder<RoutineBuilder<IN, OUT>>(this, mConfiguration);
   }

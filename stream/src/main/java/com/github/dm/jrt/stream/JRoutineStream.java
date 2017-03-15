@@ -27,7 +27,7 @@ import com.github.dm.jrt.function.util.Consumer;
 import com.github.dm.jrt.function.util.Function;
 import com.github.dm.jrt.function.util.Supplier;
 import com.github.dm.jrt.stream.builder.StreamBuilder;
-import com.github.dm.jrt.stream.builder.StreamConfiguration;
+import com.github.dm.jrt.stream.config.StreamConfiguration;
 import com.github.dm.jrt.stream.transform.LiftFunction;
 
 import org.jetbrains.annotations.NotNull;

@@ -31,7 +31,7 @@ import com.github.dm.jrt.function.util.BiConsumer;
 import com.github.dm.jrt.function.util.BiFunction;
 import com.github.dm.jrt.function.util.Function;
 import com.github.dm.jrt.stream.builder.StreamBuilder;
-import com.github.dm.jrt.stream.builder.StreamConfiguration;
+import com.github.dm.jrt.stream.config.StreamConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -175,8 +175,7 @@ public class Transformations {
         return decorate(function).andThen(
             new BindParallelCount<OUT, AFTER>(streamConfiguration.toChannelConfiguration(),
                 invocationCount,
-                JRoutineCore.with(factory).apply(streamConfiguration.toInvocationConfiguration()),
-                streamConfiguration.getInvocationMode()));
+                JRoutineCore.with(factory).apply(streamConfiguration.toInvocationConfiguration())));
       }
     };
   }
@@ -208,7 +207,7 @@ public class Transformations {
           final Function<Channel<?, IN>, Channel<?, OUT>> function) {
         return decorate(function).andThen(
             new BindParallelCount<OUT, AFTER>(streamConfiguration.toChannelConfiguration(),
-                invocationCount, routine, streamConfiguration.getInvocationMode()));
+                invocationCount, routine));
       }
     };
   }
@@ -265,8 +264,7 @@ public class Transformations {
         return decorate(function).andThen(
             new BindParallelKey<OUT, AFTER>(streamConfiguration.toChannelConfiguration(),
                 keyFunction,
-                JRoutineCore.with(factory).apply(streamConfiguration.toInvocationConfiguration()),
-                streamConfiguration.getInvocationMode()));
+                JRoutineCore.with(factory).apply(streamConfiguration.toInvocationConfiguration())));
       }
     };
   }
@@ -299,7 +297,7 @@ public class Transformations {
           final Function<Channel<?, IN>, Channel<?, OUT>> function) {
         return decorate(function).andThen(
             new BindParallelKey<OUT, AFTER>(streamConfiguration.toChannelConfiguration(),
-                keyFunction, routine, streamConfiguration.getInvocationMode()));
+                keyFunction, routine));
       }
     };
   }

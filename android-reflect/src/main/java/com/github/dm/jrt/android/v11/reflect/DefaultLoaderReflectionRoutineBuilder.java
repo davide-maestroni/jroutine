@@ -637,8 +637,8 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
           JRoutineLoader.on(mContext).with(factory);
       final LoaderRoutine<Object, Object> routine =
           builder.apply(invocationConfiguration).apply(loaderConfiguration).buildRoutine();
-      return ReflectionRoutineBuilders.invokeRoutine(routine, method, asArgs(args),
-          methodInfo.invocationMode, inputMode, outputMode);
+      return ReflectionRoutineBuilders.invokeRoutine(routine, method, asArgs(args), inputMode,
+          outputMode);
     }
   }
 }

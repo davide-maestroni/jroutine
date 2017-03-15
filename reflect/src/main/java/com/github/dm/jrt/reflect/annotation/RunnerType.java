@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.reflect.annotation;
 
-import com.github.dm.jrt.core.routine.InvocationMode;
+import com.github.dm.jrt.core.runner.Runner;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -24,17 +24,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Through this annotation it is possible to indicate the invocation mode of the routine wrapping
- * the target object method.
- * <p>
- * The only use case in which this annotation is useful, is when an interface is used as a proxy
- * of another class methods. The annotation will indicate the type of invocation to be applied to
- * the wrapping routine.
- * <p>
- * Note that, unless the {@link InvocationMode#PARALLEL} is specified, to each call to a method of
- * the proxy interface will correspond a single invocation of the wrapping routine.
- * <br>
- * In case this annotation is absent, the asynchronous invocation mode will be employed.
+ * Through this annotation it is possible to indicate the runner type to be used by the wrapping
+ * routine. The specified class must have a default constructor.
  * <p>
  * This annotation is used to decorate methods that are to be invoked in an asynchronous way.
  * <br>
@@ -45,25 +36,31 @@ import java.lang.annotation.Target;
  * (unless immutable) in protected and non-protected code, or to call synchronous methods through
  * routines as well.
  * <p>
+ * Finally, be aware that a method might need to be made accessible in order to be called. That
+ * means that, in case a {@link java.lang.SecurityManager} is installed, a security exception might
+ * be raised based on the specific policy implemented.
+ * <p>
  * Remember also that, in order for the annotation to properly work at run time, the following rules
  * must be added to the project Proguard file (if employed for shrinking or obfuscation):
  * <pre><code>
  * -keepattributes RuntimeVisibleAnnotations
  * -keepclassmembers class ** {
- *   &#64;com.github.dm.jrt.reflect.annotation.Invoke *;
+ *   &#64;com.github.dm.jrt.reflect.annotation.RunnerType *;
  * }
  * </code></pre>
  * <p>
- * Created by davide-maestroni on 09/27/2015.
+ * Created by davide-maestroni on 07/24/2016.
+ *
+ * @see com.github.dm.jrt.core.config.InvocationConfiguration InvocationConfiguration
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Invoke {
+public @interface RunnerType {
 
   /**
-   * The routine invocation mode.
+   * The runner type.
    *
-   * @return the invocation mode.
+   * @return the runner type.
    */
-  InvocationMode value() default InvocationMode.ASYNC;
+  Class<? extends Runner> value();
 }

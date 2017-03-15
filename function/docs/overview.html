@@ -108,13 +108,20 @@
                 final Routine&lt;String, Integer&gt; parseRoutine =
                         JRoutineFunction.&lt;String, Integer&gt;stateless()
                                         .onNextOutput(Integer::parseInt)
+                                        .invocationConfiguration()
+                                        .withInvocationMode(InvocationMode.PARALLEL)
+                                        .apply()
                                         .buildRoutine();
                 final Routine&lt;Integer, Integer&gt; squareRoutine =
                         JRoutineFunction.&lt;Integer, Integer&gt;stateless()
                                         .onNextOutput(integer -&gt; {
                                             final int input = integer;
                                             return (input * input);
-                                        })).buildRoutine();
+                                        })
+                                        .invocationConfiguration()
+                                        .withInvocationMode(InvocationMode.PARALLEL)
+                                        .apply()
+                                        .buildRoutine();
                 final Routine&lt;Integer, Double&gt; meanRoutine =
                         JRoutineFunction.&lt;Integer, Double, MeanState&gt;stateful()
                                         .onCreate(MeanState::new)
@@ -123,8 +130,8 @@
                                         .buildRoutine();
                 final Double rms =
                         meanRoutine.invoke()
-                                   .pass(squareRoutine.invokeParallel()
-                                                      .pass(parseRoutine.invokeParallel().pass(args).close())
+                                   .pass(squareRoutine.invoke()
+                                                      .pass(parseRoutine.invoke().pass(args).close())
                                                       .close())
                                    .close()
                                    .in(seconds(3))

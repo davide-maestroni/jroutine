@@ -21,7 +21,7 @@ import com.github.dm.jrt.android.core.config.LoaderConfiguration.Builder;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.util.Function;
-import com.github.dm.jrt.stream.builder.StreamConfiguration;
+import com.github.dm.jrt.stream.config.StreamConfiguration;
 import com.github.dm.jrt.stream.transform.LiftFunction;
 
 import org.jetbrains.annotations.NotNull;

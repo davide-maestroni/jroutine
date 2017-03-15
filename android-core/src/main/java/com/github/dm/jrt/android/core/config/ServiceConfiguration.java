@@ -254,6 +254,17 @@ public final class ServiceConfiguration extends DeepEqualObject {
     }
 
     /**
+     * Resets all the options to their default values.
+     *
+     * @return this builder.
+     */
+    @NotNull
+    public Builder<TYPE> withDefaults() {
+      setConfiguration(defaultConfiguration());
+      return this;
+    }
+
+    /**
      * Sets the arguments to be passed to the log constructor.
      *
      * @param args the argument objects.
@@ -292,9 +303,8 @@ public final class ServiceConfiguration extends DeepEqualObject {
     }
 
     /**
-     * Applies the specified patch configuration to this builder. A null value means that all the
-     * configuration options will be reset to their default, otherwise only the non-default
-     * options will be applied.
+     * Applies the specified patch configuration to this builder. Only the non-default options will
+     * be applied. A null value will have no effect.
      *
      * @param configuration the Service configuration.
      * @return this builder.
@@ -302,7 +312,6 @@ public final class ServiceConfiguration extends DeepEqualObject {
     @NotNull
     public Builder<TYPE> withPatch(@Nullable final ServiceConfiguration configuration) {
       if (configuration == null) {
-        setConfiguration(defaultConfiguration());
         return this;
       }
 

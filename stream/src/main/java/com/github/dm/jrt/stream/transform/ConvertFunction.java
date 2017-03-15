@@ -18,7 +18,7 @@ package com.github.dm.jrt.stream.transform;
 
 import com.github.dm.jrt.function.util.BiFunction;
 import com.github.dm.jrt.stream.builder.StreamBuilder;
-import com.github.dm.jrt.stream.builder.StreamConfiguration;
+import com.github.dm.jrt.stream.config.StreamConfiguration;
 
 /**
  * Interface defining a function converting a stream builder.

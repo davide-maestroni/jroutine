@@ -18,11 +18,11 @@ package com.github.dm.jrt.core;
 
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.config.InvocationConfiguration.InvocationModeType;
 import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.log.Logger;
-import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;
@@ -56,6 +56,8 @@ public abstract class AbstractRoutine<IN, OUT> implements Routine<IN, OUT> {
   private final InvocationConfiguration mConfiguration;
 
   private final int mCoreInvocations;
+
+  private final InvocationModeType mInvocationMode;
 
   private final SimpleQueue<Invocation<IN, OUT>> mInvocations =
       new SimpleQueue<Invocation<IN, OUT>>();
@@ -91,8 +93,9 @@ public abstract class AbstractRoutine<IN, OUT> implements Routine<IN, OUT> {
       mRunner = runner;
     }
 
-    mMaxInvocations = configuration.getMaxInstancesOrElse(DEFAULT_MAX_INVOCATIONS);
-    mCoreInvocations = configuration.getCoreInstancesOrElse(DEFAULT_CORE_INVOCATIONS);
+    mInvocationMode = configuration.getInvocationModeOrElse(InvocationModeType.SIMPLE);
+    mMaxInvocations = configuration.getMaxInvocationsOrElse(DEFAULT_MAX_INVOCATIONS);
+    mCoreInvocations = configuration.getCoreInvocationsOrElse(DEFAULT_CORE_INVOCATIONS);
     mLogger = configuration.newLogger(this);
     mLogger.dbg("building routine with configuration: %s", configuration);
   }
@@ -108,6 +111,7 @@ public abstract class AbstractRoutine<IN, OUT> implements Routine<IN, OUT> {
       @NotNull final Runner runner, @NotNull final Logger logger) {
     mConfiguration = configuration;
     mRunner = runner;
+    mInvocationMode = InvocationModeType.SIMPLE;
     mMaxInvocations = DEFAULT_MAX_INVOCATIONS;
     mCoreInvocations = DEFAULT_CORE_INVOCATIONS;
     mLogger = logger.subContextLogger(this);
@@ -126,14 +130,13 @@ public abstract class AbstractRoutine<IN, OUT> implements Routine<IN, OUT> {
 
   @NotNull
   public Channel<IN, OUT> invoke() {
-    mLogger.dbg("invoking routine: %s", InvocationMode.ASYNC);
-    return invokeRoutine();
-  }
+    final InvocationModeType invocationMode = mInvocationMode;
+    mLogger.dbg("invoking routine: %s", invocationMode);
+    if (invocationMode == InvocationModeType.SIMPLE) {
+      return invokeInternal();
+    }
 
-  @NotNull
-  public Channel<IN, OUT> invokeParallel() {
-    mLogger.dbg("invoking routine: %s", InvocationMode.PARALLEL);
-    return getElementRoutine().invoke();
+    return getElementRoutine().invokeInternal();
   }
 
   /**
@@ -176,7 +179,7 @@ public abstract class AbstractRoutine<IN, OUT> implements Routine<IN, OUT> {
   }
 
   @NotNull
-  private Routine<IN, OUT> getElementRoutine() {
+  private AbstractRoutine<IN, OUT> getElementRoutine() {
     if (mElementRoutine == null) {
       mElementRoutine = new AbstractRoutine<IN, OUT>(mConfiguration, mRunner, mLogger) {
 
@@ -192,7 +195,7 @@ public abstract class AbstractRoutine<IN, OUT> implements Routine<IN, OUT> {
   }
 
   @NotNull
-  private Channel<IN, OUT> invokeRoutine() {
+  private Channel<IN, OUT> invokeInternal() {
     final SingleExecutionRunner runner = new SingleExecutionRunner(mRunner);
     return new InvocationChannel<IN, OUT>(mConfiguration, new DefaultInvocationManager(runner),
         runner, mLogger);
@@ -206,7 +209,7 @@ public abstract class AbstractRoutine<IN, OUT> implements Routine<IN, OUT> {
    */
   private static class ParallelInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> {
 
-    private final Routine<IN, OUT> mRoutine;
+    private final AbstractRoutine<IN, OUT> mRoutine;
 
     private boolean mHasInputs;
 
@@ -215,14 +218,14 @@ public abstract class AbstractRoutine<IN, OUT> implements Routine<IN, OUT> {
      *
      * @param routine the routine to invoke in parallel mode.
      */
-    private ParallelInvocation(@NotNull final Routine<IN, OUT> routine) {
+    private ParallelInvocation(@NotNull final AbstractRoutine<IN, OUT> routine) {
       mRoutine = routine;
     }
 
     @Override
     public void onComplete(@NotNull final Channel<OUT, ?> result) {
       if (!mHasInputs) {
-        final Channel<IN, OUT> channel = mRoutine.invoke();
+        final Channel<IN, OUT> channel = mRoutine.invokeInternal();
         result.pass(channel);
         channel.close();
       }
@@ -231,7 +234,7 @@ public abstract class AbstractRoutine<IN, OUT> implements Routine<IN, OUT> {
     @Override
     public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) {
       mHasInputs = true;
-      final Channel<IN, OUT> channel = mRoutine.invoke();
+      final Channel<IN, OUT> channel = mRoutine.invokeInternal();
       result.pass(channel);
       channel.pass(input).close();
     }

@@ -49,7 +49,8 @@ public interface ReflectionRoutineBuilder extends InvocationConfigurable<Reflect
    * {@link com.github.dm.jrt.reflect.annotation.AsyncInput AsyncInput},
    * {@link com.github.dm.jrt.reflect.annotation.AsyncMethod AsyncMethod},
    * {@link com.github.dm.jrt.reflect.annotation.AsyncOutput AsyncOutput} and
-   * {@link com.github.dm.jrt.reflect.annotation.Invoke Invoke} annotations will be honored.
+   * {@link com.github.dm.jrt.reflect.annotation.InvocationMode InvocationMode} annotations will be
+   * honored.
    *
    * @param itf    the interface implemented by the returned object.
    * @param <TYPE> the interface type.
@@ -78,7 +79,8 @@ public interface ReflectionRoutineBuilder extends InvocationConfigurable<Reflect
    * {@link com.github.dm.jrt.reflect.annotation.AsyncInput AsyncInput},
    * {@link com.github.dm.jrt.reflect.annotation.AsyncMethod AsyncMethod},
    * {@link com.github.dm.jrt.reflect.annotation.AsyncOutput AsyncOutput} and
-   * {@link com.github.dm.jrt.reflect.annotation.Invoke Invoke} annotations will be honored.
+   * {@link com.github.dm.jrt.reflect.annotation.InvocationMode InvocationMode} annotations will be
+   * honored.
    *
    * @param itf    the token of the interface implemented by the returned object.
    * @param <TYPE> the interface type.

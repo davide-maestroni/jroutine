@@ -91,8 +91,8 @@
                 final Routine&lt;Integer, Integer&gt; squareRoutine = builder.method(SQUARE);
                 final Routine&lt;List&lt;Integer&gt;, Double&gt; meanRoutine = builder.method(MEAN);
                 final Double rms = meanRoutine.invoke()
-                                              .pass(squareRoutine.invokeParallel()
-                                                                 .pass(parseRoutine.invokeParallel().pass(args).close())
+                                              .pass(squareRoutine.invoke()
+                                                                 .pass(parseRoutine.invoke().pass(args).close())
                                                                  .close()
                                                                  .all())
                                               .next();
@@ -101,11 +101,13 @@
             }
 
             &commat;Alias(PARSE)
+            &commat;InvocationMode(InvocationModeType.PARALLEL)
             private static int parseArg(final String arg) {
                 return Integer.parseInt(arg);
             }
 
             &commat;Alias(SQUARE)
+            &commat;InvocationMode(InvocationModeType.PARALLEL)
             private static int square(final int value) {
                 return value * value;
             }
@@ -173,11 +175,11 @@
 
             private interface AsyncMain {
 
-                &commat;Invoke(InvocationMode.PARALLEL)
+                &commat;InvocationMode(InvocationModeType.PARALLEL)
                 &commat;AsyncOutput
                 Channel&lt;?, Integer&gt; parseArg(&commat;AsyncInput(String.class) Channel&lt;?, String&gt; args);
 
-                &commat;Invoke(InvocationMode.PARALLEL)
+                &commat;InvocationMode(InvocationModeType.PARALLEL)
                 &commat;AsyncOutput
                 Channel&lt;?, Integer&gt; square(&commat;AsyncInput(int.class) Channel&lt;?, Integer&gt; value);
 

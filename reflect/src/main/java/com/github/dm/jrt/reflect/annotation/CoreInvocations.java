@@ -43,7 +43,7 @@ import java.lang.annotation.Target;
  * <pre><code>
  * -keepattributes RuntimeVisibleAnnotations
  * -keepclassmembers class ** {
- *   &#64;com.github.dm.jrt.reflect.annotation.CoreInstances *;
+ *   &#64;com.github.dm.jrt.reflect.annotation.CoreInvocations *;
  * }
  * </code></pre>
  * <p>
@@ -53,7 +53,7 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface CoreInstances {
+public @interface CoreInvocations {
 
   /**
    * The number of invocation instances which represents the core pool of reusable invocations.

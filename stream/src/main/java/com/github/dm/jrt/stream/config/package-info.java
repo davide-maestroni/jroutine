@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Davide Maestroni
+ * Copyright 2017 Davide Maestroni
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-// GENERATED CODE - PLEASE DO NOT EDIT
-
-  @SuppressWarnings({"unchecked", "RedundantCast"})
-  public ${resultType} ${methodName}(${paramVars}) {
-    final com.github.dm.jrt.core.routine.Routine<Object, ${resultClassName}> $$routine = (com.github.dm.jrt.core.routine.Routine<Object, ${resultClassName}>) this.mRoutine${methodCount};
-    return $$routine.invoke()${inputOptions}${inputParams}.close().all().iterator().next();
-  }
+/**
+ * Classes handling stream builder configurations.
+ * <p>
+ * Created by davide-maestroni on 03/14/2017.
+ */
+package com.github.dm.jrt.stream.config;

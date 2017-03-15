@@ -88,7 +88,7 @@ public class LoaderConfigurationTest extends AndroidTestCase {
                                                        .apply();
     assertThat(builder().withPatch(configuration).apply()).isEqualTo(configuration);
     assertThat(configuration.builderFrom().apply()).isEqualTo(configuration);
-    assertThat(configuration.builderFrom().withPatch(null).apply()).isEqualTo(
+    assertThat(configuration.builderFrom().withDefaults().apply()).isEqualTo(
         LoaderConfiguration.defaultConfiguration());
   }
 

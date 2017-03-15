@@ -19,6 +19,7 @@ package com.github.dm.jrt.method;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
+import com.github.dm.jrt.core.config.InvocationConfiguration.InvocationModeType;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.method.annotation.Input;
@@ -58,7 +59,10 @@ public class RoutineMethodTest {
           output.pass(input.next().length());
         }
       }
-    }.callParallel(inputStrings, outputLengths);
+    }.invocationConfiguration()
+     .withInvocationMode(InvocationModeType.PARALLEL)
+     .apply()
+     .call(inputStrings, outputLengths);
     inputStrings.pass("test", "test1", "test22");
     assertThat(outputLengths.in(seconds(1)).next(3)).containsOnly(4, 5, 6);
   }
@@ -229,7 +233,10 @@ public class RoutineMethodTest {
     final Channel<String, String> inputChannel = JRoutineCore.<String>ofData().buildChannel();
     final Channel<?, Object> outputChannel =
         RoutineMethod.from(RoutineMethodTest.class.getMethod("length", String.class))
-                     .callParallel(inputChannel);
+                     .invocationConfiguration()
+                     .withInvocationMode(InvocationModeType.PARALLEL)
+                     .apply()
+                     .call(inputChannel);
     inputChannel.pass("test", "test1", "test22").close();
     assertThat(outputChannel.in(seconds(1)).all()).containsOnly(4, 5, 6);
   }
@@ -389,8 +396,9 @@ public class RoutineMethodTest {
     final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     new SumRoutine(0).invocationConfiguration()
                      .withRunner(Runners.syncRunner())
+                     .withInvocationMode(InvocationModeType.PARALLEL)
                      .apply()
-                     .callParallel(inputChannel, outputChannel);
+                     .call(inputChannel, outputChannel);
     inputChannel.pass(1, 2, 3, 4, 5).close();
     assertThat(outputChannel.all()).containsOnly(1, 2, 3, 4, 5);
   }
@@ -422,8 +430,9 @@ public class RoutineMethodTest {
     final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     new SumRoutine().invocationConfiguration()
                     .withRunner(Runners.syncRunner())
+                    .withInvocationMode(InvocationModeType.PARALLEL)
                     .apply()
-                    .callParallel(inputChannel, outputChannel);
+                    .call(inputChannel, outputChannel);
     inputChannel.pass(1, 2, 3, 4, 5).close();
     assertThat(outputChannel.all()).containsOnly(2, 3, 4, 5, 6);
   }
@@ -452,8 +461,9 @@ public class RoutineMethodTest {
     final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     new SumRoutine().invocationConfiguration()
                     .withRunner(Runners.syncRunner())
+                    .withInvocationMode(InvocationModeType.PARALLEL)
                     .apply()
-                    .callParallel(inputChannel, outputChannel);
+                    .call(inputChannel, outputChannel);
     inputChannel.pass(1, 2, 3, 4, 5).close();
     assertThat(outputChannel.all()).containsOnly(1, 2, 3, 4, 5);
   }
@@ -469,7 +479,10 @@ public class RoutineMethodTest {
         }
         return 0;
       }
-    }.callParallel(inputStrings);
+    }.invocationConfiguration()
+     .withInvocationMode(InvocationModeType.PARALLEL)
+     .apply()
+     .call(inputStrings);
     inputStrings.pass("test");
     assertThat(outputChannel.in(seconds(1)).next()).isEqualTo(4);
   }
@@ -480,8 +493,9 @@ public class RoutineMethodTest {
     final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     new SumRoutineInner(0).invocationConfiguration()
                           .withRunner(Runners.syncRunner())
+                          .withInvocationMode(InvocationModeType.PARALLEL)
                           .apply()
-                          .callParallel(inputChannel, outputChannel);
+                          .call(inputChannel, outputChannel);
     inputChannel.pass(1, 2, 3, 4, 5).close();
     assertThat(outputChannel.all()).containsOnly(1, 2, 3, 4, 5);
   }
@@ -493,7 +507,7 @@ public class RoutineMethodTest {
       int zero() {
         return 0;
       }
-    }.callParallel();
+    }.invocationConfiguration().withInvocationMode(InvocationModeType.PARALLEL).apply().call();
   }
 
   @Test

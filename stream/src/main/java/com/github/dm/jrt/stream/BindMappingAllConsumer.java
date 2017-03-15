@@ -21,8 +21,8 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
+import com.github.dm.jrt.core.config.InvocationConfiguration.InvocationModeType;
 import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
-import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.util.BiConsumer;
 import com.github.dm.jrt.function.util.Function;
@@ -44,7 +44,7 @@ class BindMappingAllConsumer<IN, OUT> implements Function<Channel<?, IN>, Channe
 
   private final ChannelConfiguration mConfiguration;
 
-  private final InvocationMode mInvocationMode;
+  private final InvocationModeType mInvocationMode;
 
   private final BiConsumer<? super List<IN>, ? super Channel<OUT, ?>> mMappingConsumer;
 
@@ -56,7 +56,7 @@ class BindMappingAllConsumer<IN, OUT> implements Function<Channel<?, IN>, Channe
    * @param mappingConsumer the mapping consumer.
    */
   BindMappingAllConsumer(@NotNull final ChannelConfiguration configuration,
-      @NotNull final InvocationMode invocationMode,
+      @NotNull final InvocationModeType invocationMode,
       @NotNull final BiConsumer<? super List<IN>, ? super Channel<OUT, ?>> mappingConsumer) {
     mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
     mInvocationMode = ConstantConditions.notNull("invocation mode", invocationMode);
@@ -67,7 +67,7 @@ class BindMappingAllConsumer<IN, OUT> implements Function<Channel<?, IN>, Channe
     final Channel<OUT, OUT> outputChannel =
         JRoutineCore.<OUT>ofData().apply(mConfiguration).buildChannel();
     channel.consume(
-        (mInvocationMode == InvocationMode.ASYNC) ? new MappingConsumerConsumer<IN, OUT>(
+        (mInvocationMode == InvocationModeType.SIMPLE) ? new MappingConsumerConsumer<IN, OUT>(
             mMappingConsumer, outputChannel)
             : new MappingConsumerConsumerParallel<IN, OUT>(mMappingConsumer, outputChannel));
     return outputChannel;

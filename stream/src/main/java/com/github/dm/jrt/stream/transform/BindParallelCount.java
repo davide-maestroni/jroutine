@@ -19,7 +19,6 @@ package com.github.dm.jrt.stream.transform;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
-import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
@@ -44,16 +43,14 @@ class BindParallelCount<IN, OUT> extends BindMap<IN, OUT> {
   /**
    * Constructor.
    *
-   * @param configuration  the channel configuration.
-   * @param count          the invocation count.
-   * @param routine        the routine instance.
-   * @param invocationMode the invocation mode.
+   * @param configuration the channel configuration.
+   * @param count         the invocation count.
+   * @param routine       the routine instance.
    * @throws java.lang.IllegalArgumentException if the invocation count is not positive.
    */
   BindParallelCount(@NotNull final ChannelConfiguration configuration, final int count,
-      @NotNull final Routine<? super IN, ? extends OUT> routine,
-      @NotNull final InvocationMode invocationMode) {
-    super(routine, invocationMode);
+      @NotNull final Routine<? super IN, ? extends OUT> routine) {
+    super(routine);
     mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
     mCount = ConstantConditions.positive("invocation count", count);
   }

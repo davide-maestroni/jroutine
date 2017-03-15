@@ -69,7 +69,7 @@ public class Downloader {
                                   .withRunner(sReadRunner)
                                   // By setting the maximum number of parallel invocations we
                                   // effectively limit the number of parallel downloads
-                                  .withMaxInstances(maxParallelDownloads).apply().buildRoutine();
+                                  .withMaxInvocations(maxParallelDownloads).apply().buildRoutine();
   }
 
   /**

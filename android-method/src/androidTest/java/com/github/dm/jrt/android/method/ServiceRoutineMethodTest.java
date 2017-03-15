@@ -27,6 +27,7 @@ import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
+import com.github.dm.jrt.core.config.InvocationConfiguration.InvocationModeType;
 import com.github.dm.jrt.method.annotation.Input;
 import com.github.dm.jrt.method.annotation.Output;
 
@@ -263,7 +264,11 @@ public class ServiceRoutineMethodTest extends ActivityInstrumentationTestCase2<T
     final Channel<String, String> inputChannel = JRoutineCore.<String>ofData().buildChannel();
     final Channel<?, Object> outputChannel = ServiceRoutineMethod.from(serviceFrom(getActivity()),
         ServiceRoutineMethodTest.class.getMethod("length", String.class))
-                                                                 .callParallel(inputChannel);
+                                                                 .invocationConfiguration()
+                                                                 .withInvocationMode(
+                                                                     InvocationModeType.PARALLEL)
+                                                                 .apply()
+                                                                 .call(inputChannel);
     inputChannel.pass("test", "test1", "test22").close();
     assertThat(outputChannel.in(seconds(10)).all()).containsOnly(4, 5, 6);
   }
@@ -334,9 +339,10 @@ public class ServiceRoutineMethodTest extends ActivityInstrumentationTestCase2<T
     final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     new SumRoutine(serviceFrom(getActivity())).invocationConfiguration()
+                                              .withInvocationMode(InvocationModeType.PARALLEL)
                                               .withOutputOrder(OrderType.SORTED)
                                               .apply()
-                                              .callParallel(inputChannel, outputChannel);
+                                              .call(inputChannel, outputChannel);
     inputChannel.pass(1, 2, 3, 4, 5).close();
     assertThat(outputChannel.in(seconds(10)).all()).containsOnly(1, 2, 3, 4, 5);
   }

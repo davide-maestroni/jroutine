@@ -25,7 +25,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
 
 import retrofit2.CallAdapter;
 
@@ -81,7 +80,6 @@ public class RoutineAdapterFactory extends AbstractAdapterFactory {
    * The options set through the builder configuration will be applied to all the routine handling
    * the Retrofit calls, unless they are overwritten by specific annotations.
    *
-   * @see ReflectionRoutineBuilders#getInvocationMode(Method)
    * @see ReflectionRoutineBuilders#withAnnotations(InvocationConfiguration, Annotation...)
    */
   public static class Builder implements InvocationConfigurable<Builder> {

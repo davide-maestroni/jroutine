@@ -180,7 +180,7 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
    */
   @NotNull
   <BEFORE, AFTER> StreamBuilder<BEFORE, AFTER> convert(
-      @NotNull BiFunction<? super StreamConfiguration, ? super StreamBuilder<IN, OUT>, ? extends
+      @NotNull BiFunction<? super com.github.dm.jrt.stream.config.StreamConfiguration, ? super StreamBuilder<IN, OUT>, ? extends
           StreamBuilder<BEFORE, AFTER>> transformingFunction);
 
   /**
@@ -284,7 +284,7 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
    */
   @NotNull
   <BEFORE, AFTER> StreamBuilder<BEFORE, AFTER> lift(
-      @NotNull BiFunction<? super StreamConfiguration, ? super Function<Channel<?, IN>,
+      @NotNull BiFunction<? super com.github.dm.jrt.stream.config.StreamConfiguration, ? super Function<Channel<?, IN>,
           Channel<?, OUT>>, ? extends Function<? super Channel<?, BEFORE>, ? extends Channel<?,
           AFTER>>> liftingFunction);
 

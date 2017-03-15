@@ -20,7 +20,6 @@ import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.common.RoutineException;
-import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.util.Function;
@@ -49,16 +48,14 @@ class ParallelKeyChannelConsumer<IN, OUT> extends BindMap<IN, OUT> implements Ch
   /**
    * Constructor.
    *
-   * @param outputChannel  the output channel instance.
-   * @param keyFunction    the key function.
-   * @param routine        the routine instance.
-   * @param invocationMode the invocation mode.
+   * @param outputChannel the output channel instance.
+   * @param keyFunction   the key function.
+   * @param routine       the routine instance.
    */
   ParallelKeyChannelConsumer(@NotNull final Channel<OUT, ?> outputChannel,
       @NotNull final Function<? super IN, ?> keyFunction,
-      @NotNull final Routine<? super IN, ? extends OUT> routine,
-      @NotNull final InvocationMode invocationMode) {
-    super(routine, invocationMode);
+      @NotNull final Routine<? super IN, ? extends OUT> routine) {
+    super(routine);
     mOutputChannel = ConstantConditions.notNull("channel instance", outputChannel);
     mKeyFunction = ConstantConditions.notNull("key function", keyFunction);
   }

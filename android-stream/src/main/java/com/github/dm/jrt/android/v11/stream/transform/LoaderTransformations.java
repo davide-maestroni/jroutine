@@ -28,7 +28,7 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.util.Function;
 import com.github.dm.jrt.function.util.FunctionDecorator;
-import com.github.dm.jrt.stream.builder.StreamConfiguration;
+import com.github.dm.jrt.stream.config.StreamConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 

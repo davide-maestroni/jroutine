@@ -19,6 +19,7 @@ package com.github.dm.jrt.core.config;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.ChannelConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
+import com.github.dm.jrt.core.config.InvocationConfiguration.InvocationModeType;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.Logs;
 import com.github.dm.jrt.core.log.NullLog;
@@ -99,22 +100,22 @@ public class InvocationConfigurationTest {
                                                            .apply();
     assertThat(builder().withPatch(configuration).apply()).isEqualTo(configuration);
     assertThat(configuration.builderFrom().apply()).isEqualTo(configuration);
-    assertThat(configuration.builderFrom().withPatch(null).apply()).isEqualTo(
+    assertThat(configuration.builderFrom().withDefaults().apply()).isEqualTo(
         InvocationConfiguration.defaultConfiguration());
   }
 
   @Test
   public void testCoreInvocationsEquals() {
 
-    final InvocationConfiguration configuration = builder().withCoreInstances(27)
+    final InvocationConfiguration configuration = builder().withCoreInvocations(27)
                                                            .withInputOrder(OrderType.SORTED)
                                                            .withRunner(Runners.syncRunner())
                                                            .withLog(new NullLog())
                                                            .withOutputMaxSize(100)
                                                            .apply();
-    assertThat(configuration).isNotEqualTo(builder().withCoreInstances(3).apply());
-    assertThat(configuration.builderFrom().withCoreInstances(27).apply()).isNotEqualTo(
-        builder().withCoreInstances(27).apply());
+    assertThat(configuration).isNotEqualTo(builder().withCoreInvocations(3).apply());
+    assertThat(configuration.builderFrom().withCoreInvocations(27).apply()).isNotEqualTo(
+        builder().withCoreInvocations(27).apply());
   }
 
   @Test
@@ -123,7 +124,7 @@ public class InvocationConfigurationTest {
 
     try {
 
-      builder().withCoreInstances(-1);
+      builder().withCoreInvocations(-1);
 
       fail();
 
@@ -325,6 +326,22 @@ public class InvocationConfigurationTest {
   }
 
   @Test
+  public void testInvocationModeEquals() {
+
+    final InvocationConfiguration configuration = builder().withInputOrder(OrderType.SORTED)
+                                                           .withRunner(Runners.syncRunner())
+                                                           .withLog(new NullLog())
+                                                           .withOutputMaxSize(100)
+                                                           .apply();
+    assertThat(configuration).isNotEqualTo(
+        builder().withInvocationMode(InvocationModeType.PARALLEL).apply());
+    assertThat(configuration.builderFrom()
+                            .withInvocationMode(InvocationModeType.PARALLEL)
+                            .apply()).isNotEqualTo(
+        builder().withInvocationMode(InvocationModeType.PARALLEL).apply());
+  }
+
+  @Test
   public void testLogEquals() {
 
     final InvocationConfiguration configuration = builder().withInputOrder(OrderType.SORTED)
@@ -358,9 +375,9 @@ public class InvocationConfigurationTest {
                                                            .withLog(new NullLog())
                                                            .withOutputMaxSize(100)
                                                            .apply();
-    assertThat(configuration).isNotEqualTo(builder().withMaxInstances(4).apply());
-    assertThat(configuration.builderFrom().withMaxInstances(41).apply()).isNotEqualTo(
-        builder().withMaxInstances(41).apply());
+    assertThat(configuration).isNotEqualTo(builder().withMaxInvocations(4).apply());
+    assertThat(configuration.builderFrom().withMaxInvocations(41).apply()).isNotEqualTo(
+        builder().withMaxInvocations(41).apply());
   }
 
   @Test
@@ -369,7 +386,7 @@ public class InvocationConfigurationTest {
 
     try {
 
-      builder().withMaxInstances(0);
+      builder().withMaxInvocations(0);
 
       fail();
 
@@ -475,7 +492,7 @@ public class InvocationConfigurationTest {
   public void testPriorityEquals() {
 
     final InvocationConfiguration configuration = builder().withPriority(17)
-                                                           .withCoreInstances(27)
+                                                           .withCoreInvocations(27)
                                                            .withInputOrder(OrderType.SORTED)
                                                            .withRunner(Runners.syncRunner())
                                                            .withLog(new NullLog())

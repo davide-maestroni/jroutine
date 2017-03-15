@@ -34,8 +34,8 @@ import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.config.InvocationConfiguration.InvocationModeType;
 import com.github.dm.jrt.core.invocation.InvocationException;
-import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.Reflection;
@@ -269,42 +269,18 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
                 + "constructor arguments");
       }
 
+      final InvocationModeType invocationMode = getConfiguration().getInvocationModeOrElse(null);
+      if (invocationMode == InvocationModeType.PARALLEL) {
+        throw new IllegalStateException(
+            "cannot invoke the routine in parallel mode: please provide proper "
+                + "constructor arguments");
+      }
+
       setReturnType(method.getReturnType());
       factory = new SingleInvocationFactory(this, method, safeParams);
     }
 
-    return call(factory, method, InvocationMode.ASYNC, safeParams);
-  }
-
-  /**
-   * Calls the routine in parallel mode.
-   * <br>
-   * The output channel will produced the data returned by the method. In case the method does not
-   * return any output, the channel will be anyway notified of invocation abortion and completion.
-   * <p>
-   * Note that the specific method will be selected based on the specified parameters. If no
-   * matching method is found, the call will fail with an exception.
-   *
-   * @param params the parameters.
-   * @param <OUT>  the output data type.
-   * @return the output channel instance.
-   * @see com.github.dm.jrt.core.routine.Routine Routine
-   */
-  @NotNull
-  @Override
-  public <OUT> Channel<?, OUT> callParallel(@Nullable final Object... params) {
-    final Constructor<? extends LoaderRoutineMethodCompat> constructor = mConstructor;
-    if (constructor == null) {
-      throw new IllegalStateException(
-          "cannot invoke the routine in parallel mode: please provide proper "
-              + "constructor arguments");
-    }
-
-    final Object[] safeParams = asArgs(params);
-    final Class<? extends LoaderRoutineMethodCompat> type = getClass();
-    final Method method = findBestMatchingMethod(type, safeParams);
-    return call(new MultiInvocationFactory(type, constructor, mArgs, method, safeParams), method,
-        InvocationMode.PARALLEL, safeParams);
+    return call(factory, method, safeParams);
   }
 
   @NotNull
@@ -384,8 +360,7 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
   @SuppressWarnings("unchecked")
   private <OUT> Channel<?, OUT> call(
       @NotNull final ContextInvocationFactory<Flow<Object>, Flow<Object>> factory,
-      @NotNull final Method method, @NotNull final InvocationMode mode,
-      @NotNull final Object[] params) {
+      @NotNull final Method method, @NotNull final Object[] params) {
     final ArrayList<Channel<?, ?>> inputChannels = new ArrayList<Channel<?, ?>>();
     final ArrayList<Channel<?, ?>> outputChannels = new ArrayList<Channel<?, ?>>();
     final Annotation[][] annotations = method.getParameterAnnotations();
@@ -407,11 +382,16 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
         (!inputChannels.isEmpty()) ? AndroidChannels.mergeParcelableOutput(inputChannels)
                                                     .buildChannel()
             : JRoutineCore.<Flow<Object>>of().buildChannel();
-    final Channel<Flow<Object>, Flow<Object>> outputChannel = mode.invoke(
-        JRoutineLoaderCompat.on(mContext)
-                            .with(factory)
-                            .apply(getConfiguration())
-                            .apply(getLoaderConfiguration())).pass(inputChannel).close();
+    final Channel<Flow<Object>, Flow<Object>> outputChannel = JRoutineLoaderCompat.on(mContext)
+                                                                                  .with(factory)
+                                                                                  .apply(
+                                                                                      getConfiguration())
+                                                                                  .apply(
+                                                                                      getLoaderConfiguration())
+                                                                                  .invoke()
+                                                                                  .pass(
+                                                                                      inputChannel)
+                                                                                  .close();
     final Map<Integer, ? extends Channel<?, Object>> channelMap =
         AndroidChannels.flowOutput(0, outputChannels.size(), outputChannel).buildChannelMap();
     for (final Entry<Integer, ? extends Channel<?, Object>> entry : channelMap.entrySet()) {
@@ -487,14 +467,35 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
 
     @NotNull
     @Override
+    @SuppressWarnings("unchecked")
     public <OUT> Channel<?, OUT> call(@Nullable final Object... params) {
-      return call(InvocationMode.ASYNC, params);
-    }
+      final Object[] safeParams = asArgs(params);
+      final Method method = mMethod;
+      if (method.getParameterTypes().length != safeParams.length) {
+        throw new IllegalArgumentException(
+            "wrong number of parameters: expected <" + method.getParameterTypes().length
+                + "> but was <" + safeParams.length + ">");
+      }
 
-    @NotNull
-    @Override
-    public <OUT> Channel<?, OUT> callParallel(@Nullable final Object... params) {
-      return call(InvocationMode.PARALLEL, params);
+      final Routine<Object, Object> routine = JRoutineLoaderReflectionCompat.on(mContext)
+                                                                            .with(mTarget)
+                                                                            .apply(
+                                                                                getConfiguration())
+                                                                            .apply(
+                                                                                getLoaderConfiguration())
+                                                                            .apply(mConfiguration)
+                                                                            .method(method);
+      final Channel<Object, Object> channel = routine.invoke().sorted();
+      for (final Object param : safeParams) {
+        if (param instanceof Channel) {
+          channel.pass((Channel<?, ?>) param);
+
+        } else {
+          channel.pass(param);
+        }
+      }
+
+      return (Channel<?, OUT>) channel.close();
     }
 
     @NotNull
@@ -526,38 +527,6 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
     wrapperConfiguration() {
       return new WrapperConfiguration.Builder<ReflectionLoaderRoutineMethodCompat>(this,
           mConfiguration);
-    }
-
-    @NotNull
-    @SuppressWarnings("unchecked")
-    private <OUT> Channel<?, OUT> call(@NotNull final InvocationMode mode,
-        @Nullable final Object[] params) {
-      final Object[] safeParams = asArgs(params);
-      final Method method = mMethod;
-      if (method.getParameterTypes().length != safeParams.length) {
-        throw new IllegalArgumentException("wrong number of parameters: expected <" +
-            method.getParameterTypes().length + "> but was <" + safeParams.length + ">");
-      }
-
-      final Routine<Object, Object> routine = JRoutineLoaderReflectionCompat.on(mContext)
-                                                                            .with(mTarget)
-                                                                            .apply(
-                                                                                getConfiguration())
-                                                                            .apply(
-                                                                                getLoaderConfiguration())
-                                                                            .apply(mConfiguration)
-                                                                            .method(method);
-      final Channel<Object, Object> channel = mode.invoke(routine).sorted();
-      for (final Object param : safeParams) {
-        if (param instanceof Channel) {
-          channel.pass((Channel<?, ?>) param);
-
-        } else {
-          channel.pass(param);
-        }
-      }
-
-      return (Channel<?, OUT>) channel.close();
     }
   }
 

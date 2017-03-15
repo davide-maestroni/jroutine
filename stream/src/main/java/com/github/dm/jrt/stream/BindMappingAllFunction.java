@@ -21,8 +21,8 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
+import com.github.dm.jrt.core.config.InvocationConfiguration.InvocationModeType;
 import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
-import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.util.Function;
 
@@ -43,7 +43,7 @@ class BindMappingAllFunction<IN, OUT> implements Function<Channel<?, IN>, Channe
 
   private final ChannelConfiguration mConfiguration;
 
-  private final InvocationMode mInvocationMode;
+  private final InvocationModeType mInvocationMode;
 
   private final Function<? super List<IN>, ? extends OUT> mMappingFunction;
 
@@ -55,7 +55,7 @@ class BindMappingAllFunction<IN, OUT> implements Function<Channel<?, IN>, Channe
    * @param mappingFunction the mapping function.
    */
   BindMappingAllFunction(@NotNull final ChannelConfiguration configuration,
-      @NotNull final InvocationMode invocationMode,
+      @NotNull final InvocationModeType invocationMode,
       @NotNull final Function<? super List<IN>, ? extends OUT> mappingFunction) {
     mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
     mInvocationMode = ConstantConditions.notNull("invocation mode", invocationMode);
@@ -66,7 +66,7 @@ class BindMappingAllFunction<IN, OUT> implements Function<Channel<?, IN>, Channe
     final Channel<OUT, OUT> outputChannel =
         JRoutineCore.<OUT>ofData().apply(mConfiguration).buildChannel();
     channel.consume(
-        (mInvocationMode == InvocationMode.ASYNC) ? new MappingFunctionConsumer<IN, OUT>(
+        (mInvocationMode == InvocationModeType.SIMPLE) ? new MappingFunctionConsumer<IN, OUT>(
             mMappingFunction, outputChannel)
             : new MappingFunctionConsumerParallel<IN, OUT>(mMappingFunction, outputChannel));
     return outputChannel;

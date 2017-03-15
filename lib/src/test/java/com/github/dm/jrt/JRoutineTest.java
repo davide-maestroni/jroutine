@@ -84,8 +84,8 @@ public class JRoutineTest {
     final Routine<Object, Object> routine = JRoutine.with(instance(test))
                                                     .invocationConfiguration()
                                                     .withRunner(Runners.syncRunner())
-                                                    .withMaxInstances(1)
-                                                    .withCoreInstances(1)
+                                                    .withMaxInvocations(1)
+                                                    .withCoreInvocations(1)
                                                     .withOutputTimeoutAction(
                                                         TimeoutActionType.CONTINUE)
                                                     .withLogLevel(Level.DEBUG)

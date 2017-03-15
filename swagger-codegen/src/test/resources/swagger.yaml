@@ -11,7 +11,7 @@ paths:
   /{user}/repos:
     get:
       x-jroutine-output-timeout: 20
-      x-jroutine-output-timeout-unit: java.util.concurrent.TimeUnit.SECONDS
+      x-jroutine-output-timeout-unit: SECONDS
       operationId: getRepos
       summary: Gets the user public repositories.
       description: |

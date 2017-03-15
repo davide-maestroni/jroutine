@@ -32,17 +32,17 @@ import org.jetbrains.annotations.NotNull;
  * Invocation objects are dynamically instantiated when needed, effectively mimicking the temporary
  * scope of a function call.
  * <br>
- * The paradigm is based on channels. A routine can be invoked in different ways (as explained
- * below), and each routine invocation returns a channel through which the caller can pass the input
- * parameters. The channel can then be used to read the invocation results. At the same time a
- * result channel is passed to the invocation implementation, so that the output computed from the
- * input parameters can be published outside.
+ * The paradigm is based on channels. A routine can be invoked several times, and each routine
+ * invocation returns a channel through which the caller can pass the input parameters. The channel
+ * is then used to read the invocation results. At the same time a result channel is passed to the
+ * invocation implementation, so that the output computed from the input parameters can be published
+ * outside.
  * <br>
  * Note that, when all the parameters has been passed, the channel might need to be closed for the
  * invocation to successfully complete. In fact, some invocation implementations may rely on the
  * completion notification to produce their results.
  * <p>
- * The advantage of this approach is that the invocation flow can be run in steps, allowing for
+ * The advantage of this approach is that the invocation can be executed in steps, allowing for
  * continuous streaming of the input data and for abortion in the middle of the execution, without
  * blocking the running thread for the whole duration of the asynchronous invocation.
  * <br>
@@ -57,24 +57,6 @@ import org.jetbrains.annotations.NotNull;
  * reading output data from a channel) in the middle of an execution when shared runner instances
  * are employed. Additionally, to prevent deadlock or starvation issues, it is encouraged the use of
  * finite timeouts when performing blocking calls.
- * <p>
- * The routine object provides two different ways to be invoked:
- * <p>
- * <b>Asynchronous invocation</b><br>
- * The routine starts an invocation employing an asynchronous runner. In this case the processing
- * happens in a different thread, while the calling process may go on with its own execution and
- * perform other tasks. The invocation results can be collected at any time through the output
- * channel methods.
- * <p>
- * <b>Parallel invocation</b><br>
- * Processing parallelization is the key to leverage the power of multi-core machines. In order to
- * achieve it, the input data must be divided into subsets which are then processed on different
- * threads.
- * <br>
- * A routine object provides a convenient way to start an invocation which in turn spawns another
- * invocation for each input passed. This particular type of invocation obviously produces
- * meaningful results only for routines which takes a single input parameter and computes the
- * relative output results.
  * <p>
  * It is worth noting how the library has been designed only through interfaces, so that, as far as
  * the implementation honors the specific contracts, it is possible to seamlessly combine different
@@ -102,12 +84,4 @@ public interface Routine<IN, OUT> {
    */
   @NotNull
   Channel<IN, OUT> invoke();
-
-  /**
-   * Invokes the execution of this routine in parallel mode.
-   *
-   * @return the invocation channel.
-   */
-  @NotNull
-  Channel<IN, OUT> invokeParallel();
 }

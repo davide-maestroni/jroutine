@@ -50,6 +50,8 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * values, it is important to keep in mind that the difference between two priorities corresponds to
  * the maximum age the lower priority invocation will have, before getting precedence over the
  * higher priority one.</li>
+ * <li>The invocation mode: simple, where all the inputs are passed to the same invocation instance,
+ * and parallel, where each input is processed by a different invocation.</li>
  * <li>The core number of invocation instances to be retained in order to be re-used when needed.
  * When an invocation completes without being discarded, the instance is retained for future
  * executions.</li>
@@ -95,7 +97,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
   private static final InvocationConfiguration sDefaultConfiguration =
       builder().buildConfiguration();
 
-  private final int mCoreInstances;
+  private final int mCoreInvocations;
 
   private final Backoff mInputBackoff;
 
@@ -103,11 +105,13 @@ public final class InvocationConfiguration extends DeepEqualObject {
 
   private final OrderType mInputOrderType;
 
+  private final InvocationModeType mInvocationMode;
+
   private final Log mLog;
 
   private final Level mLogLevel;
 
-  private final int mMaxInstances;
+  private final int mMaxInvocations;
 
   private final Backoff mOutputBackoff;
 
@@ -128,8 +132,9 @@ public final class InvocationConfiguration extends DeepEqualObject {
    *
    * @param runner          the runner used for asynchronous invocations.
    * @param priority        the invocation priority.
-   * @param maxInstances    the maximum number of parallel running invocations. Must be positive.
-   * @param coreInstances   the maximum number of retained invocation instances. Must not be
+   * @param invocationMode  the invocation mode.
+   * @param maxInvocations  the maximum number of parallel running invocations. Must be positive.
+   * @param coreInvocations the maximum number of retained invocation instances. Must not be
    *                        negative.
    * @param outputTimeout   the timeout for an invocation instance to produce a result.
    * @param actionType      the action to be taken if the timeout elapses before a readable
@@ -146,19 +151,20 @@ public final class InvocationConfiguration extends DeepEqualObject {
    * @param logLevel        the log level.
    */
   private InvocationConfiguration(@Nullable final Runner runner, final int priority,
-      final int maxInstances, final int coreInstances,
-      @Nullable final DurationMeasure outputTimeout, @Nullable final TimeoutActionType actionType,
-      @Nullable final OrderType inputOrderType, @Nullable final Backoff inputBackoff,
-      final int inputMaxSize, @Nullable final OrderType outputOrderType,
-      @Nullable final Backoff outputBackoff, final int outputMaxSize, @Nullable final Log log,
-      @Nullable final Level logLevel) {
-    super(asArgs(runner, priority, maxInstances, coreInstances, outputTimeout, actionType,
-        inputOrderType, inputBackoff, inputMaxSize, outputOrderType, outputBackoff, outputMaxSize,
-        log, logLevel));
+      @Nullable final InvocationModeType invocationMode, final int maxInvocations,
+      final int coreInvocations, @Nullable final DurationMeasure outputTimeout,
+      @Nullable final TimeoutActionType actionType, @Nullable final OrderType inputOrderType,
+      @Nullable final Backoff inputBackoff, final int inputMaxSize,
+      @Nullable final OrderType outputOrderType, @Nullable final Backoff outputBackoff,
+      final int outputMaxSize, @Nullable final Log log, @Nullable final Level logLevel) {
+    super(asArgs(runner, priority, invocationMode, maxInvocations, coreInvocations, outputTimeout,
+        actionType, inputOrderType, inputBackoff, inputMaxSize, outputOrderType, outputBackoff,
+        outputMaxSize, log, logLevel));
     mRunner = runner;
+    mInvocationMode = invocationMode;
     mPriority = priority;
-    mMaxInstances = maxInstances;
-    mCoreInstances = coreInstances;
+    mMaxInvocations = maxInvocations;
+    mCoreInvocations = coreInvocations;
     mOutputTimeout = outputTimeout;
     mTimeoutActionType = actionType;
     mInputOrderType = inputOrderType;
@@ -255,6 +261,18 @@ public final class InvocationConfiguration extends DeepEqualObject {
   }
 
   /**
+   * Returns a configuration with just the specified invocation mode set as option.
+   *
+   * @param invocationMode the invocation mode.
+   * @return the configuration instance.
+   */
+  @NotNull
+  public static InvocationConfiguration withMode(
+      @Nullable final InvocationModeType invocationMode) {
+    return builder().withInvocationMode(invocationMode).apply();
+  }
+
+  /**
    * Returns a configuration with just the specified runner set as option.
    *
    * @param runner the runner instance.
@@ -263,6 +281,19 @@ public final class InvocationConfiguration extends DeepEqualObject {
   @NotNull
   public static InvocationConfiguration withRunner(@Nullable final Runner runner) {
     return builder().withRunner(runner).apply();
+  }
+
+  /**
+   * Returns a configuration with just the specified runner and invocation mode set as options.
+   *
+   * @param runner         the runner instance.
+   * @param invocationMode the invocation mode.
+   * @return the configuration instance.
+   */
+  @NotNull
+  public static InvocationConfiguration withRunnerAndMode(@Nullable final Runner runner,
+      @Nullable final InvocationModeType invocationMode) {
+    return builder().withRunner(runner).withInvocationMode(invocationMode).apply();
   }
 
   /**
@@ -281,9 +312,9 @@ public final class InvocationConfiguration extends DeepEqualObject {
    * @param valueIfNotSet the default value if none was set.
    * @return the maximum number.
    */
-  public int getCoreInstancesOrElse(final int valueIfNotSet) {
-    final int coreInstances = mCoreInstances;
-    return (coreInstances != DEFAULT) ? coreInstances : valueIfNotSet;
+  public int getCoreInvocationsOrElse(final int valueIfNotSet) {
+    final int coreInvocations = mCoreInvocations;
+    return (coreInvocations != DEFAULT) ? coreInvocations : valueIfNotSet;
   }
 
   /**
@@ -321,6 +352,18 @@ public final class InvocationConfiguration extends DeepEqualObject {
   }
 
   /**
+   * Returns the invocation mode (null by default).
+   *
+   * @param valueIfNotSet the default value if none was set.
+   * @return invocation mode.
+   */
+  public InvocationModeType getInvocationModeOrElse(
+      @Nullable final InvocationModeType valueIfNotSet) {
+    final InvocationModeType invocationMode = mInvocationMode;
+    return (invocationMode != null) ? invocationMode : valueIfNotSet;
+  }
+
+  /**
    * Returns the log level (null by default).
    *
    * @param valueIfNotSet the default value if none was set.
@@ -343,14 +386,14 @@ public final class InvocationConfiguration extends DeepEqualObject {
   }
 
   /**
-   * Returns the maximum number of parallel running invocation instances (DEFAULT by default).
+   * Returns the maximum number of concurrently running invocation instances (DEFAULT by default).
    *
    * @param valueIfNotSet the default value if none was set.
    * @return the maximum number.
    */
-  public int getMaxInstancesOrElse(final int valueIfNotSet) {
-    final int maxInstances = mMaxInstances;
-    return (maxInstances != DEFAULT) ? maxInstances : valueIfNotSet;
+  public int getMaxInvocationsOrElse(final int valueIfNotSet) {
+    final int maxInvocations = mMaxInvocations;
+    return (maxInvocations != DEFAULT) ? maxInvocations : valueIfNotSet;
   }
 
   /**
@@ -484,6 +527,22 @@ public final class InvocationConfiguration extends DeepEqualObject {
   }
 
   /**
+   * Enumeration defining the mode in which the invocation is executed.
+   */
+  public enum InvocationModeType {
+
+    /**
+     * All the input passed to the invocation channel are processed by the same invocation instance.
+     */
+    SIMPLE,
+
+    /**
+     * Each input passed to the invocation channel is processed by a different invocation instance.
+     */
+    PARALLEL
+  }
+
+  /**
    * Interface exposing constants which can be used as a common set of priorities.
    * <p>
    * Note that, since the priority value can be any in an integer range, it is always possible to
@@ -578,7 +637,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
 
     private final Configurable<? extends TYPE> mConfigurable;
 
-    private int mCoreInstances;
+    private int mCoreInvocations;
 
     private Backoff mInputBackoff;
 
@@ -586,11 +645,13 @@ public final class InvocationConfiguration extends DeepEqualObject {
 
     private OrderType mInputOrderType;
 
+    private InvocationModeType mInvocationMode;
+
     private Log mLog;
 
     private Level mLogLevel;
 
-    private int mMaxInstances;
+    private int mMaxInvocations;
 
     private Backoff mOutputBackoff;
 
@@ -614,8 +675,8 @@ public final class InvocationConfiguration extends DeepEqualObject {
     public Builder(@NotNull final Configurable<? extends TYPE> configurable) {
       mConfigurable = ConstantConditions.notNull("configurable instance", configurable);
       mPriority = DEFAULT;
-      mMaxInstances = DEFAULT;
-      mCoreInstances = DEFAULT;
+      mMaxInvocations = DEFAULT;
+      mCoreInvocations = DEFAULT;
       mInputMaxSize = DEFAULT;
       mOutputMaxSize = DEFAULT;
     }
@@ -643,21 +704,32 @@ public final class InvocationConfiguration extends DeepEqualObject {
     }
 
     /**
-     * Sets the number of invocation instances, which represents the core pool of reusable
+     * Sets the number of invocation instances which represents the core pool of reusable
      * invocations. A {@link InvocationConfiguration#DEFAULT DEFAULT} value means that it is
      * up to the specific implementation to choose a default one.
      *
-     * @param coreInstances the core number of instances.
+     * @param coreInvocations the core number of invocation instances.
      * @return this builder.
      * @throws java.lang.IllegalArgumentException if the number is negative.
      */
     @NotNull
-    public Builder<TYPE> withCoreInstances(final int coreInstances) {
-      if (coreInstances != DEFAULT) {
-        ConstantConditions.notNegative("maximum number of retained instances", coreInstances);
+    public Builder<TYPE> withCoreInvocations(final int coreInvocations) {
+      if (coreInvocations != DEFAULT) {
+        ConstantConditions.notNegative("maximum number of retained instances", coreInvocations);
       }
 
-      mCoreInstances = coreInstances;
+      mCoreInvocations = coreInvocations;
+      return this;
+    }
+
+    /**
+     * Resets all the options to their default values.
+     *
+     * @return this builder.
+     */
+    @NotNull
+    public Builder<TYPE> withDefaults() {
+      setConfiguration(defaultConfiguration());
       return this;
     }
 
@@ -721,6 +793,30 @@ public final class InvocationConfiguration extends DeepEqualObject {
     }
 
     /**
+     * Sets the invocation mode to be used.
+     * <p>
+     * There are two different ways to invoke a routine:
+     * <p>
+     * <b>Simple invocation</b><br>
+     * The routine starts an invocation employing the configured runner and delivers all the input
+     * passed to the invocation channel to the same invocation instance.
+     * <p>
+     * <b>Parallel invocation</b><br>
+     * The routine starts an invocation which in turn spawns another invocation for each input
+     * passed to the invocation channel. This particular type of invocation obviously produces
+     * meaningful results only for routines which takes a single input parameter and computes the
+     * relative output results.
+     *
+     * @param invocationMode the invocation mode.
+     * @return this builder.
+     */
+    @NotNull
+    public Builder<TYPE> withInvocationMode(@Nullable final InvocationModeType invocationMode) {
+      mInvocationMode = invocationMode;
+      return this;
+    }
+
+    /**
      * Sets the log instance. A null value means that it is up to the specific implementation to
      * choose a default one.
      *
@@ -751,18 +847,18 @@ public final class InvocationConfiguration extends DeepEqualObject {
      * {@link InvocationConfiguration#DEFAULT DEFAULT} value means that it is up to the
      * specific implementation to choose a default one.
      *
-     * @param maxInstances the max number of instances.
+     * @param maxInvocations the max number of invocation instances.
      * @return this builder.
      * @throws java.lang.IllegalArgumentException if the number is less than 1.
      */
     @NotNull
-    public Builder<TYPE> withMaxInstances(final int maxInstances) {
-      if (maxInstances != DEFAULT) {
+    public Builder<TYPE> withMaxInvocations(final int maxInvocations) {
+      if (maxInvocations != DEFAULT) {
         ConstantConditions.positive("maximum number of concurrently running instances",
-            maxInstances);
+            maxInvocations);
       }
 
-      mMaxInstances = maxInstances;
+      mMaxInvocations = maxInvocations;
       return this;
     }
 
@@ -875,9 +971,8 @@ public final class InvocationConfiguration extends DeepEqualObject {
     }
 
     /**
-     * Applies the specified patch configuration to this builder. A null value means that all the
-     * configuration options will be reset to their default, otherwise only the non-default
-     * options will be applied.
+     * Applies the specified patch configuration to this builder. Only the non-default options will
+     * be applied. A null value will have no effect.
      *
      * @param configuration the invocation configuration.
      * @return this builder.
@@ -885,7 +980,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
     @NotNull
     public Builder<TYPE> withPatch(@Nullable final InvocationConfiguration configuration) {
       if (configuration == null) {
-        setConfiguration(defaultConfiguration());
         return this;
       }
 
@@ -933,14 +1027,19 @@ public final class InvocationConfiguration extends DeepEqualObject {
         withPriority(priority);
       }
 
-      final int maxInvocations = configuration.mMaxInstances;
-      if (maxInvocations != DEFAULT) {
-        withMaxInstances(maxInvocations);
+      final InvocationModeType invocationMode = configuration.mInvocationMode;
+      if (invocationMode != null) {
+        withInvocationMode(invocationMode);
       }
 
-      final int coreInvocations = configuration.mCoreInstances;
+      final int maxInvocations = configuration.mMaxInvocations;
+      if (maxInvocations != DEFAULT) {
+        withMaxInvocations(maxInvocations);
+      }
+
+      final int coreInvocations = configuration.mCoreInvocations;
       if (coreInvocations != DEFAULT) {
-        withCoreInstances(coreInvocations);
+        withCoreInvocations(coreInvocations);
       }
 
       final DurationMeasure outputTimeout = configuration.mOutputTimeout;
@@ -1000,16 +1099,17 @@ public final class InvocationConfiguration extends DeepEqualObject {
 
     @NotNull
     private InvocationConfiguration buildConfiguration() {
-      return new InvocationConfiguration(mRunner, mPriority, mMaxInstances, mCoreInstances,
-          mOutputTimeout, mTimeoutActionType, mInputOrderType, mInputBackoff, mInputMaxSize,
-          mOutputOrderType, mOutputBackoff, mOutputMaxSize, mLog, mLogLevel);
+      return new InvocationConfiguration(mRunner, mPriority, mInvocationMode, mMaxInvocations,
+          mCoreInvocations, mOutputTimeout, mTimeoutActionType, mInputOrderType, mInputBackoff,
+          mInputMaxSize, mOutputOrderType, mOutputBackoff, mOutputMaxSize, mLog, mLogLevel);
     }
 
     private void setConfiguration(@NotNull final InvocationConfiguration configuration) {
       mRunner = configuration.mRunner;
       mPriority = configuration.mPriority;
-      mMaxInstances = configuration.mMaxInstances;
-      mCoreInstances = configuration.mCoreInstances;
+      mInvocationMode = configuration.mInvocationMode;
+      mMaxInvocations = configuration.mMaxInvocations;
+      mCoreInvocations = configuration.mCoreInvocations;
       mOutputTimeout = configuration.mOutputTimeout;
       mTimeoutActionType = configuration.mTimeoutActionType;
       mInputOrderType = configuration.mInputOrderType;

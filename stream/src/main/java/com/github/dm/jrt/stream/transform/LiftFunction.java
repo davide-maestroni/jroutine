@@ -19,7 +19,7 @@ package com.github.dm.jrt.stream.transform;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.function.util.BiFunction;
 import com.github.dm.jrt.function.util.Function;
-import com.github.dm.jrt.stream.builder.StreamConfiguration;
+import com.github.dm.jrt.stream.config.StreamConfiguration;
 
 /**
  * Interface defining a function lifting a stream builder.

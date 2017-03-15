@@ -116,22 +116,30 @@
 
             public static void main(final String[] args) {
                 final Routine&lt;String, Integer&gt; parseRoutine =
-                        JRoutineCore.with(InvocationFactory.factoryOf(Parse.class)).buildRoutine();
+                        JRoutineCore.with(InvocationFactory.factoryOf(Parse.class))
+                                    .invocationConfiguration()
+                                    .withInvocationMode(InvocationMode.PARALLEL)
+                                    .apply()
+                                    .buildRoutine();
                 final Routine&lt;Integer, Integer&gt; squareRoutine =
-                        JRoutineCore.with(InvocationFactory.factoryOf(Square.class)).buildRoutine();
+                        JRoutineCore.with(InvocationFactory.factoryOf(Square.class))
+                                    .invocationConfiguration()
+                                    .withInvocationMode(InvocationMode.PARALLEL)
+                                    .apply()
+                                    .buildRoutine();
                 final Routine&lt;Integer, Double&gt; meanRoutine =
                         JRoutineCore.with(InvocationFactory.factoryOf(SquareRootMean.class)).buildRoutine();
                 final Double rms =
                         meanRoutine.invoke()
-                                   .pass(squareRoutine.invokeParallel()
-                                                      .pass(parseRoutine.invokeParallel().pass(args).close())
+                                   .pass(squareRoutine.invoke()
+                                                      .pass(parseRoutine.invoke().pass(args).close())
                                                       .close())
                                    .close()
                                    .in(seconds(3))
                                    .next();
                 // Or:
-                // final Double rms = parseRoutine.invokeParallel()
-                //                                .pipe(squareRoutine.invokeParallel())
+                // final Double rms = parseRoutine.invoke()
+                //                                .pipe(squareRoutine.invoke())
                 //                                .pipe(meanRoutine.invoke())
                 //                                .pass(args)
                 //                                .close()
@@ -203,21 +211,31 @@
         public class Main {
 
             public static void main(final String[] args) {
-                final Routine&lt;String, Integer&gt; parseRoutine = JRoutineCore.with(new Parse()).buildRoutine();
-                final Routine&lt;Integer, Integer&gt; squareRoutine = JRoutineCore.with(new Square()).buildRoutine();
+                final Routine&lt;String, Integer&gt; parseRoutine =
+                        JRoutineCore.with(new Parse())
+                                    .invocationConfiguration()
+                                    .withInvocationMode(InvocationMode.PARALLEL)
+                                    .apply()
+                                    .buildRoutine();
+                final Routine&lt;Integer, Integer&gt; squareRoutine =
+                        JRoutineCore.with(new Square())
+                                    .invocationConfiguration()
+                                    .withInvocationMode(InvocationMode.PARALLEL)
+                                    .apply()
+                                    .buildRoutine();
                 final Routine&lt;Integer, Double&gt; meanRoutine =
                         JRoutineCore.with(new SquareRootMeanFactory()).buildRoutine();
                 final Double rms =
                         meanRoutine.invoke()
-                                   .pass(squareRoutine.invokeParallel()
-                                                      .pass(parseRoutine.invokeParallel().pass(args).close())
+                                   .pass(squareRoutine.invoke()
+                                                      .pass(parseRoutine.invoke().pass(args).close())
                                                       .close())
                                    .close()
                                    .in(seconds(3))
                                    .next();
                 // Or:
-                // final Double rms = parseRoutine.invokeParallel()
-                //                                .pipe(squareRoutine.invokeParallel())
+                // final Double rms = parseRoutine.invoke()
+                //                                .pipe(squareRoutine.invoke())
                 //                                .pipe(meanRoutine.invoke())
                 //                                .pass(args)
                 //                                .close()

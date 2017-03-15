@@ -114,11 +114,11 @@
             &commat;Proxy(Main.class)
             public interface AsyncMain {
 
-                &commat;Invoke(InvocationMode.PARALLEL)
+                &commat;InvocationMode(InvocationModeType.PARALLEL)
                 &commat;AsyncOutput
                 Channel&lt;?, Integer&gt; parseArg(&commat;AsyncInput(String.class) Channel&lt;?, String&gt; args);
 
-                &commat;Invoke(InvocationMode.PARALLEL)
+                &commat;InvocationMode(InvocationModeType.PARALLEL)
                 &commat;AsyncOutput
                 Channel&lt;?, Integer&gt; square(&commat;AsyncInput(int.class) Channel&lt;?, Integer&gt; value);
 
@@ -176,11 +176,11 @@
             &commat;Proxy(Main.class)
             public interface AsyncMain {
 
-                &commat;Invoke(InvocationMode.PARALLEL)
+                &commat;InvocationMode(InvocationModeType.PARALLEL)
                 &commat;AsyncOutput
                 Channel&lt;?, Integer&gt; parseArg(&commat;AsyncInput(String.class) Channel&lt;?, String&gt; args);
 
-                &commat;Invoke(InvocationMode.PARALLEL)
+                &commat;InvocationMode(InvocationModeType.PARALLEL)
                 &commat;AsyncOutput
                 Channel&lt;?, Integer&gt; square(&commat;AsyncInput(int.class) Channel&lt;?, Integer&gt; value);
 

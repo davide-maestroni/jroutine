@@ -326,8 +326,7 @@ class DefaultReflectionRoutineBuilder implements ReflectionRoutineBuilder {
           getRoutine(withAnnotations(mInvocationConfiguration, method),
               withAnnotations(mWrapperConfiguration, method), methodInfo.method, inputMode,
               outputMode);
-      return invokeRoutine(routine, method, asArgs(args), methodInfo.invocationMode, inputMode,
-          outputMode);
+      return invokeRoutine(routine, method, asArgs(args), inputMode, outputMode);
     }
   }
 }

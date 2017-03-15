@@ -19,6 +19,7 @@ package com.github.dm.jrt.operator.sequence;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
+import com.github.dm.jrt.core.config.InvocationConfiguration.InvocationModeType;
 import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.function.util.BiFunction;
@@ -327,8 +328,9 @@ public class SequencesTest {
         })))
                            .invocationConfiguration()
                            .withOutputOrder(OrderType.SORTED)
+                           .withInvocationMode(InvocationModeType.PARALLEL)
                            .apply()
-                           .invokeParallel()
+                           .invoke()
                            .close()
                            .in(seconds(3))
                            .all()).containsExactly('a', 'b', 'c', 'd', 'e');

@@ -31,7 +31,6 @@ import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
-import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;
@@ -45,7 +44,7 @@ import com.github.dm.jrt.function.util.Function;
 import com.github.dm.jrt.operator.Operators;
 import com.github.dm.jrt.stream.builder.StreamBuilder;
 import com.github.dm.jrt.stream.builder.StreamBuildingException;
-import com.github.dm.jrt.stream.builder.StreamConfiguration;
+import com.github.dm.jrt.stream.config.StreamConfiguration;
 import com.github.dm.jrt.stream.transform.ConvertFunction;
 import com.github.dm.jrt.stream.transform.Transformations;
 
@@ -894,7 +893,6 @@ public class StreamBuilderTest {
                 ChannelConfiguration.defaultConfiguration());
             assertThat(configuration.toInvocationConfiguration()).isEqualTo(
                 InvocationConfiguration.defaultConfiguration());
-            assertThat(configuration.getInvocationMode()).isEqualTo(InvocationMode.ASYNC);
             return Functions.decorate(function)
                             .andThen(new Function<Channel<?, String>, Channel<?, String>>() {
 
@@ -993,34 +991,49 @@ public class StreamBuilderTest {
 
   @Test
   public void testMapAllConsumer() {
-    assertThat(JRoutineStream.<String>withStream().async().mapAllAccept(new BiConsumer<List<?
-        extends String>, Channel<String, ?>>() {
+    assertThat(JRoutineStream.<String>withStream().async()
+                                                  .mapAllAccept(
+                                                      new BiConsumer<List<? extends String>,
+                                                          Channel<String, ?>>() {
 
-      public void accept(final List<?
-          extends
-          String> strings, final Channel<String, ?> result) {
-        final StringBuilder builder = new StringBuilder();
-        for (final String string : strings) {
-          builder.append(string);
-        }
+                                                        public void accept(
+                                                            final List<? extends String> strings,
+                                                            final Channel<String, ?> result) {
+                                                          final StringBuilder builder =
+                                                              new StringBuilder();
+                                                          for (final String string : strings) {
+                                                            builder.append(string);
+                                                          }
 
-        result.pass(builder.toString());
-      }
-    }).invoke().pass("test1", "test2", "test3").close().in(seconds(3)).all()).containsExactly(
-        "test1test2test3");
-    assertThat(JRoutineStream.<String>withStream().sync().mapAllAccept(new BiConsumer<List<? extends
-        String>, Channel<String, ?>>() {
+                                                          result.pass(builder.toString());
+                                                        }
+                                                      })
+                                                  .invoke()
+                                                  .pass("test1", "test2", "test3")
+                                                  .close()
+                                                  .in(seconds(3))
+                                                  .all()).containsExactly("test1test2test3");
+    assertThat(JRoutineStream.<String>withStream().sync()
+                                                  .mapAllAccept(
+                                                      new BiConsumer<List<? extends String>,
+                                                          Channel<String, ?>>() {
 
-      public void accept(final List<? extends
-          String> strings, final Channel<String, ?> result) {
-        final StringBuilder builder = new StringBuilder();
-        for (final String string : strings) {
-          builder.append(string);
-        }
+                                                        public void accept(
+                                                            final List<? extends String> strings,
+                                                            final Channel<String, ?> result) {
+                                                          final StringBuilder builder =
+                                                              new StringBuilder();
+                                                          for (final String string : strings) {
+                                                            builder.append(string);
+                                                          }
 
-        result.pass(builder.toString());
-      }
-    }).invoke().pass("test1", "test2", "test3").close().all()).containsExactly("test1test2test3");
+                                                          result.pass(builder.toString());
+                                                        }
+                                                      })
+                                                  .invoke()
+                                                  .pass("test1", "test2", "test3")
+                                                  .close()
+                                                  .all()).containsExactly("test1test2test3");
   }
 
   @Test
@@ -1036,31 +1049,47 @@ public class StreamBuilderTest {
 
   @Test
   public void testMapAllFunction() {
-    assertThat(JRoutineStream.<String>withStream().async().mapAll(new Function<List<? extends
-        String>, String>() {
+    assertThat(JRoutineStream.<String>withStream().async()
+                                                  .mapAll(
+                                                      new Function<List<? extends String>,
+                                                          String>() {
 
-      public String apply(final List<? extends String> strings) {
-        final StringBuilder builder = new StringBuilder();
-        for (final String string : strings) {
-          builder.append(string);
-        }
+                                                        public String apply(
+                                                            final List<? extends String> strings) {
+                                                          final StringBuilder builder =
+                                                              new StringBuilder();
+                                                          for (final String string : strings) {
+                                                            builder.append(string);
+                                                          }
 
-        return builder.toString();
-      }
-    }).invoke().pass("test1", "test2", "test3").close().in(seconds(3)).all()).containsExactly(
-        "test1test2test3");
-    assertThat(JRoutineStream.<String>withStream().sync().mapAll(new Function<List<? extends
-        String>, String>() {
+                                                          return builder.toString();
+                                                        }
+                                                      })
+                                                  .invoke()
+                                                  .pass("test1", "test2", "test3")
+                                                  .close()
+                                                  .in(seconds(3))
+                                                  .all()).containsExactly("test1test2test3");
+    assertThat(JRoutineStream.<String>withStream().sync()
+                                                  .mapAll(
+                                                      new Function<List<? extends String>,
+                                                          String>() {
 
-      public String apply(final List<? extends String> strings) {
-        final StringBuilder builder = new StringBuilder();
-        for (final String string : strings) {
-          builder.append(string);
-        }
+                                                        public String apply(
+                                                            final List<? extends String> strings) {
+                                                          final StringBuilder builder =
+                                                              new StringBuilder();
+                                                          for (final String string : strings) {
+                                                            builder.append(string);
+                                                          }
 
-        return builder.toString();
-      }
-    }).invoke().pass("test1", "test2", "test3").close().all()).containsExactly("test1test2test3");
+                                                          return builder.toString();
+                                                        }
+                                                      })
+                                                  .invoke()
+                                                  .pass("test1", "test2", "test3")
+                                                  .close()
+                                                  .all()).containsExactly("test1test2test3");
   }
 
   @Test

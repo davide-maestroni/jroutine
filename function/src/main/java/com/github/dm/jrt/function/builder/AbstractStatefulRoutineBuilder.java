@@ -265,11 +265,6 @@ public abstract class AbstractStatefulRoutineBuilder<IN, OUT, STATE, TYPE extend
     return buildRoutine().invoke();
   }
 
-  @NotNull
-  public Channel<IN, OUT> invokeParallel() {
-    return buildRoutine().invokeParallel();
-  }
-
   /**
    * Returns the current invocation configuration.
    *

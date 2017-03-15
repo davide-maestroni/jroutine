@@ -61,12 +61,19 @@
             public static void main(final String[] args) {
                 final Routine&lt;String, Integer&gt; parseRoutine =
                         JRoutineCore.with(Functions.&lt;String, Integer&gt;functionMapping(Integer::parseInt))
+                                    .invocationConfiguration()
+                                    .withInvocationMode(InvocationMode.PARALLEL)
+                                    .apply()
                                     .buildRoutine();
                 final Routine&lt;Integer, Integer&gt; squareRoutine =
                         JRoutineCore.with(Functions.&lt;Integer, Integer&gt;functionMapping(integer -&gt; {
                                 final int input = integer;
                                 return (input * input);
-                        })).buildRoutine();
+                        })
+                                    .invocationConfiguration()
+                                    .withInvocationMode(InvocationMode.PARALLEL)
+                                    .apply()
+                                    .buildRoutine();
                 final Routine&lt;Integer, Double&gt; meanRoutine =
                         JRoutineCore.with(Operators.&lt;Integer, Double&gt;average(Double.class))).buildRoutine();
                 final Routine&lt;Double, Double&gt; sqrtRoutine =
@@ -75,8 +82,8 @@
                                     .withRunner(syncRunner())
                                     .apply()
                                     .buildRoutine();
-                final Double rms = parseRoutine.invokeParallel()
-                                               .pipe(squareRoutine.invokeParallel())
+                final Double rms = parseRoutine.invoke()
+                                               .pipe(squareRoutine.invoke())
                                                .pipe(meanRoutine.invoke())
                                                .pipe(sqrtRoutine.invoke())
                                                .pass(args)

@@ -221,6 +221,17 @@ public class FlowableConfiguration<IN> extends DeepEqualObject {
     }
 
     /**
+     * Resets all the options to their default values.
+     *
+     * @return this builder.
+     */
+    @NotNull
+    public Builder<IN, TYPE> withDefaults() {
+      setConfiguration(FlowableConfiguration.<IN>defaultConfiguration());
+      return this;
+    }
+
+    /**
      * Sets the input to be passed to the routine invocation.
      *
      * @param input the input.
@@ -229,26 +240,6 @@ public class FlowableConfiguration<IN> extends DeepEqualObject {
     @NotNull
     public Builder<IN, TYPE> withInput(@Nullable final IN input) {
       mInputs = Collections.singletonList(input);
-      return this;
-    }
-
-    /**
-     * Sets the inputs to be passed to the routine invocation.
-     *
-     * @param inputs the input data.
-     * @return this builder.
-     */
-    @NotNull
-    public Builder<IN, TYPE> withInputs(@Nullable final IN... inputs) {
-      if (inputs != null) {
-        final ArrayList<IN> inputList = new ArrayList<IN>();
-        Collections.addAll(inputList, inputs);
-        mInputs = Collections.unmodifiableList(inputList);
-
-      } else {
-        mInputs = null;
-      }
-
       return this;
     }
 
@@ -276,9 +267,28 @@ public class FlowableConfiguration<IN> extends DeepEqualObject {
     }
 
     /**
-     * Applies the specified patch configuration to this builder. A null value means that all the
-     * configuration options will be reset to their default, otherwise only the non-default
-     * options will be applied.
+     * Sets the inputs to be passed to the routine invocation.
+     *
+     * @param inputs the input data.
+     * @return this builder.
+     */
+    @NotNull
+    public Builder<IN, TYPE> withInputs(@Nullable final IN... inputs) {
+      if (inputs != null) {
+        final ArrayList<IN> inputList = new ArrayList<IN>();
+        Collections.addAll(inputList, inputs);
+        mInputs = Collections.unmodifiableList(inputList);
+
+      } else {
+        mInputs = null;
+      }
+
+      return this;
+    }
+
+    /**
+     * Applies the specified patch configuration to this builder. Only the non-default options will
+     * be applied. A null value will have no effect.
      *
      * @param configuration the Flowable configuration.
      * @return this builder.
@@ -286,7 +296,6 @@ public class FlowableConfiguration<IN> extends DeepEqualObject {
     @NotNull
     public Builder<IN, TYPE> withPatch(@Nullable final FlowableConfiguration<IN> configuration) {
       if (configuration == null) {
-        setConfiguration(FlowableConfiguration.<IN>defaultConfiguration());
         return this;
       }
 

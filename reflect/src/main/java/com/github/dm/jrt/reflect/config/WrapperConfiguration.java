@@ -175,9 +175,19 @@ public final class WrapperConfiguration extends DeepEqualObject {
     }
 
     /**
-     * Applies the specified patch configuration to this builder. A null value means that all the
-     * configuration options will be reset to their default, otherwise only the non-default
-     * options will be applied.
+     * Resets all the options to their default values.
+     *
+     * @return this builder.
+     */
+    @NotNull
+    public Builder<TYPE> withDefaults() {
+      setConfiguration(defaultConfiguration());
+      return this;
+    }
+
+    /**
+     * Applies the specified patch configuration to this builder. Only the non-default options will
+     * be applied. A null value will have no effect.
      *
      * @param configuration the wrapper configuration.
      * @return this builder.
@@ -185,7 +195,6 @@ public final class WrapperConfiguration extends DeepEqualObject {
     @NotNull
     public Builder<TYPE> withPatch(@Nullable final WrapperConfiguration configuration) {
       if (configuration == null) {
-        setConfiguration(defaultConfiguration());
         return this;
       }
 

@@ -25,16 +25,10 @@ archivesBaseName = "${project.parent.name}-${project.name}"
 compileJavaCompatibility = JavaVersion.VERSION_1_6
 compileTestJavaCompatibility = JavaVersion.VERSION_1_7
 
-repositories {
-  maven {
-    url 'https://oss.sonatype.org/content/repositories/snapshots'
-  }
-}
-
 configurations.create('swaggerCompile')
 
 ext {
-  swaggerVersion = '2.2.2-20170113.000507-4'
+  swaggerVersion = '2.2.2'
   generatedSourceDir = 'src/test/java/com/github/dm/jrt/swagger/client'
 }
 

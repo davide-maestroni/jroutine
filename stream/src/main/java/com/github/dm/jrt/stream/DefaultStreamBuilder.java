@@ -20,11 +20,10 @@ import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
-import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.function.util.FunctionDecorator;
 import com.github.dm.jrt.stream.builder.StreamBuilder;
-import com.github.dm.jrt.stream.builder.StreamConfiguration;
+import com.github.dm.jrt.stream.config.StreamConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -40,7 +39,7 @@ class DefaultStreamBuilder<IN, OUT> extends AbstractStreamBuilder<IN, OUT> {
 
   private static final StreamConfiguration sDefaultConfiguration =
       new StreamConfiguration(InvocationConfiguration.defaultConfiguration(),
-          InvocationConfiguration.defaultConfiguration(), InvocationMode.ASYNC);
+          InvocationConfiguration.defaultConfiguration());
 
   /**
    * Constructor.

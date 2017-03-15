@@ -106,7 +106,7 @@ public class ChunkStreamConfigurationTest {
                  .apply();
     assertThat(builder().withPatch(configuration).apply()).isEqualTo(configuration);
     assertThat(configuration.builderFrom().apply()).isEqualTo(configuration);
-    assertThat(configuration.builderFrom().withPatch(null).apply()).isEqualTo(
+    assertThat(configuration.builderFrom().withDefaults().apply()).isEqualTo(
         com.github.dm.jrt.channel.config.ChunkStreamConfiguration.defaultConfiguration());
   }
 

@@ -279,6 +279,17 @@ public class ChunkStreamConfiguration extends DeepEqualObject {
     }
 
     /**
+     * Resets all the options to their default values.
+     *
+     * @return this builder.
+     */
+    @NotNull
+    public Builder<TYPE> withDefaults() {
+      setConfiguration(defaultConfiguration());
+      return this;
+    }
+
+    /**
      * Sets the action to be taken when the output stream is closed. A null value means that it is
      * up to the specific implementation to choose a default one.
      *
@@ -292,9 +303,8 @@ public class ChunkStreamConfiguration extends DeepEqualObject {
     }
 
     /**
-     * Applies the specified patch configuration to this builder. A null value means that all the
-     * configuration options will be reset to their default, otherwise only the non-default
-     * options will be applied.
+     * Applies the specified patch configuration to this builder. Only the non-default options will
+     * be applied. A null value will have no effect.
      *
      * @param configuration the output stream configuration.
      * @return this builder.
@@ -302,7 +312,6 @@ public class ChunkStreamConfiguration extends DeepEqualObject {
     @NotNull
     public Builder<TYPE> withPatch(@Nullable final ChunkStreamConfiguration configuration) {
       if (configuration == null) {
-        setConfiguration(defaultConfiguration());
         return this;
       }
 

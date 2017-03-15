@@ -17,7 +17,6 @@
 package com.github.dm.jrt.stream.transform;
 
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.util.Function;
@@ -34,24 +33,19 @@ import org.jetbrains.annotations.NotNull;
  */
 class BindMap<IN, OUT> implements Function<Channel<?, IN>, Channel<?, OUT>> {
 
-  private final InvocationMode mInvocationMode;
-
   private final Routine<IN, OUT> mRoutine;
 
   /**
    * Constructor.
    *
-   * @param routine        the routine to bind.
-   * @param invocationMode the invocation mode.
+   * @param routine the routine to bind.
    */
   @SuppressWarnings("unchecked")
-  BindMap(@NotNull final Routine<? super IN, ? extends OUT> routine,
-      @NotNull final InvocationMode invocationMode) {
+  BindMap(@NotNull final Routine<? super IN, ? extends OUT> routine) {
     mRoutine = (Routine<IN, OUT>) ConstantConditions.notNull("routine instance", routine);
-    mInvocationMode = ConstantConditions.notNull("invocation mode", invocationMode);
   }
 
   public Channel<?, OUT> apply(final Channel<?, IN> channel) {
-    return mInvocationMode.invoke(mRoutine).pass(channel).close();
+    return mRoutine.invoke().pass(channel).close();
   }
 }

@@ -569,8 +569,7 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
                                                              .apply(invocationConfiguration)
                                                              .apply(serviceConfiguration)
                                                              .buildRoutine();
-      return invokeRoutine(routine, method, asArgs(args), methodInfo.invocationMode, inputMode,
-          outputMode);
+      return invokeRoutine(routine, method, asArgs(args), inputMode, outputMode);
     }
   }
 }

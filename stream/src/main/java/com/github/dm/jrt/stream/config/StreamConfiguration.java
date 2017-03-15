@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.stream.builder;
+package com.github.dm.jrt.stream.config;
 
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
-import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
@@ -32,8 +31,6 @@ public class StreamConfiguration {
 
   private final InvocationConfiguration mConfiguration;
 
-  private final InvocationMode mInvocationMode;
-
   private final InvocationConfiguration mStreamConfiguration;
 
   private volatile ChannelConfiguration mChannelConfiguration;
@@ -45,25 +42,12 @@ public class StreamConfiguration {
    *
    * @param streamConfiguration the stream invocation configuration.
    * @param nextConfiguration   the next invocation configuration.
-   * @param invocationMode      the invocation mode.
    */
   public StreamConfiguration(@NotNull final InvocationConfiguration streamConfiguration,
-      @NotNull final InvocationConfiguration nextConfiguration,
-      @NotNull final InvocationMode invocationMode) {
+      @NotNull final InvocationConfiguration nextConfiguration) {
     mStreamConfiguration =
         ConstantConditions.notNull("stream invocation configuration", streamConfiguration);
     mConfiguration = ConstantConditions.notNull("next invocation configuration", nextConfiguration);
-    mInvocationMode = ConstantConditions.notNull("invocation mode", invocationMode);
-  }
-
-  /**
-   * Gets the stream invocation mode.
-   *
-   * @return the invocation mode.
-   */
-  @NotNull
-  public InvocationMode getInvocationMode() {
-    return mInvocationMode;
   }
 
   /**
@@ -109,7 +93,8 @@ public class StreamConfiguration {
   @NotNull
   public InvocationConfiguration toInvocationConfiguration() {
     if (mInvocationConfiguration == null) {
-      mInvocationConfiguration = mStreamConfiguration.builderFrom().withPatch(mConfiguration).apply();
+      mInvocationConfiguration =
+          mStreamConfiguration.builderFrom().withPatch(mConfiguration).apply();
     }
 
     return mInvocationConfiguration;

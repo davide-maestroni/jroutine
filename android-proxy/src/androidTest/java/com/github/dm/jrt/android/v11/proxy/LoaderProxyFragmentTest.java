@@ -30,11 +30,11 @@ import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.config.InvocationConfiguration.InvocationModeType;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.log.Log;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.NullLog;
-import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.Runners;
@@ -46,7 +46,7 @@ import com.github.dm.jrt.reflect.annotation.AsyncInput.InputMode;
 import com.github.dm.jrt.reflect.annotation.AsyncMethod;
 import com.github.dm.jrt.reflect.annotation.AsyncOutput;
 import com.github.dm.jrt.reflect.annotation.AsyncOutput.OutputMode;
-import com.github.dm.jrt.reflect.annotation.Invoke;
+import com.github.dm.jrt.reflect.annotation.InvocationMode;
 import com.github.dm.jrt.reflect.annotation.OutputTimeout;
 import com.github.dm.jrt.reflect.annotation.OutputTimeoutAction;
 
@@ -451,8 +451,8 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
     assertThat(itf.add7().pass('d', 'e', 'f').close().all()).containsOnly((int) 'd', (int) 'e',
         (int) 'f');
     assertThat(itf.add10().invoke().pass('d').close().all()).containsOnly((int) 'd');
-    assertThat(itf.add11().invokeParallel().pass('d', 'e', 'f').close().all()).containsOnly(
-        (int) 'd', (int) 'e', (int) 'f');
+    assertThat(itf.add11().invoke().pass('d', 'e', 'f').close().all()).containsOnly((int) 'd',
+        (int) 'e', (int) 'f');
     assertThat(itf.addA00(new char[]{'c', 'z'})).isEqualTo(new int[]{'c', 'z'});
     final Channel<char[], char[]> channel5 = JRoutineCore.<char[]>ofData().buildChannel();
     channel5.pass(new char[]{'a', 'z'}).close();
@@ -496,7 +496,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
     assertThat(itf.addA14().invoke().pass(new char[]{'c', 'z'}).close().all()).containsOnly(
         new int[]{'c', 'z'});
     assertThat(itf.addA15()
-                  .invokeParallel()
+                  .invoke()
                   .pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'})
                   .close()
                   .all()).containsOnly(new int[]{'d', 'z'}, new int[]{'e', 'z'},
@@ -511,7 +511,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
     assertThat(itf.addA18().invoke().pass(new char[]{'c', 'z'}).close().all()).containsExactly(
         (int) 'c', (int) 'z');
     assertThat(itf.addA19()
-                  .invokeParallel()
+                  .invoke()
                   .pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'})
                   .close()
                   .all()).containsOnly((int) 'd', (int) 'z', (int) 'e', (int) 'z', (int) 'f',
@@ -570,7 +570,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
     assertThat(itf.addL14().invoke().pass(Arrays.asList('c', 'z')).close().all()).containsOnly(
         Arrays.asList((int) 'c', (int) 'z'));
     assertThat(itf.addL15()
-                  .invokeParallel()
+                  .invoke()
                   .pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'), Arrays.asList('f', 'z'))
                   .close()
                   .all()).containsOnly(Arrays.asList((int) 'd', (int) 'z'),
@@ -585,7 +585,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
     assertThat(itf.addL18().invoke().pass(Arrays.asList('c', 'z')).close().all()).containsExactly(
         (int) 'c', (int) 'z');
     assertThat(itf.addL19()
-                  .invokeParallel()
+                  .invoke()
                   .pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'), Arrays.asList('f', 'z'))
                   .close()
                   .all()).containsOnly((int) 'd', (int) 'z', (int) 'e', (int) 'z', (int) 'f',
@@ -691,12 +691,12 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
     Routine<Character, Integer> add10();
 
     @Alias("a")
-    @Invoke(InvocationMode.PARALLEL)
+    @InvocationMode(InvocationModeType.PARALLEL)
     @AsyncMethod(char.class)
     Routine<Character, Integer> add11();
 
     @Alias("a")
-    @Invoke(InvocationMode.PARALLEL)
+    @InvocationMode(InvocationModeType.PARALLEL)
     int add2(@AsyncInput(value = char.class, mode = InputMode.VALUE) Channel<?, Character> c);
 
     @Alias("a")
@@ -709,7 +709,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
         @AsyncInput(value = char.class, mode = InputMode.VALUE) Channel<?, Character> c);
 
     @Alias("a")
-    @Invoke(InvocationMode.PARALLEL)
+    @InvocationMode(InvocationModeType.PARALLEL)
     @AsyncOutput(OutputMode.VALUE)
     Channel<?, Integer> add5(
         @AsyncInput(value = char.class, mode = InputMode.VALUE) Channel<?, Character> c);
@@ -719,7 +719,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
     Channel<Character, Integer> add6();
 
     @Alias("a")
-    @Invoke(InvocationMode.PARALLEL)
+    @InvocationMode(InvocationModeType.PARALLEL)
     @AsyncMethod(char.class)
     Channel<Character, Integer> add7();
 
@@ -727,17 +727,15 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
     int[] addA00(char[] c);
 
     @Alias("aa")
-    int[] addA01(@AsyncInput(value = char[].class,
-        mode = InputMode.VALUE) Channel<?, char[]> c);
+    int[] addA01(@AsyncInput(value = char[].class, mode = InputMode.VALUE) Channel<?, char[]> c);
 
     @Alias("aa")
-    int[] addA02(@AsyncInput(value = char[].class,
-        mode = InputMode.COLLECTION) Channel<?, Character> c);
+    int[] addA02(
+        @AsyncInput(value = char[].class, mode = InputMode.COLLECTION) Channel<?, Character> c);
 
     @Alias("aa")
-    @Invoke(InvocationMode.PARALLEL)
-    int[] addA03(@AsyncInput(value = char[].class,
-        mode = InputMode.VALUE) Channel<?, char[]> c);
+    @InvocationMode(InvocationModeType.PARALLEL)
+    int[] addA03(@AsyncInput(value = char[].class, mode = InputMode.VALUE) Channel<?, char[]> c);
 
     @Alias("aa")
     @AsyncOutput(OutputMode.VALUE)
@@ -750,14 +748,14 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
 
     @Alias("aa")
     @AsyncOutput(OutputMode.VALUE)
-    Channel<?, int[]> addA06(@AsyncInput(value = char[].class,
-        mode = InputMode.COLLECTION) Channel<?, Character> c);
+    Channel<?, int[]> addA06(
+        @AsyncInput(value = char[].class, mode = InputMode.COLLECTION) Channel<?, Character> c);
 
     @Alias("aa")
-    @Invoke(InvocationMode.PARALLEL)
+    @InvocationMode(InvocationModeType.PARALLEL)
     @AsyncOutput(OutputMode.VALUE)
-    Channel<?, int[]> addA07(@AsyncInput(value = char[].class,
-        mode = InputMode.VALUE) Channel<?, char[]> c);
+    Channel<?, int[]> addA07(
+        @AsyncInput(value = char[].class, mode = InputMode.VALUE) Channel<?, char[]> c);
 
     @Alias("aa")
     @AsyncOutput(OutputMode.ELEMENT)
@@ -770,21 +768,21 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
 
     @Alias("aa")
     @AsyncOutput(OutputMode.ELEMENT)
-    Channel<?, Integer> addA10(@AsyncInput(value = char[].class,
-        mode = InputMode.COLLECTION) Channel<?, Character> c);
+    Channel<?, Integer> addA10(
+        @AsyncInput(value = char[].class, mode = InputMode.COLLECTION) Channel<?, Character> c);
 
     @Alias("aa")
-    @Invoke(InvocationMode.PARALLEL)
+    @InvocationMode(InvocationModeType.PARALLEL)
     @AsyncOutput(OutputMode.ELEMENT)
-    Channel<?, Integer> addA11(@AsyncInput(value = char[].class,
-        mode = InputMode.VALUE) Channel<?, char[]> c);
+    Channel<?, Integer> addA11(
+        @AsyncInput(value = char[].class, mode = InputMode.VALUE) Channel<?, char[]> c);
 
     @Alias("aa")
     @AsyncMethod(char[].class)
     Channel<char[], int[]> addA12();
 
     @Alias("aa")
-    @Invoke(InvocationMode.PARALLEL)
+    @InvocationMode(InvocationModeType.PARALLEL)
     @AsyncMethod(char[].class)
     Channel<char[], int[]> addA13();
 
@@ -793,7 +791,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
     Routine<char[], int[]> addA14();
 
     @Alias("aa")
-    @Invoke(InvocationMode.PARALLEL)
+    @InvocationMode(InvocationModeType.PARALLEL)
     @AsyncMethod(char[].class)
     Routine<char[], int[]> addA15();
 
@@ -802,7 +800,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
     Channel<char[], Integer> addA16();
 
     @Alias("aa")
-    @Invoke(InvocationMode.PARALLEL)
+    @InvocationMode(InvocationModeType.PARALLEL)
     @AsyncMethod(value = char[].class, mode = OutputMode.ELEMENT)
     Channel<char[], Integer> addA17();
 
@@ -811,7 +809,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
     Routine<char[], Integer> addA18();
 
     @Alias("aa")
-    @Invoke(InvocationMode.PARALLEL)
+    @InvocationMode(InvocationModeType.PARALLEL)
     @AsyncMethod(value = char[].class, mode = OutputMode.ELEMENT)
     Routine<char[], Integer> addA19();
 
@@ -819,17 +817,17 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
     List<Integer> addL00(List<Character> c);
 
     @Alias("al")
-    List<Integer> addL01(@AsyncInput(value = List.class,
-        mode = InputMode.VALUE) Channel<?, List<Character>> c);
+    List<Integer> addL01(
+        @AsyncInput(value = List.class, mode = InputMode.VALUE) Channel<?, List<Character>> c);
 
     @Alias("al")
-    List<Integer> addL02(@AsyncInput(value = List.class,
-        mode = InputMode.COLLECTION) Channel<?, Character> c);
+    List<Integer> addL02(
+        @AsyncInput(value = List.class, mode = InputMode.COLLECTION) Channel<?, Character> c);
 
     @Alias("al")
-    @Invoke(InvocationMode.PARALLEL)
-    List<Integer> addL03(@AsyncInput(value = List.class,
-        mode = InputMode.VALUE) Channel<?, List<Character>> c);
+    @InvocationMode(InvocationModeType.PARALLEL)
+    List<Integer> addL03(
+        @AsyncInput(value = List.class, mode = InputMode.VALUE) Channel<?, List<Character>> c);
 
     @Alias("al")
     @AsyncOutput(OutputMode.VALUE)
@@ -837,19 +835,19 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
 
     @Alias("al")
     @AsyncOutput(OutputMode.VALUE)
-    Channel<?, List<Integer>> addL05(@AsyncInput(value = List.class,
-        mode = InputMode.VALUE) Channel<?, List<Character>> c);
+    Channel<?, List<Integer>> addL05(
+        @AsyncInput(value = List.class, mode = InputMode.VALUE) Channel<?, List<Character>> c);
 
     @Alias("al")
     @AsyncOutput(OutputMode.VALUE)
-    Channel<?, List<Integer>> addL06(@AsyncInput(value = List.class,
-        mode = InputMode.COLLECTION) Channel<?, Character> c);
+    Channel<?, List<Integer>> addL06(
+        @AsyncInput(value = List.class, mode = InputMode.COLLECTION) Channel<?, Character> c);
 
     @Alias("al")
-    @Invoke(InvocationMode.PARALLEL)
+    @InvocationMode(InvocationModeType.PARALLEL)
     @AsyncOutput(OutputMode.VALUE)
-    Channel<?, List<Integer>> addL07(@AsyncInput(value = List.class,
-        mode = InputMode.VALUE) Channel<?, List<Character>> c);
+    Channel<?, List<Integer>> addL07(
+        @AsyncInput(value = List.class, mode = InputMode.VALUE) Channel<?, List<Character>> c);
 
     @Alias("al")
     @AsyncOutput(OutputMode.ELEMENT)
@@ -857,26 +855,26 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
 
     @Alias("al")
     @AsyncOutput(OutputMode.ELEMENT)
-    Channel<?, Integer> addL09(@AsyncInput(value = List.class,
-        mode = InputMode.VALUE) Channel<?, List<Character>> c);
+    Channel<?, Integer> addL09(
+        @AsyncInput(value = List.class, mode = InputMode.VALUE) Channel<?, List<Character>> c);
 
     @Alias("al")
     @AsyncOutput(OutputMode.ELEMENT)
-    Channel<?, Integer> addL10(@AsyncInput(value = List.class,
-        mode = InputMode.COLLECTION) Channel<?, Character> c);
+    Channel<?, Integer> addL10(
+        @AsyncInput(value = List.class, mode = InputMode.COLLECTION) Channel<?, Character> c);
 
     @Alias("al")
-    @Invoke(InvocationMode.PARALLEL)
+    @InvocationMode(InvocationModeType.PARALLEL)
     @AsyncOutput(OutputMode.ELEMENT)
-    Channel<?, Integer> addL11(@AsyncInput(value = List.class,
-        mode = InputMode.VALUE) Channel<?, List<Character>> c);
+    Channel<?, Integer> addL11(
+        @AsyncInput(value = List.class, mode = InputMode.VALUE) Channel<?, List<Character>> c);
 
     @Alias("al")
     @AsyncMethod(List.class)
     Channel<List<Character>, List<Integer>> addL12();
 
     @Alias("al")
-    @Invoke(InvocationMode.PARALLEL)
+    @InvocationMode(InvocationModeType.PARALLEL)
     @AsyncMethod(List.class)
     Channel<List<Character>, List<Integer>> addL13();
 
@@ -885,7 +883,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
     Routine<List<Character>, List<Integer>> addL14();
 
     @Alias("al")
-    @Invoke(InvocationMode.PARALLEL)
+    @InvocationMode(InvocationModeType.PARALLEL)
     @AsyncMethod(List.class)
     Routine<List<Character>, List<Integer>> addL15();
 
@@ -894,7 +892,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
     Channel<List<Character>, Integer> addL16();
 
     @Alias("al")
-    @Invoke(InvocationMode.PARALLEL)
+    @InvocationMode(InvocationModeType.PARALLEL)
     @AsyncMethod(value = List.class, mode = OutputMode.ELEMENT)
     Channel<List<Character>, Integer> addL17();
 
@@ -903,7 +901,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
     Routine<List<Character>, Integer> addL18();
 
     @Alias("al")
-    @Invoke(InvocationMode.PARALLEL)
+    @InvocationMode(InvocationModeType.PARALLEL)
     @AsyncMethod(value = List.class, mode = OutputMode.ELEMENT)
     Routine<List<Character>, Integer> addL19();
 
@@ -925,7 +923,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
     Channel<Void, Integer> get2();
 
     @Alias("s")
-    @Invoke(InvocationMode.PARALLEL)
+    @InvocationMode(InvocationModeType.PARALLEL)
     void set2(@AsyncInput(value = int.class, mode = InputMode.VALUE) Channel<?, Integer> i);
 
     @Alias("g")
@@ -950,15 +948,14 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
     Channel<Void, int[]> getA2();
 
     @Alias("sa")
-    void setA2(@AsyncInput(value = int[].class,
-        mode = InputMode.COLLECTION) Channel<?, Integer> i);
+    void setA2(@AsyncInput(value = int[].class, mode = InputMode.COLLECTION) Channel<?, Integer> i);
 
     @Alias("ga")
     @AsyncMethod({})
     Routine<Void, int[]> getA3();
 
     @Alias("sa")
-    @Invoke(InvocationMode.PARALLEL)
+    @InvocationMode(InvocationModeType.PARALLEL)
     void setA3(@AsyncInput(value = int[].class, mode = InputMode.VALUE) Channel<?, int[]> i);
 
     @Alias("ga")
@@ -980,8 +977,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
     Channel<?, Integer> getL1();
 
     @Alias("sl")
-    void setL1(@AsyncInput(value = List.class,
-        mode = InputMode.VALUE) Channel<?, List<Integer>> i);
+    void setL1(@AsyncInput(value = List.class, mode = InputMode.VALUE) Channel<?, List<Integer>> i);
 
     @Alias("gl")
     @AsyncMethod({})
@@ -995,9 +991,8 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
     Routine<Void, List<Integer>> getL3();
 
     @Alias("sl")
-    @Invoke(InvocationMode.PARALLEL)
-    void setL3(@AsyncInput(value = List.class,
-        mode = InputMode.VALUE) Channel<?, List<Integer>> i);
+    @InvocationMode(InvocationModeType.PARALLEL)
+    void setL3(@AsyncInput(value = List.class, mode = InputMode.VALUE) Channel<?, List<Integer>> i);
 
     @Alias("gl")
     @AsyncMethod(value = {}, mode = OutputMode.ELEMENT)
@@ -1073,7 +1068,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
   public interface TestProxy {
 
     @OutputTimeout(10000)
-    @Invoke(InvocationMode.PARALLEL)
+    @InvocationMode(InvocationModeType.PARALLEL)
     @AsyncOutput
     Iterable<Iterable> getList(@AsyncInput(List.class) Channel<?, List<String>> i);
 
@@ -1086,12 +1081,12 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
 
     @Alias("getString")
     @OutputTimeout(10000)
-    @Invoke(InvocationMode.PARALLEL)
+    @InvocationMode(InvocationModeType.PARALLEL)
     String getStringParallel1(@AsyncInput(int.class) Channel<?, Integer> i);
 
     @Alias("getString")
     @OutputTimeout(10000)
-    @Invoke(InvocationMode.PARALLEL)
+    @InvocationMode(InvocationModeType.PARALLEL)
     @AsyncOutput
     Channel<?, String> getStringParallel2(@AsyncInput(int.class) Channel<?, Integer> i);
   }

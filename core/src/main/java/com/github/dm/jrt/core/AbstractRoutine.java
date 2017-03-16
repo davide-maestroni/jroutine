@@ -196,7 +196,7 @@ public abstract class AbstractRoutine<IN, OUT> implements Routine<IN, OUT> {
 
   @NotNull
   private Channel<IN, OUT> invokeInternal() {
-    final SingleExecutionRunner runner = new SingleExecutionRunner(mRunner);
+    final ConcurrentRunner runner = new ConcurrentRunner(mRunner);
     return new InvocationChannel<IN, OUT>(mConfiguration, new DefaultInvocationManager(runner),
         runner, mLogger);
   }
@@ -278,14 +278,14 @@ public abstract class AbstractRoutine<IN, OUT> implements Routine<IN, OUT> {
 
     private final CreateExecution mCreateExecution;
 
-    private final SingleExecutionRunner mManagerRunner;
+    private final ConcurrentRunner mManagerRunner;
 
     /**
      * Constructor.
      *
      * @param runner the runner used for asynchronous invocation.
      */
-    private DefaultInvocationManager(@NotNull final SingleExecutionRunner runner) {
+    private DefaultInvocationManager(@NotNull final ConcurrentRunner runner) {
       mManagerRunner = runner;
       mCreateExecution = new CreateExecution(this);
     }
@@ -300,12 +300,12 @@ public abstract class AbstractRoutine<IN, OUT> implements Routine<IN, OUT> {
         invocation.onRecycle();
 
       } catch (final Throwable t) {
-        internalDiscard(invocation);
+        discardInternal(invocation);
         InterruptedInvocationException.throwIfInterrupt(t);
         return;
       }
 
-      internalDiscard(invocation);
+      discardInternal(invocation);
     }
 
     public void recycle(@NotNull final Invocation<IN, OUT> invocation) {
@@ -316,14 +316,14 @@ public abstract class AbstractRoutine<IN, OUT> implements Routine<IN, OUT> {
 
       } catch (final Throwable t) {
         logger.wrn(t, "Discarding invocation since it failed to be recycled");
-        internalDiscard(invocation);
+        discardInternal(invocation);
         InterruptedInvocationException.throwIfInterrupt(t);
         return;
       }
 
       if (!canRecycle) {
         logger.dbg("Discarding invocation since it cannot be recycled");
-        internalDiscard(invocation);
+        discardInternal(invocation);
         return;
       }
 
@@ -411,7 +411,7 @@ public abstract class AbstractRoutine<IN, OUT> implements Routine<IN, OUT> {
       return true;
     }
 
-    private void internalDiscard(@NotNull final Invocation<IN, OUT> invocation) {
+    private void discardInternal(@NotNull final Invocation<IN, OUT> invocation) {
       final boolean hasDelayed;
       synchronized (mMutex) {
         AbstractRoutine.this.discard(invocation);

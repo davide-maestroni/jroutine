@@ -27,7 +27,7 @@ import org.jetbrains.annotations.NotNull;
  * <p>
  * Created by davide-maestroni on 11/24/2016.
  */
-class SingleExecutionRunner extends RunnerDecorator {
+class ConcurrentRunner extends RunnerDecorator {
 
   private final Runner mRunner;
 
@@ -36,7 +36,7 @@ class SingleExecutionRunner extends RunnerDecorator {
    *
    * @param wrapped the wrapped runner instance.
    */
-  SingleExecutionRunner(@NotNull final Runner wrapped) {
+  ConcurrentRunner(@NotNull final Runner wrapped) {
     super(wrapped.isSynchronous() ? new SynchronizedRunner(wrapped)
         : Runners.throttlingRunner(wrapped, 1));
     mRunner = wrapped;

@@ -87,6 +87,8 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
 @SuppressWarnings("WeakerAccess")
 public final class InvocationConfiguration extends DeepEqualObject {
 
+  // TODO: 15/03/2017 instance backoff
+
   /**
    * Constant indicating the default value of an integer attribute.
    */

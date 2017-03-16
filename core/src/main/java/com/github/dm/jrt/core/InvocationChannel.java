@@ -115,7 +115,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
    */
   InvocationChannel(@NotNull final InvocationConfiguration configuration,
       @NotNull final InvocationManager<IN, OUT> manager,
-      @NotNull final SingleExecutionRunner runner, @NotNull final Logger logger) {
+      @NotNull final ConcurrentRunner runner, @NotNull final Logger logger) {
     mLogger = logger.subContextLogger(this);
     mRunner = ConstantConditions.notNull("invocation runner", runner);
     mInputOrder =

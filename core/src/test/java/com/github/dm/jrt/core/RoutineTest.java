@@ -271,7 +271,6 @@ public class RoutineTest {
 
   @Test
   public void testBind() {
-
     final TestChannelConsumer consumer = new TestChannelConsumer();
     final Channel<Object, Object> channel1 =
         JRoutineCore.with(IdentityInvocation.factoryOf()).invoke().after(seconds(1)).pass("test1");
@@ -469,8 +468,7 @@ public class RoutineTest {
     try {
       final InvocationChannel<Object, Object> channel =
           new InvocationChannel<Object, Object>(InvocationConfiguration.defaultConfiguration(),
-              new TestInvocationManager(), new ConcurrentRunner(Runners.sharedRunner()),
-              logger);
+              new TestInvocationManager(), new ConcurrentRunner(Runners.sharedRunner()), logger);
       channel.close();
       channel.pass("test");
       fail();
@@ -482,8 +480,7 @@ public class RoutineTest {
 
       final InvocationChannel<Object, Object> channel =
           new InvocationChannel<Object, Object>(InvocationConfiguration.defaultConfiguration(),
-              new TestInvocationManager(), new ConcurrentRunner(Runners.sharedRunner()),
-              logger);
+              new TestInvocationManager(), new ConcurrentRunner(Runners.sharedRunner()), logger);
       channel.after(null);
       fail();
 
@@ -493,8 +490,7 @@ public class RoutineTest {
     try {
       final InvocationChannel<Object, Object> channel =
           new InvocationChannel<Object, Object>(InvocationConfiguration.defaultConfiguration(),
-              new TestInvocationManager(), new ConcurrentRunner(Runners.sharedRunner()),
-              logger);
+              new TestInvocationManager(), new ConcurrentRunner(Runners.sharedRunner()), logger);
       channel.after(1, null);
       fail();
 
@@ -504,8 +500,7 @@ public class RoutineTest {
     try {
       final InvocationChannel<Object, Object> channel =
           new InvocationChannel<Object, Object>(InvocationConfiguration.defaultConfiguration(),
-              new TestInvocationManager(), new ConcurrentRunner(Runners.sharedRunner()),
-              logger);
+              new TestInvocationManager(), new ConcurrentRunner(Runners.sharedRunner()), logger);
       channel.after(-1, TimeUnit.MILLISECONDS);
       fail();
 
@@ -516,8 +511,7 @@ public class RoutineTest {
 
       final InvocationChannel<Object, Object> channel =
           new InvocationChannel<Object, Object>(InvocationConfiguration.defaultConfiguration(),
-              new TestInvocationManager(), new ConcurrentRunner(Runners.sharedRunner()),
-              logger);
+              new TestInvocationManager(), new ConcurrentRunner(Runners.sharedRunner()), logger);
       channel.in(null);
       fail();
 
@@ -527,8 +521,7 @@ public class RoutineTest {
     try {
       final InvocationChannel<Object, Object> channel =
           new InvocationChannel<Object, Object>(InvocationConfiguration.defaultConfiguration(),
-              new TestInvocationManager(), new ConcurrentRunner(Runners.sharedRunner()),
-              logger);
+              new TestInvocationManager(), new ConcurrentRunner(Runners.sharedRunner()), logger);
       channel.in(1, null);
       fail();
 
@@ -538,8 +531,7 @@ public class RoutineTest {
     try {
       final InvocationChannel<Object, Object> channel =
           new InvocationChannel<Object, Object>(InvocationConfiguration.defaultConfiguration(),
-              new TestInvocationManager(), new ConcurrentRunner(Runners.sharedRunner()),
-              logger);
+              new TestInvocationManager(), new ConcurrentRunner(Runners.sharedRunner()), logger);
       channel.in(-1, TimeUnit.MILLISECONDS);
       fail();
 
@@ -1782,6 +1774,21 @@ public class RoutineTest {
   }
 
   @Test
+  public void testParallel() {
+    assertThat(JRoutineCore.with(new SleepInvocation(millis(100)))
+                           .invocationConfiguration()
+                           .withInvocationMode(InvocationModeType.PARALLEL)
+                           .withInputBackoff(afterCount(0).constantDelay(millis(100)))
+                           .withMaxInvocations(2)
+                           .apply()
+                           .invoke()
+                           .pass(1, 2, 3, 4, 5)
+                           .close()
+                           .in(seconds(1))
+                           .all()).containsOnly(1, 2, 3, 4, 5);
+  }
+
+  @Test
   public void testPartialOut() {
     final TemplateInvocation<String, String> invocation = new TemplateInvocation<String, String>() {
 
@@ -2587,9 +2594,6 @@ public class RoutineTest {
 
   private static class AbortInvocation extends MappingInvocation<String, String> {
 
-    /**
-     * Constructor.
-     */
     protected AbortInvocation() {
       super(null);
     }
@@ -2639,9 +2643,6 @@ public class RoutineTest {
 
   private static class AbortInvocation2 extends MappingInvocation<String, String> {
 
-    /**
-     * Constructor.
-     */
     protected AbortInvocation2() {
       super(null);
     }
@@ -2654,9 +2655,6 @@ public class RoutineTest {
 
   private static class AllInvocation extends MappingInvocation<Object, Object> {
 
-    /**
-     * Constructor.
-     */
     protected AllInvocation() {
       super(null);
     }
@@ -2673,9 +2671,6 @@ public class RoutineTest {
 
   private static class CheckCompleteInvocation extends MappingInvocation<Object, Object> {
 
-    /**
-     * Constructor.
-     */
     protected CheckCompleteInvocation() {
       super(null);
     }
@@ -2878,9 +2873,6 @@ public class RoutineTest {
 
   private static class HasNextInvocation extends MappingInvocation<Object, Object> {
 
-    /**
-     * Constructor.
-     */
     protected HasNextInvocation() {
       super(null);
     }
@@ -2898,9 +2890,6 @@ public class RoutineTest {
 
   private static class InputArrayRunnerDeadlock extends MappingInvocation<String, String> {
 
-    /**
-     * Constructor.
-     */
     protected InputArrayRunnerDeadlock() {
       super(null);
     }
@@ -2923,9 +2912,6 @@ public class RoutineTest {
 
   private static class InputConsumerRunnerDeadlock extends MappingInvocation<String, String> {
 
-    /**
-     * Constructor.
-     */
     protected InputConsumerRunnerDeadlock() {
       super(null);
     }
@@ -2948,9 +2934,6 @@ public class RoutineTest {
 
   private static class InputListRunnerDeadlock extends MappingInvocation<String, String> {
 
-    /**
-     * Constructor.
-     */
     protected InputListRunnerDeadlock() {
       super(null);
     }
@@ -2974,9 +2957,6 @@ public class RoutineTest {
 
   private static class InputRunnerDeadlock extends MappingInvocation<String, String> {
 
-    /**
-     * Constructor.
-     */
     protected InputRunnerDeadlock() {
       super(null);
     }
@@ -2999,9 +2979,6 @@ public class RoutineTest {
 
   private static class NextInvocation extends MappingInvocation<Object, Object> {
 
-    /**
-     * Constructor.
-     */
     protected NextInvocation() {
       super(null);
     }
@@ -3036,9 +3013,6 @@ public class RoutineTest {
 
   private static class ResultArrayRunnerDeadlock extends MappingInvocation<String, String> {
 
-    /**
-     * Constructor.
-     */
     protected ResultArrayRunnerDeadlock() {
       super(null);
     }
@@ -3050,9 +3024,6 @@ public class RoutineTest {
 
   private static class ResultListRunnerDeadlock extends MappingInvocation<String, String> {
 
-    /**
-     * Constructor.
-     */
     protected ResultListRunnerDeadlock() {
       super(null);
     }
@@ -3064,9 +3035,6 @@ public class RoutineTest {
 
   private static class ResultRunnerDeadlock extends MappingInvocation<String, String> {
 
-    /**
-     * Constructor.
-     */
     protected ResultRunnerDeadlock() {
       super(null);
     }
@@ -3078,9 +3046,6 @@ public class RoutineTest {
 
   private static class SleepCommand extends CommandInvocation<Void> {
 
-    /**
-     * Constructor.
-     */
     protected SleepCommand() {
       super(null);
     }
@@ -3113,9 +3078,6 @@ public class RoutineTest {
 
   private static class SquareInvocation extends MappingInvocation<Integer, Integer> {
 
-    /**
-     * Constructor.
-     */
     protected SquareInvocation() {
       super(null);
     }

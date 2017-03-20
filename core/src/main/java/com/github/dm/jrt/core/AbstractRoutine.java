@@ -17,6 +17,8 @@
 package com.github.dm.jrt.core;
 
 import com.github.dm.jrt.core.channel.Channel;
+import com.github.dm.jrt.core.channel.InputDeadlockException;
+import com.github.dm.jrt.core.common.Backoff;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.InvocationModeType;
 import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
@@ -27,12 +29,18 @@ import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.Runners;
+import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.core.util.DurationMeasure;
+import com.github.dm.jrt.core.util.DurationMeasure.Condition;
 import com.github.dm.jrt.core.util.SimpleQueue;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
+
+import static com.github.dm.jrt.core.common.Backoff.NO_DELAY;
 
 /**
  * Basic abstract implementation of a routine.
@@ -104,13 +112,13 @@ public abstract class AbstractRoutine<IN, OUT> implements Routine<IN, OUT> {
    * Constructor.
    *
    * @param configuration the invocation configuration.
-   * @param runner        the runner used for executing invocation.
    * @param logger        the logger instance.
    */
   private AbstractRoutine(@NotNull final InvocationConfiguration configuration,
-      @NotNull final Runner runner, @NotNull final Logger logger) {
+      @NotNull final Logger logger) {
+    // parallel routine
     mConfiguration = configuration;
-    mRunner = runner;
+    mRunner = Runners.immediateRunner();
     mInvocationMode = InvocationModeType.SIMPLE;
     mMaxInvocations = DEFAULT_MAX_INVOCATIONS;
     mCoreInvocations = DEFAULT_CORE_INVOCATIONS;
@@ -181,7 +189,7 @@ public abstract class AbstractRoutine<IN, OUT> implements Routine<IN, OUT> {
   @NotNull
   private AbstractRoutine<IN, OUT> getElementRoutine() {
     if (mElementRoutine == null) {
-      mElementRoutine = new AbstractRoutine<IN, OUT>(mConfiguration, mRunner, mLogger) {
+      mElementRoutine = new AbstractRoutine<IN, OUT>(mConfiguration, mLogger) {
 
         @NotNull
         @Override
@@ -202,6 +210,49 @@ public abstract class AbstractRoutine<IN, OUT> implements Routine<IN, OUT> {
   }
 
   /**
+   * Invocation observer notifying events through a specific runner.
+   *
+   * @param <IN>  the input data type.
+   * @param <OUT> the output data type.
+   */
+  private static class DelayedObserver<IN, OUT> implements InvocationObserver<IN, OUT> {
+
+    private final InvocationObserver<IN, OUT> mObserver;
+
+    private final Runner mRunner;
+
+    /**
+     * Constructor.
+     *
+     * @param observer the wrapped observer.
+     * @param runner   the runner instance.
+     */
+    private DelayedObserver(@NotNull final InvocationObserver<IN, OUT> observer,
+        @NotNull final Runner runner) {
+      mObserver = observer;
+      mRunner = runner;
+    }
+
+    public void onCreate(@NotNull final Invocation<IN, OUT> invocation) {
+      mRunner.run(new Execution() {
+
+        public void run() {
+          mObserver.onCreate(invocation);
+        }
+      }, 0, TimeUnit.MILLISECONDS);
+    }
+
+    public void onError(@NotNull final Throwable error) {
+      mRunner.run(new Execution() {
+
+        public void run() {
+          mObserver.onError(error);
+        }
+      }, 0, TimeUnit.MILLISECONDS);
+    }
+  }
+
+  /**
    * Implementation of an invocation handling parallel mode.
    *
    * @param <IN>  the input data type.
@@ -209,9 +260,22 @@ public abstract class AbstractRoutine<IN, OUT> implements Routine<IN, OUT> {
    */
   private static class ParallelInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> {
 
+    private final Backoff mBackoff;
+
+    private final Logger mLogger;
+
     private final AbstractRoutine<IN, OUT> mRoutine;
 
-    private boolean mHasInputs;
+    private ArrayList<Channel<IN, OUT>> mChannels;
+
+    private final Condition mHasInputs = new Condition() {
+
+      public boolean isTrue() {
+        return (mBackoff.getDelay(getInputCount()) == NO_DELAY);
+      }
+    };
+
+    private boolean mForceInvocation;
 
     /**
      * Constructor.
@@ -220,54 +284,82 @@ public abstract class AbstractRoutine<IN, OUT> implements Routine<IN, OUT> {
      */
     private ParallelInvocation(@NotNull final AbstractRoutine<IN, OUT> routine) {
       mRoutine = routine;
+      mBackoff = routine.mConfiguration.getInputBackoffOrElse(null);
+      mLogger = routine.mLogger.subContextLogger(this);
     }
 
     @Override
     public void onComplete(@NotNull final Channel<OUT, ?> result) {
-      if (!mHasInputs) {
+      if (mForceInvocation) {
         final Channel<IN, OUT> channel = mRoutine.invokeInternal();
         result.pass(channel);
         channel.close();
+        mChannels.add(channel);
+        waitInputs();
       }
     }
 
     @Override
     public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) {
-      mHasInputs = true;
+      mForceInvocation = false;
       final Channel<IN, OUT> channel = mRoutine.invokeInternal();
       result.pass(channel);
       channel.pass(input).close();
+      mChannels.add(channel);
+      waitInputs();
     }
 
     @Override
     public boolean onRecycle() {
+      mChannels = null;
       return true;
     }
 
     @Override
     public void onRestart() {
-      mHasInputs = false;
-    }
-  }
-
-  /**
-   * Execution implementation used to delay the creation of invocations.
-   */
-  private class CreateExecution implements Execution {
-
-    private final DefaultInvocationManager mManager;
-
-    /**
-     * Constructor.
-     *
-     * @param invocationManager the invocation manager instance.
-     */
-    private CreateExecution(@NotNull final DefaultInvocationManager invocationManager) {
-      mManager = invocationManager;
+      mForceInvocation = true;
+      mChannels = new ArrayList<Channel<IN, OUT>>();
     }
 
-    public void run() {
-      mManager.create(null, true);
+    private int getInputCount() {
+      int count = 0;
+      for (final Channel<IN, OUT> channel : mChannels) {
+        count += channel.inputSize();
+      }
+
+      return count;
+    }
+
+    private void waitInputs() {
+      final Backoff backoff = mBackoff;
+      if (backoff == null) {
+        return;
+      }
+
+      final AbstractRoutine<IN, OUT> routine = mRoutine;
+      final Condition hasInputs = mHasInputs;
+      if (hasInputs.isTrue()) {
+        return;
+      }
+
+      final long delay = backoff.getDelay(getInputCount());
+      if ((delay > 0) && routine.mRunner.isExecutionThread()) {
+        throw new InputDeadlockException(
+            "cannot wait on the invocation runner thread: " + Thread.currentThread() + "\nTry "
+                + "employing a different runner than: " + routine.mRunner);
+      }
+
+      synchronized (routine.mMutex) {
+        try {
+          if (!DurationMeasure.waitUntil(routine.mMutex, hasInputs, delay, TimeUnit.MILLISECONDS)) {
+            mLogger.dbg("timeout while waiting for room in the input channel [%s %s]", delay,
+                TimeUnit.MILLISECONDS);
+          }
+
+        } catch (final InterruptedException e) {
+          throw new InterruptedInvocationException(e);
+        }
+      }
     }
   }
 
@@ -275,8 +367,6 @@ public abstract class AbstractRoutine<IN, OUT> implements Routine<IN, OUT> {
    * Default implementation of an invocation manager supporting recycling of invocation instances.
    */
   private class DefaultInvocationManager implements InvocationManager<IN, OUT> {
-
-    private final CreateExecution mCreateExecution;
 
     private final ConcurrentRunner mManagerRunner;
 
@@ -287,11 +377,10 @@ public abstract class AbstractRoutine<IN, OUT> implements Routine<IN, OUT> {
      */
     private DefaultInvocationManager(@NotNull final ConcurrentRunner runner) {
       mManagerRunner = runner;
-      mCreateExecution = new CreateExecution(this);
     }
 
     public boolean create(@NotNull final InvocationObserver<IN, OUT> observer) {
-      return create(observer, false);
+      return createInternal(ConstantConditions.notNull("invocation observer", observer));
     }
 
     public void discard(@NotNull final Invocation<IN, OUT> invocation) {
@@ -344,22 +433,22 @@ public abstract class AbstractRoutine<IN, OUT> implements Routine<IN, OUT> {
 
         hasDelayed = !mObservers.isEmpty();
         --mRunningCount;
+        mMutex.notifyAll();
       }
 
       if (hasDelayed) {
-        mManagerRunner.run(mCreateExecution, 0, TimeUnit.MILLISECONDS);
+        createInternal(null);
       }
     }
 
     @SuppressWarnings("ConstantConditions")
-    private boolean create(@Nullable final InvocationObserver<IN, OUT> observer,
-        final boolean isDelayed) {
+    private boolean createInternal(@Nullable final InvocationObserver<IN, OUT> observer) {
       InvocationObserver<IN, OUT> invocationObserver = observer;
       try {
         Invocation<IN, OUT> invocation;
         synchronized (mMutex) {
           final SimpleQueue<InvocationObserver<IN, OUT>> observers = mObservers;
-          if (isDelayed) {
+          if (observer == null) {
             if (observers.isEmpty()) {
               return false;
             }
@@ -367,7 +456,7 @@ public abstract class AbstractRoutine<IN, OUT> implements Routine<IN, OUT> {
             invocationObserver = observers.removeFirst();
           }
 
-          if (isDelayed || ((mRunningCount + observers.size()) < mMaxInvocations)) {
+          if ((observer == null) || ((mRunningCount + observers.size()) < mMaxInvocations)) {
             final int coreInvocations = mCoreInvocations;
             final SimpleQueue<Invocation<IN, OUT>> invocations = mInvocations;
             if (!invocations.isEmpty()) {
@@ -385,7 +474,7 @@ public abstract class AbstractRoutine<IN, OUT> implements Routine<IN, OUT> {
             }
 
           } else {
-            observers.add(invocationObserver);
+            observers.add(new DelayedObserver<IN, OUT>(invocationObserver, mManagerRunner));
             return false;
           }
         }
@@ -417,10 +506,11 @@ public abstract class AbstractRoutine<IN, OUT> implements Routine<IN, OUT> {
         AbstractRoutine.this.discard(invocation);
         hasDelayed = !mObservers.isEmpty();
         --mRunningCount;
+        mMutex.notifyAll();
       }
 
       if (hasDelayed) {
-        mManagerRunner.run(mCreateExecution, 0, TimeUnit.MILLISECONDS);
+        createInternal(null);
       }
     }
   }

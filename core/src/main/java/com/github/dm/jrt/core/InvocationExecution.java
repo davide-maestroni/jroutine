@@ -147,7 +147,6 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
   private void execute(@NotNull final Invocation<IN, OUT> invocation) {
     final Logger logger = mLogger;
     final ExecutionObserver<IN> observer = mObserver;
-    final InvocationManager<IN, OUT> manager = mInvocationManager;
     final ResultChannel<OUT> resultChannel = mResultChannel;
     try {
       logger.dbg("running execution");
@@ -177,7 +176,7 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
         try {
           if (!mIsTerminated) {
             mIsTerminated = true;
-            manager.recycle(invocation);
+            mInvocationManager.recycle(invocation);
           }
 
         } finally {

@@ -114,8 +114,8 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
    * @param logger        the logger instance.
    */
   InvocationChannel(@NotNull final InvocationConfiguration configuration,
-      @NotNull final InvocationManager<IN, OUT> manager,
-      @NotNull final ConcurrentRunner runner, @NotNull final Logger logger) {
+      @NotNull final InvocationManager<IN, OUT> manager, @NotNull final ConcurrentRunner runner,
+      @NotNull final Logger logger) {
     mLogger = logger.subContextLogger(this);
     mRunner = ConstantConditions.notNull("invocation runner", runner);
     mInputOrder =
@@ -130,11 +130,10 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
         // Preventing closing
       }
     };
-    final Backoff backoff = mInputBackoff;
     mHasInputs = (configuration.getInputBackoffOrElse(null) != null) ? new Condition() {
 
       public boolean isTrue() {
-        return (backoff.getDelay(mInputCount) == NO_DELAY) || (mAbortException != null);
+        return (mInputBackoff.getDelay(mInputCount) == NO_DELAY) || (mAbortException != null);
       }
     } : new Condition() {
 

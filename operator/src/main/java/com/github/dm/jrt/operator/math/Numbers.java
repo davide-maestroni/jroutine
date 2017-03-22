@@ -1132,14 +1132,8 @@ public class Numbers {
    */
   private enum Precision {
 
-    BYTE(false),
-    SHORT(false),
-    INTEGER(false),
-    LONG(false),
-    FLOAT(true),
-    DOUBLE(true),
-    BIG_INTEGER(false),
-    BIG_DECIMAL(true);
+    BYTE(false), SHORT(false), INTEGER(false), LONG(false), FLOAT(true), DOUBLE(true), BIG_INTEGER(
+        false), BIG_DECIMAL(true);
 
     private final boolean mIsFloating;
 

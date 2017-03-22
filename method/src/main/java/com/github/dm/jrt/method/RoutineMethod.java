@@ -171,7 +171,7 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  *   }
  * }
  * .invocationConfiguration()
- * .withInvocationMode(InvocationModeType.PARALLEL)
+ * .withMode(InvocationModeType.PARALLEL)
  * .apply()
  * .call(inputChannel, true);
  * inputChannel.pass("Hello", "JRoutine", "!").close();
@@ -631,8 +631,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
                 + "constructor arguments");
       }
 
-      final InvocationModeType invocationMode =
-          mConfiguration.getInvocationModeOrElse(null);
+      final InvocationModeType invocationMode = mConfiguration.getModeOrElse(null);
       if (invocationMode == InvocationModeType.PARALLEL) {
         throw new IllegalStateException(
             "cannot invoke the routine in parallel mode: please provide proper "

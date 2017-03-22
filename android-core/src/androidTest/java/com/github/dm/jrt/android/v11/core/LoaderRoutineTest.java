@@ -489,8 +489,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                IdentityContextInvocation
                                                                    .factoryOf())
                                                            .invocationConfiguration()
-                                                           .withInvocationMode(
-                                                               InvocationModeType.PARALLEL)
+                                                           .withMode(InvocationModeType.PARALLEL)
                                                            .apply()
                                                            .buildRoutine();
     final Routine<Object, Object> routine2 = JRoutineLoader.on(loaderFrom(getActivity()))
@@ -1666,7 +1665,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                        .in(timeout)
                        .all()).containsOnly("1", "2", "3", "4", "5");
     assertThat(routine1.invocationConfiguration()
-                       .withInvocationMode(InvocationModeType.PARALLEL)
+                       .withMode(InvocationModeType.PARALLEL)
                        .apply()
                        .invoke()
                        .pass("1", "2", "3", "4", "5")
@@ -1688,7 +1687,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                        .in(timeout)
                        .all()).containsOnly("1", "2", "3", "4", "5");
     assertThat(routine2.invocationConfiguration()
-                       .withInvocationMode(InvocationModeType.PARALLEL)
+                       .withMode(InvocationModeType.PARALLEL)
                        .apply()
                        .invoke()
                        .pass("1", "2", "3", "4", "5")

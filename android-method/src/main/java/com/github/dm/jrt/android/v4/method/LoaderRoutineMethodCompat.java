@@ -269,7 +269,7 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
                 + "constructor arguments");
       }
 
-      final InvocationModeType invocationMode = getConfiguration().getInvocationModeOrElse(null);
+      final InvocationModeType invocationMode = getConfiguration().getModeOrElse(null);
       if (invocationMode == InvocationModeType.PARALLEL) {
         throw new IllegalStateException(
             "cannot invoke the routine in parallel mode: please provide proper "

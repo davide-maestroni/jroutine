@@ -43,8 +43,8 @@ class SupplierContextInvocationFactory<IN, OUT> extends ContextInvocationFactory
    * @param supplier the supplier function.
    */
   SupplierContextInvocationFactory(
-      @NotNull final SupplierDecorator<? extends ContextInvocation<? super IN, ? extends
-          OUT>> supplier) {
+      @NotNull final SupplierDecorator<? extends ContextInvocation<? super IN, ? extends OUT>>
+          supplier) {
     super(asArgs(ConstantConditions.notNull("supplier wrapper", supplier)));
     mSupplier = supplier;
   }

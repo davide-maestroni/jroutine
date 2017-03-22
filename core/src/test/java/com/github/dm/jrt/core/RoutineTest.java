@@ -397,7 +397,7 @@ public class RoutineTest {
                                                              .buildRoutine();
     final Routine<Integer, Integer> squareRoutine = JRoutineCore.with(new SquareInvocation())
                                                                 .invocationConfiguration()
-                                                                .withInvocationMode(
+                                                                .withMode(
                                                                     InvocationModeType.PARALLEL)
                                                                 .apply()
                                                                 .buildRoutine();
@@ -924,8 +924,7 @@ public class RoutineTest {
     assertThat(TestDiscard.getInstanceCount()).isZero();
     final Routine<String, String> routine5 = JRoutineCore.with(factoryOf(TestDiscard.class))
                                                          .invocationConfiguration()
-                                                         .withInvocationMode(
-                                                             InvocationModeType.PARALLEL)
+                                                         .withMode(InvocationModeType.PARALLEL)
                                                          .apply()
                                                          .buildRoutine();
     final Routine<String, String> routine6 =
@@ -946,8 +945,7 @@ public class RoutineTest {
     final Routine<String, String> routine2 = JRoutineCore.with(factoryOf(TestDiscard.class))
                                                          .invocationConfiguration()
                                                          .withCoreInvocations(0)
-                                                         .withInvocationMode(
-                                                             InvocationModeType.PARALLEL)
+                                                         .withMode(InvocationModeType.PARALLEL)
                                                          .apply()
                                                          .buildRoutine();
     assertThat(
@@ -972,8 +970,7 @@ public class RoutineTest {
         JRoutineCore.with(factoryOf(TestDiscard.class)).buildRoutine();
     final Routine<String, String> routine6 = JRoutineCore.with(factoryOf(TestDiscard.class))
                                                          .invocationConfiguration()
-                                                         .withInvocationMode(
-                                                             InvocationModeType.PARALLEL)
+                                                         .withMode(InvocationModeType.PARALLEL)
                                                          .apply()
                                                          .buildRoutine();
     assertThat(
@@ -991,7 +988,7 @@ public class RoutineTest {
     final Routine<String, String> routine8 =
         JRoutineCore.with(factoryOf(TestDiscardException.class))
                     .invocationConfiguration()
-                    .withInvocationMode(InvocationModeType.PARALLEL)
+                    .withMode(InvocationModeType.PARALLEL)
                     .apply()
                     .buildRoutine();
     assertThat(
@@ -1188,7 +1185,7 @@ public class RoutineTest {
         JRoutineCore.with(factoryOf(exceptionOnResult, this));
     testException(exceptionRoutine.buildRoutine(), "test", "test3");
     testException(exceptionRoutine.invocationConfiguration()
-                                  .withInvocationMode(InvocationModeType.PARALLEL)
+                                  .withMode(InvocationModeType.PARALLEL)
                                   .apply()
                                   .buildRoutine(), "test", "test3");
 
@@ -1197,7 +1194,7 @@ public class RoutineTest {
     testChained(passingRoutine, exceptionRoutine.buildRoutine(), "test", "test3");
     testChained(exceptionRoutine.buildRoutine(), passingRoutine, "test", "test3");
     testChained(passingRoutine, exceptionRoutine.invocationConfiguration()
-                                                .withInvocationMode(InvocationModeType.SIMPLE)
+                                                .withMode(InvocationModeType.SIMPLE)
                                                 .apply()
                                                 .buildRoutine(), "test", "test3");
     testChained(exceptionRoutine.buildRoutine(), passingRoutine, "test", "test3");
@@ -1218,7 +1215,7 @@ public class RoutineTest {
         JRoutineCore.with(factoryOf(exceptionOnInit, this));
     testException(exceptionRoutine.buildRoutine(), "test", "test1");
     testException(exceptionRoutine.invocationConfiguration()
-                                  .withInvocationMode(InvocationModeType.PARALLEL)
+                                  .withMode(InvocationModeType.PARALLEL)
                                   .apply()
                                   .buildRoutine(), "test", "test1");
 
@@ -1227,7 +1224,7 @@ public class RoutineTest {
     testChained(passingRoutine, exceptionRoutine.buildRoutine(), "test", "test1");
     testChained(exceptionRoutine.buildRoutine(), passingRoutine, "test", "test1");
     testChained(passingRoutine, exceptionRoutine.invocationConfiguration()
-                                                .withInvocationMode(InvocationModeType.SIMPLE)
+                                                .withMode(InvocationModeType.SIMPLE)
                                                 .apply()
                                                 .buildRoutine(), "test", "test1");
     testChained(exceptionRoutine.buildRoutine(), passingRoutine, "test", "test1");
@@ -1248,7 +1245,7 @@ public class RoutineTest {
         JRoutineCore.with(factoryOf(exceptionOnInput, this));
     testException(exceptionRoutine.buildRoutine(), "test2", "test2");
     testException(exceptionRoutine.invocationConfiguration()
-                                  .withInvocationMode(InvocationModeType.PARALLEL)
+                                  .withMode(InvocationModeType.PARALLEL)
                                   .apply()
                                   .buildRoutine(), "test2", "test2");
 
@@ -1257,7 +1254,7 @@ public class RoutineTest {
     testChained(passingRoutine, exceptionRoutine.buildRoutine(), "test2", "test2");
     testChained(exceptionRoutine.buildRoutine(), passingRoutine, "test2", "test2");
     testChained(passingRoutine, exceptionRoutine.invocationConfiguration()
-                                                .withInvocationMode(InvocationModeType.SIMPLE)
+                                                .withMode(InvocationModeType.SIMPLE)
                                                 .apply()
                                                 .buildRoutine(), "test2", "test2");
     testChained(exceptionRoutine.buildRoutine(), passingRoutine, "test2", "test2");
@@ -1777,7 +1774,7 @@ public class RoutineTest {
   public void testParallel() {
     assertThat(JRoutineCore.with(new SleepInvocation(millis(100)))
                            .invocationConfiguration()
-                           .withInvocationMode(InvocationModeType.PARALLEL)
+                           .withMode(InvocationModeType.PARALLEL)
                            .withInputBackoff(afterCount(0).constantDelay(millis(100)))
                            .withMaxInvocations(2)
                            .apply()
@@ -2118,7 +2115,7 @@ public class RoutineTest {
     assertThat(squareRoutine.invoke().pass(1, 2, 3, 4).close().in(timeout).all()).containsExactly(1,
         4, 9, 16);
     assertThat(squareRoutine.invocationConfiguration()
-                            .withInvocationMode(InvocationModeType.PARALLEL)
+                            .withMode(InvocationModeType.PARALLEL)
                             .apply()
                             .invoke()
                             .pass(1, 2, 3, 4)
@@ -2538,7 +2535,7 @@ public class RoutineTest {
     assertThat(
         routine.invoke().pass(input).close().consume(consumer).in(timeout).getComplete()).isTrue();
     assertThat(routine.invocationConfiguration()
-                      .withInvocationMode(InvocationModeType.PARALLEL)
+                      .withMode(InvocationModeType.PARALLEL)
                       .apply()
                       .invoke()
                       .pass(input)
@@ -2986,7 +2983,7 @@ public class RoutineTest {
     public void onInput(final Object o, @NotNull final Channel<Object, ?> result) {
       JRoutineCore.with(factoryOf(DelayedInvocation.class, millis(100)))
                   .invocationConfiguration()
-                  .withInvocationMode(InvocationModeType.PARALLEL)
+                  .withMode(InvocationModeType.PARALLEL)
                   .apply()
                   .invoke()
                   .pass("test")

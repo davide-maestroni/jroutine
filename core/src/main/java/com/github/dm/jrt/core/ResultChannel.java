@@ -967,8 +967,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
             public boolean isTrue() {
               verifyBound();
-              return !outputQueue.isEmpty() || mState.isDone() ||
-                  mIsWaitingInvocation;
+              return !outputQueue.isEmpty() || mState.isDone() || mIsWaitingInvocation;
             }
           };
         }

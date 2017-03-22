@@ -39,25 +39,25 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 @SuppressWarnings("WeakerAccess")
 public class FunctionDecorator<IN, OUT> extends DeepEqualObject
-    implements com.github.dm.jrt.function.util.Function<IN, OUT>, Decorator {
+    implements Function<IN, OUT>, Decorator {
 
   private static final FunctionDecorator<Object, Object> sIdentity =
-      new FunctionDecorator<Object, Object>(new com.github.dm.jrt.function.util.Function<Object, Object>() {
+      new FunctionDecorator<Object, Object>(new Function<Object, Object>() {
 
         public Object apply(final Object in) {
           return in;
         }
       });
 
-  private final List<com.github.dm.jrt.function.util.Function<?, ?>> mFunctions;
+  private final List<Function<?, ?>> mFunctions;
 
   /**
    * Constructor.
    *
    * @param function the wrapped function.
    */
-  private FunctionDecorator(@NotNull final com.github.dm.jrt.function.util.Function<?, ?> function) {
-    this(Collections.<com.github.dm.jrt.function.util.Function<?, ?>>singletonList(
+  private FunctionDecorator(@NotNull final Function<?, ?> function) {
+    this(Collections.<Function<?, ?>>singletonList(
         ConstantConditions.notNull("function instance", function)));
   }
 
@@ -66,7 +66,7 @@ public class FunctionDecorator<IN, OUT> extends DeepEqualObject
    *
    * @param functions the list of wrapped functions.
    */
-  private FunctionDecorator(@NotNull final List<com.github.dm.jrt.function.util.Function<?, ?>> functions) {
+  private FunctionDecorator(@NotNull final List<Function<?, ?>> functions) {
     super(asArgs(functions));
     mFunctions = functions;
   }
@@ -122,7 +122,7 @@ public class FunctionDecorator<IN, OUT> extends DeepEqualObject
    */
   @NotNull
   public static <IN, OUT> FunctionDecorator<IN, OUT> decorate(
-      @NotNull final com.github.dm.jrt.function.util.Function<IN, OUT> function) {
+      @NotNull final Function<IN, OUT> function) {
     if (function instanceof FunctionDecorator) {
       return (FunctionDecorator<IN, OUT>) function;
     }
@@ -154,11 +154,11 @@ public class FunctionDecorator<IN, OUT> extends DeepEqualObject
    */
   @NotNull
   public <AFTER> FunctionDecorator<IN, AFTER> andThen(
-      @NotNull final com.github.dm.jrt.function.util.Function<? super OUT, ? extends AFTER> after) {
+      @NotNull final Function<? super OUT, ? extends AFTER> after) {
     ConstantConditions.notNull("function instance", after);
-    final List<com.github.dm.jrt.function.util.Function<?, ?>> functions = mFunctions;
-    final ArrayList<com.github.dm.jrt.function.util.Function<?, ?>> newFunctions =
-        new ArrayList<com.github.dm.jrt.function.util.Function<?, ?>>(functions.size() + 1);
+    final List<Function<?, ?>> functions = mFunctions;
+    final ArrayList<Function<?, ?>> newFunctions =
+        new ArrayList<Function<?, ?>>(functions.size() + 1);
     newFunctions.addAll(functions);
     if (after instanceof FunctionDecorator) {
       newFunctions.addAll(((FunctionDecorator<?, ?>) after).mFunctions);
@@ -180,11 +180,11 @@ public class FunctionDecorator<IN, OUT> extends DeepEqualObject
    */
   @NotNull
   public <BEFORE> FunctionDecorator<BEFORE, OUT> compose(
-      @NotNull final com.github.dm.jrt.function.util.Function<? super BEFORE, ? extends IN> before) {
+      @NotNull final Function<? super BEFORE, ? extends IN> before) {
     ConstantConditions.notNull("function instance", before);
-    final List<com.github.dm.jrt.function.util.Function<?, ?>> functions = mFunctions;
-    final ArrayList<com.github.dm.jrt.function.util.Function<?, ?>> newFunctions =
-        new ArrayList<com.github.dm.jrt.function.util.Function<?, ?>>(functions.size() + 1);
+    final List<Function<?, ?>> functions = mFunctions;
+    final ArrayList<Function<?, ?>> newFunctions =
+        new ArrayList<Function<?, ?>>(functions.size() + 1);
     if (before instanceof FunctionDecorator) {
       newFunctions.addAll(((FunctionDecorator<?, ?>) before).mFunctions);
 
@@ -197,7 +197,7 @@ public class FunctionDecorator<IN, OUT> extends DeepEqualObject
   }
 
   public boolean hasStaticScope() {
-    for (final com.github.dm.jrt.function.util.Function<?, ?> function : mFunctions) {
+    for (final Function<?, ?> function : mFunctions) {
       if (!Reflection.hasStaticScope(function)) {
         return false;
       }
@@ -213,7 +213,7 @@ public class FunctionDecorator<IN, OUT> extends DeepEqualObject
    * @param <OUT> the output data type.
    */
   private static class ClassCastFunction<IN, OUT> extends DeepEqualObject
-      implements com.github.dm.jrt.function.util.Function<IN, OUT> {
+      implements Function<IN, OUT> {
 
     private final Class<? extends OUT> mType;
 
@@ -235,8 +235,8 @@ public class FunctionDecorator<IN, OUT> extends DeepEqualObject
   @SuppressWarnings("unchecked")
   public OUT apply(final IN in) throws Exception {
     Object result = in;
-    for (final com.github.dm.jrt.function.util.Function<?, ?> function : mFunctions) {
-      result = ((com.github.dm.jrt.function.util.Function<Object, Object>) function).apply(result);
+    for (final Function<?, ?> function : mFunctions) {
+      result = ((Function<Object, Object>) function).apply(result);
     }
 
     return (OUT) result;

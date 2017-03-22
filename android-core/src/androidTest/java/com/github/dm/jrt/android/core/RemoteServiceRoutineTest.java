@@ -298,7 +298,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
                        .in(timeout)
                        .all()).containsOnly("1", "2", "3", "4", "5");
     assertThat(routine1.invocationConfiguration()
-                       .withInvocationMode(InvocationModeType.PARALLEL)
+                       .withMode(InvocationModeType.PARALLEL)
                        .apply()
                        .buildRoutine()
                        .invoke()
@@ -329,7 +329,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
                        .in(timeout)
                        .all()).containsExactly("1", "2", "3", "4", "5");
     assertThat(routine2.invocationConfiguration()
-                       .withInvocationMode(InvocationModeType.PARALLEL)
+                       .withMode(InvocationModeType.PARALLEL)
                        .apply()
                        .buildRoutine()
                        .invoke()
@@ -355,7 +355,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
         routine3.invoke().pass("1", "2", "3", "4", "5").close().in(timeout).all()).containsExactly(
         "1", "2", "3", "4", "5");
     assertThat(routine3.invocationConfiguration()
-                       .withInvocationMode(InvocationModeType.PARALLEL)
+                       .withMode(InvocationModeType.PARALLEL)
                        .apply()
                        .invoke()
                        .pass("1", "2", "3", "4", "5")
@@ -380,7 +380,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
         routine4.invoke().pass("1", "2", "3", "4", "5").close().in(timeout).all()).containsOnly("1",
         "2", "3", "4", "5");
     assertThat(routine4.invocationConfiguration()
-                       .withInvocationMode(InvocationModeType.PARALLEL)
+                       .withMode(InvocationModeType.PARALLEL)
                        .apply()
                        .invoke()
                        .pass("1", "2", "3", "4", "5")
@@ -403,7 +403,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
                        .apply();
     assertThat(routine4.invoke().close().in(timeout).all()).containsOnly("test1", "test2", "test3");
     assertThat(routine4.invocationConfiguration()
-                       .withInvocationMode(InvocationModeType.PARALLEL)
+                       .withMode(InvocationModeType.PARALLEL)
                        .apply()
                        .invoke()
                        .close()
@@ -434,7 +434,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
         routine.invoke().pass("1", "2", "3", "4", "5").close().in(timeout).all()).containsOnly("1",
         "2", "3", "4", "5");
     assertThat(routine.invocationConfiguration()
-                      .withInvocationMode(InvocationModeType.PARALLEL)
+                      .withMode(InvocationModeType.PARALLEL)
                       .apply()
                       .invoke()
                       .pass("1", "2", "3", "4", "5")

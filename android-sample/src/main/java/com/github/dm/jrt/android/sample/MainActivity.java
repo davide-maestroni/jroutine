@@ -49,9 +49,8 @@ public class MainActivity extends AppCompatActivity {
   @Override
   protected void onCreate(final Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    getWindow().addFlags(LayoutParams.FLAG_DISMISS_KEYGUARD |
-        LayoutParams.FLAG_SHOW_WHEN_LOCKED |
-        LayoutParams.FLAG_TURN_SCREEN_ON | LayoutParams.FLAG_KEEP_SCREEN_ON);
+    getWindow().addFlags(LayoutParams.FLAG_DISMISS_KEYGUARD | LayoutParams.FLAG_SHOW_WHEN_LOCKED
+        | LayoutParams.FLAG_TURN_SCREEN_ON | LayoutParams.FLAG_KEEP_SCREEN_ON);
     setContentView(R.layout.activity_main);
     mRepoAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
     final ListView repoList = (ListView) findViewById(R.id.repo_list);

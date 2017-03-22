@@ -101,7 +101,7 @@ public abstract class AbstractRoutine<IN, OUT> implements Routine<IN, OUT> {
       mRunner = runner;
     }
 
-    mInvocationMode = configuration.getInvocationModeOrElse(InvocationModeType.SIMPLE);
+    mInvocationMode = configuration.getModeOrElse(InvocationModeType.SIMPLE);
     mMaxInvocations = configuration.getMaxInvocationsOrElse(DEFAULT_MAX_INVOCATIONS);
     mCoreInvocations = configuration.getCoreInvocationsOrElse(DEFAULT_CORE_INVOCATIONS);
     mLogger = configuration.newLogger(this);
@@ -262,8 +262,6 @@ public abstract class AbstractRoutine<IN, OUT> implements Routine<IN, OUT> {
 
     private final Backoff mBackoff;
 
-    private final Logger mLogger;
-
     private final AbstractRoutine<IN, OUT> mRoutine;
 
     private ArrayList<Channel<IN, OUT>> mChannels;
@@ -285,7 +283,6 @@ public abstract class AbstractRoutine<IN, OUT> implements Routine<IN, OUT> {
     private ParallelInvocation(@NotNull final AbstractRoutine<IN, OUT> routine) {
       mRoutine = routine;
       mBackoff = routine.mConfiguration.getInputBackoffOrElse(null);
-      mLogger = routine.mLogger.subContextLogger(this);
     }
 
     @Override
@@ -352,8 +349,8 @@ public abstract class AbstractRoutine<IN, OUT> implements Routine<IN, OUT> {
       synchronized (routine.mMutex) {
         try {
           if (!DurationMeasure.waitUntil(routine.mMutex, hasInputs, delay, TimeUnit.MILLISECONDS)) {
-            mLogger.dbg("timeout while waiting for room in the input channel [%s %s]", delay,
-                TimeUnit.MILLISECONDS);
+            routine.mLogger.dbg("timeout while waiting for room in the input channel [%s %s]",
+                delay, TimeUnit.MILLISECONDS);
           }
 
         } catch (final InterruptedException e) {

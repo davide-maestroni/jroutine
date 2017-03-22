@@ -246,7 +246,7 @@ public class OperatorsTest {
       }
     }))
                            .invocationConfiguration()
-                           .withInvocationMode(InvocationModeType.PARALLEL)
+                           .withMode(InvocationModeType.PARALLEL)
                            .apply()
                            .invoke()
                            .pass("test1")
@@ -260,7 +260,7 @@ public class OperatorsTest {
       }
     }))
                            .invocationConfiguration()
-                           .withInvocationMode(InvocationModeType.PARALLEL)
+                           .withMode(InvocationModeType.PARALLEL)
                            .apply()
                            .invoke()
                            .pass("test1")
@@ -274,7 +274,7 @@ public class OperatorsTest {
       }
     }))
                            .invocationConfiguration()
-                           .withInvocationMode(InvocationModeType.PARALLEL)
+                           .withMode(InvocationModeType.PARALLEL)
                            .apply()
                            .invoke()
                            .pass("test1")
@@ -288,7 +288,7 @@ public class OperatorsTest {
       }
     }))
                            .invocationConfiguration()
-                           .withInvocationMode(InvocationModeType.PARALLEL)
+                           .withMode(InvocationModeType.PARALLEL)
                            .apply()
                            .invoke()
                            .pass("test1")
@@ -1091,7 +1091,7 @@ public class OperatorsTest {
                            .all()).containsExactly("test");
     assertThat(JRoutineCore.with(filter(Functions.isNotNull()))
                            .invocationConfiguration()
-                           .withInvocationMode(InvocationModeType.PARALLEL)
+                           .withMode(InvocationModeType.PARALLEL)
                            .apply()
                            .invoke()
                            .pass(null, "test")
@@ -1109,7 +1109,7 @@ public class OperatorsTest {
     assertThat(JRoutineCore.with(filter(Functions.isNotNull()))
                            .invocationConfiguration()
                            .withRunner(Runners.syncRunner())
-                           .withInvocationMode(InvocationModeType.PARALLEL)
+                           .withMode(InvocationModeType.PARALLEL)
                            .apply()
                            .invoke()
                            .pass(null, "test")
@@ -1994,7 +1994,7 @@ public class OperatorsTest {
       }
     }))
                            .invocationConfiguration()
-                           .withInvocationMode(InvocationModeType.PARALLEL)
+                           .withMode(InvocationModeType.PARALLEL)
                            .apply()
                            .invoke()
                            .pass("test1")
@@ -2008,7 +2008,7 @@ public class OperatorsTest {
       }
     }))
                            .invocationConfiguration()
-                           .withInvocationMode(InvocationModeType.PARALLEL)
+                           .withMode(InvocationModeType.PARALLEL)
                            .apply()
                            .invoke()
                            .pass("test1")
@@ -2022,7 +2022,7 @@ public class OperatorsTest {
       }
     }))
                            .invocationConfiguration()
-                           .withInvocationMode(InvocationModeType.PARALLEL)
+                           .withMode(InvocationModeType.PARALLEL)
                            .apply()
                            .invoke()
                            .pass("test1")
@@ -2036,7 +2036,7 @@ public class OperatorsTest {
       }
     }))
                            .invocationConfiguration()
-                           .withInvocationMode(InvocationModeType.PARALLEL)
+                           .withMode(InvocationModeType.PARALLEL)
                            .apply()
                            .invoke()
                            .pass("test1")
@@ -2548,7 +2548,7 @@ public class OperatorsTest {
       }
     }))
                            .invocationConfiguration()
-                           .withInvocationMode(InvocationModeType.PARALLEL)
+                           .withMode(InvocationModeType.PARALLEL)
                            .apply()
                            .invoke()
                            .pass("test1")
@@ -2562,7 +2562,7 @@ public class OperatorsTest {
       }
     }))
                            .invocationConfiguration()
-                           .withInvocationMode(InvocationModeType.PARALLEL)
+                           .withMode(InvocationModeType.PARALLEL)
                            .apply()
                            .invoke()
                            .pass("test1")
@@ -2576,7 +2576,7 @@ public class OperatorsTest {
       }
     }))
                            .invocationConfiguration()
-                           .withInvocationMode(InvocationModeType.PARALLEL)
+                           .withMode(InvocationModeType.PARALLEL)
                            .apply()
                            .invoke()
                            .pass("test1")
@@ -2590,7 +2590,7 @@ public class OperatorsTest {
       }
     }))
                            .invocationConfiguration()
-                           .withInvocationMode(InvocationModeType.PARALLEL)
+                           .withMode(InvocationModeType.PARALLEL)
                            .apply()
                            .invoke()
                            .pass("test1")
@@ -2716,7 +2716,7 @@ public class OperatorsTest {
                            .invoke()
                            .pipe(JRoutineCore.with(Operators.<Number>unfold())
                                              .invocationConfiguration()
-                                             .withInvocationMode(InvocationModeType.PARALLEL)
+                                             .withMode(InvocationModeType.PARALLEL)
                                              .apply()
                                              .invoke())
                            .pass(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)

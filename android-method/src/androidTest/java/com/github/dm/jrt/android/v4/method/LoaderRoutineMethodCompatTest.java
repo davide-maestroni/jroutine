@@ -290,7 +290,7 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
         LoaderRoutineMethodCompat.from(loaderFrom(getActivity()),
             LoaderRoutineMethodCompatTest.class.getMethod("length", String.class))
                                  .invocationConfiguration()
-                                 .withInvocationMode(InvocationModeType.PARALLEL)
+                                 .withMode(InvocationModeType.PARALLEL)
                                  .apply()
                                  .call(inputChannel);
     inputChannel.pass("test", "test1", "test22").close();
@@ -374,7 +374,7 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
     final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     new SumRoutine(loaderFrom(getActivity())).invocationConfiguration()
-                                             .withInvocationMode(InvocationModeType.PARALLEL)
+                                             .withMode(InvocationModeType.PARALLEL)
                                              .withOutputOrder(OrderType.SORTED)
                                              .apply()
                                              .call(inputChannel, outputChannel);

@@ -265,7 +265,7 @@ public class ServiceRoutineMethodTest extends ActivityInstrumentationTestCase2<T
     final Channel<?, Object> outputChannel = ServiceRoutineMethod.from(serviceFrom(getActivity()),
         ServiceRoutineMethodTest.class.getMethod("length", String.class))
                                                                  .invocationConfiguration()
-                                                                 .withInvocationMode(
+                                                                 .withMode(
                                                                      InvocationModeType.PARALLEL)
                                                                  .apply()
                                                                  .call(inputChannel);
@@ -339,7 +339,7 @@ public class ServiceRoutineMethodTest extends ActivityInstrumentationTestCase2<T
     final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     new SumRoutine(serviceFrom(getActivity())).invocationConfiguration()
-                                              .withInvocationMode(InvocationModeType.PARALLEL)
+                                              .withMode(InvocationModeType.PARALLEL)
                                               .withOutputOrder(OrderType.SORTED)
                                               .apply()
                                               .call(inputChannel, outputChannel);

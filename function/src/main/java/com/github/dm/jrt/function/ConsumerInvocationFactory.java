@@ -47,8 +47,8 @@ class ConsumerInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
    *
    * @param consumer the consumer instance.
    */
-  ConsumerInvocationFactory(@NotNull final BiConsumerDecorator<? super List<IN>, ? super
-      Channel<OUT, ?>> consumer) {
+  ConsumerInvocationFactory(
+      @NotNull final BiConsumerDecorator<? super List<IN>, ? super Channel<OUT, ?>> consumer) {
     super(asArgs(ConstantConditions.notNull("bi-consumer wrapper", consumer)));
     mInvocation = new ConsumerInvocation<IN, OUT>(consumer);
   }
@@ -74,8 +74,8 @@ class ConsumerInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
      *
      * @param consumer the consumer instance.
      */
-    private ConsumerInvocation(@NotNull final BiConsumerDecorator<? super List<IN>, ? super
-        Channel<OUT, ?>> consumer) {
+    private ConsumerInvocation(
+        @NotNull final BiConsumerDecorator<? super List<IN>, ? super Channel<OUT, ?>> consumer) {
       mConsumer = consumer;
     }
 

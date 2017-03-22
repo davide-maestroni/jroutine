@@ -509,9 +509,10 @@ public class RoutineProcessor extends AbstractProcessor {
              .append(")");
     }
 
-    final InvocationMode invocationModeAnnotation = methodElement.getAnnotation(InvocationMode.class);
+    final InvocationMode invocationModeAnnotation =
+        methodElement.getAnnotation(InvocationMode.class);
     if (invocationModeAnnotation != null) {
-      builder.append(".withInvocationMode(")
+      builder.append(".withMode(")
              .append(InvocationModeType.class.getCanonicalName())
              .append(".")
              .append(invocationModeAnnotation.value())
@@ -946,7 +947,8 @@ public class RoutineProcessor extends AbstractProcessor {
   protected InvocationModeType getInvocationMode(@NotNull final ExecutableElement methodElement,
       @NotNull final InvocationMode annotation) {
     final InvocationModeType invocationMode = annotation.value();
-    if ((invocationMode == InvocationModeType.PARALLEL) && (methodElement.getParameters().size() > 1)) {
+    if ((invocationMode == InvocationModeType.PARALLEL) && (methodElement.getParameters().size()
+        > 1)) {
       throw new IllegalArgumentException("methods annotated with invocation mode " + invocationMode
           + " must have at maximum one input parameter: " + methodElement);
     }
@@ -1718,7 +1720,8 @@ public class RoutineProcessor extends AbstractProcessor {
     final ExecutableElement targetMethod = findMatchingMethod(methodElement, targetElement);
     TypeMirror targetReturnType = targetMethod.getReturnType();
     final boolean isVoid = (targetReturnType.getKind() == TypeKind.VOID);
-    final InvocationMode invocationModeAnnotation = methodElement.getAnnotation(InvocationMode.class);
+    final InvocationMode invocationModeAnnotation =
+        methodElement.getAnnotation(InvocationMode.class);
     final AsyncMethod asyncMethodAnnotation = methodElement.getAnnotation(AsyncMethod.class);
     final AsyncOutput asyncOutputAnnotation = methodElement.getAnnotation(AsyncOutput.class);
     InputMode inputMode = null;
@@ -1807,9 +1810,9 @@ public class RoutineProcessor extends AbstractProcessor {
 
     final InvocationModeType invocationMode =
         (invocationModeAnnotation != null) ? getInvocationMode(methodElement,
-            invocationModeAnnotation)
-            : InvocationModeType.SIMPLE;
-    if ((invocationMode == InvocationModeType.PARALLEL) && (targetMethod.getParameters().size() > 1)) {
+            invocationModeAnnotation) : InvocationModeType.SIMPLE;
+    if ((invocationMode == InvocationModeType.PARALLEL) && (targetMethod.getParameters().size()
+        > 1)) {
       throw new IllegalArgumentException("methods annotated with invocation mode " + invocationMode
           + " must have no input parameters: " + methodElement);
     }

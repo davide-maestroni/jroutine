@@ -328,7 +328,7 @@ public class SequencesTest {
         })))
                            .invocationConfiguration()
                            .withOutputOrder(OrderType.SORTED)
-                           .withInvocationMode(InvocationModeType.PARALLEL)
+                           .withMode(InvocationModeType.PARALLEL)
                            .apply()
                            .invoke()
                            .close()

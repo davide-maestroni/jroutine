@@ -42,8 +42,8 @@ class MapInvocation<IN, OUT> extends MappingInvocation<IN, OUT> {
    *
    * @param function the mapping function.
    */
-  MapInvocation(@NotNull final FunctionDecorator<? super IN, ? extends Channel<?, ? extends
-      OUT>> function) {
+  MapInvocation(
+      @NotNull final FunctionDecorator<? super IN, ? extends Channel<?, ? extends OUT>> function) {
     super(asArgs(ConstantConditions.notNull("function instance", function)));
     mFunction = function;
   }

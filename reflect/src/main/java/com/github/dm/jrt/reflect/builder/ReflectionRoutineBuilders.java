@@ -573,7 +573,7 @@ public class ReflectionRoutineBuilders {
         builder.withInputOrder(((InputOrder) annotation).value());
 
       } else if (annotationType == InvocationMode.class) {
-        builder.withInvocationMode(((InvocationMode) annotation).value());
+        builder.withMode(((InvocationMode) annotation).value());
 
       } else if (annotationType == LogLevel.class) {
         builder.withLogLevel(((LogLevel) annotation).value());

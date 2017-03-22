@@ -46,8 +46,7 @@ class BindTryCatch<OUT> implements Function<Channel<?, OUT>, Channel<?, OUT>> {
    * @param catchConsumer the error consumer instance.
    */
   BindTryCatch(@NotNull final ChannelConfiguration configuration,
-      @NotNull final BiConsumer<? super RoutineException, ? super
-          Channel<OUT, ?>> catchConsumer) {
+      @NotNull final BiConsumer<? super RoutineException, ? super Channel<OUT, ?>> catchConsumer) {
     mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
     mCatchConsumer = ConstantConditions.notNull("consumer instance", catchConsumer);
   }

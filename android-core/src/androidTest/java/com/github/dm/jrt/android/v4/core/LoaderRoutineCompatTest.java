@@ -449,7 +449,7 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
                                                                      IdentityContextInvocation
                                                                          .factoryOf())
                                                                  .invocationConfiguration()
-                                                                 .withInvocationMode(
+                                                                 .withMode(
                                                                      InvocationModeType.PARALLEL)
                                                                  .apply()
                                                                  .buildRoutine();
@@ -1486,7 +1486,7 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
                        .in(timeout)
                        .all()).containsOnly("1", "2", "3", "4", "5");
     assertThat(routine1.invocationConfiguration()
-                       .withInvocationMode(InvocationModeType.PARALLEL)
+                       .withMode(InvocationModeType.PARALLEL)
                        .apply()
                        .buildRoutine()
                        .invoke()
@@ -1510,7 +1510,7 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
                        .in(timeout)
                        .all()).containsOnly("1", "2", "3", "4", "5");
     assertThat(routine2.invocationConfiguration()
-                       .withInvocationMode(InvocationModeType.PARALLEL)
+                       .withMode(InvocationModeType.PARALLEL)
                        .apply()
                        .buildRoutine()
                        .invoke()

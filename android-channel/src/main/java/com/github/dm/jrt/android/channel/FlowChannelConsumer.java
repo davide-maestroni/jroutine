@@ -33,8 +33,7 @@ import org.jetbrains.annotations.NotNull;
  */
 class FlowChannelConsumer<OUT, IN extends OUT> implements ChannelConsumer<IN> {
 
-  private final Channel<? super
-      ParcelableFlow<OUT>, ?> mChannel;
+  private final Channel<? super ParcelableFlow<OUT>, ?> mChannel;
 
   private final int mId;
 
@@ -44,8 +43,8 @@ class FlowChannelConsumer<OUT, IN extends OUT> implements ChannelConsumer<IN> {
    * @param channel the flow channel.
    * @param id      the flow ID.
    */
-  FlowChannelConsumer(@NotNull final Channel<? super
-      ParcelableFlow<OUT>, ?> channel, final int id) {
+  FlowChannelConsumer(@NotNull final Channel<? super ParcelableFlow<OUT>, ?> channel,
+      final int id) {
     mChannel = ConstantConditions.notNull("channel instance", channel);
     mId = id;
   }

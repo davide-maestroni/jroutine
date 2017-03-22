@@ -132,12 +132,7 @@ public class LifecycleInvocationDecorator<IN, OUT> extends InvocationDecorator<I
   }
 
   private enum State {
-    START,
-    INPUT,
-    COMPLETE,
-    ABORT,
-    RECYCLE,
-    DESTROY
+    START, INPUT, COMPLETE, ABORT, RECYCLE, DESTROY
   }
 
   /**

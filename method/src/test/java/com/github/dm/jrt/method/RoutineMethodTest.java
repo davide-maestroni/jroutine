@@ -60,7 +60,7 @@ public class RoutineMethodTest {
         }
       }
     }.invocationConfiguration()
-     .withInvocationMode(InvocationModeType.PARALLEL)
+     .withMode(InvocationModeType.PARALLEL)
      .apply()
      .call(inputStrings, outputLengths);
     inputStrings.pass("test", "test1", "test22");
@@ -234,7 +234,7 @@ public class RoutineMethodTest {
     final Channel<?, Object> outputChannel =
         RoutineMethod.from(RoutineMethodTest.class.getMethod("length", String.class))
                      .invocationConfiguration()
-                     .withInvocationMode(InvocationModeType.PARALLEL)
+                     .withMode(InvocationModeType.PARALLEL)
                      .apply()
                      .call(inputChannel);
     inputChannel.pass("test", "test1", "test22").close();
@@ -396,7 +396,7 @@ public class RoutineMethodTest {
     final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     new SumRoutine(0).invocationConfiguration()
                      .withRunner(Runners.syncRunner())
-                     .withInvocationMode(InvocationModeType.PARALLEL)
+                     .withMode(InvocationModeType.PARALLEL)
                      .apply()
                      .call(inputChannel, outputChannel);
     inputChannel.pass(1, 2, 3, 4, 5).close();
@@ -430,7 +430,7 @@ public class RoutineMethodTest {
     final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     new SumRoutine().invocationConfiguration()
                     .withRunner(Runners.syncRunner())
-                    .withInvocationMode(InvocationModeType.PARALLEL)
+                    .withMode(InvocationModeType.PARALLEL)
                     .apply()
                     .call(inputChannel, outputChannel);
     inputChannel.pass(1, 2, 3, 4, 5).close();
@@ -461,7 +461,7 @@ public class RoutineMethodTest {
     final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     new SumRoutine().invocationConfiguration()
                     .withRunner(Runners.syncRunner())
-                    .withInvocationMode(InvocationModeType.PARALLEL)
+                    .withMode(InvocationModeType.PARALLEL)
                     .apply()
                     .call(inputChannel, outputChannel);
     inputChannel.pass(1, 2, 3, 4, 5).close();
@@ -479,10 +479,7 @@ public class RoutineMethodTest {
         }
         return 0;
       }
-    }.invocationConfiguration()
-     .withInvocationMode(InvocationModeType.PARALLEL)
-     .apply()
-     .call(inputStrings);
+    }.invocationConfiguration().withMode(InvocationModeType.PARALLEL).apply().call(inputStrings);
     inputStrings.pass("test");
     assertThat(outputChannel.in(seconds(1)).next()).isEqualTo(4);
   }
@@ -493,7 +490,7 @@ public class RoutineMethodTest {
     final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     new SumRoutineInner(0).invocationConfiguration()
                           .withRunner(Runners.syncRunner())
-                          .withInvocationMode(InvocationModeType.PARALLEL)
+                          .withMode(InvocationModeType.PARALLEL)
                           .apply()
                           .call(inputChannel, outputChannel);
     inputChannel.pass(1, 2, 3, 4, 5).close();
@@ -507,7 +504,7 @@ public class RoutineMethodTest {
       int zero() {
         return 0;
       }
-    }.invocationConfiguration().withInvocationMode(InvocationModeType.PARALLEL).apply().call();
+    }.invocationConfiguration().withMode(InvocationModeType.PARALLEL).apply().call();
   }
 
   @Test

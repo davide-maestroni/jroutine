@@ -130,8 +130,8 @@ public class DurationMeasure extends TimeMeasure {
       return sZeroes[ordinal];
     }
 
-    if ((ordinal >= CACHE_UNIT_LOW) && (ordinal <= CACHE_UNIT_HIGH) && (time >= CACHE_TIME_LOW) &&
-        (time <= CACHE_TIME_HIGH)) {
+    if ((ordinal >= CACHE_UNIT_LOW) && (ordinal <= CACHE_UNIT_HIGH) && (time >= CACHE_TIME_LOW) && (
+        time <= CACHE_TIME_HIGH)) {
       return sCaches[ordinal - CACHE_UNIT_LOW][(int) time - CACHE_TIME_LOW];
     }
 

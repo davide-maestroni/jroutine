@@ -334,12 +334,10 @@ public class InvocationConfigurationTest {
                                                            .withLog(new NullLog())
                                                            .withOutputMaxSize(100)
                                                            .apply();
-    assertThat(configuration).isNotEqualTo(
-        builder().withInvocationMode(InvocationModeType.PARALLEL).apply());
-    assertThat(configuration.builderFrom()
-                            .withInvocationMode(InvocationModeType.PARALLEL)
-                            .apply()).isNotEqualTo(
-        builder().withInvocationMode(InvocationModeType.PARALLEL).apply());
+    assertThat(configuration).isNotEqualTo(builder().withMode(InvocationModeType.PARALLEL).apply());
+    assertThat(
+        configuration.builderFrom().withMode(InvocationModeType.PARALLEL).apply()).isNotEqualTo(
+        builder().withMode(InvocationModeType.PARALLEL).apply());
   }
 
   @Test

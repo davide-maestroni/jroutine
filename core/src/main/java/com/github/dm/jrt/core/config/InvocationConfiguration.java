@@ -269,7 +269,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
   @NotNull
   public static InvocationConfiguration withMode(
       @Nullable final InvocationModeType invocationMode) {
-    return builder().withInvocationMode(invocationMode).apply();
+    return builder().withMode(invocationMode).apply();
   }
 
   /**
@@ -293,7 +293,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
   @NotNull
   public static InvocationConfiguration withRunnerAndMode(@Nullable final Runner runner,
       @Nullable final InvocationModeType invocationMode) {
-    return builder().withRunner(runner).withInvocationMode(invocationMode).apply();
+    return builder().withRunner(runner).withMode(invocationMode).apply();
   }
 
   /**
@@ -352,18 +352,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
   }
 
   /**
-   * Returns the invocation mode (null by default).
-   *
-   * @param valueIfNotSet the default value if none was set.
-   * @return invocation mode.
-   */
-  public InvocationModeType getInvocationModeOrElse(
-      @Nullable final InvocationModeType valueIfNotSet) {
-    final InvocationModeType invocationMode = mInvocationMode;
-    return (invocationMode != null) ? invocationMode : valueIfNotSet;
-  }
-
-  /**
    * Returns the log level (null by default).
    *
    * @param valueIfNotSet the default value if none was set.
@@ -394,6 +382,17 @@ public final class InvocationConfiguration extends DeepEqualObject {
   public int getMaxInvocationsOrElse(final int valueIfNotSet) {
     final int maxInvocations = mMaxInvocations;
     return (maxInvocations != DEFAULT) ? maxInvocations : valueIfNotSet;
+  }
+
+  /**
+   * Returns the invocation mode (null by default).
+   *
+   * @param valueIfNotSet the default value if none was set.
+   * @return invocation mode.
+   */
+  public InvocationModeType getModeOrElse(@Nullable final InvocationModeType valueIfNotSet) {
+    final InvocationModeType invocationMode = mInvocationMode;
+    return (invocationMode != null) ? invocationMode : valueIfNotSet;
   }
 
   /**
@@ -793,30 +792,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
     }
 
     /**
-     * Sets the invocation mode to be used.
-     * <p>
-     * There are two different ways to invoke a routine:
-     * <p>
-     * <b>Simple invocation</b><br>
-     * The routine starts an invocation employing the configured runner and delivers all the input
-     * passed to the invocation channel to the same invocation instance.
-     * <p>
-     * <b>Parallel invocation</b><br>
-     * The routine starts an invocation which in turn spawns another invocation for each input
-     * passed to the invocation channel. This particular type of invocation obviously produces
-     * meaningful results only for routines which takes a single input parameter and computes the
-     * relative output results.
-     *
-     * @param invocationMode the invocation mode.
-     * @return this builder.
-     */
-    @NotNull
-    public Builder<TYPE> withInvocationMode(@Nullable final InvocationModeType invocationMode) {
-      mInvocationMode = invocationMode;
-      return this;
-    }
-
-    /**
      * Sets the log instance. A null value means that it is up to the specific implementation to
      * choose a default one.
      *
@@ -859,6 +834,30 @@ public final class InvocationConfiguration extends DeepEqualObject {
       }
 
       mMaxInvocations = maxInvocations;
+      return this;
+    }
+
+    /**
+     * Sets the invocation mode to be used.
+     * <p>
+     * There are two different ways to invoke a routine:
+     * <p>
+     * <b>Simple invocation</b><br>
+     * The routine starts an invocation employing the configured runner and delivers all the input
+     * passed to the invocation channel to the same invocation instance.
+     * <p>
+     * <b>Parallel invocation</b><br>
+     * The routine starts an invocation which in turn spawns another invocation for each input
+     * passed to the invocation channel. This particular type of invocation obviously produces
+     * meaningful results only for routines which takes a single input parameter and computes the
+     * relative output results.
+     *
+     * @param invocationMode the invocation mode.
+     * @return this builder.
+     */
+    @NotNull
+    public Builder<TYPE> withMode(@Nullable final InvocationModeType invocationMode) {
+      mInvocationMode = invocationMode;
       return this;
     }
 
@@ -1029,7 +1028,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
 
       final InvocationModeType invocationMode = configuration.mInvocationMode;
       if (invocationMode != null) {
-        withInvocationMode(invocationMode);
+        withMode(invocationMode);
       }
 
       final int maxInvocations = configuration.mMaxInvocations;

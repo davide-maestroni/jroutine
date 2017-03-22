@@ -285,8 +285,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends AbstractRoutineBuil
       return newBuilder(decorate(getBindingFunction().andThen(
           new BindMappingAllFunction<OUT, AFTER>(streamConfiguration.toChannelConfiguration(),
               streamConfiguration.toInvocationConfiguration()
-                                 .getInvocationModeOrElse(InvocationModeType.SIMPLE),
-              mappingFunction))));
+                                 .getModeOrElse(InvocationModeType.SIMPLE), mappingFunction))));
     }
 
     return map(functionCall(mappingFunction));
@@ -300,8 +299,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends AbstractRoutineBuil
       return newBuilder(decorate(getBindingFunction().andThen(
           new BindMappingAllConsumer<OUT, AFTER>(streamConfiguration.toChannelConfiguration(),
               streamConfiguration.toInvocationConfiguration()
-                                 .getInvocationModeOrElse(InvocationModeType.SIMPLE),
-              mappingConsumer))));
+                                 .getModeOrElse(InvocationModeType.SIMPLE), mappingConsumer))));
     }
 
     return map(consumerCall(mappingConsumer));
@@ -433,7 +431,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends AbstractRoutineBuil
     return newBuilder(new StreamConfiguration(streamConfiguration.getStreamInvocationConfiguration()
                                                                  .builderFrom()
                                                                  .withRunner(runner)
-                                                                 .withInvocationMode(
+                                                                 .withMode(
                                                                      InvocationModeType.PARALLEL)
                                                                  .withMaxInvocations(maxInvocations)
                                                                  .apply(),
@@ -447,7 +445,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends AbstractRoutineBuil
     return newBuilder(new StreamConfiguration(streamConfiguration.getStreamInvocationConfiguration()
                                                                  .builderFrom()
                                                                  .withRunner(runner)
-                                                                 .withInvocationMode(invocationMode)
+                                                                 .withMode(invocationMode)
                                                                  .apply(),
         streamConfiguration.getNextInvocationConfiguration()));
   }

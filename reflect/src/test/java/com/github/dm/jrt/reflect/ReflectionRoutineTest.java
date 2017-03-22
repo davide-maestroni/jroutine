@@ -1099,16 +1099,15 @@ public class ReflectionRoutineTest {
   @SuppressWarnings("NullArgumentToVariableArgMethod")
   public void testProxyRoutine() {
 
-    final DurationMeasure timeout = seconds(1000000);
+    final DurationMeasure timeout = seconds(1);
     final Square square = new Square();
     final SquareItf squareAsync =
         JRoutineReflection.with(instance(square)).buildProxy(SquareItf.class);
-//
-//    assertThat(squareAsync.compute(3)).isEqualTo(9);
-//
-//    final Channel<Integer, Integer> channel1 = JRoutineCore.<Integer>ofData().buildChannel();
-//    channel1.pass(4).close();
-//    assertThat(squareAsync.computeAsync(channel1)).isEqualTo(16);
+    assertThat(squareAsync.compute(3)).isEqualTo(9);
+
+    final Channel<Integer, Integer> channel1 = JRoutineCore.<Integer>ofData().buildChannel();
+    channel1.pass(4).close();
+    assertThat(squareAsync.computeAsync(channel1)).isEqualTo(16);
 
     final Channel<Integer, Integer> channel2 = JRoutineCore.<Integer>ofData().buildChannel();
     channel2.pass(1, 2, 3).close();

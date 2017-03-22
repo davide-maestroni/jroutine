@@ -270,7 +270,7 @@ public class RemoteServiceRoutineMethodTest extends ActivityInstrumentationTestC
         ServiceRoutineMethod.from(serviceFrom(getActivity(), RemoteTestService.class),
             ServiceRoutineMethodTest.class.getMethod("length", String.class))
                             .invocationConfiguration()
-                            .withInvocationMode(InvocationModeType.PARALLEL)
+                            .withMode(InvocationModeType.PARALLEL)
                             .apply()
                             .call(inputChannel);
     inputChannel.pass("test", "test1", "test22").close();
@@ -355,8 +355,9 @@ public class RemoteServiceRoutineMethodTest extends ActivityInstrumentationTestC
     final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     new SumRoutine(serviceFrom(getActivity(), RemoteTestService.class)).invocationConfiguration()
-                                                                       .withInvocationMode(
-                                                                           InvocationModeType.PARALLEL)
+                                                                       .withMode(
+                                                                           InvocationModeType
+                                                                               .PARALLEL)
                                                                        .withOutputOrder(
                                                                            OrderType.SORTED)
                                                                        .apply()

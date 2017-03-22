@@ -36,9 +36,8 @@ public class TestActivity extends FragmentActivity {
   protected void onCreate(final Bundle savedInstanceState) {
 
     super.onCreate(savedInstanceState);
-    getWindow().addFlags(LayoutParams.FLAG_DISMISS_KEYGUARD |
-        LayoutParams.FLAG_SHOW_WHEN_LOCKED |
-        LayoutParams.FLAG_TURN_SCREEN_ON | LayoutParams.FLAG_KEEP_SCREEN_ON);
+    getWindow().addFlags(LayoutParams.FLAG_DISMISS_KEYGUARD | LayoutParams.FLAG_SHOW_WHEN_LOCKED
+        | LayoutParams.FLAG_TURN_SCREEN_ON | LayoutParams.FLAG_KEEP_SCREEN_ON);
     setContentView(R.layout.test_v4_layout);
   }
 }

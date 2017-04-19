@@ -16,6 +16,8 @@
 
 package com.github.dm.jrt.swagger.generator;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.jetbrains.annotations.NotNull;
@@ -65,6 +67,8 @@ public class JRoutineCodegen extends JavaClientCodegen {
 
   private static final String JROUTINE_CODEGEN_VERSION = "jroutineCodegenVersion";
 
+  private static final String JROUTINE_OPTIONS_EXTENSION = "x-jroutine-options";
+
   private static final String PROJECT_NAME = "projectName";
 
   private static final String PROJECT_PREFIX = "projectPrefix";
@@ -72,6 +76,8 @@ public class JRoutineCodegen extends JavaClientCodegen {
   private static final String SWAGGER_CODEGEN_VERSION = "swaggerCodegenVersion";
 
   private static final String USE_SUPPORT_LIBRARY = "useSupportLibrary";
+
+  private static final ObjectMapper sMapper = new ObjectMapper();
 
   /**
    * Constructor.
@@ -223,6 +229,12 @@ public class JRoutineCodegen extends JavaClientCodegen {
     final CodegenOperation codegenOperation =
         super.fromOperation(path, httpMethod, operation, definitions, swagger);
     codegenOperation.path = swagger.getBasePath() + codegenOperation.path;
+    final Object annotations = codegenOperation.vendorExtensions.get(JROUTINE_OPTIONS_EXTENSION);
+    if (annotations != null) {
+      codegenOperation.vendorExtensions.put(JROUTINE_OPTIONS_EXTENSION,
+          sMapper.convertValue(annotations, Map.class));
+    }
+
     return codegenOperation;
   }
 

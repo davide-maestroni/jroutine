@@ -164,6 +164,7 @@ public class Transformations {
    */
   @NotNull
   public static <IN, OUT, AFTER> LiftFunction<IN, OUT, IN, AFTER> parallel(
+      // TODO: 03/04/2017 split?
       final int invocationCount,
       @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
     ConstantConditions.notNull("invocation factory", factory);

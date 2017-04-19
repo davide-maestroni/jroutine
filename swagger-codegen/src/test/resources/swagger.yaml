@@ -10,8 +10,10 @@ basePath: /users
 paths:
   /{user}/repos:
     get:
-      x-jroutine-outputTimeout: 20
-      x-jroutine-outputTimeoutUnit: SECONDS
+      x-jroutine-options:
+        OutputTimeout:
+          value: 20
+          unit: SECONDS
       operationId: getRepos
       summary: Gets the user public repositories.
       description: |

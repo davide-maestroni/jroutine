@@ -18,7 +18,6 @@ package com.github.dm.jrt.reflect.builder;
 
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
-import com.github.dm.jrt.core.config.InvocationConfiguration.InvocationModeType;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -35,7 +34,6 @@ import com.github.dm.jrt.reflect.annotation.CoreInvocations;
 import com.github.dm.jrt.reflect.annotation.InputBackoff;
 import com.github.dm.jrt.reflect.annotation.InputMaxSize;
 import com.github.dm.jrt.reflect.annotation.InputOrder;
-import com.github.dm.jrt.reflect.annotation.InvocationMode;
 import com.github.dm.jrt.reflect.annotation.LogLevel;
 import com.github.dm.jrt.reflect.annotation.LogType;
 import com.github.dm.jrt.reflect.annotation.MaxInvocations;
@@ -238,10 +236,10 @@ public class ReflectionRoutineBuilders {
     InputMode inputMode = asyncInputAnnotation.mode();
     final Class<?>[] parameterTypes = method.getParameterTypes();
     final Class<?> parameterType = parameterTypes[index];
-    if (inputMode == InputMode.VALUE) {
+    if (inputMode == InputMode.DEFAULT) {
       if (!Channel.class.isAssignableFrom(parameterType)) {
         throw new IllegalArgumentException(
-            "[" + method + "] an async input with mode " + InputMode.VALUE + " must implement a "
+            "[" + method + "] an async input with mode " + InputMode.DEFAULT + " must implement a "
                 + Channel.class.getCanonicalName());
       }
 
@@ -409,7 +407,7 @@ public class ReflectionRoutineBuilders {
           }
 
           targetParameterTypes = asyncMethodAnnotation.value();
-          inputMode = InputMode.VALUE;
+          inputMode = InputMode.DEFAULT;
           outputMode = asyncMethodAnnotation.mode();
 
         } else {
@@ -427,18 +425,6 @@ public class ReflectionRoutineBuilders {
                 }
               }
             }
-          }
-        }
-
-        final InvocationMode invocationModeAnnotation =
-            proxyMethod.getAnnotation(InvocationMode.class);
-        if (invocationModeAnnotation != null) {
-          final InvocationModeType invocationMode = invocationModeAnnotation.value();
-          if ((invocationMode == InvocationModeType.PARALLEL) && (targetParameterTypes.length
-              > 1)) {
-            throw new IllegalArgumentException(
-                "methods annotated with invocation mode " + invocationMode
-                    + " must have no input parameters: " + proxyMethod);
           }
         }
 
@@ -490,7 +476,7 @@ public class ReflectionRoutineBuilders {
 
     final Channel<Object, Object> outputChannel;
     final Channel<Object, Object> invocationChannel = routine.invoke();
-    if (inputMode == InputMode.VALUE) {
+    if (inputMode == InputMode.DEFAULT) {
       invocationChannel.sorted();
       final Class<?>[] parameterTypes = method.getParameterTypes();
       final int length = args.length;
@@ -536,7 +522,6 @@ public class ReflectionRoutineBuilders {
    * @see com.github.dm.jrt.reflect.annotation.InputBackoff InputBackoff
    * @see com.github.dm.jrt.reflect.annotation.InputMaxSize InputMaxSize
    * @see com.github.dm.jrt.reflect.annotation.InputOrder InputOrder
-   * @see com.github.dm.jrt.reflect.annotation.InvocationMode InvocationMode
    * @see com.github.dm.jrt.reflect.annotation.LogLevel LogLevel
    * @see com.github.dm.jrt.reflect.annotation.LogType LogType
    * @see com.github.dm.jrt.reflect.annotation.MaxInvocations MaxInvocations
@@ -571,9 +556,6 @@ public class ReflectionRoutineBuilders {
 
       } else if (annotationType == InputOrder.class) {
         builder.withInputOrder(((InputOrder) annotation).value());
-
-      } else if (annotationType == InvocationMode.class) {
-        builder.withMode(((InvocationMode) annotation).value());
 
       } else if (annotationType == LogLevel.class) {
         builder.withLogLevel(((LogLevel) annotation).value());
@@ -623,7 +605,6 @@ public class ReflectionRoutineBuilders {
    * @see com.github.dm.jrt.reflect.annotation.InputBackoff InputBackoff
    * @see com.github.dm.jrt.reflect.annotation.InputMaxSize InputMaxSize
    * @see com.github.dm.jrt.reflect.annotation.InputOrder InputOrder
-   * @see com.github.dm.jrt.reflect.annotation.InvocationMode InvocationMode
    * @see com.github.dm.jrt.reflect.annotation.LogLevel LogLevel
    * @see com.github.dm.jrt.reflect.annotation.LogType LogType
    * @see com.github.dm.jrt.reflect.annotation.MaxInvocations MaxInvocations

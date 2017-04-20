@@ -34,6 +34,8 @@ import org.jetbrains.annotations.NotNull;
 public abstract class ChannelContextInvocation<IN, OUT> extends ChannelInvocation<IN, OUT>
     implements ContextInvocation<IN, OUT> {
 
+  // TODO: 20/04/2017 delete
+
   private Context mContext;
 
   @Override

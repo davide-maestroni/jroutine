@@ -47,9 +47,8 @@ public interface ReflectionRoutineBuilder extends InvocationConfigurable<Reflect
    * <br>
    * The interface will be interpreted as a proxy of the target object methods, and the optional
    * {@link com.github.dm.jrt.reflect.annotation.AsyncInput AsyncInput},
-   * {@link com.github.dm.jrt.reflect.annotation.AsyncMethod AsyncMethod},
-   * {@link com.github.dm.jrt.reflect.annotation.AsyncOutput AsyncOutput} and
-   * {@link com.github.dm.jrt.reflect.annotation.InvocationMode InvocationMode} annotations will be
+   * {@link com.github.dm.jrt.reflect.annotation.AsyncMethod AsyncMethod} and
+   * {@link com.github.dm.jrt.reflect.annotation.AsyncOutput AsyncOutput} annotations will be
    * honored.
    *
    * @param itf    the interface implemented by the returned object.
@@ -77,9 +76,8 @@ public interface ReflectionRoutineBuilder extends InvocationConfigurable<Reflect
    * <br>
    * The interface will be interpreted as a proxy of the target object methods, and the optional
    * {@link com.github.dm.jrt.reflect.annotation.AsyncInput AsyncInput},
-   * {@link com.github.dm.jrt.reflect.annotation.AsyncMethod AsyncMethod},
-   * {@link com.github.dm.jrt.reflect.annotation.AsyncOutput AsyncOutput} and
-   * {@link com.github.dm.jrt.reflect.annotation.InvocationMode InvocationMode} annotations will be
+   * {@link com.github.dm.jrt.reflect.annotation.AsyncMethod AsyncMethod} and
+   * {@link com.github.dm.jrt.reflect.annotation.AsyncOutput AsyncOutput} annotations will be
    * honored.
    *
    * @param itf    the token of the interface implemented by the returned object.

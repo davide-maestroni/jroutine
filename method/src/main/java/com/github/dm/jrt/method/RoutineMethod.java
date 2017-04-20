@@ -25,7 +25,6 @@ import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.InvocationConfigurable;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
-import com.github.dm.jrt.core.config.InvocationConfiguration.InvocationModeType;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
@@ -170,12 +169,9 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  *     return ignoreReturnValue();
  *   }
  * }
- * .invocationConfiguration()
- * .withMode(InvocationModeType.PARALLEL)
- * .apply()
  * .call(inputChannel, true);
- * inputChannel.pass("Hello", "JRoutine", "!").close();
- * outputChannel.in(seconds(1)).all(); // expected values: "HELLO", "JROUTINE", "!"
+ * inputChannel.pass("Hello JRoutine!").close();
+ * outputChannel.in(seconds(1)).next(); // expected value: "HELLO JROUTINE!"
  * </code></pre>
  * <p>
  * Or, for an inner class:
@@ -627,14 +623,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
     } else {
       if (!mIsFirstCall.getAndSet(false)) {
         throw new IllegalStateException(
-            "cannot invoke the routine in more than once: please provide proper "
-                + "constructor arguments");
-      }
-
-      final InvocationModeType invocationMode = mConfiguration.getModeOrElse(null);
-      if (invocationMode == InvocationModeType.PARALLEL) {
-        throw new IllegalStateException(
-            "cannot invoke the routine in parallel mode: please provide proper "
+            "cannot invoke the routine more than once: please provide proper "
                 + "constructor arguments");
       }
 

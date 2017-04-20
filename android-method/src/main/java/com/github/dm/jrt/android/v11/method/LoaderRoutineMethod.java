@@ -34,7 +34,6 @@ import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
-import com.github.dm.jrt.core.config.InvocationConfiguration.InvocationModeType;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -269,13 +268,6 @@ public class LoaderRoutineMethod extends RoutineMethod
       if (!mIsFirstCall.getAndSet(false)) {
         throw new IllegalStateException(
             "cannot invoke the routine in more than once: please provide proper "
-                + "constructor arguments");
-      }
-
-      final InvocationModeType invocationMode = getConfiguration().getModeOrElse(null);
-      if (invocationMode == InvocationModeType.PARALLEL) {
-        throw new IllegalStateException(
-            "cannot invoke the routine in parallel mode: please provide proper "
                 + "constructor arguments");
       }
 

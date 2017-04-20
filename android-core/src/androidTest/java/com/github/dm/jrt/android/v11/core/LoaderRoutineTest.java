@@ -42,12 +42,10 @@ import com.github.dm.jrt.android.core.log.AndroidLogs;
 import com.github.dm.jrt.android.core.routine.LoaderRoutine;
 import com.github.dm.jrt.android.core.runner.AndroidRunners;
 import com.github.dm.jrt.android.core.test.R;
-import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
-import com.github.dm.jrt.core.config.InvocationConfiguration.InvocationModeType;
 import com.github.dm.jrt.core.log.Log;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.Logger;
@@ -63,8 +61,8 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-import static com.github.dm.jrt.android.core.RoutineContextInvocation.factoryFrom;
 import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.factoryOf;
+import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.factoryOfParallel;
 import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builder;
 import static com.github.dm.jrt.core.util.DurationMeasure.millis;
@@ -78,6 +76,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @TargetApi(VERSION_CODES.HONEYCOMB)
 public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActivity> {
+
+  private static final int PARALLEL_ROUTINE_ID = 1;
 
   private static final int TEST_ROUTINE_ID = 0;
 
@@ -485,16 +485,18 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
     final DurationMeasure timeout = seconds(10);
     final Routine<Object, Object> routine1 = JRoutineLoader.on(loaderFrom(getActivity()))
-                                                           .with(
-                                                               IdentityContextInvocation
-                                                                   .factoryOf())
-                                                           .invocationConfiguration()
-                                                           .withMode(InvocationModeType.PARALLEL)
-                                                           .apply()
+                                                           .with(factoryOfParallel(
+                                                               JRoutineLoader.on(
+                                                                   loaderFrom(getActivity()))
+                                                                             .with(
+                                                                                 IdentityContextInvocation
+                                                                                     .factoryOf())
+                                                                             .buildRoutine(),
+                                                               PARALLEL_ROUTINE_ID))
                                                            .buildRoutine();
     final Routine<Object, Object> routine2 = JRoutineLoader.on(loaderFrom(getActivity()))
-                                                           .with(factoryFrom(routine1,
-                                                               TEST_ROUTINE_ID))
+                                                           .with(
+                                                               factoryOf(routine1, TEST_ROUTINE_ID))
                                                            .buildRoutine();
 
     assertThat(routine2.invoke().pass("test1").close().in(timeout).all()).containsExactly("test1");
@@ -1260,8 +1262,8 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                    .factoryOf())
                                                            .buildRoutine();
     final Routine<Object, Object> routine2 = JRoutineLoader.on(loaderFrom(fragment))
-                                                           .with(factoryFrom(routine1,
-                                                               TEST_ROUTINE_ID))
+                                                           .with(
+                                                               factoryOf(routine1, TEST_ROUTINE_ID))
                                                            .buildRoutine();
 
     assertThat(routine2.invoke().pass("test1").close().in(timeout).all()).containsExactly("test1");
@@ -1650,50 +1652,44 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
     }
 
     final DurationMeasure timeout = seconds(10);
-    final RoutineBuilder<String, String> routine1 = JRoutineLoader.on(loaderFrom(getActivity()))
-                                                                  .with(
-                                                                      IdentityContextInvocation
-                                                                          .<String>factoryOf())
-                                                                  .invocationConfiguration()
-                                                                  .withLog(AndroidLogs.androidLog())
-                                                                  .withLogLevel(Level.WARNING)
-                                                                  .apply();
-    assertThat(routine1.buildRoutine()
-                       .invoke()
-                       .pass("1", "2", "3", "4", "5")
-                       .close()
-                       .in(timeout)
-                       .all()).containsOnly("1", "2", "3", "4", "5");
-    assertThat(routine1.invocationConfiguration()
-                       .withMode(InvocationModeType.PARALLEL)
-                       .apply()
-                       .invoke()
-                       .pass("1", "2", "3", "4", "5")
-                       .close()
-                       .in(timeout)
-                       .all()).containsOnly("1", "2", "3", "4", "5");
+    final Routine<String, String> routine1 = JRoutineLoader.on(loaderFrom(getActivity()))
+                                                           .with(
+                                                               IdentityContextInvocation
+                                                                   .<String>factoryOf())
+                                                           .invocationConfiguration()
+                                                           .withLog(AndroidLogs.androidLog())
+                                                           .withLogLevel(Level.WARNING)
+                                                           .apply()
+                                                           .buildRoutine();
+    assertThat(
+        routine1.invoke().pass("1", "2", "3", "4", "5").close().in(timeout).all()).containsOnly("1",
+        "2", "3", "4", "5");
+    assertThat(JRoutineLoader.on(loaderFrom(getActivity()))
+                             .with(factoryOfParallel(routine1, PARALLEL_ROUTINE_ID))
+                             .invoke()
+                             .pass("1", "2", "3", "4", "5")
+                             .close()
+                             .in(timeout)
+                             .all()).containsOnly("1", "2", "3", "4", "5");
 
     final ClassToken<StringCallInvocation> token2 = ClassToken.tokenOf(StringCallInvocation.class);
-    final RoutineBuilder<String, String> routine2 = JRoutineLoader.on(loaderFrom(getActivity()))
-                                                                  .with(factoryOf(token2))
-                                                                  .invocationConfiguration()
-                                                                  .withLog(AndroidLogs.androidLog())
-                                                                  .withLogLevel(Level.WARNING)
-                                                                  .apply();
-    assertThat(routine2.buildRoutine()
-                       .invoke()
-                       .pass("1", "2", "3", "4", "5")
-                       .close()
-                       .in(timeout)
-                       .all()).containsOnly("1", "2", "3", "4", "5");
-    assertThat(routine2.invocationConfiguration()
-                       .withMode(InvocationModeType.PARALLEL)
-                       .apply()
-                       .invoke()
-                       .pass("1", "2", "3", "4", "5")
-                       .close()
-                       .in(timeout)
-                       .all()).containsOnly("1", "2", "3", "4", "5");
+    final Routine<String, String> routine2 = JRoutineLoader.on(loaderFrom(getActivity()))
+                                                           .with(factoryOf(token2))
+                                                           .invocationConfiguration()
+                                                           .withLog(AndroidLogs.androidLog())
+                                                           .withLogLevel(Level.WARNING)
+                                                           .apply()
+                                                           .buildRoutine();
+    assertThat(
+        routine2.invoke().pass("1", "2", "3", "4", "5").close().in(timeout).all()).containsOnly("1",
+        "2", "3", "4", "5");
+    assertThat(JRoutineLoader.on(loaderFrom(getActivity()))
+                             .with(factoryOfParallel(routine2, PARALLEL_ROUTINE_ID))
+                             .invoke()
+                             .pass("1", "2", "3", "4", "5")
+                             .close()
+                             .in(timeout)
+                             .all()).containsOnly("1", "2", "3", "4", "5");
   }
 
   @SuppressWarnings("ConstantConditions")

@@ -28,8 +28,6 @@ import com.github.dm.jrt.android.v11.core.LoaderContext;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
-import com.github.dm.jrt.core.config.InvocationConfiguration.InvocationModeType;
 import com.github.dm.jrt.method.annotation.Input;
 import com.github.dm.jrt.method.annotation.Output;
 
@@ -314,16 +312,6 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
                                   .call(JRoutineCore.of("test").buildChannel())
                                   .in(seconds(10))
                                   .next()).isEqualTo(4);
-    final Channel<String, String> inputChannel = JRoutineCore.<String>ofData().buildChannel();
-    final Channel<?, Object> outputChannel = LoaderRoutineMethod.from(loaderFrom(getActivity()),
-        LoaderRoutineMethodTest.class.getMethod("length", String.class))
-                                                                .invocationConfiguration()
-                                                                .withMode(
-                                                                    InvocationModeType.PARALLEL)
-                                                                .apply()
-                                                                .call(inputChannel);
-    inputChannel.pass("test", "test1", "test22").close();
-    assertThat(outputChannel.in(seconds(10)).all()).containsOnly(4, 5, 6);
   }
 
   public void testFromClass2() throws NoSuchMethodException {
@@ -406,22 +394,6 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
     }
 
     testNoInputs(getActivity());
-  }
-
-  public void testParallel() {
-    if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-      return;
-    }
-
-    final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofData().buildChannel();
-    final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
-    new SumRoutine(loaderFrom(getActivity())).invocationConfiguration()
-                                             .withMode(InvocationModeType.PARALLEL)
-                                             .withOutputOrder(OrderType.SORTED)
-                                             .apply()
-                                             .call(inputChannel, outputChannel);
-    inputChannel.pass(1, 2, 3, 4, 5).close();
-    assertThat(outputChannel.in(seconds(10)).all()).containsOnly(1, 2, 3, 4, 5);
   }
 
   public void testParams() {

@@ -33,6 +33,8 @@ import org.jetbrains.annotations.NotNull;
  */
 public abstract class ChannelInvocation<IN, OUT> implements Invocation<IN, OUT> {
 
+  // TODO: 19/04/2017 delete?
+
   private Channel<IN, IN> mInputChannel;
 
   private Channel<?, OUT> mOutputChannel;

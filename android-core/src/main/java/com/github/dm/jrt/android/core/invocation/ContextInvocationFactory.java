@@ -20,6 +20,7 @@ import android.content.Context;
 
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
+import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DeepEqualObject;
@@ -67,7 +68,7 @@ public abstract class ContextInvocationFactory<IN, OUT> extends DeepEqualObject 
   @NotNull
   public static <IN, OUT> ContextInvocationFactory<IN, OUT> factoryFrom(
       @NotNull final InvocationFactory<IN, OUT> factory) {
-    return new WrappingContextInvocationFactory<IN, OUT>(factory);
+    return new WrappingContextInvocationFactory<IN, OUT>(factory, null);
   }
 
   /**
@@ -171,6 +172,48 @@ public abstract class ContextInvocationFactory<IN, OUT> extends DeepEqualObject 
       @NotNull final ClassToken<? extends Invocation<IN, OUT>> invocationToken,
       @Nullable final Object... args) {
     return factoryOf(invocationToken.getRawClass(), args);
+  }
+
+  /**
+   * Builds and returns a new Context invocation factory creating instances delegating the execution
+   * to another routine.
+   * <p>
+   * Note that the specified identifier will be used to detect clashing of invocations (see
+   * {@link com.github.dm.jrt.android.v11.core.JRoutineLoader} and
+   * {@link com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat}).
+   *
+   * @param routine   the delegated routine.
+   * @param routineId the routine identifier.
+   * @param <IN>      the input data type.
+   * @param <OUT>     the output data type.
+   * @return the invocation factory.
+   */
+  @NotNull
+  public static <IN, OUT> ContextInvocationFactory<IN, OUT> factoryOf(
+      @NotNull final Routine<IN, OUT> routine, final int routineId) {
+    return new WrappingContextInvocationFactory<IN, OUT>(InvocationFactory.factoryOf(routine),
+        routineId);
+  }
+
+  /**
+   * Builds and returns a new Context invocation factory creating instances delegating the
+   * processing of each input separately to another routine invocation.
+   * <p>
+   * Note that the specified identifier will be used to detect clashing of invocations (see
+   * {@link com.github.dm.jrt.android.v11.core.JRoutineLoader} and
+   * {@link com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat}).
+   *
+   * @param routine   the delegated routine.
+   * @param routineId the routine identifier.
+   * @param <IN>      the input data type.
+   * @param <OUT>     the output data type.
+   * @return the invocation factory.
+   */
+  @NotNull
+  public static <IN, OUT> ContextInvocationFactory<IN, OUT> factoryOfParallel(
+      @NotNull final Routine<IN, OUT> routine, final int routineId) {
+    return new WrappingContextInvocationFactory<IN, OUT>(
+        InvocationFactory.factoryOfParallel(routine), routineId);
   }
 
   /**
@@ -290,10 +333,12 @@ public abstract class ContextInvocationFactory<IN, OUT> extends DeepEqualObject 
     /**
      * Constructor.
      *
-     * @param factory the invocation factory.
+     * @param factory   the invocation factory.
+     * @param routineId the optional routine ID.
      */
-    private WrappingContextInvocationFactory(@NotNull final InvocationFactory<IN, OUT> factory) {
-      super(asArgs(factory));
+    private WrappingContextInvocationFactory(@NotNull final InvocationFactory<IN, OUT> factory,
+        @Nullable final Integer routineId) {
+      super(asArgs((routineId != null) ? routineId : factory));
       final Class<? extends InvocationFactory> factoryClass = factory.getClass();
       if (!Reflection.hasStaticScope(factoryClass)) {
         throw new IllegalArgumentException(

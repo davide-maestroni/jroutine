@@ -27,7 +27,6 @@ import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
-import com.github.dm.jrt.core.config.InvocationConfiguration.InvocationModeType;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.log.Log;
 import com.github.dm.jrt.core.log.Log.Level;
@@ -44,10 +43,8 @@ import com.github.dm.jrt.reflect.annotation.AsyncInput.InputMode;
 import com.github.dm.jrt.reflect.annotation.AsyncMethod;
 import com.github.dm.jrt.reflect.annotation.AsyncOutput;
 import com.github.dm.jrt.reflect.annotation.AsyncOutput.OutputMode;
-import com.github.dm.jrt.reflect.annotation.InvocationMode;
 import com.github.dm.jrt.reflect.annotation.OutputTimeout;
 import com.github.dm.jrt.reflect.annotation.OutputTimeoutAction;
-import com.github.dm.jrt.reflect.annotation.SharedFields;
 import com.github.dm.jrt.reflect.config.WrapperConfiguration;
 
 import org.jetbrains.annotations.NotNull;
@@ -351,19 +348,6 @@ public class ServiceReflectionRoutineTest extends ActivityInstrumentationTestCas
     } catch (final IllegalArgumentException ignored) {
 
     }
-
-    try {
-
-      JRoutineServiceReflection.on(serviceFrom(getActivity()))
-                               .with(instanceOf(Sum.class))
-                               .buildProxy(SumError.class)
-                               .compute("test", channel);
-
-      fail();
-
-    } catch (final IllegalArgumentException ignored) {
-
-    }
   }
 
   public void testInvalidProxyMethodError() {
@@ -600,22 +584,12 @@ public class ServiceReflectionRoutineTest extends ActivityInstrumentationTestCas
     final Channel<Character, Character> channel1 = JRoutineCore.<Character>ofData().buildChannel();
     channel1.pass('a').close();
     assertThat(itf.add1(channel1)).isEqualTo((int) 'a');
-    final Channel<Character, Character> channel2 = JRoutineCore.<Character>ofData().buildChannel();
-    channel2.pass('d', 'e', 'f').close();
-    assertThat(itf.add2(channel2)).isIn((int) 'd', (int) 'e', (int) 'f');
     assertThat(itf.add3('c').all()).containsExactly((int) 'c');
     final Channel<Character, Character> channel3 = JRoutineCore.<Character>ofData().buildChannel();
     channel3.pass('a').close();
     assertThat(itf.add4(channel3).all()).containsExactly((int) 'a');
-    final Channel<Character, Character> channel4 = JRoutineCore.<Character>ofData().buildChannel();
-    channel4.pass('d', 'e', 'f').close();
-    assertThat(itf.add5(channel4).all()).containsOnly((int) 'd', (int) 'e', (int) 'f');
     assertThat(itf.add6().pass('d').close().all()).containsOnly((int) 'd');
-    assertThat(itf.add7().pass('d', 'e', 'f').close().all()).containsOnly((int) 'd', (int) 'e',
-        (int) 'f');
     assertThat(itf.add10().invoke().pass('d').close().all()).containsOnly((int) 'd');
-    assertThat(itf.add11().invoke().pass('d', 'e', 'f').close().all()).containsOnly((int) 'd',
-        (int) 'e', (int) 'f');
     assertThat(itf.addA00(new char[]{'c', 'z'})).isEqualTo(new int[]{'c', 'z'});
     final Channel<char[], char[]> channel5 = JRoutineCore.<char[]>ofData().buildChannel();
     channel5.pass(new char[]{'a', 'z'}).close();
@@ -623,10 +597,6 @@ public class ServiceReflectionRoutineTest extends ActivityInstrumentationTestCas
     final Channel<Character, Character> channel6 = JRoutineCore.<Character>ofData().buildChannel();
     channel6.pass('d', 'e', 'f').close();
     assertThat(itf.addA02(channel6)).isEqualTo(new int[]{'d', 'e', 'f'});
-    final Channel<char[], char[]> channel7 = JRoutineCore.<char[]>ofData().buildChannel();
-    channel7.pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'}).close();
-    assertThat(itf.addA03(channel7)).isIn(new int[]{'d', 'z'}, new int[]{'e', 'z'},
-        new int[]{'f', 'z'});
     assertThat(itf.addA04(new char[]{'c', 'z'}).all()).containsExactly(new int[]{'c', 'z'});
     final Channel<char[], char[]> channel8 = JRoutineCore.<char[]>ofData().buildChannel();
     channel8.pass(new char[]{'a', 'z'}).close();
@@ -636,8 +606,6 @@ public class ServiceReflectionRoutineTest extends ActivityInstrumentationTestCas
     assertThat(itf.addA06(channel9).all()).containsExactly(new int[]{'d', 'e', 'f'});
     final Channel<char[], char[]> channel10 = JRoutineCore.<char[]>ofData().buildChannel();
     channel10.pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'}).close();
-    assertThat(itf.addA07(channel10).all()).containsOnly(new int[]{'d', 'z'}, new int[]{'e', 'z'},
-        new int[]{'f', 'z'});
     assertThat(itf.addA08(new char[]{'c', 'z'}).all()).containsExactly((int) 'c', (int) 'z');
     final Channel<char[], char[]> channel11 = JRoutineCore.<char[]>ofData().buildChannel();
     channel11.pass(new char[]{'a', 'z'}).close();
@@ -645,40 +613,14 @@ public class ServiceReflectionRoutineTest extends ActivityInstrumentationTestCas
     final Channel<Character, Character> channel12 = JRoutineCore.<Character>ofData().buildChannel();
     channel12.pass('d', 'e', 'f').close();
     assertThat(itf.addA10(channel12).all()).containsExactly((int) 'd', (int) 'e', (int) 'f');
-    final Channel<char[], char[]> channel13 = JRoutineCore.<char[]>ofData().buildChannel();
-    channel13.pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'}).close();
-    assertThat(itf.addA11(channel13).all()).containsOnly((int) 'd', (int) 'e', (int) 'f',
-        (int) 'z');
     assertThat(itf.addA12().pass(new char[]{'c', 'z'}).close().all()).containsOnly(
         new int[]{'c', 'z'});
-    assertThat(itf.addA13()
-                  .pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'})
-                  .close()
-                  .all()).containsOnly(new int[]{'d', 'z'}, new int[]{'e', 'z'},
-        new int[]{'f', 'z'});
     assertThat(itf.addA14().invoke().pass(new char[]{'c', 'z'}).close().all()).containsOnly(
         new int[]{'c', 'z'});
-    assertThat(itf.addA15()
-                  .invoke()
-                  .pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'})
-                  .close()
-                  .all()).containsOnly(new int[]{'d', 'z'}, new int[]{'e', 'z'},
-        new int[]{'f', 'z'});
     assertThat(itf.addA16().pass(new char[]{'c', 'z'}).close().all()).containsExactly((int) 'c',
-        (int) 'z');
-    assertThat(itf.addA17()
-                  .pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'})
-                  .close()
-                  .all()).containsOnly((int) 'd', (int) 'z', (int) 'e', (int) 'z', (int) 'f',
         (int) 'z');
     assertThat(itf.addA18().invoke().pass(new char[]{'c', 'z'}).close().all()).containsExactly(
         (int) 'c', (int) 'z');
-    assertThat(itf.addA19()
-                  .invoke()
-                  .pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'})
-                  .close()
-                  .all()).containsOnly((int) 'd', (int) 'z', (int) 'e', (int) 'z', (int) 'f',
-        (int) 'z');
     assertThat(itf.addL00(Arrays.asList('c', 'z'))).isEqualTo(Arrays.asList((int) 'c', (int) 'z'));
     final Channel<List<Character>, List<Character>> channel20 =
         JRoutineCore.<List<Character>>ofData().buildChannel();
@@ -687,12 +629,6 @@ public class ServiceReflectionRoutineTest extends ActivityInstrumentationTestCas
     final Channel<Character, Character> channel21 = JRoutineCore.<Character>ofData().buildChannel();
     channel21.pass('d', 'e', 'f').close();
     assertThat(itf.addL02(channel21)).isEqualTo(Arrays.asList((int) 'd', (int) 'e', (int) 'f'));
-    final Channel<List<Character>, List<Character>> channel22 =
-        JRoutineCore.<List<Character>>ofData().buildChannel();
-    channel22.pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'), Arrays.asList('f', 'z'))
-             .close();
-    assertThat(itf.addL03(channel22)).isIn(Arrays.asList((int) 'd', (int) 'z'),
-        Arrays.asList((int) 'e', (int) 'z'), Arrays.asList((int) 'f', (int) 'z'));
     assertThat(itf.addL04(Arrays.asList('c', 'z')).all()).containsExactly(
         Arrays.asList((int) 'c', (int) 'z'));
     final Channel<List<Character>, List<Character>> channel23 =
@@ -703,12 +639,6 @@ public class ServiceReflectionRoutineTest extends ActivityInstrumentationTestCas
     channel24.pass('d', 'e', 'f').close();
     assertThat(itf.addL06(channel24).all()).containsExactly(
         Arrays.asList((int) 'd', (int) 'e', (int) 'f'));
-    final Channel<List<Character>, List<Character>> channel25 =
-        JRoutineCore.<List<Character>>ofData().buildChannel();
-    channel25.pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'), Arrays.asList('f', 'z'))
-             .close();
-    assertThat(itf.addL07(channel25).all()).containsOnly(Arrays.asList((int) 'd', (int) 'z'),
-        Arrays.asList((int) 'e', (int) 'z'), Arrays.asList((int) 'f', (int) 'z'));
     assertThat(itf.addL08(Arrays.asList('c', 'z')).all()).containsExactly((int) 'c', (int) 'z');
     final Channel<List<Character>, List<Character>> channel26 =
         JRoutineCore.<List<Character>>ofData().buildChannel();
@@ -717,42 +647,14 @@ public class ServiceReflectionRoutineTest extends ActivityInstrumentationTestCas
     final Channel<Character, Character> channel27 = JRoutineCore.<Character>ofData().buildChannel();
     channel27.pass('d', 'e', 'f').close();
     assertThat(itf.addL10(channel27).all()).containsExactly((int) 'd', (int) 'e', (int) 'f');
-    final Channel<List<Character>, List<Character>> channel28 =
-        JRoutineCore.<List<Character>>ofData().buildChannel();
-    channel28.pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'), Arrays.asList('f', 'z'))
-             .close();
-    assertThat(itf.addL11(channel28).all()).containsOnly((int) 'd', (int) 'e', (int) 'f',
-        (int) 'z');
     assertThat(itf.addL12().pass(Arrays.asList('c', 'z')).close().all()).containsOnly(
         Arrays.asList((int) 'c', (int) 'z'));
-    assertThat(itf.addL13()
-                  .pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'), Arrays.asList('f', 'z'))
-                  .close()
-                  .all()).containsOnly(Arrays.asList((int) 'd', (int) 'z'),
-        Arrays.asList((int) 'e', (int) 'z'), Arrays.asList((int) 'f', (int) 'z'));
     assertThat(itf.addL14().invoke().pass(Arrays.asList('c', 'z')).close().all()).containsOnly(
         Arrays.asList((int) 'c', (int) 'z'));
-    assertThat(itf.addL15()
-                  .invoke()
-                  .pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'), Arrays.asList('f', 'z'))
-                  .close()
-                  .all()).containsOnly(Arrays.asList((int) 'd', (int) 'z'),
-        Arrays.asList((int) 'e', (int) 'z'), Arrays.asList((int) 'f', (int) 'z'));
     assertThat(itf.addL16().pass(Arrays.asList('c', 'z')).close().all()).containsExactly((int) 'c',
-        (int) 'z');
-    assertThat(itf.addL17()
-                  .pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'), Arrays.asList('f', 'z'))
-                  .close()
-                  .all()).containsOnly((int) 'd', (int) 'z', (int) 'e', (int) 'z', (int) 'f',
         (int) 'z');
     assertThat(itf.addL18().invoke().pass(Arrays.asList('c', 'z')).close().all()).containsExactly(
         (int) 'c', (int) 'z');
-    assertThat(itf.addL19()
-                  .invoke()
-                  .pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'), Arrays.asList('f', 'z'))
-                  .close()
-                  .all()).containsOnly((int) 'd', (int) 'z', (int) 'e', (int) 'z', (int) 'f',
-        (int) 'z');
     assertThat(itf.get0()).isEqualTo(31);
     assertThat(itf.get1().all()).containsExactly(31);
     assertThat(itf.get2().close().all()).containsExactly(31);
@@ -773,9 +675,6 @@ public class ServiceReflectionRoutineTest extends ActivityInstrumentationTestCas
     final Channel<Integer, Integer> channel35 = JRoutineCore.<Integer>ofData().buildChannel();
     channel35.pass(-17).close();
     itf.set1(channel35);
-    final Channel<Integer, Integer> channel36 = JRoutineCore.<Integer>ofData().buildChannel();
-    channel36.pass(-17).close();
-    itf.set2(channel36);
     itf.set3().pass(-17).close().getComplete();
     itf.set5().invoke().pass(-17).close().getComplete();
     itf.setA0(new int[]{1, 2, 3});
@@ -785,9 +684,6 @@ public class ServiceReflectionRoutineTest extends ActivityInstrumentationTestCas
     final Channel<Integer, Integer> channel38 = JRoutineCore.<Integer>ofData().buildChannel();
     channel38.pass(1, 2, 3).close();
     itf.setA2(channel38);
-    final Channel<int[], int[]> channel39 = JRoutineCore.<int[]>ofData().buildChannel();
-    channel39.pass(new int[]{1, 2, 3}).close();
-    itf.setA3(channel39);
     itf.setA4().pass(new int[]{1, 2, 3}).close().getComplete();
     itf.setA6().invoke().pass(new int[]{1, 2, 3}).close().getComplete();
     itf.setL0(Arrays.asList(1, 2, 3));
@@ -798,10 +694,6 @@ public class ServiceReflectionRoutineTest extends ActivityInstrumentationTestCas
     final Channel<Integer, Integer> channel41 = JRoutineCore.<Integer>ofData().buildChannel();
     channel41.pass(1, 2, 3).close();
     itf.setL2(channel41);
-    final Channel<List<Integer>, List<Integer>> channel42 =
-        JRoutineCore.<List<Integer>>ofData().buildChannel();
-    channel42.pass(Arrays.asList(1, 2, 3)).close();
-    itf.setL3(channel42);
     itf.setL4().pass(Arrays.asList(1, 2, 3)).close().getComplete();
     itf.setL6().invoke().pass(Arrays.asList(1, 2, 3)).close().getComplete();
   }
@@ -819,10 +711,6 @@ public class ServiceReflectionRoutineTest extends ActivityInstrumentationTestCas
     final Channel<Integer, Integer> channel1 = JRoutineCore.<Integer>ofData().buildChannel();
     channel1.pass(4).close();
     assertThat(squareAsync.computeAsync(channel1)).isEqualTo(16);
-
-    final Channel<Integer, Integer> channel2 = JRoutineCore.<Integer>ofData().buildChannel();
-    channel2.pass(1, 2, 3).close();
-    assertThat(squareAsync.computeParallel(channel2).in(timeout).all()).containsOnly(1, 4, 9);
   }
 
   public void testSharedFields() throws NoSuchMethodException {
@@ -987,78 +875,48 @@ public class ServiceReflectionRoutineTest extends ActivityInstrumentationTestCas
     int add0(char c);
 
     @Alias("a")
-    int add1(@AsyncInput(value = char.class, mode = InputMode.VALUE) Channel<?, Character> c);
+    int add1(@AsyncInput(value = char.class, mode = InputMode.DEFAULT) Channel<?, Character> c);
 
     @Alias("a")
     @AsyncMethod(char.class)
     Routine<Character, Integer> add10();
 
     @Alias("a")
-    @InvocationMode(InvocationModeType.PARALLEL)
-    @AsyncMethod(char.class)
-    Routine<Character, Integer> add11();
-
-    @Alias("a")
-    @InvocationMode(InvocationModeType.PARALLEL)
-    int add2(@AsyncInput(value = char.class, mode = InputMode.VALUE) Channel<?, Character> c);
-
-    @Alias("a")
-    @AsyncOutput(OutputMode.VALUE)
+    @AsyncOutput(OutputMode.DEFAULT)
     Channel<?, Integer> add3(char c);
 
     @Alias("a")
-    @AsyncOutput(OutputMode.VALUE)
+    @AsyncOutput(OutputMode.DEFAULT)
     Channel<?, Integer> add4(
-        @AsyncInput(value = char.class, mode = InputMode.VALUE) Channel<?, Character> c);
-
-    @Alias("a")
-    @InvocationMode(InvocationModeType.PARALLEL)
-    @AsyncOutput(OutputMode.VALUE)
-    Channel<?, Integer> add5(
-        @AsyncInput(value = char.class, mode = InputMode.VALUE) Channel<?, Character> c);
+        @AsyncInput(value = char.class, mode = InputMode.DEFAULT) Channel<?, Character> c);
 
     @Alias("a")
     @AsyncMethod(char.class)
     Channel<Character, Integer> add6();
 
-    @Alias("a")
-    @InvocationMode(InvocationModeType.PARALLEL)
-    @AsyncMethod(char.class)
-    Channel<Character, Integer> add7();
-
     @Alias("aa")
     int[] addA00(char[] c);
 
     @Alias("aa")
-    int[] addA01(@AsyncInput(value = char[].class, mode = InputMode.VALUE) Channel<?, char[]> c);
+    int[] addA01(@AsyncInput(value = char[].class, mode = InputMode.DEFAULT) Channel<?, char[]> c);
 
     @Alias("aa")
     int[] addA02(
         @AsyncInput(value = char[].class, mode = InputMode.COLLECTION) Channel<?, Character> c);
 
     @Alias("aa")
-    @InvocationMode(InvocationModeType.PARALLEL)
-    int[] addA03(@AsyncInput(value = char[].class, mode = InputMode.VALUE) Channel<?, char[]> c);
-
-    @Alias("aa")
-    @AsyncOutput(OutputMode.VALUE)
+    @AsyncOutput(OutputMode.DEFAULT)
     Channel<?, int[]> addA04(char[] c);
 
     @Alias("aa")
-    @AsyncOutput(OutputMode.VALUE)
+    @AsyncOutput(OutputMode.DEFAULT)
     Channel<?, int[]> addA05(
-        @AsyncInput(value = char[].class, mode = InputMode.VALUE) Channel<?, char[]> c);
+        @AsyncInput(value = char[].class, mode = InputMode.DEFAULT) Channel<?, char[]> c);
 
     @Alias("aa")
-    @AsyncOutput(OutputMode.VALUE)
+    @AsyncOutput(OutputMode.DEFAULT)
     Channel<?, int[]> addA06(
         @AsyncInput(value = char[].class, mode = InputMode.COLLECTION) Channel<?, Character> c);
-
-    @Alias("aa")
-    @InvocationMode(InvocationModeType.PARALLEL)
-    @AsyncOutput(OutputMode.VALUE)
-    Channel<?, int[]> addA07(
-        @AsyncInput(value = char[].class, mode = InputMode.VALUE) Channel<?, char[]> c);
 
     @Alias("aa")
     @AsyncOutput(OutputMode.ELEMENT)
@@ -1067,7 +925,7 @@ public class ServiceReflectionRoutineTest extends ActivityInstrumentationTestCas
     @Alias("aa")
     @AsyncOutput(OutputMode.ELEMENT)
     Channel<?, Integer> addA09(
-        @AsyncInput(value = char[].class, mode = InputMode.VALUE) Channel<?, char[]> c);
+        @AsyncInput(value = char[].class, mode = InputMode.DEFAULT) Channel<?, char[]> c);
 
     @Alias("aa")
     @AsyncOutput(OutputMode.ELEMENT)
@@ -1075,82 +933,45 @@ public class ServiceReflectionRoutineTest extends ActivityInstrumentationTestCas
         @AsyncInput(value = char[].class, mode = InputMode.COLLECTION) Channel<?, Character> c);
 
     @Alias("aa")
-    @InvocationMode(InvocationModeType.PARALLEL)
-    @AsyncOutput(OutputMode.ELEMENT)
-    Channel<?, Integer> addA11(
-        @AsyncInput(value = char[].class, mode = InputMode.VALUE) Channel<?, char[]> c);
-
-    @Alias("aa")
     @AsyncMethod(char[].class)
     Channel<char[], int[]> addA12();
-
-    @Alias("aa")
-    @InvocationMode(InvocationModeType.PARALLEL)
-    @AsyncMethod(char[].class)
-    Channel<char[], int[]> addA13();
 
     @Alias("aa")
     @AsyncMethod(char[].class)
     Routine<char[], int[]> addA14();
 
     @Alias("aa")
-    @InvocationMode(InvocationModeType.PARALLEL)
-    @AsyncMethod(char[].class)
-    Routine<char[], int[]> addA15();
-
-    @Alias("aa")
     @AsyncMethod(value = char[].class, mode = OutputMode.ELEMENT)
     Channel<char[], Integer> addA16();
 
     @Alias("aa")
-    @InvocationMode(InvocationModeType.PARALLEL)
-    @AsyncMethod(value = char[].class, mode = OutputMode.ELEMENT)
-    Channel<char[], Integer> addA17();
-
-    @Alias("aa")
     @AsyncMethod(value = char[].class, mode = OutputMode.ELEMENT)
     Routine<char[], Integer> addA18();
-
-    @Alias("aa")
-    @InvocationMode(InvocationModeType.PARALLEL)
-    @AsyncMethod(value = char[].class, mode = OutputMode.ELEMENT)
-    Routine<char[], Integer> addA19();
 
     @Alias("al")
     List<Integer> addL00(List<Character> c);
 
     @Alias("al")
     List<Integer> addL01(
-        @AsyncInput(value = List.class, mode = InputMode.VALUE) Channel<?, List<Character>> c);
+        @AsyncInput(value = List.class, mode = InputMode.DEFAULT) Channel<?, List<Character>> c);
 
     @Alias("al")
     List<Integer> addL02(
         @AsyncInput(value = List.class, mode = InputMode.COLLECTION) Channel<?, Character> c);
 
     @Alias("al")
-    @InvocationMode(InvocationModeType.PARALLEL)
-    List<Integer> addL03(
-        @AsyncInput(value = List.class, mode = InputMode.VALUE) Channel<?, List<Character>> c);
-
-    @Alias("al")
-    @AsyncOutput(OutputMode.VALUE)
+    @AsyncOutput(OutputMode.DEFAULT)
     Channel<?, List<Integer>> addL04(List<Character> c);
 
     @Alias("al")
-    @AsyncOutput(OutputMode.VALUE)
+    @AsyncOutput(OutputMode.DEFAULT)
     Channel<?, List<Integer>> addL05(
-        @AsyncInput(value = List.class, mode = InputMode.VALUE) Channel<?, List<Character>> c);
+        @AsyncInput(value = List.class, mode = InputMode.DEFAULT) Channel<?, List<Character>> c);
 
     @Alias("al")
-    @AsyncOutput(OutputMode.VALUE)
+    @AsyncOutput(OutputMode.DEFAULT)
     Channel<?, List<Integer>> addL06(
         @AsyncInput(value = List.class, mode = InputMode.COLLECTION) Channel<?, Character> c);
-
-    @Alias("al")
-    @InvocationMode(InvocationModeType.PARALLEL)
-    @AsyncOutput(OutputMode.VALUE)
-    Channel<?, List<Integer>> addL07(
-        @AsyncInput(value = List.class, mode = InputMode.VALUE) Channel<?, List<Character>> c);
 
     @Alias("al")
     @AsyncOutput(OutputMode.ELEMENT)
@@ -1159,7 +980,7 @@ public class ServiceReflectionRoutineTest extends ActivityInstrumentationTestCas
     @Alias("al")
     @AsyncOutput(OutputMode.ELEMENT)
     Channel<?, Integer> addL09(
-        @AsyncInput(value = List.class, mode = InputMode.VALUE) Channel<?, List<Character>> c);
+        @AsyncInput(value = List.class, mode = InputMode.DEFAULT) Channel<?, List<Character>> c);
 
     @Alias("al")
     @AsyncOutput(OutputMode.ELEMENT)
@@ -1167,46 +988,20 @@ public class ServiceReflectionRoutineTest extends ActivityInstrumentationTestCas
         @AsyncInput(value = List.class, mode = InputMode.COLLECTION) Channel<?, Character> c);
 
     @Alias("al")
-    @InvocationMode(InvocationModeType.PARALLEL)
-    @AsyncOutput(OutputMode.ELEMENT)
-    Channel<?, Integer> addL11(
-        @AsyncInput(value = List.class, mode = InputMode.VALUE) Channel<?, List<Character>> c);
-
-    @Alias("al")
     @AsyncMethod(List.class)
     Channel<List<Character>, List<Integer>> addL12();
-
-    @Alias("al")
-    @InvocationMode(InvocationModeType.PARALLEL)
-    @AsyncMethod(List.class)
-    Channel<List<Character>, List<Integer>> addL13();
 
     @Alias("al")
     @AsyncMethod(List.class)
     Routine<List<Character>, List<Integer>> addL14();
 
     @Alias("al")
-    @InvocationMode(InvocationModeType.PARALLEL)
-    @AsyncMethod(List.class)
-    Routine<List<Character>, List<Integer>> addL15();
-
-    @Alias("al")
     @AsyncMethod(value = List.class, mode = OutputMode.ELEMENT)
     Channel<List<Character>, Integer> addL16();
 
     @Alias("al")
-    @InvocationMode(InvocationModeType.PARALLEL)
-    @AsyncMethod(value = List.class, mode = OutputMode.ELEMENT)
-    Channel<List<Character>, Integer> addL17();
-
-    @Alias("al")
     @AsyncMethod(value = List.class, mode = OutputMode.ELEMENT)
     Routine<List<Character>, Integer> addL18();
-
-    @Alias("al")
-    @InvocationMode(InvocationModeType.PARALLEL)
-    @AsyncMethod(value = List.class, mode = OutputMode.ELEMENT)
-    Routine<List<Character>, Integer> addL19();
 
     @Alias("g")
     int get0();
@@ -1215,19 +1010,15 @@ public class ServiceReflectionRoutineTest extends ActivityInstrumentationTestCas
     void set0(int i);
 
     @Alias("g")
-    @AsyncOutput(OutputMode.VALUE)
+    @AsyncOutput(OutputMode.DEFAULT)
     Channel<?, Integer> get1();
 
     @Alias("s")
-    void set1(@AsyncInput(value = int.class, mode = InputMode.VALUE) Channel<?, Integer> i);
+    void set1(@AsyncInput(value = int.class, mode = InputMode.DEFAULT) Channel<?, Integer> i);
 
     @Alias("g")
     @AsyncMethod({})
     Channel<Void, Integer> get2();
-
-    @Alias("s")
-    @InvocationMode(InvocationModeType.PARALLEL)
-    void set2(@AsyncInput(value = int.class, mode = InputMode.VALUE) Channel<?, Integer> i);
 
     @Alias("g")
     @AsyncMethod({})
@@ -1244,7 +1035,7 @@ public class ServiceReflectionRoutineTest extends ActivityInstrumentationTestCas
     Channel<?, Integer> getA1();
 
     @Alias("sa")
-    void setA1(@AsyncInput(value = int[].class, mode = InputMode.VALUE) Channel<?, int[]> i);
+    void setA1(@AsyncInput(value = int[].class, mode = InputMode.DEFAULT) Channel<?, int[]> i);
 
     @Alias("ga")
     @AsyncMethod({})
@@ -1256,10 +1047,6 @@ public class ServiceReflectionRoutineTest extends ActivityInstrumentationTestCas
     @Alias("ga")
     @AsyncMethod({})
     Routine<Void, int[]> getA3();
-
-    @Alias("sa")
-    @InvocationMode(InvocationModeType.PARALLEL)
-    void setA3(@AsyncInput(value = int[].class, mode = InputMode.VALUE) Channel<?, int[]> i);
 
     @Alias("ga")
     @AsyncMethod(value = {}, mode = OutputMode.ELEMENT)
@@ -1280,7 +1067,8 @@ public class ServiceReflectionRoutineTest extends ActivityInstrumentationTestCas
     Channel<?, Integer> getL1();
 
     @Alias("sl")
-    void setL1(@AsyncInput(value = List.class, mode = InputMode.VALUE) Channel<?, List<Integer>> i);
+    void setL1(
+        @AsyncInput(value = List.class, mode = InputMode.DEFAULT) Channel<?, List<Integer>> i);
 
     @Alias("gl")
     @AsyncMethod({})
@@ -1292,10 +1080,6 @@ public class ServiceReflectionRoutineTest extends ActivityInstrumentationTestCas
     @Alias("gl")
     @AsyncMethod({})
     Routine<Void, List<Integer>> getL3();
-
-    @Alias("sl")
-    @InvocationMode(InvocationModeType.PARALLEL)
-    void setL3(@AsyncInput(value = List.class, mode = InputMode.VALUE) Channel<?, List<Integer>> i);
 
     @Alias("gl")
     @AsyncMethod(value = {}, mode = OutputMode.ELEMENT)
@@ -1339,7 +1123,7 @@ public class ServiceReflectionRoutineTest extends ActivityInstrumentationTestCas
     @AsyncOutput(OutputMode.ELEMENT)
     String[] count1(int length);
 
-    @AsyncOutput(OutputMode.VALUE)
+    @AsyncOutput(OutputMode.DEFAULT)
     List<Integer> countList(int length);
 
     @Alias("countList")
@@ -1353,7 +1137,7 @@ public class ServiceReflectionRoutineTest extends ActivityInstrumentationTestCas
     Channel<?, Integer> count(int length);
 
     @Alias("count")
-    @AsyncOutput(OutputMode.VALUE)
+    @AsyncOutput(OutputMode.DEFAULT)
     Channel<?, int[]> count1(int length);
 
     @Alias("count")
@@ -1376,13 +1160,6 @@ public class ServiceReflectionRoutineTest extends ActivityInstrumentationTestCas
     @Alias("compute")
     @OutputTimeout(10000)
     int computeAsync(@AsyncInput(int.class) Channel<?, Integer> i);
-
-    @SharedFields({})
-    @Alias("compute")
-    @InvocationMode(InvocationModeType.PARALLEL)
-    @AsyncOutput
-    Channel<?, Integer> computeParallel(
-        @AsyncInput(value = int.class, mode = InputMode.VALUE) Channel<?, Integer> i);
   }
 
   private interface SumError {
@@ -1391,7 +1168,7 @@ public class ServiceReflectionRoutineTest extends ActivityInstrumentationTestCas
 
     int compute(@AsyncInput(int.class) String[] ints);
 
-    int compute(@AsyncInput(value = int.class, mode = InputMode.VALUE) int[] ints);
+    int compute(@AsyncInput(value = int.class, mode = InputMode.DEFAULT) int[] ints);
 
     int compute(@AsyncInput(value = int.class, mode = InputMode.COLLECTION) Iterable<Integer> ints);
 
@@ -1400,9 +1177,6 @@ public class ServiceReflectionRoutineTest extends ActivityInstrumentationTestCas
 
     int compute(int a,
         @AsyncInput(value = int[].class, mode = InputMode.COLLECTION) Channel<?, Integer> b);
-
-    @InvocationMode(InvocationModeType.PARALLEL)
-    int compute(String text, @AsyncInput(int.class) Channel<?, Integer> ints);
   }
 
   private interface SumItf {

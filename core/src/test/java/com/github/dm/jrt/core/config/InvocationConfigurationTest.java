@@ -19,7 +19,6 @@ package com.github.dm.jrt.core.config;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.ChannelConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
-import com.github.dm.jrt.core.config.InvocationConfiguration.InvocationModeType;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.Logs;
 import com.github.dm.jrt.core.log.NullLog;
@@ -35,7 +34,6 @@ import static com.github.dm.jrt.core.config.InvocationConfiguration.builder;
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builderFrom;
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builderFromInput;
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builderFromOutput;
-import static com.github.dm.jrt.core.config.InvocationConfiguration.withRunner;
 import static com.github.dm.jrt.core.util.DurationMeasure.millis;
 import static com.github.dm.jrt.core.util.DurationMeasure.noTime;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -327,20 +325,6 @@ public class InvocationConfigurationTest {
   }
 
   @Test
-  public void testInvocationModeEquals() {
-
-    final InvocationConfiguration configuration = builder().withInputOrder(OrderType.SORTED)
-                                                           .withRunner(Runners.syncRunner())
-                                                           .withLog(new NullLog())
-                                                           .withOutputMaxSize(100)
-                                                           .apply();
-    assertThat(configuration).isNotEqualTo(builder().withMode(InvocationModeType.PARALLEL).apply());
-    assertThat(
-        configuration.builderFrom().withMode(InvocationModeType.PARALLEL).apply()).isNotEqualTo(
-        builder().withMode(InvocationModeType.PARALLEL).apply());
-  }
-
-  @Test
   public void testLogEquals() {
 
     final InvocationConfiguration configuration = builder().withInputOrder(OrderType.SORTED)
@@ -500,12 +484,6 @@ public class InvocationConfigurationTest {
     assertThat(configuration).isNotEqualTo(builder().withPriority(3).apply());
     assertThat(configuration.builderFrom().withPriority(17).apply()).isNotEqualTo(
         builder().withPriority(17).apply());
-  }
-
-  @Test
-  public void testRunnerConfig() {
-    assertThat(withRunner(Runners.syncRunner())).isEqualTo(
-        builder().withRunner(Runners.syncRunner()).apply());
   }
 
   @Test

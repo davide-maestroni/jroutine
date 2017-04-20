@@ -21,7 +21,6 @@ import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.BackoffBuilder;
 import com.github.dm.jrt.core.common.RoutineException;
-import com.github.dm.jrt.core.config.InvocationConfiguration.InvocationModeType;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.function.Functions;
@@ -47,6 +46,7 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOfParallel;
 import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
 import static com.github.dm.jrt.core.util.DurationMeasure.millis;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
@@ -239,62 +239,38 @@ public class OperatorsTest {
       }
     })).invoke().pass("test1").close().in(seconds(3)).all()).containsExactly("test1", "TEST2",
         "TEST2", "TEST2");
-    assertThat(JRoutineCore.with(appendGet(new Supplier<String>() {
+    assertThat(
+        JRoutineCore.with(factoryOfParallel(JRoutineCore.with(appendGet(new Supplier<String>() {
 
-      public String get() {
-        return "TEST2";
-      }
-    }))
-                           .invocationConfiguration()
-                           .withMode(InvocationModeType.PARALLEL)
-                           .apply()
-                           .invoke()
-                           .pass("test1")
-                           .close()
-                           .in(seconds(3))
-                           .all()).containsExactly("test1", "TEST2");
-    assertThat(JRoutineCore.with(appendAccept(new Consumer<Channel<String, ?>>() {
+          public String get() {
+            return "TEST2";
+          }
+        })).buildRoutine())).invoke().pass("test1").close().in(seconds(3)).all()).containsExactly(
+        "test1", "TEST2");
+    assertThat(JRoutineCore.with(
+        factoryOfParallel(JRoutineCore.with(appendAccept(new Consumer<Channel<String, ?>>() {
 
-      public void accept(final Channel<String, ?> resultChannel) {
-        resultChannel.pass("TEST2");
-      }
-    }))
-                           .invocationConfiguration()
-                           .withMode(InvocationModeType.PARALLEL)
-                           .apply()
-                           .invoke()
-                           .pass("test1")
-                           .close()
-                           .in(seconds(3))
-                           .all()).containsExactly("test1", "TEST2");
-    assertThat(JRoutineCore.with(appendGet(3, new Supplier<String>() {
+          public void accept(final Channel<String, ?> resultChannel) {
+            resultChannel.pass("TEST2");
+          }
+        })).buildRoutine())).invoke().pass("test1").close().in(seconds(3)).all()).containsExactly(
+        "test1", "TEST2");
+    assertThat(
+        JRoutineCore.with(factoryOfParallel(JRoutineCore.with(appendGet(3, new Supplier<String>() {
 
-      public String get() {
-        return "TEST2";
-      }
-    }))
-                           .invocationConfiguration()
-                           .withMode(InvocationModeType.PARALLEL)
-                           .apply()
-                           .invoke()
-                           .pass("test1")
-                           .close()
-                           .in(seconds(3))
-                           .all()).containsExactly("test1", "TEST2", "TEST2", "TEST2");
-    assertThat(JRoutineCore.with(appendAccept(3, new Consumer<Channel<String, ?>>() {
+          public String get() {
+            return "TEST2";
+          }
+        })).buildRoutine())).invoke().pass("test1").close().in(seconds(3)).all()).containsExactly(
+        "test1", "TEST2", "TEST2", "TEST2");
+    assertThat(JRoutineCore.with(
+        factoryOfParallel(JRoutineCore.with(appendAccept(3, new Consumer<Channel<String, ?>>() {
 
-      public void accept(final Channel<String, ?> resultChannel) {
-        resultChannel.pass("TEST2");
-      }
-    }))
-                           .invocationConfiguration()
-                           .withMode(InvocationModeType.PARALLEL)
-                           .apply()
-                           .invoke()
-                           .pass("test1")
-                           .close()
-                           .in(seconds(3))
-                           .all()).containsExactly("test1", "TEST2", "TEST2", "TEST2");
+          public void accept(final Channel<String, ?> resultChannel) {
+            resultChannel.pass("TEST2");
+          }
+        })).buildRoutine())).invoke().pass("test1").close().in(seconds(3)).all()).containsExactly(
+        "test1", "TEST2", "TEST2", "TEST2");
   }
 
   @Test
@@ -1089,10 +1065,8 @@ public class OperatorsTest {
                            .close()
                            .in(seconds(3))
                            .all()).containsExactly("test");
-    assertThat(JRoutineCore.with(filter(Functions.isNotNull()))
-                           .invocationConfiguration()
-                           .withMode(InvocationModeType.PARALLEL)
-                           .apply()
+    assertThat(JRoutineCore.with(
+        factoryOfParallel(JRoutineCore.with(filter(Functions.isNotNull())).buildRoutine()))
                            .invoke()
                            .pass(null, "test")
                            .close()
@@ -1106,10 +1080,13 @@ public class OperatorsTest {
                            .pass(null, "test")
                            .close()
                            .all()).containsExactly("test");
-    assertThat(JRoutineCore.with(filter(Functions.isNotNull()))
+    assertThat(JRoutineCore.with(factoryOfParallel(JRoutineCore.with(filter(Functions.isNotNull()))
+                                                               .invocationConfiguration()
+                                                               .withRunner(Runners.syncRunner())
+                                                               .apply()
+                                                               .buildRoutine()))
                            .invocationConfiguration()
                            .withRunner(Runners.syncRunner())
-                           .withMode(InvocationModeType.PARALLEL)
                            .apply()
                            .invoke()
                            .pass(null, "test")
@@ -1987,62 +1964,38 @@ public class OperatorsTest {
       }
     })).invoke().pass("test1").close().in(seconds(3)).all()).containsExactly("TEST2", "TEST2",
         "TEST2", "test1");
-    assertThat(JRoutineCore.with(prependGet(new Supplier<String>() {
+    assertThat(
+        JRoutineCore.with(factoryOfParallel(JRoutineCore.with(prependGet(new Supplier<String>() {
 
-      public String get() {
-        return "TEST2";
-      }
-    }))
-                           .invocationConfiguration()
-                           .withMode(InvocationModeType.PARALLEL)
-                           .apply()
-                           .invoke()
-                           .pass("test1")
-                           .close()
-                           .in(seconds(3))
-                           .all()).containsExactly("TEST2", "test1");
-    assertThat(JRoutineCore.with(prependAccept(new Consumer<Channel<String, ?>>() {
+          public String get() {
+            return "TEST2";
+          }
+        })).buildRoutine())).invoke().pass("test1").close().in(seconds(3)).all()).containsExactly(
+        "TEST2", "test1");
+    assertThat(JRoutineCore.with(
+        factoryOfParallel(JRoutineCore.with(prependAccept(new Consumer<Channel<String, ?>>() {
 
-      public void accept(final Channel<String, ?> resultChannel) {
-        resultChannel.pass("TEST2");
-      }
-    }))
-                           .invocationConfiguration()
-                           .withMode(InvocationModeType.PARALLEL)
-                           .apply()
-                           .invoke()
-                           .pass("test1")
-                           .close()
-                           .in(seconds(3))
-                           .all()).containsExactly("TEST2", "test1");
-    assertThat(JRoutineCore.with(prependGet(3, new Supplier<String>() {
+          public void accept(final Channel<String, ?> resultChannel) {
+            resultChannel.pass("TEST2");
+          }
+        })).buildRoutine())).invoke().pass("test1").close().in(seconds(3)).all()).containsExactly(
+        "TEST2", "test1");
+    assertThat(
+        JRoutineCore.with(factoryOfParallel(JRoutineCore.with(prependGet(3, new Supplier<String>() {
 
-      public String get() {
-        return "TEST2";
-      }
-    }))
-                           .invocationConfiguration()
-                           .withMode(InvocationModeType.PARALLEL)
-                           .apply()
-                           .invoke()
-                           .pass("test1")
-                           .close()
-                           .in(seconds(3))
-                           .all()).containsExactly("TEST2", "TEST2", "TEST2", "test1");
-    assertThat(JRoutineCore.with(prependAccept(3, new Consumer<Channel<String, ?>>() {
+          public String get() {
+            return "TEST2";
+          }
+        })).buildRoutine())).invoke().pass("test1").close().in(seconds(3)).all()).containsExactly(
+        "TEST2", "TEST2", "TEST2", "test1");
+    assertThat(JRoutineCore.with(
+        factoryOfParallel(JRoutineCore.with(prependAccept(3, new Consumer<Channel<String, ?>>() {
 
-      public void accept(final Channel<String, ?> resultChannel) {
-        resultChannel.pass("TEST2");
-      }
-    }))
-                           .invocationConfiguration()
-                           .withMode(InvocationModeType.PARALLEL)
-                           .apply()
-                           .invoke()
-                           .pass("test1")
-                           .close()
-                           .in(seconds(3))
-                           .all()).containsExactly("TEST2", "TEST2", "TEST2", "test1");
+          public void accept(final Channel<String, ?> resultChannel) {
+            resultChannel.pass("TEST2");
+          }
+        })).buildRoutine())).invoke().pass("test1").close().in(seconds(3)).all()).containsExactly(
+        "TEST2", "TEST2", "TEST2", "test1");
   }
 
   @Test
@@ -2541,62 +2494,38 @@ public class OperatorsTest {
       }
     })).invoke().pass("test1").close().in(seconds(3)).all()).containsExactly("TEST2", "TEST2",
         "TEST2");
-    assertThat(JRoutineCore.with(thenGet(new Supplier<String>() {
+    assertThat(
+        JRoutineCore.with(factoryOfParallel(JRoutineCore.with(thenGet(new Supplier<String>() {
 
-      public String get() {
-        return "TEST2";
-      }
-    }))
-                           .invocationConfiguration()
-                           .withMode(InvocationModeType.PARALLEL)
-                           .apply()
-                           .invoke()
-                           .pass("test1")
-                           .close()
-                           .in(seconds(3))
-                           .all()).containsExactly("TEST2");
-    assertThat(JRoutineCore.with(thenAccept(new Consumer<Channel<String, ?>>() {
+          public String get() {
+            return "TEST2";
+          }
+        })).buildRoutine())).invoke().pass("test1").close().in(seconds(3)).all()).containsExactly(
+        "TEST2");
+    assertThat(JRoutineCore.with(
+        factoryOfParallel(JRoutineCore.with(thenAccept(new Consumer<Channel<String, ?>>() {
 
-      public void accept(final Channel<String, ?> resultChannel) {
-        resultChannel.pass("TEST2");
-      }
-    }))
-                           .invocationConfiguration()
-                           .withMode(InvocationModeType.PARALLEL)
-                           .apply()
-                           .invoke()
-                           .pass("test1")
-                           .close()
-                           .in(seconds(3))
-                           .all()).containsExactly("TEST2");
-    assertThat(JRoutineCore.with(thenGet(3, new Supplier<String>() {
+          public void accept(final Channel<String, ?> resultChannel) {
+            resultChannel.pass("TEST2");
+          }
+        })).buildRoutine())).invoke().pass("test1").close().in(seconds(3)).all()).containsExactly(
+        "TEST2");
+    assertThat(
+        JRoutineCore.with(factoryOfParallel(JRoutineCore.with(thenGet(3, new Supplier<String>() {
 
-      public String get() {
-        return "TEST2";
-      }
-    }))
-                           .invocationConfiguration()
-                           .withMode(InvocationModeType.PARALLEL)
-                           .apply()
-                           .invoke()
-                           .pass("test1")
-                           .close()
-                           .in(seconds(3))
-                           .all()).containsExactly("TEST2", "TEST2", "TEST2");
-    assertThat(JRoutineCore.with(thenAccept(3, new Consumer<Channel<String, ?>>() {
+          public String get() {
+            return "TEST2";
+          }
+        })).buildRoutine())).invoke().pass("test1").close().in(seconds(3)).all()).containsExactly(
+        "TEST2", "TEST2", "TEST2");
+    assertThat(JRoutineCore.with(
+        factoryOfParallel(JRoutineCore.with(thenAccept(3, new Consumer<Channel<String, ?>>() {
 
-      public void accept(final Channel<String, ?> resultChannel) {
-        resultChannel.pass("TEST2");
-      }
-    }))
-                           .invocationConfiguration()
-                           .withMode(InvocationModeType.PARALLEL)
-                           .apply()
-                           .invoke()
-                           .pass("test1")
-                           .close()
-                           .in(seconds(3))
-                           .all()).containsExactly("TEST2", "TEST2", "TEST2");
+          public void accept(final Channel<String, ?> resultChannel) {
+            resultChannel.pass("TEST2");
+          }
+        })).buildRoutine())).invoke().pass("test1").close().in(seconds(3)).all()).containsExactly(
+        "TEST2", "TEST2", "TEST2");
   }
 
   @Test
@@ -2714,10 +2643,8 @@ public class OperatorsTest {
   public void testUnfold() {
     assertThat(JRoutineCore.with(Operators.<Number>groupBy(3))
                            .invoke()
-                           .pipe(JRoutineCore.with(Operators.<Number>unfold())
-                                             .invocationConfiguration()
-                                             .withMode(InvocationModeType.PARALLEL)
-                                             .apply()
+                           .pipe(JRoutineCore.with(factoryOfParallel(
+                               JRoutineCore.with(Operators.<Number>unfold()).buildRoutine()))
                                              .invoke())
                            .pass(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
                            .close()

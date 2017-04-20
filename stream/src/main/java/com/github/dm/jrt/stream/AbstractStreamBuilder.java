@@ -24,7 +24,6 @@ import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Configurable;
-import com.github.dm.jrt.core.config.InvocationConfiguration.InvocationModeType;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
@@ -151,7 +150,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends AbstractRoutineBuil
 
   @NotNull
   public StreamBuilder<IN, OUT> async(@Nullable final Runner runner) {
-    return applyRunner(runner, InvocationModeType.SIMPLE);
+    return applyRunner(runner);
   }
 
   @NotNull
@@ -166,7 +165,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends AbstractRoutineBuil
 
   @NotNull
   public StreamBuilder<IN, OUT> asyncParallel(@Nullable final Runner runner) {
-    return applyRunner(runner, InvocationModeType.PARALLEL);
+    return applyRunner(runner);
   }
 
   @NotNull
@@ -208,12 +207,12 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends AbstractRoutineBuil
 
   @NotNull
   public StreamBuilder<IN, OUT> immediate() {
-    return applyRunner(Runners.immediateRunner(), InvocationModeType.SIMPLE);
+    return applyRunner(Runners.immediateRunner());
   }
 
   @NotNull
   public StreamBuilder<IN, OUT> immediateParallel() {
-    return applyRunner(Runners.immediateRunner(), InvocationModeType.PARALLEL);
+    return applyRunner(Runners.immediateRunner());
   }
 
   @NotNull
@@ -281,11 +280,9 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends AbstractRoutineBuil
   public <AFTER> StreamBuilder<IN, AFTER> mapAll(
       @NotNull final Function<? super List<OUT>, ? extends AFTER> mappingFunction) {
     if (canOptimizeBinding()) {
-      final StreamConfiguration streamConfiguration = mStreamConfiguration;
       return newBuilder(decorate(getBindingFunction().andThen(
-          new BindMappingAllFunction<OUT, AFTER>(streamConfiguration.toChannelConfiguration(),
-              streamConfiguration.toInvocationConfiguration()
-                                 .getModeOrElse(InvocationModeType.SIMPLE), mappingFunction))));
+          new BindMappingAllFunction<OUT, AFTER>(mStreamConfiguration.toChannelConfiguration(),
+              mappingFunction))));
     }
 
     return map(functionCall(mappingFunction));
@@ -295,11 +292,9 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends AbstractRoutineBuil
   public <AFTER> StreamBuilder<IN, AFTER> mapAllAccept(
       @NotNull final BiConsumer<? super List<OUT>, ? super Channel<AFTER, ?>> mappingConsumer) {
     if (canOptimizeBinding()) {
-      final StreamConfiguration streamConfiguration = mStreamConfiguration;
       return newBuilder(decorate(getBindingFunction().andThen(
-          new BindMappingAllConsumer<OUT, AFTER>(streamConfiguration.toChannelConfiguration(),
-              streamConfiguration.toInvocationConfiguration()
-                                 .getModeOrElse(InvocationModeType.SIMPLE), mappingConsumer))));
+          new BindMappingAllConsumer<OUT, AFTER>(mStreamConfiguration.toChannelConfiguration(),
+              mappingConsumer))));
     }
 
     return map(consumerCall(mappingConsumer));
@@ -337,12 +332,12 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends AbstractRoutineBuil
 
   @NotNull
   public StreamBuilder<IN, OUT> sync() {
-    return applyRunner(Runners.syncRunner(), InvocationModeType.SIMPLE);
+    return applyRunner(Runners.syncRunner());
   }
 
   @NotNull
   public StreamBuilder<IN, OUT> syncParallel() {
-    return applyRunner(Runners.syncRunner(), InvocationModeType.PARALLEL);
+    return applyRunner(Runners.syncRunner());
   }
 
   @NotNull
@@ -431,21 +426,17 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends AbstractRoutineBuil
     return newBuilder(new StreamConfiguration(streamConfiguration.getStreamInvocationConfiguration()
                                                                  .builderFrom()
                                                                  .withRunner(runner)
-                                                                 .withMode(
-                                                                     InvocationModeType.PARALLEL)
                                                                  .withMaxInvocations(maxInvocations)
                                                                  .apply(),
         streamConfiguration.getNextInvocationConfiguration()));
   }
 
   @NotNull
-  private StreamBuilder<IN, OUT> applyRunner(@Nullable final Runner runner,
-      @NotNull final InvocationModeType invocationMode) {
+  private StreamBuilder<IN, OUT> applyRunner(@Nullable final Runner runner) {
     final StreamConfiguration streamConfiguration = mStreamConfiguration;
     return newBuilder(new StreamConfiguration(streamConfiguration.getStreamInvocationConfiguration()
                                                                  .builderFrom()
                                                                  .withRunner(runner)
-                                                                 .withMode(invocationMode)
                                                                  .apply(),
         streamConfiguration.getNextInvocationConfiguration()));
   }

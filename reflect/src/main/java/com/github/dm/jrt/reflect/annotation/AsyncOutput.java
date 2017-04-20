@@ -45,7 +45,7 @@ import java.lang.annotation.Target;
  * public Channel&lt;?, Integer&gt; sum(int i1, int i2);
  * </code></pre>
  * Note that the transfer mode is specifically chosen through the annotation {@code mode} attribute
- * (it's {@link AsyncOutput.OutputMode#VALUE VALUE} by default).
+ * (it's {@link AsyncOutput.OutputMode#DEFAULT DEFAULT} by default).
  * <p>
  * This annotation is used to decorate methods that are to be invoked in an asynchronous way.
  * <br>
@@ -80,7 +80,7 @@ public @interface AsyncOutput {
    *
    * @return the mode.
    */
-  OutputMode value() default OutputMode.VALUE;
+  OutputMode value() default OutputMode.DEFAULT;
 
   /**
    * Output transfer mode type.
@@ -90,14 +90,14 @@ public @interface AsyncOutput {
   enum OutputMode {
 
     /**
-     * Value mode.
+     * Default mode.
      * <br>
      * The variable is just passed to the channel.
      * <p>
      * The annotated method must return a superclass of
      * {@link com.github.dm.jrt.core.channel.Channel Channel}.
      */
-    VALUE,
+    DEFAULT,
     /**
      * Element mode.
      * <br>

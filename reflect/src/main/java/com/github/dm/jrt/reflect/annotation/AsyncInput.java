@@ -40,7 +40,7 @@ import java.lang.annotation.Target;
  * public int sum(&#64;AsyncInput(int.class) Channel&lt;?, Integer&gt; i1, int i2);
  * </code></pre>
  * Note that the transfer mode is specifically chosen through the annotation {@code mode} attribute
- * (it's {@link AsyncInput.InputMode#VALUE VALUE} by default).
+ * (it's {@link AsyncInput.InputMode#DEFAULT DEFAULT} by default).
  * <p>
  * This annotation is used to decorate methods that are to be invoked in an asynchronous way.
  * <br>
@@ -75,7 +75,7 @@ public @interface AsyncInput {
    *
    * @return the mode.
    */
-  InputMode mode() default InputMode.VALUE;
+  InputMode mode() default InputMode.DEFAULT;
 
   /**
    * The parameter class.
@@ -92,14 +92,14 @@ public @interface AsyncInput {
   enum InputMode {
 
     /**
-     * Value mode.
+     * Default mode.
      * <br>
      * The variable is just read from a channel.
      * <p>
      * The annotated parameters must extend a
      * {@link com.github.dm.jrt.core.channel.Channel Channel}.
      */
-    VALUE,
+    DEFAULT,
     /**
      * Collection mode.
      * <br>

@@ -635,23 +635,6 @@ public class StreamBuilderTest {
                                                    .pass(1, 2, 3)
                                                    .close()
                                                    .all()).containsExactly(6);
-    assertThat(JRoutineStream.<Integer>withStream().immediateParallel()
-                                                   .mapAll(new Function<List<Integer>, Integer>() {
-
-                                                     public Integer apply(
-                                                         final List<Integer> integers) {
-                                                       int sum = 0;
-                                                       for (final Integer integer : integers) {
-                                                         sum += integer;
-                                                       }
-
-                                                       return sum;
-                                                     }
-                                                   })
-                                                   .invoke()
-                                                   .pass(1, 2, 3)
-                                                   .close()
-                                                   .all()).containsExactly(1, 2, 3);
     assertThat(JRoutineStream.<Integer>withStream().immediate()
                                                    .mapAllAccept(
                                                        new BiConsumer<List<Integer>,
@@ -672,26 +655,6 @@ public class StreamBuilderTest {
                                                    .pass(1, 2, 3)
                                                    .close()
                                                    .all()).containsExactly(6);
-    assertThat(JRoutineStream.<Integer>withStream().immediateParallel()
-                                                   .mapAllAccept(
-                                                       new BiConsumer<List<Integer>,
-                                                           Channel<Integer, ?>>() {
-
-                                                         public void accept(
-                                                             final List<Integer> integers,
-                                                             final Channel<Integer, ?> result) {
-                                                           int sum = 0;
-                                                           for (final Integer integer : integers) {
-                                                             sum += integer;
-                                                           }
-
-                                                           result.pass(sum);
-                                                         }
-                                                       })
-                                                   .invoke()
-                                                   .pass(1, 2, 3)
-                                                   .close()
-                                                   .all()).containsExactly(1, 2, 3);
   }
 
   @Test

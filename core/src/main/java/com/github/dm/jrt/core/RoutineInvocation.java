@@ -36,6 +36,8 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 public class RoutineInvocation<IN, OUT> extends ChannelInvocation<IN, OUT> {
 
+  // TODO: 19/04/2017 delete?
+
   private final Routine<IN, OUT> mRoutine;
 
   /**

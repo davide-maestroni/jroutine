@@ -19,7 +19,6 @@ package com.github.dm.jrt.operator.sequence;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
-import com.github.dm.jrt.core.config.InvocationConfiguration.InvocationModeType;
 import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.function.util.BiFunction;
@@ -32,6 +31,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
 
+import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOfParallel;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static com.github.dm.jrt.function.Functions.consumerCommand;
 import static com.github.dm.jrt.operator.sequence.Sequences.range;
@@ -319,16 +319,15 @@ public class SequencesTest {
             return (char) (character + 1);
           }
         }))).invoke().close().in(seconds(3)).all()).containsExactly('a', 'b', 'c', 'd', 'e');
-    assertThat(JRoutineCore.with(
+    assertThat(JRoutineCore.with(factoryOfParallel(JRoutineCore.with(
         consumerCommand(sequence('a', 5, new BiFunction<Character, Long, Character>() {
 
           public Character apply(final Character character, final Long n) {
             return (char) (character + 1);
           }
-        })))
+        }))).buildRoutine()))
                            .invocationConfiguration()
                            .withOutputOrder(OrderType.SORTED)
-                           .withMode(InvocationModeType.PARALLEL)
                            .apply()
                            .invoke()
                            .close()

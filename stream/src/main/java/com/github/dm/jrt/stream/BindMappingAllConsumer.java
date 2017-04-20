@@ -21,7 +21,6 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
-import com.github.dm.jrt.core.config.InvocationConfiguration.InvocationModeType;
 import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.util.BiConsumer;
@@ -44,32 +43,24 @@ class BindMappingAllConsumer<IN, OUT> implements Function<Channel<?, IN>, Channe
 
   private final ChannelConfiguration mConfiguration;
 
-  private final InvocationModeType mInvocationMode;
-
   private final BiConsumer<? super List<IN>, ? super Channel<OUT, ?>> mMappingConsumer;
 
   /**
    * Constructor.
    *
    * @param configuration   the channel configuration.
-   * @param invocationMode  the invocation mode.
    * @param mappingConsumer the mapping consumer.
    */
   BindMappingAllConsumer(@NotNull final ChannelConfiguration configuration,
-      @NotNull final InvocationModeType invocationMode,
       @NotNull final BiConsumer<? super List<IN>, ? super Channel<OUT, ?>> mappingConsumer) {
     mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
-    mInvocationMode = ConstantConditions.notNull("invocation mode", invocationMode);
     mMappingConsumer = ConstantConditions.notNull("consumer instance", mappingConsumer);
   }
 
   public Channel<?, OUT> apply(final Channel<?, IN> channel) {
     final Channel<OUT, OUT> outputChannel =
         JRoutineCore.<OUT>ofData().apply(mConfiguration).buildChannel();
-    channel.consume(
-        (mInvocationMode == InvocationModeType.SIMPLE) ? new MappingConsumerConsumer<IN, OUT>(
-            mMappingConsumer, outputChannel)
-            : new MappingConsumerConsumerParallel<IN, OUT>(mMappingConsumer, outputChannel));
+    channel.consume(new MappingConsumerConsumer<IN, OUT>(mMappingConsumer, outputChannel));
     return outputChannel;
   }
 
@@ -118,46 +109,6 @@ class BindMappingAllConsumer<IN, OUT> implements Function<Channel<?, IN>, Channe
 
     public void onOutput(final IN output) {
       mOutputs.add(output);
-    }
-  }
-
-  /**
-   * Channel consumer implementation handling parallel mode.
-   *
-   * @param <IN>  the input data type.
-   * @param <OUT> the output data type.
-   */
-  private static class MappingConsumerConsumerParallel<IN, OUT> implements ChannelConsumer<IN> {
-
-    private final BiConsumer<? super List<IN>, ? super Channel<OUT, ?>> mMappingConsumer;
-
-    private final Channel<OUT, ?> mOutputChannel;
-
-    /**
-     * Constructor.
-     *
-     * @param mappingConsumer the mapping consumer.
-     * @param outputChannel   the output channel.
-     */
-    private MappingConsumerConsumerParallel(
-        @NotNull final BiConsumer<? super List<IN>, ? super Channel<OUT, ?>> mappingConsumer,
-        @NotNull final Channel<OUT, ?> outputChannel) {
-      mMappingConsumer = mappingConsumer;
-      mOutputChannel = outputChannel;
-    }
-
-    public void onComplete() {
-      mOutputChannel.close();
-    }
-
-    public void onError(@NotNull final RoutineException error) {
-      mOutputChannel.abort(error);
-    }
-
-    public void onOutput(final IN output) throws Exception {
-      final ArrayList<IN> outputs = new ArrayList<IN>(1);
-      outputs.add(output);
-      mMappingConsumer.accept(outputs, mOutputChannel);
     }
   }
 }

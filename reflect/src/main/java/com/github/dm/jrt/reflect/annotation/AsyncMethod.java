@@ -83,7 +83,7 @@ public @interface AsyncMethod {
    *
    * @return the mode.
    */
-  OutputMode mode() default OutputMode.VALUE;
+  OutputMode mode() default OutputMode.DEFAULT;
 
   /**
    * The array of parameter types.

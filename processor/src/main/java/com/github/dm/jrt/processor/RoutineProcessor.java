@@ -19,7 +19,6 @@ package com.github.dm.jrt.processor;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.ChannelConfiguration.TimeoutActionType;
-import com.github.dm.jrt.core.config.InvocationConfiguration.InvocationModeType;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.Reflection;
@@ -33,7 +32,6 @@ import com.github.dm.jrt.reflect.annotation.CoreInvocations;
 import com.github.dm.jrt.reflect.annotation.InputBackoff;
 import com.github.dm.jrt.reflect.annotation.InputMaxSize;
 import com.github.dm.jrt.reflect.annotation.InputOrder;
-import com.github.dm.jrt.reflect.annotation.InvocationMode;
 import com.github.dm.jrt.reflect.annotation.LogLevel;
 import com.github.dm.jrt.reflect.annotation.LogType;
 import com.github.dm.jrt.reflect.annotation.MaxInvocations;
@@ -317,7 +315,7 @@ public class RoutineProcessor extends AbstractProcessor {
   protected String buildInputOptions(@NotNull final TypeElement annotationElement,
       @NotNull final TypeElement element, @NotNull final Element targetElement,
       @NotNull final ExecutableElement methodElement, @Nullable final InputMode inputMode) {
-    return ((inputMode == InputMode.VALUE) || (inputMode == InputMode.COLLECTION)) ? ".sorted()"
+    return ((inputMode == InputMode.DEFAULT) || (inputMode == InputMode.COLLECTION)) ? ".sorted()"
         : "";
   }
 
@@ -506,16 +504,6 @@ public class RoutineProcessor extends AbstractProcessor {
              .append(OrderType.class.getCanonicalName())
              .append(".")
              .append(inputOrderAnnotation.value())
-             .append(")");
-    }
-
-    final InvocationMode invocationModeAnnotation =
-        methodElement.getAnnotation(InvocationMode.class);
-    if (invocationModeAnnotation != null) {
-      builder.append(".withMode(")
-             .append(InvocationModeType.class.getCanonicalName())
-             .append(".")
-             .append(invocationModeAnnotation.value())
              .append(")");
     }
 
@@ -901,11 +889,11 @@ public class RoutineProcessor extends AbstractProcessor {
     final TypeMirror targetMirror =
         (TypeMirror) getAnnotationValue(targetParameter, annotationType, "value");
     InputMode inputMode = annotation.mode();
-    if (inputMode == InputMode.VALUE) {
+    if (inputMode == InputMode.DEFAULT) {
       if (!typeUtils.isAssignable(targetTypeErasure, channelType)) {
         throw new IllegalArgumentException(
             "[" + methodElement.getEnclosingElement() + "." + methodElement
-                + "] an async input with mode " + InputMode.VALUE + " must implement a "
+                + "] an async input with mode " + InputMode.DEFAULT + " must implement a "
                 + channelType);
       }
 
@@ -934,26 +922,6 @@ public class RoutineProcessor extends AbstractProcessor {
     }
 
     return inputMode;
-  }
-
-  /**
-   * Gets the routine invocation mode.
-   *
-   * @param methodElement the method element.
-   * @param annotation    the method annotation.
-   * @return the invocation mode.
-   */
-  @NotNull
-  protected InvocationModeType getInvocationMode(@NotNull final ExecutableElement methodElement,
-      @NotNull final InvocationMode annotation) {
-    final InvocationModeType invocationMode = annotation.value();
-    if ((invocationMode == InvocationModeType.PARALLEL) && (methodElement.getParameters().size()
-        > 1)) {
-      throw new IllegalArgumentException("methods annotated with invocation mode " + invocationMode
-          + " must have at maximum one input parameter: " + methodElement);
-    }
-
-    return invocationMode;
   }
 
   /**
@@ -1720,8 +1688,6 @@ public class RoutineProcessor extends AbstractProcessor {
     final ExecutableElement targetMethod = findMatchingMethod(methodElement, targetElement);
     TypeMirror targetReturnType = targetMethod.getReturnType();
     final boolean isVoid = (targetReturnType.getKind() == TypeKind.VOID);
-    final InvocationMode invocationModeAnnotation =
-        methodElement.getAnnotation(InvocationMode.class);
     final AsyncMethod asyncMethodAnnotation = methodElement.getAnnotation(AsyncMethod.class);
     final AsyncOutput asyncOutputAnnotation = methodElement.getAnnotation(AsyncOutput.class);
     InputMode inputMode = null;
@@ -1761,7 +1727,7 @@ public class RoutineProcessor extends AbstractProcessor {
         targetReturnType = typeArguments.get(typeArguments.size() - 1);
       }
 
-      inputMode = InputMode.VALUE;
+      inputMode = InputMode.DEFAULT;
       outputMode = asyncMethodAnnotation.mode();
       if (typeUtils.isAssignable(channelType, returnErasure)) {
         method =
@@ -1806,15 +1772,6 @@ public class RoutineProcessor extends AbstractProcessor {
 
     if (asyncOutputAnnotation != null) {
       outputMode = getOutputMode(methodElement, targetMethod);
-    }
-
-    final InvocationModeType invocationMode =
-        (invocationModeAnnotation != null) ? getInvocationMode(methodElement,
-            invocationModeAnnotation) : InvocationModeType.SIMPLE;
-    if ((invocationMode == InvocationModeType.PARALLEL) && (targetMethod.getParameters().size()
-        > 1)) {
-      throw new IllegalArgumentException("methods annotated with invocation mode " + invocationMode
-          + " must have no input parameters: " + methodElement);
     }
 
     final String resultClassName = getBoxedType(targetReturnType).toString();

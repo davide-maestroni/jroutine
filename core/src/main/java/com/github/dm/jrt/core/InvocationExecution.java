@@ -21,7 +21,6 @@ import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.log.Logger;
-import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
@@ -37,7 +36,7 @@ import org.jetbrains.annotations.NotNull;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, OUT> {
+class InvocationExecution<IN, OUT> implements Runnable, InvocationObserver<IN, OUT> {
 
   private final InputData<IN> mInputData = new InputData<IN>();
 
@@ -81,12 +80,12 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
   }
 
   /**
-   * Returns the abort execution.
+   * Returns the abort command.
    *
-   * @return the execution.
+   * @return the command.
    */
   @NotNull
-  public Execution abort() {
+  public Runnable abort() {
     if (mAbortExecution == null) {
       mAbortExecution = new AbortExecution();
     }
@@ -258,9 +257,9 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
   }
 
   /**
-   * Abort execution implementation.
+   * Abort command implementation.
    */
-  private class AbortExecution implements Execution, InvocationObserver<IN, OUT> {
+  private class AbortExecution implements Runnable, InvocationObserver<IN, OUT> {
 
     public void run() {
       if (mIsWaitingAbortInvocation) {

@@ -28,14 +28,13 @@ import com.github.dm.jrt.core.common.TimeoutException;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.executor.ScheduledExecutor;
+import com.github.dm.jrt.core.executor.ScheduledExecutors;
+import com.github.dm.jrt.core.executor.SyncExecutor;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.routine.Routine;
-import com.github.dm.jrt.core.runner.Execution;
-import com.github.dm.jrt.core.runner.Runner;
-import com.github.dm.jrt.core.runner.Runners;
-import com.github.dm.jrt.core.runner.SyncRunner;
 import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.function.util.BiConsumer;
 import com.github.dm.jrt.function.util.BiFunction;
@@ -81,15 +80,15 @@ import static org.junit.Assert.fail;
  */
 public class StreamBuilderTest {
 
-  private static Runner sSingleThreadRunner;
+  private static ScheduledExecutor sSingleThreadExecutor;
 
   @NotNull
-  private static Runner getSingleThreadRunner() {
-    if (sSingleThreadRunner == null) {
-      sSingleThreadRunner = Runners.poolRunner(1);
+  private static ScheduledExecutor getSingleThreadExecutor() {
+    if (sSingleThreadExecutor == null) {
+      sSingleThreadExecutor = ScheduledExecutors.poolExecutor(1);
     }
 
-    return sSingleThreadRunner;
+    return sSingleThreadExecutor;
   }
 
   @Test
@@ -768,17 +767,17 @@ public class StreamBuilderTest {
   @Test
   public void testInvocationDeadlock() {
     try {
-      final Runner runner1 = Runners.poolRunner(1);
-      final Runner runner2 = Runners.poolRunner(1);
+      final ScheduledExecutor executor1 = ScheduledExecutors.poolExecutor(1);
+      final ScheduledExecutor executor2 = ScheduledExecutors.poolExecutor(1);
       final Function<String, Object> function = new Function<String, Object>() {
 
         public Object apply(final String s) {
           return JRoutineStream.<String>withStream().nextInvocationConfiguration()
-                                                    .withRunner(runner1)
+                                                    .withExecutor(executor1)
                                                     .apply()
                                                     .map(Functions.identity())
                                                     .nextInvocationConfiguration()
-                                                    .withRunner(runner2)
+                                                    .withExecutor(executor2)
                                                     .apply()
                                                     .map(Functions.identity())
                                                     .invocationConfiguration()
@@ -791,7 +790,7 @@ public class StreamBuilderTest {
         }
       };
       JRoutineStream.<String>withStream().nextInvocationConfiguration()
-                                         .withRunner(runner1)
+                                         .withExecutor(executor1)
                                          .apply()
                                          .map(function)
                                          .invoke()
@@ -1321,17 +1320,17 @@ public class StreamBuilderTest {
   @Test
   public void testMapOn() {
     final AtomicBoolean isCalled = new AtomicBoolean();
-    final Runner testRunner = new SyncRunner() {
+    final ScheduledExecutor testExecutor = new SyncExecutor() {
 
       @Override
-      public void run(@NotNull final Execution execution, final long delay,
+      public void execute(@NotNull final Runnable command, final long delay,
           @NotNull final TimeUnit timeUnit) {
         isCalled.set(true);
-        execution.run();
+        command.run();
       }
     };
     assertThat(JRoutineStream.<String>withStream().unsorted()
-                                                  .consumeOn(testRunner)
+                                                  .consumeOn(testExecutor)
                                                   .invoke()
                                                   .pass("test")
                                                   .close()
@@ -1477,7 +1476,7 @@ public class StreamBuilderTest {
     try {
       assertThat(JRoutineStream //
           .<Integer>withStream().streamInvocationConfiguration()
-                                .withRunner(getSingleThreadRunner())
+                                .withExecutor(getSingleThreadExecutor())
                                 .apply()
                                 .map(appendAccept(range(1, 1000)))
                                 .streamInvocationConfiguration()
@@ -1524,7 +1523,7 @@ public class StreamBuilderTest {
     try {
       assertThat(JRoutineStream //
           .<Integer>withStream().streamInvocationConfiguration()
-                                .withRunner(getSingleThreadRunner())
+                                .withExecutor(getSingleThreadExecutor())
                                 .apply()
                                 .map(appendAccept(range(1, 1000)))
                                 .streamInvocationConfiguration()

@@ -24,16 +24,15 @@ import com.github.dm.jrt.core.common.BackoffDecorator;
 import com.github.dm.jrt.core.config.ChannelConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.AgingPriority;
+import com.github.dm.jrt.core.executor.ScheduledExecutor;
+import com.github.dm.jrt.core.executor.ScheduledExecutorDecorator;
+import com.github.dm.jrt.core.executor.ScheduledExecutors;
+import com.github.dm.jrt.core.executor.SyncExecutor;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.log.Log;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.NullLog;
 import com.github.dm.jrt.core.routine.Routine;
-import com.github.dm.jrt.core.runner.Execution;
-import com.github.dm.jrt.core.runner.Runner;
-import com.github.dm.jrt.core.runner.RunnerDecorator;
-import com.github.dm.jrt.core.runner.Runners;
-import com.github.dm.jrt.core.runner.SyncRunner;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.DurationMeasure;
 import com.github.dm.jrt.proxy.annotation.Proxy;
@@ -46,13 +45,13 @@ import com.github.dm.jrt.reflect.annotation.AsyncInput.InputMode;
 import com.github.dm.jrt.reflect.annotation.AsyncMethod;
 import com.github.dm.jrt.reflect.annotation.AsyncOutput;
 import com.github.dm.jrt.reflect.annotation.AsyncOutput.OutputMode;
+import com.github.dm.jrt.reflect.annotation.ExecutorType;
 import com.github.dm.jrt.reflect.annotation.InputBackoff;
 import com.github.dm.jrt.reflect.annotation.LogType;
 import com.github.dm.jrt.reflect.annotation.OutputBackoff;
 import com.github.dm.jrt.reflect.annotation.OutputTimeout;
 import com.github.dm.jrt.reflect.annotation.OutputTimeoutAction;
 import com.github.dm.jrt.reflect.annotation.Priority;
-import com.github.dm.jrt.reflect.annotation.RunnerType;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -82,10 +81,10 @@ public class ProxyRoutineTest {
   public void testAgingPriority() {
 
     final Pass pass = new Pass();
-    final TestRunner runner = new TestRunner();
+    final TestExecutor executor = new TestExecutor();
     final PriorityPass priorityPass = JRoutineProxy.with(instance(pass))
                                                    .invocationConfiguration()
-                                                   .withRunner(runner)
+                                                   .withExecutor(executor)
                                                    .apply()
                                                    .buildProxy(PriorityPass.class);
     final Channel<?, String> output1 = priorityPass.passNormal("test1").eventuallyContinue();
@@ -93,14 +92,14 @@ public class ProxyRoutineTest {
     for (int i = 0; i < AgingPriority.HIGH_PRIORITY - 1; i++) {
 
       priorityPass.passHigh("test2");
-      runner.run(1);
+      executor.run(1);
       assertThat(output1.all()).isEmpty();
     }
 
     final Channel<?, String> output2 = priorityPass.passHigh("test2");
-    runner.run(1);
+    executor.run(1);
     assertThat(output1.all()).containsExactly("test1");
-    runner.run(Integer.MAX_VALUE);
+    executor.run(Integer.MAX_VALUE);
     assertThat(output2.all()).containsExactly("test2");
   }
 
@@ -125,7 +124,7 @@ public class ProxyRoutineTest {
 
     final TestStatic testStatic = JRoutineProxy.with(classOfType(TestClass.class))
                                                .invocationConfiguration()
-                                               .withRunner(Runners.poolRunner())
+                                               .withExecutor(ScheduledExecutors.poolExecutor())
                                                .withLogLevel(Level.DEBUG)
                                                .withLog(new NullLog())
                                                .apply()
@@ -165,7 +164,8 @@ public class ProxyRoutineTest {
     final TestList<String> testList = new TestList<String>();
     final ProxyRoutineBuilder builder = JRoutineProxy.with(instance(testList))
                                                      .invocationConfiguration()
-                                                     .withRunner(Runners.syncRunner())
+                                                     .withExecutor(
+                                                         ScheduledExecutors.syncExecutor())
                                                      .apply();
 
     final TestListItf<String> testListItf1 =
@@ -230,7 +230,7 @@ public class ProxyRoutineTest {
     final TestClass test = new TestClass();
     final TestStatic testStatic = JRoutineProxy.with(instance(test))
                                                .invocationConfiguration()
-                                               .withRunner(Runners.poolRunner())
+                                               .withExecutor(ScheduledExecutors.poolExecutor())
                                                .withLogLevel(Level.DEBUG)
                                                .withLog(new NullLog())
                                                .apply()
@@ -244,11 +244,11 @@ public class ProxyRoutineTest {
   public void testProxy() {
 
     final NullLog log = new NullLog();
-    final Runner runner = Runners.poolRunner();
+    final ScheduledExecutor executor = ScheduledExecutors.poolExecutor();
     final TestClass test = new TestClass();
     final TestProxy testProxy = JRoutineProxy.with(instance(test))
                                              .invocationConfiguration()
-                                             .withRunner(runner)
+                                             .withExecutor(executor)
                                              .withLogLevel(Level.DEBUG)
                                              .withLog(log)
                                              .apply()
@@ -268,10 +268,10 @@ public class ProxyRoutineTest {
   public void testProxyBuilder() {
 
     final NullLog log = new NullLog();
-    final Runner runner = Runners.poolRunner();
+    final ScheduledExecutor executor = ScheduledExecutors.poolExecutor();
     final TestClass test = new TestClass();
     final InvocationConfiguration configuration =
-        builder().withRunner(runner).withLogLevel(Level.DEBUG).withLog(log).apply();
+        builder().withExecutor(executor).withLogLevel(Level.DEBUG).withLog(log).apply();
     final ProxyObjectBuilder<TestProxy> builder =
         com.github.dm.jrt.proxy.Proxy_Test.with(instance(test));
     final TestProxy testProxy = builder.invocationConfiguration()
@@ -305,10 +305,10 @@ public class ProxyRoutineTest {
   public void testProxyCache() {
 
     final NullLog log = new NullLog();
-    final Runner runner = Runners.poolRunner();
+    final ScheduledExecutor executor = ScheduledExecutors.poolExecutor();
     final TestClass test = new TestClass();
     final InvocationConfiguration configuration =
-        builder().withRunner(runner).withLogLevel(Level.DEBUG).withLog(log).apply();
+        builder().withExecutor(executor).withLogLevel(Level.DEBUG).withLog(log).apply();
     final TestProxy testProxy = JRoutineProxy.with(instance(test))
                                              .invocationConfiguration()
                                              .withPatch(configuration)
@@ -810,7 +810,7 @@ public class ProxyRoutineTest {
     @LogType(NullLog.class)
     @InputBackoff(MyBackoff.class)
     @OutputBackoff(MyBackoff.class)
-    @RunnerType(MyRunner.class)
+    @ExecutorType(MyExecutor.class)
     @AsyncOutput
     Channel<?, Integer> getSize(String[] a);
   }
@@ -964,10 +964,10 @@ public class ProxyRoutineTest {
     }
   }
 
-  public static class MyRunner extends RunnerDecorator {
+  public static class MyExecutor extends ScheduledExecutorDecorator {
 
-    public MyRunner() {
-      super(Runners.syncRunner());
+    public MyExecutor() {
+      super(ScheduledExecutors.syncExecutor());
     }
   }
 
@@ -1110,25 +1110,25 @@ public class ProxyRoutineTest {
     }
   }
 
-  private static class TestRunner extends SyncRunner {
+  private static class TestExecutor extends SyncExecutor {
 
-    private final ArrayList<Execution> mExecutions = new ArrayList<Execution>();
+    private final ArrayList<Runnable> mExecutions = new ArrayList<Runnable>();
+
+    @Override
+    public void execute(@NotNull final Runnable command, final long delay,
+        @NotNull final TimeUnit timeUnit) {
+      mExecutions.add(command);
+    }
 
     @Override
     public boolean isExecutionThread() {
       return false;
     }
 
-    @Override
-    public void run(@NotNull final Execution execution, final long delay,
-        @NotNull final TimeUnit timeUnit) {
-      mExecutions.add(execution);
-    }
-
     private void run(int count) {
-      final ArrayList<Execution> executions = mExecutions;
+      final ArrayList<Runnable> executions = mExecutions;
       while (!executions.isEmpty() && (count-- > 0)) {
-        final Execution execution = executions.remove(0);
+        final Runnable execution = executions.remove(0);
         execution.run();
       }
     }

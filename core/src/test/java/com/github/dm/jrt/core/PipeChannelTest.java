@@ -24,11 +24,11 @@ import com.github.dm.jrt.core.common.DeadlockException;
 import com.github.dm.jrt.core.common.TimeoutException;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.ChannelConfiguration.TimeoutActionType;
+import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.log.Log;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.NullLog;
-import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.DurationMeasure;
 
 import org.jetbrains.annotations.NotNull;
@@ -631,7 +631,7 @@ public class PipeChannelTest {
     final Channel<Object, Object> channel = JRoutineCore.ofData()
                                                         .channelConfiguration()
                                                         .withOrder(OrderType.SORTED)
-                                                        .withRunner(Runners.sharedRunner())
+                                                        .withExecutor(ScheduledExecutors.defaultExecutor())
                                                         .withMaxSize(1)
                                                         .withBackoff(noDelay())
                                                         .withLogLevel(Level.DEBUG)

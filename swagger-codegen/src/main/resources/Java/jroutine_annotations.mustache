@@ -18,6 +18,6 @@
 {{/InvocationId.value}}{{#LoaderId.value}}  @com.github.dm.jrt.android.reflect.annotation.LoaderId({{LoaderId.value}})
 {{/LoaderId.value}}{{#MatchResolution.value}}  @com.github.dm.jrt.android.reflect.annotation.MatchResolution(com.github.dm.jrt.android.core.config.LoaderConfiguration.ClashResolutionType.{{MatchResolution.value}})
 {{/MatchResolution.value}}{{#ResultStaleTime.value}}  @com.github.dm.jrt.android.reflect.annotation.ResultStaleTime(value = {{ResultStaleTime.value}}{{#ResultStaleTime.unit}}, unit = java.util.concurrent.TimeUnit.{{ResultStaleTime.unit}}{{/ResultStaleTime.unit}})
-{{/ResultStaleTime.value}}{{/enableLoaders}}{{#enableServices}}{{#ServiceLog.value}}  @com.github.dm.jrt.android.reflect.annotation.ServiceLog({{ServiceLog.value}})
-{{/ServiceLog.value}}{{#ServiceRunner.value}}  @com.github.dm.jrt.android.reflect.annotation.ServiceRunner({{ServiceRunner.value}})
-{{/ServiceRunner.value}}{{/enableServices}}{{/vendorExtensions.x-jroutine-options}}
+{{/ResultStaleTime.value}}{{/enableLoaders}}{{#enableServices}}{{#ServiceExecutor.value}}  @com.github.dm.jrt.android.reflect.annotation.ServiceExecutor({{ServiceExecutor.value}})
+{{/ServiceExecutor.value}}{{#ServiceLog.value}}  @com.github.dm.jrt.android.reflect.annotation.ServiceLog({{ServiceLog.value}})
+{{/ServiceLog.value}}{{/enableServices}}{{/vendorExtensions.x-jroutine-options}}

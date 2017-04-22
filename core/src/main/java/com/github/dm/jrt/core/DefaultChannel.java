@@ -21,11 +21,10 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
+import com.github.dm.jrt.core.executor.ScheduledExecutor;
+import com.github.dm.jrt.core.executor.ScheduledExecutorDecorator;
+import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.core.log.Logger;
-import com.github.dm.jrt.core.runner.Execution;
-import com.github.dm.jrt.core.runner.Runner;
-import com.github.dm.jrt.core.runner.RunnerDecorator;
-import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.DurationMeasure;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 
@@ -47,10 +46,10 @@ import java.util.concurrent.TimeUnit;
  */
 class DefaultChannel<DATA> implements Channel<DATA, DATA> {
 
-  private static final WeakIdentityHashMap<Runner, WeakReference<ChannelRunner>> sRunners =
-      new WeakIdentityHashMap<Runner, WeakReference<ChannelRunner>>();
+  private static final WeakIdentityHashMap<ScheduledExecutor, WeakReference<ChannelExecutor>>
+      sExecutors = new WeakIdentityHashMap<ScheduledExecutor, WeakReference<ChannelExecutor>>();
 
-  private static final Runner sSyncRunner = Runners.syncRunner();
+  private static final ScheduledExecutor sSyncExecutor = ScheduledExecutors.syncExecutor();
 
   private final ResultChannel<DATA> mChannel;
 
@@ -61,21 +60,23 @@ class DefaultChannel<DATA> implements Channel<DATA, DATA> {
    */
   DefaultChannel(@NotNull final ChannelConfiguration configuration) {
     final Logger logger = configuration.newLogger(this);
-    final Runner wrapped = configuration.getRunnerOrElse(Runners.sharedRunner());
-    ChannelRunner channelRunner;
-    synchronized (sRunners) {
-      final WeakIdentityHashMap<Runner, WeakReference<ChannelRunner>> runners = sRunners;
-      final WeakReference<ChannelRunner> runner = runners.get(wrapped);
-      channelRunner = (runner != null) ? runner.get() : null;
-      if (channelRunner == null) {
-        channelRunner = new ChannelRunner(wrapped);
-        runners.put(wrapped, new WeakReference<ChannelRunner>(channelRunner));
+    final ScheduledExecutor wrapped =
+        configuration.getExecutorOrElse(ScheduledExecutors.defaultExecutor());
+    ChannelExecutor channelExecutor;
+    synchronized (sExecutors) {
+      final WeakIdentityHashMap<ScheduledExecutor, WeakReference<ChannelExecutor>> executors =
+          sExecutors;
+      final WeakReference<ChannelExecutor> executor = executors.get(wrapped);
+      channelExecutor = (executor != null) ? executor.get() : null;
+      if (channelExecutor == null) {
+        channelExecutor = new ChannelExecutor(wrapped);
+        executors.put(wrapped, new WeakReference<ChannelExecutor>(channelExecutor));
       }
     }
 
     final ChannelAbortHandler abortHandler = new ChannelAbortHandler();
     final ResultChannel<DATA> channel =
-        new ResultChannel<DATA>(configuration, channelRunner, abortHandler, logger);
+        new ResultChannel<DATA>(configuration, channelExecutor, abortHandler, logger);
     abortHandler.setChannel(channel);
     mChannel = channel;
     logger.dbg("building channel with configuration: %s", configuration);
@@ -304,33 +305,38 @@ class DefaultChannel<DATA> implements Channel<DATA, DATA> {
   }
 
   /**
-   * Runner decorator running executions synchronously if delay is 0.
+   * Executor decorator running executions synchronously if delay is 0.
    */
-  private static class ChannelRunner extends RunnerDecorator {
+  private static class ChannelExecutor extends ScheduledExecutorDecorator {
 
     /**
      * Constructor.
      *
      * @param wrapped the wrapped instance.
      */
-    private ChannelRunner(@NotNull final Runner wrapped) {
+    private ChannelExecutor(@NotNull final ScheduledExecutor wrapped) {
       super(wrapped);
+    }
+
+    @Override
+    public void execute(@NotNull final Runnable command) {
+      sSyncExecutor.execute(command);
+    }
+
+    @Override
+    public void execute(@NotNull final Runnable command, final long delay,
+        @NotNull final TimeUnit timeUnit) {
+      if (delay == 0) {
+        execute(command);
+
+      } else {
+        super.execute(command, delay, timeUnit);
+      }
     }
 
     @Override
     public boolean isExecutionThread() {
       return true;
-    }
-
-    @Override
-    public void run(@NotNull final Execution execution, final long delay,
-        @NotNull final TimeUnit timeUnit) {
-      if (delay == 0) {
-        sSyncRunner.run(execution, delay, timeUnit);
-
-      } else {
-        super.run(execution, delay, timeUnit);
-      }
     }
   }
 }

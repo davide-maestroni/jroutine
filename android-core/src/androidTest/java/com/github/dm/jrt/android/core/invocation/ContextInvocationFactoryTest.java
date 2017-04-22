@@ -24,10 +24,10 @@ import com.github.dm.jrt.android.core.TestActivity;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
-import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ClassToken;
 
 import org.jetbrains.annotations.NotNull;
@@ -53,7 +53,7 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
 
   public void testClass() {
     final InvocationConfiguration configuration =
-        InvocationConfiguration.builder().withRunner(Runners.syncRunner()).apply();
+        InvocationConfiguration.builder().withExecutor(ScheduledExecutors.syncExecutor()).apply();
     assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(Case.class)))
                            .apply(configuration)
                            .invoke()
@@ -94,7 +94,7 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
         fromFactory(getActivity(), factoryOf(tokenOf(Case.class)));
     assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryFrom(factory)))
                            .invocationConfiguration()
-                           .withRunner(Runners.syncRunner())
+                           .withExecutor(ScheduledExecutors.syncExecutor())
                            .apply()
                            .invoke()
                            .pass("TEST")
@@ -146,7 +146,7 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
 
   public void testTemplateInvocation() {
     final InvocationConfiguration configuration =
-        InvocationConfiguration.builder().withRunner(Runners.syncRunner()).apply();
+        InvocationConfiguration.builder().withExecutor(ScheduledExecutors.syncExecutor()).apply();
     assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(ContextTest.class)))
                            .apply(configuration)
                            .invoke()
@@ -156,7 +156,7 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
 
   public void testToken() {
     final InvocationConfiguration configuration =
-        InvocationConfiguration.builder().withRunner(Runners.syncRunner()).apply();
+        InvocationConfiguration.builder().withExecutor(ScheduledExecutors.syncExecutor()).apply();
     assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(tokenOf(Case.class))))
                            .apply(configuration)
                            .invoke()
@@ -193,7 +193,7 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
 
   public void testWrapper() {
     final InvocationConfiguration configuration =
-        InvocationConfiguration.builder().withRunner(Runners.syncRunner()).apply();
+        InvocationConfiguration.builder().withExecutor(ScheduledExecutors.syncExecutor()).apply();
     assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(CaseWrapper.class)))
                            .apply(configuration)
                            .invoke()

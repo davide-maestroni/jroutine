@@ -19,7 +19,7 @@ package com.github.dm.jrt.operator.sequence;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
-import com.github.dm.jrt.core.runner.Runners;
+import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.function.util.BiFunction;
 import com.github.dm.jrt.function.util.Consumer;
@@ -341,7 +341,7 @@ public class SequencesTest {
           }
         })))
                            .invocationConfiguration()
-                           .withRunner(Runners.syncRunner())
+                           .withExecutor(ScheduledExecutors.syncExecutor())
                            .apply()
                            .invoke()
                            .close()

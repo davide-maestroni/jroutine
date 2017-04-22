@@ -21,8 +21,8 @@ import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.BackoffBuilder;
 import com.github.dm.jrt.core.common.RoutineException;
+import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
-import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.function.util.Action;
 import com.github.dm.jrt.function.util.BiConsumer;
@@ -167,7 +167,7 @@ public class OperatorsTest {
       }
     }))
                            .invocationConfiguration()
-                           .withRunner(Runners.syncRunner())
+                           .withExecutor(ScheduledExecutors.syncExecutor())
                            .apply()
                            .invoke()
                            .pass("test1")
@@ -180,7 +180,7 @@ public class OperatorsTest {
       }
     }))
                            .invocationConfiguration()
-                           .withRunner(Runners.syncRunner())
+                           .withExecutor(ScheduledExecutors.syncExecutor())
                            .apply()
                            .invoke()
                            .pass("test1")
@@ -193,7 +193,7 @@ public class OperatorsTest {
       }
     }))
                            .invocationConfiguration()
-                           .withRunner(Runners.syncRunner())
+                           .withExecutor(ScheduledExecutors.syncExecutor())
                            .apply()
                            .invoke()
                            .pass("test1")
@@ -207,7 +207,7 @@ public class OperatorsTest {
       }
     }))
                            .invocationConfiguration()
-                           .withRunner(Runners.syncRunner())
+                           .withExecutor(ScheduledExecutors.syncExecutor())
                            .apply()
                            .invoke()
                            .pass("test1")
@@ -806,7 +806,7 @@ public class OperatorsTest {
       }
     }))
                            .invocationConfiguration()
-                           .withRunner(Runners.syncRunner())
+                           .withExecutor(ScheduledExecutors.syncExecutor())
                            .apply()
                            .invoke()
                            .pass(new StringBuilder("test1"), new StringBuilder("test2"),
@@ -833,7 +833,7 @@ public class OperatorsTest {
       }
     }))
                            .invocationConfiguration()
-                           .withRunner(Runners.syncRunner())
+                           .withExecutor(ScheduledExecutors.syncExecutor())
                            .apply()
                            .invoke()
                            .pass("test1", "test2", "test3")
@@ -853,7 +853,7 @@ public class OperatorsTest {
       }
     }))
                            .invocationConfiguration()
-                           .withRunner(Runners.syncRunner())
+                           .withExecutor(ScheduledExecutors.syncExecutor())
                            .apply()
                            .invoke()
                            .close()
@@ -914,7 +914,7 @@ public class OperatorsTest {
       }
     }))
                            .invocationConfiguration()
-                           .withRunner(Runners.syncRunner())
+                           .withExecutor(ScheduledExecutors.syncExecutor())
                            .apply()
                            .invoke()
                            .pass("test1", "test2", "test3")
@@ -1074,7 +1074,7 @@ public class OperatorsTest {
                            .all()).containsExactly("test");
     assertThat(JRoutineCore.with(filter(Functions.isNotNull()))
                            .invocationConfiguration()
-                           .withRunner(Runners.syncRunner())
+                           .withExecutor(ScheduledExecutors.syncExecutor())
                            .apply()
                            .invoke()
                            .pass(null, "test")
@@ -1082,11 +1082,11 @@ public class OperatorsTest {
                            .all()).containsExactly("test");
     assertThat(JRoutineCore.with(factoryOfParallel(JRoutineCore.with(filter(Functions.isNotNull()))
                                                                .invocationConfiguration()
-                                                               .withRunner(Runners.syncRunner())
+                                                               .withExecutor(ScheduledExecutors.syncExecutor())
                                                                .apply()
                                                                .buildRoutine()))
                            .invocationConfiguration()
-                           .withRunner(Runners.syncRunner())
+                           .withExecutor(ScheduledExecutors.syncExecutor())
                            .apply()
                            .invoke()
                            .pass(null, "test")
@@ -1641,7 +1641,7 @@ public class OperatorsTest {
     })).invoke().close().in(seconds(3)).all()).containsExactly("est", "est");
     assertThat(JRoutineCore.with(orElse("est"))
                            .invocationConfiguration()
-                           .withRunner(Runners.syncRunner())
+                           .withExecutor(ScheduledExecutors.syncExecutor())
                            .apply()
                            .invoke()
                            .pass("test")
@@ -1650,7 +1650,7 @@ public class OperatorsTest {
                            .all()).containsExactly("test");
     assertThat(JRoutineCore.with(orElse("est1", "est2"))
                            .invocationConfiguration()
-                           .withRunner(Runners.syncRunner())
+                           .withExecutor(ScheduledExecutors.syncExecutor())
                            .apply()
                            .invoke()
                            .pass("test")
@@ -1659,7 +1659,7 @@ public class OperatorsTest {
                            .all()).containsExactly("test");
     assertThat(JRoutineCore.with(orElse(Arrays.asList("est1", "est2")))
                            .invocationConfiguration()
-                           .withRunner(Runners.syncRunner())
+                           .withExecutor(ScheduledExecutors.syncExecutor())
                            .apply()
                            .invoke()
                            .pass("test")
@@ -1673,7 +1673,7 @@ public class OperatorsTest {
       }
     }))
                            .invocationConfiguration()
-                           .withRunner(Runners.syncRunner())
+                           .withExecutor(ScheduledExecutors.syncExecutor())
                            .apply()
                            .invoke()
                            .pass("test")
@@ -1687,7 +1687,7 @@ public class OperatorsTest {
       }
     }))
                            .invocationConfiguration()
-                           .withRunner(Runners.syncRunner())
+                           .withExecutor(ScheduledExecutors.syncExecutor())
                            .apply()
                            .invoke()
                            .close()
@@ -1700,7 +1700,7 @@ public class OperatorsTest {
       }
     }))
                            .invocationConfiguration()
-                           .withRunner(Runners.syncRunner())
+                           .withExecutor(ScheduledExecutors.syncExecutor())
                            .apply()
                            .invoke()
                            .pass("test")
@@ -1714,7 +1714,7 @@ public class OperatorsTest {
       }
     }))
                            .invocationConfiguration()
-                           .withRunner(Runners.syncRunner())
+                           .withExecutor(ScheduledExecutors.syncExecutor())
                            .apply()
                            .invoke()
                            .close()
@@ -1892,7 +1892,7 @@ public class OperatorsTest {
       }
     }))
                            .invocationConfiguration()
-                           .withRunner(Runners.syncRunner())
+                           .withExecutor(ScheduledExecutors.syncExecutor())
                            .apply()
                            .invoke()
                            .pass("test1")
@@ -1905,7 +1905,7 @@ public class OperatorsTest {
       }
     }))
                            .invocationConfiguration()
-                           .withRunner(Runners.syncRunner())
+                           .withExecutor(ScheduledExecutors.syncExecutor())
                            .apply()
                            .invoke()
                            .pass("test1")
@@ -1918,7 +1918,7 @@ public class OperatorsTest {
       }
     }))
                            .invocationConfiguration()
-                           .withRunner(Runners.syncRunner())
+                           .withExecutor(ScheduledExecutors.syncExecutor())
                            .apply()
                            .invoke()
                            .pass("test1")
@@ -1932,7 +1932,7 @@ public class OperatorsTest {
       }
     }))
                            .invocationConfiguration()
-                           .withRunner(Runners.syncRunner())
+                           .withExecutor(ScheduledExecutors.syncExecutor())
                            .apply()
                            .invoke()
                            .pass("test1")
@@ -2014,7 +2014,7 @@ public class OperatorsTest {
       }
     }))
                            .invocationConfiguration()
-                           .withRunner(Runners.syncRunner())
+                           .withExecutor(ScheduledExecutors.syncExecutor())
                            .apply()
                            .invoke()
                            .pass("test1", "test2", "test3")
@@ -2064,7 +2064,7 @@ public class OperatorsTest {
       }
     }))
                            .invocationConfiguration()
-                           .withRunner(Runners.syncRunner())
+                           .withExecutor(ScheduledExecutors.syncExecutor())
                            .apply()
                            .invoke()
                            .pass("test1", "test2", "test3")
@@ -2422,7 +2422,7 @@ public class OperatorsTest {
       }
     }))
                            .invocationConfiguration()
-                           .withRunner(Runners.syncRunner())
+                           .withExecutor(ScheduledExecutors.syncExecutor())
                            .apply()
                            .invoke()
                            .pass("test1")
@@ -2435,7 +2435,7 @@ public class OperatorsTest {
       }
     }))
                            .invocationConfiguration()
-                           .withRunner(Runners.syncRunner())
+                           .withExecutor(ScheduledExecutors.syncExecutor())
                            .apply()
                            .invoke()
                            .pass("test1")
@@ -2448,7 +2448,7 @@ public class OperatorsTest {
       }
     }))
                            .invocationConfiguration()
-                           .withRunner(Runners.syncRunner())
+                           .withExecutor(ScheduledExecutors.syncExecutor())
                            .apply()
                            .invoke()
                            .pass("test1")
@@ -2462,7 +2462,7 @@ public class OperatorsTest {
       }
     }))
                            .invocationConfiguration()
-                           .withRunner(Runners.syncRunner())
+                           .withExecutor(ScheduledExecutors.syncExecutor())
                            .apply()
                            .invoke()
                            .pass("test1")

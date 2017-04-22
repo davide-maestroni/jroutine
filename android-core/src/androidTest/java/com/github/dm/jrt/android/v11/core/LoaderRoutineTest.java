@@ -32,6 +32,7 @@ import android.test.ActivityInstrumentationTestCase2;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.CacheStrategyType;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.ClashResolutionType;
+import com.github.dm.jrt.android.core.executor.AndroidExecutors;
 import com.github.dm.jrt.android.core.invocation.CallContextInvocation;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.core.invocation.IdentityContextInvocation;
@@ -40,7 +41,6 @@ import com.github.dm.jrt.android.core.invocation.MissingLoaderException;
 import com.github.dm.jrt.android.core.invocation.TypeClashException;
 import com.github.dm.jrt.android.core.log.AndroidLogs;
 import com.github.dm.jrt.android.core.routine.LoaderRoutine;
-import com.github.dm.jrt.android.core.runner.AndroidRunners;
 import com.github.dm.jrt.android.core.test.R;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
@@ -1159,7 +1159,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
     final Channel<?, String> channel2 = JRoutineLoader.on(loaderFrom(fragment))
                                                       .withId(0)
                                                       .channelConfiguration()
-                                                      .withRunner(AndroidRunners.mainRunner())
+                                                      .withExecutor(AndroidExecutors.mainExecutor())
                                                       .apply()
                                                       .buildChannel();
 

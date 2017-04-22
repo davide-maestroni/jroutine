@@ -23,12 +23,12 @@ import android.os.Parcelable;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.github.dm.jrt.android.core.config.ServiceConfiguration;
+import com.github.dm.jrt.android.core.executor.MainExecutor;
 import com.github.dm.jrt.android.core.invocation.CallContextInvocation;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationWrapper;
 import com.github.dm.jrt.android.core.invocation.TargetInvocationFactory;
 import com.github.dm.jrt.android.core.invocation.TemplateContextInvocation;
 import com.github.dm.jrt.android.core.log.AndroidLog;
-import com.github.dm.jrt.android.core.runner.MainRunner;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
@@ -36,6 +36,7 @@ import com.github.dm.jrt.core.channel.OutputTimeoutException;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.ChannelConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
@@ -43,7 +44,6 @@ import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.log.Log;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.routine.Routine;
-import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.DurationMeasure;
 
@@ -80,7 +80,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
         JRoutineService.on(serviceFrom(getActivity(), RemoteInvocationService.class))
                        .with(factoryOf(Delay.class))
                        .serviceConfiguration()
-                       .withRunnerClass(MainRunner.class)
+                       .withExecutorClass(MainExecutor.class)
                        .apply()
                        .invoke()
                        .pass(data)
@@ -194,7 +194,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
         JRoutineService.on(serviceFrom(getActivity(), RemoteInvocationService.class))
                        .with(targetFactory)
                        .invocationConfiguration()
-                       .withRunner(Runners.syncRunner())
+                       .withExecutor(ScheduledExecutors.syncExecutor())
                        .withInputOrder(OrderType.UNSORTED)
                        .withLogLevel(Level.DEBUG)
                        .apply()

@@ -23,10 +23,10 @@ import com.github.dm.jrt.android.core.invocation.ContextInvocation;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
+import com.github.dm.jrt.core.executor.ScheduledExecutor;
+import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
 import com.github.dm.jrt.core.log.Logger;
-import com.github.dm.jrt.core.runner.Runner;
-import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
@@ -46,6 +46,8 @@ import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory
  */
 class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
 
+  private final ScheduledExecutor mExecutor;
+
   private final ContextInvocationFactory<IN, OUT> mFactory;
 
   private final List<? extends IN> mInputs;
@@ -55,8 +57,6 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
   private final Logger mLogger;
 
   private final OrderType mOrderType;
-
-  private final Runner mRunner;
 
   private int mInvocationCount;
 
@@ -69,19 +69,20 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
    * @param inputs     the input data.
    * @param invocation the invocation instance.
    * @param factory    the invocation factory.
-   * @param runner     the invocation runner.
+   * @param executor   the invocation executor.
    * @param order      the data order.
    * @param logger     the logger instance.
    */
   InvocationLoader(@NotNull final Context context, @NotNull final List<? extends IN> inputs,
       @NotNull final ContextInvocation<IN, OUT> invocation,
-      @NotNull final ContextInvocationFactory<IN, OUT> factory, @Nullable final Runner runner,
-      @Nullable final OrderType order, @NotNull final Logger logger) {
+      @NotNull final ContextInvocationFactory<IN, OUT> factory,
+      @Nullable final ScheduledExecutor executor, @Nullable final OrderType order,
+      @NotNull final Logger logger) {
     super(context);
     mInputs = ConstantConditions.notNull("list of input data", inputs);
     mInvocation = ConstantConditions.notNull("invocation instance", invocation);
     mFactory = ConstantConditions.notNull("Context invocation factory", factory);
-    mRunner = (runner != null) ? runner : Runners.syncRunner();
+    mExecutor = (executor != null) ? executor : ScheduledExecutors.syncExecutor();
     mOrderType = order;
     mLogger = logger.subContextLogger(this);
   }
@@ -132,7 +133,7 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
         new LoaderContextInvocationFactory<IN, OUT>(mInvocation);
     JRoutineCore.with(fromFactory(getContext(), factory))
                 .invocationConfiguration()
-                .withRunner(mRunner)
+                .withExecutor(mExecutor)
                 .withOutputOrder(mOrderType)
                 .withLog(logger.getLog())
                 .withLogLevel(logger.getLogLevel())

@@ -19,8 +19,8 @@ package com.github.dm.jrt.function;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.RoutineException;
+import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.core.routine.Routine;
-import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.function.builder.StatefulRoutineBuilder;
 import com.github.dm.jrt.function.util.BiConsumer;
 import com.github.dm.jrt.function.util.BiFunction;
@@ -65,7 +65,7 @@ public class StatefulRoutineBuilderTest {
         atomicBoolean.set(false);
         return atomicBoolean;
       }
-    }).invocationConfiguration().withRunner(Runners.immediateRunner()).apply().invoke().close();
+    }).invocationConfiguration().withExecutor(ScheduledExecutors.immediateExecutor()).apply().invoke().close();
     assertThat(state.get()).isFalse();
   }
 
@@ -89,7 +89,7 @@ public class StatefulRoutineBuilderTest {
                                                    }
                                                  })
                                                  .invocationConfiguration()
-                                                 .withRunner(Runners.immediateRunner())
+                                                 .withExecutor(ScheduledExecutors.immediateExecutor())
                                                  .apply()
                                                  .buildRoutine();
     routine.invoke().close();
@@ -111,7 +111,7 @@ public class StatefulRoutineBuilderTest {
                 reference.set(e);
                 return null;
               }
-            }).invocationConfiguration().withRunner(Runners.immediateRunner()).apply().invoke();
+            }).invocationConfiguration().withExecutor(ScheduledExecutors.immediateExecutor()).apply().invoke();
     assertThat(reference.get()).isNull();
     channel.abort(new IOException());
     assertThat(reference.get()).isExactlyInstanceOf(AbortException.class);
@@ -129,7 +129,7 @@ public class StatefulRoutineBuilderTest {
               public void accept(final RoutineException state, final RoutineException e) {
                 reference.set(e);
               }
-            }).invocationConfiguration().withRunner(Runners.immediateRunner()).apply().invoke();
+            }).invocationConfiguration().withExecutor(ScheduledExecutors.immediateExecutor()).apply().invoke();
     assertThat(reference.get()).isNull();
     channel.abort(new IOException());
     assertThat(reference.get()).isExactlyInstanceOf(AbortException.class);
@@ -148,7 +148,7 @@ public class StatefulRoutineBuilderTest {
                 reference.set(e);
                 return null;
               }
-            }).invocationConfiguration().withRunner(Runners.immediateRunner()).apply().invoke();
+            }).invocationConfiguration().withExecutor(ScheduledExecutors.immediateExecutor()).apply().invoke();
     assertThat(reference.get()).isNull();
     channel.abort(new IOException());
     assertThat(reference.get()).isExactlyInstanceOf(AbortException.class);
@@ -171,7 +171,7 @@ public class StatefulRoutineBuilderTest {
             atomicBoolean.set(false);
             return atomicBoolean;
           }
-        }).invocationConfiguration().withRunner(Runners.immediateRunner()).apply().invoke();
+        }).invocationConfiguration().withExecutor(ScheduledExecutors.immediateExecutor()).apply().invoke();
     assertThat(state.get()).isTrue();
     channel.abort(new IOException());
     assertThat(state.get()).isFalse();
@@ -191,7 +191,7 @@ public class StatefulRoutineBuilderTest {
       public void accept(final AtomicBoolean atomicBoolean) {
         atomicBoolean.set(false);
       }
-    }).invocationConfiguration().withRunner(Runners.immediateRunner()).apply().buildRoutine();
+    }).invocationConfiguration().withExecutor(ScheduledExecutors.immediateExecutor()).apply().buildRoutine();
     routine.invoke().close();
     assertThat(state.get()).isFalse();
   }
@@ -283,7 +283,7 @@ public class StatefulRoutineBuilderTest {
               }
             })
                                                          .invocationConfiguration()
-                                                         .withRunner(Runners.immediateRunner())
+                                                         .withExecutor(ScheduledExecutors.immediateExecutor())
                                                          .apply()
                                                          .buildRoutine();
     assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(1)).all()).containsExactly(4);

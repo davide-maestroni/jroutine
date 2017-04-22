@@ -23,8 +23,8 @@ import com.github.dm.jrt.android.core.routine.LoaderRoutine;
 import com.github.dm.jrt.core.AbstractRoutine;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.executor.ScheduledExecutor;
 import com.github.dm.jrt.core.invocation.Invocation;
-import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
@@ -35,9 +35,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static com.github.dm.jrt.android.core.runner.AndroidRunners.mainRunner;
+import static com.github.dm.jrt.android.core.executor.AndroidExecutors.mainExecutor;
 import static com.github.dm.jrt.android.v4.core.LoaderInvocation.clearLoaders;
-import static com.github.dm.jrt.core.runner.Runners.zeroDelayRunner;
+import static com.github.dm.jrt.core.executor.ScheduledExecutors.zeroDelayExecutor;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
@@ -61,7 +61,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
 
   private final OrderType mOrderType;
 
-  private final Runner mRunner;
+  private final ScheduledExecutor mExecutor;
 
   /**
    * Constructor.
@@ -75,7 +75,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
       @NotNull final ContextInvocationFactory<IN, OUT> factory,
       @NotNull final InvocationConfiguration invocationConfiguration,
       @NotNull final LoaderConfiguration loaderConfiguration) {
-    super(invocationConfiguration.builderFrom().withRunner(zeroDelayRunner(mainRunner())).apply());
+    super(invocationConfiguration.builderFrom().withExecutor(zeroDelayExecutor(mainExecutor())).apply());
     final int invocationId = loaderConfiguration.getInvocationIdOrElse(LoaderConfiguration.AUTO);
     mContext = ConstantConditions.notNull("Loader context", context);
     ConstantConditions.notNull("Context invocation factory", factory);
@@ -84,7 +84,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
     mConfiguration = loaderConfiguration;
     mLoaderId = loaderConfiguration.getLoaderIdOrElse(LoaderConfiguration.AUTO);
     mOrderType = invocationConfiguration.getOutputOrderTypeOrElse(null);
-    mRunner = invocationConfiguration.getRunnerOrElse(null);
+    mExecutor = invocationConfiguration.getExecutorOrElse(null);
     getLogger().dbg("building Context routine with configuration: %s", loaderConfiguration);
   }
 
@@ -100,7 +100,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
   @NotNull
   @Override
   protected Invocation<IN, OUT> newInvocation() {
-    return new LoaderInvocation<IN, OUT>(mContext, mFactory, mConfiguration, mRunner, mOrderType,
+    return new LoaderInvocation<IN, OUT>(mContext, mFactory, mConfiguration, mExecutor, mOrderType,
         getLogger());
   }
 

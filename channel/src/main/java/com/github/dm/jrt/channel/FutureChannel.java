@@ -24,12 +24,11 @@ import com.github.dm.jrt.core.channel.PipeChannel;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.ChannelConfiguration.TimeoutActionType;
+import com.github.dm.jrt.core.executor.ScheduledExecutor;
+import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.log.Logger;
-import com.github.dm.jrt.core.runner.Execution;
-import com.github.dm.jrt.core.runner.Runner;
-import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DurationMeasure;
 import com.github.dm.jrt.core.util.LocalField;
@@ -60,6 +59,8 @@ import static com.github.dm.jrt.core.util.DurationMeasure.noTime;
  */
 class FutureChannel<OUT> implements Channel<OUT, OUT> {
 
+  private final ScheduledExecutor mExecutor;
+
   private final Future<OUT> mFuture;
 
   private final boolean mInterruptIfRunning;
@@ -73,8 +74,6 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
   private final LocalField<DurationMeasure> mOutputTimeout;
 
   private final LocalField<DurationMeasure> mResultDelay;
-
-  private final Runner mRunner;
 
   private final LocalField<TimeoutActionType> mTimeoutActionType;
 
@@ -93,7 +92,7 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
       @NotNull final Future<OUT> future, final boolean mayInterruptIfRunning) {
     mLogger = configuration.newLogger(this);
     mFuture = ConstantConditions.notNull("future instance", future);
-    mRunner = configuration.getRunnerOrElse(Runners.sharedRunner());
+    mExecutor = configuration.getExecutorOrElse(ScheduledExecutors.defaultExecutor());
     mInterruptIfRunning = mayInterruptIfRunning;
     mResultDelay = new LocalField<DurationMeasure>(noTime());
     mOutputTimeout =
@@ -119,7 +118,7 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
     }
 
     if (!future.isCancelled()) {
-      mRunner.run(new Execution() {
+      mExecutor.execute(new Runnable() {
 
         public void run() {
           future.cancel(mInterruptIfRunning);
@@ -194,7 +193,7 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
 
     } else {
       final DurationMeasure delay = mResultDelay.get();
-      mRunner.run(new Execution() {
+      mExecutor.execute(new Runnable() {
 
         public void run() {
           try {

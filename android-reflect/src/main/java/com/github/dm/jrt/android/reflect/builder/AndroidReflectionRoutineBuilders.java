@@ -24,8 +24,8 @@ import com.github.dm.jrt.android.reflect.annotation.InvocationId;
 import com.github.dm.jrt.android.reflect.annotation.LoaderId;
 import com.github.dm.jrt.android.reflect.annotation.MatchResolution;
 import com.github.dm.jrt.android.reflect.annotation.ResultStaleTime;
+import com.github.dm.jrt.android.reflect.annotation.ServiceExecutor;
 import com.github.dm.jrt.android.reflect.annotation.ServiceLog;
-import com.github.dm.jrt.android.reflect.annotation.ServiceRunner;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
@@ -129,8 +129,8 @@ public class AndroidReflectionRoutineBuilders {
    * @param configuration the initial configuration.
    * @param annotations   the annotations.
    * @return the modified configuration.
+   * @see com.github.dm.jrt.android.reflect.annotation.ServiceExecutor ServiceExecutor
    * @see com.github.dm.jrt.android.reflect.annotation.ServiceLog ServiceLog
-   * @see com.github.dm.jrt.android.reflect.annotation.ServiceRunner ServiceRunner
    */
   @NotNull
   public static ServiceConfiguration withAnnotations(
@@ -147,9 +147,9 @@ public class AndroidReflectionRoutineBuilders {
       if (annotationType == ServiceLog.class) {
         builder.withLogClass(((ServiceLog) annotation).value()).withLogArgs((Object[]) null);
 
-      } else if (annotationType == ServiceRunner.class) {
-        builder.withRunnerClass(((ServiceRunner) annotation).value())
-               .withRunnerArgs((Object[]) null);
+      } else if (annotationType == ServiceExecutor.class) {
+        builder.withExecutorClass(((ServiceExecutor) annotation).value())
+               .withExecutorArgs((Object[]) null);
       }
     }
 
@@ -163,8 +163,8 @@ public class AndroidReflectionRoutineBuilders {
    * @param configuration the initial configuration.
    * @param method        the target method.
    * @return the modified configuration.
+   * @see com.github.dm.jrt.android.reflect.annotation.ServiceExecutor ServiceExecutor
    * @see com.github.dm.jrt.android.reflect.annotation.ServiceLog ServiceLog
-   * @see com.github.dm.jrt.android.reflect.annotation.ServiceRunner ServiceRunner
    */
   @NotNull
   public static ServiceConfiguration withAnnotations(

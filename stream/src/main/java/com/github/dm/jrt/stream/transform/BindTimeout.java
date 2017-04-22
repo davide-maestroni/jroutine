@@ -19,7 +19,7 @@ package com.github.dm.jrt.stream.transform;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
-import com.github.dm.jrt.core.runner.Runners;
+import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.util.Function;
 
@@ -71,7 +71,7 @@ class BindTimeout<OUT> implements Function<Channel<?, OUT>, Channel<?, OUT>> {
         JRoutineCore.<OUT>ofData().apply(configuration).buildChannel();
     channel.consume(
         new TimeoutChannelConsumer<OUT>(mOutputTimeout, mOutputTimeoutUnit, mTotalTimeout,
-            mTotalTimeoutUnit, configuration.getRunnerOrElse(Runners.sharedRunner()),
+            mTotalTimeoutUnit, configuration.getExecutorOrElse(ScheduledExecutors.defaultExecutor()),
             outputChannel));
     return outputChannel;
   }

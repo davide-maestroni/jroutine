@@ -223,7 +223,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
    * If a delay has been set through the dedicated methods, the transfer of data will be
    * accordingly postponed.
    * <p>
-   * Note that the consumer methods may be called on the runner thread.
+   * Note that the consumer methods may be called on the executor thread.
    *
    * @param consumer the consumer instance.
    * @return this channel.
@@ -725,7 +725,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
    * Tells the channel to not sort the passed input data.
    * <p>
    * Note that only the inputs passed with a 0 delay will be delivered in the same order as they
-   * are passed to the channel, while the others will be delivered as soon as the dedicated runner
+   * are passed to the channel, while the others will be delivered as soon as the dedicated executor
    * handles the specific execution.
    * <p>
    * This is the default behavior.

@@ -35,12 +35,11 @@ import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
+import com.github.dm.jrt.core.executor.ScheduledExecutor;
+import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.core.invocation.CallInvocation;
 import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.routine.Routine;
-import com.github.dm.jrt.core.runner.Execution;
-import com.github.dm.jrt.core.runner.Runner;
-import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 
@@ -52,8 +51,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import static com.github.dm.jrt.android.core.executor.AndroidExecutors.mainExecutor;
 import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.fromFactory;
-import static com.github.dm.jrt.android.core.runner.AndroidRunners.mainRunner;
 import static com.github.dm.jrt.core.util.DurationMeasure.indefiniteTime;
 
 /**
@@ -72,13 +71,16 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
       new WeakIdentityHashMap<Object,
           SparseArrayCompat<WeakReference<RoutineLoaderCallbacks<?>>>>();
 
-  private static final Runner sMainRunner = Runners.zeroDelayRunner(mainRunner());
+  private static final ScheduledExecutor sMainExecutor =
+      ScheduledExecutors.zeroDelayExecutor(mainExecutor());
 
   private final CacheStrategyType mCacheStrategyType;
 
   private final ClashResolutionType mClashResolutionType;
 
   private final LoaderContextCompat mContext;
+
+  private final ScheduledExecutor mExecutor;
 
   private final ContextInvocationFactory<IN, OUT> mFactory;
 
@@ -92,21 +94,19 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
 
   private final long mResultStaleTimeMillis;
 
-  private final Runner mRunner;
-
   /**
    * Constructor.
    *
    * @param context       the context instance.
    * @param factory       the invocation factory.
    * @param configuration the Loader configuration.
-   * @param runner        the invocation runner.
+   * @param executor      the invocation executor.
    * @param order         the input data order.
    * @param logger        the logger instance.
    */
   LoaderInvocation(@NotNull final LoaderContextCompat context,
       @NotNull final ContextInvocationFactory<IN, OUT> factory,
-      @NotNull final LoaderConfiguration configuration, @Nullable final Runner runner,
+      @NotNull final LoaderConfiguration configuration, @Nullable final ScheduledExecutor executor,
       @Nullable final OrderType order, @NotNull final Logger logger) {
     mContext = ConstantConditions.notNull("Loader context", context);
     mFactory = ConstantConditions.notNull("Context invocation factory", factory);
@@ -116,7 +116,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
     mMatchResolutionType = configuration.getMatchResolutionTypeOrElse(ClashResolutionType.JOIN);
     mCacheStrategyType = configuration.getCacheStrategyTypeOrElse(CacheStrategyType.CLEAR);
     mResultStaleTimeMillis = configuration.getResultStaleTimeOrElse(indefiniteTime()).toMillis();
-    mRunner = runner;
+    mExecutor = executor;
     mOrderType = order;
     mLogger = logger.subContextLogger(this);
   }
@@ -128,7 +128,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
    * @param loaderId the Loader ID.
    */
   static void clearLoader(@NotNull final LoaderContextCompat context, final int loaderId) {
-    sMainRunner.run(new ClearExecution(context, loaderId), 0, TimeUnit.MILLISECONDS);
+    sMainExecutor.execute(new ClearCommand(context, loaderId));
   }
 
   /**
@@ -140,7 +140,8 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
    */
   static void clearLoader(@NotNull final LoaderContextCompat context, final int loaderId,
       @NotNull final List<?> inputs) {
-    sMainRunner.run(new ClearInputsExecution(context, loaderId, inputs), 0, TimeUnit.MILLISECONDS);
+    sMainExecutor.execute(new ClearInputsCommand(context, loaderId, inputs), 0,
+        TimeUnit.MILLISECONDS);
   }
 
   /**
@@ -152,7 +153,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
    */
   static void clearLoaders(@NotNull final LoaderContextCompat context, final int loaderId,
       @NotNull final ContextInvocationFactory<?, ?> factory) {
-    sMainRunner.run(new ClearFactoryExecution(context, factory, loaderId), 0,
+    sMainExecutor.execute(new ClearFactoryCommand(context, factory, loaderId), 0,
         TimeUnit.MILLISECONDS);
   }
 
@@ -166,7 +167,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
    */
   static void clearLoaders(@NotNull final LoaderContextCompat context, final int loaderId,
       @NotNull final ContextInvocationFactory<?, ?> factory, @NotNull final List<?> inputs) {
-    sMainRunner.run(new ClearFactoryInputsExecution(context, factory, loaderId, inputs), 0,
+    sMainExecutor.execute(new ClearFactoryInputsCommand(context, factory, loaderId, inputs), 0,
         TimeUnit.MILLISECONDS);
   }
 
@@ -351,7 +352,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
     final Routine<IN, OUT> routine =
         JRoutineCore.with(fromFactory(loaderContext.getApplicationContext(), factory))
                     .invocationConfiguration()
-                    .withRunner(Runners.syncRunner())
+                    .withExecutor(ScheduledExecutors.syncExecutor())
                     .apply()
                     .buildRoutine();
     routine.invoke().abort(reason);
@@ -449,7 +450,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
     final Logger logger = mLogger;
     final InvocationLoader<IN, OUT> callbacksLoader = (loader != null) ? loader
         : new InvocationLoader<IN, OUT>(loaderContext, inputs, createInvocation(loaderId), mFactory,
-            mRunner, mOrderType, logger);
+            mExecutor, mOrderType, logger);
     return new RoutineLoaderCallbacks<OUT>(loaderManager, callbacksLoader, logger);
   }
 
@@ -516,9 +517,9 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
   }
 
   /**
-   * Execution implementation purging the Loader with a specific ID.
+   * Runnable implementation purging the Loader with a specific ID.
    */
-  private static class ClearExecution implements Execution {
+  private static class ClearCommand implements Runnable {
 
     private final LoaderContextCompat mContext;
 
@@ -530,7 +531,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
      * @param context  the context instance.
      * @param loaderId the Loader ID.
      */
-    private ClearExecution(@NotNull final LoaderContextCompat context, final int loaderId) {
+    private ClearCommand(@NotNull final LoaderContextCompat context, final int loaderId) {
       mContext = context;
       mLoaderId = loaderId;
     }
@@ -542,9 +543,9 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
   }
 
   /**
-   * Execution implementation purging all Loaders with a specific invocation factory.
+   * Runnable implementation purging all Loaders with a specific invocation factory.
    */
-  private static class ClearFactoryExecution implements Execution {
+  private static class ClearFactoryCommand implements Runnable {
 
     private final LoaderContextCompat mContext;
 
@@ -559,7 +560,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
      * @param factory  the invocation factory.
      * @param loaderId the Loader ID.
      */
-    private ClearFactoryExecution(@NotNull final LoaderContextCompat context,
+    private ClearFactoryCommand(@NotNull final LoaderContextCompat context,
         @NotNull final ContextInvocationFactory<?, ?> factory, final int loaderId) {
       mContext = context;
       mFactory = factory;
@@ -573,9 +574,9 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
   }
 
   /**
-   * Execution implementation purging the Loader with a specific invocation factory and inputs.
+   * Runnable implementation purging the Loader with a specific invocation factory and inputs.
    */
-  private static class ClearFactoryInputsExecution implements Execution {
+  private static class ClearFactoryInputsCommand implements Runnable {
 
     private final LoaderContextCompat mContext;
 
@@ -593,7 +594,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
      * @param loaderId the Loader ID.
      * @param inputs   the list of inputs.
      */
-    private ClearFactoryInputsExecution(@NotNull final LoaderContextCompat context,
+    private ClearFactoryInputsCommand(@NotNull final LoaderContextCompat context,
         @NotNull final ContextInvocationFactory<?, ?> factory, final int loaderId,
         @NotNull final List<?> inputs) {
       mContext = context;
@@ -609,9 +610,9 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
   }
 
   /**
-   * Execution implementation purging the Loader with a specific ID and inputs.
+   * Runnable implementation purging the Loader with a specific ID and inputs.
    */
-  private static class ClearInputsExecution implements Execution {
+  private static class ClearInputsCommand implements Runnable {
 
     private final LoaderContextCompat mContext;
 
@@ -626,7 +627,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
      * @param loaderId the Loader ID.
      * @param inputs   the list of inputs.
      */
-    private ClearInputsExecution(@NotNull final LoaderContextCompat context, final int loaderId,
+    private ClearInputsCommand(@NotNull final LoaderContextCompat context, final int loaderId,
         @NotNull final List<?> inputs) {
       mContext = context;
       mLoaderId = loaderId;

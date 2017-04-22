@@ -27,14 +27,14 @@ import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.executor.ScheduledExecutor;
+import com.github.dm.jrt.core.executor.ScheduledExecutorDecorator;
+import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.log.Log;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.NullLog;
 import com.github.dm.jrt.core.routine.Routine;
-import com.github.dm.jrt.core.runner.Runner;
-import com.github.dm.jrt.core.runner.RunnerDecorator;
-import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.DurationMeasure;
 import com.github.dm.jrt.reflect.annotation.Alias;
@@ -84,7 +84,7 @@ public class RemoteServiceReflectionRoutineTest
         JRoutineServiceReflection.on(serviceFrom(getActivity(), RemoteInvocationService.class))
                                  .with(instanceOf(TestClass.class))
                                  .invocationConfiguration()
-                                 .withRunner(Runners.syncRunner())
+                                 .withExecutor(ScheduledExecutors.syncExecutor())
                                  .withMaxInvocations(1)
                                  .withCoreInvocations(1)
                                  .withOutputTimeoutAction(TimeoutActionType.CONTINUE)
@@ -454,7 +454,7 @@ public class RemoteServiceReflectionRoutineTest
         JRoutineServiceReflection.on(serviceFrom(getActivity(), RemoteInvocationService.class))
                                  .with(instanceOf(TestClass.class))
                                  .invocationConfiguration()
-                                 .withRunner(Runners.poolRunner())
+                                 .withExecutor(ScheduledExecutors.poolExecutor())
                                  .withMaxInvocations(1)
                                  .apply()
                                  .wrapperConfiguration()
@@ -472,7 +472,7 @@ public class RemoteServiceReflectionRoutineTest
         JRoutineServiceReflection.on(serviceFrom(getActivity(), RemoteInvocationService.class))
                                  .with(instanceOf(TestClass.class))
                                  .invocationConfiguration()
-                                 .withRunner(Runners.poolRunner())
+                                 .withExecutor(ScheduledExecutors.poolExecutor())
                                  .apply()
                                  .method("getLong");
 
@@ -712,7 +712,7 @@ public class RemoteServiceReflectionRoutineTest
         JRoutineServiceReflection.on(serviceFrom(getActivity(), RemoteTestService.class))
                                  .with(instanceOf(TestClass2.class))
                                  .serviceConfiguration()
-                                 .withRunnerClass(SharedFieldRunner.class)
+                                 .withExecutorClass(SharedFieldExecutor.class)
                                  .apply()
                                  .invocationConfiguration()
                                  .withOutputTimeout(seconds(10))
@@ -1286,12 +1286,12 @@ public class RemoteServiceReflectionRoutineTest
     }
   }
 
-  public static class SharedFieldRunner extends RunnerDecorator {
+  public static class SharedFieldExecutor extends ScheduledExecutorDecorator {
 
-    private static final Runner sRunner = Runners.poolRunner(2);
+    private static final ScheduledExecutor sExecutor = ScheduledExecutors.poolExecutor(2);
 
-    public SharedFieldRunner() {
-      super(sRunner);
+    public SharedFieldExecutor() {
+      super(sExecutor);
     }
 
     @Override

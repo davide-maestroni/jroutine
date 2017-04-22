@@ -23,8 +23,7 @@
 <h1>Overview</h1>
 <p>
     This module implements the core part of the JRoutine library. It enables safe asynchronous invocation of code, and both active and passive retrieval of results.<br>
-    A routine can by invoked in asynchronous or parallel mode. In the former mode all the inputs are passed to the same invocation instance, while, in the latter mode, a new invocation will be created (or recycled) to handle each of the routine inputs.<br>
-    The channel returned by the routine invocation is used to both pass the input data and to collect the results. Outputs can be actively read, by calling the proper read methods, or passively, by binding the channel to an output consumer or another channel.<br>
+    The channel returned by the routine invocation is used to both pass the input data and to collect the results. Outputs can be actively read, by calling the proper read methods, or passively, by binding the channel to a consumer or another channel.<br>
     The examples below show the main ways to build, invoke and concatenate routines.
 </p>
 <h2>Main concepts</h2>
@@ -32,50 +31,49 @@
     <li>
         <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/core/com/github/dm/jrt/core/invocation/Invocation.html">Invocation</a>
         <p>
-            An invocation represents the business logic to be executed in the routine. The invocation instance is responsible for the processing of inputs and the publishing of outputs.
-            Invocations are managed objects, whose instantiation and lifecycle are controlled by the routine instance.
-            Invocation objects are meant to be recycled, so it's up to the specific implementation to properly clean-up and reset the internal state.
+            An invocation represents the business logic to be executed in the routine. The invocation instance is responsible for the processing of inputs and the publishing of outputs.<br>
+            Invocations are managed objects, whose instantiation and lifecycle are controlled by the routine instance.<br>
+            Invocation objects are meant to be recycled, so it's up to the specific implementation to properly clean-up and reset the internal state.<br>
             Implementing classes may safely retain variable member fields without the need of explicit synchronization.
         </p>
     </li>
     <li>
         <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/core/com/github/dm/jrt/core/invocation/InvocationFactory.html">InvocationFactory</a>
         <p>
-            A factory is needed to dynamically instantiate new invocation objects. In fact, the same routine can be invoked several times on different threads, and, each time, an invocation instance will be required to process the input data.
+            A factory is needed to dynamically instantiate new invocation objects. In fact, the same routine can be invoked several times on different threads, and, each time, an invocation instance will be required to process the input data.<br>
             Invocation factories might be used to identify the invocation type, for this reason the constructor parameters (which should always be immutable or effectively so) are required to be passed to the base class.
         </p>
     </li>
     <li>
         <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/core/com/github/dm/jrt/core/routine/Routine.html">Routine</a>
         <p>
-            Routine objects enable the execution of invocations in two different modes.
-            Routines can be called asynchronously, in which case an invocation instance is created and employed to process all the inputs data, or parallelly, where the main difference with the first mode is that a different invocation instance is used for each input passed.
+            Routine objects enable the execution of invocations in an asynchronous way.<br>
             Note that routines are designed to be combined in different ways, and that they can be implemented based on different paradigms other than invocations, as far as they honour the interface contract.
         </p>
     </li>
     <li>
         <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/core/com/github/dm/jrt/core/builder/RoutineBuilder.html">RoutineBuilder</a>
         <p>
-            Each routine instance needs an invocation factory and a specific configuration, so routine builders provide a convenient way to set the required options.
-            In particular, the set <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/core/com/github/dm/jrt/core/runner/Runner.html">Runner</a> represents the source of concurrency to be used when a routine is asynchronously or parallelly invoked.
+            Each routine instance needs an invocation factory and a specific configuration, so routine builders provide a convenient way to set the required options.<br>
+            In particular, the set <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/core/com/github/dm/jrt/core/runner/Runner.html">Runner</a> represents the source of concurrency to be used when a routine is asynchronously invoked.<br>
             By design builders are not synchronized, since the same instance is not meant to be used in different threads.
         </p>
     </li>
     <li>
         <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/core/com/github/dm/jrt/core/channel/Channel.html">Channel</a>
         <p>
-            A channel is the object returned when a routine is invoked, and represents the mean of communication between the invocation and the external world.
-            One channel is used to pass input data to the invocation and to retrieve the outputs of the processing, while another channel will be employed by the invocation instance to publish the processing results.
-            Each channel can receive inputs from several other channels, but its outputs can be consumed only by a single object, be it another a channel or a specific consumer.
-            When a channel is bound to another channel or a channel consumer, any further attempt to explicitly read its outputs will raise an exception.
+            A channel is the object returned when a routine is invoked, and represents the mean of communication between the invocation and the external world.<br>
+            One channel is used to pass input data to the invocation and to retrieve the outputs of the processing, while another channel will be employed by the invocation instance to publish the processing results.<br>
+            Each channel can receive inputs from several other channels, but its outputs can be consumed only by a single object, be it another a channel or a specific consumer.<br>
+            When a channel is bound to another channel or a channel consumer, any further attempt to explicitly read its outputs will raise an exception.<br>
             Note that the data passed through a channel instance are expected to be immutable or effectively so.
         </p>
     </li>
     <li>
         <a href="http://davide-maestroni.github.io/jroutine/javadoc/7.0.0/core/com/github/dm/jrt/core/channel/ChannelConsumer.html">ChannelConsumer</a>
         <p>
-            A channel consumer is used to capture the outputs and the errors coming from routine invocations.
-            The consumer object is automatically synchronized so that no other form of synchronization should be required. Nevertheless, in case a consumer retain a reference to an external object, it will be up to the caller to ensure a proper use of it, since the consumer methods are likely to be called from different threads.
+            A channel consumer is used to capture the outputs and the errors coming from routine invocations.<br>
+            The consumer object is automatically synchronized so that no other form of synchronization should be required. Nevertheless, in case a consumer retain a reference to an external object, it will be up to the caller to ensure a proper use of it, since the consumer methods are likely to be called from different threads.<br>
             The very same consumer instance may be safely bound to different channels, note however that in such case the consumer lifecycle will not be guaranteed.
         </p>
     </li>

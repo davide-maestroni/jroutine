@@ -17,10 +17,10 @@
 package com.github.dm.jrt.core.config;
 
 import com.github.dm.jrt.core.common.Backoff;
+import com.github.dm.jrt.core.executor.ScheduledExecutor;
 import com.github.dm.jrt.core.log.Log;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.Logger;
-import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.core.util.DurationMeasure;
@@ -41,7 +41,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * <p>
  * The configuration allows to set:
  * <ul>
- * <li>The asynchronous runner used to dispatch delayed data.</li>
+ * <li>The asynchronous executor used to dispatch delayed data.</li>
  * <li>The order in which data are dispatched through the channel. The order of input data is not
  * guaranteed. Nevertheless, it is possible to force data to be delivered in the same order as they
  * are passed to the channels, at the cost of a slightly increase in memory usage and computation.
@@ -77,20 +77,20 @@ public final class ChannelConfiguration extends DeepEqualObject {
 
   private final OrderType mChannelOrderType;
 
+  private final ScheduledExecutor mExecutor;
+
   private final Log mLog;
 
   private final Level mLogLevel;
 
   private final DurationMeasure mOutputTimeout;
 
-  private final Runner mRunner;
-
   private final TimeoutActionType mTimeoutActionType;
 
   /**
    * Constructor.
    *
-   * @param runner           the runner used for asynchronous inputs.
+   * @param executor         the executor used for asynchronous inputs.
    * @param outputTimeout    the timeout for the channel to produce an output.
    * @param actionType       the action to be taken if the timeout elapses before a readable
    *                         output is available.
@@ -101,14 +101,13 @@ public final class ChannelConfiguration extends DeepEqualObject {
    * @param log              the log instance.
    * @param logLevel         the log level.
    */
-  private ChannelConfiguration(@Nullable final Runner runner,
+  private ChannelConfiguration(@Nullable final ScheduledExecutor executor,
       @Nullable final DurationMeasure outputTimeout, @Nullable final TimeoutActionType actionType,
       @Nullable final OrderType channelOrderType, @Nullable final Backoff channelBackoff,
       final int channelMaxSize, @Nullable final Log log, @Nullable final Level logLevel) {
-    super(
-        asArgs(runner, outputTimeout, actionType, channelOrderType, channelBackoff, channelMaxSize,
-            log, logLevel));
-    mRunner = runner;
+    super(asArgs(executor, outputTimeout, actionType, channelOrderType, channelBackoff,
+        channelMaxSize, log, logLevel));
+    mExecutor = executor;
     mOutputTimeout = outputTimeout;
     mTimeoutActionType = actionType;
     mChannelOrderType = channelOrderType;
@@ -171,6 +170,17 @@ public final class ChannelConfiguration extends DeepEqualObject {
   public Backoff getBackoffOrElse(@Nullable final Backoff valueIfNotSet) {
     final Backoff channelBackoff = mChannelBackoff;
     return (channelBackoff != null) ? channelBackoff : valueIfNotSet;
+  }
+
+  /**
+   * Returns the executor used for asynchronous inputs (null by default).
+   *
+   * @param valueIfNotSet the default value if none was set.
+   * @return the executor instance.
+   */
+  public ScheduledExecutor getExecutorOrElse(@Nullable final ScheduledExecutor valueIfNotSet) {
+    final ScheduledExecutor executor = mExecutor;
+    return (executor != null) ? executor : valueIfNotSet;
   }
 
   /**
@@ -239,17 +249,6 @@ public final class ChannelConfiguration extends DeepEqualObject {
   public DurationMeasure getOutputTimeoutOrElse(@Nullable final DurationMeasure valueIfNotSet) {
     final DurationMeasure outputTimeout = mOutputTimeout;
     return (outputTimeout != null) ? outputTimeout : valueIfNotSet;
-  }
-
-  /**
-   * Returns the runner used for asynchronous inputs (null by default).
-   *
-   * @param valueIfNotSet the default value if none was set.
-   * @return the runner instance.
-   */
-  public Runner getRunnerOrElse(@Nullable final Runner valueIfNotSet) {
-    final Runner runner = mRunner;
-    return (runner != null) ? runner : valueIfNotSet;
   }
 
   /**
@@ -340,13 +339,13 @@ public final class ChannelConfiguration extends DeepEqualObject {
 
     private OrderType mChannelOrderType;
 
+    private ScheduledExecutor mExecutor;
+
     private Log mLog;
 
     private Level mLogLevel;
 
     private DurationMeasure mOutputTimeout;
-
-    private Runner mRunner;
 
     private TimeoutActionType mTimeoutActionType;
 
@@ -410,6 +409,19 @@ public final class ChannelConfiguration extends DeepEqualObject {
     @NotNull
     public Builder<TYPE> withDefaults() {
       setConfiguration(defaultConfiguration());
+      return this;
+    }
+
+    /**
+     * Sets the asynchronous executor instance. A null value means that it is up to the specific
+     * implementation to choose a default one.
+     *
+     * @param executor the executor instance.
+     * @return this builder.
+     */
+    @NotNull
+    public Builder<TYPE> withExecutor(@Nullable final ScheduledExecutor executor) {
+      mExecutor = executor;
       return this;
     }
 
@@ -536,9 +548,9 @@ public final class ChannelConfiguration extends DeepEqualObject {
         return this;
       }
 
-      final Runner runner = configuration.mRunner;
-      if (runner != null) {
-        withRunner(runner);
+      final ScheduledExecutor executor = configuration.mExecutor;
+      if (executor != null) {
+        withExecutor(executor);
       }
 
       final DurationMeasure outputTimeout = configuration.mOutputTimeout;
@@ -579,27 +591,14 @@ public final class ChannelConfiguration extends DeepEqualObject {
       return this;
     }
 
-    /**
-     * Sets the asynchronous runner instance. A null value means that it is up to the specific
-     * implementation to choose a default one.
-     *
-     * @param runner the runner instance.
-     * @return this builder.
-     */
-    @NotNull
-    public Builder<TYPE> withRunner(@Nullable final Runner runner) {
-      mRunner = runner;
-      return this;
-    }
-
     @NotNull
     private ChannelConfiguration buildConfiguration() {
-      return new ChannelConfiguration(mRunner, mOutputTimeout, mTimeoutActionType,
+      return new ChannelConfiguration(mExecutor, mOutputTimeout, mTimeoutActionType,
           mChannelOrderType, mChannelBackoff, mChannelMaxSize, mLog, mLogLevel);
     }
 
     private void setConfiguration(@NotNull final ChannelConfiguration configuration) {
-      mRunner = configuration.mRunner;
+      mExecutor = configuration.mExecutor;
       mOutputTimeout = configuration.mOutputTimeout;
       mTimeoutActionType = configuration.mTimeoutActionType;
       mChannelOrderType = configuration.mChannelOrderType;

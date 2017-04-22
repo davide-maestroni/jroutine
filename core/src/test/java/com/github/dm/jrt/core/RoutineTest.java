@@ -35,6 +35,8 @@ import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.ChannelConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.AgingPriority;
+import com.github.dm.jrt.core.executor.ScheduledExecutors;
+import com.github.dm.jrt.core.executor.SyncExecutor;
 import com.github.dm.jrt.core.invocation.CallInvocation;
 import com.github.dm.jrt.core.invocation.CommandInvocation;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
@@ -49,9 +51,6 @@ import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.log.NullLog;
 import com.github.dm.jrt.core.routine.Routine;
-import com.github.dm.jrt.core.runner.Execution;
-import com.github.dm.jrt.core.runner.Runners;
-import com.github.dm.jrt.core.runner.SyncRunner;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.DurationMeasure;
 
@@ -72,6 +71,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static com.github.dm.jrt.core.common.BackoffBuilder.afterCount;
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builder;
+import static com.github.dm.jrt.core.executor.ScheduledExecutors.defaultExecutor;
 import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
 import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOfParallel;
 import static com.github.dm.jrt.core.util.DurationMeasure.indefiniteTime;
@@ -235,17 +235,17 @@ public class RoutineTest {
 
   @Test
   public void testAgingPriority() {
-    final TestRunner runner = new TestRunner();
+    final TestExecutor executor = new TestExecutor();
     final Routine<Object, Object> routine1 = JRoutineCore.with(IdentityInvocation.factoryOf())
                                                          .invocationConfiguration()
-                                                         .withRunner(runner)
+                                                         .withExecutor(executor)
                                                          .withPriority(
                                                              AgingPriority.NORMAL_PRIORITY)
                                                          .apply()
                                                          .buildRoutine();
     final Routine<Object, Object> routine2 = JRoutineCore.with(IdentityInvocation.factoryOf())
                                                          .invocationConfiguration()
-                                                         .withRunner(runner)
+                                                         .withExecutor(executor)
                                                          .withPriority(AgingPriority.HIGH_PRIORITY)
                                                          .apply()
                                                          .buildRoutine();
@@ -254,14 +254,14 @@ public class RoutineTest {
     final Channel<Object, Object> input2 = routine2.invoke();
     for (int i = 0; i < AgingPriority.HIGH_PRIORITY - 1; i++) {
       input2.pass("test2");
-      runner.run(1);
+      executor.run(1);
       assertThat(output1.all()).isEmpty();
     }
 
     final Channel<Object, Object> output2 = input2.pass("test2").close();
-    runner.run(1);
+    executor.run(1);
     assertThat(output1.all()).containsExactly("test1");
-    runner.run(Integer.MAX_VALUE);
+    executor.run(Integer.MAX_VALUE);
     final List<Object> result2 = output2.all();
     assertThat(result2).hasSize(AgingPriority.HIGH_PRIORITY);
     assertThat(result2).containsOnly("test2");
@@ -277,7 +277,8 @@ public class RoutineTest {
     assertThat(consumer.isOutput()).isFalse();
     final Channel<Object, Object> channel2 = JRoutineCore.with(IdentityInvocation.factoryOf())
                                                          .invocationConfiguration()
-                                                         .withRunner(Runners.syncRunner())
+                                                         .withExecutor(
+                                                             ScheduledExecutors.syncExecutor())
                                                          .apply()
                                                          .invoke()
                                                          .pass("test2");
@@ -294,17 +295,19 @@ public class RoutineTest {
     final Routine<String, String> routine =
         JRoutineCore.with(IdentityInvocation.<String>factoryOf())
                     .invocationConfiguration()
-                    .withRunner(Runners.syncRunner())
+                    .withExecutor(ScheduledExecutors.syncExecutor())
                     .apply()
                     .buildRoutine();
     final Routine<String, String> parallelRoutine = JRoutineCore.with(factoryOfParallel(JRoutineCore
         .with(IdentityInvocation.<String>factoryOf())
         .invocationConfiguration()
-        .withRunner(Runners.syncRunner())
+        .withExecutor(ScheduledExecutors.syncExecutor())
         .apply()
         .buildRoutine()))
                                                                 .invocationConfiguration()
-                                                                .withRunner(Runners.syncRunner())
+                                                                .withExecutor(
+                                                                    ScheduledExecutors
+                                                                        .syncExecutor())
                                                                 .apply()
                                                                 .buildRoutine();
     assertThat(routine.invoke().close().in(timeout).all()).isEmpty();
@@ -397,7 +400,8 @@ public class RoutineTest {
     };
     final Routine<Integer, Integer> sumRoutine = JRoutineCore.with(factoryOf(sum, this))
                                                              .invocationConfiguration()
-                                                             .withRunner(Runners.syncRunner())
+                                                             .withExecutor(
+                                                                 ScheduledExecutors.syncExecutor())
                                                              .apply()
                                                              .buildRoutine();
     final Routine<Integer, Integer> squareRoutine = JRoutineCore.with(
@@ -436,7 +440,7 @@ public class RoutineTest {
     final Logger logger = Logger.newLogger(new NullLog(), Level.DEBUG, this);
     try {
       new InvocationChannel<Object, Object>(InvocationConfiguration.defaultConfiguration(), null,
-          new ConcurrentRunner(Runners.sharedRunner()), logger);
+          new ConcurrentExecutor(defaultExecutor()), logger);
       fail();
 
     } catch (final NullPointerException ignored) {
@@ -452,7 +456,7 @@ public class RoutineTest {
 
     try {
       new InvocationChannel<Object, Object>(InvocationConfiguration.defaultConfiguration(),
-          new TestInvocationManager(), new ConcurrentRunner(Runners.sharedRunner()), null);
+          new TestInvocationManager(), new ConcurrentExecutor(defaultExecutor()), null);
       fail();
 
     } catch (final NullPointerException ignored) {
@@ -460,7 +464,7 @@ public class RoutineTest {
 
     try {
       new InvocationChannel<Object, Object>(null, new TestInvocationManager(),
-          new ConcurrentRunner(Runners.sharedRunner()), logger);
+          new ConcurrentExecutor(defaultExecutor()), logger);
       fail();
 
     } catch (final NullPointerException ignored) {
@@ -469,7 +473,7 @@ public class RoutineTest {
     try {
       final InvocationChannel<Object, Object> channel =
           new InvocationChannel<Object, Object>(InvocationConfiguration.defaultConfiguration(),
-              new TestInvocationManager(), new ConcurrentRunner(Runners.sharedRunner()), logger);
+              new TestInvocationManager(), new ConcurrentExecutor(defaultExecutor()), logger);
       channel.close();
       channel.pass("test");
       fail();
@@ -481,7 +485,7 @@ public class RoutineTest {
 
       final InvocationChannel<Object, Object> channel =
           new InvocationChannel<Object, Object>(InvocationConfiguration.defaultConfiguration(),
-              new TestInvocationManager(), new ConcurrentRunner(Runners.sharedRunner()), logger);
+              new TestInvocationManager(), new ConcurrentExecutor(defaultExecutor()), logger);
       channel.after(null);
       fail();
 
@@ -491,7 +495,7 @@ public class RoutineTest {
     try {
       final InvocationChannel<Object, Object> channel =
           new InvocationChannel<Object, Object>(InvocationConfiguration.defaultConfiguration(),
-              new TestInvocationManager(), new ConcurrentRunner(Runners.sharedRunner()), logger);
+              new TestInvocationManager(), new ConcurrentExecutor(defaultExecutor()), logger);
       channel.after(1, null);
       fail();
 
@@ -501,7 +505,7 @@ public class RoutineTest {
     try {
       final InvocationChannel<Object, Object> channel =
           new InvocationChannel<Object, Object>(InvocationConfiguration.defaultConfiguration(),
-              new TestInvocationManager(), new ConcurrentRunner(Runners.sharedRunner()), logger);
+              new TestInvocationManager(), new ConcurrentExecutor(defaultExecutor()), logger);
       channel.after(-1, TimeUnit.MILLISECONDS);
       fail();
 
@@ -512,7 +516,7 @@ public class RoutineTest {
 
       final InvocationChannel<Object, Object> channel =
           new InvocationChannel<Object, Object>(InvocationConfiguration.defaultConfiguration(),
-              new TestInvocationManager(), new ConcurrentRunner(Runners.sharedRunner()), logger);
+              new TestInvocationManager(), new ConcurrentExecutor(defaultExecutor()), logger);
       channel.in(null);
       fail();
 
@@ -522,7 +526,7 @@ public class RoutineTest {
     try {
       final InvocationChannel<Object, Object> channel =
           new InvocationChannel<Object, Object>(InvocationConfiguration.defaultConfiguration(),
-              new TestInvocationManager(), new ConcurrentRunner(Runners.sharedRunner()), logger);
+              new TestInvocationManager(), new ConcurrentExecutor(defaultExecutor()), logger);
       channel.in(1, null);
       fail();
 
@@ -532,7 +536,7 @@ public class RoutineTest {
     try {
       final InvocationChannel<Object, Object> channel =
           new InvocationChannel<Object, Object>(InvocationConfiguration.defaultConfiguration(),
-              new TestInvocationManager(), new ConcurrentRunner(Runners.sharedRunner()), logger);
+              new TestInvocationManager(), new ConcurrentExecutor(defaultExecutor()), logger);
       channel.in(-1, TimeUnit.MILLISECONDS);
       fail();
 
@@ -901,7 +905,8 @@ public class RoutineTest {
     final DurationMeasure timeout = seconds(1);
     final Routine<Object, Object> routine1 = JRoutineCore.with(IdentityInvocation.factoryOf())
                                                          .invocationConfiguration()
-                                                         .withRunner(Runners.syncRunner())
+                                                         .withExecutor(
+                                                             ScheduledExecutors.syncExecutor())
                                                          .apply()
                                                          .buildRoutine();
     final Routine<Object, Object> routine2 = JRoutineCore.with(factoryOf(routine1)).buildRoutine();
@@ -1042,7 +1047,7 @@ public class RoutineTest {
     try {
       JRoutineCore.with(factoryOf(ConstructorException.class))
                   .invocationConfiguration()
-                  .withRunner(Runners.syncRunner())
+                  .withExecutor(ScheduledExecutors.syncExecutor())
                   .withLogLevel(Level.SILENT)
                   .apply()
                   .invoke()
@@ -1092,7 +1097,7 @@ public class RoutineTest {
     try {
       final ResultChannel<Object> channel =
           new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(),
-              Runners.syncRunner(), new TestAbortHandler(), logger);
+              ScheduledExecutors.syncExecutor(), new TestAbortHandler(), logger);
       new InvocationExecution<Object, Object>(null, new TestExecutionObserver(), channel, logger);
       fail();
 
@@ -1102,7 +1107,8 @@ public class RoutineTest {
     try {
       final ResultChannel<Object> channel =
           new ResultChannel<Object>(ChannelConfiguration.defaultConfiguration(),
-              new ConcurrentRunner(Runners.syncRunner()), new TestAbortHandler(), logger);
+              new ConcurrentExecutor(ScheduledExecutors.syncExecutor()), new TestAbortHandler(),
+              logger);
       new InvocationExecution<Object, Object>(new TestInvocationManager(), null, channel, logger);
       fail();
 
@@ -1120,7 +1126,7 @@ public class RoutineTest {
     try {
       final ResultChannel<Object> channel =
           new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(),
-              Runners.syncRunner(), new TestAbortHandler(), logger);
+              ScheduledExecutors.syncExecutor(), new TestAbortHandler(), logger);
       new InvocationExecution<Object, Object>(new TestInvocationManager(),
           new TestExecutionObserver(), channel, null);
       fail();
@@ -1409,9 +1415,9 @@ public class RoutineTest {
   }
 
   @Test
-  public void testInputRunnerDeadlock() {
+  public void testInputExecutorDeadlock() {
     try {
-      JRoutineCore.with(new InputRunnerDeadlock())
+      JRoutineCore.with(new InputExecutorDeadlock())
                   .invoke()
                   .pass("test")
                   .close()
@@ -1423,7 +1429,7 @@ public class RoutineTest {
     }
 
     try {
-      JRoutineCore.with(new InputListRunnerDeadlock())
+      JRoutineCore.with(new InputListExecutorDeadlock())
                   .invoke()
                   .pass("test")
                   .close()
@@ -1435,7 +1441,7 @@ public class RoutineTest {
     }
 
     try {
-      JRoutineCore.with(new InputArrayRunnerDeadlock())
+      JRoutineCore.with(new InputArrayExecutorDeadlock())
                   .invoke()
                   .pass("test")
                   .close()
@@ -1447,7 +1453,7 @@ public class RoutineTest {
     }
 
     try {
-      JRoutineCore.with(new InputConsumerRunnerDeadlock())
+      JRoutineCore.with(new InputConsumerExecutorDeadlock())
                   .invoke()
                   .pass("test")
                   .close()
@@ -1499,7 +1505,7 @@ public class RoutineTest {
   public void testInvocationNotAvailable() {
     final Routine<Void, Void> routine = JRoutineCore.with(new SleepCommand())
                                                     .invocationConfiguration()
-                                                    .withRunner(Runners.syncRunner())
+                                                    .withExecutor(ScheduledExecutors.syncExecutor())
                                                     .withMaxInvocations(1)
                                                     .apply()
                                                     .buildRoutine();
@@ -1827,8 +1833,8 @@ public class RoutineTest {
   public void testResultChannelError() {
     final Logger logger = Logger.newLogger(new NullLog(), Level.DEBUG, this);
     try {
-      new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(),
-          Runners.sharedRunner(), null, logger);
+      new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(), defaultExecutor(),
+          null, logger);
       fail();
 
     } catch (final NullPointerException ignored) {
@@ -1843,24 +1849,24 @@ public class RoutineTest {
     }
 
     try {
-      new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(),
-          Runners.sharedRunner(), new TestAbortHandler(), null);
+      new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(), defaultExecutor(),
+          new TestAbortHandler(), null);
       fail();
 
     } catch (final NullPointerException ignored) {
     }
 
     try {
-      new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(),
-          Runners.sharedRunner(), new TestAbortHandler(), logger).after(null);
+      new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(), defaultExecutor(),
+          new TestAbortHandler(), logger).after(null);
       fail();
 
     } catch (final NullPointerException ignored) {
     }
 
     try {
-      new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(),
-          Runners.sharedRunner(), new TestAbortHandler(), logger).after(0, null);
+      new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(), defaultExecutor(),
+          new TestAbortHandler(), logger).after(0, null);
       fail();
 
     } catch (final NullPointerException ignored) {
@@ -1869,7 +1875,7 @@ public class RoutineTest {
     try {
       final ResultChannel<Object> channel =
           new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(),
-              Runners.sharedRunner(), new TestAbortHandler(), logger);
+              defaultExecutor(), new TestAbortHandler(), logger);
       channel.after(-1, TimeUnit.MILLISECONDS);
       fail();
 
@@ -1877,16 +1883,16 @@ public class RoutineTest {
     }
 
     try {
-      new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(),
-          Runners.sharedRunner(), new TestAbortHandler(), logger).in(null);
+      new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(), defaultExecutor(),
+          new TestAbortHandler(), logger).in(null);
       fail();
 
     } catch (final NullPointerException ignored) {
     }
 
     try {
-      new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(),
-          Runners.sharedRunner(), new TestAbortHandler(), logger).in(0, null);
+      new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(), defaultExecutor(),
+          new TestAbortHandler(), logger).in(0, null);
       fail();
 
     } catch (final NullPointerException ignored) {
@@ -1895,7 +1901,7 @@ public class RoutineTest {
     try {
       final ResultChannel<Object> channel =
           new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(),
-              Runners.sharedRunner(), new TestAbortHandler(), logger);
+              defaultExecutor(), new TestAbortHandler(), logger);
       channel.in(-1, TimeUnit.MILLISECONDS);
       fail();
 
@@ -1905,7 +1911,7 @@ public class RoutineTest {
     final Channel<String, String> channel =
         JRoutineCore.with(factoryOf(DelayedInvocation.class, noTime()))
                     .invocationConfiguration()
-                    .withRunner(Runners.syncRunner())
+                    .withExecutor(ScheduledExecutors.syncExecutor())
                     .withLogLevel(Level.SILENT)
                     .apply()
                     .invoke();
@@ -1990,7 +1996,7 @@ public class RoutineTest {
     final Routine<String, String> routine1 =
         JRoutineCore.with(factoryOf(DelayedInvocation.class, millis(100)))
                     .invocationConfiguration()
-                    .withRunner(Runners.syncRunner())
+                    .withExecutor(ScheduledExecutors.syncExecutor())
                     .withLogLevel(Level.SILENT)
                     .apply()
                     .buildRoutine();
@@ -2036,9 +2042,9 @@ public class RoutineTest {
   }
 
   @Test
-  public void testResultRunnerDeadlock() {
+  public void testResultExecutorDeadlock() {
     try {
-      JRoutineCore.with(new ResultRunnerDeadlock())
+      JRoutineCore.with(new ResultExecutorDeadlock())
                   .invocationConfiguration()
                   .withOutputMaxSize(1)
                   .apply()
@@ -2053,7 +2059,7 @@ public class RoutineTest {
     }
 
     try {
-      JRoutineCore.with(new ResultListRunnerDeadlock())
+      JRoutineCore.with(new ResultListExecutorDeadlock())
                   .invocationConfiguration()
                   .withOutputMaxSize(1)
                   .apply()
@@ -2068,7 +2074,7 @@ public class RoutineTest {
     }
 
     try {
-      JRoutineCore.with(new ResultArrayRunnerDeadlock())
+      JRoutineCore.with(new ResultArrayExecutorDeadlock())
                   .invocationConfiguration()
                   .withOutputMaxSize(1)
                   .apply()
@@ -2112,7 +2118,7 @@ public class RoutineTest {
   public void testRoutineBuilder() {
     assertThat(JRoutineCore.with(factoryOf(new ClassToken<IdentityInvocation<String>>() {}))
                            .invocationConfiguration()
-                           .withRunner(Runners.syncRunner())
+                           .withExecutor(ScheduledExecutors.syncExecutor())
                            .withCoreInvocations(0)
                            .withMaxInvocations(1)
                            .withInputBackoff(afterCount(2).constantDelay(1, TimeUnit.SECONDS))
@@ -2128,7 +2134,7 @@ public class RoutineTest {
 
     assertThat(JRoutineCore.with(factoryOf(new ClassToken<IdentityInvocation<String>>() {}))
                            .invocationConfiguration()
-                           .withRunner(Runners.syncRunner())
+                           .withExecutor(ScheduledExecutors.syncExecutor())
                            .withCoreInvocations(0)
                            .withMaxInvocations(1)
                            .withInputBackoff(afterCount(2).constantDelay(noTime()))
@@ -2872,9 +2878,9 @@ public class RoutineTest {
     }
   }
 
-  private static class InputArrayRunnerDeadlock extends MappingInvocation<String, String> {
+  private static class InputArrayExecutorDeadlock extends MappingInvocation<String, String> {
 
-    protected InputArrayRunnerDeadlock() {
+    protected InputArrayExecutorDeadlock() {
       super(null);
     }
 
@@ -2894,9 +2900,9 @@ public class RoutineTest {
     }
   }
 
-  private static class InputConsumerRunnerDeadlock extends MappingInvocation<String, String> {
+  private static class InputConsumerExecutorDeadlock extends MappingInvocation<String, String> {
 
-    protected InputConsumerRunnerDeadlock() {
+    protected InputConsumerExecutorDeadlock() {
       super(null);
     }
 
@@ -2916,9 +2922,31 @@ public class RoutineTest {
     }
   }
 
-  private static class InputListRunnerDeadlock extends MappingInvocation<String, String> {
+  private static class InputExecutorDeadlock extends MappingInvocation<String, String> {
 
-    protected InputListRunnerDeadlock() {
+    protected InputExecutorDeadlock() {
+      super(null);
+    }
+
+    public void onInput(final String s, @NotNull final Channel<String, ?> result) {
+      JRoutineCore.with(IdentityInvocation.<String>factoryOf())
+                  .invocationConfiguration()
+                  .withInputMaxSize(1)
+                  .withInputBackoff(afterCount(1).constantDelay(indefiniteTime()))
+                  .apply()
+                  .invoke()
+                  .after(millis(500))
+                  .pass(s)
+                  .afterNoDelay()
+                  .pass(s)
+                  .close()
+                  .all();
+    }
+  }
+
+  private static class InputListExecutorDeadlock extends MappingInvocation<String, String> {
+
+    protected InputListExecutorDeadlock() {
       super(null);
     }
 
@@ -2934,28 +2962,6 @@ public class RoutineTest {
                   .afterNoDelay()
                   .pass(Collections.singletonList(s))
                   .afterNoDelay()
-                  .close()
-                  .all();
-    }
-  }
-
-  private static class InputRunnerDeadlock extends MappingInvocation<String, String> {
-
-    protected InputRunnerDeadlock() {
-      super(null);
-    }
-
-    public void onInput(final String s, @NotNull final Channel<String, ?> result) {
-      JRoutineCore.with(IdentityInvocation.<String>factoryOf())
-                  .invocationConfiguration()
-                  .withInputMaxSize(1)
-                  .withInputBackoff(afterCount(1).constantDelay(indefiniteTime()))
-                  .apply()
-                  .invoke()
-                  .after(millis(500))
-                  .pass(s)
-                  .afterNoDelay()
-                  .pass(s)
                   .close()
                   .all();
     }
@@ -2993,9 +2999,9 @@ public class RoutineTest {
     }
   }
 
-  private static class ResultArrayRunnerDeadlock extends MappingInvocation<String, String> {
+  private static class ResultArrayExecutorDeadlock extends MappingInvocation<String, String> {
 
-    protected ResultArrayRunnerDeadlock() {
+    protected ResultArrayExecutorDeadlock() {
       super(null);
     }
 
@@ -3004,25 +3010,25 @@ public class RoutineTest {
     }
   }
 
-  private static class ResultListRunnerDeadlock extends MappingInvocation<String, String> {
+  private static class ResultExecutorDeadlock extends MappingInvocation<String, String> {
 
-    protected ResultListRunnerDeadlock() {
-      super(null);
-    }
-
-    public void onInput(final String s, @NotNull final Channel<String, ?> result) {
-      result.after(millis(500)).pass(s).after(millis(100)).pass(Collections.singletonList(s));
-    }
-  }
-
-  private static class ResultRunnerDeadlock extends MappingInvocation<String, String> {
-
-    protected ResultRunnerDeadlock() {
+    protected ResultExecutorDeadlock() {
       super(null);
     }
 
     public void onInput(final String s, @NotNull final Channel<String, ?> result) {
       result.after(millis(500)).pass(s).after(millis(100)).pass(s);
+    }
+  }
+
+  private static class ResultListExecutorDeadlock extends MappingInvocation<String, String> {
+
+    protected ResultListExecutorDeadlock() {
+      super(null);
+    }
+
+    public void onInput(final String s, @NotNull final Channel<String, ?> result) {
+      result.after(millis(500)).pass(s).after(millis(100)).pass(Collections.singletonList(s));
     }
   }
 
@@ -3170,6 +3176,25 @@ public class RoutineTest {
     }
   }
 
+  private static class TestExecutor extends SyncExecutor {
+
+    private final ArrayList<Runnable> mExecutions = new ArrayList<Runnable>();
+
+    @Override
+    public void execute(@NotNull final Runnable command, final long delay,
+        @NotNull final TimeUnit timeUnit) {
+      mExecutions.add(command);
+    }
+
+    private void run(int count) {
+      final ArrayList<Runnable> executions = mExecutions;
+      while (!executions.isEmpty() && (count-- > 0)) {
+        final Runnable execution = executions.remove(0);
+        execution.run();
+      }
+    }
+  }
+
   private static class TestInvocationManager implements InvocationManager<Object, Object> {
 
     public boolean create(@NotNull final InvocationObserver<Object, Object> observer) {
@@ -3215,25 +3240,6 @@ public class RoutineTest {
     @Override
     public void onComplete(@NotNull final Channel<String, ?> result) {
       sActive = false;
-    }
-  }
-
-  private static class TestRunner extends SyncRunner {
-
-    private final ArrayList<Execution> mExecutions = new ArrayList<Execution>();
-
-    @Override
-    public void run(@NotNull final Execution execution, final long delay,
-        @NotNull final TimeUnit timeUnit) {
-      mExecutions.add(execution);
-    }
-
-    private void run(int count) {
-      final ArrayList<Execution> executions = mExecutions;
-      while (!executions.isEmpty() && (count-- > 0)) {
-        final Execution execution = executions.remove(0);
-        execution.run();
-      }
     }
   }
 }

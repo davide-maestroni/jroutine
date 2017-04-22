@@ -32,8 +32,8 @@ import com.github.dm.jrt.android.v11.core.LoaderContext;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.core.routine.Routine;
-import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.Reflection;
@@ -274,7 +274,7 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
 
       mRoutine = JRoutineReflection.with(target)
                                    .invocationConfiguration()
-                                   .withRunner(Runners.syncRunner())
+                                   .withExecutor(ScheduledExecutors.syncExecutor())
                                    .apply()
                                    .apply(mWrapperConfiguration)
                                    .method(mAliasName);
@@ -424,7 +424,7 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
 
       mRoutine = JRoutineReflection.with(target)
                                    .invocationConfiguration()
-                                   .withRunner(Runners.syncRunner())
+                                   .withExecutor(ScheduledExecutors.syncExecutor())
                                    .apply()
                                    .apply(mWrapperConfiguration)
                                    .method(mMethod);

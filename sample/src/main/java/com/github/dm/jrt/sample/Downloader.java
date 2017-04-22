@@ -19,10 +19,10 @@ package com.github.dm.jrt.sample;
 import com.github.dm.jrt.channel.io.ByteChannel.ByteChunk;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
+import com.github.dm.jrt.core.executor.ScheduledExecutor;
+import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.routine.Routine;
-import com.github.dm.jrt.core.runner.Runner;
-import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.DurationMeasure;
 
 import java.io.File;
@@ -45,9 +45,9 @@ import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 @SuppressWarnings("WeakerAccess")
 public class Downloader {
 
-  private static final Runner sReadRunner = Runners.poolRunner();
+  private static final ScheduledExecutor sReadExecutor = ScheduledExecutors.poolExecutor();
 
-  private static final Runner sWriteRunner = Runners.poolRunner(1);
+  private static final ScheduledExecutor sWriteExecutor = ScheduledExecutors.poolExecutor(1);
 
   private final HashSet<URI> mDownloaded = new HashSet<URI>();
 
@@ -65,8 +65,8 @@ public class Downloader {
     // The read connection invocation is stateless so we can just use a single instance of it
     mReadConnection = JRoutineCore.with(new ReadConnection()).invocationConfiguration()
                                   // Since each download may take a long time to complete, we use a
-                                  // dedicated runner
-                                  .withRunner(sReadRunner)
+                                  // dedicated executor
+                                  .withExecutor(sReadExecutor)
                                   // By setting the maximum number of parallel invocations we
                                   // effectively limit the number of parallel downloads
                                   .withMaxInvocations(maxParallelDownloads).apply().buildRoutine();
@@ -154,9 +154,9 @@ public class Downloader {
           JRoutineCore.with(factoryOf(WriteFile.class, dstFile))
                       .invocationConfiguration()
                       // Since we want to limit the number of allocated chunks, we have to make the
-                      // writing happen in a dedicated runner, so that waiting for available space
+                      // writing happen in a dedicated executor, so that waiting for available space
                       // becomes allowed
-                      .withRunner(sWriteRunner)
+                      .withExecutor(sWriteExecutor)
                       .withInputBackoff(afterCount(32).linearDelay(seconds(3)))
                       .apply()
                       .buildRoutine();

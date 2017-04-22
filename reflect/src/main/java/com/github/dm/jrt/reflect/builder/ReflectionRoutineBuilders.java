@@ -31,6 +31,7 @@ import com.github.dm.jrt.reflect.annotation.AsyncMethod;
 import com.github.dm.jrt.reflect.annotation.AsyncOutput;
 import com.github.dm.jrt.reflect.annotation.AsyncOutput.OutputMode;
 import com.github.dm.jrt.reflect.annotation.CoreInvocations;
+import com.github.dm.jrt.reflect.annotation.ExecutorType;
 import com.github.dm.jrt.reflect.annotation.InputBackoff;
 import com.github.dm.jrt.reflect.annotation.InputMaxSize;
 import com.github.dm.jrt.reflect.annotation.InputOrder;
@@ -43,7 +44,6 @@ import com.github.dm.jrt.reflect.annotation.OutputOrder;
 import com.github.dm.jrt.reflect.annotation.OutputTimeout;
 import com.github.dm.jrt.reflect.annotation.OutputTimeoutAction;
 import com.github.dm.jrt.reflect.annotation.Priority;
-import com.github.dm.jrt.reflect.annotation.RunnerType;
 import com.github.dm.jrt.reflect.annotation.SharedFields;
 import com.github.dm.jrt.reflect.common.Mutex;
 import com.github.dm.jrt.reflect.config.WrapperConfiguration;
@@ -519,6 +519,7 @@ public class ReflectionRoutineBuilders {
    * @return the modified configuration.
    * @throws java.lang.IllegalArgumentException if an unexpected error occurs.
    * @see com.github.dm.jrt.reflect.annotation.CoreInvocations CoreInvocations
+   * @see com.github.dm.jrt.reflect.annotation.ExecutorType ExecutorType
    * @see com.github.dm.jrt.reflect.annotation.InputBackoff InputBackoff
    * @see com.github.dm.jrt.reflect.annotation.InputMaxSize InputMaxSize
    * @see com.github.dm.jrt.reflect.annotation.InputOrder InputOrder
@@ -531,7 +532,6 @@ public class ReflectionRoutineBuilders {
    * @see com.github.dm.jrt.reflect.annotation.OutputTimeout OutputTimeout
    * @see com.github.dm.jrt.reflect.annotation.OutputTimeoutAction OutputTimeoutAction
    * @see com.github.dm.jrt.reflect.annotation.Priority Priority
-   * @see com.github.dm.jrt.reflect.annotation.RunnerType RunnerType
    */
   @NotNull
   public static InvocationConfiguration withAnnotations(
@@ -585,8 +585,8 @@ public class ReflectionRoutineBuilders {
       } else if (annotationType == Priority.class) {
         builder.withPriority(((Priority) annotation).value());
 
-      } else if (annotationType == RunnerType.class) {
-        builder.withRunner(newInstanceOf(((RunnerType) annotation).value()));
+      } else if (annotationType == ExecutorType.class) {
+        builder.withExecutor(newInstanceOf(((ExecutorType) annotation).value()));
       }
     }
 
@@ -602,6 +602,7 @@ public class ReflectionRoutineBuilders {
    * @return the modified configuration.
    * @throws java.lang.IllegalArgumentException if an unexpected error occurs.
    * @see com.github.dm.jrt.reflect.annotation.CoreInvocations CoreInvocations
+   * @see com.github.dm.jrt.reflect.annotation.ExecutorType ExecutorType
    * @see com.github.dm.jrt.reflect.annotation.InputBackoff InputBackoff
    * @see com.github.dm.jrt.reflect.annotation.InputMaxSize InputMaxSize
    * @see com.github.dm.jrt.reflect.annotation.InputOrder InputOrder
@@ -614,7 +615,6 @@ public class ReflectionRoutineBuilders {
    * @see com.github.dm.jrt.reflect.annotation.OutputTimeout OutputTimeout
    * @see com.github.dm.jrt.reflect.annotation.OutputTimeoutAction OutputTimeoutAction
    * @see com.github.dm.jrt.reflect.annotation.Priority Priority
-   * @see com.github.dm.jrt.reflect.annotation.RunnerType RunnerType
    */
   @NotNull
   public static InvocationConfiguration withAnnotations(

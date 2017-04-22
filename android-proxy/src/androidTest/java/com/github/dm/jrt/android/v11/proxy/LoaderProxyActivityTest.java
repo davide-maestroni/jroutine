@@ -29,13 +29,13 @@ import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.executor.ScheduledExecutor;
+import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.log.Log;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.NullLog;
 import com.github.dm.jrt.core.routine.Routine;
-import com.github.dm.jrt.core.runner.Runner;
-import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.DurationMeasure;
 import com.github.dm.jrt.reflect.annotation.Alias;
@@ -84,7 +84,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
     final TestStatic testStatic = JRoutineLoaderProxy.on(loaderFrom(getActivity()))
                                                      .with(classOfType(TestClass.class))
                                                      .invocationConfiguration()
-                                                     .withRunner(Runners.poolRunner())
+                                                     .withExecutor(ScheduledExecutors.poolExecutor())
                                                      .withLogLevel(Level.DEBUG)
                                                      .withLog(new NullLog())
                                                      .apply()
@@ -207,7 +207,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
     final TestStatic testStatic = JRoutineLoaderProxy.on(loaderFrom(getActivity()))
                                                      .with(instanceOf(TestClass.class))
                                                      .invocationConfiguration()
-                                                     .withRunner(Runners.poolRunner())
+                                                     .withExecutor(ScheduledExecutors.poolExecutor())
                                                      .withLogLevel(Level.DEBUG)
                                                      .withLog(new NullLog())
                                                      .apply()
@@ -225,11 +225,11 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
     }
 
     final NullLog log = new NullLog();
-    final Runner runner = Runners.poolRunner();
+    final ScheduledExecutor executor = ScheduledExecutors.poolExecutor();
     final TestProxy testProxy = JRoutineLoaderProxy.on(loaderFrom(getActivity()))
                                                    .with(instanceOf(TestClass.class))
                                                    .invocationConfiguration()
-                                                   .withRunner(runner)
+                                                   .withExecutor(executor)
                                                    .withLogLevel(Level.DEBUG)
                                                    .withLog(log)
                                                    .apply()
@@ -253,9 +253,9 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
     }
 
     final NullLog log = new NullLog();
-    final Runner runner = Runners.poolRunner();
+    final ScheduledExecutor executor = ScheduledExecutors.poolExecutor();
     final InvocationConfiguration configuration =
-        builder().withRunner(runner).withLogLevel(Level.DEBUG).withLog(log).apply();
+        builder().withExecutor(executor).withLogLevel(Level.DEBUG).withLog(log).apply();
     final LoaderProxyObjectBuilder<TestProxy> builder =
         com.github.dm.jrt.android.proxy.LoaderProxy_TestActivity.on(loaderFrom(getActivity()))
                                                                 .with(instanceOf(TestClass.class));
@@ -302,9 +302,9 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
     }
 
     final NullLog log = new NullLog();
-    final Runner runner = Runners.poolRunner();
+    final ScheduledExecutor executor = ScheduledExecutors.poolExecutor();
     final InvocationConfiguration configuration =
-        builder().withRunner(runner).withLogLevel(Level.DEBUG).withLog(log).apply();
+        builder().withExecutor(executor).withLogLevel(Level.DEBUG).withLog(log).apply();
     final TestProxy testProxy = JRoutineLoaderProxy.on(loaderFrom(getActivity()))
                                                    .with(instanceOf(TestClass.class))
                                                    .invocationConfiguration()

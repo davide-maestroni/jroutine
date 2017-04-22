@@ -30,12 +30,11 @@ import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.ChannelConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.executor.ScheduledExecutor;
 import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
 import com.github.dm.jrt.core.invocation.InvocationDeadlockException;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.log.Logger;
-import com.github.dm.jrt.core.runner.Execution;
-import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DurationMeasure;
 import com.github.dm.jrt.core.util.DurationMeasure.Condition;
@@ -86,6 +85,8 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
   private final ArrayList<Channel<?, ? extends OUT>> mBoundChannels =
       new ArrayList<Channel<?, ? extends OUT>>();
 
+  private final ScheduledExecutor mExecutor;
+
   private final Flusher<OUT> mFlusher;
 
   private final AbortHandler mHandler;
@@ -108,8 +109,6 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
   private final LocalField<OrderType> mResultOrder;
 
-  private final Runner mRunner;
-
   private final LocalField<TimeoutActionType> mTimeoutActionType;
 
   private final LocalField<Throwable> mTimeoutException = new LocalField<Throwable>(null);
@@ -118,9 +117,9 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
   private BindingHandler<OUT> mBindingHandler;
 
-  private volatile FlushExecution mFlushExecution;
+  private volatile FlushCommand mFlushCommand;
 
-  private volatile FlushExecution mForcedFlushExecution;
+  private volatile FlushCommand mForcedFlushCommand;
 
   private boolean mIWaitingOutput;
 
@@ -144,16 +143,17 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
    * Constructor.
    *
    * @param configuration the channel configuration.
-   * @param runner        the runner instance.
+   * @param executor      the executor instance.
    * @param handler       the abort handler.
    * @param logger        the logger instance.
    */
-  ResultChannel(@NotNull final ChannelConfiguration configuration, @NotNull final Runner runner,
-      @NotNull final AbortHandler handler, @NotNull final Logger logger) {
+  ResultChannel(@NotNull final ChannelConfiguration configuration,
+      @NotNull final ScheduledExecutor executor, @NotNull final AbortHandler handler,
+      @NotNull final Logger logger) {
     this(configuration.getOrderTypeOrElse(OrderType.UNSORTED),
         configuration.getMaxSizeOrElse(Integer.MAX_VALUE), configuration.getBackoffOrElse(null),
         configuration.getOutputTimeoutOrElse(noTime()),
-        configuration.getOutputTimeoutActionOrElse(TimeoutActionType.FAIL), runner, handler,
+        configuration.getOutputTimeoutActionOrElse(TimeoutActionType.FAIL), executor, handler,
         logger);
   }
 
@@ -161,16 +161,17 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
    * Constructor.
    *
    * @param configuration the invocation configuration.
-   * @param runner        the runner instance.
+   * @param executor      the executor instance.
    * @param handler       the abort handler.
    * @param logger        the logger instance.
    */
-  ResultChannel(@NotNull final InvocationConfiguration configuration, @NotNull final Runner runner,
-      @NotNull final AbortHandler handler, @NotNull final Logger logger) {
+  ResultChannel(@NotNull final InvocationConfiguration configuration,
+      @NotNull final ScheduledExecutor executor, @NotNull final AbortHandler handler,
+      @NotNull final Logger logger) {
     this(configuration.getOutputOrderTypeOrElse(OrderType.UNSORTED),
         configuration.getOutputMaxSizeOrElse(Integer.MAX_VALUE),
         configuration.getOutputBackoffOrElse(null), configuration.getOutputTimeoutOrElse(noTime()),
-        configuration.getOutputTimeoutActionOrElse(TimeoutActionType.FAIL), runner, handler,
+        configuration.getOutputTimeoutActionOrElse(TimeoutActionType.FAIL), executor, handler,
         logger);
   }
 
@@ -182,18 +183,18 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
    * @param backoff           the channel backoff or null.
    * @param outputTimeout     the output timeout.
    * @param timeoutActionType the timeout action type.
-   * @param runner            the runner instance.
+   * @param executor          the executor instance.
    * @param handler           the abort handler.
    * @param logger            the logger instance.
    */
   private ResultChannel(@NotNull final OrderType orderType, final int maxOutput,
       @Nullable final Backoff backoff, @NotNull final DurationMeasure outputTimeout,
-      @NotNull final TimeoutActionType timeoutActionType, @NotNull final Runner runner,
+      @NotNull final TimeoutActionType timeoutActionType, @NotNull final ScheduledExecutor executor,
       @NotNull final AbortHandler handler, @NotNull final Logger logger) {
     mLogger = logger.subContextLogger(this);
     mHandler = ConstantConditions.notNull("abort handler", handler);
-    mRunner = runner;
-    mFlusher = runner.isSynchronous() ? new SyncFlusher() : new AsyncFlusher();
+    mExecutor = executor;
+    mFlusher = executor.isSynchronous() ? new SyncFlusher() : new AsyncFlusher();
     mResultOrder = new LocalField<OrderType>(orderType);
     mResultDelay = new LocalField<DurationMeasure>(noTime());
     mOutputTimeout = new LocalField<DurationMeasure>(outputTimeout);
@@ -254,7 +255,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         mHandler.onAbort(abortException, 0, TimeUnit.MILLISECONDS);
 
       } else {
-        mRunner.run(new DelayedAbortExecution(abortException), delay.value, delay.unit);
+        mExecutor.execute(new DelayedAbortCommand(abortException), delay.value, delay.unit);
       }
 
       return true;
@@ -301,17 +302,17 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
   public Channel<OUT, OUT> close() {
     final DurationMeasure delay = mResultDelay.get();
     final boolean isOpen;
-    final Execution execution;
+    final Runnable command;
     final BindingHandler<OUT> handler;
     synchronized (mMutex) {
       final OutputChannelState state = mState;
       isOpen = state.isOpen();
-      execution = state.closeResultChannel(delay);
+      command = state.closeResultChannel(delay);
       handler = mBindingHandler;
     }
 
-    if (execution != null) {
-      mRunner.run(execution, delay.value, delay.unit);
+    if (command != null) {
+      mExecutor.execute(command, delay.value, delay.unit);
 
     } else if (isOpen) {
       mFlusher.run(handler, false);
@@ -551,15 +552,15 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
   @NotNull
   public Channel<OUT, OUT> pass(@Nullable final Iterable<? extends OUT> outputs) {
     final DurationMeasure delay = mResultDelay.get();
-    final Execution execution;
+    final Runnable command;
     final BindingHandler<OUT> handler;
     synchronized (mMutex) {
-      execution = mState.pass(outputs, delay);
+      command = mState.pass(outputs, delay);
       handler = mBindingHandler;
     }
 
-    if (execution != null) {
-      mRunner.run(execution, delay.value, delay.unit);
+    if (command != null) {
+      mExecutor.execute(command, delay.value, delay.unit);
 
     } else {
       mFlusher.run(handler, false);
@@ -577,15 +578,15 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
   @NotNull
   public Channel<OUT, OUT> pass(@Nullable final OUT output) {
     final DurationMeasure delay = mResultDelay.get();
-    final Execution execution;
+    final Runnable command;
     final BindingHandler<OUT> handler;
     synchronized (mMutex) {
-      execution = mState.pass(output, delay);
+      command = mState.pass(output, delay);
       handler = mBindingHandler;
     }
 
-    if (execution != null) {
-      mRunner.run(execution, delay.value, delay.unit);
+    if (command != null) {
+      mExecutor.execute(command, delay.value, delay.unit);
 
     } else {
       mFlusher.run(handler, false);
@@ -603,15 +604,15 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
   @NotNull
   public Channel<OUT, OUT> pass(@Nullable final OUT... outputs) {
     final DurationMeasure delay = mResultDelay.get();
-    final Execution execution;
+    final Runnable command;
     final BindingHandler<OUT> handler;
     synchronized (mMutex) {
-      execution = mState.pass(outputs, delay);
+      command = mState.pass(outputs, delay);
       handler = mBindingHandler;
     }
 
-    if (execution != null) {
-      mRunner.run(execution, delay.value, delay.unit);
+    if (command != null) {
+      mExecutor.execute(command, delay.value, delay.unit);
 
     } else {
       mFlusher.run(handler, false);
@@ -800,10 +801,11 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
               + "\nTry binding the output channel to another channel or an output consumer");
     }
 
-    if (Runner.isManagedThread()) {
+    if (ScheduledExecutor.isManagedThread()) {
       throw new ExecutionDeadlockException(
-          "cannot wait on a runner thread: " + Thread.currentThread()
-              + "\nTry binding the output channel to another channel or an output consumer");
+          "cannot wait on a executor thread: " + Thread.currentThread()
+              + "\nTry binding the output channel to another channel or an output consumer: "
+              + ScheduledExecutor.getManager());
     }
 
     if (mIsWaitingInvocation) {
@@ -1149,34 +1151,34 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
   }
 
   /**
-   * Flusher implementation handling an asynchronous runner.
+   * Flusher implementation handling an asynchronous executor.
    */
   private class AsyncFlusher implements Flusher<OUT> {
 
     public void run(@NotNull final BindingHandler<OUT> handler, final boolean forceClose) {
-      // Need to make sure to pass the outputs to the consumer in the runner thread, so to avoid
+      // Need to make sure to pass the outputs to the consumer in the executor thread, so to avoid
       // deadlock issues
-      if (mRunner.isExecutionThread()) {
+      if (mExecutor.isExecutionThread()) {
         handler.flushOutput(forceClose);
 
       } else {
-        final FlushExecution execution;
+        final FlushCommand command;
         if (forceClose) {
-          if (mForcedFlushExecution == null) {
-            mForcedFlushExecution = new FlushExecution(true);
+          if (mForcedFlushCommand == null) {
+            mForcedFlushCommand = new FlushCommand(true);
           }
 
-          execution = mForcedFlushExecution;
+          command = mForcedFlushCommand;
 
         } else {
-          if (mFlushExecution == null) {
-            mFlushExecution = new FlushExecution(false);
+          if (mFlushCommand == null) {
+            mFlushCommand = new FlushCommand(false);
           }
 
-          execution = mFlushExecution;
+          command = mFlushCommand;
         }
 
-        mRunner.run(execution, 0, TimeUnit.MILLISECONDS);
+        mExecutor.execute(command);
       }
     }
   }
@@ -1317,7 +1319,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         }
 
       } else {
-        mRunner.run(new DelayedConsumerCompleteExecution(mQueue), delay, timeUnit);
+        mExecutor.execute(new DelayedConsumerCompleteCommand(mQueue), delay, timeUnit);
       }
     }
 
@@ -1334,7 +1336,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
           mHandler.onAbort(error, 0, TimeUnit.MILLISECONDS);
 
         } else {
-          mRunner.run(new DelayedConsumerErrorExecution(mQueue, error), delay, timeUnit);
+          mExecutor.execute(new DelayedConsumerErrorCommand(mQueue, error), delay, timeUnit);
         }
       }
     }
@@ -1342,15 +1344,15 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     public void onOutput(final OUT output) {
       final long delay = mDelay;
       final TimeUnit timeUnit = mDelayUnit;
-      final Execution execution;
+      final Runnable command;
       final BindingHandler<OUT> handler;
       synchronized (mMutex) {
-        execution = mState.onConsumerOutput(mQueue, output, mOrderType, delay, timeUnit);
+        command = mState.onConsumerOutput(mQueue, output, mOrderType, delay, timeUnit);
         handler = mBindingHandler;
       }
 
-      if (execution != null) {
-        mRunner.run(execution, delay, timeUnit);
+      if (command != null) {
+        mExecutor.execute(command, delay, timeUnit);
 
       } else {
         mFlusher.run(handler, false);
@@ -1407,9 +1409,9 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
   }
 
   /**
-   * Implementation of an execution handling a delayed abortion.
+   * Implementation of a runnable handling a delayed abortion.
    */
-  private class DelayedAbortExecution implements Execution {
+  private class DelayedAbortCommand implements Runnable {
 
     private final RoutineException mAbortException;
 
@@ -1418,7 +1420,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
      *
      * @param reason the reason of the abortion.
      */
-    private DelayedAbortExecution(@NotNull final RoutineException reason) {
+    private DelayedAbortCommand(@NotNull final RoutineException reason) {
       mAbortException = reason;
     }
 
@@ -1435,14 +1437,14 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
   }
 
   /**
-   * Implementation of an execution handling a delayed close.
+   * Implementation of a runnable handling a delayed close.
    */
-  private class DelayedCloseExecution implements Execution {
+  private class DelayedCloseCommand implements Runnable {
 
     /**
      * Constructor.
      */
-    private DelayedCloseExecution() {
+    private DelayedCloseCommand() {
     }
 
     public void run() {
@@ -1461,9 +1463,9 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
   }
 
   /**
-   * Implementation of an execution handling a delayed consumer completion.
+   * Implementation of a runnable handling a delayed consumer completion.
    */
-  private class DelayedConsumerCompleteExecution implements Execution {
+  private class DelayedConsumerCompleteCommand implements Runnable {
 
     private final NestedQueue<Object> mQueue;
 
@@ -1472,7 +1474,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
      *
      * @param queue the output queue.
      */
-    private DelayedConsumerCompleteExecution(@NotNull final NestedQueue<Object> queue) {
+    private DelayedConsumerCompleteCommand(@NotNull final NestedQueue<Object> queue) {
       mQueue = queue;
     }
 
@@ -1491,9 +1493,9 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
   }
 
   /**
-   * Implementation of an execution handling a delayed consumer error.
+   * Implementation of a runnable handling a delayed consumer error.
    */
-  private class DelayedConsumerErrorExecution implements Execution {
+  private class DelayedConsumerErrorCommand implements Runnable {
 
     private final RoutineException mAbortException;
 
@@ -1505,7 +1507,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
      * @param queue the output queue.
      * @param error the abortion error.
      */
-    private DelayedConsumerErrorExecution(@NotNull final NestedQueue<Object> queue,
+    private DelayedConsumerErrorCommand(@NotNull final NestedQueue<Object> queue,
         @NotNull final RoutineException error) {
       mQueue = queue;
       mAbortException = error;
@@ -1525,9 +1527,9 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
   }
 
   /**
-   * Implementation of an execution handling a delayed output of a list of data.
+   * Implementation of a runnable handling a delayed output of a list of data.
    */
-  private class DelayedListOutputExecution implements Execution {
+  private class DelayedListOutputCommand implements Runnable {
 
     private final ArrayList<OUT> mOutputs;
 
@@ -1539,7 +1541,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
      * @param queue   the output queue.
      * @param outputs the list of output data.
      */
-    private DelayedListOutputExecution(@NotNull final NestedQueue<Object> queue,
+    private DelayedListOutputCommand(@NotNull final NestedQueue<Object> queue,
         @NotNull final ArrayList<OUT> outputs) {
       mOutputs = outputs;
       mQueue = queue;
@@ -1560,9 +1562,9 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
   }
 
   /**
-   * Implementation of an execution handling a delayed output.
+   * Implementation of a runnable handling a delayed output.
    */
-  private class DelayedOutputExecution implements Execution {
+  private class DelayedOutputCommand implements Runnable {
 
     private final OUT mOutput;
 
@@ -1574,7 +1576,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
      * @param queue  the output queue.
      * @param output the output.
      */
-    private DelayedOutputExecution(@NotNull final NestedQueue<Object> queue,
+    private DelayedOutputCommand(@NotNull final NestedQueue<Object> queue,
         @Nullable final OUT output) {
       mQueue = queue;
       mOutput = output;
@@ -1646,7 +1648,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
     @Nullable
     @Override
-    Execution onConsumerOutput(@NotNull final NestedQueue<Object> queue, @Nullable final OUT output,
+    Runnable onConsumerOutput(@NotNull final NestedQueue<Object> queue, @Nullable final OUT output,
         @NotNull final OrderType orderType, final long delay, @NotNull final TimeUnit timeUnit) {
       throw abortException();
     }
@@ -1689,20 +1691,20 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
     @Nullable
     @Override
-    Execution pass(@Nullable final Iterable<? extends OUT> outputs,
+    Runnable pass(@Nullable final Iterable<? extends OUT> outputs,
         @NotNull final DurationMeasure delay) {
       throw abortException();
     }
 
     @Nullable
     @Override
-    Execution pass(@Nullable final OUT output, @NotNull final DurationMeasure delay) {
+    Runnable pass(@Nullable final OUT output, @NotNull final DurationMeasure delay) {
       throw abortException();
     }
 
     @Nullable
     @Override
-    Execution pass(@Nullable final OUT[] outputs, @NotNull final DurationMeasure delay) {
+    Runnable pass(@Nullable final OUT[] outputs, @NotNull final DurationMeasure delay) {
       throw abortException();
     }
 
@@ -1779,14 +1781,14 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
     @Override
     boolean delayedOutput(@NotNull final NestedQueue<Object> queue, @Nullable final OUT output) {
-      mLogger.wrn("avoiding delayed output execution since channel is closed: %s", output);
+      mLogger.wrn("avoiding delayed output command since channel is closed: %s", output);
       return false;
     }
 
     @Override
     boolean delayedOutputs(@NotNull final NestedQueue<Object> queue,
         @NotNull final List<OUT> outputs) {
-      mLogger.wrn("avoiding delayed output execution since channel is closed: %s", outputs);
+      mLogger.wrn("avoiding delayed output command since channel is closed: %s", outputs);
       return false;
     }
 
@@ -1815,7 +1817,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
     @Nullable
     @Override
-    Execution onConsumerOutput(@NotNull final NestedQueue<Object> queue, @Nullable final OUT output,
+    Runnable onConsumerOutput(@NotNull final NestedQueue<Object> queue, @Nullable final OUT output,
         @NotNull final OrderType orderType, final long delay, @NotNull final TimeUnit timeUnit) {
       throw exception();
     }
@@ -1840,9 +1842,9 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
   }
 
   /**
-   * Execution flushing the output to the bound consumer.
+   * Runnable flushing the output to the bound consumer.
    */
-  private class FlushExecution implements Execution {
+  private class FlushCommand implements Runnable {
 
     private final boolean mForceClose;
 
@@ -1851,7 +1853,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
      *
      * @param forceClose whether to forcedly close the consumer.
      */
-    private FlushExecution(final boolean forceClose) {
+    private FlushCommand(final boolean forceClose) {
       mForceClose = forceClose;
     }
 
@@ -1958,10 +1960,10 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
      * Called when the result channel is closed.
      *
      * @param delay the result delay.
-     * @return the execution to run or null.
+     * @return the command to run or null.
      */
     @Nullable
-    Execution closeResultChannel(@NotNull final DurationMeasure delay) {
+    Runnable closeResultChannel(@NotNull final DurationMeasure delay) {
       if (delay.isZero()) {
         mLogger.dbg("closing result channel [#%d]", mPendingOutputCount);
         if (mPendingOutputCount > 0) {
@@ -1974,7 +1976,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         return null;
       }
 
-      return new DelayedCloseExecution();
+      return new DelayedCloseCommand();
     }
 
     /**
@@ -2044,7 +2046,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
      * @return whether the queue content has changed.
      */
     boolean delayedOutput(@NotNull final NestedQueue<Object> queue, @Nullable final OUT output) {
-      mLogger.dbg("delayed output execution: %s", output);
+      mLogger.dbg("delayed output command: %s", output);
       --mPendingOutputCount;
       queue.add(output);
       queue.close();
@@ -2060,7 +2062,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
      */
     boolean delayedOutputs(@NotNull final NestedQueue<Object> queue,
         @NotNull final List<OUT> outputs) {
-      mLogger.dbg("delayed output execution: %s", outputs);
+      mLogger.dbg("delayed output command: %s", outputs);
       --mPendingOutputCount;
       queue.addAll(outputs);
       queue.close();
@@ -2142,10 +2144,10 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
      * @param orderType the output order type.
      * @param delay     the output delay.
      * @param timeUnit  the output delay unit.
-     * @return the execution to run or null.
+     * @return the command to run or null.
      */
     @Nullable
-    Execution onConsumerOutput(@NotNull final NestedQueue<Object> queue, @Nullable final OUT output,
+    Runnable onConsumerOutput(@NotNull final NestedQueue<Object> queue, @Nullable final OUT output,
         @NotNull final OrderType orderType, final long delay, @NotNull final TimeUnit timeUnit) {
       mLogger.dbg("consumer output [#%d+1]: %s [%d %s]", mOutputCount, output, delay, timeUnit);
       ++mOutputCount;
@@ -2155,8 +2157,8 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
       }
 
       ++mPendingOutputCount;
-      return new DelayedOutputExecution(
-          (orderType != OrderType.UNSORTED) ? queue.addNested() : queue, output);
+      return new DelayedOutputCommand((orderType != OrderType.UNSORTED) ? queue.addNested() : queue,
+          output);
     }
 
     /**
@@ -2192,10 +2194,10 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
      *
      * @param outputs the outputs.
      * @param delay   the result delay.
-     * @return the execution to run or null.
+     * @return the command to run or null.
      */
     @Nullable
-    Execution pass(@Nullable final Iterable<? extends OUT> outputs,
+    Runnable pass(@Nullable final Iterable<? extends OUT> outputs,
         @NotNull final DurationMeasure delay) {
       if (outputs == null) {
         mLogger.wrn("passing null iterable");
@@ -2217,7 +2219,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
       }
 
       ++mPendingOutputCount;
-      return new DelayedListOutputExecution(
+      return new DelayedListOutputCommand(
           (mResultOrder.get() != OrderType.UNSORTED) ? mOutputQueue.addNested() : mOutputQueue,
           list);
     }
@@ -2227,10 +2229,10 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
      *
      * @param output the output.
      * @param delay  the result delay;
-     * @return the execution to run or null.
+     * @return the command to run or null.
      */
     @Nullable
-    Execution pass(@Nullable final OUT output, @NotNull final DurationMeasure delay) {
+    Runnable pass(@Nullable final OUT output, @NotNull final DurationMeasure delay) {
       mLogger.dbg("passing output [#%d+1]: %s [%s]", mOutputCount, output, delay);
       ++mOutputCount;
       checkMaxSize();
@@ -2240,7 +2242,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
       }
 
       ++mPendingOutputCount;
-      return new DelayedOutputExecution(
+      return new DelayedOutputCommand(
           (mResultOrder.get() != OrderType.UNSORTED) ? mOutputQueue.addNested() : mOutputQueue,
           output);
     }
@@ -2250,10 +2252,10 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
      *
      * @param outputs the outputs.
      * @param delay   the result delay;
-     * @return the execution to run or null.
+     * @return the command to run or null.
      */
     @Nullable
-    Execution pass(@Nullable final OUT[] outputs, @NotNull final DurationMeasure delay) {
+    Runnable pass(@Nullable final OUT[] outputs, @NotNull final DurationMeasure delay) {
       if (outputs == null) {
         mLogger.wrn("passing null output array");
         return null;
@@ -2272,7 +2274,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
       }
 
       ++mPendingOutputCount;
-      return new DelayedListOutputExecution(
+      return new DelayedListOutputCommand(
           (mResultOrder.get() != OrderType.UNSORTED) ? mOutputQueue.addNested() : mOutputQueue,
           list);
     }
@@ -2328,7 +2330,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
     @Nullable
     @Override
-    Execution closeResultChannel(@NotNull final DurationMeasure delay) {
+    Runnable closeResultChannel(@NotNull final DurationMeasure delay) {
       mLogger.dbg("avoiding closing result channel since already closed");
       return null;
     }
@@ -2353,7 +2355,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
     @Override
     boolean delayedOutput(@NotNull final NestedQueue<Object> queue, @Nullable final OUT output) {
-      mLogger.dbg("delayed output execution: %s", output);
+      mLogger.dbg("delayed output command: %s", output);
       if (--mPendingOutputCount == 0) {
         mState = new FlushChannelState();
       }
@@ -2366,7 +2368,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     @Override
     boolean delayedOutputs(@NotNull final NestedQueue<Object> queue,
         @NotNull final List<OUT> outputs) {
-      mLogger.dbg("delayed output execution: %s", outputs);
+      mLogger.dbg("delayed output command: %s", outputs);
       if (--mPendingOutputCount == 0) {
         mState = new FlushChannelState();
       }
@@ -2410,26 +2412,26 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
     @Nullable
     @Override
-    Execution pass(@Nullable final Iterable<? extends OUT> outputs,
+    Runnable pass(@Nullable final Iterable<? extends OUT> outputs,
         @NotNull final DurationMeasure delay) {
       throw exception();
     }
 
     @Nullable
     @Override
-    Execution pass(@Nullable final OUT output, @NotNull final DurationMeasure delay) {
+    Runnable pass(@Nullable final OUT output, @NotNull final DurationMeasure delay) {
       throw exception();
     }
 
     @Nullable
     @Override
-    Execution pass(@Nullable final OUT[] outputs, @NotNull final DurationMeasure delay) {
+    Runnable pass(@Nullable final OUT[] outputs, @NotNull final DurationMeasure delay) {
       throw exception();
     }
   }
 
   /**
-   * Flusher implementation handling a synchronous runner.
+   * Flusher implementation handling a synchronous executor.
    */
   private class SyncFlusher implements Flusher<OUT> {
 

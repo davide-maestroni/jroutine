@@ -24,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Interface defining a builder of channel objects.
  * <p>
- * Note that the passed inputs might be delivered through the configured runner.
+ * Note that the passed inputs might be delivered through the configured executor.
  * <p>
  * Created by davide-maestroni on 03/07/2015.
  *

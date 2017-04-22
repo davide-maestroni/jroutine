@@ -22,6 +22,7 @@ import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.DeadlockException;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
+import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
@@ -29,7 +30,6 @@ import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.log.Log;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.routine.Routine;
-import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ClassToken;
 
 import org.jetbrains.annotations.NotNull;
@@ -208,7 +208,7 @@ public class ChannelsTest {
       }
     })
                        .channelConfiguration()
-                       .withRunner(Runners.immediateRunner())
+                       .withExecutor(ScheduledExecutors.immediateExecutor())
                        .apply()
                        .buildChannel()
                        .next()).isEqualTo("test");
@@ -1166,8 +1166,8 @@ public class ChannelsTest {
     final int count = 7;
     final List<? extends Channel<Object, Object>> channels = Channels.number(count)
                                                                      .channelConfiguration()
-                                                                     .withRunner(
-                                                                         Runners.immediateRunner())
+                                                                     .withExecutor(
+                                                                         ScheduledExecutors.immediateExecutor())
                                                                      .apply()
                                                                      .buildChannels();
     for (final Channel<Object, Object> channel : channels) {
@@ -1820,8 +1820,8 @@ public class ChannelsTest {
 
     final Routine<Flow<Object>, Flow<Object>> routine = JRoutineCore.with(new Sort())
                                                                     .invocationConfiguration()
-                                                                    .withRunner(
-                                                                        Runners.syncRunner())
+                                                                    .withExecutor(
+                                                                        ScheduledExecutors.syncExecutor())
                                                                     .apply()
                                                                     .buildRoutine();
     Map<Integer, ? extends Channel<?, Object>> channelMap;

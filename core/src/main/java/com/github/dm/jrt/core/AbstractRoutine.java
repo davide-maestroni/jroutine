@@ -18,20 +18,17 @@ package com.github.dm.jrt.core;
 
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.executor.ScheduledExecutor;
+import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.routine.Routine;
-import com.github.dm.jrt.core.runner.Execution;
-import com.github.dm.jrt.core.runner.Runner;
-import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.SimpleQueue;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * Basic abstract implementation of a routine.
@@ -56,6 +53,8 @@ public abstract class AbstractRoutine<IN, OUT> implements Routine<IN, OUT> {
 
   private final int mCoreInvocations;
 
+  private final ScheduledExecutor mExecutor;
+
   private final SimpleQueue<Invocation<IN, OUT>> mInvocations =
       new SimpleQueue<Invocation<IN, OUT>>();
 
@@ -68,8 +67,6 @@ public abstract class AbstractRoutine<IN, OUT> implements Routine<IN, OUT> {
   private final SimpleQueue<InvocationObserver<IN, OUT>> mObservers =
       new SimpleQueue<InvocationObserver<IN, OUT>>();
 
-  private final Runner mRunner;
-
   private int mRunningCount;
 
   /**
@@ -80,12 +77,13 @@ public abstract class AbstractRoutine<IN, OUT> implements Routine<IN, OUT> {
   protected AbstractRoutine(@NotNull final InvocationConfiguration configuration) {
     mConfiguration = configuration;
     final int priority = configuration.getPriorityOrElse(InvocationConfiguration.DEFAULT);
-    final Runner runner = configuration.getRunnerOrElse(Runners.sharedRunner());
+    final ScheduledExecutor executor =
+        configuration.getExecutorOrElse(ScheduledExecutors.defaultExecutor());
     if (priority != InvocationConfiguration.DEFAULT) {
-      mRunner = Runners.priorityRunner(runner).getRunner(priority);
+      mExecutor = ScheduledExecutors.priorityExecutor(executor).getExecutor(priority);
 
     } else {
-      mRunner = runner;
+      mExecutor = executor;
     }
 
     mMaxInvocations = configuration.getMaxInvocationsOrElse(DEFAULT_MAX_INVOCATIONS);
@@ -107,9 +105,9 @@ public abstract class AbstractRoutine<IN, OUT> implements Routine<IN, OUT> {
 
   @NotNull
   public Channel<IN, OUT> invoke() {
-    final ConcurrentRunner runner = new ConcurrentRunner(mRunner);
-    return new InvocationChannel<IN, OUT>(mConfiguration, new DefaultInvocationManager(runner),
-        runner, mLogger);
+    final ConcurrentExecutor executor = new ConcurrentExecutor(mExecutor);
+    return new InvocationChannel<IN, OUT>(mConfiguration, new DefaultInvocationManager(executor),
+        executor, mLogger);
   }
 
   /**
@@ -152,45 +150,45 @@ public abstract class AbstractRoutine<IN, OUT> implements Routine<IN, OUT> {
   }
 
   /**
-   * Invocation observer notifying events through a specific runner.
+   * Invocation observer notifying events through a specific executor.
    *
    * @param <IN>  the input data type.
    * @param <OUT> the output data type.
    */
   private static class DelayedObserver<IN, OUT> implements InvocationObserver<IN, OUT> {
 
-    private final InvocationObserver<IN, OUT> mObserver;
+    private final ScheduledExecutor mExecutor;
 
-    private final Runner mRunner;
+    private final InvocationObserver<IN, OUT> mObserver;
 
     /**
      * Constructor.
      *
      * @param observer the wrapped observer.
-     * @param runner   the runner instance.
+     * @param executor the executor instance.
      */
     private DelayedObserver(@NotNull final InvocationObserver<IN, OUT> observer,
-        @NotNull final Runner runner) {
+        @NotNull final ScheduledExecutor executor) {
       mObserver = observer;
-      mRunner = runner;
+      mExecutor = executor;
     }
 
     public void onCreate(@NotNull final Invocation<IN, OUT> invocation) {
-      mRunner.run(new Execution() {
+      mExecutor.execute(new Runnable() {
 
         public void run() {
           mObserver.onCreate(invocation);
         }
-      }, 0, TimeUnit.MILLISECONDS);
+      });
     }
 
     public void onError(@NotNull final Throwable error) {
-      mRunner.run(new Execution() {
+      mExecutor.execute(new Runnable() {
 
         public void run() {
           mObserver.onError(error);
         }
-      }, 0, TimeUnit.MILLISECONDS);
+      });
     }
   }
 
@@ -199,15 +197,15 @@ public abstract class AbstractRoutine<IN, OUT> implements Routine<IN, OUT> {
    */
   private class DefaultInvocationManager implements InvocationManager<IN, OUT> {
 
-    private final ConcurrentRunner mManagerRunner;
+    private final ConcurrentExecutor mManagerExecutor;
 
     /**
      * Constructor.
      *
-     * @param runner the runner used for asynchronous invocation.
+     * @param executor the executor used for asynchronous invocation.
      */
-    private DefaultInvocationManager(@NotNull final ConcurrentRunner runner) {
-      mManagerRunner = runner;
+    private DefaultInvocationManager(@NotNull final ConcurrentExecutor executor) {
+      mManagerExecutor = executor;
     }
 
     public boolean create(@NotNull final InvocationObserver<IN, OUT> observer) {
@@ -305,7 +303,7 @@ public abstract class AbstractRoutine<IN, OUT> implements Routine<IN, OUT> {
             }
 
           } else {
-            observers.add(new DelayedObserver<IN, OUT>(invocationObserver, mManagerRunner));
+            observers.add(new DelayedObserver<IN, OUT>(invocationObserver, mManagerExecutor));
             return false;
           }
         }

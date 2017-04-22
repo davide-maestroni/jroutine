@@ -44,6 +44,8 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
   private TypeMirror mClashAnnotationType;
 
+  private TypeMirror mExecutorClassAnnotationType;
+
   private String mHeaderService;
 
   private String mHeaderV11;
@@ -67,8 +69,6 @@ public class ContextRoutineProcessor extends RoutineProcessor {
   private String mMethodHeaderV1;
 
   private String mMethodInvocationHeader;
-
-  private TypeMirror mRunnerClassAnnotationType;
 
   private TypeElement mServiceProxyElement;
 
@@ -98,10 +98,10 @@ public class ContextRoutineProcessor extends RoutineProcessor {
         getMirrorFromName("com.github.dm.jrt.android.reflect.annotation.MatchResolution");
     mStaleTimeAnnotationType =
         getMirrorFromName("com.github.dm.jrt.android.reflect.annotation.ResultStaleTime");
+    mExecutorClassAnnotationType =
+        getMirrorFromName("com.github.dm.jrt.android.reflect.annotation.ServiceExecutor");
     mLogClassAnnotationType =
         getMirrorFromName("com.github.dm.jrt.android.reflect.annotation.ServiceLog");
-    mRunnerClassAnnotationType =
-        getMirrorFromName("com.github.dm.jrt.android.reflect.annotation.ServiceRunner");
     final Types typeUtils = processingEnv.getTypeUtils();
     mServiceProxyElement = (TypeElement) typeUtils.asElement(
         getMirrorFromName("com.github.dm.jrt.android.proxy.annotation.ServiceProxy"));
@@ -257,15 +257,15 @@ public class ContextRoutineProcessor extends RoutineProcessor {
   private String buildServiceOptions(@NotNull final ExecutableElement methodElement) {
     // We need to avoid explicit dependency on the android module...
     final StringBuilder builder = new StringBuilder();
+    final Object executorClass =
+        getAnnotationValue(methodElement, mExecutorClassAnnotationType, "value");
+    if (executorClass != null) {
+      builder.append(".withExecutorClass(").append(executorClass).append(")");
+    }
+
     final Object logClass = getAnnotationValue(methodElement, mLogClassAnnotationType, "value");
     if (logClass != null) {
       builder.append(".withLogClass(").append(logClass).append(")");
-    }
-
-    final Object runnerClass =
-        getAnnotationValue(methodElement, mRunnerClassAnnotationType, "value");
-    if (runnerClass != null) {
-      builder.append(".withRunnerClass(").append(runnerClass).append(")");
     }
 
     return builder.toString();

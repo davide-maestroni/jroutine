@@ -38,21 +38,18 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.executor.ScheduledExecutor;
+import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.log.Log;
 import com.github.dm.jrt.core.log.Logger;
-import com.github.dm.jrt.core.runner.Execution;
-import com.github.dm.jrt.core.runner.Runner;
-import com.github.dm.jrt.core.runner.Runners;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.concurrent.TimeUnit;
-
-import static com.github.dm.jrt.android.core.runner.AndroidRunners.mainRunner;
+import static com.github.dm.jrt.android.core.executor.AndroidExecutors.mainExecutor;
 import static com.github.dm.jrt.android.core.service.InvocationService.getAbortError;
 import static com.github.dm.jrt.android.core.service.InvocationService.getValue;
 import static com.github.dm.jrt.android.core.service.InvocationService.putError;
@@ -90,7 +87,7 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
    * @param serviceConfiguration    the Service configuration.
    * @throws java.lang.IllegalArgumentException if no constructor taking the specified objects as
    *                                            parameters was found for the configured log or the
-   *                                            configured runner.
+   *                                            configured executor.
    * @throws java.lang.IllegalStateException    if the specified context is no more valid.
    */
   ServiceRoutine(@NotNull final ServiceContext context,
@@ -103,9 +100,11 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
       throw new IllegalStateException("the Service Context has been destroyed");
     }
 
-    final Class<? extends Runner> runnerClass = serviceConfiguration.getRunnerClassOrElse(null);
-    if (runnerClass != null) {
-      findBestMatchingConstructor(runnerClass, serviceConfiguration.getRunnerArgsOrElse(NO_ARGS));
+    final Class<? extends ScheduledExecutor> executorClass =
+        serviceConfiguration.getExecutorClassOrElse(null);
+    if (executorClass != null) {
+      findBestMatchingConstructor(executorClass,
+          serviceConfiguration.getExecutorArgsOrElse(NO_ARGS));
     }
 
     final Class<? extends Log> logClass = serviceConfiguration.getLogClassOrElse(null);
@@ -260,7 +259,7 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
       final Context serviceContext = mContext.getServiceContext();
       if (serviceContext != null) {
         // Unbind on main thread to avoid crashing the IPC
-        Runners.zeroDelayRunner(mainRunner()).run(new Execution() {
+        ScheduledExecutors.zeroDelayExecutor(mainExecutor()).execute(new Runnable() {
 
           @Override
           public void run() {
@@ -273,7 +272,7 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
               mLogger.wrn(t, "unbinding failed (maybe the connection was leaked...)");
             }
           }
-        }, 0, TimeUnit.MILLISECONDS);
+        });
       }
     }
   }
@@ -342,8 +341,8 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
       final ServiceConfiguration serviceConfiguration = mServiceConfiguration;
       putInvocation(message.getData(), invocationId, targetFactory.getInvocationClass(),
           targetFactory.getFactoryArgs(), mInvocationConfiguration,
-          serviceConfiguration.getRunnerClassOrElse(null),
-          serviceConfiguration.getRunnerArgsOrElse((Object[]) null),
+          serviceConfiguration.getExecutorClassOrElse(null),
+          serviceConfiguration.getExecutorArgsOrElse((Object[]) null),
           serviceConfiguration.getLogClassOrElse(null),
           serviceConfiguration.getLogArgsOrElse((Object[]) null));
       final Messenger inMessenger = new Messenger(mIncomingHandler);

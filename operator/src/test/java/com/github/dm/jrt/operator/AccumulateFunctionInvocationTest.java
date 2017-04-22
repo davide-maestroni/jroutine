@@ -17,8 +17,8 @@
 package com.github.dm.jrt.operator;
 
 import com.github.dm.jrt.core.JRoutineCore;
+import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
-import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.function.util.BiFunction;
 import com.github.dm.jrt.function.util.Supplier;
 
@@ -52,7 +52,7 @@ public class AccumulateFunctionInvocationTest {
     final BiFunction<String, String, String> function = createFunction();
     assertThat(JRoutineCore.with(functionFactory(function))
                            .invocationConfiguration()
-                           .withRunner(Runners.syncRunner())
+                           .withExecutor(ScheduledExecutors.syncExecutor())
                            .apply()
                            .invoke()
                            .pass("test1", "test2", "test3")
@@ -66,7 +66,7 @@ public class AccumulateFunctionInvocationTest {
       }
     }, function))
                            .invocationConfiguration()
-                           .withRunner(Runners.syncRunner())
+                           .withExecutor(ScheduledExecutors.syncExecutor())
                            .apply()
                            .invoke()
                            .pass("test1", "test2", "test3")

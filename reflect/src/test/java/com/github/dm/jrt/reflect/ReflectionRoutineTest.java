@@ -25,15 +25,14 @@ import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.ChannelConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.AgingPriority;
+import com.github.dm.jrt.core.executor.ScheduledExecutorDecorator;
+import com.github.dm.jrt.core.executor.ScheduledExecutors;
+import com.github.dm.jrt.core.executor.SyncExecutor;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.log.Log;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.NullLog;
 import com.github.dm.jrt.core.routine.Routine;
-import com.github.dm.jrt.core.runner.Execution;
-import com.github.dm.jrt.core.runner.RunnerDecorator;
-import com.github.dm.jrt.core.runner.Runners;
-import com.github.dm.jrt.core.runner.SyncRunner;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.core.util.DurationMeasure;
@@ -44,6 +43,7 @@ import com.github.dm.jrt.reflect.annotation.AsyncMethod;
 import com.github.dm.jrt.reflect.annotation.AsyncOutput;
 import com.github.dm.jrt.reflect.annotation.AsyncOutput.OutputMode;
 import com.github.dm.jrt.reflect.annotation.CoreInvocations;
+import com.github.dm.jrt.reflect.annotation.ExecutorType;
 import com.github.dm.jrt.reflect.annotation.InputBackoff;
 import com.github.dm.jrt.reflect.annotation.InputMaxSize;
 import com.github.dm.jrt.reflect.annotation.InputOrder;
@@ -56,7 +56,6 @@ import com.github.dm.jrt.reflect.annotation.OutputOrder;
 import com.github.dm.jrt.reflect.annotation.OutputTimeout;
 import com.github.dm.jrt.reflect.annotation.OutputTimeoutAction;
 import com.github.dm.jrt.reflect.annotation.Priority;
-import com.github.dm.jrt.reflect.annotation.RunnerType;
 import com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilder;
 import com.github.dm.jrt.reflect.config.WrapperConfiguration;
 
@@ -91,10 +90,10 @@ public class ReflectionRoutineTest {
   public void testAgingPriority() {
 
     final Pass pass = new Pass();
-    final TestRunner runner = new TestRunner();
+    final TestExecutor executor = new TestExecutor();
     final PriorityPass priorityPass = JRoutineReflection.with(instance(pass))
                                                         .invocationConfiguration()
-                                                        .withRunner(runner)
+                                                        .withExecutor(executor)
                                                         .apply()
                                                         .buildProxy(PriorityPass.class);
     final Channel<?, String> output1 = priorityPass.passNormal("test1").eventuallyContinue();
@@ -102,14 +101,14 @@ public class ReflectionRoutineTest {
     for (int i = 0; i < AgingPriority.HIGH_PRIORITY - 1; i++) {
 
       priorityPass.passHigh("test2");
-      runner.run(1);
+      executor.run(1);
       assertThat(output1.all()).isEmpty();
     }
 
     final Channel<?, String> output2 = priorityPass.passHigh("test2");
-    runner.run(1);
+    executor.run(1);
     assertThat(output1.all()).containsExactly("test1");
-    runner.run(Integer.MAX_VALUE);
+    executor.run(Integer.MAX_VALUE);
     assertThat(output2.all()).containsExactly("test2");
   }
 
@@ -120,7 +119,8 @@ public class ReflectionRoutineTest {
     final TestClass test = new TestClass();
     final Routine<Object, Object> routine = JRoutineReflection.with(instance(test))
                                                               .invocationConfiguration()
-                                                              .withRunner(Runners.poolRunner())
+                                                              .withExecutor(
+                                                                  ScheduledExecutors.poolExecutor())
                                                               .withMaxInvocations(1)
                                                               .withCoreInvocations(1)
                                                               .withOutputTimeoutAction(
@@ -139,7 +139,8 @@ public class ReflectionRoutineTest {
     final DurationMeasure timeout = seconds(1);
     final Routine<Object, Object> routine = JRoutineReflection.with(classOfType(TestStatic.class))
                                                               .invocationConfiguration()
-                                                              .withRunner(Runners.poolRunner())
+                                                              .withExecutor(
+                                                                  ScheduledExecutors.poolExecutor())
                                                               .withLogLevel(Level.DEBUG)
                                                               .withLog(new NullLog())
                                                               .apply()
@@ -244,7 +245,7 @@ public class ReflectionRoutineTest {
                  .withOutputTimeout(1111, TimeUnit.MICROSECONDS)
                  .withOutputTimeoutAction(TimeoutActionType.ABORT)
                  .withPriority(41)
-                 .withRunner(new MyRunner())
+                 .withExecutor(new MyExecutor())
                  .apply());
   }
 
@@ -622,7 +623,9 @@ public class ReflectionRoutineTest {
     final TestClass test = new TestClass();
     final Routine<Object, Object> routine2 = JRoutineReflection.with(instance(test))
                                                                .invocationConfiguration()
-                                                               .withRunner(Runners.poolRunner())
+                                                               .withExecutor(
+                                                                   ScheduledExecutors
+                                                                       .poolExecutor())
                                                                .withMaxInvocations(1)
                                                                .apply()
                                                                .wrapperConfiguration()
@@ -641,7 +644,9 @@ public class ReflectionRoutineTest {
     final TestClass test = new TestClass();
     final Routine<Object, Object> routine1 = JRoutineReflection.with(instance(test))
                                                                .invocationConfiguration()
-                                                               .withRunner(Runners.poolRunner())
+                                                               .withExecutor(
+                                                                   ScheduledExecutors
+                                                                       .poolExecutor())
                                                                .apply()
                                                                .method("getLong");
 
@@ -842,7 +847,8 @@ public class ReflectionRoutineTest {
     final TestStatic test = new TestStatic();
     final Routine<Object, Object> routine = JRoutineReflection.with(instance(test))
                                                               .invocationConfiguration()
-                                                              .withRunner(Runners.syncRunner())
+                                                              .withExecutor(
+                                                                  ScheduledExecutors.syncExecutor())
                                                               .withLogLevel(Level.DEBUG)
                                                               .withLog(new NullLog())
                                                               .apply()
@@ -1000,7 +1006,9 @@ public class ReflectionRoutineTest {
     final NullLog nullLog = new NullLog();
     final Routine<Object, Object> routine1 = JRoutineReflection.with(instance(test))
                                                                .invocationConfiguration()
-                                                               .withRunner(Runners.syncRunner())
+                                                               .withExecutor(
+                                                                   ScheduledExecutors
+                                                                       .syncExecutor())
                                                                .withCoreInvocations(16)
                                                                .withLogLevel(Level.DEBUG)
                                                                .withLog(nullLog)
@@ -1011,7 +1019,9 @@ public class ReflectionRoutineTest {
 
     final Routine<Object, Object> routine2 = JRoutineReflection.with(instance(test))
                                                                .invocationConfiguration()
-                                                               .withRunner(Runners.syncRunner())
+                                                               .withExecutor(
+                                                                   ScheduledExecutors
+                                                                       .syncExecutor())
                                                                .withCoreInvocations(16)
                                                                .withLogLevel(Level.DEBUG)
                                                                .withLog(nullLog)
@@ -1023,7 +1033,9 @@ public class ReflectionRoutineTest {
 
     final Routine<Object, Object> routine3 = JRoutineReflection.with(instance(test))
                                                                .invocationConfiguration()
-                                                               .withRunner(Runners.syncRunner())
+                                                               .withExecutor(
+                                                                   ScheduledExecutors
+                                                                       .syncExecutor())
                                                                .withCoreInvocations(32)
                                                                .withLogLevel(Level.DEBUG)
                                                                .withLog(nullLog)
@@ -1036,7 +1048,9 @@ public class ReflectionRoutineTest {
 
     final Routine<Object, Object> routine4 = JRoutineReflection.with(instance(test))
                                                                .invocationConfiguration()
-                                                               .withRunner(Runners.syncRunner())
+                                                               .withExecutor(
+                                                                   ScheduledExecutors
+                                                                       .syncExecutor())
                                                                .withCoreInvocations(32)
                                                                .withLogLevel(Level.WARNING)
                                                                .withLog(nullLog)
@@ -1048,7 +1062,9 @@ public class ReflectionRoutineTest {
 
     final Routine<Object, Object> routine5 = JRoutineReflection.with(instance(test))
                                                                .invocationConfiguration()
-                                                               .withRunner(Runners.syncRunner())
+                                                               .withExecutor(
+                                                                   ScheduledExecutors
+                                                                       .syncExecutor())
                                                                .withCoreInvocations(32)
                                                                .withLogLevel(Level.WARNING)
                                                                .withLog(new NullLog())
@@ -1065,7 +1081,9 @@ public class ReflectionRoutineTest {
     final NullLog nullLog = new NullLog();
     final Routine<Object, Object> routine1 = JRoutineReflection.with(classOfType(TestStatic.class))
                                                                .invocationConfiguration()
-                                                               .withRunner(Runners.syncRunner())
+                                                               .withExecutor(
+                                                                   ScheduledExecutors
+                                                                       .syncExecutor())
                                                                .withCoreInvocations(16)
                                                                .withLogLevel(Level.DEBUG)
                                                                .withLog(nullLog)
@@ -1076,7 +1094,9 @@ public class ReflectionRoutineTest {
 
     final Routine<Object, Object> routine2 = JRoutineReflection.with(classOfType(TestStatic.class))
                                                                .invocationConfiguration()
-                                                               .withRunner(Runners.syncRunner())
+                                                               .withExecutor(
+                                                                   ScheduledExecutors
+                                                                       .syncExecutor())
                                                                .withCoreInvocations(16)
                                                                .withLogLevel(Level.DEBUG)
                                                                .withLog(nullLog)
@@ -1088,7 +1108,9 @@ public class ReflectionRoutineTest {
 
     final Routine<Object, Object> routine3 = JRoutineReflection.with(classOfType(TestStatic.class))
                                                                .invocationConfiguration()
-                                                               .withRunner(Runners.syncRunner())
+                                                               .withExecutor(
+                                                                   ScheduledExecutors
+                                                                       .syncExecutor())
                                                                .withCoreInvocations(32)
                                                                .withLogLevel(Level.DEBUG)
                                                                .withLog(nullLog)
@@ -1101,7 +1123,9 @@ public class ReflectionRoutineTest {
 
     final Routine<Object, Object> routine4 = JRoutineReflection.with(classOfType(TestStatic.class))
                                                                .invocationConfiguration()
-                                                               .withRunner(Runners.syncRunner())
+                                                               .withExecutor(
+                                                                   ScheduledExecutors
+                                                                       .syncExecutor())
                                                                .withCoreInvocations(32)
                                                                .withLogLevel(Level.WARNING)
                                                                .withLog(nullLog)
@@ -1113,7 +1137,9 @@ public class ReflectionRoutineTest {
 
     final Routine<Object, Object> routine5 = JRoutineReflection.with(classOfType(TestStatic.class))
                                                                .invocationConfiguration()
-                                                               .withRunner(Runners.syncRunner())
+                                                               .withExecutor(
+                                                                   ScheduledExecutors
+                                                                       .syncExecutor())
                                                                .withCoreInvocations(32)
                                                                .withLogLevel(Level.WARNING)
                                                                .withLog(new NullLog())
@@ -1358,7 +1384,9 @@ public class ReflectionRoutineTest {
     final DurationMeasure timeout = seconds(1);
     final Routine<Object, Object> routine2 = JRoutineReflection.with(classOfType(TestStatic.class))
                                                                .invocationConfiguration()
-                                                               .withRunner(Runners.syncRunner())
+                                                               .withExecutor(
+                                                                   ScheduledExecutors
+                                                                       .syncExecutor())
                                                                .withMaxInvocations(1)
                                                                .withCoreInvocations(0)
                                                                .apply()
@@ -1377,7 +1405,9 @@ public class ReflectionRoutineTest {
     final DurationMeasure timeout = seconds(1);
     final Routine<Object, Object> routine1 = JRoutineReflection.with(classOfType(TestStatic.class))
                                                                .invocationConfiguration()
-                                                               .withRunner(Runners.syncRunner())
+                                                               .withExecutor(
+                                                                   ScheduledExecutors
+                                                                       .syncExecutor())
                                                                .withMaxInvocations(1)
                                                                .apply()
                                                                .method("getLong");
@@ -1510,7 +1540,7 @@ public class ReflectionRoutineTest {
     @InputBackoff(InBackoff.class)
     @InputMaxSize(33)
     @InputOrder(OrderType.UNSORTED)
-    @RunnerType(MyRunner.class)
+    @ExecutorType(MyExecutor.class)
     @LogLevel(Level.WARNING)
     @LogType(MyLog.class)
     @MaxInvocations(17)
@@ -2020,6 +2050,24 @@ public class ReflectionRoutineTest {
     }
   }
 
+  public static class MyExecutor extends ScheduledExecutorDecorator {
+
+    public MyExecutor() {
+      super(ScheduledExecutors.syncExecutor());
+    }
+
+    @Override
+    public int hashCode() {
+      return MyExecutor.class.hashCode();
+    }
+
+    @Override
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
+    public boolean equals(final Object obj) {
+      return (obj instanceof MyExecutor);
+    }
+  }
+
   public static class MyLog extends DeepEqualObject implements Log {
 
     public MyLog() {
@@ -2036,24 +2084,6 @@ public class ReflectionRoutineTest {
 
     public void wrn(@NotNull final List<Object> contexts, @Nullable final String message,
         @Nullable final Throwable throwable) {
-    }
-  }
-
-  public static class MyRunner extends RunnerDecorator {
-
-    public MyRunner() {
-      super(Runners.syncRunner());
-    }
-
-    @Override
-    public int hashCode() {
-      return MyRunner.class.hashCode();
-    }
-
-    @Override
-    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
-    public boolean equals(final Object obj) {
-      return (obj instanceof MyRunner);
     }
   }
 
@@ -2319,25 +2349,25 @@ public class ReflectionRoutineTest {
     }
   }
 
-  private static class TestRunner extends SyncRunner {
+  private static class TestExecutor extends SyncExecutor {
 
-    private final ArrayList<Execution> mExecutions = new ArrayList<Execution>();
+    private final ArrayList<Runnable> mExecutions = new ArrayList<Runnable>();
+
+    @Override
+    public void execute(@NotNull final Runnable command, final long delay,
+        @NotNull final TimeUnit timeUnit) {
+      mExecutions.add(command);
+    }
 
     @Override
     public boolean isExecutionThread() {
       return false;
     }
 
-    @Override
-    public void run(@NotNull final Execution execution, final long delay,
-        @NotNull final TimeUnit timeUnit) {
-      mExecutions.add(execution);
-    }
-
     private void run(int count) {
-      final ArrayList<Execution> executions = mExecutions;
+      final ArrayList<Runnable> executions = mExecutions;
       while (!executions.isEmpty() && (count-- > 0)) {
-        final Execution execution = executions.remove(0);
+        final Runnable execution = executions.remove(0);
         execution.run();
       }
     }

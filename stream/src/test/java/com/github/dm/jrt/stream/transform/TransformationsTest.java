@@ -22,14 +22,14 @@ import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.BackoffBuilder;
 import com.github.dm.jrt.core.common.RoutineException;
+import com.github.dm.jrt.core.executor.ScheduledExecutor;
+import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.routine.Routine;
-import com.github.dm.jrt.core.runner.Runner;
-import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.function.util.Action;
 import com.github.dm.jrt.function.util.BiConsumer;
@@ -66,15 +66,15 @@ import static org.junit.Assert.fail;
  */
 public class TransformationsTest {
 
-  private static Runner sSingleThreadRunner;
+  private static ScheduledExecutor sSingleThreadExecutor;
 
   @NotNull
-  private static Runner getSingleThreadRunner() {
-    if (sSingleThreadRunner == null) {
-      sSingleThreadRunner = Runners.poolRunner(1);
+  private static ScheduledExecutor getSingleThreadExecutor() {
+    if (sSingleThreadExecutor == null) {
+      sSingleThreadExecutor = ScheduledExecutors.poolExecutor(1);
     }
 
-    return sSingleThreadRunner;
+    return sSingleThreadExecutor;
   }
 
   @Test
@@ -82,7 +82,7 @@ public class TransformationsTest {
     Assertions.assertThat(JRoutineStream //
         .<Integer>withStream().map(appendAccept(range(1, 1000)))
                               .invocationConfiguration()
-                              .withRunner(getSingleThreadRunner())
+                              .withExecutor(getSingleThreadExecutor())
                               .withInputBackoff(
                                   BackoffBuilder.afterCount(2).linearDelay(seconds(10)))
                               .apply()
@@ -121,7 +121,7 @@ public class TransformationsTest {
     Assertions.assertThat(JRoutineStream //
         .<Integer>withStream().map(appendAccept(range(1, 1000)))
                               .invocationConfiguration()
-                              .withRunner(getSingleThreadRunner())
+                              .withExecutor(getSingleThreadExecutor())
                               .withInputBackoff(
                                   BackoffBuilder.afterCount(2).constantDelay(seconds(10)))
                               .apply()
@@ -439,7 +439,7 @@ public class TransformationsTest {
   public void testRetryConsumerError() {
     final Channel<Object, Object> inputChannel = JRoutineCore.ofData().buildChannel();
     final Channel<Object, Object> outputChannel = JRoutineCore.ofData().buildChannel();
-    new RetryChannelConsumer<Object, Object>(inputChannel, outputChannel, Runners.syncRunner(),
+    new RetryChannelConsumer<Object, Object>(inputChannel, outputChannel, ScheduledExecutors.syncExecutor(),
         new Function<Channel<?, Object>, Channel<?, Object>>() {
 
           public Channel<?, Object> apply(final Channel<?, Object> channel) throws Exception {
@@ -459,7 +459,7 @@ public class TransformationsTest {
   public void testRetryConsumerError2() {
     final Channel<Object, Object> inputChannel = JRoutineCore.ofData().buildChannel();
     final Channel<Object, Object> outputChannel = JRoutineCore.ofData().buildChannel();
-    new RetryChannelConsumer<Object, Object>(inputChannel, outputChannel, Runners.syncRunner(),
+    new RetryChannelConsumer<Object, Object>(inputChannel, outputChannel, ScheduledExecutors.syncExecutor(),
         new Function<Channel<?, Object>, Channel<?, Object>>() {
 
           public Channel<?, Object> apply(final Channel<?, Object> channel) {
@@ -499,7 +499,7 @@ public class TransformationsTest {
     final Routine<Object, Object> routine = JRoutineStream.withStream()
                                                           .lift(throttle(1))
                                                           .invocationConfiguration()
-                                                          .withRunner(Runners.poolRunner(1))
+                                                          .withExecutor(ScheduledExecutors.poolExecutor(1))
                                                           .apply()
                                                           .buildRoutine();
     final Channel<Object, Object> channel1 = routine.invoke().pass("test1");
@@ -514,7 +514,7 @@ public class TransformationsTest {
     final Routine<Object, Object> routine = JRoutineStream.withStream()
                                                           .lift(throttle(1))
                                                           .invocationConfiguration()
-                                                          .withRunner(Runners.poolRunner(1))
+                                                          .withExecutor(ScheduledExecutors.poolExecutor(1))
                                                           .apply()
                                                           .buildRoutine();
     final Channel<Object, Object> channel1 = routine.invoke().pass("test1");

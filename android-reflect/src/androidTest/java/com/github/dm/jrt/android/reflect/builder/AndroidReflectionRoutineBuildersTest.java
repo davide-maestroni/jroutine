@@ -28,11 +28,11 @@ import com.github.dm.jrt.android.reflect.annotation.InvocationId;
 import com.github.dm.jrt.android.reflect.annotation.LoaderId;
 import com.github.dm.jrt.android.reflect.annotation.MatchResolution;
 import com.github.dm.jrt.android.reflect.annotation.ResultStaleTime;
+import com.github.dm.jrt.android.reflect.annotation.ServiceExecutor;
 import com.github.dm.jrt.android.reflect.annotation.ServiceLog;
-import com.github.dm.jrt.android.reflect.annotation.ServiceRunner;
+import com.github.dm.jrt.core.executor.ScheduledExecutorDecorator;
+import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.core.log.NullLog;
-import com.github.dm.jrt.core.runner.RunnerDecorator;
-import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.DurationMeasure;
 
 import static com.github.dm.jrt.android.reflect.builder.AndroidReflectionRoutineBuilders
@@ -59,11 +59,11 @@ public class AndroidReflectionRoutineBuildersTest extends AndroidTestCase {
                            .withResultStaleTime(DurationMeasure.millis(333))
                            .apply());
     assertThat(
-        withAnnotations(ServiceConfiguration.builder().withRunnerArgs(1).withLogArgs(1).apply(),
+        withAnnotations(ServiceConfiguration.builder().withExecutorArgs(1).withLogArgs(1).apply(),
             AnnotationItf.class.getMethod("toString"))).isEqualTo( //
         ServiceConfiguration.builder()
                             .withLogClass(NullLog.class)
-                            .withRunnerClass(MyRunner.class)
+                            .withExecutorClass(MyExecutor.class)
                             .apply());
   }
 
@@ -89,15 +89,15 @@ public class AndroidReflectionRoutineBuildersTest extends AndroidTestCase {
     @LoaderId(-77)
     @MatchResolution(ClashResolutionType.ABORT_THIS)
     @ResultStaleTime(333)
+    @ServiceExecutor(MyExecutor.class)
     @ServiceLog(NullLog.class)
-    @ServiceRunner(MyRunner.class)
     String toString();
   }
 
-  public static class MyRunner extends RunnerDecorator {
+  public static class MyExecutor extends ScheduledExecutorDecorator {
 
-    public MyRunner() {
-      super(Runners.sharedRunner());
+    public MyExecutor() {
+      super(ScheduledExecutors.defaultExecutor());
     }
   }
 }

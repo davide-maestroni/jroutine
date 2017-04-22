@@ -19,10 +19,9 @@ package com.github.dm.jrt.stream.transform;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
+import com.github.dm.jrt.core.executor.ScheduledExecutor;
+import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
-import com.github.dm.jrt.core.runner.Execution;
-import com.github.dm.jrt.core.runner.Runner;
-import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.SimpleQueue;
 import com.github.dm.jrt.function.util.Function;
@@ -75,13 +74,13 @@ class TimeThrottle<IN, OUT> implements LiftFunction<IN, OUT, IN, OUT> {
   /**
    * Binding function implementation.
    */
-  private class BindingFunction implements Function<Channel<?, IN>, Channel<?, OUT>>, Execution {
+  private class BindingFunction implements Function<Channel<?, IN>, Channel<?, OUT>>, Runnable {
 
     private final Function<? super Channel<?, IN>, ? extends Channel<?, OUT>> mBindingFunction;
 
     private final ChannelConfiguration mConfiguration;
 
-    private final Runner mRunner;
+    private final ScheduledExecutor mExecutor;
 
     /**
      * Constructor.
@@ -94,7 +93,7 @@ class TimeThrottle<IN, OUT> implements LiftFunction<IN, OUT, IN, OUT> {
             bindingFunction) {
       mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
       mBindingFunction = ConstantConditions.notNull("binding function", bindingFunction);
-      mRunner = configuration.getRunnerOrElse(Runners.sharedRunner());
+      mExecutor = configuration.getExecutorOrElse(ScheduledExecutors.defaultExecutor());
     }
 
     public Channel<?, OUT> apply(final Channel<?, IN> channel) throws Exception {
@@ -103,7 +102,7 @@ class TimeThrottle<IN, OUT> implements LiftFunction<IN, OUT, IN, OUT> {
           JRoutineCore.<OUT>ofData().apply(configuration).buildChannel();
       final long delay;
       final boolean isBind;
-      final Runner runner = mRunner;
+      final ScheduledExecutor executor = mExecutor;
       synchronized (mMutex) {
         final long rangeMillis = mRangeMillis;
         final long nextTimeSlot = mNextTimeSlot;
@@ -141,7 +140,7 @@ class TimeThrottle<IN, OUT> implements LiftFunction<IN, OUT, IN, OUT> {
         outputChannel.pass(mBindingFunction.apply(channel));
 
       } else {
-        runner.run(this, delay, TimeUnit.MILLISECONDS);
+        executor.execute(this, delay, TimeUnit.MILLISECONDS);
       }
 
       return outputChannel;

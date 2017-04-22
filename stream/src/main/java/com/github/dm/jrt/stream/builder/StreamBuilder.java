@@ -20,9 +20,10 @@ import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
+import com.github.dm.jrt.core.executor.ScheduledExecutor;
+import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.routine.Routine;
-import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.function.util.BiConsumer;
 import com.github.dm.jrt.function.util.BiFunction;
 import com.github.dm.jrt.function.util.Function;
@@ -61,9 +62,9 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
 
   /**
    * Returns a stream builder where the concatenated routines will be invoked in asynchronous mode
-   * employing the shared asynchronous runner.
+   * employing the shared asynchronous executor.
    * <br>
-   * Note, however, that the current configuration runner will still override the stream one.
+   * Note, however, that the current configuration executor will still override the stream one.
    *
    * @return the new builder.
    * @see com.github.dm.jrt.core.routine.Routine Routine
@@ -73,22 +74,22 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
 
   /**
    * Returns a stream builder where the concatenated routines will be invoked in asynchronous mode
-   * employing the specified runner.
+   * employing the specified executor.
    * <br>
-   * Note, however, that the current configuration runner will still override the stream one.
+   * Note, however, that the current configuration executor will still override the stream one.
    *
-   * @param runner the runner instance.
+   * @param executor the executor instance.
    * @return the new builder.
    * @see com.github.dm.jrt.core.routine.Routine Routine
    */
   @NotNull
-  StreamBuilder<IN, OUT> async(@Nullable Runner runner);
+  StreamBuilder<IN, OUT> async(@Nullable ScheduledExecutor executor);
 
   /**
    * Returns a stream builder where the concatenated routines will be invoked in parallel mode
-   * employing the shared asynchronous runner.
+   * employing the shared asynchronous executor.
    * <br>
-   * Note, however, that the current configuration runner will still override the stream one.
+   * Note, however, that the current configuration executor will still override the stream one.
    *
    * @return the new builder.
    * @see com.github.dm.jrt.core.routine.Routine Routine
@@ -98,10 +99,10 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
 
   /**
    * Returns a stream builder where the concatenated routines will be invoked in parallel mode
-   * employing the shared asynchronous runner, and the maximum allowed number of concurrent
+   * employing the shared asynchronous executor, and the maximum allowed number of concurrent
    * invocations is the specified one.
    * <br>
-   * Note, however, that the current configuration runner will still override the stream one.
+   * Note, however, that the current configuration executor will still override the stream one.
    *
    * @param maxInvocations the maximum number of invocations.
    * @return the new builder.
@@ -112,31 +113,32 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
 
   /**
    * Returns a stream builder where the concatenated routines will be invoked in parallel mode
-   * employing the specified runner.
+   * employing the specified executor.
    * <br>
-   * Note, however, that the current configuration runner will still override the stream one.
+   * Note, however, that the current configuration executor will still override the stream one.
    *
-   * @param runner the runner instance.
+   * @param executor the executor instance.
    * @return the new builder.
    * @see com.github.dm.jrt.core.routine.Routine Routine
    */
   @NotNull
-  StreamBuilder<IN, OUT> asyncParallel(@Nullable Runner runner);
+  StreamBuilder<IN, OUT> asyncParallel(@Nullable ScheduledExecutor executor);
 
   /**
    * Returns a stream builder where the concatenated routines will be invoked in parallel mode
-   * employing the specified runner, and the maximum allowed number of concurrent invocations is the
+   * employing the specified executor, and the maximum allowed number of concurrent invocations
+   * is the
    * specified one.
    * <br>
-   * Note, however, that the current configuration runner will still override the stream one.
+   * Note, however, that the current configuration executor will still override the stream one.
    *
    * @param maxInvocations the maximum number of invocations.
-   * @param runner         the runner instance.
+   * @param executor       the executor instance.
    * @return the new builder.
    * @see com.github.dm.jrt.core.routine.Routine Routine
    */
   @NotNull
-  StreamBuilder<IN, OUT> asyncParallel(@Nullable Runner runner, int maxInvocations);
+  StreamBuilder<IN, OUT> asyncParallel(@Nullable ScheduledExecutor executor, int maxInvocations);
 
   /**
    * Builds a new invocation factory instance.
@@ -155,13 +157,13 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
   Routine<IN, OUT> buildRoutine();
 
   /**
-   * Concatenates a routine dispatching this stream outputs through the specified runner.
+   * Concatenates a routine dispatching this stream outputs through the specified executor.
    *
-   * @param runner the runner instance.
+   * @param executor the executor instance.
    * @return the new builder.
    */
   @NotNull
-  StreamBuilder<IN, OUT> consumeOn(@Nullable Runner runner);
+  StreamBuilder<IN, OUT> consumeOn(@Nullable ScheduledExecutor executor);
 
   /**
    * Transforms this stream by applying the specified function.
@@ -199,59 +201,59 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
 
   /**
    * Returns a stream builder where the concatenated routines will be invoked in asynchronous mode
-   * employing the shared immediate runner.
+   * employing the shared immediate executor.
    * <br>
-   * Note, however, that the current configuration runner will still override the stream one.
+   * Note, however, that the current configuration executor will still override the stream one.
    * <p>
-   * Unlike the default synchronous runner, the employed one makes so that each routine in the
+   * Unlike the default synchronous executor, the employed one makes so that each routine in the
    * chain is passed any input as soon as it is produced by the previous one. Such behavior
    * decreases memory demands at the expense of a deeper stack of calls. In fact, the default
-   * synchronous runner breaks up routine calls so to perform them in a loop. The main drawback of
+   * synchronous executor breaks up routine calls so to perform them in a loop. The main drawback of
    * the latter approach is that all input data might be accumulated before actually being
    * processed by the next routine invocation.
    *
    * @return the new builder.
-   * @see com.github.dm.jrt.core.runner.Runners#immediateRunner() Runners.immediateRunner()
+   * @see ScheduledExecutors#immediateExecutor() ScheduledExecutors.immediateExecutor()
    */
   @NotNull
   StreamBuilder<IN, OUT> immediate();
 
   /**
    * Returns a stream builder where the concatenated routines will be invoked in parallel mode
-   * employing the shared immediate runner.
+   * employing the shared immediate executor.
    * <br>
-   * Note, however, that the current configuration runner will still override the stream one.
+   * Note, however, that the current configuration executor will still override the stream one.
    * <p>
-   * Unlike the default synchronous runner, the employed one makes so that each routine in the
+   * Unlike the default synchronous executor, the employed one makes so that each routine in the
    * chain is passed any input as soon as it is produced by the previous one. Such behavior
    * decreases memory demands at the expense of a deeper stack of calls. In fact, the default
-   * synchronous runner breaks up routine calls so to perform them in a loop. The main drawback of
+   * synchronous executor breaks up routine calls so to perform them in a loop. The main drawback of
    * the latter approach is that all input data might be accumulated before actually being
    * processed by the next routine invocation.
    *
    * @return the new builder.
-   * @see com.github.dm.jrt.core.runner.Runners#immediateRunner() Runners.immediateRunner()
+   * @see ScheduledExecutors#immediateExecutor() ScheduledExecutors#immediateExecutor()
    */
   @NotNull
   StreamBuilder<IN, OUT> immediateParallel();
 
   /**
    * Returns a stream builder where the concatenated routines will be invoked in parallel mode
-   * employing the shared immediate runner, and the maximum allowed number of concurrent
+   * employing the shared immediate executor, and the maximum allowed number of concurrent
    * invocations is the specified one.
    * <br>
-   * Note, however, that the current configuration runner will still override the stream one.
+   * Note, however, that the current configuration executor will still override the stream one.
    * <p>
-   * Unlike the default synchronous runner, the employed one makes so that each routine in the
+   * Unlike the default synchronous executor, the employed one makes so that each routine in the
    * chain is passed any input as soon as it is produced by the previous one. Such behavior
    * decreases memory demands at the expense of a deeper stack of calls. In fact, the default
-   * synchronous runner breaks up routine calls so to perform them in a loop. The main drawback of
+   * synchronous executor breaks up routine calls so to perform them in a loop. The main drawback of
    * the latter approach is that all input data might be accumulated before actually being
    * processed by the next routine invocation.
    *
    * @param maxInvocations the maximum number of invocations.
    * @return the new builder.
-   * @see com.github.dm.jrt.core.runner.Runners#immediateRunner() Runners.immediateRunner()
+   * @see ScheduledExecutors#immediateExecutor() ScheduledExecutors#immediateExecutor()
    */
   @NotNull
   StreamBuilder<IN, OUT> immediateParallel(int maxInvocations);
@@ -442,38 +444,38 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
 
   /**
    * Returns a stream builder where the concatenated routines will be invoked in asynchronous mode
-   * employing the shared synchronous runner.
+   * employing the shared synchronous executor.
    * <br>
-   * Note, however, that the current configuration runner will still override the stream one.
+   * Note, however, that the current configuration executor will still override the stream one.
    *
    * @return the new builder.
-   * @see com.github.dm.jrt.core.runner.Runners#syncRunner() Runners.syncRunner()
+   * @see ScheduledExecutors#syncExecutor() ScheduledExecutors#syncExecutor()
    */
   @NotNull
   StreamBuilder<IN, OUT> sync();
 
   /**
    * Returns a stream builder where the concatenated routines will be invoked in parallel mode
-   * employing the shared asynchronous runner.
+   * employing the shared asynchronous executor.
    * <br>
-   * Note, however, that the current configuration runner will still override the stream one.
+   * Note, however, that the current configuration executor will still override the stream one.
    *
    * @return the new builder.
-   * @see com.github.dm.jrt.core.runner.Runners#syncRunner() Runners.syncRunner()
+   * @see ScheduledExecutors#syncExecutor() ScheduledExecutors#syncExecutor()
    */
   @NotNull
   StreamBuilder<IN, OUT> syncParallel();
 
   /**
    * Returns a stream builder where the concatenated routines will be invoked in parallel mode
-   * employing the shared asynchronous runner, and the maximum allowed number of concurrent
+   * employing the shared asynchronous executor, and the maximum allowed number of concurrent
    * invocations is the specified one.
    * <br>
-   * Note, however, that the current configuration runner will still override the stream one.
+   * Note, however, that the current configuration executor will still override the stream one.
    *
    * @param maxInvocations the maximum number of invocations.
    * @return the new builder.
-   * @see com.github.dm.jrt.core.runner.Runners#syncRunner() Runners.syncRunner()
+   * @see ScheduledExecutors#syncExecutor() ScheduledExecutors#syncExecutor()
    */
   @NotNull
   StreamBuilder<IN, OUT> syncParallel(int maxInvocations);

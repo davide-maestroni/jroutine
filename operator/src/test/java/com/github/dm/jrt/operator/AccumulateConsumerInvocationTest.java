@@ -17,8 +17,8 @@
 package com.github.dm.jrt.operator;
 
 import com.github.dm.jrt.core.JRoutineCore;
+import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
-import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.function.util.BiConsumer;
 import com.github.dm.jrt.function.util.Supplier;
 
@@ -57,7 +57,7 @@ public class AccumulateConsumerInvocationTest {
     final BiConsumer<List<String>, List<String>> consumer = createConsumer();
     assertThat(JRoutineCore.with(consumerFactory(consumer))
                            .invocationConfiguration()
-                           .withRunner(Runners.syncRunner())
+                           .withExecutor(ScheduledExecutors.syncExecutor())
                            .apply()
                            .invoke()
                            .pass(new ArrayList<String>() {{
@@ -79,7 +79,7 @@ public class AccumulateConsumerInvocationTest {
       }
     }, consumer))
                            .invocationConfiguration()
-                           .withRunner(Runners.syncRunner())
+                           .withExecutor(ScheduledExecutors.syncExecutor())
                            .apply()
                            .invoke()
                            .pass(new ArrayList<String>() {{

@@ -33,12 +33,12 @@ import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.log.Log;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.NullLog;
 import com.github.dm.jrt.core.routine.Routine;
-import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.DurationMeasure;
 import com.github.dm.jrt.core.util.Reflection;
@@ -176,8 +176,8 @@ public class LoaderReflectionRoutineActivityTest
                                                                     .with(
                                                                         instanceOf(TestClass.class))
                                                                     .invocationConfiguration()
-                                                                    .withRunner(
-                                                                        Runners.poolRunner())
+                                                                    .withExecutor(
+                                                                        ScheduledExecutors.poolExecutor())
                                                                     .withMaxInvocations(1)
                                                                     .withCoreInvocations(1)
                                                                     .withOutputTimeoutAction(
@@ -630,8 +630,8 @@ public class LoaderReflectionRoutineActivityTest
                                                                      .with(instanceOf(
                                                                          TestClass.class))
                                                                      .invocationConfiguration()
-                                                                     .withRunner(
-                                                                         Runners.poolRunner())
+                                                                     .withExecutor(
+                                                                         ScheduledExecutors.poolExecutor())
                                                                      .withMaxInvocations(1)
                                                                      .apply()
                                                                      .wrapperConfiguration()
@@ -657,8 +657,8 @@ public class LoaderReflectionRoutineActivityTest
                                                                      .with(instanceOf(
                                                                          TestClass.class))
                                                                      .invocationConfiguration()
-                                                                     .withRunner(
-                                                                         Runners.poolRunner())
+                                                                     .withExecutor(
+                                                                         ScheduledExecutors.poolExecutor())
                                                                      .apply()
                                                                      .method("getLong");
 

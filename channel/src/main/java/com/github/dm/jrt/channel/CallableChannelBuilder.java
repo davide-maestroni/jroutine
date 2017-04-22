@@ -20,8 +20,8 @@ import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.AbstractChannelBuilder;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.core.invocation.CommandInvocation;
-import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
@@ -56,7 +56,7 @@ class CallableChannelBuilder<OUT> extends AbstractChannelBuilder<Void, OUT> {
         InvocationConfiguration.builderFromOutput(getConfiguration()).apply();
     return JRoutineCore.with(new CallableInvocation<OUT>(mCallable))
                        .invocationConfiguration()
-                       .withRunner(Runners.immediateRunner())
+                       .withExecutor(ScheduledExecutors.immediateExecutor())
                        .withPatch(configuration)
                        .apply()
                        .invoke()

@@ -24,7 +24,7 @@ import android.test.ActivityInstrumentationTestCase2;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.RoutineException;
-import com.github.dm.jrt.core.runner.Runners;
+import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.function.builder.StatelessRoutineBuilder;
 import com.github.dm.jrt.function.util.BiConsumer;
 import com.github.dm.jrt.function.util.Consumer;
@@ -65,7 +65,7 @@ public class StatelessLoaderRoutineBuilderCompatTest
               public void accept(final RoutineException e) throws Exception {
                 reference.set(e);
               }
-            }).invocationConfiguration().withRunner(Runners.immediateRunner()).apply().invoke();
+            }).invocationConfiguration().withExecutor(ScheduledExecutors.immediateExecutor()).apply().invoke();
     assertThat(reference.get()).isNull();
     channel.abort(new IOException());
     assertThat(channel.in(seconds(10)).getComplete()).isTrue();
@@ -129,7 +129,7 @@ public class StatelessLoaderRoutineBuilderCompatTest
           public List<Integer> get() {
             return list;
           }
-        }).invocationConfiguration().withRunner(Runners.immediateRunner()).apply();
+        }).invocationConfiguration().withExecutor(ScheduledExecutors.immediateExecutor()).apply();
     assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(10)).all()).containsOnly(
         Arrays.asList(2, 3, 4, 5));
   }

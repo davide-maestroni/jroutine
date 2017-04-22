@@ -24,12 +24,12 @@ import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Configurable;
+import com.github.dm.jrt.core.executor.ScheduledExecutor;
+import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.routine.Routine;
-import com.github.dm.jrt.core.runner.Runner;
-import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.util.BiConsumer;
 import com.github.dm.jrt.function.util.BiFunction;
@@ -73,9 +73,9 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends AbstractRoutineBuil
 
   private InvocationConfiguration mConfiguration = InvocationConfiguration.defaultConfiguration()
                                                                           .builderFrom()
-                                                                          .withRunner(
-                                                                              Runners
-                                                                                  .immediateRunner())
+                                                                          .withExecutor(
+                                                                              ScheduledExecutors
+                                                                                  .immediateExecutor())
                                                                           .apply();
 
   private final Configurable<StreamBuilder<IN, OUT>> mNextConfigurable =
@@ -145,33 +145,33 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends AbstractRoutineBuil
 
   @NotNull
   public StreamBuilder<IN, OUT> async() {
-    return async(Runners.sharedRunner());
+    return async(ScheduledExecutors.defaultExecutor());
   }
 
   @NotNull
-  public StreamBuilder<IN, OUT> async(@Nullable final Runner runner) {
-    return applyRunner(runner);
+  public StreamBuilder<IN, OUT> async(@Nullable final ScheduledExecutor executor) {
+    return applyExecutor(executor);
   }
 
   @NotNull
   public StreamBuilder<IN, OUT> asyncParallel() {
-    return asyncParallel(Runners.sharedRunner());
+    return asyncParallel(ScheduledExecutors.defaultExecutor());
   }
 
   @NotNull
   public StreamBuilder<IN, OUT> asyncParallel(final int maxInvocations) {
-    return asyncParallel(Runners.sharedRunner(), maxInvocations);
+    return asyncParallel(ScheduledExecutors.defaultExecutor(), maxInvocations);
   }
 
   @NotNull
-  public StreamBuilder<IN, OUT> asyncParallel(@Nullable final Runner runner) {
-    return applyRunner(runner);
+  public StreamBuilder<IN, OUT> asyncParallel(@Nullable final ScheduledExecutor executor) {
+    return applyExecutor(executor);
   }
 
   @NotNull
-  public StreamBuilder<IN, OUT> asyncParallel(@Nullable final Runner runner,
+  public StreamBuilder<IN, OUT> asyncParallel(@Nullable final ScheduledExecutor executor,
       final int maxInvocations) {
-    return applyParallelRunner(runner, maxInvocations);
+    return applyParallelExecutor(executor, maxInvocations);
   }
 
   @NotNull
@@ -180,9 +180,9 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends AbstractRoutineBuil
   }
 
   @NotNull
-  public StreamBuilder<IN, OUT> consumeOn(@Nullable final Runner runner) {
+  public StreamBuilder<IN, OUT> consumeOn(@Nullable final ScheduledExecutor executor) {
     return map(newRoutine(
-        mStreamConfiguration.toInvocationConfiguration().builderFrom().withRunner(runner).apply(),
+        mStreamConfiguration.toInvocationConfiguration().builderFrom().withExecutor(executor).apply(),
         IdentityInvocation.<OUT>factoryOf()));
   }
 
@@ -207,17 +207,17 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends AbstractRoutineBuil
 
   @NotNull
   public StreamBuilder<IN, OUT> immediate() {
-    return applyRunner(Runners.immediateRunner());
+    return applyExecutor(ScheduledExecutors.immediateExecutor());
   }
 
   @NotNull
   public StreamBuilder<IN, OUT> immediateParallel() {
-    return applyRunner(Runners.immediateRunner());
+    return applyExecutor(ScheduledExecutors.immediateExecutor());
   }
 
   @NotNull
   public StreamBuilder<IN, OUT> immediateParallel(final int maxInvocations) {
-    return applyParallelRunner(Runners.immediateRunner(), maxInvocations);
+    return applyParallelExecutor(ScheduledExecutors.immediateExecutor(), maxInvocations);
   }
 
   @NotNull
@@ -332,17 +332,17 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends AbstractRoutineBuil
 
   @NotNull
   public StreamBuilder<IN, OUT> sync() {
-    return applyRunner(Runners.syncRunner());
+    return applyExecutor(ScheduledExecutors.syncExecutor());
   }
 
   @NotNull
   public StreamBuilder<IN, OUT> syncParallel() {
-    return applyRunner(Runners.syncRunner());
+    return applyExecutor(ScheduledExecutors.syncExecutor());
   }
 
   @NotNull
   public StreamBuilder<IN, OUT> syncParallel(final int maxInvocations) {
-    return applyParallelRunner(Runners.syncRunner(), maxInvocations);
+    return applyParallelExecutor(ScheduledExecutors.syncExecutor(), maxInvocations);
   }
 
   @NotNull
@@ -369,7 +369,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends AbstractRoutineBuil
    */
   protected boolean canOptimizeBinding() {
     final InvocationConfiguration configuration = mStreamConfiguration.toInvocationConfiguration();
-    return (configuration.getRunnerOrElse(null) == Runners.immediateRunner()) && (
+    return (configuration.getExecutorOrElse(null) == ScheduledExecutors.immediateExecutor()) && (
         configuration.getPriorityOrElse(InvocationConfiguration.DEFAULT)
             == InvocationConfiguration.DEFAULT) && (
         configuration.getMaxInvocationsOrElse(InvocationConfiguration.DEFAULT)
@@ -420,23 +420,23 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends AbstractRoutineBuil
   }
 
   @NotNull
-  private StreamBuilder<IN, OUT> applyParallelRunner(@Nullable final Runner runner,
+  private StreamBuilder<IN, OUT> applyParallelExecutor(@Nullable final ScheduledExecutor executor,
       final int maxInvocations) {
     final StreamConfiguration streamConfiguration = mStreamConfiguration;
     return newBuilder(new StreamConfiguration(streamConfiguration.getStreamInvocationConfiguration()
                                                                  .builderFrom()
-                                                                 .withRunner(runner)
+                                                                 .withExecutor(executor)
                                                                  .withMaxInvocations(maxInvocations)
                                                                  .apply(),
         streamConfiguration.getNextInvocationConfiguration()));
   }
 
   @NotNull
-  private StreamBuilder<IN, OUT> applyRunner(@Nullable final Runner runner) {
+  private StreamBuilder<IN, OUT> applyExecutor(@Nullable final ScheduledExecutor executor) {
     final StreamConfiguration streamConfiguration = mStreamConfiguration;
     return newBuilder(new StreamConfiguration(streamConfiguration.getStreamInvocationConfiguration()
                                                                  .builderFrom()
-                                                                 .withRunner(runner)
+                                                                 .withExecutor(executor)
                                                                  .apply(),
         streamConfiguration.getNextInvocationConfiguration()));
   }

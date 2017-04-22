@@ -29,14 +29,14 @@ import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.executor.ScheduledExecutor;
+import com.github.dm.jrt.core.executor.ScheduledExecutorDecorator;
+import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.log.Log;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.NullLog;
 import com.github.dm.jrt.core.routine.Routine;
-import com.github.dm.jrt.core.runner.Runner;
-import com.github.dm.jrt.core.runner.RunnerDecorator;
-import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.DurationMeasure;
 import com.github.dm.jrt.reflect.annotation.Alias;
@@ -82,7 +82,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
         JRoutineServiceProxy.on(serviceFrom(getActivity(), TestService.class))
                             .with(classOfType(TestClass.class))
                             .invocationConfiguration()
-                            .withRunner(Runners.poolRunner())
+                            .withExecutor(ScheduledExecutors.poolExecutor())
                             .withLogLevel(Level.DEBUG)
                             .withLog(new NullLog())
                             .apply()
@@ -192,7 +192,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
         JRoutineServiceProxy.on(serviceFrom(getActivity(), TestService.class))
                             .with(instanceOf(TestClass.class))
                             .invocationConfiguration()
-                            .withRunner(Runners.poolRunner())
+                            .withExecutor(ScheduledExecutors.poolExecutor())
                             .withLogLevel(Level.DEBUG)
                             .withLog(new NullLog())
                             .apply()
@@ -209,7 +209,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
         JRoutineServiceProxy.on(serviceFrom(getActivity(), TestService.class))
                             .with(instanceOf(TestClass.class))
                             .invocationConfiguration()
-                            .withRunner(Runners.poolRunner())
+                            .withExecutor(ScheduledExecutors.poolExecutor())
                             .withLogLevel(Level.DEBUG)
                             .withLog(log)
                             .apply()
@@ -238,7 +238,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
                                        .withPatch(configuration)
                                        .apply()
                                        .serviceConfiguration()
-                                       .withRunnerClass(MyRunner.class)
+                                       .withExecutorClass(MyExecutor.class)
                                        .apply()
                                        .wrapperConfiguration()
                                        .withSharedFields()
@@ -260,7 +260,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
                                    .withPatch(configuration)
                                    .apply()
                                    .serviceConfiguration()
-                                   .withRunnerClass(MyRunner.class)
+                                   .withExecutorClass(MyExecutor.class)
                                    .apply()
                                    .wrapperConfiguration()
                                    .withSharedFields()
@@ -272,9 +272,9 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
   public void testProxyCache() {
 
     final NullLog log = new NullLog();
-    final Runner runner = Runners.poolRunner();
+    final ScheduledExecutor executor = ScheduledExecutors.poolExecutor();
     final InvocationConfiguration configuration =
-        builder().withRunner(runner).withLogLevel(Level.DEBUG).withLog(log).apply();
+        builder().withExecutor(executor).withLogLevel(Level.DEBUG).withLog(log).apply();
     final TestProxy testProxy =
         JRoutineServiceProxy.on(serviceFrom(getActivity(), TestService.class))
                             .with(instanceOf(TestClass.class))
@@ -325,7 +325,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
         JRoutineServiceProxy.on(serviceFrom(getActivity(), TestService.class))
                             .with(instanceOf(TestClass2.class))
                             .serviceConfiguration()
-                            .withRunnerClass(SharedFieldRunner.class)
+                            .withExecutorClass(SharedFieldExecutor.class)
                             .apply()
                             .invocationConfiguration()
                             .withOutputTimeout(seconds(10))
@@ -901,11 +901,11 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
     }
   }
 
-  public static class SharedFieldRunner extends RunnerDecorator {
+  public static class SharedFieldExecutor extends ScheduledExecutorDecorator {
 
-    public SharedFieldRunner() {
+    public SharedFieldExecutor() {
 
-      super(Runners.poolRunner(2));
+      super(ScheduledExecutors.poolExecutor(2));
     }
   }
 
@@ -1020,11 +1020,11 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
     }
   }
 
-  private static class MyRunner extends RunnerDecorator {
+  private static class MyExecutor extends ScheduledExecutorDecorator {
 
-    public MyRunner() {
+    public MyExecutor() {
 
-      super(Runners.poolRunner());
+      super(ScheduledExecutors.poolExecutor());
     }
   }
 }

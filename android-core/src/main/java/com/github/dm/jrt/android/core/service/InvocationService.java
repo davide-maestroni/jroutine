@@ -34,12 +34,12 @@ import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.executor.ScheduledExecutor;
 import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.log.Log;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.Logger;
-import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.core.util.Reflection;
@@ -86,6 +86,10 @@ public class InvocationService extends Service {
 
   private static final String KEY_DATA_VALUE = "data_value";
 
+  private static final String KEY_EXECUTOR_ARGS = "executor_args";
+
+  private static final String KEY_EXECUTOR_CLASS = "executor_class";
+
   private static final String KEY_FACTORY_ARGS = "factory_args";
 
   private static final String KEY_INVOCATION_ID = "invocation_id";
@@ -97,10 +101,6 @@ public class InvocationService extends Service {
   private static final String KEY_LOG_LEVEL = "log_level";
 
   private static final String KEY_OUTPUT_ORDER = "output_order";
-
-  private static final String KEY_RUNNER_ARGS = "runner_args";
-
-  private static final String KEY_RUNNER_CLASS = "runner_class";
 
   private static final String KEY_TARGET_INVOCATION = "target_invocation";
 
@@ -190,8 +190,8 @@ public class InvocationService extends Service {
    * @param targetClass             the target invocation class.
    * @param factoryArgs             the invocation factory arguments.
    * @param invocationConfiguration the invocation configuration.
-   * @param runnerClass             the invocation runner class.
-   * @param runnerArgs              the runner constructor args.
+   * @param executorClass           the invocation executor class.
+   * @param executorArgs            the executor constructor args.
    * @param logClass                the invocation log class.
    * @param logArgs                 the log constructor args.
    */
@@ -199,8 +199,9 @@ public class InvocationService extends Service {
       @NotNull final Class<? extends ContextInvocation<?, ?>> targetClass,
       @Nullable final Object[] factoryArgs,
       @NotNull final InvocationConfiguration invocationConfiguration,
-      @Nullable final Class<? extends Runner> runnerClass, @Nullable final Object[] runnerArgs,
-      @Nullable final Class<? extends Log> logClass, @Nullable final Object[] logArgs) {
+      @Nullable final Class<? extends ScheduledExecutor> executorClass,
+      @Nullable final Object[] executorArgs, @Nullable final Class<? extends Log> logClass,
+      @Nullable final Object[] logArgs) {
     bundle.putString(KEY_INVOCATION_ID, ConstantConditions.notNull("invocation ID", invocationId));
     bundle.putSerializable(KEY_TARGET_INVOCATION,
         ConstantConditions.notNull("target invocation class", targetClass));
@@ -209,9 +210,9 @@ public class InvocationService extends Service {
     bundle.putSerializable(KEY_OUTPUT_ORDER,
         invocationConfiguration.getOutputOrderTypeOrElse(null));
     bundle.putSerializable(KEY_LOG_LEVEL, invocationConfiguration.getLogLevelOrElse(null));
-    bundle.putSerializable(KEY_RUNNER_CLASS, runnerClass);
-    bundle.putParcelable(KEY_RUNNER_ARGS,
-        (runnerArgs != null) ? new ParcelableValue(runnerArgs) : null);
+    bundle.putSerializable(KEY_EXECUTOR_CLASS, executorClass);
+    bundle.putParcelable(KEY_EXECUTOR_ARGS,
+        (executorArgs != null) ? new ParcelableValue(executorArgs) : null);
     bundle.putSerializable(KEY_LOG_CLASS, logClass);
     bundle.putParcelable(KEY_LOG_ARGS, (logArgs != null) ? new ParcelableValue(logArgs) : null);
   }
@@ -352,26 +353,27 @@ public class InvocationService extends Service {
 
       final OrderType outputOrderType = (OrderType) data.getSerializable(KEY_OUTPUT_ORDER);
       final Level logLevel = (Level) data.getSerializable(KEY_LOG_LEVEL);
-      @SuppressWarnings("unchecked") final Class<? extends Runner> runnerClass =
-          (Class<? extends Runner>) data.getSerializable(KEY_RUNNER_CLASS);
+      @SuppressWarnings("unchecked") final Class<? extends ScheduledExecutor> executorClass =
+          (Class<? extends ScheduledExecutor>) data.getSerializable(KEY_EXECUTOR_CLASS);
       @SuppressWarnings("unchecked") final Class<? extends Log> logClass =
           (Class<? extends Log>) data.getSerializable(KEY_LOG_CLASS);
       final RoutineInfo routineInfo =
-          new RoutineInfo(targetClass, args, outputOrderType, runnerClass, logClass, logLevel);
+          new RoutineInfo(targetClass, args, outputOrderType, executorClass, logClass, logLevel);
       final HashMap<RoutineInfo, RoutineState> routines = mRoutines;
       RoutineState routineState = routines.get(routineInfo);
       if (routineState == null) {
         final InvocationConfiguration.Builder<InvocationConfiguration> builder =
             InvocationConfiguration.builder();
-        if (runnerClass != null) {
-          final ParcelableValue runnerValue = data.getParcelable(KEY_RUNNER_ARGS);
-          final Object[] runnerArgs = ((runnerValue != null) && (runnerValue.getValue() != null))
-              ? (Object[]) runnerValue.getValue() : Reflection.NO_ARGS;
+        if (executorClass != null) {
+          final ParcelableValue executorValue = data.getParcelable(KEY_EXECUTOR_ARGS);
+          final Object[] executorArgs =
+              ((executorValue != null) && (executorValue.getValue() != null))
+                  ? (Object[]) executorValue.getValue() : Reflection.NO_ARGS;
           try {
-            builder.withRunner(newInstanceOf(runnerClass, runnerArgs));
+            builder.withExecutor(newInstanceOf(executorClass, executorArgs));
 
           } catch (final Exception e) {
-            mLogger.err(e, "error creating the runner instance");
+            mLogger.err(e, "error creating the executor instance");
             throw e;
           }
         }
@@ -440,10 +442,10 @@ public class InvocationService extends Service {
       return (Invocation<Object, Object>) invocation;
     }
 
-    private void stopRunner() {
-      final Runner runner = getConfiguration().getRunnerOrElse(null);
-      if (runner != null) {
-        runner.stop();
+    private void stopExecutor() {
+      final ScheduledExecutor executor = getConfiguration().getExecutorOrElse(null);
+      if (executor != null) {
+        executor.stop();
       }
     }
   }
@@ -548,15 +550,15 @@ public class InvocationService extends Service {
      * @param invocationClass the invocation class.
      * @param factoryArgs     the invocation constructor arguments.
      * @param outputOrder     the output data order.
-     * @param runnerClass     the runner class.
+     * @param executorClass   the executor class.
      * @param logClass        the log class.
      * @param logLevel        the log level.
      */
     private RoutineInfo(@NotNull final Class<? extends ContextInvocation<?, ?>> invocationClass,
         @NotNull final Object[] factoryArgs, @Nullable final OrderType outputOrder,
-        @Nullable final Class<? extends Runner> runnerClass,
+        @Nullable final Class<? extends ScheduledExecutor> executorClass,
         @Nullable final Class<? extends Log> logClass, @Nullable final Level logLevel) {
-      super(asArgs(invocationClass, factoryArgs, outputOrder, runnerClass, logClass, logLevel));
+      super(asArgs(invocationClass, factoryArgs, outputOrder, executorClass, logClass, logLevel));
     }
   }
 
@@ -583,7 +585,7 @@ public class InvocationService extends Service {
      */
     void clear() {
       mRoutine.clear();
-      mRoutine.stopRunner();
+      mRoutine.stopExecutor();
     }
 
     /**

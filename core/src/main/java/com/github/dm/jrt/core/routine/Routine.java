@@ -54,9 +54,9 @@ import org.jetbrains.annotations.NotNull;
  * <br>
  * Moreover, it must be possible to recursively call the same or another routine from inside a
  * routine invocation in a safe way. However, it is not allowed to perform blocking calls (such as
- * reading output data from a channel) in the middle of an execution when shared runner instances
- * are employed. Additionally, to prevent deadlock or starvation issues, it is encouraged the use of
- * finite timeouts when performing blocking calls.
+ * reading output data from a channel) in the middle of an execution. Additionally, to prevent
+ * deadlock or starvation issues, it is encouraged the use of finite timeouts when performing
+ * blocking calls.
  * <p>
  * It is worth noting how the library has been designed only through interfaces, so that, as far as
  * the implementation honors the specific contracts, it is possible to seamlessly combine different
@@ -78,7 +78,7 @@ public interface Routine<IN, OUT> {
   void clear();
 
   /**
-   * Invokes the execution of this routine in asynchronous mode.
+   * Invokes the execution of this routine.
    *
    * @return the invocation channel.
    */

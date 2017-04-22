@@ -21,10 +21,9 @@ import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.common.RoutineException;
+import com.github.dm.jrt.core.executor.ScheduledExecutor;
 import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
 import com.github.dm.jrt.core.invocation.InvocationException;
-import com.github.dm.jrt.core.runner.Execution;
-import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.util.BiFunction;
 import com.github.dm.jrt.function.util.Function;
@@ -42,20 +41,20 @@ import java.util.concurrent.TimeUnit;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class RetryChannelConsumer<IN, OUT> implements Execution, ChannelConsumer<OUT> {
+class RetryChannelConsumer<IN, OUT> implements Runnable, ChannelConsumer<OUT> {
 
   private final BiFunction<? super Integer, ? super RoutineException, ? extends Long>
       mBackoffFunction;
 
   private final Function<Channel<?, IN>, Channel<?, OUT>> mBindingFunction;
 
+  private final ScheduledExecutor mExecutor;
+
   private final Channel<?, IN> mInputChannel;
 
   private final Channel<OUT, ?> mOutputChannel;
 
   private final ArrayList<OUT> mOutputs = new ArrayList<OUT>();
-
-  private final Runner mRunner;
 
   private int mCount;
 
@@ -64,18 +63,18 @@ class RetryChannelConsumer<IN, OUT> implements Execution, ChannelConsumer<OUT> {
    *
    * @param inputChannel    the input channel.
    * @param outputChannel   the output channel.
-   * @param runner          the runner instance.
+   * @param executor        the executor instance.
    * @param bindingFunction the binding function.
    * @param backoffFunction the backoff function.
    */
   RetryChannelConsumer(@NotNull final Channel<?, IN> inputChannel,
-      @NotNull final Channel<OUT, ?> outputChannel, @NotNull final Runner runner,
+      @NotNull final Channel<OUT, ?> outputChannel, @NotNull final ScheduledExecutor executor,
       @NotNull final Function<Channel<?, IN>, Channel<?, OUT>> bindingFunction,
       @NotNull final BiFunction<? super Integer, ? super RoutineException, ? extends Long>
           backoffFunction) {
     mInputChannel = ConstantConditions.notNull("input channel instance", inputChannel);
     mOutputChannel = ConstantConditions.notNull("output channel instance", outputChannel);
-    mRunner = ConstantConditions.notNull("runner instance", runner);
+    mExecutor = ConstantConditions.notNull("executor instance", executor);
     mBindingFunction = ConstantConditions.notNull("binding function", bindingFunction);
     mBackoffFunction = ConstantConditions.notNull("backoff function", backoffFunction);
   }
@@ -161,7 +160,7 @@ class RetryChannelConsumer<IN, OUT> implements Execution, ChannelConsumer<OUT> {
 
     if (delay != null) {
       mOutputs.clear();
-      mRunner.run(this, delay, TimeUnit.MILLISECONDS);
+      mExecutor.execute(this, delay, TimeUnit.MILLISECONDS);
 
     } else {
       mOutputChannel.abort(error);

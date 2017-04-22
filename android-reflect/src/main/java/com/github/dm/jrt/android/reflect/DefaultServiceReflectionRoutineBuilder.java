@@ -29,8 +29,8 @@ import com.github.dm.jrt.android.reflect.builder.ServiceReflectionRoutineBuilder
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.core.routine.Routine;
-import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.Reflection;
@@ -333,7 +333,7 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
       mInstance = target.getTarget();
       mRoutine = JRoutineReflection.with(target)
                                    .invocationConfiguration()
-                                   .withRunner(Runners.syncRunner())
+                                   .withExecutor(ScheduledExecutors.syncExecutor())
                                    .apply()
                                    .wrapperConfiguration()
                                    .withSharedFields(mSharedFields)
@@ -445,7 +445,7 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
       mInstance = target.getTarget();
       mRoutine = JRoutineReflection.with(target)
                                    .invocationConfiguration()
-                                   .withRunner(Runners.syncRunner())
+                                   .withExecutor(ScheduledExecutors.syncExecutor())
                                    .apply()
                                    .wrapperConfiguration()
                                    .withSharedFields(mSharedFields)

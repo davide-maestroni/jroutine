@@ -18,8 +18,8 @@ package com.github.dm.jrt.android.core.config;
 
 import android.os.Looper;
 
+import com.github.dm.jrt.core.executor.ScheduledExecutor;
 import com.github.dm.jrt.core.log.Log;
-import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DeepEqualObject;
 
@@ -36,12 +36,12 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * <p>
  * The configuration allows to set:
  * <ul>
- * <li>The class of the runner to be employed to execute the invocation in the configured Service.
+ * <li>The class of the executor to be employed to execute the invocation in the configured Service.
  * It must declare a default constructor to be correctly instantiated.</li>
  * <li>The class of the logger to be employed by the invocations executed in the configured Service.
  * It must declare a default constructor to be correctly instantiated.</li>
  * <li>The Looper to employ to deliver the Service messages (by default the main thread one). Note
- * that, in any case, the outputs will be collected through the configured runner.</li>
+ * that, in any case, the outputs will be collected through the configured executor.</li>
  * </ul>
  * <p>
  * Created by davide-maestroni on 04/20/2015.
@@ -52,32 +52,33 @@ public final class ServiceConfiguration extends DeepEqualObject {
 
   private static final ServiceConfiguration sDefaultConfiguration = builder().buildConfiguration();
 
+  private final Object[] mExecutorArgs;
+
+  private final Class<? extends ScheduledExecutor> mExecutorClass;
+
   private final Object[] mLogArgs;
 
   private final Class<? extends Log> mLogClass;
 
   private final Looper mLooper;
 
-  private final Object[] mRunnerArgs;
-
-  private final Class<? extends Runner> mRunnerClass;
-
   /**
    * Constructor.
    *
-   * @param looper      the Looper instance.
-   * @param runnerClass the runner class.
-   * @param runnerArgs  the runner constructor args.
-   * @param logClass    the log class.
-   * @param logArgs     the log constructor args.
+   * @param looper        the Looper instance.
+   * @param executorClass the executor class.
+   * @param executorArgs  the executor constructor args.
+   * @param logClass      the log class.
+   * @param logArgs       the log constructor args.
    */
   private ServiceConfiguration(@Nullable final Looper looper,
-      @Nullable final Class<? extends Runner> runnerClass, @Nullable final Object[] runnerArgs,
-      @Nullable final Class<? extends Log> logClass, @Nullable final Object[] logArgs) {
-    super(asArgs(looper, runnerClass, runnerArgs, logClass, logArgs));
+      @Nullable final Class<? extends ScheduledExecutor> executorClass,
+      @Nullable final Object[] executorArgs, @Nullable final Class<? extends Log> logClass,
+      @Nullable final Object[] logArgs) {
+    super(asArgs(looper, executorClass, executorArgs, logClass, logArgs));
     mLooper = looper;
-    mRunnerClass = runnerClass;
-    mRunnerArgs = runnerArgs;
+    mExecutorClass = executorClass;
+    mExecutorArgs = executorArgs;
     mLogClass = logClass;
     mLogArgs = logArgs;
   }
@@ -130,6 +131,29 @@ public final class ServiceConfiguration extends DeepEqualObject {
   }
 
   /**
+   * Returns the arguments to be passed to the executor constructor.
+   *
+   * @param valueIfNotSet the default value if none was set.
+   * @return the constructor arguments.
+   */
+  public Object[] getExecutorArgsOrElse(@Nullable final Object... valueIfNotSet) {
+    final Object[] executorArgs = mExecutorArgs;
+    return (executorArgs != null) ? cloneOrNull(executorArgs) : valueIfNotSet;
+  }
+
+  /**
+   * Returns the executor class (null by default).
+   *
+   * @param valueIfNotSet the default value if none was set.
+   * @return the executor class instance.
+   */
+  public Class<? extends ScheduledExecutor> getExecutorClassOrElse(
+      @Nullable final Class<? extends ScheduledExecutor> valueIfNotSet) {
+    final Class<? extends ScheduledExecutor> executorClass = mExecutorClass;
+    return (executorClass != null) ? executorClass : valueIfNotSet;
+  }
+
+  /**
    * Returns the arguments to be passed to the log constructor.
    *
    * @param valueIfNotSet the default value if none was set.
@@ -164,29 +188,6 @@ public final class ServiceConfiguration extends DeepEqualObject {
   }
 
   /**
-   * Returns the arguments to be passed to the runner constructor.
-   *
-   * @param valueIfNotSet the default value if none was set.
-   * @return the constructor arguments.
-   */
-  public Object[] getRunnerArgsOrElse(@Nullable final Object... valueIfNotSet) {
-    final Object[] runnerArgs = mRunnerArgs;
-    return (runnerArgs != null) ? cloneOrNull(runnerArgs) : valueIfNotSet;
-  }
-
-  /**
-   * Returns the runner class (null by default).
-   *
-   * @param valueIfNotSet the default value if none was set.
-   * @return the runner class instance.
-   */
-  public Class<? extends Runner> getRunnerClassOrElse(
-      @Nullable final Class<? extends Runner> valueIfNotSet) {
-    final Class<? extends Runner> runnerClass = mRunnerClass;
-    return (runnerClass != null) ? runnerClass : valueIfNotSet;
-  }
-
-  /**
    * Interface defining a configurable object.
    *
    * @param <TYPE> the configurable object type.
@@ -212,15 +213,15 @@ public final class ServiceConfiguration extends DeepEqualObject {
 
     private final Configurable<? extends TYPE> mConfigurable;
 
+    private Object[] mExecutorArgs;
+
+    private Class<? extends ScheduledExecutor> mExecutorClass;
+
     private Object[] mLogArgs;
 
     private Class<? extends Log> mLogClass;
 
     private Looper mLooper;
-
-    private Object[] mRunnerArgs;
-
-    private Class<? extends Runner> mRunnerClass;
 
     /**
      * Constructor.
@@ -261,6 +262,32 @@ public final class ServiceConfiguration extends DeepEqualObject {
     @NotNull
     public Builder<TYPE> withDefaults() {
       setConfiguration(defaultConfiguration());
+      return this;
+    }
+
+    /**
+     * Sets the arguments to be passed to the executor constructor.
+     *
+     * @param args the argument objects.
+     * @return this builder.
+     */
+    @NotNull
+    public Builder<TYPE> withExecutorArgs(@Nullable final Object... args) {
+      mExecutorArgs = cloneOrNull(args);
+      return this;
+    }
+
+    /**
+     * Sets the executor class. A null value means that it is up to the specific implementation to
+     * choose a default executor.
+     *
+     * @param executorClass the executor class.
+     * @return this builder.
+     */
+    @NotNull
+    public Builder<TYPE> withExecutorClass(
+        @Nullable final Class<? extends ScheduledExecutor> executorClass) {
+      mExecutorClass = executorClass;
       return this;
     }
 
@@ -320,14 +347,14 @@ public final class ServiceConfiguration extends DeepEqualObject {
         withMessageLooper(looper);
       }
 
-      final Class<? extends Runner> runnerClass = configuration.mRunnerClass;
-      if (runnerClass != null) {
-        withRunnerClass(runnerClass);
+      final Class<? extends ScheduledExecutor> executorClass = configuration.mExecutorClass;
+      if (executorClass != null) {
+        withExecutorClass(executorClass);
       }
 
-      final Object[] runnerArgs = configuration.mRunnerArgs;
-      if (runnerArgs != null) {
-        withRunnerArgs(runnerArgs);
+      final Object[] executorArgs = configuration.mExecutorArgs;
+      if (executorArgs != null) {
+        withExecutorArgs(executorArgs);
       }
 
       final Class<? extends Log> logClass = configuration.mLogClass;
@@ -343,40 +370,15 @@ public final class ServiceConfiguration extends DeepEqualObject {
       return this;
     }
 
-    /**
-     * Sets the arguments to be passed to the runner constructor.
-     *
-     * @param args the argument objects.
-     * @return this builder.
-     */
-    @NotNull
-    public Builder<TYPE> withRunnerArgs(@Nullable final Object... args) {
-      mRunnerArgs = cloneOrNull(args);
-      return this;
-    }
-
-    /**
-     * Sets the runner class. A null value means that it is up to the specific implementation to
-     * choose a default runner.
-     *
-     * @param runnerClass the runner class.
-     * @return this builder.
-     */
-    @NotNull
-    public Builder<TYPE> withRunnerClass(@Nullable final Class<? extends Runner> runnerClass) {
-      mRunnerClass = runnerClass;
-      return this;
-    }
-
     @NotNull
     private ServiceConfiguration buildConfiguration() {
-      return new ServiceConfiguration(mLooper, mRunnerClass, mRunnerArgs, mLogClass, mLogArgs);
+      return new ServiceConfiguration(mLooper, mExecutorClass, mExecutorArgs, mLogClass, mLogArgs);
     }
 
     private void setConfiguration(@NotNull final ServiceConfiguration configuration) {
       mLooper = configuration.mLooper;
-      mRunnerClass = configuration.mRunnerClass;
-      mRunnerArgs = configuration.mRunnerArgs;
+      mExecutorClass = configuration.mExecutorClass;
+      mExecutorArgs = configuration.mExecutorArgs;
       mLogClass = configuration.mLogClass;
       mLogArgs = configuration.mLogArgs;
     }

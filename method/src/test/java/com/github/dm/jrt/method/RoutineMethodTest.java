@@ -19,8 +19,8 @@ package com.github.dm.jrt.method;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
+import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
-import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.method.annotation.Input;
 import com.github.dm.jrt.method.annotation.Output;
 
@@ -209,7 +209,7 @@ public class RoutineMethodTest {
     final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     new SumRoutine().invocationConfiguration()
-                    .withRunner(Runners.syncRunner())
+                    .withExecutor(ScheduledExecutors.syncExecutor())
                     .apply()
                     .call(inputChannel, outputChannel);
     inputChannel.pass(1, 2, 3, 4, 5).close();
@@ -273,7 +273,7 @@ public class RoutineMethodTest {
                             .next()).isEqualTo("test");
     assertThat(RoutineMethod.from(instance(test), String.class.getMethod("toString"))
                             .invocationConfiguration()
-                            .withRunner(Runners.syncRunner())
+                            .withExecutor(ScheduledExecutors.syncExecutor())
                             .apply()
                             .wrapperConfiguration()
                             .withSharedFields()
@@ -290,7 +290,7 @@ public class RoutineMethodTest {
         "test");
     assertThat(RoutineMethod.from(instance(test), "toString")
                             .invocationConfiguration()
-                            .withRunner(Runners.syncRunner())
+                            .withExecutor(ScheduledExecutors.syncExecutor())
                             .apply()
                             .wrapperConfiguration()
                             .withSharedFields()
@@ -382,7 +382,7 @@ public class RoutineMethodTest {
     final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     new SumRoutine(0).invocationConfiguration()
-                     .withRunner(Runners.syncRunner())
+                     .withExecutor(ScheduledExecutors.syncExecutor())
                      .apply()
                      .call(inputChannel, outputChannel);
     inputChannel.pass(1, 2, 3, 4, 5).close();
@@ -415,7 +415,7 @@ public class RoutineMethodTest {
     final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     new SumRoutine().invocationConfiguration()
-                    .withRunner(Runners.syncRunner())
+                    .withExecutor(ScheduledExecutors.syncExecutor())
                     .apply()
                     .call(inputChannel, outputChannel);
     inputChannel.pass(1, 2, 3, 4, 5).close();

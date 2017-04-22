@@ -18,8 +18,8 @@ package com.github.dm.jrt.android.proxy.builder;
 
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.executor.ScheduledExecutor;
 import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
-import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;
@@ -112,10 +112,10 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
         return (TYPE) instance;
       }
 
-      final Runner asyncRunner = invocationConfiguration.getRunnerOrElse(null);
-      if (asyncRunner != null) {
+      final ScheduledExecutor asyncExecutor = invocationConfiguration.getExecutorOrElse(null);
+      if (asyncExecutor != null) {
         invocationConfiguration.newLogger(this)
-                               .wrn("the specified runner will be ignored: %s", asyncRunner);
+                               .wrn("the specified executor will be ignored: %s", asyncExecutor);
       }
 
       try {

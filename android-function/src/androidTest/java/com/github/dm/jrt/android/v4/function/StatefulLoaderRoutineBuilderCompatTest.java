@@ -31,9 +31,9 @@ import com.github.dm.jrt.android.function.builder.StatefulLoaderRoutineBuilder;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.RoutineException;
+import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.routine.Routine;
-import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.function.util.BiConsumer;
 import com.github.dm.jrt.function.util.BiFunction;
 import com.github.dm.jrt.function.util.Consumer;
@@ -90,7 +90,7 @@ public class StatefulLoaderRoutineBuilderCompatTest
                 }
               })
               .invocationConfiguration()
-              .withRunner(Runners.immediateRunner())
+              .withExecutor(ScheduledExecutors.immediateExecutor())
               .apply()
               .invoke()
               .close()
@@ -134,7 +134,7 @@ public class StatefulLoaderRoutineBuilderCompatTest
                                                          }
                                                        })
                                                        .invocationConfiguration()
-                                                       .withRunner(Runners.immediateRunner())
+                                                       .withExecutor(ScheduledExecutors.immediateExecutor())
                                                        .apply()
                                                        .loaderConfiguration()
                                                        .withCacheStrategy(CacheStrategyType.CACHE)
@@ -161,7 +161,7 @@ public class StatefulLoaderRoutineBuilderCompatTest
               }
             })
             .invocationConfiguration()
-            .withRunner(Runners.immediateRunner())
+            .withExecutor(ScheduledExecutors.immediateExecutor())
             .apply()
             .invoke();
     assertThat(reference.get()).isNull();
@@ -183,7 +183,7 @@ public class StatefulLoaderRoutineBuilderCompatTest
               }
             })
             .invocationConfiguration()
-            .withRunner(Runners.immediateRunner())
+            .withExecutor(ScheduledExecutors.immediateExecutor())
             .apply()
             .invoke();
     assertThat(reference.get()).isNull();
@@ -206,7 +206,7 @@ public class StatefulLoaderRoutineBuilderCompatTest
               }
             })
             .invocationConfiguration()
-            .withRunner(Runners.immediateRunner())
+            .withExecutor(ScheduledExecutors.immediateExecutor())
             .apply()
             .invoke();
     assertThat(reference.get()).isNull();
@@ -231,7 +231,7 @@ public class StatefulLoaderRoutineBuilderCompatTest
             atomicBoolean.set(false);
             return atomicBoolean;
           }
-        }).invocationConfiguration().withRunner(Runners.immediateRunner()).apply().invoke();
+        }).invocationConfiguration().withExecutor(ScheduledExecutors.immediateExecutor()).apply().invoke();
     assertThat(state.get()).isTrue();
     channel.abort(new IOException());
     assertThat(channel.in(seconds(10)).getComplete()).isTrue();
@@ -252,7 +252,7 @@ public class StatefulLoaderRoutineBuilderCompatTest
       public void accept(final AtomicBoolean atomicBoolean) {
         atomicBoolean.set(false);
       }
-    }).invocationConfiguration().withRunner(Runners.immediateRunner()).apply().buildRoutine();
+    }).invocationConfiguration().withExecutor(ScheduledExecutors.immediateExecutor()).apply().buildRoutine();
     assertThat(routine.invoke().close().in(seconds(10)).getComplete()).isTrue();
     assertThat(state.get()).isFalse();
   }
@@ -444,7 +444,7 @@ public class StatefulLoaderRoutineBuilderCompatTest
           public Integer apply(final List<Integer> list) {
             return list.size();
           }
-        }).invocationConfiguration().withRunner(Runners.immediateRunner()).apply().buildRoutine();
+        }).invocationConfiguration().withExecutor(ScheduledExecutors.immediateExecutor()).apply().buildRoutine();
     assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(10)).all()).containsExactly(4);
   }
 

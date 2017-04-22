@@ -20,14 +20,13 @@ import android.annotation.TargetApi;
 import android.content.Loader;
 import android.os.Build.VERSION_CODES;
 
-import com.github.dm.jrt.android.core.runner.AndroidRunners;
+import com.github.dm.jrt.android.core.executor.AndroidExecutors;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.common.RoutineException;
+import com.github.dm.jrt.core.executor.ScheduledExecutor;
 import com.github.dm.jrt.core.log.Logger;
-import com.github.dm.jrt.core.runner.Execution;
-import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
@@ -35,7 +34,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Class consuming the invocation Loader results.
@@ -47,11 +45,11 @@ import java.util.concurrent.TimeUnit;
 @TargetApi(VERSION_CODES.HONEYCOMB)
 class InvocationChannelConsumer<OUT> implements ChannelConsumer<OUT> {
 
-  private static final Runner sMainRunner = AndroidRunners.mainRunner();
+  private static final ScheduledExecutor sMainExecutor = AndroidExecutors.mainExecutor();
 
   private final ArrayList<OUT> mCachedResults = new ArrayList<OUT>();
 
-  private final Execution mDeliverResult;
+  private final Runnable mDeliverResult;
 
   private final ArrayList<OUT> mLastResults = new ArrayList<OUT>();
 
@@ -74,7 +72,7 @@ class InvocationChannelConsumer<OUT> implements ChannelConsumer<OUT> {
   InvocationChannelConsumer(@NotNull final Loader<InvocationResult<OUT>> loader,
       @NotNull final Logger logger) {
     ConstantConditions.notNull("Loader instance", loader);
-    mDeliverResult = new Execution() {
+    mDeliverResult = new Runnable() {
 
       public void run() {
         loader.deliverResult(createResult());
@@ -150,7 +148,7 @@ class InvocationChannelConsumer<OUT> implements ChannelConsumer<OUT> {
   }
 
   private void deliverResult() {
-    sMainRunner.run(mDeliverResult, 0, TimeUnit.MILLISECONDS);
+    sMainExecutor.execute(mDeliverResult);
   }
 
   /**

@@ -407,7 +407,7 @@ public class Channels {
    * If the channel is aborted the Future will be cancelled with {@code mayInterruptIfRunning} set
    * to false.
    * <p>
-   * Note that the configured runner will be employed to wait for the Future to complete.
+   * Note that the configured executor will be employed to wait for the Future to complete.
    * <br>
    * Note also that the returned channel will be already closed.
    *
@@ -426,7 +426,7 @@ public class Channels {
    * If the channel is aborted the Future will be cancelled with {@code mayInterruptIfRunning} set
    * to the specified value.
    * <p>
-   * Note that the configured runner will be employed to wait for the Future to complete.
+   * Note that the configured executor will be employed to wait for the Future to complete.
    * <br>
    * Note also that the returned channel will be already closed.
    *

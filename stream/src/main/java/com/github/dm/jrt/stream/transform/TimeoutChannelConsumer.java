@@ -19,8 +19,7 @@ package com.github.dm.jrt.stream.transform;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.common.RoutineException;
-import com.github.dm.jrt.core.runner.Execution;
-import com.github.dm.jrt.core.runner.Runner;
+import com.github.dm.jrt.core.executor.ScheduledExecutor;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
@@ -39,15 +38,15 @@ class TimeoutChannelConsumer<OUT> implements ChannelConsumer<OUT> {
 
   private final AtomicLong mCount = new AtomicLong();
 
+  private final ScheduledExecutor mExecutor;
+
   private final Channel<OUT, ?> mOutputChannel;
 
   private final long mOutputTimeout;
 
   private final TimeUnit mOutputTimeoutUnit;
 
-  private final Runner mRunner;
-
-  private AbortExecution mExecution = new AbortExecution();
+  private AbortCommand mExecution = new AbortCommand();
 
   /**
    * Constructor.
@@ -56,20 +55,20 @@ class TimeoutChannelConsumer<OUT> implements ChannelConsumer<OUT> {
    * @param outputTimeUnit the new output timeout unit.
    * @param totalTimeout   the total timeout value.
    * @param totalTimeUnit  the total timeout unit.
-   * @param runner         the runner instance.
+   * @param executor       the executor instance.
    * @param outputChannel  the output channel.
    */
   TimeoutChannelConsumer(final long outputTimeout, @NotNull final TimeUnit outputTimeUnit,
-      final long totalTimeout, @NotNull final TimeUnit totalTimeUnit, @NotNull final Runner runner,
-      @NotNull final Channel<OUT, ?> outputChannel) {
+      final long totalTimeout, @NotNull final TimeUnit totalTimeUnit,
+      @NotNull final ScheduledExecutor executor, @NotNull final Channel<OUT, ?> outputChannel) {
     ConstantConditions.notNegative("total timeout value", totalTimeout);
     ConstantConditions.notNull("total time unit", totalTimeUnit);
     mOutputTimeout = ConstantConditions.notNegative("output timeout value", outputTimeout);
     mOutputTimeoutUnit = ConstantConditions.notNull("output time unit", outputTimeUnit);
-    mRunner = ConstantConditions.notNull("runner instance", runner);
+    mExecutor = ConstantConditions.notNull("executor instance", executor);
     mOutputChannel = ConstantConditions.notNull("output channel", outputChannel);
-    runner.run(mExecution, outputTimeout, outputTimeUnit);
-    runner.run(new Execution() {
+    executor.execute(mExecution, outputTimeout, outputTimeUnit);
+    executor.execute(new Runnable() {
 
       public void run() {
         mOutputChannel.abort(new ResultTimeoutException(
@@ -92,24 +91,24 @@ class TimeoutChannelConsumer<OUT> implements ChannelConsumer<OUT> {
   }
 
   private void restartTimeout() {
-    final Runner runner = mRunner;
-    final AbortExecution execution = new AbortExecution();
-    runner.cancel(mExecution);
-    mExecution = execution;
-    runner.run(execution, mOutputTimeout, mOutputTimeoutUnit);
+    final ScheduledExecutor executor = mExecutor;
+    final AbortCommand command = new AbortCommand();
+    executor.cancel(mExecution);
+    mExecution = command;
+    executor.execute(command, mOutputTimeout, mOutputTimeoutUnit);
   }
 
   /**
-   * Execution aborting the output channel.
+   * Runnable aborting the output channel.
    */
-  private class AbortExecution implements Execution {
+  private class AbortCommand implements Runnable {
 
     private final long mExecutionCount;
 
     /**
      * Constructor.
      */
-    AbortExecution() {
+    AbortCommand() {
       mExecutionCount = mCount.incrementAndGet();
     }
 

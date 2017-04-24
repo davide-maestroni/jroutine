@@ -20,7 +20,6 @@ import com.github.dm.jrt.core.common.Backoff;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.ChannelConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.executor.PriorityExecutor;
-import com.github.dm.jrt.core.executor.ScheduledExecutor;
 import com.github.dm.jrt.core.log.Log;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.Logger;
@@ -44,7 +43,6 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * <p>
  * The configuration allows to set:
  * <ul>
- * <li>The asynchronous executor used to execute the invocations.</li>
  * <li>The invocations priority. Every invocation will age each time an higher priority one takes
  * the precedence, so that older invocations slowly increases their priority. Such mechanism has
  * been implemented to avoid starvation of low priority invocations. Hence, when assigning priority
@@ -98,8 +96,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
 
   private final int mCoreInvocations;
 
-  private final ScheduledExecutor mExecutor;
-
   private final Backoff mInputBackoff;
 
   private final int mInputMaxSize;
@@ -127,7 +123,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
   /**
    * Constructor.
    *
-   * @param executor        the executor used for asynchronous invocations.
    * @param priority        the invocation priority.
    * @param maxInvocations  the maximum number of parallel running invocations. Must be positive.
    * @param coreInvocations the maximum number of retained invocation instances. Must not be
@@ -146,17 +141,16 @@ public final class InvocationConfiguration extends DeepEqualObject {
    * @param log             the log instance.
    * @param logLevel        the log level.
    */
-  private InvocationConfiguration(@Nullable final ScheduledExecutor executor, final int priority,
-      final int maxInvocations, final int coreInvocations,
-      @Nullable final DurationMeasure outputTimeout, @Nullable final TimeoutActionType actionType,
-      @Nullable final OrderType inputOrderType, @Nullable final Backoff inputBackoff,
-      final int inputMaxSize, @Nullable final OrderType outputOrderType,
-      @Nullable final Backoff outputBackoff, final int outputMaxSize, @Nullable final Log log,
-      @Nullable final Level logLevel) {
-    super(asArgs(executor, priority, maxInvocations, coreInvocations, outputTimeout, actionType,
-        inputOrderType, inputBackoff, inputMaxSize, outputOrderType, outputBackoff, outputMaxSize,
-        log, logLevel));
-    mExecutor = executor;
+  private InvocationConfiguration(final int priority, final int maxInvocations,
+      final int coreInvocations, @Nullable final DurationMeasure outputTimeout,
+      @Nullable final TimeoutActionType actionType, @Nullable final OrderType inputOrderType,
+      @Nullable final Backoff inputBackoff, final int inputMaxSize,
+      @Nullable final OrderType outputOrderType, @Nullable final Backoff outputBackoff,
+      final int outputMaxSize, @Nullable final Log log, @Nullable final Level logLevel) {
+    super(
+        asArgs(priority, maxInvocations, coreInvocations, outputTimeout, actionType, inputOrderType,
+            inputBackoff, inputMaxSize, outputOrderType, outputBackoff, outputMaxSize, log,
+            logLevel));
     mPriority = priority;
     mMaxInvocations = maxInvocations;
     mCoreInvocations = coreInvocations;
@@ -207,8 +201,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
       @Nullable final ChannelConfiguration initialConfiguration) {
     final Builder<InvocationConfiguration> builder = builder();
     if (initialConfiguration != null) {
-      builder.withExecutor(initialConfiguration.getExecutorOrElse(null))
-             .withInputBackoff(initialConfiguration.getBackoffOrElse(null))
+      builder.withInputBackoff(initialConfiguration.getBackoffOrElse(null))
              .withInputMaxSize(initialConfiguration.getMaxSizeOrElse(DEFAULT))
              .withInputOrder(initialConfiguration.getOrderTypeOrElse(null))
              .withLog(initialConfiguration.getLogOrElse(null))
@@ -232,8 +225,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
       @Nullable final ChannelConfiguration initialConfiguration) {
     final Builder<InvocationConfiguration> builder = builder();
     if (initialConfiguration != null) {
-      builder.withExecutor(initialConfiguration.getExecutorOrElse(null))
-             .withOutputBackoff(initialConfiguration.getBackoffOrElse(null))
+      builder.withOutputBackoff(initialConfiguration.getBackoffOrElse(null))
              .withOutputMaxSize(initialConfiguration.getMaxSizeOrElse(DEFAULT))
              .withOutputOrder(initialConfiguration.getOrderTypeOrElse(null))
              .withLog(initialConfiguration.getLogOrElse(null))
@@ -274,17 +266,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
   public int getCoreInvocationsOrElse(final int valueIfNotSet) {
     final int coreInvocations = mCoreInvocations;
     return (coreInvocations != DEFAULT) ? coreInvocations : valueIfNotSet;
-  }
-
-  /**
-   * Returns the executor used for asynchronous invocations (null by default).
-   *
-   * @param valueIfNotSet the default value if none was set.
-   * @return the executor instance.
-   */
-  public ScheduledExecutor getExecutorOrElse(@Nullable final ScheduledExecutor valueIfNotSet) {
-    final ScheduledExecutor executor = mExecutor;
-    return (executor != null) ? executor : valueIfNotSet;
   }
 
   /**
@@ -433,7 +414,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
   @NotNull
   public ChannelConfiguration.Builder<ChannelConfiguration> inputConfigurationBuilder() {
     return ChannelConfiguration.builder()
-                               .withExecutor(getExecutorOrElse(null))
                                .withBackoff(getInputBackoffOrElse(null))
                                .withMaxSize(getInputMaxSizeOrElse(ChannelConfiguration.DEFAULT))
                                .withOrder(getInputOrderTypeOrElse(null))
@@ -463,7 +443,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
   @NotNull
   public ChannelConfiguration.Builder<ChannelConfiguration> outputConfigurationBuilder() {
     return ChannelConfiguration.builder()
-                               .withExecutor(getExecutorOrElse(null))
                                .withBackoff(getOutputBackoffOrElse(null))
                                .withMaxSize(getOutputMaxSizeOrElse(ChannelConfiguration.DEFAULT))
                                .withOrder(getOutputOrderTypeOrElse(null))
@@ -521,8 +500,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
      * @return the configurable instance.
      */
     @NotNull
-    TYPE apply(@NotNull InvocationConfiguration configuration);
-    // TODO: 19/04/2017 withConfig()
+    TYPE withConfiguration(@NotNull InvocationConfiguration configuration);
   }
 
   /**
@@ -570,8 +548,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
     private final Configurable<? extends TYPE> mConfigurable;
 
     private int mCoreInvocations;
-
-    private ScheduledExecutor mExecutor;
 
     private Backoff mInputBackoff;
 
@@ -629,8 +605,8 @@ public final class InvocationConfiguration extends DeepEqualObject {
      * @return the configured object.
      */
     @NotNull
-    public TYPE apply() {
-      return mConfigurable.apply(buildConfiguration());
+    public TYPE configured() {
+      return mConfigurable.withConfiguration(buildConfiguration());
     }
 
     /**
@@ -660,19 +636,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
     @NotNull
     public Builder<TYPE> withDefaults() {
       setConfiguration(defaultConfiguration());
-      return this;
-    }
-
-    /**
-     * Sets the asynchronous executor instance. A null value means that it is up to the specific
-     * implementation to choose a default one.
-     *
-     * @param executor the executor instance.
-     * @return this builder.
-     */
-    @NotNull
-    public Builder<TYPE> withExecutor(@Nullable final ScheduledExecutor executor) {
-      mExecutor = executor;
       return this;
     }
 
@@ -923,11 +886,6 @@ public final class InvocationConfiguration extends DeepEqualObject {
     }
 
     private void applyBaseConfiguration(@NotNull final InvocationConfiguration configuration) {
-      final ScheduledExecutor executor = configuration.mExecutor;
-      if (executor != null) {
-        withExecutor(executor);
-      }
-
       final int priority = configuration.mPriority;
       if (priority != DEFAULT) {
         withPriority(priority);
@@ -1000,13 +958,12 @@ public final class InvocationConfiguration extends DeepEqualObject {
 
     @NotNull
     private InvocationConfiguration buildConfiguration() {
-      return new InvocationConfiguration(mExecutor, mPriority, mMaxInvocations, mCoreInvocations,
+      return new InvocationConfiguration(mPriority, mMaxInvocations, mCoreInvocations,
           mOutputTimeout, mTimeoutActionType, mInputOrderType, mInputBackoff, mInputMaxSize,
           mOutputOrderType, mOutputBackoff, mOutputMaxSize, mLog, mLogLevel);
     }
 
     private void setConfiguration(@NotNull final InvocationConfiguration configuration) {
-      mExecutor = configuration.mExecutor;
       mPriority = configuration.mPriority;
       mMaxInvocations = configuration.mMaxInvocations;
       mCoreInvocations = configuration.mCoreInvocations;
@@ -1029,7 +986,8 @@ public final class InvocationConfiguration extends DeepEqualObject {
   private static class DefaultConfigurable implements Configurable<InvocationConfiguration> {
 
     @NotNull
-    public InvocationConfiguration apply(@NotNull final InvocationConfiguration configuration) {
+    public InvocationConfiguration withConfiguration(
+        @NotNull final InvocationConfiguration configuration) {
       return configuration;
     }
   }

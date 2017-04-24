@@ -79,7 +79,7 @@ class DistinctInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
   }
 
   @Override
-  public void onRestart() {
+  public void onStart() {
     mSet = new HashSet<DATA>();
   }
 }

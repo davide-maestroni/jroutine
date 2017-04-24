@@ -88,7 +88,7 @@ class LimitInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
     }
 
     @Override
-    public void onRestart() {
+    public void onStart() {
       mCurrent = 0;
     }
   }

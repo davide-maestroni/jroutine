@@ -91,7 +91,7 @@ class BinaryOperatorInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
   }
 
   @Override
-  public void onRestart() {
+  public void onStart() {
     mIsFirst = true;
   }
 

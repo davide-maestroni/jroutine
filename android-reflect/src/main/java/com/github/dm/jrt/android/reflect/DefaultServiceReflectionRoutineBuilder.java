@@ -162,7 +162,7 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
 
   @NotNull
   @Override
-  public ServiceReflectionRoutineBuilder apply(
+  public ServiceReflectionRoutineBuilder withConfiguration(
       @NotNull final InvocationConfiguration configuration) {
     mInvocationConfiguration =
         ConstantConditions.notNull("invocation configuration", configuration);
@@ -178,17 +178,16 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
 
   @NotNull
   @Override
-  public InvocationConfiguration.Builder<? extends ServiceReflectionRoutineBuilder>
-  invocationConfiguration() {
+  public InvocationConfiguration.Builder<? extends ServiceReflectionRoutineBuilder> withInvocation() {
     final InvocationConfiguration config = mInvocationConfiguration;
     return new InvocationConfiguration.Builder<ServiceReflectionRoutineBuilder>(
         new InvocationConfiguration.Configurable<ServiceReflectionRoutineBuilder>() {
 
           @NotNull
           @Override
-          public ServiceReflectionRoutineBuilder apply(
+          public ServiceReflectionRoutineBuilder withConfiguration(
               @NotNull final InvocationConfiguration configuration) {
-            return DefaultServiceReflectionRoutineBuilder.this.apply(configuration);
+            return DefaultServiceReflectionRoutineBuilder.this.withConfiguration(configuration);
           }
         }, config);
   }
@@ -249,7 +248,7 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
         AndroidReflectionRoutineBuilders.withAnnotations(mServiceConfiguration, targetMethod);
     return (Routine<IN, OUT>) JRoutineService.on(mContext)
                                              .with(factory)
-                                             .apply(invocationConfiguration)
+                                             .withConfiguration(invocationConfiguration)
                                              .apply(serviceConfiguration)
                                              .buildRoutine();
   }
@@ -271,7 +270,7 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
         AndroidReflectionRoutineBuilders.withAnnotations(mServiceConfiguration, targetMethod);
     return (Routine<IN, OUT>) JRoutineService.on(mContext)
                                              .with(factory)
-                                             .apply(invocationConfiguration)
+                                             .withConfiguration(invocationConfiguration)
                                              .apply(serviceConfiguration)
                                              .buildRoutine();
   }
@@ -332,9 +331,9 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
       final InvocationTarget target = mTarget.getInvocationTarget(context);
       mInstance = target.getTarget();
       mRoutine = JRoutineReflection.with(target)
-                                   .invocationConfiguration()
+                                   .withInvocation()
                                    .withExecutor(ScheduledExecutors.syncExecutor())
-                                   .apply()
+                                   .configured()
                                    .wrapperConfiguration()
                                    .withSharedFields(mSharedFields)
                                    .apply()
@@ -364,7 +363,7 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
     }
 
     @Override
-    public void onRestart() {
+    public void onStart() {
       mChannel = mRoutine.invoke();
     }
   }
@@ -435,7 +434,7 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
     }
 
     @Override
-    public void onRestart() {
+    public void onStart() {
       mChannel = mRoutine.invoke();
     }
 
@@ -444,9 +443,9 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
       final InvocationTarget target = mTarget.getInvocationTarget(context);
       mInstance = target.getTarget();
       mRoutine = JRoutineReflection.with(target)
-                                   .invocationConfiguration()
+                                   .withInvocation()
                                    .withExecutor(ScheduledExecutors.syncExecutor())
-                                   .apply()
+                                   .configured()
                                    .wrapperConfiguration()
                                    .withSharedFields(mSharedFields)
                                    .apply()
@@ -566,7 +565,7 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
           AndroidReflectionRoutineBuilders.withAnnotations(mServiceConfiguration, method);
       final Routine<Object, Object> routine = JRoutineService.on(mContext)
                                                              .with(factory)
-                                                             .apply(invocationConfiguration)
+                                                             .withConfiguration(invocationConfiguration)
                                                              .apply(serviceConfiguration)
                                                              .buildRoutine();
       return invokeRoutine(routine, method, asArgs(args), inputMode, outputMode);

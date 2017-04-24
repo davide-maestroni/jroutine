@@ -81,9 +81,9 @@ public class LoaderAdapterFactoryCompatTest extends ActivityInstrumentationTestC
       final LoaderAdapterFactoryCompat adapterFactory = //
           LoaderAdapterFactoryCompat.on(context)
                                     .delegateFactory(factory)
-                                    .invocationConfiguration()
+                                    .withInvocation()
                                     .withOutputTimeout(seconds(10))
-                                    .apply()
+                                    .configured()
                                     .loaderConfiguration()
                                     .withCacheStrategy(CacheStrategyType.CLEAR)
                                     .apply()
@@ -140,10 +140,10 @@ public class LoaderAdapterFactoryCompatTest extends ActivityInstrumentationTestC
     server.start();
     try {
       final LoaderAdapterFactoryCompat adapterFactory = LoaderAdapterFactoryCompat.on(context)
-                                                                                  .invocationConfiguration()
+                                                                                  .withInvocation()
                                                                                   .withOutputTimeout(
                                                                                       seconds(10))
-                                                                                  .apply()
+                                                                                  .configured()
                                                                                   .buildFactory();
       final GsonConverterFactory converterFactory = GsonConverterFactory.create();
       final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + server.getPort())
@@ -181,9 +181,9 @@ public class LoaderAdapterFactoryCompatTest extends ActivityInstrumentationTestC
       final LoaderAdapterFactoryCompat adapterFactory = //
           LoaderAdapterFactoryCompat.on(context)
                                     .delegateFactory(factory)
-                                    .invocationConfiguration()
+                                    .withInvocation()
                                     .withOutputTimeout(seconds(10))
-                                    .apply()
+                                    .configured()
                                     .loaderConfiguration()
                                     .withCacheStrategy(CacheStrategyType.CLEAR)
                                     .apply()

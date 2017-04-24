@@ -46,7 +46,7 @@ public class IdentityInvocation<DATA> extends MappingInvocation<DATA, DATA> {
    */
   @NotNull
   @SuppressWarnings("unchecked")
-  public static <DATA> MappingInvocation<DATA, DATA> factoryOf() {
+  public static <DATA> MappingInvocation<DATA, DATA> factory() {
     return (MappingInvocation<DATA, DATA>) sInvocation;
   }
 

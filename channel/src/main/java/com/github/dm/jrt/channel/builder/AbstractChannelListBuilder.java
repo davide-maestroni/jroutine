@@ -35,13 +35,13 @@ public abstract class AbstractChannelListBuilder<IN, OUT> implements ChannelList
   private ChannelConfiguration mConfiguration = ChannelConfiguration.defaultConfiguration();
 
   @NotNull
-  public ChannelListBuilder<IN, OUT> apply(@NotNull final ChannelConfiguration configuration) {
+  public ChannelListBuilder<IN, OUT> withConfiguration(@NotNull final ChannelConfiguration configuration) {
     mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
     return this;
   }
 
   @NotNull
-  public Builder<? extends ChannelListBuilder<IN, OUT>> channelConfiguration() {
+  public Builder<? extends ChannelListBuilder<IN, OUT>> withChannel() {
     return new Builder<ChannelListBuilder<IN, OUT>>(this, mConfiguration);
   }
 

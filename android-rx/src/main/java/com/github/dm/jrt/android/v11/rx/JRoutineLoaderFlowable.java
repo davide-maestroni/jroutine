@@ -39,7 +39,7 @@ import io.reactivex.Flowable;
  * JRoutineLoaderFlowable.with(myFlowable)
  *                       .loaderConfiguration()
  *                       .withInvocationId(INVOCATION_ID)
- *                       .apply()
+ *                       .configured()
  *                       .observeOn(loaderFrom(activity))
  *                       .subscribe(getConsumer());
  * </code></pre>
@@ -104,7 +104,7 @@ public class JRoutineLoaderFlowable {
 
     @NotNull
     @Override
-    public LoaderFlowable<DATA> apply(@NotNull final InvocationConfiguration configuration) {
+    public LoaderFlowable<DATA> withConfiguration(@NotNull final InvocationConfiguration configuration) {
       mInvocationConfiguration =
           ConstantConditions.notNull("invocation configuration", configuration);
       return this;
@@ -126,8 +126,7 @@ public class JRoutineLoaderFlowable {
 
     @NotNull
     @Override
-    public InvocationConfiguration.Builder<? extends LoaderFlowable<DATA>>
-    invocationConfiguration() {
+    public InvocationConfiguration.Builder<? extends LoaderFlowable<DATA>> withInvocation() {
       return new InvocationConfiguration.Builder<LoaderFlowable<DATA>>(this,
           mInvocationConfiguration);
     }
@@ -152,7 +151,7 @@ public class JRoutineLoaderFlowable {
           new FlowableInvocationFactory<DATA>(mFlowable);
       return JRoutineFlowable.from(JRoutineLoader.on(context)
                                                  .with(factory)
-                                                 .apply(mInvocationConfiguration)
+                                                 .withConfiguration(mInvocationConfiguration)
                                                  .apply(mLoaderConfiguration))
                              .apply(mFlowableConfiguration)
                              .buildFlowable();

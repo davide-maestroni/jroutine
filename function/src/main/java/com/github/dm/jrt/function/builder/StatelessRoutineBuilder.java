@@ -54,13 +54,13 @@ public interface StatelessRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT
    * {@inheritDoc}
    */
   @NotNull
-  StatelessRoutineBuilder<IN, OUT> apply(@NotNull InvocationConfiguration configuration);
+  StatelessRoutineBuilder<IN, OUT> withConfiguration(@NotNull InvocationConfiguration configuration);
 
   /**
    * {@inheritDoc}
    */
   @NotNull
-  Builder<? extends StatelessRoutineBuilder<IN, OUT>> invocationConfiguration();
+  Builder<? extends StatelessRoutineBuilder<IN, OUT>> withInvocation();
 
   /**
    * Sets the consumer to call when the invocation completes.

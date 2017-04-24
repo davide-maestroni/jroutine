@@ -142,17 +142,17 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
   public void testActivityBuilderClear() throws InterruptedException {
 
     final InvocationConfiguration invocationConfiguration =
-        builder().withInputOrder(OrderType.SORTED).withOutputOrder(OrderType.SORTED).apply();
+        builder().withInputOrder(OrderType.SORTED).withOutputOrder(OrderType.SORTED).configured();
     final LoaderRoutine<String, String> routine = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                                                                       .with(factoryOf(
                                                                           ClearContextInvocation
                                                                               .class))
-                                                                      .invocationConfiguration()
+                                                                      .withInvocation()
                                                                       .withPatch(
                                                                           invocationConfiguration)
                                                                       .withOutputTimeout(
                                                                           seconds(10))
-                                                                      .apply()
+                                                                      .configured()
                                                                       .loaderConfiguration()
                                                                       .withLoaderId(0)
                                                                       .withCacheStrategy(
@@ -179,17 +179,17 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
   public void testActivityBuilderClearInputs() throws InterruptedException {
 
     final InvocationConfiguration invocationConfiguration =
-        builder().withInputOrder(OrderType.SORTED).withOutputOrder(OrderType.SORTED).apply();
+        builder().withInputOrder(OrderType.SORTED).withOutputOrder(OrderType.SORTED).configured();
     final LoaderRoutine<String, String> routine = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                                                                       .with(factoryOf(
                                                                           ClearContextInvocation
                                                                               .class))
-                                                                      .invocationConfiguration()
+                                                                      .withInvocation()
                                                                       .withPatch(
                                                                           invocationConfiguration)
                                                                       .withOutputTimeout(
                                                                           seconds(10))
-                                                                      .apply()
+                                                                      .configured()
                                                                       .loaderConfiguration()
                                                                       .withLoaderId(0)
                                                                       .withCacheStrategy(
@@ -723,17 +723,17 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
   public void testActivityRoutineClear() throws InterruptedException {
 
     final InvocationConfiguration invocationConfiguration =
-        builder().withInputOrder(OrderType.SORTED).withOutputOrder(OrderType.SORTED).apply();
+        builder().withInputOrder(OrderType.SORTED).withOutputOrder(OrderType.SORTED).configured();
     final LoaderRoutine<String, String> routine = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                                                                       .with(factoryOf(
                                                                           ClearContextInvocation
                                                                               .class))
-                                                                      .invocationConfiguration()
+                                                                      .withInvocation()
                                                                       .withPatch(
                                                                           invocationConfiguration)
                                                                       .withOutputTimeout(
                                                                           seconds(10))
-                                                                      .apply()
+                                                                      .configured()
                                                                       .loaderConfiguration()
                                                                       .withLoaderId(0)
                                                                       .withCacheStrategy(
@@ -753,14 +753,14 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
                                                                       .with(factoryOf(
                                                                           ClearContextInvocation
                                                                               .class))
-                                                                      .invocationConfiguration()
+                                                                      .withInvocation()
                                                                       .withInputOrder(
                                                                           OrderType.SORTED)
                                                                       .withOutputOrder(
                                                                           OrderType.SORTED)
                                                                       .withOutputTimeout(
                                                                           seconds(10))
-                                                                      .apply()
+                                                                      .configured()
                                                                       .loaderConfiguration()
                                                                       .withLoaderId(0)
                                                                       .withCacheStrategy(
@@ -852,7 +852,7 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
 
     try {
 
-      new DefaultLoaderRoutineBuilder<Object, Object>(loaderFrom(getActivity()), factory).apply(
+      new DefaultLoaderRoutineBuilder<Object, Object>(loaderFrom(getActivity()), factory).withConfiguration(
           (InvocationConfiguration) null);
 
       fail();
@@ -924,14 +924,14 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
                                                                       .with(factoryOf(
                                                                           ClearContextInvocation
                                                                               .class))
-                                                                      .invocationConfiguration()
+                                                                      .withInvocation()
                                                                       .withInputOrder(
                                                                           OrderType.SORTED)
                                                                       .withOutputOrder(
                                                                           OrderType.SORTED)
                                                                       .withOutputTimeout(
                                                                           seconds(10))
-                                                                      .apply()
+                                                                      .configured()
                                                                       .loaderConfiguration()
                                                                       .withLoaderId(0)
                                                                       .withCacheStrategy(
@@ -963,14 +963,14 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
                                                                       .with(factoryOf(
                                                                           ClearContextInvocation
                                                                               .class))
-                                                                      .invocationConfiguration()
+                                                                      .withInvocation()
                                                                       .withInputOrder(
                                                                           OrderType.SORTED)
                                                                       .withOutputOrder(
                                                                           OrderType.SORTED)
                                                                       .withOutputTimeout(
                                                                           seconds(10))
-                                                                      .apply()
+                                                                      .configured()
                                                                       .loaderConfiguration()
                                                                       .withLoaderId(0)
                                                                       .withCacheStrategy(
@@ -1041,16 +1041,16 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
                                                                 .loaderConfiguration()
                                                                 .withLoaderId(0)
                                                                 .apply()
-                                                                .invocationConfiguration()
+                                                                .withInvocation()
                                                                 .withOutputOrder(OrderType.SORTED)
-                                                                .apply()
+                                                                .configured()
                                                                 .buildRoutine();
     final Channel<?, String> channel1 = routine.invoke().pass("test1", "test2").close();
     final Channel<?, String> channel2 = JRoutineLoaderCompat.on(loaderFrom(fragment))
                                                             .withId(0)
-                                                            .channelConfiguration()
+                                                            .withChannel()
                                                             .withExecutor(AndroidExecutors.mainExecutor())
-                                                            .apply()
+                                                            .configured()
                                                             .buildChannel();
 
     assertThat(channel1.in(timeout).all()).containsExactly("TEST1", "TEST2");
@@ -1343,14 +1343,14 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
                                                                       .with(factoryOf(
                                                                           ClearContextInvocation
                                                                               .class))
-                                                                      .invocationConfiguration()
+                                                                      .withInvocation()
                                                                       .withInputOrder(
                                                                           OrderType.SORTED)
                                                                       .withOutputOrder(
                                                                           OrderType.SORTED)
                                                                       .withOutputTimeout(
                                                                           seconds(10))
-                                                                      .apply()
+                                                                      .configured()
                                                                       .loaderConfiguration()
                                                                       .withLoaderId(0)
                                                                       .withCacheStrategy(
@@ -1372,14 +1372,14 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
                                                                       .with(factoryOf(
                                                                           ClearContextInvocation
                                                                               .class))
-                                                                      .invocationConfiguration()
+                                                                      .withInvocation()
                                                                       .withInputOrder(
                                                                           OrderType.SORTED)
                                                                       .withOutputOrder(
                                                                           OrderType.SORTED)
                                                                       .withOutputTimeout(
                                                                           seconds(10))
-                                                                      .apply()
+                                                                      .configured()
                                                                       .loaderConfiguration()
                                                                       .withLoaderId(0)
                                                                       .withCacheStrategy(
@@ -1477,10 +1477,10 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
                                                                  .with(
                                                                      IdentityContextInvocation
                                                                          .<String>factoryOf())
-                                                                 .invocationConfiguration()
+                                                                 .withInvocation()
                                                                  .withLog(AndroidLogs.androidLog())
                                                                  .withLogLevel(Level.WARNING)
-                                                                 .apply()
+                                                                 .configured()
                                                                  .buildRoutine();
     assertThat(
         routine1.invoke().pass("1", "2", "3", "4", "5").close().in(timeout).all()).containsOnly("1",
@@ -1497,10 +1497,10 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
     final ClassToken<StringCallInvocation> token2 = ClassToken.tokenOf(StringCallInvocation.class);
     final Routine<String, String> routine2 = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                                                                  .with(factoryOf(token2))
-                                                                 .invocationConfiguration()
+                                                                 .withInvocation()
                                                                  .withLog(AndroidLogs.androidLog())
                                                                  .withLogLevel(Level.WARNING)
-                                                                 .apply()
+                                                                 .configured()
                                                                  .buildRoutine();
     assertThat(
         routine2.invoke().pass("1", "2", "3", "4", "5").close().in(timeout).all()).containsOnly("1",

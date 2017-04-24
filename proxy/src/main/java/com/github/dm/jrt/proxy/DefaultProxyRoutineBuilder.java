@@ -64,7 +64,7 @@ class DefaultProxyRoutineBuilder implements ProxyRoutineBuilder {
   }
 
   @NotNull
-  public ProxyRoutineBuilder apply(@NotNull final InvocationConfiguration configuration) {
+  public ProxyRoutineBuilder withConfiguration(@NotNull final InvocationConfiguration configuration) {
     mInvocationConfiguration =
         ConstantConditions.notNull("invocation configuration", configuration);
     return this;
@@ -90,7 +90,7 @@ class DefaultProxyRoutineBuilder implements ProxyRoutineBuilder {
     }
 
     final TargetProxyObjectBuilder<TYPE> builder = new TargetProxyObjectBuilder<TYPE>(mTarget, itf);
-    return builder.apply(mInvocationConfiguration).apply(mWrapperConfiguration).buildProxy();
+    return builder.withConfiguration(mInvocationConfiguration).apply(mWrapperConfiguration).buildProxy();
   }
 
   @NotNull
@@ -99,7 +99,7 @@ class DefaultProxyRoutineBuilder implements ProxyRoutineBuilder {
   }
 
   @NotNull
-  public InvocationConfiguration.Builder<? extends ProxyRoutineBuilder> invocationConfiguration() {
+  public InvocationConfiguration.Builder<? extends ProxyRoutineBuilder> withInvocation() {
     final InvocationConfiguration config = mInvocationConfiguration;
     return new InvocationConfiguration.Builder<ProxyRoutineBuilder>(this, config);
   }

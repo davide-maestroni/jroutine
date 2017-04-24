@@ -96,7 +96,7 @@ class SortByInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
     }
 
     @Override
-    public void onRestart() {
+    public void onStart() {
       mList = new ArrayList<DATA>();
     }
   }

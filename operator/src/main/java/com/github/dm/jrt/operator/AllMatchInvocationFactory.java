@@ -96,7 +96,7 @@ class AllMatchInvocationFactory<IN> extends InvocationFactory<IN, Boolean> {
     }
 
     @Override
-    public void onRestart() {
+    public void onStart() {
       mIsMatch = true;
     }
   }

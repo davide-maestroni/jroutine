@@ -68,7 +68,7 @@ class DefaultStatefulLoaderRoutineBuilderCompat<IN, OUT, STATE> extends
                                .with(new StatefulContextInvocationFactory<IN, OUT, STATE>(
                                    getOnContext(), getOnCreateState(), getOnNext(), getOnError(),
                                    getOnComplete(), getOnFinalize(), getOnDestroy()))
-                               .apply(getConfiguration())
+                               .withConfiguration(getConfiguration())
                                .apply(getLoaderConfiguration())
                                .buildRoutine();
   }
@@ -155,7 +155,7 @@ class DefaultStatefulLoaderRoutineBuilderCompat<IN, OUT, STATE> extends
       return true;
     }
 
-    public void onRestart() throws Exception {
+    public void onStart() throws Exception {
       mState = mOnCreate.apply(mState);
     }
 

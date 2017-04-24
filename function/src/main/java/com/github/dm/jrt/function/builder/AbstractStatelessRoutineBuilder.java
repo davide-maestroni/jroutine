@@ -54,8 +54,8 @@ public abstract class AbstractStatelessRoutineBuilder<IN, OUT, TYPE extends
   private final Configurable<TYPE> mConfigurable = new Configurable<TYPE>() {
 
     @NotNull
-    public TYPE apply(@NotNull final InvocationConfiguration configuration) {
-      return AbstractStatelessRoutineBuilder.this.apply(configuration);
+    public TYPE withConfiguration(@NotNull final InvocationConfiguration configuration) {
+      return AbstractStatelessRoutineBuilder.this.withConfiguration(configuration);
     }
   };
 
@@ -68,14 +68,14 @@ public abstract class AbstractStatelessRoutineBuilder<IN, OUT, TYPE extends
 
   @NotNull
   @SuppressWarnings("unchecked")
-  public TYPE apply(@NotNull final InvocationConfiguration configuration) {
+  public TYPE withConfiguration(@NotNull final InvocationConfiguration configuration) {
     mConfiguration = ConstantConditions.notNull("invocation configuration", configuration);
     return (TYPE) this;
   }
 
   @NotNull
   @SuppressWarnings("unchecked")
-  public Builder<? extends TYPE> invocationConfiguration() {
+  public Builder<? extends TYPE> withInvocation() {
     return new Builder<TYPE>(mConfigurable, mConfiguration);
   }
 

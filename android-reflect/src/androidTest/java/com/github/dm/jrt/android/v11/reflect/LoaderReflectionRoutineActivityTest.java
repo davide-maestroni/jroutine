@@ -175,7 +175,7 @@ public class LoaderReflectionRoutineActivityTest
     final Routine<Object, Object> routine = JRoutineLoaderReflection.on(loaderFrom(getActivity()))
                                                                     .with(
                                                                         instanceOf(TestClass.class))
-                                                                    .invocationConfiguration()
+                                                                    .withInvocation()
                                                                     .withExecutor(
                                                                         ScheduledExecutors.poolExecutor())
                                                                     .withMaxInvocations(1)
@@ -184,7 +184,7 @@ public class LoaderReflectionRoutineActivityTest
                                                                         TimeoutActionType.CONTINUE)
                                                                     .withLogLevel(Level.DEBUG)
                                                                     .withLog(new NullLog())
-                                                                    .apply()
+                                                                    .configured()
                                                                     .method(TestClass.GET);
 
     assertThat(routine.invoke().close().in(timeout).all()).containsExactly(-77L);
@@ -216,9 +216,9 @@ public class LoaderReflectionRoutineActivityTest
     final DurationMeasure timeout = seconds(10);
     final SumItf sumAsync = JRoutineLoaderReflection.on(loaderFrom(getActivity()))
                                                     .with(instanceOf(Sum.class))
-                                                    .invocationConfiguration()
+                                                    .withInvocation()
                                                     .withOutputTimeout(timeout)
-                                                    .apply()
+                                                    .configured()
                                                     .buildProxy(SumItf.class);
     final Channel<Integer, Integer> channel3 = JRoutineCore.<Integer>ofData().buildChannel();
     channel3.pass(7).close();
@@ -251,9 +251,9 @@ public class LoaderReflectionRoutineActivityTest
     final DurationMeasure timeout = seconds(10);
     final CountItf countAsync = JRoutineLoaderReflection.on(loaderFrom(getActivity()))
                                                         .with(instanceOf(Count.class))
-                                                        .invocationConfiguration()
+                                                        .withInvocation()
                                                         .withOutputTimeout(timeout)
-                                                        .apply()
+                                                        .configured()
                                                         .buildProxy(CountItf.class);
     assertThat(countAsync.count(3).all()).containsExactly(0, 1, 2);
     assertThat(countAsync.count1(3).all()).containsExactly(new int[]{0, 1, 2});
@@ -273,7 +273,7 @@ public class LoaderReflectionRoutineActivityTest
     try {
 
       new DefaultLoaderReflectionRoutineBuilder(loaderFrom(getActivity()),
-          instanceOf(TestClass.class)).apply((InvocationConfiguration) null);
+          instanceOf(TestClass.class)).withConfiguration((InvocationConfiguration) null);
 
       fail();
 
@@ -513,9 +513,9 @@ public class LoaderReflectionRoutineActivityTest
 
       JRoutineLoaderReflection.on(loaderFrom(getActivity()))
                               .with(instanceOf(TestClass.class))
-                              .invocationConfiguration()
+                              .withInvocation()
                               .withOutputTimeout(indefiniteTime())
-                              .apply()
+                              .configured()
                               .buildProxy(TestItf.class)
                               .throwException(null);
 
@@ -529,9 +529,9 @@ public class LoaderReflectionRoutineActivityTest
 
       JRoutineLoaderReflection.on(loaderFrom(getActivity()))
                               .with(instanceOf(TestClass.class))
-                              .invocationConfiguration()
+                              .withInvocation()
                               .withOutputTimeout(indefiniteTime())
-                              .apply()
+                              .configured()
                               .buildProxy(TestItf.class)
                               .throwException1(null);
 
@@ -545,9 +545,9 @@ public class LoaderReflectionRoutineActivityTest
 
       JRoutineLoaderReflection.on(loaderFrom(getActivity()))
                               .with(instanceOf(TestClass.class))
-                              .invocationConfiguration()
+                              .withInvocation()
                               .withOutputTimeout(indefiniteTime())
-                              .apply()
+                              .configured()
                               .buildProxy(TestItf.class)
                               .throwException2(null);
 
@@ -629,11 +629,11 @@ public class LoaderReflectionRoutineActivityTest
     final Routine<Object, Object> routine2 = JRoutineLoaderReflection.on(loaderFrom(getActivity()))
                                                                      .with(instanceOf(
                                                                          TestClass.class))
-                                                                     .invocationConfiguration()
+                                                                     .withInvocation()
                                                                      .withExecutor(
                                                                          ScheduledExecutors.poolExecutor())
                                                                      .withMaxInvocations(1)
-                                                                     .apply()
+                                                                     .configured()
                                                                      .wrapperConfiguration()
                                                                      .withSharedFields("test")
                                                                      .apply()
@@ -656,10 +656,10 @@ public class LoaderReflectionRoutineActivityTest
     final Routine<Object, Object> routine1 = JRoutineLoaderReflection.on(loaderFrom(getActivity()))
                                                                      .with(instanceOf(
                                                                          TestClass.class))
-                                                                     .invocationConfiguration()
+                                                                     .withInvocation()
                                                                      .withExecutor(
                                                                          ScheduledExecutors.poolExecutor())
-                                                                     .apply()
+                                                                     .configured()
                                                                      .method("getLong");
 
     assertThat(routine1.invoke().close().in(timeout).all()).containsExactly(-77L);
@@ -777,9 +777,9 @@ public class LoaderReflectionRoutineActivityTest
 
     final Itf itf = JRoutineLoaderReflection.on(loaderFrom(getActivity()))
                                             .with(instanceOf(Impl.class))
-                                            .invocationConfiguration()
+                                            .withInvocation()
                                             .withOutputTimeout(seconds(10))
-                                            .apply()
+                                            .configured()
                                             .buildProxy(Itf.class);
 
     assertThat(itf.add0('c')).isEqualTo((int) 'c');
@@ -927,9 +927,9 @@ public class LoaderReflectionRoutineActivityTest
     final LoaderReflectionRoutineBuilder builder =
         JRoutineLoaderReflection.on(loaderFrom(getActivity()))
                                 .with(instanceOf(TestClass2.class))
-                                .invocationConfiguration()
+                                .withInvocation()
                                 .withOutputTimeout(seconds(10))
-                                .apply();
+                                .configured();
 
     long startTime = System.currentTimeMillis();
 
@@ -969,9 +969,9 @@ public class LoaderReflectionRoutineActivityTest
 
     assertThat(JRoutineLoaderReflection.on(loaderFrom(getActivity()))
                                        .with(instanceOf(TestTimeout.class))
-                                       .invocationConfiguration()
+                                       .withInvocation()
                                        .withOutputTimeout(seconds(10))
-                                       .apply()
+                                       .configured()
                                        .loaderConfiguration()
                                        .withLoaderId(0)
                                        .apply()
@@ -984,9 +984,9 @@ public class LoaderReflectionRoutineActivityTest
 
       JRoutineLoaderReflection.on(loaderFrom(getActivity()))
                               .with(instanceOf(TestTimeout.class))
-                              .invocationConfiguration()
+                              .withInvocation()
                               .withOutputTimeoutAction(TimeoutActionType.FAIL)
-                              .apply()
+                              .configured()
                               .loaderConfiguration()
                               .withLoaderId(1)
                               .apply()
@@ -1003,9 +1003,9 @@ public class LoaderReflectionRoutineActivityTest
 
     assertThat(JRoutineLoaderReflection.on(loaderFrom(getActivity()))
                                        .with(instanceOf(TestTimeout.class))
-                                       .invocationConfiguration()
+                                       .withInvocation()
                                        .withOutputTimeout(seconds(10))
-                                       .apply()
+                                       .configured()
                                        .loaderConfiguration()
                                        .withLoaderId(2)
                                        .apply()
@@ -1018,9 +1018,9 @@ public class LoaderReflectionRoutineActivityTest
 
       JRoutineLoaderReflection.on(loaderFrom(getActivity()))
                               .with(instanceOf(TestTimeout.class))
-                              .invocationConfiguration()
+                              .withInvocation()
                               .withOutputTimeoutAction(TimeoutActionType.FAIL)
-                              .apply()
+                              .configured()
                               .loaderConfiguration()
                               .withLoaderId(3)
                               .apply()
@@ -1037,9 +1037,9 @@ public class LoaderReflectionRoutineActivityTest
 
     assertThat(JRoutineLoaderReflection.on(loaderFrom(getActivity()))
                                        .with(instanceOf(TestTimeout.class))
-                                       .invocationConfiguration()
+                                       .withInvocation()
                                        .withOutputTimeout(seconds(10))
-                                       .apply()
+                                       .configured()
                                        .loaderConfiguration()
                                        .withLoaderId(4)
                                        .apply()
@@ -1052,9 +1052,9 @@ public class LoaderReflectionRoutineActivityTest
 
       JRoutineLoaderReflection.on(loaderFrom(getActivity()))
                               .with(instanceOf(TestTimeout.class))
-                              .invocationConfiguration()
+                              .withInvocation()
                               .withOutputTimeoutAction(TimeoutActionType.FAIL)
-                              .apply()
+                              .configured()
                               .loaderConfiguration()
                               .withLoaderId(5)
                               .apply()
@@ -1071,9 +1071,9 @@ public class LoaderReflectionRoutineActivityTest
 
     assertThat(JRoutineLoaderReflection.on(loaderFrom(getActivity()))
                                        .with(instanceOf(TestTimeout.class))
-                                       .invocationConfiguration()
+                                       .withInvocation()
                                        .withOutputTimeout(seconds(10))
-                                       .apply()
+                                       .configured()
                                        .loaderConfiguration()
                                        .withLoaderId(6)
                                        .apply()
@@ -1084,9 +1084,9 @@ public class LoaderReflectionRoutineActivityTest
 
       JRoutineLoaderReflection.on(loaderFrom(getActivity()))
                               .with(instanceOf(TestTimeout.class))
-                              .invocationConfiguration()
+                              .withInvocation()
                               .withOutputTimeoutAction(TimeoutActionType.FAIL)
-                              .apply()
+                              .configured()
                               .loaderConfiguration()
                               .withLoaderId(7)
                               .apply()

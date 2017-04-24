@@ -38,7 +38,7 @@ public interface LoaderProxyRoutineBuilder
    */
   @NotNull
   @Override
-  LoaderProxyRoutineBuilder apply(@NotNull InvocationConfiguration configuration);
+  LoaderProxyRoutineBuilder withConfiguration(@NotNull InvocationConfiguration configuration);
 
   /**
    * {@inheritDoc}
@@ -116,7 +116,7 @@ public interface LoaderProxyRoutineBuilder
    */
   @NotNull
   @Override
-  InvocationConfiguration.Builder<? extends LoaderProxyRoutineBuilder> invocationConfiguration();
+  InvocationConfiguration.Builder<? extends LoaderProxyRoutineBuilder> withInvocation();
 
   /**
    * {@inheritDoc}

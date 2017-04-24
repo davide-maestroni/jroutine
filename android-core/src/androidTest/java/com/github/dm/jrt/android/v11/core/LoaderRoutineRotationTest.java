@@ -87,9 +87,9 @@ public class LoaderRoutineRotationTest
     final DurationMeasure timeout = DurationMeasure.seconds(10);
     JRoutineLoader.on(loaderFrom(getActivity()))
                   .with(factoryOf(ToUpperCase.class))
-                  .invocationConfiguration()
+                  .withInvocation()
                   .withOutputOrder(OrderType.SORTED)
-                  .apply()
+                  .configured()
                   .loaderConfiguration()
                   .withLoaderId(0)
                   .apply()

@@ -59,11 +59,9 @@ public class PipeChannelTest {
   @SuppressWarnings({"ConstantConditions", "ThrowableResultOfMethodCallIgnored"})
   public void testAbort() {
     final DurationMeasure timeout = seconds(1);
-    final Channel<String, String> channel = JRoutineCore.<String>ofData().buildChannel()
-                                                                         .pipe(
-                                                                             JRoutineCore
-                                                                                 .<String>ofData()
-                                                                                 .buildChannel());
+    final Channel<String, String> channel =
+        JRoutineCore.channel().<String>ofType().pipe(
+            JRoutineCore.channel().<String>ofType());
     channel.abort(new IllegalStateException());
     try {
       channel.in(timeout).throwError();
@@ -77,11 +75,9 @@ public class PipeChannelTest {
 
   @Test
   public void testAbortDelay() {
-    final Channel<String, String> channel = JRoutineCore.<String>ofData().buildChannel()
-                                                                         .pipe(
-                                                                             JRoutineCore
-                                                                                 .<String>ofData()
-                                                                                 .buildChannel());
+    final Channel<String, String> channel =
+        JRoutineCore.channel().<String>ofType().pipe(
+            JRoutineCore.channel().<String>ofType());
     channel.after(seconds(3)).pass("test");
     assertThat(channel.inNoTime().eventuallyContinue().all()).isEmpty();
     final ArrayList<String> results = new ArrayList<String>();
@@ -101,11 +97,9 @@ public class PipeChannelTest {
 
   @Test
   public void testAllIntoTimeout() {
-    final Channel<String, String> channel = JRoutineCore.<String>ofData().buildChannel()
-                                                                         .pipe(
-                                                                             JRoutineCore
-                                                                                 .<String>ofData()
-                                                                                 .buildChannel());
+    final Channel<String, String> channel =
+        JRoutineCore.channel().<String>ofType().pipe(
+            JRoutineCore.channel().<String>ofType());
     channel.after(seconds(3)).pass("test").close();
     assertThat(channel.inNoTime().eventuallyContinue().all()).isEmpty();
     channel.eventuallyAbort().eventuallyFail();
@@ -121,11 +115,9 @@ public class PipeChannelTest {
 
   @Test
   public void testAllIntoTimeout2() {
-    final Channel<String, String> channel = JRoutineCore.<String>ofData().buildChannel()
-                                                                         .pipe(
-                                                                             JRoutineCore
-                                                                                 .<String>ofData()
-                                                                                 .buildChannel());
+    final Channel<String, String> channel =
+        JRoutineCore.channel().<String>ofType().pipe(
+            JRoutineCore.channel().<String>ofType());
     channel.after(seconds(3)).pass("test").close();
     assertThat(channel.inNoTime().eventuallyContinue().all()).isEmpty();
     channel.eventuallyFail().in(millis(10));
@@ -141,11 +133,9 @@ public class PipeChannelTest {
 
   @Test
   public void testAllTimeout() {
-    final Channel<String, String> channel = JRoutineCore.<String>ofData().buildChannel()
-                                                                         .pipe(
-                                                                             JRoutineCore
-                                                                                 .<String>ofData()
-                                                                                 .buildChannel());
+    final Channel<String, String> channel =
+        JRoutineCore.channel().<String>ofType().pipe(
+            JRoutineCore.channel().<String>ofType());
     channel.after(seconds(3)).pass("test").close();
     assertThat(channel.inNoTime().eventuallyContinue().all()).isEmpty();
     channel.eventuallyFail();
@@ -161,11 +151,9 @@ public class PipeChannelTest {
 
   @Test
   public void testAllTimeout2() {
-    final Channel<String, String> channel = JRoutineCore.<String>ofData().buildChannel()
-                                                                         .pipe(
-                                                                             JRoutineCore
-                                                                                 .<String>ofData()
-                                                                                 .buildChannel());
+    final Channel<String, String> channel =
+        JRoutineCore.channel().<String>ofType().pipe(
+            JRoutineCore.channel().<String>ofType());
     channel.after(seconds(3)).pass("test").close();
     assertThat(channel.inNoTime().eventuallyContinue().all()).isEmpty();
     channel.eventuallyFail().in(millis(10));
@@ -182,11 +170,9 @@ public class PipeChannelTest {
   @Test
   public void testAsynchronousInput() {
     final DurationMeasure timeout = seconds(1);
-    final Channel<String, String> channel = JRoutineCore.<String>ofData().buildChannel()
-                                                                         .pipe(
-                                                                             JRoutineCore
-                                                                                 .<String>ofData()
-                                                                                 .buildChannel());
+    final Channel<String, String> channel =
+        JRoutineCore.channel().<String>ofType().pipe(
+            JRoutineCore.channel().<String>ofType());
     new Thread() {
 
       @Override
@@ -201,8 +187,12 @@ public class PipeChannelTest {
         }
       }
     }.start();
-    final Channel<String, String> outputChannel =
-        JRoutineCore.with(IdentityInvocation.<String>factoryOf()).invoke().pass(channel).close();
+    final Channel<String, String> outputChannel = JRoutineCore.routine()
+                                                              .of(IdentityInvocation
+                                                                  .<String>factory())
+                                                              .invoke()
+                                                              .pass(channel)
+                                                              .close();
     assertThat(outputChannel.in(timeout).next()).isEqualTo("test");
     assertThat(outputChannel.getComplete()).isTrue();
   }
@@ -210,15 +200,11 @@ public class PipeChannelTest {
   @Test
   public void testAsynchronousInput2() {
     final DurationMeasure timeout = seconds(1);
-    final Channel<String, String> channel1 = JRoutineCore.<String>ofData().channelConfiguration()
-                                                                          .withOrder(
-                                                                              OrderType.SORTED)
-                                                                          .apply()
-                                                                          .buildChannel()
-                                                                          .pipe(
-                                                                              JRoutineCore
-                                                                                  .<String>ofData()
-                                                                                  .buildChannel());
+    final Channel<String, String> channel1 = JRoutineCore.channel()
+                                                         .withChannel()
+                                                         .withOrder(OrderType.SORTED)
+                                                         .configured().<String>ofType().pipe(
+            JRoutineCore.channel().<String>ofType());
     new Thread() {
 
       @Override
@@ -231,65 +217,55 @@ public class PipeChannelTest {
                 .close();
       }
     }.start();
-    final Channel<String, String> outputChannel1 =
-        JRoutineCore.with(IdentityInvocation.<String>factoryOf()).invoke().pass(channel1).close();
+    final Channel<String, String> outputChannel1 = JRoutineCore.routine()
+                                                               .of(IdentityInvocation
+                                                                   .<String>factory())
+                                                               .invoke()
+                                                               .pass(channel1)
+                                                               .close();
     assertThat(outputChannel1.in(timeout).all()).containsExactly("test1", "test2", "test3");
   }
 
   @Test
   public void testDelayedClose() {
     final DurationMeasure timeout = seconds(1);
-    final Channel<String, String> channel1 = JRoutineCore.<String>ofData().buildChannel()
-                                                                          .pipe(
-                                                                              JRoutineCore
-                                                                                  .<String>ofData()
-                                                                                  .buildChannel());
+    final Channel<String, String> channel1 =
+        JRoutineCore.channel().<String>ofType().pipe(
+            JRoutineCore.channel().<String>ofType());
     channel1.after(seconds(2)).close();
     assertThat(channel1.afterNoDelay().pass("test").in(timeout).next()).isEqualTo("test");
     assertThat(channel1.isOpen()).isTrue();
-    final Channel<String, String> channel2 = JRoutineCore.<String>ofData().buildChannel()
-                                                                          .pipe(
-                                                                              JRoutineCore
-                                                                                  .<String>ofData()
-                                                                                  .buildChannel());
+    final Channel<String, String> channel2 =
+        JRoutineCore.channel().<String>ofType().pipe(
+            JRoutineCore.channel().<String>ofType());
     channel2.after(millis(100)).close();
     assertThat(channel2.after(millis(200)).pass("test").in(timeout).all()).containsExactly("test");
-    final Channel<String, String> channel3 = JRoutineCore.<String>ofData().buildChannel()
-                                                                          .pipe(
-                                                                              JRoutineCore
-                                                                                  .<String>ofData()
-                                                                                  .buildChannel());
+    final Channel<String, String> channel3 =
+        JRoutineCore.channel().<String>ofType().pipe(
+            JRoutineCore.channel().<String>ofType());
     channel3.after(millis(200)).close();
     assertThat(channel3.afterNoDelay().pass("test").in(timeout).all()).containsExactly("test");
   }
 
   @Test
   public void testDelayedConsumer() {
-    final Channel<String, String> channel1 = JRoutineCore.<String>ofData().buildChannel()
-                                                                          .pipe(
-                                                                              JRoutineCore
-                                                                                  .<String>ofData()
-                                                                                  .buildChannel());
-    final Channel<String, String> channel2 = JRoutineCore.<String>ofData().buildChannel()
-                                                                          .pipe(
-                                                                              JRoutineCore
-                                                                                  .<String>ofData()
-                                                                                  .buildChannel());
+    final Channel<String, String> channel1 =
+        JRoutineCore.channel().<String>ofType().pipe(
+            JRoutineCore.channel().<String>ofType());
+    final Channel<String, String> channel2 =
+        JRoutineCore.channel().<String>ofType().pipe(
+            JRoutineCore.channel().<String>ofType());
     channel2.after(millis(300)).pass(channel1).afterNoDelay().close();
     channel1.pass("test").close();
     long startTime = System.currentTimeMillis();
     assertThat(channel2.in(seconds(1)).all()).containsExactly("test");
     assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(300);
-    final Channel<String, String> channel3 = JRoutineCore.<String>ofData().buildChannel()
-                                                                          .pipe(
-                                                                              JRoutineCore
-                                                                                  .<String>ofData()
-                                                                                  .buildChannel());
-    final Channel<String, String> channel4 = JRoutineCore.<String>ofData().buildChannel()
-                                                                          .pipe(
-                                                                              JRoutineCore
-                                                                                  .<String>ofData()
-                                                                                  .buildChannel());
+    final Channel<String, String> channel3 =
+        JRoutineCore.channel().<String>ofType().pipe(
+            JRoutineCore.channel().<String>ofType());
+    final Channel<String, String> channel4 =
+        JRoutineCore.channel().<String>ofType().pipe(
+            JRoutineCore.channel().<String>ofType());
     channel4.after(millis(300)).pass(channel3).afterNoDelay().close();
     startTime = System.currentTimeMillis();
     channel3.abort();
@@ -300,11 +276,9 @@ public class PipeChannelTest {
 
   @Test
   public void testEmpty() {
-    final Channel<String, String> channel = JRoutineCore.<String>ofData().buildChannel()
-                                                                         .pipe(
-                                                                             JRoutineCore
-                                                                                 .<String>ofData()
-                                                                                 .buildChannel());
+    final Channel<String, String> channel =
+        JRoutineCore.channel().<String>ofType().pipe(
+            JRoutineCore.channel().<String>ofType());
     assertThat(channel.isEmpty()).isTrue();
     assertThat(channel.pass("test").isEmpty()).isFalse();
     channel.in(seconds(1)).next();
@@ -316,8 +290,11 @@ public class PipeChannelTest {
 
   @Test
   public void testEmptyAbort() {
-    final Channel<Object, Object> channel =
-        JRoutineCore.ofData().buildChannel().pipe(JRoutineCore.ofData().buildChannel());
+    final Channel<Object, Object> channel = JRoutineCore.channel()
+                                                        .ofType()
+                                                        .pipe(
+                                                            JRoutineCore.channel()
+                                                                        .ofType());
     assertThat(channel.isEmpty()).isTrue();
     assertThat(channel.pass("test").isEmpty()).isFalse();
     assertThat(channel.abort()).isTrue();
@@ -326,11 +303,9 @@ public class PipeChannelTest {
 
   @Test
   public void testHasNextIteratorTimeout() {
-    final Channel<String, String> channel = JRoutineCore.<String>ofData().buildChannel()
-                                                                         .pipe(
-                                                                             JRoutineCore
-                                                                                 .<String>ofData()
-                                                                                 .buildChannel());
+    final Channel<String, String> channel =
+        JRoutineCore.channel().<String>ofType().pipe(
+            JRoutineCore.channel().<String>ofType());
     channel.after(seconds(3)).pass("test").close();
     assertThat(channel.inNoTime().eventuallyContinue().all()).isEmpty();
     channel.eventuallyFail();
@@ -346,11 +321,9 @@ public class PipeChannelTest {
 
   @Test
   public void testHasNextIteratorTimeout2() {
-    final Channel<String, String> channel = JRoutineCore.<String>ofData().buildChannel()
-                                                                         .pipe(
-                                                                             JRoutineCore
-                                                                                 .<String>ofData()
-                                                                                 .buildChannel());
+    final Channel<String, String> channel =
+        JRoutineCore.channel().<String>ofType().pipe(
+            JRoutineCore.channel().<String>ofType());
     channel.after(seconds(3)).pass("test").close();
     assertThat(channel.inNoTime().eventuallyContinue().all()).isEmpty();
     channel.eventuallyFail().in(millis(10));
@@ -367,9 +340,12 @@ public class PipeChannelTest {
   @Test
   public void testIllegalBind() {
     final Channel<Object, Object> invocationChannel =
-        JRoutineCore.with(IdentityInvocation.factoryOf()).invoke();
-    final Channel<Object, Object> channel =
-        JRoutineCore.ofData().buildChannel().pipe(JRoutineCore.ofData().buildChannel());
+        JRoutineCore.routine().of(IdentityInvocation.factory()).invoke();
+    final Channel<Object, Object> channel = JRoutineCore.channel()
+                                                        .ofType()
+                                                        .pipe(
+                                                            JRoutineCore.channel()
+                                                                        .ofType());
     invocationChannel.consume(new TemplateChannelConsumer<Object>() {});
     try {
       channel.pass(invocationChannel);
@@ -382,12 +358,12 @@ public class PipeChannelTest {
   @Test
   public void testMaxSize() {
     try {
-      JRoutineCore.ofData()
-                  .channelConfiguration()
+      JRoutineCore.channel()
+                  .withChannel()
                   .withMaxSize(1)
-                  .apply()
-                  .buildChannel()
-                  .pipe(JRoutineCore.ofData().buildChannel())
+                  .configured()
+                  .ofType()
+                  .pipe(JRoutineCore.channel().ofType())
                   .pass("test1", "test2");
       fail();
 
@@ -397,11 +373,9 @@ public class PipeChannelTest {
 
   @Test
   public void testNextIteratorTimeout() {
-    final Channel<String, String> channel = JRoutineCore.<String>ofData().buildChannel()
-                                                                         .pipe(
-                                                                             JRoutineCore
-                                                                                 .<String>ofData()
-                                                                                 .buildChannel());
+    final Channel<String, String> channel =
+        JRoutineCore.channel().<String>ofType().pipe(
+            JRoutineCore.channel().<String>ofType());
     channel.after(seconds(3)).pass("test").close();
     assertThat(channel.inNoTime().eventuallyContinue().all()).isEmpty();
     channel.eventuallyFail();
@@ -417,11 +391,9 @@ public class PipeChannelTest {
 
   @Test
   public void testNextIteratorTimeout2() {
-    final Channel<String, String> channel = JRoutineCore.<String>ofData().buildChannel()
-                                                                         .pipe(
-                                                                             JRoutineCore
-                                                                                 .<String>ofData()
-                                                                                 .buildChannel());
+    final Channel<String, String> channel =
+        JRoutineCore.channel().<String>ofType().pipe(
+            JRoutineCore.channel().<String>ofType());
     channel.after(seconds(3)).pass("test").close();
     assertThat(channel.inNoTime().eventuallyContinue().all()).isEmpty();
     channel.eventuallyFail().in(millis(10));
@@ -437,25 +409,25 @@ public class PipeChannelTest {
 
   @Test
   public void testNextList() {
-    assertThat(JRoutineCore.ofData()
-                           .buildChannel()
-                           .pipe(JRoutineCore.ofData().buildChannel())
+    assertThat(JRoutineCore.channel()
+                           .ofType()
+                           .pipe(JRoutineCore.channel().ofType())
                            .pass("test1", "test2", "test3", "test4")
                            .close()
                            .in(seconds(1))
                            .next(2)).containsExactly("test1", "test2");
-    assertThat(JRoutineCore.ofData()
-                           .buildChannel()
-                           .pipe(JRoutineCore.ofData().buildChannel())
+    assertThat(JRoutineCore.channel()
+                           .ofType()
+                           .pipe(JRoutineCore.channel().ofType())
                            .pass("test1")
                            .close()
                            .eventuallyContinue()
                            .in(seconds(1))
                            .next(2)).containsExactly("test1");
     try {
-      JRoutineCore.ofData()
-                  .buildChannel()
-                  .pipe(JRoutineCore.ofData().buildChannel())
+      JRoutineCore.channel()
+                  .ofType()
+                  .pipe(JRoutineCore.channel().ofType())
                   .pass("test1")
                   .eventuallyAbort()
                   .in(seconds(1))
@@ -466,9 +438,9 @@ public class PipeChannelTest {
     }
 
     try {
-      JRoutineCore.ofData()
-                  .buildChannel()
-                  .pipe(JRoutineCore.ofData().buildChannel())
+      JRoutineCore.channel()
+                  .ofType()
+                  .pipe(JRoutineCore.channel().ofType())
                   .pass("test1")
                   .eventuallyAbort(new IllegalStateException())
                   .in(seconds(1))
@@ -480,9 +452,9 @@ public class PipeChannelTest {
     }
 
     try {
-      JRoutineCore.ofData()
-                  .buildChannel()
-                  .pipe(JRoutineCore.ofData().buildChannel())
+      JRoutineCore.channel()
+                  .ofType()
+                  .pipe(JRoutineCore.channel().ofType())
                   .pass("test1")
                   .eventuallyFail()
                   .in(seconds(1))
@@ -495,22 +467,22 @@ public class PipeChannelTest {
 
   @Test
   public void testNextOr() {
-    assertThat(JRoutineCore.ofData()
-                           .buildChannel()
-                           .pipe(JRoutineCore.ofData().buildChannel())
+    assertThat(JRoutineCore.channel()
+                           .ofType()
+                           .pipe(JRoutineCore.channel().ofType())
                            .pass("test1")
                            .in(seconds(1))
                            .nextOrElse(2)).isEqualTo("test1");
-    assertThat(JRoutineCore.ofData()
-                           .buildChannel()
-                           .pipe(JRoutineCore.ofData().buildChannel())
+    assertThat(JRoutineCore.channel()
+                           .ofType()
+                           .pipe(JRoutineCore.channel().ofType())
                            .eventuallyContinue()
                            .in(seconds(1))
                            .nextOrElse(2)).isEqualTo(2);
     try {
-      JRoutineCore.ofData()
-                  .buildChannel()
-                  .pipe(JRoutineCore.ofData().buildChannel())
+      JRoutineCore.channel()
+                  .ofType()
+                  .pipe(JRoutineCore.channel().ofType())
                   .eventuallyAbort()
                   .in(millis(100))
                   .nextOrElse("test2");
@@ -520,9 +492,9 @@ public class PipeChannelTest {
     }
 
     try {
-      JRoutineCore.ofData()
-                  .buildChannel()
-                  .pipe(JRoutineCore.ofData().buildChannel())
+      JRoutineCore.channel()
+                  .ofType()
+                  .pipe(JRoutineCore.channel().ofType())
                   .eventuallyAbort(new IllegalStateException())
                   .in(millis(100))
                   .nextOrElse("test2");
@@ -533,9 +505,9 @@ public class PipeChannelTest {
     }
 
     try {
-      JRoutineCore.ofData()
-                  .buildChannel()
-                  .pipe(JRoutineCore.ofData().buildChannel())
+      JRoutineCore.channel()
+                  .ofType()
+                  .pipe(JRoutineCore.channel().ofType())
                   .eventuallyFail()
                   .in(millis(100))
                   .nextOrElse("test2");
@@ -547,11 +519,9 @@ public class PipeChannelTest {
 
   @Test
   public void testNextTimeout() {
-    final Channel<String, String> channel = JRoutineCore.<String>ofData().buildChannel()
-                                                                         .pipe(
-                                                                             JRoutineCore
-                                                                                 .<String>ofData()
-                                                                                 .buildChannel());
+    final Channel<String, String> channel =
+        JRoutineCore.channel().<String>ofType().pipe(
+            JRoutineCore.channel().<String>ofType());
     channel.after(seconds(3)).pass("test").close();
     assertThat(channel.inNoTime().eventuallyContinue().all()).isEmpty();
     channel.eventuallyFail();
@@ -567,11 +537,9 @@ public class PipeChannelTest {
 
   @Test
   public void testNextTimeout2() {
-    final Channel<String, String> channel = JRoutineCore.<String>ofData().buildChannel()
-                                                                         .pipe(
-                                                                             JRoutineCore
-                                                                                 .<String>ofData()
-                                                                                 .buildChannel());
+    final Channel<String, String> channel =
+        JRoutineCore.channel().<String>ofType().pipe(
+            JRoutineCore.channel().<String>ofType());
     channel.after(seconds(3)).pass("test").close();
     assertThat(channel.eventuallyContinue().all()).isEmpty();
     channel.eventuallyFail().in(millis(10));
@@ -587,40 +555,40 @@ public class PipeChannelTest {
 
   @Test
   public void testOf() {
-    final Channel<?, Integer> channel = JRoutineCore.of(2)
-                                                    .buildChannel()
+    final Channel<?, Integer> channel = JRoutineCore.channel()
+                                                    .of(2)
                                                     .pipe(
-                                                        JRoutineCore.<Integer>ofData()
-                                                            .buildChannel())
+                                                        JRoutineCore.channel()
+                                                            .<Integer>ofType())
                                                     .close();
     assertThat(channel.isOpen()).isFalse();
     assertThat(channel.in(seconds(1)).all()).containsExactly(2);
-    assertThat(JRoutineCore.of()
-                           .buildChannel()
-                           .pipe(JRoutineCore.ofData().buildChannel())
+    assertThat(JRoutineCore.channel()
+                           .of()
+                           .pipe(JRoutineCore.channel().ofType())
                            .close()
                            .in(seconds(1))
                            .all()).isEmpty();
-    assertThat(JRoutineCore.of(-11, 73)
-                           .buildChannel()
-                           .pipe(JRoutineCore.<Integer>ofData().buildChannel())
+    assertThat(JRoutineCore.channel()
+                           .of(-11, 73)
+                           .pipe(JRoutineCore.channel().<Integer>ofType())
                            .close()
                            .in(seconds(1))
                            .all()).containsExactly(-11, 73);
-    assertThat(JRoutineCore.of(Arrays.asList(3, 12, -7))
-                           .buildChannel()
-                           .pipe(JRoutineCore.<Integer>ofData().buildChannel())
+    assertThat(JRoutineCore.channel()
+                           .of(Arrays.asList(3, 12, -7))
+                           .pipe(JRoutineCore.channel().<Integer>ofType())
                            .close()
                            .in(seconds(1))
                            .all()).containsExactly(3, 12, -7);
-    assertThat(JRoutineCore.of((Object[]) null)
-                           .buildChannel()
-                           .pipe(JRoutineCore.ofData().buildChannel())
+    assertThat(JRoutineCore.channel()
+                           .of((Object[]) null)
+                           .pipe(JRoutineCore.channel().ofType())
                            .close()
                            .all()).isEmpty();
-    assertThat(JRoutineCore.of((List<Object>) null)
-                           .buildChannel()
-                           .pipe(JRoutineCore.ofData().buildChannel())
+    assertThat(JRoutineCore.channel()
+                           .of((List<Object>) null)
+                           .pipe(JRoutineCore.channel().ofType())
                            .close()
                            .all()).isEmpty();
   }
@@ -628,25 +596,34 @@ public class PipeChannelTest {
   @Test
   public void testOrderType() {
     final DurationMeasure timeout = seconds(1);
-    final Channel<Object, Object> channel = JRoutineCore.ofData()
-                                                        .channelConfiguration()
+    final Channel<Object, Object> channel = JRoutineCore.channel()
+                                                        .withChannel()
                                                         .withOrder(OrderType.SORTED)
-                                                        .withExecutor(ScheduledExecutors.defaultExecutor())
+                                                        .withExecutor(
+                                                            ScheduledExecutors.defaultExecutor())
                                                         .withMaxSize(1)
                                                         .withBackoff(noDelay())
                                                         .withLogLevel(Level.DEBUG)
                                                         .withLog(new NullLog())
-                                                        .apply()
-                                                        .buildChannel()
-                                                        .pipe(JRoutineCore.ofData().buildChannel());
+                                                        .configured()
+                                                        .ofType()
+                                                        .pipe(
+                                                            JRoutineCore.channel()
+                                                                        .ofType());
     channel.pass(-77L);
     assertThat(channel.in(timeout).next()).isEqualTo(-77L);
-    final Channel<Object, Object> channel1 =
-        JRoutineCore.ofData().buildChannel().pipe(JRoutineCore.ofData().buildChannel());
+    final Channel<Object, Object> channel1 = JRoutineCore.channel()
+                                                         .ofType()
+                                                         .pipe(
+                                                             JRoutineCore.channel()
+                                                                         .ofType());
     channel1.after(millis(200)).pass(23).afterNoDelay().pass(-77L).close();
     assertThat(channel1.in(timeout).all()).containsOnly(23, -77L);
-    final Channel<Object, Object> channel2 =
-        JRoutineCore.ofData().buildChannel().pipe(JRoutineCore.ofData().buildChannel());
+    final Channel<Object, Object> channel2 = JRoutineCore.channel()
+                                                         .ofType()
+                                                         .pipe(
+                                                             JRoutineCore.channel()
+                                                                         .ofType());
     channel2.unsorted().sorted();
     channel2.after(millis(200)).pass(23).afterNoDelay().pass(-77L).close();
     assertThat(channel2.in(timeout).all()).containsExactly(23, -77L);
@@ -654,11 +631,9 @@ public class PipeChannelTest {
 
   @Test
   public void testPartialOut() {
-    final Channel<String, String> channel = JRoutineCore.<String>ofData().buildChannel()
-                                                                         .pipe(
-                                                                             JRoutineCore
-                                                                                 .<String>ofData()
-                                                                                 .buildChannel());
+    final Channel<String, String> channel =
+        JRoutineCore.channel().<String>ofType().pipe(
+            JRoutineCore.channel().<String>ofType());
     new Thread() {
 
       @Override
@@ -667,12 +642,13 @@ public class PipeChannelTest {
       }
     }.start();
     final long startTime = System.currentTimeMillis();
-    final Channel<String, String> outputChannel =
-        JRoutineCore.with(IdentityInvocation.<String>factoryOf())
-                    .invoke()
-                    .pass(channel)
-                    .close()
-                    .eventuallyContinue();
+    final Channel<String, String> outputChannel = JRoutineCore.routine()
+                                                              .of(IdentityInvocation
+                                                                  .<String>factory())
+                                                              .invoke()
+                                                              .pass(channel)
+                                                              .close()
+                                                              .eventuallyContinue();
     assertThat(outputChannel.in(millis(500)).all()).containsExactly("test");
     assertThat(System.currentTimeMillis() - startTime).isLessThan(2000);
     assertThat(outputChannel.inNoTime().getComplete()).isFalse();
@@ -683,33 +659,35 @@ public class PipeChannelTest {
 
   @Test
   public void testPassTimeout() {
-    final Channel<Object, Object> channel1 = JRoutineCore.ofData()
-                                                         .buildChannel()
-                                                         .pipe(JRoutineCore.ofData()
-                                                                           .channelConfiguration()
-                                                                           .withOutputTimeout(
-                                                                               millis(10))
-                                                                           .withOutputTimeoutAction(
-                                                                               TimeoutActionType
-                                                                                   .CONTINUE)
-                                                                           .apply()
-                                                                           .buildChannel());
+    final Channel<Object, Object> channel1 = JRoutineCore.channel()
+                                                         .ofType()
+                                                         .pipe(
+                                                             JRoutineCore.channel()
+                                                                         .withChannel()
+                                                                         .withOutputTimeout(
+                                                                             millis(10))
+                                                                         .withOutputTimeoutAction(
+                                                                             TimeoutActionType
+                                                                                 .CONTINUE)
+                                                                         .configured()
+                                                                         .ofType());
     assertThat(channel1.all()).isEmpty();
   }
 
   @Test
   public void testPassTimeout2() {
-    final Channel<Object, Object> channel2 = JRoutineCore.ofData()
-                                                         .buildChannel()
-                                                         .pipe(JRoutineCore.ofData()
-                                                                           .channelConfiguration()
-                                                                           .withOutputTimeout(
-                                                                               millis(10))
-                                                                           .withOutputTimeoutAction(
-                                                                               TimeoutActionType
-                                                                                   .ABORT)
-                                                                           .apply()
-                                                                           .buildChannel());
+    final Channel<Object, Object> channel2 = JRoutineCore.channel()
+                                                         .ofType()
+                                                         .pipe(
+                                                             JRoutineCore.channel()
+                                                                         .withChannel()
+                                                                         .withOutputTimeout(
+                                                                             millis(10))
+                                                                         .withOutputTimeoutAction(
+                                                                             TimeoutActionType
+                                                                                 .ABORT)
+                                                                         .configured()
+                                                                         .ofType());
     try {
       channel2.all();
       fail();
@@ -720,15 +698,16 @@ public class PipeChannelTest {
 
   @Test
   public void testPassTimeout3() {
-    final Channel<Object, Object> channel3 = JRoutineCore.ofData()
-                                                         .channelConfiguration()
+    final Channel<Object, Object> channel3 = JRoutineCore.channel()
+                                                         .withChannel()
                                                          .withOutputTimeout(millis(10))
                                                          .withOutputTimeoutAction(
                                                              TimeoutActionType.FAIL)
-                                                         .apply()
-                                                         .buildChannel()
+                                                         .configured()
+                                                         .ofType()
                                                          .pipe(
-                                                             JRoutineCore.ofData().buildChannel());
+                                                             JRoutineCore.channel()
+                                                                         .ofType());
     try {
       channel3.all();
       fail();
@@ -739,15 +718,22 @@ public class PipeChannelTest {
 
   @Test
   public void testPendingInputs() {
-    final Channel<Object, Object> channel =
-        JRoutineCore.ofData().buildChannel().pipe(JRoutineCore.ofData().buildChannel());
+    final Channel<Object, Object> channel = JRoutineCore.channel()
+                                                        .ofType()
+                                                        .pipe(
+                                                            JRoutineCore.channel()
+                                                                        .ofType());
     assertThat(channel.isOpen()).isTrue();
     channel.pass("test");
     assertThat(channel.isOpen()).isTrue();
     channel.after(millis(500)).pass("test");
     assertThat(channel.isOpen()).isTrue();
-    final Channel<Object, Object> outputChannel =
-        JRoutineCore.ofData().buildChannel().pipe(JRoutineCore.ofData().buildChannel());
+    final Channel<Object, Object> outputChannel = JRoutineCore.channel()
+                                                              .ofType()
+                                                              .pipe(
+                                                                  JRoutineCore
+                                                                      .channel()
+                                                                              .ofType());
     channel.pass(outputChannel);
     assertThat(channel.isOpen()).isTrue();
     channel.afterNoDelay().close();
@@ -758,15 +744,22 @@ public class PipeChannelTest {
 
   @Test
   public void testPendingInputsAbort() {
-    final Channel<Object, Object> channel =
-        JRoutineCore.ofData().buildChannel().pipe(JRoutineCore.ofData().buildChannel());
+    final Channel<Object, Object> channel = JRoutineCore.channel()
+                                                        .ofType()
+                                                        .pipe(
+                                                            JRoutineCore.channel()
+                                                                        .ofType());
     assertThat(channel.isOpen()).isTrue();
     channel.pass("test");
     assertThat(channel.isOpen()).isTrue();
     channel.after(millis(500)).pass("test");
     assertThat(channel.isOpen()).isTrue();
-    final Channel<Object, Object> outputChannel =
-        JRoutineCore.ofData().buildChannel().pipe(JRoutineCore.ofData().buildChannel());
+    final Channel<Object, Object> outputChannel = JRoutineCore.channel()
+                                                              .ofType()
+                                                              .pipe(
+                                                                  JRoutineCore
+                                                                      .channel()
+                                                                              .ofType());
     channel.pass(outputChannel);
     assertThat(channel.isOpen()).isTrue();
     channel.afterNoDelay().abort();
@@ -776,22 +769,27 @@ public class PipeChannelTest {
   @Test
   public void testReadFirst() {
     final DurationMeasure timeout = seconds(1);
-    final Channel<String, String> channel = JRoutineCore.<String>ofData().buildChannel()
-                                                                         .pipe(
-                                                                             JRoutineCore
-                                                                                 .<String>ofData()
-                                                                                 .buildChannel());
+    final Channel<String, String> channel =
+        JRoutineCore.channel().<String>ofType().pipe(
+            JRoutineCore.channel().<String>ofType());
     new WeakThread(channel).start();
-    final Channel<String, String> outputChannel =
-        JRoutineCore.with(IdentityInvocation.<String>factoryOf()).invoke().pass(channel).close();
+    final Channel<String, String> outputChannel = JRoutineCore.routine()
+                                                              .of(IdentityInvocation
+                                                                  .<String>factory())
+                                                              .invoke()
+                                                              .pass(channel)
+                                                              .close();
     assertThat(outputChannel.in(timeout).next()).isEqualTo("test");
   }
 
   @Test
   public void testSize() {
-    final Channel<Object, Object> channel = JRoutineCore.with(IdentityInvocation.factoryOf())
+    final Channel<Object, Object> channel = JRoutineCore.routine()
+                                                        .of(IdentityInvocation.factory())
                                                         .invoke()
-                                                        .pipe(JRoutineCore.ofData().buildChannel());
+                                                        .pipe(
+                                                            JRoutineCore.channel()
+                                                                        .ofType());
     assertThat(channel.inputSize()).isEqualTo(0);
     assertThat(channel.outputSize()).isEqualTo(0);
     channel.after(millis(500)).pass("test");
@@ -804,8 +802,11 @@ public class PipeChannelTest {
     assertThat(channel.size()).isEqualTo(1);
     assertThat(channel.skipNext(1).outputSize()).isEqualTo(0);
 
-    final Channel<Object, Object> channel1 =
-        JRoutineCore.ofData().buildChannel().pipe(JRoutineCore.ofData().buildChannel());
+    final Channel<Object, Object> channel1 = JRoutineCore.channel()
+                                                         .ofType()
+                                                         .pipe(
+                                                             JRoutineCore.channel()
+                                                                         .ofType());
     assertThat(channel1.inputSize()).isEqualTo(0);
     assertThat(channel1.outputSize()).isEqualTo(0);
     channel1.after(millis(500)).pass("test");
@@ -821,17 +822,17 @@ public class PipeChannelTest {
 
   @Test
   public void testSkip() {
-    assertThat(JRoutineCore.ofData()
-                           .buildChannel()
-                           .pipe(JRoutineCore.ofData().buildChannel())
+    assertThat(JRoutineCore.channel()
+                           .ofType()
+                           .pipe(JRoutineCore.channel().ofType())
                            .pass("test1", "test2", "test3", "test4")
                            .close()
                            .in(seconds(1))
                            .skipNext(2)
                            .all()).containsExactly("test3", "test4");
-    assertThat(JRoutineCore.ofData()
-                           .buildChannel()
-                           .pipe(JRoutineCore.ofData().buildChannel())
+    assertThat(JRoutineCore.channel()
+                           .ofType()
+                           .pipe(JRoutineCore.channel().ofType())
                            .pass("test1")
                            .close()
                            .eventuallyContinue()
@@ -839,9 +840,9 @@ public class PipeChannelTest {
                            .skipNext(2)
                            .all()).isEmpty();
     try {
-      JRoutineCore.ofData()
-                  .buildChannel()
-                  .pipe(JRoutineCore.ofData().buildChannel())
+      JRoutineCore.channel()
+                  .ofType()
+                  .pipe(JRoutineCore.channel().ofType())
                   .pass("test1")
                   .close()
                   .eventuallyAbort()
@@ -853,9 +854,9 @@ public class PipeChannelTest {
     }
 
     try {
-      JRoutineCore.ofData()
-                  .buildChannel()
-                  .pipe(JRoutineCore.ofData().buildChannel())
+      JRoutineCore.channel()
+                  .ofType()
+                  .pipe(JRoutineCore.channel().ofType())
                   .pass("test1")
                   .close()
                   .eventuallyAbort(new IllegalStateException())
@@ -868,9 +869,9 @@ public class PipeChannelTest {
     }
 
     try {
-      JRoutineCore.ofData()
-                  .buildChannel()
-                  .pipe(JRoutineCore.ofData().buildChannel())
+      JRoutineCore.channel()
+                  .ofType()
+                  .pipe(JRoutineCore.channel().ofType())
                   .pass("test1")
                   .close()
                   .eventuallyFail()

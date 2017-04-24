@@ -67,7 +67,7 @@ class DefaultWrapperRoutineBuilder implements WrapperRoutineBuilder {
   }
 
   @NotNull
-  public WrapperRoutineBuilder apply(@NotNull final InvocationConfiguration configuration) {
+  public WrapperRoutineBuilder withConfiguration(@NotNull final InvocationConfiguration configuration) {
     mInvocationConfiguration =
         ConstantConditions.notNull("invocation configuration", configuration);
     return this;
@@ -80,15 +80,15 @@ class DefaultWrapperRoutineBuilder implements WrapperRoutineBuilder {
   }
 
   @NotNull
-  public InvocationConfiguration.Builder<? extends WrapperRoutineBuilder> invocationConfiguration
+  public InvocationConfiguration.Builder<? extends WrapperRoutineBuilder> withInvocation
       () {
     final InvocationConfiguration config = mInvocationConfiguration;
     return new InvocationConfiguration.Builder<WrapperRoutineBuilder>(
         new InvocationConfiguration.Configurable<WrapperRoutineBuilder>() {
 
           @NotNull
-          public WrapperRoutineBuilder apply(@NotNull final InvocationConfiguration configuration) {
-            return DefaultWrapperRoutineBuilder.this.apply(configuration);
+          public WrapperRoutineBuilder withConfiguration(@NotNull final InvocationConfiguration configuration) {
+            return DefaultWrapperRoutineBuilder.this.withConfiguration(configuration);
           }
         }, config);
   }
@@ -153,13 +153,13 @@ class DefaultWrapperRoutineBuilder implements WrapperRoutineBuilder {
 
   @NotNull
   private ProxyRoutineBuilder newProxyBuilder() {
-    return JRoutineProxy.with(mTarget).apply(mInvocationConfiguration).apply(mWrapperConfiguration);
+    return JRoutineProxy.with(mTarget).withConfiguration(mInvocationConfiguration).apply(mWrapperConfiguration);
   }
 
   @NotNull
   private ReflectionRoutineBuilder newReflectionBuilder() {
     return JRoutineReflection.with(mTarget)
-                             .apply(mInvocationConfiguration)
+                             .withConfiguration(mInvocationConfiguration)
                              .apply(mWrapperConfiguration);
   }
 }

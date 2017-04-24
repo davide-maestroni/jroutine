@@ -18,45 +18,52 @@ package com.github.dm.jrt.core;
 
 import com.github.dm.jrt.core.builder.AbstractChannelBuilder;
 import com.github.dm.jrt.core.channel.Channel;
+import com.github.dm.jrt.core.executor.ScheduledExecutor;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Class implementing a builder of channel objects.
  * <p>
  * Created by davide-maestroni on 10/25/2014.
- *
- * @param <DATA> the data type.
  */
-class DefaultChannelBuilder<DATA> extends AbstractChannelBuilder<DATA, DATA> {
+class DefaultChannelBuilder extends AbstractChannelBuilder {
 
-  private final Iterable<DATA> mData;
-
-  /**
-   * Constructor.
-   */
-  DefaultChannelBuilder() {
-    mData = null;
-  }
+  private final ScheduledExecutor mExecutor;
 
   /**
    * Constructor.
    *
-   * @param data the output data.
+   * @param executor the executor instance.
    */
-  DefaultChannelBuilder(@NotNull final Iterable<DATA> data) {
-    mData = ConstantConditions.notNull("data", data);
+  DefaultChannelBuilder(@NotNull final ScheduledExecutor executor) {
+    mExecutor = ConstantConditions.notNull("executor instance", executor);
   }
 
   @NotNull
-  public Channel<DATA, DATA> buildChannel() {
-    final DefaultChannel<DATA> channel = new DefaultChannel<DATA>(getConfiguration());
-    final Iterable<DATA> data = mData;
-    if (data != null) {
-      channel.pass(data).close();
-    }
+  public <OUT> Channel<?, OUT> of(@Nullable final OUT... outputs) {
+    return this.<OUT>ofType().pass(outputs).close();
+  }
 
-    return channel;
+  @NotNull
+  public <OUT> Channel<?, OUT> of(@Nullable final Iterable<OUT> outputs) {
+    return this.<OUT>ofType().pass(outputs).close();
+  }
+
+  @NotNull
+  public <OUT> Channel<?, OUT> of() {
+    return this.<OUT>ofType().close();
+  }
+
+  @NotNull
+  public <OUT> Channel<?, OUT> of(@Nullable final OUT output) {
+    return this.<OUT>ofType().pass(output).close();
+  }
+
+  @NotNull
+  public <DATA> Channel<DATA, DATA> ofType() {
+    return new DefaultChannel<DATA>(getConfiguration(), mExecutor);
   }
 }

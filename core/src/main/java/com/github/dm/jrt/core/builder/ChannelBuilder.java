@@ -20,6 +20,7 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfigurable;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Interface defining a builder of channel objects.
@@ -27,17 +28,62 @@ import org.jetbrains.annotations.NotNull;
  * Note that the passed inputs might be delivered through the configured executor.
  * <p>
  * Created by davide-maestroni on 03/07/2015.
- *
- * @param <IN>  the input data type.
- * @param <OUT> the output data type.
  */
-public interface ChannelBuilder<IN, OUT> extends ChannelConfigurable<ChannelBuilder<IN, OUT>> {
+public interface ChannelBuilder extends ChannelConfigurable<ChannelBuilder> {
 
   /**
-   * Builds and returns a channel instance.
+   * Creates a channel producing the specified outputs.
+   * <p>
+   * Note that the returned channel will be already closed.
    *
-   * @return the newly created channel.
+   * @param outputs the output data.
+   * @param <OUT>   the output data type.
+   * @return the channel instance.
    */
   @NotNull
-  Channel<IN, OUT> buildChannel();
+  <OUT> Channel<?, OUT> of(@Nullable OUT... outputs);
+
+  /**
+   * Creates a channel producing the specified outputs.
+   * <p>
+   * Note that the returned channel will be already closed.
+   *
+   * @param outputs the iterable returning the output data.
+   * @param <OUT>   the output data type.
+   * @return the channel instance.
+   */
+  @NotNull
+  <OUT> Channel<?, OUT> of(@Nullable Iterable<OUT> outputs);
+
+  /**
+   * Creates a channel producing no data.
+   * <p>
+   * Note that the returned channel will be already closed.
+   *
+   * @param <OUT> the output data type.
+   * @return the channel instance.
+   */
+  @NotNull
+  <OUT> Channel<?, OUT> of();
+
+  /**
+   * Creates a channel producing the specified output.
+   * <p>
+   * Note that the returned channel will be already closed.
+   *
+   * @param output the output.
+   * @param <OUT>  the output data type.
+   * @return the channel instance.
+   */
+  @NotNull
+  <OUT> Channel<?, OUT> of(@Nullable OUT output);
+
+  /**
+   * Creates a new channel instance.
+   *
+   * @param <DATA> the data type.
+   * @return the channel instance.
+   */
+  @NotNull
+  <DATA> Channel<DATA, DATA> ofType();
 }

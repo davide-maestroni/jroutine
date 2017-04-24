@@ -539,7 +539,7 @@ public class StreamBuilderTest {
                                                    .streamInvocationConfiguration()
                                                    .withInputMaxSize(1)
                                                    .withOutputMaxSize(1)
-                                                   .apply()
+                                                   .configured()
                                                    .map(new Function<Number, Double>() {
 
                                                      public Double apply(final Number number) {
@@ -555,7 +555,7 @@ public class StreamBuilderTest {
                                                    .streamInvocationConfiguration()
                                                    .withInputMaxSize(1)
                                                    .withOutputMaxSize(1)
-                                                   .apply()
+                                                   .configured()
                                                    .map(new Function<Number, Double>() {
 
                                                      public Double apply(final Number number) {
@@ -774,15 +774,15 @@ public class StreamBuilderTest {
         public Object apply(final String s) {
           return JRoutineStream.<String>withStream().nextInvocationConfiguration()
                                                     .withExecutor(executor1)
-                                                    .apply()
+                                                    .configured()
                                                     .map(Functions.identity())
                                                     .nextInvocationConfiguration()
                                                     .withExecutor(executor2)
-                                                    .apply()
+                                                    .configured()
                                                     .map(Functions.identity())
-                                                    .invocationConfiguration()
+                                                    .withInvocation()
                                                     .withOutputTimeout(minutes(3))
-                                                    .apply()
+                                                    .configured()
                                                     .invoke()
                                                     .pass(s)
                                                     .close()
@@ -791,7 +791,7 @@ public class StreamBuilderTest {
       };
       JRoutineStream.<String>withStream().nextInvocationConfiguration()
                                          .withExecutor(executor1)
-                                         .apply()
+                                         .configured()
                                          .map(function)
                                          .invoke()
                                          .pass("test")
@@ -1477,12 +1477,12 @@ public class StreamBuilderTest {
       assertThat(JRoutineStream //
           .<Integer>withStream().streamInvocationConfiguration()
                                 .withExecutor(getSingleThreadExecutor())
-                                .apply()
+                                .configured()
                                 .map(appendAccept(range(1, 1000)))
                                 .streamInvocationConfiguration()
                                 .withInputBackoff(afterCount(2).linearDelay(seconds(3)))
                                 .withOutputBackoff(afterCount(2).linearDelay(seconds(3)))
-                                .apply()
+                                .configured()
                                 .map(Functions.<Number>identity())
                                 .map(new Function<Number, Double>() {
 
@@ -1524,11 +1524,11 @@ public class StreamBuilderTest {
       assertThat(JRoutineStream //
           .<Integer>withStream().streamInvocationConfiguration()
                                 .withExecutor(getSingleThreadExecutor())
-                                .apply()
+                                .configured()
                                 .map(appendAccept(range(1, 1000)))
                                 .streamInvocationConfiguration()
                                 .withInputBackoff(afterCount(2).linearDelay(seconds(3)))
-                                .apply()
+                                .configured()
                                 .map(Functions.<Number>identity())
                                 .map(new Function<Number, Double>() {
 

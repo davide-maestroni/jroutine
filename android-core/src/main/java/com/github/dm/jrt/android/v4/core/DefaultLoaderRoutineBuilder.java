@@ -68,8 +68,8 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends AbstractRoutineBuilder<IN, OU
 
   @NotNull
   @Override
-  public LoaderRoutineBuilder<IN, OUT> apply(@NotNull final InvocationConfiguration configuration) {
-    super.apply(configuration);
+  public LoaderRoutineBuilder<IN, OUT> withConfiguration(@NotNull final InvocationConfiguration configuration) {
+    super.withConfiguration(configuration);
     return this;
   }
 
@@ -81,9 +81,8 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends AbstractRoutineBuilder<IN, OU
   @NotNull
   @Override
   @SuppressWarnings("unchecked")
-  public InvocationConfiguration.Builder<? extends LoaderRoutineBuilder<IN, OUT>>
-  invocationConfiguration() {
-    return (Builder<? extends LoaderRoutineBuilder<IN, OUT>>) super.invocationConfiguration();
+  public InvocationConfiguration.Builder<? extends LoaderRoutineBuilder<IN, OUT>> withInvocation() {
+    return (Builder<? extends LoaderRoutineBuilder<IN, OUT>>) super.withInvocation();
   }
 
   @NotNull

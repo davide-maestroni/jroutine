@@ -107,7 +107,7 @@ class GroupByFunctionInvocationFactory<DATA> extends InvocationFactory<DATA, Lis
     }
 
     @Override
-    public void onRestart() {
+    public void onStart() {
       mGroups = new HashMap<Object, ArrayList<DATA>>();
     }
   }

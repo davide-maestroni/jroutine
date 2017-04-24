@@ -55,7 +55,7 @@ class ZeroDelayExecutor extends ScheduledExecutorDecorator {
    * @return the zero delay executor.
    */
   @NotNull
-  static ZeroDelayExecutor of(@NotNull final ScheduledExecutor wrapped) {
+  static ZeroDelayExecutor executorOf(@NotNull final ScheduledExecutor wrapped) {
     if (wrapped instanceof ZeroDelayExecutor) {
       return (ZeroDelayExecutor) wrapped;
     }

@@ -48,7 +48,7 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
   private WrapperConfiguration mWrapperConfiguration = WrapperConfiguration.defaultConfiguration();
 
   @NotNull
-  public ProxyObjectBuilder<TYPE> apply(@NotNull final InvocationConfiguration configuration) {
+  public ProxyObjectBuilder<TYPE> withConfiguration(@NotNull final InvocationConfiguration configuration) {
     mInvocationConfiguration =
         ConstantConditions.notNull("invocation configuration", configuration);
     return this;
@@ -94,8 +94,7 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
   }
 
   @NotNull
-  public InvocationConfiguration.Builder<? extends ProxyObjectBuilder<TYPE>>
-  invocationConfiguration() {
+  public InvocationConfiguration.Builder<? extends ProxyObjectBuilder<TYPE>> withInvocation() {
     final InvocationConfiguration config = mInvocationConfiguration;
     return new InvocationConfiguration.Builder<ProxyObjectBuilder<TYPE>>(this, config);
   }

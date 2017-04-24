@@ -58,7 +58,7 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
    * @see #buildRoutine()
    */
   @NotNull
-  StreamBuilder<IN, OUT> apply(@NotNull InvocationConfiguration configuration);
+  StreamBuilder<IN, OUT> withConfiguration(@NotNull InvocationConfiguration configuration);
 
   /**
    * Returns a stream builder where the concatenated routines will be invoked in asynchronous mode
@@ -267,7 +267,7 @@ public interface StreamBuilder<IN, OUT> extends RoutineBuilder<IN, OUT> {
    * @see #buildRoutine()
    */
   @NotNull
-  Builder<? extends StreamBuilder<IN, OUT>> invocationConfiguration();
+  Builder<? extends StreamBuilder<IN, OUT>> withInvocation();
 
   /**
    * Transforms the stream by modifying the chain building function.

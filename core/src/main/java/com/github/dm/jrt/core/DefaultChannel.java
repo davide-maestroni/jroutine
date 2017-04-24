@@ -57,20 +57,20 @@ class DefaultChannel<DATA> implements Channel<DATA, DATA> {
    * Constructor.
    *
    * @param configuration the channel configuration.
+   * @param executor      the executor instance.
    */
-  DefaultChannel(@NotNull final ChannelConfiguration configuration) {
+  DefaultChannel(@NotNull final ChannelConfiguration configuration,
+      @NotNull final ScheduledExecutor executor) {
     final Logger logger = configuration.newLogger(this);
-    final ScheduledExecutor wrapped =
-        configuration.getExecutorOrElse(ScheduledExecutors.defaultExecutor());
     ChannelExecutor channelExecutor;
     synchronized (sExecutors) {
       final WeakIdentityHashMap<ScheduledExecutor, WeakReference<ChannelExecutor>> executors =
           sExecutors;
-      final WeakReference<ChannelExecutor> executor = executors.get(wrapped);
-      channelExecutor = (executor != null) ? executor.get() : null;
+      final WeakReference<ChannelExecutor> executorReference = executors.get(executor);
+      channelExecutor = (executorReference != null) ? executorReference.get() : null;
       if (channelExecutor == null) {
-        channelExecutor = new ChannelExecutor(wrapped);
-        executors.put(wrapped, new WeakReference<ChannelExecutor>(channelExecutor));
+        channelExecutor = new ChannelExecutor(executor);
+        executors.put(executor, new WeakReference<ChannelExecutor>(channelExecutor));
       }
     }
 

@@ -540,7 +540,7 @@ public class ReflectionRoutineBuilders {
     final InvocationConfiguration.Builder<InvocationConfiguration> builder =
         InvocationConfiguration.builderFrom(configuration);
     if (annotations == null) {
-      return builder.apply();
+      return builder.configured();
     }
 
     for (final Annotation annotation : annotations) {
@@ -590,7 +590,7 @@ public class ReflectionRoutineBuilders {
       }
     }
 
-    return builder.apply();
+    return builder.configured();
   }
 
   /**

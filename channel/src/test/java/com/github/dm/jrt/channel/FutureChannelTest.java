@@ -245,7 +245,7 @@ public class FutureChannelTest {
         }, 500, TimeUnit.MILLISECONDS);
     final Channel<?, String> channel = Channels.fromFuture(future).buildChannel();
     final Channel<String, String> outputChannel =
-        JRoutineCore.with(IdentityInvocation.<String>factoryOf()).invoke().pass(channel).close();
+        JRoutineCore.with(IdentityInvocation.<String>factory()).invoke().pass(channel).close();
     assertThat(outputChannel.in(seconds(1)).next()).isEqualTo("test");
     assertThat(outputChannel.getComplete()).isTrue();
   }
@@ -726,10 +726,10 @@ public class FutureChannelTest {
           }
         }, 3, TimeUnit.SECONDS);
     final Channel<?, String> channel = Channels.fromFuture(future)
-                                               .channelConfiguration()
+                                               .withChannel()
                                                .withOutputTimeout(millis(10))
                                                .withOutputTimeoutAction(TimeoutActionType.CONTINUE)
-                                               .apply()
+                                               .configured()
                                                .buildChannel();
     assertThat(channel.all()).isEmpty();
   }
@@ -744,10 +744,10 @@ public class FutureChannelTest {
           }
         }, 3, TimeUnit.SECONDS);
     final Channel<?, String> channel = Channels.fromFuture(future)
-                                               .channelConfiguration()
+                                               .withChannel()
                                                .withOutputTimeout(millis(10))
                                                .withOutputTimeoutAction(TimeoutActionType.ABORT)
-                                               .apply()
+                                               .configured()
                                                .buildChannel();
     try {
       channel.all();
@@ -767,10 +767,10 @@ public class FutureChannelTest {
           }
         }, 3, TimeUnit.SECONDS);
     final Channel<?, String> channel = Channels.fromFuture(future)
-                                               .channelConfiguration()
+                                               .withChannel()
                                                .withOutputTimeout(millis(10))
                                                .withOutputTimeoutAction(TimeoutActionType.FAIL)
-                                               .apply()
+                                               .configured()
                                                .buildChannel();
     try {
       channel.all();

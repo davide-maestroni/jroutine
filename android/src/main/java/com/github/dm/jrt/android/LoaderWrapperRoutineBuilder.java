@@ -45,7 +45,7 @@ public interface LoaderWrapperRoutineBuilder
    */
   @NotNull
   @Override
-  LoaderWrapperRoutineBuilder apply(@NotNull InvocationConfiguration configuration);
+  LoaderWrapperRoutineBuilder withConfiguration(@NotNull InvocationConfiguration configuration);
 
   /**
    * {@inheritDoc}
@@ -59,7 +59,7 @@ public interface LoaderWrapperRoutineBuilder
    */
   @NotNull
   @Override
-  InvocationConfiguration.Builder<? extends LoaderWrapperRoutineBuilder> invocationConfiguration();
+  InvocationConfiguration.Builder<? extends LoaderWrapperRoutineBuilder> withInvocation();
 
   /**
    * {@inheritDoc}

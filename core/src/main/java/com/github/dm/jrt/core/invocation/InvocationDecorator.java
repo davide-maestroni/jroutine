@@ -63,7 +63,7 @@ public class InvocationDecorator<IN, OUT> implements Invocation<IN, OUT> {
     return mInvocation.onRecycle();
   }
 
-  public void onRestart() throws Exception {
-    mInvocation.onRestart();
+  public void onStart() throws Exception {
+    mInvocation.onStart();
   }
 }

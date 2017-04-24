@@ -73,7 +73,7 @@ class InputMapBuilder<DATA, IN extends DATA> extends AbstractChannelArrayCompatB
     final ChannelConfiguration configuration = getConfiguration();
     for (final Integer id : ids) {
       @SuppressWarnings("unchecked") final Channel<IN, IN> inputChannel =
-          (Channel<IN, IN>) AndroidChannels.<DATA, IN>parcelableFlowInput(channel, id).apply(
+          (Channel<IN, IN>) AndroidChannels.<DATA, IN>parcelableFlowInput(channel, id).withConfiguration(
               configuration).buildChannel();
       channelMap.put(id, inputChannel);
     }

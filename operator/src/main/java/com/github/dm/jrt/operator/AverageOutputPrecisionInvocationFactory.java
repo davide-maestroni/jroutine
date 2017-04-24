@@ -102,7 +102,7 @@ class AverageOutputPrecisionInvocationFactory<N extends Number>
     }
 
     @Override
-    public void onRestart() {
+    public void onStart() {
       mSum = mOperation.convert(0);
       mCount = 0;
     }

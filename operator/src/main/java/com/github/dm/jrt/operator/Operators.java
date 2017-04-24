@@ -543,7 +543,7 @@ public class Operators {
    */
   @NotNull
   public static <DATA> InvocationFactory<DATA, DATA> identity() {
-    return IdentityInvocation.factoryOf();
+    return IdentityInvocation.factory();
   }
 
   /**

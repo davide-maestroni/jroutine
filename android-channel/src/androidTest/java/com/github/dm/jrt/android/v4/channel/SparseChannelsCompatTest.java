@@ -81,10 +81,10 @@ public class SparseChannelsCompatTest extends ActivityInstrumentationTestCase2<T
         JRoutineCore.<ParcelableFlow<String>>ofData().buildChannel();
     final TestLog testLog = new TestLog();
     SparseChannelsCompat.parcelableFlowInput(3, 1, channel)
-                        .channelConfiguration()
+                        .withChannel()
                         .withLog(testLog)
                         .withLogLevel(Level.DEBUG)
-                        .apply()
+                        .configured()
                         .buildChannelArray()
                         .get(3)
                         .pass("test")
@@ -228,9 +228,9 @@ public class SparseChannelsCompatTest extends ActivityInstrumentationTestCase2<T
     final Channel<?, ParcelableFlow<Object>> output =
         JRoutineLoaderCompat.on(loaderFrom(getActivity()))
                             .with(factoryOf(Sort.class))
-                            .invocationConfiguration()
+                            .withInvocation()
                             .withInputOrder(OrderType.SORTED)
-                            .apply()
+                            .configured()
                             .invoke()
                             .pass(channel)
                             .close();

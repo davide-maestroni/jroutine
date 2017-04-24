@@ -83,17 +83,6 @@ public abstract class ScheduledExecutor implements Executor {
     return false;
   }
 
-  // TODO: 21/04/2017 remove
-  public static ThreadManager getManager() {
-    for (final ThreadManager manager : sManagers.keySet()) {
-      if ((manager != null) && manager.isManagedThread()) {
-        return manager;
-      }
-    }
-
-    return null;
-  }
-
   private static void registerManager(@NotNull final ThreadManager manager) {
     synchronized (sMutex) {
       // Copy-on-write pattern

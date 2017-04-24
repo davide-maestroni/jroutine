@@ -91,7 +91,7 @@ class IntervalInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
     }
 
     @Override
-    public void onRestart() {
+    public void onStart() {
       mStartTime = System.currentTimeMillis();
       mCount = 0;
     }

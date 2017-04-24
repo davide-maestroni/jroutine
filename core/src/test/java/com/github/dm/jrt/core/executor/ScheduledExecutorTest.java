@@ -251,8 +251,8 @@ public class ScheduledExecutorTest {
   public void testServiceExecutor() throws InterruptedException {
 
     final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-    final ServiceExecutor instance = ServiceExecutor.of(executorService);
-    assertThat(instance).isSameAs(ServiceExecutor.of(executorService));
+    final ServiceExecutor instance = ServiceExecutor.executorOf(executorService);
+    assertThat(instance).isSameAs(ServiceExecutor.executorOf(executorService));
     final ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
     try {
       testExecutor(instance);
@@ -271,7 +271,7 @@ public class ScheduledExecutorTest {
   public void testServiceExecutorError() {
 
     try {
-      ServiceExecutor.of(null);
+      ServiceExecutor.executorOf(null);
       fail();
 
     } catch (final NullPointerException ignored) {
@@ -400,9 +400,9 @@ public class ScheduledExecutorTest {
   @Test
   public void testZeroDelayExecutor() throws InterruptedException {
 
-    final ZeroDelayExecutor instance = ZeroDelayExecutor.of(ScheduledExecutors.defaultExecutor());
-    assertThat(instance).isSameAs(ZeroDelayExecutor.of(ScheduledExecutors.defaultExecutor()));
-    assertThat(instance).isSameAs(ZeroDelayExecutor.of(instance));
+    final ZeroDelayExecutor instance = ZeroDelayExecutor.executorOf(ScheduledExecutors.defaultExecutor());
+    assertThat(instance).isSameAs(ZeroDelayExecutor.executorOf(ScheduledExecutors.defaultExecutor()));
+    assertThat(instance).isSameAs(ZeroDelayExecutor.executorOf(instance));
     testExecutor(instance);
     testExecutor(ScheduledExecutors.zeroDelayExecutor(ScheduledExecutors.poolExecutor()));
     testExecutor(new ScheduledExecutorDecorator(instance));
@@ -471,7 +471,7 @@ public class ScheduledExecutorTest {
   public void testZeroDelayExecutorError() {
 
     try {
-      ZeroDelayExecutor.of(null);
+      ZeroDelayExecutor.executorOf(null);
       fail();
 
     } catch (final NullPointerException ignored) {

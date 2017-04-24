@@ -55,7 +55,7 @@ public interface LoaderRoutineBuilder<IN, OUT>
    */
   @NotNull
   @Override
-  LoaderRoutineBuilder<IN, OUT> apply(@NotNull InvocationConfiguration configuration);
+  LoaderRoutineBuilder<IN, OUT> withConfiguration(@NotNull InvocationConfiguration configuration);
 
   /**
    * {@inheritDoc}
@@ -69,5 +69,5 @@ public interface LoaderRoutineBuilder<IN, OUT>
    */
   @NotNull
   @Override
-  Builder<? extends LoaderRoutineBuilder<IN, OUT>> invocationConfiguration();
+  Builder<? extends LoaderRoutineBuilder<IN, OUT>> withInvocation();
 }

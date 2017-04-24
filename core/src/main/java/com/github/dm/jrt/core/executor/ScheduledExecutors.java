@@ -58,10 +58,9 @@ public class ScheduledExecutors {
     synchronized (sMutex) {
       if (sDefaultExecutor == null) {
         final int processors = Runtime.getRuntime().availableProcessors();
-        sDefaultExecutor = ServiceExecutor.of(
-            new com.github.dm.jrt.core.executor.DynamicScheduledThreadExecutor(
-                Math.max(2, processors >> 1), Math.max(2, (processors << 2) - 1), 10L,
-                TimeUnit.SECONDS));
+        sDefaultExecutor = ServiceExecutor.executorOf(
+            new DynamicScheduledThreadExecutor(Math.max(2, processors >> 1),
+                Math.max(2, (processors << 2) - 1), 10L, TimeUnit.SECONDS));
       }
 
       return sDefaultExecutor;
@@ -90,7 +89,7 @@ public class ScheduledExecutors {
   @NotNull
   public static ScheduledExecutor dynamicPoolExecutor(final int corePoolSize,
       final int maximumPoolSize, final long keepAliveTime, @NotNull final TimeUnit keepAliveUnit) {
-    return ServiceExecutor.ofStoppable(
+    return ServiceExecutor.executorOfStoppable(
         new DynamicScheduledThreadExecutor(corePoolSize, maximumPoolSize, keepAliveTime,
             keepAliveUnit));
   }
@@ -131,7 +130,7 @@ public class ScheduledExecutors {
    */
   @NotNull
   public static ScheduledExecutor poolExecutor(final int poolSize) {
-    return ServiceExecutor.ofStoppable(Executors.newScheduledThreadPool(poolSize));
+    return ServiceExecutor.executorOfStoppable(Executors.newScheduledThreadPool(poolSize));
   }
 
   /**
@@ -165,7 +164,7 @@ public class ScheduledExecutors {
    */
   @NotNull
   public static ScheduledExecutor serviceExecutor(@NotNull final ScheduledExecutorService service) {
-    return ServiceExecutor.of(service);
+    return ServiceExecutor.executorOf(service);
   }
 
   /**
@@ -229,6 +228,6 @@ public class ScheduledExecutors {
    */
   @NotNull
   public static ScheduledExecutor zeroDelayExecutor(@NotNull final ScheduledExecutor wrapped) {
-    return ZeroDelayExecutor.of(wrapped);
+    return ZeroDelayExecutor.executorOf(wrapped);
   }
 }

@@ -63,7 +63,7 @@ class DefaultStatelessLoaderRoutineBuilder<IN, OUT>
     return JRoutineLoader.on(mLoaderContext)
                          .with(new StatelessContextInvocation<IN, OUT>(getOnNext(), getOnError(),
                              getOnComplete()))
-                         .apply(getConfiguration())
+                         .withConfiguration(getConfiguration())
                          .apply(getLoaderConfiguration())
                          .buildRoutine();
   }
@@ -131,7 +131,7 @@ class DefaultStatelessLoaderRoutineBuilder<IN, OUT>
     }
 
     @Override
-    public void onRestart() {
+    public void onStart() {
     }
 
     @Override

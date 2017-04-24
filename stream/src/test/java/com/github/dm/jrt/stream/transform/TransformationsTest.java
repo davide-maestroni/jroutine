@@ -81,11 +81,11 @@ public class TransformationsTest {
   public void testBackoff() {
     Assertions.assertThat(JRoutineStream //
         .<Integer>withStream().map(appendAccept(range(1, 1000)))
-                              .invocationConfiguration()
+                              .withInvocation()
                               .withExecutor(getSingleThreadExecutor())
                               .withInputBackoff(
                                   BackoffBuilder.afterCount(2).linearDelay(seconds(10)))
-                              .apply()
+                              .configured()
                               .map(Functions.<Number>identity())
                               .map(new Function<Number, Double>() {
 
@@ -120,11 +120,11 @@ public class TransformationsTest {
                               .next()).isCloseTo(21, Offset.offset(0.1));
     Assertions.assertThat(JRoutineStream //
         .<Integer>withStream().map(appendAccept(range(1, 1000)))
-                              .invocationConfiguration()
+                              .withInvocation()
                               .withExecutor(getSingleThreadExecutor())
                               .withInputBackoff(
                                   BackoffBuilder.afterCount(2).constantDelay(seconds(10)))
-                              .apply()
+                              .configured()
                               .map(Functions.<Number>identity())
                               .map(new Function<Number, Double>() {
 
@@ -298,7 +298,7 @@ public class TransformationsTest {
     assertThat(JRoutineStream //
         .<Integer>withStream().map(appendAccept(range(1, 3)))
                               .lift(Transformations.<Integer, Integer, Integer>parallel(2,
-                                  JRoutineCore.with(IdentityInvocation.<Integer>factoryOf())))
+                                  JRoutineCore.with(IdentityInvocation.<Integer>factory())))
                               .invoke()
                               .close()
                               .in(seconds(3))
@@ -323,7 +323,7 @@ public class TransformationsTest {
         .<Integer>withStream().map(appendAccept(range(1, 3)))
                               .lift(Transformations.<Integer, Integer, Integer>parallelBy(
                                   Functions.<Integer>identity(),
-                                  JRoutineCore.with(IdentityInvocation.<Integer>factoryOf())))
+                                  JRoutineCore.with(IdentityInvocation.<Integer>factory())))
                               .invoke()
                               .close()
                               .in(seconds(3))
@@ -498,9 +498,9 @@ public class TransformationsTest {
   public void testThrottle() throws InterruptedException {
     final Routine<Object, Object> routine = JRoutineStream.withStream()
                                                           .lift(throttle(1))
-                                                          .invocationConfiguration()
+                                                          .withInvocation()
                                                           .withExecutor(ScheduledExecutors.poolExecutor(1))
-                                                          .apply()
+                                                          .configured()
                                                           .buildRoutine();
     final Channel<Object, Object> channel1 = routine.invoke().pass("test1");
     final Channel<Object, Object> channel2 = routine.invoke().pass("test2");
@@ -513,9 +513,9 @@ public class TransformationsTest {
   public void testThrottleAbort() throws InterruptedException {
     final Routine<Object, Object> routine = JRoutineStream.withStream()
                                                           .lift(throttle(1))
-                                                          .invocationConfiguration()
+                                                          .withInvocation()
                                                           .withExecutor(ScheduledExecutors.poolExecutor(1))
-                                                          .apply()
+                                                          .configured()
                                                           .buildRoutine();
     final Channel<Object, Object> channel1 = routine.invoke().pass("test1");
     final Channel<Object, Object> channel2 = routine.invoke().pass("test2");

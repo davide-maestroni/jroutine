@@ -577,9 +577,9 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
     new TestClass("TEST");
     assertThat(JRoutineAndroid.on(getActivity())
                               .withInstanceOf(TestClass.class)
-                              .invocationConfiguration()
+                              .withInvocation()
                               .withLog(AndroidLogs.androidLog())
-                              .apply()
+                              .configured()
                               .wrapperConfiguration()
                               .withSharedFields()
                               .apply()
@@ -847,9 +847,9 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
     new TestClass("TEST");
     assertThat(JRoutineAndroid.on((Context) getActivity())
                               .withInstanceOf(TestClass.class)
-                              .invocationConfiguration()
+                              .withInvocation()
                               .withLog(AndroidLogs.androidLog())
-                              .apply()
+                              .configured()
                               .wrapperConfiguration()
                               .withSharedFields()
                               .apply()

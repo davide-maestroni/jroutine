@@ -36,14 +36,14 @@ public abstract class AbstractChannelArrayBuilder<IN, OUT> implements ChannelArr
 
   @NotNull
   @Override
-  public ChannelArrayBuilder<IN, OUT> apply(@NotNull final ChannelConfiguration configuration) {
+  public ChannelArrayBuilder<IN, OUT> withConfiguration(@NotNull final ChannelConfiguration configuration) {
     mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
     return this;
   }
 
   @NotNull
   @Override
-  public Builder<? extends ChannelArrayBuilder<IN, OUT>> channelConfiguration() {
+  public Builder<? extends ChannelArrayBuilder<IN, OUT>> withChannel() {
     return new Builder<ChannelArrayBuilder<IN, OUT>>(this, mConfiguration);
   }
 

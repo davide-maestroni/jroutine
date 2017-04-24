@@ -53,7 +53,7 @@ class FlowableChannelBuilder<OUT> implements ChannelBuilder<OUT, OUT> {
   }
 
   @NotNull
-  public ChannelBuilder<OUT, OUT> apply(@NotNull final ChannelConfiguration configuration) {
+  public ChannelBuilder<OUT, OUT> withConfiguration(@NotNull final ChannelConfiguration configuration) {
     mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
     return this;
   }
@@ -67,7 +67,7 @@ class FlowableChannelBuilder<OUT> implements ChannelBuilder<OUT, OUT> {
   }
 
   @NotNull
-  public Builder<? extends ChannelBuilder<OUT, OUT>> channelConfiguration() {
+  public Builder<? extends ChannelBuilder<OUT, OUT>> withChannel() {
     return new Builder<ChannelBuilder<OUT, OUT>>(this, mConfiguration);
   }
 

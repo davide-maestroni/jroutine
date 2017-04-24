@@ -52,6 +52,6 @@ public abstract class TemplateInvocation<IN, OUT> implements Invocation<IN, OUT>
     return false;
   }
 
-  public void onRestart() throws Exception {
+  public void onStart() throws Exception {
   }
 }

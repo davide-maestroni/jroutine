@@ -434,7 +434,7 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
     }
 
     @Override
-    public void onRestart() {
+    public void onStart() {
       final Logger logger = mLogger;
       mInputChannel = JRoutineCore.<IN>ofData().channelConfiguration()
                                                .withLog(logger.getLog())

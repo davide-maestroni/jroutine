@@ -71,8 +71,8 @@ public class ContextInvocationDecorator<IN, OUT> implements ContextInvocation<IN
   }
 
   @Override
-  public void onRestart() throws Exception {
-    mInvocation.onRestart();
+  public void onStart() throws Exception {
+    mInvocation.onStart();
   }
 
   @Override

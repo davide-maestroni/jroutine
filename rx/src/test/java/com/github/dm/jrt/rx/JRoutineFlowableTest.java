@@ -181,9 +181,9 @@ public class JRoutineFlowableTest {
   public void testChannelAbortCompletable() {
     final Channel<?, ?> channel =
         JRoutineFlowable.with(Completable.complete().delay(1, TimeUnit.SECONDS))
-                        .channelConfiguration()
+                        .withChannel()
                         .withMaxSize(2)
-                        .apply()
+                        .configured()
                         .buildChannel();
     assertThat(channel.abort()).isTrue();
   }
@@ -192,9 +192,9 @@ public class JRoutineFlowableTest {
   public void testChannelAbortFlowable() {
     final Channel<?, String> channel =
         JRoutineFlowable.with(Flowable.just("test1", "test2").delay(1, TimeUnit.SECONDS))
-                        .channelConfiguration()
+                        .withChannel()
                         .withMaxSize(2)
-                        .apply()
+                        .configured()
                         .buildChannel();
     assertThat(channel.abort()).isTrue();
   }
@@ -203,9 +203,9 @@ public class JRoutineFlowableTest {
   public void testChannelAbortObservable() {
     final Channel<?, String> channel =
         JRoutineFlowable.with(Observable.just("test1", "test2").delay(1, TimeUnit.SECONDS))
-                        .channelConfiguration()
+                        .withChannel()
                         .withMaxSize(2)
-                        .apply()
+                        .configured()
                         .buildChannel();
     assertThat(channel.abort()).isTrue();
   }
@@ -214,9 +214,9 @@ public class JRoutineFlowableTest {
   public void testChannelAbortSingle() {
     final Channel<?, String> channel =
         JRoutineFlowable.with(Single.just("test1").delay(1, TimeUnit.SECONDS))
-                        .channelConfiguration()
+                        .withChannel()
                         .withMaxSize(2)
-                        .apply()
+                        .configured()
                         .buildChannel();
     assertThat(channel.abort()).isTrue();
   }
@@ -224,9 +224,9 @@ public class JRoutineFlowableTest {
   @Test
   public void testChannelCompletable() {
     final Channel<?, ?> channel = JRoutineFlowable.with(Completable.complete())
-                                                  .channelConfiguration()
+                                                  .withChannel()
                                                   .withMaxSize(2)
-                                                  .apply()
+                                                  .configured()
                                                   .buildChannel();
     assertThat(channel.all()).isEmpty();
   }
@@ -279,9 +279,9 @@ public class JRoutineFlowableTest {
   @Test
   public void testChannelFlowable() {
     final Channel<?, String> channel = JRoutineFlowable.with(Flowable.just("test1", "test2"))
-                                                       .channelConfiguration()
+                                                       .withChannel()
                                                        .withMaxSize(2)
-                                                       .apply()
+                                                       .configured()
                                                        .buildChannel();
     assertThat(channel.all()).containsExactly("test1", "test2");
   }
@@ -289,9 +289,9 @@ public class JRoutineFlowableTest {
   @Test
   public void testChannelObservable() {
     final Channel<?, String> channel = JRoutineFlowable.with(Observable.just("test1", "test2"))
-                                                       .channelConfiguration()
+                                                       .withChannel()
                                                        .withMaxSize(2)
-                                                       .apply()
+                                                       .configured()
                                                        .buildChannel();
     assertThat(channel.all()).containsExactly("test1", "test2");
   }
@@ -299,9 +299,9 @@ public class JRoutineFlowableTest {
   @Test
   public void testChannelSingle() {
     final Channel<?, String> channel = JRoutineFlowable.with(Single.just("test1"))
-                                                       .channelConfiguration()
+                                                       .withChannel()
                                                        .withMaxSize(2)
-                                                       .apply()
+                                                       .configured()
                                                        .buildChannel();
     assertThat(channel.all()).containsExactly("test1");
   }

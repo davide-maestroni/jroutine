@@ -81,9 +81,9 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
       final LoaderAdapterFactory adapterFactory = //
           LoaderAdapterFactory.on(context)
                               .delegateFactory(factory)
-                              .invocationConfiguration()
+                              .withInvocation()
                               .withOutputTimeout(seconds(10))
-                              .apply()
+                              .configured()
                               .loaderConfiguration()
                               .withCacheStrategy(CacheStrategyType.CLEAR)
                               .apply()
@@ -140,10 +140,10 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
     server.start();
     try {
       final LoaderAdapterFactory adapterFactory = LoaderAdapterFactory.on(context)
-                                                                      .invocationConfiguration()
+                                                                      .withInvocation()
                                                                       .withOutputTimeout(
                                                                           seconds(10))
-                                                                      .apply()
+                                                                      .configured()
                                                                       .buildFactory();
       final GsonConverterFactory converterFactory = GsonConverterFactory.create();
       final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + server.getPort())
@@ -180,9 +180,9 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
       final LoaderAdapterFactory adapterFactory = //
           LoaderAdapterFactory.on(context)
                               .delegateFactory(factory)
-                              .invocationConfiguration()
+                              .withInvocation()
                               .withOutputTimeout(seconds(10))
-                              .apply()
+                              .configured()
                               .loaderConfiguration()
                               .withCacheStrategy(CacheStrategyType.CLEAR)
                               .apply()

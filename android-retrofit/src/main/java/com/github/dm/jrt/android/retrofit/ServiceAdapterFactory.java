@@ -166,7 +166,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
       @NotNull final ServiceConfiguration serviceConfiguration) {
     return JRoutineService.on(mServiceContext)
                           .with(factoryOf(ServiceCallInvocation.class))
-                          .apply(invocationConfiguration)
+                          .withConfiguration(invocationConfiguration)
                           .apply(serviceConfiguration)
                           .buildRoutine();
   }
@@ -202,7 +202,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
 
     @NotNull
     @Override
-    public Builder apply(@NotNull final InvocationConfiguration configuration) {
+    public Builder withConfiguration(@NotNull final InvocationConfiguration configuration) {
       mInvocationConfiguration =
           ConstantConditions.notNull("invocation configuration", configuration);
       return this;
@@ -228,7 +228,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
 
     @NotNull
     @Override
-    public InvocationConfiguration.Builder<? extends Builder> invocationConfiguration() {
+    public InvocationConfiguration.Builder<? extends Builder> withInvocation() {
       return new InvocationConfiguration.Builder<Builder>(this, mInvocationConfiguration);
     }
 
@@ -341,7 +341,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
         @NotNull final Type responseType) {
       super(routine, responseType);
       mInvocationConfiguration = configuration;
-      mChannelConfiguration = configuration.outputConfigurationBuilder().apply();
+      mChannelConfiguration = configuration.outputConfigurationBuilder().configured();
       mConverter = converter;
     }
 
@@ -404,7 +404,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
 
     @Override
     public <OUT> StreamBuilder adapt(final Call<OUT> call) {
-      return JRoutineStream.<Call<?>>withStreamOf(call).apply(mInvocationConfiguration)
+      return JRoutineStream.<Call<?>>withStreamOf(call).withConfiguration(mInvocationConfiguration)
                                                        .map(sInvocation)
                                                        .lift(this);
     }

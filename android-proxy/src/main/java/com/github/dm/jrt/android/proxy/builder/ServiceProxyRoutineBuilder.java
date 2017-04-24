@@ -38,7 +38,7 @@ public interface ServiceProxyRoutineBuilder
    */
   @NotNull
   @Override
-  ServiceProxyRoutineBuilder apply(@NotNull InvocationConfiguration configuration);
+  ServiceProxyRoutineBuilder withConfiguration(@NotNull InvocationConfiguration configuration);
 
   /**
    * {@inheritDoc}
@@ -110,7 +110,7 @@ public interface ServiceProxyRoutineBuilder
    */
   @NotNull
   @Override
-  InvocationConfiguration.Builder<? extends ServiceProxyRoutineBuilder> invocationConfiguration();
+  InvocationConfiguration.Builder<? extends ServiceProxyRoutineBuilder> withInvocation();
 
   /**
    * {@inheritDoc}

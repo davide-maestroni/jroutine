@@ -63,6 +63,6 @@ public abstract class CommandInvocation<OUT> extends InvocationFactory<Void, OUT
     return true;
   }
 
-  public final void onRestart() {
+  public final void onStart() {
   }
 }

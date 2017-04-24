@@ -88,7 +88,7 @@ class DefaultReflectionRoutineBuilder implements ReflectionRoutineBuilder {
   }
 
   @NotNull
-  public ReflectionRoutineBuilder apply(@NotNull final InvocationConfiguration configuration) {
+  public ReflectionRoutineBuilder withConfiguration(@NotNull final InvocationConfiguration configuration) {
     mInvocationConfiguration =
         ConstantConditions.notNull("invocation configuration", configuration);
     return this;
@@ -140,8 +140,7 @@ class DefaultReflectionRoutineBuilder implements ReflectionRoutineBuilder {
   }
 
   @NotNull
-  public InvocationConfiguration.Builder<? extends ReflectionRoutineBuilder>
-  invocationConfiguration() {
+  public InvocationConfiguration.Builder<? extends ReflectionRoutineBuilder> withInvocation() {
     final InvocationConfiguration config = mInvocationConfiguration;
     return new InvocationConfiguration.Builder<ReflectionRoutineBuilder>(this, config);
   }

@@ -38,7 +38,7 @@ public interface LoaderProxyObjectBuilder<TYPE>
    */
   @NotNull
   @Override
-  LoaderProxyObjectBuilder<TYPE> apply(@NotNull InvocationConfiguration configuration);
+  LoaderProxyObjectBuilder<TYPE> withConfiguration(@NotNull InvocationConfiguration configuration);
 
   /**
    * {@inheritDoc}
@@ -76,8 +76,7 @@ public interface LoaderProxyObjectBuilder<TYPE>
    */
   @NotNull
   @Override
-  InvocationConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>>
-  invocationConfiguration();
+  InvocationConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>> withInvocation();
 
   /**
    * {@inheritDoc}

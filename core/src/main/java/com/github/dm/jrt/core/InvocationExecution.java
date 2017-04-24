@@ -154,7 +154,7 @@ class InvocationExecution<IN, OUT> implements Runnable, InvocationObserver<IN, O
         if (mInvocation == null) {
           mInvocation = invocation;
           logger.dbg("initializing invocation: %s", invocation);
-          invocation.onRestart();
+          invocation.onStart();
           mIsInitialized = true;
         }
 
@@ -295,7 +295,7 @@ class InvocationExecution<IN, OUT> implements Runnable, InvocationObserver<IN, O
             if (mInvocation == null) {
               mInvocation = invocation;
               logger.dbg("initializing invocation: %s", invocation);
-              invocation.onRestart();
+              invocation.onStart();
               mIsInitialized = true;
             }
 

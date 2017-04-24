@@ -99,7 +99,7 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
 
   @NotNull
   @Override
-  public LoaderReflectionRoutineBuilder apply(
+  public LoaderReflectionRoutineBuilder withConfiguration(
       @NotNull final InvocationConfiguration configuration) {
     mInvocationConfiguration =
         ConstantConditions.notNull("invocation configuration", configuration);
@@ -151,7 +151,7 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
         AndroidReflectionRoutineBuilders.withAnnotations(mLoaderConfiguration, targetMethod);
     return JRoutineLoaderCompat.on(mContext)
                                .with(factory)
-                               .apply(invocationConfiguration)
+                               .withConfiguration(invocationConfiguration)
                                .apply(loaderConfiguration)
                                .buildRoutine();
   }
@@ -177,24 +177,23 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
         AndroidReflectionRoutineBuilders.withAnnotations(mLoaderConfiguration, method);
     return JRoutineLoaderCompat.on(mContext)
                                .with(factory)
-                               .apply(invocationConfiguration)
+                               .withConfiguration(invocationConfiguration)
                                .apply(loaderConfiguration)
                                .buildRoutine();
   }
 
   @NotNull
   @Override
-  public InvocationConfiguration.Builder<? extends LoaderReflectionRoutineBuilder>
-  invocationConfiguration() {
+  public InvocationConfiguration.Builder<? extends LoaderReflectionRoutineBuilder> withInvocation() {
     final InvocationConfiguration config = mInvocationConfiguration;
     return new InvocationConfiguration.Builder<LoaderReflectionRoutineBuilder>(
         new InvocationConfiguration.Configurable<LoaderReflectionRoutineBuilder>() {
 
           @NotNull
           @Override
-          public LoaderReflectionRoutineBuilder apply(
+          public LoaderReflectionRoutineBuilder withConfiguration(
               @NotNull final InvocationConfiguration configuration) {
-            return DefaultLoaderReflectionRoutineBuilder.this.apply(configuration);
+            return DefaultLoaderReflectionRoutineBuilder.this.withConfiguration(configuration);
           }
         }, config);
   }
@@ -273,9 +272,9 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
       }
 
       mRoutine = JRoutineReflection.with(target)
-                                   .invocationConfiguration()
+                                   .withInvocation()
                                    .withExecutor(ScheduledExecutors.syncExecutor())
-                                   .apply()
+                                   .configured()
                                    .apply(mWrapperConfiguration)
                                    .method(mAliasName);
     }
@@ -293,7 +292,7 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
     }
 
     @Override
-    public void onRestart() {
+    public void onStart() {
       mChannel = mRoutine.invoke();
     }
 
@@ -404,7 +403,7 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
     }
 
     @Override
-    public void onRestart() {
+    public void onStart() {
       mChannel = mRoutine.invoke();
     }
 
@@ -423,9 +422,9 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
       }
 
       mRoutine = JRoutineReflection.with(target)
-                                   .invocationConfiguration()
+                                   .withInvocation()
                                    .withExecutor(ScheduledExecutors.syncExecutor())
-                                   .apply()
+                                   .configured()
                                    .apply(mWrapperConfiguration)
                                    .method(mMethod);
     }
@@ -636,7 +635,7 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
       final LoaderRoutineBuilder<Object, Object> builder =
           JRoutineLoaderCompat.on(mContext).with(factory);
       final LoaderRoutine<Object, Object> routine =
-          builder.apply(invocationConfiguration).apply(loaderConfiguration).buildRoutine();
+          builder.withConfiguration(invocationConfiguration).apply(loaderConfiguration).buildRoutine();
       return ReflectionRoutineBuilders.invokeRoutine(routine, method, asArgs(args), inputMode,
           outputMode);
     }

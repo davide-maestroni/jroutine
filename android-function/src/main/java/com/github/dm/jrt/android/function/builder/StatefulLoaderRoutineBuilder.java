@@ -50,7 +50,7 @@ public interface StatefulLoaderRoutineBuilder<IN, OUT, STATE>
    */
   @NotNull
   @Override
-  StatefulLoaderRoutineBuilder<IN, OUT, STATE> apply(
+  StatefulLoaderRoutineBuilder<IN, OUT, STATE> withConfiguration(
       @NotNull InvocationConfiguration configuration);
 
   /**
@@ -58,8 +58,7 @@ public interface StatefulLoaderRoutineBuilder<IN, OUT, STATE>
    */
   @NotNull
   @Override
-  InvocationConfiguration.Builder<? extends StatefulLoaderRoutineBuilder<IN, OUT, STATE>>
-  invocationConfiguration();
+  InvocationConfiguration.Builder<? extends StatefulLoaderRoutineBuilder<IN, OUT, STATE>> withInvocation();
 
   /**
    * {@inheritDoc}
@@ -275,7 +274,7 @@ public interface StatefulLoaderRoutineBuilder<IN, OUT, STATE>
    *
    * @param onCreate the function instance.
    * @return this builder.
-   * @see com.github.dm.jrt.android.core.invocation.ContextInvocation#onRestart() onRestart()
+   * @see com.github.dm.jrt.android.core.invocation.ContextInvocation#onStart() onStart()
    */
   @NotNull
   StatefulLoaderRoutineBuilder<IN, OUT, STATE> onCreateState(

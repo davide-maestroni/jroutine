@@ -78,7 +78,7 @@ class SumInvocation extends TemplateInvocation<Number, Number> {
   }
 
   @Override
-  public void onRestart() {
+  public void onStart() {
     mSum = 0;
   }
 }

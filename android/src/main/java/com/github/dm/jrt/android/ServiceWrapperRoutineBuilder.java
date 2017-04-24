@@ -46,7 +46,7 @@ public interface ServiceWrapperRoutineBuilder
    */
   @NotNull
   @Override
-  ServiceWrapperRoutineBuilder apply(@NotNull InvocationConfiguration configuration);
+  ServiceWrapperRoutineBuilder withConfiguration(@NotNull InvocationConfiguration configuration);
 
   /**
    * {@inheritDoc}
@@ -60,7 +60,7 @@ public interface ServiceWrapperRoutineBuilder
    */
   @NotNull
   @Override
-  InvocationConfiguration.Builder<? extends ServiceWrapperRoutineBuilder> invocationConfiguration();
+  InvocationConfiguration.Builder<? extends ServiceWrapperRoutineBuilder> withInvocation();
 
   /**
    * {@inheritDoc}

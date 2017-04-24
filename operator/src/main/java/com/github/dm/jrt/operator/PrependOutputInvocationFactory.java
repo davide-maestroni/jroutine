@@ -90,7 +90,7 @@ class PrependOutputInvocationFactory<OUT> extends InvocationFactory<OUT, OUT> {
     }
 
     @Override
-    public void onRestart() {
+    public void onStart() {
       mIsCalled = false;
     }
 

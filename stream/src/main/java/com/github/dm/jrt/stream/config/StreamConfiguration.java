@@ -79,7 +79,7 @@ public class StreamConfiguration {
   @NotNull
   public ChannelConfiguration toChannelConfiguration() {
     if (mChannelConfiguration == null) {
-      mChannelConfiguration = toInvocationConfiguration().outputConfigurationBuilder().apply();
+      mChannelConfiguration = toInvocationConfiguration().outputConfigurationBuilder().configured();
     }
 
     return mChannelConfiguration;
@@ -94,7 +94,7 @@ public class StreamConfiguration {
   public InvocationConfiguration toInvocationConfiguration() {
     if (mInvocationConfiguration == null) {
       mInvocationConfiguration =
-          mStreamConfiguration.builderFrom().withPatch(mConfiguration).apply();
+          mStreamConfiguration.builderFrom().withPatch(mConfiguration).configured();
     }
 
     return mInvocationConfiguration;

@@ -58,18 +58,17 @@ class DefaultServiceRoutineBuilder<IN, OUT> extends AbstractRoutineBuilder<IN, O
 
   @NotNull
   @Override
-  public ServiceRoutineBuilder<IN, OUT> apply(
+  public ServiceRoutineBuilder<IN, OUT> withConfiguration(
       @NotNull final InvocationConfiguration configuration) {
-    super.apply(configuration);
+    super.withConfiguration(configuration);
     return this;
   }
 
   @NotNull
   @Override
   @SuppressWarnings("unchecked")
-  public InvocationConfiguration.Builder<? extends ServiceRoutineBuilder<IN, OUT>>
-  invocationConfiguration() {
-    return (Builder<? extends ServiceRoutineBuilder<IN, OUT>>) super.invocationConfiguration();
+  public InvocationConfiguration.Builder<? extends ServiceRoutineBuilder<IN, OUT>> withInvocation() {
+    return (Builder<? extends ServiceRoutineBuilder<IN, OUT>>) super.withInvocation();
   }
 
   @NotNull

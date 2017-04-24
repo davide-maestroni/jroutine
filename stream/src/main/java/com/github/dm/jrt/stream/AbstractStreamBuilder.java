@@ -76,13 +76,13 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends AbstractRoutineBuil
                                                                           .withExecutor(
                                                                               ScheduledExecutors
                                                                                   .immediateExecutor())
-                                                                          .apply();
+                                                                          .configured();
 
   private final Configurable<StreamBuilder<IN, OUT>> mNextConfigurable =
       new Configurable<StreamBuilder<IN, OUT>>() {
 
         @NotNull
-        public StreamBuilder<IN, OUT> apply(@NotNull final InvocationConfiguration configuration) {
+        public StreamBuilder<IN, OUT> withConfiguration(@NotNull final InvocationConfiguration configuration) {
           return AbstractStreamBuilder.this.nextApply(configuration);
         }
       };
@@ -91,7 +91,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends AbstractRoutineBuil
       new Configurable<StreamBuilder<IN, OUT>>() {
 
         @NotNull
-        public StreamBuilder<IN, OUT> apply(@NotNull final InvocationConfiguration configuration) {
+        public StreamBuilder<IN, OUT> withConfiguration(@NotNull final InvocationConfiguration configuration) {
           return AbstractStreamBuilder.this.streamApply(configuration);
         }
       };
@@ -131,7 +131,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends AbstractRoutineBuil
 
   @NotNull
   @Override
-  public StreamBuilder<IN, OUT> apply(@NotNull final InvocationConfiguration configuration) {
+  public StreamBuilder<IN, OUT> withConfiguration(@NotNull final InvocationConfiguration configuration) {
     mConfiguration = ConstantConditions.notNull("invocation configuration", configuration);
     return this;
   }
@@ -139,8 +139,8 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends AbstractRoutineBuil
   @NotNull
   @Override
   @SuppressWarnings("unchecked")
-  public Builder<? extends StreamBuilder<IN, OUT>> invocationConfiguration() {
-    return (Builder<? extends StreamBuilder<IN, OUT>>) super.invocationConfiguration();
+  public Builder<? extends StreamBuilder<IN, OUT>> withInvocation() {
+    return (Builder<? extends StreamBuilder<IN, OUT>>) super.withInvocation();
   }
 
   @NotNull
@@ -182,8 +182,8 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends AbstractRoutineBuil
   @NotNull
   public StreamBuilder<IN, OUT> consumeOn(@Nullable final ScheduledExecutor executor) {
     return map(newRoutine(
-        mStreamConfiguration.toInvocationConfiguration().builderFrom().withExecutor(executor).apply(),
-        IdentityInvocation.<OUT>factoryOf()));
+        mStreamConfiguration.toInvocationConfiguration().builderFrom().withExecutor(executor).configured(),
+        IdentityInvocation.<OUT>factory()));
   }
 
   @NotNull
@@ -261,7 +261,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends AbstractRoutineBuil
   @NotNull
   public <AFTER> StreamBuilder<IN, AFTER> map(
       @NotNull final RoutineBuilder<? super OUT, ? extends AFTER> builder) {
-    return map(builder.apply(mStreamConfiguration.toInvocationConfiguration()).buildRoutine());
+    return map(builder.withConfiguration(mStreamConfiguration.toInvocationConfiguration()).buildRoutine());
   }
 
   @NotNull
@@ -415,7 +415,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends AbstractRoutineBuil
     return newBuilder(new StreamConfiguration(streamConfiguration.getStreamInvocationConfiguration()
                                                                  .builderFrom()
                                                                  .withOutputOrder(orderType)
-                                                                 .apply(),
+                                                                 .configured(),
         streamConfiguration.getNextInvocationConfiguration()));
   }
 
@@ -427,7 +427,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends AbstractRoutineBuil
                                                                  .builderFrom()
                                                                  .withExecutor(executor)
                                                                  .withMaxInvocations(maxInvocations)
-                                                                 .apply(),
+                                                                 .configured(),
         streamConfiguration.getNextInvocationConfiguration()));
   }
 
@@ -437,7 +437,7 @@ public abstract class AbstractStreamBuilder<IN, OUT> extends AbstractRoutineBuil
     return newBuilder(new StreamConfiguration(streamConfiguration.getStreamInvocationConfiguration()
                                                                  .builderFrom()
                                                                  .withExecutor(executor)
-                                                                 .apply(),
+                                                                 .configured(),
         streamConfiguration.getNextInvocationConfiguration()));
   }
 

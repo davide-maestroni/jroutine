@@ -62,7 +62,7 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
 
   @NotNull
   @Override
-  public LoaderProxyObjectBuilder<TYPE> apply(
+  public LoaderProxyObjectBuilder<TYPE> withConfiguration(
       @NotNull final InvocationConfiguration configuration) {
     mInvocationConfiguration =
         ConstantConditions.notNull("invocation configuration", configuration);
@@ -133,17 +133,16 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
 
   @NotNull
   @Override
-  public InvocationConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>>
-  invocationConfiguration() {
+  public InvocationConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>> withInvocation() {
     final InvocationConfiguration config = mInvocationConfiguration;
     return new InvocationConfiguration.Builder<LoaderProxyObjectBuilder<TYPE>>(
         new InvocationConfiguration.Configurable<LoaderProxyObjectBuilder<TYPE>>() {
 
           @NotNull
           @Override
-          public LoaderProxyObjectBuilder<TYPE> apply(
+          public LoaderProxyObjectBuilder<TYPE> withConfiguration(
               @NotNull final InvocationConfiguration configuration) {
-            return AbstractLoaderProxyObjectBuilder.this.apply(configuration);
+            return AbstractLoaderProxyObjectBuilder.this.withConfiguration(configuration);
           }
         }, config);
   }

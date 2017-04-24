@@ -73,12 +73,12 @@ public abstract class AbstractRoutine<IN, OUT> implements Routine<IN, OUT> {
    * Constructor.
    *
    * @param configuration the invocation configuration.
+   * @param executor      the executor instance.
    */
-  protected AbstractRoutine(@NotNull final InvocationConfiguration configuration) {
+  protected AbstractRoutine(@NotNull final InvocationConfiguration configuration,
+      @NotNull final ScheduledExecutor executor) {
     mConfiguration = configuration;
     final int priority = configuration.getPriorityOrElse(InvocationConfiguration.DEFAULT);
-    final ScheduledExecutor executor =
-        configuration.getExecutorOrElse(ScheduledExecutors.defaultExecutor());
     if (priority != InvocationConfiguration.DEFAULT) {
       mExecutor = ScheduledExecutors.priorityExecutor(executor).getExecutor(priority);
 

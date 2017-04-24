@@ -528,9 +528,9 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
     new TestClass("TEST");
     assertThat(JRoutineAndroidCompat.on(getActivity())
                                     .withInstanceOf(TestClass.class)
-                                    .invocationConfiguration()
+                                    .withInvocation()
                                     .withLog(AndroidLogs.androidLog())
-                                    .apply()
+                                    .configured()
                                     .wrapperConfiguration()
                                     .withSharedFields()
                                     .apply()
@@ -760,9 +760,9 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
     new TestClass("TEST");
     assertThat(JRoutineAndroidCompat.on((Context) getActivity())
                                     .withInstanceOf(TestClass.class)
-                                    .invocationConfiguration()
+                                    .withInvocation()
                                     .withLog(AndroidLogs.androidLog())
-                                    .apply()
+                                    .configured()
                                     .wrapperConfiguration()
                                     .withSharedFields()
                                     .apply()

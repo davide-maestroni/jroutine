@@ -588,12 +588,6 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
     return parameters.toArray();
   }
 
-  @NotNull
-  public RoutineMethod apply(@NotNull final InvocationConfiguration configuration) {
-    mConfiguration = ConstantConditions.notNull("invocation configuration", configuration);
-    return this;
-  }
-
   /**
    * Calls the routine.
    * <br>
@@ -635,7 +629,13 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
   }
 
   @NotNull
-  public InvocationConfiguration.Builder<? extends RoutineMethod> invocationConfiguration() {
+  public RoutineMethod withConfiguration(@NotNull final InvocationConfiguration configuration) {
+    mConfiguration = ConstantConditions.notNull("invocation configuration", configuration);
+    return this;
+  }
+
+  @NotNull
+  public InvocationConfiguration.Builder<? extends RoutineMethod> withInvocation() {
     return new Builder<RoutineMethod>(this, mConfiguration);
   }
 
@@ -761,8 +761,9 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
 
     @NotNull
     @Override
-    public ReflectionRoutineMethod apply(@NotNull final InvocationConfiguration configuration) {
-      return (ReflectionRoutineMethod) super.apply(configuration);
+    public ReflectionRoutineMethod withConfiguration(
+        @NotNull final InvocationConfiguration configuration) {
+      return (ReflectionRoutineMethod) super.withConfiguration(configuration);
     }
 
     @NotNull
@@ -778,7 +779,8 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
       }
 
       final Routine<Object, Object> routine = JRoutineReflection.with(mTarget)
-                                                                .apply(getConfiguration())
+                                                                .withConfiguration(
+                                                                    getConfiguration())
                                                                 .apply(mConfiguration)
                                                                 .method(method);
       final Channel<Object, Object> channel = routine.invoke().sorted();
@@ -797,8 +799,8 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
     @NotNull
     @Override
     @SuppressWarnings("unchecked")
-    public Builder<? extends ReflectionRoutineMethod> invocationConfiguration() {
-      return (Builder<? extends ReflectionRoutineMethod>) super.invocationConfiguration();
+    public Builder<? extends ReflectionRoutineMethod> withInvocation() {
+      return (Builder<? extends ReflectionRoutineMethod>) super.withInvocation();
     }
 
     @NotNull
@@ -957,7 +959,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
       }
     }
 
-    public void onRestart() throws Exception {
+    public void onStart() throws Exception {
       mIsBound = false;
       mIsAborted = false;
       mIsComplete = false;
@@ -1010,8 +1012,8 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
     }
 
     @Override
-    public void onRestart() throws Exception {
-      super.onRestart();
+    public void onStart() throws Exception {
+      super.onStart();
       final RoutineMethod instance = (mInstance = mConstructor.newInstance(mArgs));
       final Method method = mMethod;
       instance.setReturnType(method.getReturnType());

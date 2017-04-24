@@ -804,8 +804,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     if (ScheduledExecutor.isManagedThread()) {
       throw new ExecutionDeadlockException(
           "cannot wait on a executor thread: " + Thread.currentThread()
-              + "\nTry binding the output channel to another channel or an output consumer: "
-              + ScheduledExecutor.getManager());
+              + "\nTry binding the output channel to another channel or an output consumer");
     }
 
     if (mIsWaitingInvocation) {

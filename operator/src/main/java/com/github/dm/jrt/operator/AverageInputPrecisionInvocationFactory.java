@@ -114,7 +114,7 @@ class AverageInputPrecisionInvocationFactory<IN extends Number, OUT extends Numb
     }
 
     @Override
-    public void onRestart() {
+    public void onStart() {
       mSum = mInputOperation.convert(0);
       mCount = 0;
     }

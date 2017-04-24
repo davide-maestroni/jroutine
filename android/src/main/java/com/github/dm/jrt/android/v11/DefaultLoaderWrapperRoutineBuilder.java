@@ -71,7 +71,7 @@ class DefaultLoaderWrapperRoutineBuilder implements LoaderWrapperRoutineBuilder 
 
   @NotNull
   @Override
-  public LoaderWrapperRoutineBuilder apply(@NotNull final InvocationConfiguration configuration) {
+  public LoaderWrapperRoutineBuilder withConfiguration(@NotNull final InvocationConfiguration configuration) {
     mInvocationConfiguration =
         ConstantConditions.notNull("invocation configuration", configuration);
     return this;
@@ -86,15 +86,15 @@ class DefaultLoaderWrapperRoutineBuilder implements LoaderWrapperRoutineBuilder 
 
   @NotNull
   @Override
-  public Builder<? extends LoaderWrapperRoutineBuilder> invocationConfiguration() {
+  public Builder<? extends LoaderWrapperRoutineBuilder> withInvocation() {
     return new InvocationConfiguration.Builder<LoaderWrapperRoutineBuilder>(
         new InvocationConfiguration.Configurable<LoaderWrapperRoutineBuilder>() {
 
           @NotNull
           @Override
-          public LoaderWrapperRoutineBuilder apply(
+          public LoaderWrapperRoutineBuilder withConfiguration(
               @NotNull final InvocationConfiguration configuration) {
-            return DefaultLoaderWrapperRoutineBuilder.this.apply(configuration);
+            return DefaultLoaderWrapperRoutineBuilder.this.withConfiguration(configuration);
           }
         }, mInvocationConfiguration);
   }
@@ -192,7 +192,7 @@ class DefaultLoaderWrapperRoutineBuilder implements LoaderWrapperRoutineBuilder 
   private LoaderProxyRoutineBuilder newProxyBuilder() {
     return JRoutineLoaderProxy.on(mContext)
                               .with(mTarget)
-                              .apply(mInvocationConfiguration)
+                              .withConfiguration(mInvocationConfiguration)
                               .apply(mWrapperConfiguration)
                               .apply(mLoaderConfiguration);
   }
@@ -201,7 +201,7 @@ class DefaultLoaderWrapperRoutineBuilder implements LoaderWrapperRoutineBuilder 
   private LoaderReflectionRoutineBuilder newReflectionBuilder() {
     return JRoutineLoaderReflection.on(mContext)
                                    .with(mTarget)
-                                   .apply(mInvocationConfiguration)
+                                   .withConfiguration(mInvocationConfiguration)
                                    .apply(mWrapperConfiguration)
                                    .apply(mLoaderConfiguration);
   }

@@ -43,7 +43,7 @@ public interface LoaderReflectionRoutineBuilder
    */
   @NotNull
   @Override
-  LoaderReflectionRoutineBuilder apply(@NotNull InvocationConfiguration configuration);
+  LoaderReflectionRoutineBuilder withConfiguration(@NotNull InvocationConfiguration configuration);
 
   /**
    * {@inheritDoc}
@@ -176,8 +176,7 @@ public interface LoaderReflectionRoutineBuilder
    */
   @NotNull
   @Override
-  InvocationConfiguration.Builder<? extends LoaderReflectionRoutineBuilder>
-  invocationConfiguration();
+  InvocationConfiguration.Builder<? extends LoaderReflectionRoutineBuilder> withInvocation();
 
   /**
    * {@inheritDoc}

@@ -17,6 +17,7 @@
 package com.github.dm.jrt.core;
 
 import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.executor.ScheduledExecutor;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.log.Logger;
@@ -40,11 +41,13 @@ class DefaultRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
    * Constructor.
    *
    * @param configuration the invocation configuration.
+   * @param executor      the executor instance.
    * @param factory       the invocation factory.
    */
   DefaultRoutine(@NotNull final InvocationConfiguration configuration,
+      @NotNull final ScheduledExecutor executor,
       @NotNull final InvocationFactory<IN, OUT> factory) {
-    super(configuration);
+    super(configuration, executor);
     mFactory = ConstantConditions.notNull("invocation factory", factory);
   }
 

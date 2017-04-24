@@ -72,7 +72,7 @@ class LoaderFlowableOperator<DATA> implements FlowableOperator<DATA, DATA> {
         new SubscriberInvocationFactory<DATA>(subscriber);
     return new LoaderSubscriber<DATA>(subscriber, JRoutineLoader.on(mContext)
                                                                 .with(factory)
-                                                                .apply(mInvocationConfiguration)
+                                                                .withConfiguration(mInvocationConfiguration)
                                                                 .apply(mLoaderConfiguration)
                                                                 .buildRoutine());
   }
@@ -167,7 +167,7 @@ class LoaderFlowableOperator<DATA> implements FlowableOperator<DATA, DATA> {
     }
 
     @Override
-    public void onRestart() {
+    public void onStart() {
     }
 
     @Override

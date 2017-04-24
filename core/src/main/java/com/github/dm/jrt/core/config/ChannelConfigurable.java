@@ -40,5 +40,5 @@ public interface ChannelConfigurable<TYPE> extends Configurable<TYPE> {
    * @return the channel configuration builder.
    */
   @NotNull
-  Builder<? extends TYPE> channelConfiguration();
+  Builder<? extends TYPE> withChannel();
 }

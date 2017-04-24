@@ -65,7 +65,7 @@ public class StatelessLoaderRoutineBuilderCompatTest
               public void accept(final RoutineException e) throws Exception {
                 reference.set(e);
               }
-            }).invocationConfiguration().withExecutor(ScheduledExecutors.immediateExecutor()).apply().invoke();
+            }).withInvocation().withExecutor(ScheduledExecutors.immediateExecutor()).configured().invoke();
     assertThat(reference.get()).isNull();
     channel.abort(new IOException());
     assertThat(channel.in(seconds(10)).getComplete()).isTrue();
@@ -129,7 +129,7 @@ public class StatelessLoaderRoutineBuilderCompatTest
           public List<Integer> get() {
             return list;
           }
-        }).invocationConfiguration().withExecutor(ScheduledExecutors.immediateExecutor()).apply();
+        }).withInvocation().withExecutor(ScheduledExecutors.immediateExecutor()).configured();
     assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(10)).all()).containsOnly(
         Arrays.asList(2, 3, 4, 5));
   }

@@ -92,7 +92,7 @@ class SumPrecisionInvocationFactory<N extends Number> extends InvocationFactory<
     }
 
     @Override
-    public void onRestart() {
+    public void onStart() {
       mSum = mOperation.convert(0);
     }
   }

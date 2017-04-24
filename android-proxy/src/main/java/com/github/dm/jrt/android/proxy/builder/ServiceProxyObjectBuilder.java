@@ -39,7 +39,7 @@ public interface ServiceProxyObjectBuilder<TYPE>
    */
   @NotNull
   @Override
-  ServiceProxyObjectBuilder<TYPE> apply(@NotNull InvocationConfiguration configuration);
+  ServiceProxyObjectBuilder<TYPE> withConfiguration(@NotNull InvocationConfiguration configuration);
 
   /**
    * {@inheritDoc}
@@ -74,8 +74,7 @@ public interface ServiceProxyObjectBuilder<TYPE>
    */
   @NotNull
   @Override
-  InvocationConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>>
-  invocationConfiguration();
+  InvocationConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>> withInvocation();
 
   /**
    * {@inheritDoc}

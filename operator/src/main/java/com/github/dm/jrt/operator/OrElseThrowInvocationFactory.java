@@ -92,7 +92,7 @@ class OrElseThrowInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
     }
 
     @Override
-    public void onRestart() {
+    public void onStart() {
       mHasOutputs = false;
     }
   }

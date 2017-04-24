@@ -870,7 +870,7 @@ public class FunctionsTest {
   public void testFactoryEquals() {
 
     final Supplier<Invocation<Object, Object>> supplier =
-        constant(IdentityInvocation.factoryOf().newInvocation());
+        constant(IdentityInvocation.factory().newInvocation());
     final InvocationFactory<Object, String> factory = createFactory();
     assertThat(factory).isEqualTo(factory);
     assertThat(factory).isNotEqualTo(createFactory());

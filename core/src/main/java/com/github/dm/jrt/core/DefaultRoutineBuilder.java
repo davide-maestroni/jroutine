@@ -17,35 +17,105 @@
 package com.github.dm.jrt.core;
 
 import com.github.dm.jrt.core.builder.AbstractRoutineBuilder;
+import com.github.dm.jrt.core.executor.ScheduledExecutor;
+import com.github.dm.jrt.core.invocation.Invocation;
+import com.github.dm.jrt.core.invocation.InvocationDecorator;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 
+import static com.github.dm.jrt.core.util.Reflection.asArgs;
+
 /**
  * Class implementing a builder of routine objects based on an invocation factory.
  * <p>
  * Created by davide-maestroni on 09/21/2014.
- *
- * @param <IN>  the input data type.
- * @param <OUT> the output data type.
  */
-class DefaultRoutineBuilder<IN, OUT> extends AbstractRoutineBuilder<IN, OUT> {
+class DefaultRoutineBuilder extends AbstractRoutineBuilder {
 
-  private final InvocationFactory<IN, OUT> mFactory;
+  private final ScheduledExecutor mExecutor;
 
   /**
    * Constructor.
    *
-   * @param factory the invocation factory.
+   * @param executor the executor instance.
    */
-  DefaultRoutineBuilder(@NotNull final InvocationFactory<IN, OUT> factory) {
-    mFactory = ConstantConditions.notNull("invocation factory", factory);
+  DefaultRoutineBuilder(@NotNull final ScheduledExecutor executor) {
+    mExecutor = ConstantConditions.notNull("executor instance", executor);
   }
 
   @NotNull
-  public Routine<IN, OUT> buildRoutine() {
-    return new DefaultRoutine<IN, OUT>(getConfiguration(), mFactory);
+  public <IN, OUT> Routine<IN, OUT> of(@NotNull final InvocationFactory<IN, OUT> factory) {
+    return new DefaultRoutine<IN, OUT>(getConfiguration(), mExecutor, factory);
+  }
+
+  @NotNull
+  public <IN, OUT> Routine<IN, OUT> ofSingleton(@NotNull final Invocation<IN, OUT> invocation) {
+    return new DefaultRoutine<IN, OUT>(
+        getConfiguration().builderFrom().withMaxInvocations(1).configured(), mExecutor,
+        new SingletonInvocationFactory<IN, OUT>(invocation));
+  }
+
+  /**
+   * Invocation decorator ensuring that a destroyed instance will not be reused.
+   *
+   * @param <IN>  the input data type.
+   * @param <OUT> the output data type.
+   */
+  private static class SingletonInvocation<IN, OUT> extends InvocationDecorator<IN, OUT> {
+
+    private boolean mIsDestroyed;
+
+    /**
+     * Constructor.
+     *
+     * @param wrapped the wrapped invocation instance.
+     */
+    private SingletonInvocation(@NotNull final Invocation<IN, OUT> wrapped) {
+      super(wrapped);
+    }
+
+    @Override
+    public void onDestroy() throws Exception {
+      mIsDestroyed = true;
+      super.onDestroy();
+    }
+
+    @Override
+    public void onStart() throws Exception {
+      if (mIsDestroyed) {
+        throw new IllegalStateException("the invocation has been destroyed");
+      }
+
+      super.onStart();
+    }
+  }
+
+  /**
+   * Factory wrapping an invocation instance so that, once destroyed, it will not be reused.
+   *
+   * @param <IN>  the input data type.
+   * @param <OUT> the output data type.
+   */
+  private static class SingletonInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
+
+    private final SingletonInvocation<IN, OUT> mInvocation;
+
+    /**
+     * Constructor.
+     *
+     * @param wrapped the wrapped invocation instance.
+     */
+    private SingletonInvocationFactory(@NotNull final Invocation<IN, OUT> wrapped) {
+      super(asArgs(wrapped));
+      mInvocation = new SingletonInvocation<IN, OUT>(wrapped);
+    }
+
+    @NotNull
+    public Invocation<IN, OUT> newInvocation() {
+      return mInvocation;
+    }
   }
 }

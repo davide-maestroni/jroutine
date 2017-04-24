@@ -37,13 +37,13 @@ public abstract class AbstractChannelMapBuilder<KEY, IN, OUT>
   private ChannelConfiguration mConfiguration = ChannelConfiguration.defaultConfiguration();
 
   @NotNull
-  public ChannelMapBuilder<KEY, IN, OUT> apply(@NotNull final ChannelConfiguration configuration) {
+  public ChannelMapBuilder<KEY, IN, OUT> withConfiguration(@NotNull final ChannelConfiguration configuration) {
     mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
     return this;
   }
 
   @NotNull
-  public Builder<? extends ChannelMapBuilder<KEY, IN, OUT>> channelConfiguration() {
+  public Builder<? extends ChannelMapBuilder<KEY, IN, OUT>> withChannel() {
     return new Builder<ChannelMapBuilder<KEY, IN, OUT>>(this, mConfiguration);
   }
 

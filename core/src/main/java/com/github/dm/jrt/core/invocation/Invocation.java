@@ -32,7 +32,7 @@ import org.jetbrains.annotations.NotNull;
  *    |               |     |     |                                   |
  *    |               V     V     |                                   |
  *    |             -----------------                                 |
- *    |             |  onRestart()  |                                 |
+ *    |             |   onStart()   |                                 |
  *    |             -----------------                                 |
  *    |               |     |     |                                   |
  *    |    -----------      |     |                                   |
@@ -72,16 +72,16 @@ import org.jetbrains.annotations.NotNull;
  * </code></pre>
  * The routine invocation interface is designed so to allow recycling of instantiated objects.
  * <p>
+ * The {@code onStart()} method is meant to allow the initialization needed to prepare the
+ * invocation object to be (re)used. When the method does not complete successfully, the invocation
+ * object is discarded.
+ * <p>
  * Note that the {@code onInput()} method will be called for each input passed to the routine, so,
  * in case no input is expected, the {@code onComplete()} method will be called soon after the
  * initialization.
  * <p>
- * Note also that {@code onAbort()} might be called at any time after {@code onRestart()} in case
- * the invocation is aborted.
- * <p>
- * The {@code onRestart()} method is meant to allow the reset operations needed to prepare the
- * invocation object to be reused. When the method does not complete successfully, the invocation
- * object is discarded.
+ * Note also that {@code onAbort()} might be called at any time after {@code onStart()} in case the
+ * invocation is aborted.
  * <br>
  * Note that the method will be called also right after the object instantiation.
  * <p>
@@ -176,5 +176,5 @@ public interface Invocation<IN, OUT> {
    *
    * @throws java.lang.Exception if an unexpected error occurs.
    */
-  void onRestart() throws Exception;
+  void onStart() throws Exception;
 }

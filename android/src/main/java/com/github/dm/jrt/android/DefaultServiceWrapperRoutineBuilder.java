@@ -69,7 +69,7 @@ class DefaultServiceWrapperRoutineBuilder implements ServiceWrapperRoutineBuilde
 
   @NotNull
   @Override
-  public ServiceWrapperRoutineBuilder apply(@NotNull final InvocationConfiguration configuration) {
+  public ServiceWrapperRoutineBuilder withConfiguration(@NotNull final InvocationConfiguration configuration) {
     mInvocationConfiguration =
         ConstantConditions.notNull("invocation configuration", configuration);
     return this;
@@ -84,16 +84,15 @@ class DefaultServiceWrapperRoutineBuilder implements ServiceWrapperRoutineBuilde
 
   @NotNull
   @Override
-  public InvocationConfiguration.Builder<? extends ServiceWrapperRoutineBuilder>
-  invocationConfiguration() {
+  public InvocationConfiguration.Builder<? extends ServiceWrapperRoutineBuilder> withInvocation() {
     return new InvocationConfiguration.Builder<ServiceWrapperRoutineBuilder>(
         new InvocationConfiguration.Configurable<ServiceWrapperRoutineBuilder>() {
 
           @NotNull
           @Override
-          public ServiceWrapperRoutineBuilder apply(
+          public ServiceWrapperRoutineBuilder withConfiguration(
               @NotNull final InvocationConfiguration configuration) {
-            return DefaultServiceWrapperRoutineBuilder.this.apply(configuration);
+            return DefaultServiceWrapperRoutineBuilder.this.withConfiguration(configuration);
           }
         }, mInvocationConfiguration);
   }
@@ -192,7 +191,7 @@ class DefaultServiceWrapperRoutineBuilder implements ServiceWrapperRoutineBuilde
   private ServiceProxyRoutineBuilder newProxyBuilder() {
     return JRoutineServiceProxy.on(mContext)
                                .with(mTarget)
-                               .apply(mInvocationConfiguration)
+                               .withConfiguration(mInvocationConfiguration)
                                .apply(mWrapperConfiguration)
                                .apply(mServiceConfiguration);
   }
@@ -201,7 +200,7 @@ class DefaultServiceWrapperRoutineBuilder implements ServiceWrapperRoutineBuilde
   private ServiceReflectionRoutineBuilder newReflectionBuilder() {
     return JRoutineServiceReflection.on(mContext)
                                     .with(mTarget)
-                                    .apply(mInvocationConfiguration)
+                                    .withConfiguration(mInvocationConfiguration)
                                     .apply(mWrapperConfiguration)
                                     .apply(mServiceConfiguration);
   }

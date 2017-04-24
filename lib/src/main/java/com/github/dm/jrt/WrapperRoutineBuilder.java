@@ -41,7 +41,7 @@ public interface WrapperRoutineBuilder extends ReflectionRoutineBuilder {
    * {@inheritDoc}
    */
   @NotNull
-  WrapperRoutineBuilder apply(@NotNull InvocationConfiguration configuration);
+  WrapperRoutineBuilder withConfiguration(@NotNull InvocationConfiguration configuration);
 
   /**
    * {@inheritDoc}
@@ -53,7 +53,7 @@ public interface WrapperRoutineBuilder extends ReflectionRoutineBuilder {
    * {@inheritDoc}
    */
   @NotNull
-  InvocationConfiguration.Builder<? extends WrapperRoutineBuilder> invocationConfiguration();
+  InvocationConfiguration.Builder<? extends WrapperRoutineBuilder> withInvocation();
 
   /**
    * Force the type of strategy to be employed to create the proxy instance.

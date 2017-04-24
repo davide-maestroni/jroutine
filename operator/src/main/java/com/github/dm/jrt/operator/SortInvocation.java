@@ -84,7 +84,7 @@ class SortInvocation<DATA extends Comparable<? super DATA>> extends TemplateInvo
   }
 
   @Override
-  public void onRestart() {
+  public void onStart() {
     mList = new ArrayList<DATA>();
   }
 }

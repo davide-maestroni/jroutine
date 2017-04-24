@@ -82,7 +82,7 @@ public class ServiceReflectionRoutineTest extends ActivityInstrumentationTestCas
     final Routine<Object, Object> routine = JRoutineServiceReflection.on(serviceFrom(getActivity()))
                                                                      .with(instanceOf(
                                                                          TestClass.class))
-                                                                     .invocationConfiguration()
+                                                                     .withInvocation()
                                                                      .withExecutor(
                                                                          ScheduledExecutors.syncExecutor())
                                                                      .withMaxInvocations(1)
@@ -91,7 +91,7 @@ public class ServiceReflectionRoutineTest extends ActivityInstrumentationTestCas
                                                                          TimeoutActionType.CONTINUE)
                                                                      .withLogLevel(Level.DEBUG)
                                                                      .withLog(new NullLog())
-                                                                     .apply()
+                                                                     .configured()
                                                                      .method(TestClass.GET);
     assertThat(routine.invoke().close().in(timeout).all()).containsExactly(-77L);
   }
@@ -112,9 +112,9 @@ public class ServiceReflectionRoutineTest extends ActivityInstrumentationTestCas
     final DurationMeasure timeout = seconds(10);
     final SumItf sumAsync = JRoutineServiceReflection.on(serviceFrom(getActivity()))
                                                      .with(instanceOf(Sum.class))
-                                                     .invocationConfiguration()
+                                                     .withInvocation()
                                                      .withOutputTimeout(timeout)
-                                                     .apply()
+                                                     .configured()
                                                      .buildProxy(ClassToken.tokenOf(SumItf.class));
     final Channel<Integer, Integer> channel3 = JRoutineCore.<Integer>ofData().buildChannel();
     channel3.pass(7).close();
@@ -142,9 +142,9 @@ public class ServiceReflectionRoutineTest extends ActivityInstrumentationTestCas
     final DurationMeasure timeout = seconds(10);
     final CountItf countAsync = JRoutineServiceReflection.on(serviceFrom(getActivity()))
                                                          .with(instanceOf(Count.class))
-                                                         .invocationConfiguration()
+                                                         .withInvocation()
                                                          .withOutputTimeout(timeout)
-                                                         .apply()
+                                                         .configured()
                                                          .buildProxy(CountItf.class);
     assertThat(countAsync.count(3).all()).containsExactly(0, 1, 2);
     assertThat(countAsync.count1(3).all()).containsExactly(new int[]{0, 1, 2});
@@ -159,7 +159,7 @@ public class ServiceReflectionRoutineTest extends ActivityInstrumentationTestCas
     try {
 
       new DefaultServiceReflectionRoutineBuilder(serviceFrom(getActivity()),
-          instanceOf(TestClass.class)).apply((InvocationConfiguration) null);
+          instanceOf(TestClass.class)).withConfiguration((InvocationConfiguration) null);
 
       fail();
 
@@ -356,9 +356,9 @@ public class ServiceReflectionRoutineTest extends ActivityInstrumentationTestCas
 
       JRoutineServiceReflection.on(serviceFrom(getActivity()))
                                .with(instanceOf(TestClass.class))
-                               .invocationConfiguration()
+                               .withInvocation()
                                .withOutputTimeout(indefiniteTime())
-                               .apply()
+                               .configured()
                                .buildProxy(TestItf.class)
                                .throwException(null);
 
@@ -372,9 +372,9 @@ public class ServiceReflectionRoutineTest extends ActivityInstrumentationTestCas
 
       JRoutineServiceReflection.on(serviceFrom(getActivity()))
                                .with(instanceOf(TestClass.class))
-                               .invocationConfiguration()
+                               .withInvocation()
                                .withOutputTimeout(indefiniteTime())
-                               .apply()
+                               .configured()
                                .buildProxy(TestItf.class)
                                .throwException1(null);
 
@@ -388,9 +388,9 @@ public class ServiceReflectionRoutineTest extends ActivityInstrumentationTestCas
 
       JRoutineServiceReflection.on(serviceFrom(getActivity()))
                                .with(instanceOf(TestClass.class))
-                               .invocationConfiguration()
+                               .withInvocation()
                                .withOutputTimeout(indefiniteTime())
-                               .apply()
+                               .configured()
                                .buildProxy(TestItf.class)
                                .throwException2(null);
 
@@ -462,10 +462,10 @@ public class ServiceReflectionRoutineTest extends ActivityInstrumentationTestCas
     final Routine<Object, Object> routine2 =
         JRoutineServiceReflection.on(serviceFrom(getActivity()))
                                  .with(instanceOf(TestClass.class))
-                                 .invocationConfiguration()
+                                 .withInvocation()
                                  .withExecutor(ScheduledExecutors.poolExecutor())
                                  .withMaxInvocations(1)
-                                 .apply()
+                                 .configured()
                                  .wrapperConfiguration()
                                  .withSharedFields("test")
                                  .apply()
@@ -480,9 +480,9 @@ public class ServiceReflectionRoutineTest extends ActivityInstrumentationTestCas
     final Routine<Object, Object> routine1 =
         JRoutineServiceReflection.on(serviceFrom(getActivity()))
                                  .with(instanceOf(TestClass.class))
-                                 .invocationConfiguration()
+                                 .withInvocation()
                                  .withExecutor(ScheduledExecutors.poolExecutor())
-                                 .apply()
+                                 .configured()
                                  .method("getLong");
 
     assertThat(routine1.invoke().close().in(timeout).all()).containsExactly(-77L);
@@ -575,9 +575,9 @@ public class ServiceReflectionRoutineTest extends ActivityInstrumentationTestCas
 
     final Itf itf = JRoutineServiceReflection.on(serviceFrom(getActivity()))
                                              .with(instanceOf(Impl.class))
-                                             .invocationConfiguration()
+                                             .withInvocation()
                                              .withOutputTimeout(indefiniteTime())
-                                             .apply()
+                                             .configured()
                                              .buildProxy(Itf.class);
 
     assertThat(itf.add0('c')).isEqualTo((int) 'c');
@@ -721,9 +721,9 @@ public class ServiceReflectionRoutineTest extends ActivityInstrumentationTestCas
                                  .serviceConfiguration()
                                  .withExecutorClass(SharedFieldExecutor.class)
                                  .apply()
-                                 .invocationConfiguration()
+                                 .withInvocation()
                                  .withOutputTimeout(seconds(10))
-                                 .apply();
+                                 .configured();
 
     long startTime = System.currentTimeMillis();
 
@@ -762,9 +762,9 @@ public class ServiceReflectionRoutineTest extends ActivityInstrumentationTestCas
 
     assertThat(JRoutineServiceReflection.on(serviceFrom(getActivity()))
                                         .with(instanceOf(TestTimeout.class))
-                                        .invocationConfiguration()
+                                        .withInvocation()
                                         .withOutputTimeout(seconds(10))
-                                        .apply()
+                                        .configured()
                                         .method("test")
                                         .invoke()
                                         .close()
@@ -774,9 +774,9 @@ public class ServiceReflectionRoutineTest extends ActivityInstrumentationTestCas
 
       JRoutineServiceReflection.on(serviceFrom(getActivity()))
                                .with(instanceOf(TestTimeout.class))
-                               .invocationConfiguration()
+                               .withInvocation()
                                .withOutputTimeoutAction(TimeoutActionType.FAIL)
-                               .apply()
+                               .configured()
                                .method("test")
                                .invoke()
                                .close()
@@ -790,9 +790,9 @@ public class ServiceReflectionRoutineTest extends ActivityInstrumentationTestCas
 
     assertThat(JRoutineServiceReflection.on(serviceFrom(getActivity()))
                                         .with(instanceOf(TestTimeout.class))
-                                        .invocationConfiguration()
+                                        .withInvocation()
                                         .withOutputTimeout(seconds(10))
-                                        .apply()
+                                        .configured()
                                         .method("getInt")
                                         .invoke()
                                         .close()
@@ -802,9 +802,9 @@ public class ServiceReflectionRoutineTest extends ActivityInstrumentationTestCas
 
       JRoutineServiceReflection.on(serviceFrom(getActivity()))
                                .with(instanceOf(TestTimeout.class))
-                               .invocationConfiguration()
+                               .withInvocation()
                                .withOutputTimeoutAction(TimeoutActionType.FAIL)
-                               .apply()
+                               .configured()
                                .method("getInt")
                                .invoke()
                                .close()
@@ -818,9 +818,9 @@ public class ServiceReflectionRoutineTest extends ActivityInstrumentationTestCas
 
     assertThat(JRoutineServiceReflection.on(serviceFrom(getActivity()))
                                         .with(instanceOf(TestTimeout.class))
-                                        .invocationConfiguration()
+                                        .withInvocation()
                                         .withOutputTimeout(seconds(10))
-                                        .apply()
+                                        .configured()
                                         .method(TestTimeout.class.getMethod("getInt"))
                                         .invoke()
                                         .close()
@@ -830,9 +830,9 @@ public class ServiceReflectionRoutineTest extends ActivityInstrumentationTestCas
 
       JRoutineServiceReflection.on(serviceFrom(getActivity()))
                                .with(instanceOf(TestTimeout.class))
-                               .invocationConfiguration()
+                               .withInvocation()
                                .withOutputTimeoutAction(TimeoutActionType.FAIL)
-                               .apply()
+                               .configured()
                                .method(TestTimeout.class.getMethod("getInt"))
                                .invoke()
                                .close()
@@ -846,9 +846,9 @@ public class ServiceReflectionRoutineTest extends ActivityInstrumentationTestCas
 
     assertThat(JRoutineServiceReflection.on(serviceFrom(getActivity()))
                                         .with(instanceOf(TestTimeout.class))
-                                        .invocationConfiguration()
+                                        .withInvocation()
                                         .withOutputTimeout(seconds(10))
-                                        .apply()
+                                        .configured()
                                         .buildProxy(TestTimeoutItf.class)
                                         .getInt()).isEqualTo(31);
 
@@ -856,9 +856,9 @@ public class ServiceReflectionRoutineTest extends ActivityInstrumentationTestCas
 
       JRoutineServiceReflection.on(serviceFrom(getActivity()))
                                .with(instanceOf(TestTimeout.class))
-                               .invocationConfiguration()
+                               .withInvocation()
                                .withOutputTimeoutAction(TimeoutActionType.FAIL)
-                               .apply()
+                               .configured()
                                .buildProxy(TestTimeoutItf.class)
                                .getInt();
 

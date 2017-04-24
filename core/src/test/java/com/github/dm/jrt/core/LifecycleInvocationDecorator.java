@@ -122,13 +122,13 @@ public class LifecycleInvocationDecorator<IN, OUT> extends InvocationDecorator<I
   }
 
   @Override
-  public void onRestart() throws Exception {
+  public void onStart() throws Exception {
     if (!TO_START_STATES.contains(mState)) {
       throwInvalidState(mState);
     }
 
     mState = State.START;
-    super.onRestart();
+    super.onStart();
   }
 
   private enum State {

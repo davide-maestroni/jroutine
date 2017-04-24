@@ -63,6 +63,6 @@ public abstract class MappingInvocation<IN, OUT> extends InvocationFactory<IN, O
     return true;
   }
 
-  public final void onRestart() {
+  public final void onStart() {
   }
 }

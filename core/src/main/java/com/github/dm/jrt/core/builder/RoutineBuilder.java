@@ -17,6 +17,8 @@
 package com.github.dm.jrt.core.builder;
 
 import com.github.dm.jrt.core.config.InvocationConfigurable;
+import com.github.dm.jrt.core.invocation.Invocation;
+import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.routine.Routine;
 
 import org.jetbrains.annotations.NotNull;
@@ -24,22 +26,36 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Interface defining a builder of routine objects.
  * <p>
- * Note that when the invocation is started directly from the builder, a new routine instance is
- * implicitly created.
- * <p>
  * Created by davide-maestroni on 11/11/2014.
- *
- * @param <IN>  the input data type.
- * @param <OUT> the output data type.
  */
-public interface RoutineBuilder<IN, OUT>
-    extends InvocationConfigurable<RoutineBuilder<IN, OUT>>, Routine<IN, OUT> {
+public interface RoutineBuilder extends InvocationConfigurable<RoutineBuilder> {
 
   /**
-   * Builds a new routine instance.
+   * Builds a new routine instance based on the specified invocation factory.
+   * <br>
+   * In order to prevent undesired leaks, the class of the specified factory should have a static
+   * scope.
    *
+   * @param factory the invocation factory.
+   * @param <IN>    the input data type.
+   * @param <OUT>   the output data type.
    * @return the routine instance.
    */
   @NotNull
-  Routine<IN, OUT> buildRoutine();
+  <IN, OUT> Routine<IN, OUT> of(@NotNull InvocationFactory<IN, OUT> factory);
+
+  /**
+   * Builds a new routine instance based on the specified invocation.
+   * <br>
+   * Only that specific invocation instance will be employed (and possibly recycled) by the routine.
+   * <br>
+   * In case the instance is destroyed, a successive routine invocation will fail with an exception.
+   *
+   * @param invocation the invocation insatnce.
+   * @param <IN>       the input data type.
+   * @param <OUT>      the output data type.
+   * @return the routine instance.
+   */
+  @NotNull
+  <IN, OUT> Routine<IN, OUT> ofSingleton(@NotNull Invocation<IN, OUT> invocation);
 }

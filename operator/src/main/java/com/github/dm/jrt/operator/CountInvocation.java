@@ -74,7 +74,7 @@ class CountInvocation extends TemplateInvocation<Object, Long> {
   }
 
   @Override
-  public void onRestart() {
+  public void onStart() {
     mCount = 0;
   }
 }

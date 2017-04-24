@@ -18,15 +18,12 @@ package com.github.dm.jrt.core;
 
 import com.github.dm.jrt.core.builder.ChannelBuilder;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
-import com.github.dm.jrt.core.invocation.InvocationFactory;
+import com.github.dm.jrt.core.executor.ScheduledExecutor;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
+import static com.github.dm.jrt.core.executor.ScheduledExecutors.defaultExecutor;
 
 /**
  * This utility class represents the entry point to the library by acting as a factory of routine
@@ -44,21 +41,20 @@ import java.util.Collections;
  * <b>Example 1:</b> Configure and build a routine.
  * <pre><code>
  * final Routine&lt;Input, Result&gt; routine =
- *     JRoutineCore.with(myFactory)
- *                 .invocationConfiguration()
+ *     JRoutineCore.routine()
+ *                 .withInvocation()
  *                 .withLogLevel(Level.WARNING)
- *                 .apply()
- *                 .buildRoutine();
+ *                 .configured()
+ *                 .of(myFactory);
  * </code></pre>
  * <p>
  * <b>Example 2:</b> Asynchronously merge the output of two routines.
  * <pre><code>
- * final Channel&lt;Result, Result&gt; channel =
- *     JRoutineCore.&lt;Result&gt;ofData().buildChannel();
+ * final Channel&lt;Result, Result&gt; channel = JRoutineCore.channel().&lt;Result&gt;ofType();
  * channel.pass(routine1.invoke().close())
  *        .pass(routine2.invoke().close())
  *        .close();
- *        .in(seconds(20))
+ *        .in(seconds(2))
  *        .allInto(results);
  * </code></pre>
  * <p>
@@ -66,8 +62,8 @@ import java.util.Collections;
  * <pre><code>
  * final Channel&lt;Void, Result&gt; output1 = routine1.invoke().close();
  * final Channel&lt;Void, Result&gt; output2 = routine2.invoke().close();
- * output1.in(seconds(20)).allInto(results);
- * output2.in(seconds(20)).allInto(results);
+ * output1.in(seconds(2)).allInto(results);
+ * output2.in(seconds(2)).allInto(results);
  * </code></pre>
  * (Note that, the order of the input or the output of the routine is not guaranteed unless properly
  * configured)
@@ -79,14 +75,13 @@ import java.util.Collections;
  * <p>
  * Or, in an equivalent way:
  * <pre><code>
- * routine1.invoke().close().pipe(routine2.invoke()).close().in(seconds(20)).all();
+ * routine1.invoke().pipe(routine2.invoke()).close().in(seconds(20)).all();
  * </code></pre>
  * <p>
  * <b>Example 4:</b> Asynchronously feed a routine from a different thread.
  * <pre><code>
  * final Routine&lt;Result, Result&gt; routine =
- *     JRoutineCore.with(IdentityInvocation.&lt;Result&gt;factoryOf())
- *                 .buildRoutine();
+ *     JRoutineCore.routine().of(IdentityInvocation.&lt;Result&gt;factory());
  * final Channel&lt;Result, Result&gt; channel = routine.invoke();
  *
  * new Thread() {
@@ -97,7 +92,7 @@ import java.util.Collections;
  *   }
  * }.start();
  *
- * channel.in(seconds(20)).allInto(results);
+ * channel.in(seconds(2)).allInto(results);
  * </code></pre>
  * <p>
  * Created by davide-maestroni on 09/07/2014.
@@ -105,6 +100,23 @@ import java.util.Collections;
  * @see com.github.dm.jrt.core.routine.Routine Routine
  */
 public class JRoutineCore {
+
+  // TODO: 22/04/2017 fixme
+      /*
+      JRoutineCore.routine()
+                  .withInvocation()
+                  .withLogLevel(Level.SILENT)
+                  .configured()
+                  .of(factoryOfParallel(JRoutineCore.routine()
+                                                    .of(factoryOf(DelayedInvocation.class,
+                                                        millis(100)))))
+                  .invoke()
+                  .pass("test")
+                  .close()
+                  .in(seconds(1))
+                  .iterator()
+                  .next();
+                  */
 
   /**
    * Avoid explicit instantiation.
@@ -114,98 +126,44 @@ public class JRoutineCore {
   }
 
   /**
-   * Returns a builder of channels producing no data.
-   * <p>
-   * Note that the returned channels will be already closed.
+   * Returns a builder of channels running on the default executor.
    *
-   * @param <OUT> the output data type.
    * @return the channel builder instance.
    */
   @NotNull
-  public static <OUT> ChannelBuilder<?, OUT> of() {
-    return of(Collections.<OUT>emptyList());
+  public static ChannelBuilder channel() {
+    return channelOn(defaultExecutor());
   }
 
   /**
-   * Returns a builder of channels producing the specified output.
-   * <p>
-   * Note that the returned channels will be already closed.
+   * Returns a builder of channels running on the specified executor.
    *
-   * @param output the output.
-   * @param <OUT>  the output data type.
+   * @param executor the executor instance.
    * @return the channel builder instance.
    */
   @NotNull
-  public static <OUT> ChannelBuilder<?, OUT> of(@Nullable final OUT output) {
-    return of(Collections.singleton(output));
+  public static ChannelBuilder channelOn(@NotNull final ScheduledExecutor executor) {
+    return new DefaultChannelBuilder(executor);
   }
 
   /**
-   * Returns a builder of channels producing the specified outputs.
-   * <p>
-   * Note that the returned channels will be already closed.
+   * Returns a builder of routines running on the default executor.
    *
-   * @param outputs the output data.
-   * @param <OUT>   the output data type.
-   * @return the channel builder instance.
-   */
-  @NotNull
-  public static <OUT> ChannelBuilder<?, OUT> of(@Nullable final OUT... outputs) {
-    if (outputs == null) {
-      return of();
-    }
-
-    return of(Arrays.asList(outputs));
-  }
-
-  /**
-   * Returns a builder of channels producing the specified outputs.
-   * <p>
-   * Note that the returned channels will be already closed.
-   *
-   * @param outputs the iterable returning the output data.
-   * @param <OUT>   the output data type.
-   * @return the channel builder instance.
-   */
-  @NotNull
-  public static <OUT> ChannelBuilder<?, OUT> of(@Nullable final Iterable<OUT> outputs) {
-    if (outputs == null) {
-      return of();
-    }
-
-    final ArrayList<OUT> list = new ArrayList<OUT>();
-    for (final OUT output : outputs) {
-      list.add(output);
-    }
-
-    return new DefaultChannelBuilder<OUT>(list);
-  }
-
-  /**
-   * Returns a channel builder.
-   *
-   * @param <DATA> the data type.
-   * @return the channel builder instance.
-   */
-  @NotNull
-  public static <DATA> ChannelBuilder<DATA, DATA> ofData() {
-    return new DefaultChannelBuilder<DATA>();
-  }
-
-  /**
-   * Returns a routine builder based on the specified invocation factory.
-   * <br>
-   * In order to prevent undesired leaks, the class of the specified factory should have a static
-   * scope.
-   *
-   * @param factory the invocation factory.
-   * @param <IN>    the input data type.
-   * @param <OUT>   the output data type.
    * @return the routine builder instance.
    */
   @NotNull
-  public static <IN, OUT> RoutineBuilder<IN, OUT> with(
-      @NotNull final InvocationFactory<IN, OUT> factory) {
-    return new DefaultRoutineBuilder<IN, OUT>(factory);
+  public static RoutineBuilder routine() {
+    return routineOn(defaultExecutor());
+  }
+
+  /**
+   * Returns a builder of routines running on the specified executor.
+   *
+   * @param executor the executor instance.
+   * @return the routine builder instance.
+   */
+  @NotNull
+  public static RoutineBuilder routineOn(@NotNull final ScheduledExecutor executor) {
+    return new DefaultRoutineBuilder(executor);
   }
 }

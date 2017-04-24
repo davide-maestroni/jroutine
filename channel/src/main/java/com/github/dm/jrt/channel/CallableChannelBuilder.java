@@ -53,7 +53,7 @@ class CallableChannelBuilder<OUT> extends AbstractChannelBuilder<Void, OUT> {
   @NotNull
   public Channel<Void, OUT> buildChannel() {
     final InvocationConfiguration configuration =
-        InvocationConfiguration.builderFromOutput(getConfiguration()).apply();
+        InvocationConfiguration.builderFromOutput(getConfiguration()).configured();
     return JRoutineCore.with(new CallableInvocation<OUT>(mCallable))
                        .invocationConfiguration()
                        .withExecutor(ScheduledExecutors.immediateExecutor())

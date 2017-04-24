@@ -37,7 +37,7 @@ public abstract class AbstractChannelArrayCompatBuilder<IN, OUT>
 
   @NotNull
   @Override
-  public ChannelArrayCompatBuilder<IN, OUT> apply(
+  public ChannelArrayCompatBuilder<IN, OUT> withConfiguration(
       @NotNull final ChannelConfiguration configuration) {
     mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
     return this;
@@ -45,7 +45,7 @@ public abstract class AbstractChannelArrayCompatBuilder<IN, OUT>
 
   @NotNull
   @Override
-  public Builder<? extends ChannelArrayCompatBuilder<IN, OUT>> channelConfiguration() {
+  public Builder<? extends ChannelArrayCompatBuilder<IN, OUT>> withChannel() {
     return new Builder<ChannelArrayCompatBuilder<IN, OUT>>(this, mConfiguration);
   }
 

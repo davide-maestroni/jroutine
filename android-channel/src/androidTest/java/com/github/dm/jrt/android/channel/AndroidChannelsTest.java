@@ -67,10 +67,10 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     final Channel<?, String> channel = JRoutineCore.of("test").buildChannel();
     final TestLog testLog = new TestLog();
     assertThat(AndroidChannels.outputParcelableFlow(channel, 3)
-                              .channelConfiguration()
+                              .withChannel()
                               .withLog(testLog)
                               .withLogLevel(Level.DEBUG)
-                              .apply()
+                              .configured()
                               .buildChannel()
                               .all()).containsExactly(new ParcelableFlow<String>(3, "test"));
     assertThat(testLog.mLogCount).isGreaterThan(0);
@@ -675,10 +675,10 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
                        .buildChannel();
     final Channel<?, ParcelableFlow<Object>> output = JRoutineService.on(serviceFrom(getActivity()))
                                                                      .with(factoryOf(Sort.class))
-                                                                     .invocationConfiguration()
+                                                                     .withInvocation()
                                                                      .withInputOrder(
                                                                          OrderType.SORTED)
-                                                                     .apply()
+                                                                     .configured()
                                                                      .invoke()
                                                                      .pass(channel)
                                                                      .close();
@@ -1388,7 +1388,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     }
 
     @Override
-    public void onRestart() {
+    public void onStart() {
       mFirstIndex = NO_INDEX;
     }
   }

@@ -236,8 +236,8 @@ public class LoaderRoutineMethod extends RoutineMethod
 
   @NotNull
   @Override
-  public LoaderRoutineMethod apply(@NotNull final InvocationConfiguration configuration) {
-    return (LoaderRoutineMethod) super.apply(configuration);
+  public LoaderRoutineMethod withConfiguration(@NotNull final InvocationConfiguration configuration) {
+    return (LoaderRoutineMethod) super.withConfiguration(configuration);
   }
 
   /**
@@ -281,9 +281,9 @@ public class LoaderRoutineMethod extends RoutineMethod
   @NotNull
   @Override
   @SuppressWarnings("unchecked")
-  public InvocationConfiguration.Builder<? extends LoaderRoutineMethod> invocationConfiguration() {
+  public InvocationConfiguration.Builder<? extends LoaderRoutineMethod> withInvocation() {
     return (InvocationConfiguration.Builder<? extends LoaderRoutineMethod>) super
-        .invocationConfiguration();
+        .withInvocation();
   }
 
   /**
@@ -378,7 +378,7 @@ public class LoaderRoutineMethod extends RoutineMethod
             : JRoutineCore.<Flow<Object>>of().buildChannel();
     final Channel<Flow<Object>, Flow<Object>> outputChannel = JRoutineLoader.on(mContext)
                                                                             .with(factory)
-                                                                            .apply(
+                                                                            .withConfiguration(
                                                                                 getConfiguration())
                                                                             .apply(
                                                                                 getLoaderConfiguration())
@@ -452,9 +452,9 @@ public class LoaderRoutineMethod extends RoutineMethod
 
     @NotNull
     @Override
-    public ReflectionLoaderRoutineMethod apply(
+    public ReflectionLoaderRoutineMethod withConfiguration(
         @NotNull final InvocationConfiguration configuration) {
-      return (ReflectionLoaderRoutineMethod) super.apply(configuration);
+      return (ReflectionLoaderRoutineMethod) super.withConfiguration(configuration);
     }
 
     @NotNull
@@ -471,7 +471,7 @@ public class LoaderRoutineMethod extends RoutineMethod
 
       final Routine<Object, Object> routine = JRoutineLoaderReflection.on(mContext)
                                                                       .with(mTarget)
-                                                                      .apply(getConfiguration())
+                                                                      .withConfiguration(getConfiguration())
                                                                       .apply(
                                                                           getLoaderConfiguration())
                                                                       .apply(mConfiguration)
@@ -492,10 +492,10 @@ public class LoaderRoutineMethod extends RoutineMethod
     @NotNull
     @Override
     @SuppressWarnings("unchecked")
-    public InvocationConfiguration.Builder<? extends ReflectionLoaderRoutineMethod>
-    invocationConfiguration() {
+    public InvocationConfiguration.Builder<? extends ReflectionLoaderRoutineMethod> withInvocation() {
+
       return (InvocationConfiguration.Builder<? extends ReflectionLoaderRoutineMethod>) super
-          .invocationConfiguration();
+          .withInvocation();
     }
 
     @NotNull
@@ -674,7 +674,7 @@ public class LoaderRoutineMethod extends RoutineMethod
     }
 
     @Override
-    public void onRestart() throws Exception {
+    public void onStart() throws Exception {
       mIsBound = false;
       mIsAborted = false;
       mIsComplete = false;
@@ -734,8 +734,8 @@ public class LoaderRoutineMethod extends RoutineMethod
     }
 
     @Override
-    public void onRestart() throws Exception {
-      super.onRestart();
+    public void onStart() throws Exception {
+      super.onStart();
       final LoaderRoutineMethod instance = (mInstance = mConstructor.newInstance(mArgs));
       final Method method = mMethod;
       instance.setReturnType(method.getReturnType());

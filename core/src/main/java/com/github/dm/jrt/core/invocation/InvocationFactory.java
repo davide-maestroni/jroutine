@@ -335,7 +335,7 @@ public abstract class InvocationFactory<IN, OUT> extends DeepEqualObject {
       return true;
     }
 
-    public void onRestart() {
+    public void onStart() {
       mForceInvocation = true;
     }
   }
@@ -429,7 +429,7 @@ public abstract class InvocationFactory<IN, OUT> extends DeepEqualObject {
       return true;
     }
 
-    public void onRestart() {
+    public void onStart() {
       mChannel = mRoutine.invoke();
     }
   }

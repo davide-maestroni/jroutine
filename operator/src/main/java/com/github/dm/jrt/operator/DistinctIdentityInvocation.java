@@ -80,7 +80,7 @@ class DistinctIdentityInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
   }
 
   @Override
-  public void onRestart() {
+  public void onStart() {
     mMap = new IdentityHashMap<DATA, Object>();
   }
 }

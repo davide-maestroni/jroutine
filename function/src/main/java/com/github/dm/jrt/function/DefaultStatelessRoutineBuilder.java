@@ -111,7 +111,7 @@ class DefaultStatelessRoutineBuilder<IN, OUT>
       return true;
     }
 
-    public void onRestart() {
+    public void onStart() {
     }
   }
 }

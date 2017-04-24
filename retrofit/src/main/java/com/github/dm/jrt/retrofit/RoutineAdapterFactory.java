@@ -95,7 +95,7 @@ public class RoutineAdapterFactory extends AbstractAdapterFactory {
     }
 
     @NotNull
-    public Builder apply(@NotNull final InvocationConfiguration configuration) {
+    public Builder withConfiguration(@NotNull final InvocationConfiguration configuration) {
       mConfiguration = ConstantConditions.notNull("invocation configuration", configuration);
       return this;
     }
@@ -123,7 +123,7 @@ public class RoutineAdapterFactory extends AbstractAdapterFactory {
     }
 
     @NotNull
-    public InvocationConfiguration.Builder<? extends Builder> invocationConfiguration() {
+    public InvocationConfiguration.Builder<? extends Builder> withInvocation() {
       return new InvocationConfiguration.Builder<Builder>(this, mConfiguration);
     }
   }

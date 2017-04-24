@@ -73,13 +73,13 @@ public interface StatefulRoutineBuilder<IN, OUT, STATE> extends RoutineBuilder<I
    * {@inheritDoc}
    */
   @NotNull
-  StatefulRoutineBuilder<IN, OUT, STATE> apply(@NotNull InvocationConfiguration configuration);
+  StatefulRoutineBuilder<IN, OUT, STATE> withConfiguration(@NotNull InvocationConfiguration configuration);
 
   /**
    * {@inheritDoc}
    */
   @NotNull
-  Builder<? extends StatefulRoutineBuilder<IN, OUT, STATE>> invocationConfiguration();
+  Builder<? extends StatefulRoutineBuilder<IN, OUT, STATE>> withInvocation();
 
   /**
    * Sets the function to call when the invocation completes.
@@ -165,7 +165,7 @@ public interface StatefulRoutineBuilder<IN, OUT, STATE> extends RoutineBuilder<I
    *
    * @param onCreate the supplier instance.
    * @return this builder.
-   * @see com.github.dm.jrt.core.invocation.Invocation#onRestart() onRestart()
+   * @see com.github.dm.jrt.core.invocation.Invocation#onStart() onStart()
    */
   @NotNull
   StatefulRoutineBuilder<IN, OUT, STATE> onCreate(@NotNull Supplier<? extends STATE> onCreate);

@@ -111,7 +111,7 @@ class ToMapInvocationFactory<IN, KEY, VALUE> extends InvocationFactory<IN, Map<K
     }
 
     @Override
-    public void onRestart() {
+    public void onStart() {
       mMap = new HashMap<KEY, VALUE>();
     }
   }

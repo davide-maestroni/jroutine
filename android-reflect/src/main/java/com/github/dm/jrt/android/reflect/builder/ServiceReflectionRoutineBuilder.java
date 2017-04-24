@@ -39,7 +39,7 @@ public interface ServiceReflectionRoutineBuilder
    */
   @NotNull
   @Override
-  ServiceReflectionRoutineBuilder apply(@NotNull InvocationConfiguration configuration);
+  ServiceReflectionRoutineBuilder withConfiguration(@NotNull InvocationConfiguration configuration);
 
   /**
    * {@inheritDoc}
@@ -53,8 +53,7 @@ public interface ServiceReflectionRoutineBuilder
    */
   @NotNull
   @Override
-  InvocationConfiguration.Builder<? extends ServiceReflectionRoutineBuilder>
-  invocationConfiguration();
+  InvocationConfiguration.Builder<? extends ServiceReflectionRoutineBuilder> withInvocation();
 
   /**
    * {@inheritDoc}

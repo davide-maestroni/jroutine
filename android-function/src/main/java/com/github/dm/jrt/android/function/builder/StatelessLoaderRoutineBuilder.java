@@ -45,15 +45,14 @@ public interface StatelessLoaderRoutineBuilder<IN, OUT>
    */
   @NotNull
   @Override
-  StatelessLoaderRoutineBuilder<IN, OUT> apply(@NotNull InvocationConfiguration configuration);
+  StatelessLoaderRoutineBuilder<IN, OUT> withConfiguration(@NotNull InvocationConfiguration configuration);
 
   /**
    * {@inheritDoc}
    */
   @NotNull
   @Override
-  InvocationConfiguration.Builder<? extends StatelessLoaderRoutineBuilder<IN, OUT>>
-  invocationConfiguration();
+  InvocationConfiguration.Builder<? extends StatelessLoaderRoutineBuilder<IN, OUT>> withInvocation();
 
   /**
    * {@inheritDoc}

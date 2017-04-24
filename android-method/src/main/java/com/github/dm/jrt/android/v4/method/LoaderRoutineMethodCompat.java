@@ -233,8 +233,8 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
 
   @NotNull
   @Override
-  public LoaderRoutineMethodCompat apply(@NotNull final InvocationConfiguration configuration) {
-    return (LoaderRoutineMethodCompat) super.apply(configuration);
+  public LoaderRoutineMethodCompat withConfiguration(@NotNull final InvocationConfiguration configuration) {
+    return (LoaderRoutineMethodCompat) super.withConfiguration(configuration);
   }
 
   /**
@@ -278,10 +278,9 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
   @NotNull
   @Override
   @SuppressWarnings("unchecked")
-  public InvocationConfiguration.Builder<? extends LoaderRoutineMethodCompat>
-  invocationConfiguration() {
+  public InvocationConfiguration.Builder<? extends LoaderRoutineMethodCompat> withInvocation() {
     return (InvocationConfiguration.Builder<? extends LoaderRoutineMethodCompat>) super
-        .invocationConfiguration();
+        .withInvocation();
   }
 
   /**
@@ -376,7 +375,7 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
             : JRoutineCore.<Flow<Object>>of().buildChannel();
     final Channel<Flow<Object>, Flow<Object>> outputChannel = JRoutineLoaderCompat.on(mContext)
                                                                                   .with(factory)
-                                                                                  .apply(
+                                                                                  .withConfiguration(
                                                                                       getConfiguration())
                                                                                   .apply(
                                                                                       getLoaderConfiguration())
@@ -452,9 +451,9 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
 
     @NotNull
     @Override
-    public ReflectionLoaderRoutineMethodCompat apply(
+    public ReflectionLoaderRoutineMethodCompat withConfiguration(
         @NotNull final InvocationConfiguration configuration) {
-      return (ReflectionLoaderRoutineMethodCompat) super.apply(configuration);
+      return (ReflectionLoaderRoutineMethodCompat) super.withConfiguration(configuration);
     }
 
     @NotNull
@@ -471,7 +470,7 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
 
       final Routine<Object, Object> routine = JRoutineLoaderReflectionCompat.on(mContext)
                                                                             .with(mTarget)
-                                                                            .apply(
+                                                                            .withConfiguration(
                                                                                 getConfiguration())
                                                                             .apply(
                                                                                 getLoaderConfiguration())
@@ -493,10 +492,9 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
     @NotNull
     @Override
     @SuppressWarnings("unchecked")
-    public InvocationConfiguration.Builder<? extends ReflectionLoaderRoutineMethodCompat>
-    invocationConfiguration() {
+    public InvocationConfiguration.Builder<? extends ReflectionLoaderRoutineMethodCompat> withInvocation() {
       return (InvocationConfiguration.Builder<? extends ReflectionLoaderRoutineMethodCompat>)
-          super.invocationConfiguration();
+          super.withInvocation();
     }
 
     @NotNull
@@ -677,7 +675,7 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
     }
 
     @Override
-    public void onRestart() throws Exception {
+    public void onStart() throws Exception {
       mIsBound = false;
       mIsAborted = false;
       mIsComplete = false;
@@ -738,8 +736,8 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
     }
 
     @Override
-    public void onRestart() throws Exception {
-      super.onRestart();
+    public void onStart() throws Exception {
+      super.onStart();
       final LoaderRoutineMethodCompat instance = (mInstance = mConstructor.newInstance(mArgs));
       final Method method = mMethod;
       instance.setReturnType(method.getReturnType());

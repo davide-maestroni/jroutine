@@ -26,23 +26,20 @@ import org.jetbrains.annotations.NotNull;
  * Base abstract implementation of a channel builder.
  * <p>
  * Created by davide-maestroni on 12/11/2016.
- *
- * @param <IN>  the input data type.
- * @param <OUT> the output data type.
  */
-public abstract class AbstractChannelBuilder<IN, OUT> implements ChannelBuilder<IN, OUT> {
+public abstract class AbstractChannelBuilder implements ChannelBuilder {
 
   private ChannelConfiguration mConfiguration = ChannelConfiguration.defaultConfiguration();
 
   @NotNull
-  public ChannelBuilder<IN, OUT> apply(@NotNull final ChannelConfiguration configuration) {
-    mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
-    return this;
+  public Builder<? extends ChannelBuilder> withChannel() {
+    return new Builder<ChannelBuilder>(this, mConfiguration);
   }
 
   @NotNull
-  public Builder<? extends ChannelBuilder<IN, OUT>> channelConfiguration() {
-    return new Builder<ChannelBuilder<IN, OUT>>(this, mConfiguration);
+  public ChannelBuilder withConfiguration(@NotNull final ChannelConfiguration configuration) {
+    mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
+    return this;
   }
 
   /**

@@ -53,7 +53,7 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
 
   public void testClass() {
     final InvocationConfiguration configuration =
-        InvocationConfiguration.builder().withExecutor(ScheduledExecutors.syncExecutor()).apply();
+        InvocationConfiguration.builder().withExecutor(ScheduledExecutors.syncExecutor()).configured();
     assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(Case.class)))
                            .apply(configuration)
                            .invoke()
@@ -146,7 +146,7 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
 
   public void testTemplateInvocation() {
     final InvocationConfiguration configuration =
-        InvocationConfiguration.builder().withExecutor(ScheduledExecutors.syncExecutor()).apply();
+        InvocationConfiguration.builder().withExecutor(ScheduledExecutors.syncExecutor()).configured();
     assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(ContextTest.class)))
                            .apply(configuration)
                            .invoke()
@@ -156,7 +156,7 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
 
   public void testToken() {
     final InvocationConfiguration configuration =
-        InvocationConfiguration.builder().withExecutor(ScheduledExecutors.syncExecutor()).apply();
+        InvocationConfiguration.builder().withExecutor(ScheduledExecutors.syncExecutor()).configured();
     assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(tokenOf(Case.class))))
                            .apply(configuration)
                            .invoke()
@@ -193,7 +193,7 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
 
   public void testWrapper() {
     final InvocationConfiguration configuration =
-        InvocationConfiguration.builder().withExecutor(ScheduledExecutors.syncExecutor()).apply();
+        InvocationConfiguration.builder().withExecutor(ScheduledExecutors.syncExecutor()).configured();
     assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(CaseWrapper.class)))
                            .apply(configuration)
                            .invoke()

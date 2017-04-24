@@ -59,7 +59,7 @@ class ServiceExecutor extends AsyncExecutor {
    * @return the executor.
    */
   @NotNull
-  static ServiceExecutor of(@NotNull final ScheduledExecutorService service) {
+  static ServiceExecutor executorOf(@NotNull final ScheduledExecutorService service) {
     ServiceExecutor serviceExecutor;
     synchronized (sExecutors) {
       final WeakHashMap<ScheduledExecutorService, WeakReference<ServiceExecutor>> executors =
@@ -84,7 +84,7 @@ class ServiceExecutor extends AsyncExecutor {
    * @return the executor.
    */
   @NotNull
-  static ServiceExecutor ofStoppable(@NotNull final ScheduledExecutorService service) {
+  static ServiceExecutor executorOfStoppable(@NotNull final ScheduledExecutorService service) {
     return new StoppableServiceExecutor(service);
   }
 

@@ -71,7 +71,7 @@ public class WriteFile extends TemplateInvocation<ByteChunk, Boolean> {
   }
 
   @Override
-  public void onRestart() throws FileNotFoundException {
+  public void onStart() throws FileNotFoundException {
     mOutputStream = new BufferedOutputStream(new FileOutputStream(mFile));
   }
 

@@ -220,8 +220,8 @@ public class ServiceRoutineMethod extends RoutineMethod
 
   @NotNull
   @Override
-  public ServiceRoutineMethod apply(@NotNull final InvocationConfiguration configuration) {
-    return (ServiceRoutineMethod) super.apply(configuration);
+  public ServiceRoutineMethod withConfiguration(@NotNull final InvocationConfiguration configuration) {
+    return (ServiceRoutineMethod) super.withConfiguration(configuration);
   }
 
   /**
@@ -247,9 +247,9 @@ public class ServiceRoutineMethod extends RoutineMethod
   @NotNull
   @Override
   @SuppressWarnings("unchecked")
-  public InvocationConfiguration.Builder<? extends ServiceRoutineMethod> invocationConfiguration() {
+  public InvocationConfiguration.Builder<? extends ServiceRoutineMethod> withInvocation() {
     return (InvocationConfiguration.Builder<? extends ServiceRoutineMethod>) super
-        .invocationConfiguration();
+        .withInvocation();
   }
 
   /**
@@ -344,7 +344,7 @@ public class ServiceRoutineMethod extends RoutineMethod
     final Channel<ParcelableFlow<Object>, ParcelableFlow<Object>> outputChannel =
         JRoutineService.on(mContext)
                        .with(factoryOf(ServiceInvocation.class, getClass(), mArgs, params))
-                       .apply(getConfiguration())
+                       .withConfiguration(getConfiguration())
                        .apply(getServiceConfiguration())
                        .invoke()
                        .pass(inputChannel)
@@ -409,9 +409,9 @@ public class ServiceRoutineMethod extends RoutineMethod
 
     @NotNull
     @Override
-    public ReflectionServiceRoutineMethod apply(
+    public ReflectionServiceRoutineMethod withConfiguration(
         @NotNull final InvocationConfiguration configuration) {
-      return (ReflectionServiceRoutineMethod) super.apply(configuration);
+      return (ReflectionServiceRoutineMethod) super.withConfiguration(configuration);
     }
 
     @NotNull
@@ -428,7 +428,7 @@ public class ServiceRoutineMethod extends RoutineMethod
 
       final Routine<Object, Object> routine = JRoutineServiceReflection.on(mContext)
                                                                        .with(mTarget)
-                                                                       .apply(getConfiguration())
+                                                                       .withConfiguration(getConfiguration())
                                                                        .apply(
                                                                            getServiceConfiguration())
                                                                        .apply(mConfiguration)
@@ -449,10 +449,10 @@ public class ServiceRoutineMethod extends RoutineMethod
     @NotNull
     @Override
     @SuppressWarnings("unchecked")
-    public InvocationConfiguration.Builder<? extends ReflectionServiceRoutineMethod>
-    invocationConfiguration() {
+    public InvocationConfiguration.Builder<? extends ReflectionServiceRoutineMethod> withInvocation() {
+
       return (InvocationConfiguration.Builder<? extends ReflectionServiceRoutineMethod>) super
-          .invocationConfiguration();
+          .withInvocation();
     }
 
     @NotNull
@@ -645,7 +645,7 @@ public class ServiceRoutineMethod extends RoutineMethod
     }
 
     @Override
-    public void onRestart() throws Exception {
+    public void onStart() throws Exception {
       mIsBound = false;
       mIsAborted = false;
       mIsComplete = false;

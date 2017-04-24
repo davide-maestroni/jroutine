@@ -16,10 +16,8 @@
 
 package com.github.dm.jrt.core.builder;
 
-import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
-import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
@@ -28,32 +26,23 @@ import org.jetbrains.annotations.NotNull;
  * Base abstract implementation of a routine builder.
  * <p>
  * Created by davide-maestroni on 03/16/2015.
- *
- * @param <IN>  the input data type.
- * @param <OUT> the output data type.
  */
-public abstract class AbstractRoutineBuilder<IN, OUT>
-    implements RoutineBuilder<IN, OUT>, Routine<IN, OUT> {
+public abstract class AbstractRoutineBuilder implements RoutineBuilder {
 
   private InvocationConfiguration mConfiguration = InvocationConfiguration.defaultConfiguration();
-
-  @NotNull
-  public RoutineBuilder<IN, OUT> apply(@NotNull final InvocationConfiguration configuration) {
-    mConfiguration = ConstantConditions.notNull("invocation configuration", configuration);
-    return this;
-  }
 
   public void clear() {
   }
 
   @NotNull
-  public Channel<IN, OUT> invoke() {
-    return buildRoutine().invoke();
+  public RoutineBuilder withConfiguration(@NotNull final InvocationConfiguration configuration) {
+    mConfiguration = ConstantConditions.notNull("invocation configuration", configuration);
+    return this;
   }
 
   @NotNull
-  public Builder<? extends RoutineBuilder<IN, OUT>> invocationConfiguration() {
-    return new Builder<RoutineBuilder<IN, OUT>>(this, mConfiguration);
+  public Builder<? extends RoutineBuilder> withInvocation() {
+    return new Builder<RoutineBuilder>(this, mConfiguration);
   }
 
   /**

@@ -45,12 +45,12 @@ public interface ServiceRoutineBuilder<IN, OUT>
    */
   @NotNull
   @Override
-  ServiceRoutineBuilder<IN, OUT> apply(@NotNull InvocationConfiguration configuration);
+  ServiceRoutineBuilder<IN, OUT> withConfiguration(@NotNull InvocationConfiguration configuration);
 
   /**
    * {@inheritDoc}
    */
   @NotNull
   @Override
-  Builder<? extends ServiceRoutineBuilder<IN, OUT>> invocationConfiguration();
+  Builder<? extends ServiceRoutineBuilder<IN, OUT>> withInvocation();
 }

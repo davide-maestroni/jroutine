@@ -321,7 +321,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
      * @return the configurable instance.
      */
     @NotNull
-    TYPE apply(@NotNull ChannelConfiguration configuration);
+    TYPE withConfiguration(@NotNull ChannelConfiguration configuration);
   }
 
   /**
@@ -377,8 +377,8 @@ public final class ChannelConfiguration extends DeepEqualObject {
      * @return the configured object.
      */
     @NotNull
-    public TYPE apply() {
-      return mConfigurable.apply(buildConfiguration());
+    public TYPE configured() {
+      return mConfigurable.withConfiguration(buildConfiguration());
     }
 
     /**
@@ -615,7 +615,8 @@ public final class ChannelConfiguration extends DeepEqualObject {
   private static class DefaultConfigurable implements Configurable<ChannelConfiguration> {
 
     @NotNull
-    public ChannelConfiguration apply(@NotNull final ChannelConfiguration configuration) {
+    public ChannelConfiguration withConfiguration(
+        @NotNull final ChannelConfiguration configuration) {
       return configuration;
     }
   }

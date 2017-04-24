@@ -56,7 +56,7 @@ class FlowInputMapBuilder<DATA, IN extends DATA>
     final ChannelConfiguration configuration = getConfiguration();
     for (final Integer id : ids) {
       final Channel<IN, IN> inputChannel =
-          new FlowInputBuilder<DATA, IN>(channel, id).apply(configuration).buildChannel();
+          new FlowInputBuilder<DATA, IN>(channel, id).withConfiguration(configuration).buildChannel();
       channelMap.put(id, inputChannel);
     }
 

@@ -135,7 +135,7 @@ class DefaultStatefulRoutineBuilder<IN, OUT, STATE>
       return true;
     }
 
-    public void onRestart() throws Exception {
+    public void onStart() throws Exception {
       if (mState == null) {
         mState = mOnCreate.get();
       }

@@ -59,6 +59,6 @@ abstract class GenerateInvocation<IN, OUT> extends InvocationFactory<IN, OUT>
     return true;
   }
 
-  public final void onRestart() {
+  public final void onStart() {
   }
 }

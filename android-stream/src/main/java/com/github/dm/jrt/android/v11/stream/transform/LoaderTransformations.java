@@ -63,7 +63,7 @@ public class LoaderTransformations {
    *               .lift(LoaderTransformations.runOn(loaderFrom(activity))
    *                                          .loaderConfiguration()
    *                                          .withInvocationId(INVOCATION_ID)
-   *                                          .apply()
+   *                                          .configured()
    *                                          .buildFunction())
    *               .invoke()
    *               .consume(getConsumer())
@@ -96,7 +96,7 @@ public class LoaderTransformations {
             return JRoutineLoader.on(context)
                                  .with(new LoaderContextInvocationFactory<IN, OUT>(
                                      decorate(function)))
-                                 .apply(streamConfiguration.toInvocationConfiguration())
+                                 .withConfiguration(streamConfiguration.toInvocationConfiguration())
                                  .apply(loaderConfiguration)
                                  .invoke()
                                  .pass(channel)

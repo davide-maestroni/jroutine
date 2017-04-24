@@ -101,7 +101,7 @@ public class LoaderAdapterFactoryCompat extends ContextAdapterFactory {
         getFactory(configuration, responseType, annotations, retrofit);
     return JRoutineLoaderCompat.on(mLoaderContext)
                                .with(factory)
-                               .apply(invocationConfiguration)
+                               .withConfiguration(invocationConfiguration)
                                .apply(loaderConfiguration)
                                .buildRoutine();
   }
@@ -148,7 +148,7 @@ public class LoaderAdapterFactoryCompat extends ContextAdapterFactory {
 
     @NotNull
     @Override
-    public Builder apply(@NotNull final InvocationConfiguration configuration) {
+    public Builder withConfiguration(@NotNull final InvocationConfiguration configuration) {
       mInvocationConfiguration =
           ConstantConditions.notNull("invocation configuration", configuration);
       return this;
@@ -186,7 +186,7 @@ public class LoaderAdapterFactoryCompat extends ContextAdapterFactory {
 
     @NotNull
     @Override
-    public InvocationConfiguration.Builder<? extends Builder> invocationConfiguration() {
+    public InvocationConfiguration.Builder<? extends Builder> withInvocation() {
       return new InvocationConfiguration.Builder<Builder>(this, mInvocationConfiguration);
     }
 

@@ -61,7 +61,7 @@ public abstract class CallInvocation<IN, OUT> extends TemplateInvocation<IN, OUT
   }
 
   @Override
-  public final void onRestart() {
+  public final void onStart() {
     mInputs = new ArrayList<IN>();
   }
 

@@ -89,9 +89,9 @@ public class StatefulLoaderRoutineBuilderCompatTest
                   return atomicBoolean;
                 }
               })
-              .invocationConfiguration()
+              .withInvocation()
               .withExecutor(ScheduledExecutors.immediateExecutor())
-              .apply()
+              .configured()
               .invoke()
               .close()
               .in(seconds(10))
@@ -133,9 +133,9 @@ public class StatefulLoaderRoutineBuilderCompatTest
                                                            atomicBoolean.set(false);
                                                          }
                                                        })
-                                                       .invocationConfiguration()
+                                                       .withInvocation()
                                                        .withExecutor(ScheduledExecutors.immediateExecutor())
-                                                       .apply()
+                                                       .configured()
                                                        .loaderConfiguration()
                                                        .withCacheStrategy(CacheStrategyType.CACHE)
                                                        .apply()
@@ -160,9 +160,9 @@ public class StatefulLoaderRoutineBuilderCompatTest
                 return null;
               }
             })
-            .invocationConfiguration()
+            .withInvocation()
             .withExecutor(ScheduledExecutors.immediateExecutor())
-            .apply()
+            .configured()
             .invoke();
     assertThat(reference.get()).isNull();
     channel.abort(new IOException());
@@ -182,9 +182,9 @@ public class StatefulLoaderRoutineBuilderCompatTest
                 reference.set(e);
               }
             })
-            .invocationConfiguration()
+            .withInvocation()
             .withExecutor(ScheduledExecutors.immediateExecutor())
-            .apply()
+            .configured()
             .invoke();
     assertThat(reference.get()).isNull();
     channel.abort(new IOException());
@@ -205,9 +205,9 @@ public class StatefulLoaderRoutineBuilderCompatTest
                 return null;
               }
             })
-            .invocationConfiguration()
+            .withInvocation()
             .withExecutor(ScheduledExecutors.immediateExecutor())
-            .apply()
+            .configured()
             .invoke();
     assertThat(reference.get()).isNull();
     channel.abort(new IOException());
@@ -231,7 +231,7 @@ public class StatefulLoaderRoutineBuilderCompatTest
             atomicBoolean.set(false);
             return atomicBoolean;
           }
-        }).invocationConfiguration().withExecutor(ScheduledExecutors.immediateExecutor()).apply().invoke();
+        }).withInvocation().withExecutor(ScheduledExecutors.immediateExecutor()).configured().invoke();
     assertThat(state.get()).isTrue();
     channel.abort(new IOException());
     assertThat(channel.in(seconds(10)).getComplete()).isTrue();
@@ -252,7 +252,7 @@ public class StatefulLoaderRoutineBuilderCompatTest
       public void accept(final AtomicBoolean atomicBoolean) {
         atomicBoolean.set(false);
       }
-    }).invocationConfiguration().withExecutor(ScheduledExecutors.immediateExecutor()).apply().buildRoutine();
+    }).withInvocation().withExecutor(ScheduledExecutors.immediateExecutor()).configured().buildRoutine();
     assertThat(routine.invoke().close().in(seconds(10)).getComplete()).isTrue();
     assertThat(state.get()).isFalse();
   }
@@ -444,7 +444,7 @@ public class StatefulLoaderRoutineBuilderCompatTest
           public Integer apply(final List<Integer> list) {
             return list.size();
           }
-        }).invocationConfiguration().withExecutor(ScheduledExecutors.immediateExecutor()).apply().buildRoutine();
+        }).withInvocation().withExecutor(ScheduledExecutors.immediateExecutor()).configured().buildRoutine();
     assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(10)).all()).containsExactly(4);
   }
 

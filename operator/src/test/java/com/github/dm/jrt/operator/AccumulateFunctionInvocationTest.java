@@ -20,11 +20,11 @@ import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.function.util.BiFunction;
+import com.github.dm.jrt.function.util.BiFunctionDecorator;
 import com.github.dm.jrt.function.util.Supplier;
 
 import org.junit.Test;
 
-import static com.github.dm.jrt.function.Functions.first;
 import static com.github.dm.jrt.operator.AccumulateFunctionInvocation.functionFactory;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -50,24 +50,19 @@ public class AccumulateFunctionInvocationTest {
   public void testFactory() {
 
     final BiFunction<String, String, String> function = createFunction();
-    assertThat(JRoutineCore.with(functionFactory(function))
-                           .invocationConfiguration()
-                           .withExecutor(ScheduledExecutors.syncExecutor())
-                           .apply()
+    assertThat(JRoutineCore.routineOn(ScheduledExecutors.syncExecutor())
+                           .of(functionFactory(function))
                            .invoke()
                            .pass("test1", "test2", "test3")
                            .close()
                            .next()).isEqualTo("test1test2test3");
-    assertThat(JRoutineCore.with(functionFactory(new Supplier<String>() {
+    assertThat(JRoutineCore.routineOn(ScheduledExecutors.syncExecutor())
+                           .of(functionFactory(new Supplier<String>() {
 
-      public String get() {
-
-        return "test0";
-      }
-    }, function))
-                           .invocationConfiguration()
-                           .withExecutor(ScheduledExecutors.syncExecutor())
-                           .apply()
+                             public String get() {
+                               return "test0";
+                             }
+                           }, function))
                            .invoke()
                            .pass("test1", "test2", "test3")
                            .close()
@@ -79,7 +74,7 @@ public class AccumulateFunctionInvocationTest {
 
     final BiFunction<String, String, String> function = createFunction();
     final InvocationFactory<String, String> factory = functionFactory(function);
-    final BiFunction<String, String, String> first = first();
+    final BiFunction<String, String, String> first = BiFunctionDecorator.first();
     assertThat(factory).isEqualTo(factory);
     assertThat(factory).isEqualTo(functionFactory(function));
     assertThat(functionFactory(function)).isEqualTo(functionFactory(function));

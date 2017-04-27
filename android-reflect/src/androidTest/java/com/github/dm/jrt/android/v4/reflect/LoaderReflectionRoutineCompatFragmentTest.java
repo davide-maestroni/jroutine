@@ -191,7 +191,7 @@ public class LoaderReflectionRoutineCompatFragmentTest
     try {
 
       new DefaultLoaderReflectionRoutineBuilder(loaderFrom(fragment),
-          instanceOf(TestClass.class)).apply((WrapperConfiguration) null);
+          instanceOf(TestClass.class)).withConfiguration((WrapperConfiguration) null);
 
       fail();
 
@@ -866,15 +866,15 @@ public class LoaderReflectionRoutineCompatFragmentTest
 
     long startTime = System.currentTimeMillis();
 
-    Channel<?, Object> getOne = builder.wrapperConfiguration()
+    Channel<?, Object> getOne = builder.withWrapper()
                                        .withSharedFields("1")
-                                       .apply()
+                                       .configured()
                                        .method("getOne")
                                        .invoke()
                                        .close();
-    Channel<?, Object> getTwo = builder.wrapperConfiguration()
+    Channel<?, Object> getTwo = builder.withWrapper()
                                        .withSharedFields("2")
-                                       .apply()
+                                       .configured()
                                        .method("getTwo")
                                        .invoke()
                                        .close();

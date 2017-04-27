@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.channel.io;
 
+import com.github.dm.jrt.channel.config.ChunkStreamConfigurable;
 import com.github.dm.jrt.channel.config.ChunkStreamConfiguration;
 import com.github.dm.jrt.channel.config.ChunkStreamConfiguration.Builder;
 import com.github.dm.jrt.channel.config.ChunkStreamConfiguration.CloseActionType;
@@ -38,7 +39,7 @@ import java.util.ArrayList;
  * <pre><code>
  * public void onInput(final IN in, final Channel&lt;ByteChunk, ?&gt; result) {
  *   ...
- *   final ChunkOutputStream outputStream = ByteChannel.withOutput(result).buildOutputStream();
+ *   final ChunkOutputStream outputStream = ByteChannel.outputStream().of(result);
  *   ...
  * }
  * </code></pre>
@@ -47,7 +48,7 @@ import java.util.ArrayList;
  * <pre><code>
  * public void onInput(final ByteChunk chunk, final Channel&lt;OUT, ?&gt; result) {
  *   ...
- *   final ChunkInputStream inputStream = ByteChannel.getInputStream(chunk);
+ *   final ChunkInputStream inputStream = ByteChannel.inputStream(chunk);
  *   ...
  * }
  * </code></pre>
@@ -100,7 +101,7 @@ public class ByteChannel {
    *                                         of the specified chunks.
    */
   @NotNull
-  public static ChunkInputStream getInputStream(@NotNull final ByteChunk... chunks) {
+  public static ChunkInputStream inputStream(@NotNull final ByteChunk... chunks) {
     return new MultiChunkInputStream(chunks);
   }
 
@@ -115,8 +116,7 @@ public class ByteChannel {
    *                                         of the specified chunks.
    */
   @NotNull
-  public static ChunkInputStream getInputStream(
-      @NotNull final Iterable<? extends ByteChunk> chunks) {
+  public static ChunkInputStream inputStream(@NotNull final Iterable<? extends ByteChunk> chunks) {
     return new MultiChunkInputStream(chunks);
   }
 
@@ -131,7 +131,7 @@ public class ByteChannel {
    *                                         specified chunk.
    */
   @NotNull
-  public static ChunkInputStream getInputStream(@NotNull final ByteChunk chunk) {
+  public static ChunkInputStream inputStream(@NotNull final ByteChunk chunk) {
     return chunk.getStream();
   }
 
@@ -140,13 +140,11 @@ public class ByteChannel {
    * <p>
    * The built streams will not close the underlying channel by default.
    *
-   * @param channel the output channel to feed with data.
    * @return the output stream builder.
    */
   @NotNull
-  public static ChunkOutputStreamBuilder withOutput(
-      @NotNull final Channel<? super ByteChunk, ?> channel) {
-    return new DefaultChunkOutputStreamBuilder(channel);
+  public static ChunkOutputStreamBuilder outputStream() {
+    return new DefaultChunkOutputStreamBuilder();
   }
 
   private static boolean outOfBound(final int off, final int len, final int bytes) {
@@ -171,7 +169,7 @@ public class ByteChannel {
   }
 
   @NotNull
-  private ChunkOutputStream getOutputStream(@NotNull final Channel<? super ByteChunk, ?> channel) {
+  private ChunkOutputStream outputStream(@NotNull final Channel<? super ByteChunk, ?> channel) {
     return new DefaultChunkOutputStream(mConfiguration, channel);
   }
 
@@ -193,6 +191,21 @@ public class ByteChannel {
     TRANSFER,   // the chunk is being transferred through the channel
     READ,       // can read data from the chunk
     RECYCLED    // the chunk is not usable
+  }
+
+  /**
+   * Interface defining a builder of chunk output streams.
+   */
+  public interface ChunkOutputStreamBuilder
+      extends ChunkStreamConfigurable<ChunkOutputStreamBuilder> {
+
+    /**
+     * Builds a new output stream instance.
+     *
+     * @return the output stream instance.
+     */
+    @NotNull
+    ChunkOutputStream of(@NotNull Channel<? super ByteChunk, ?> channel);
   }
 
   /**
@@ -406,33 +419,29 @@ public class ByteChannel {
    */
   private static class DefaultChunkOutputStreamBuilder implements ChunkOutputStreamBuilder {
 
-    private final Channel<? super ByteChunk, ?> mChannel;
-
     private ChunkStreamConfiguration mConfiguration =
         ChunkStreamConfiguration.defaultConfiguration();
 
     /**
      * Constructor.
-     *
-     * @param channel the output channel to feed with data.
      */
-    private DefaultChunkOutputStreamBuilder(@NotNull final Channel<? super ByteChunk, ?> channel) {
-      mChannel = ConstantConditions.notNull("channel instance", channel);
+    private DefaultChunkOutputStreamBuilder() {
     }
 
     @NotNull
-    public ChunkOutputStreamBuilder apply(@NotNull final ChunkStreamConfiguration configuration) {
+    public ChunkOutputStream of(@NotNull final Channel<? super ByteChunk, ?> channel) {
+      return new ByteChannel(mConfiguration).outputStream(channel);
+    }
+
+    @NotNull
+    public ChunkOutputStreamBuilder withConfiguration(
+        @NotNull final ChunkStreamConfiguration configuration) {
       mConfiguration = ConstantConditions.notNull("output stream configuration", configuration);
       return this;
     }
 
     @NotNull
-    public ChunkOutputStream buildOutputStream() {
-      return new ByteChannel(mConfiguration).getOutputStream(mChannel);
-    }
-
-    @NotNull
-    public Builder<? extends ChunkOutputStreamBuilder> chunkStreamConfiguration() {
+    public Builder<? extends ChunkOutputStreamBuilder> withStream() {
       return new Builder<ChunkOutputStreamBuilder>(this, mConfiguration);
     }
   }
@@ -710,14 +719,14 @@ public class ByteChannel {
    * {@code ChunkOutputStream}s and passed to the underlying channel.
    * <br>
    * The data contained in a chunk can be read through the dedicated {@code ChunkInputStream}
-   * returned by one of the {@code ByteChannel.getInputStream()} methods. Note that only one input
+   * returned by one of the {@code ByteChannel.inputStream()} methods. Note that only one input
    * stream can be created for each chunk, any further attempt will generate an exception.
    * <br>
    * Used chunks will be released as soon as the corresponding input stream is closed.
    *
-   * @see ByteChannel#getInputStream(ByteChunk)
-   * @see ByteChannel#getInputStream(ByteChunk...)
-   * @see ByteChannel#getInputStream(Iterable)
+   * @see ByteChannel#inputStream(ByteChunk)
+   * @see ByteChannel#inputStream(ByteChunk...)
+   * @see ByteChannel#inputStream(Iterable)
    */
   public class ByteChunk {
 
@@ -1059,7 +1068,7 @@ public class ByteChannel {
      */
     private DefaultChunkOutputStream(@NotNull final ChunkStreamConfiguration configuration,
         @NotNull final Channel<? super ByteChunk, ?> channel) {
-      mChannel = channel;
+      mChannel = ConstantConditions.notNull("channel instance", channel);
       mCloseAction = configuration.getCloseActionTypeOrElse(CloseActionType.CLOSE_STREAM);
     }
 

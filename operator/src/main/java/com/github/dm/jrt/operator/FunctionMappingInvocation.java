@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Davide Maestroni
+ * Copyright 2017 Davide Maestroni
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,39 +14,40 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.function;
+package com.github.dm.jrt.operator;
 
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.invocation.CommandInvocation;
+import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.util.SupplierDecorator;
+import com.github.dm.jrt.function.util.FunctionDecorator;
 
 import org.jetbrains.annotations.NotNull;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
- * Command invocation based on a supplier instance.
+ * Mapping invocation based on a function instance.
  * <p>
- * Created by davide-maestroni on 04/23/2016.
+ * Created by davide-maestroni on 04/25/2017.
  *
+ * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class SupplierCommandInvocation<OUT> extends CommandInvocation<OUT> {
+class FunctionMappingInvocation<IN, OUT> extends MappingInvocation<IN, OUT> {
 
-  private final SupplierDecorator<? extends OUT> mSupplier;
+  private final FunctionDecorator<? super IN, ? extends OUT> mFunction;
 
   /**
    * Constructor.
    *
-   * @param supplier the supplier instance.
+   * @param function the function instance.
    */
-  SupplierCommandInvocation(@NotNull final SupplierDecorator<? extends OUT> supplier) {
-    super(asArgs(ConstantConditions.notNull("supplier wrapper", supplier)));
-    mSupplier = supplier;
+  FunctionMappingInvocation(@NotNull final FunctionDecorator<? super IN, ? extends OUT> function) {
+    super(asArgs(ConstantConditions.notNull("function wrapper", function)));
+    mFunction = function;
   }
 
-  public void onComplete(@NotNull final Channel<OUT, ?> result) throws Exception {
-    result.pass(mSupplier.get());
+  public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) throws Exception {
+    result.pass(mFunction.apply(input));
   }
 }

@@ -20,13 +20,13 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
-import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.function.util.BiFunction;
 import com.github.dm.jrt.function.util.BiFunctionDecorator;
 
 import org.jetbrains.annotations.NotNull;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
+import static com.github.dm.jrt.function.util.BiFunctionDecorator.decorate;
 
 /**
  * Invocation implementation computing the result by applying a bi-function instance to the inputs.
@@ -63,7 +63,7 @@ class BinaryOperatorInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
   @NotNull
   static <DATA> InvocationFactory<DATA, DATA> functionFactory(
       @NotNull final BiFunction<DATA, DATA, DATA> binaryFunction) {
-    return new BinaryOperatorInvocationFactory<DATA>(Functions.decorate(binaryFunction));
+    return new BinaryOperatorInvocationFactory<DATA>(decorate(binaryFunction));
   }
 
   @Override

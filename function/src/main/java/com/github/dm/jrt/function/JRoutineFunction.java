@@ -17,24 +17,20 @@
 package com.github.dm.jrt.function;
 
 import com.github.dm.jrt.core.common.RoutineException;
+import com.github.dm.jrt.core.executor.ScheduledExecutor;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.builder.ChannelConsumerBuilder;
+import com.github.dm.jrt.function.builder.FunctionalChannelConsumer;
 import com.github.dm.jrt.function.builder.StatefulRoutineBuilder;
 import com.github.dm.jrt.function.builder.StatelessRoutineBuilder;
 import com.github.dm.jrt.function.util.Action;
-import com.github.dm.jrt.function.util.BiConsumer;
-import com.github.dm.jrt.function.util.BiConsumerDecorator;
 import com.github.dm.jrt.function.util.Consumer;
-import com.github.dm.jrt.function.util.Supplier;
-import com.github.dm.jrt.function.util.SupplierDecorator;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
+import static com.github.dm.jrt.core.executor.ScheduledExecutors.defaultExecutor;
 
 /**
- * This utility class provides a few way to easily implement routines and channel consumer through
+ * This utility class provides a few ways to easily implement routines and channel consumer through
  * functional interfaces.
  * <p>
  * For example, a routine concatenating strings through a {@code StringBuilder} can be implemented
@@ -44,35 +40,19 @@ import java.util.List;
  *                 .onCreate(StringBuilder::new)
  *                 .onNextState(StringBuilder::append)
  *                 .onCompleteOutput(StringBuilder::toString)
- *                 .buildRoutine();
+ *                 .routine();
  * </code></pre>
  * <p>
  * In a similar way, a routine switching strings to upper-case can be implemented as follows:
  * <pre><code>
  * JRoutineFunction.&lt;String, String,&gt;stateless()
  *                 .onNextOutput(String::toUpperCase)
- *                 .buildRoutine();
+ *                 .routine();
  * </code></pre>
  * <p>
  * Created by davide-maestroni on 02/27/2017.
  */
 public class JRoutineFunction {
-
-  private static final BiConsumerDecorator<? extends List<?>, ?> sListConsumer =
-      BiConsumerDecorator.decorate(new BiConsumer<List<Object>, Object>() {
-
-        public void accept(final List<Object> list, final Object input) {
-          list.add(input);
-        }
-      });
-
-  private static final SupplierDecorator<? extends List<?>> sListSupplier =
-      SupplierDecorator.decorate(new Supplier<List<?>>() {
-
-        public List<?> get() {
-          return new ArrayList<Object>();
-        }
-      });
 
   /**
    * Avoid explicit instantiation.
@@ -89,8 +69,8 @@ public class JRoutineFunction {
    * @return the channel consumer builder.
    */
   @NotNull
-  public static ChannelConsumerBuilder<Object> onComplete(@NotNull final Action onComplete) {
-    return DefaultChannelConsumerBuilder.onComplete(onComplete);
+  public static FunctionalChannelConsumer<Object> onComplete(@NotNull final Action onComplete) {
+    return DefaultFunctionalChannelConsumer.onComplete(onComplete);
   }
 
   /**
@@ -101,9 +81,9 @@ public class JRoutineFunction {
    * @return the channel consumer builder.
    */
   @NotNull
-  public static ChannelConsumerBuilder<Object> onError(
+  public static FunctionalChannelConsumer<Object> onError(
       @NotNull final Consumer<? super RoutineException> onError) {
-    return DefaultChannelConsumerBuilder.onError(onError);
+    return DefaultFunctionalChannelConsumer.onError(onError);
   }
 
   /**
@@ -116,10 +96,10 @@ public class JRoutineFunction {
    * @return the channel consumer builder.
    */
   @NotNull
-  public static <OUT> ChannelConsumerBuilder<OUT> onOutput(
+  public static <OUT> FunctionalChannelConsumer<OUT> onOutput(
       @NotNull final Consumer<? super OUT> onOutput,
       @NotNull final Consumer<? super RoutineException> onError) {
-    return DefaultChannelConsumerBuilder.onOutput(onOutput, onError);
+    return DefaultFunctionalChannelConsumer.onOutput(onOutput, onError);
   }
 
   /**
@@ -133,10 +113,10 @@ public class JRoutineFunction {
    * @return the channel consumer builder.
    */
   @NotNull
-  public static <OUT> ChannelConsumerBuilder<OUT> onOutput(
+  public static <OUT> FunctionalChannelConsumer<OUT> onOutput(
       @NotNull final Consumer<? super OUT> onOutput,
       @NotNull final Consumer<? super RoutineException> onError, @NotNull final Action onComplete) {
-    return DefaultChannelConsumerBuilder.onOutput(onOutput, onError, onComplete);
+    return DefaultFunctionalChannelConsumer.onOutput(onOutput, onError, onComplete);
   }
 
   /**
@@ -148,13 +128,13 @@ public class JRoutineFunction {
    * @return the channel consumer builder.
    */
   @NotNull
-  public static <OUT> ChannelConsumerBuilder<OUT> onOutput(
+  public static <OUT> FunctionalChannelConsumer<OUT> onOutput(
       @NotNull final Consumer<? super OUT> onOutput) {
-    return DefaultChannelConsumerBuilder.onOutput(onOutput);
+    return DefaultFunctionalChannelConsumer.onOutput(onOutput);
   }
 
   /**
-   * Returns a builder of stateful routines.
+   * Returns a builder of stateful routines running on the default executor.
    * <p>
    * This type of routines are based on invocations retaining a mutable state during their
    * lifecycle.
@@ -169,28 +149,32 @@ public class JRoutineFunction {
    */
   @NotNull
   public static <IN, OUT, STATE> StatefulRoutineBuilder<IN, OUT, STATE> stateful() {
-    return new DefaultStatefulRoutineBuilder<IN, OUT, STATE>();
+    return statefulOn(defaultExecutor());
   }
 
   /**
-   * Returns a builder of stateful routines already configured to accumulate the inputs into a list.
+   * Returns a builder of stateful routines.
+   * <p>
+   * This type of routines are based on invocations retaining a mutable state during their
+   * lifecycle.
    * <br>
-   * In order to finalize the invocation implementation, it will be sufficient to set the function
-   * to call when the invocation completes by calling the proper {@code onComplete} method.
+   * A typical example of stateful routine is the one computing a final result by accumulating the
+   * input data (for instance, computing the sum of input numbers).
    *
-   * @param <IN>  the input data type.
-   * @param <OUT> the output data type.
+   * @param executor the executor instance.
+   * @param <IN>     the input data type.
+   * @param <OUT>    the output data type.
+   * @param <STATE>  the state data type.
    * @return the routine builder.
    */
   @NotNull
-  public static <IN, OUT> StatefulRoutineBuilder<IN, OUT, ? extends List<IN>> statefulList() {
-    final Supplier<? extends List<IN>> onCreate = listSupplier();
-    final BiConsumer<? super List<IN>, ? super IN> onNext = listConsumer();
-    return JRoutineFunction.<IN, OUT, List<IN>>stateful().onCreate(onCreate).onNextConsume(onNext);
+  public static <IN, OUT, STATE> StatefulRoutineBuilder<IN, OUT, STATE> statefulOn(
+      @NotNull final ScheduledExecutor executor) {
+    return new DefaultStatefulRoutineBuilder<IN, OUT, STATE>(executor);
   }
 
   /**
-   * Returns a builder of stateless routines.
+   * Returns a builder of stateless routines running on the default executor.
    * <p>
    * This type of routines are based on invocations not retaining a mutable internal state.
    * <br>
@@ -203,18 +187,25 @@ public class JRoutineFunction {
    */
   @NotNull
   public static <IN, OUT> StatelessRoutineBuilder<IN, OUT> stateless() {
-    return new DefaultStatelessRoutineBuilder<IN, OUT>();
+    return statelessOn(defaultExecutor());
   }
 
+  /**
+   * Returns a builder of stateless routines.
+   * <p>
+   * This type of routines are based on invocations not retaining a mutable internal state.
+   * <br>
+   * A typical example of stateless routine is the one processing each input separately (for
+   * instance, computing the square of input numbers).
+   *
+   * @param executor the executor instance.
+   * @param <IN>     the input data type.
+   * @param <OUT>    the output data type.
+   * @return the routine builder.
+   */
   @NotNull
-  @SuppressWarnings("unchecked")
-  private static <IN> BiConsumer<? super List<IN>, ? super IN> listConsumer() {
-    return (BiConsumer<? super List<IN>, ? super IN>) sListConsumer;
-  }
-
-  @NotNull
-  @SuppressWarnings("unchecked")
-  private static <IN> Supplier<? extends List<IN>> listSupplier() {
-    return (Supplier<? extends List<IN>>) sListSupplier;
+  public static <IN, OUT> StatelessRoutineBuilder<IN, OUT> statelessOn(
+      @NotNull final ScheduledExecutor executor) {
+    return new DefaultStatelessRoutineBuilder<IN, OUT>(executor);
   }
 }

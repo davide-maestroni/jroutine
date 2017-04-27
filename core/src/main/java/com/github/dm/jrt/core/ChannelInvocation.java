@@ -71,8 +71,7 @@ public abstract class ChannelInvocation<IN, OUT> implements Invocation<IN, OUT> 
   }
 
   public final void onStart() throws Exception {
-    final Channel<IN, IN> inputChannel =
-        (mInputChannel = JRoutineCore.channel().ofType());
+    final Channel<IN, IN> inputChannel = (mInputChannel = JRoutineCore.channel().ofType());
     mOutputChannel = ConstantConditions.notNull("stream channel", onChannel(inputChannel));
   }
 

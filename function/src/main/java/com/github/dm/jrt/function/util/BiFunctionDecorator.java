@@ -105,6 +105,22 @@ public class BiFunctionDecorator<IN1, IN2, OUT> extends DeepEqualObject
   }
 
   /**
+   * Returns a bi-function decorator always returning the same result.
+   * <br>
+   * The returned object will support concatenation and comparison.
+   *
+   * @param result the result.
+   * @param <IN1>  the first input data type.
+   * @param <IN2>  the second input data type.
+   * @param <OUT>  the output data type.
+   * @return the bi-function decorator.
+   */
+  @NotNull
+  public static <IN1, IN2, OUT> BiFunctionDecorator<IN1, IN2, OUT> constant(final OUT result) {
+    return new BiFunctionDecorator<IN1, IN2, OUT>(new ConstantFunction<IN1, IN2, OUT>(result));
+  }
+
+  /**
    * Decorates the specified bi-function instance so to provide additional features.
    * <br>
    * The returned object will support concatenation and comparison.
@@ -239,6 +255,33 @@ public class BiFunctionDecorator<IN1, IN2, OUT> extends DeepEqualObject
 
   public boolean hasStaticScope() {
     return Reflection.hasStaticScope(mBiFunction) && mFunction.hasStaticScope();
+  }
+
+  /**
+   * Bi-function implementation returning always the same object.
+   *
+   * @param <IN1> the first input data type.
+   * @param <IN2> the second input data type.
+   * @param <OUT> the output data type.
+   */
+  private static class ConstantFunction<IN1, IN2, OUT> extends DeepEqualObject
+      implements BiFunction<IN1, IN2, OUT> {
+
+    private final OUT mResult;
+
+    /**
+     * Constructor.
+     *
+     * @param result the object to return.
+     */
+    private ConstantFunction(final OUT result) {
+      super(asArgs(result));
+      mResult = result;
+    }
+
+    public OUT apply(final IN1 in1, final IN2 in2) {
+      return mResult;
+    }
   }
 
   /**

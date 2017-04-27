@@ -68,19 +68,6 @@ public abstract class AbstractStatelessRoutineBuilder<IN, OUT, TYPE extends
 
   @NotNull
   @SuppressWarnings("unchecked")
-  public TYPE withConfiguration(@NotNull final InvocationConfiguration configuration) {
-    mConfiguration = ConstantConditions.notNull("invocation configuration", configuration);
-    return (TYPE) this;
-  }
-
-  @NotNull
-  @SuppressWarnings("unchecked")
-  public Builder<? extends TYPE> withInvocation() {
-    return new Builder<TYPE>(mConfigurable, mConfiguration);
-  }
-
-  @NotNull
-  @SuppressWarnings("unchecked")
   public TYPE onComplete(@NotNull final Consumer<? super Channel<OUT, ?>> onComplete) {
     mOnComplete = ConsumerDecorator.decorate(onComplete);
     return (TYPE) this;
@@ -151,12 +138,17 @@ public abstract class AbstractStatelessRoutineBuilder<IN, OUT, TYPE extends
     return (TYPE) this;
   }
 
-  public void clear() {
+  @NotNull
+  @SuppressWarnings("unchecked")
+  public TYPE withConfiguration(@NotNull final InvocationConfiguration configuration) {
+    mConfiguration = ConstantConditions.notNull("invocation configuration", configuration);
+    return (TYPE) this;
   }
 
   @NotNull
-  public Channel<IN, OUT> invoke() {
-    return buildRoutine().invoke();
+  @SuppressWarnings("unchecked")
+  public Builder<? extends TYPE> withInvocation() {
+    return new Builder<TYPE>(mConfigurable, mConfiguration);
   }
 
   /**

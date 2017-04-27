@@ -16,7 +16,6 @@
 
 package com.github.dm.jrt.android.channel;
 
-import com.github.dm.jrt.channel.Channels;
 import com.github.dm.jrt.core.builder.ChannelBuilder;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.util.ConstantConditions;

@@ -105,6 +105,21 @@ public class FunctionDecorator<IN, OUT> extends DeepEqualObject
   }
 
   /**
+   * Returns a function decorator always returning the same result.
+   * <br>
+   * The returned object will support concatenation and comparison.
+   *
+   * @param result the result.
+   * @param <IN>   the input data type.
+   * @param <OUT>  the output data type.
+   * @return the function decorator.
+   */
+  @NotNull
+  public static <IN, OUT> FunctionDecorator<IN, OUT> constant(final OUT result) {
+    return new FunctionDecorator<IN, OUT>(new ConstantFunction<IN, OUT>(result));
+  }
+
+  /**
    * Decorates the specified function instance so to provide additional features.
    * <br>
    * The returned object will support concatenation and comparison.
@@ -229,6 +244,32 @@ public class FunctionDecorator<IN, OUT> extends DeepEqualObject
 
     public OUT apply(final IN in) {
       return mType.cast(in);
+    }
+  }
+
+  /**
+   * Function implementation returning always the same object.
+   *
+   * @param <IN>  the input data type.
+   * @param <OUT> the output data type.
+   */
+  private static class ConstantFunction<IN, OUT> extends DeepEqualObject
+      implements Function<IN, OUT> {
+
+    private final OUT mResult;
+
+    /**
+     * Constructor.
+     *
+     * @param result the object to return.
+     */
+    private ConstantFunction(final OUT result) {
+      super(asArgs(result));
+      mResult = result;
+    }
+
+    public OUT apply(final IN in) {
+      return mResult;
     }
   }
 

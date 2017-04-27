@@ -108,7 +108,7 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
 
   @Override
   @NotNull
-  public LoaderReflectionRoutineBuilder apply(@NotNull final WrapperConfiguration configuration) {
+  public LoaderReflectionRoutineBuilder withConfiguration(@NotNull final WrapperConfiguration configuration) {
     mWrapperConfiguration = ConstantConditions.notNull("wrapper configuration", configuration);
     return this;
   }
@@ -200,17 +200,16 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
 
   @NotNull
   @Override
-  public WrapperConfiguration.Builder<? extends LoaderReflectionRoutineBuilder>
-  wrapperConfiguration() {
+  public WrapperConfiguration.Builder<? extends LoaderReflectionRoutineBuilder> withWrapper() {
     final WrapperConfiguration config = mWrapperConfiguration;
     return new WrapperConfiguration.Builder<LoaderReflectionRoutineBuilder>(
         new WrapperConfiguration.Configurable<LoaderReflectionRoutineBuilder>() {
 
           @NotNull
           @Override
-          public LoaderReflectionRoutineBuilder apply(
+          public LoaderReflectionRoutineBuilder withConfiguration(
               @NotNull final WrapperConfiguration configuration) {
-            return DefaultLoaderReflectionRoutineBuilder.this.apply(configuration);
+            return DefaultLoaderReflectionRoutineBuilder.this.withConfiguration(configuration);
           }
         }, config);
   }

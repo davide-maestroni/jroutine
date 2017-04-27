@@ -17,6 +17,7 @@
 package com.github.dm.jrt.proxy;
 
 import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.executor.ScheduledExecutor;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.proxy.annotation.Proxy;
@@ -26,7 +27,6 @@ import com.github.dm.jrt.reflect.InvocationTarget;
 import com.github.dm.jrt.reflect.config.WrapperConfiguration;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
 
@@ -39,7 +39,7 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingConstructor
  */
 class DefaultProxyRoutineBuilder implements ProxyRoutineBuilder {
 
-  private final InvocationTarget<?> mTarget;
+  private final ScheduledExecutor mExecutor;
 
   private InvocationConfiguration mInvocationConfiguration =
       InvocationConfiguration.defaultConfiguration();
@@ -49,35 +49,27 @@ class DefaultProxyRoutineBuilder implements ProxyRoutineBuilder {
   /**
    * Constructor.
    *
-   * @param target the invocation target.
-   * @throws java.lang.IllegalArgumentException if the class of specified target represents an
-   *                                            interface.
+   * @param executor the executor instance.
    */
-  DefaultProxyRoutineBuilder(@NotNull final InvocationTarget<?> target) {
+  DefaultProxyRoutineBuilder(@NotNull final ScheduledExecutor executor) {
+    mExecutor = ConstantConditions.notNull("executor instance", executor);
+  }
+
+  @NotNull
+  private static InvocationTarget<?> validateTarget(@NotNull final InvocationTarget<?> target) {
     final Class<?> targetClass = target.getTargetClass();
     if (targetClass.isInterface()) {
       throw new IllegalArgumentException(
           "the target class must not be an interface: " + targetClass.getName());
     }
 
-    mTarget = target;
+    return target;
   }
 
   @NotNull
-  public ProxyRoutineBuilder withConfiguration(@NotNull final InvocationConfiguration configuration) {
-    mInvocationConfiguration =
-        ConstantConditions.notNull("invocation configuration", configuration);
-    return this;
-  }
-
-  @NotNull
-  public ProxyRoutineBuilder apply(@NotNull final WrapperConfiguration configuration) {
-    mWrapperConfiguration = ConstantConditions.notNull("wrapper configuration", configuration);
-    return this;
-  }
-
-  @NotNull
-  public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
+  @Override
+  public <TYPE> TYPE proxyOf(@NotNull final InvocationTarget<?> target,
+      @NotNull final Class<TYPE> itf) {
     if (!itf.isInterface()) {
       throw new IllegalArgumentException(
           "the specified class is not an interface: " + itf.getName());
@@ -89,13 +81,32 @@ class DefaultProxyRoutineBuilder implements ProxyRoutineBuilder {
               + itf.getName());
     }
 
-    final TargetProxyObjectBuilder<TYPE> builder = new TargetProxyObjectBuilder<TYPE>(mTarget, itf);
-    return builder.withConfiguration(mInvocationConfiguration).apply(mWrapperConfiguration).buildProxy();
+    final TargetProxyObjectBuilder<TYPE> builder =
+        new TargetProxyObjectBuilder<TYPE>(mExecutor, itf);
+    return builder.withConfiguration(mInvocationConfiguration)
+                  .withConfiguration(mWrapperConfiguration)
+                  .proxyOf(validateTarget(target));
   }
 
   @NotNull
-  public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
-    return buildProxy(itf.getRawClass());
+  @Override
+  public <TYPE> TYPE proxyOf(@NotNull final InvocationTarget<?> target,
+      @NotNull final ClassToken<TYPE> itf) {
+    return proxyOf(target, itf.getRawClass());
+  }
+
+  @NotNull
+  public ProxyRoutineBuilder withConfiguration(
+      @NotNull final InvocationConfiguration configuration) {
+    mInvocationConfiguration =
+        ConstantConditions.notNull("invocation configuration", configuration);
+    return this;
+  }
+
+  @NotNull
+  public ProxyRoutineBuilder withConfiguration(@NotNull final WrapperConfiguration configuration) {
+    mWrapperConfiguration = ConstantConditions.notNull("wrapper configuration", configuration);
+    return this;
   }
 
   @NotNull
@@ -105,7 +116,7 @@ class DefaultProxyRoutineBuilder implements ProxyRoutineBuilder {
   }
 
   @NotNull
-  public WrapperConfiguration.Builder<? extends ProxyRoutineBuilder> wrapperConfiguration() {
+  public WrapperConfiguration.Builder<? extends ProxyRoutineBuilder> withWrapper() {
     final WrapperConfiguration config = mWrapperConfiguration;
     return new WrapperConfiguration.Builder<ProxyRoutineBuilder>(this, config);
   }
@@ -119,17 +130,15 @@ class DefaultProxyRoutineBuilder implements ProxyRoutineBuilder {
 
     private final Class<? super TYPE> mInterfaceClass;
 
-    private final InvocationTarget<?> mTarget;
-
     /**
      * Constructor.
      *
-     * @param target         the invocation target.
+     * @param executor       the executor instance.
      * @param interfaceClass the proxy interface class.
      */
-    private TargetProxyObjectBuilder(@NotNull final InvocationTarget<?> target,
+    private TargetProxyObjectBuilder(@NotNull final ScheduledExecutor executor,
         @NotNull final Class<? super TYPE> interfaceClass) {
-      mTarget = target;
+      super(executor);
       mInterfaceClass = interfaceClass;
     }
 
@@ -139,18 +148,13 @@ class DefaultProxyRoutineBuilder implements ProxyRoutineBuilder {
       return mInterfaceClass;
     }
 
-    @Nullable
-    @Override
-    protected Object getTarget() {
-      return mTarget.getTarget();
-    }
-
     @NotNull
     @Override
     @SuppressWarnings("unchecked")
-    protected TYPE newProxy(@NotNull final InvocationConfiguration invocationConfiguration,
+    protected TYPE newProxy(@NotNull final InvocationTarget<?> target,
+        @NotNull final ScheduledExecutor executor,
+        @NotNull final InvocationConfiguration invocationConfiguration,
         @NotNull final WrapperConfiguration wrapperConfiguration) throws Exception {
-      final Object target = mTarget;
       final Class<? super TYPE> interfaceClass = mInterfaceClass;
       final Proxy annotation = interfaceClass.getAnnotation(Proxy.class);
       String packageName = annotation.classPackage();
@@ -175,9 +179,10 @@ class DefaultProxyRoutineBuilder implements ProxyRoutineBuilder {
       final String fullClassName =
           packageName + annotation.classPrefix() + className + annotation.classSuffix();
       final Constructor<?> constructor =
-          findBestMatchingConstructor(Class.forName(fullClassName), target, invocationConfiguration,
-              wrapperConfiguration);
-      return (TYPE) constructor.newInstance(target, invocationConfiguration, wrapperConfiguration);
+          findBestMatchingConstructor(Class.forName(fullClassName), target, executor,
+              invocationConfiguration, wrapperConfiguration);
+      return (TYPE) constructor.newInstance(target, executor, invocationConfiguration,
+          wrapperConfiguration);
     }
   }
 }

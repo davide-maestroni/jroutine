@@ -97,8 +97,7 @@ public @interface AsyncOutput {
      * The annotated method must return a superclass of
      * {@link com.github.dm.jrt.core.channel.Channel Channel}.
      */
-    DEFAULT,
-    /**
+    DEFAULT, /**
      * Element mode.
      * <br>
      * The elements of the result array or iterable are passed one by one to the channel.

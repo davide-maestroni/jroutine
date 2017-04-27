@@ -312,9 +312,9 @@ public class RemoteServiceRoutineMethodTest extends ActivityInstrumentationTestC
                                    .next()).isEqualTo("test");
     assertThat(ServiceRoutineMethod.from(serviceFrom(getActivity(), RemoteTestService.class),
         instanceOf(String.class, test), String.class.getMethod("toString"))
-                                   .wrapperConfiguration()
+                                   .withWrapper()
                                    .withSharedFields()
-                                   .apply()
+                                   .configured()
                                    .call()
                                    .in(seconds(10))
                                    .next()).isEqualTo("test");
@@ -327,9 +327,9 @@ public class RemoteServiceRoutineMethodTest extends ActivityInstrumentationTestC
         "test");
     assertThat(ServiceRoutineMethod.from(serviceFrom(getActivity(), RemoteTestService.class),
         instanceOf(String.class, test), "toString")
-                                   .wrapperConfiguration()
+                                   .withWrapper()
                                    .withSharedFields()
-                                   .apply()
+                                   .configured()
                                    .call()
                                    .in(seconds(10))
                                    .next()).isEqualTo("test");

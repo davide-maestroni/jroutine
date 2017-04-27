@@ -71,7 +71,7 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
 
   @NotNull
   @Override
-  public LoaderProxyObjectBuilder<TYPE> apply(@NotNull final WrapperConfiguration configuration) {
+  public LoaderProxyObjectBuilder<TYPE> withConfiguration(@NotNull final WrapperConfiguration configuration) {
     mWrapperConfiguration = ConstantConditions.notNull("wrapper configuration", configuration);
     return this;
   }
@@ -149,17 +149,16 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
 
   @NotNull
   @Override
-  public WrapperConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>>
-  wrapperConfiguration() {
+  public WrapperConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>> withWrapper() {
     final WrapperConfiguration config = mWrapperConfiguration;
     return new WrapperConfiguration.Builder<LoaderProxyObjectBuilder<TYPE>>(
         new WrapperConfiguration.Configurable<LoaderProxyObjectBuilder<TYPE>>() {
 
           @NotNull
           @Override
-          public LoaderProxyObjectBuilder<TYPE> apply(
+          public LoaderProxyObjectBuilder<TYPE> withConfiguration(
               @NotNull final WrapperConfiguration configuration) {
-            return AbstractLoaderProxyObjectBuilder.this.apply(configuration);
+            return AbstractLoaderProxyObjectBuilder.this.withConfiguration(configuration);
           }
         }, config);
   }

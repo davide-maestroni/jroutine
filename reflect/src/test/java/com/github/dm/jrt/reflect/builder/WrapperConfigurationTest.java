@@ -36,10 +36,12 @@ public class WrapperConfigurationTest {
   @Test
   public void testBuildFrom() {
 
-    final WrapperConfiguration configuration = builder().withSharedFields("test").apply();
-    assertThat(configuration.builderFrom().apply()).isEqualTo(configuration);
-    assertThat(configuration.builderFrom().apply().hashCode()).isEqualTo(configuration.hashCode());
-    assertThat(builderFrom(null).apply()).isEqualTo(WrapperConfiguration.defaultConfiguration());
+    final WrapperConfiguration configuration = builder().withSharedFields("test").configured();
+    assertThat(configuration.builderFrom().configured()).isEqualTo(configuration);
+    assertThat(configuration.builderFrom().configured().hashCode()).isEqualTo(
+        configuration.hashCode());
+    assertThat(builderFrom(null).configured()).isEqualTo(
+        WrapperConfiguration.defaultConfiguration());
   }
 
   @Test
@@ -70,11 +72,11 @@ public class WrapperConfigurationTest {
   @Test
   public void testBuilderFromEquals() {
 
-    final WrapperConfiguration configuration = builder().withSharedFields("test").apply();
-    assertThat(builder().withPatch(configuration).apply()).isEqualTo(configuration);
-    assertThat(configuration.builderFrom().apply()).isEqualTo(configuration);
-    assertThat(configuration.builderFrom().withPatch(null).apply()).isEqualTo(configuration);
-    assertThat(configuration.builderFrom().withDefaults().apply()).isEqualTo(
+    final WrapperConfiguration configuration = builder().withSharedFields("test").configured();
+    assertThat(builder().withPatch(configuration).configured()).isEqualTo(configuration);
+    assertThat(configuration.builderFrom().configured()).isEqualTo(configuration);
+    assertThat(configuration.builderFrom().withPatch(null).configured()).isEqualTo(configuration);
+    assertThat(configuration.builderFrom().withDefaults().configured()).isEqualTo(
         WrapperConfiguration.defaultConfiguration());
   }
 
@@ -96,17 +98,17 @@ public class WrapperConfigurationTest {
   @Test
   public void testSharedFieldsEquals() {
 
-    final WrapperConfiguration configuration = builder().withSharedFields("group").apply();
-    assertThat(configuration).isNotEqualTo(builder().withSharedFields("test").apply());
-    assertThat(configuration.builderFrom().withSharedFields("test").apply()).isEqualTo(
-        builder().withSharedFields("test").apply());
-    assertThat(configuration).isNotEqualTo(builder().withSharedFields("test").apply());
+    final WrapperConfiguration configuration = builder().withSharedFields("group").configured();
+    assertThat(configuration).isNotEqualTo(builder().withSharedFields("test").configured());
+    assertThat(configuration.builderFrom().withSharedFields("test").configured()).isEqualTo(
+        builder().withSharedFields("test").configured());
+    assertThat(configuration).isNotEqualTo(builder().withSharedFields("test").configured());
   }
 
   @Test
   public void testToString() {
 
-    assertThat(builder().withSharedFields("testGroupName123").apply().toString()).contains(
+    assertThat(builder().withSharedFields("testGroupName123").configured().toString()).contains(
         "testGroupName123");
   }
 }

@@ -72,8 +72,7 @@ public class InvocationFactoryTest {
   public void testInvocationDecoratorAbort() {
     final InvocationFactory<String, String> factory = IdentityInvocation.factory();
     final TestInvocationFactory decoratedFactory = new TestInvocationFactory(factory);
-    final Routine<String, String> routine =
-        JRoutineCore.routine().of(decoratedFactory);
+    final Routine<String, String> routine = JRoutineCore.routine().of(decoratedFactory);
     assertThat(routine.invoke().after(millis(100)).pass("test").afterNoDelay().abort()).isTrue();
   }
 
@@ -81,8 +80,7 @@ public class InvocationFactoryTest {
   public void testInvocationDecoratorLifecycle() {
     final InvocationFactory<String, String> factory = IdentityInvocation.factory();
     final TestInvocationFactory decoratedFactory = new TestInvocationFactory(factory);
-    final Routine<String, String> routine =
-        JRoutineCore.routine().of(decoratedFactory);
+    final Routine<String, String> routine = JRoutineCore.routine().of(decoratedFactory);
     assertThat(routine.invoke().pass("test").close().in(seconds(1)).all()).containsExactly("test");
   }
 

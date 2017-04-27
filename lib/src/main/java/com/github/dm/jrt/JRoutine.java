@@ -16,11 +16,9 @@
 
 package com.github.dm.jrt;
 
-import com.github.dm.jrt.channel.Channels;
 import com.github.dm.jrt.channel.io.ByteChannel;
 import com.github.dm.jrt.channel.io.ByteChannel.ByteChunk;
 import com.github.dm.jrt.channel.io.ByteChannel.ChunkInputStream;
-import com.github.dm.jrt.channel.io.ChunkOutputStreamBuilder;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.ChannelBuilder;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
@@ -85,7 +83,7 @@ public class JRoutine extends Channels {
    */
   @NotNull
   public static ChunkInputStream getInputStream(@NotNull final ByteChunk... buffers) {
-    return ByteChannel.getInputStream(buffers);
+    return ByteChannel.inputStream(buffers);
   }
 
   /**
@@ -102,7 +100,7 @@ public class JRoutine extends Channels {
   @NotNull
   public static ChunkInputStream getInputStream(
       @NotNull final Iterable<? extends ByteChunk> buffers) {
-    return ByteChannel.getInputStream(buffers);
+    return ByteChannel.inputStream(buffers);
   }
 
   /**
@@ -117,7 +115,7 @@ public class JRoutine extends Channels {
    */
   @NotNull
   public static ChunkInputStream getInputStream(@NotNull final ByteChunk buffer) {
-    return ByteChannel.getInputStream(buffer);
+    return ByteChannel.inputStream(buffer);
   }
 
   /**
@@ -554,7 +552,7 @@ public class JRoutine extends Channels {
   @NotNull
   public static ChunkOutputStreamBuilder withOutput(
       @NotNull final Channel<? super ByteChunk, ?> channel) {
-    return ByteChannel.withOutput(channel);
+    return ByteChannel.outputStream(channel);
   }
 
   /**

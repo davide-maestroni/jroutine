@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Davide Maestroni
+ * Copyright 2017 Davide Maestroni
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,42 +16,48 @@
 
 package com.github.dm.jrt.channel;
 
-import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.builder.AbstractChannelBuilder;
 import com.github.dm.jrt.core.channel.Channel;
+import com.github.dm.jrt.core.channel.ChannelConsumer;
+import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Builder implementation returning a channel making the output data a flow.
+ * Channel consumer filtering flow data.
  * <p>
- * Created by davide-maestroni on 02/26/2016.
+ * Created by davide-maestroni on 04/24/2017.
  *
- * @param <OUT> the output data type.
+ * @param <IN> the input data type.
  */
-class OutputFlowBuilder<OUT> extends AbstractChannelBuilder<Flow<OUT>, Flow<OUT>> {
+class FilterChannelConsumer<IN> implements ChannelConsumer<Flow<IN>> {
 
-  private final Channel<?, ? extends OUT> mChannel;
+  private final Channel<? super IN, ?> mChannel;
 
   private final int mId;
 
   /**
    * Constructor.
    *
-   * @param channel the channel.
-   * @param id      the flow ID.
+   * @param channel the channel to feed.
+   * @param id      the ID to filter.
    */
-  OutputFlowBuilder(@NotNull final Channel<?, ? extends OUT> channel, final int id) {
+  FilterChannelConsumer(@NotNull final Channel<? super IN, ?> channel, final int id) {
     mChannel = ConstantConditions.notNull("channel instance", channel);
     mId = id;
   }
 
-  @NotNull
-  public Channel<Flow<OUT>, Flow<OUT>> buildChannel() {
-    final Channel<Flow<OUT>, Flow<OUT>> outputChannel =
-        JRoutineCore.<Flow<OUT>>ofData().apply(getConfiguration()).buildChannel();
-    mChannel.consume(new FlowChannelConsumer<OUT, OUT>(outputChannel, mId));
-    return outputChannel;
+  public void onComplete() {
+    mChannel.close();
+  }
+
+  public void onError(@NotNull final RoutineException error) {
+    mChannel.abort(error);
+  }
+
+  public void onOutput(final Flow<IN> flow) {
+    if (flow.id == mId) {
+      mChannel.pass(flow.data);
+    }
   }
 }

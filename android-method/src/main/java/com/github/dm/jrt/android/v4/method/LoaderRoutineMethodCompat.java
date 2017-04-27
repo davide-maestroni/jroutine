@@ -28,7 +28,6 @@ import com.github.dm.jrt.android.reflect.ContextInvocationTarget;
 import com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
 import com.github.dm.jrt.android.v4.reflect.JRoutineLoaderReflectionCompat;
-import com.github.dm.jrt.channel.Channels;
 import com.github.dm.jrt.channel.Flow;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
@@ -443,7 +442,7 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
 
     @NotNull
     @Override
-    public ReflectionLoaderRoutineMethodCompat apply(
+    public ReflectionLoaderRoutineMethodCompat withConfiguration(
         @NotNull final WrapperConfiguration configuration) {
       mConfiguration = ConstantConditions.notNull("wrapper configuration", configuration);
       return this;
@@ -474,7 +473,7 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
                                                                                 getConfiguration())
                                                                             .apply(
                                                                                 getLoaderConfiguration())
-                                                                            .apply(mConfiguration)
+                                                                            .withConfiguration(mConfiguration)
                                                                             .method(method);
       final Channel<Object, Object> channel = routine.invoke().sorted();
       for (final Object param : safeParams) {
@@ -513,8 +512,8 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
 
     @NotNull
     @Override
-    public WrapperConfiguration.Builder<? extends ReflectionLoaderRoutineMethodCompat>
-    wrapperConfiguration() {
+    public WrapperConfiguration.Builder<? extends ReflectionLoaderRoutineMethodCompat> withWrapper() {
+
       return new WrapperConfiguration.Builder<ReflectionLoaderRoutineMethodCompat>(this,
           mConfiguration);
     }

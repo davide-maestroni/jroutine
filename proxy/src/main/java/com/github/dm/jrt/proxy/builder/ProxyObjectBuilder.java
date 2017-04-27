@@ -17,6 +17,7 @@
 package com.github.dm.jrt.proxy.builder;
 
 import com.github.dm.jrt.core.config.InvocationConfigurable;
+import com.github.dm.jrt.reflect.InvocationTarget;
 import com.github.dm.jrt.reflect.config.WrapperConfigurable;
 
 import org.jetbrains.annotations.NotNull;
@@ -35,16 +36,20 @@ public interface ProxyObjectBuilder<TYPE> extends InvocationConfigurable<ProxyOb
    * Returns a proxy object enabling asynchronous call of the target instance methods.
    * <p>
    * The routines used for calling the methods will honor the attributes specified in any optional
-   * <i>{@code com.github.dm.jrt.annotation.*}</i> annotations.
-   * <br>
-   * Note that such annotations will override any configuration set through the builder.
+   * <i>{@code com.github.dm.jrt.annotation.*}</i> annotations. Such annotations will override any
+   * configuration set through the builder.
    * <p>
    * The proxy object is created through code generation based on the interfaces annotated with
    * {@link com.github.dm.jrt.proxy.annotation.Proxy Proxy}.
+   * <p>
+   * Note that it is responsibility of the caller to retain a strong reference to the target
+   * instance to prevent it from being garbage collected.
    *
+   * @param target the invocation target.
    * @return the proxy object.
+   * @throws java.lang.IllegalArgumentException if the target does not represent a concrete class.
    * @see com.github.dm.jrt.reflect.annotation Annotations
    */
   @NotNull
-  TYPE buildProxy();
+  TYPE proxyOf(@NotNull InvocationTarget<?> target);
 }

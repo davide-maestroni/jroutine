@@ -29,7 +29,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
-import static com.github.dm.jrt.function.Functions.decorate;
 
 /**
  * Invocation implementation accumulating the result returned by a bi-function instance.
@@ -73,7 +72,8 @@ class AccumulateConsumerInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> 
   @NotNull
   static <IN> InvocationFactory<IN, IN> consumerFactory(
       @NotNull final BiConsumer<? super IN, ? super IN> accumulateConsumer) {
-    return new AccumulateInvocationFactory<IN, IN>(null, decorate(accumulateConsumer));
+    return new AccumulateInvocationFactory<IN, IN>(null,
+        BiConsumerDecorator.decorate(accumulateConsumer));
   }
 
   /**
@@ -90,8 +90,8 @@ class AccumulateConsumerInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> 
   static <IN, OUT> InvocationFactory<IN, OUT> consumerFactory(
       @NotNull final Supplier<? extends OUT> seedSupplier,
       @NotNull final BiConsumer<? super OUT, ? super IN> accumulateConsumer) {
-    return new AccumulateInvocationFactory<IN, OUT>(decorate(seedSupplier),
-        decorate(accumulateConsumer));
+    return new AccumulateInvocationFactory<IN, OUT>(SupplierDecorator.decorate(seedSupplier),
+        BiConsumerDecorator.decorate(accumulateConsumer));
   }
 
   @Override

@@ -171,7 +171,7 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
 
   @NotNull
   @Override
-  public ServiceReflectionRoutineBuilder apply(@NotNull final WrapperConfiguration configuration) {
+  public ServiceReflectionRoutineBuilder withConfiguration(@NotNull final WrapperConfiguration configuration) {
     mWrapperConfiguration = ConstantConditions.notNull("wrapper configuration", configuration);
     return this;
   }
@@ -194,17 +194,16 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
 
   @NotNull
   @Override
-  public WrapperConfiguration.Builder<? extends ServiceReflectionRoutineBuilder>
-  wrapperConfiguration() {
+  public WrapperConfiguration.Builder<? extends ServiceReflectionRoutineBuilder> withWrapper() {
     final WrapperConfiguration config = mWrapperConfiguration;
     return new WrapperConfiguration.Builder<ServiceReflectionRoutineBuilder>(
         new WrapperConfiguration.Configurable<ServiceReflectionRoutineBuilder>() {
 
           @NotNull
           @Override
-          public ServiceReflectionRoutineBuilder apply(
+          public ServiceReflectionRoutineBuilder withConfiguration(
               @NotNull final WrapperConfiguration configuration) {
-            return DefaultServiceReflectionRoutineBuilder.this.apply(configuration);
+            return DefaultServiceReflectionRoutineBuilder.this.withConfiguration(configuration);
           }
         }, config);
   }

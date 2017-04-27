@@ -67,7 +67,7 @@ public class WriteFile extends TemplateInvocation<ByteChunk, Boolean> {
   @Override
   public void onInput(final ByteChunk chunk, @NotNull final Channel<Boolean, ?> result) throws
       IOException {
-    ByteChannel.getInputStream(chunk).transferTo(mOutputStream);
+    ByteChannel.inputStream(chunk).transferTo(mOutputStream);
   }
 
   @Override

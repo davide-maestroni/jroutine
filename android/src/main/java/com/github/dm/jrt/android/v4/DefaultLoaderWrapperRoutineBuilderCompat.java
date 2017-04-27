@@ -79,7 +79,7 @@ class DefaultLoaderWrapperRoutineBuilderCompat implements LoaderWrapperRoutineBu
 
   @NotNull
   @Override
-  public LoaderWrapperRoutineBuilder apply(@NotNull final WrapperConfiguration configuration) {
+  public LoaderWrapperRoutineBuilder withConfiguration(@NotNull final WrapperConfiguration configuration) {
     mWrapperConfiguration = ConstantConditions.notNull("wrapper configuration", configuration);
     return this;
   }
@@ -108,16 +108,16 @@ class DefaultLoaderWrapperRoutineBuilderCompat implements LoaderWrapperRoutineBu
 
   @NotNull
   @Override
-  public WrapperConfiguration.Builder<? extends LoaderWrapperRoutineBuilder> wrapperConfiguration
+  public WrapperConfiguration.Builder<? extends LoaderWrapperRoutineBuilder> withWrapper
       () {
     return new WrapperConfiguration.Builder<LoaderWrapperRoutineBuilder>(
         new WrapperConfiguration.Configurable<LoaderWrapperRoutineBuilder>() {
 
           @NotNull
           @Override
-          public LoaderWrapperRoutineBuilder apply(
+          public LoaderWrapperRoutineBuilder withConfiguration(
               @NotNull final WrapperConfiguration configuration) {
-            return DefaultLoaderWrapperRoutineBuilderCompat.this.apply(configuration);
+            return DefaultLoaderWrapperRoutineBuilderCompat.this.withConfiguration(configuration);
           }
         }, mWrapperConfiguration);
   }
@@ -193,7 +193,7 @@ class DefaultLoaderWrapperRoutineBuilderCompat implements LoaderWrapperRoutineBu
     return JRoutineLoaderProxyCompat.on(mContext)
                                     .with(mTarget)
                                     .withConfiguration(mInvocationConfiguration)
-                                    .apply(mWrapperConfiguration)
+                                    .withConfiguration(mWrapperConfiguration)
                                     .apply(mLoaderConfiguration);
   }
 
@@ -202,7 +202,7 @@ class DefaultLoaderWrapperRoutineBuilderCompat implements LoaderWrapperRoutineBu
     return JRoutineLoaderReflectionCompat.on(mContext)
                                          .with(mTarget)
                                          .withConfiguration(mInvocationConfiguration)
-                                         .apply(mWrapperConfiguration)
+                                         .withConfiguration(mWrapperConfiguration)
                                          .apply(mLoaderConfiguration);
   }
 }

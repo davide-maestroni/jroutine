@@ -19,7 +19,6 @@ package com.github.dm.jrt.core.config;
 import com.github.dm.jrt.core.config.ChannelConfiguration.Builder;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.ChannelConfiguration.TimeoutActionType;
-import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.Logs;
 import com.github.dm.jrt.core.log.NullLog;
@@ -48,17 +47,15 @@ public class ChannelConfigurationTest {
   @Test
   public void testBuildFrom() {
 
-    final ChannelConfiguration configuration = builder().withOrder(OrderType.SORTED)
-                                                        .withExecutor(
-                                                            ScheduledExecutors.syncExecutor())
-                                                        .withLog(new NullLog())
-                                                        .withMaxSize(100)
-                                                        .configured();
-    assertThat(builderFrom(configuration).configured().hashCode()).isEqualTo(configuration.hashCode());
+    final ChannelConfiguration configuration =
+        builder().withOrder(OrderType.SORTED).withLog(new NullLog()).withMaxSize(100).configured();
+    assertThat(builderFrom(configuration).configured().hashCode()).isEqualTo(
+        configuration.hashCode());
     assertThat(builderFrom(configuration).configured()).isEqualTo(configuration);
     assertThat(builderFrom(null).configured().hashCode()).isEqualTo(
         ChannelConfiguration.defaultConfiguration().hashCode());
-    assertThat(builderFrom(null).configured()).isEqualTo(ChannelConfiguration.defaultConfiguration());
+    assertThat(builderFrom(null).configured()).isEqualTo(
+        ChannelConfiguration.defaultConfiguration());
   }
 
   @Test
@@ -80,8 +77,6 @@ public class ChannelConfigurationTest {
   public void testBuilderFromEquals() {
 
     final ChannelConfiguration configuration = builder().withOrder(OrderType.SORTED)
-                                                        .withExecutor(
-                                                            ScheduledExecutors.syncExecutor())
                                                         .withLog(new NullLog())
                                                         .withMaxSize(100)
                                                         .withLogLevel(Level.SILENT)
@@ -101,12 +96,8 @@ public class ChannelConfigurationTest {
   @Test
   public void testChannelBackoffEquals() {
 
-    final ChannelConfiguration configuration = builder().withOrder(OrderType.SORTED)
-                                                        .withExecutor(
-                                                            ScheduledExecutors.syncExecutor())
-                                                        .withLog(new NullLog())
-                                                        .withMaxSize(100)
-                                                        .configured();
+    final ChannelConfiguration configuration =
+        builder().withOrder(OrderType.SORTED).withLog(new NullLog()).withMaxSize(100).configured();
     assertThat(configuration).isNotEqualTo(builder().withBackoff(noDelay()).configured());
     assertThat(configuration).isNotEqualTo(
         builder().withBackoff(afterCount(1).constantDelay(1, TimeUnit.MILLISECONDS)).configured());
@@ -119,12 +110,8 @@ public class ChannelConfigurationTest {
   @Test
   public void testChannelOrderEquals() {
 
-    final ChannelConfiguration configuration = builder().withOrder(OrderType.SORTED)
-                                                        .withExecutor(
-                                                            ScheduledExecutors.syncExecutor())
-                                                        .withLog(new NullLog())
-                                                        .withMaxSize(100)
-                                                        .configured();
+    final ChannelConfiguration configuration =
+        builder().withOrder(OrderType.SORTED).withLog(new NullLog()).withMaxSize(100).configured();
     assertThat(configuration).isNotEqualTo(builder().withOrder(OrderType.UNSORTED).configured());
     assertThat(configuration.builderFrom().withOrder(OrderType.SORTED).configured()).isNotEqualTo(
         builder().withOrder(OrderType.SORTED).configured());
@@ -133,12 +120,8 @@ public class ChannelConfigurationTest {
   @Test
   public void testChannelSizeEquals() {
 
-    final ChannelConfiguration configuration = builder().withOrder(OrderType.SORTED)
-                                                        .withExecutor(
-                                                            ScheduledExecutors.syncExecutor())
-                                                        .withLog(new NullLog())
-                                                        .withMaxSize(100)
-                                                        .configured();
+    final ChannelConfiguration configuration =
+        builder().withOrder(OrderType.SORTED).withLog(new NullLog()).withMaxSize(100).configured();
     assertThat(configuration).isNotEqualTo(builder().withMaxSize(10).configured());
     assertThat(configuration.builderFrom().withMaxSize(1).configured()).isNotEqualTo(
         builder().withMaxSize(1).configured());
@@ -159,31 +142,10 @@ public class ChannelConfigurationTest {
   }
 
   @Test
-  public void testExecutorEquals() {
-
-    final ChannelConfiguration configuration = builder().withOrder(OrderType.SORTED)
-                                                        .withExecutor(
-                                                            ScheduledExecutors.syncExecutor())
-                                                        .withLog(new NullLog())
-                                                        .withMaxSize(100)
-                                                        .configured();
-    assertThat(configuration).isNotEqualTo(
-        builder().withExecutor(ScheduledExecutors.defaultExecutor()).configured());
-    assertThat(configuration.builderFrom()
-                            .withExecutor(ScheduledExecutors.syncExecutor())
-                            .configured()).isNotEqualTo(
-        builder().withExecutor(ScheduledExecutors.syncExecutor()).configured());
-  }
-
-  @Test
   public void testLogEquals() {
 
-    final ChannelConfiguration configuration = builder().withOrder(OrderType.SORTED)
-                                                        .withExecutor(
-                                                            ScheduledExecutors.syncExecutor())
-                                                        .withLog(new NullLog())
-                                                        .withMaxSize(100)
-                                                        .configured();
+    final ChannelConfiguration configuration =
+        builder().withOrder(OrderType.SORTED).withLog(new NullLog()).withMaxSize(100).configured();
     assertThat(configuration).isNotEqualTo(builder().withLog(Logs.nullLog()).configured());
     assertThat(configuration.builderFrom().withLog(Logs.systemLog()).configured()).isNotEqualTo(
         builder().withLog(Logs.systemLog()).configured());
@@ -192,12 +154,8 @@ public class ChannelConfigurationTest {
   @Test
   public void testLogLevelEquals() {
 
-    final ChannelConfiguration configuration = builder().withOrder(OrderType.SORTED)
-                                                        .withExecutor(
-                                                            ScheduledExecutors.syncExecutor())
-                                                        .withLog(new NullLog())
-                                                        .withMaxSize(100)
-                                                        .configured();
+    final ChannelConfiguration configuration =
+        builder().withOrder(OrderType.SORTED).withLog(new NullLog()).withMaxSize(100).configured();
     assertThat(configuration).isNotEqualTo(builder().withLogLevel(Level.DEBUG).configured());
     assertThat(configuration.builderFrom().withLogLevel(Level.WARNING).configured()).isNotEqualTo(
         builder().withLogLevel(Level.WARNING).configured());
@@ -206,12 +164,8 @@ public class ChannelConfigurationTest {
   @Test
   public void testReadTimeoutActionEquals() {
 
-    final ChannelConfiguration configuration = builder().withOrder(OrderType.SORTED)
-                                                        .withExecutor(
-                                                            ScheduledExecutors.syncExecutor())
-                                                        .withLog(new NullLog())
-                                                        .withMaxSize(100)
-                                                        .configured();
+    final ChannelConfiguration configuration =
+        builder().withOrder(OrderType.SORTED).withLog(new NullLog()).withMaxSize(100).configured();
     assertThat(configuration).isNotEqualTo(
         builder().withOutputTimeoutAction(TimeoutActionType.ABORT).configured());
     assertThat(configuration).isNotEqualTo(
@@ -225,12 +179,8 @@ public class ChannelConfigurationTest {
   @Test
   public void testReadTimeoutEquals() {
 
-    final ChannelConfiguration configuration = builder().withOrder(OrderType.SORTED)
-                                                        .withExecutor(
-                                                            ScheduledExecutors.syncExecutor())
-                                                        .withLog(new NullLog())
-                                                        .withMaxSize(100)
-                                                        .configured();
+    final ChannelConfiguration configuration =
+        builder().withOrder(OrderType.SORTED).withLog(new NullLog()).withMaxSize(100).configured();
     assertThat(configuration).isNotEqualTo(builder().withOutputTimeout(noTime()).configured());
     assertThat(configuration).isNotEqualTo(
         builder().withOutputTimeout(1, TimeUnit.MILLISECONDS).configured());

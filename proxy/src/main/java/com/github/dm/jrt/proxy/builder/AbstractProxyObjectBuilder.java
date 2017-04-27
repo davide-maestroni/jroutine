@@ -17,14 +17,15 @@
 package com.github.dm.jrt.proxy.builder;
 
 import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.executor.ScheduledExecutor;
 import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;
+import com.github.dm.jrt.reflect.InvocationTarget;
 import com.github.dm.jrt.reflect.config.WrapperConfiguration;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 
@@ -42,34 +43,38 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
   private static final WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>> sProxies =
       new WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>>();
 
+  private final ScheduledExecutor mExecutor;
+
   private InvocationConfiguration mInvocationConfiguration =
       InvocationConfiguration.defaultConfiguration();
 
   private WrapperConfiguration mWrapperConfiguration = WrapperConfiguration.defaultConfiguration();
 
-  @NotNull
-  public ProxyObjectBuilder<TYPE> withConfiguration(@NotNull final InvocationConfiguration configuration) {
-    mInvocationConfiguration =
-        ConstantConditions.notNull("invocation configuration", configuration);
-    return this;
-  }
-
-  @NotNull
-  public ProxyObjectBuilder<TYPE> apply(@NotNull final WrapperConfiguration configuration) {
-    mWrapperConfiguration = ConstantConditions.notNull("wrapper configuration", configuration);
-    return this;
+  /**
+   * Constructor.
+   *
+   * @param executor the executor instance.
+   */
+  protected AbstractProxyObjectBuilder(@NotNull final ScheduledExecutor executor) {
+    mExecutor = ConstantConditions.notNull("executor instance", executor);
   }
 
   @NotNull
   @SuppressWarnings("unchecked")
-  public TYPE buildProxy() {
-    final Object target = getTarget();
+  public TYPE proxyOf(@NotNull final InvocationTarget<?> target) {
+    final Class<?> targetClass = target.getTargetClass();
+    if (targetClass.isInterface()) {
+      throw new IllegalArgumentException(
+          "the target class must not be an interface: " + targetClass.getName());
+    }
+
     synchronized (sProxies) {
+      final Object proxyTarget = target.getTarget();
       final WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>> proxies = sProxies;
-      HashMap<ClassInfo, Object> proxyMap = proxies.get(target);
+      HashMap<ClassInfo, Object> proxyMap = proxies.get(proxyTarget);
       if (proxyMap == null) {
         proxyMap = new HashMap<ClassInfo, Object>();
-        proxies.put(target, proxyMap);
+        proxies.put(proxyTarget, proxyMap);
       }
 
       final InvocationConfiguration invocationConfiguration = mInvocationConfiguration;
@@ -82,7 +87,8 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
       }
 
       try {
-        final TYPE newInstance = newProxy(invocationConfiguration, wrapperConfiguration);
+        final TYPE newInstance =
+            newProxy(target, mExecutor, invocationConfiguration, wrapperConfiguration);
         proxyMap.put(classInfo, newInstance);
         return newInstance;
 
@@ -94,13 +100,28 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
   }
 
   @NotNull
+  public ProxyObjectBuilder<TYPE> withConfiguration(
+      @NotNull final WrapperConfiguration configuration) {
+    mWrapperConfiguration = ConstantConditions.notNull("wrapper configuration", configuration);
+    return this;
+  }
+
+  @NotNull
+  public ProxyObjectBuilder<TYPE> withConfiguration(
+      @NotNull final InvocationConfiguration configuration) {
+    mInvocationConfiguration =
+        ConstantConditions.notNull("invocation configuration", configuration);
+    return this;
+  }
+
+  @NotNull
   public InvocationConfiguration.Builder<? extends ProxyObjectBuilder<TYPE>> withInvocation() {
     final InvocationConfiguration config = mInvocationConfiguration;
     return new InvocationConfiguration.Builder<ProxyObjectBuilder<TYPE>>(this, config);
   }
 
   @NotNull
-  public WrapperConfiguration.Builder<? extends ProxyObjectBuilder<TYPE>> wrapperConfiguration() {
+  public WrapperConfiguration.Builder<? extends ProxyObjectBuilder<TYPE>> withWrapper() {
     final WrapperConfiguration config = mWrapperConfiguration;
     return new WrapperConfiguration.Builder<ProxyObjectBuilder<TYPE>>(this, config);
   }
@@ -114,23 +135,18 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
   protected abstract Class<? super TYPE> getInterfaceClass();
 
   /**
-   * Returns the builder target object.
-   *
-   * @return the target object.
-   */
-  @Nullable
-  protected abstract Object getTarget();
-
-  /**
    * Creates and return a new proxy instance.
    *
+   * @param target                  the invocation target.
+   * @param executor                the executor instance.
    * @param invocationConfiguration the invocation configuration.
    * @param wrapperConfiguration    the wrapper configuration.
    * @return the proxy instance.
    * @throws java.lang.Exception if an unexpected error occurs.
    */
   @NotNull
-  protected abstract TYPE newProxy(@NotNull InvocationConfiguration invocationConfiguration,
+  protected abstract TYPE newProxy(@NotNull InvocationTarget<?> target,
+      @NotNull ScheduledExecutor executor, @NotNull InvocationConfiguration invocationConfiguration,
       @NotNull WrapperConfiguration wrapperConfiguration) throws Exception;
 
   /**

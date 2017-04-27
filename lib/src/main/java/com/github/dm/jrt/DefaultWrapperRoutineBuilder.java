@@ -74,7 +74,7 @@ class DefaultWrapperRoutineBuilder implements WrapperRoutineBuilder {
   }
 
   @NotNull
-  public WrapperRoutineBuilder apply(@NotNull final WrapperConfiguration configuration) {
+  public WrapperRoutineBuilder withConfiguration(@NotNull final WrapperConfiguration configuration) {
     mWrapperConfiguration = ConstantConditions.notNull("wrapper configuration", configuration);
     return this;
   }
@@ -100,14 +100,14 @@ class DefaultWrapperRoutineBuilder implements WrapperRoutineBuilder {
   }
 
   @NotNull
-  public WrapperConfiguration.Builder<? extends WrapperRoutineBuilder> wrapperConfiguration() {
+  public WrapperConfiguration.Builder<? extends WrapperRoutineBuilder> withWrapper() {
     final WrapperConfiguration config = mWrapperConfiguration;
     return new WrapperConfiguration.Builder<WrapperRoutineBuilder>(
         new WrapperConfiguration.Configurable<WrapperRoutineBuilder>() {
 
           @NotNull
-          public WrapperRoutineBuilder apply(@NotNull final WrapperConfiguration configuration) {
-            return DefaultWrapperRoutineBuilder.this.apply(configuration);
+          public WrapperRoutineBuilder withConfiguration(@NotNull final WrapperConfiguration configuration) {
+            return DefaultWrapperRoutineBuilder.this.withConfiguration(configuration);
           }
         }, config);
   }
@@ -153,13 +153,13 @@ class DefaultWrapperRoutineBuilder implements WrapperRoutineBuilder {
 
   @NotNull
   private ProxyRoutineBuilder newProxyBuilder() {
-    return JRoutineProxy.with(mTarget).withConfiguration(mInvocationConfiguration).apply(mWrapperConfiguration);
+    return JRoutineProxy.with(mTarget).withConfiguration(mInvocationConfiguration).withConfiguration(mWrapperConfiguration);
   }
 
   @NotNull
   private ReflectionRoutineBuilder newReflectionBuilder() {
     return JRoutineReflection.with(mTarget)
                              .withConfiguration(mInvocationConfiguration)
-                             .apply(mWrapperConfiguration);
+                             .withConfiguration(mWrapperConfiguration);
   }
 }

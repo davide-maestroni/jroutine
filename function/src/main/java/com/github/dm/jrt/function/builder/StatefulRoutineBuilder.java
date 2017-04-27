@@ -16,11 +16,12 @@
 
 package com.github.dm.jrt.function.builder;
 
-import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.RoutineException;
+import com.github.dm.jrt.core.config.InvocationConfigurable;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
+import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.function.util.BiConsumer;
 import com.github.dm.jrt.function.util.BiFunction;
 import com.github.dm.jrt.function.util.Consumer;
@@ -52,7 +53,7 @@ import org.jetbrains.annotations.NotNull;
  * builder.onCreate(StringBuilder::new)
  *        .onNextState(StringBuilder::append)
  *        .onCompleteOutput(StringBuilder::toString)
- *        .buildRoutine();
+ *        .routine();
  * </code></pre>
  * <p>
  * Note that the passed instances are expected to behave like a function, that is, they must not
@@ -67,19 +68,8 @@ import org.jetbrains.annotations.NotNull;
  * @param <OUT>   the output data type.
  * @param <STATE> the state data type.
  */
-public interface StatefulRoutineBuilder<IN, OUT, STATE> extends RoutineBuilder<IN, OUT> {
-
-  /**
-   * {@inheritDoc}
-   */
-  @NotNull
-  StatefulRoutineBuilder<IN, OUT, STATE> withConfiguration(@NotNull InvocationConfiguration configuration);
-
-  /**
-   * {@inheritDoc}
-   */
-  @NotNull
-  Builder<? extends StatefulRoutineBuilder<IN, OUT, STATE>> withInvocation();
+public interface StatefulRoutineBuilder<IN, OUT, STATE>
+    extends InvocationConfigurable<StatefulRoutineBuilder<IN, OUT, STATE>> {
 
   /**
    * Sets the function to call when the invocation completes.
@@ -347,4 +337,25 @@ public interface StatefulRoutineBuilder<IN, OUT, STATE> extends RoutineBuilder<I
   @NotNull
   StatefulRoutineBuilder<IN, OUT, STATE> onNextState(
       @NotNull BiFunction<? super STATE, ? super IN, ? extends STATE> onNext);
+
+  /**
+   * Builds a new routine instance based on the set functions.
+   *
+   * @return the routine instance.
+   */
+  @NotNull
+  Routine<IN, OUT> routine();
+
+  /**
+   * {@inheritDoc}
+   */
+  @NotNull
+  StatefulRoutineBuilder<IN, OUT, STATE> withConfiguration(
+      @NotNull InvocationConfiguration configuration);
+
+  /**
+   * {@inheritDoc}
+   */
+  @NotNull
+  Builder<? extends StatefulRoutineBuilder<IN, OUT, STATE>> withInvocation();
 }

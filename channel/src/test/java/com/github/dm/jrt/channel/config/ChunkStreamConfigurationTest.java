@@ -39,10 +39,10 @@ public class ChunkStreamConfigurationTest {
         builder().withChunkSize(11)
                  .withCorePoolSize(17)
                  .withOnClose(CloseActionType.CLOSE_CHANNEL)
-                 .apply();
-    assertThat(configuration).isNotEqualTo(builder().withChunkSize(3).apply());
-    assertThat(configuration.builderFrom().withChunkSize(27).apply()).isNotEqualTo(
-        builder().withChunkSize(27).apply());
+                 .configured();
+    assertThat(configuration).isNotEqualTo(builder().withChunkSize(3).configured());
+    assertThat(configuration.builderFrom().withChunkSize(27).configured()).isNotEqualTo(
+        builder().withChunkSize(27).configured());
   }
 
   @Test
@@ -68,13 +68,14 @@ public class ChunkStreamConfigurationTest {
         builder().withChunkSize(11)
                  .withCorePoolSize(17)
                  .withOnClose(CloseActionType.CLOSE_CHANNEL)
-                 .apply();
-    assertThat(builderFrom(configuration).apply().hashCode()).isEqualTo(configuration.hashCode());
-    assertThat(builderFrom(configuration).apply()).isEqualTo(configuration);
-    assertThat(builderFrom(null).apply().hashCode()).isEqualTo(
+                 .configured();
+    assertThat(builderFrom(configuration).configured().hashCode()).isEqualTo(
+        configuration.hashCode());
+    assertThat(builderFrom(configuration).configured()).isEqualTo(configuration);
+    assertThat(builderFrom(null).configured().hashCode()).isEqualTo(
         com.github.dm.jrt.channel.config.ChunkStreamConfiguration.defaultConfiguration()
                                                                  .hashCode());
-    assertThat(builderFrom(null).apply()).isEqualTo(
+    assertThat(builderFrom(null).configured()).isEqualTo(
         com.github.dm.jrt.channel.config.ChunkStreamConfiguration.defaultConfiguration());
   }
 
@@ -103,11 +104,11 @@ public class ChunkStreamConfigurationTest {
         builder().withChunkSize(11)
                  .withCorePoolSize(17)
                  .withOnClose(CloseActionType.CLOSE_CHANNEL)
-                 .apply();
-    assertThat(builder().withPatch(configuration).apply()).isEqualTo(configuration);
-    assertThat(configuration.builderFrom().apply()).isEqualTo(configuration);
-    assertThat(configuration.builderFrom().withPatch(null).apply()).isEqualTo(configuration);
-    assertThat(configuration.builderFrom().withDefaults().apply()).isEqualTo(
+                 .configured();
+    assertThat(builder().withPatch(configuration).configured()).isEqualTo(configuration);
+    assertThat(configuration.builderFrom().configured()).isEqualTo(configuration);
+    assertThat(configuration.builderFrom().withPatch(null).configured()).isEqualTo(configuration);
+    assertThat(configuration.builderFrom().withDefaults().configured()).isEqualTo(
         com.github.dm.jrt.channel.config.ChunkStreamConfiguration.defaultConfiguration());
   }
 
@@ -117,12 +118,13 @@ public class ChunkStreamConfigurationTest {
         builder().withChunkSize(11)
                  .withCorePoolSize(17)
                  .withOnClose(CloseActionType.CLOSE_CHANNEL)
-                 .apply();
+                 .configured();
     assertThat(configuration).isNotEqualTo(
-        builder().withOnClose(CloseActionType.FLUSH_STREAM).apply());
-    assertThat(
-        configuration.builderFrom().withOnClose(CloseActionType.FLUSH_STREAM).apply()).isNotEqualTo(
-        builder().withOnClose(CloseActionType.FLUSH_STREAM).apply());
+        builder().withOnClose(CloseActionType.FLUSH_STREAM).configured());
+    assertThat(configuration.builderFrom()
+                            .withOnClose(CloseActionType.FLUSH_STREAM)
+                            .configured()).isNotEqualTo(
+        builder().withOnClose(CloseActionType.FLUSH_STREAM).configured());
   }
 
   @Test
@@ -131,10 +133,10 @@ public class ChunkStreamConfigurationTest {
         builder().withChunkSize(11)
                  .withCorePoolSize(17)
                  .withOnClose(CloseActionType.CLOSE_CHANNEL)
-                 .apply();
-    assertThat(configuration).isNotEqualTo(builder().withCorePoolSize(0).apply());
-    assertThat(configuration.builderFrom().withCorePoolSize(0).apply()).isNotEqualTo(
-        builder().withCorePoolSize(0).apply());
+                 .configured();
+    assertThat(configuration).isNotEqualTo(builder().withCorePoolSize(0).configured());
+    assertThat(configuration.builderFrom().withCorePoolSize(0).configured()).isNotEqualTo(
+        builder().withCorePoolSize(0).configured());
   }
 
   @Test

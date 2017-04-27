@@ -330,9 +330,9 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
     assertThat(
         LoaderRoutineMethodCompat.from(loaderFrom(getActivity()), instanceOf(String.class, test),
             String.class.getMethod("toString"))
-                                 .wrapperConfiguration()
+                                 .withWrapper()
                                  .withSharedFields()
-                                 .apply()
+                                 .configured()
                                  .call()
                                  .in(seconds(10))
                                  .next()).isEqualTo("test");
@@ -346,9 +346,9 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
     assertThat(
         LoaderRoutineMethodCompat.from(loaderFrom(getActivity()), instanceOf(String.class, test),
             "toString")
-                                 .wrapperConfiguration()
+                                 .withWrapper()
                                  .withSharedFields()
-                                 .apply()
+                                 .configured()
                                  .call()
                                  .in(seconds(10))
                                  .next()).isEqualTo("test");

@@ -16,8 +16,8 @@
 
 package com.github.dm.jrt.method;
 
-import com.github.dm.jrt.channel.Channels;
 import com.github.dm.jrt.channel.Flow;
+import com.github.dm.jrt.channel.JRoutineChannel;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.ChannelBuilder;
 import com.github.dm.jrt.core.channel.Channel;
@@ -25,6 +25,7 @@ import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.InvocationConfigurable;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
+import com.github.dm.jrt.core.executor.ScheduledExecutor;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
@@ -63,8 +64,11 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * with other ones.
  * <h2>How to implement a routine</h2>
  * A routine is implemented by extending the class and defining a method taking input and output
- * channels as parameters. The number of input and output channels can be arbitrarily chosen,
- * moreover, any other type of parameters can be passed in any order.
+ * channels as parameters. The only requirement is that each constructor must have an executor
+ * instance as first parameter.
+ * <br>
+ * The number of input and output channels can be arbitrarily chosen, and any other type of
+ * parameters can be passed in any order.
  * <br>
  * The method will be called each time a new input is passed to one of the input channels.
  * Additionally, the method is called once when the invocation is aborted and when it completes.
@@ -79,11 +83,9 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * <p>
  * For example, a routine computing the square of integers can be implemented as follows:
  * <pre><code>
- * final Channel&lt;Integer, Integer&gt; inputChannel =
- *     JRoutineCore.&lt;Integer&gt;ofData().buildChannel();
- * final Channel&lt;Integer, Integer&gt; outputChannel =
- *     JRoutineCore.&lt;Integer&gt;ofData().buildChannel();
- * new RoutineMethod() {
+ * final Channel&lt;Integer, Integer&gt; inputChannel = JRoutineCore.channel().ofType();
+ * final Channel&lt;Integer, Integer&gt; outputChannel = JRoutineCore.channel().ofType();
+ * new RoutineMethod(defaultExecutor()) {
  *
  *   public void square(&#64;Input final Channel&lt;?, Integer&gt; input,
  *       &#64;Output final Channel&lt;Integer, ?&gt; output) {
@@ -109,9 +111,8 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * <p>
  * For example, a routine transforming the case of a string can be implemented as follows:
  * <pre><code>
- * final Channel&lt;String, String&gt; inputChannel =
- *     JRoutineCore.&lt;String&gt;ofData().buildChannel();
- * final Channel&lt;?, String&gt; outputChannel = new RoutineMethod() {
+ * final Channel&lt;String, String&gt; inputChannel = JRoutineCore.channel().ofType();
+ * final Channel&lt;?, String&gt; outputChannel = new RoutineMethod(defaultExecutor()) {
  *
  *   public String switchCase(&#64;Input final Channel&lt;?, String&gt; input,
  *       final boolean isUpper) {
@@ -134,9 +135,8 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * In case the very same input or output channel instance has to be passed as parameter, it is
  * sufficient to avoid in/out annotations, like shown below:
  * <pre><code>
- * final Channel&lt;String, String&gt; outputChannel =
- *     JRoutineCore.&lt;String&gt;ofData().buildChannel();
- * new MyRoutine() {
+ * final Channel&lt;String, String&gt; outputChannel = JRoutineCore.channel().ofType();
+ * new RoutineMethod(defaultExecutor()) {
  *
  *   void run(final Channel&lt;String, ?&gt; output) {
  *     output.pass("...");
@@ -144,10 +144,9 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  *
  * }.call(outputChannel);
  * </code></pre>
- * <h2>Parallel and multiple invocations</h2>
- * In order to enable parallel invocation of the routine, it is necessary to provide the proper
- * parameters to the routine method non-default constructor. In fact, parallel invocations will
- * employ several instances of the implementing class.
+ * <h2>Multiple invocations</h2>
+ * In order to enable multiple invocations of the routine, it is necessary to provide the proper
+ * parameters to the routine method non-default constructor.
  * <br>
  * Note that, for anonymous and inner classes, synthetic constructors will be created by the
  * compiler, hence the enclosing class, along with any variable captured inside the method, must be
@@ -156,9 +155,8 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * Like, for example:
  * <pre><code>
  * final Locale locale = Locale.getDefault();
- * final Channel&lt;String, String&gt; inputChannel =
- *     JRoutineCore.&lt;String&gt;ofData().buildChannel();
- * final Channel&lt;?, String&gt; outputChannel = new RoutineMethod(this, locale) {
+ * final Channel&lt;String, String&gt; inputChannel = JRoutineCore.channel().ofType();
+ * final Channel&lt;?, String&gt; outputChannel = new RoutineMethod(executor, this, locale) {
  *
  *   public String switchCase(&#64;Input final Channel&lt;?, String&gt; input,
  *        final boolean isUpper) {
@@ -180,8 +178,8 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  *
  *   private final Locale mLocale;
  *
- *   MyMethod(final Locale locale) {
- *     super(OuterClass.this, locale);
+ *   MyMethod(final ScheduledExecutor executor, final Locale locale) {
+ *     super(executor, OuterClass.this, locale);
  *     mLocale = locale;
  *   }
  *
@@ -203,8 +201,8 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  *
  *   private final Locale mLocale;
  *
- *   MyMethod(final Locale locale) {
- *     super(locale);
+ *   MyMethod(final ScheduledExecutor executor, final Locale locale) {
+ *     super(executor, locale);
  *     mLocale = locale;
  *   }
  *
@@ -229,13 +227,10 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * <p>
  * For example, a routine printing the inputs of different types can be implemented as follows:
  * <pre><code>
- * final Channel&lt;Integer, Integer&gt; inputInts =
- *     JRoutineCore.&lt;Integer&gt;ofData().buildChannel();
- * final Channel&lt;String, String&gt; inputStrings =
- *     JRoutineCore.&lt;String&gt;ofData().buildChannel();
- * final Channel&lt;String, String&gt; outputChannel =
- *     JRoutineCore.&lt;String&gt;ofData().buildChannel();
- * new RoutineMethod() {
+ * final Channel&lt;Integer, Integer&gt; inputInts = JRoutineCore.channel().ofType();
+ * final Channel&lt;String, String&gt; inputStrings = JRoutineCore.channel().ofType();
+ * final Channel&lt;String, String&gt; outputChannel = JRoutineCore.channel().ofType();
+ * new RoutineMethod(defaultExecutor()) {
  *
  *   void run(&#64;Input final Channel&lt;?, Integer&gt; inputInts,
  *       &#64;Input final Channel&lt;?, String&gt; inputStrings,
@@ -267,11 +262,9 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * The same is true for other method routines, when output channels can be passed as inputs as shown
  * in the following example:
  * <pre><code>
- * final Channel&lt;Integer, Integer&gt; inputChannel =
- *     JRoutineCore.&lt;Integer&gt;ofData().buildChannel();
- * final Channel&lt;Integer, Integer&gt; outputChannel =
- *     JRoutineCore.&lt;Integer&gt;ofData().buildChannel();
- * new RoutineMethod() {
+ * final Channel&lt;Integer, Integer&gt; inputChannel = JRoutineCore.channel().ofType();
+ * final Channel&lt;Integer, Integer&gt; outputChannel = JRoutineCore.channel().ofType();
+ * new RoutineMethod(defaultExecutor()) {
  *
  *   public void square(&#64;Input final Channel&lt;?, Integer&gt; input,
  *       &#64;Output final Channel&lt;Integer, ?&gt; output) {
@@ -281,9 +274,8 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  *     }
  *   }
  * }.call(inputChannel, outputChannel);
- * final Channel&lt;Integer, Integer&gt; resultChannel =
- *     JRoutineCore.&lt;Integer&gt;ofData().buildChannel();
- * new RoutineMethod() {
+ * final Channel&lt;Integer, Integer&gt; resultChannel = JRoutineCore.channel().ofType();
+ * new RoutineMethod(defaultExecutor()) {
  *
  *   private int mSum;
  *
@@ -307,9 +299,8 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * concatenated to the sum routine method as shown below:
  * <pre><code>
  * final Channel&lt;String, Integer&gt; channel = parseRoutine.invoke();
- * final Channel&lt;Integer, Integer&gt; outputChannel =
- *     JRoutineCore.&lt;Integer&gt;ofData().buildChannel();
- * new RoutineMethod() {
+ * final Channel&lt;Integer, Integer&gt; outputChannel = JRoutineCore.channel().ofType();
+ * new RoutineMethod(defaultExecutor()) {
  *
  *   private int mSum;
  *
@@ -339,9 +330,8 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * invocation completes or is aborted:
  * <pre><code>
  * final ExternalStorage storage = ExternalStorage.create();
- * final Channel&lt;String, String&gt; inputChannel =
- *     JRoutineCore.&lt;String&gt;ofData().buildChannel();
- * new RoutineMethod(this, storage) {
+ * final Channel&lt;String, String&gt; inputChannel = JRoutineCore.channel().ofType();
+ * new RoutineMethod(defaultExecutor(), this, storage) {
  *
  *   private final StorageConnection mConnection = storage.openConnection();
  *
@@ -365,7 +355,7 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * </code></pre>
  * <h2>Wrapping existing method</h2>
  * An additional way to create a routine method is by wrapping a method of an existing object or
- * class. The routine is created by calling one of the provided {@code from()} methods.
+ * class. The routine is created by calling one of the provided {@code of()} methods.
  * <br>
  * No strong reference to the target object will be retained, so, it's up to the caller to ensure
  * that it does not get garbage collected.
@@ -378,10 +368,9 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * <p>
  * For example, a routine wrapping the {@code String.format()} method can be built as shown below:
  * <pre><code>
- * final Channel&lt;Object[], Object[]&gt; inputChannel =
- *     JRoutineCore.&lt;Object[]&gt;ofData().buildChannel();
+ * final Channel&lt;Object[], Object[]&gt; inputChannel = JRoutineCore.channel().ofType();
  * final Channel&lt;?, String&gt; outputChannel =
- *     RoutineMethod.from(String.class.getMethod("format", String.class, Object[].class))
+ *     RoutineMethod.of(executor, String.class.getMethod("format", String.class, Object[].class))
  *                  .call("%s %s!", inputChannel);
  * inputChannel.pass(new Object[]{"Hello", "JRoutine"}).close();
  * outputChannel.in(seconds(1)).next(); // expected value: "Hello JRoutine!"
@@ -390,10 +379,9 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * In case the very same input or output channel instance has to be passed as parameter, it has to
  * be wrapped in another input channel, like shown below:
  * <pre><code>
- * final Channel&lt;String, String&gt; channel =
- *     JRoutineCore.&lt;String&gt;ofData().buildChannel();
- * RoutineMethod.from(MyClass.class.getMethod("run", Channel.class))
- *              .call(JRoutineCore.of(channel).buildChannel());
+ * final Channel&lt;String, String&gt; channel = JRoutineCore.channel().ofType();
+ * RoutineMethod.of(executor, MyClass.class.getMethod("run", Channel.class))
+ *              .call(JRoutineCore.channel().of(channel));
  * </code></pre>
  * <p>
  * Created by davide-maestroni on 08/10/2016.
@@ -404,6 +392,8 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
   private final Object[] mArgs;
 
   private final Constructor<? extends RoutineMethod> mConstructor;
+
+  private final ScheduledExecutor mExecutor;
 
   private final AtomicBoolean mIsFirstCall = new AtomicBoolean(true);
 
@@ -417,38 +407,55 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
 
   /**
    * Constructor.
+   *
+   * @param executor the executor instance.
    */
-  public RoutineMethod() {
-    this((Object[]) null);
+  public RoutineMethod(@NotNull final ScheduledExecutor executor) {
+    this(executor, (Object[]) null);
   }
 
   /**
    * Constructor.
    *
-   * @param args the constructor arguments.
+   * @param executor the executor instance.
+   * @param args     the constructor arguments.
    */
-  public RoutineMethod(@Nullable final Object... args) {
+  public RoutineMethod(@NotNull final ScheduledExecutor executor, @Nullable final Object... args) {
+    mExecutor = ConstantConditions.notNull("executor instance", executor);
     final Class<? extends RoutineMethod> type = getClass();
     final Object[] constructorArgs;
+    final Object[] safeArgs = Reflection.asArgs(args);
     if (type.isAnonymousClass()) {
-      final Object[] safeArgs = asArgs(args);
       if (safeArgs.length > 0) {
-        constructorArgs = new Object[safeArgs.length + 1];
-        System.arraycopy(safeArgs, 0, constructorArgs, 1, safeArgs.length);
+        constructorArgs = new Object[safeArgs.length + 2];
+        System.arraycopy(safeArgs, 0, constructorArgs, 2, safeArgs.length);
         if (Reflection.hasStaticScope(type)) {
-          constructorArgs[0] = safeArgs;
+          constructorArgs[0] = executor;
+          constructorArgs[1] = safeArgs;
 
         } else {
           constructorArgs[0] = safeArgs[0];
-          constructorArgs[1] = safeArgs;
+          constructorArgs[1] = executor;
+          constructorArgs[2] = safeArgs;
         }
 
       } else {
-        constructorArgs = safeArgs;
+        constructorArgs = new Object[]{executor};
+      }
+
+    } else if (safeArgs.length > 0) {
+      constructorArgs = new Object[safeArgs.length + 1];
+      System.arraycopy(safeArgs, 0, constructorArgs, 1, safeArgs.length);
+      if (Reflection.hasStaticScope(type)) {
+        constructorArgs[0] = executor;
+
+      } else {
+        constructorArgs[0] = safeArgs[0];
+        constructorArgs[1] = executor;
       }
 
     } else {
-      constructorArgs = cloneArgs(args);
+      constructorArgs = new Object[]{executor};
     }
 
     Constructor<? extends RoutineMethod> constructor = null;
@@ -465,42 +472,46 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
   /**
    * Builds a reflection routine method by wrapping the specified static method.
    *
-   * @param method the method.
+   * @param executor the executor instance.
+   * @param method   the method.
    * @return the routine method instance.
    * @throws java.lang.IllegalArgumentException if the specified method is not static.
    */
   @NotNull
-  public static ReflectionRoutineMethod from(@NotNull final Method method) {
+  public static ReflectionRoutineMethod of(@NotNull final ScheduledExecutor executor,
+      @NotNull final Method method) {
     if (!Modifier.isStatic(method.getModifiers())) {
       throw new IllegalArgumentException("the method is not static: " + method);
     }
 
-    return from(InvocationTarget.classOfType(method.getDeclaringClass()), method);
+    return of(executor, InvocationTarget.classOfType(method.getDeclaringClass()), method);
   }
 
   /**
    * Builds a reflection routine method by wrapping a method of the specified target.
    *
-   * @param target the invocation target.
-   * @param method the method.
+   * @param executor the executor instance.
+   * @param target   the invocation target.
+   * @param method   the method.
    * @return the routine method instance.
    * @throws java.lang.IllegalArgumentException if the specified method is not implemented by the
    *                                            target instance.
    */
   @NotNull
-  public static ReflectionRoutineMethod from(@NotNull final InvocationTarget<?> target,
-      @NotNull final Method method) {
+  public static ReflectionRoutineMethod of(@NotNull final ScheduledExecutor executor,
+      @NotNull final InvocationTarget<?> target, @NotNull final Method method) {
     if (!method.getDeclaringClass().isAssignableFrom(target.getTargetClass())) {
       throw new IllegalArgumentException(
           "the method is not applicable to the specified target class: " + target.getTargetClass());
     }
 
-    return new ReflectionRoutineMethod(target, method);
+    return new ReflectionRoutineMethod(executor, target, method);
   }
 
   /**
    * Builds a reflection routine method by wrapping a method of the specified target.
    *
+   * @param executor       the executor instance.
    * @param target         the invocation target.
    * @param name           the method name.
    * @param parameterTypes the method parameter types.
@@ -508,10 +519,10 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
    * @throws java.lang.NoSuchMethodException if no method with the specified signature is found.
    */
   @NotNull
-  public static ReflectionRoutineMethod from(@NotNull final InvocationTarget<?> target,
-      @NotNull final String name, @Nullable final Class<?>... parameterTypes) throws
-      NoSuchMethodException {
-    return from(target, target.getTargetClass().getMethod(name, parameterTypes));
+  public static ReflectionRoutineMethod of(@NotNull final ScheduledExecutor executor,
+      @NotNull final InvocationTarget<?> target, @NotNull final String name,
+      @Nullable final Class<?>... parameterTypes) throws NoSuchMethodException {
+    return of(executor, target, target.getTargetClass().getMethod(name, parameterTypes));
   }
 
   /**
@@ -566,17 +577,17 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
     final Annotation[][] annotations = method.getParameterAnnotations();
     final int length = params.length;
     final ArrayList<Object> parameters = new ArrayList<Object>(length);
-    final ChannelBuilder<Object, Object> channelBuilder = JRoutineCore.ofData();
+    final ChannelBuilder channelBuilder = JRoutineCore.channel();
     for (int i = 0; i < length; ++i) {
       final Object param = params[i];
       final Class<? extends Annotation> annotationType = getAnnotationType(param, annotations[i]);
       if (annotationType == Input.class) {
-        final Channel<Object, Object> inputChannel = channelBuilder.buildChannel();
+        final Channel<Object, Object> inputChannel = channelBuilder.ofType();
         inputChannels.add(inputChannel);
         parameters.add(inputChannel);
 
       } else if (annotationType == Output.class) {
-        final Channel<Object, Object> outputChannel = channelBuilder.buildChannel();
+        final Channel<Object, Object> outputChannel = channelBuilder.ofType();
         outputChannels.add(outputChannel);
         parameters.add(outputChannel);
 
@@ -697,15 +708,20 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
       }
     }
 
-    final Channel<OUT, OUT> resultChannel = JRoutineCore.<OUT>ofData().buildChannel();
+    final Channel<OUT, OUT> resultChannel = JRoutineCore.channel().ofType();
     outputChannels.add(resultChannel);
     final Channel<?, ? extends Flow<Object>> inputChannel =
-        (!inputChannels.isEmpty()) ? Channels.mergeOutput(inputChannels).buildChannel()
-            : JRoutineCore.<Flow<Object>>of().buildChannel();
-    final Channel<Flow<Object>, Flow<Object>> outputChannel =
-        JRoutineCore.with(factory).apply(getConfiguration()).invoke().pass(inputChannel).close();
+        (!inputChannels.isEmpty()) ? JRoutineChannel.channelHandler().mergeOutputOf(inputChannels)
+            : JRoutineCore.channel().<Flow<Object>>of();
+    final Channel<Flow<Object>, Flow<Object>> outputChannel = JRoutineCore.routineOn(mExecutor)
+                                                                          .withConfiguration(
+                                                                              getConfiguration())
+                                                                          .of(factory)
+                                                                          .invoke()
+                                                                          .pass(inputChannel)
+                                                                          .close();
     final Map<Integer, ? extends Channel<?, Object>> channelMap =
-        Channels.flowOutput(0, outputChannels.size(), outputChannel).buildChannelMap();
+        JRoutineChannel.channelHandler().outputOfFlow(0, outputChannels.size(), outputChannel);
     for (final Entry<Integer, ? extends Channel<?, Object>> entry : channelMap.entrySet()) {
       ((Channel<Object, Object>) outputChannels.get(entry.getKey())).pass(entry.getValue()).close();
     }
@@ -735,6 +751,8 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
   public static class ReflectionRoutineMethod extends RoutineMethod
       implements WrapperConfigurable<ReflectionRoutineMethod> {
 
+    private final ScheduledExecutor mExecutor;
+
     private final Method mMethod;
 
     private final InvocationTarget<?> mTarget;
@@ -744,26 +762,16 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
     /**
      * Constructor.
      *
-     * @param target the invocation target.
-     * @param method the method instance.
+     * @param executor the executor instance.
+     * @param target   the invocation target.
+     * @param method   the method instance.
      */
-    private ReflectionRoutineMethod(@NotNull final InvocationTarget<?> target,
-        @NotNull final Method method) {
+    private ReflectionRoutineMethod(@NotNull final ScheduledExecutor executor,
+        @NotNull final InvocationTarget<?> target, @NotNull final Method method) {
+      super(executor);
+      mExecutor = ConstantConditions.notNull("executor instance", executor);
       mTarget = target;
       mMethod = method;
-    }
-
-    @NotNull
-    public ReflectionRoutineMethod apply(@NotNull final WrapperConfiguration configuration) {
-      mConfiguration = ConstantConditions.notNull("wrapper configuration", configuration);
-      return this;
-    }
-
-    @NotNull
-    @Override
-    public ReflectionRoutineMethod withConfiguration(
-        @NotNull final InvocationConfiguration configuration) {
-      return (ReflectionRoutineMethod) super.withConfiguration(configuration);
     }
 
     @NotNull
@@ -778,11 +786,11 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
                 + "> but was <" + safeParams.length + ">");
       }
 
-      final Routine<Object, Object> routine = JRoutineReflection.with(mTarget)
+      final Routine<Object, Object> routine = JRoutineReflection.wrapperOn(mExecutor)
                                                                 .withConfiguration(
                                                                     getConfiguration())
-                                                                .apply(mConfiguration)
-                                                                .method(method);
+                                                                .withConfiguration(mConfiguration)
+                                                                .methodOf(mTarget, method);
       final Channel<Object, Object> channel = routine.invoke().sorted();
       for (final Object param : safeParams) {
         if (param instanceof Channel) {
@@ -798,13 +806,27 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
 
     @NotNull
     @Override
+    public ReflectionRoutineMethod withConfiguration(
+        @NotNull final InvocationConfiguration configuration) {
+      return (ReflectionRoutineMethod) super.withConfiguration(configuration);
+    }
+
+    @NotNull
+    @Override
     @SuppressWarnings("unchecked")
     public Builder<? extends ReflectionRoutineMethod> withInvocation() {
       return (Builder<? extends ReflectionRoutineMethod>) super.withInvocation();
     }
 
     @NotNull
-    public WrapperConfiguration.Builder<? extends ReflectionRoutineMethod> wrapperConfiguration() {
+    public ReflectionRoutineMethod withConfiguration(
+        @NotNull final WrapperConfiguration configuration) {
+      mConfiguration = ConstantConditions.notNull("wrapper configuration", configuration);
+      return this;
+    }
+
+    @NotNull
+    public WrapperConfiguration.Builder<? extends ReflectionRoutineMethod> withWrapper() {
       return new WrapperConfiguration.Builder<ReflectionRoutineMethod>(this, mConfiguration);
     }
   }
@@ -944,7 +966,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
         mIsBound = true;
         final List<Channel<?, ?>> outputChannels = getOutputChannels();
         if (!outputChannels.isEmpty()) {
-          result.pass(Channels.mergeOutput(outputChannels).buildChannel());
+          result.pass(JRoutineChannel.channelHandler().mergeOutputOf(outputChannels));
         }
       }
     }

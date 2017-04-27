@@ -77,7 +77,7 @@ class DefaultServiceWrapperRoutineBuilder implements ServiceWrapperRoutineBuilde
 
   @NotNull
   @Override
-  public ServiceWrapperRoutineBuilder apply(@NotNull final WrapperConfiguration configuration) {
+  public ServiceWrapperRoutineBuilder withConfiguration(@NotNull final WrapperConfiguration configuration) {
     mWrapperConfiguration = ConstantConditions.notNull("wrapper configuration", configuration);
     return this;
   }
@@ -106,16 +106,15 @@ class DefaultServiceWrapperRoutineBuilder implements ServiceWrapperRoutineBuilde
 
   @NotNull
   @Override
-  public WrapperConfiguration.Builder<? extends ServiceWrapperRoutineBuilder>
-  wrapperConfiguration() {
+  public WrapperConfiguration.Builder<? extends ServiceWrapperRoutineBuilder> withWrapper() {
     return new WrapperConfiguration.Builder<ServiceWrapperRoutineBuilder>(
         new WrapperConfiguration.Configurable<ServiceWrapperRoutineBuilder>() {
 
           @NotNull
           @Override
-          public ServiceWrapperRoutineBuilder apply(
+          public ServiceWrapperRoutineBuilder withConfiguration(
               @NotNull final WrapperConfiguration configuration) {
-            return DefaultServiceWrapperRoutineBuilder.this.apply(configuration);
+            return DefaultServiceWrapperRoutineBuilder.this.withConfiguration(configuration);
           }
         }, mWrapperConfiguration);
   }
@@ -192,7 +191,7 @@ class DefaultServiceWrapperRoutineBuilder implements ServiceWrapperRoutineBuilde
     return JRoutineServiceProxy.on(mContext)
                                .with(mTarget)
                                .withConfiguration(mInvocationConfiguration)
-                               .apply(mWrapperConfiguration)
+                               .withConfiguration(mWrapperConfiguration)
                                .apply(mServiceConfiguration);
   }
 
@@ -201,7 +200,7 @@ class DefaultServiceWrapperRoutineBuilder implements ServiceWrapperRoutineBuilde
     return JRoutineServiceReflection.on(mContext)
                                     .with(mTarget)
                                     .withConfiguration(mInvocationConfiguration)
-                                    .apply(mWrapperConfiguration)
+                                    .withConfiguration(mWrapperConfiguration)
                                     .apply(mServiceConfiguration);
   }
 }

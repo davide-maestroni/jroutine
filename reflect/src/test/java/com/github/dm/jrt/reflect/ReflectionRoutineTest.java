@@ -25,8 +25,6 @@ import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.ChannelConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.AgingPriority;
-import com.github.dm.jrt.core.executor.ScheduledExecutorDecorator;
-import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.core.executor.SyncExecutor;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.log.Log;
@@ -43,7 +41,6 @@ import com.github.dm.jrt.reflect.annotation.AsyncMethod;
 import com.github.dm.jrt.reflect.annotation.AsyncOutput;
 import com.github.dm.jrt.reflect.annotation.AsyncOutput.OutputMode;
 import com.github.dm.jrt.reflect.annotation.CoreInvocations;
-import com.github.dm.jrt.reflect.annotation.ExecutorType;
 import com.github.dm.jrt.reflect.annotation.InputBackoff;
 import com.github.dm.jrt.reflect.annotation.InputMaxSize;
 import com.github.dm.jrt.reflect.annotation.InputOrder;
@@ -71,6 +68,9 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builder;
+import static com.github.dm.jrt.core.executor.ScheduledExecutors.defaultExecutor;
+import static com.github.dm.jrt.core.executor.ScheduledExecutors.poolExecutor;
+import static com.github.dm.jrt.core.executor.ScheduledExecutors.syncExecutor;
 import static com.github.dm.jrt.core.util.DurationMeasure.indefiniteTime;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static com.github.dm.jrt.reflect.InvocationTarget.classOfType;
@@ -91,11 +91,8 @@ public class ReflectionRoutineTest {
 
     final Pass pass = new Pass();
     final TestExecutor executor = new TestExecutor();
-    final PriorityPass priorityPass = JRoutineReflection.with(instance(pass))
-                                                        .withInvocation()
-                                                        .withExecutor(executor)
-                                                        .configured()
-                                                        .buildProxy(PriorityPass.class);
+    final PriorityPass priorityPass =
+        JRoutineReflection.wrapperOn(executor).proxyOf(instance(pass), PriorityPass.class);
     final Channel<?, String> output1 = priorityPass.passNormal("test1").eventuallyContinue();
 
     for (int i = 0; i < AgingPriority.HIGH_PRIORITY - 1; i++) {
@@ -117,10 +114,8 @@ public class ReflectionRoutineTest {
 
     final DurationMeasure timeout = seconds(1);
     final TestClass test = new TestClass();
-    final Routine<Object, Object> routine = JRoutineReflection.with(instance(test))
+    final Routine<Object, Object> routine = JRoutineReflection.wrapperOn(poolExecutor())
                                                               .withInvocation()
-                                                              .withExecutor(
-                                                                  ScheduledExecutors.poolExecutor())
                                                               .withMaxInvocations(1)
                                                               .withCoreInvocations(1)
                                                               .withOutputTimeoutAction(
@@ -128,7 +123,8 @@ public class ReflectionRoutineTest {
                                                               .withLogLevel(Level.DEBUG)
                                                               .withLog(new NullLog())
                                                               .configured()
-                                                              .method(TestClass.GET);
+                                                              .methodOf(instance(test),
+                                                                  TestClass.GET);
 
     assertThat(routine.invoke().close().in(timeout).all()).containsExactly(-77L);
   }
@@ -137,14 +133,14 @@ public class ReflectionRoutineTest {
   public void testAliasStaticMethod() throws NoSuchMethodException {
 
     final DurationMeasure timeout = seconds(1);
-    final Routine<Object, Object> routine = JRoutineReflection.with(classOfType(TestStatic.class))
+    final Routine<Object, Object> routine = JRoutineReflection.wrapperOn(poolExecutor())
                                                               .withInvocation()
-                                                              .withExecutor(
-                                                                  ScheduledExecutors.poolExecutor())
                                                               .withLogLevel(Level.DEBUG)
                                                               .withLog(new NullLog())
                                                               .configured()
-                                                              .method(TestStatic.GET);
+                                                              .methodOf(
+                                                                  classOfType(TestStatic.class),
+                                                                  TestStatic.GET);
 
     assertThat(routine.invoke().close().in(timeout).all()).containsExactly(-77L);
   }
@@ -154,7 +150,7 @@ public class ReflectionRoutineTest {
 
     try {
 
-      JRoutineReflection.with(classOfType(TestStatic.class)).method("test");
+      JRoutineReflection.wrapper().methodOf(classOfType(TestStatic.class), "test");
 
       fail();
 
@@ -167,7 +163,7 @@ public class ReflectionRoutineTest {
   public void testAnnotationGenerics() {
 
     final Size size = new Size();
-    final SizeItf proxy = JRoutineReflection.with(instance(size)).buildProxy(SizeItf.class);
+    final SizeItf proxy = JRoutineReflection.wrapper().proxyOf(instance(size), SizeItf.class);
     assertThat(
         proxy.getSize(Arrays.asList("test1", "test2", "test3")).in(seconds(3)).next()).isEqualTo(3);
     assertThat(proxy.getSize()
@@ -182,30 +178,30 @@ public class ReflectionRoutineTest {
 
     final DurationMeasure timeout = seconds(1);
     final Sum sum = new Sum();
-    final SumItf sumAsync = JRoutineReflection.with(instance(sum))
+    final SumItf sumAsync = JRoutineReflection.wrapper()
                                               .withInvocation()
                                               .withOutputTimeout(timeout)
                                               .configured()
-                                              .buildProxy(SumItf.class);
-    final Channel<Integer, Integer> channel3 = JRoutineCore.<Integer>ofData().buildChannel();
+                                              .proxyOf(instance(sum), SumItf.class);
+    final Channel<Integer, Integer> channel3 = JRoutineCore.channel().ofType();
     channel3.pass(7).close();
     assertThat(sumAsync.compute(3, channel3)).isEqualTo(10);
 
-    final Channel<Integer, Integer> channel4 = JRoutineCore.<Integer>ofData().buildChannel();
+    final Channel<Integer, Integer> channel4 = JRoutineCore.channel().ofType();
     channel4.pass(1, 2, 3, 4).close();
     assertThat(sumAsync.compute(channel4)).isEqualTo(10);
 
-    final Channel<int[], int[]> channel5 = JRoutineCore.<int[]>ofData().buildChannel();
+    final Channel<int[], int[]> channel5 = JRoutineCore.channel().ofType();
     channel5.pass(new int[]{1, 2, 3, 4}).close();
     assertThat(sumAsync.compute1(channel5)).isEqualTo(10);
     assertThat(sumAsync.compute2().pass(new int[]{1, 2, 3, 4}).close().next()).isEqualTo(10);
     assertThat(sumAsync.compute3().pass(17).close().next()).isEqualTo(17);
 
-    final Channel<Integer, Integer> channel6 = JRoutineCore.<Integer>ofData().buildChannel();
+    final Channel<Integer, Integer> channel6 = JRoutineCore.channel().ofType();
     channel6.pass(1, 2, 3, 4).close();
     assertThat(sumAsync.computeList(channel6)).isEqualTo(10);
 
-    final Channel<Integer, Integer> channel7 = JRoutineCore.<Integer>ofData().buildChannel();
+    final Channel<Integer, Integer> channel7 = JRoutineCore.channel().ofType();
     channel7.pass(1, 2, 3, 4).close();
     assertThat(sumAsync.computeList1(channel7)).isEqualTo(10);
   }
@@ -215,11 +211,11 @@ public class ReflectionRoutineTest {
 
     final DurationMeasure timeout = seconds(1);
     final Count count = new Count();
-    final CountItf countAsync = JRoutineReflection.with(instance(count))
+    final CountItf countAsync = JRoutineReflection.wrapper()
                                                   .withInvocation()
                                                   .withOutputTimeout(timeout)
                                                   .configured()
-                                                  .buildProxy(CountItf.class);
+                                                  .proxyOf(instance(count), CountItf.class);
     assertThat(countAsync.count(3).all()).containsExactly(0, 1, 2);
     assertThat(countAsync.count1(3).all()).containsExactly(new int[]{0, 1, 2});
     assertThat(countAsync.count2(2).all()).containsExactly(0, 1);
@@ -245,7 +241,6 @@ public class ReflectionRoutineTest {
                  .withOutputTimeout(1111, TimeUnit.MICROSECONDS)
                  .withOutputTimeoutAction(TimeoutActionType.ABORT)
                  .withPriority(41)
-                 .withExecutor(new MyExecutor())
                  .configured());
   }
 
@@ -255,7 +250,7 @@ public class ReflectionRoutineTest {
 
     try {
 
-      new DefaultReflectionRoutineBuilder(classOfType(TestStatic.class)).withConfiguration(
+      new DefaultReflectionRoutineBuilder(defaultExecutor()).withConfiguration(
           (InvocationConfiguration) null);
 
       fail();
@@ -266,7 +261,7 @@ public class ReflectionRoutineTest {
 
     try {
 
-      new DefaultReflectionRoutineBuilder(classOfType(TestStatic.class)).apply(
+      new DefaultReflectionRoutineBuilder(defaultExecutor()).withConfiguration(
           (WrapperConfiguration) null);
 
       fail();
@@ -296,7 +291,8 @@ public class ReflectionRoutineTest {
 
     try {
 
-      JRoutineReflection.with(instance(new DuplicateAnnotation())).method(DuplicateAnnotation.GET);
+      JRoutineReflection.wrapper()
+                        .methodOf(instance(new DuplicateAnnotation()), DuplicateAnnotation.GET);
 
       fail();
 
@@ -306,8 +302,9 @@ public class ReflectionRoutineTest {
 
     try {
 
-      JRoutineReflection.with(classOfType(DuplicateAnnotationStatic.class))
-                        .method(DuplicateAnnotationStatic.GET);
+      JRoutineReflection.wrapper()
+                        .methodOf(classOfType(DuplicateAnnotationStatic.class),
+                            DuplicateAnnotationStatic.GET);
 
       fail();
 
@@ -322,7 +319,7 @@ public class ReflectionRoutineTest {
     final DurationMeasure timeout = seconds(1);
     final TestClass test = new TestClass();
     final Routine<Object, Object> routine3 =
-        JRoutineReflection.with(instance(test)).method(TestClass.THROW);
+        JRoutineReflection.wrapper().methodOf(instance(test), TestClass.THROW);
 
     try {
 
@@ -343,7 +340,7 @@ public class ReflectionRoutineTest {
     final DurationMeasure timeout = seconds(1);
 
     final Routine<Object, Object> routine3 =
-        JRoutineReflection.with(classOfType(TestStatic.class)).method(TestStatic.THROW);
+        JRoutineReflection.wrapper().methodOf(classOfType(TestStatic.class), TestStatic.THROW);
 
     try {
 
@@ -363,7 +360,7 @@ public class ReflectionRoutineTest {
 
     try {
 
-      JRoutineReflection.with(classOfType(TestItf.class));
+      JRoutineReflection.wrapper().methodOf(classOfType(TestItf.class), "throwException");
 
       fail();
 
@@ -379,7 +376,7 @@ public class ReflectionRoutineTest {
 
     try {
 
-      JRoutineReflection.with(instance(sum)).buildProxy(SumError2.class).compute1();
+      JRoutineReflection.wrapper().proxyOf(instance(sum), SumError2.class).compute1();
 
       fail();
 
@@ -389,7 +386,7 @@ public class ReflectionRoutineTest {
 
     try {
 
-      JRoutineReflection.with(instance(sum)).buildProxy(SumError2.class).compute2();
+      JRoutineReflection.wrapper().proxyOf(instance(sum), SumError2.class).compute2();
 
       fail();
 
@@ -399,7 +396,7 @@ public class ReflectionRoutineTest {
 
     try {
 
-      JRoutineReflection.with(instance(sum)).buildProxy(SumError2.class).compute4();
+      JRoutineReflection.wrapper().proxyOf(instance(sum), SumError2.class).compute4();
 
       fail();
 
@@ -409,7 +406,7 @@ public class ReflectionRoutineTest {
 
     try {
 
-      JRoutineReflection.with(instance(sum)).buildProxy(SumError2.class).compute5(7);
+      JRoutineReflection.wrapper().proxyOf(instance(sum), SumError2.class).compute5(7);
 
       fail();
 
@@ -425,7 +422,7 @@ public class ReflectionRoutineTest {
 
     try {
 
-      JRoutineReflection.with(instance(test)).buildProxy(TestClass.class);
+      JRoutineReflection.wrapper().proxyOf(instance(test), TestClass.class);
 
       fail();
 
@@ -435,7 +432,7 @@ public class ReflectionRoutineTest {
 
     try {
 
-      JRoutineReflection.with(instance(test)).buildProxy(ClassToken.tokenOf(TestClass.class));
+      JRoutineReflection.wrapper().proxyOf(instance(test), ClassToken.tokenOf(TestClass.class));
 
       fail();
 
@@ -451,7 +448,7 @@ public class ReflectionRoutineTest {
 
     try {
 
-      JRoutineReflection.with(instance(sum)).buildProxy(SumError.class).compute(1, new int[0]);
+      JRoutineReflection.wrapper().proxyOf(instance(sum), SumError.class).compute(1, new int[0]);
 
       fail();
 
@@ -461,7 +458,7 @@ public class ReflectionRoutineTest {
 
     try {
 
-      JRoutineReflection.with(instance(sum)).buildProxy(SumError.class).compute(new String[0]);
+      JRoutineReflection.wrapper().proxyOf(instance(sum), SumError.class).compute(new String[0]);
 
       fail();
 
@@ -471,7 +468,7 @@ public class ReflectionRoutineTest {
 
     try {
 
-      JRoutineReflection.with(instance(sum)).buildProxy(SumError.class).compute(new int[0]);
+      JRoutineReflection.wrapper().proxyOf(instance(sum), SumError.class).compute(new int[0]);
 
       fail();
 
@@ -481,8 +478,8 @@ public class ReflectionRoutineTest {
 
     try {
 
-      JRoutineReflection.with(instance(sum))
-                        .buildProxy(SumError.class)
+      JRoutineReflection.wrapper()
+                        .proxyOf(instance(sum), SumError.class)
                         .compute(Collections.<Integer>emptyList());
 
       fail();
@@ -491,11 +488,11 @@ public class ReflectionRoutineTest {
 
     }
 
-    final Channel<Integer, Integer> channel = JRoutineCore.<Integer>ofData().buildChannel();
+    final Channel<Integer, Integer> channel = JRoutineCore.channel().ofType();
 
     try {
 
-      JRoutineReflection.with(instance(sum)).buildProxy(SumError.class).compute(channel);
+      JRoutineReflection.wrapper().proxyOf(instance(sum), SumError.class).compute(channel);
 
       fail();
 
@@ -505,7 +502,7 @@ public class ReflectionRoutineTest {
 
     try {
 
-      JRoutineReflection.with(instance(sum)).buildProxy(SumError.class).compute(1, channel);
+      JRoutineReflection.wrapper().proxyOf(instance(sum), SumError.class).compute(1, channel);
 
       fail();
 
@@ -521,11 +518,11 @@ public class ReflectionRoutineTest {
 
     try {
 
-      JRoutineReflection.with(instance(test))
+      JRoutineReflection.wrapper()
                         .withInvocation()
                         .withOutputTimeout(indefiniteTime())
                         .configured()
-                        .buildProxy(TestItf.class)
+                        .proxyOf(instance(test), TestItf.class)
                         .throwException(null);
 
       fail();
@@ -536,11 +533,11 @@ public class ReflectionRoutineTest {
 
     try {
 
-      JRoutineReflection.with(instance(test))
+      JRoutineReflection.wrapper()
                         .withInvocation()
                         .withOutputTimeout(indefiniteTime())
                         .configured()
-                        .buildProxy(TestItf.class)
+                        .proxyOf(instance(test), TestItf.class)
                         .throwException1(null);
 
       fail();
@@ -551,7 +548,7 @@ public class ReflectionRoutineTest {
 
     try {
 
-      JRoutineReflection.with(instance(test)).buildProxy(TestItf.class).throwException2(null);
+      JRoutineReflection.wrapper().proxyOf(instance(test), TestItf.class).throwException2(null);
 
       fail();
 
@@ -567,7 +564,7 @@ public class ReflectionRoutineTest {
 
     try {
 
-      JRoutineReflection.with(instance(count)).buildProxy(CountError.class).count(3);
+      JRoutineReflection.wrapper().proxyOf(instance(count), CountError.class).count(3);
 
       fail();
 
@@ -577,7 +574,7 @@ public class ReflectionRoutineTest {
 
     try {
 
-      JRoutineReflection.with(instance(count)).buildProxy(CountError.class).count1(3);
+      JRoutineReflection.wrapper().proxyOf(instance(count), CountError.class).count1(3);
 
       fail();
 
@@ -587,7 +584,7 @@ public class ReflectionRoutineTest {
 
     try {
 
-      JRoutineReflection.with(instance(count)).buildProxy(CountError.class).count2();
+      JRoutineReflection.wrapper().proxyOf(instance(count), CountError.class).count2();
 
       fail();
 
@@ -597,7 +594,7 @@ public class ReflectionRoutineTest {
 
     try {
 
-      JRoutineReflection.with(instance(count)).buildProxy(CountError.class).countList(3);
+      JRoutineReflection.wrapper().proxyOf(instance(count), CountError.class).countList(3);
 
       fail();
 
@@ -607,7 +604,7 @@ public class ReflectionRoutineTest {
 
     try {
 
-      JRoutineReflection.with(instance(count)).buildProxy(CountError.class).countList1(3);
+      JRoutineReflection.wrapper().proxyOf(instance(count), CountError.class).countList1(3);
 
       fail();
 
@@ -621,18 +618,16 @@ public class ReflectionRoutineTest {
 
     final DurationMeasure timeout = seconds(1);
     final TestClass test = new TestClass();
-    final Routine<Object, Object> routine2 = JRoutineReflection.with(instance(test))
+    final Routine<Object, Object> routine2 = JRoutineReflection.wrapperOn(poolExecutor())
                                                                .withInvocation()
-                                                               .withExecutor(
-                                                                   ScheduledExecutors
-                                                                       .poolExecutor())
                                                                .withMaxInvocations(1)
                                                                .configured()
-                                                               .wrapperConfiguration()
+                                                               .withWrapper()
                                                                .withSharedFields("test")
-                                                               .apply()
-                                                               .method(TestClass.class.getMethod(
-                                                                   "getLong"));
+                                                               .configured()
+                                                               .methodOf(instance(test),
+                                                                   TestClass.class.getMethod(
+                                                                       "getLong"));
 
     assertThat(routine2.invoke().close().in(timeout).all()).containsExactly(-77L);
   }
@@ -642,13 +637,8 @@ public class ReflectionRoutineTest {
 
     final DurationMeasure timeout = seconds(1);
     final TestClass test = new TestClass();
-    final Routine<Object, Object> routine1 = JRoutineReflection.with(instance(test))
-                                                               .withInvocation()
-                                                               .withExecutor(
-                                                                   ScheduledExecutors
-                                                                       .poolExecutor())
-                                                               .configured()
-                                                               .method("getLong");
+    final Routine<Object, Object> routine1 =
+        JRoutineReflection.wrapperOn(poolExecutor()).methodOf(instance(test), "getLong");
 
     assertThat(routine1.invoke().close().in(timeout).all()).containsExactly(-77L);
   }
@@ -658,51 +648,55 @@ public class ReflectionRoutineTest {
 
     final DurationMeasure timeout = seconds(1);
     final TestClassImpl test = new TestClassImpl();
-    assertThat(JRoutineReflection.with(instance(test))
-                                 .method(TestClassImpl.class.getMethod("getOne"))
+    assertThat(JRoutineReflection.wrapper()
+                                 .methodOf(instance(test), TestClassImpl.class.getMethod("getOne"))
                                  .invoke()
                                  .close()
                                  .in(timeout)
                                  .all()).containsExactly(1);
-    assertThat(
-        JRoutineReflection.with(instance(test)).method("getOne").invoke().close().in(timeout).all())
-        .containsExactly(1);
-    assertThat(JRoutineReflection.with(instance(test))
-                                 .method(TestClassImpl.GET)
+    assertThat(JRoutineReflection.wrapper()
+                                 .methodOf(instance(test), "getOne")
                                  .invoke()
                                  .close()
                                  .in(timeout)
                                  .all()).containsExactly(1);
-    assertThat(JRoutineReflection.with(classOfType(TestClassImpl.class))
-                                 .method(TestClassImpl.STATIC_GET)
+    assertThat(JRoutineReflection.wrapper()
+                                 .methodOf(instance(test), TestClassImpl.GET)
+                                 .invoke()
+                                 .close()
+                                 .in(timeout)
+                                 .all()).containsExactly(1);
+    assertThat(JRoutineReflection.wrapper()
+                                 .methodOf(classOfType(TestClassImpl.class),
+                                     TestClassImpl.STATIC_GET)
                                  .invoke()
                                  .pass(3)
                                  .close()
                                  .in(timeout)
                                  .all()).containsExactly(3);
-    assertThat(JRoutineReflection.with(classOfType(TestClassImpl.class))
-                                 .method("sget")
+    assertThat(JRoutineReflection.wrapper()
+                                 .methodOf(classOfType(TestClassImpl.class), "sget")
                                  .invoke()
                                  .pass(-3)
                                  .close()
                                  .in(timeout)
                                  .all()).containsExactly(-3);
-    assertThat(JRoutineReflection.with(classOfType(TestClassImpl.class))
-                                 .method("get", int.class)
+    assertThat(JRoutineReflection.wrapper()
+                                 .methodOf(classOfType(TestClassImpl.class), "get", int.class)
                                  .invoke()
                                  .pass(17)
                                  .close()
                                  .in(timeout)
                                  .all()).containsExactly(17);
 
-    assertThat(JRoutineReflection.with(instance(test))
-                                 .buildProxy(TestInterface.class)
+    assertThat(JRoutineReflection.wrapper()
+                                 .proxyOf(instance(test), TestInterface.class)
                                  .getInt(2)).isEqualTo(2);
 
     try {
 
-      JRoutineReflection.with(classOfType(TestClassImpl.class))
-                        .method("sget")
+      JRoutineReflection.wrapper()
+                        .methodOf(classOfType(TestClassImpl.class), "sget")
                         .invoke()
                         .close()
                         .in(timeout)
@@ -716,7 +710,7 @@ public class ReflectionRoutineTest {
 
     try {
 
-      JRoutineReflection.with(classOfType(TestClassImpl.class)).method("take");
+      JRoutineReflection.wrapper().methodOf(classOfType(TestClassImpl.class), "take");
 
       fail();
 
@@ -724,24 +718,24 @@ public class ReflectionRoutineTest {
 
     }
 
-    assertThat(JRoutineReflection.with(instance(test))
+    assertThat(JRoutineReflection.wrapper()
                                  .withInvocation()
                                  .withOutputTimeout(timeout)
                                  .configured()
-                                 .buildProxy(TestInterfaceAsync.class)
+                                 .proxyOf(instance(test), TestInterfaceAsync.class)
                                  .take(77)).isEqualTo(77);
-    assertThat(JRoutineReflection.with(instance(test))
-                                 .buildProxy(TestInterfaceAsync.class)
+    assertThat(JRoutineReflection.wrapper()
+                                 .proxyOf(instance(test), TestInterfaceAsync.class)
                                  .getOne()
                                  .in(timeout)
                                  .next()).isEqualTo(1);
 
-    final TestInterfaceAsync testInterfaceAsync = JRoutineReflection.with(instance(test))
+    final TestInterfaceAsync testInterfaceAsync = JRoutineReflection.wrapper()
                                                                     .withInvocation()
                                                                     .withOutputTimeout(1,
                                                                         TimeUnit.SECONDS)
                                                                     .configured()
-                                                                    .buildProxy(
+                                                                    .proxyOf(instance(test),
                                                                         TestInterfaceAsync.class);
     assertThat(testInterfaceAsync.getInt(testInterfaceAsync.getOne())).isEqualTo(1);
   }
@@ -753,7 +747,7 @@ public class ReflectionRoutineTest {
 
     try {
 
-      JRoutineReflection.with(instance(test)).method("test");
+      JRoutineReflection.wrapper().methodOf(instance(test), "test");
 
       fail();
 
@@ -769,7 +763,7 @@ public class ReflectionRoutineTest {
 
     try {
 
-      JRoutineReflection.with(instance(test)).method("test");
+      JRoutineReflection.wrapper().methodOf(instance(test), "test1");
 
       fail();
 
@@ -784,27 +778,7 @@ public class ReflectionRoutineTest {
 
     try {
 
-      JRoutineReflection.with(null);
-
-      fail();
-
-    } catch (final NullPointerException ignored) {
-
-    }
-
-    try {
-
-      JRoutineReflection.with(instance(null));
-
-      fail();
-
-    } catch (final NullPointerException ignored) {
-
-    }
-
-    try {
-
-      JRoutineReflection.with(classOfType(null));
+      JRoutineReflection.wrapperOn(null);
 
       fail();
 
@@ -821,7 +795,7 @@ public class ReflectionRoutineTest {
 
     try {
 
-      JRoutineReflection.with(instance(test)).buildProxy((Class<?>) null);
+      JRoutineReflection.wrapper().proxyOf(instance(test), (Class<?>) null);
 
       fail();
 
@@ -831,7 +805,7 @@ public class ReflectionRoutineTest {
 
     try {
 
-      JRoutineReflection.with(instance(test)).buildProxy((ClassToken<?>) null);
+      JRoutineReflection.wrapper().proxyOf(instance(test), (ClassToken<?>) null);
 
       fail();
 
@@ -845,14 +819,13 @@ public class ReflectionRoutineTest {
 
     final DurationMeasure timeout = seconds(1);
     final TestStatic test = new TestStatic();
-    final Routine<Object, Object> routine = JRoutineReflection.with(instance(test))
+    final Routine<Object, Object> routine = JRoutineReflection.wrapperOn(syncExecutor())
                                                               .withInvocation()
-                                                              .withExecutor(
-                                                                  ScheduledExecutors.syncExecutor())
                                                               .withLogLevel(Level.DEBUG)
                                                               .withLog(new NullLog())
                                                               .configured()
-                                                              .method(TestStatic.GET);
+                                                              .methodOf(instance(test),
+                                                                  TestStatic.GET);
 
     assertThat(routine.invoke().close().in(timeout).all()).containsExactly(-77L);
   }
@@ -862,41 +835,41 @@ public class ReflectionRoutineTest {
   public void testProxyAnnotations() {
 
     final Impl impl = new Impl();
-    final Itf itf = JRoutineReflection.with(instance(impl))
+    final Itf itf = JRoutineReflection.wrapper()
                                       .withInvocation()
                                       .withOutputTimeout(seconds(10))
                                       .configured()
-                                      .buildProxy(Itf.class);
+                                      .proxyOf(instance(impl), Itf.class);
 
     assertThat(itf.add0('c')).isEqualTo((int) 'c');
-    final Channel<Character, Character> channel1 = JRoutineCore.<Character>ofData().buildChannel();
+    final Channel<Character, Character> channel1 = JRoutineCore.channel().ofType();
     channel1.pass('a').close();
     assertThat(itf.add1(channel1)).isEqualTo((int) 'a');
     assertThat(itf.add3('c').all()).containsExactly((int) 'c');
-    final Channel<Character, Character> channel3 = JRoutineCore.<Character>ofData().buildChannel();
+    final Channel<Character, Character> channel3 = JRoutineCore.channel().ofType();
     channel3.pass('a').close();
     assertThat(itf.add4(channel3).all()).containsExactly((int) 'a');
     assertThat(itf.add6().pass('d').close().all()).containsOnly((int) 'd');
     assertThat(itf.add10().invoke().pass('d').close().all()).containsOnly((int) 'd');
     assertThat(itf.addA00(new char[]{'c', 'z'})).isEqualTo(new int[]{'c', 'z'});
-    final Channel<char[], char[]> channel5 = JRoutineCore.<char[]>ofData().buildChannel();
+    final Channel<char[], char[]> channel5 = JRoutineCore.channel().ofType();
     channel5.pass(new char[]{'a', 'z'}).close();
     assertThat(itf.addA01(channel5)).isEqualTo(new int[]{'a', 'z'});
-    final Channel<Character, Character> channel6 = JRoutineCore.<Character>ofData().buildChannel();
+    final Channel<Character, Character> channel6 = JRoutineCore.channel().ofType();
     channel6.pass('d', 'e', 'f').close();
     assertThat(itf.addA02(channel6)).isEqualTo(new int[]{'d', 'e', 'f'});
     assertThat(itf.addA04(new char[]{'c', 'z'}).all()).containsExactly(new int[]{'c', 'z'});
-    final Channel<char[], char[]> channel8 = JRoutineCore.<char[]>ofData().buildChannel();
+    final Channel<char[], char[]> channel8 = JRoutineCore.channel().ofType();
     channel8.pass(new char[]{'a', 'z'}).close();
     assertThat(itf.addA05(channel8).all()).containsExactly(new int[]{'a', 'z'});
-    final Channel<Character, Character> channel9 = JRoutineCore.<Character>ofData().buildChannel();
+    final Channel<Character, Character> channel9 = JRoutineCore.channel().ofType();
     channel9.pass('d', 'e', 'f').close();
     assertThat(itf.addA06(channel9).all()).containsExactly(new int[]{'d', 'e', 'f'});
     assertThat(itf.addA08(new char[]{'c', 'z'}).all()).containsExactly((int) 'c', (int) 'z');
-    final Channel<char[], char[]> channel11 = JRoutineCore.<char[]>ofData().buildChannel();
+    final Channel<char[], char[]> channel11 = JRoutineCore.channel().ofType();
     channel11.pass(new char[]{'a', 'z'}).close();
     assertThat(itf.addA09(channel11).all()).containsExactly((int) 'a', (int) 'z');
-    final Channel<Character, Character> channel12 = JRoutineCore.<Character>ofData().buildChannel();
+    final Channel<Character, Character> channel12 = JRoutineCore.channel().ofType();
     channel12.pass('d', 'e', 'f').close();
     assertThat(itf.addA10(channel12).all()).containsExactly((int) 'd', (int) 'e', (int) 'f');
     assertThat(itf.addA12().pass(new char[]{'c', 'z'}).close().all()).containsOnly(
@@ -908,29 +881,26 @@ public class ReflectionRoutineTest {
     assertThat(itf.addA18().invoke().pass(new char[]{'c', 'z'}).close().all()).containsExactly(
         (int) 'c', (int) 'z');
     assertThat(itf.addL00(Arrays.asList('c', 'z'))).isEqualTo(Arrays.asList((int) 'c', (int) 'z'));
-    final Channel<List<Character>, List<Character>> channel20 =
-        JRoutineCore.<List<Character>>ofData().buildChannel();
+    final Channel<List<Character>, List<Character>> channel20 = JRoutineCore.channel().ofType();
     channel20.pass(Arrays.asList('a', 'z')).close();
     assertThat(itf.addL01(channel20)).isEqualTo(Arrays.asList((int) 'a', (int) 'z'));
-    final Channel<Character, Character> channel21 = JRoutineCore.<Character>ofData().buildChannel();
+    final Channel<Character, Character> channel21 = JRoutineCore.channel().ofType();
     channel21.pass('d', 'e', 'f').close();
     assertThat(itf.addL02(channel21)).isEqualTo(Arrays.asList((int) 'd', (int) 'e', (int) 'f'));
     assertThat(itf.addL04(Arrays.asList('c', 'z')).all()).containsExactly(
         Arrays.asList((int) 'c', (int) 'z'));
-    final Channel<List<Character>, List<Character>> channel23 =
-        JRoutineCore.<List<Character>>ofData().buildChannel();
+    final Channel<List<Character>, List<Character>> channel23 = JRoutineCore.channel().ofType();
     channel23.pass(Arrays.asList('a', 'z')).close();
     assertThat(itf.addL05(channel23).all()).containsExactly(Arrays.asList((int) 'a', (int) 'z'));
-    final Channel<Character, Character> channel24 = JRoutineCore.<Character>ofData().buildChannel();
+    final Channel<Character, Character> channel24 = JRoutineCore.channel().ofType();
     channel24.pass('d', 'e', 'f').close();
     assertThat(itf.addL06(channel24).all()).containsExactly(
         Arrays.asList((int) 'd', (int) 'e', (int) 'f'));
     assertThat(itf.addL08(Arrays.asList('c', 'z')).all()).containsExactly((int) 'c', (int) 'z');
-    final Channel<List<Character>, List<Character>> channel26 =
-        JRoutineCore.<List<Character>>ofData().buildChannel();
+    final Channel<List<Character>, List<Character>> channel26 = JRoutineCore.channel().ofType();
     channel26.pass(Arrays.asList('a', 'z')).close();
     assertThat(itf.addL09(channel26).all()).containsExactly((int) 'a', (int) 'z');
-    final Channel<Character, Character> channel27 = JRoutineCore.<Character>ofData().buildChannel();
+    final Channel<Character, Character> channel27 = JRoutineCore.channel().ofType();
     channel27.pass('d', 'e', 'f').close();
     assertThat(itf.addL10(channel27).all()).containsExactly((int) 'd', (int) 'e', (int) 'f');
     assertThat(itf.addL12().pass(Arrays.asList('c', 'z')).close().all()).containsOnly(
@@ -958,26 +928,25 @@ public class ReflectionRoutineTest {
     assertThat(itf.getL4().close().all()).containsExactly(1, 2, 3);
     assertThat(itf.getL5().invoke().close().all()).containsExactly(1, 2, 3);
     itf.set0(-17);
-    final Channel<Integer, Integer> channel35 = JRoutineCore.<Integer>ofData().buildChannel();
+    final Channel<Integer, Integer> channel35 = JRoutineCore.channel().ofType();
     channel35.pass(-17).close();
     itf.set1(channel35);
     itf.set3().pass(-17).close().getComplete();
     itf.set5().invoke().pass(-17).close().getComplete();
     itf.setA0(new int[]{1, 2, 3});
-    final Channel<int[], int[]> channel37 = JRoutineCore.<int[]>ofData().buildChannel();
+    final Channel<int[], int[]> channel37 = JRoutineCore.channel().ofType();
     channel37.pass(new int[]{1, 2, 3}).close();
     itf.setA1(channel37);
-    final Channel<Integer, Integer> channel38 = JRoutineCore.<Integer>ofData().buildChannel();
+    final Channel<Integer, Integer> channel38 = JRoutineCore.channel().ofType();
     channel38.pass(1, 2, 3).close();
     itf.setA2(channel38);
     itf.setA4().pass(new int[]{1, 2, 3}).close().getComplete();
     itf.setA6().invoke().pass(new int[]{1, 2, 3}).close().getComplete();
     itf.setL0(Arrays.asList(1, 2, 3));
-    final Channel<List<Integer>, List<Integer>> channel40 =
-        JRoutineCore.<List<Integer>>ofData().buildChannel();
+    final Channel<List<Integer>, List<Integer>> channel40 = JRoutineCore.channel().ofType();
     channel40.pass(Arrays.asList(1, 2, 3)).close();
     itf.setL1(channel40);
-    final Channel<Integer, Integer> channel41 = JRoutineCore.<Integer>ofData().buildChannel();
+    final Channel<Integer, Integer> channel41 = JRoutineCore.channel().ofType();
     channel41.pass(1, 2, 3).close();
     itf.setL2(channel41);
     itf.setL4().pass(Arrays.asList(1, 2, 3)).close().getComplete();
@@ -988,13 +957,12 @@ public class ReflectionRoutineTest {
   @SuppressWarnings("NullArgumentToVariableArgMethod")
   public void testProxyRoutine() {
 
-    final DurationMeasure timeout = seconds(1);
     final Square square = new Square();
     final SquareItf squareAsync =
-        JRoutineReflection.with(instance(square)).buildProxy(SquareItf.class);
+        JRoutineReflection.wrapper().proxyOf(instance(square), SquareItf.class);
     assertThat(squareAsync.compute(3)).isEqualTo(9);
 
-    final Channel<Integer, Integer> channel1 = JRoutineCore.<Integer>ofData().buildChannel();
+    final Channel<Integer, Integer> channel1 = JRoutineCore.channel().ofType();
     channel1.pass(4).close();
     assertThat(squareAsync.computeAsync(channel1)).isEqualTo(16);
   }
@@ -1004,72 +972,62 @@ public class ReflectionRoutineTest {
 
     final TestClass test = new TestClass();
     final NullLog nullLog = new NullLog();
-    final Routine<Object, Object> routine1 = JRoutineReflection.with(instance(test))
+    final Routine<Object, Object> routine1 = JRoutineReflection.wrapperOn(syncExecutor())
                                                                .withInvocation()
-                                                               .withExecutor(
-                                                                   ScheduledExecutors
-                                                                       .syncExecutor())
                                                                .withCoreInvocations(16)
                                                                .withLogLevel(Level.DEBUG)
                                                                .withLog(nullLog)
                                                                .configured()
-                                                               .method(TestClass.GET);
+                                                               .methodOf(instance(test),
+                                                                   TestClass.GET);
 
     assertThat(routine1.invoke().close().all()).containsExactly(-77L);
 
-    final Routine<Object, Object> routine2 = JRoutineReflection.with(instance(test))
+    final Routine<Object, Object> routine2 = JRoutineReflection.wrapperOn(syncExecutor())
                                                                .withInvocation()
-                                                               .withExecutor(
-                                                                   ScheduledExecutors
-                                                                       .syncExecutor())
                                                                .withCoreInvocations(16)
                                                                .withLogLevel(Level.DEBUG)
                                                                .withLog(nullLog)
                                                                .configured()
-                                                               .method(TestClass.GET);
+                                                               .methodOf(instance(test),
+                                                                   TestClass.GET);
 
     assertThat(routine2.invoke().close().all()).containsExactly(-77L);
     assertThat(routine1).isEqualTo(routine2);
 
-    final Routine<Object, Object> routine3 = JRoutineReflection.with(instance(test))
+    final Routine<Object, Object> routine3 = JRoutineReflection.wrapperOn(syncExecutor())
                                                                .withInvocation()
-                                                               .withExecutor(
-                                                                   ScheduledExecutors
-                                                                       .syncExecutor())
                                                                .withCoreInvocations(32)
                                                                .withLogLevel(Level.DEBUG)
                                                                .withLog(nullLog)
                                                                .configured()
-                                                               .method(TestClass.GET);
+                                                               .methodOf(instance(test),
+                                                                   TestClass.GET);
 
     assertThat(routine3.invoke().close().all()).containsExactly(-77L);
     assertThat(routine1).isNotEqualTo(routine3);
     assertThat(routine2).isNotEqualTo(routine3);
 
-    final Routine<Object, Object> routine4 = JRoutineReflection.with(instance(test))
+    final Routine<Object, Object> routine4 = JRoutineReflection.wrapperOn(syncExecutor())
                                                                .withInvocation()
-                                                               .withExecutor(
-                                                                   ScheduledExecutors
-                                                                       .syncExecutor())
                                                                .withCoreInvocations(32)
                                                                .withLogLevel(Level.WARNING)
                                                                .withLog(nullLog)
                                                                .configured()
-                                                               .method(TestClass.GET);
+                                                               .methodOf(instance(test),
+                                                                   TestClass.GET);
 
     assertThat(routine4.invoke().close().all()).containsExactly(-77L);
     assertThat(routine3).isNotEqualTo(routine4);
 
-    final Routine<Object, Object> routine5 = JRoutineReflection.with(instance(test))
+    final Routine<Object, Object> routine5 = JRoutineReflection.wrapperOn(syncExecutor())
                                                                .withInvocation()
-                                                               .withExecutor(
-                                                                   ScheduledExecutors
-                                                                       .syncExecutor())
                                                                .withCoreInvocations(32)
                                                                .withLogLevel(Level.WARNING)
                                                                .withLog(new NullLog())
                                                                .configured()
-                                                               .method(TestClass.GET);
+                                                               .methodOf(instance(test),
+                                                                   TestClass.GET);
 
     assertThat(routine5.invoke().close().all()).containsExactly(-77L);
     assertThat(routine4).isNotEqualTo(routine5);
@@ -1079,72 +1037,67 @@ public class ReflectionRoutineTest {
   public void testRoutineCache2() {
 
     final NullLog nullLog = new NullLog();
-    final Routine<Object, Object> routine1 = JRoutineReflection.with(classOfType(TestStatic.class))
+    final Routine<Object, Object> routine1 = JRoutineReflection.wrapperOn(syncExecutor())
                                                                .withInvocation()
-                                                               .withExecutor(
-                                                                   ScheduledExecutors
-                                                                       .syncExecutor())
                                                                .withCoreInvocations(16)
                                                                .withLogLevel(Level.DEBUG)
                                                                .withLog(nullLog)
                                                                .configured()
-                                                               .method(TestStatic.GET);
+                                                               .methodOf(
+                                                                   classOfType(TestStatic.class),
+                                                                   TestStatic.GET);
 
     assertThat(routine1.invoke().close().all()).containsExactly(-77L);
 
-    final Routine<Object, Object> routine2 = JRoutineReflection.with(classOfType(TestStatic.class))
+    final Routine<Object, Object> routine2 = JRoutineReflection.wrapperOn(syncExecutor())
                                                                .withInvocation()
-                                                               .withExecutor(
-                                                                   ScheduledExecutors
-                                                                       .syncExecutor())
                                                                .withCoreInvocations(16)
                                                                .withLogLevel(Level.DEBUG)
                                                                .withLog(nullLog)
                                                                .configured()
-                                                               .method(TestStatic.GET);
+                                                               .methodOf(
+                                                                   classOfType(TestStatic.class),
+                                                                   TestStatic.GET);
 
     assertThat(routine2.invoke().close().all()).containsExactly(-77L);
     assertThat(routine1).isEqualTo(routine2);
 
-    final Routine<Object, Object> routine3 = JRoutineReflection.with(classOfType(TestStatic.class))
+    final Routine<Object, Object> routine3 = JRoutineReflection.wrapperOn(syncExecutor())
                                                                .withInvocation()
-                                                               .withExecutor(
-                                                                   ScheduledExecutors
-                                                                       .syncExecutor())
                                                                .withCoreInvocations(32)
                                                                .withLogLevel(Level.DEBUG)
                                                                .withLog(nullLog)
                                                                .configured()
-                                                               .method(TestStatic.GET);
+                                                               .methodOf(
+                                                                   classOfType(TestStatic.class),
+                                                                   TestStatic.GET);
 
     assertThat(routine3.invoke().close().all()).containsExactly(-77L);
     assertThat(routine1).isNotEqualTo(routine3);
     assertThat(routine2).isNotEqualTo(routine3);
 
-    final Routine<Object, Object> routine4 = JRoutineReflection.with(classOfType(TestStatic.class))
+    final Routine<Object, Object> routine4 = JRoutineReflection.wrapperOn(syncExecutor())
                                                                .withInvocation()
-                                                               .withExecutor(
-                                                                   ScheduledExecutors
-                                                                       .syncExecutor())
                                                                .withCoreInvocations(32)
                                                                .withLogLevel(Level.WARNING)
                                                                .withLog(nullLog)
                                                                .configured()
-                                                               .method(TestStatic.GET);
+                                                               .methodOf(
+                                                                   classOfType(TestStatic.class),
+                                                                   TestStatic.GET);
 
     assertThat(routine4.invoke().close().all()).containsExactly(-77L);
     assertThat(routine3).isNotEqualTo(routine4);
 
-    final Routine<Object, Object> routine5 = JRoutineReflection.with(classOfType(TestStatic.class))
+    final Routine<Object, Object> routine5 = JRoutineReflection.wrapperOn(syncExecutor())
                                                                .withInvocation()
-                                                               .withExecutor(
-                                                                   ScheduledExecutors
-                                                                       .syncExecutor())
                                                                .withCoreInvocations(32)
                                                                .withLogLevel(Level.WARNING)
                                                                .withLog(new NullLog())
                                                                .configured()
-                                                               .method(TestStatic.GET);
+                                                               .methodOf(
+                                                                   classOfType(TestStatic.class),
+                                                                   TestStatic.GET);
 
     assertThat(routine5.invoke().close().all()).containsExactly(-77L);
     assertThat(routine4).isNotEqualTo(routine5);
@@ -1154,16 +1107,22 @@ public class ReflectionRoutineTest {
   public void testSharedFields() throws NoSuchMethodException {
 
     final TestClass2 test2 = new TestClass2();
-    final ReflectionRoutineBuilder builder = JRoutineReflection.with(instance(test2))
-                                                               .withInvocation()
-                                                               .withOutputTimeout(seconds(2))
-                                                               .configured();
+    final ReflectionRoutineBuilder builder =
+        JRoutineReflection.wrapper().withInvocation().withOutputTimeout(seconds(2)).configured();
     long startTime = System.currentTimeMillis();
 
-    Channel<?, Object> getOne =
-        builder.wrapperConfiguration().withSharedFields().apply().method("getOne").invoke().close();
-    Channel<?, Object> getTwo =
-        builder.wrapperConfiguration().withSharedFields().apply().method("getTwo").invoke().close();
+    Channel<?, Object> getOne = builder.withWrapper()
+                                       .withSharedFields()
+                                       .configured()
+                                       .methodOf(instance(test2), "getOne")
+                                       .invoke()
+                                       .close();
+    Channel<?, Object> getTwo = builder.withWrapper()
+                                       .withSharedFields()
+                                       .configured()
+                                       .methodOf(instance(test2), "getTwo")
+                                       .invoke()
+                                       .close();
 
     assertThat(getOne.getComplete()).isTrue();
     assertThat(getTwo.getComplete()).isTrue();
@@ -1171,16 +1130,16 @@ public class ReflectionRoutineTest {
 
     startTime = System.currentTimeMillis();
 
-    getOne = builder.wrapperConfiguration()
+    getOne = builder.withWrapper()
                     .withSharedFields("1")
-                    .apply()
-                    .method("getOne")
+                    .configured()
+                    .methodOf(instance(test2), "getOne")
                     .invoke()
                     .close();
-    getTwo = builder.wrapperConfiguration()
+    getTwo = builder.withWrapper()
                     .withSharedFields("2")
-                    .apply()
-                    .method("getTwo")
+                    .configured()
+                    .methodOf(instance(test2), "getTwo")
                     .invoke()
                     .close();
 
@@ -1190,8 +1149,8 @@ public class ReflectionRoutineTest {
 
     startTime = System.currentTimeMillis();
 
-    getOne = builder.method("getOne").invoke().close();
-    getTwo = builder.method("getTwo").invoke().close();
+    getOne = builder.methodOf(instance(test2), "getOne").invoke().close();
+    getTwo = builder.methodOf(instance(test2), "getTwo").invoke().close();
 
     assertThat(getOne.getComplete()).isTrue();
     assertThat(getTwo.getComplete()).isTrue();
@@ -1202,15 +1161,17 @@ public class ReflectionRoutineTest {
   public void testSharedFields2() throws NoSuchMethodException {
 
     final TestClass2 test2 = new TestClass2();
-    final ReflectionRoutineBuilder builder = JRoutineReflection.with(instance(test2))
-                                                               .withInvocation()
-                                                               .withOutputTimeout(seconds(2))
-                                                               .configured();
+    final ReflectionRoutineBuilder builder =
+        JRoutineReflection.wrapper().withInvocation().withOutputTimeout(seconds(2)).configured();
     long startTime = System.currentTimeMillis();
 
-    Channel<?, Object> getOne = builder.method("getOne").invoke().close();
-    Channel<?, Object> getTwo =
-        builder.wrapperConfiguration().withSharedFields().apply().method("getTwo").invoke().close();
+    Channel<?, Object> getOne = builder.methodOf(instance(test2), "getOne").invoke().close();
+    Channel<?, Object> getTwo = builder.withWrapper()
+                                       .withSharedFields()
+                                       .configured()
+                                       .methodOf(instance(test2), "getTwo")
+                                       .invoke()
+                                       .close();
 
     assertThat(getOne.getComplete()).isTrue();
     assertThat(getTwo.getComplete()).isTrue();
@@ -1218,14 +1179,18 @@ public class ReflectionRoutineTest {
 
     startTime = System.currentTimeMillis();
 
-    getOne = builder.wrapperConfiguration()
+    getOne = builder.withWrapper()
                     .withSharedFields("1", "2")
-                    .apply()
-                    .method("getOne")
+                    .configured()
+                    .methodOf(instance(test2), "getOne")
                     .invoke()
                     .close();
-    getTwo =
-        builder.wrapperConfiguration().withSharedFields().apply().method("getTwo").invoke().close();
+    getTwo = builder.withWrapper()
+                    .withSharedFields()
+                    .configured()
+                    .methodOf(instance(test2), "getTwo")
+                    .invoke()
+                    .close();
 
     assertThat(getOne.getComplete()).isTrue();
     assertThat(getTwo.getComplete()).isTrue();
@@ -1233,13 +1198,13 @@ public class ReflectionRoutineTest {
 
     startTime = System.currentTimeMillis();
 
-    getOne = builder.wrapperConfiguration()
+    getOne = builder.withWrapper()
                     .withSharedFields("1", "2")
-                    .apply()
-                    .method("getOne")
+                    .configured()
+                    .methodOf(instance(test2), "getOne")
                     .invoke()
                     .close();
-    getTwo = builder.method("getTwo").invoke().close();
+    getTwo = builder.methodOf(instance(test2), "getTwo").invoke().close();
 
     assertThat(getOne.getComplete()).isTrue();
     assertThat(getTwo.getComplete()).isTrue();
@@ -1247,16 +1212,16 @@ public class ReflectionRoutineTest {
 
     startTime = System.currentTimeMillis();
 
-    getOne = builder.wrapperConfiguration()
+    getOne = builder.withWrapper()
                     .withSharedFields("1", "2")
-                    .apply()
-                    .method("getOne")
+                    .configured()
+                    .methodOf(instance(test2), "getOne")
                     .invoke()
                     .close();
-    getTwo = builder.wrapperConfiguration()
+    getTwo = builder.withWrapper()
                     .withSharedFields("2")
-                    .apply()
-                    .method("getTwo")
+                    .configured()
+                    .methodOf(instance(test2), "getTwo")
                     .invoke()
                     .close();
 
@@ -1268,16 +1233,22 @@ public class ReflectionRoutineTest {
   @Test
   public void testSharedFieldsStatic() throws NoSuchMethodException {
 
-    final ReflectionRoutineBuilder builder = JRoutineReflection.with(classOfType(TestStatic2.class))
-                                                               .withInvocation()
-                                                               .withOutputTimeout(seconds(2))
-                                                               .configured();
+    final ReflectionRoutineBuilder builder =
+        JRoutineReflection.wrapper().withInvocation().withOutputTimeout(seconds(2)).configured();
     long startTime = System.currentTimeMillis();
 
-    Channel<?, Object> getOne =
-        builder.wrapperConfiguration().withSharedFields().apply().method("getOne").invoke().close();
-    Channel<?, Object> getTwo =
-        builder.wrapperConfiguration().withSharedFields().apply().method("getTwo").invoke().close();
+    Channel<?, Object> getOne = builder.withWrapper()
+                                       .withSharedFields()
+                                       .configured()
+                                       .methodOf(classOfType(TestStatic2.class), "getOne")
+                                       .invoke()
+                                       .close();
+    Channel<?, Object> getTwo = builder.withWrapper()
+                                       .withSharedFields()
+                                       .configured()
+                                       .methodOf(classOfType(TestStatic2.class), "getTwo")
+                                       .invoke()
+                                       .close();
 
     assertThat(getOne.getComplete()).isTrue();
     assertThat(getTwo.getComplete()).isTrue();
@@ -1285,16 +1256,16 @@ public class ReflectionRoutineTest {
 
     startTime = System.currentTimeMillis();
 
-    getOne = builder.wrapperConfiguration()
+    getOne = builder.withWrapper()
                     .withSharedFields("1")
-                    .apply()
-                    .method("getOne")
+                    .configured()
+                    .methodOf(classOfType(TestStatic2.class), "getOne")
                     .invoke()
                     .close();
-    getTwo = builder.wrapperConfiguration()
+    getTwo = builder.withWrapper()
                     .withSharedFields("2")
-                    .apply()
-                    .method("getTwo")
+                    .configured()
+                    .methodOf(classOfType(TestStatic2.class), "getTwo")
                     .invoke()
                     .close();
 
@@ -1304,8 +1275,8 @@ public class ReflectionRoutineTest {
 
     startTime = System.currentTimeMillis();
 
-    getOne = builder.method("getOne").invoke().close();
-    getTwo = builder.method("getTwo").invoke().close();
+    getOne = builder.methodOf(classOfType(TestStatic2.class), "getOne").invoke().close();
+    getTwo = builder.methodOf(classOfType(TestStatic2.class), "getTwo").invoke().close();
 
     assertThat(getOne.getComplete()).isTrue();
     assertThat(getTwo.getComplete()).isTrue();
@@ -1315,15 +1286,18 @@ public class ReflectionRoutineTest {
   @Test
   public void testSharedFieldsStatic2() throws NoSuchMethodException {
 
-    final ReflectionRoutineBuilder builder = JRoutineReflection.with(classOfType(TestStatic2.class))
-                                                               .withInvocation()
-                                                               .withOutputTimeout(seconds(2))
-                                                               .configured();
+    final ReflectionRoutineBuilder builder =
+        JRoutineReflection.wrapper().withInvocation().withOutputTimeout(seconds(2)).configured();
     long startTime = System.currentTimeMillis();
 
-    Channel<?, Object> getOne = builder.method("getOne").invoke().close();
-    Channel<?, Object> getTwo =
-        builder.wrapperConfiguration().withSharedFields().apply().method("getTwo").invoke().close();
+    Channel<?, Object> getOne =
+        builder.methodOf(classOfType(TestStatic2.class), "getOne").invoke().close();
+    Channel<?, Object> getTwo = builder.withWrapper()
+                                       .withSharedFields()
+                                       .configured()
+                                       .methodOf(classOfType(TestStatic2.class), "getTwo")
+                                       .invoke()
+                                       .close();
 
     assertThat(getOne.getComplete()).isTrue();
     assertThat(getTwo.getComplete()).isTrue();
@@ -1331,14 +1305,18 @@ public class ReflectionRoutineTest {
 
     startTime = System.currentTimeMillis();
 
-    getOne = builder.wrapperConfiguration()
+    getOne = builder.withWrapper()
                     .withSharedFields("1", "2")
-                    .apply()
-                    .method("getOne")
+                    .configured()
+                    .methodOf(classOfType(TestStatic2.class), "getOne")
                     .invoke()
                     .close();
-    getTwo =
-        builder.wrapperConfiguration().withSharedFields().apply().method("getTwo").invoke().close();
+    getTwo = builder.withWrapper()
+                    .withSharedFields()
+                    .configured()
+                    .methodOf(classOfType(TestStatic2.class), "getTwo")
+                    .invoke()
+                    .close();
 
     assertThat(getOne.getComplete()).isTrue();
     assertThat(getTwo.getComplete()).isTrue();
@@ -1346,13 +1324,13 @@ public class ReflectionRoutineTest {
 
     startTime = System.currentTimeMillis();
 
-    getOne = builder.wrapperConfiguration()
+    getOne = builder.withWrapper()
                     .withSharedFields("1", "2")
-                    .apply()
-                    .method("getOne")
+                    .configured()
+                    .methodOf(classOfType(TestStatic2.class), "getOne")
                     .invoke()
                     .close();
-    getTwo = builder.method("getTwo").invoke().close();
+    getTwo = builder.methodOf(classOfType(TestStatic2.class), "getTwo").invoke().close();
 
     assertThat(getOne.getComplete()).isTrue();
     assertThat(getTwo.getComplete()).isTrue();
@@ -1360,16 +1338,16 @@ public class ReflectionRoutineTest {
 
     startTime = System.currentTimeMillis();
 
-    getOne = builder.wrapperConfiguration()
+    getOne = builder.withWrapper()
                     .withSharedFields("1", "2")
-                    .apply()
-                    .method("getOne")
+                    .configured()
+                    .methodOf(classOfType(TestStatic2.class), "getOne")
                     .invoke()
                     .close();
-    getTwo = builder.wrapperConfiguration()
+    getTwo = builder.withWrapper()
                     .withSharedFields("2")
-                    .apply()
-                    .method("getTwo")
+                    .configured()
+                    .methodOf(classOfType(TestStatic2.class), "getTwo")
                     .invoke()
                     .close();
 
@@ -1382,19 +1360,18 @@ public class ReflectionRoutineTest {
   public void testStaticMethod() throws NoSuchMethodException {
 
     final DurationMeasure timeout = seconds(1);
-    final Routine<Object, Object> routine2 = JRoutineReflection.with(classOfType(TestStatic.class))
+    final Routine<Object, Object> routine2 = JRoutineReflection.wrapperOn(syncExecutor())
                                                                .withInvocation()
-                                                               .withExecutor(
-                                                                   ScheduledExecutors
-                                                                       .syncExecutor())
                                                                .withMaxInvocations(1)
                                                                .withCoreInvocations(0)
                                                                .configured()
-                                                               .wrapperConfiguration()
+                                                               .withWrapper()
                                                                .withSharedFields("test")
-                                                               .apply()
-                                                               .method(TestStatic.class.getMethod(
-                                                                   "getLong"));
+                                                               .configured()
+                                                               .methodOf(
+                                                                   classOfType(TestStatic.class),
+                                                                   TestStatic.class.getMethod(
+                                                                       "getLong"));
 
     assertThat(routine2.invoke().close().in(timeout).all()).containsExactly(-77L);
   }
@@ -1403,14 +1380,13 @@ public class ReflectionRoutineTest {
   public void testStaticMethodBySignature() throws NoSuchMethodException {
 
     final DurationMeasure timeout = seconds(1);
-    final Routine<Object, Object> routine1 = JRoutineReflection.with(classOfType(TestStatic.class))
+    final Routine<Object, Object> routine1 = JRoutineReflection.wrapperOn(syncExecutor())
                                                                .withInvocation()
-                                                               .withExecutor(
-                                                                   ScheduledExecutors
-                                                                       .syncExecutor())
                                                                .withMaxInvocations(1)
                                                                .configured()
-                                                               .method("getLong");
+                                                               .methodOf(
+                                                                   classOfType(TestStatic.class),
+                                                                   "getLong");
 
     assertThat(routine1.invoke().close().in(timeout).all()).containsExactly(-77L);
   }
@@ -1420,7 +1396,7 @@ public class ReflectionRoutineTest {
 
     try {
 
-      JRoutineReflection.with(classOfType(TestStatic.class)).method("test");
+      JRoutineReflection.wrapper().methodOf(classOfType(TestStatic2.class), "test");
 
       fail();
 
@@ -1433,22 +1409,22 @@ public class ReflectionRoutineTest {
   public void testTimeoutActionAnnotation() throws NoSuchMethodException {
 
     final TestTimeout testTimeout = new TestTimeout();
-    assertThat(JRoutineReflection.with(instance(testTimeout))
+    assertThat(JRoutineReflection.wrapper()
                                  .withInvocation()
                                  .withOutputTimeout(seconds(1))
                                  .configured()
-                                 .method("test")
+                                 .methodOf(instance(testTimeout), "test")
                                  .invoke()
                                  .close()
                                  .next()).isEqualTo(31);
 
     try {
 
-      JRoutineReflection.with(instance(testTimeout))
+      JRoutineReflection.wrapper()
                         .withInvocation()
                         .withOutputTimeoutAction(TimeoutActionType.FAIL)
                         .configured()
-                        .method("test")
+                        .methodOf(instance(testTimeout), "test")
                         .invoke()
                         .close()
                         .next();
@@ -1459,22 +1435,22 @@ public class ReflectionRoutineTest {
 
     }
 
-    assertThat(JRoutineReflection.with(instance(testTimeout))
+    assertThat(JRoutineReflection.wrapper()
                                  .withInvocation()
                                  .withOutputTimeout(seconds(1))
                                  .configured()
-                                 .method("getInt")
+                                 .methodOf(instance(testTimeout), "getInt")
                                  .invoke()
                                  .close()
                                  .next()).isEqualTo(31);
 
     try {
 
-      JRoutineReflection.with(instance(testTimeout))
+      JRoutineReflection.wrapper()
                         .withInvocation()
                         .withOutputTimeoutAction(TimeoutActionType.FAIL)
                         .configured()
-                        .method("getInt")
+                        .methodOf(instance(testTimeout), "getInt")
                         .invoke()
                         .close()
                         .next();
@@ -1485,22 +1461,23 @@ public class ReflectionRoutineTest {
 
     }
 
-    assertThat(JRoutineReflection.with(instance(testTimeout))
+    assertThat(JRoutineReflection.wrapper()
                                  .withInvocation()
                                  .withOutputTimeout(seconds(1))
                                  .configured()
-                                 .method(TestTimeout.class.getMethod("getInt"))
+                                 .methodOf(instance(testTimeout),
+                                     TestTimeout.class.getMethod("getInt"))
                                  .invoke()
                                  .close()
                                  .next()).isEqualTo(31);
 
     try {
 
-      JRoutineReflection.with(instance(testTimeout))
+      JRoutineReflection.wrapper()
                         .withInvocation()
                         .withOutputTimeoutAction(TimeoutActionType.FAIL)
                         .configured()
-                        .method(TestTimeout.class.getMethod("getInt"))
+                        .methodOf(instance(testTimeout), TestTimeout.class.getMethod("getInt"))
                         .invoke()
                         .close()
                         .next();
@@ -1511,20 +1488,20 @@ public class ReflectionRoutineTest {
 
     }
 
-    assertThat(JRoutineReflection.with(instance(testTimeout))
+    assertThat(JRoutineReflection.wrapper()
                                  .withInvocation()
                                  .withOutputTimeout(seconds(1))
                                  .configured()
-                                 .buildProxy(TestTimeoutItf.class)
+                                 .proxyOf(instance(testTimeout), TestTimeoutItf.class)
                                  .getInt()).isEqualTo(31);
 
     try {
 
-      JRoutineReflection.with(instance(testTimeout))
+      JRoutineReflection.wrapper()
                         .withInvocation()
                         .withOutputTimeoutAction(TimeoutActionType.FAIL)
                         .configured()
-                        .buildProxy(TestTimeoutItf.class)
+                        .proxyOf(instance(testTimeout), TestTimeoutItf.class)
                         .getInt();
 
       fail();
@@ -1540,7 +1517,6 @@ public class ReflectionRoutineTest {
     @InputBackoff(InBackoff.class)
     @InputMaxSize(33)
     @InputOrder(OrderType.UNSORTED)
-    @ExecutorType(MyExecutor.class)
     @LogLevel(Level.WARNING)
     @LogType(MyLog.class)
     @MaxInvocations(17)
@@ -2047,24 +2023,6 @@ public class ReflectionRoutineTest {
 
     public InBackoff() {
       super(BackoffBuilder.afterCount(71).linearDelay(7777, TimeUnit.MICROSECONDS));
-    }
-  }
-
-  public static class MyExecutor extends ScheduledExecutorDecorator {
-
-    public MyExecutor() {
-      super(ScheduledExecutors.syncExecutor());
-    }
-
-    @Override
-    public int hashCode() {
-      return MyExecutor.class.hashCode();
-    }
-
-    @Override
-    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
-    public boolean equals(final Object obj) {
-      return (obj instanceof MyExecutor);
     }
   }
 

@@ -92,19 +92,6 @@ public abstract class AbstractStatefulRoutineBuilder<IN, OUT, STATE, TYPE extend
 
   @NotNull
   @SuppressWarnings("unchecked")
-  public TYPE withConfiguration(@NotNull final InvocationConfiguration configuration) {
-    mConfiguration = ConstantConditions.notNull("invocation configuration", configuration);
-    return (TYPE) this;
-  }
-
-  @NotNull
-  @SuppressWarnings("unchecked")
-  public Builder<? extends TYPE> withInvocation() {
-    return new Builder<TYPE>(mConfigurable, mConfiguration);
-  }
-
-  @NotNull
-  @SuppressWarnings("unchecked")
   public TYPE onComplete(
       @NotNull final BiFunction<? super STATE, ? super Channel<OUT, ?>, ? extends STATE>
           onComplete) {
@@ -257,12 +244,17 @@ public abstract class AbstractStatefulRoutineBuilder<IN, OUT, STATE, TYPE extend
     return (TYPE) this;
   }
 
-  public void clear() {
+  @NotNull
+  @SuppressWarnings("unchecked")
+  public TYPE withConfiguration(@NotNull final InvocationConfiguration configuration) {
+    mConfiguration = ConstantConditions.notNull("invocation configuration", configuration);
+    return (TYPE) this;
   }
 
   @NotNull
-  public Channel<IN, OUT> invoke() {
-    return buildRoutine().invoke();
+  @SuppressWarnings("unchecked")
+  public Builder<? extends TYPE> withInvocation() {
+    return new Builder<TYPE>(mConfigurable, mConfiguration);
   }
 
   /**

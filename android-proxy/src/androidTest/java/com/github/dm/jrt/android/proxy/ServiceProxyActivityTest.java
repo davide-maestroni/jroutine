@@ -240,9 +240,9 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
                                        .serviceConfiguration()
                                        .withExecutorClass(MyExecutor.class)
                                        .apply()
-                                       .wrapperConfiguration()
+                                       .withWrapper()
                                        .withSharedFields()
-                                       .apply()
+                                       .configured()
                                        .buildProxy();
 
     assertThat(testProxy.getOne().next()).isEqualTo(1);
@@ -262,9 +262,9 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
                                    .serviceConfiguration()
                                    .withExecutorClass(MyExecutor.class)
                                    .apply()
-                                   .wrapperConfiguration()
+                                   .withWrapper()
                                    .withSharedFields()
-                                   .apply()
+                                   .configured()
                                    .buildProxy(ClassToken.tokenOf(TestProxy.class))).isSameAs(
         testProxy);
   }
@@ -333,14 +333,14 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
 
     long startTime = System.currentTimeMillis();
 
-    Channel<?, Integer> getOne = builder.wrapperConfiguration()
+    Channel<?, Integer> getOne = builder.withWrapper()
                                         .withSharedFields("1")
-                                        .apply()
+                                        .configured()
                                         .buildProxy(TestClassAsync.class)
                                         .getOne();
-    Channel<?, Integer> getTwo = builder.wrapperConfiguration()
+    Channel<?, Integer> getTwo = builder.withWrapper()
                                         .withSharedFields("2")
-                                        .apply()
+                                        .configured()
                                         .buildProxy(TestClassAsync.class)
                                         .getTwo();
 

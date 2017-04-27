@@ -20,6 +20,7 @@ import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.function.util.BiConsumer;
+import com.github.dm.jrt.function.util.BiConsumerDecorator;
 import com.github.dm.jrt.function.util.Supplier;
 
 import org.junit.Test;
@@ -28,7 +29,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.github.dm.jrt.function.Functions.biSink;
 import static com.github.dm.jrt.operator.AccumulateConsumerInvocation.consumerFactory;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -55,10 +55,8 @@ public class AccumulateConsumerInvocationTest {
   public void testFactory() {
 
     final BiConsumer<List<String>, List<String>> consumer = createConsumer();
-    assertThat(JRoutineCore.with(consumerFactory(consumer))
-                           .invocationConfiguration()
-                           .withExecutor(ScheduledExecutors.syncExecutor())
-                           .apply()
+    assertThat(JRoutineCore.routineOn(ScheduledExecutors.syncExecutor())
+                           .of(consumerFactory(consumer))
                            .invoke()
                            .pass(new ArrayList<String>() {{
                              add("test1");
@@ -69,18 +67,15 @@ public class AccumulateConsumerInvocationTest {
                            }})
                            .close()
                            .next()).isEqualTo(Arrays.asList("test1", "test2", "test3"));
-    assertThat(JRoutineCore.with(consumerFactory(new Supplier<List<String>>() {
+    assertThat(JRoutineCore.routineOn(ScheduledExecutors.syncExecutor())
+                           .of(consumerFactory(new Supplier<List<String>>() {
 
-      public List<String> get() {
-
-        return new ArrayList<String>() {{
-          add("test0");
-        }};
-      }
-    }, consumer))
-                           .invocationConfiguration()
-                           .withExecutor(ScheduledExecutors.syncExecutor())
-                           .apply()
+                             public List<String> get() {
+                               return new ArrayList<String>() {{
+                                 add("test0");
+                               }};
+                             }
+                           }, consumer))
                            .invoke()
                            .pass(new ArrayList<String>() {{
                              add("test1");
@@ -98,7 +93,7 @@ public class AccumulateConsumerInvocationTest {
 
     final BiConsumer<List<String>, List<String>> consumer = createConsumer();
     final InvocationFactory<List<String>, List<String>> factory = consumerFactory(consumer);
-    final BiConsumer<List<String>, List<String>> biSink = biSink();
+    final BiConsumer<List<String>, List<String>> biSink = BiConsumerDecorator.biSink();
     assertThat(factory).isEqualTo(factory);
     assertThat(factory).isEqualTo(consumerFactory(consumer));
     assertThat(consumerFactory(consumer)).isEqualTo(consumerFactory(consumer));

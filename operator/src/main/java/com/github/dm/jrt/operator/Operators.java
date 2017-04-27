@@ -16,8 +16,6 @@
 
 package com.github.dm.jrt.operator;
 
-import com.github.dm.jrt.channel.Channels;
-import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.Backoff;
 import com.github.dm.jrt.core.common.BackoffBuilder;
@@ -28,7 +26,6 @@ import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DurationMeasure;
-import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.function.util.Action;
 import com.github.dm.jrt.function.util.ActionDecorator;
 import com.github.dm.jrt.function.util.BiConsumer;
@@ -47,7 +44,10 @@ import com.github.dm.jrt.function.util.SupplierDecorator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -77,13 +77,13 @@ public class Operators {
   private static final InvocationFactory<?, ?> sMin = binary(BiFunctionDecorator.min());
 
   private static final InvocationFactory<?, ?> sNone =
-      Functions.predicateFilter(PredicateDecorator.negative());
+      new PredicateMappingInvocation<Object>(PredicateDecorator.negative());
 
   private static final InvocationFactory<?, ?> sNotNull =
-      Functions.predicateFilter(PredicateDecorator.isNotNull());
+      new PredicateMappingInvocation<Object>(PredicateDecorator.isNotNull());
 
   private static final InvocationFactory<?, ?> sNull =
-      Functions.predicateFilter(PredicateDecorator.isNull());
+      new PredicateMappingInvocation<Object>(PredicateDecorator.isNull());
 
   private static final MappingInvocation<? extends Iterable<?>, ?> sUnfoldInvocation =
       new MappingInvocation<Iterable<?>, Object>(null) {
@@ -137,7 +137,7 @@ public class Operators {
    */
   @NotNull
   public static <DATA> InvocationFactory<DATA, DATA> append(@Nullable final DATA output) {
-    return append(Channels.replayOutput(JRoutineCore.of(output).buildChannel()).buildChannel());
+    return new AppendOutputInvocation<DATA>(Collections.singletonList(output));
   }
 
   /**
@@ -149,7 +149,7 @@ public class Operators {
    */
   @NotNull
   public static <DATA> InvocationFactory<DATA, DATA> append(@Nullable final DATA... outputs) {
-    return append(Channels.replayOutput(JRoutineCore.of(outputs).buildChannel()).buildChannel());
+    return new AppendOutputInvocation<DATA>(toList(outputs));
   }
 
   /**
@@ -163,25 +163,7 @@ public class Operators {
   @NotNull
   public static <DATA> InvocationFactory<DATA, DATA> append(
       @Nullable final Iterable<? extends DATA> outputs) {
-    return append(Channels.replayOutput(JRoutineCore.of(outputs).buildChannel()).buildChannel());
-  }
-
-  /**
-   * Returns a factory of invocations appending the outputs returned by the specified channel to
-   * the invocation ones.
-   * <p>
-   * Note that the passed channel will be bound as a result of the call, so, in order to support
-   * multiple invocations, consider wrapping the channel in a replayable one, by calling the
-   * {@link Channels#replayOutput(Channel)} utility method.
-   *
-   * @param channel the output channel.
-   * @param <DATA>  the data type.
-   * @return the invocation factory instance.
-   */
-  @NotNull
-  public static <DATA> InvocationFactory<DATA, DATA> append(
-      @Nullable final Channel<?, ? extends DATA> channel) {
-    return new AppendOutputInvocation<DATA>(channel);
+    return new AppendOutputInvocation<DATA>(toList(outputs));
   }
 
   /**
@@ -337,7 +319,7 @@ public class Operators {
   @NotNull
   public static <IN, OUT> InvocationFactory<IN, OUT> castTo(
       @NotNull final Class<? extends OUT> type) {
-    return Functions.functionMapping(FunctionDecorator.castTo(type));
+    return new FunctionMappingInvocation<IN, OUT>(FunctionDecorator.castTo(type));
   }
 
   /**
@@ -464,7 +446,7 @@ public class Operators {
   @NotNull
   public static <DATA> InvocationFactory<DATA, DATA> filter(
       @NotNull final Predicate<? super DATA> filterPredicate) {
-    return Functions.predicateFilter(filterPredicate);
+    return new PredicateMappingInvocation<DATA>(PredicateDecorator.decorate(filterPredicate));
   }
 
   /**
@@ -606,7 +588,7 @@ public class Operators {
       return isNull();
     }
 
-    return Functions.predicateFilter(PredicateDecorator.isEqualTo(targetRef));
+    return filter(PredicateDecorator.isEqualTo(targetRef));
   }
 
   /**
@@ -619,7 +601,7 @@ public class Operators {
    */
   @NotNull
   public static <DATA> InvocationFactory<DATA, DATA> isInstanceOf(@NotNull final Class<?> type) {
-    return Functions.predicateFilter(PredicateDecorator.isInstanceOf(type));
+    return filter(PredicateDecorator.isInstanceOf(type));
   }
 
   /**
@@ -637,7 +619,7 @@ public class Operators {
       return isNotNull();
     }
 
-    return Functions.predicateFilter(PredicateDecorator.isEqualTo(targetRef).negate());
+    return filter(PredicateDecorator.isEqualTo(targetRef).negate());
   }
 
   /**
@@ -650,7 +632,7 @@ public class Operators {
    */
   @NotNull
   public static <DATA> InvocationFactory<DATA, DATA> isNotInstanceOf(@NotNull final Class<?> type) {
-    return Functions.predicateFilter(PredicateDecorator.isInstanceOf(type).negate());
+    return filter(PredicateDecorator.isInstanceOf(type).negate());
   }
 
   /**
@@ -679,7 +661,7 @@ public class Operators {
       return isNotNull();
     }
 
-    return Functions.predicateFilter(PredicateDecorator.isSameAs(targetRef).negate());
+    return filter(PredicateDecorator.isSameAs(targetRef).negate());
   }
 
   /**
@@ -708,7 +690,7 @@ public class Operators {
       return isNull();
     }
 
-    return Functions.predicateFilter(PredicateDecorator.isSameAs(targetRef));
+    return filter(PredicateDecorator.isSameAs(targetRef));
   }
 
   /**
@@ -853,7 +835,7 @@ public class Operators {
    */
   @NotNull
   public static <DATA> InvocationFactory<DATA, DATA> orElse(@Nullable final DATA output) {
-    return orElse(Channels.replayOutput(JRoutineCore.of(output).buildChannel()).buildChannel());
+    return new OrElseInvocationFactory<DATA>(Collections.singletonList(output));
   }
 
   /**
@@ -866,7 +848,7 @@ public class Operators {
    */
   @NotNull
   public static <DATA> InvocationFactory<DATA, DATA> orElse(@Nullable final DATA... outputs) {
-    return orElse(Channels.replayOutput(JRoutineCore.of(outputs).buildChannel()).buildChannel());
+    return new OrElseInvocationFactory<DATA>(toList(outputs));
   }
 
   /**
@@ -880,25 +862,7 @@ public class Operators {
   @NotNull
   public static <DATA> InvocationFactory<DATA, DATA> orElse(
       @Nullable final Iterable<? extends DATA> outputs) {
-    return orElse(Channels.replayOutput(JRoutineCore.of(outputs).buildChannel()).buildChannel());
-  }
-
-  /**
-   * Returns a factory of invocations producing the outputs returned by the specified channel in
-   * case the invocation produced none.
-   * <p>
-   * Note that the passed channel will be bound as a result of the call, so, in order to support
-   * multiple invocations, consider wrapping the channel in a replayable one, by calling the
-   * {@link Channels#replayOutput(Channel)} utility method.
-   *
-   * @param channel the output channel.
-   * @param <DATA>  the data type.
-   * @return the invocation factory instance.
-   */
-  @NotNull
-  public static <DATA> InvocationFactory<DATA, DATA> orElse(
-      @NotNull final Channel<?, ? extends DATA> channel) {
-    return new OrElseInvocationFactory<DATA>(channel);
+    return new OrElseInvocationFactory<DATA>(toList(outputs));
   }
 
   /**
@@ -1053,7 +1017,7 @@ public class Operators {
    */
   @NotNull
   public static <DATA> InvocationFactory<DATA, DATA> prepend(@Nullable final DATA output) {
-    return prepend(Channels.replayOutput(JRoutineCore.of(output).buildChannel()).buildChannel());
+    return new PrependOutputInvocationFactory<DATA>(Collections.singletonList(output));
   }
 
   /**
@@ -1068,7 +1032,7 @@ public class Operators {
    */
   @NotNull
   public static <DATA> InvocationFactory<DATA, DATA> prepend(@Nullable final DATA... outputs) {
-    return prepend(Channels.replayOutput(JRoutineCore.of(outputs).buildChannel()).buildChannel());
+    return new PrependOutputInvocationFactory<DATA>(toList(outputs));
   }
 
   /**
@@ -1085,28 +1049,7 @@ public class Operators {
   @NotNull
   public static <DATA> InvocationFactory<DATA, DATA> prepend(
       @Nullable final Iterable<? extends DATA> outputs) {
-    return prepend(Channels.replayOutput(JRoutineCore.of(outputs).buildChannel()).buildChannel());
-  }
-
-  /**
-   * Returns a factory of invocations prepending the outputs returned by the specified channel to
-   * the invocation ones.
-   * <br>
-   * If no input is passed to the invocation, the outputs will be produced only when the invocation
-   * completes.
-   * <p>
-   * Note that the passed channel will be bound as a result of the call, so, in order to support
-   * multiple invocations, consider wrapping the channel in a replayable one, by calling the
-   * {@link Channels#replayOutput(Channel)} utility method.
-   *
-   * @param channel the output channel.
-   * @param <DATA>  the data type.
-   * @return the invocation factory instance.
-   */
-  @NotNull
-  public static <DATA> InvocationFactory<DATA, DATA> prepend(
-      @Nullable final Channel<?, ? extends DATA> channel) {
-    return new PrependOutputInvocationFactory<DATA>(channel);
+    return new PrependOutputInvocationFactory<DATA>(toList(outputs));
   }
 
   /**
@@ -1500,7 +1443,7 @@ public class Operators {
    */
   @NotNull
   public static <IN, OUT> InvocationFactory<IN, OUT> then(@Nullable final OUT output) {
-    return then(Channels.replayOutput(JRoutineCore.of(output).buildChannel()).buildChannel());
+    return new ThenOutputInvocation<IN, OUT>(Collections.singletonList(output));
   }
 
   /**
@@ -1516,7 +1459,7 @@ public class Operators {
    */
   @NotNull
   public static <IN, OUT> InvocationFactory<IN, OUT> then(@Nullable final OUT... outputs) {
-    return then(Channels.replayOutput(JRoutineCore.of(outputs).buildChannel()).buildChannel());
+    return new ThenOutputInvocation<IN, OUT>(toList(outputs));
   }
 
   /**
@@ -1533,28 +1476,7 @@ public class Operators {
   @NotNull
   public static <IN, OUT> InvocationFactory<IN, OUT> then(
       @Nullable final Iterable<? extends OUT> outputs) {
-    return then(Channels.replayOutput(JRoutineCore.of(outputs).buildChannel()).buildChannel());
-  }
-
-  /**
-   * Returns a factory of invocations generating the outputs returned by the specified channel
-   * after the invocation completes.
-   * <br>
-   * The invocation inputs will be ignored.
-   * <p>
-   * Note that the passed channel will be bound as a result of the call, so, in order to support
-   * multiple invocations, consider wrapping the channel in a replayable one, by calling the
-   * {@link Channels#replayOutput(Channel)} utility method.
-   *
-   * @param channel the output channel.
-   * @param <IN>    the input data type.
-   * @param <OUT>   the output data type.
-   * @return the invocation factory instance.
-   */
-  @NotNull
-  public static <IN, OUT> InvocationFactory<IN, OUT> then(
-      @Nullable final Channel<?, ? extends OUT> channel) {
-    return new ThenOutputInvocation<IN, OUT>(channel);
+    return new ThenOutputInvocation<IN, OUT>(toList(outputs));
   }
 
   /**
@@ -1741,5 +1663,24 @@ public class Operators {
   @SuppressWarnings("unchecked")
   public static <IN> InvocationFactory<Iterable<? extends IN>, IN> unfold() {
     return (InvocationFactory<Iterable<? extends IN>, IN>) sUnfoldInvocation;
+  }
+
+  @Nullable
+  private static <DATA> List<DATA> toList(@Nullable final DATA... data) {
+    return (data != null) ? Arrays.asList(data) : null;
+  }
+
+  @Nullable
+  private static <DATA> List<DATA> toList(@Nullable final Iterable<? extends DATA> data) {
+    if (data == null) {
+      return null;
+    }
+
+    final ArrayList<DATA> dataList = new ArrayList<DATA>();
+    for (final DATA datum : data) {
+      dataList.add(datum);
+    }
+
+    return dataList;
   }
 }

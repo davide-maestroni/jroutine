@@ -23,6 +23,8 @@ import com.github.dm.jrt.core.channel.PipeChannel;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
+import com.github.dm.jrt.core.executor.ScheduledExecutor;
+import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DurationMeasure;
 
 import org.jetbrains.annotations.NotNull;
@@ -62,6 +64,8 @@ class ReplayOutputChannel<OUT> implements Channel<OUT, OUT>, ChannelConsumer<OUT
   private final IdentityHashMap<ChannelConsumer<? super OUT>, Channel<OUT, OUT>> mConsumers =
       new IdentityHashMap<ChannelConsumer<? super OUT>, Channel<OUT, OUT>>();
 
+  private final ScheduledExecutor mExecutor;
+
   private final Object mMutex = new Object();
 
   private RoutineException mAbortException;
@@ -73,13 +77,14 @@ class ReplayOutputChannel<OUT> implements Channel<OUT, OUT>, ChannelConsumer<OUT
   /**
    * Constructor.
    *
+   * @param executor      the executor instance.
    * @param configuration the channel configuration.
    * @param channel       the channel to replay.
    */
-  ReplayOutputChannel(@Nullable final ChannelConfiguration configuration,
-      @NotNull final Channel<?, OUT> channel) {
-    mConfiguration =
-        (configuration != null) ? configuration : ChannelConfiguration.defaultConfiguration();
+  ReplayOutputChannel(@NotNull final ScheduledExecutor executor,
+      @NotNull final ChannelConfiguration configuration, @NotNull final Channel<?, OUT> channel) {
+    mExecutor = ConstantConditions.notNull("executor instance", executor);
+    mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
     mOutputChannel = createOutputChannel();
     mChannel = channel;
     channel.consume((ChannelConsumer<? super OUT>) this);
@@ -154,7 +159,7 @@ class ReplayOutputChannel<OUT> implements Channel<OUT, OUT>, ChannelConsumer<OUT
       }
 
       mOutputChannel = (newChannel = createOutputChannel());
-      inputChannel = JRoutineCore.<OUT>ofData().buildChannel();
+      inputChannel = JRoutineCore.channel().ofType();
       newChannel.pass(inputChannel);
       cachedOutputs = new ArrayList<OUT>(mCached);
     }
@@ -387,10 +392,11 @@ class ReplayOutputChannel<OUT> implements Channel<OUT, OUT>, ChannelConsumer<OUT
 
   @NotNull
   private Channel<OUT, OUT> createOutputChannel() {
-    return JRoutineCore.<OUT>ofData().channelConfiguration()
-                                     .withPatch(mConfiguration)
-                                     .withOrder(OrderType.SORTED)
-                                     .apply()
-                                     .buildChannel();
+    return JRoutineCore.channelOn(mExecutor)
+                       .withChannel()
+                       .withPatch(mConfiguration)
+                       .withOrder(OrderType.SORTED)
+                       .configured()
+                       .ofType();
   }
 }

@@ -39,7 +39,6 @@ dependencies {
 }
 
 conditionalDependencies {
-  compile name: 'channel', version: channelVersion
   compile name: 'core', version: coreVersion
   compile name: 'function', version: functionVersion
 }
@@ -62,7 +61,6 @@ findbugs {
 javadoc {
   def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc'
   options.overview("${project.projectDir}/docs/overview.html")
-  options.links("${prefix}/${channelVersion}/channel/",
-      "${prefix}/${coreVersion}/core/",
+  options.links("${prefix}/${coreVersion}/core/",
       "${prefix}/${functionVersion}/function/")
 }

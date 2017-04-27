@@ -71,8 +71,8 @@ public class ScheduledExecutorTest {
     testExecutor(ScheduledExecutors.defaultExecutor());
     testExecutor(ScheduledExecutors.dynamicPoolExecutor(3, 4, 5L, TimeUnit.SECONDS));
     testExecutor(new ScheduledExecutorDecorator(ScheduledExecutors.defaultExecutor()));
-    testExecutor(
-        new ScheduledExecutorDecorator(ScheduledExecutors.dynamicPoolExecutor(1, 4, 0L, TimeUnit.SECONDS)));
+    testExecutor(new ScheduledExecutorDecorator(
+        ScheduledExecutors.dynamicPoolExecutor(1, 4, 0L, TimeUnit.SECONDS)));
   }
 
   @Test
@@ -174,8 +174,8 @@ public class ScheduledExecutorTest {
         ScheduledExecutors.priorityExecutor(ScheduledExecutors.defaultExecutor());
     testExecutor(priorityExecutor.getExecutor(NotAgingPriority.NORMAL_PRIORITY));
     testExecutor(priorityExecutor.getExecutor(NotAgingPriority.LOW_PRIORITY));
-    testExecutor(
-        new ScheduledExecutorDecorator(priorityExecutor.getExecutor(NotAgingPriority.LOWEST_PRIORITY)));
+    testExecutor(new ScheduledExecutorDecorator(
+        priorityExecutor.getExecutor(NotAgingPriority.LOWEST_PRIORITY)));
   }
 
   @Test
@@ -292,8 +292,8 @@ public class ScheduledExecutorTest {
 
     testExecutor(new ThrottlingExecutor(ScheduledExecutors.defaultExecutor(), 5));
     testExecutor(ScheduledExecutors.throttlingExecutor(ScheduledExecutors.poolExecutor(), 5));
-    testExecutor(
-        new ScheduledExecutorDecorator(new ThrottlingExecutor(ScheduledExecutors.defaultExecutor(), 5)));
+    testExecutor(new ScheduledExecutorDecorator(
+        new ThrottlingExecutor(ScheduledExecutors.defaultExecutor(), 5)));
     testExecutor(ScheduledExecutors.throttlingExecutor(ScheduledExecutors.syncExecutor(), 1));
   }
 
@@ -400,8 +400,10 @@ public class ScheduledExecutorTest {
   @Test
   public void testZeroDelayExecutor() throws InterruptedException {
 
-    final ZeroDelayExecutor instance = ZeroDelayExecutor.executorOf(ScheduledExecutors.defaultExecutor());
-    assertThat(instance).isSameAs(ZeroDelayExecutor.executorOf(ScheduledExecutors.defaultExecutor()));
+    final ZeroDelayExecutor instance =
+        ZeroDelayExecutor.executorOf(ScheduledExecutors.defaultExecutor());
+    assertThat(instance).isSameAs(
+        ZeroDelayExecutor.executorOf(ScheduledExecutors.defaultExecutor()));
     assertThat(instance).isSameAs(ZeroDelayExecutor.executorOf(instance));
     testExecutor(instance);
     testExecutor(ScheduledExecutors.zeroDelayExecutor(ScheduledExecutors.poolExecutor()));

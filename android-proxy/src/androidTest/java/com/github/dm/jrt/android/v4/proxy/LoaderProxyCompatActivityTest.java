@@ -229,9 +229,9 @@ public class LoaderProxyCompatActivityTest extends ActivityInstrumentationTestCa
     final TestProxy testProxy = builder.withInvocation()
                                        .withPatch(configuration)
                                        .configured()
-                                       .wrapperConfiguration()
+                                       .withWrapper()
                                        .withSharedFields()
-                                       .apply()
+                                       .configured()
                                        .loaderConfiguration()
                                        .withInvocationId(11)
                                        .apply()
@@ -251,9 +251,9 @@ public class LoaderProxyCompatActivityTest extends ActivityInstrumentationTestCa
                                         .withInvocation()
                                         .withPatch(configuration)
                                         .configured()
-                                        .wrapperConfiguration()
+                                        .withWrapper()
                                         .withSharedFields()
-                                        .apply()
+                                        .configured()
                                         .loaderConfiguration()
                                         .withInvocationId(11)
                                         .apply()
@@ -322,14 +322,14 @@ public class LoaderProxyCompatActivityTest extends ActivityInstrumentationTestCa
 
     long startTime = System.currentTimeMillis();
 
-    Channel<?, Integer> getOne = builder.wrapperConfiguration()
+    Channel<?, Integer> getOne = builder.withWrapper()
                                         .withSharedFields("1")
-                                        .apply()
+                                        .configured()
                                         .buildProxy(TestClassAsync.class)
                                         .getOne();
-    Channel<?, Integer> getTwo = builder.wrapperConfiguration()
+    Channel<?, Integer> getTwo = builder.withWrapper()
                                         .withSharedFields("2")
-                                        .apply()
+                                        .configured()
                                         .buildProxy(TestClassAsync.class)
                                         .getTwo();
 

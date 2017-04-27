@@ -25,7 +25,6 @@ import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.ChannelConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.executor.ScheduledExecutor;
-import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.log.Logger;
@@ -84,21 +83,23 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
   /**
    * Constructor.
    *
+   * @param executor              the executor instance.
    * @param configuration         the channel configuration.
    * @param future                the Future instance.
    * @param mayInterruptIfRunning if the thread executing the task should be interrupted.
    */
-  FutureChannel(@NotNull final ChannelConfiguration configuration,
-      @NotNull final Future<OUT> future, final boolean mayInterruptIfRunning) {
-    mLogger = configuration.newLogger(this);
+  FutureChannel(@NotNull final ScheduledExecutor executor,
+      @NotNull final ChannelConfiguration configuration, @NotNull final Future<OUT> future,
+      final boolean mayInterruptIfRunning) {
+    mExecutor = ConstantConditions.notNull("executor instance", executor);
     mFuture = ConstantConditions.notNull("future instance", future);
-    mExecutor = configuration.getExecutorOrElse(ScheduledExecutors.defaultExecutor());
-    mInterruptIfRunning = mayInterruptIfRunning;
-    mResultDelay = new LocalField<DurationMeasure>(noTime());
     mOutputTimeout =
         new LocalField<DurationMeasure>(configuration.getOutputTimeoutOrElse(noTime()));
     mTimeoutActionType = new LocalField<TimeoutActionType>(
         configuration.getOutputTimeoutActionOrElse(TimeoutActionType.FAIL));
+    mInterruptIfRunning = mayInterruptIfRunning;
+    mResultDelay = new LocalField<DurationMeasure>(noTime());
+    mLogger = configuration.newLogger(this);
   }
 
   public boolean abort() {

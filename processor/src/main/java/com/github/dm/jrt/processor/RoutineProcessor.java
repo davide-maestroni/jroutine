@@ -29,7 +29,6 @@ import com.github.dm.jrt.reflect.annotation.AsyncMethod;
 import com.github.dm.jrt.reflect.annotation.AsyncOutput;
 import com.github.dm.jrt.reflect.annotation.AsyncOutput.OutputMode;
 import com.github.dm.jrt.reflect.annotation.CoreInvocations;
-import com.github.dm.jrt.reflect.annotation.ExecutorType;
 import com.github.dm.jrt.reflect.annotation.InputBackoff;
 import com.github.dm.jrt.reflect.annotation.InputMaxSize;
 import com.github.dm.jrt.reflect.annotation.InputOrder;
@@ -455,7 +454,7 @@ public class RoutineProcessor extends AbstractProcessor {
              .append(" = ")
              .append("initRoutine")
              .append(i)
-             .append("(target, invocationConfiguration, wrapperConfiguration);")
+             .append("(target, executor, invocationConfiguration, wrapperConfiguration);")
              .append(NEW_LINE);
     }
 
@@ -481,16 +480,6 @@ public class RoutineProcessor extends AbstractProcessor {
         methodElement.getAnnotation(CoreInvocations.class);
     if (coreInvocationsAnnotation != null) {
       builder.append(".withCoreInvocations(").append(coreInvocationsAnnotation.value()).append(")");
-    }
-
-    final ExecutorType executorTypeAnnotation = methodElement.getAnnotation(ExecutorType.class);
-    if (executorTypeAnnotation != null) {
-      builder.append(".withExecutor(")
-             .append(Reflection.class.getCanonicalName())
-             .append(".newInstanceOf(")
-             .append(getAnnotationValue(methodElement,
-                 getMirrorFromName(ExecutorType.class.getCanonicalName()), "value"))
-             .append(".class))");
     }
 
     final InputBackoff inputBackoffAnnotation = methodElement.getAnnotation(InputBackoff.class);

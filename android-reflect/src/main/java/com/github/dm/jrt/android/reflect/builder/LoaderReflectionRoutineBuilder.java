@@ -50,7 +50,7 @@ public interface LoaderReflectionRoutineBuilder
    */
   @NotNull
   @Override
-  LoaderReflectionRoutineBuilder apply(@NotNull WrapperConfiguration configuration);
+  LoaderReflectionRoutineBuilder withConfiguration(@NotNull WrapperConfiguration configuration);
 
   /**
    * Returns a proxy object enabling asynchronous call of the target instance methods.
@@ -183,5 +183,5 @@ public interface LoaderReflectionRoutineBuilder
    */
   @NotNull
   @Override
-  WrapperConfiguration.Builder<? extends LoaderReflectionRoutineBuilder> wrapperConfiguration();
+  WrapperConfiguration.Builder<? extends LoaderReflectionRoutineBuilder> withWrapper();
 }

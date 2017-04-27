@@ -40,5 +40,5 @@ public interface ChunkStreamConfigurable<TYPE> extends Configurable<TYPE> {
    * @return the output stream configuration builder.
    */
   @NotNull
-  Builder<? extends TYPE> chunkStreamConfiguration();
+  Builder<? extends TYPE> withStream();
 }

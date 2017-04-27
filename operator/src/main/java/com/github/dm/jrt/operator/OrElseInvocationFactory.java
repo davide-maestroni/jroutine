@@ -22,6 +22,9 @@ import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
@@ -34,22 +37,22 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class OrElseInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
 
-  private final Channel<?, ? extends DATA> mChannel;
+  private final List<? extends DATA> mOutputs;
 
   /**
    * Constructor.
    *
-   * @param channel the output channel.
+   * @param outputs the outputs.
    */
-  OrElseInvocationFactory(@NotNull final Channel<?, ? extends DATA> channel) {
-    super(asArgs(channel));
-    mChannel = channel;
+  OrElseInvocationFactory(@Nullable final List<? extends DATA> outputs) {
+    super(asArgs(outputs));
+    mOutputs = outputs;
   }
 
   @NotNull
   @Override
   public Invocation<DATA, DATA> newInvocation() {
-    return new OrElseInvocation<DATA>(mChannel);
+    return new OrElseInvocation<DATA>(mOutputs);
   }
 
   /**
@@ -59,23 +62,23 @@ class OrElseInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
    */
   private static class OrElseInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
 
-    private final Channel<?, ? extends DATA> mChannel;
+    private final List<? extends DATA> mOutputs;
 
     private boolean mHasOutputs;
 
     /**
      * Constructor.
      *
-     * @param channel the output channel.
+     * @param outputs the outputs.
      */
-    OrElseInvocation(@NotNull final Channel<?, ? extends DATA> channel) {
-      mChannel = channel;
+    OrElseInvocation(@Nullable final List<? extends DATA> outputs) {
+      mOutputs = outputs;
     }
 
     @Override
     public void onComplete(@NotNull final Channel<DATA, ?> result) {
       if (!mHasOutputs) {
-        result.pass(mChannel);
+        result.pass(mOutputs);
       }
     }
 

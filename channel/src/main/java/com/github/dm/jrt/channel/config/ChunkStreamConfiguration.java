@@ -192,7 +192,7 @@ public class ChunkStreamConfiguration extends DeepEqualObject {
      * @return the configurable instance.
      */
     @NotNull
-    TYPE apply(@NotNull ChunkStreamConfiguration configuration);
+    TYPE withConfiguration(@NotNull ChunkStreamConfiguration configuration);
   }
 
   /**
@@ -239,8 +239,8 @@ public class ChunkStreamConfiguration extends DeepEqualObject {
      * @return the configured object.
      */
     @NotNull
-    public TYPE apply() {
-      return mConfigurable.apply(buildConfiguration());
+    public TYPE configured() {
+      return mConfigurable.withConfiguration(buildConfiguration());
     }
 
     /**
@@ -351,7 +351,8 @@ public class ChunkStreamConfiguration extends DeepEqualObject {
   private static class DefaultConfigurable implements Configurable<ChunkStreamConfiguration> {
 
     @NotNull
-    public ChunkStreamConfiguration apply(@NotNull final ChunkStreamConfiguration configuration) {
+    public ChunkStreamConfiguration withConfiguration(
+        @NotNull final ChunkStreamConfiguration configuration) {
       return configuration;
     }
   }

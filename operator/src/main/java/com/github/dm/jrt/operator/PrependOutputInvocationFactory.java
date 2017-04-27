@@ -24,6 +24,8 @@ import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
@@ -35,22 +37,22 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class PrependOutputInvocationFactory<OUT> extends InvocationFactory<OUT, OUT> {
 
-  private final Channel<?, ? extends OUT> mChannel;
+  private final List<? extends OUT> mOutputs;
 
   /**
    * Constructor.
    *
-   * @param channel the output channel.
+   * @param outputs the outputs.
    */
-  PrependOutputInvocationFactory(@Nullable final Channel<?, ? extends OUT> channel) {
-    super(asArgs(channel));
-    mChannel = channel;
+  PrependOutputInvocationFactory(@Nullable final List<? extends OUT> outputs) {
+    super(asArgs(outputs));
+    mOutputs = outputs;
   }
 
   @NotNull
   @Override
   public Invocation<OUT, OUT> newInvocation() {
-    return new PrependOutputInvocation<OUT>(mChannel);
+    return new PrependOutputInvocation<OUT>(mOutputs);
   }
 
   /**
@@ -60,17 +62,17 @@ class PrependOutputInvocationFactory<OUT> extends InvocationFactory<OUT, OUT> {
    */
   private static class PrependOutputInvocation<OUT> extends TemplateInvocation<OUT, OUT> {
 
-    private final Channel<?, ? extends OUT> mChannel;
+    private final List<? extends OUT> mOutputs;
 
     private boolean mIsCalled;
 
     /**
      * Constructor.
      *
-     * @param channel the output channel.
+     * @param outputs the outputs.
      */
-    private PrependOutputInvocation(@Nullable final Channel<?, ? extends OUT> channel) {
-      mChannel = channel;
+    private PrependOutputInvocation(@Nullable final List<? extends OUT> outputs) {
+      mOutputs = outputs;
     }
 
     @Override
@@ -97,7 +99,7 @@ class PrependOutputInvocationFactory<OUT> extends InvocationFactory<OUT, OUT> {
     private void onResult(@NotNull final Channel<OUT, ?> result) {
       if (!mIsCalled) {
         mIsCalled = true;
-        result.pass(mChannel);
+        result.pass(mOutputs);
       }
     }
   }

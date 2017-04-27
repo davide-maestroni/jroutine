@@ -17,17 +17,19 @@
 package com.github.dm.jrt.function;
 
 import com.github.dm.jrt.core.common.RoutineException;
-import com.github.dm.jrt.function.builder.ChannelConsumerBuilder;
+import com.github.dm.jrt.function.builder.FunctionalChannelConsumer;
 import com.github.dm.jrt.function.util.Action;
 import com.github.dm.jrt.function.util.Consumer;
+import com.github.dm.jrt.function.util.ConsumerDecorator;
 
 import org.junit.Test;
 
-import static com.github.dm.jrt.function.Functions.sink;
 import static com.github.dm.jrt.function.JRoutineFunction.onComplete;
 import static com.github.dm.jrt.function.JRoutineFunction.onError;
 import static com.github.dm.jrt.function.JRoutineFunction.onOutput;
 import static com.github.dm.jrt.function.util.ActionDecorator.decorate;
+import static com.github.dm.jrt.function.util.ActionDecorator.noOp;
+import static com.github.dm.jrt.function.util.ConsumerDecorator.sink;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -36,7 +38,7 @@ import static org.junit.Assert.fail;
  * <p>
  * Created by davide-maestroni on 09/24/2015.
  */
-public class ChannelConsumerBuilderTest {
+public class FunctionalChannelConsumerTest {
 
   @Test
   @SuppressWarnings("ConstantConditions")
@@ -44,7 +46,7 @@ public class ChannelConsumerBuilderTest {
 
     try {
 
-      onOutput(null, Functions.<RoutineException>sink(), Functions.noOp());
+      onOutput(null, ConsumerDecorator.<RoutineException>sink(), noOp());
 
       fail();
 
@@ -54,7 +56,7 @@ public class ChannelConsumerBuilderTest {
 
     try {
 
-      onOutput(sink(), null, Functions.noOp());
+      onOutput(sink(), null, noOp());
 
       fail();
 
@@ -64,7 +66,7 @@ public class ChannelConsumerBuilderTest {
 
     try {
 
-      onOutput(sink(), Functions.<RoutineException>sink(), null);
+      onOutput(sink(), ConsumerDecorator.<RoutineException>sink(), null);
 
       fail();
 
@@ -79,7 +81,7 @@ public class ChannelConsumerBuilderTest {
     final TestAction action1 = new TestAction();
     final TestAction action2 = new TestAction();
     final TestAction action3 = new TestAction();
-    ChannelConsumerBuilder<Object> channelConsumer = onComplete(action1);
+    FunctionalChannelConsumer<Object> channelConsumer = onComplete(action1);
     channelConsumer.onOutput("test");
     assertThat(action1.isCalled()).isFalse();
     channelConsumer.onError(new RoutineException());
@@ -143,7 +145,7 @@ public class ChannelConsumerBuilderTest {
 
     try {
 
-      onComplete(Functions.noOp()).andOnComplete(null);
+      onComplete(noOp()).andOnComplete(null);
 
       fail();
 
@@ -153,7 +155,7 @@ public class ChannelConsumerBuilderTest {
 
     try {
 
-      onComplete(Functions.noOp()).andOnError(null);
+      onComplete(noOp()).andOnError(null);
 
       fail();
 
@@ -163,7 +165,7 @@ public class ChannelConsumerBuilderTest {
 
     try {
 
-      onComplete(Functions.noOp()).andOnOutput(null);
+      onComplete(noOp()).andOnOutput(null);
 
       fail();
 
@@ -178,7 +180,7 @@ public class ChannelConsumerBuilderTest {
     final TestConsumer<RoutineException> consumer1 = new TestConsumer<RoutineException>();
     final TestConsumer<RoutineException> consumer2 = new TestConsumer<RoutineException>();
     final TestConsumer<RoutineException> consumer3 = new TestConsumer<RoutineException>();
-    ChannelConsumerBuilder<Object> channelConsumer = onError(consumer1);
+    FunctionalChannelConsumer<Object> channelConsumer = onError(consumer1);
     channelConsumer.onOutput("test");
     assertThat(consumer1.isCalled()).isFalse();
     channelConsumer.onComplete();
@@ -199,7 +201,7 @@ public class ChannelConsumerBuilderTest {
     consumer1.reset();
     consumer2.reset();
     channelConsumer =
-        onError(consumer1).andOnError(Functions.decorate(consumer2).andThen(consumer3));
+        onError(consumer1).andOnError(ConsumerDecorator.decorate(consumer2).andThen(consumer3));
     channelConsumer.onOutput("test");
     assertThat(consumer1.isCalled()).isFalse();
     assertThat(consumer2.isCalled()).isFalse();
@@ -243,7 +245,7 @@ public class ChannelConsumerBuilderTest {
 
     try {
 
-      onError(Functions.<RoutineException>sink()).andOnComplete(null);
+      onError(ConsumerDecorator.<RoutineException>sink()).andOnComplete(null);
 
       fail();
 
@@ -253,7 +255,7 @@ public class ChannelConsumerBuilderTest {
 
     try {
 
-      onError(Functions.<RoutineException>sink()).andOnError(null);
+      onError(ConsumerDecorator.<RoutineException>sink()).andOnError(null);
 
       fail();
 
@@ -263,7 +265,7 @@ public class ChannelConsumerBuilderTest {
 
     try {
 
-      onError(Functions.<RoutineException>sink()).andOnOutput(null);
+      onError(ConsumerDecorator.<RoutineException>sink()).andOnOutput(null);
 
       fail();
 
@@ -278,7 +280,7 @@ public class ChannelConsumerBuilderTest {
     final TestConsumer<Object> consumer1 = new TestConsumer<Object>();
     final TestConsumer<Object> consumer2 = new TestConsumer<Object>();
     final TestConsumer<Object> consumer3 = new TestConsumer<Object>();
-    ChannelConsumerBuilder<Object> channelConsumer = onOutput(consumer1);
+    FunctionalChannelConsumer<Object> channelConsumer = onOutput(consumer1);
     channelConsumer.onError(new RoutineException());
     assertThat(consumer1.isCalled()).isFalse();
     channelConsumer.onComplete();
@@ -299,7 +301,7 @@ public class ChannelConsumerBuilderTest {
     consumer1.reset();
     consumer2.reset();
     channelConsumer =
-        onOutput(consumer1).andOnOutput(Functions.decorate(consumer2).andThen(consumer3));
+        onOutput(consumer1).andOnOutput(ConsumerDecorator.decorate(consumer2).andThen(consumer3));
     channelConsumer.onError(new RoutineException());
     assertThat(consumer1.isCalled()).isFalse();
     assertThat(consumer2.isCalled()).isFalse();

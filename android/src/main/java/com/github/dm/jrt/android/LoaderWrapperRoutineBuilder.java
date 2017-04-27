@@ -52,7 +52,7 @@ public interface LoaderWrapperRoutineBuilder
    */
   @NotNull
   @Override
-  LoaderWrapperRoutineBuilder apply(@NotNull WrapperConfiguration configuration);
+  LoaderWrapperRoutineBuilder withConfiguration(@NotNull WrapperConfiguration configuration);
 
   /**
    * {@inheritDoc}
@@ -76,7 +76,7 @@ public interface LoaderWrapperRoutineBuilder
    */
   @NotNull
   @Override
-  WrapperConfiguration.Builder<? extends LoaderWrapperRoutineBuilder> wrapperConfiguration();
+  WrapperConfiguration.Builder<? extends LoaderWrapperRoutineBuilder> withWrapper();
 
   /**
    * {@inheritDoc}

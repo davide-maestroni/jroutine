@@ -46,7 +46,7 @@ public interface ServiceReflectionRoutineBuilder
    */
   @NotNull
   @Override
-  ServiceReflectionRoutineBuilder apply(@NotNull WrapperConfiguration configuration);
+  ServiceReflectionRoutineBuilder withConfiguration(@NotNull WrapperConfiguration configuration);
 
   /**
    * {@inheritDoc}
@@ -60,5 +60,5 @@ public interface ServiceReflectionRoutineBuilder
    */
   @NotNull
   @Override
-  WrapperConfiguration.Builder<? extends ServiceReflectionRoutineBuilder> wrapperConfiguration();
+  WrapperConfiguration.Builder<? extends ServiceReflectionRoutineBuilder> withWrapper();
 }

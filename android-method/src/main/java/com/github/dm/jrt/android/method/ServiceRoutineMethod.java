@@ -431,7 +431,7 @@ public class ServiceRoutineMethod extends RoutineMethod
                                                                        .withConfiguration(getConfiguration())
                                                                        .apply(
                                                                            getServiceConfiguration())
-                                                                       .apply(mConfiguration)
+                                                                       .withConfiguration(mConfiguration)
                                                                        .method(method);
       final Channel<Object, Object> channel = routine.invoke().sorted();
       for (final Object param : safeParams) {
@@ -470,15 +470,14 @@ public class ServiceRoutineMethod extends RoutineMethod
 
     @NotNull
     @Override
-    public ReflectionServiceRoutineMethod apply(@NotNull final WrapperConfiguration configuration) {
+    public ReflectionServiceRoutineMethod withConfiguration(@NotNull final WrapperConfiguration configuration) {
       mConfiguration = ConstantConditions.notNull("wrapper configuration", configuration);
       return this;
     }
 
     @NotNull
     @Override
-    public WrapperConfiguration.Builder<? extends ReflectionServiceRoutineMethod>
-    wrapperConfiguration() {
+    public WrapperConfiguration.Builder<? extends ReflectionServiceRoutineMethod> withWrapper() {
       return new WrapperConfiguration.Builder<ReflectionServiceRoutineMethod>(this, mConfiguration);
     }
   }

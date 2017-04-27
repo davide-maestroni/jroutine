@@ -38,6 +38,33 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
 public class TriFunctionDecorator<IN1, IN2, IN3, OUT> extends DeepEqualObject
     implements TriFunction<IN1, IN2, IN3, OUT>, Decorator {
 
+  private static final TriFunctionDecorator<Object, Object, Object, Object> sFirst =
+      new TriFunctionDecorator<Object, Object, Object, Object>(
+          new TriFunction<Object, Object, Object, Object>() {
+
+            public Object apply(final Object in1, final Object in2, final Object in3) {
+              return in1;
+            }
+          });
+
+  private static final TriFunctionDecorator<Object, Object, Object, Object> sSecond =
+      new TriFunctionDecorator<Object, Object, Object, Object>(
+          new TriFunction<Object, Object, Object, Object>() {
+
+            public Object apply(final Object in1, final Object in2, final Object in3) {
+              return in2;
+            }
+          });
+
+  private static final TriFunctionDecorator<Object, Object, Object, Object> sThird =
+      new TriFunctionDecorator<Object, Object, Object, Object>(
+          new TriFunction<Object, Object, Object, Object>() {
+
+            public Object apply(final Object in1, final Object in2, final Object in3) {
+              return in3;
+            }
+          });
+
   private final FunctionDecorator<?, ? extends OUT> mFunction;
 
   private final TriFunction<IN1, IN2, IN3, ?> mTriFunction;
@@ -63,6 +90,25 @@ public class TriFunctionDecorator<IN1, IN2, IN3, OUT> extends DeepEqualObject
     super(asArgs(biFunction, function));
     mTriFunction = biFunction;
     mFunction = function;
+  }
+
+  /**
+   * Returns a tri-function decorator always returning the same result.
+   * <br>
+   * The returned object will support concatenation and comparison.
+   *
+   * @param result the result.
+   * @param <IN1>  the first input data type.
+   * @param <IN2>  the second input data type.
+   * @param <IN3>  the third input data type.
+   * @param <OUT>  the output data type.
+   * @return the tri-function decorator.
+   */
+  @NotNull
+  public static <IN1, IN2, IN3, OUT> TriFunctionDecorator<IN1, IN2, IN3, OUT> constant(
+      final OUT result) {
+    return new TriFunctionDecorator<IN1, IN2, IN3, OUT>(
+        new ConstantFunction<IN1, IN2, IN3, OUT>(result));
   }
 
   /**
@@ -94,6 +140,54 @@ public class TriFunctionDecorator<IN1, IN2, IN3, OUT> extends DeepEqualObject
   }
 
   /**
+   * Returns a tri-function decorator just returning the first passed argument.
+   * <br>
+   * The returned object will support concatenation and comparison.
+   *
+   * @param <IN1> the first input data type.
+   * @param <IN2> the second input data type.
+   * @param <IN3> the third input data type.
+   * @return the tri-function decorator.
+   */
+  @NotNull
+  @SuppressWarnings("unchecked")
+  public static <IN1, IN2, IN3> TriFunctionDecorator<IN1, IN2, IN3, IN1> first() {
+    return (TriFunctionDecorator<IN1, IN2, IN3, IN1>) sFirst;
+  }
+
+  /**
+   * Returns a tri-function decorator just returning the second passed argument.
+   * <br>
+   * The returned object will support concatenation and comparison.
+   *
+   * @param <IN1> the first input data type.
+   * @param <IN2> the second input data type.
+   * @param <IN3> the third input data type.
+   * @return the tri-function decorator.
+   */
+  @NotNull
+  @SuppressWarnings("unchecked")
+  public static <IN1, IN2, IN3> TriFunctionDecorator<IN1, IN2, IN3, IN2> second() {
+    return (TriFunctionDecorator<IN1, IN2, IN3, IN2>) sSecond;
+  }
+
+  /**
+   * Returns a tri-function decorator just returning the third passed argument.
+   * <br>
+   * The returned object will support concatenation and comparison.
+   *
+   * @param <IN1> the first input data type.
+   * @param <IN2> the second input data type.
+   * @param <IN3> the third input data type.
+   * @return the tri-function decorator.
+   */
+  @NotNull
+  @SuppressWarnings("unchecked")
+  public static <IN1, IN2, IN3> TriFunctionDecorator<IN1, IN2, IN3, IN3> third() {
+    return (TriFunctionDecorator<IN1, IN2, IN3, IN3>) sThird;
+  }
+
+  /**
    * Returns a composed tri-function decorator that first applies this function to its input, and
    * then applies the after function to the result.
    *
@@ -107,12 +201,40 @@ public class TriFunctionDecorator<IN1, IN2, IN3, OUT> extends DeepEqualObject
     return new TriFunctionDecorator<IN1, IN2, IN3, AFTER>(mTriFunction, mFunction.andThen(after));
   }
 
+  public boolean hasStaticScope() {
+    return Reflection.hasStaticScope(mTriFunction) && mFunction.hasStaticScope();
+  }
+
+  /**
+   * Tri-function implementation returning always the same object.
+   *
+   * @param <IN1> the first input data type.
+   * @param <IN2> the second input data type.
+   * @param <IN3> the third input data type.
+   * @param <OUT> the output data type.
+   */
+  private static class ConstantFunction<IN1, IN2, IN3, OUT> extends DeepEqualObject
+      implements TriFunction<IN1, IN2, IN3, OUT> {
+
+    private final OUT mResult;
+
+    /**
+     * Constructor.
+     *
+     * @param result the object to return.
+     */
+    private ConstantFunction(final OUT result) {
+      super(asArgs(result));
+      mResult = result;
+    }
+
+    public OUT apply(final IN1 in1, final IN2 in2, final IN3 in3) {
+      return mResult;
+    }
+  }
+
   @SuppressWarnings("unchecked")
   public OUT apply(final IN1 in1, final IN2 in2, final IN3 in3) throws Exception {
     return ((FunctionDecorator<Object, OUT>) mFunction).apply(mTriFunction.apply(in1, in2, in3));
-  }
-
-  public boolean hasStaticScope() {
-    return Reflection.hasStaticScope(mTriFunction) && mFunction.hasStaticScope();
   }
 }

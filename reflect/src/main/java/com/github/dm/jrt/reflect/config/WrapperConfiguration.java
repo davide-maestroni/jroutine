@@ -129,7 +129,7 @@ public final class WrapperConfiguration extends DeepEqualObject {
      * @return the configurable instance.
      */
     @NotNull
-    TYPE apply(@NotNull WrapperConfiguration configuration);
+    TYPE withConfiguration(@NotNull WrapperConfiguration configuration);
   }
 
   /**
@@ -170,8 +170,8 @@ public final class WrapperConfiguration extends DeepEqualObject {
      * @return the configured object.
      */
     @NotNull
-    public TYPE apply() {
-      return mConfigurable.apply(buildConfiguration());
+    public TYPE configured() {
+      return mConfigurable.withConfiguration(buildConfiguration());
     }
 
     /**
@@ -276,7 +276,8 @@ public final class WrapperConfiguration extends DeepEqualObject {
   private static class DefaultConfigurable implements Configurable<WrapperConfiguration> {
 
     @NotNull
-    public WrapperConfiguration apply(@NotNull final WrapperConfiguration configuration) {
+    public WrapperConfiguration withConfiguration(
+        @NotNull final WrapperConfiguration configuration) {
       return configuration;
     }
   }

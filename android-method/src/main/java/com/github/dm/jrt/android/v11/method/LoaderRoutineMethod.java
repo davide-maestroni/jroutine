@@ -28,7 +28,6 @@ import com.github.dm.jrt.android.reflect.ContextInvocationTarget;
 import com.github.dm.jrt.android.v11.core.JRoutineLoader;
 import com.github.dm.jrt.android.v11.core.LoaderContext;
 import com.github.dm.jrt.android.v11.reflect.JRoutineLoaderReflection;
-import com.github.dm.jrt.channel.Channels;
 import com.github.dm.jrt.channel.Flow;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
@@ -445,7 +444,7 @@ public class LoaderRoutineMethod extends RoutineMethod
 
     @NotNull
     @Override
-    public ReflectionLoaderRoutineMethod apply(@NotNull final WrapperConfiguration configuration) {
+    public ReflectionLoaderRoutineMethod withConfiguration(@NotNull final WrapperConfiguration configuration) {
       mConfiguration = ConstantConditions.notNull("wrapper configuration", configuration);
       return this;
     }
@@ -474,7 +473,7 @@ public class LoaderRoutineMethod extends RoutineMethod
                                                                       .withConfiguration(getConfiguration())
                                                                       .apply(
                                                                           getLoaderConfiguration())
-                                                                      .apply(mConfiguration)
+                                                                      .withConfiguration(mConfiguration)
                                                                       .method(method);
       final Channel<Object, Object> channel = routine.invoke().sorted();
       for (final Object param : safeParams) {
@@ -513,8 +512,7 @@ public class LoaderRoutineMethod extends RoutineMethod
 
     @NotNull
     @Override
-    public WrapperConfiguration.Builder<? extends ReflectionLoaderRoutineMethod>
-    wrapperConfiguration() {
+    public WrapperConfiguration.Builder<? extends ReflectionLoaderRoutineMethod> withWrapper() {
       return new WrapperConfiguration.Builder<ReflectionLoaderRoutineMethod>(this, mConfiguration);
     }
   }

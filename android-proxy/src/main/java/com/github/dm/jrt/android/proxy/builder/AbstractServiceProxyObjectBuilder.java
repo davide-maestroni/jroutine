@@ -73,7 +73,7 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
 
   @NotNull
   @Override
-  public ServiceProxyObjectBuilder<TYPE> apply(@NotNull final WrapperConfiguration configuration) {
+  public ServiceProxyObjectBuilder<TYPE> withConfiguration(@NotNull final WrapperConfiguration configuration) {
     mWrapperConfiguration = ConstantConditions.notNull("wrapper configuration", configuration);
     return this;
   }
@@ -145,17 +145,16 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
 
   @NotNull
   @Override
-  public WrapperConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>>
-  wrapperConfiguration() {
+  public WrapperConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>> withWrapper() {
     final WrapperConfiguration config = mWrapperConfiguration;
     return new WrapperConfiguration.Builder<ServiceProxyObjectBuilder<TYPE>>(
         new WrapperConfiguration.Configurable<ServiceProxyObjectBuilder<TYPE>>() {
 
           @NotNull
           @Override
-          public ServiceProxyObjectBuilder<TYPE> apply(
+          public ServiceProxyObjectBuilder<TYPE> withConfiguration(
               @NotNull final WrapperConfiguration configuration) {
-            return AbstractServiceProxyObjectBuilder.this.apply(configuration);
+            return AbstractServiceProxyObjectBuilder.this.withConfiguration(configuration);
           }
         }, config);
   }

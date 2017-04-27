@@ -40,5 +40,5 @@ public interface WrapperConfigurable<TYPE> extends Configurable<TYPE> {
    * @return the wrapper configuration builder.
    */
   @NotNull
-  Builder<? extends TYPE> wrapperConfiguration();
+  Builder<? extends TYPE> withWrapper();
 }

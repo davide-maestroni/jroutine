@@ -46,7 +46,7 @@ public interface ServiceProxyObjectBuilder<TYPE>
    */
   @NotNull
   @Override
-  ServiceProxyObjectBuilder<TYPE> apply(@NotNull WrapperConfiguration configuration);
+  ServiceProxyObjectBuilder<TYPE> withConfiguration(@NotNull WrapperConfiguration configuration);
 
   /**
    * Returns a proxy object enabling asynchronous call of the target instance methods.
@@ -81,5 +81,5 @@ public interface ServiceProxyObjectBuilder<TYPE>
    */
   @NotNull
   @Override
-  WrapperConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>> wrapperConfiguration();
+  WrapperConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>> withWrapper();
 }

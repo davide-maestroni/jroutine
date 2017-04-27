@@ -19,9 +19,11 @@ package com.github.dm.jrt.function;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.RoutineException;
+import com.github.dm.jrt.core.executor.ScheduledExecutor;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.routine.Routine;
+import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.builder.AbstractStatefulRoutineBuilder;
 import com.github.dm.jrt.function.builder.StatefulRoutineBuilder;
 import com.github.dm.jrt.function.util.BiFunctionDecorator;
@@ -46,18 +48,23 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
 class DefaultStatefulRoutineBuilder<IN, OUT, STATE>
     extends AbstractStatefulRoutineBuilder<IN, OUT, STATE, StatefulRoutineBuilder<IN, OUT, STATE>> {
 
+  private final ScheduledExecutor mExecutor;
+
   /**
    * Constructor.
+   *
+   * @param executor the executor instance.
    */
-  DefaultStatefulRoutineBuilder() {
+  DefaultStatefulRoutineBuilder(@NotNull final ScheduledExecutor executor) {
+    mExecutor = ConstantConditions.notNull("executor instance", executor);
   }
 
   @NotNull
-  public Routine<IN, OUT> buildRoutine() {
+  public Routine<IN, OUT> routine() {
     final StatefulInvocationFactory<IN, OUT, STATE> factory =
         new StatefulInvocationFactory<IN, OUT, STATE>(getOnCreate(), getOnNext(), getOnError(),
             getOnComplete(), getOnFinalize(), getOnDestroy());
-    return JRoutineCore.with(factory).apply(getConfiguration()).buildRoutine();
+    return JRoutineCore.routineOn(mExecutor).withConfiguration(getConfiguration()).of(factory);
   }
 
   /**

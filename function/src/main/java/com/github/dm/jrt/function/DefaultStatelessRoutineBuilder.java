@@ -19,9 +19,11 @@ package com.github.dm.jrt.function;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.RoutineException;
+import com.github.dm.jrt.core.executor.ScheduledExecutor;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.routine.Routine;
+import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.builder.AbstractStatelessRoutineBuilder;
 import com.github.dm.jrt.function.builder.StatelessRoutineBuilder;
 import com.github.dm.jrt.function.util.BiConsumerDecorator;
@@ -42,17 +44,22 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
 class DefaultStatelessRoutineBuilder<IN, OUT>
     extends AbstractStatelessRoutineBuilder<IN, OUT, StatelessRoutineBuilder<IN, OUT>> {
 
+  private final ScheduledExecutor mExecutor;
+
   /**
    * Constructor.
+   *
+   * @param executor the executor instance.
    */
-  DefaultStatelessRoutineBuilder() {
+  DefaultStatelessRoutineBuilder(@NotNull final ScheduledExecutor executor) {
+    mExecutor = ConstantConditions.notNull("executor instance", executor);
   }
 
   @NotNull
-  public Routine<IN, OUT> buildRoutine() {
+  public Routine<IN, OUT> routine() {
     final StatelessInvocation<IN, OUT> invocation =
         new StatelessInvocation<IN, OUT>(getOnNext(), getOnError(), getOnComplete());
-    return JRoutineCore.with(invocation).apply(getConfiguration()).buildRoutine();
+    return JRoutineCore.routineOn(mExecutor).withConfiguration(getConfiguration()).of(invocation);
   }
 
   /**

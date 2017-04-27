@@ -18,6 +18,7 @@ package com.github.dm.jrt.proxy.builder;
 
 import com.github.dm.jrt.core.config.InvocationConfigurable;
 import com.github.dm.jrt.core.util.ClassToken;
+import com.github.dm.jrt.reflect.InvocationTarget;
 import com.github.dm.jrt.reflect.config.WrapperConfigurable;
 
 import org.jetbrains.annotations.NotNull;
@@ -34,55 +35,55 @@ public interface ProxyRoutineBuilder
    * Returns a proxy object enabling asynchronous call of the target instance methods.
    * <p>
    * The routines used for calling the methods will honor the attributes specified in any optional
-   * <i>{@code com.github.dm.jrt.annotation.*}</i> annotations.
-   * <br>
-   * Note that such annotations will override any configuration set through the builder.
+   * <i>{@code com.github.dm.jrt.annotation.*}</i> annotations. Such annotations will override any
+   * configuration set through the builder.
    * <p>
    * The proxy object is created through code generation based on the interfaces annotated with
    * {@link com.github.dm.jrt.proxy.annotation.Proxy Proxy}. The generated class name and package
    * will be chosen according to the specific annotation attributes.
    * <br>
    * It is actually possible to avoid the use of reflection for the proxy object instantiation by
-   * explicitly calling the {@code &lt;generated_class_name&gt;.with()} methods.
-   * <br>
-   * Note, however, that, since the class is generated, a generic IDE may highlight an error even
-   * if the compilation is successful.
+   * explicitly calling the {@code &lt;generated_class_name&gt;.wrapper()} methods.
+   * <p>
+   * Note that it is responsibility of the caller to retain a strong reference to the target
+   * instance to prevent it from being garbage collected.
    *
+   * @param target the invocation target.
    * @param itf    the interface implemented by the return object.
    * @param <TYPE> the interface type.
    * @return the proxy object.
-   * @throws java.lang.IllegalArgumentException if the specified class does not represent an
-   *                                            interface.
+   * @throws java.lang.IllegalArgumentException if the target does not represent a concrete class or
+   *                                            the specified proxy is not an interface.
    * @see com.github.dm.jrt.reflect.annotation Annotations
    */
   @NotNull
-  <TYPE> TYPE buildProxy(@NotNull Class<TYPE> itf);
+  <TYPE> TYPE proxyOf(@NotNull InvocationTarget<?> target, @NotNull Class<TYPE> itf);
 
   /**
    * Returns a proxy object enabling asynchronous call of the target instance methods.
    * <p>
    * The routines used for calling the methods will honor the attributes specified in any optional
-   * <i>{@code com.github.dm.jrt.annotation.*}</i> annotations.
-   * <br>
-   * Note that such annotations will override any configuration set through the builder.
+   * <i>{@code com.github.dm.jrt.annotation.*}</i> annotations. Such annotations will override any
+   * configuration set through the builder.
    * <p>
    * The proxy object is created through code generation based on the interfaces annotated with
    * {@link com.github.dm.jrt.proxy.annotation.Proxy Proxy}. The generated class name and package
    * will be chosen according to the specific annotation attributes.
    * <br>
    * It is actually possible to avoid the use of reflection for the proxy object instantiation by
-   * explicitly calling the {@code &lt;generated_class_name&gt;.with()} methods.
-   * <br>
-   * Note, however, that, since the class is generated, a generic IDE may highlight an error even
-   * if the compilation is successful.
+   * explicitly calling the {@code &lt;generated_class_name&gt;.wrapper()} methods.
+   * <p>
+   * Note that it is responsibility of the caller to retain a strong reference to the target
+   * instance to prevent it from being garbage collected.
    *
+   * @param target the invocation target.
    * @param itf    the token of the interface implemented by the return object.
    * @param <TYPE> the interface type.
    * @return the proxy object.
-   * @throws java.lang.IllegalArgumentException if the specified class does not represent an
-   *                                            interface.
+   * @throws java.lang.IllegalArgumentException if the target does not represent a concrete class or
+   *                                            the specified proxy is not an interface.
    * @see com.github.dm.jrt.reflect.annotation Annotations
    */
   @NotNull
-  <TYPE> TYPE buildProxy(@NotNull ClassToken<TYPE> itf);
+  <TYPE> TYPE proxyOf(@NotNull InvocationTarget<?> target, @NotNull ClassToken<TYPE> itf);
 }

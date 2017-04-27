@@ -16,10 +16,13 @@
 
 package com.github.dm.jrt.reflect;
 
+import com.github.dm.jrt.core.executor.ScheduledExecutor;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilder;
 
 import org.jetbrains.annotations.NotNull;
+
+import static com.github.dm.jrt.core.executor.ScheduledExecutors.defaultExecutor;
 
 /**
  * This utility class provides an additional way to build a routine, based on the asynchronous
@@ -48,8 +51,9 @@ import org.jetbrains.annotations.NotNull;
  *       &#64;AsyncInput(Result.class) Channel&lt;?, Result&gt; result2);
  * }
  *
- * final AsyncCallback callback = JRoutineReflection.with(instance(myCallback))
- *                                                  .buildProxy(AsyncCallback.class);
+ * final AsyncCallback callback =
+ *         JRoutineReflection.wrapper()
+ *                           .proxyOf(instance(myCallback), AsyncCallback.class);
  * callback.onResults(routine1.invoke(), routine2.invoke());
  * </code></pre>
  * Where the object {@code myCallback} implements a method
@@ -70,22 +74,23 @@ public class JRoutineReflection {
   }
 
   /**
-   * Returns a routine builder wrapping the specified target object.
-   * <p>
-   * Note that it is responsibility of the caller to retain a strong reference to the target
-   * instance to prevent it from being garbage collected.
-   * <br>
-   * Note also that the invocation input data will be cached, and the results will be produced
-   * only after the invocation channel is closed, so be sure to avoid streaming inputs in order to
-   * prevent starvation or out of memory errors.
+   * Returns a builder of routines running on the specified executor, wrapping a target object.
    *
-   * @param target the invocation target.
    * @return the routine builder instance.
-   * @throws java.lang.IllegalArgumentException if the specified object class represents an
-   *                                            interface.
    */
   @NotNull
-  public static ReflectionRoutineBuilder with(@NotNull final InvocationTarget<?> target) {
-    return new DefaultReflectionRoutineBuilder(target);
+  public static ReflectionRoutineBuilder wrapper() {
+    return wrapperOn(defaultExecutor());
+  }
+
+  /**
+   * Returns a builder of routines wrapping a target object.
+   *
+   * @param executor the executor instance.
+   * @return the routine builder instance.
+   */
+  @NotNull
+  public static ReflectionRoutineBuilder wrapperOn(@NotNull final ScheduledExecutor executor) {
+    return new DefaultReflectionRoutineBuilder(executor);
   }
 }

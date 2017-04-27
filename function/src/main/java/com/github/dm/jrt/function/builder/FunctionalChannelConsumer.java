@@ -31,7 +31,7 @@ import org.jetbrains.annotations.NotNull;
  * @param <OUT> the output data type.
  */
 @SuppressWarnings("WeakerAccess")
-public interface ChannelConsumerBuilder<OUT> extends ChannelConsumer<OUT> {
+public interface FunctionalChannelConsumer<OUT> extends ChannelConsumer<OUT> {
 
   /**
    * Returns a new channel consumer builder employing also the specified consumer function to
@@ -41,7 +41,7 @@ public interface ChannelConsumerBuilder<OUT> extends ChannelConsumer<OUT> {
    * @return the builder instance.
    */
   @NotNull
-  ChannelConsumerBuilder<OUT> andOnComplete(@NotNull Action onComplete);
+  FunctionalChannelConsumer<OUT> andOnComplete(@NotNull Action onComplete);
 
   /**
    * Returns a new channel consumer builder employing also the specified consumer function to
@@ -51,7 +51,7 @@ public interface ChannelConsumerBuilder<OUT> extends ChannelConsumer<OUT> {
    * @return the builder instance.
    */
   @NotNull
-  ChannelConsumerBuilder<OUT> andOnError(@NotNull Consumer<? super RoutineException> onError);
+  FunctionalChannelConsumer<OUT> andOnError(@NotNull Consumer<? super RoutineException> onError);
 
   /**
    * Returns a new channel consumer builder employing also the specified consumer function to
@@ -61,5 +61,5 @@ public interface ChannelConsumerBuilder<OUT> extends ChannelConsumer<OUT> {
    * @return the builder instance.
    */
   @NotNull
-  ChannelConsumerBuilder<OUT> andOnOutput(@NotNull Consumer<? super OUT> onOutput);
+  FunctionalChannelConsumer<OUT> andOnOutput(@NotNull Consumer<? super OUT> onOutput);
 }

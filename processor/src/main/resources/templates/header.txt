@@ -21,6 +21,7 @@ ${generatedPackage}
 public final class ${generatedClassName}${genericTypes} implements ${interfaceFullName} {
 
   public ${generatedClassName}(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.reflect.InvocationTarget<?> target,
+      @org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.executor.ScheduledExecutor executor,
       @org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.config.InvocationConfiguration invocationConfiguration,
       @org.jetbrains.annotations.NotNull final com.github.dm.jrt.reflect.config.WrapperConfiguration wrapperConfiguration) {
     com.github.dm.jrt.core.util.ConstantConditions.notNull("invocation configuration", invocationConfiguration);
@@ -33,20 +34,19 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
   }
 
   @org.jetbrains.annotations.NotNull
-  public static ${genericTypes} com.github.dm.jrt.proxy.builder.ProxyObjectBuilder<${interfaceFullName}> with(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.reflect.InvocationTarget<? extends ${classFullName}> target) {
-    if (!target.isOfType(${classErasure}.class)) {
-      throw new IllegalArgumentException("the invocation target must be the class or an instance of ${classFullName}");
-    }
+  public static ${genericTypes} com.github.dm.jrt.proxy.builder.ProxyObjectBuilder<${interfaceFullName}> wrapper() {
+    return wrapperOn(com.github.dm.jrt.core.executor.ScheduledExecutors.defaultExecutor());
+  }
 
-    return new ProxyObjectBuilder${genericTypes}(target);
+  @org.jetbrains.annotations.NotNull
+  public static ${genericTypes} com.github.dm.jrt.proxy.builder.ProxyObjectBuilder<${interfaceFullName}> wrapperOn(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.executor.ScheduledExecutor executor) {
+    return new ProxyObjectBuilder${genericTypes}(executor);
   }
 
   private static class ProxyObjectBuilder${genericTypes} extends com.github.dm.jrt.proxy.builder.AbstractProxyObjectBuilder<${interfaceFullName}> {
 
-    private final com.github.dm.jrt.reflect.InvocationTarget<?> mTarget;
-
-    private ProxyObjectBuilder(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.reflect.InvocationTarget<?> target) {
-      mTarget = target;
+    private ProxyObjectBuilder(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.executor.ScheduledExecutor executor) {
+      super(executor);
     }
 
     @Override
@@ -56,16 +56,15 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
     }
 
     @Override
-    @org.jetbrains.annotations.Nullable
-    protected Object getTarget() {
-      return mTarget.getTarget();
-    }
-
-    @Override
     @org.jetbrains.annotations.NotNull
-    protected ${interfaceFullName} newProxy(
+    protected ${interfaceFullName} newProxy(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.reflect.InvocationTarget<?> target,
+        @org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.executor.ScheduledExecutor executor,
         @org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.config.InvocationConfiguration invocationConfiguration,
         @org.jetbrains.annotations.NotNull final com.github.dm.jrt.reflect.config.WrapperConfiguration wrapperConfiguration) {
-      return new ${generatedClassName}${genericTypes}(mTarget, invocationConfiguration, wrapperConfiguration);
+      if (!target.isOfType(${classErasure}.class)) {
+        throw new IllegalArgumentException("the invocation target must be the class or an instance of ${classFullName}");
+      }
+
+      return new ${generatedClassName}${genericTypes}(target, executor, invocationConfiguration, wrapperConfiguration);
     }
   }

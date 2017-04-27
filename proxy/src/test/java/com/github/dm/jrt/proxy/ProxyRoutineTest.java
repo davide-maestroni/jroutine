@@ -25,8 +25,6 @@ import com.github.dm.jrt.core.config.ChannelConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.AgingPriority;
 import com.github.dm.jrt.core.executor.ScheduledExecutor;
-import com.github.dm.jrt.core.executor.ScheduledExecutorDecorator;
-import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.core.executor.SyncExecutor;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.log.Log;
@@ -45,7 +43,6 @@ import com.github.dm.jrt.reflect.annotation.AsyncInput.InputMode;
 import com.github.dm.jrt.reflect.annotation.AsyncMethod;
 import com.github.dm.jrt.reflect.annotation.AsyncOutput;
 import com.github.dm.jrt.reflect.annotation.AsyncOutput.OutputMode;
-import com.github.dm.jrt.reflect.annotation.ExecutorType;
 import com.github.dm.jrt.reflect.annotation.InputBackoff;
 import com.github.dm.jrt.reflect.annotation.LogType;
 import com.github.dm.jrt.reflect.annotation.OutputBackoff;
@@ -63,6 +60,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builder;
+import static com.github.dm.jrt.core.executor.ScheduledExecutors.poolExecutor;
+import static com.github.dm.jrt.core.executor.ScheduledExecutors.syncExecutor;
 import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static com.github.dm.jrt.reflect.InvocationTarget.classOfType;
@@ -82,11 +81,8 @@ public class ProxyRoutineTest {
 
     final Pass pass = new Pass();
     final TestExecutor executor = new TestExecutor();
-    final PriorityPass priorityPass = JRoutineProxy.with(instance(pass))
-                                                   .withInvocation()
-                                                   .withExecutor(executor)
-                                                   .configured()
-                                                   .buildProxy(PriorityPass.class);
+    final PriorityPass priorityPass =
+        JRoutineProxy.wrapperOn(executor).proxyOf(instance(pass), PriorityPass.class);
     final Channel<?, String> output1 = priorityPass.passNormal("test1").eventuallyContinue();
 
     for (int i = 0; i < AgingPriority.HIGH_PRIORITY - 1; i++) {
@@ -107,7 +103,7 @@ public class ProxyRoutineTest {
   public void testAnnotationGenerics() {
 
     final Size size = new Size();
-    final SizeItf proxy = JRoutineReflection.with(instance(size)).buildProxy(SizeItf.class);
+    final SizeItf proxy = JRoutineReflection.wrapper().proxyOf(instance(size), SizeItf.class);
     assertThat(
         proxy.getSize(Arrays.asList("test1", "test2", "test3")).in(seconds(3)).next()).isEqualTo(3);
     assertThat(proxy.getSize()
@@ -122,13 +118,13 @@ public class ProxyRoutineTest {
   @Test
   public void testClassStaticMethod() {
 
-    final TestStatic testStatic = JRoutineProxy.with(classOfType(TestClass.class))
+    final TestStatic testStatic = JRoutineProxy.wrapperOn(poolExecutor())
                                                .withInvocation()
-                                               .withExecutor(ScheduledExecutors.poolExecutor())
                                                .withLogLevel(Level.DEBUG)
                                                .withLog(new NullLog())
                                                .configured()
-                                               .buildProxy(TestStatic.class);
+                                               .proxyOf(classOfType(TestClass.class),
+                                                   TestStatic.class);
 
     try {
 
@@ -162,24 +158,22 @@ public class ProxyRoutineTest {
   public void testGenericProxyCache() {
 
     final TestList<String> testList = new TestList<String>();
-    final ProxyRoutineBuilder builder = JRoutineProxy.with(instance(testList))
-                                                     .withInvocation()
-                                                     .withExecutor(
-                                                         ScheduledExecutors.syncExecutor())
-                                                     .configured();
+    final ProxyRoutineBuilder builder = JRoutineProxy.wrapperOn(syncExecutor());
 
     final TestListItf<String> testListItf1 =
-        builder.buildProxy(new ClassToken<TestListItf<String>>() {});
+        builder.proxyOf(instance(testList), new ClassToken<TestListItf<String>>() {});
     testListItf1.add("test");
 
     assertThat(testListItf1.get(0)).isEqualTo("test");
-    assertThat(builder.buildProxy(new ClassToken<TestListItf<Integer>>() {})).isSameAs(
+    assertThat(
+        builder.proxyOf(instance(testList), new ClassToken<TestListItf<Integer>>() {})).isSameAs(
         testListItf1);
 
     final TestListItf<Integer> testListItf2 =
-        builder.buildProxy(new ClassToken<TestListItf<Integer>>() {});
+        builder.proxyOf(instance(testList), new ClassToken<TestListItf<Integer>>() {});
     assertThat(testListItf2).isSameAs(testListItf1);
-    assertThat(builder.buildProxy(new ClassToken<TestListItf<Integer>>() {})).isSameAs(
+    assertThat(
+        builder.proxyOf(instance(testList), new ClassToken<TestListItf<Integer>>() {})).isSameAs(
         testListItf2);
 
     testListItf2.add(3);
@@ -192,7 +186,7 @@ public class ProxyRoutineTest {
 
     final TestClass test = new TestClass();
     final ClassToken<TestInterfaceProxy> token = tokenOf(TestInterfaceProxy.class);
-    final TestInterfaceProxy testProxy = JRoutineProxy.with(instance(test)).buildProxy(token);
+    final TestInterfaceProxy testProxy = JRoutineProxy.wrapper().proxyOf(instance(test), token);
 
     assertThat(testProxy.getOne().next()).isEqualTo(1);
   }
@@ -205,7 +199,7 @@ public class ProxyRoutineTest {
 
     try {
 
-      JRoutineProxy.with(instance(test)).buildProxy((Class<?>) null);
+      JRoutineProxy.wrapper().proxyOf(instance(test), (Class<?>) null);
 
       fail();
 
@@ -215,7 +209,7 @@ public class ProxyRoutineTest {
 
     try {
 
-      JRoutineProxy.with(instance(test)).buildProxy((ClassToken<?>) null);
+      JRoutineProxy.wrapper().proxyOf(instance(test), (ClassToken<?>) null);
 
       fail();
 
@@ -228,13 +222,12 @@ public class ProxyRoutineTest {
   public void testObjectStaticMethod() {
 
     final TestClass test = new TestClass();
-    final TestStatic testStatic = JRoutineProxy.with(instance(test))
+    final TestStatic testStatic = JRoutineProxy.wrapperOn(poolExecutor())
                                                .withInvocation()
-                                               .withExecutor(ScheduledExecutors.poolExecutor())
                                                .withLogLevel(Level.DEBUG)
                                                .withLog(new NullLog())
                                                .configured()
-                                               .buildProxy(TestStatic.class);
+                                               .proxyOf(instance(test), TestStatic.class);
 
     assertThat(testStatic.getOne().all()).containsExactly(1);
     assertThat(testStatic.getTwo().all()).containsExactly(2);
@@ -244,82 +237,81 @@ public class ProxyRoutineTest {
   public void testProxy() {
 
     final NullLog log = new NullLog();
-    final ScheduledExecutor executor = ScheduledExecutors.poolExecutor();
+    final ScheduledExecutor executor = poolExecutor();
     final TestClass test = new TestClass();
-    final TestProxy testProxy = JRoutineProxy.with(instance(test))
+    final TestProxy testProxy = JRoutineProxy.wrapperOn(executor)
                                              .withInvocation()
-                                             .withExecutor(executor)
                                              .withLogLevel(Level.DEBUG)
                                              .withLog(log)
                                              .configured()
-                                             .buildProxy(tokenOf(TestProxy.class));
+                                             .proxyOf(instance(test), tokenOf(TestProxy.class));
 
     assertThat(testProxy.getOne().next()).isEqualTo(1);
 
     final ArrayList<String> list = new ArrayList<String>();
-    assertThat((Iterable<?>) testProxy.getList(JRoutineCore.<List<String>>of(list).buildChannel())
+    assertThat((Iterable<?>) testProxy.getList(JRoutineCore.channel().<List<String>>of(list))
                                       .iterator()
                                       .next()).isSameAs(list);
 
-    assertThat(testProxy.getString(JRoutineCore.of(3).buildChannel())).isEqualTo("3");
+    assertThat(testProxy.getString(JRoutineCore.channel().of(3))).isEqualTo("3");
   }
 
   @Test
   public void testProxyBuilder() {
 
     final NullLog log = new NullLog();
-    final ScheduledExecutor executor = ScheduledExecutors.poolExecutor();
+    final ScheduledExecutor executor = poolExecutor();
     final TestClass test = new TestClass();
     final InvocationConfiguration configuration =
-        builder().withExecutor(executor).withLogLevel(Level.DEBUG).withLog(log).configured();
+        builder().withLogLevel(Level.DEBUG).withLog(log).configured();
     final ProxyObjectBuilder<TestProxy> builder =
-        com.github.dm.jrt.proxy.Proxy_Test.with(instance(test));
+        com.github.dm.jrt.proxy.Proxy_Test.wrapperOn(executor);
     final TestProxy testProxy = builder.withInvocation()
                                        .withPatch(configuration)
                                        .configured()
-                                       .wrapperConfiguration()
+                                       .withWrapper()
                                        .withSharedFields()
-                                       .apply()
-                                       .buildProxy();
+                                       .configured()
+                                       .proxyOf(instance(test));
 
     assertThat(testProxy.getOne().next()).isEqualTo(1);
 
     final ArrayList<String> list = new ArrayList<String>();
-    assertThat((Iterable<?>) testProxy.getList(JRoutineCore.<List<String>>of(list).buildChannel())
+    assertThat((Iterable<?>) testProxy.getList(JRoutineCore.channel().<List<String>>of(list))
                                       .iterator()
                                       .next()).isSameAs(list);
 
-    assertThat(testProxy.getString(JRoutineCore.of(3).buildChannel())).isEqualTo("3");
+    assertThat(testProxy.getString(JRoutineCore.channel().of(3))).isEqualTo("3");
 
-    assertThat(JRoutineProxy.with(instance(test))
+    assertThat(JRoutineProxy.wrapperOn(executor)
                             .withInvocation()
                             .withPatch(configuration)
                             .configured()
-                            .wrapperConfiguration()
+                            .withWrapper()
                             .withSharedFields()
-                            .apply()
-                            .buildProxy(tokenOf(TestProxy.class))).isSameAs(testProxy);
+                            .configured()
+                            .proxyOf(instance(test), tokenOf(TestProxy.class))).isSameAs(testProxy);
   }
 
   @Test
   public void testProxyCache() {
 
     final NullLog log = new NullLog();
-    final ScheduledExecutor executor = ScheduledExecutors.poolExecutor();
+    final ScheduledExecutor executor = poolExecutor();
     final TestClass test = new TestClass();
     final InvocationConfiguration configuration =
-        builder().withExecutor(executor).withLogLevel(Level.DEBUG).withLog(log).configured();
-    final TestProxy testProxy = JRoutineProxy.with(instance(test))
+        builder().withLogLevel(Level.DEBUG).withLog(log).configured();
+    final TestProxy testProxy = JRoutineProxy.wrapperOn(executor)
                                              .withInvocation()
                                              .withPatch(configuration)
                                              .configured()
-                                             .buildProxy(tokenOf(TestProxy.class));
+                                             .proxyOf(instance(test), tokenOf(TestProxy.class));
 
-    assertThat(JRoutineProxy.with(instance(test))
+    assertThat(JRoutineProxy.wrapperOn(executor)
                             .withInvocation()
                             .withPatch(configuration)
                             .configured()
-                            .buildProxy(tokenOf(TestProxy.class))).isSameAs(testProxy);
+                            .proxyOf(instance(test), tokenOf(TestProxy.class))).isSameAs(testProxy);
   }
 
   @Test
@@ -329,7 +321,7 @@ public class ProxyRoutineTest {
 
     try {
 
-      JRoutineProxy.with(instance(test)).buildProxy(TestClass.class);
+      JRoutineProxy.wrapper().proxyOf(instance(test), TestClass.class);
 
       fail();
 
@@ -339,7 +331,7 @@ public class ProxyRoutineTest {
 
     try {
 
-      JRoutineProxy.with(instance(test)).buildProxy(tokenOf(TestClass.class));
+      JRoutineProxy.wrapper().proxyOf(instance(test), tokenOf(TestClass.class));
 
       fail();
 
@@ -352,22 +344,20 @@ public class ProxyRoutineTest {
   public void testSharedFields() {
 
     final TestClass2 test = new TestClass2();
-    final ProxyRoutineBuilder builder = JRoutineProxy.with(instance(test))
-                                                     .withInvocation()
-                                                     .withOutputTimeout(seconds(2))
-                                                     .configured();
+    final ProxyRoutineBuilder builder =
+        JRoutineProxy.wrapper().withInvocation().withOutputTimeout(seconds(2)).configured();
 
     long startTime = System.currentTimeMillis();
 
-    Channel<?, Integer> getOne = builder.wrapperConfiguration()
+    Channel<?, Integer> getOne = builder.withWrapper()
                                         .withSharedFields("1")
-                                        .apply()
-                                        .buildProxy(TestClassAsync.class)
+                                        .configured()
+                                        .proxyOf(instance(test), TestClassAsync.class)
                                         .getOne();
-    Channel<?, Integer> getTwo = builder.wrapperConfiguration()
+    Channel<?, Integer> getTwo = builder.withWrapper()
                                         .withSharedFields("2")
-                                        .apply()
-                                        .buildProxy(TestClassAsync.class)
+                                        .configured()
+                                        .proxyOf(instance(test), TestClassAsync.class)
                                         .getTwo();
 
     assertThat(getOne.getComplete()).isTrue();
@@ -376,8 +366,8 @@ public class ProxyRoutineTest {
 
     startTime = System.currentTimeMillis();
 
-    getOne = builder.buildProxy(TestClassAsync.class).getOne();
-    getTwo = builder.buildProxy(TestClassAsync.class).getTwo();
+    getOne = builder.proxyOf(instance(test), TestClassAsync.class).getOne();
+    getTwo = builder.proxyOf(instance(test), TestClassAsync.class).getTwo();
 
     assertThat(getOne.getComplete()).isTrue();
     assertThat(getTwo.getComplete()).isTrue();
@@ -389,41 +379,41 @@ public class ProxyRoutineTest {
   public void testTemplates() {
 
     final Impl impl = new Impl();
-    final Itf itf = JRoutineProxy.with(instance(impl))
+    final Itf itf = JRoutineProxy.wrapper()
                                  .withInvocation()
                                  .withOutputTimeout(seconds(10))
                                  .configured()
-                                 .buildProxy(Itf.class);
+                                 .proxyOf(instance(impl), Itf.class);
 
     assertThat(itf.add0('c')).isEqualTo((int) 'c');
-    final Channel<Character, Character> channel1 = JRoutineCore.<Character>ofData().buildChannel();
+    final Channel<Character, Character> channel1 = JRoutineCore.channel().ofType();
     channel1.pass('a').close();
     assertThat(itf.add1(channel1)).isEqualTo((int) 'a');
     assertThat(itf.add3('c').all()).containsExactly((int) 'c');
-    final Channel<Character, Character> channel3 = JRoutineCore.<Character>ofData().buildChannel();
+    final Channel<Character, Character> channel3 = JRoutineCore.channel().ofType();
     channel3.pass('a').close();
     assertThat(itf.add4(channel3).all()).containsExactly((int) 'a');
     assertThat(itf.add6().pass('d').close().all()).containsOnly((int) 'd');
     assertThat(itf.add10().invoke().pass('d').close().all()).containsOnly((int) 'd');
     assertThat(itf.addA00(new char[]{'c', 'z'})).isEqualTo(new int[]{'c', 'z'});
-    final Channel<char[], char[]> channel5 = JRoutineCore.<char[]>ofData().buildChannel();
+    final Channel<char[], char[]> channel5 = JRoutineCore.channel().ofType();
     channel5.pass(new char[]{'a', 'z'}).close();
     assertThat(itf.addA01(channel5)).isEqualTo(new int[]{'a', 'z'});
-    final Channel<Character, Character> channel6 = JRoutineCore.<Character>ofData().buildChannel();
+    final Channel<Character, Character> channel6 = JRoutineCore.channel().ofType();
     channel6.pass('d', 'e', 'f').close();
     assertThat(itf.addA02(channel6)).isEqualTo(new int[]{'d', 'e', 'f'});
     assertThat(itf.addA04(new char[]{'c', 'z'}).all()).containsExactly(new int[]{'c', 'z'});
-    final Channel<char[], char[]> channel8 = JRoutineCore.<char[]>ofData().buildChannel();
+    final Channel<char[], char[]> channel8 = JRoutineCore.channel().ofType();
     channel8.pass(new char[]{'a', 'z'}).close();
     assertThat(itf.addA05(channel8).all()).containsExactly(new int[]{'a', 'z'});
-    final Channel<Character, Character> channel9 = JRoutineCore.<Character>ofData().buildChannel();
+    final Channel<Character, Character> channel9 = JRoutineCore.channel().ofType();
     channel9.pass('d', 'e', 'f').close();
     assertThat(itf.addA06(channel9).all()).containsExactly(new int[]{'d', 'e', 'f'});
     assertThat(itf.addA08(new char[]{'c', 'z'}).all()).containsExactly((int) 'c', (int) 'z');
-    final Channel<char[], char[]> channel11 = JRoutineCore.<char[]>ofData().buildChannel();
+    final Channel<char[], char[]> channel11 = JRoutineCore.channel().ofType();
     channel11.pass(new char[]{'a', 'z'}).close();
     assertThat(itf.addA09(channel11).all()).containsExactly((int) 'a', (int) 'z');
-    final Channel<Character, Character> channel12 = JRoutineCore.<Character>ofData().buildChannel();
+    final Channel<Character, Character> channel12 = JRoutineCore.channel().ofType();
     channel12.pass('d', 'e', 'f').close();
     assertThat(itf.addA10(channel12).all()).containsExactly((int) 'd', (int) 'e', (int) 'f');
     assertThat(itf.addA12().pass(new char[]{'c', 'z'}).close().all()).containsOnly(
@@ -435,29 +425,26 @@ public class ProxyRoutineTest {
     assertThat(itf.addA18().invoke().pass(new char[]{'c', 'z'}).close().all()).containsExactly(
         (int) 'c', (int) 'z');
     assertThat(itf.addL00(Arrays.asList('c', 'z'))).isEqualTo(Arrays.asList((int) 'c', (int) 'z'));
-    final Channel<List<Character>, List<Character>> channel20 =
-        JRoutineCore.<List<Character>>ofData().buildChannel();
+    final Channel<List<Character>, List<Character>> channel20 = JRoutineCore.channel().ofType();
     channel20.pass(Arrays.asList('a', 'z')).close();
     assertThat(itf.addL01(channel20)).isEqualTo(Arrays.asList((int) 'a', (int) 'z'));
-    final Channel<Character, Character> channel21 = JRoutineCore.<Character>ofData().buildChannel();
+    final Channel<Character, Character> channel21 = JRoutineCore.channel().ofType();
     channel21.pass('d', 'e', 'f').close();
     assertThat(itf.addL02(channel21)).isEqualTo(Arrays.asList((int) 'd', (int) 'e', (int) 'f'));
     assertThat(itf.addL04(Arrays.asList('c', 'z')).all()).containsExactly(
         Arrays.asList((int) 'c', (int) 'z'));
-    final Channel<List<Character>, List<Character>> channel23 =
-        JRoutineCore.<List<Character>>ofData().buildChannel();
+    final Channel<List<Character>, List<Character>> channel23 = JRoutineCore.channel().ofType();
     channel23.pass(Arrays.asList('a', 'z')).close();
     assertThat(itf.addL05(channel23).all()).containsExactly(Arrays.asList((int) 'a', (int) 'z'));
-    final Channel<Character, Character> channel24 = JRoutineCore.<Character>ofData().buildChannel();
+    final Channel<Character, Character> channel24 = JRoutineCore.channel().ofType();
     channel24.pass('d', 'e', 'f').close();
     assertThat(itf.addL06(channel24).all()).containsExactly(
         Arrays.asList((int) 'd', (int) 'e', (int) 'f'));
     assertThat(itf.addL08(Arrays.asList('c', 'z')).all()).containsExactly((int) 'c', (int) 'z');
-    final Channel<List<Character>, List<Character>> channel26 =
-        JRoutineCore.<List<Character>>ofData().buildChannel();
+    final Channel<List<Character>, List<Character>> channel26 = JRoutineCore.channel().ofType();
     channel26.pass(Arrays.asList('a', 'z')).close();
     assertThat(itf.addL09(channel26).all()).containsExactly((int) 'a', (int) 'z');
-    final Channel<Character, Character> channel27 = JRoutineCore.<Character>ofData().buildChannel();
+    final Channel<Character, Character> channel27 = JRoutineCore.channel().ofType();
     channel27.pass('d', 'e', 'f').close();
     assertThat(itf.addL10(channel27).all()).containsExactly((int) 'd', (int) 'e', (int) 'f');
     assertThat(itf.addL12().pass(Arrays.asList('c', 'z')).close().all()).containsOnly(
@@ -485,26 +472,25 @@ public class ProxyRoutineTest {
     assertThat(itf.getL4().close().all()).containsExactly(1, 2, 3);
     assertThat(itf.getL5().invoke().close().all()).containsExactly(1, 2, 3);
     itf.set0(-17);
-    final Channel<Integer, Integer> channel35 = JRoutineCore.<Integer>ofData().buildChannel();
+    final Channel<Integer, Integer> channel35 = JRoutineCore.channel().ofType();
     channel35.pass(-17).close();
     itf.set1(channel35);
     itf.set3().pass(-17).close().getComplete();
     itf.set5().invoke().pass(-17).close().getComplete();
     itf.setA0(new int[]{1, 2, 3});
-    final Channel<int[], int[]> channel37 = JRoutineCore.<int[]>ofData().buildChannel();
+    final Channel<int[], int[]> channel37 = JRoutineCore.channel().ofType();
     channel37.pass(new int[]{1, 2, 3}).close();
     itf.setA1(channel37);
-    final Channel<Integer, Integer> channel38 = JRoutineCore.<Integer>ofData().buildChannel();
+    final Channel<Integer, Integer> channel38 = JRoutineCore.channel().ofType();
     channel38.pass(1, 2, 3).close();
     itf.setA2(channel38);
     itf.setA4().pass(new int[]{1, 2, 3}).close().getComplete();
     itf.setA6().invoke().pass(new int[]{1, 2, 3}).close().getComplete();
     itf.setL0(Arrays.asList(1, 2, 3));
-    final Channel<List<Integer>, List<Integer>> channel40 =
-        JRoutineCore.<List<Integer>>ofData().buildChannel();
+    final Channel<List<Integer>, List<Integer>> channel40 = JRoutineCore.channel().ofType();
     channel40.pass(Arrays.asList(1, 2, 3)).close();
     itf.setL1(channel40);
-    final Channel<Integer, Integer> channel41 = JRoutineCore.<Integer>ofData().buildChannel();
+    final Channel<Integer, Integer> channel41 = JRoutineCore.channel().ofType();
     channel41.pass(1, 2, 3).close();
     itf.setL2(channel41);
     itf.setL4().pass(Arrays.asList(1, 2, 3)).close().getComplete();
@@ -515,20 +501,20 @@ public class ProxyRoutineTest {
   public void testTimeoutActionAnnotation() throws NoSuchMethodException {
 
     final TestTimeout testTimeout = new TestTimeout();
-    assertThat(JRoutineProxy.with(instance(testTimeout))
+    assertThat(JRoutineProxy.wrapper()
                             .withInvocation()
                             .withOutputTimeout(seconds(1))
                             .configured()
-                            .buildProxy(TestTimeoutItf.class)
+                            .proxyOf(instance(testTimeout), TestTimeoutItf.class)
                             .getInt()).isEqualTo(31);
 
     try {
 
-      JRoutineProxy.with(instance(testTimeout))
+      JRoutineProxy.wrapper()
                    .withInvocation()
                    .withOutputTimeoutAction(TimeoutActionType.FAIL)
                    .configured()
-                   .buildProxy(TestTimeoutItf.class)
+                   .proxyOf(instance(testTimeout), TestTimeoutItf.class)
                    .getInt();
 
       fail();
@@ -810,7 +796,6 @@ public class ProxyRoutineTest {
     @LogType(NullLog.class)
     @InputBackoff(MyBackoff.class)
     @OutputBackoff(MyBackoff.class)
-    @ExecutorType(MyExecutor.class)
     @AsyncOutput
     Channel<?, Integer> getSize(String[] a);
   }
@@ -961,13 +946,6 @@ public class ProxyRoutineTest {
 
     public MyBackoff() {
       super(BackoffBuilder.afterCount(3).linearDelay(1, TimeUnit.SECONDS));
-    }
-  }
-
-  public static class MyExecutor extends ScheduledExecutorDecorator {
-
-    public MyExecutor() {
-      super(ScheduledExecutors.syncExecutor());
     }
   }
 

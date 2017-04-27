@@ -47,7 +47,7 @@ public interface WrapperRoutineBuilder extends ReflectionRoutineBuilder {
    * {@inheritDoc}
    */
   @NotNull
-  WrapperRoutineBuilder apply(@NotNull WrapperConfiguration configuration);
+  WrapperRoutineBuilder withConfiguration(@NotNull WrapperConfiguration configuration);
 
   /**
    * {@inheritDoc}
@@ -72,7 +72,7 @@ public interface WrapperRoutineBuilder extends ReflectionRoutineBuilder {
    * {@inheritDoc}
    */
   @NotNull
-  WrapperConfiguration.Builder<? extends WrapperRoutineBuilder> wrapperConfiguration();
+  WrapperConfiguration.Builder<? extends WrapperRoutineBuilder> withWrapper();
 
   /**
    * Proxy instantiation strategy type enumeration.

@@ -31,7 +31,6 @@ import com.github.dm.jrt.reflect.annotation.AsyncMethod;
 import com.github.dm.jrt.reflect.annotation.AsyncOutput;
 import com.github.dm.jrt.reflect.annotation.AsyncOutput.OutputMode;
 import com.github.dm.jrt.reflect.annotation.CoreInvocations;
-import com.github.dm.jrt.reflect.annotation.ExecutorType;
 import com.github.dm.jrt.reflect.annotation.InputBackoff;
 import com.github.dm.jrt.reflect.annotation.InputMaxSize;
 import com.github.dm.jrt.reflect.annotation.InputOrder;
@@ -519,7 +518,6 @@ public class ReflectionRoutineBuilders {
    * @return the modified configuration.
    * @throws java.lang.IllegalArgumentException if an unexpected error occurs.
    * @see com.github.dm.jrt.reflect.annotation.CoreInvocations CoreInvocations
-   * @see com.github.dm.jrt.reflect.annotation.ExecutorType ExecutorType
    * @see com.github.dm.jrt.reflect.annotation.InputBackoff InputBackoff
    * @see com.github.dm.jrt.reflect.annotation.InputMaxSize InputMaxSize
    * @see com.github.dm.jrt.reflect.annotation.InputOrder InputOrder
@@ -584,9 +582,6 @@ public class ReflectionRoutineBuilders {
 
       } else if (annotationType == Priority.class) {
         builder.withPriority(((Priority) annotation).value());
-
-      } else if (annotationType == ExecutorType.class) {
-        builder.withExecutor(newInstanceOf(((ExecutorType) annotation).value()));
       }
     }
 
@@ -602,7 +597,6 @@ public class ReflectionRoutineBuilders {
    * @return the modified configuration.
    * @throws java.lang.IllegalArgumentException if an unexpected error occurs.
    * @see com.github.dm.jrt.reflect.annotation.CoreInvocations CoreInvocations
-   * @see com.github.dm.jrt.reflect.annotation.ExecutorType ExecutorType
    * @see com.github.dm.jrt.reflect.annotation.InputBackoff InputBackoff
    * @see com.github.dm.jrt.reflect.annotation.InputMaxSize InputMaxSize
    * @see com.github.dm.jrt.reflect.annotation.InputOrder InputOrder
@@ -637,7 +631,7 @@ public class ReflectionRoutineBuilders {
     final WrapperConfiguration.Builder<WrapperConfiguration> builder =
         WrapperConfiguration.builderFrom(configuration);
     if (annotations == null) {
-      return builder.apply();
+      return builder.configured();
     }
 
     for (final Annotation annotation : annotations) {
@@ -647,7 +641,7 @@ public class ReflectionRoutineBuilders {
       }
     }
 
-    return builder.apply();
+    return builder.configured();
   }
 
   /**

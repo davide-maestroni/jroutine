@@ -17,7 +17,7 @@
 package com.github.dm.jrt.function;
 
 import com.github.dm.jrt.core.common.RoutineException;
-import com.github.dm.jrt.function.builder.ChannelConsumerBuilder;
+import com.github.dm.jrt.function.builder.FunctionalChannelConsumer;
 import com.github.dm.jrt.function.util.Action;
 import com.github.dm.jrt.function.util.ActionDecorator;
 import com.github.dm.jrt.function.util.Consumer;
@@ -32,7 +32,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <OUT> the output data type.
  */
-class DefaultChannelConsumerBuilder<OUT> implements ChannelConsumerBuilder<OUT> {
+class DefaultFunctionalChannelConsumer<OUT> implements FunctionalChannelConsumer<OUT> {
 
   private final ActionDecorator mOnComplete;
 
@@ -48,7 +48,7 @@ class DefaultChannelConsumerBuilder<OUT> implements ChannelConsumerBuilder<OUT> 
    * @param onComplete the complete action.
    */
   @SuppressWarnings("unchecked")
-  private DefaultChannelConsumerBuilder(@NotNull final ConsumerDecorator<? super OUT> onOutput,
+  private DefaultFunctionalChannelConsumer(@NotNull final ConsumerDecorator<? super OUT> onOutput,
       @NotNull final ConsumerDecorator<? super RoutineException> onError,
       @NotNull final ActionDecorator onComplete) {
     mOnOutput = (ConsumerDecorator<OUT>) onOutput;
@@ -64,8 +64,8 @@ class DefaultChannelConsumerBuilder<OUT> implements ChannelConsumerBuilder<OUT> 
    * @return the builder instance.
    */
   @NotNull
-  static ChannelConsumerBuilder<Object> onComplete(@NotNull final Action onComplete) {
-    return new DefaultChannelConsumerBuilder<Object>(ConsumerDecorator.sink(),
+  static FunctionalChannelConsumer<Object> onComplete(@NotNull final Action onComplete) {
+    return new DefaultFunctionalChannelConsumer<Object>(ConsumerDecorator.sink(),
         ConsumerDecorator.<RoutineException>sink(), ActionDecorator.decorate(onComplete));
   }
 
@@ -77,9 +77,9 @@ class DefaultChannelConsumerBuilder<OUT> implements ChannelConsumerBuilder<OUT> 
    * @return the builder instance.
    */
   @NotNull
-  static ChannelConsumerBuilder<Object> onError(
+  static FunctionalChannelConsumer<Object> onError(
       @NotNull final Consumer<? super RoutineException> onError) {
-    return new DefaultChannelConsumerBuilder<Object>(ConsumerDecorator.sink(),
+    return new DefaultFunctionalChannelConsumer<Object>(ConsumerDecorator.sink(),
         ConsumerDecorator.decorate(onError), ActionDecorator.noOp());
   }
 
@@ -92,8 +92,8 @@ class DefaultChannelConsumerBuilder<OUT> implements ChannelConsumerBuilder<OUT> 
    * @return the builder instance.
    */
   @NotNull
-  static <OUT> ChannelConsumerBuilder<OUT> onOutput(@NotNull final Consumer<? super OUT> onOutput) {
-    return new DefaultChannelConsumerBuilder<OUT>(ConsumerDecorator.decorate(onOutput),
+  static <OUT> FunctionalChannelConsumer<OUT> onOutput(@NotNull final Consumer<? super OUT> onOutput) {
+    return new DefaultFunctionalChannelConsumer<OUT>(ConsumerDecorator.decorate(onOutput),
         ConsumerDecorator.<RoutineException>sink(), ActionDecorator.noOp());
   }
 
@@ -107,9 +107,9 @@ class DefaultChannelConsumerBuilder<OUT> implements ChannelConsumerBuilder<OUT> 
    * @return the builder instance.
    */
   @NotNull
-  static <OUT> ChannelConsumerBuilder<OUT> onOutput(@NotNull final Consumer<? super OUT> onOutput,
+  static <OUT> FunctionalChannelConsumer<OUT> onOutput(@NotNull final Consumer<? super OUT> onOutput,
       @NotNull final Consumer<? super RoutineException> onError) {
-    return new DefaultChannelConsumerBuilder<OUT>(ConsumerDecorator.decorate(onOutput),
+    return new DefaultFunctionalChannelConsumer<OUT>(ConsumerDecorator.decorate(onOutput),
         ConsumerDecorator.decorate(onError), ActionDecorator.noOp());
   }
 
@@ -124,28 +124,28 @@ class DefaultChannelConsumerBuilder<OUT> implements ChannelConsumerBuilder<OUT> 
    * @return the builder instance.
    */
   @NotNull
-  static <OUT> ChannelConsumerBuilder<OUT> onOutput(@NotNull final Consumer<? super OUT> onOutput,
+  static <OUT> FunctionalChannelConsumer<OUT> onOutput(@NotNull final Consumer<? super OUT> onOutput,
       @NotNull final Consumer<? super RoutineException> onError, @NotNull final Action onComplete) {
-    return new DefaultChannelConsumerBuilder<OUT>(ConsumerDecorator.decorate(onOutput),
+    return new DefaultFunctionalChannelConsumer<OUT>(ConsumerDecorator.decorate(onOutput),
         ConsumerDecorator.decorate(onError), ActionDecorator.decorate(onComplete));
   }
 
   @NotNull
-  public ChannelConsumerBuilder<OUT> andOnComplete(@NotNull final Action onComplete) {
-    return new DefaultChannelConsumerBuilder<OUT>(mOnOutput, mOnError,
+  public FunctionalChannelConsumer<OUT> andOnComplete(@NotNull final Action onComplete) {
+    return new DefaultFunctionalChannelConsumer<OUT>(mOnOutput, mOnError,
         mOnComplete.andThen(onComplete));
   }
 
   @NotNull
-  public ChannelConsumerBuilder<OUT> andOnError(
+  public FunctionalChannelConsumer<OUT> andOnError(
       @NotNull final Consumer<? super RoutineException> onError) {
-    return new DefaultChannelConsumerBuilder<OUT>(mOnOutput, mOnError.andThen(onError),
+    return new DefaultFunctionalChannelConsumer<OUT>(mOnOutput, mOnError.andThen(onError),
         mOnComplete);
   }
 
   @NotNull
-  public ChannelConsumerBuilder<OUT> andOnOutput(@NotNull final Consumer<? super OUT> onOutput) {
-    return new DefaultChannelConsumerBuilder<OUT>(mOnOutput.andThen(onOutput), mOnError,
+  public FunctionalChannelConsumer<OUT> andOnOutput(@NotNull final Consumer<? super OUT> onOutput) {
+    return new DefaultFunctionalChannelConsumer<OUT>(mOnOutput.andThen(onOutput), mOnError,
         mOnComplete);
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Davide Maestroni
+ * Copyright 2017 Davide Maestroni
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,40 +14,41 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.function;
+package com.github.dm.jrt.operator;
 
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.util.FunctionDecorator;
+import com.github.dm.jrt.function.util.PredicateDecorator;
 
 import org.jetbrains.annotations.NotNull;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
- * Mapping invocation based on a function instance.
+ * Mapping invocation based on a predicate instance.
  * <p>
  * Created by davide-maestroni on 04/23/2016.
  *
- * @param <IN>  the input data type.
- * @param <OUT> the output data type.
+ * @param <IN> the input data type.
  */
-class FunctionMappingInvocation<IN, OUT> extends MappingInvocation<IN, OUT> {
+class PredicateMappingInvocation<IN> extends MappingInvocation<IN, IN> {
 
-  private final FunctionDecorator<? super IN, ? extends OUT> mFunction;
+  private final PredicateDecorator<? super IN> mPredicate;
 
   /**
    * Constructor.
    *
-   * @param function the function instance.
+   * @param predicate the predicate instance.
    */
-  FunctionMappingInvocation(@NotNull final FunctionDecorator<? super IN, ? extends OUT> function) {
-    super(asArgs(ConstantConditions.notNull("function wrapper", function)));
-    mFunction = function;
+  PredicateMappingInvocation(@NotNull final PredicateDecorator<? super IN> predicate) {
+    super(asArgs(ConstantConditions.notNull("predicate wrapper", predicate)));
+    mPredicate = predicate;
   }
 
-  public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) throws Exception {
-    result.pass(mFunction.apply(input));
+  public void onInput(final IN input, @NotNull final Channel<IN, ?> result) throws Exception {
+    if (mPredicate.test(input)) {
+      result.pass(input);
+    }
   }
 }

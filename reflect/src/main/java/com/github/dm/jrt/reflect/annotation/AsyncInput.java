@@ -99,8 +99,7 @@ public @interface AsyncInput {
      * The annotated parameters must extend a
      * {@link com.github.dm.jrt.core.channel.Channel Channel}.
      */
-    DEFAULT,
-    /**
+    DEFAULT, /**
      * Collection mode.
      * <br>
      * The inputs are collected from the channel and passed as an array or collection to the

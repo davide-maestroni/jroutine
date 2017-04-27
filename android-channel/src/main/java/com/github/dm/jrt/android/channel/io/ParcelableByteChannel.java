@@ -25,7 +25,6 @@ import com.github.dm.jrt.channel.io.ByteChannel;
 import com.github.dm.jrt.channel.io.ByteChannel.ByteChunk;
 import com.github.dm.jrt.channel.io.ByteChannel.ChunkInputStream;
 import com.github.dm.jrt.channel.io.ByteChannel.ChunkOutputStream;
-import com.github.dm.jrt.channel.io.ChunkOutputStreamBuilder;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ChannelConsumer;
@@ -49,7 +48,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * <pre><code>
  * public void onInput(final IN in, final Channel&lt;ParcelableByteChunk, ?&gt; result) {
  *   ...
- *   final ChunkOutputStream outputStream = ParcelableByteChannel.withOutput(result)
+ *   final ChunkOutputStream outputStream = ParcelableByteChannel.outputStream(result)
  *                                                                .buildOutputStream();
  *   ...
  * }
@@ -59,7 +58,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * <pre><code>
  * public void onInput(final ParcelableByteChunk chunk, final Channel&lt;OUT, ?&gt; result) {
  *   ...
- *   final ChunkInputStream getInputStream = ParcelableByteChannel.getInputStream(chunk);
+ *   final ChunkInputStream inputStream = ParcelableByteChannel.inputStream(chunk);
  *   ...
  * }
  * </code></pre>
@@ -97,7 +96,7 @@ public class ParcelableByteChannel {
       byteChunks.add(chunk.getChunk());
     }
 
-    return ByteChannel.getInputStream(byteChunks);
+    return ByteChannel.inputStream(byteChunks);
   }
 
   /**
@@ -119,7 +118,7 @@ public class ParcelableByteChannel {
       byteChunks.add(chunk.getChunk());
     }
 
-    return ByteChannel.getInputStream(byteChunks);
+    return ByteChannel.inputStream(byteChunks);
   }
 
   /**
@@ -134,7 +133,7 @@ public class ParcelableByteChannel {
    */
   @NotNull
   public static ChunkInputStream getInputStream(@NotNull final ParcelableByteChunk chunk) {
-    return ByteChannel.getInputStream(chunk.getChunk());
+    return ByteChannel.inputStream(chunk.getChunk());
   }
 
   /**
@@ -163,7 +162,7 @@ public class ParcelableByteChannel {
    * {@code ChunkOutputStream}s and passed to the underlying channel.
    * <br>
    * The data contained in a chunk can be read through the dedicated {@code ChunkInputStream}
-   * returned by one of the {@code ParcelableByteChannel.getInputStream()} methods. Note that
+   * returned by one of the {@code ParcelableByteChannel.inputStream()} methods. Note that
    * only one
    * input stream can be created for each chunk, any further attempt will generate an exception.
    * <br>
@@ -185,10 +184,10 @@ public class ParcelableByteChannel {
         final byte[] data = in.createByteArray();
         final Channel<ByteChunk, ByteChunk> channel =
             JRoutineCore.<ByteChunk>ofData().buildChannel();
-        final ChunkOutputStream outputStream = ByteChannel.withOutput(channel)
-                                                          .chunkStreamConfiguration()
+        final ChunkOutputStream outputStream = ByteChannel.outputStream(channel)
+                                                          .withStream()
                                                           .withChunkSize(Math.max(data.length, 1))
-                                                          .apply()
+                                                          .configured()
                                                           .buildOutputStream();
         try {
           outputStream.write(data);
@@ -230,7 +229,7 @@ public class ParcelableByteChannel {
     public void writeToParcel(final Parcel dest, final int flags) {
       final ByteChunk chunk = mChunk;
       if (chunk != null) {
-        final ChunkInputStream inputStream = ByteChannel.getInputStream(chunk);
+        final ChunkInputStream inputStream = ByteChannel.inputStream(chunk);
         final ParcelOutputStream outputStream = new ParcelOutputStream(inputStream.available());
         try {
           inputStream.transferTo(outputStream);
@@ -325,7 +324,7 @@ public class ParcelableByteChannel {
       final Channel<ByteChunk, ByteChunk> outputChannel =
           JRoutineCore.<ByteChunk>ofData().buildChannel();
       outputChannel.consume(new ChunkChannelConsumer(mChannel));
-      return ByteChannel.withOutput(outputChannel).apply(mConfiguration).buildOutputStream();
+      return ByteChannel.outputStream(outputChannel).withConfiguration(mConfiguration).buildOutputStream();
     }
 
     @NotNull

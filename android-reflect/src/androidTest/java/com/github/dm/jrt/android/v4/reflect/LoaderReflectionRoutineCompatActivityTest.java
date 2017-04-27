@@ -254,7 +254,7 @@ public class LoaderReflectionRoutineCompatActivityTest
     try {
 
       new DefaultLoaderReflectionRoutineBuilder(loaderFrom(getActivity()),
-          instanceOf(TestClass.class)).apply((WrapperConfiguration) null);
+          instanceOf(TestClass.class)).withConfiguration((WrapperConfiguration) null);
 
       fail();
 
@@ -819,15 +819,15 @@ public class LoaderReflectionRoutineCompatActivityTest
 
     long startTime = System.currentTimeMillis();
 
-    Channel<?, Object> getOne = builder.wrapperConfiguration()
+    Channel<?, Object> getOne = builder.withWrapper()
                                        .withSharedFields("1")
-                                       .apply()
+                                       .configured()
                                        .method("getOne")
                                        .invoke()
                                        .close();
-    Channel<?, Object> getTwo = builder.wrapperConfiguration()
+    Channel<?, Object> getTwo = builder.withWrapper()
                                        .withSharedFields("2")
-                                       .apply()
+                                       .configured()
                                        .method("getTwo")
                                        .invoke()
                                        .close();

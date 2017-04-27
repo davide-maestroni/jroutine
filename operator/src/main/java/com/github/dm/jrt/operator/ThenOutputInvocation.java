@@ -21,6 +21,8 @@ import com.github.dm.jrt.core.channel.Channel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
@@ -33,20 +35,20 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class ThenOutputInvocation<IN, OUT> extends GenerateInvocation<IN, OUT> {
 
-  private final Channel<?, ? extends OUT> mChannel;
+  private final List<? extends OUT> mOutputs;
 
   /**
    * Constructor.
    *
-   * @param channel the output channel.
+   * @param outputs the outputs.
    */
-  ThenOutputInvocation(@Nullable final Channel<?, ? extends OUT> channel) {
-    super(asArgs(channel));
-    mChannel = channel;
+  ThenOutputInvocation(@Nullable final List<? extends OUT> outputs) {
+    super(asArgs(outputs));
+    mOutputs = outputs;
   }
 
   public void onComplete(@NotNull final Channel<OUT, ?> result) {
-    result.pass(mChannel);
+    result.pass(mOutputs);
   }
 
   public void onInput(final IN input, @NotNull final Channel<OUT, ?> result) {

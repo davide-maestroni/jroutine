@@ -18,11 +18,12 @@ package com.github.dm.jrt.operator;
 
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.util.ActionDecorator;
+import com.github.dm.jrt.function.util.Action;
 
 import org.jetbrains.annotations.NotNull;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
+import static com.github.dm.jrt.function.util.ActionDecorator.wrapAction;
 
 /**
  * Generating invocation peeking output data completion.
@@ -33,15 +34,15 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class PeekCompleteInvocation<DATA> extends GenerateInvocation<DATA, DATA> {
 
-  private final ActionDecorator mCompleteAction;
+  private final Action mCompleteAction;
 
   /**
    * Constructor.
    *
    * @param completeAction the action instance.
    */
-  PeekCompleteInvocation(final ActionDecorator completeAction) {
-    super(asArgs(ConstantConditions.notNull("action instance", completeAction)));
+  PeekCompleteInvocation(final Action completeAction) {
+    super(asArgs(ConstantConditions.notNull("action instance", wrapAction(completeAction))));
     mCompleteAction = completeAction;
   }
 

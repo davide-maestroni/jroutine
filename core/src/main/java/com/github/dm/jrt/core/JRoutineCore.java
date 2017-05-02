@@ -18,6 +18,7 @@ package com.github.dm.jrt.core;
 
 import com.github.dm.jrt.core.builder.ChannelBuilder;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.executor.ScheduledExecutor;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
@@ -40,12 +41,11 @@ import static com.github.dm.jrt.core.executor.ScheduledExecutors.defaultExecutor
  * <p>
  * <b>Example 1:</b> Configure and build a routine.
  * <pre><code>
- * final Routine&lt;Input, Result&gt; routine =
- *     JRoutineCore.routine()
- *                 .withInvocation()
- *                 .withLogLevel(Level.WARNING)
- *                 .configured()
- *                 .of(myFactory);
+ * final Routine&lt;Input, Result&gt; routine = JRoutineCore.routine()
+ *                                                          .withInvocation()
+ *                                                          .withLogLevel(Level.WARNING)
+ *                                                          .configuration()
+ *                                                          .of(myFactory);
  * </code></pre>
  * <p>
  * <b>Example 2:</b> Asynchronously merge the output of two routines.
@@ -101,23 +101,6 @@ import static com.github.dm.jrt.core.executor.ScheduledExecutors.defaultExecutor
  */
 public class JRoutineCore {
 
-  // TODO: 22/04/2017 fixme
-      /*
-      JRoutineCore.routine()
-                  .withInvocation()
-                  .withLogLevel(Level.SILENT)
-                  .configured()
-                  .of(factoryOfParallel(JRoutineCore.routine()
-                                                    .of(factoryOf(DelayedInvocation.class,
-                                                        millis(100)))))
-                  .invoke()
-                  .pass("test")
-                  .close()
-                  .in(seconds(1))
-                  .iterator()
-                  .next();
-                  */
-
   /**
    * Avoid explicit instantiation.
    */
@@ -144,6 +127,25 @@ public class JRoutineCore {
   @NotNull
   public static ChannelBuilder channelOn(@NotNull final ScheduledExecutor executor) {
     return new DefaultChannelBuilder(executor);
+  }
+
+  /**
+   * Returns a channel pushing inputs to the specified input one and collecting outputs from the
+   * specified output one.
+   * <p>
+   * Note that it's up to the caller to ensure that inputs and outputs of two channels are actually
+   * connected.
+   *
+   * @param inputChannel  the input channel.
+   * @param outputChannel the output channel.
+   * @param <IN>          the input data type.
+   * @param <OUT>         the output data type.
+   * @return the new channel instance.
+   */
+  @NotNull
+  public static <IN, OUT> Channel<IN, OUT> flattenChannels(
+      @NotNull final Channel<IN, ?> inputChannel, @NotNull final Channel<?, OUT> outputChannel) {
+    return new FlatChannel<IN, OUT>(inputChannel, outputChannel);
   }
 
   /**

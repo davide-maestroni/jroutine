@@ -20,15 +20,15 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.function.util.BiFunction;
-import com.github.dm.jrt.function.util.BiFunctionDecorator;
 import com.github.dm.jrt.function.util.Consumer;
 import com.github.dm.jrt.function.util.Function;
-import com.github.dm.jrt.function.util.FunctionDecorator;
 import com.github.dm.jrt.operator.math.Operation;
 
 import org.jetbrains.annotations.NotNull;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
+import static com.github.dm.jrt.function.util.BiFunctionDecorator.wrapBiFunction;
+import static com.github.dm.jrt.function.util.FunctionDecorator.wrapFunction;
 import static com.github.dm.jrt.operator.math.Numbers.getHigherPrecisionOperation;
 import static com.github.dm.jrt.operator.math.Numbers.getOperation;
 
@@ -62,9 +62,7 @@ public class Sequences {
   public static <DATA extends Comparable<? super DATA>> Consumer<Channel<DATA, ?>> range(
       @NotNull final DATA start, @NotNull final DATA end,
       @NotNull final Function<DATA, DATA> incrementFunction) {
-    return new RangeConsumer<DATA>(ConstantConditions.notNull("start element", start),
-        ConstantConditions.notNull("end element", end),
-        FunctionDecorator.decorate(incrementFunction));
+    return new RangeConsumer<DATA>(start, end, incrementFunction);
   }
 
   /**
@@ -131,9 +129,7 @@ public class Sequences {
   @NotNull
   public static <DATA> Consumer<Channel<DATA, ?>> sequence(@NotNull final DATA start,
       final long count, @NotNull final BiFunction<DATA, Long, DATA> nextFunction) {
-    return new SequenceConsumer<DATA>(ConstantConditions.notNull("start element", start),
-        ConstantConditions.positive("sequence size", count),
-        BiFunctionDecorator.decorate(nextFunction));
+    return new SequenceConsumer<DATA>(start, count, nextFunction);
   }
 
   /**
@@ -163,7 +159,9 @@ public class Sequences {
      */
     private NumberRangeConsumer(@NotNull final N start, @NotNull final N end,
         @NotNull final N increment) {
-      super(asArgs(start, end, increment));
+      super(asArgs(ConstantConditions.notNull("start element", start),
+          ConstantConditions.notNull("end element", end),
+          ConstantConditions.notNull("increment", increment)));
       mStart = start;
       mEnd = end;
       mIncrement = increment;
@@ -227,7 +225,8 @@ public class Sequences {
      */
     private RangeConsumer(@NotNull final OUT start, @NotNull final OUT end,
         @NotNull final Function<OUT, OUT> incrementFunction) {
-      super(asArgs(start, end, incrementFunction));
+      super(asArgs(ConstantConditions.notNull("start element", start),
+          ConstantConditions.notNull("end element", end), wrapFunction(incrementFunction)));
       mStart = start;
       mEnd = end;
       mIncrementFunction = incrementFunction;
@@ -263,7 +262,7 @@ public class Sequences {
 
     private final long mCount;
 
-    private final BiFunctionDecorator<OUT, Long, OUT> mNextFunction;
+    private final BiFunction<OUT, Long, OUT> mNextFunction;
 
     private final OUT mStart;
 
@@ -275,15 +274,16 @@ public class Sequences {
      * @param nextFunction the function computing the next element.
      */
     private SequenceConsumer(@NotNull final OUT start, final long count,
-        @NotNull final BiFunctionDecorator<OUT, Long, OUT> nextFunction) {
-      super(asArgs(start, count, nextFunction));
+        @NotNull final BiFunction<OUT, Long, OUT> nextFunction) {
+      super(asArgs(ConstantConditions.notNull("start element", start),
+          ConstantConditions.positive("sequence size", count), wrapBiFunction(nextFunction)));
       mStart = start;
       mCount = count;
       mNextFunction = nextFunction;
     }
 
     public void accept(final Channel<OUT, ?> result) throws Exception {
-      final BiFunctionDecorator<OUT, Long, OUT> next = mNextFunction;
+      final BiFunction<OUT, Long, OUT> next = mNextFunction;
       OUT current = mStart;
       final long last = mCount - 1;
       if (last >= 0) {

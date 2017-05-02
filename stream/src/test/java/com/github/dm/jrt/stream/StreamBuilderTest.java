@@ -39,12 +39,10 @@ import com.github.dm.jrt.function.util.BiConsumer;
 import com.github.dm.jrt.function.util.BiFunction;
 import com.github.dm.jrt.function.util.Consumer;
 import com.github.dm.jrt.function.util.Function;
-import com.github.dm.jrt.operator.Operators;
+import com.github.dm.jrt.operator.JRoutineOperators;
 import com.github.dm.jrt.stream.builder.StreamBuilder;
 import com.github.dm.jrt.stream.builder.StreamBuildingException;
 import com.github.dm.jrt.stream.config.StreamConfiguration;
-import com.github.dm.jrt.stream.transform.ConvertFunction;
-import com.github.dm.jrt.stream.transform.Transformations;
 
 import org.assertj.core.data.Offset;
 import org.jetbrains.annotations.NotNull;
@@ -63,10 +61,10 @@ import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static com.github.dm.jrt.function.Functions.constant;
 import static com.github.dm.jrt.function.Functions.functionMapping;
 import static com.github.dm.jrt.function.JRoutineFunction.onOutput;
-import static com.github.dm.jrt.operator.Operators.append;
-import static com.github.dm.jrt.operator.Operators.appendAccept;
-import static com.github.dm.jrt.operator.Operators.filter;
-import static com.github.dm.jrt.operator.Operators.reduce;
+import static com.github.dm.jrt.operator.JRoutineOperators.append;
+import static com.github.dm.jrt.operator.JRoutineOperators.appendAccept;
+import static com.github.dm.jrt.operator.JRoutineOperators.filter;
+import static com.github.dm.jrt.operator.JRoutineOperators.reduce;
 import static com.github.dm.jrt.operator.sequence.Sequences.range;
 import static com.github.dm.jrt.stream.transform.Transformations.tryCatchAccept;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -545,7 +543,7 @@ public class StreamBuilderTest {
                                                        return Math.sqrt(number.doubleValue());
                                                      }
                                                    })
-                                                   .map(Operators.average(Double.class))
+                                                   .map(JRoutineOperators.average(Double.class))
                                                    .invoke()
                                                    .close()
                                                    .next()).isCloseTo(21, Offset.offset(0.1));
@@ -562,7 +560,7 @@ public class StreamBuilderTest {
                                                      }
                                                    })
                                                    .immediate()
-                                                   .map(Operators.average(Double.class))
+                                                   .map(JRoutineOperators.average(Double.class))
                                                    .invoke()
                                                    .close()
                                                    .next()).isCloseTo(21, Offset.offset(0.1));

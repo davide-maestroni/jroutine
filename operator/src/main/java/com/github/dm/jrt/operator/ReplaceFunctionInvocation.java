@@ -18,13 +18,14 @@ package com.github.dm.jrt.operator;
 
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
-import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.util.FunctionDecorator;
-import com.github.dm.jrt.function.util.PredicateDecorator;
+import com.github.dm.jrt.function.util.Function;
+import com.github.dm.jrt.function.util.Predicate;
 
 import org.jetbrains.annotations.NotNull;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
+import static com.github.dm.jrt.function.util.FunctionDecorator.wrapFunction;
+import static com.github.dm.jrt.function.util.PredicateDecorator.wrapPredicate;
 
 /**
  * Mapping invocation replacing all the data satisfying the specified predicate, with the outputs
@@ -36,9 +37,9 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class ReplaceFunctionInvocation<DATA> extends MappingInvocation<DATA, DATA> {
 
-  private final PredicateDecorator<? super DATA> mPredicate;
+  private final Predicate<? super DATA> mPredicate;
 
-  private final FunctionDecorator<DATA, ? extends DATA> mReplacementFunction;
+  private final Function<DATA, ? extends DATA> mReplacementFunction;
 
   /**
    * Constructor.
@@ -46,10 +47,9 @@ class ReplaceFunctionInvocation<DATA> extends MappingInvocation<DATA, DATA> {
    * @param predicate           the predicate instance.
    * @param replacementFunction the function instance.
    */
-  ReplaceFunctionInvocation(@NotNull final PredicateDecorator<? super DATA> predicate,
-      @NotNull final FunctionDecorator<DATA, ? extends DATA> replacementFunction) {
-    super(asArgs(ConstantConditions.notNull("predicate instance", predicate),
-        ConstantConditions.notNull("supplier instance", replacementFunction)));
+  ReplaceFunctionInvocation(@NotNull final Predicate<? super DATA> predicate,
+      @NotNull final Function<DATA, ? extends DATA> replacementFunction) {
+    super(asArgs(wrapPredicate(predicate), wrapFunction(replacementFunction)));
     mPredicate = predicate;
     mReplacementFunction = replacementFunction;
   }

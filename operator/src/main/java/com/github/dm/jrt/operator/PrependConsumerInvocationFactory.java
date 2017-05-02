@@ -21,11 +21,12 @@ import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.util.ConsumerDecorator;
+import com.github.dm.jrt.function.util.Consumer;
 
 import org.jetbrains.annotations.NotNull;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
+import static com.github.dm.jrt.function.util.ConsumerDecorator.wrapConsumer;
 
 /**
  * Factory of prepending invocations used to call a consumer a specific number of times.
@@ -38,7 +39,7 @@ class PrependConsumerInvocationFactory<OUT> extends InvocationFactory<OUT, OUT> 
 
   private final long mCount;
 
-  private final ConsumerDecorator<? super Channel<OUT, ?>> mOutputsConsumer;
+  private final Consumer<? super Channel<OUT, ?>> mOutputsConsumer;
 
   /**
    * Constructor.
@@ -47,9 +48,9 @@ class PrependConsumerInvocationFactory<OUT> extends InvocationFactory<OUT, OUT> 
    * @param outputsConsumer the consumer instance.
    */
   PrependConsumerInvocationFactory(final long count,
-      @NotNull final ConsumerDecorator<? super Channel<OUT, ?>> outputsConsumer) {
-    super(asArgs(ConstantConditions.positive("count number", count),
-        ConstantConditions.notNull("consumer instance", outputsConsumer)));
+      @NotNull final Consumer<? super Channel<OUT, ?>> outputsConsumer) {
+    super(
+        asArgs(ConstantConditions.positive("count number", count), wrapConsumer(outputsConsumer)));
     mCount = count;
     mOutputsConsumer = outputsConsumer;
   }
@@ -69,7 +70,7 @@ class PrependConsumerInvocationFactory<OUT> extends InvocationFactory<OUT, OUT> 
 
     private final long mCount;
 
-    private final ConsumerDecorator<? super Channel<OUT, ?>> mOutputsConsumer;
+    private final Consumer<? super Channel<OUT, ?>> mOutputsConsumer;
 
     private boolean mIsCalled;
 
@@ -80,7 +81,7 @@ class PrependConsumerInvocationFactory<OUT> extends InvocationFactory<OUT, OUT> 
      * @param outputsConsumer the consumer instance.
      */
     private PrependConsumerInvocation(final long count,
-        @NotNull final ConsumerDecorator<? super Channel<OUT, ?>> outputsConsumer) {
+        @NotNull final Consumer<? super Channel<OUT, ?>> outputsConsumer) {
       mCount = count;
       mOutputsConsumer = outputsConsumer;
     }
@@ -110,7 +111,7 @@ class PrependConsumerInvocationFactory<OUT> extends InvocationFactory<OUT, OUT> 
       if (!mIsCalled) {
         mIsCalled = true;
         final long count = mCount;
-        final ConsumerDecorator<? super Channel<OUT, ?>> consumer = mOutputsConsumer;
+        final Consumer<? super Channel<OUT, ?>> consumer = mOutputsConsumer;
         for (long i = 0; i < count; ++i) {
           consumer.accept(result);
         }

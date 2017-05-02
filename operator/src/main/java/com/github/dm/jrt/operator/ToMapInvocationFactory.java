@@ -20,8 +20,7 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
-import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.util.FunctionDecorator;
+import com.github.dm.jrt.function.util.Function;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -29,6 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
+import static com.github.dm.jrt.function.util.FunctionDecorator.wrapFunction;
 
 /**
  * Factory of invocations collecting inputs into maps.
@@ -41,9 +41,9 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class ToMapInvocationFactory<IN, KEY, VALUE> extends InvocationFactory<IN, Map<KEY, VALUE>> {
 
-  private final FunctionDecorator<? super IN, KEY> mKeyFunction;
+  private final Function<? super IN, KEY> mKeyFunction;
 
-  private final FunctionDecorator<? super IN, VALUE> mValueFunction;
+  private final Function<? super IN, VALUE> mValueFunction;
 
   /**
    * Constructor.
@@ -51,10 +51,9 @@ class ToMapInvocationFactory<IN, KEY, VALUE> extends InvocationFactory<IN, Map<K
    * @param keyFunction   the function extracting the key.
    * @param valueFunction the function extracting the value.
    */
-  ToMapInvocationFactory(@NotNull final FunctionDecorator<? super IN, KEY> keyFunction,
-      @NotNull final FunctionDecorator<? super IN, VALUE> valueFunction) {
-    super(asArgs(ConstantConditions.notNull("key function instance", keyFunction),
-        ConstantConditions.notNull("value function instance", valueFunction)));
+  ToMapInvocationFactory(@NotNull final Function<? super IN, KEY> keyFunction,
+      @NotNull final Function<? super IN, VALUE> valueFunction) {
+    super(asArgs(wrapFunction(keyFunction), wrapFunction(valueFunction)));
     mKeyFunction = keyFunction;
     mValueFunction = valueFunction;
   }
@@ -75,9 +74,9 @@ class ToMapInvocationFactory<IN, KEY, VALUE> extends InvocationFactory<IN, Map<K
   private static class ToMapInvocation<IN, KEY, VALUE>
       extends TemplateInvocation<IN, Map<KEY, VALUE>> {
 
-    private final FunctionDecorator<? super IN, KEY> mKeyFunction;
+    private final Function<? super IN, KEY> mKeyFunction;
 
-    private final FunctionDecorator<? super IN, VALUE> mValueFunction;
+    private final Function<? super IN, VALUE> mValueFunction;
 
     private HashMap<KEY, VALUE> mMap;
 
@@ -87,8 +86,8 @@ class ToMapInvocationFactory<IN, KEY, VALUE> extends InvocationFactory<IN, Map<K
      * @param keyFunction   the function extracting the key.
      * @param valueFunction the function extracting the value.
      */
-    private ToMapInvocation(@NotNull final FunctionDecorator<? super IN, KEY> keyFunction,
-        @NotNull final FunctionDecorator<? super IN, VALUE> valueFunction) {
+    private ToMapInvocation(@NotNull final Function<? super IN, KEY> keyFunction,
+        @NotNull final Function<? super IN, VALUE> valueFunction) {
       mKeyFunction = keyFunction;
       mValueFunction = valueFunction;
     }

@@ -62,7 +62,7 @@ public class ReadConnection extends MappingInvocation<URI, ByteChunk> {
     final ChunkOutputStream outputStream = ByteChannel.outputStream(result)
                                                       .withStream()
                                                       .withChunkSize(MAX_CHUNK_SIZE)
-                                                      .configured()
+                                                      .configuration()
                                                       .buildOutputStream();
     try {
       outputStream.transferFrom(connection.getInputStream());

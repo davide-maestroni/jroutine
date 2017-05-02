@@ -112,34 +112,6 @@ public class TriFunctionDecorator<IN1, IN2, IN3, OUT> extends DeepEqualObject
   }
 
   /**
-   * Decorates the specified tri-function instance so to provide additional features.
-   * <br>
-   * The returned object will support concatenation and comparison.
-   * <p>
-   * Note that the passed object is expected to have a functional behavior, that is, it must not
-   * retain a mutable internal state.
-   * <br>
-   * Note also that any external object used inside the function must be synchronized in order to
-   * avoid concurrency issues.
-   *
-   * @param function the tri-function instance.
-   * @param <IN1>    the first input data type.
-   * @param <IN2>    the second input data type.
-   * @param <IN3>    the third input data type.
-   * @param <OUT>    the output data type.
-   * @return the decorated tri-function.
-   */
-  @NotNull
-  public static <IN1, IN2, IN3, OUT> TriFunctionDecorator<IN1, IN2, IN3, OUT> decorate(
-      @NotNull final TriFunction<IN1, IN2, IN3, OUT> function) {
-    if (function instanceof TriFunctionDecorator) {
-      return (TriFunctionDecorator<IN1, IN2, IN3, OUT>) function;
-    }
-
-    return new TriFunctionDecorator<IN1, IN2, IN3, OUT>(function);
-  }
-
-  /**
    * Returns a tri-function decorator just returning the first passed argument.
    * <br>
    * The returned object will support concatenation and comparison.
@@ -185,6 +157,34 @@ public class TriFunctionDecorator<IN1, IN2, IN3, OUT> extends DeepEqualObject
   @SuppressWarnings("unchecked")
   public static <IN1, IN2, IN3> TriFunctionDecorator<IN1, IN2, IN3, IN3> third() {
     return (TriFunctionDecorator<IN1, IN2, IN3, IN3>) sThird;
+  }
+
+  /**
+   * Wraps the specified tri-function instance so to provide additional features.
+   * <br>
+   * The returned object will support concatenation and comparison.
+   * <p>
+   * Note that the passed object is expected to have a functional behavior, that is, it must not
+   * retain a mutable internal state.
+   * <br>
+   * Note also that any external object used inside the function must be synchronized in order to
+   * avoid concurrency issues.
+   *
+   * @param function the tri-function instance.
+   * @param <IN1>    the first input data type.
+   * @param <IN2>    the second input data type.
+   * @param <IN3>    the third input data type.
+   * @param <OUT>    the output data type.
+   * @return the decorated tri-function.
+   */
+  @NotNull
+  public static <IN1, IN2, IN3, OUT> TriFunctionDecorator<IN1, IN2, IN3, OUT> wrapTriFunction(
+      @NotNull final TriFunction<IN1, IN2, IN3, OUT> function) {
+    if (function instanceof TriFunctionDecorator) {
+      return (TriFunctionDecorator<IN1, IN2, IN3, OUT>) function;
+    }
+
+    return new TriFunctionDecorator<IN1, IN2, IN3, OUT>(function);
   }
 
   /**

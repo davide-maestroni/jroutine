@@ -121,33 +121,6 @@ public class BiFunctionDecorator<IN1, IN2, OUT> extends DeepEqualObject
   }
 
   /**
-   * Decorates the specified bi-function instance so to provide additional features.
-   * <br>
-   * The returned object will support concatenation and comparison.
-   * <p>
-   * Note that the passed object is expected to have a functional behavior, that is, it must not
-   * retain a mutable internal state.
-   * <br>
-   * Note also that any external object used inside the function must be synchronized in order to
-   * avoid concurrency issues.
-   *
-   * @param function the bi-function instance.
-   * @param <IN1>    the first input data type.
-   * @param <IN2>    the second input data type.
-   * @param <OUT>    the output data type.
-   * @return the decorated bi-function.
-   */
-  @NotNull
-  public static <IN1, IN2, OUT> BiFunctionDecorator<IN1, IN2, OUT> decorate(
-      @NotNull final BiFunction<IN1, IN2, OUT> function) {
-    if (function instanceof BiFunctionDecorator) {
-      return (BiFunctionDecorator<IN1, IN2, OUT>) function;
-    }
-
-    return new BiFunctionDecorator<IN1, IN2, OUT>(function);
-  }
-
-  /**
    * Returns a bi-function decorator just returning the first passed argument.
    * <br>
    * The returned object will support concatenation and comparison.
@@ -237,6 +210,33 @@ public class BiFunctionDecorator<IN1, IN2, OUT> extends DeepEqualObject
   @SuppressWarnings("unchecked")
   public static <IN1, IN2> BiFunctionDecorator<IN1, IN2, IN2> second() {
     return (BiFunctionDecorator<IN1, IN2, IN2>) sSecond;
+  }
+
+  /**
+   * Wraps the specified bi-function instance so to provide additional features.
+   * <br>
+   * The returned object will support concatenation and comparison.
+   * <p>
+   * Note that the passed object is expected to have a functional behavior, that is, it must not
+   * retain a mutable internal state.
+   * <br>
+   * Note also that any external object used inside the function must be synchronized in order to
+   * avoid concurrency issues.
+   *
+   * @param function the bi-function instance.
+   * @param <IN1>    the first input data type.
+   * @param <IN2>    the second input data type.
+   * @param <OUT>    the output data type.
+   * @return the decorated bi-function.
+   */
+  @NotNull
+  public static <IN1, IN2, OUT> BiFunctionDecorator<IN1, IN2, OUT> wrapBiFunction(
+      @NotNull final BiFunction<IN1, IN2, OUT> function) {
+    if (function instanceof BiFunctionDecorator) {
+      return (BiFunctionDecorator<IN1, IN2, OUT>) function;
+    }
+
+    return new BiFunctionDecorator<IN1, IN2, OUT>(function);
   }
 
   /**

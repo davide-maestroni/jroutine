@@ -21,12 +21,12 @@ import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
-import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.util.ConsumerDecorator;
+import com.github.dm.jrt.function.util.Consumer;
 
 import org.jetbrains.annotations.NotNull;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
+import static com.github.dm.jrt.function.util.ConsumerDecorator.wrapConsumer;
 
 /**
  * Factory of invocations peeking errors as they are passed along.
@@ -37,16 +37,15 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class PeekErrorInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
 
-  private final ConsumerDecorator<? super RoutineException> mErrorConsumer;
+  private final Consumer<? super RoutineException> mErrorConsumer;
 
   /**
    * Constructor.
    *
    * @param errorConsumer the consumer instance.
    */
-  PeekErrorInvocationFactory(
-      @NotNull final ConsumerDecorator<? super RoutineException> errorConsumer) {
-    super(asArgs(ConstantConditions.notNull("consumer instance", errorConsumer)));
+  PeekErrorInvocationFactory(@NotNull final Consumer<? super RoutineException> errorConsumer) {
+    super(asArgs(wrapConsumer(errorConsumer)));
     mErrorConsumer = errorConsumer;
   }
 
@@ -63,15 +62,14 @@ class PeekErrorInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
    */
   private static class PeekErrorInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
 
-    private final ConsumerDecorator<? super RoutineException> mErrorConsumer;
+    private final Consumer<? super RoutineException> mErrorConsumer;
 
     /**
      * Constructor.
      *
      * @param errorConsumer the consumer instance.
      */
-    private PeekErrorInvocation(
-        @NotNull final ConsumerDecorator<? super RoutineException> errorConsumer) {
+    private PeekErrorInvocation(@NotNull final Consumer<? super RoutineException> errorConsumer) {
       mErrorConsumer = errorConsumer;
     }
 

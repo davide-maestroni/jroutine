@@ -23,7 +23,6 @@ import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.channel.InputDeadlockException;
-import com.github.dm.jrt.core.channel.PipeChannel;
 import com.github.dm.jrt.core.common.Backoff;
 import com.github.dm.jrt.core.common.BackoffBuilder;
 import com.github.dm.jrt.core.common.RoutineException;
@@ -428,8 +427,10 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
   }
 
   @NotNull
+  @SuppressWarnings("unchecked")
   public <AFTER> Channel<IN, AFTER> pipe(@NotNull final Channel<? super OUT, AFTER> channel) {
-    return new PipeChannel<IN, OUT, AFTER>(this, channel);
+    ((Channel<OUT, AFTER>) channel).pass(this);
+    return new FlatChannel<IN, AFTER>(this, channel);
   }
 
   public int size() {

@@ -18,13 +18,13 @@ package com.github.dm.jrt.operator;
 
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
-import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.util.PredicateDecorator;
+import com.github.dm.jrt.function.util.Predicate;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
+import static com.github.dm.jrt.function.util.PredicateDecorator.wrapPredicate;
 
 /**
  * Mapping invocation replacing all the data satisfying the specified predicate.
@@ -35,7 +35,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class ReplaceInvocation<DATA> extends MappingInvocation<DATA, DATA> {
 
-  private final PredicateDecorator<? super DATA> mPredicate;
+  private final Predicate<? super DATA> mPredicate;
 
   private final DATA mReplacement;
 
@@ -45,9 +45,9 @@ class ReplaceInvocation<DATA> extends MappingInvocation<DATA, DATA> {
    * @param predicate   the predicate instance.
    * @param replacement the replacement instance.
    */
-  ReplaceInvocation(@NotNull final PredicateDecorator<? super DATA> predicate,
+  ReplaceInvocation(@NotNull final Predicate<? super DATA> predicate,
       @Nullable final DATA replacement) {
-    super(asArgs(ConstantConditions.notNull("predicate instance", predicate), replacement));
+    super(asArgs(wrapPredicate(predicate), replacement));
     mPredicate = predicate;
     mReplacement = replacement;
   }

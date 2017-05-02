@@ -24,7 +24,7 @@ import com.github.dm.jrt.android.core.ServiceContext;
 import com.github.dm.jrt.android.retrofit.service.RemoteTestService;
 import com.github.dm.jrt.android.retrofit.service.TestService;
 import com.github.dm.jrt.function.util.Consumer;
-import com.github.dm.jrt.operator.Operators;
+import com.github.dm.jrt.operator.JRoutineOperators;
 import com.google.gson.Gson;
 
 import org.jetbrains.annotations.NotNull;
@@ -70,7 +70,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
           ServiceAdapterFactory.on(context)
                                .withInvocation()
                                .withOutputTimeout(seconds(10))
-                               .configured()
+                               .configuration()
                                .buildFactory();
       final GsonConverterFactory converterFactory = GsonConverterFactory.create();
       final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + server.getPort())
@@ -113,7 +113,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
           ServiceAdapterFactory.on(context)
                                .withInvocation()
                                .withOutputTimeout(seconds(10))
-                               .configured()
+                               .configuration()
                                .buildFactory();
       final GsonConverterFactory converterFactory = GsonConverterFactory.create();
       final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + server.getPort())
@@ -146,7 +146,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
                                              .build();
       final GitHubService service = retrofit.create(GitHubService.class);
       assertThat(service.streamRepos("octocat")
-                        .map(Operators.<Repo>unfold())
+                        .map(JRoutineOperators.<Repo>unfold())
                         .invoke()
                         .consume(onOutput(new Consumer<Repo>() {
 

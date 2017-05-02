@@ -28,13 +28,14 @@ import com.github.dm.jrt.function.util.BiConsumerDecorator;
 import com.github.dm.jrt.function.util.Consumer;
 import com.github.dm.jrt.function.util.ConsumerDecorator;
 import com.github.dm.jrt.function.util.Function;
-import com.github.dm.jrt.function.util.FunctionDecorator;
 import com.github.dm.jrt.function.util.Supplier;
-import com.github.dm.jrt.function.util.SupplierDecorator;
 
 import org.jetbrains.annotations.NotNull;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
+import static com.github.dm.jrt.function.util.ConsumerDecorator.wrapConsumer;
+import static com.github.dm.jrt.function.util.FunctionDecorator.wrapFunction;
+import static com.github.dm.jrt.function.util.SupplierDecorator.wrapSupplier;
 
 /**
  * Abstract implementation of a stateless routine builder.
@@ -59,24 +60,23 @@ public abstract class AbstractStatelessRoutineBuilder<IN, OUT, TYPE extends
     }
   };
 
-  private ConsumerDecorator<? super Channel<OUT, ?>> mOnComplete = ConsumerDecorator.sink();
+  private Consumer<? super Channel<OUT, ?>> mOnComplete = ConsumerDecorator.sink();
 
-  private ConsumerDecorator<? super RoutineException> mOnError = ConsumerDecorator.sink();
+  private Consumer<? super RoutineException> mOnError = ConsumerDecorator.sink();
 
-  private BiConsumerDecorator<? super IN, ? super Channel<OUT, ?>> mOnNext =
-      BiConsumerDecorator.biSink();
+  private BiConsumer<? super IN, ? super Channel<OUT, ?>> mOnNext = BiConsumerDecorator.biSink();
 
   @NotNull
   @SuppressWarnings("unchecked")
   public TYPE onComplete(@NotNull final Consumer<? super Channel<OUT, ?>> onComplete) {
-    mOnComplete = ConsumerDecorator.decorate(onComplete);
+    mOnComplete = ConstantConditions.notNull("consumer instance", onComplete);
     return (TYPE) this;
   }
 
   @NotNull
   @SuppressWarnings("unchecked")
   public TYPE onCompleteArray(@NotNull final Supplier<OUT[]> onComplete) {
-    mOnComplete = ConsumerDecorator.decorate(new CompleteArraySupplier<OUT>(onComplete));
+    mOnComplete = new CompleteArraySupplier<OUT>(onComplete);
     return (TYPE) this;
   }
 
@@ -84,42 +84,42 @@ public abstract class AbstractStatelessRoutineBuilder<IN, OUT, TYPE extends
   @SuppressWarnings("unchecked")
   public TYPE onCompleteIterable(
       @NotNull final Supplier<? extends Iterable<? extends OUT>> onComplete) {
-    mOnComplete = ConsumerDecorator.decorate(new CompleteIterableSupplier<OUT>(onComplete));
+    mOnComplete = new CompleteIterableSupplier<OUT>(onComplete);
     return (TYPE) this;
   }
 
   @NotNull
   @SuppressWarnings("unchecked")
   public TYPE onCompleteOutput(@NotNull final Supplier<? extends OUT> onComplete) {
-    mOnComplete = ConsumerDecorator.decorate(new CompleteOutputSupplier<OUT>(onComplete));
+    mOnComplete = new CompleteOutputSupplier<OUT>(onComplete);
     return (TYPE) this;
   }
 
   @NotNull
   @SuppressWarnings("unchecked")
   public TYPE onError(@NotNull final Consumer<? super RoutineException> onError) {
-    mOnError = ConsumerDecorator.decorate(onError);
+    mOnError = ConstantConditions.notNull("consumer instance", onError);
     return (TYPE) this;
   }
 
   @NotNull
   @SuppressWarnings("unchecked")
   public TYPE onNext(@NotNull final BiConsumer<? super IN, ? super Channel<OUT, ?>> onNext) {
-    mOnNext = BiConsumerDecorator.decorate(onNext);
+    mOnNext = ConstantConditions.notNull("consumer instance", onNext);
     return (TYPE) this;
   }
 
   @NotNull
   @SuppressWarnings("unchecked")
   public TYPE onNextArray(@NotNull final Function<? super IN, OUT[]> onNext) {
-    mOnNext = BiConsumerDecorator.decorate(new NextArrayFunction<IN, OUT>(onNext));
+    mOnNext = new NextArrayFunction<IN, OUT>(onNext);
     return (TYPE) this;
   }
 
   @NotNull
   @SuppressWarnings("unchecked")
   public TYPE onNextConsume(@NotNull final Consumer<? super IN> onNext) {
-    mOnNext = BiConsumerDecorator.decorate(new NextConsumer<IN, OUT>(onNext));
+    mOnNext = new NextConsumer<IN, OUT>(onNext);
     return (TYPE) this;
   }
 
@@ -127,14 +127,14 @@ public abstract class AbstractStatelessRoutineBuilder<IN, OUT, TYPE extends
   @SuppressWarnings("unchecked")
   public TYPE onNextIterable(
       @NotNull final Function<? super IN, ? extends Iterable<? extends OUT>> onNext) {
-    mOnNext = BiConsumerDecorator.decorate(new NextIterableFunction<IN, OUT>(onNext));
+    mOnNext = new NextIterableFunction<IN, OUT>(onNext);
     return (TYPE) this;
   }
 
   @NotNull
   @SuppressWarnings("unchecked")
   public TYPE onNextOutput(@NotNull final Function<? super IN, ? extends OUT> onNext) {
-    mOnNext = BiConsumerDecorator.decorate(new NextOutputFunction<IN, OUT>(onNext));
+    mOnNext = new NextOutputFunction<IN, OUT>(onNext);
     return (TYPE) this;
   }
 
@@ -167,7 +167,7 @@ public abstract class AbstractStatelessRoutineBuilder<IN, OUT, TYPE extends
    * @return the consumer decorator.
    */
   @NotNull
-  protected ConsumerDecorator<? super Channel<OUT, ?>> getOnComplete() {
+  protected Consumer<? super Channel<OUT, ?>> getOnComplete() {
     return mOnComplete;
   }
 
@@ -177,7 +177,7 @@ public abstract class AbstractStatelessRoutineBuilder<IN, OUT, TYPE extends
    * @return the consumer decorator.
    */
   @NotNull
-  protected ConsumerDecorator<? super RoutineException> getOnError() {
+  protected Consumer<? super RoutineException> getOnError() {
     return mOnError;
   }
 
@@ -187,7 +187,7 @@ public abstract class AbstractStatelessRoutineBuilder<IN, OUT, TYPE extends
    * @return the consumer decorator.
    */
   @NotNull
-  protected BiConsumerDecorator<? super IN, ? super Channel<OUT, ?>> getOnNext() {
+  protected BiConsumer<? super IN, ? super Channel<OUT, ?>> getOnNext() {
     return mOnNext;
   }
 
@@ -207,7 +207,7 @@ public abstract class AbstractStatelessRoutineBuilder<IN, OUT, TYPE extends
      * @param onComplete the supplier instance.
      */
     private CompleteArraySupplier(@NotNull final Supplier<OUT[]> onComplete) {
-      super(asArgs(SupplierDecorator.decorate(onComplete)));
+      super(asArgs(wrapSupplier(onComplete)));
       mOnComplete = onComplete;
     }
 
@@ -233,7 +233,7 @@ public abstract class AbstractStatelessRoutineBuilder<IN, OUT, TYPE extends
      */
     private CompleteIterableSupplier(
         @NotNull final Supplier<? extends Iterable<? extends OUT>> onComplete) {
-      super(asArgs(SupplierDecorator.decorate(onComplete)));
+      super(asArgs(wrapSupplier(onComplete)));
       mOnComplete = onComplete;
     }
 
@@ -258,7 +258,7 @@ public abstract class AbstractStatelessRoutineBuilder<IN, OUT, TYPE extends
      * @param onComplete the supplier instance.
      */
     private CompleteOutputSupplier(@NotNull final Supplier<? extends OUT> onComplete) {
-      super(asArgs(SupplierDecorator.decorate(onComplete)));
+      super(asArgs(wrapSupplier(onComplete)));
       mOnComplete = onComplete;
     }
 
@@ -284,7 +284,7 @@ public abstract class AbstractStatelessRoutineBuilder<IN, OUT, TYPE extends
      * @param onNext the function instance.
      */
     private NextArrayFunction(@NotNull final Function<? super IN, OUT[]> onNext) {
-      super(asArgs(FunctionDecorator.decorate(onNext)));
+      super(asArgs(wrapFunction(onNext)));
       mOnNext = onNext;
     }
 
@@ -310,7 +310,7 @@ public abstract class AbstractStatelessRoutineBuilder<IN, OUT, TYPE extends
      * @param onNext the consumer instance.
      */
     private NextConsumer(@NotNull final Consumer<? super IN> onNext) {
-      super(asArgs(ConsumerDecorator.decorate(onNext)));
+      super(asArgs(wrapConsumer(onNext)));
       mOnNext = onNext;
     }
 
@@ -337,7 +337,7 @@ public abstract class AbstractStatelessRoutineBuilder<IN, OUT, TYPE extends
      */
     private NextIterableFunction(
         @NotNull final Function<? super IN, ? extends Iterable<? extends OUT>> onNext) {
-      super(asArgs(FunctionDecorator.decorate(onNext)));
+      super(asArgs(wrapFunction(onNext)));
       mOnNext = onNext;
     }
 
@@ -363,7 +363,7 @@ public abstract class AbstractStatelessRoutineBuilder<IN, OUT, TYPE extends
      * @param onNext the function instance.
      */
     private NextOutputFunction(@NotNull final Function<? super IN, ? extends OUT> onNext) {
-      super(asArgs(FunctionDecorator.decorate(onNext)));
+      super(asArgs(wrapFunction(onNext)));
       mOnNext = onNext;
     }
 

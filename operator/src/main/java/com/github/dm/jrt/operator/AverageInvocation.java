@@ -62,7 +62,7 @@ class AverageInvocation extends TemplateInvocation<Number, Number> {
    * @return the factory instance.
    */
   @NotNull
-  static InvocationFactory<Number, Number> factoryOf() {
+  static InvocationFactory<Number, Number> factory() {
     return sFactory;
   }
 

@@ -332,7 +332,7 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
             String.class.getMethod("toString"))
                                  .withWrapper()
                                  .withSharedFields()
-                                 .configured()
+                                 .configuration()
                                  .call()
                                  .in(seconds(10))
                                  .next()).isEqualTo("test");
@@ -348,7 +348,7 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
             "toString")
                                  .withWrapper()
                                  .withSharedFields()
-                                 .configured()
+                                 .configuration()
                                  .call()
                                  .in(seconds(10))
                                  .next()).isEqualTo("test");

@@ -21,11 +21,12 @@ import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.util.ConsumerDecorator;
+import com.github.dm.jrt.function.util.Consumer;
 
 import org.jetbrains.annotations.NotNull;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
+import static com.github.dm.jrt.function.util.ConsumerDecorator.wrapConsumer;
 
 /**
  * Invocation factory employing a consumer to generate outputs when no one has been received.
@@ -38,7 +39,7 @@ class OrElseConsumerInvocationFactory<DATA> extends InvocationFactory<DATA, DATA
 
   private final long mCount;
 
-  private final ConsumerDecorator<? super Channel<DATA, ?>> mOutputsConsumer;
+  private final Consumer<? super Channel<DATA, ?>> mOutputsConsumer;
 
   /**
    * Constructor.
@@ -47,9 +48,9 @@ class OrElseConsumerInvocationFactory<DATA> extends InvocationFactory<DATA, DATA
    * @param outputsConsumer the consumer instance.
    */
   OrElseConsumerInvocationFactory(final long count,
-      @NotNull final ConsumerDecorator<? super Channel<DATA, ?>> outputsConsumer) {
-    super(asArgs(ConstantConditions.positive("count number", count),
-        ConstantConditions.notNull("consumer instance", outputsConsumer)));
+      @NotNull final Consumer<? super Channel<DATA, ?>> outputsConsumer) {
+    super(
+        asArgs(ConstantConditions.positive("count number", count), wrapConsumer(outputsConsumer)));
     mCount = count;
     mOutputsConsumer = outputsConsumer;
   }
@@ -69,7 +70,7 @@ class OrElseConsumerInvocationFactory<DATA> extends InvocationFactory<DATA, DATA
 
     private final long mCount;
 
-    private final ConsumerDecorator<? super Channel<DATA, ?>> mOutputsConsumer;
+    private final Consumer<? super Channel<DATA, ?>> mOutputsConsumer;
 
     private boolean mHasOutputs;
 
@@ -80,7 +81,7 @@ class OrElseConsumerInvocationFactory<DATA> extends InvocationFactory<DATA, DATA
      * @param outputsConsumer the consumer instance.
      */
     OrElseConsumerInvocation(final long count,
-        @NotNull final ConsumerDecorator<? super Channel<DATA, ?>> outputsConsumer) {
+        @NotNull final Consumer<? super Channel<DATA, ?>> outputsConsumer) {
       mCount = count;
       mOutputsConsumer = outputsConsumer;
     }
@@ -88,7 +89,7 @@ class OrElseConsumerInvocationFactory<DATA> extends InvocationFactory<DATA, DATA
     public void onComplete(@NotNull final Channel<DATA, ?> result) throws Exception {
       if (!mHasOutputs) {
         final long count = mCount;
-        final ConsumerDecorator<? super Channel<DATA, ?>> consumer = mOutputsConsumer;
+        final Consumer<? super Channel<DATA, ?>> consumer = mOutputsConsumer;
         for (long i = 0; i < count; ++i) {
           consumer.accept(result);
         }

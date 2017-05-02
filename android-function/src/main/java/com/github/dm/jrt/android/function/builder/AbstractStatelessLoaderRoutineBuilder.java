@@ -24,17 +24,18 @@ import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.builder.AbstractStatelessRoutineBuilder;
 import com.github.dm.jrt.function.util.BiConsumer;
-import com.github.dm.jrt.function.util.BiConsumerDecorator;
 import com.github.dm.jrt.function.util.Consumer;
-import com.github.dm.jrt.function.util.ConsumerDecorator;
 import com.github.dm.jrt.function.util.Decorator;
 import com.github.dm.jrt.function.util.Function;
-import com.github.dm.jrt.function.util.FunctionDecorator;
 import com.github.dm.jrt.function.util.Supplier;
-import com.github.dm.jrt.function.util.SupplierDecorator;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import static com.github.dm.jrt.function.util.BiConsumerDecorator.wrapBiConsumer;
+import static com.github.dm.jrt.function.util.ConsumerDecorator.wrapConsumer;
+import static com.github.dm.jrt.function.util.FunctionDecorator.wrapFunction;
+import static com.github.dm.jrt.function.util.SupplierDecorator.wrapSupplier;
 
 /**
  * Abstract implementation of a stateless Loader routine builder.
@@ -97,63 +98,63 @@ public abstract class AbstractStatelessLoaderRoutineBuilder<IN, OUT, TYPE extend
   @NotNull
   @Override
   public TYPE onComplete(@NotNull final Consumer<? super Channel<OUT, ?>> onComplete) {
-    return super.onComplete(checkStaticScope(ConsumerDecorator.decorate(onComplete)));
+    return super.onComplete(checkStaticScope(wrapConsumer(onComplete)));
   }
 
   @NotNull
   @Override
   public TYPE onCompleteArray(@NotNull final Supplier<OUT[]> onComplete) {
-    return super.onCompleteArray(checkStaticScope(SupplierDecorator.decorate(onComplete)));
+    return super.onCompleteArray(checkStaticScope(wrapSupplier(onComplete)));
   }
 
   @NotNull
   @Override
   public TYPE onCompleteIterable(
       @NotNull final Supplier<? extends Iterable<? extends OUT>> onComplete) {
-    return super.onCompleteIterable(checkStaticScope(SupplierDecorator.decorate(onComplete)));
+    return super.onCompleteIterable(checkStaticScope(wrapSupplier(onComplete)));
   }
 
   @NotNull
   @Override
   public TYPE onCompleteOutput(@NotNull final Supplier<? extends OUT> onComplete) {
-    return super.onCompleteOutput(checkStaticScope(SupplierDecorator.decorate(onComplete)));
+    return super.onCompleteOutput(checkStaticScope(wrapSupplier(onComplete)));
   }
 
   @NotNull
   @Override
   public TYPE onError(@NotNull final Consumer<? super RoutineException> onError) {
-    return super.onError(checkStaticScope(ConsumerDecorator.decorate(onError)));
+    return super.onError(checkStaticScope(wrapConsumer(onError)));
   }
 
   @NotNull
   @Override
   public TYPE onNext(@NotNull final BiConsumer<? super IN, ? super Channel<OUT, ?>> onNext) {
-    return super.onNext(checkStaticScope(BiConsumerDecorator.decorate(onNext)));
+    return super.onNext(checkStaticScope(wrapBiConsumer(onNext)));
   }
 
   @NotNull
   @Override
   public TYPE onNextArray(@NotNull final Function<? super IN, OUT[]> onNext) {
-    return super.onNextArray(checkStaticScope(FunctionDecorator.decorate(onNext)));
+    return super.onNextArray(checkStaticScope(wrapFunction(onNext)));
   }
 
   @NotNull
   @Override
   public TYPE onNextConsume(@NotNull final Consumer<? super IN> onNext) {
-    return super.onNextConsume(checkStaticScope(ConsumerDecorator.decorate(onNext)));
+    return super.onNextConsume(checkStaticScope(wrapConsumer(onNext)));
   }
 
   @NotNull
   @Override
   public TYPE onNextIterable(
       @NotNull final Function<? super IN, ? extends Iterable<? extends OUT>> onNext) {
-    return super.onNextIterable(checkStaticScope(FunctionDecorator.decorate(onNext)));
+    return super.onNextIterable(checkStaticScope(wrapFunction(onNext)));
   }
 
   @NotNull
   @Override
   public TYPE onNextOutput(@NotNull final Function<? super IN, ? extends OUT> onNext) {
-    return super.onNextOutput(checkStaticScope(FunctionDecorator.decorate(onNext)));
+    return super.onNextOutput(checkStaticScope(wrapFunction(onNext)));
   }
 
   /**

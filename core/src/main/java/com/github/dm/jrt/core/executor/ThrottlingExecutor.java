@@ -58,9 +58,23 @@ class ThrottlingExecutor extends ScheduledExecutorDecorator {
    * @param maxCommands the maximum number of running commands.
    * @throws java.lang.IllegalArgumentException if the specified max number is less than 1.
    */
-  ThrottlingExecutor(@NotNull final ScheduledExecutor wrapped, final int maxCommands) {
+  private ThrottlingExecutor(@NotNull final ScheduledExecutor wrapped, final int maxCommands) {
     super(wrapped);
     mMaxRunning = ConstantConditions.positive("maximum number of running commands", maxCommands);
+  }
+
+  /**
+   * Returns a new throttling executor instance.
+   *
+   * @param wrapped     the wrapped instance.
+   * @param maxCommands the maximum number of running commands.
+   * @return the executor instance.
+   * @throws java.lang.IllegalArgumentException if the specified max number is less than 1.
+   */
+  @NotNull
+  static ThrottlingExecutor executorOf(@NotNull final ScheduledExecutor wrapped,
+      final int maxCommands) {
+    return new ThrottlingExecutor(wrapped, maxCommands);
   }
 
   @Override

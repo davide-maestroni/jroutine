@@ -217,12 +217,12 @@ public class RoutineMethodTest {
 
   @Test
   public void testFromClass() throws NoSuchMethodException {
-    assertThat(RoutineMethod.of(defaultExecutor(),
+    assertThat(RoutineMethod.methodOn(defaultExecutor(),
         RoutineMethodTest.class.getMethod("length", String.class))
                             .call("test")
                             .in(seconds(1))
                             .next()).isEqualTo(4);
-    assertThat(RoutineMethod.of(defaultExecutor(),
+    assertThat(RoutineMethod.methodOn(defaultExecutor(),
         RoutineMethodTest.class.getMethod("length", String.class))
                             .call(JRoutineCore.channel().of("test"))
                             .in(seconds(1))
@@ -231,13 +231,16 @@ public class RoutineMethodTest {
 
   @Test
   public void testFromClass2() throws NoSuchMethodException {
-    assertThat(RoutineMethod.of(defaultExecutor(), classOfType(RoutineMethodTest.class), "length",
-        String.class).call("test").in(seconds(1)).next()).isEqualTo(4);
-    assertThat(RoutineMethod.of(defaultExecutor(), classOfType(RoutineMethodTest.class), "length",
-        String.class).call(JRoutineCore.channel().of("test")).in(seconds(1)).next()).isEqualTo(4);
+    assertThat(
+        RoutineMethod.methodOn(defaultExecutor(), classOfType(RoutineMethodTest.class), "length",
+            String.class).call("test").in(seconds(1)).next()).isEqualTo(4);
+    assertThat(
+        RoutineMethod.methodOn(defaultExecutor(), classOfType(RoutineMethodTest.class), "length",
+            String.class).call(JRoutineCore.channel().of("test")).in(seconds(1)).next()).isEqualTo(
+        4);
     final Channel<String, String> inputChannel = JRoutineCore.channel().ofType();
     final Channel<?, Object> outputChannel =
-        RoutineMethod.of(defaultExecutor(), classOfType(RoutineMethodTest.class), "length",
+        RoutineMethod.methodOn(defaultExecutor(), classOfType(RoutineMethodTest.class), "length",
             String.class).call(inputChannel);
     inputChannel.pass("test").close();
     assertThat(outputChannel.in(seconds(1)).next()).isEqualTo(4);
@@ -246,14 +249,14 @@ public class RoutineMethodTest {
   @Test
   public void testFromError() throws NoSuchMethodException {
     try {
-      RoutineMethod.of(defaultExecutor(), String.class.getMethod("toString"));
+      RoutineMethod.methodOn(defaultExecutor(), String.class.getMethod("toString"));
       fail();
 
     } catch (final IllegalArgumentException ignored) {
     }
 
     try {
-      RoutineMethod.of(defaultExecutor(), instance("test"),
+      RoutineMethod.methodOn(defaultExecutor(), instance("test"),
           RoutineMethodTest.class.getMethod("length", String.class));
       fail();
 
@@ -264,30 +267,28 @@ public class RoutineMethodTest {
   @Test
   public void testFromInstance() throws NoSuchMethodException {
     final String test = "test";
+    assertThat(RoutineMethod.methodOn(defaultExecutor(), instance(test),
+        String.class.getMethod("toString")).call().in(seconds(1)).next()).isEqualTo("test");
     assertThat(
-        RoutineMethod.of(defaultExecutor(), instance(test), String.class.getMethod("toString"))
+        RoutineMethod.methodOn(syncExecutor(), instance(test), String.class.getMethod("toString"))
+                     .withWrapper()
+                     .withSharedFields()
+                     .configuration()
                      .call()
-                     .in(seconds(1))
                      .next()).isEqualTo("test");
-    assertThat(RoutineMethod.of(syncExecutor(), instance(test), String.class.getMethod("toString"))
-                            .withWrapper()
-                            .withSharedFields()
-                            .configured()
-                            .call()
-                            .next()).isEqualTo("test");
   }
 
   @Test
   public void testFromInstance2() throws NoSuchMethodException {
     final String test = "test";
-    assertThat(RoutineMethod.of(defaultExecutor(), instance(test), "toString")
+    assertThat(RoutineMethod.methodOn(defaultExecutor(), instance(test), "toString")
                             .call()
                             .in(seconds(1))
                             .next()).isEqualTo("test");
-    assertThat(RoutineMethod.of(syncExecutor(), instance(test), "toString")
+    assertThat(RoutineMethod.methodOn(syncExecutor(), instance(test), "toString")
                             .withWrapper()
                             .withSharedFields()
-                            .configured()
+                            .configuration()
                             .call()
                             .next()).isEqualTo("test");
   }

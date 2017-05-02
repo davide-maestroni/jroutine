@@ -183,7 +183,7 @@ public class JRoutineFlowableTest {
         JRoutineFlowable.with(Completable.complete().delay(1, TimeUnit.SECONDS))
                         .withChannel()
                         .withMaxSize(2)
-                        .configured()
+                        .configuration()
                         .buildChannel();
     assertThat(channel.abort()).isTrue();
   }
@@ -194,7 +194,7 @@ public class JRoutineFlowableTest {
         JRoutineFlowable.with(Flowable.just("test1", "test2").delay(1, TimeUnit.SECONDS))
                         .withChannel()
                         .withMaxSize(2)
-                        .configured()
+                        .configuration()
                         .buildChannel();
     assertThat(channel.abort()).isTrue();
   }
@@ -205,7 +205,7 @@ public class JRoutineFlowableTest {
         JRoutineFlowable.with(Observable.just("test1", "test2").delay(1, TimeUnit.SECONDS))
                         .withChannel()
                         .withMaxSize(2)
-                        .configured()
+                        .configuration()
                         .buildChannel();
     assertThat(channel.abort()).isTrue();
   }
@@ -216,7 +216,7 @@ public class JRoutineFlowableTest {
         JRoutineFlowable.with(Single.just("test1").delay(1, TimeUnit.SECONDS))
                         .withChannel()
                         .withMaxSize(2)
-                        .configured()
+                        .configuration()
                         .buildChannel();
     assertThat(channel.abort()).isTrue();
   }
@@ -226,7 +226,7 @@ public class JRoutineFlowableTest {
     final Channel<?, ?> channel = JRoutineFlowable.with(Completable.complete())
                                                   .withChannel()
                                                   .withMaxSize(2)
-                                                  .configured()
+                                                  .configuration()
                                                   .buildChannel();
     assertThat(channel.all()).isEmpty();
   }
@@ -281,7 +281,7 @@ public class JRoutineFlowableTest {
     final Channel<?, String> channel = JRoutineFlowable.with(Flowable.just("test1", "test2"))
                                                        .withChannel()
                                                        .withMaxSize(2)
-                                                       .configured()
+                                                       .configuration()
                                                        .buildChannel();
     assertThat(channel.all()).containsExactly("test1", "test2");
   }
@@ -291,7 +291,7 @@ public class JRoutineFlowableTest {
     final Channel<?, String> channel = JRoutineFlowable.with(Observable.just("test1", "test2"))
                                                        .withChannel()
                                                        .withMaxSize(2)
-                                                       .configured()
+                                                       .configuration()
                                                        .buildChannel();
     assertThat(channel.all()).containsExactly("test1", "test2");
   }
@@ -301,7 +301,7 @@ public class JRoutineFlowableTest {
     final Channel<?, String> channel = JRoutineFlowable.with(Single.just("test1"))
                                                        .withChannel()
                                                        .withMaxSize(2)
-                                                       .configured()
+                                                       .configuration()
                                                        .buildChannel();
     assertThat(channel.all()).containsExactly("test1");
   }

@@ -28,7 +28,7 @@ import com.github.dm.jrt.core.config.InvocationConfigurable;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilders;
+import com.github.dm.jrt.reflect.util.InvocationReflection;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -98,7 +98,7 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
       @NotNull final Retrofit retrofit) {
     // Use annotations to configure the routine
     final InvocationConfiguration invocationConfiguration =
-        ReflectionRoutineBuilders.withAnnotations(configuration, annotations);
+        InvocationReflection.withAnnotations(configuration, annotations);
     final LoaderConfiguration loaderConfiguration =
         AndroidReflectionRoutineBuilders.withAnnotations(mLoaderConfiguration, annotations);
     final ContextInvocationFactory<Call<Object>, Object> factory =
@@ -126,7 +126,7 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
    * The options set through the builder configuration will be applied to all the routine handling
    * the Retrofit calls, unless they are overwritten by specific annotations.
    *
-   * @see ReflectionRoutineBuilders#withAnnotations(InvocationConfiguration, Annotation...)
+   * @see InvocationReflection#withAnnotations(InvocationConfiguration, Annotation...)
    * @see AndroidReflectionRoutineBuilders#withAnnotations(LoaderConfiguration, Annotation...)
    */
   public static class Builder

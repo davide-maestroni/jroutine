@@ -16,17 +16,19 @@
 
 package com.github.dm.jrt.stream.transform;
 
+import com.github.dm.jrt.channel.JRoutineChannels;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.common.RoutineException;
+import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.executor.ScheduledExecutor;
 import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.util.BiFunction;
-import com.github.dm.jrt.function.util.Function;
+import com.github.dm.jrt.function.util.Supplier;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -46,37 +48,40 @@ class RetryChannelConsumer<IN, OUT> implements Runnable, ChannelConsumer<OUT> {
   private final BiFunction<? super Integer, ? super RoutineException, ? extends Long>
       mBackoffFunction;
 
-  private final Function<Channel<?, IN>, Channel<?, OUT>> mBindingFunction;
+  private final Supplier<? extends Channel<IN, OUT>> mChannelSupplier;
 
   private final ScheduledExecutor mExecutor;
 
-  private final Channel<?, IN> mInputChannel;
-
-  private final Channel<OUT, ?> mOutputChannel;
+  private final Channel<OUT, OUT> mOutputChannel;
 
   private final ArrayList<OUT> mOutputs = new ArrayList<OUT>();
+
+  private final Channel<?, IN> mReplayChannel;
 
   private int mCount;
 
   /**
    * Constructor.
    *
+   * @param executor        the executor instance.
+   * @param configuration   the channel configuration.
+   * @param channelSupplier the binding function.
+   * @param backoffFunction the backoff function.
    * @param inputChannel    the input channel.
    * @param outputChannel   the output channel.
-   * @param executor        the executor instance.
-   * @param bindingFunction the binding function.
-   * @param backoffFunction the backoff function.
    */
-  RetryChannelConsumer(@NotNull final Channel<?, IN> inputChannel,
-      @NotNull final Channel<OUT, ?> outputChannel, @NotNull final ScheduledExecutor executor,
-      @NotNull final Function<Channel<?, IN>, Channel<?, OUT>> bindingFunction,
+  RetryChannelConsumer(@NotNull final ScheduledExecutor executor,
+      @NotNull final ChannelConfiguration configuration,
+      @NotNull final Supplier<? extends Channel<IN, OUT>> channelSupplier,
       @NotNull final BiFunction<? super Integer, ? super RoutineException, ? extends Long>
-          backoffFunction) {
-    mInputChannel = ConstantConditions.notNull("input channel instance", inputChannel);
-    mOutputChannel = ConstantConditions.notNull("output channel instance", outputChannel);
+          backoffFunction,
+      @NotNull final Channel<?, IN> inputChannel, @NotNull final Channel<OUT, ?> outputChannel) {
     mExecutor = ConstantConditions.notNull("executor instance", executor);
-    mBindingFunction = ConstantConditions.notNull("binding function", bindingFunction);
+    mChannelSupplier = ConstantConditions.notNull("binding function", channelSupplier);
     mBackoffFunction = ConstantConditions.notNull("backoff function", backoffFunction);
+    mReplayChannel = JRoutineChannels.channelHandler().replayOutputOf(inputChannel);
+    outputChannel.pass(mOutputChannel =
+        JRoutineCore.channelOn(executor).withConfiguration(configuration).ofType());
   }
 
   public void onComplete() {
@@ -91,10 +96,10 @@ class RetryChannelConsumer<IN, OUT> implements Runnable, ChannelConsumer<OUT> {
   }
 
   public void run() {
-    final Channel<IN, IN> channel = JRoutineCore.<IN>ofData().buildChannel();
-    mInputChannel.consume(new SafeChannelConsumer<IN>(channel));
+    final Channel<IN, IN> channel = JRoutineCore.channel().ofType();
+    mReplayChannel.consume(new SafeChannelConsumer<IN>(channel));
     try {
-      mBindingFunction.apply(channel).consume(this);
+      mChannelSupplier.get().consume(this).pass(channel).close();
 
     } catch (final Throwable t) {
       abort(t);
@@ -105,7 +110,7 @@ class RetryChannelConsumer<IN, OUT> implements Runnable, ChannelConsumer<OUT> {
   private void abort(@NotNull final Throwable error) {
     final RoutineException ex = InvocationException.wrapIfNeeded(error);
     mOutputChannel.abort(ex);
-    mInputChannel.abort(ex);
+    mReplayChannel.abort(ex);
   }
 
   /**
@@ -164,7 +169,7 @@ class RetryChannelConsumer<IN, OUT> implements Runnable, ChannelConsumer<OUT> {
 
     } else {
       mOutputChannel.abort(error);
-      mInputChannel.abort(error);
+      mReplayChannel.abort(error);
     }
   }
 

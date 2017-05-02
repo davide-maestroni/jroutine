@@ -61,7 +61,7 @@ class SortInvocation<DATA extends Comparable<? super DATA>> extends TemplateInvo
    */
   @NotNull
   @SuppressWarnings("unchecked")
-  static <DATA extends Comparable<? super DATA>> InvocationFactory<DATA, DATA> factoryOf() {
+  static <DATA extends Comparable<? super DATA>> InvocationFactory<DATA, DATA> factory() {
     return (InvocationFactory<DATA, DATA>) sFactory;
   }
 

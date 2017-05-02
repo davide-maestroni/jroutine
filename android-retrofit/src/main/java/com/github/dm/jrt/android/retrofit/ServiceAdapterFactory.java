@@ -31,7 +31,7 @@ import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.util.BiFunction;
 import com.github.dm.jrt.function.util.Function;
-import com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilders;
+import com.github.dm.jrt.reflect.util.InvocationReflection;
 import com.github.dm.jrt.stream.JRoutineStream;
 import com.github.dm.jrt.stream.builder.StreamBuilder;
 import com.github.dm.jrt.stream.config.StreamConfiguration;
@@ -142,7 +142,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
     if (rawType != null) {
       // Use annotations to configure the routine
       final InvocationConfiguration invocationConfiguration =
-          ReflectionRoutineBuilders.withAnnotations(mInvocationConfiguration, annotations);
+          InvocationReflection.withAnnotations(mInvocationConfiguration, annotations);
       final ServiceConfiguration serviceConfiguration =
           AndroidReflectionRoutineBuilders.withAnnotations(mServiceConfiguration, annotations);
       if (Channel.class == rawType) {
@@ -177,7 +177,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
    * The options set through the builder configuration will be applied to all the routine handling
    * the Retrofit calls, unless they are overwritten by specific annotations.
    *
-   * @see ReflectionRoutineBuilders#withAnnotations(InvocationConfiguration, Annotation...)
+   * @see InvocationReflection#withAnnotations(InvocationConfiguration, Annotation...)
    * @see AndroidReflectionRoutineBuilders#withAnnotations(ServiceConfiguration, Annotation...)
    */
   public static class Builder
@@ -341,7 +341,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
         @NotNull final Type responseType) {
       super(routine, responseType);
       mInvocationConfiguration = configuration;
-      mChannelConfiguration = configuration.outputConfigurationBuilder().configured();
+      mChannelConfiguration = configuration.outputConfigurationBuilder().configuration();
       mConverter = converter;
     }
 

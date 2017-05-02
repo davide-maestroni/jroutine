@@ -70,7 +70,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
                               .withChannel()
                               .withLog(testLog)
                               .withLogLevel(Level.DEBUG)
-                              .configured()
+                              .configuration()
                               .buildChannel()
                               .all()).containsExactly(new ParcelableFlow<String>(3, "test"));
     assertThat(testLog.mLogCount).isGreaterThan(0);
@@ -678,7 +678,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
                                                                      .withInvocation()
                                                                      .withInputOrder(
                                                                          OrderType.SORTED)
-                                                                     .configured()
+                                                                     .configuration()
                                                                      .invoke()
                                                                      .pass(channel)
                                                                      .close();

@@ -293,7 +293,7 @@ public class SequencesTest {
     assertThat(JRoutineCore.routine()
                            .withInvocation()
                            .withOutputOrder(OrderType.SORTED)
-                           .configured()
+                           .configuration()
                            .of(factoryOfParallel(commandRoutine(
                                sequence('a', 5, new BiFunction<Character, Long, Character>() {
 

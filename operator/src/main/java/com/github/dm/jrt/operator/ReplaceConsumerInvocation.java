@@ -18,13 +18,14 @@ package com.github.dm.jrt.operator;
 
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
-import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.util.BiConsumerDecorator;
-import com.github.dm.jrt.function.util.PredicateDecorator;
+import com.github.dm.jrt.function.util.BiConsumer;
+import com.github.dm.jrt.function.util.Predicate;
 
 import org.jetbrains.annotations.NotNull;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
+import static com.github.dm.jrt.function.util.BiConsumerDecorator.wrapBiConsumer;
+import static com.github.dm.jrt.function.util.PredicateDecorator.wrapPredicate;
 
 /**
  * Mapping invocation replacing all the data satisfying the specified predicate, with the outputs
@@ -36,9 +37,9 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class ReplaceConsumerInvocation<DATA> extends MappingInvocation<DATA, DATA> {
 
-  private final PredicateDecorator<? super DATA> mPredicate;
+  private final Predicate<? super DATA> mPredicate;
 
-  private final BiConsumerDecorator<DATA, ? super Channel<DATA, ?>> mReplacementConsumer;
+  private final BiConsumer<DATA, ? super Channel<DATA, ?>> mReplacementConsumer;
 
   /**
    * Constructor.
@@ -46,10 +47,9 @@ class ReplaceConsumerInvocation<DATA> extends MappingInvocation<DATA, DATA> {
    * @param predicate           the predicate instance.
    * @param replacementConsumer the consumer instance.
    */
-  ReplaceConsumerInvocation(@NotNull final PredicateDecorator<? super DATA> predicate,
-      @NotNull final BiConsumerDecorator<DATA, ? super Channel<DATA, ?>> replacementConsumer) {
-    super(asArgs(ConstantConditions.notNull("predicate instance", predicate),
-        ConstantConditions.notNull("consumer instance", replacementConsumer)));
+  ReplaceConsumerInvocation(@NotNull final Predicate<? super DATA> predicate,
+      @NotNull final BiConsumer<DATA, ? super Channel<DATA, ?>> replacementConsumer) {
+    super(asArgs(wrapPredicate(predicate), wrapBiConsumer(replacementConsumer)));
     mPredicate = predicate;
     mReplacementConsumer = replacementConsumer;
   }

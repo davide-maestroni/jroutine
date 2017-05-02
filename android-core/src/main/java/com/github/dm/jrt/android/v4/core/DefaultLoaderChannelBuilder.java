@@ -85,7 +85,7 @@ class DefaultLoaderChannelBuilder implements LoaderChannelBuilder {
         new MissingLoaderInvocationFactory<OUT>(loaderId);
     final DefaultLoaderRoutineBuilder<Void, OUT> builder =
         new DefaultLoaderRoutineBuilder<Void, OUT>(context, factory);
-    return builder.withConfiguration(builderFromOutput(mChannelConfiguration).configured())
+    return builder.withConfiguration(builderFromOutput(mChannelConfiguration).configuration())
                   .apply(loaderConfiguration)
                   .invoke()
                   .close();

@@ -89,7 +89,7 @@ public class LoaderRoutineRotationTest
                   .with(factoryOf(ToUpperCase.class))
                   .withInvocation()
                   .withOutputOrder(OrderType.SORTED)
-                  .configured()
+                  .configuration()
                   .loaderConfiguration()
                   .withLoaderId(0)
                   .apply()

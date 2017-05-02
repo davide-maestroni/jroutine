@@ -77,30 +77,6 @@ public class SupplierDecorator<OUT> extends DeepEqualObject implements Supplier<
   }
 
   /**
-   * Decorates the specified supplier instance so to provide additional features.
-   * <br>
-   * The returned object will support concatenation and comparison.
-   * <p>
-   * Note that the passed object is expected to have a functional behavior, that is, it must not
-   * retain a mutable internal state.
-   * <br>
-   * Note also that any external object used inside the function must be synchronized in order to
-   * avoid concurrency issues.
-   *
-   * @param supplier the supplier instance.
-   * @param <OUT>    the output data type.
-   * @return the decorated supplier.
-   */
-  @NotNull
-  public static <OUT> SupplierDecorator<OUT> decorate(@NotNull final Supplier<OUT> supplier) {
-    if (supplier instanceof SupplierDecorator) {
-      return (SupplierDecorator<OUT>) supplier;
-    }
-
-    return new SupplierDecorator<OUT>(supplier);
-  }
-
-  /**
    * Returns a new invocation factory based on the specified supplier instance.
    * <br>
    * It's up to the caller to prevent undesired leaks.
@@ -119,7 +95,31 @@ public class SupplierDecorator<OUT> extends DeepEqualObject implements Supplier<
   @NotNull
   public static <IN, OUT> InvocationFactory<IN, OUT> factoryOf(
       @NotNull final Supplier<? extends Invocation<? super IN, ? extends OUT>> supplier) {
-    return new SupplierInvocationFactory<IN, OUT>(decorate(supplier));
+    return new SupplierInvocationFactory<IN, OUT>(supplier);
+  }
+
+  /**
+   * Wraps the specified supplier instance so to provide additional features.
+   * <br>
+   * The returned object will support concatenation and comparison.
+   * <p>
+   * Note that the passed object is expected to have a functional behavior, that is, it must not
+   * retain a mutable internal state.
+   * <br>
+   * Note also that any external object used inside the function must be synchronized in order to
+   * avoid concurrency issues.
+   *
+   * @param supplier the supplier instance.
+   * @param <OUT>    the output data type.
+   * @return the decorated supplier.
+   */
+  @NotNull
+  public static <OUT> SupplierDecorator<OUT> wrapSupplier(@NotNull final Supplier<OUT> supplier) {
+    if (supplier instanceof SupplierDecorator) {
+      return (SupplierDecorator<OUT>) supplier;
+    }
+
+    return new SupplierDecorator<OUT>(supplier);
   }
 
   /**
@@ -177,7 +177,7 @@ public class SupplierDecorator<OUT> extends DeepEqualObject implements Supplier<
    */
   private static class SupplierInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
 
-    private final SupplierDecorator<? extends Invocation<? super IN, ? extends OUT>> mSupplier;
+    private final Supplier<? extends Invocation<? super IN, ? extends OUT>> mSupplier;
 
     /**
      * Constructor.
@@ -185,9 +185,8 @@ public class SupplierDecorator<OUT> extends DeepEqualObject implements Supplier<
      * @param supplier the supplier function.
      */
     private SupplierInvocationFactory(
-        @NotNull final SupplierDecorator<? extends Invocation<? super IN, ? extends OUT>>
-            supplier) {
-      super(asArgs(ConstantConditions.notNull("supplier wrapper", supplier)));
+        @NotNull final Supplier<? extends Invocation<? super IN, ? extends OUT>> supplier) {
+      super(asArgs(wrapSupplier(supplier)));
       mSupplier = supplier;
     }
 

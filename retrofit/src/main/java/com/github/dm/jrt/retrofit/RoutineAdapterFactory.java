@@ -19,7 +19,7 @@ package com.github.dm.jrt.retrofit;
 import com.github.dm.jrt.core.config.InvocationConfigurable;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilders;
+import com.github.dm.jrt.reflect.util.InvocationReflection;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -80,7 +80,7 @@ public class RoutineAdapterFactory extends AbstractAdapterFactory {
    * The options set through the builder configuration will be applied to all the routine handling
    * the Retrofit calls, unless they are overwritten by specific annotations.
    *
-   * @see ReflectionRoutineBuilders#withAnnotations(InvocationConfiguration, Annotation...)
+   * @see InvocationReflection#withAnnotations(InvocationConfiguration, Annotation...)
    */
   public static class Builder implements InvocationConfigurable<Builder> {
 

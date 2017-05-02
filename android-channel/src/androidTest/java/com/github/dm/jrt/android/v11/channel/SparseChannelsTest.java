@@ -85,7 +85,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
                   .withChannel()
                   .withLog(testLog)
                   .withLogLevel(Level.DEBUG)
-                  .configured()
+                  .configuration()
                   .buildChannelArray()
                   .get(3)
                   .pass("test")
@@ -245,7 +245,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
                                                                     .withInvocation()
                                                                     .withInputOrder(
                                                                         OrderType.SORTED)
-                                                                    .configured()
+                                                                    .configuration()
                                                                     .invoke()
                                                                     .pass(channel)
                                                                     .close();

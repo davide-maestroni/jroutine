@@ -96,30 +96,6 @@ public class PredicateDecorator<IN> extends DeepEqualObject implements Predicate
   }
 
   /**
-   * Decorates the specified predicate instance so to provide additional features.
-   * <br>
-   * The returned object will support concatenation and comparison.
-   * <p>
-   * Note that the passed object is expected to have a functional behavior, that is, it must not
-   * retain a mutable internal state.
-   * <br>
-   * Note also that any external object used inside the function must be synchronized in order to
-   * avoid concurrency issues.
-   *
-   * @param predicate the predicate instance.
-   * @param <IN>      the input data type.
-   * @return the decorated predicate.
-   */
-  @NotNull
-  public static <IN> PredicateDecorator<IN> decorate(@NotNull final Predicate<IN> predicate) {
-    if (predicate instanceof PredicateDecorator) {
-      return (PredicateDecorator<IN>) predicate;
-    }
-
-    return new PredicateDecorator<IN>(predicate);
-  }
-
-  /**
    * Returns a predicate decorator testing for equality to the specified object.
    * <br>
    * The returned object will support concatenation and comparison.
@@ -225,6 +201,30 @@ public class PredicateDecorator<IN> extends DeepEqualObject implements Predicate
   @SuppressWarnings("unchecked")
   public static <IN> PredicateDecorator<IN> positive() {
     return (PredicateDecorator<IN>) sPositive;
+  }
+
+  /**
+   * Wraps the specified predicate instance so to provide additional features.
+   * <br>
+   * The returned object will support concatenation and comparison.
+   * <p>
+   * Note that the passed object is expected to have a functional behavior, that is, it must not
+   * retain a mutable internal state.
+   * <br>
+   * Note also that any external object used inside the function must be synchronized in order to
+   * avoid concurrency issues.
+   *
+   * @param predicate the predicate instance.
+   * @param <IN>      the input data type.
+   * @return the decorated predicate.
+   */
+  @NotNull
+  public static <IN> PredicateDecorator<IN> wrapPredicate(@NotNull final Predicate<IN> predicate) {
+    if (predicate instanceof PredicateDecorator) {
+      return (PredicateDecorator<IN>) predicate;
+    }
+
+    return new PredicateDecorator<IN>(predicate);
   }
 
   /**

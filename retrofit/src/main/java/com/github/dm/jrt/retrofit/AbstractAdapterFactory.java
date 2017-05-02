@@ -22,7 +22,7 @@ import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilders;
+import com.github.dm.jrt.reflect.util.InvocationReflection;
 import com.github.dm.jrt.stream.JRoutineStream;
 import com.github.dm.jrt.stream.builder.StreamBuilder;
 
@@ -130,7 +130,7 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
       @NotNull final Retrofit retrofit) {
     // Use annotations to configure the routine
     final InvocationConfiguration invocationConfiguration =
-        ReflectionRoutineBuilders.withAnnotations(configuration, annotations);
+        InvocationReflection.withAnnotations(configuration, annotations);
     final MappingInvocation<Call<Object>, Object> factory =
         getFactory(configuration, responseType, annotations, retrofit);
     return JRoutineCore.with(factory).apply(invocationConfiguration).buildRoutine();

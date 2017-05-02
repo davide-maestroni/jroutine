@@ -24,7 +24,6 @@ import com.github.dm.jrt.core.config.InvocationConfiguration.Configurable;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.function.util.BiConsumer;
-import com.github.dm.jrt.function.util.BiConsumerDecorator;
 import com.github.dm.jrt.function.util.BiFunction;
 import com.github.dm.jrt.function.util.BiFunctionDecorator;
 import com.github.dm.jrt.function.util.Consumer;
@@ -39,6 +38,10 @@ import com.github.dm.jrt.function.util.TriFunctionDecorator;
 import org.jetbrains.annotations.NotNull;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
+import static com.github.dm.jrt.function.util.BiConsumerDecorator.wrapBiConsumer;
+import static com.github.dm.jrt.function.util.BiFunctionDecorator.wrapBiFunction;
+import static com.github.dm.jrt.function.util.ConsumerDecorator.wrapConsumer;
+import static com.github.dm.jrt.function.util.FunctionDecorator.wrapFunction;
 
 /**
  * Abstract implementation of a stateful routine builder.
@@ -64,45 +67,34 @@ public abstract class AbstractStatefulRoutineBuilder<IN, OUT, STATE, TYPE extend
     }
   };
 
-  private BiFunctionDecorator<? super STATE, ? super Channel<OUT, ?>, ? extends STATE> mOnComplete =
+  private BiFunction<? super STATE, ? super Channel<OUT, ?>, ? extends STATE> mOnComplete =
       BiFunctionDecorator.<STATE, Channel<OUT, ?>>first();
 
-  private SupplierDecorator<? extends STATE> mOnCreate = SupplierDecorator.constant(null);
+  private Supplier<? extends STATE> mOnCreate = SupplierDecorator.constant(null);
 
-  private ConsumerDecorator<? super STATE> mOnDestroy = ConsumerDecorator.sink();
+  private Consumer<? super STATE> mOnDestroy = ConsumerDecorator.sink();
 
-  private BiFunctionDecorator<? super STATE, ? super RoutineException, ? extends STATE> mOnError =
+  private BiFunction<? super STATE, ? super RoutineException, ? extends STATE> mOnError =
       BiFunctionDecorator.<STATE, RoutineException>first();
 
-  private FunctionDecorator<? super STATE, ? extends STATE> mOnFinalize =
-      FunctionDecorator.decorate(new Function<STATE, STATE>() {
+  private Function<? super STATE, ? extends STATE> mOnFinalize = FunctionDecorator.constant(null);
 
-        public STATE apply(final STATE state) {
-          return null;
-        }
-      });
-
-  private TriFunctionDecorator<? super STATE, ? super IN, ? super Channel<OUT, ?>, ? extends STATE>
-      mOnNext = TriFunctionDecorator.decorate(new TriFunction<STATE, IN, Channel<OUT, ?>, STATE>() {
-
-    public STATE apply(final STATE state, final IN in, final Channel<OUT, ?> objects) {
-      return state;
-    }
-  });
+  private TriFunction<? super STATE, ? super IN, ? super Channel<OUT, ?>, ? extends STATE> mOnNext =
+      TriFunctionDecorator.<STATE, IN, Channel<OUT, ?>>first();
 
   @NotNull
   @SuppressWarnings("unchecked")
   public TYPE onComplete(
       @NotNull final BiFunction<? super STATE, ? super Channel<OUT, ?>, ? extends STATE>
           onComplete) {
-    mOnComplete = BiFunctionDecorator.decorate(onComplete);
+    mOnComplete = ConstantConditions.notNull("function instance", onComplete);
     return (TYPE) this;
   }
 
   @NotNull
   @SuppressWarnings("unchecked")
   public TYPE onCompleteArray(@NotNull final Function<? super STATE, OUT[]> onComplete) {
-    mOnComplete = BiFunctionDecorator.decorate(new CompleteArrayFunction<OUT, STATE>(onComplete));
+    mOnComplete = new CompleteArrayFunction<OUT, STATE>(onComplete);
     return (TYPE) this;
   }
 
@@ -110,7 +102,7 @@ public abstract class AbstractStatefulRoutineBuilder<IN, OUT, STATE, TYPE extend
   @SuppressWarnings("unchecked")
   public TYPE onCompleteConsume(
       @NotNull final BiConsumer<? super STATE, ? super Channel<OUT, ?>> onComplete) {
-    mOnComplete = BiFunctionDecorator.decorate(new CompleteConsumer<OUT, STATE>(onComplete));
+    mOnComplete = new CompleteConsumer<OUT, STATE>(onComplete);
     return (TYPE) this;
   }
 
@@ -118,36 +110,35 @@ public abstract class AbstractStatefulRoutineBuilder<IN, OUT, STATE, TYPE extend
   @SuppressWarnings("unchecked")
   public TYPE onCompleteIterable(
       @NotNull final Function<? super STATE, ? extends Iterable<? extends OUT>> onComplete) {
-    mOnComplete =
-        BiFunctionDecorator.decorate(new CompleteIterableFunction<OUT, STATE>(onComplete));
+    mOnComplete = new CompleteIterableFunction<OUT, STATE>(onComplete);
     return (TYPE) this;
   }
 
   @NotNull
   @SuppressWarnings("unchecked")
   public TYPE onCompleteOutput(@NotNull final Function<? super STATE, ? extends OUT> onComplete) {
-    mOnComplete = BiFunctionDecorator.decorate(new CompleteOutputFunction<OUT, STATE>(onComplete));
+    mOnComplete = new CompleteOutputFunction<OUT, STATE>(onComplete);
     return (TYPE) this;
   }
 
   @NotNull
   @SuppressWarnings("unchecked")
   public TYPE onCompleteState(@NotNull final Function<? super STATE, ? extends STATE> onComplete) {
-    mOnComplete = BiFunctionDecorator.decorate(new CompleteStateFunction<OUT, STATE>(onComplete));
+    mOnComplete = new CompleteStateFunction<OUT, STATE>(onComplete);
     return (TYPE) this;
   }
 
   @NotNull
   @SuppressWarnings("unchecked")
   public TYPE onCreate(@NotNull final Supplier<? extends STATE> onCreate) {
-    mOnCreate = SupplierDecorator.decorate(onCreate);
+    mOnCreate = ConstantConditions.notNull("supplier instance", onCreate);
     return (TYPE) this;
   }
 
   @NotNull
   @SuppressWarnings("unchecked")
   public TYPE onDestroy(@NotNull final Consumer<? super STATE> onDestroy) {
-    mOnDestroy = ConsumerDecorator.decorate(onDestroy);
+    mOnDestroy = ConstantConditions.notNull("consumer instance", onDestroy);
     return (TYPE) this;
   }
 
@@ -155,7 +146,7 @@ public abstract class AbstractStatefulRoutineBuilder<IN, OUT, STATE, TYPE extend
   @SuppressWarnings("unchecked")
   public TYPE onError(
       @NotNull final BiFunction<? super STATE, ? super RoutineException, ? extends STATE> onError) {
-    mOnError = BiFunctionDecorator.decorate(onError);
+    mOnError = ConstantConditions.notNull("function instance", onError);
     return (TYPE) this;
   }
 
@@ -163,7 +154,7 @@ public abstract class AbstractStatefulRoutineBuilder<IN, OUT, STATE, TYPE extend
   @SuppressWarnings("unchecked")
   public TYPE onErrorConsume(
       @NotNull final BiConsumer<? super STATE, ? super RoutineException> onError) {
-    mOnError = BiFunctionDecorator.decorate(new ErrorConsumer<STATE>(onError));
+    mOnError = new ErrorConsumer<STATE>(onError);
     return (TYPE) this;
   }
 
@@ -171,28 +162,28 @@ public abstract class AbstractStatefulRoutineBuilder<IN, OUT, STATE, TYPE extend
   @SuppressWarnings("unchecked")
   public TYPE onErrorException(
       @NotNull final Function<? super RoutineException, ? extends STATE> onError) {
-    mOnError = BiFunctionDecorator.decorate(new ErrorExceptionFunction<STATE>(onError));
+    mOnError = new ErrorExceptionFunction<STATE>(onError);
     return (TYPE) this;
   }
 
   @NotNull
   @SuppressWarnings("unchecked")
   public TYPE onErrorState(@NotNull final Function<? super STATE, ? extends STATE> onError) {
-    mOnError = BiFunctionDecorator.decorate(new ErrorStateFunction<STATE>(onError));
+    mOnError = new ErrorStateFunction<STATE>(onError);
     return (TYPE) this;
   }
 
   @NotNull
   @SuppressWarnings("unchecked")
   public TYPE onFinalize(@NotNull final Function<? super STATE, ? extends STATE> onFinalize) {
-    mOnFinalize = FunctionDecorator.decorate(onFinalize);
+    mOnFinalize = ConstantConditions.notNull("function instance", onFinalize);
     return (TYPE) this;
   }
 
   @NotNull
   @SuppressWarnings("unchecked")
   public TYPE onFinalizeConsume(@NotNull final Consumer<? super STATE> onFinalize) {
-    mOnFinalize = FunctionDecorator.decorate(new FinalizeConsumer<STATE>(onFinalize));
+    mOnFinalize = new FinalizeConsumer<STATE>(onFinalize);
     return (TYPE) this;
   }
 
@@ -201,21 +192,21 @@ public abstract class AbstractStatefulRoutineBuilder<IN, OUT, STATE, TYPE extend
   public TYPE onNext(
       @NotNull final TriFunction<? super STATE, ? super IN, ? super Channel<OUT, ?>, ? extends
           STATE> onNext) {
-    mOnNext = TriFunctionDecorator.decorate(onNext);
+    mOnNext = ConstantConditions.notNull("function instance", onNext);
     return (TYPE) this;
   }
 
   @NotNull
   @SuppressWarnings("unchecked")
   public TYPE onNextArray(@NotNull final BiFunction<? super STATE, ? super IN, OUT[]> onNext) {
-    mOnNext = TriFunctionDecorator.decorate(new NextArrayFunction<IN, OUT, STATE>(onNext));
+    mOnNext = new NextArrayFunction<IN, OUT, STATE>(onNext);
     return (TYPE) this;
   }
 
   @NotNull
   @SuppressWarnings("unchecked")
   public TYPE onNextConsume(@NotNull final BiConsumer<? super STATE, ? super IN> onNext) {
-    mOnNext = TriFunctionDecorator.decorate(new NextConsumer<IN, OUT, STATE>(onNext));
+    mOnNext = new NextConsumer<IN, OUT, STATE>(onNext);
     return (TYPE) this;
   }
 
@@ -224,7 +215,7 @@ public abstract class AbstractStatefulRoutineBuilder<IN, OUT, STATE, TYPE extend
   public TYPE onNextIterable(
       @NotNull final BiFunction<? super STATE, ? super IN, ? extends Iterable<? extends OUT>>
           onNext) {
-    mOnNext = TriFunctionDecorator.decorate(new NextIterableFunction<IN, OUT, STATE>(onNext));
+    mOnNext = new NextIterableFunction<IN, OUT, STATE>(onNext);
     return (TYPE) this;
   }
 
@@ -232,7 +223,7 @@ public abstract class AbstractStatefulRoutineBuilder<IN, OUT, STATE, TYPE extend
   @SuppressWarnings("unchecked")
   public TYPE onNextOutput(
       @NotNull final BiFunction<? super STATE, ? super IN, ? extends OUT> onNext) {
-    mOnNext = TriFunctionDecorator.decorate(new NextOutputFunction<IN, OUT, STATE>(onNext));
+    mOnNext = new NextOutputFunction<IN, OUT, STATE>(onNext);
     return (TYPE) this;
   }
 
@@ -240,7 +231,7 @@ public abstract class AbstractStatefulRoutineBuilder<IN, OUT, STATE, TYPE extend
   @SuppressWarnings("unchecked")
   public TYPE onNextState(
       @NotNull final BiFunction<? super STATE, ? super IN, ? extends STATE> onNext) {
-    mOnNext = TriFunctionDecorator.decorate(new NextStateFunction<IN, OUT, STATE>(onNext));
+    mOnNext = new NextStateFunction<IN, OUT, STATE>(onNext);
     return (TYPE) this;
   }
 
@@ -273,8 +264,7 @@ public abstract class AbstractStatefulRoutineBuilder<IN, OUT, STATE, TYPE extend
    * @return the function decorator.
    */
   @NotNull
-  protected BiFunctionDecorator<? super STATE, ? super Channel<OUT, ?>, ? extends STATE>
-  getOnComplete() {
+  protected BiFunction<? super STATE, ? super Channel<OUT, ?>, ? extends STATE> getOnComplete() {
     return mOnComplete;
   }
 
@@ -284,7 +274,7 @@ public abstract class AbstractStatefulRoutineBuilder<IN, OUT, STATE, TYPE extend
    * @return the supplier decorator.
    */
   @NotNull
-  protected SupplierDecorator<? extends STATE> getOnCreate() {
+  protected Supplier<? extends STATE> getOnCreate() {
     return mOnCreate;
   }
 
@@ -294,7 +284,7 @@ public abstract class AbstractStatefulRoutineBuilder<IN, OUT, STATE, TYPE extend
    * @return the consumer decorator.
    */
   @NotNull
-  protected ConsumerDecorator<? super STATE> getOnDestroy() {
+  protected Consumer<? super STATE> getOnDestroy() {
     return mOnDestroy;
   }
 
@@ -304,8 +294,7 @@ public abstract class AbstractStatefulRoutineBuilder<IN, OUT, STATE, TYPE extend
    * @return the function decorator.
    */
   @NotNull
-  protected BiFunctionDecorator<? super STATE, ? super RoutineException, ? extends STATE>
-  getOnError() {
+  protected BiFunction<? super STATE, ? super RoutineException, ? extends STATE> getOnError() {
     return mOnError;
   }
 
@@ -315,7 +304,7 @@ public abstract class AbstractStatefulRoutineBuilder<IN, OUT, STATE, TYPE extend
    * @return the function decorator.
    */
   @NotNull
-  protected FunctionDecorator<? super STATE, ? extends STATE> getOnFinalize() {
+  protected Function<? super STATE, ? extends STATE> getOnFinalize() {
     return mOnFinalize;
   }
 
@@ -325,8 +314,8 @@ public abstract class AbstractStatefulRoutineBuilder<IN, OUT, STATE, TYPE extend
    * @return the function decorator.
    */
   @NotNull
-  protected TriFunctionDecorator<? super STATE, ? super IN, ? super Channel<OUT, ?>, ? extends
-      STATE> getOnNext() {
+  protected TriFunction<? super STATE, ? super IN, ? super Channel<OUT, ?>, ? extends STATE>
+  getOnNext() {
     return mOnNext;
   }
 
@@ -347,7 +336,7 @@ public abstract class AbstractStatefulRoutineBuilder<IN, OUT, STATE, TYPE extend
      * @param onComplete the function instance.
      */
     private CompleteArrayFunction(@NotNull final Function<? super STATE, OUT[]> onComplete) {
-      super(asArgs(FunctionDecorator.decorate(onComplete)));
+      super(asArgs(wrapFunction(onComplete)));
       mOnComplete = onComplete;
     }
 
@@ -376,7 +365,7 @@ public abstract class AbstractStatefulRoutineBuilder<IN, OUT, STATE, TYPE extend
      */
     private CompleteConsumer(
         @NotNull final BiConsumer<? super STATE, ? super Channel<OUT, ?>> onComplete) {
-      super(asArgs(BiConsumerDecorator.decorate(onComplete)));
+      super(asArgs(wrapBiConsumer(onComplete)));
       mOnComplete = onComplete;
     }
 
@@ -404,7 +393,7 @@ public abstract class AbstractStatefulRoutineBuilder<IN, OUT, STATE, TYPE extend
      */
     private CompleteIterableFunction(
         @NotNull final Function<? super STATE, ? extends Iterable<? extends OUT>> onComplete) {
-      super(asArgs(FunctionDecorator.decorate(onComplete)));
+      super(asArgs(wrapFunction(onComplete)));
       mOnComplete = onComplete;
     }
 
@@ -432,7 +421,7 @@ public abstract class AbstractStatefulRoutineBuilder<IN, OUT, STATE, TYPE extend
      */
     private CompleteOutputFunction(
         @NotNull final Function<? super STATE, ? extends OUT> onComplete) {
-      super(asArgs(FunctionDecorator.decorate(onComplete)));
+      super(asArgs(wrapFunction(onComplete)));
       mOnComplete = onComplete;
     }
 
@@ -460,7 +449,7 @@ public abstract class AbstractStatefulRoutineBuilder<IN, OUT, STATE, TYPE extend
      */
     private CompleteStateFunction(
         @NotNull final Function<? super STATE, ? extends STATE> onComplete) {
-      super(asArgs(FunctionDecorator.decorate(onComplete)));
+      super(asArgs(wrapFunction(onComplete)));
       mOnComplete = onComplete;
     }
 
@@ -486,7 +475,7 @@ public abstract class AbstractStatefulRoutineBuilder<IN, OUT, STATE, TYPE extend
      */
     private ErrorConsumer(
         @NotNull final BiConsumer<? super STATE, ? super RoutineException> onError) {
-      super(asArgs(BiConsumerDecorator.decorate(onError)));
+      super(asArgs(wrapBiConsumer(onError)));
       mOnError = onError;
     }
 
@@ -513,7 +502,7 @@ public abstract class AbstractStatefulRoutineBuilder<IN, OUT, STATE, TYPE extend
      */
     private ErrorExceptionFunction(
         @NotNull final Function<? super RoutineException, ? extends STATE> onError) {
-      super(asArgs(FunctionDecorator.decorate(onError)));
+      super(asArgs(wrapFunction(onError)));
       mOnError = onError;
     }
 
@@ -538,7 +527,7 @@ public abstract class AbstractStatefulRoutineBuilder<IN, OUT, STATE, TYPE extend
      * @param onError the function instance.
      */
     private ErrorStateFunction(@NotNull final Function<? super STATE, ? extends STATE> onError) {
-      super(asArgs(FunctionDecorator.decorate(onError)));
+      super(asArgs(wrapFunction(onError)));
       mOnError = onError;
     }
 
@@ -563,7 +552,7 @@ public abstract class AbstractStatefulRoutineBuilder<IN, OUT, STATE, TYPE extend
      * @param onFinalize the consumer instance.
      */
     private FinalizeConsumer(@NotNull final Consumer<? super STATE> onFinalize) {
-      super(asArgs(ConsumerDecorator.decorate(onFinalize)));
+      super(asArgs(wrapConsumer(onFinalize)));
       mOnFinalize = onFinalize;
     }
 
@@ -591,7 +580,7 @@ public abstract class AbstractStatefulRoutineBuilder<IN, OUT, STATE, TYPE extend
      * @param onNext the function instance.
      */
     private NextArrayFunction(@NotNull final BiFunction<? super STATE, ? super IN, OUT[]> onNext) {
-      super(asArgs(BiFunctionDecorator.decorate(onNext)));
+      super(asArgs(wrapBiFunction(onNext)));
       mOnNext = onNext;
     }
 
@@ -620,7 +609,7 @@ public abstract class AbstractStatefulRoutineBuilder<IN, OUT, STATE, TYPE extend
      * @param onNext the consumer instance.
      */
     private NextConsumer(@NotNull final BiConsumer<? super STATE, ? super IN> onNext) {
-      super(asArgs(BiConsumerDecorator.decorate(onNext)));
+      super(asArgs(wrapBiConsumer(onNext)));
       mOnNext = onNext;
     }
 
@@ -651,7 +640,7 @@ public abstract class AbstractStatefulRoutineBuilder<IN, OUT, STATE, TYPE extend
     private NextIterableFunction(
         @NotNull final BiFunction<? super STATE, ? super IN, ? extends Iterable<? extends OUT>>
             onNext) {
-      super(asArgs(BiFunctionDecorator.decorate(onNext)));
+      super(asArgs(wrapBiFunction(onNext)));
       mOnNext = onNext;
     }
 
@@ -681,7 +670,7 @@ public abstract class AbstractStatefulRoutineBuilder<IN, OUT, STATE, TYPE extend
      */
     private NextOutputFunction(
         @NotNull final BiFunction<? super STATE, ? super IN, ? extends OUT> onNext) {
-      super(asArgs(BiFunctionDecorator.decorate(onNext)));
+      super(asArgs(wrapBiFunction(onNext)));
       mOnNext = onNext;
     }
 
@@ -711,7 +700,7 @@ public abstract class AbstractStatefulRoutineBuilder<IN, OUT, STATE, TYPE extend
      */
     private NextStateFunction(
         @NotNull final BiFunction<? super STATE, ? super IN, ? extends STATE> onNext) {
-      super(asArgs(BiFunctionDecorator.decorate(onNext)));
+      super(asArgs(wrapBiFunction(onNext)));
       mOnNext = onNext;
     }
 

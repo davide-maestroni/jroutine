@@ -59,7 +59,7 @@ public class ScheduledExecutors {
       if (sDefaultExecutor == null) {
         final int processors = Runtime.getRuntime().availableProcessors();
         sDefaultExecutor = ServiceExecutor.executorOf(
-            new DynamicScheduledThreadExecutor(Math.max(2, processors >> 1),
+            new DynamicScheduledThreadPoolExecutorService(Math.max(2, processors >> 1),
                 Math.max(2, (processors << 2) - 1), 10L, TimeUnit.SECONDS));
       }
 
@@ -90,7 +90,7 @@ public class ScheduledExecutors {
   public static ScheduledExecutor dynamicPoolExecutor(final int corePoolSize,
       final int maximumPoolSize, final long keepAliveTime, @NotNull final TimeUnit keepAliveUnit) {
     return ServiceExecutor.executorOfStoppable(
-        new DynamicScheduledThreadExecutor(corePoolSize, maximumPoolSize, keepAliveTime,
+        new DynamicScheduledThreadPoolExecutorService(corePoolSize, maximumPoolSize, keepAliveTime,
             keepAliveUnit));
   }
 
@@ -145,7 +145,7 @@ public class ScheduledExecutors {
    */
   @NotNull
   public static PriorityExecutor priorityExecutor(@NotNull final ScheduledExecutor wrapped) {
-    return PriorityExecutor.of(wrapped);
+    return PriorityExecutor.executor(wrapped);
   }
 
   /**
@@ -183,7 +183,7 @@ public class ScheduledExecutors {
    */
   @NotNull
   public static ScheduledExecutor serviceExecutor(@NotNull final ExecutorService service) {
-    return serviceExecutor(new ScheduledThreadExecutor(service));
+    return serviceExecutor(new ScheduledThreadPoolExecutorService(service));
   }
 
   /**
@@ -216,7 +216,7 @@ public class ScheduledExecutors {
   @NotNull
   public static ScheduledExecutor throttlingExecutor(@NotNull final ScheduledExecutor wrapped,
       final int maxExecutions) {
-    return new ThrottlingExecutor(wrapped, maxExecutions);
+    return ThrottlingExecutor.executorOf(wrapped, maxExecutions);
   }
 
   /**

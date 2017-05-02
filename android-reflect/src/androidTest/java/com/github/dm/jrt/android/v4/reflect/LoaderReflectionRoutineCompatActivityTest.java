@@ -198,7 +198,7 @@ public class LoaderReflectionRoutineCompatActivityTest
                                                           .with(instanceOf(Sum.class))
                                                           .withInvocation()
                                                           .withOutputTimeout(timeout)
-                                                          .configured()
+                                                          .configuration()
                                                           .buildProxy(SumItf.class);
     final Channel<Integer, Integer> channel3 = JRoutineCore.<Integer>ofData().buildChannel();
     channel3.pass(7).close();
@@ -228,7 +228,7 @@ public class LoaderReflectionRoutineCompatActivityTest
                                                               .with(instanceOf(Count.class))
                                                               .withInvocation()
                                                               .withOutputTimeout(timeout)
-                                                              .configured()
+                                                              .configuration()
                                                               .buildProxy(CountItf.class);
     assertThat(countAsync.count(3).all()).containsExactly(0, 1, 2);
     assertThat(countAsync.count1(3).all()).containsExactly(new int[]{0, 1, 2});
@@ -455,7 +455,7 @@ public class LoaderReflectionRoutineCompatActivityTest
                                     .with(instanceOf(TestClass.class))
                                     .withInvocation()
                                     .withOutputTimeout(indefiniteTime())
-                                    .configured()
+                                    .configuration()
                                     .buildProxy(TestItf.class)
                                     .throwException(null);
 
@@ -471,7 +471,7 @@ public class LoaderReflectionRoutineCompatActivityTest
                                     .with(instanceOf(TestClass.class))
                                     .withInvocation()
                                     .withOutputTimeout(indefiniteTime())
-                                    .configured()
+                                    .configuration()
                                     .buildProxy(TestItf.class)
                                     .throwException1(null);
 
@@ -487,7 +487,7 @@ public class LoaderReflectionRoutineCompatActivityTest
                                     .with(instanceOf(TestClass.class))
                                     .withInvocation()
                                     .withOutputTimeout(indefiniteTime())
-                                    .configured()
+                                    .configuration()
                                     .buildProxy(TestItf.class)
                                     .throwException2(null);
 
@@ -675,7 +675,7 @@ public class LoaderReflectionRoutineCompatActivityTest
                                                   .with(instanceOf(Impl.class))
                                                   .withInvocation()
                                                   .withOutputTimeout(seconds(10))
-                                                  .configured()
+                                                  .configuration()
                                                   .buildProxy(Itf.class);
 
     assertThat(itf.add0('c')).isEqualTo((int) 'c');
@@ -815,19 +815,19 @@ public class LoaderReflectionRoutineCompatActivityTest
                                       .with(instanceOf(TestClass2.class))
                                       .withInvocation()
                                       .withOutputTimeout(seconds(10))
-                                      .configured();
+                                      .configuration();
 
     long startTime = System.currentTimeMillis();
 
     Channel<?, Object> getOne = builder.withWrapper()
                                        .withSharedFields("1")
-                                       .configured()
+                                       .configuration()
                                        .method("getOne")
                                        .invoke()
                                        .close();
     Channel<?, Object> getTwo = builder.withWrapper()
                                        .withSharedFields("2")
-                                       .configured()
+                                       .configuration()
                                        .method("getTwo")
                                        .invoke()
                                        .close();
@@ -852,7 +852,7 @@ public class LoaderReflectionRoutineCompatActivityTest
                                              .with(instanceOf(TestTimeout.class))
                                              .withInvocation()
                                              .withOutputTimeout(seconds(10))
-                                             .configured()
+                                             .configuration()
                                              .loaderConfiguration()
                                              .withLoaderId(0)
                                              .apply()
@@ -867,7 +867,7 @@ public class LoaderReflectionRoutineCompatActivityTest
                                     .with(instanceOf(TestTimeout.class))
                                     .withInvocation()
                                     .withOutputTimeoutAction(TimeoutActionType.FAIL)
-                                    .configured()
+                                    .configuration()
                                     .loaderConfiguration()
                                     .withLoaderId(1)
                                     .apply()
@@ -886,7 +886,7 @@ public class LoaderReflectionRoutineCompatActivityTest
                                              .with(instanceOf(TestTimeout.class))
                                              .withInvocation()
                                              .withOutputTimeout(seconds(10))
-                                             .configured()
+                                             .configuration()
                                              .loaderConfiguration()
                                              .withLoaderId(2)
                                              .apply()
@@ -901,7 +901,7 @@ public class LoaderReflectionRoutineCompatActivityTest
                                     .with(instanceOf(TestTimeout.class))
                                     .withInvocation()
                                     .withOutputTimeoutAction(TimeoutActionType.FAIL)
-                                    .configured()
+                                    .configuration()
                                     .loaderConfiguration()
                                     .withLoaderId(3)
                                     .apply()
@@ -920,7 +920,7 @@ public class LoaderReflectionRoutineCompatActivityTest
                                              .with(instanceOf(TestTimeout.class))
                                              .withInvocation()
                                              .withOutputTimeout(seconds(10))
-                                             .configured()
+                                             .configuration()
                                              .loaderConfiguration()
                                              .withLoaderId(4)
                                              .apply()
@@ -935,7 +935,7 @@ public class LoaderReflectionRoutineCompatActivityTest
                                     .with(instanceOf(TestTimeout.class))
                                     .withInvocation()
                                     .withOutputTimeoutAction(TimeoutActionType.FAIL)
-                                    .configured()
+                                    .configuration()
                                     .loaderConfiguration()
                                     .withLoaderId(5)
                                     .apply()
@@ -954,7 +954,7 @@ public class LoaderReflectionRoutineCompatActivityTest
                                              .with(instanceOf(TestTimeout.class))
                                              .withInvocation()
                                              .withOutputTimeout(seconds(10))
-                                             .configured()
+                                             .configuration()
                                              .loaderConfiguration()
                                              .withLoaderId(6)
                                              .apply()
@@ -967,7 +967,7 @@ public class LoaderReflectionRoutineCompatActivityTest
                                     .with(instanceOf(TestTimeout.class))
                                     .withInvocation()
                                     .withOutputTimeoutAction(TimeoutActionType.FAIL)
-                                    .configured()
+                                    .configuration()
                                     .loaderConfiguration()
                                     .withLoaderId(7)
                                     .apply()

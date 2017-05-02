@@ -84,7 +84,7 @@ public class SparseChannelsCompatTest extends ActivityInstrumentationTestCase2<T
                         .withChannel()
                         .withLog(testLog)
                         .withLogLevel(Level.DEBUG)
-                        .configured()
+                        .configuration()
                         .buildChannelArray()
                         .get(3)
                         .pass("test")
@@ -230,7 +230,7 @@ public class SparseChannelsCompatTest extends ActivityInstrumentationTestCase2<T
                             .with(factoryOf(Sort.class))
                             .withInvocation()
                             .withInputOrder(OrderType.SORTED)
-                            .configured()
+                            .configuration()
                             .invoke()
                             .pass(channel)
                             .close();

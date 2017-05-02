@@ -54,7 +54,7 @@ class DefaultRoutineBuilder extends AbstractRoutineBuilder {
   @NotNull
   public <IN, OUT> Routine<IN, OUT> ofSingleton(@NotNull final Invocation<IN, OUT> invocation) {
     return new DefaultRoutine<IN, OUT>(
-        getConfiguration().builderFrom().withMaxInvocations(1).configured(), mExecutor,
+        getConfiguration().builderFrom().withMaxInvocations(1).configuration(), mExecutor,
         new SingletonInvocationFactory<IN, OUT>(invocation));
   }
 

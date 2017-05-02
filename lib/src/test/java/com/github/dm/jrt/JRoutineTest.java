@@ -41,7 +41,7 @@ import com.github.dm.jrt.function.util.Consumer;
 import com.github.dm.jrt.function.util.Function;
 import com.github.dm.jrt.function.util.Predicate;
 import com.github.dm.jrt.function.util.Supplier;
-import com.github.dm.jrt.operator.Operators;
+import com.github.dm.jrt.operator.JRoutineOperators;
 import com.github.dm.jrt.proxy.annotation.Proxy;
 import com.github.dm.jrt.reflect.annotation.Alias;
 import com.github.dm.jrt.reflect.annotation.AsyncOutput;
@@ -63,7 +63,7 @@ import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.function.Functions.constant;
 import static com.github.dm.jrt.function.Functions.functionMapping;
-import static com.github.dm.jrt.operator.Operators.appendAccept;
+import static com.github.dm.jrt.operator.JRoutineOperators.appendAccept;
 import static com.github.dm.jrt.operator.sequence.Sequences.range;
 import static com.github.dm.jrt.reflect.InvocationTarget.instance;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -603,7 +603,7 @@ public class JRoutineTest {
                                                }
                                              })
                                              .sync()
-                                             .map(Operators.average(Double.class))
+                                             .map(JRoutineOperators.average(Double.class))
                                              .invoke()
                                              .close()
                                              .in(seconds(3))

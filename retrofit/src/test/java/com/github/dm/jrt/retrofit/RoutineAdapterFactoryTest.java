@@ -19,7 +19,7 @@ package com.github.dm.jrt.retrofit;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.function.util.Consumer;
-import com.github.dm.jrt.operator.Operators;
+import com.github.dm.jrt.operator.JRoutineOperators;
 
 import org.junit.Test;
 
@@ -65,7 +65,7 @@ public class RoutineAdapterFactoryTest {
             RoutineAdapterFactory.builder()
                                  .withInvocation()
                                  .withOutputTimeout(seconds(3))
-                                 .configured()
+                                 .configuration()
                                  .buildFactory();
         final GsonConverterFactory converterFactory = GsonConverterFactory.create();
         final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + server.getPort())
@@ -93,7 +93,7 @@ public class RoutineAdapterFactoryTest {
                                  .delegateFactory(factory)
                                  .withInvocation()
                                  .withOutputTimeout(seconds(3))
-                                 .configured()
+                                 .configuration()
                                  .buildFactory();
         final GsonConverterFactory converterFactory = GsonConverterFactory.create();
         final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + server.getPort())
@@ -121,7 +121,7 @@ public class RoutineAdapterFactoryTest {
                                  .delegateFactory(factory)
                                  .withInvocation()
                                  .withOutputTimeout(seconds(3))
-                                 .configured()
+                                 .configuration()
                                  .buildFactory();
         final GsonConverterFactory converterFactory = GsonConverterFactory.create();
         final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + server.getPort())
@@ -165,7 +165,7 @@ public class RoutineAdapterFactoryTest {
                                                .build();
         final GitHubService service = retrofit.create(GitHubService.class);
         assertThat(service.streamRepos("octocat")
-                          .map(Operators.<Repo>unfold())
+                          .map(JRoutineOperators.<Repo>unfold())
                           .invoke()
                           .consume(onOutput(new Consumer<Repo>() {
 
@@ -193,7 +193,7 @@ public class RoutineAdapterFactoryTest {
                                                .build();
         final GitHubService service = retrofit.create(GitHubService.class);
         assertThat(service.streamRepos("octocat")
-                          .map(Operators.<Repo>unfold())
+                          .map(JRoutineOperators.<Repo>unfold())
                           .invoke()
                           .consume(onOutput(new Consumer<Repo>() {
 
@@ -221,7 +221,7 @@ public class RoutineAdapterFactoryTest {
                                                .build();
         final GitHubService service = retrofit.create(GitHubService.class);
         assertThat(service.streamRepos("octocat")
-                          .map(Operators.<Repo>unfold())
+                          .map(JRoutineOperators.<Repo>unfold())
                           .invoke()
                           .consume(onOutput(new Consumer<Repo>() {
 

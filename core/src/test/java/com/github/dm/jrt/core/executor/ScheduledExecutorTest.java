@@ -161,21 +161,21 @@ public class ScheduledExecutorTest {
 
   @Test
   public void testPriorityExecutor() throws InterruptedException {
-
+    // TODO: 29/04/2017 why so long?
     testExecutor(ScheduledExecutors.priorityExecutor(ScheduledExecutors.defaultExecutor())
-                                   .getExecutor(AgingPriority.NORMAL_PRIORITY));
+                                   .ofPriority(AgingPriority.NORMAL_PRIORITY));
     testExecutor(ScheduledExecutors.priorityExecutor(ScheduledExecutors.syncExecutor())
-                                   .getExecutor(AgingPriority.LOW_PRIORITY));
+                                   .ofPriority(AgingPriority.LOW_PRIORITY));
     testExecutor(new ScheduledExecutorDecorator(
         ScheduledExecutors.priorityExecutor(ScheduledExecutors.poolExecutor())
-                          .getExecutor(AgingPriority.LOWEST_PRIORITY)));
+                          .ofPriority(AgingPriority.LOWEST_PRIORITY)));
 
     final PriorityExecutor priorityExecutor =
         ScheduledExecutors.priorityExecutor(ScheduledExecutors.defaultExecutor());
-    testExecutor(priorityExecutor.getExecutor(NotAgingPriority.NORMAL_PRIORITY));
-    testExecutor(priorityExecutor.getExecutor(NotAgingPriority.LOW_PRIORITY));
+    testExecutor(priorityExecutor.ofPriority(NotAgingPriority.NORMAL_PRIORITY));
+    testExecutor(priorityExecutor.ofPriority(NotAgingPriority.LOW_PRIORITY));
     testExecutor(new ScheduledExecutorDecorator(
-        priorityExecutor.getExecutor(NotAgingPriority.LOWEST_PRIORITY)));
+        priorityExecutor.ofPriority(NotAgingPriority.LOWEST_PRIORITY)));
   }
 
   @Test
@@ -193,7 +193,7 @@ public class ScheduledExecutorTest {
     final TestExecution execution = new TestExecution();
     final TestExecutor testExecutor = new TestExecutor();
     final ScheduledExecutor executor =
-        ScheduledExecutors.priorityExecutor(testExecutor).getExecutor(0);
+        ScheduledExecutors.priorityExecutor(testExecutor).ofPriority(0);
     try {
       assertThat(executor.isExecutionThread()).isFalse();
       testExecutor.setExecutionThread(new Thread());
@@ -243,7 +243,7 @@ public class ScheduledExecutorTest {
 
     final PriorityExecutor priorityExecutor =
         ScheduledExecutors.priorityExecutor(ScheduledExecutors.syncExecutor());
-    assertThat(ScheduledExecutors.priorityExecutor(priorityExecutor.getExecutor(3))).isSameAs(
+    assertThat(ScheduledExecutors.priorityExecutor(priorityExecutor.ofPriority(3))).isSameAs(
         priorityExecutor);
   }
 
@@ -290,10 +290,9 @@ public class ScheduledExecutorTest {
   @Test
   public void testThrottlingExecutor() throws InterruptedException {
 
-    testExecutor(new ThrottlingExecutor(ScheduledExecutors.defaultExecutor(), 5));
     testExecutor(ScheduledExecutors.throttlingExecutor(ScheduledExecutors.poolExecutor(), 5));
     testExecutor(new ScheduledExecutorDecorator(
-        new ThrottlingExecutor(ScheduledExecutors.defaultExecutor(), 5)));
+        ScheduledExecutors.throttlingExecutor(ScheduledExecutors.defaultExecutor(), 5)));
     testExecutor(ScheduledExecutors.throttlingExecutor(ScheduledExecutors.syncExecutor(), 1));
   }
 
@@ -365,26 +364,10 @@ public class ScheduledExecutorTest {
   public void testThrottlingExecutorError() {
 
     try {
-      new ThrottlingExecutor(null, 5);
-      fail();
-
-    } catch (final NullPointerException ignored) {
-
-    }
-
-    try {
       ScheduledExecutors.throttlingExecutor(null, 5);
       fail();
 
     } catch (final NullPointerException ignored) {
-
-    }
-
-    try {
-      new ThrottlingExecutor(ScheduledExecutors.defaultExecutor(), 0);
-      fail();
-
-    } catch (final IllegalArgumentException ignored) {
 
     }
 

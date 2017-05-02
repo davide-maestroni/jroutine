@@ -25,6 +25,6 @@
 
     private Invocation${methodCount}(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.reflect.config.WrapperConfiguration wrapperConfiguration,
         @org.jetbrains.annotations.NotNull final com.github.dm.jrt.reflect.InvocationTarget<?> target) {
-      mMutex = com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilders.getSharedMutex(${mutexTarget}, ${sharedFields});
+      mMutex = com.github.dm.jrt.reflect.util.InvocationReflection.getSharedMutex(${mutexTarget}, ${sharedFields});
       mTarget = target;
     }

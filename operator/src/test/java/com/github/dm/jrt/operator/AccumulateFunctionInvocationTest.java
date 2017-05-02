@@ -25,7 +25,7 @@ import com.github.dm.jrt.function.util.Supplier;
 
 import org.junit.Test;
 
-import static com.github.dm.jrt.operator.AccumulateFunctionInvocation.functionFactory;
+import static com.github.dm.jrt.operator.AccumulateFunctionInvocation.factoryOf;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -51,13 +51,13 @@ public class AccumulateFunctionInvocationTest {
 
     final BiFunction<String, String, String> function = createFunction();
     assertThat(JRoutineCore.routineOn(ScheduledExecutors.syncExecutor())
-                           .of(functionFactory(function))
+                           .of(AccumulateFunctionInvocation.factoryOf(function))
                            .invoke()
                            .pass("test1", "test2", "test3")
                            .close()
                            .next()).isEqualTo("test1test2test3");
     assertThat(JRoutineCore.routineOn(ScheduledExecutors.syncExecutor())
-                           .of(functionFactory(new Supplier<String>() {
+                           .of(factoryOf(new Supplier<String>() {
 
                              public String get() {
                                return "test0";
@@ -73,15 +73,17 @@ public class AccumulateFunctionInvocationTest {
   public void testFactoryEquals() {
 
     final BiFunction<String, String, String> function = createFunction();
-    final InvocationFactory<String, String> factory = functionFactory(function);
+    final InvocationFactory<String, String> factory = AccumulateFunctionInvocation.factoryOf(function);
     final BiFunction<String, String, String> first = BiFunctionDecorator.first();
     assertThat(factory).isEqualTo(factory);
-    assertThat(factory).isEqualTo(functionFactory(function));
-    assertThat(functionFactory(function)).isEqualTo(functionFactory(function));
-    assertThat(functionFactory(first)).isEqualTo(functionFactory(first));
-    assertThat(factory).isNotEqualTo(functionFactory(first));
+    assertThat(factory).isEqualTo(AccumulateFunctionInvocation.factoryOf(function));
+    assertThat(AccumulateFunctionInvocation.factoryOf(function)).isEqualTo(
+        AccumulateFunctionInvocation.factoryOf(function));
+    assertThat(AccumulateFunctionInvocation.factoryOf(first)).isEqualTo(
+        AccumulateFunctionInvocation.factoryOf(first));
+    assertThat(factory).isNotEqualTo(AccumulateFunctionInvocation.factoryOf(first));
     assertThat(factory).isNotEqualTo("");
-    assertThat(factory.hashCode()).isEqualTo(functionFactory(function).hashCode());
-    assertThat(factory.hashCode()).isNotEqualTo(functionFactory(first).hashCode());
+    assertThat(factory.hashCode()).isEqualTo(AccumulateFunctionInvocation.factoryOf(function).hashCode());
+    assertThat(factory.hashCode()).isNotEqualTo(AccumulateFunctionInvocation.factoryOf(first).hashCode());
   }
 }

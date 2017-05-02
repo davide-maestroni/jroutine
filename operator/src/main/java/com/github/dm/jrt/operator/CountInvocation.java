@@ -54,7 +54,7 @@ class CountInvocation extends TemplateInvocation<Object, Long> {
    * @return the factory instance.
    */
   @NotNull
-  static InvocationFactory<?, Long> factoryOf() {
+  static InvocationFactory<?, Long> factory() {
     return sFactory;
   }
 

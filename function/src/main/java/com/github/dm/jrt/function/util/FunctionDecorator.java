@@ -120,7 +120,21 @@ public class FunctionDecorator<IN, OUT> extends DeepEqualObject
   }
 
   /**
-   * Decorates the specified function instance so to provide additional features.
+   * Returns the identity function decorator.
+   * <br>
+   * The returned object will support concatenation and comparison.
+   *
+   * @param <IN> the input data type.
+   * @return the function decorator.
+   */
+  @NotNull
+  @SuppressWarnings("unchecked")
+  public static <IN> FunctionDecorator<IN, IN> identity() {
+    return (FunctionDecorator<IN, IN>) sIdentity;
+  }
+
+  /**
+   * Wraps the specified function instance so to provide additional features.
    * <br>
    * The returned object will support concatenation and comparison.
    * <p>
@@ -136,27 +150,13 @@ public class FunctionDecorator<IN, OUT> extends DeepEqualObject
    * @return the decorated function.
    */
   @NotNull
-  public static <IN, OUT> FunctionDecorator<IN, OUT> decorate(
+  public static <IN, OUT> FunctionDecorator<IN, OUT> wrapFunction(
       @NotNull final Function<IN, OUT> function) {
     if (function instanceof FunctionDecorator) {
       return (FunctionDecorator<IN, OUT>) function;
     }
 
     return new FunctionDecorator<IN, OUT>(function);
-  }
-
-  /**
-   * Returns the identity function decorator.
-   * <br>
-   * The returned object will support concatenation and comparison.
-   *
-   * @param <IN> the input data type.
-   * @return the function decorator.
-   */
-  @NotNull
-  @SuppressWarnings("unchecked")
-  public static <IN> FunctionDecorator<IN, IN> identity() {
-    return (FunctionDecorator<IN, IN>) sIdentity;
   }
 
   /**

@@ -20,8 +20,7 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
-import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.util.FunctionDecorator;
+import com.github.dm.jrt.function.util.Function;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -30,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
+import static com.github.dm.jrt.function.util.FunctionDecorator.wrapFunction;
 
 /**
  * Factory of grouping by key invocations.
@@ -40,15 +40,15 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class GroupByFunctionInvocationFactory<DATA> extends InvocationFactory<DATA, List<DATA>> {
 
-  private final FunctionDecorator<DATA, Object> mKeyFunction;
+  private final Function<DATA, Object> mKeyFunction;
 
   /**
    * Constructor.
    *
    * @param keyFunction the function returning the group key.
    */
-  GroupByFunctionInvocationFactory(@NotNull final FunctionDecorator<DATA, Object> keyFunction) {
-    super(asArgs(ConstantConditions.notNull("function instance", keyFunction)));
+  GroupByFunctionInvocationFactory(@NotNull final Function<DATA, Object> keyFunction) {
+    super(asArgs(wrapFunction(keyFunction)));
     mKeyFunction = keyFunction;
   }
 
@@ -66,7 +66,7 @@ class GroupByFunctionInvocationFactory<DATA> extends InvocationFactory<DATA, Lis
   private static class GroupByFunctionInvocation<DATA>
       extends TemplateInvocation<DATA, List<DATA>> {
 
-    private final FunctionDecorator<DATA, Object> mKeyFunction;
+    private final Function<DATA, Object> mKeyFunction;
 
     private HashMap<Object, ArrayList<DATA>> mGroups;
 
@@ -75,7 +75,7 @@ class GroupByFunctionInvocationFactory<DATA> extends InvocationFactory<DATA, Lis
      *
      * @param keyFunction the function returning the group key.
      */
-    private GroupByFunctionInvocation(@NotNull final FunctionDecorator<DATA, Object> keyFunction) {
+    private GroupByFunctionInvocation(@NotNull final Function<DATA, Object> keyFunction) {
       mKeyFunction = keyFunction;
     }
 

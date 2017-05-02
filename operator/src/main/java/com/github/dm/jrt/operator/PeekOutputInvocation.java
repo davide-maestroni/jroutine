@@ -18,12 +18,12 @@ package com.github.dm.jrt.operator;
 
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
-import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.util.ConsumerDecorator;
+import com.github.dm.jrt.function.util.Consumer;
 
 import org.jetbrains.annotations.NotNull;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
+import static com.github.dm.jrt.function.util.ConsumerDecorator.wrapConsumer;
 
 /**
  * Mapping invocation peeking output data as they are passed along.
@@ -34,15 +34,15 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class PeekOutputInvocation<DATA> extends MappingInvocation<DATA, DATA> {
 
-  private final ConsumerDecorator<? super DATA> mOutputConsumer;
+  private final Consumer<? super DATA> mOutputConsumer;
 
   /**
    * Constructor.
    *
    * @param outputConsumer the consumer instance.
    */
-  PeekOutputInvocation(@NotNull final ConsumerDecorator<? super DATA> outputConsumer) {
-    super(asArgs(ConstantConditions.notNull("consumer instance", outputConsumer)));
+  PeekOutputInvocation(@NotNull final Consumer<? super DATA> outputConsumer) {
+    super(asArgs(wrapConsumer(outputConsumer)));
     mOutputConsumer = outputConsumer;
   }
 

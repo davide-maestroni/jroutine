@@ -39,10 +39,10 @@ import com.github.dm.jrt.reflect.JRoutineReflection;
 import com.github.dm.jrt.reflect.annotation.AsyncInput.InputMode;
 import com.github.dm.jrt.reflect.annotation.AsyncOutput.OutputMode;
 import com.github.dm.jrt.reflect.annotation.SharedFields;
-import com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilders;
-import com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilders.MethodInfo;
 import com.github.dm.jrt.reflect.common.Mutex;
 import com.github.dm.jrt.reflect.config.WrapperConfiguration;
+import com.github.dm.jrt.reflect.util.InvocationReflection;
+import com.github.dm.jrt.reflect.util.InvocationReflection.MethodInfo;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -60,11 +60,11 @@ import java.util.Set;
 import static com.github.dm.jrt.android.core.invocation.TargetInvocationFactory.factoryOf;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.core.util.Reflection.findMethod;
-import static com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilders.callFromInvocation;
-import static com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilders.getAnnotatedMethod;
-import static com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilders.getSharedMutex;
-import static com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilders.getTargetMethodInfo;
-import static com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilders.invokeRoutine;
+import static com.github.dm.jrt.reflect.util.InvocationReflection.callFromInvocation;
+import static com.github.dm.jrt.reflect.util.InvocationReflection.getAnnotatedMethod;
+import static com.github.dm.jrt.reflect.util.InvocationReflection.getSharedMutex;
+import static com.github.dm.jrt.reflect.util.InvocationReflection.getTargetMethodInfo;
+import static com.github.dm.jrt.reflect.util.InvocationReflection.invokeRoutine;
 
 /**
  * Class implementing a builder of routines wrapping an object methods.
@@ -242,7 +242,7 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
     final TargetInvocationFactory<Object, Object> factory =
         factoryOf(MethodAliasInvocation.class, args);
     final InvocationConfiguration invocationConfiguration =
-        ReflectionRoutineBuilders.withAnnotations(mInvocationConfiguration, targetMethod);
+        InvocationReflection.withAnnotations(mInvocationConfiguration, targetMethod);
     final ServiceConfiguration serviceConfiguration =
         AndroidReflectionRoutineBuilders.withAnnotations(mServiceConfiguration, targetMethod);
     return (Routine<IN, OUT>) JRoutineService.on(mContext)
@@ -264,7 +264,7 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
     final TargetInvocationFactory<Object, Object> factory =
         factoryOf(MethodSignatureInvocation.class, args);
     final InvocationConfiguration invocationConfiguration =
-        ReflectionRoutineBuilders.withAnnotations(mInvocationConfiguration, targetMethod);
+        InvocationReflection.withAnnotations(mInvocationConfiguration, targetMethod);
     final ServiceConfiguration serviceConfiguration =
         AndroidReflectionRoutineBuilders.withAnnotations(mServiceConfiguration, targetMethod);
     return (Routine<IN, OUT>) JRoutineService.on(mContext)
@@ -559,7 +559,7 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
       final TargetInvocationFactory<Object, Object> factory =
           factoryOf(ProxyInvocation.class, factoryArgs);
       final InvocationConfiguration invocationConfiguration =
-          ReflectionRoutineBuilders.withAnnotations(mInvocationConfiguration, method);
+          InvocationReflection.withAnnotations(mInvocationConfiguration, method);
       final ServiceConfiguration serviceConfiguration =
           AndroidReflectionRoutineBuilders.withAnnotations(mServiceConfiguration, method);
       final Routine<Object, Object> routine = JRoutineService.on(mContext)

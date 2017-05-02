@@ -27,13 +27,12 @@ import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.util.Function;
-import com.github.dm.jrt.function.util.FunctionDecorator;
 import com.github.dm.jrt.stream.config.StreamConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
-import static com.github.dm.jrt.function.util.FunctionDecorator.decorate;
+import static com.github.dm.jrt.function.util.FunctionDecorator.wrapFunction;
 
 /**
  * Utility class providing transformation functions based on Loader instances.
@@ -90,9 +89,9 @@ public class LoaderTransformationsCompat {
           @Override
           public Channel<?, OUT> apply(final Channel<?, IN> channel) {
             return JRoutineLoaderCompat.on(context)
-                                       .with(new LoaderContextInvocationFactory<IN, OUT>(
-                                           decorate(function)))
-                                       .withConfiguration(streamConfiguration.toInvocationConfiguration())
+                                       .with(new LoaderContextInvocationFactory<IN, OUT>(function))
+                                       .withConfiguration(
+                                           streamConfiguration.toInvocationConfiguration())
                                        .apply(loaderConfiguration)
                                        .invoke()
                                        .pass(channel)
@@ -111,7 +110,7 @@ public class LoaderTransformationsCompat {
    */
   private static class LoaderContextInvocation<IN, OUT> extends ChannelContextInvocation<IN, OUT> {
 
-    private final FunctionDecorator<Channel<?, IN>, Channel<?, OUT>> mFunction;
+    private final Function<Channel<?, IN>, Channel<?, OUT>> mFunction;
 
     /**
      * Constructor.
@@ -119,7 +118,7 @@ public class LoaderTransformationsCompat {
      * @param function the binding function.
      */
     private LoaderContextInvocation(
-        @NotNull final FunctionDecorator<Channel<?, IN>, Channel<?, OUT>> function) {
+        @NotNull final Function<Channel<?, IN>, Channel<?, OUT>> function) {
       mFunction = function;
     }
 
@@ -139,7 +138,7 @@ public class LoaderTransformationsCompat {
   private static class LoaderContextInvocationFactory<IN, OUT>
       extends ContextInvocationFactory<IN, OUT> {
 
-    private final FunctionDecorator<Channel<?, IN>, Channel<?, OUT>> mFunction;
+    private final Function<Channel<?, IN>, Channel<?, OUT>> mFunction;
 
     /**
      * Constructor.
@@ -147,9 +146,9 @@ public class LoaderTransformationsCompat {
      * @param function the binding function.
      */
     private LoaderContextInvocationFactory(
-        @NotNull final FunctionDecorator<Channel<?, IN>, Channel<?, OUT>> function) {
-      super(asArgs(function));
-      mFunction = ConstantConditions.notNull("binding function", function);
+        @NotNull final Function<Channel<?, IN>, Channel<?, OUT>> function) {
+      super(asArgs(wrapFunction(function)));
+      mFunction = function;
     }
 
     @NotNull

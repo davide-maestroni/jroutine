@@ -61,6 +61,8 @@ import static com.github.dm.jrt.core.util.Reflection.newInstanceOf;
 public abstract class TargetInvocationFactory<IN, OUT> extends DeepEqualObject
     implements Parcelable {
 
+  // TODO: 30/04/2017 rename (TargetFactory, InvocationFactoryReference)
+
   /**
    * Constructor.
    *

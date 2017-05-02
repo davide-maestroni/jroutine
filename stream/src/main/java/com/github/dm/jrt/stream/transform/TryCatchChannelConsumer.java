@@ -16,9 +16,12 @@
 
 package com.github.dm.jrt.stream.transform;
 
+import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.common.RoutineException;
+import com.github.dm.jrt.core.config.ChannelConfiguration;
+import com.github.dm.jrt.core.executor.ScheduledExecutor;
 import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.util.BiConsumer;
@@ -36,19 +39,23 @@ class TryCatchChannelConsumer<OUT> implements ChannelConsumer<OUT> {
 
   private final BiConsumer<? super RoutineException, ? super Channel<OUT, ?>> mCatchConsumer;
 
-  private final Channel<OUT, ?> mOutputChannel;
+  private final Channel<OUT, OUT> mOutputChannel;
 
   /**
    * Constructor.
    *
+   * @param executor      the executor instance.
+   * @param configuration the channel configuration.
    * @param catchConsumer the consumer instance.
    * @param outputChannel the output channel.
    */
-  TryCatchChannelConsumer(
+  TryCatchChannelConsumer(@NotNull final ScheduledExecutor executor,
+      @NotNull final ChannelConfiguration configuration,
       @NotNull final BiConsumer<? super RoutineException, ? super Channel<OUT, ?>> catchConsumer,
       @NotNull final Channel<OUT, ?> outputChannel) {
     mCatchConsumer = ConstantConditions.notNull("bi-consumer instance", catchConsumer);
-    mOutputChannel = ConstantConditions.notNull("channel instance", outputChannel);
+    outputChannel.pass(mOutputChannel =
+        JRoutineCore.channelOn(executor).withConfiguration(configuration).ofType());
   }
 
   public void onComplete() {

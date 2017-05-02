@@ -23,7 +23,7 @@ package com.github.dm.jrt.channel;
  *
  * @param <DATA> the data type.
  */
-public class Flow<DATA> {
+public class Flow<DATA> { // TODO: 28/04/2017 rename?
 
   /**
    * The data object.

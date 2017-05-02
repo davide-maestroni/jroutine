@@ -80,7 +80,7 @@ public abstract class AbstractRoutine<IN, OUT> implements Routine<IN, OUT> {
     mConfiguration = configuration;
     final int priority = configuration.getPriorityOrElse(InvocationConfiguration.DEFAULT);
     if (priority != InvocationConfiguration.DEFAULT) {
-      mExecutor = ScheduledExecutors.priorityExecutor(executor).getExecutor(priority);
+      mExecutor = ScheduledExecutors.priorityExecutor(executor).ofPriority(priority);
 
     } else {
       mExecutor = executor;

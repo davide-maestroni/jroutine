@@ -64,30 +64,19 @@ public class ActionDecorator extends DeepEqualObject implements Action, Decorato
   }
 
   /**
-   * Decorates the specified action instance so to provide additional features.
+   * Returns an action decorator doing nothing.
    * <br>
    * The returned object will support concatenation and comparison.
-   * <p>
-   * Note that the passed object is expected to have a functional behavior, that is, it must not
-   * retain a mutable internal state.
-   * <br>
-   * Note also that any external object used inside the function must be synchronized in order to
-   * avoid concurrency issues.
    *
-   * @param action the action instance.
-   * @return the decorated action.
+   * @return the action decorator.
    */
   @NotNull
-  public static ActionDecorator decorate(@NotNull final Action action) {
-    if (action instanceof ActionDecorator) {
-      return (ActionDecorator) action;
-    }
-
-    return new ActionDecorator(action);
+  public static ActionDecorator noOp() {
+    return sNoOp;
   }
 
   /**
-   * Decorates the specified runnable instance so to provide additional features.
+   * Wraps the specified runnable instance so to provide additional features.
    * <br>
    * The returned object will support concatenation and comparison.
    * <p>
@@ -101,20 +90,31 @@ public class ActionDecorator extends DeepEqualObject implements Action, Decorato
    * @return the decorated action.
    */
   @NotNull
-  public static ActionDecorator decorate(@NotNull final Runnable action) {
+  public static ActionDecorator wrapAction(@NotNull final Runnable action) {
     return new ActionDecorator(new ActionRunnable(action));
   }
 
   /**
-   * Returns an action decorator doing nothing.
+   * Wraps the specified action instance so to provide additional features.
    * <br>
    * The returned object will support concatenation and comparison.
+   * <p>
+   * Note that the passed object is expected to have a functional behavior, that is, it must not
+   * retain a mutable internal state.
+   * <br>
+   * Note also that any external object used inside the function must be synchronized in order to
+   * avoid concurrency issues.
    *
-   * @return the action decorator.
+   * @param action the action instance.
+   * @return the decorated action.
    */
   @NotNull
-  public static ActionDecorator noOp() {
-    return sNoOp;
+  public static ActionDecorator wrapAction(@NotNull final Action action) {
+    if (action instanceof ActionDecorator) {
+      return (ActionDecorator) action;
+    }
+
+    return new ActionDecorator(action);
   }
 
   /**

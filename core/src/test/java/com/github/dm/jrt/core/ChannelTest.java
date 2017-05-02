@@ -187,7 +187,7 @@ public class ChannelTest {
   public void testAsynchronousInput2() {
     final DurationMeasure timeout = seconds(1);
     final Channel<String, String> channel1 =
-        JRoutineCore.channel().withChannel().withOrder(OrderType.SORTED).configured().ofType();
+        JRoutineCore.channel().withChannel().withOrder(OrderType.SORTED).configuration().ofType();
     new Thread() {
 
       @Override
@@ -327,7 +327,7 @@ public class ChannelTest {
       JRoutineCore.channel()
                   .withChannel()
                   .withMaxSize(1)
-                  .configured()
+                  .configuration()
                   .ofType()
                   .pass("test1", "test2");
       fail();
@@ -504,7 +504,7 @@ public class ChannelTest {
                                                         .withBackoff(noDelay())
                                                         .withLogLevel(Level.DEBUG)
                                                         .withLog(new NullLog())
-                                                        .configured()
+                                                        .configuration()
                                                         .ofType();
     channel.pass(-77L);
     assertThat(channel.in(timeout).next()).isEqualTo(-77L);
@@ -550,7 +550,7 @@ public class ChannelTest {
                                                          .withOutputTimeout(millis(10))
                                                          .withOutputTimeoutAction(
                                                              TimeoutActionType.CONTINUE)
-                                                         .configured()
+                                                         .configuration()
                                                          .ofType();
     assertThat(channel1.all()).isEmpty();
   }
@@ -562,7 +562,7 @@ public class ChannelTest {
                                                          .withOutputTimeout(millis(10))
                                                          .withOutputTimeoutAction(
                                                              TimeoutActionType.ABORT)
-                                                         .configured()
+                                                         .configuration()
                                                          .ofType();
     try {
       channel2.all();
@@ -579,7 +579,7 @@ public class ChannelTest {
                                                          .withOutputTimeout(millis(10))
                                                          .withOutputTimeoutAction(
                                                              TimeoutActionType.FAIL)
-                                                         .configured()
+                                                         .configuration()
                                                          .ofType();
     try {
       channel3.all();

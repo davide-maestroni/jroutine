@@ -27,9 +27,10 @@ import org.junit.Test;
 import static com.github.dm.jrt.function.JRoutineFunction.onComplete;
 import static com.github.dm.jrt.function.JRoutineFunction.onError;
 import static com.github.dm.jrt.function.JRoutineFunction.onOutput;
-import static com.github.dm.jrt.function.util.ActionDecorator.decorate;
 import static com.github.dm.jrt.function.util.ActionDecorator.noOp;
+import static com.github.dm.jrt.function.util.ActionDecorator.wrapAction;
 import static com.github.dm.jrt.function.util.ConsumerDecorator.sink;
+import static com.github.dm.jrt.function.util.ConsumerDecorator.wrapConsumer;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -101,7 +102,7 @@ public class FunctionalChannelConsumerTest {
     assertThat(action2.isCalled()).isTrue();
     action1.reset();
     action2.reset();
-    channelConsumer = onComplete(action1).andOnComplete(decorate(action2).andThen(action3));
+    channelConsumer = onComplete(action1).andOnComplete(wrapAction(action2).andThen(action3));
     channelConsumer.onOutput("test");
     assertThat(action1.isCalled()).isFalse();
     assertThat(action2.isCalled()).isFalse();
@@ -200,8 +201,7 @@ public class FunctionalChannelConsumerTest {
     assertThat(consumer2.isCalled()).isTrue();
     consumer1.reset();
     consumer2.reset();
-    channelConsumer =
-        onError(consumer1).andOnError(ConsumerDecorator.decorate(consumer2).andThen(consumer3));
+    channelConsumer = onError(consumer1).andOnError(wrapConsumer(consumer2).andThen(consumer3));
     channelConsumer.onOutput("test");
     assertThat(consumer1.isCalled()).isFalse();
     assertThat(consumer2.isCalled()).isFalse();
@@ -300,8 +300,7 @@ public class FunctionalChannelConsumerTest {
     assertThat(consumer2.isCalled()).isTrue();
     consumer1.reset();
     consumer2.reset();
-    channelConsumer =
-        onOutput(consumer1).andOnOutput(ConsumerDecorator.decorate(consumer2).andThen(consumer3));
+    channelConsumer = onOutput(consumer1).andOnOutput(wrapConsumer(consumer2).andThen(consumer3));
     channelConsumer.onError(new RoutineException());
     assertThat(consumer1.isCalled()).isFalse();
     assertThat(consumer2.isCalled()).isFalse();

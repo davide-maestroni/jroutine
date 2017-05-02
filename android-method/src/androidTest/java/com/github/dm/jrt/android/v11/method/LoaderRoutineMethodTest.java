@@ -369,7 +369,7 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
         String.class.getMethod("toString"))
                                   .withWrapper()
                                   .withSharedFields()
-                                  .configured()
+                                  .configuration()
                                   .call()
                                   .in(seconds(10))
                                   .next()).isEqualTo("test");
@@ -384,7 +384,7 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
     assertThat(LoaderRoutineMethod.from(loaderFrom(getActivity()), instanceOf(String.class, test),
         "toString").call().in(seconds(10)).next()).isEqualTo("test");
     assertThat(LoaderRoutineMethod.from(loaderFrom(getActivity()), instanceOf(String.class, test),
-        "toString").withWrapper().withSharedFields().configured().call().in(seconds(10)).next())
+        "toString").withWrapper().withSharedFields().configuration().call().in(seconds(10)).next())
         .isEqualTo("test");
   }
 

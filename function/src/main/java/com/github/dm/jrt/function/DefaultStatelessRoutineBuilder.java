@@ -26,12 +26,14 @@ import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.builder.AbstractStatelessRoutineBuilder;
 import com.github.dm.jrt.function.builder.StatelessRoutineBuilder;
-import com.github.dm.jrt.function.util.BiConsumerDecorator;
-import com.github.dm.jrt.function.util.ConsumerDecorator;
+import com.github.dm.jrt.function.util.BiConsumer;
+import com.github.dm.jrt.function.util.Consumer;
 
 import org.jetbrains.annotations.NotNull;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
+import static com.github.dm.jrt.function.util.BiConsumerDecorator.wrapBiConsumer;
+import static com.github.dm.jrt.function.util.ConsumerDecorator.wrapConsumer;
 
 /**
  * Default implementation of a stateless routine builder.
@@ -71,11 +73,11 @@ class DefaultStatelessRoutineBuilder<IN, OUT>
   private static class StatelessInvocation<IN, OUT> extends InvocationFactory<IN, OUT>
       implements Invocation<IN, OUT> {
 
-    private final ConsumerDecorator<? super Channel<OUT, ?>> mOnComplete;
+    private final Consumer<? super Channel<OUT, ?>> mOnComplete;
 
-    private final ConsumerDecorator<? super RoutineException> mOnError;
+    private final Consumer<? super RoutineException> mOnError;
 
-    private final BiConsumerDecorator<? super IN, ? super Channel<OUT, ?>> mOnNext;
+    private final BiConsumer<? super IN, ? super Channel<OUT, ?>> mOnNext;
 
     /**
      * Constructor.
@@ -85,10 +87,10 @@ class DefaultStatelessRoutineBuilder<IN, OUT>
      * @param onComplete the complete consumer.
      */
     private StatelessInvocation(
-        @NotNull final BiConsumerDecorator<? super IN, ? super Channel<OUT, ?>> onNext,
-        @NotNull final ConsumerDecorator<? super RoutineException> onError,
-        @NotNull final ConsumerDecorator<? super Channel<OUT, ?>> onComplete) {
-      super(asArgs(onNext, onError, onComplete));
+        @NotNull final BiConsumer<? super IN, ? super Channel<OUT, ?>> onNext,
+        @NotNull final Consumer<? super RoutineException> onError,
+        @NotNull final Consumer<? super Channel<OUT, ?>> onComplete) {
+      super(asArgs(wrapBiConsumer(onNext), wrapConsumer(onError), wrapConsumer(onComplete)));
       mOnNext = onNext;
       mOnError = onError;
       mOnComplete = onComplete;

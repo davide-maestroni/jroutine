@@ -32,9 +32,9 @@ import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 import com.github.dm.jrt.reflect.annotation.AsyncInput.InputMode;
 import com.github.dm.jrt.reflect.annotation.AsyncOutput.OutputMode;
 import com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilder;
-import com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilders.MethodInfo;
 import com.github.dm.jrt.reflect.common.Mutex;
 import com.github.dm.jrt.reflect.config.WrapperConfiguration;
+import com.github.dm.jrt.reflect.util.InvocationReflection.MethodInfo;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -47,12 +47,12 @@ import java.util.HashMap;
 import java.util.List;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
-import static com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilders.callFromInvocation;
-import static com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilders.getAnnotatedMethod;
-import static com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilders.getSharedMutex;
-import static com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilders.getTargetMethodInfo;
-import static com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilders.invokeRoutine;
-import static com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilders.withAnnotations;
+import static com.github.dm.jrt.reflect.util.InvocationReflection.callFromInvocation;
+import static com.github.dm.jrt.reflect.util.InvocationReflection.getAnnotatedMethod;
+import static com.github.dm.jrt.reflect.util.InvocationReflection.getSharedMutex;
+import static com.github.dm.jrt.reflect.util.InvocationReflection.getTargetMethodInfo;
+import static com.github.dm.jrt.reflect.util.InvocationReflection.invokeRoutine;
+import static com.github.dm.jrt.reflect.util.InvocationReflection.withAnnotations;
 
 /**
  * Class implementing a builder of routines wrapping an object methods.

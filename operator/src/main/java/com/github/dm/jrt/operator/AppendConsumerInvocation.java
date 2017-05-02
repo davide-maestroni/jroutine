@@ -18,11 +18,12 @@ package com.github.dm.jrt.operator;
 
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.util.ConsumerDecorator;
+import com.github.dm.jrt.function.util.Consumer;
 
 import org.jetbrains.annotations.NotNull;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
+import static com.github.dm.jrt.function.util.ConsumerDecorator.wrapConsumer;
 
 /**
  * Appending invocation used to call a consumer a specific number of times.
@@ -35,7 +36,7 @@ class AppendConsumerInvocation<OUT> extends GenerateInvocation<OUT, OUT> {
 
   private final long mCount;
 
-  private final ConsumerDecorator<? super Channel<OUT, ?>> mOutputsConsumer;
+  private final Consumer<? super Channel<OUT, ?>> mOutputsConsumer;
 
   /**
    * Constructor.
@@ -44,16 +45,16 @@ class AppendConsumerInvocation<OUT> extends GenerateInvocation<OUT, OUT> {
    * @param outputsConsumer the consumer instance.
    */
   AppendConsumerInvocation(final long count,
-      @NotNull final ConsumerDecorator<? super Channel<OUT, ?>> outputsConsumer) {
-    super(asArgs(ConstantConditions.positive("count number", count),
-        ConstantConditions.notNull("consumer instance", outputsConsumer)));
+      @NotNull final Consumer<? super Channel<OUT, ?>> outputsConsumer) {
+    super(
+        asArgs(ConstantConditions.positive("count number", count), wrapConsumer(outputsConsumer)));
     mCount = count;
     mOutputsConsumer = outputsConsumer;
   }
 
   public void onComplete(@NotNull final Channel<OUT, ?> result) throws Exception {
     final long count = mCount;
-    final ConsumerDecorator<? super Channel<OUT, ?>> consumer = mOutputsConsumer;
+    final Consumer<? super Channel<OUT, ?>> consumer = mOutputsConsumer;
     for (long i = 0; i < count; ++i) {
       consumer.accept(result);
     }

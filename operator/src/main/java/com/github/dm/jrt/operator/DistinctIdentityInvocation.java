@@ -62,7 +62,7 @@ class DistinctIdentityInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
    */
   @NotNull
   @SuppressWarnings("unchecked")
-  static <DATA> InvocationFactory<DATA, DATA> factoryOf() {
+  static <DATA> InvocationFactory<DATA, DATA> factory() {
     return (InvocationFactory<DATA, DATA>) sFactory;
   }
 

@@ -225,7 +225,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                                                       .withOutputTimeout(millis(10))
                                                       .withOutputTimeoutAction(
                                                           TimeoutActionType.CONTINUE)
-                                                      .configured()
+                                                      .configuration()
                                                       .invoke()
                                                       .pass("test1")
                                                       .close();
@@ -241,7 +241,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                                                       .withOutputTimeout(millis(10))
                                                       .withOutputTimeoutAction(
                                                           TimeoutActionType.ABORT)
-                                                      .configured()
+                                                      .configuration()
                                                       .invoke()
                                                       .pass("test2")
                                                       .close();
@@ -267,7 +267,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                                                       .withOutputTimeout(millis(10))
                                                       .withOutputTimeoutAction(
                                                           TimeoutActionType.FAIL)
-                                                      .configured()
+                                                      .configuration()
                                                       .invoke()
                                                       .pass("test3")
                                                       .close();
@@ -295,7 +295,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                                                             .withInvocation()
                                                             .withInputOrder(OrderType.UNSORTED)
                                                             .withLogLevel(Level.DEBUG)
-                                                            .configured()
+                                                            .configuration()
                                                             .serviceConfiguration()
                                                             .withLogClass(AndroidLog.class)
                                                             .apply()
@@ -320,7 +320,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                                                             .withInvocation()
                                                             .withOutputOrder(OrderType.UNSORTED)
                                                             .withLogLevel(Level.DEBUG)
-                                                            .configured()
+                                                            .configuration()
                                                             .serviceConfiguration()
                                                             .withLogClass(AndroidLog.class)
                                                             .apply()
@@ -346,7 +346,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                                                             .withInvocation()
                                                             .withInputOrder(OrderType.SORTED)
                                                             .withOutputOrder(OrderType.SORTED)
-                                                            .configured()
+                                                            .configuration()
                                                             .buildRoutine();
     assertThat(
         routine3.invoke().pass("1", "2", "3", "4", "5").close().in(timeout).all()).containsExactly(
@@ -369,7 +369,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                                                             .withInvocation()
                                                             .withCoreInvocations(0)
                                                             .withMaxInvocations(2)
-                                                            .configured()
+                                                            .configuration()
                                                             .buildRoutine();
     assertThat(
         routine4.invoke().pass("1", "2", "3", "4", "5").close().in(timeout).all()).containsOnly("1",
@@ -392,7 +392,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                                                           .withInvocation()
                                                           .withCoreInvocations(0)
                                                           .withMaxInvocations(2)
-                                                          .configured()
+                                                          .configuration()
                                                           .buildRoutine();
     assertThat(routine5.invoke().close().in(timeout).all()).containsOnly("test1", "test2", "test3");
     assertThat(

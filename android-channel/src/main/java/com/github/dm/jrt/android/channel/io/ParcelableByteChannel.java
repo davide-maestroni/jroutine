@@ -187,7 +187,7 @@ public class ParcelableByteChannel {
         final ChunkOutputStream outputStream = ByteChannel.outputStream(channel)
                                                           .withStream()
                                                           .withChunkSize(Math.max(data.length, 1))
-                                                          .configured()
+                                                          .configuration()
                                                           .buildOutputStream();
         try {
           outputStream.write(data);

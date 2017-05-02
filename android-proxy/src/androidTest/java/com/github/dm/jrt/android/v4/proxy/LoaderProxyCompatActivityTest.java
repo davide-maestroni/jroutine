@@ -118,7 +118,7 @@ public class LoaderProxyCompatActivityTest extends ActivityInstrumentationTestCa
                                  .with(instanceOf(TestList.class))
                                  .withInvocation()
                                  .withOutputTimeout(seconds(10))
-                                 .configured();
+                                 .configuration();
 
     final TestListItf<String> testListItf1 =
         builder.buildProxy(new ClassToken<TestListItf<String>>() {});
@@ -228,10 +228,10 @@ public class LoaderProxyCompatActivityTest extends ActivityInstrumentationTestCa
                                                                           TestClass.class));
     final TestProxy testProxy = builder.withInvocation()
                                        .withPatch(configuration)
-                                       .configured()
+                                       .configuration()
                                        .withWrapper()
                                        .withSharedFields()
-                                       .configured()
+                                       .configuration()
                                        .loaderConfiguration()
                                        .withInvocationId(11)
                                        .apply()
@@ -250,10 +250,10 @@ public class LoaderProxyCompatActivityTest extends ActivityInstrumentationTestCa
                                         .with(instanceOf(TestClass.class))
                                         .withInvocation()
                                         .withPatch(configuration)
-                                        .configured()
+                                        .configuration()
                                         .withWrapper()
                                         .withSharedFields()
-                                        .configured()
+                                        .configuration()
                                         .loaderConfiguration()
                                         .withInvocationId(11)
                                         .apply()
@@ -271,7 +271,7 @@ public class LoaderProxyCompatActivityTest extends ActivityInstrumentationTestCa
                                                          .with(instanceOf(TestClass.class))
                                                          .withInvocation()
                                                          .withPatch(configuration)
-                                                         .configured()
+                                                         .configuration()
                                                          .buildProxy(
                                                              ClassToken.tokenOf(TestProxy.class));
 
@@ -279,7 +279,7 @@ public class LoaderProxyCompatActivityTest extends ActivityInstrumentationTestCa
                                         .with(instanceOf(TestClass.class))
                                         .withInvocation()
                                         .withPatch(configuration)
-                                        .configured()
+                                        .configuration()
                                         .buildProxy(ClassToken.tokenOf(TestProxy.class))).isSameAs(
         testProxy);
   }
@@ -318,18 +318,18 @@ public class LoaderProxyCompatActivityTest extends ActivityInstrumentationTestCa
                                  .with(instanceOf(TestClass2.class))
                                  .withInvocation()
                                  .withOutputTimeout(seconds(10))
-                                 .configured();
+                                 .configuration();
 
     long startTime = System.currentTimeMillis();
 
     Channel<?, Integer> getOne = builder.withWrapper()
                                         .withSharedFields("1")
-                                        .configured()
+                                        .configuration()
                                         .buildProxy(TestClassAsync.class)
                                         .getOne();
     Channel<?, Integer> getTwo = builder.withWrapper()
                                         .withSharedFields("2")
-                                        .configured()
+                                        .configuration()
                                         .buildProxy(TestClassAsync.class)
                                         .getTwo();
 
@@ -355,7 +355,7 @@ public class LoaderProxyCompatActivityTest extends ActivityInstrumentationTestCa
                                              .with(instanceOf(Impl.class))
                                              .withInvocation()
                                              .withOutputTimeout(seconds(10))
-                                             .configured()
+                                             .configuration()
                                              .buildProxy(Itf.class);
 
     assertThat(itf.add0('c')).isEqualTo((int) 'c');
@@ -480,7 +480,7 @@ public class LoaderProxyCompatActivityTest extends ActivityInstrumentationTestCa
                                         .with(instanceOf(TestTimeout.class))
                                         .withInvocation()
                                         .withOutputTimeout(seconds(10))
-                                        .configured()
+                                        .configuration()
                                         .buildProxy(TestTimeoutItf.class)
                                         .getInt()).isEqualTo(31);
 
@@ -490,7 +490,7 @@ public class LoaderProxyCompatActivityTest extends ActivityInstrumentationTestCa
                                .with(instanceOf(TestTimeout.class))
                                .withInvocation()
                                .withOutputTimeoutAction(TimeoutActionType.FAIL)
-                               .configured()
+                               .configuration()
                                .buildProxy(TestTimeoutItf.class)
                                .getInt();
 

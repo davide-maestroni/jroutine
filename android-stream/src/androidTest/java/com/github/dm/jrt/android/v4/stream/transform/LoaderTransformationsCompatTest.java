@@ -23,12 +23,11 @@ import android.test.ActivityInstrumentationTestCase2;
 import com.github.dm.jrt.android.v4.stream.TestActivity;
 import com.github.dm.jrt.function.util.Function;
 import com.github.dm.jrt.function.util.Predicate;
-import com.github.dm.jrt.operator.Operators;
+import com.github.dm.jrt.operator.JRoutineOperators;
 import com.github.dm.jrt.stream.JRoutineStream;
 
 import static com.github.dm.jrt.android.v4.core.LoaderContextCompat.loaderFrom;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Loader transformations unit test.
@@ -46,7 +45,7 @@ public class LoaderTransformationsCompatTest
   public void testRunOn() {
     assertThat(JRoutineStream.withStreamOf("test1", "test2", "test3")
                              .immediate()
-                             .map(Operators.filter(new Predicate<String>() {
+                             .map(JRoutineOperators.filter(new Predicate<String>() {
 
                                @Override
                                public boolean test(final String s) {
@@ -60,7 +59,7 @@ public class LoaderTransformationsCompatTest
                                  return s.length();
                                }
                              })
-                             .map(Operators.<Integer, Integer>sum(Integer.class))
+                             .map(JRoutineOperators.<Integer, Integer>sum(Integer.class))
                              .lift(LoaderTransformationsCompat.<String, Integer>runOn(
                                  loaderFrom(getActivity())).loaderConfiguration()
                                                            .withInvocationId(12)

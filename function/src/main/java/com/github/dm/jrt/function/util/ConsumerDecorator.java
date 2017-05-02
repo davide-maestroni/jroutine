@@ -67,7 +67,21 @@ public class ConsumerDecorator<IN> extends DeepEqualObject implements Consumer<I
   }
 
   /**
-   * Decorates the specified consumer instance so to provide additional features.
+   * Returns a consumer decorator just discarding the passed inputs.
+   * <br>
+   * The returned object will support concatenation and comparison.
+   *
+   * @param <IN> the input data type.
+   * @return the consumer decorator.
+   */
+  @NotNull
+  @SuppressWarnings("unchecked")
+  public static <IN> ConsumerDecorator<IN> sink() {
+    return (ConsumerDecorator<IN>) sSink;
+  }
+
+  /**
+   * Wraps the specified consumer instance so to provide additional features.
    * <br>
    * The returned object will support concatenation and comparison.
    * <p>
@@ -82,26 +96,12 @@ public class ConsumerDecorator<IN> extends DeepEqualObject implements Consumer<I
    * @return the decorated consumer.
    */
   @NotNull
-  public static <IN> ConsumerDecorator<IN> decorate(@NotNull final Consumer<IN> consumer) {
+  public static <IN> ConsumerDecorator<IN> wrapConsumer(@NotNull final Consumer<IN> consumer) {
     if (consumer instanceof ConsumerDecorator) {
       return (ConsumerDecorator<IN>) consumer;
     }
 
     return new ConsumerDecorator<IN>(consumer);
-  }
-
-  /**
-   * Returns a consumer decorator just discarding the passed inputs.
-   * <br>
-   * The returned object will support concatenation and comparison.
-   *
-   * @param <IN> the input data type.
-   * @return the consumer decorator.
-   */
-  @NotNull
-  @SuppressWarnings("unchecked")
-  public static <IN> ConsumerDecorator<IN> sink() {
-    return (ConsumerDecorator<IN>) sSink;
   }
 
   /**

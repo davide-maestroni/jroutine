@@ -96,7 +96,7 @@ public class PriorityExecutor {
    * @return the priority executor.
    */
   @NotNull
-  static PriorityExecutor of(@NotNull final ScheduledExecutor wrapped) {
+  static PriorityExecutor executor(@NotNull final ScheduledExecutor wrapped) {
     if (wrapped instanceof QueuingExecutor) {
       return ((QueuingExecutor) wrapped).enclosingExecutor();
     }
@@ -126,7 +126,7 @@ public class PriorityExecutor {
    * @return the executor instance.
    */
   @NotNull
-  public ScheduledExecutor getExecutor(final int priority) {
+  public ScheduledExecutor ofPriority(final int priority) {
     synchronized (mExecutors) {
       final WeakHashMap<QueuingExecutor, Void> executors = mExecutors;
       for (final QueuingExecutor executor : executors.keySet()) {

@@ -41,10 +41,10 @@ import com.github.dm.jrt.reflect.InvocationTarget;
 import com.github.dm.jrt.reflect.JRoutineReflection;
 import com.github.dm.jrt.reflect.annotation.AsyncInput.InputMode;
 import com.github.dm.jrt.reflect.annotation.AsyncOutput.OutputMode;
-import com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilders;
-import com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilders.MethodInfo;
 import com.github.dm.jrt.reflect.common.Mutex;
 import com.github.dm.jrt.reflect.config.WrapperConfiguration;
+import com.github.dm.jrt.reflect.util.InvocationReflection;
+import com.github.dm.jrt.reflect.util.InvocationReflection.MethodInfo;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -57,8 +57,8 @@ import java.util.List;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.core.util.Reflection.findMethod;
-import static com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilders.callFromInvocation;
-import static com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilders.getAnnotatedMethod;
+import static com.github.dm.jrt.reflect.util.InvocationReflection.callFromInvocation;
+import static com.github.dm.jrt.reflect.util.InvocationReflection.getAnnotatedMethod;
 
 /**
  * Class implementing a builder of routines wrapping an object methods.
@@ -142,11 +142,11 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
     }
 
     final WrapperConfiguration wrapperConfiguration =
-        ReflectionRoutineBuilders.withAnnotations(mWrapperConfiguration, targetMethod);
+        InvocationReflection.withAnnotations(mWrapperConfiguration, targetMethod);
     final MethodAliasInvocationFactory<IN, OUT> factory =
         new MethodAliasInvocationFactory<IN, OUT>(targetMethod, wrapperConfiguration, target, name);
     final InvocationConfiguration invocationConfiguration =
-        ReflectionRoutineBuilders.withAnnotations(mInvocationConfiguration, targetMethod);
+        InvocationReflection.withAnnotations(mInvocationConfiguration, targetMethod);
     final LoaderConfiguration loaderConfiguration =
         AndroidReflectionRoutineBuilders.withAnnotations(mLoaderConfiguration, targetMethod);
     return JRoutineLoaderCompat.on(mContext)
@@ -167,12 +167,12 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
   @Override
   public <IN, OUT> LoaderRoutine<IN, OUT> method(@NotNull final Method method) {
     final WrapperConfiguration wrapperConfiguration =
-        ReflectionRoutineBuilders.withAnnotations(mWrapperConfiguration, method);
+        InvocationReflection.withAnnotations(mWrapperConfiguration, method);
     final MethodSignatureInvocationFactory<IN, OUT> factory =
         new MethodSignatureInvocationFactory<IN, OUT>(method, wrapperConfiguration, mTarget,
             method);
     final InvocationConfiguration invocationConfiguration =
-        ReflectionRoutineBuilders.withAnnotations(mInvocationConfiguration, method);
+        InvocationReflection.withAnnotations(mInvocationConfiguration, method);
     final LoaderConfiguration loaderConfiguration =
         AndroidReflectionRoutineBuilders.withAnnotations(mLoaderConfiguration, method);
     return JRoutineLoaderCompat.on(mContext)
@@ -514,7 +514,7 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
       final Object mutexTarget =
           (Modifier.isStatic(mTargetMethod.getModifiers())) ? target.getTargetClass()
               : target.getTarget();
-      mMutex = ReflectionRoutineBuilders.getSharedMutex(mutexTarget,
+      mMutex = InvocationReflection.getSharedMutex(mutexTarget,
           mWrapperConfiguration.getSharedFieldsOrElse(null));
       mInstance = target.getTarget();
       final Object targetInstance = mInstance;
@@ -618,14 +618,14 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
         Throwable {
       final ContextInvocationTarget<?> target = mTarget;
       final MethodInfo methodInfo =
-          ReflectionRoutineBuilders.getTargetMethodInfo(target.getTargetClass(), method);
+          InvocationReflection.getTargetMethodInfo(target.getTargetClass(), method);
       final Method targetMethod = methodInfo.method;
       final InputMode inputMode = methodInfo.inputMode;
       final OutputMode outputMode = methodInfo.outputMode;
       final WrapperConfiguration wrapperConfiguration =
-          ReflectionRoutineBuilders.withAnnotations(mWrapperConfiguration, targetMethod);
+          InvocationReflection.withAnnotations(mWrapperConfiguration, targetMethod);
       final InvocationConfiguration invocationConfiguration =
-          ReflectionRoutineBuilders.withAnnotations(mInvocationConfiguration, method);
+          InvocationReflection.withAnnotations(mInvocationConfiguration, method);
       final LoaderConfiguration loaderConfiguration =
           AndroidReflectionRoutineBuilders.withAnnotations(mLoaderConfiguration, method);
       final ProxyInvocationFactory factory =
@@ -635,7 +635,7 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
           JRoutineLoaderCompat.on(mContext).with(factory);
       final LoaderRoutine<Object, Object> routine =
           builder.withConfiguration(invocationConfiguration).apply(loaderConfiguration).buildRoutine();
-      return ReflectionRoutineBuilders.invokeRoutine(routine, method, asArgs(args), inputMode,
+      return InvocationReflection.invokeRoutine(routine, method, asArgs(args), inputMode,
           outputMode);
     }
   }

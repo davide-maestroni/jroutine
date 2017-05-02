@@ -17,7 +17,7 @@
 package com.github.dm.jrt.method;
 
 import com.github.dm.jrt.channel.Flow;
-import com.github.dm.jrt.channel.JRoutineChannel;
+import com.github.dm.jrt.channel.JRoutineChannels;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.ChannelBuilder;
 import com.github.dm.jrt.core.channel.Channel;
@@ -369,9 +369,9 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * For example, a routine wrapping the {@code String.format()} method can be built as shown below:
  * <pre><code>
  * final Channel&lt;Object[], Object[]&gt; inputChannel = JRoutineCore.channel().ofType();
- * final Channel&lt;?, String&gt; outputChannel =
- *     RoutineMethod.of(executor, String.class.getMethod("format", String.class, Object[].class))
- *                  .call("%s %s!", inputChannel);
+ * final Method format = String.class.getMethod("format", String.class, Object[].class);
+ * final Channel&lt;?, String&gt; outputChannel = RoutineMethod.methodOn(executor, format)
+ *                                                             .call("%s %s!", inputChannel);
  * inputChannel.pass(new Object[]{"Hello", "JRoutine"}).close();
  * outputChannel.in(seconds(1)).next(); // expected value: "Hello JRoutine!"
  * </code></pre>
@@ -380,7 +380,7 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * be wrapped in another input channel, like shown below:
  * <pre><code>
  * final Channel&lt;String, String&gt; channel = JRoutineCore.channel().ofType();
- * RoutineMethod.of(executor, MyClass.class.getMethod("run", Channel.class))
+ * RoutineMethod.methodOn(executor, MyClass.class.getMethod("run", Channel.class))
  *              .call(JRoutineCore.channel().of(channel));
  * </code></pre>
  * <p>
@@ -478,13 +478,13 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
    * @throws java.lang.IllegalArgumentException if the specified method is not static.
    */
   @NotNull
-  public static ReflectionRoutineMethod of(@NotNull final ScheduledExecutor executor,
+  public static ReflectionRoutineMethod methodOn(@NotNull final ScheduledExecutor executor,
       @NotNull final Method method) {
     if (!Modifier.isStatic(method.getModifiers())) {
       throw new IllegalArgumentException("the method is not static: " + method);
     }
 
-    return of(executor, InvocationTarget.classOfType(method.getDeclaringClass()), method);
+    return methodOn(executor, InvocationTarget.classOfType(method.getDeclaringClass()), method);
   }
 
   /**
@@ -498,7 +498,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
    *                                            target instance.
    */
   @NotNull
-  public static ReflectionRoutineMethod of(@NotNull final ScheduledExecutor executor,
+  public static ReflectionRoutineMethod methodOn(@NotNull final ScheduledExecutor executor,
       @NotNull final InvocationTarget<?> target, @NotNull final Method method) {
     if (!method.getDeclaringClass().isAssignableFrom(target.getTargetClass())) {
       throw new IllegalArgumentException(
@@ -519,10 +519,10 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
    * @throws java.lang.NoSuchMethodException if no method with the specified signature is found.
    */
   @NotNull
-  public static ReflectionRoutineMethod of(@NotNull final ScheduledExecutor executor,
+  public static ReflectionRoutineMethod methodOn(@NotNull final ScheduledExecutor executor,
       @NotNull final InvocationTarget<?> target, @NotNull final String name,
       @Nullable final Class<?>... parameterTypes) throws NoSuchMethodException {
-    return of(executor, target, target.getTargetClass().getMethod(name, parameterTypes));
+    return methodOn(executor, target, target.getTargetClass().getMethod(name, parameterTypes));
   }
 
   /**
@@ -711,7 +711,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
     final Channel<OUT, OUT> resultChannel = JRoutineCore.channel().ofType();
     outputChannels.add(resultChannel);
     final Channel<?, ? extends Flow<Object>> inputChannel =
-        (!inputChannels.isEmpty()) ? JRoutineChannel.channelHandler().mergeOutputOf(inputChannels)
+        (!inputChannels.isEmpty()) ? JRoutineChannels.channelHandler().mergeOutputOf(inputChannels)
             : JRoutineCore.channel().<Flow<Object>>of();
     final Channel<Flow<Object>, Flow<Object>> outputChannel = JRoutineCore.routineOn(mExecutor)
                                                                           .withConfiguration(
@@ -721,7 +721,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
                                                                           .pass(inputChannel)
                                                                           .close();
     final Map<Integer, ? extends Channel<?, Object>> channelMap =
-        JRoutineChannel.channelHandler().outputOfFlow(0, outputChannels.size(), outputChannel);
+        JRoutineChannels.channelHandler().outputOfFlow(0, outputChannels.size(), outputChannel);
     for (final Entry<Integer, ? extends Channel<?, Object>> entry : channelMap.entrySet()) {
       ((Channel<Object, Object>) outputChannels.get(entry.getKey())).pass(entry.getValue()).close();
     }
@@ -966,7 +966,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
         mIsBound = true;
         final List<Channel<?, ?>> outputChannels = getOutputChannels();
         if (!outputChannels.isEmpty()) {
-          result.pass(JRoutineChannel.channelHandler().mergeOutputOf(outputChannels));
+          result.pass(JRoutineChannels.channelHandler().mergeOutputOf(outputChannels));
         }
       }
     }

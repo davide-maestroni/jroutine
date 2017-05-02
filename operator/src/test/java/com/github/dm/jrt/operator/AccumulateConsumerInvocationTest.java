@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.github.dm.jrt.operator.AccumulateConsumerInvocation.consumerFactory;
+import static com.github.dm.jrt.operator.AccumulateConsumerInvocation.factoryOf;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -56,7 +56,7 @@ public class AccumulateConsumerInvocationTest {
 
     final BiConsumer<List<String>, List<String>> consumer = createConsumer();
     assertThat(JRoutineCore.routineOn(ScheduledExecutors.syncExecutor())
-                           .of(consumerFactory(consumer))
+                           .of(AccumulateConsumerInvocation.factoryOf(consumer))
                            .invoke()
                            .pass(new ArrayList<String>() {{
                              add("test1");
@@ -68,7 +68,7 @@ public class AccumulateConsumerInvocationTest {
                            .close()
                            .next()).isEqualTo(Arrays.asList("test1", "test2", "test3"));
     assertThat(JRoutineCore.routineOn(ScheduledExecutors.syncExecutor())
-                           .of(consumerFactory(new Supplier<List<String>>() {
+                           .of(factoryOf(new Supplier<List<String>>() {
 
                              public List<String> get() {
                                return new ArrayList<String>() {{
@@ -92,15 +92,18 @@ public class AccumulateConsumerInvocationTest {
   public void testFactoryEquals() {
 
     final BiConsumer<List<String>, List<String>> consumer = createConsumer();
-    final InvocationFactory<List<String>, List<String>> factory = consumerFactory(consumer);
+    final InvocationFactory<List<String>, List<String>> factory = AccumulateConsumerInvocation
+        .factoryOf(consumer);
     final BiConsumer<List<String>, List<String>> biSink = BiConsumerDecorator.biSink();
     assertThat(factory).isEqualTo(factory);
-    assertThat(factory).isEqualTo(consumerFactory(consumer));
-    assertThat(consumerFactory(consumer)).isEqualTo(consumerFactory(consumer));
-    assertThat(consumerFactory(biSink)).isEqualTo(consumerFactory(biSink));
-    assertThat(factory).isNotEqualTo(consumerFactory(biSink));
+    assertThat(factory).isEqualTo(AccumulateConsumerInvocation.factoryOf(consumer));
+    assertThat(AccumulateConsumerInvocation.factoryOf(consumer)).isEqualTo(
+        AccumulateConsumerInvocation.factoryOf(consumer));
+    assertThat(AccumulateConsumerInvocation.factoryOf(biSink)).isEqualTo(
+        AccumulateConsumerInvocation.factoryOf(biSink));
+    assertThat(factory).isNotEqualTo(AccumulateConsumerInvocation.factoryOf(biSink));
     assertThat(factory).isNotEqualTo("");
-    assertThat(factory.hashCode()).isEqualTo(consumerFactory(consumer).hashCode());
-    assertThat(factory.hashCode()).isNotEqualTo(consumerFactory(biSink).hashCode());
+    assertThat(factory.hashCode()).isEqualTo(AccumulateConsumerInvocation.factoryOf(consumer).hashCode());
+    assertThat(factory.hashCode()).isNotEqualTo(AccumulateConsumerInvocation.factoryOf(biSink).hashCode());
   }
 }

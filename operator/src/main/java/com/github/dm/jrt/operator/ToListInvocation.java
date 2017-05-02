@@ -58,7 +58,7 @@ class ToListInvocation<DATA> extends CallInvocation<DATA, List<DATA>> {
    */
   @NotNull
   @SuppressWarnings("unchecked")
-  static <DATA> InvocationFactory<DATA, List<DATA>> factoryOf() {
+  static <DATA> InvocationFactory<DATA, List<DATA>> factory() {
     return (InvocationFactory<DATA, List<DATA>>) sFactory;
   }
 

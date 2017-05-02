@@ -22,7 +22,6 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.util.Function;
 import com.github.dm.jrt.stream.config.StreamConfiguration;
-import com.github.dm.jrt.stream.transform.LiftFunction;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -79,7 +78,8 @@ public abstract class AbstractLoaderTransformationBuilder<IN, OUT, BEFORE, AFTER
   /**
    * Lifting function implementation.
    */
-  private class BuilderLiftFunction implements LiftFunction<IN, OUT, BEFORE, AFTER> {
+  private class BuilderLiftFunction implements
+      com.github.dm.jrt.function.util.BiFunction<StreamConfiguration,Function<Channel<?,IN>,Channel<?,OUT>>,Function<Channel<?,BEFORE>,Channel<?,AFTER>>> {
 
     private final LoaderConfiguration mConfiguration;
 

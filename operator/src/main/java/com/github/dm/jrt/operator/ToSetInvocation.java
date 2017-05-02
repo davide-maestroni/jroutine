@@ -61,7 +61,7 @@ class ToSetInvocation<DATA> extends TemplateInvocation<DATA, Set<DATA>> {
    */
   @NotNull
   @SuppressWarnings("unchecked")
-  static <DATA> InvocationFactory<DATA, Set<DATA>> factoryOf() {
+  static <DATA> InvocationFactory<DATA, Set<DATA>> factory() {
     return (InvocationFactory<DATA, Set<DATA>>) sFactory;
   }
 

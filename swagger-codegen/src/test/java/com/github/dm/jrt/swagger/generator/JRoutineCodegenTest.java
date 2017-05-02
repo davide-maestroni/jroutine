@@ -19,7 +19,7 @@ package com.github.dm.jrt.swagger.generator;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.function.util.Consumer;
-import com.github.dm.jrt.operator.Operators;
+import com.github.dm.jrt.operator.JRoutineOperators;
 import com.github.dm.jrt.retrofit.RoutineAdapterFactory;
 import com.github.dm.jrt.swagger.client.UsersApiClient;
 import com.github.dm.jrt.swagger.client.api.UsersApi;
@@ -85,7 +85,7 @@ public class JRoutineCodegenTest {
                                  .delegateFactory(factory)
                                  .withInvocation()
                                  .withOutputTimeout(seconds(3))
-                                 .configured()
+                                 .configuration()
                                  .buildFactory();
         final UsersApi service =
             new UsersApiClient().withBaseUrl("http://localhost:" + server.getPort())
@@ -111,7 +111,7 @@ public class JRoutineCodegenTest {
                                  .delegateFactory(factory)
                                  .withInvocation()
                                  .withOutputTimeout(seconds(3))
-                                 .configured()
+                                 .configuration()
                                  .buildFactory();
         final UsersApi service =
             new UsersApiClient().withBaseUrl("http://localhost:" + server.getPort())
@@ -148,7 +148,7 @@ public class JRoutineCodegenTest {
             new UsersApiClient().withBaseUrl("http://localhost:" + server.getPort())
                                 .createService(UsersApi.class);
         assertThat(service.getReposStream("octocat", null, null, null)
-                          .map(Operators.<Repo>unfold())
+                          .map(JRoutineOperators.<Repo>unfold())
                           .invoke()
                           .consume(onOutput(new Consumer<Repo>() {
 
@@ -173,7 +173,7 @@ public class JRoutineCodegenTest {
                                 .withAdapterFactory(adapterFactory)
                                 .createService(UsersApi.class);
         assertThat(service.getReposStream("octocat", null, null, null)
-                          .map(Operators.<Repo>unfold())
+                          .map(JRoutineOperators.<Repo>unfold())
                           .invoke()
                           .consume(onOutput(new Consumer<Repo>() {
 
@@ -198,7 +198,7 @@ public class JRoutineCodegenTest {
                                 .withAdapterFactory(adapterFactory)
                                 .createService(UsersApi.class);
         assertThat(service.getReposStream("octocat", null, null, null)
-                          .map(Operators.<Repo>unfold())
+                          .map(JRoutineOperators.<Repo>unfold())
                           .invoke()
                           .consume(onOutput(new Consumer<Repo>() {
 

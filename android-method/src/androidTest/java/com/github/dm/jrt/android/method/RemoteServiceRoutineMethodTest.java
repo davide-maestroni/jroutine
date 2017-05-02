@@ -314,7 +314,7 @@ public class RemoteServiceRoutineMethodTest extends ActivityInstrumentationTestC
         instanceOf(String.class, test), String.class.getMethod("toString"))
                                    .withWrapper()
                                    .withSharedFields()
-                                   .configured()
+                                   .configuration()
                                    .call()
                                    .in(seconds(10))
                                    .next()).isEqualTo("test");
@@ -329,7 +329,7 @@ public class RemoteServiceRoutineMethodTest extends ActivityInstrumentationTestC
         instanceOf(String.class, test), "toString")
                                    .withWrapper()
                                    .withSharedFields()
-                                   .configured()
+                                   .configuration()
                                    .call()
                                    .in(seconds(10))
                                    .next()).isEqualTo("test");

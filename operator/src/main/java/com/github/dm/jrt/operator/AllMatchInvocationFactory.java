@@ -20,12 +20,12 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
-import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.util.PredicateDecorator;
+import com.github.dm.jrt.function.util.Predicate;
 
 import org.jetbrains.annotations.NotNull;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
+import static com.github.dm.jrt.function.util.PredicateDecorator.wrapPredicate;
 
 /**
  * Factory of invocations verifying that all the inputs satisfy a specific conditions.
@@ -36,15 +36,15 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class AllMatchInvocationFactory<IN> extends InvocationFactory<IN, Boolean> {
 
-  private final PredicateDecorator<? super IN> mFilterPredicate;
+  private final Predicate<? super IN> mFilterPredicate;
 
   /**
    * Constructor.
    *
    * @param filterPredicate the predicate defining the condition.
    */
-  AllMatchInvocationFactory(@NotNull final PredicateDecorator<? super IN> filterPredicate) {
-    super(asArgs(ConstantConditions.notNull("predicate instance", filterPredicate)));
+  AllMatchInvocationFactory(@NotNull final Predicate<? super IN> filterPredicate) {
+    super(asArgs(wrapPredicate(filterPredicate)));
     mFilterPredicate = filterPredicate;
   }
 
@@ -61,7 +61,7 @@ class AllMatchInvocationFactory<IN> extends InvocationFactory<IN, Boolean> {
    */
   private static class AllMatchInvocation<IN> extends TemplateInvocation<IN, Boolean> {
 
-    private final PredicateDecorator<? super IN> mFilterPredicate;
+    private final Predicate<? super IN> mFilterPredicate;
 
     private boolean mIsMatch;
 
@@ -70,7 +70,7 @@ class AllMatchInvocationFactory<IN> extends InvocationFactory<IN, Boolean> {
      *
      * @param filterPredicate the predicate defining the condition.
      */
-    private AllMatchInvocation(@NotNull final PredicateDecorator<? super IN> filterPredicate) {
+    private AllMatchInvocation(@NotNull final Predicate<? super IN> filterPredicate) {
       mFilterPredicate = filterPredicate;
     }
 

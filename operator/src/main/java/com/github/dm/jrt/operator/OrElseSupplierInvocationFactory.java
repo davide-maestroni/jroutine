@@ -21,11 +21,12 @@ import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.util.SupplierDecorator;
+import com.github.dm.jrt.function.util.Supplier;
 
 import org.jetbrains.annotations.NotNull;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
+import static com.github.dm.jrt.function.util.SupplierDecorator.wrapSupplier;
 
 /**
  * Invocation factory employing a supplier to generate outputs when no one has been received.
@@ -38,7 +39,7 @@ class OrElseSupplierInvocationFactory<DATA> extends InvocationFactory<DATA, DATA
 
   private final long mCount;
 
-  private final SupplierDecorator<? extends DATA> mOutputSupplier;
+  private final Supplier<? extends DATA> mOutputSupplier;
 
   /**
    * Constructor.
@@ -47,9 +48,8 @@ class OrElseSupplierInvocationFactory<DATA> extends InvocationFactory<DATA, DATA
    * @param outputSupplier the supplier instance.
    */
   OrElseSupplierInvocationFactory(final long count,
-      @NotNull final SupplierDecorator<? extends DATA> outputSupplier) {
-    super(asArgs(ConstantConditions.positive("count number", count),
-        ConstantConditions.notNull("supplier instance", outputSupplier)));
+      @NotNull final Supplier<? extends DATA> outputSupplier) {
+    super(asArgs(ConstantConditions.positive("count number", count), wrapSupplier(outputSupplier)));
     mCount = count;
     mOutputSupplier = outputSupplier;
   }
@@ -69,7 +69,7 @@ class OrElseSupplierInvocationFactory<DATA> extends InvocationFactory<DATA, DATA
 
     private final long mCount;
 
-    private final SupplierDecorator<? extends DATA> mOutputSupplier;
+    private final Supplier<? extends DATA> mOutputSupplier;
 
     private boolean mHasOutputs;
 
@@ -80,7 +80,7 @@ class OrElseSupplierInvocationFactory<DATA> extends InvocationFactory<DATA, DATA
      * @param outputSupplier the supplier instance.
      */
     OrElseConsumerInvocation(final long count,
-        @NotNull final SupplierDecorator<? extends DATA> outputSupplier) {
+        @NotNull final Supplier<? extends DATA> outputSupplier) {
       mCount = count;
       mOutputSupplier = outputSupplier;
     }
@@ -88,7 +88,7 @@ class OrElseSupplierInvocationFactory<DATA> extends InvocationFactory<DATA, DATA
     public void onComplete(@NotNull final Channel<DATA, ?> result) throws Exception {
       if (!mHasOutputs) {
         final long count = mCount;
-        final SupplierDecorator<? extends DATA> supplier = mOutputSupplier;
+        final Supplier<? extends DATA> supplier = mOutputSupplier;
         for (long i = 0; i < count; ++i) {
           result.pass(supplier.get());
         }

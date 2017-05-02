@@ -75,7 +75,7 @@ import static com.github.dm.jrt.core.util.DurationMeasure.indefiniteTime;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static com.github.dm.jrt.reflect.InvocationTarget.classOfType;
 import static com.github.dm.jrt.reflect.InvocationTarget.instance;
-import static com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilders.withAnnotations;
+import static com.github.dm.jrt.reflect.util.InvocationReflection.withAnnotations;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -122,7 +122,7 @@ public class ReflectionRoutineTest {
                                                                   TimeoutActionType.CONTINUE)
                                                               .withLogLevel(Level.DEBUG)
                                                               .withLog(new NullLog())
-                                                              .configured()
+                                                              .configuration()
                                                               .methodOf(instance(test),
                                                                   TestClass.GET);
 
@@ -137,7 +137,7 @@ public class ReflectionRoutineTest {
                                                               .withInvocation()
                                                               .withLogLevel(Level.DEBUG)
                                                               .withLog(new NullLog())
-                                                              .configured()
+                                                              .configuration()
                                                               .methodOf(
                                                                   classOfType(TestStatic.class),
                                                                   TestStatic.GET);
@@ -181,7 +181,7 @@ public class ReflectionRoutineTest {
     final SumItf sumAsync = JRoutineReflection.wrapper()
                                               .withInvocation()
                                               .withOutputTimeout(timeout)
-                                              .configured()
+                                              .configuration()
                                               .proxyOf(instance(sum), SumItf.class);
     final Channel<Integer, Integer> channel3 = JRoutineCore.channel().ofType();
     channel3.pass(7).close();
@@ -214,7 +214,7 @@ public class ReflectionRoutineTest {
     final CountItf countAsync = JRoutineReflection.wrapper()
                                                   .withInvocation()
                                                   .withOutputTimeout(timeout)
-                                                  .configured()
+                                                  .configuration()
                                                   .proxyOf(instance(count), CountItf.class);
     assertThat(countAsync.count(3).all()).containsExactly(0, 1, 2);
     assertThat(countAsync.count1(3).all()).containsExactly(new int[]{0, 1, 2});
@@ -241,7 +241,7 @@ public class ReflectionRoutineTest {
                  .withOutputTimeout(1111, TimeUnit.MICROSECONDS)
                  .withOutputTimeoutAction(TimeoutActionType.ABORT)
                  .withPriority(41)
-                 .configured());
+                 .configuration());
   }
 
   @Test
@@ -521,7 +521,7 @@ public class ReflectionRoutineTest {
       JRoutineReflection.wrapper()
                         .withInvocation()
                         .withOutputTimeout(indefiniteTime())
-                        .configured()
+                        .configuration()
                         .proxyOf(instance(test), TestItf.class)
                         .throwException(null);
 
@@ -536,7 +536,7 @@ public class ReflectionRoutineTest {
       JRoutineReflection.wrapper()
                         .withInvocation()
                         .withOutputTimeout(indefiniteTime())
-                        .configured()
+                        .configuration()
                         .proxyOf(instance(test), TestItf.class)
                         .throwException1(null);
 
@@ -621,10 +621,10 @@ public class ReflectionRoutineTest {
     final Routine<Object, Object> routine2 = JRoutineReflection.wrapperOn(poolExecutor())
                                                                .withInvocation()
                                                                .withMaxInvocations(1)
-                                                               .configured()
+                                                               .configuration()
                                                                .withWrapper()
                                                                .withSharedFields("test")
-                                                               .configured()
+                                                               .configuration()
                                                                .methodOf(instance(test),
                                                                    TestClass.class.getMethod(
                                                                        "getLong"));
@@ -721,7 +721,7 @@ public class ReflectionRoutineTest {
     assertThat(JRoutineReflection.wrapper()
                                  .withInvocation()
                                  .withOutputTimeout(timeout)
-                                 .configured()
+                                 .configuration()
                                  .proxyOf(instance(test), TestInterfaceAsync.class)
                                  .take(77)).isEqualTo(77);
     assertThat(JRoutineReflection.wrapper()
@@ -734,7 +734,7 @@ public class ReflectionRoutineTest {
                                                                     .withInvocation()
                                                                     .withOutputTimeout(1,
                                                                         TimeUnit.SECONDS)
-                                                                    .configured()
+                                                                    .configuration()
                                                                     .proxyOf(instance(test),
                                                                         TestInterfaceAsync.class);
     assertThat(testInterfaceAsync.getInt(testInterfaceAsync.getOne())).isEqualTo(1);
@@ -823,7 +823,7 @@ public class ReflectionRoutineTest {
                                                               .withInvocation()
                                                               .withLogLevel(Level.DEBUG)
                                                               .withLog(new NullLog())
-                                                              .configured()
+                                                              .configuration()
                                                               .methodOf(instance(test),
                                                                   TestStatic.GET);
 
@@ -838,7 +838,7 @@ public class ReflectionRoutineTest {
     final Itf itf = JRoutineReflection.wrapper()
                                       .withInvocation()
                                       .withOutputTimeout(seconds(10))
-                                      .configured()
+                                      .configuration()
                                       .proxyOf(instance(impl), Itf.class);
 
     assertThat(itf.add0('c')).isEqualTo((int) 'c');
@@ -977,7 +977,7 @@ public class ReflectionRoutineTest {
                                                                .withCoreInvocations(16)
                                                                .withLogLevel(Level.DEBUG)
                                                                .withLog(nullLog)
-                                                               .configured()
+                                                               .configuration()
                                                                .methodOf(instance(test),
                                                                    TestClass.GET);
 
@@ -988,7 +988,7 @@ public class ReflectionRoutineTest {
                                                                .withCoreInvocations(16)
                                                                .withLogLevel(Level.DEBUG)
                                                                .withLog(nullLog)
-                                                               .configured()
+                                                               .configuration()
                                                                .methodOf(instance(test),
                                                                    TestClass.GET);
 
@@ -1000,7 +1000,7 @@ public class ReflectionRoutineTest {
                                                                .withCoreInvocations(32)
                                                                .withLogLevel(Level.DEBUG)
                                                                .withLog(nullLog)
-                                                               .configured()
+                                                               .configuration()
                                                                .methodOf(instance(test),
                                                                    TestClass.GET);
 
@@ -1013,7 +1013,7 @@ public class ReflectionRoutineTest {
                                                                .withCoreInvocations(32)
                                                                .withLogLevel(Level.WARNING)
                                                                .withLog(nullLog)
-                                                               .configured()
+                                                               .configuration()
                                                                .methodOf(instance(test),
                                                                    TestClass.GET);
 
@@ -1025,7 +1025,7 @@ public class ReflectionRoutineTest {
                                                                .withCoreInvocations(32)
                                                                .withLogLevel(Level.WARNING)
                                                                .withLog(new NullLog())
-                                                               .configured()
+                                                               .configuration()
                                                                .methodOf(instance(test),
                                                                    TestClass.GET);
 
@@ -1042,7 +1042,7 @@ public class ReflectionRoutineTest {
                                                                .withCoreInvocations(16)
                                                                .withLogLevel(Level.DEBUG)
                                                                .withLog(nullLog)
-                                                               .configured()
+                                                               .configuration()
                                                                .methodOf(
                                                                    classOfType(TestStatic.class),
                                                                    TestStatic.GET);
@@ -1054,7 +1054,7 @@ public class ReflectionRoutineTest {
                                                                .withCoreInvocations(16)
                                                                .withLogLevel(Level.DEBUG)
                                                                .withLog(nullLog)
-                                                               .configured()
+                                                               .configuration()
                                                                .methodOf(
                                                                    classOfType(TestStatic.class),
                                                                    TestStatic.GET);
@@ -1067,7 +1067,7 @@ public class ReflectionRoutineTest {
                                                                .withCoreInvocations(32)
                                                                .withLogLevel(Level.DEBUG)
                                                                .withLog(nullLog)
-                                                               .configured()
+                                                               .configuration()
                                                                .methodOf(
                                                                    classOfType(TestStatic.class),
                                                                    TestStatic.GET);
@@ -1081,7 +1081,7 @@ public class ReflectionRoutineTest {
                                                                .withCoreInvocations(32)
                                                                .withLogLevel(Level.WARNING)
                                                                .withLog(nullLog)
-                                                               .configured()
+                                                               .configuration()
                                                                .methodOf(
                                                                    classOfType(TestStatic.class),
                                                                    TestStatic.GET);
@@ -1094,7 +1094,7 @@ public class ReflectionRoutineTest {
                                                                .withCoreInvocations(32)
                                                                .withLogLevel(Level.WARNING)
                                                                .withLog(new NullLog())
-                                                               .configured()
+                                                               .configuration()
                                                                .methodOf(
                                                                    classOfType(TestStatic.class),
                                                                    TestStatic.GET);
@@ -1108,18 +1108,18 @@ public class ReflectionRoutineTest {
 
     final TestClass2 test2 = new TestClass2();
     final ReflectionRoutineBuilder builder =
-        JRoutineReflection.wrapper().withInvocation().withOutputTimeout(seconds(2)).configured();
+        JRoutineReflection.wrapper().withInvocation().withOutputTimeout(seconds(2)).configuration();
     long startTime = System.currentTimeMillis();
 
     Channel<?, Object> getOne = builder.withWrapper()
                                        .withSharedFields()
-                                       .configured()
+                                       .configuration()
                                        .methodOf(instance(test2), "getOne")
                                        .invoke()
                                        .close();
     Channel<?, Object> getTwo = builder.withWrapper()
                                        .withSharedFields()
-                                       .configured()
+                                       .configuration()
                                        .methodOf(instance(test2), "getTwo")
                                        .invoke()
                                        .close();
@@ -1132,13 +1132,13 @@ public class ReflectionRoutineTest {
 
     getOne = builder.withWrapper()
                     .withSharedFields("1")
-                    .configured()
+                    .configuration()
                     .methodOf(instance(test2), "getOne")
                     .invoke()
                     .close();
     getTwo = builder.withWrapper()
                     .withSharedFields("2")
-                    .configured()
+                    .configuration()
                     .methodOf(instance(test2), "getTwo")
                     .invoke()
                     .close();
@@ -1162,13 +1162,13 @@ public class ReflectionRoutineTest {
 
     final TestClass2 test2 = new TestClass2();
     final ReflectionRoutineBuilder builder =
-        JRoutineReflection.wrapper().withInvocation().withOutputTimeout(seconds(2)).configured();
+        JRoutineReflection.wrapper().withInvocation().withOutputTimeout(seconds(2)).configuration();
     long startTime = System.currentTimeMillis();
 
     Channel<?, Object> getOne = builder.methodOf(instance(test2), "getOne").invoke().close();
     Channel<?, Object> getTwo = builder.withWrapper()
                                        .withSharedFields()
-                                       .configured()
+                                       .configuration()
                                        .methodOf(instance(test2), "getTwo")
                                        .invoke()
                                        .close();
@@ -1181,13 +1181,13 @@ public class ReflectionRoutineTest {
 
     getOne = builder.withWrapper()
                     .withSharedFields("1", "2")
-                    .configured()
+                    .configuration()
                     .methodOf(instance(test2), "getOne")
                     .invoke()
                     .close();
     getTwo = builder.withWrapper()
                     .withSharedFields()
-                    .configured()
+                    .configuration()
                     .methodOf(instance(test2), "getTwo")
                     .invoke()
                     .close();
@@ -1200,7 +1200,7 @@ public class ReflectionRoutineTest {
 
     getOne = builder.withWrapper()
                     .withSharedFields("1", "2")
-                    .configured()
+                    .configuration()
                     .methodOf(instance(test2), "getOne")
                     .invoke()
                     .close();
@@ -1214,13 +1214,13 @@ public class ReflectionRoutineTest {
 
     getOne = builder.withWrapper()
                     .withSharedFields("1", "2")
-                    .configured()
+                    .configuration()
                     .methodOf(instance(test2), "getOne")
                     .invoke()
                     .close();
     getTwo = builder.withWrapper()
                     .withSharedFields("2")
-                    .configured()
+                    .configuration()
                     .methodOf(instance(test2), "getTwo")
                     .invoke()
                     .close();
@@ -1234,18 +1234,18 @@ public class ReflectionRoutineTest {
   public void testSharedFieldsStatic() throws NoSuchMethodException {
 
     final ReflectionRoutineBuilder builder =
-        JRoutineReflection.wrapper().withInvocation().withOutputTimeout(seconds(2)).configured();
+        JRoutineReflection.wrapper().withInvocation().withOutputTimeout(seconds(2)).configuration();
     long startTime = System.currentTimeMillis();
 
     Channel<?, Object> getOne = builder.withWrapper()
                                        .withSharedFields()
-                                       .configured()
+                                       .configuration()
                                        .methodOf(classOfType(TestStatic2.class), "getOne")
                                        .invoke()
                                        .close();
     Channel<?, Object> getTwo = builder.withWrapper()
                                        .withSharedFields()
-                                       .configured()
+                                       .configuration()
                                        .methodOf(classOfType(TestStatic2.class), "getTwo")
                                        .invoke()
                                        .close();
@@ -1258,13 +1258,13 @@ public class ReflectionRoutineTest {
 
     getOne = builder.withWrapper()
                     .withSharedFields("1")
-                    .configured()
+                    .configuration()
                     .methodOf(classOfType(TestStatic2.class), "getOne")
                     .invoke()
                     .close();
     getTwo = builder.withWrapper()
                     .withSharedFields("2")
-                    .configured()
+                    .configuration()
                     .methodOf(classOfType(TestStatic2.class), "getTwo")
                     .invoke()
                     .close();
@@ -1287,14 +1287,14 @@ public class ReflectionRoutineTest {
   public void testSharedFieldsStatic2() throws NoSuchMethodException {
 
     final ReflectionRoutineBuilder builder =
-        JRoutineReflection.wrapper().withInvocation().withOutputTimeout(seconds(2)).configured();
+        JRoutineReflection.wrapper().withInvocation().withOutputTimeout(seconds(2)).configuration();
     long startTime = System.currentTimeMillis();
 
     Channel<?, Object> getOne =
         builder.methodOf(classOfType(TestStatic2.class), "getOne").invoke().close();
     Channel<?, Object> getTwo = builder.withWrapper()
                                        .withSharedFields()
-                                       .configured()
+                                       .configuration()
                                        .methodOf(classOfType(TestStatic2.class), "getTwo")
                                        .invoke()
                                        .close();
@@ -1307,13 +1307,13 @@ public class ReflectionRoutineTest {
 
     getOne = builder.withWrapper()
                     .withSharedFields("1", "2")
-                    .configured()
+                    .configuration()
                     .methodOf(classOfType(TestStatic2.class), "getOne")
                     .invoke()
                     .close();
     getTwo = builder.withWrapper()
                     .withSharedFields()
-                    .configured()
+                    .configuration()
                     .methodOf(classOfType(TestStatic2.class), "getTwo")
                     .invoke()
                     .close();
@@ -1326,7 +1326,7 @@ public class ReflectionRoutineTest {
 
     getOne = builder.withWrapper()
                     .withSharedFields("1", "2")
-                    .configured()
+                    .configuration()
                     .methodOf(classOfType(TestStatic2.class), "getOne")
                     .invoke()
                     .close();
@@ -1340,13 +1340,13 @@ public class ReflectionRoutineTest {
 
     getOne = builder.withWrapper()
                     .withSharedFields("1", "2")
-                    .configured()
+                    .configuration()
                     .methodOf(classOfType(TestStatic2.class), "getOne")
                     .invoke()
                     .close();
     getTwo = builder.withWrapper()
                     .withSharedFields("2")
-                    .configured()
+                    .configuration()
                     .methodOf(classOfType(TestStatic2.class), "getTwo")
                     .invoke()
                     .close();
@@ -1364,10 +1364,10 @@ public class ReflectionRoutineTest {
                                                                .withInvocation()
                                                                .withMaxInvocations(1)
                                                                .withCoreInvocations(0)
-                                                               .configured()
+                                                               .configuration()
                                                                .withWrapper()
                                                                .withSharedFields("test")
-                                                               .configured()
+                                                               .configuration()
                                                                .methodOf(
                                                                    classOfType(TestStatic.class),
                                                                    TestStatic.class.getMethod(
@@ -1383,7 +1383,7 @@ public class ReflectionRoutineTest {
     final Routine<Object, Object> routine1 = JRoutineReflection.wrapperOn(syncExecutor())
                                                                .withInvocation()
                                                                .withMaxInvocations(1)
-                                                               .configured()
+                                                               .configuration()
                                                                .methodOf(
                                                                    classOfType(TestStatic.class),
                                                                    "getLong");
@@ -1412,7 +1412,7 @@ public class ReflectionRoutineTest {
     assertThat(JRoutineReflection.wrapper()
                                  .withInvocation()
                                  .withOutputTimeout(seconds(1))
-                                 .configured()
+                                 .configuration()
                                  .methodOf(instance(testTimeout), "test")
                                  .invoke()
                                  .close()
@@ -1423,7 +1423,7 @@ public class ReflectionRoutineTest {
       JRoutineReflection.wrapper()
                         .withInvocation()
                         .withOutputTimeoutAction(TimeoutActionType.FAIL)
-                        .configured()
+                        .configuration()
                         .methodOf(instance(testTimeout), "test")
                         .invoke()
                         .close()
@@ -1438,7 +1438,7 @@ public class ReflectionRoutineTest {
     assertThat(JRoutineReflection.wrapper()
                                  .withInvocation()
                                  .withOutputTimeout(seconds(1))
-                                 .configured()
+                                 .configuration()
                                  .methodOf(instance(testTimeout), "getInt")
                                  .invoke()
                                  .close()
@@ -1449,7 +1449,7 @@ public class ReflectionRoutineTest {
       JRoutineReflection.wrapper()
                         .withInvocation()
                         .withOutputTimeoutAction(TimeoutActionType.FAIL)
-                        .configured()
+                        .configuration()
                         .methodOf(instance(testTimeout), "getInt")
                         .invoke()
                         .close()
@@ -1464,7 +1464,7 @@ public class ReflectionRoutineTest {
     assertThat(JRoutineReflection.wrapper()
                                  .withInvocation()
                                  .withOutputTimeout(seconds(1))
-                                 .configured()
+                                 .configuration()
                                  .methodOf(instance(testTimeout),
                                      TestTimeout.class.getMethod("getInt"))
                                  .invoke()
@@ -1476,7 +1476,7 @@ public class ReflectionRoutineTest {
       JRoutineReflection.wrapper()
                         .withInvocation()
                         .withOutputTimeoutAction(TimeoutActionType.FAIL)
-                        .configured()
+                        .configuration()
                         .methodOf(instance(testTimeout), TestTimeout.class.getMethod("getInt"))
                         .invoke()
                         .close()
@@ -1491,7 +1491,7 @@ public class ReflectionRoutineTest {
     assertThat(JRoutineReflection.wrapper()
                                  .withInvocation()
                                  .withOutputTimeout(seconds(1))
-                                 .configured()
+                                 .configuration()
                                  .proxyOf(instance(testTimeout), TestTimeoutItf.class)
                                  .getInt()).isEqualTo(31);
 
@@ -1500,7 +1500,7 @@ public class ReflectionRoutineTest {
       JRoutineReflection.wrapper()
                         .withInvocation()
                         .withOutputTimeoutAction(TimeoutActionType.FAIL)
-                        .configured()
+                        .configuration()
                         .proxyOf(instance(testTimeout), TestTimeoutItf.class)
                         .getInt();
 

@@ -117,7 +117,7 @@ class DefaultChannelHandler implements ChannelHandler {
   @NotNull
   public <OUT> Channel<?, OUT> channelOf(@NotNull final Callable<OUT> callable) {
     final InvocationConfiguration configuration =
-        InvocationConfiguration.builderFromOutput(mConfiguration).configured();
+        InvocationConfiguration.builderFromOutput(mConfiguration).configuration();
     return JRoutineCore.routineOn(mExecutor)
                        .withConfiguration(configuration)
                        .of(new CallableInvocation<OUT>(callable))
@@ -160,7 +160,7 @@ class DefaultChannelHandler implements ChannelHandler {
                                                         .withChannel()
                                                         .withPatch(mConfiguration)
                                                         .withOrder(OrderType.SORTED)
-                                                        .configured()
+                                                        .configuration()
                                                         .ofType();
     for (final Channel<?, ?> channel : channels) {
       if (channel == null) {
@@ -181,7 +181,7 @@ class DefaultChannelHandler implements ChannelHandler {
                                                         .withChannel()
                                                         .withPatch(mConfiguration)
                                                         .withOrder(OrderType.SORTED)
-                                                        .configured()
+                                                        .configuration()
                                                         .ofType();
     boolean isEmpty = true;
     for (final Channel<?, ?> channel : channels) {

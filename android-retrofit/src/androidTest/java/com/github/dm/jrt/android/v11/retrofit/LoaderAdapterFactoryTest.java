@@ -32,7 +32,7 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.util.Consumer;
-import com.github.dm.jrt.operator.Operators;
+import com.github.dm.jrt.operator.JRoutineOperators;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -83,7 +83,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                               .delegateFactory(factory)
                               .withInvocation()
                               .withOutputTimeout(seconds(10))
-                              .configured()
+                              .configuration()
                               .loaderConfiguration()
                               .withCacheStrategy(CacheStrategyType.CLEAR)
                               .apply()
@@ -111,7 +111,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
       {
         final GitHubService service = retrofit.create(GitHubService.class);
         assertThat(service.streamRepos("octocat")
-                          .map(Operators.<Repo>unfold())
+                          .map(JRoutineOperators.<Repo>unfold())
                           .invoke()
                           .consume(onOutput(new Consumer<Repo>() {
 
@@ -143,7 +143,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                                                       .withInvocation()
                                                                       .withOutputTimeout(
                                                                           seconds(10))
-                                                                      .configured()
+                                                                      .configuration()
                                                                       .buildFactory();
       final GsonConverterFactory converterFactory = GsonConverterFactory.create();
       final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + server.getPort())
@@ -182,7 +182,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                               .delegateFactory(factory)
                               .withInvocation()
                               .withOutputTimeout(seconds(10))
-                              .configured()
+                              .configuration()
                               .loaderConfiguration()
                               .withCacheStrategy(CacheStrategyType.CLEAR)
                               .apply()
@@ -210,7 +210,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
       {
         final GitHubService service = retrofit.create(GitHubService.class);
         assertThat(service.streamRepos("octocat")
-                          .map(Operators.<Repo>unfold())
+                          .map(JRoutineOperators.<Repo>unfold())
                           .invoke()
                           .consume(onOutput(new Consumer<Repo>() {
 
@@ -246,7 +246,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                              .build();
       final GitHubService service = retrofit.create(GitHubService.class);
       assertThat(service.streamRepos("octocat")
-                        .map(Operators.<Repo>unfold())
+                        .map(JRoutineOperators.<Repo>unfold())
                         .invoke()
                         .consume(onOutput(new Consumer<Repo>() {
 

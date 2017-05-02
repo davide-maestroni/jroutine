@@ -21,9 +21,7 @@ import com.github.dm.jrt.android.function.builder.StatelessLoaderRoutineBuilder;
 import com.github.dm.jrt.android.v11.core.LoaderContext;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.util.BiConsumer;
-import com.github.dm.jrt.function.util.BiConsumerDecorator;
 import com.github.dm.jrt.function.util.Supplier;
-import com.github.dm.jrt.function.util.SupplierDecorator;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -35,21 +33,20 @@ import java.util.List;
  */
 public class JRoutineLoaderFunction {
 
-  private static final BiConsumerDecorator<? extends List<?>, ?> sListConsumer =
-      BiConsumerDecorator.decorate(new BiConsumer<List<Object>, Object>() {
+  private static final BiConsumer<? extends List<?>, ?> sListConsumer =
+      new BiConsumer<List<Object>, Object>() {
 
         public void accept(final List<Object> list, final Object input) {
           list.add(input);
         }
-      });
+      };
 
-  private static final SupplierDecorator<? extends List<?>> sListSupplier =
-      SupplierDecorator.decorate(new Supplier<List<?>>() {
+  private static final Supplier<? extends List<?>> sListSupplier = new Supplier<List<?>>() {
 
-        public List<?> get() {
-          return new ArrayList<Object>();
-        }
-      });
+    public List<?> get() {
+      return new ArrayList<Object>();
+    }
+  };
 
   private JRoutineLoaderFunction() {
     ConstantConditions.avoid();

@@ -84,7 +84,7 @@ public class BiConsumerDecorator<IN1, IN2> extends DeepEqualObject
   }
 
   /**
-   * Decorates the specified bi-consumer instance so to provide additional features.
+   * Wraps the specified bi-consumer instance so to provide additional features.
    * <br>
    * The returned object will support concatenation and comparison.
    * <p>
@@ -100,7 +100,7 @@ public class BiConsumerDecorator<IN1, IN2> extends DeepEqualObject
    * @return the decorated bi-consumer.
    */
   @NotNull
-  public static <IN1, IN2> BiConsumerDecorator<IN1, IN2> decorate(
+  public static <IN1, IN2> BiConsumerDecorator<IN1, IN2> wrapBiConsumer(
       @NotNull final BiConsumer<IN1, IN2> consumer) {
     if (consumer instanceof BiConsumerDecorator) {
       return (BiConsumerDecorator<IN1, IN2>) consumer;

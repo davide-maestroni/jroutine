@@ -394,7 +394,7 @@ public class InvocationService extends Service {
 
         builder.withOutputOrder(outputOrderType).withLogLevel(logLevel);
         final ContextInvocationFactory<?, ?> factory = getInvocationFactory(targetClass, args);
-        final ContextRoutine contextRoutine = new ContextRoutine(this, builder.configured(), factory);
+        final ContextRoutine contextRoutine = new ContextRoutine(this, builder.configuration(), factory);
         routineState = new RoutineState(contextRoutine);
         routines.put(routineInfo, routineState);
       }

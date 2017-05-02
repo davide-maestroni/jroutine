@@ -17,7 +17,6 @@
 package com.github.dm.jrt.android.stream.builder;
 
 import com.github.dm.jrt.android.core.config.LoaderConfigurable;
-import com.github.dm.jrt.stream.transform.LiftFunction;
 
 import org.jetbrains.annotations.NotNull;
 

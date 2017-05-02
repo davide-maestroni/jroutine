@@ -49,7 +49,7 @@ import com.github.dm.jrt.function.util.Consumer;
 import com.github.dm.jrt.function.util.Function;
 import com.github.dm.jrt.function.util.Predicate;
 import com.github.dm.jrt.function.util.Supplier;
-import com.github.dm.jrt.operator.Operators;
+import com.github.dm.jrt.operator.JRoutineOperators;
 import com.github.dm.jrt.reflect.annotation.Alias;
 import com.github.dm.jrt.reflect.annotation.AsyncOutput;
 import com.github.dm.jrt.reflect.annotation.OutputTimeout;
@@ -71,7 +71,7 @@ import static com.github.dm.jrt.android.v4.core.LoaderContextCompat.loaderFrom;
 import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static com.github.dm.jrt.function.util.SupplierDecorator.constant;
-import static com.github.dm.jrt.operator.Operators.appendAccept;
+import static com.github.dm.jrt.operator.JRoutineOperators.appendAccept;
 import static com.github.dm.jrt.operator.sequence.Sequences.range;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -191,7 +191,7 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
                                                             }
                                                           })
                                                           .sync()
-                                                          .map(Operators.average(Double.class))
+                                                          .map(JRoutineOperators.average(Double.class))
                                                           .lift(
                                                               LoaderTransformationsCompat
                                                                   .<Integer, Double>runOn(
@@ -530,10 +530,10 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
                                     .withInstanceOf(TestClass.class)
                                     .withInvocation()
                                     .withLog(AndroidLogs.androidLog())
-                                    .configured()
+                                    .configuration()
                                     .withWrapper()
                                     .withSharedFields()
-                                    .configured()
+                                    .configuration()
                                     .loaderConfiguration()
                                     .withInvocationId(11)
                                     .apply()
@@ -762,10 +762,10 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
                                     .withInstanceOf(TestClass.class)
                                     .withInvocation()
                                     .withLog(AndroidLogs.androidLog())
-                                    .configured()
+                                    .configuration()
                                     .withWrapper()
                                     .withSharedFields()
-                                    .configured()
+                                    .configuration()
                                     .serviceConfiguration()
                                     .withLogClass(AndroidLog.class)
                                     .apply()

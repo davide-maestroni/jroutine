@@ -21,12 +21,11 @@ import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.function.util.BiFunction;
-import com.github.dm.jrt.function.util.BiFunctionDecorator;
 
 import org.jetbrains.annotations.NotNull;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
-import static com.github.dm.jrt.function.util.BiFunctionDecorator.decorate;
+import static com.github.dm.jrt.function.util.BiFunctionDecorator.wrapBiFunction;
 
 /**
  * Invocation implementation computing the result by applying a bi-function instance to the inputs.
@@ -61,9 +60,9 @@ class BinaryOperatorInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
    * @return the invocation factory.
    */
   @NotNull
-  static <DATA> InvocationFactory<DATA, DATA> functionFactory(
+  static <DATA> InvocationFactory<DATA, DATA> factoryOf(
       @NotNull final BiFunction<DATA, DATA, DATA> binaryFunction) {
-    return new BinaryOperatorInvocationFactory<DATA>(decorate(binaryFunction));
+    return new BinaryOperatorInvocationFactory<DATA>(binaryFunction);
   }
 
   @Override
@@ -102,7 +101,7 @@ class BinaryOperatorInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
    */
   private static class BinaryOperatorInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
 
-    private final BiFunctionDecorator<DATA, DATA, DATA> mBinaryFunction;
+    private final BiFunction<DATA, DATA, DATA> mBinaryFunction;
 
     /**
      * Constructor.
@@ -110,8 +109,8 @@ class BinaryOperatorInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
      * @param binaryFunction the operator bi-function instance.
      */
     private BinaryOperatorInvocationFactory(
-        @NotNull final BiFunctionDecorator<DATA, DATA, DATA> binaryFunction) {
-      super(asArgs(binaryFunction));
+        @NotNull final BiFunction<DATA, DATA, DATA> binaryFunction) {
+      super(asArgs(wrapBiFunction(binaryFunction)));
       mBinaryFunction = binaryFunction;
     }
 

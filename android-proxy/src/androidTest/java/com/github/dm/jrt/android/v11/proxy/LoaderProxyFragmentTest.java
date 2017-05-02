@@ -119,7 +119,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
                                                                  .with(instanceOf(TestList.class))
                                                                  .withInvocation()
                                                                  .withOutputTimeout(seconds(10))
-                                                                 .configured();
+                                                                 .configuration();
 
     final TestListItf<String> testListItf1 =
         builder.buildProxy(new ClassToken<TestListItf<String>>() {});
@@ -263,10 +263,10 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
                                                                 .with(instanceOf(TestClass.class));
     final TestProxy testProxy = builder.withInvocation()
                                        .withPatch(configuration)
-                                       .configured()
+                                       .configuration()
                                        .withWrapper()
                                        .withSharedFields()
-                                       .configured()
+                                       .configuration()
                                        .loaderConfiguration()
                                        .withInvocationId(11)
                                        .apply()
@@ -285,10 +285,10 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
                                   .with(instanceOf(TestClass.class))
                                   .withInvocation()
                                   .withPatch(configuration)
-                                  .configured()
+                                  .configuration()
                                   .withWrapper()
                                   .withSharedFields()
-                                  .configured()
+                                  .configuration()
                                   .loaderConfiguration()
                                   .withInvocationId(11)
                                   .apply()
@@ -313,14 +313,14 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
                                                    .with(instanceOf(TestClass.class))
                                                    .withInvocation()
                                                    .withPatch(configuration)
-                                                   .configured()
+                                                   .configuration()
                                                    .buildProxy(ClassToken.tokenOf(TestProxy.class));
 
     assertThat(JRoutineLoaderProxy.on(loaderFrom(fragment))
                                   .with(instanceOf(TestClass.class))
                                   .withInvocation()
                                   .withPatch(configuration)
-                                  .configured()
+                                  .configuration()
                                   .buildProxy(ClassToken.tokenOf(TestProxy.class))).isSameAs(
         testProxy);
   }
@@ -373,18 +373,18 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
                                                                  .with(instanceOf(TestClass2.class))
                                                                  .withInvocation()
                                                                  .withOutputTimeout(seconds(10))
-                                                                 .configured();
+                                                                 .configuration();
 
     long startTime = System.currentTimeMillis();
 
     Channel<?, Integer> getOne = builder.withWrapper()
                                         .withSharedFields("1")
-                                        .configured()
+                                        .configuration()
                                         .buildProxy(TestClassAsync.class)
                                         .getOne();
     Channel<?, Integer> getTwo = builder.withWrapper()
                                         .withSharedFields("2")
-                                        .configured()
+                                        .configuration()
                                         .buildProxy(TestClassAsync.class)
                                         .getTwo();
 
@@ -417,7 +417,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
                                        .with(instanceOf(Impl.class))
                                        .withInvocation()
                                        .withOutputTimeout(seconds(10))
-                                       .configured()
+                                       .configuration()
                                        .buildProxy(Itf.class);
 
     assertThat(itf.add0('c')).isEqualTo((int) 'c');
@@ -549,7 +549,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
                                   .with(instanceOf(TestTimeout.class))
                                   .withInvocation()
                                   .withOutputTimeout(seconds(10))
-                                  .configured()
+                                  .configuration()
                                   .buildProxy(TestTimeoutItf.class)
                                   .getInt()).isEqualTo(31);
 
@@ -559,7 +559,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
                          .with(instanceOf(TestTimeout.class))
                          .withInvocation()
                          .withOutputTimeoutAction(TimeoutActionType.FAIL)
-                         .configured()
+                         .configuration()
                          .buildProxy(TestTimeoutItf.class)
                          .getInt();
 

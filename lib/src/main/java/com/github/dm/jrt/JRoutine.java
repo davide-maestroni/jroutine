@@ -16,44 +16,35 @@
 
 package com.github.dm.jrt;
 
+import com.github.dm.jrt.channel.JRoutineChannels;
+import com.github.dm.jrt.channel.builder.ChannelHandler;
 import com.github.dm.jrt.channel.io.ByteChannel;
 import com.github.dm.jrt.channel.io.ByteChannel.ByteChunk;
-import com.github.dm.jrt.channel.io.ByteChannel.ChunkInputStream;
+import com.github.dm.jrt.channel.io.ByteChannel.ByteChunkInputStream;
+import com.github.dm.jrt.channel.io.ByteChannel.ByteChunkOutputStreamBuilder;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.ChannelBuilder;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.invocation.CommandInvocation;
-import com.github.dm.jrt.core.invocation.Invocation;
-import com.github.dm.jrt.core.invocation.InvocationFactory;
-import com.github.dm.jrt.core.invocation.MappingInvocation;
-import com.github.dm.jrt.core.util.ClassToken;
+import com.github.dm.jrt.core.common.BackoffBuilder;
+import com.github.dm.jrt.core.common.BackoffBuilder.DefaultBackoff;
+import com.github.dm.jrt.core.common.RoutineException;
+import com.github.dm.jrt.core.executor.ScheduledExecutor;
+import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.util.BiConsumer;
+import com.github.dm.jrt.function.JRoutineFunction;
+import com.github.dm.jrt.function.builder.FunctionalChannelConsumer;
+import com.github.dm.jrt.function.builder.StatefulRoutineBuilder;
+import com.github.dm.jrt.function.builder.StatelessRoutineBuilder;
+import com.github.dm.jrt.function.util.Action;
 import com.github.dm.jrt.function.util.Consumer;
-import com.github.dm.jrt.function.util.Function;
-import com.github.dm.jrt.function.util.Predicate;
-import com.github.dm.jrt.function.util.Supplier;
-import com.github.dm.jrt.reflect.InvocationTarget;
 import com.github.dm.jrt.stream.JRoutineStream;
-import com.github.dm.jrt.stream.builder.StreamBuilder;
+import com.github.dm.jrt.stream.routine.StreamRoutine;
+import com.github.dm.jrt.stream.transform.StreamLifter;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-
-import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
-import static com.github.dm.jrt.function.Functions.consumerCall;
-import static com.github.dm.jrt.function.Functions.consumerCommand;
-import static com.github.dm.jrt.function.Functions.consumerMapping;
-import static com.github.dm.jrt.function.Functions.functionCall;
-import static com.github.dm.jrt.function.Functions.functionMapping;
-import static com.github.dm.jrt.function.Functions.predicateFilter;
-import static com.github.dm.jrt.function.Functions.supplierCommand;
-import static com.github.dm.jrt.function.Functions.supplierFactory;
-import static com.github.dm.jrt.reflect.InvocationTarget.classOfType;
-import static com.github.dm.jrt.reflect.InvocationTarget.instance;
+import static com.github.dm.jrt.core.executor.ScheduledExecutors.defaultExecutor;
 
 /**
  * Class acting as a fa&ccedil;ade of all the JRoutine library features.
@@ -61,13 +52,86 @@ import static com.github.dm.jrt.reflect.InvocationTarget.instance;
  * Created by davide-maestroni on 02/29/2016.
  */
 @SuppressWarnings("WeakerAccess")
-public class JRoutine extends Channels {
+public class JRoutine {
 
   /**
    * Avoid explicit instantiation.
    */
   protected JRoutine() {
     ConstantConditions.avoid();
+  }
+
+  /**
+   * Returns a builder of backoff instances applying a delay when the passed count exceeds the
+   * specified value.
+   *
+   * @param count the count value.
+   * @return the builder instance.
+   */
+  @NotNull
+  public static BackoffBuilder afterCount(final int count) {
+    return BackoffBuilder.afterCount(count);
+  }
+
+  /**
+   * Returns a builder of channels running on the default executor.
+   *
+   * @return the channel builder instance.
+   */
+  @NotNull
+  public static ChannelBuilder channel() {
+    return JRoutineCore.channel();
+  }
+
+  /**
+   * Returns a channel handler employing the default executor.
+   *
+   * @return the handler instance.
+   */
+  @NotNull
+  public static ChannelHandler channelHandler() {
+    return JRoutineChannels.channelHandler();
+  }
+
+  /**
+   * Returns a channel handler employing the specified executor.
+   *
+   * @param executor the executor instance.
+   * @return the handler instance.
+   */
+  @NotNull
+  public static ChannelHandler channelHandlerOn(@NotNull final ScheduledExecutor executor) {
+    return JRoutineChannels.channelHandlerOn(executor);
+  }
+
+  /**
+   * Returns a builder of channels running on the specified executor.
+   *
+   * @param executor the executor instance.
+   * @return the channel builder instance.
+   */
+  @NotNull
+  public static ChannelBuilder channelOn(@NotNull final ScheduledExecutor executor) {
+    return JRoutineCore.channelOn(executor);
+  }
+
+  /**
+   * Returns a channel pushing inputs to the specified input one and collecting outputs from the
+   * specified output one.
+   * <p>
+   * Note that it's up to the caller to ensure that inputs and outputs of two channels are actually
+   * connected.
+   *
+   * @param inputChannel  the input channel.
+   * @param outputChannel the output channel.
+   * @param <IN>          the input data type.
+   * @param <OUT>         the output data type.
+   * @return the new channel instance.
+   */
+  @NotNull
+  public static <IN, OUT> Channel<IN, OUT> flattenChannels(
+      @NotNull final Channel<IN, ?> inputChannel, @NotNull final Channel<?, OUT> outputChannel) {
+    return JRoutineCore.flattenChannels(inputChannel, outputChannel);
   }
 
   /**
@@ -82,7 +146,7 @@ public class JRoutine extends Channels {
    *                                         of the specified buffers.
    */
   @NotNull
-  public static ChunkInputStream getInputStream(@NotNull final ByteChunk... buffers) {
+  public static ByteChunkInputStream inputStream(@NotNull final ByteChunk... buffers) {
     return ByteChannel.inputStream(buffers);
   }
 
@@ -98,7 +162,7 @@ public class JRoutine extends Channels {
    *                                         of the specified buffers.
    */
   @NotNull
-  public static ChunkInputStream getInputStream(
+  public static ByteChunkInputStream inputStream(
       @NotNull final Iterable<? extends ByteChunk> buffers) {
     return ByteChannel.inputStream(buffers);
   }
@@ -114,606 +178,255 @@ public class JRoutine extends Channels {
    *                                         specified buffer.
    */
   @NotNull
-  public static ChunkInputStream getInputStream(@NotNull final ByteChunk buffer) {
+  public static ByteChunkInputStream inputStream(@NotNull final ByteChunk buffer) {
     return ByteChannel.inputStream(buffer);
   }
 
   /**
-   * Returns a builder of channels producing no data.
-   * <p>
-   * Note that the returned channels will be already closed.
+   * Returns the no delay backoff instance.
+   * <br>
+   * The backoff will always return {@code NO_DELAY}.
    *
-   * @param <OUT> the output data type.
-   * @return the channel builder instance.
+   * @return the backoff instance.
    */
   @NotNull
-  public static <OUT> ChannelBuilder<?, OUT> of() {
-    return JRoutineCore.of();
+  public static DefaultBackoff noDelay() {
+    return BackoffBuilder.noDelay();
   }
 
   /**
-   * Returns a builder of channels producing the specified output.
-   * <p>
-   * Note that the returned channels will be already closed.
+   * Returns a channel consumer builder employing the specified action to handle the invocation
+   * completion.
    *
-   * @param output the output.
-   * @param <OUT>  the output data type.
-   * @return the channel builder instance.
+   * @param onComplete the action instance.
+   * @return the channel consumer builder.
    */
   @NotNull
-  public static <OUT> ChannelBuilder<?, OUT> of(@Nullable OUT output) {
-    return JRoutineCore.of(output);
+  public static FunctionalChannelConsumer<Object> onComplete(@NotNull final Action onComplete) {
+    return JRoutineFunction.onComplete(onComplete);
   }
 
   /**
-   * Returns a builder of channels producing the specified outputs.
-   * <p>
-   * Note that the returned channels will be already closed.
+   * Returns a channel consumer builder employing the specified consumer function to handle the
+   * invocation errors.
    *
-   * @param outputs the output data.
-   * @param <OUT>   the output data type.
-   * @return the channel builder instance.
+   * @param onError the consumer function.
+   * @return the channel consumer builder.
    */
   @NotNull
-  public static <OUT> ChannelBuilder<?, OUT> of(@Nullable OUT... outputs) {
-    return JRoutineCore.of(outputs);
+  public static FunctionalChannelConsumer<Object> onError(
+      @NotNull final Consumer<? super RoutineException> onError) {
+    return JRoutineFunction.onError(onError);
   }
 
   /**
-   * Returns a builder of channels producing the specified outputs.
-   * <p>
-   * Note that the returned channels will be already closed.
+   * Returns a channel consumer builder employing the specified consumer function to handle the
+   * invocation outputs.
    *
-   * @param outputs the iterable returning the output data.
-   * @param <OUT>   the output data type.
-   * @return the channel builder instance.
+   * @param onOutput the consumer function.
+   * @param onError  the consumer function.
+   * @param <OUT>    the output data type.
+   * @return the channel consumer builder.
    */
   @NotNull
-  public static <OUT> ChannelBuilder<?, OUT> of(@Nullable Iterable<OUT> outputs) {
-    return JRoutineCore.of(outputs);
+  public static <OUT> FunctionalChannelConsumer<OUT> onOutput(
+      @NotNull final Consumer<? super OUT> onOutput,
+      @NotNull final Consumer<? super RoutineException> onError) {
+    return JRoutineFunction.onOutput(onOutput, onError);
   }
 
   /**
-   * Returns a channel builder.
+   * Returns a channel consumer builder employing the specified functions to handle the invocation
+   * outputs, errors adn completion.
    *
-   * @param <DATA> the data type.
-   * @return the channel builder instance.
-   */
-  @NotNull
-  public static <DATA> ChannelBuilder<DATA, DATA> ofData() {
-    return JRoutineCore.ofData();
-  }
-
-  // TODO: 28/02/2017 onOutput, stateful, stateless
-
-  /**
-   * Returns a routine builder based on an invocation factory creating instances of the specified
-   * class.
-   *
-   * @param invocationClass the invocation class.
-   * @param <IN>            the input data type.
-   * @param <OUT>           the output data type.
-   * @return the routine builder instance.
-   * @throws java.lang.IllegalArgumentException if no default constructor was found.
-   */
-  @NotNull
-  public static <IN, OUT> RoutineBuilder<IN, OUT> with(
-      @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass) {
-    return with(factoryOf(invocationClass));
-  }
-
-  /**
-   * Returns a routine builder based on an invocation factory creating instances of the specified
-   * class by passing the specified arguments to the class constructor.
-   * <p>
-   * Note that inner and anonymous classes can be passed as well. Remember however that Java
-   * creates synthetic constructors for such classes, so be sure to specify the correct arguments
-   * to guarantee proper instantiation. In fact, inner classes always have the outer instance as
-   * first constructor parameter, and anonymous classes have both the outer instance and all the
-   * variables captured in the closure.
-   *
-   * @param invocationClass the invocation class.
-   * @param args            the invocation constructor arguments.
-   * @param <IN>            the input data type.
-   * @param <OUT>           the output data type.
-   * @return the routine builder instance.
-   * @throws java.lang.IllegalArgumentException if no constructor taking the specified objects as
-   *                                            parameters was found.
-   */
-  @NotNull
-  public static <IN, OUT> RoutineBuilder<IN, OUT> with(
-      @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass,
-      @Nullable final Object... args) {
-    return with(factoryOf(invocationClass, args));
-  }
-
-  /**
-   * Returns a routine builder based on an invocation factory creating instances of the specified
-   * class token.
-   *
-   * @param invocationToken the invocation class token.
-   * @param <IN>            the input data type.
-   * @param <OUT>           the output data type.
-   * @return the routine builder instance.
-   * @throws java.lang.IllegalArgumentException if no default constructor was found.
-   */
-  @NotNull
-  public static <IN, OUT> RoutineBuilder<IN, OUT> with(
-      @NotNull final ClassToken<? extends Invocation<IN, OUT>> invocationToken) {
-    return with(factoryOf(invocationToken));
-  }
-
-  /**
-   * Returns a routine builder based on an invocation factory creating instances of the specified
-   * class token by passing the specified arguments to the class constructor.
-   * <p>
-   * Note that class tokens of inner and anonymous classes can be passed as well. Remember however
-   * that Java creates synthetic constructors for such classes, so be sure to specify the correct
-   * arguments to guarantee proper instantiation. In fact, inner classes always have the outer
-   * instance as first constructor parameter, and anonymous classes have both the outer instance
-   * and all the variables captured in the closure.
-   *
-   * @param invocationToken the invocation class token.
-   * @param args            the invocation constructor arguments.
-   * @param <IN>            the input data type.
-   * @param <OUT>           the output data type.
-   * @return the routine builder instance.
-   * @throws java.lang.IllegalArgumentException if no constructor taking the specified objects as
-   *                                            parameters was found.
-   */
-  @NotNull
-  public static <IN, OUT> RoutineBuilder<IN, OUT> with(
-      @NotNull final ClassToken<? extends Invocation<IN, OUT>> invocationToken,
-      @Nullable final Object... args) {
-    return with(factoryOf(invocationToken, args));
-  }
-
-  /**
-   * Returns a routine builder based on the specified command invocation.
-   *
-   * @param invocation the command invocation instance.
+   * @param onOutput   the consumer function.
+   * @param onError    the consumer function.
+   * @param onComplete the action instance.
    * @param <OUT>      the output data type.
-   * @return the routine builder instance.
+   * @return the channel consumer builder.
    */
   @NotNull
-  public static <OUT> RoutineBuilder<Void, OUT> with(
-      @NotNull final CommandInvocation<OUT> invocation) {
-    return with((InvocationFactory<Void, OUT>) invocation);
+  public static <OUT> FunctionalChannelConsumer<OUT> onOutput(
+      @NotNull final Consumer<? super OUT> onOutput,
+      @NotNull final Consumer<? super RoutineException> onError, @NotNull final Action onComplete) {
+    return JRoutineFunction.onOutput(onOutput, onError, onComplete);
   }
 
   /**
-   * Returns a routine builder based on an invocation factory creating instances of the specified
-   * object.
+   * Returns a channel consumer builder employing the specified consumer function to handle the
+   * invocation outputs.
    *
-   * @param invocation the invocation instance.
-   * @param <IN>       the input data type.
-   * @param <OUT>      the output data type.
-   * @return the routine builder instance.
-   * @throws java.lang.IllegalArgumentException if no default constructor was found.
-   */
-  @NotNull
-  public static <IN, OUT> RoutineBuilder<IN, OUT> with(
-      @NotNull final Invocation<IN, OUT> invocation) {
-    return with(factoryOf(invocation));
-  }
-
-  /**
-   * Returns a routine builder based on an invocation factory creating instances of the specified
-   * object by passing the specified arguments to the class constructor.
-   * <p>
-   * Note that inner and anonymous objects can be passed as well. Remember however that Java
-   * creates synthetic constructors for such classes, so be sure to specify the correct arguments
-   * to guarantee proper instantiation. In fact, inner classes always have the outer instance as
-   * first constructor parameter, and anonymous classes have both the outer instance and all the
-   * variables captured in the closure.
-   *
-   * @param invocation the invocation instance.
-   * @param args       the invocation constructor arguments.
-   * @param <IN>       the input data type.
-   * @param <OUT>      the output data type.
-   * @return the routine builder instance.
-   * @throws java.lang.IllegalArgumentException if no constructor taking the specified objects as
-   *                                            parameters was found.
-   */
-  @NotNull
-  public static <IN, OUT> RoutineBuilder<IN, OUT> with(
-      @NotNull final Invocation<IN, OUT> invocation, @Nullable final Object... args) {
-    return with(factoryOf(invocation, args));
-  }
-
-  /**
-   * Returns a routine builder based on the specified invocation factory.
-   * <br>
-   * In order to prevent undesired leaks, the class of the specified factory should have a static
-   * scope.
-   *
-   * @param factory the invocation factory.
-   * @param <IN>    the input data type.
-   * @param <OUT>   the output data type.
-   * @return the routine builder instance.
-   */
-  @NotNull
-  public static <IN, OUT> RoutineBuilder<IN, OUT> with(
-      @NotNull final InvocationFactory<IN, OUT> factory) {
-    return JRoutineCore.with(factory);
-  }
-
-  /**
-   * Returns a routine builder wrapping the specified target.
-   * <p>
-   * Note that it is responsibility of the caller to retain a strong reference to the target
-   * instance to prevent it from being garbage collected.
-   * <br>
-   * Note also that the invocation input data will be cached, and the results will be produced
-   * only after the invocation channel is closed, so be sure to avoid streaming inputs in order to
-   * prevent starvation or out of memory errors.
-   *
-   * @param target the invocation target.
-   * @return the routine builder instance.
-   * @throws java.lang.IllegalArgumentException if the specified object class represents an
-   *                                            interface.
-   */
-  @NotNull
-  public static WrapperRoutineBuilder with(@NotNull final InvocationTarget<?> target) {
-    return new DefaultWrapperRoutineBuilder(target);
-  }
-
-  /**
-   * Returns a routine builder based on the specified mapping invocation.
-   *
-   * @param invocation the mapping invocation instance.
-   * @param <IN>       the input data type.
-   * @param <OUT>      the output data type.
-   * @return the routine builder instance.
-   */
-  @NotNull
-  public static <IN, OUT> RoutineBuilder<IN, OUT> with(
-      @NotNull final MappingInvocation<IN, OUT> invocation) {
-    return with((InvocationFactory<IN, OUT>) invocation);
-  }
-
-  /**
-   * Returns a routine builder wrapping the specified object.
-   * <br>
-   * The invocation target will be automatically chosen based on whether the specified object is
-   * a class or an instance.
-   * <p>
-   * Note that it is responsibility of the caller to retain a strong reference to the target
-   * instance to prevent it from being garbage collected.
-   * <br>
-   * Note also that the invocation input data will be cached, and the results will be produced
-   * only after the invocation channel is closed, so be sure to avoid streaming inputs in order to
-   * prevent starvation or out of memory errors.
-   *
-   * @param object the target object.
-   * @return the routine builder instance.
-   * @throws java.lang.IllegalArgumentException if the specified object class represents an
-   *                                            interface.
-   */
-  @NotNull
-  public static WrapperRoutineBuilder with(@NotNull final Object object) {
-    return (object instanceof Class) ? withClassOfType((Class<?>) object) : withInstance(object);
-  }
-
-  /**
-   * Returns a routine builder based on a call invocation factory backed by the specified function.
-   *
-   * @param function the function instance.
-   * @param <IN>     the input data type.
+   * @param onOutput the consumer function.
    * @param <OUT>    the output data type.
-   * @return the routine builder instance.
+   * @return the channel consumer builder.
    */
   @NotNull
-  public static <IN, OUT> RoutineBuilder<IN, OUT> withCall(
-      @NotNull final Function<? super List<IN>, ? extends OUT> function) {
-    return with(functionCall(function));
+  public static <OUT> FunctionalChannelConsumer<OUT> onOutput(
+      @NotNull final Consumer<? super OUT> onOutput) {
+    return JRoutineFunction.onOutput(onOutput);
   }
 
   /**
-   * Returns a routine builder based on a call invocation factory backed by the specified consumer.
-   *
-   * @param consumer the consumer instance.
-   * @param <IN>     the input data type.
-   * @param <OUT>    the output data type.
-   * @return the routine builder instance.
-   */
-  @NotNull
-  public static <IN, OUT> RoutineBuilder<IN, OUT> withCallConsumer(
-      @NotNull final BiConsumer<? super List<IN>, ? super Channel<OUT, ?>> consumer) {
-    return with(consumerCall(consumer));
-  }
-
-  /**
-   * Returns a routine builder wrapping the specified class.
-   * <p>
-   * Note that it is responsibility of the caller to retain a strong reference to the target
-   * instance to prevent it from being garbage collected.
-   * <br>
-   * Note also that the invocation input data will be cached, and the results will be produced
-   * only after the invocation channel is closed, so be sure to avoid streaming inputs in order to
-   * prevent starvation or out of memory errors.
-   *
-   * @param targetClass the target class.
-   * @return the routine builder instance.
-   * @throws java.lang.IllegalArgumentException if the specified class represents an interface.
-   */
-  @NotNull
-  public static WrapperRoutineBuilder withClassOfType(@NotNull final Class<?> targetClass) {
-    return with(classOfType(targetClass));
-  }
-
-  /**
-   * Returns a routine builder based on a command invocation backed by the specified supplier.
-   *
-   * @param supplier the supplier instance.
-   * @param <OUT>    the output data type.
-   * @return the routine builder instance.
-   */
-  @NotNull
-  public static <OUT> RoutineBuilder<Void, OUT> withCommand(
-      @NotNull final Supplier<? extends OUT> supplier) {
-    return with(supplierCommand(supplier));
-  }
-
-  /**
-   * Returns a routine builder based on a command invocation backed by the specified consumer.
-   *
-   * @param consumer the consumer instance.
-   * @param <OUT>    the output data type.
-   * @return the routine builder instance.
-   */
-  @NotNull
-  public static <OUT> RoutineBuilder<Void, OUT> withCommandConsumer(
-      @NotNull final Consumer<? super Channel<OUT, ?>> consumer) {
-    return with(consumerCommand(consumer));
-  }
-
-  /**
-   * Returns a routine builder based on an invocation factory backed by the specified supplier.
-   *
-   * @param supplier the supplier instance.
-   * @param <IN>     the input data type.
-   * @param <OUT>    the output data type.
-   * @return the routine builder instance.
-   */
-  @NotNull
-  public static <IN, OUT> RoutineBuilder<IN, OUT> withFactory(
-      @NotNull final Supplier<? extends Invocation<? super IN, ? extends OUT>> supplier) {
-    return with(supplierFactory(supplier));
-  }
-
-  /**
-   * Returns a routine builder based on a operation invocation backed by the specified predicate.
-   *
-   * @param predicate the predicate instance.
-   * @param <IN>      the input data type.
-   * @return the routine builder instance.
-   */
-  @NotNull
-  public static <IN> RoutineBuilder<IN, IN> withFilter(
-      @NotNull final Predicate<? super IN> predicate) {
-    return with(predicateFilter(predicate));
-  }
-
-  /**
-   * Returns a routine builder wrapping the specified object.
-   * <p>
-   * Note that it is responsibility of the caller to retain a strong reference to the target
-   * instance to prevent it from being garbage collected.
-   * <br>
-   * Note also that the invocation input data will be cached, and the results will be produced
-   * only after the invocation channel is closed, so be sure to avoid streaming inputs in order to
-   * prevent starvation or out of memory errors.
-   *
-   * @param object the target object.
-   * @return the routine builder instance.
-   */
-  @NotNull
-  public static WrapperRoutineBuilder withInstance(@NotNull final Object object) {
-    return with(instance(object));
-  }
-
-  /**
-   * Returns a routine builder based on a mapping invocation backed by the specified function.
-   *
-   * @param function the function instance.
-   * @param <IN>     the input data type.
-   * @param <OUT>    the output data type.
-   * @return the routine builder instance.
-   */
-  @NotNull
-  public static <IN, OUT> RoutineBuilder<IN, OUT> withMapping(
-      @NotNull final Function<? super IN, ? extends OUT> function) {
-    return with(functionMapping(function));
-  }
-
-  /**
-   * Returns a routine builder based on a mapping invocation backed by the specified consumer.
-   *
-   * @param consumer the consumer instance.
-   * @param <IN>     the input data type.
-   * @param <OUT>    the output data type.
-   * @return the routine builder instance.
-   */
-  @NotNull
-  public static <IN, OUT> RoutineBuilder<IN, OUT> withMappingConsumer(
-      @NotNull final BiConsumer<? super IN, ? super Channel<OUT, ?>> consumer) {
-    return with(consumerMapping(consumer));
-  }
-
-  /**
-   * Returns a builder of buffer output streams.
+   * Returns a builder of chunk output streams.
    * <p>
    * The built streams will not close the underlying channel by default.
    *
-   * @param channel the output channel to feed with data.
    * @return the output stream builder.
    */
   @NotNull
-  public static ChunkOutputStreamBuilder withOutput(
-      @NotNull final Channel<? super ByteChunk, ?> channel) {
-    return ByteChannel.outputStream(channel);
+  public static ByteChunkOutputStreamBuilder outputStream() {
+    return ByteChannel.outputStream();
   }
 
   /**
-   * Returns a stream routine builder.
+   * Returns a builder of routines running on the default executor.
    *
-   * @param <IN> the input data type.
    * @return the routine builder instance.
    */
   @NotNull
-  public static <IN> StreamBuilder<IN, IN> withStream() {
-    return JRoutineStream.withStream();
+  public static RoutineBuilder routine() {
+    return JRoutineCore.routine();
   }
 
   /**
-   * Returns a stream routine builder producing only the inputs passed by the specified consumer.
-   * <br>
-   * The data will be produced only when the invocation completes.
-   * <br>
-   * If any other input is passed to the built routine, the invocation will be aborted with an
-   * {@link java.lang.IllegalStateException}.
+   * Returns a builder of routines running on the specified executor.
    *
-   * @param consumer the consumer instance.
-   * @param <IN>     the input data type.
+   * @param executor the executor instance.
    * @return the routine builder instance.
    */
   @NotNull
-  public static <IN> StreamBuilder<IN, IN> withStreamAccept(
-      @NotNull final Consumer<Channel<IN, ?>> consumer) {
-    return JRoutineStream.withStreamAccept(consumer);
+  public static RoutineBuilder routineOn(@NotNull final ScheduledExecutor executor) {
+    return JRoutineCore.routineOn(executor);
   }
 
   /**
-   * Returns a stream routine builder producing only the inputs passed by the specified consumer.
-   * <br>
-   * The data will be produced by calling the consumer {@code count} number of times only when the
-   * invocation completes.
-   * <br>
-   * If any other input is passed to the built routine, the invocation will be aborted with an
-   * {@link java.lang.IllegalStateException}.
-   *
-   * @param count    the number of times the consumer is called.
-   * @param consumer the consumer instance.
-   * @param <IN>     the input data type.
-   * @return the routine builder instance.
-   * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
-   */
-  @NotNull
-  public static <IN> StreamBuilder<IN, IN> withStreamAccept(final int count,
-      @NotNull final Consumer<Channel<IN, ?>> consumer) {
-    return JRoutineStream.withStreamAccept(count, consumer);
-  }
-
-  /**
-   * Returns a stream routine builder producing only the inputs returned by the specified supplier.
-   * <br>
-   * The data will be produced only when the invocation completes.
-   * <br>
-   * If any other input is passed to the built routine, the invocation will be aborted with an
-   * {@link java.lang.IllegalStateException}.
-   *
-   * @param supplier the supplier instance.
-   * @param <IN>     the input data type.
-   * @return the routine builder instance.
-   */
-  @NotNull
-  public static <IN> StreamBuilder<IN, IN> withStreamGet(@NotNull final Supplier<IN> supplier) {
-    return JRoutineStream.withStreamGet(supplier);
-  }
-
-  /**
-   * Returns a stream routine builder producing only the inputs returned by the specified supplier.
-   * <br>
-   * The data will be produced by calling the supplier {@code count} number of times only when the
-   * invocation completes.
-   * <br>
-   * If any other input is passed to the built routine, the invocation will be aborted with an
-   * {@link java.lang.IllegalStateException}.
-   *
-   * @param count    the number of times the supplier is called.
-   * @param supplier the supplier instance.
-   * @param <IN>     the input data type.
-   * @return the routine builder instance.
-   * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
-   */
-  @NotNull
-  public static <IN> StreamBuilder<IN, IN> withStreamGet(final int count,
-      @NotNull final Supplier<IN> supplier) {
-    return JRoutineStream.withStreamGet(count, supplier);
-  }
-
-  /**
-   * Returns a stream routine builder producing only the specified input.
-   * <br>
-   * The data will be produced only when the invocation completes.
-   * <br>
-   * If any other input is passed to the built routine, the invocation will be aborted with an
-   * {@link java.lang.IllegalStateException}.
-   *
-   * @param input the input.
-   * @param <IN>  the input data type.
-   * @return the routine builder instance.
-   */
-  @NotNull
-  public static <IN> StreamBuilder<IN, IN> withStreamOf(@Nullable final IN input) {
-    return JRoutineStream.withStreamOf(input);
-  }
-
-  /**
-   * Returns a stream routine builder producing only the specified inputs.
-   * <br>
-   * The data will be produced only when the invocation completes.
-   * <br>
-   * If any other input is passed to the built routine, the invocation will be aborted with an
-   * {@link java.lang.IllegalStateException}.
-   *
-   * @param inputs the input data.
-   * @param <IN>   the input data type.
-   * @return the routine builder instance.
-   */
-  @NotNull
-  public static <IN> StreamBuilder<IN, IN> withStreamOf(@Nullable final IN... inputs) {
-    return JRoutineStream.withStreamOf(inputs);
-  }
-
-  /**
-   * Returns a stream routine builder producing only the inputs returned by the specified iterable.
-   * <br>
-   * The data will be produced only when the invocation completes.
-   * <br>
-   * If any other input is passed to the built routine, the invocation will be aborted with an
-   * {@link java.lang.IllegalStateException}.
-   *
-   * @param inputs the inputs iterable.
-   * @param <IN>   the input data type.
-   * @return the routine builder instance.
-   */
-  @NotNull
-  public static <IN> StreamBuilder<IN, IN> withStreamOf(
-      @Nullable final Iterable<? extends IN> inputs) {
-    return JRoutineStream.withStreamOf(inputs);
-  }
-
-  /**
-   * Returns a stream routine builder producing only the inputs returned by the specified channel.
-   * <br>
-   * The data will be produced only when the invocation completes.
-   * <br>
-   * If any other input is passed to the built routine, the invocation will be aborted with an
-   * {@link java.lang.IllegalStateException}.
+   * Returns a builder of stateful routines running on the default executor.
    * <p>
-   * Note that the passed channel will be bound as a result of the call, so, in order to support
-   * multiple invocations, consider wrapping the channel in a replayable one, by calling the
-   * {@link Channels#replayOutput(Channel)} utility method.
+   * This type of routines are based on invocations retaining a mutable state during their
+   * lifecycle.
+   * <br>
+   * A typical example of stateful routine is the one computing a final result by accumulating the
+   * input data (for instance, computing the sum of input numbers).
    *
-   * @param channel the input channel.
    * @param <IN>    the input data type.
+   * @param <OUT>   the output data type.
+   * @param <STATE> the state data type.
+   * @return the routine builder.
+   */
+  @NotNull
+  public static <IN, OUT, STATE> StatefulRoutineBuilder<IN, OUT, STATE> stateful() {
+    return JRoutineFunction.stateful();
+  }
+
+  /**
+   * Returns a builder of stateful routines.
+   * <p>
+   * This type of routines are based on invocations retaining a mutable state during their
+   * lifecycle.
+   * <br>
+   * A typical example of stateful routine is the one computing a final result by accumulating the
+   * input data (for instance, computing the sum of input numbers).
+   *
+   * @param executor the executor instance.
+   * @param <IN>     the input data type.
+   * @param <OUT>    the output data type.
+   * @param <STATE>  the state data type.
+   * @return the routine builder.
+   */
+  @NotNull
+  public static <IN, OUT, STATE> StatefulRoutineBuilder<IN, OUT, STATE> statefulOn(
+      @NotNull final ScheduledExecutor executor) {
+    return JRoutineFunction.statefulOn(executor);
+  }
+
+  /**
+   * Returns a builder of stateless routines running on the default executor.
+   * <p>
+   * This type of routines are based on invocations not retaining a mutable internal state.
+   * <br>
+   * A typical example of stateless routine is the one processing each input separately (for
+   * instance, computing the square of input numbers).
+   *
+   * @param <IN>  the input data type.
+   * @param <OUT> the output data type.
+   * @return the routine builder.
+   */
+  @NotNull
+  public static <IN, OUT> StatelessRoutineBuilder<IN, OUT> stateless() {
+    return JRoutineFunction.stateless();
+  }
+
+  /**
+   * Returns a builder of stateless routines.
+   * <p>
+   * This type of routines are based on invocations not retaining a mutable internal state.
+   * <br>
+   * A typical example of stateless routine is the one processing each input separately (for
+   * instance, computing the square of input numbers).
+   *
+   * @param executor the executor instance.
+   * @param <IN>     the input data type.
+   * @param <OUT>    the output data type.
+   * @return the routine builder.
+   */
+  @NotNull
+  public static <IN, OUT> StatelessRoutineBuilder<IN, OUT> statelessOn(
+      @NotNull final ScheduledExecutor executor) {
+    return JRoutineFunction.statelessOn(executor);
+  }
+
+  /**
+   * Returns a builder of lifting functions.
+   *
+   * @return the builder instance.
+   */
+  @NotNull
+  public static StreamLifter streamLifter() {
+    return JRoutineStream.streamLifter();
+  }
+
+  /**
+   * Returns a builder of lifting functions employing the specified executor.
+   *
+   * @param executor the executor instance.
+   * @return the builder instance.
+   */
+  @NotNull
+  public static StreamLifter streamLifterOn(@NotNull final ScheduledExecutor executor) {
+    return JRoutineStream.streamLifterOn(executor);
+  }
+
+  /**
+   * Returns a stream routine wrapping the specified one.
+   *
+   * @param routine the routine instance.
+   * @param <IN>    the input data type.
+   * @param <OUT>   the output data type.
+   * @return the stream routine.
+   */
+  @NotNull
+  public static <IN, OUT> StreamRoutine<IN, OUT> streamOf(@NotNull final Routine<IN, OUT> routine) {
+    return JRoutineStream.streamOf(routine);
+  }
+
+  /**
+   * Returns a builder of routines running on the specified executor, wrapping a target object.
+   *
    * @return the routine builder instance.
    */
   @NotNull
-  public static <IN> StreamBuilder<IN, IN> withStreamOf(
-      @Nullable final Channel<?, ? extends IN> channel) {
-    return JRoutineStream.withStreamOf(channel);
+  public static WrapperRoutineBuilder wrapper() {
+    return wrapperOn(defaultExecutor());
+  }
+
+  /**
+   * Returns a builder of routines wrapping a target object.
+   *
+   * @param executor the executor instance.
+   * @return the routine builder instance.
+   */
+  @NotNull
+  public static WrapperRoutineBuilder wrapperOn(@NotNull final ScheduledExecutor executor) {
+    return new DefaultWrapperRoutineBuilder(executor);
   }
 }

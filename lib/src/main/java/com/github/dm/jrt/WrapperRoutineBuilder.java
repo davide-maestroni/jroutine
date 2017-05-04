@@ -84,8 +84,7 @@ public interface WrapperRoutineBuilder extends ReflectionRoutineBuilder {
      * <br>
      * The proxy instance will be created through reflection.
      */
-    REFLECTION,
-    /**
+    REFLECTION, /**
      * Code generation strategy.
      * <br>
      * The proxy instance will be created through code generation.

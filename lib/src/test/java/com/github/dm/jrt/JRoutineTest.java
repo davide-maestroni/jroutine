@@ -18,30 +18,27 @@ package com.github.dm.jrt;
 
 import com.github.dm.jrt.WrapperRoutineBuilder.ProxyStrategyType;
 import com.github.dm.jrt.channel.io.ByteChannel.ByteChunk;
-import com.github.dm.jrt.channel.io.ByteChannel.ChunkInputStream;
-import com.github.dm.jrt.channel.io.ByteChannel.ChunkOutputStream;
-import com.github.dm.jrt.core.channel.AbortException;
+import com.github.dm.jrt.channel.io.ByteChannel.ByteChunkInputStream;
+import com.github.dm.jrt.channel.io.ByteChannel.ByteChunkOutputStream;
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.channel.TemplateChannelConsumer;
 import com.github.dm.jrt.core.config.ChannelConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.core.invocation.CallInvocation;
 import com.github.dm.jrt.core.invocation.CommandInvocation;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
-import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationException;
-import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.NullLog;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.DurationMeasure;
 import com.github.dm.jrt.function.util.BiConsumer;
+import com.github.dm.jrt.function.util.BiFunction;
 import com.github.dm.jrt.function.util.Consumer;
 import com.github.dm.jrt.function.util.Function;
 import com.github.dm.jrt.function.util.Predicate;
 import com.github.dm.jrt.function.util.Supplier;
-import com.github.dm.jrt.operator.JRoutineOperators;
+import com.github.dm.jrt.function.util.SupplierDecorator;
 import com.github.dm.jrt.proxy.annotation.Proxy;
 import com.github.dm.jrt.reflect.annotation.Alias;
 import com.github.dm.jrt.reflect.annotation.AsyncOutput;
@@ -53,18 +50,22 @@ import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.github.dm.jrt.core.executor.ScheduledExecutors.syncExecutor;
 import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
 import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
 import static com.github.dm.jrt.core.util.DurationMeasure.millis;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
-import static com.github.dm.jrt.function.Functions.constant;
-import static com.github.dm.jrt.function.Functions.functionMapping;
 import static com.github.dm.jrt.operator.JRoutineOperators.appendAccept;
+import static com.github.dm.jrt.operator.JRoutineOperators.average;
+import static com.github.dm.jrt.operator.JRoutineOperators.filter;
+import static com.github.dm.jrt.operator.JRoutineOperators.unary;
 import static com.github.dm.jrt.operator.sequence.Sequences.range;
+import static com.github.dm.jrt.reflect.InvocationTarget.classOfType;
 import static com.github.dm.jrt.reflect.InvocationTarget.instance;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
@@ -81,36 +82,66 @@ public class JRoutineTest {
 
     final DurationMeasure timeout = seconds(1);
     final TestClass test = new TestClass();
-    final Routine<Object, Object> routine = JRoutine.with(instance(test))
+    final Routine<Object, Object> routine = JRoutine.wrapperOn(syncExecutor())
                                                     .withInvocation()
-                                                    .withExecutor(ScheduledExecutors.syncExecutor())
                                                     .withMaxInvocations(1)
                                                     .withCoreInvocations(1)
                                                     .withOutputTimeoutAction(
                                                         TimeoutActionType.CONTINUE)
                                                     .withLogLevel(Level.DEBUG)
                                                     .withLog(new NullLog())
-                                                    .configured()
-                                                    .method(TestClass.GET);
+                                                    .configuration()
+                                                    .methodOf(instance(test), TestClass.GET);
     assertThat(routine.invoke().close().in(timeout).all()).containsExactly(-77L);
   }
 
   @Test
   public void testCallFunction() {
 
-    final Routine<String, String> routine = JRoutine.withCall(new Function<List<String>, String>() {
+    final Routine<String, String> routine1 =
+        JRoutine.<String, String, StringBuilder>stateful().onCreate(new Supplier<StringBuilder>() {
 
-      public String apply(final List<String> strings) {
+          public StringBuilder get() {
+            return new StringBuilder();
+          }
+        }).onNextState(new BiFunction<StringBuilder, String, StringBuilder>() {
 
-        final StringBuilder builder = new StringBuilder();
-        for (final String string : strings) {
-          builder.append(string);
-        }
+          public StringBuilder apply(final StringBuilder builder, final String s) {
+            return builder.append(s);
+          }
+        }).onCompleteOutput(new Function<StringBuilder, String>() {
 
-        return builder.toString();
-      }
-    }).buildRoutine();
-    assertThat(routine.invoke().pass("test", "1").close().in(seconds(1)).all()).containsOnly(
+          public String apply(final StringBuilder builder) {
+            return builder.toString();
+          }
+        }).routine();
+    assertThat(routine1.invoke().pass("test", "1").close().in(seconds(1)).all()).containsOnly(
+        "test1");
+
+    final Routine<String, String> routine2 =
+        JRoutine.<String, String, List<String>>statefulOn(syncExecutor()).onCreate(
+            new Supplier<List<String>>() {
+
+              public List<String> get() {
+                return new ArrayList<String>();
+              }
+            }).onNextConsume(new BiConsumer<List<String>, String>() {
+
+          public void accept(final List<String> list, final String s) {
+            list.add(s);
+          }
+        }).onCompleteOutput(new Function<List<String>, String>() {
+
+          public String apply(final List<String> strings) throws Exception {
+            final StringBuilder builder = new StringBuilder();
+            for (final String string : strings) {
+              builder.append(string);
+            }
+
+            return builder.toString();
+          }
+        }).routine();
+    assertThat(routine2.invoke().pass("test", "1").close().in(seconds(1)).all()).containsOnly(
         "test1");
   }
 
@@ -132,19 +163,16 @@ public class JRoutineTest {
       }
     };
 
-    final Routine<Integer, Integer> sumRoutine = JRoutine.with(factoryOf(execSum, this))
-                                                         .withInvocation()
-                                                         .withExecutor(ScheduledExecutors.syncExecutor())
-                                                         .configured()
-                                                         .buildRoutine();
+    final Routine<Integer, Integer> sumRoutine =
+        JRoutine.routineOn(syncExecutor()).of(factoryOf(execSum, this));
     final Routine<Integer, Integer> squareRoutine =
-        JRoutine.with(functionMapping(new Function<Integer, Integer>() {
+        JRoutine.routine().of(unary(new Function<Integer, Integer>() {
 
           public Integer apply(final Integer integer) {
             final int i = integer;
             return i * i;
           }
-        })).buildRoutine();
+        }));
 
     assertThat(sumRoutine.invoke()
                          .pass(squareRoutine.invoke().pass(1, 2, 3, 4).close())
@@ -156,13 +184,12 @@ public class JRoutineTest {
   @Test
   public void testClassStaticMethod() {
 
-    final TestStatic testStatic = JRoutine.withClassOfType(TestClass.class)
+    final TestStatic testStatic = JRoutine.wrapperOn(ScheduledExecutors.poolExecutor())
                                           .withInvocation()
-                                          .withExecutor(ScheduledExecutors.poolExecutor())
                                           .withLogLevel(Level.DEBUG)
                                           .withLog(new NullLog())
-                                          .configured()
-                                          .buildProxy(TestStatic.class);
+                                          .configuration()
+                                          .proxyOf(classOfType(TestClass.class), TestStatic.class);
     try {
       assertThat(testStatic.getOne().all()).containsExactly(1);
       fail();
@@ -177,22 +204,19 @@ public class JRoutineTest {
   @Test
   public void testCommandInvocation() {
 
-    final Routine<Void, String> routine = JRoutine.with(new GetString()).buildRoutine();
+    final Routine<Void, String> routine = JRoutine.routine().of(new GetString());
     assertThat(routine.invoke().close().in(seconds(1)).all()).containsOnly("test");
   }
 
   @Test
   public void testConcatReadOutput() throws IOException {
 
-    final Channel<ByteChunk, ByteChunk> channel = JRoutine.<ByteChunk>ofData().buildChannel();
-    final ChunkOutputStream stream = JRoutine.withOutput(channel)
-                                             .chunkStreamConfiguration()
-                                             .withChunkSize(3)
-                                             .apply()
-                                             .buildOutputStream();
+    final Channel<ByteChunk, ByteChunk> channel = JRoutine.channel().ofType();
+    final ByteChunkOutputStream stream =
+        JRoutine.outputStream().withStream().withChunkSize(3).configuration().of(channel);
     stream.write(new byte[]{31, 17, (byte) 155, 13});
     stream.flush();
-    final ChunkInputStream inputStream = JRoutine.getInputStream(channel.next(), channel.next());
+    final ByteChunkInputStream inputStream = JRoutine.inputStream(channel.next(), channel.next());
     final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     assertThat(inputStream.read(outputStream)).isEqualTo(3);
     assertThat(outputStream.size()).isEqualTo(3);
@@ -211,16 +235,13 @@ public class JRoutineTest {
   @Test
   public void testConcatReadOutput2() throws IOException {
 
-    final Channel<ByteChunk, ByteChunk> channel = JRoutine.<ByteChunk>ofData().buildChannel();
-    final ChunkOutputStream stream = JRoutine.withOutput(channel)
-                                             .chunkStreamConfiguration()
-                                             .withChunkSize(3)
-                                             .apply()
-                                             .buildOutputStream();
+    final Channel<ByteChunk, ByteChunk> channel = JRoutine.channelOn(syncExecutor()).ofType();
+    final ByteChunkOutputStream stream =
+        JRoutine.outputStream().withStream().withChunkSize(3).configuration().of(channel);
     stream.write(new byte[]{31, 17, (byte) 155, 13});
     stream.flush();
-    final ChunkInputStream inputStream =
-        JRoutine.getInputStream(channel.eventuallyContinue().all());
+    final ByteChunkInputStream inputStream =
+        JRoutine.inputStream(channel.eventuallyContinue().all());
     final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     assertThat(inputStream.read(outputStream)).isEqualTo(3);
     assertThat(outputStream.size()).isEqualTo(3);
@@ -255,69 +276,36 @@ public class JRoutineTest {
   public void testConsumerCommand() {
 
     final Routine<Void, String> routine =
-        JRoutine.withCommandConsumer(new Consumer<Channel<String, ?>>() {
+        JRoutine.<Void, String>stateless().onComplete(new Consumer<Channel<String, ?>>() {
 
           public void accept(final Channel<String, ?> result) {
 
             result.pass("test", "1");
           }
-        }).buildRoutine();
+        }).routine();
     assertThat(routine.invoke().close().in(seconds(1)).all()).containsOnly("test", "1");
-  }
-
-  @Test
-  public void testConsumerFunction() {
-
-    final Routine<String, String> routine =
-        JRoutine.withCallConsumer(new BiConsumer<List<String>, Channel<String, ?>>() {
-
-          public void accept(final List<String> strings, final Channel<String, ?> result) {
-
-            final StringBuilder builder = new StringBuilder();
-            for (final String string : strings) {
-              builder.append(string);
-            }
-
-            result.pass(builder.toString());
-          }
-        }).buildRoutine();
-    assertThat(routine.invoke().pass("test", "1").close().in(seconds(1)).all()).containsOnly(
-        "test1");
   }
 
   @Test
   public void testConsumerMapping() {
 
     final Routine<Object, String> routine =
-        JRoutine.withMappingConsumer(new BiConsumer<Object, Channel<String, ?>>() {
+        JRoutine.<Object, String>statelessOn(syncExecutor()).onNext(
+            new BiConsumer<Object, Channel<String, ?>>() {
 
-          public void accept(final Object o, final Channel<String, ?> result) {
+              public void accept(final Object o, final Channel<String, ?> result) {
 
-            result.pass(o.toString());
-          }
-        }).buildRoutine();
-    assertThat(routine.invoke().pass("test", 1).close().in(seconds(1)).all()).containsOnly("test",
-        "1");
-  }
-
-  @Test
-  public void testFunctionMapping() {
-
-    final Routine<Object, String> routine = JRoutine.withMapping(new Function<Object, String>() {
-
-      public String apply(final Object o) {
-
-        return o.toString();
-      }
-    }).buildRoutine();
+                result.pass(o.toString());
+              }
+            }).routine();
     assertThat(routine.invoke().pass("test", 1).close().in(seconds(1)).all()).containsOnly("test",
         "1");
   }
 
   @Test
   public void testInstance() {
-    assertThat(JRoutine.withInstance("test")
-                       .method("toString")
+    assertThat(JRoutine.wrapper()
+                       .methodOf(instance("test"), "toString")
                        .invoke()
                        .close()
                        .in(seconds(1))
@@ -327,44 +315,35 @@ public class JRoutineTest {
   @Test
   public void testInvocation() {
 
-    final Routine<String, String> routine =
-        JRoutine.with((Invocation<String, String>) new ToCase()).buildRoutine();
+    final Routine<String, String> routine = JRoutine.routine().ofSingleton(new ToCase());
     assertThat(routine.invoke().pass("TEST").close().in(seconds(1)).all()).containsOnly("test");
   }
 
   @Test
   public void testInvocationAndArgs() {
 
-    final Routine<String, String> routine = JRoutine.with(new ToCase(), true).buildRoutine();
+    final Routine<String, String> routine = JRoutine.routine().of(factoryOf(new ToCase(), true));
     assertThat(routine.invoke().pass("test").close().in(seconds(1)).all()).containsOnly("TEST");
   }
 
   @Test
   public void testInvocationClass() {
 
-    final Routine<String, String> routine = JRoutine.with(ToCase.class).buildRoutine();
+    final Routine<String, String> routine = JRoutine.routine().of(factoryOf(ToCase.class));
     assertThat(routine.invoke().pass("TEST").close().in(seconds(1)).all()).containsOnly("test");
   }
 
   @Test
   public void testInvocationClassAndArgs() {
 
-    final Routine<String, String> routine = JRoutine.with(ToCase.class, true).buildRoutine();
+    final Routine<String, String> routine = JRoutine.routine().of(factoryOf(ToCase.class, true));
     assertThat(routine.invoke().pass("test").close().in(seconds(1)).all()).containsOnly("TEST");
-  }
-
-  @Test
-  public void testInvocationFactory() {
-
-    final Routine<String, String> routine =
-        JRoutine.with((InvocationFactory<String, String>) new ToCase()).buildRoutine();
-    assertThat(routine.invoke().pass("TEST").close().in(seconds(1)).all()).containsOnly("test");
   }
 
   @Test
   public void testInvocationToken() {
 
-    final Routine<String, String> routine = JRoutine.with(tokenOf(ToCase.class)).buildRoutine();
+    final Routine<String, String> routine = JRoutine.routine().of(factoryOf(tokenOf(ToCase.class)));
     assertThat(routine.invoke().pass("TEST").close().in(seconds(1)).all()).containsOnly("test");
   }
 
@@ -372,14 +351,14 @@ public class JRoutineTest {
   public void testInvocationTokenAndArgs() {
 
     final Routine<String, String> routine =
-        JRoutine.with(tokenOf(ToCase.class), true).buildRoutine();
+        JRoutine.routine().of(factoryOf(tokenOf(ToCase.class), true));
     assertThat(routine.invoke().pass("test").close().in(seconds(1)).all()).containsOnly("TEST");
   }
 
   @Test
   public void testMappingInvocation() {
 
-    final Routine<String, String> routine = JRoutine.with(new ToCase()).buildRoutine();
+    final Routine<String, String> routine = JRoutine.routine().of(new ToCase());
     assertThat(routine.invoke().pass("TEST").close().in(seconds(1)).all()).containsOnly("test");
   }
 
@@ -387,14 +366,13 @@ public class JRoutineTest {
   public void testObjectStaticMethod() {
 
     final TestClass test = new TestClass();
-    final TestStatic testStatic = JRoutine.with(instance(test))
+    final TestStatic testStatic = JRoutine.wrapperOn(ScheduledExecutors.poolExecutor())
                                           .withStrategy(ProxyStrategyType.REFLECTION)
                                           .withInvocation()
-                                          .withExecutor(ScheduledExecutors.poolExecutor())
                                           .withLogLevel(Level.DEBUG)
                                           .withLog(new NullLog())
-                                          .configured()
-                                          .buildProxy(TestStatic.class);
+                                          .configuration()
+                                          .proxyOf(instance(test), TestStatic.class);
     assertThat(testStatic.getOne().all()).containsExactly(1);
     assertThat(testStatic.getTwo().all()).containsExactly(2);
   }
@@ -403,13 +381,12 @@ public class JRoutineTest {
   public void testObjectWrapAlias() {
 
     final TestClass test = new TestClass();
-    final Routine<Object, Object> routine = JRoutine.with(test)
+    final Routine<Object, Object> routine = JRoutine.wrapperOn(syncExecutor())
                                                     .withInvocation()
-                                                    .withExecutor(ScheduledExecutors.syncExecutor())
                                                     .withLogLevel(Level.DEBUG)
                                                     .withLog(new NullLog())
-                                                    .configured()
-                                                    .method(TestClass.GET);
+                                                    .configuration()
+                                                    .methodOf(instance(test), TestClass.GET);
     assertThat(routine.invoke().close().all()).containsExactly(-77L);
   }
 
@@ -417,14 +394,13 @@ public class JRoutineTest {
   public void testObjectWrapGeneratedProxy() {
 
     final TestClass test = new TestClass();
-    final TestStatic proxy = JRoutine.with(test)
+    final TestStatic proxy = JRoutine.wrapperOn(ScheduledExecutors.poolExecutor())
                                      .withStrategy(ProxyStrategyType.CODE_GENERATION)
                                      .withInvocation()
-                                     .withExecutor(ScheduledExecutors.poolExecutor())
                                      .withLogLevel(Level.DEBUG)
                                      .withLog(new NullLog())
-                                     .configured()
-                                     .buildProxy(TestStatic.class);
+                                     .configuration()
+                                     .proxyOf(instance(test), TestStatic.class);
     assertThat(proxy.getOne().all()).containsExactly(1);
   }
 
@@ -432,13 +408,12 @@ public class JRoutineTest {
   public void testObjectWrapGeneratedProxyToken() {
 
     final TestClass test = new TestClass();
-    final TestStatic proxy = JRoutine.with(test)
+    final TestStatic proxy = JRoutine.wrapperOn(ScheduledExecutors.poolExecutor())
                                      .withInvocation()
-                                     .withExecutor(ScheduledExecutors.poolExecutor())
                                      .withLogLevel(Level.DEBUG)
                                      .withLog(new NullLog())
-                                     .configured()
-                                     .buildProxy(tokenOf(TestStatic.class));
+                                     .configuration()
+                                     .proxyOf(instance(test), tokenOf(TestStatic.class));
     assertThat(proxy.getOne().all()).containsExactly(1);
   }
 
@@ -446,14 +421,12 @@ public class JRoutineTest {
   public void testObjectWrapMethod() throws NoSuchMethodException {
 
     final TestClass test = new TestClass();
-    final Routine<Object, Object> routine = JRoutine.with(test)
-                                                    .withInvocation()
-                                                    .withExecutor(ScheduledExecutors.syncExecutor())
-                                                    .configured()
-                                                    .wrapperConfiguration()
+    final Routine<Object, Object> routine = JRoutine.wrapperOn(syncExecutor())
+                                                    .withWrapper()
                                                     .withSharedFields()
-                                                    .apply()
-                                                    .method(TestClass.class.getMethod("getLong"));
+                                                    .configuration()
+                                                    .methodOf(instance(test),
+                                                        TestClass.class.getMethod("getLong"));
     assertThat(routine.invoke().close().all()).containsExactly(-77L);
   }
 
@@ -461,13 +434,12 @@ public class JRoutineTest {
   public void testObjectWrapMethodName() {
 
     final TestClass test = new TestClass();
-    final Routine<Object, Object> routine = JRoutine.with(test)
+    final Routine<Object, Object> routine = JRoutine.wrapperOn(syncExecutor())
                                                     .withInvocation()
-                                                    .withExecutor(ScheduledExecutors.syncExecutor())
                                                     .withLogLevel(Level.DEBUG)
                                                     .withLog(new NullLog())
-                                                    .configured()
-                                                    .method("getLong");
+                                                    .configuration()
+                                                    .methodOf(instance(test), "getLong");
     assertThat(routine.invoke().close().all()).containsExactly(-77L);
   }
 
@@ -475,13 +447,12 @@ public class JRoutineTest {
   public void testObjectWrapProxy() {
 
     final TestClass test = new TestClass();
-    final TestItf proxy = JRoutine.with(test)
+    final TestItf proxy = JRoutine.wrapperOn(ScheduledExecutors.poolExecutor())
                                   .withInvocation()
-                                  .withExecutor(ScheduledExecutors.poolExecutor())
                                   .withLogLevel(Level.DEBUG)
                                   .withLog(new NullLog())
-                                  .configured()
-                                  .buildProxy(TestItf.class);
+                                  .configuration()
+                                  .proxyOf(instance(test), TestItf.class);
     assertThat(proxy.getOne().all()).containsExactly(1);
   }
 
@@ -489,40 +460,40 @@ public class JRoutineTest {
   public void testObjectWrapProxyToken() {
 
     final TestClass test = new TestClass();
-    final TestItf proxy = JRoutine.with(test)
+    final TestItf proxy = JRoutine.wrapperOn(ScheduledExecutors.poolExecutor())
                                   .withInvocation()
-                                  .withExecutor(ScheduledExecutors.poolExecutor())
                                   .withLogLevel(Level.DEBUG)
                                   .withLog(new NullLog())
-                                  .configured()
-                                  .buildProxy(tokenOf(TestItf.class));
+                                  .configuration()
+                                  .proxyOf(instance(test), tokenOf(TestItf.class));
     assertThat(proxy.getOne().all()).containsExactly(1);
   }
 
   @Test
   public void testOf() {
-    final Channel<?, Integer> channel = JRoutine.of(2).buildChannel();
+    final Channel<?, Integer> channel = JRoutine.channel().of(2);
     assertThat(channel.isOpen()).isFalse();
     assertThat(channel.in(seconds(1)).all()).containsExactly(2);
-    assertThat(JRoutine.of().buildChannel().in(seconds(1)).all()).isEmpty();
-    assertThat(JRoutine.of(-11, 73).buildChannel().in(seconds(1)).all()).containsExactly(-11, 73);
+    assertThat(JRoutine.channel().of().in(seconds(1)).all()).isEmpty();
+    assertThat(JRoutine.channel().of(-11, 73).in(seconds(1)).all()).containsExactly(-11, 73);
     assertThat(
-        JRoutine.of(Arrays.asList(3, 12, -7)).buildChannel().in(seconds(1)).all()).containsExactly(
-        3, 12, -7);
-    assertThat(JRoutine.of((Object[]) null).buildChannel().all()).isEmpty();
-    assertThat(JRoutine.of((List<Object>) null).buildChannel().all()).isEmpty();
+        JRoutine.channel().of(Arrays.asList(3, 12, -7)).in(seconds(1)).all()).containsExactly(3, 12,
+        -7);
+    assertThat(JRoutine.channel().of((Object[]) null).all()).isEmpty();
+    assertThat(JRoutine.channel().of((List<Object>) null).all()).isEmpty();
   }
 
   @Test
   public void testPendingInputs() {
 
-    final Channel<Object, Object> channel = JRoutine.with(IdentityInvocation.factory()).invoke();
+    final Channel<Object, Object> channel =
+        JRoutine.routine().of(IdentityInvocation.factory()).invoke();
     assertThat(channel.isOpen()).isTrue();
     channel.pass("test");
     assertThat(channel.isOpen()).isTrue();
     channel.after(millis(500)).pass("test");
     assertThat(channel.isOpen()).isTrue();
-    final Channel<Object, Object> outputChannel = JRoutine.ofData().buildChannel();
+    final Channel<Object, Object> outputChannel = JRoutine.channelOn(syncExecutor()).ofType();
     channel.afterNoDelay().pass(outputChannel);
     assertThat(channel.isOpen()).isTrue();
     channel.close();
@@ -534,13 +505,13 @@ public class JRoutineTest {
   @Test
   public void testPredicateFilter() {
 
-    final Routine<String, String> routine = JRoutine.withFilter(new Predicate<String>() {
+    final Routine<String, String> routine = JRoutine.routine().of(filter(new Predicate<String>() {
 
       public boolean test(final String s) {
 
         return s.length() > 1;
       }
-    }).buildRoutine();
+    }));
     assertThat(routine.invoke().pass("test", "1").close().in(seconds(1)).all()).containsOnly(
         "test");
   }
@@ -549,16 +520,15 @@ public class JRoutineTest {
   public void testProxyConfiguration() {
 
     final TestClass test = new TestClass();
-    final TestItf proxy = JRoutine.with(test)
+    final TestItf proxy = JRoutine.wrapperOn(ScheduledExecutors.poolExecutor())
                                   .withInvocation()
-                                  .withExecutor(ScheduledExecutors.poolExecutor())
                                   .withLogLevel(Level.DEBUG)
                                   .withLog(new NullLog())
-                                  .configured()
-                                  .wrapperConfiguration()
+                                  .configuration()
+                                  .withWrapper()
                                   .withSharedFields()
-                                  .apply()
-                                  .buildProxy(TestItf.class);
+                                  .configuration()
+                                  .proxyOf(instance(test), TestItf.class);
     assertThat(proxy.getOne().all()).containsExactly(1);
   }
 
@@ -566,7 +536,7 @@ public class JRoutineTest {
   public void testProxyError() {
 
     try {
-      JRoutine.with(TestItf.class);
+      JRoutine.wrapper().proxyOf(classOfType(TestItf.class), TestItf.class);
       fail();
 
     } catch (final IllegalArgumentException ignored) {
@@ -577,11 +547,11 @@ public class JRoutineTest {
   @Test
   public void testReadAll() throws IOException {
 
-    final Channel<ByteChunk, ByteChunk> channel = JRoutine.<ByteChunk>ofData().buildChannel();
-    final ChunkOutputStream stream = JRoutine.withOutput(channel).buildOutputStream();
+    final Channel<ByteChunk, ByteChunk> channel = JRoutine.channel().ofType();
+    final ByteChunkOutputStream stream = JRoutine.outputStream().of(channel);
     stream.write(new byte[]{31, 17, (byte) 155, 13});
     stream.flush();
-    final ChunkInputStream inputStream = JRoutine.getInputStream(channel.next());
+    final ByteChunkInputStream inputStream = JRoutine.inputStream(channel.next());
     final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     assertThat(inputStream.readAll(outputStream)).isEqualTo(4);
     assertThat(outputStream.size()).isEqualTo(4);
@@ -595,208 +565,43 @@ public class JRoutineTest {
 
   @Test
   public void testStream() {
-    assertThat(JRoutine.<Integer>withStream().map(appendAccept(range(1, 1000)))
-                                             .map(new Function<Number, Double>() {
+    assertThat(JRoutine.streamOf(JRoutine.routine().of(appendAccept(range(1, 1000))))
+                       .map(JRoutine.routine().of(unary(new Function<Number, Double>() {
 
-                                               public Double apply(final Number number) {
-                                                 return Math.sqrt(number.doubleValue());
-                                               }
-                                             })
-                                             .sync()
-                                             .map(JRoutineOperators.average(Double.class))
-                                             .invoke()
-                                             .close()
-                                             .in(seconds(3))
-                                             .next()).isCloseTo(21, Offset.offset(0.1));
-  }
-
-  @Test
-  public void testStreamAccept() {
-    assertThat(
-        JRoutine.withStreamAccept(range(0, 3)).immediate().invoke().close().all()).containsExactly(
-        0, 1, 2, 3);
-    assertThat(JRoutine.withStreamAccept(2, range(1, 0))
-                       .immediate()
+                         public Double apply(final Number number) {
+                           return Math.sqrt(number.doubleValue());
+                         }
+                       })))
+                       .map(JRoutine.routineOn(syncExecutor()).of(average(Double.class)))
                        .invoke()
                        .close()
-                       .all()).containsExactly(1, 0, 1, 0);
-  }
-
-  @Test
-  public void testStreamAcceptAbort() {
-    Channel<Integer, Integer> channel = JRoutine.withStreamAccept(range(0, 3)).immediate().invoke();
-    assertThat(channel.abort()).isTrue();
-    assertThat(channel.getError()).isInstanceOf(AbortException.class);
-    channel = JRoutine.withStreamAccept(2, range(1, 0)).immediate().invoke();
-    assertThat(channel.abort()).isTrue();
-    assertThat(channel.getError()).isInstanceOf(AbortException.class);
-  }
-
-  @Test
-  @SuppressWarnings({"ConstantConditions", "ThrowableResultOfMethodCallIgnored"})
-  public void testStreamAcceptError() {
-    assertThat(JRoutine.withStreamAccept(range(0, 3))
-                       .immediate()
-                       .invoke()
-                       .pass(31)
-                       .close()
-                       .getError()
-                       .getCause()).isInstanceOf(IllegalStateException.class);
-    assertThat(JRoutine.withStreamAccept(2, range(1, 0))
-                       .immediate()
-                       .invoke()
-                       .pass(-17)
-                       .close()
-                       .getError()
-                       .getCause()).isInstanceOf(IllegalStateException.class);
-  }
-
-  @Test
-  public void testStreamGet() {
-    assertThat(JRoutine.withStreamGet(constant("test"))
-                       .immediate()
-                       .invoke()
-                       .close()
-                       .all()).containsExactly("test");
-    assertThat(JRoutine.withStreamGet(2, constant("test2"))
-                       .immediate()
-                       .invoke()
-                       .close()
-                       .all()).containsExactly("test2", "test2");
-  }
-
-  @Test
-  public void testStreamGetAbort() {
-    Channel<String, String> channel =
-        JRoutine.withStreamGet(constant("test")).immediate().immediate().invoke();
-    assertThat(channel.abort()).isTrue();
-    assertThat(channel.getError()).isInstanceOf(AbortException.class);
-    channel = JRoutine.withStreamGet(2, constant("test2")).immediate().invoke();
-    assertThat(channel.abort()).isTrue();
-    assertThat(channel.getError()).isInstanceOf(AbortException.class);
-  }
-
-  @Test
-  @SuppressWarnings({"ConstantConditions", "ThrowableResultOfMethodCallIgnored"})
-  public void testStreamGetError() {
-    assertThat(JRoutine.withStreamGet(constant("test"))
-                       .immediate()
-                       .invoke()
-                       .pass("test")
-                       .close()
-                       .getError()
-                       .getCause()).isInstanceOf(IllegalStateException.class);
-    assertThat(JRoutine.withStreamGet(2, constant("test2"))
-                       .immediate()
-                       .invoke()
-                       .pass("test")
-                       .close()
-                       .getError()
-                       .getCause()).isInstanceOf(IllegalStateException.class);
-  }
-
-  @Test
-  public void testStreamOf() {
-    assertThat(JRoutine.withStreamOf("test").immediate().invoke().close().all()).containsExactly(
-        "test");
-    assertThat(JRoutine.withStreamOf("test1", "test2", "test3")
-                       .immediate()
-                       .invoke()
-                       .close()
-                       .all()).containsExactly("test1", "test2", "test3");
-    assertThat(JRoutine.withStreamOf(Arrays.asList("test1", "test2", "test3"))
-                       .immediate()
-                       .invoke()
-                       .close()
-                       .all()).containsExactly("test1", "test2", "test3");
-    assertThat(JRoutine.withStreamOf(JRoutine.of("test1", "test2", "test3").buildChannel())
-                       .immediate()
-                       .invoke()
-                       .close()
-                       .all()).containsExactly("test1", "test2", "test3");
-  }
-
-  @Test
-  public void testStreamOfAbort() {
-    Channel<String, String> channel = JRoutine.withStreamOf("test").immediate().invoke();
-    assertThat(channel.abort()).isTrue();
-    assertThat(channel.getError()).isInstanceOf(AbortException.class);
-    channel = JRoutine.withStreamOf("test1", "test2", "test3").immediate().invoke();
-    assertThat(channel.abort()).isTrue();
-    assertThat(channel.getError()).isInstanceOf(AbortException.class);
-    channel = JRoutine.withStreamOf(Arrays.asList("test1", "test2", "test3")).immediate().invoke();
-    assertThat(channel.abort()).isTrue();
-    assertThat(channel.getError()).isInstanceOf(AbortException.class);
-    channel = JRoutine.withStreamOf(JRoutine.of("test1", "test2", "test3").buildChannel())
-                      .immediate()
-                      .invoke();
-    assertThat(channel.abort()).isTrue();
-    assertThat(channel.getError()).isInstanceOf(AbortException.class);
-  }
-
-  @Test
-  @SuppressWarnings({"ConstantConditions", "ThrowableResultOfMethodCallIgnored"})
-  public void testStreamOfError() {
-    assertThat(JRoutine.withStreamOf("test")
-                       .immediate()
-                       .invoke()
-                       .pass("test")
-                       .close()
-                       .getError()
-                       .getCause()).isInstanceOf(IllegalStateException.class);
-    assertThat(JRoutine.withStreamOf("test1", "test2", "test3")
-                       .immediate()
-                       .invoke()
-                       .pass("test")
-                       .close()
-                       .getError()
-                       .getCause()).isInstanceOf(IllegalStateException.class);
-    assertThat(JRoutine.withStreamOf(Arrays.asList("test1", "test2", "test3"))
-                       .immediate()
-                       .invoke()
-                       .pass("test")
-                       .close()
-                       .getError()
-                       .getCause()).isInstanceOf(IllegalStateException.class);
-    assertThat(JRoutine.withStreamOf(JRoutine.of("test1", "test2", "test3").buildChannel())
-                       .immediate()
-                       .invoke()
-                       .pass("test")
-                       .close()
-                       .getError()
-                       .getCause()).isInstanceOf(IllegalStateException.class);
-    assertThat(JRoutine.withStreamOf(
-        JRoutine.ofData().buildChannel().consume(new TemplateChannelConsumer<Object>() {}))
-                       .immediate()
-                       .invoke()
-                       .close()
-                       .getError()
-                       .getCause()).isInstanceOf(IllegalStateException.class);
+                       .in(seconds(3))
+                       .next()).isCloseTo(21, Offset.offset(0.1));
   }
 
   @Test
   public void testSupplierCommand() {
 
-    final Routine<Void, String> routine = JRoutine.withCommand(new Supplier<String>() {
+    final Routine<Void, String> routine =
+        JRoutine.<Void, String>stateless().onCompleteOutput(new Supplier<String>() {
 
-      public String get() {
-
-        return "test";
-      }
-    }).buildRoutine();
+          public String get() {
+            return "test";
+          }
+        }).routine();
     assertThat(routine.invoke().close().in(seconds(1)).all()).containsOnly("test");
   }
 
   @Test
   public void testSupplierFactory() {
 
-    final Routine<String, String> routine = JRoutine.withFactory(new Supplier<ToCase>() {
+    final Routine<String, String> routine =
+        JRoutine.routine().of(SupplierDecorator.factoryOf(new Supplier<ToCase>() {
 
-      public ToCase get() {
-
-        return new ToCase();
-      }
-    }).buildRoutine();
+          public ToCase get() {
+            return new ToCase();
+          }
+        }));
     assertThat(routine.invoke().pass("TEST").close().in(seconds(1)).all()).containsOnly("test");
   }
 
@@ -825,12 +630,10 @@ public class JRoutineTest {
      * Constructor.
      */
     protected GetString() {
-
       super(null);
     }
 
     public void onComplete(@NotNull final Channel<String, ?> result) {
-
       result.pass("test");
     }
   }
@@ -843,24 +646,20 @@ public class JRoutineTest {
     public static final String THROW = "throw";
 
     public static int getTwo() {
-
       return 2;
     }
 
     @Alias(GET)
     public long getLong() {
-
       return -77;
     }
 
     public int getOne() {
-
       return 1;
     }
 
     @Alias(THROW)
     public void throwException(final RuntimeException ex) {
-
       throw ex;
     }
   }
@@ -870,18 +669,15 @@ public class JRoutineTest {
     private final boolean mIsUpper;
 
     public ToCase() {
-
       this(false);
     }
 
     public ToCase(final boolean isUpper) {
-
       super(asArgs(isUpper));
       mIsUpper = isUpper;
     }
 
     public void onInput(final String input, @NotNull final Channel<String, ?> result) {
-
       result.pass(mIsUpper ? input.toUpperCase() : input.toLowerCase());
     }
   }

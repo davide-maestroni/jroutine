@@ -49,6 +49,6 @@
                                               .withInvocation()
                                               .withPatch(invocationConfiguration)
                                               ${routineBuilderOptions}
-                                              .configured()
+                                              .configuration()
                                               .of(new InvocationFactory${methodCount}${genericTypes}(wrapperConfiguration, target));
   }

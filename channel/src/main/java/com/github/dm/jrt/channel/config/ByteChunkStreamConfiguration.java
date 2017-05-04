@@ -40,7 +40,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * Created by davide-maestroni on 01/01/2017.
  */
 @SuppressWarnings("WeakerAccess")
-public class ChunkStreamConfiguration extends DeepEqualObject {
+public class ByteChunkStreamConfiguration extends DeepEqualObject {
 
   /**
    * Constant indicating the default value of an integer attribute.
@@ -49,7 +49,7 @@ public class ChunkStreamConfiguration extends DeepEqualObject {
 
   private static final DefaultConfigurable sDefaultConfigurable = new DefaultConfigurable();
 
-  private static final ChunkStreamConfiguration sDefaultConfiguration =
+  private static final ByteChunkStreamConfiguration sDefaultConfiguration =
       builder().buildConfiguration();
 
   private final int mChunkSize;
@@ -65,7 +65,7 @@ public class ChunkStreamConfiguration extends DeepEqualObject {
    * @param corePoolSize the core pool size.
    * @param closeAction  the close action.
    */
-  private ChunkStreamConfiguration(final int chunkSize, final int corePoolSize,
+  private ByteChunkStreamConfiguration(final int chunkSize, final int corePoolSize,
       @Nullable final CloseActionType closeAction) {
     super(asArgs(chunkSize, corePoolSize, closeAction));
     mChunkSize = chunkSize;
@@ -79,8 +79,8 @@ public class ChunkStreamConfiguration extends DeepEqualObject {
    * @return the builder.
    */
   @NotNull
-  public static Builder<ChunkStreamConfiguration> builder() {
-    return new Builder<ChunkStreamConfiguration>(sDefaultConfigurable);
+  public static Builder<ByteChunkStreamConfiguration> builder() {
+    return new Builder<ByteChunkStreamConfiguration>(sDefaultConfigurable);
   }
 
   /**
@@ -90,10 +90,10 @@ public class ChunkStreamConfiguration extends DeepEqualObject {
    * @return the builder.
    */
   @NotNull
-  public static Builder<ChunkStreamConfiguration> builderFrom(
-      @Nullable final ChunkStreamConfiguration initialConfiguration) {
+  public static Builder<ByteChunkStreamConfiguration> builderFrom(
+      @Nullable final ByteChunkStreamConfiguration initialConfiguration) {
     return (initialConfiguration == null) ? builder()
-        : new Builder<ChunkStreamConfiguration>(sDefaultConfigurable, initialConfiguration);
+        : new Builder<ByteChunkStreamConfiguration>(sDefaultConfigurable, initialConfiguration);
   }
 
   /**
@@ -102,7 +102,7 @@ public class ChunkStreamConfiguration extends DeepEqualObject {
    * @return the configuration instance.
    */
   @NotNull
-  public static ChunkStreamConfiguration defaultConfiguration() {
+  public static ByteChunkStreamConfiguration defaultConfiguration() {
     return sDefaultConfiguration;
   }
 
@@ -112,7 +112,7 @@ public class ChunkStreamConfiguration extends DeepEqualObject {
    * @return the builder.
    */
   @NotNull
-  public Builder<ChunkStreamConfiguration> builderFrom() {
+  public Builder<ByteChunkStreamConfiguration> builderFrom() {
     return builderFrom(this);
   }
 
@@ -192,7 +192,7 @@ public class ChunkStreamConfiguration extends DeepEqualObject {
      * @return the configurable instance.
      */
     @NotNull
-    TYPE withConfiguration(@NotNull ChunkStreamConfiguration configuration);
+    TYPE withConfiguration(@NotNull ByteChunkStreamConfiguration configuration);
   }
 
   /**
@@ -228,7 +228,7 @@ public class ChunkStreamConfiguration extends DeepEqualObject {
      * @param initialConfiguration the initial output stream configuration.
      */
     public Builder(@NotNull final Configurable<? extends TYPE> configurable,
-        @NotNull final ChunkStreamConfiguration initialConfiguration) {
+        @NotNull final ByteChunkStreamConfiguration initialConfiguration) {
       mConfigurable = ConstantConditions.notNull("configurable instance", configurable);
       setConfiguration(initialConfiguration);
     }
@@ -310,7 +310,7 @@ public class ChunkStreamConfiguration extends DeepEqualObject {
      * @return this builder.
      */
     @NotNull
-    public Builder<TYPE> withPatch(@Nullable final ChunkStreamConfiguration configuration) {
+    public Builder<TYPE> withPatch(@Nullable final ByteChunkStreamConfiguration configuration) {
       if (configuration == null) {
         return this;
       }
@@ -334,11 +334,11 @@ public class ChunkStreamConfiguration extends DeepEqualObject {
     }
 
     @NotNull
-    private ChunkStreamConfiguration buildConfiguration() {
-      return new ChunkStreamConfiguration(mChunkSize, mCorePoolSize, mCloseAction);
+    private ByteChunkStreamConfiguration buildConfiguration() {
+      return new ByteChunkStreamConfiguration(mChunkSize, mCorePoolSize, mCloseAction);
     }
 
-    private void setConfiguration(@NotNull final ChunkStreamConfiguration configuration) {
+    private void setConfiguration(@NotNull final ByteChunkStreamConfiguration configuration) {
       mChunkSize = configuration.mChunkSize;
       mCorePoolSize = configuration.mCorePoolSize;
       mCloseAction = configuration.mCloseAction;
@@ -348,11 +348,11 @@ public class ChunkStreamConfiguration extends DeepEqualObject {
   /**
    * Default configurable implementation.
    */
-  private static class DefaultConfigurable implements Configurable<ChunkStreamConfiguration> {
+  private static class DefaultConfigurable implements Configurable<ByteChunkStreamConfiguration> {
 
     @NotNull
-    public ChunkStreamConfiguration withConfiguration(
-        @NotNull final ChunkStreamConfiguration configuration) {
+    public ByteChunkStreamConfiguration withConfiguration(
+        @NotNull final ByteChunkStreamConfiguration configuration) {
       return configuration;
     }
   }

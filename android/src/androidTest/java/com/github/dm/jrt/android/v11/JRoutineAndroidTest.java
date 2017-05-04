@@ -38,8 +38,8 @@ import com.github.dm.jrt.android.proxy.annotation.ServiceProxy;
 import com.github.dm.jrt.android.reflect.ContextInvocationTarget;
 import com.github.dm.jrt.android.test.R;
 import com.github.dm.jrt.android.v11.stream.transform.LoaderTransformations;
-import com.github.dm.jrt.channel.io.ByteChannel.ChunkInputStream;
-import com.github.dm.jrt.channel.io.ByteChannel.ChunkOutputStream;
+import com.github.dm.jrt.channel.io.ByteChannel.ByteChunkInputStream;
+import com.github.dm.jrt.channel.io.ByteChannel.ByteChunkOutputStream;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.TemplateChannelConsumer;
@@ -248,14 +248,14 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
 
     final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
         JRoutineAndroid.<ParcelableByteChunk>ofData().buildChannel();
-    final ChunkOutputStream stream = JRoutineAndroid.withOutput(channel)
-                                                    .chunkStreamConfiguration()
-                                                    .withChunkSize(3)
-                                                    .apply()
-                                                    .buildOutputStream();
+    final ByteChunkOutputStream stream = JRoutineAndroid.withOutput(channel)
+                                                        .chunkStreamConfiguration()
+                                                        .withChunkSize(3)
+                                                        .apply()
+                                                        .buildOutputStream();
     stream.write(new byte[]{31, 17, (byte) 155, 13});
     stream.flush();
-    final ChunkInputStream inputStream =
+    final ByteChunkInputStream inputStream =
         JRoutineAndroid.getInputStream(channel.next(), channel.next());
     final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     assertThat(inputStream.read(outputStream)).isEqualTo(3);
@@ -279,14 +279,14 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
 
     final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
         JRoutineAndroid.<ParcelableByteChunk>ofData().buildChannel();
-    final ChunkOutputStream stream = JRoutineAndroid.withOutput(channel)
-                                                    .chunkStreamConfiguration()
-                                                    .withChunkSize(3)
-                                                    .apply()
-                                                    .buildOutputStream();
+    final ByteChunkOutputStream stream = JRoutineAndroid.withOutput(channel)
+                                                        .chunkStreamConfiguration()
+                                                        .withChunkSize(3)
+                                                        .apply()
+                                                        .buildOutputStream();
     stream.write(new byte[]{31, 17, (byte) 155, 13});
     stream.flush();
-    final ChunkInputStream inputStream =
+    final ByteChunkInputStream inputStream =
         JRoutineAndroid.getInputStream(channel.eventuallyContinue().all());
     final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     assertThat(inputStream.read(outputStream)).isEqualTo(3);
@@ -639,10 +639,10 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
 
     final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
         JRoutineAndroid.<ParcelableByteChunk>ofData().buildChannel();
-    final ChunkOutputStream stream = JRoutineAndroid.withOutput(channel).buildOutputStream();
+    final ByteChunkOutputStream stream = JRoutineAndroid.withOutput(channel).buildOutputStream();
     stream.write(new byte[]{31, 17, (byte) 155, 13});
     stream.flush();
-    final ChunkInputStream inputStream = JRoutineAndroid.getInputStream(channel.next());
+    final ByteChunkInputStream inputStream = JRoutineAndroid.getInputStream(channel.next());
     final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     assertThat(inputStream.readAll(outputStream)).isEqualTo(4);
     assertThat(outputStream.size()).isEqualTo(4);

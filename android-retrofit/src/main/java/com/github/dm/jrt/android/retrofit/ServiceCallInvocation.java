@@ -22,8 +22,8 @@ import com.github.dm.jrt.android.channel.io.ParcelableByteChannel;
 import com.github.dm.jrt.android.channel.io.ParcelableByteChannel.ParcelableByteChunk;
 import com.github.dm.jrt.android.core.invocation.AbstractContextInvocation;
 import com.github.dm.jrt.android.reflect.ContextInvocationTarget;
-import com.github.dm.jrt.channel.config.ChunkStreamConfiguration.CloseActionType;
-import com.github.dm.jrt.channel.io.ByteChannel.ChunkOutputStream;
+import com.github.dm.jrt.channel.config.ByteChunkStreamConfiguration.CloseActionType;
+import com.github.dm.jrt.channel.io.ByteChannel.ByteChunkOutputStream;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
@@ -188,12 +188,12 @@ public class ServiceCallInvocation
     final Channel<Object, ?> channel =
         AndroidChannels.parcelableFlowInput(result, ConverterChannelConsumer.BYTES_ID)
                        .buildChannel();
-    final ChunkOutputStream outputStream = ParcelableByteChannel.withOutput(channel)
-                                                                .chunkStreamConfiguration()
-                                                                .withOnClose(
+    final ByteChunkOutputStream outputStream = ParcelableByteChannel.withOutput(channel)
+                                                                    .chunkStreamConfiguration()
+                                                                    .withOnClose(
                                                                     CloseActionType.CLOSE_CHANNEL)
-                                                                .apply()
-                                                                .buildOutputStream();
+                                                                    .apply()
+                                                                    .buildOutputStream();
     try {
       outputStream.transferFrom(responseBody.byteStream());
 

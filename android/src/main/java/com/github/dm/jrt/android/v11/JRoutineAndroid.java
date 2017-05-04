@@ -29,7 +29,7 @@ import com.github.dm.jrt.android.core.ServiceContext;
 import com.github.dm.jrt.android.core.service.InvocationService;
 import com.github.dm.jrt.android.v11.channel.SparseChannels;
 import com.github.dm.jrt.android.v11.core.LoaderContext;
-import com.github.dm.jrt.channel.io.ByteChannel.ChunkInputStream;
+import com.github.dm.jrt.channel.io.ByteChannel.ByteChunkInputStream;
 import com.github.dm.jrt.core.builder.ChannelBuilder;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -75,7 +75,7 @@ public class JRoutineAndroid extends SparseChannels {
    *                                         of the specified buffers.
    */
   @NotNull
-  public static ChunkInputStream getInputStream(@NotNull final ParcelableByteChunk... buffers) {
+  public static ByteChunkInputStream getInputStream(@NotNull final ParcelableByteChunk... buffers) {
     return ParcelableByteChannel.getInputStream(buffers);
   }
 
@@ -91,7 +91,7 @@ public class JRoutineAndroid extends SparseChannels {
    *                                         of the specified buffers.
    */
   @NotNull
-  public static ChunkInputStream getInputStream(
+  public static ByteChunkInputStream getInputStream(
       @NotNull final Iterable<? extends ParcelableByteChunk> buffers) {
     return ParcelableByteChannel.getInputStream(buffers);
   }
@@ -107,7 +107,7 @@ public class JRoutineAndroid extends SparseChannels {
    *                                         specified buffer.
    */
   @NotNull
-  public static ChunkInputStream getInputStream(@NotNull final ParcelableByteChunk buffer) {
+  public static ByteChunkInputStream getInputStream(@NotNull final ParcelableByteChunk buffer) {
     return ParcelableByteChannel.getInputStream(buffer);
   }
 

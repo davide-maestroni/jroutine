@@ -19,7 +19,7 @@ package com.github.dm.jrt.android.retrofit;
 import com.github.dm.jrt.android.channel.ParcelableFlow;
 import com.github.dm.jrt.android.channel.io.ParcelableByteChannel;
 import com.github.dm.jrt.android.channel.io.ParcelableByteChannel.ParcelableByteChunk;
-import com.github.dm.jrt.channel.io.ByteChannel.ChunkInputStream;
+import com.github.dm.jrt.channel.io.ByteChannel.ByteChunkInputStream;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ChannelConsumer;
@@ -179,7 +179,7 @@ class ConverterChannelConsumer implements ChannelConsumer<ParcelableFlow<Object>
 
     private final Channel<ParcelableByteChunk, ParcelableByteChunk> mChannel;
 
-    private ChunkInputStream mInputStream;
+    private ByteChunkInputStream mInputStream;
 
     /**
      * Constructor.
@@ -209,7 +209,7 @@ class ConverterChannelConsumer implements ChannelConsumer<ParcelableFlow<Object>
           }
         }
 
-        final ChunkInputStream inputStream = mInputStream;
+        final ByteChunkInputStream inputStream = mInputStream;
         count = Math.min(byteCount, inputStream.available());
         sink.readFrom(inputStream, count);
         if (inputStream.available() == 0) {

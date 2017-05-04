@@ -16,10 +16,10 @@
 
 package com.github.dm.jrt.channel.io;
 
-import com.github.dm.jrt.channel.config.ChunkStreamConfigurable;
-import com.github.dm.jrt.channel.config.ChunkStreamConfiguration;
-import com.github.dm.jrt.channel.config.ChunkStreamConfiguration.Builder;
-import com.github.dm.jrt.channel.config.ChunkStreamConfiguration.CloseActionType;
+import com.github.dm.jrt.channel.config.ByteChunkStreamConfigurable;
+import com.github.dm.jrt.channel.config.ByteChunkStreamConfiguration;
+import com.github.dm.jrt.channel.config.ByteChunkStreamConfiguration.Builder;
+import com.github.dm.jrt.channel.config.ByteChunkStreamConfiguration.CloseActionType;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.SimpleQueue;
@@ -39,7 +39,7 @@ import java.util.ArrayList;
  * <pre><code>
  * public void onInput(final IN in, final Channel&lt;ByteChunk, ?&gt; result) {
  *   ...
- *   final ChunkOutputStream outputStream = ByteChannel.outputStream().of(result);
+ *   final ByteChunkOutputStream outputStream = ByteChannel.outputStream().of(result);
  *   ...
  * }
  * </code></pre>
@@ -48,7 +48,7 @@ import java.util.ArrayList;
  * <pre><code>
  * public void onInput(final ByteChunk chunk, final Channel&lt;OUT, ?&gt; result) {
  *   ...
- *   final ChunkInputStream inputStream = ByteChannel.inputStream(chunk);
+ *   final ByteChunkInputStream inputStream = ByteChannel.inputStream(chunk);
  *   ...
  * }
  * </code></pre>
@@ -72,7 +72,7 @@ public class ByteChannel {
 
   private final SimpleQueue<ByteChunk> mChunkPool;
 
-  private final ChunkStreamConfiguration mConfiguration;
+  private final ByteChunkStreamConfiguration mConfiguration;
 
   private final int mCorePoolSize;
 
@@ -83,7 +83,7 @@ public class ByteChannel {
    *
    * @param configuration the output stream configuration.
    */
-  private ByteChannel(@NotNull final ChunkStreamConfiguration configuration) {
+  private ByteChannel(@NotNull final ByteChunkStreamConfiguration configuration) {
     mConfiguration = configuration;
     mDataChunkSize = configuration.getChunkSizeOrElse(DEFAULT_CHUNK_SIZE);
     final int poolSize = (mCorePoolSize = configuration.getCorePoolSizeOrElse(DEFAULT_POOL_SIZE));
@@ -101,8 +101,8 @@ public class ByteChannel {
    *                                         of the specified chunks.
    */
   @NotNull
-  public static ChunkInputStream inputStream(@NotNull final ByteChunk... chunks) {
-    return new MultiChunkInputStream(chunks);
+  public static ByteChunkInputStream inputStream(@NotNull final ByteChunk... chunks) {
+    return new MultiByteChunkInputStream(chunks);
   }
 
   /**
@@ -116,8 +116,9 @@ public class ByteChannel {
    *                                         of the specified chunks.
    */
   @NotNull
-  public static ChunkInputStream inputStream(@NotNull final Iterable<? extends ByteChunk> chunks) {
-    return new MultiChunkInputStream(chunks);
+  public static ByteChunkInputStream inputStream(
+      @NotNull final Iterable<? extends ByteChunk> chunks) {
+    return new MultiByteChunkInputStream(chunks);
   }
 
   /**
@@ -131,7 +132,7 @@ public class ByteChannel {
    *                                         specified chunk.
    */
   @NotNull
-  public static ChunkInputStream inputStream(@NotNull final ByteChunk chunk) {
+  public static ByteChunkInputStream inputStream(@NotNull final ByteChunk chunk) {
     return chunk.getStream();
   }
 
@@ -143,8 +144,8 @@ public class ByteChannel {
    * @return the output stream builder.
    */
   @NotNull
-  public static ChunkOutputStreamBuilder outputStream() {
-    return new DefaultChunkOutputStreamBuilder();
+  public static ByteChunkOutputStreamBuilder outputStream() {
+    return new DefaultByteChunkOutputStreamBuilder();
   }
 
   private static boolean outOfBound(final int off, final int len, final int bytes) {
@@ -169,8 +170,8 @@ public class ByteChannel {
   }
 
   @NotNull
-  private ChunkOutputStream outputStream(@NotNull final Channel<? super ByteChunk, ?> channel) {
-    return new DefaultChunkOutputStream(mConfiguration, channel);
+  private ByteChunkOutputStream outputStream(@NotNull final Channel<? super ByteChunk, ?> channel) {
+    return new DefaultByteChunkOutputStream(mConfiguration, channel);
   }
 
   private void release(@NotNull final ByteChunk chunk) {
@@ -196,8 +197,8 @@ public class ByteChannel {
   /**
    * Interface defining a builder of chunk output streams.
    */
-  public interface ChunkOutputStreamBuilder
-      extends ChunkStreamConfigurable<ChunkOutputStreamBuilder> {
+  public interface ByteChunkOutputStreamBuilder
+      extends ByteChunkStreamConfigurable<ByteChunkOutputStreamBuilder> {
 
     /**
      * Builds a new output stream instance.
@@ -205,13 +206,13 @@ public class ByteChannel {
      * @return the output stream instance.
      */
     @NotNull
-    ChunkOutputStream of(@NotNull Channel<? super ByteChunk, ?> channel);
+    ByteChunkOutputStream of(@NotNull Channel<? super ByteChunk, ?> channel);
   }
 
   /**
    * Input stream used to read the data contained in a chunk instance.
    */
-  public static abstract class ChunkInputStream extends InputStream {
+  public static abstract class ByteChunkInputStream extends InputStream {
 
     /**
      * Reads some bytes from the input stream and writes them into the specified output stream.
@@ -321,7 +322,7 @@ public class ByteChannel {
   /**
    * Output stream used to write data into the chunk channel.
    */
-  public static abstract class ChunkOutputStream extends OutputStream {
+  public static abstract class ByteChunkOutputStream extends OutputStream {
 
     /**
      * Transfers all the bytes from the specified input stream and close it.
@@ -417,43 +418,43 @@ public class ByteChannel {
   /**
    * Default implementation of an output stream builder.
    */
-  private static class DefaultChunkOutputStreamBuilder implements ChunkOutputStreamBuilder {
+  private static class DefaultByteChunkOutputStreamBuilder implements ByteChunkOutputStreamBuilder {
 
-    private ChunkStreamConfiguration mConfiguration =
-        ChunkStreamConfiguration.defaultConfiguration();
+    private ByteChunkStreamConfiguration mConfiguration =
+        ByteChunkStreamConfiguration.defaultConfiguration();
 
     /**
      * Constructor.
      */
-    private DefaultChunkOutputStreamBuilder() {
+    private DefaultByteChunkOutputStreamBuilder() {
     }
 
     @NotNull
-    public ChunkOutputStream of(@NotNull final Channel<? super ByteChunk, ?> channel) {
+    public ByteChunkOutputStream of(@NotNull final Channel<? super ByteChunk, ?> channel) {
       return new ByteChannel(mConfiguration).outputStream(channel);
     }
 
     @NotNull
-    public ChunkOutputStreamBuilder withConfiguration(
-        @NotNull final ChunkStreamConfiguration configuration) {
+    public ByteChunkOutputStreamBuilder withConfiguration(
+        @NotNull final ByteChunkStreamConfiguration configuration) {
       mConfiguration = ConstantConditions.notNull("output stream configuration", configuration);
       return this;
     }
 
     @NotNull
-    public Builder<? extends ChunkOutputStreamBuilder> withStream() {
-      return new Builder<ChunkOutputStreamBuilder>(this, mConfiguration);
+    public Builder<? extends ByteChunkOutputStreamBuilder> withStream() {
+      return new Builder<ByteChunkOutputStreamBuilder>(this, mConfiguration);
     }
   }
 
   /**
    * Input stream returning the concatenation of a collection of byte chunk data.
    */
-  private static class MultiChunkInputStream extends ChunkInputStream {
+  private static class MultiByteChunkInputStream extends ByteChunkInputStream {
 
     private final Object mMutex = new Object();
 
-    private final ArrayList<ChunkInputStream> mStreams;
+    private final ArrayList<ByteChunkInputStream> mStreams;
 
     private int mIndex;
 
@@ -464,9 +465,9 @@ public class ByteChannel {
      *
      * @param chunks the array of byte chunks whose data have to be concatenated.
      */
-    private MultiChunkInputStream(@NotNull final ByteChunk[] chunks) {
-      final ArrayList<ChunkInputStream> streams =
-          (mStreams = new ArrayList<ChunkInputStream>(chunks.length));
+    private MultiByteChunkInputStream(@NotNull final ByteChunk[] chunks) {
+      final ArrayList<ByteChunkInputStream> streams =
+          (mStreams = new ArrayList<ByteChunkInputStream>(chunks.length));
       for (final ByteChunk chunk : chunks) {
         streams.add(chunk.getStream());
       }
@@ -477,8 +478,9 @@ public class ByteChannel {
      *
      * @param chunks the list of byte chunks whose data have to be concatenated.
      */
-    private MultiChunkInputStream(@NotNull final Iterable<? extends ByteChunk> chunks) {
-      final ArrayList<ChunkInputStream> streams = (mStreams = new ArrayList<ChunkInputStream>());
+    private MultiByteChunkInputStream(@NotNull final Iterable<? extends ByteChunk> chunks) {
+      final ArrayList<ByteChunkInputStream> streams =
+          (mStreams = new ArrayList<ByteChunkInputStream>());
       for (final ByteChunk chunk : chunks) {
         streams.add(chunk.getStream());
       }
@@ -487,7 +489,7 @@ public class ByteChannel {
     @Override
     public int read(@NotNull final OutputStream out) throws IOException {
       synchronized (mMutex) {
-        final ArrayList<ChunkInputStream> streams = mStreams;
+        final ArrayList<ByteChunkInputStream> streams = mStreams;
         final int size = streams.size();
         if (mIndex >= size) {
           return -1;
@@ -515,7 +517,7 @@ public class ByteChannel {
       synchronized (mMutex) {
         int count = 0;
         while (count < limit) {
-          final ArrayList<ChunkInputStream> streams = mStreams;
+          final ArrayList<ByteChunkInputStream> streams = mStreams;
           final int size = streams.size();
           if (mIndex >= size) {
             return (count > 0) ? count : -1;
@@ -540,7 +542,7 @@ public class ByteChannel {
     @Override
     public int read() {
       synchronized (mMutex) {
-        final ArrayList<ChunkInputStream> streams = mStreams;
+        final ArrayList<ByteChunkInputStream> streams = mStreams;
         final int size = streams.size();
         if (mIndex >= size) {
           return -1;
@@ -567,7 +569,7 @@ public class ByteChannel {
       }
 
       synchronized (mMutex) {
-        final ArrayList<ChunkInputStream> streams = mStreams;
+        final ArrayList<ByteChunkInputStream> streams = mStreams;
         final int size = streams.size();
         if (mIndex >= size) {
           return -1;
@@ -604,7 +606,7 @@ public class ByteChannel {
       }
 
       synchronized (mMutex) {
-        final ArrayList<ChunkInputStream> streams = mStreams;
+        final ArrayList<ByteChunkInputStream> streams = mStreams;
         final int size = streams.size();
         if (mIndex >= size) {
           return -1;
@@ -634,7 +636,7 @@ public class ByteChannel {
     @Override
     public long skip(final long n) {
       synchronized (mMutex) {
-        final ArrayList<ChunkInputStream> streams = mStreams;
+        final ArrayList<ByteChunkInputStream> streams = mStreams;
         final int size = streams.size();
         if (mIndex >= size) {
           return 0;
@@ -665,7 +667,7 @@ public class ByteChannel {
     public int available() {
       int available = 0;
       synchronized (mMutex) {
-        final ArrayList<ChunkInputStream> streams = mStreams;
+        final ArrayList<ByteChunkInputStream> streams = mStreams;
         final int size = streams.size();
         for (int i = mIndex; i < size; ++i) {
           available += streams.get(i).available();
@@ -678,7 +680,7 @@ public class ByteChannel {
     @Override
     public void close() {
       synchronized (mMutex) {
-        for (final ChunkInputStream stream : mStreams) {
+        for (final ByteChunkInputStream stream : mStreams) {
           stream.close();
         }
       }
@@ -696,7 +698,7 @@ public class ByteChannel {
     public void reset() {
       synchronized (mMutex) {
         final int index = (mIndex = mMarkIndex);
-        final ArrayList<ChunkInputStream> streams = mStreams;
+        final ArrayList<ByteChunkInputStream> streams = mStreams;
         streams.get(index).reset();
         final int size = streams.size();
         for (int i = index + 1; i < size; ++i) {
@@ -716,9 +718,9 @@ public class ByteChannel {
    * <p>
    * Chunk instances are managed by the owning byte channel and recycled when released, in order
    * to minimize memory consumption. Byte chunks are automatically acquired by
-   * {@code ChunkOutputStream}s and passed to the underlying channel.
+   * {@code ByteChunkOutputStream}s and passed to the underlying channel.
    * <br>
-   * The data contained in a chunk can be read through the dedicated {@code ChunkInputStream}
+   * The data contained in a chunk can be read through the dedicated {@code ByteChunkInputStream}
    * returned by one of the {@code ByteChannel.inputStream()} methods. Note that only one input
    * stream can be created for each chunk, any further attempt will generate an exception.
    * <br>
@@ -734,7 +736,7 @@ public class ByteChannel {
 
     private final Object mMutex = new Object();
 
-    private final DefaultChunkInputStream mStream;
+    private final DefaultByteChunkInputStream mStream;
 
     private int mSize;
 
@@ -756,7 +758,7 @@ public class ByteChannel {
      */
     private ByteChunk(final byte[] buffer) {
       mBuffer = buffer;
-      mStream = new DefaultChunkInputStream(this);
+      mStream = new DefaultByteChunkInputStream(this);
     }
 
     @Override
@@ -833,7 +835,7 @@ public class ByteChannel {
     }
 
     @NotNull
-    private ChunkInputStream getStream() {
+    private ByteChunkInputStream getStream() {
       synchronized (mMutex) {
         changeState(ChunkState.TRANSFER, ChunkState.READ,
             "attempting to get chunk stream while in illegal state");
@@ -884,7 +886,7 @@ public class ByteChannel {
   /**
    * Default chunk input stream implementation.
    */
-  private class DefaultChunkInputStream extends ChunkInputStream {
+  private class DefaultByteChunkInputStream extends ByteChunkInputStream {
 
     private final ByteChunk mChunk;
 
@@ -901,7 +903,7 @@ public class ByteChannel {
      *
      * @param chunk the internal chunk.
      */
-    private DefaultChunkInputStream(@NotNull final ByteChunk chunk) {
+    private DefaultByteChunkInputStream(@NotNull final ByteChunk chunk) {
       mChunk = chunk;
     }
 
@@ -1046,7 +1048,7 @@ public class ByteChannel {
   /**
    * Default chunk output stream implementation.
    */
-  private class DefaultChunkOutputStream extends ChunkOutputStream {
+  private class DefaultByteChunkOutputStream extends ByteChunkOutputStream {
 
     private final Channel<? super ByteChunk, ?> mChannel;
 
@@ -1066,7 +1068,7 @@ public class ByteChannel {
      * @param configuration the output stream configuration.
      * @param channel       the channel to which pass the data.
      */
-    private DefaultChunkOutputStream(@NotNull final ChunkStreamConfiguration configuration,
+    private DefaultByteChunkOutputStream(@NotNull final ByteChunkStreamConfiguration configuration,
         @NotNull final Channel<? super ByteChunk, ?> channel) {
       mChannel = ConstantConditions.notNull("channel instance", channel);
       mCloseAction = configuration.getCloseActionTypeOrElse(CloseActionType.CLOSE_STREAM);

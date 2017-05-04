@@ -16,8 +16,8 @@
 
 package com.github.dm.jrt.channel.config;
 
-import com.github.dm.jrt.channel.config.ChunkStreamConfiguration.Builder;
-import com.github.dm.jrt.channel.config.ChunkStreamConfiguration.Configurable;
+import com.github.dm.jrt.channel.config.ByteChunkStreamConfiguration.Builder;
+import com.github.dm.jrt.channel.config.ByteChunkStreamConfiguration.Configurable;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -28,7 +28,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <TYPE> the object type.
  */
-public interface ChunkStreamConfigurable<TYPE> extends Configurable<TYPE> {
+public interface ByteChunkStreamConfigurable<TYPE> extends Configurable<TYPE> {
 
   /**
    * Gets the output stream configuration builder related to the instance.

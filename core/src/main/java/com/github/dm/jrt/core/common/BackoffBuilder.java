@@ -39,7 +39,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
 @SuppressWarnings("WeakerAccess")
 public class BackoffBuilder {
 
-  private static final BaseBackoff sNoDelay = new BaseBackoff(null) {
+  private static final DefaultBackoff sNoDelay = new DefaultBackoff(null) {
 
     public long getDelay(final int count) {
       return NO_DELAY;
@@ -77,7 +77,7 @@ public class BackoffBuilder {
    * @return the backoff instance.
    */
   @NotNull
-  public static BaseBackoff noDelay() {
+  public static DefaultBackoff noDelay() {
     return sNoDelay;
   }
 
@@ -92,7 +92,7 @@ public class BackoffBuilder {
    * @throws java.lang.IllegalArgumentException if the delay is negative.
    */
   @NotNull
-  public BaseBackoff constantDelay(final long value, @NotNull final TimeUnit unit) {
+  public DefaultBackoff constantDelay(final long value, @NotNull final TimeUnit unit) {
     return new ConstantBackoff(mCount, unit.toMillis(value));
   }
 
@@ -105,7 +105,7 @@ public class BackoffBuilder {
    * @return the backoff instance.
    */
   @NotNull
-  public BaseBackoff constantDelay(@NotNull final DurationMeasure delay) {
+  public DefaultBackoff constantDelay(@NotNull final DurationMeasure delay) {
     return new ConstantBackoff(mCount, delay.toMillis());
   }
 
@@ -120,7 +120,7 @@ public class BackoffBuilder {
    * @throws java.lang.IllegalArgumentException if the delay is negative.
    */
   @NotNull
-  public BaseBackoff exponentialDelay(final long value, @NotNull final TimeUnit unit) {
+  public DefaultBackoff exponentialDelay(final long value, @NotNull final TimeUnit unit) {
     return new ExponentialBackoff(mCount, unit.toMillis(value));
   }
 
@@ -133,7 +133,7 @@ public class BackoffBuilder {
    * @return the backoff instance.
    */
   @NotNull
-  public BaseBackoff exponentialDelay(@NotNull final DurationMeasure delay) {
+  public DefaultBackoff exponentialDelay(@NotNull final DurationMeasure delay) {
     return new ExponentialBackoff(mCount, delay.toMillis());
   }
 
@@ -150,7 +150,7 @@ public class BackoffBuilder {
    * @throws java.lang.IllegalArgumentException if the delay is negative.
    */
   @NotNull
-  public BaseBackoff jitterDelay(final long value, @NotNull final TimeUnit unit) {
+  public DefaultBackoff jitterDelay(final long value, @NotNull final TimeUnit unit) {
     return new DecorrelatedJitterBackoff(mCount, unit.toMillis(value));
   }
 
@@ -165,7 +165,7 @@ public class BackoffBuilder {
    * @return the backoff instance.
    */
   @NotNull
-  public BaseBackoff jitterDelay(@NotNull final DurationMeasure delay) {
+  public DefaultBackoff jitterDelay(@NotNull final DurationMeasure delay) {
     return new DecorrelatedJitterBackoff(mCount, delay.toMillis());
   }
 
@@ -180,7 +180,7 @@ public class BackoffBuilder {
    * @throws java.lang.IllegalArgumentException if the delay is negative.
    */
   @NotNull
-  public BaseBackoff linearDelay(final long value, @NotNull final TimeUnit unit) {
+  public DefaultBackoff linearDelay(final long value, @NotNull final TimeUnit unit) {
     return new LinearBackoff(mCount, unit.toMillis(value));
   }
 
@@ -193,21 +193,21 @@ public class BackoffBuilder {
    * @return the backoff instance.
    */
   @NotNull
-  public BaseBackoff linearDelay(@NotNull final DurationMeasure delay) {
+  public DefaultBackoff linearDelay(@NotNull final DurationMeasure delay) {
     return new LinearBackoff(mCount, delay.toMillis());
   }
 
   /**
    * Base backoff policy implementation.
    */
-  public static abstract class BaseBackoff extends DeepEqualObject implements Backoff {
+  public static abstract class DefaultBackoff extends DeepEqualObject implements Backoff {
 
     /**
      * Constructor.
      *
      * @param args the constructor arguments.
      */
-    private BaseBackoff(@Nullable final Object[] args) {
+    private DefaultBackoff(@Nullable final Object[] args) {
       super(args);
     }
 
@@ -219,7 +219,7 @@ public class BackoffBuilder {
      * @throws java.lang.IllegalArgumentException if the delay is negative.
      */
     @NotNull
-    public BaseBackoff cappedTo(@NotNull final DurationMeasure delay) {
+    public DefaultBackoff cappedTo(@NotNull final DurationMeasure delay) {
       return new CappedBackoff(this, delay.toMillis());
     }
 
@@ -232,7 +232,7 @@ public class BackoffBuilder {
      * @throws java.lang.IllegalArgumentException if the delay is negative.
      */
     @NotNull
-    public BaseBackoff cappedTo(final long value, @NotNull final TimeUnit unit) {
+    public DefaultBackoff cappedTo(final long value, @NotNull final TimeUnit unit) {
       return new CappedBackoff(this, unit.toMillis(value));
     }
 
@@ -247,7 +247,7 @@ public class BackoffBuilder {
      * @return the summed backoff policy.
      */
     @NotNull
-    public BaseBackoff plus(@NotNull final Backoff backoff) {
+    public DefaultBackoff plus(@NotNull final Backoff backoff) {
       return new SummedBackoff(this, backoff);
     }
 
@@ -260,7 +260,7 @@ public class BackoffBuilder {
      * @throws java.lang.IllegalArgumentException if the percentage is outside the [0, 1] range.
      */
     @NotNull
-    public BaseBackoff withJitter(final float percentage) {
+    public DefaultBackoff withJitter(final float percentage) {
       return new JitterBackoff(this, percentage);
     }
   }
@@ -268,7 +268,7 @@ public class BackoffBuilder {
   /**
    * Capped delay backoff policy.
    */
-  private static class CappedBackoff extends BaseBackoff {
+  private static class CappedBackoff extends DefaultBackoff {
 
     private final Backoff mBackoff;
 
@@ -294,7 +294,7 @@ public class BackoffBuilder {
   /**
    * Constant backoff policy.
    */
-  private static class ConstantBackoff extends BaseBackoff {
+  private static class ConstantBackoff extends DefaultBackoff {
 
     private final long mDelay;
 
@@ -325,7 +325,7 @@ public class BackoffBuilder {
   /**
    * De-correlated jitter backoff.
    */
-  private static class DecorrelatedJitterBackoff extends BaseBackoff {
+  private static class DecorrelatedJitterBackoff extends DefaultBackoff {
 
     private final long mDelay;
 
@@ -364,7 +364,7 @@ public class BackoffBuilder {
   /**
    * Exponentially increasing backoff policy.
    */
-  private static class ExponentialBackoff extends BaseBackoff {
+  private static class ExponentialBackoff extends DefaultBackoff {
 
     private final long mDelay;
 
@@ -395,7 +395,7 @@ public class BackoffBuilder {
   /**
    * Backoff policy with jitter addition.
    */
-  private static class JitterBackoff extends BaseBackoff {
+  private static class JitterBackoff extends DefaultBackoff {
 
     private final Backoff mBackoff;
 
@@ -435,7 +435,7 @@ public class BackoffBuilder {
   /**
    * Linearly increasing backoff policy.
    */
-  private static class LinearBackoff extends BaseBackoff {
+  private static class LinearBackoff extends DefaultBackoff {
 
     private final long mDelay;
 
@@ -466,7 +466,7 @@ public class BackoffBuilder {
   /**
    * Summed backoff policy.
    */
-  private static class SummedBackoff extends BaseBackoff {
+  private static class SummedBackoff extends DefaultBackoff {
 
     private final Backoff mBackoff;
 

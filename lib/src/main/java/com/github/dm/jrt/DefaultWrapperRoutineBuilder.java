@@ -17,6 +17,7 @@
 package com.github.dm.jrt;
 
 import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.executor.ScheduledExecutor;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -40,7 +41,7 @@ import java.lang.reflect.Method;
  */
 class DefaultWrapperRoutineBuilder implements WrapperRoutineBuilder {
 
-  private final InvocationTarget<?> mTarget;
+  private final ScheduledExecutor mExecutor;
 
   private InvocationConfiguration mInvocationConfiguration =
       InvocationConfiguration.defaultConfiguration();
@@ -52,42 +53,79 @@ class DefaultWrapperRoutineBuilder implements WrapperRoutineBuilder {
   /**
    * Constructor.
    *
-   * @param target the invocation target.
-   * @throws java.lang.IllegalArgumentException if the class of specified target represents an
-   *                                            interface.
+   * @param executor the executor instance.
    */
-  DefaultWrapperRoutineBuilder(@NotNull final InvocationTarget<?> target) {
-    final Class<?> targetClass = target.getTargetClass();
-    if (targetClass.isInterface()) {
-      throw new IllegalArgumentException(
-          "the target class must not be an interface: " + targetClass.getName());
-    }
-
-    mTarget = target;
+  DefaultWrapperRoutineBuilder(@NotNull final ScheduledExecutor executor) {
+    mExecutor = ConstantConditions.notNull("executor instance", executor);
   }
 
   @NotNull
-  public WrapperRoutineBuilder withConfiguration(@NotNull final InvocationConfiguration configuration) {
+  public <IN, OUT> Routine<IN, OUT> methodOf(@NotNull final InvocationTarget<?> target,
+      @NotNull final String name) {
+    return newReflectionBuilder().methodOf(target, name);
+  }
+
+  @NotNull
+  public <IN, OUT> Routine<IN, OUT> methodOf(@NotNull final InvocationTarget<?> target,
+      @NotNull final String name, @NotNull final Class<?>... parameterTypes) {
+    return newReflectionBuilder().methodOf(target, name, parameterTypes);
+  }
+
+  @NotNull
+  public <IN, OUT> Routine<IN, OUT> methodOf(@NotNull final InvocationTarget<?> target,
+      @NotNull final Method method) {
+    return newReflectionBuilder().methodOf(target, method);
+  }
+
+  @NotNull
+  public <TYPE> TYPE proxyOf(@NotNull final InvocationTarget<?> target,
+      @NotNull final ClassToken<TYPE> itf) {
+    return proxyOf(target, itf.getRawClass());
+  }
+
+  @NotNull
+  public <TYPE> TYPE proxyOf(@NotNull final InvocationTarget<?> target,
+      @NotNull final Class<TYPE> itf) {
+    final ProxyStrategyType proxyStrategyType = mProxyStrategyType;
+    if (proxyStrategyType == null) {
+      final Proxy proxyAnnotation = itf.getAnnotation(Proxy.class);
+      if ((proxyAnnotation != null) && target.isAssignableTo(proxyAnnotation.value())) {
+        return newProxyBuilder().proxyOf(target, itf);
+      }
+
+      return newReflectionBuilder().proxyOf(target, itf);
+
+    } else if (proxyStrategyType == ProxyStrategyType.CODE_GENERATION) {
+      return newProxyBuilder().proxyOf(target, itf);
+    }
+
+    return newReflectionBuilder().proxyOf(target, itf);
+  }
+
+  @NotNull
+  public WrapperRoutineBuilder withConfiguration(
+      @NotNull final InvocationConfiguration configuration) {
     mInvocationConfiguration =
         ConstantConditions.notNull("invocation configuration", configuration);
     return this;
   }
 
   @NotNull
-  public WrapperRoutineBuilder withConfiguration(@NotNull final WrapperConfiguration configuration) {
+  public WrapperRoutineBuilder withConfiguration(
+      @NotNull final WrapperConfiguration configuration) {
     mWrapperConfiguration = ConstantConditions.notNull("wrapper configuration", configuration);
     return this;
   }
 
   @NotNull
-  public InvocationConfiguration.Builder<? extends WrapperRoutineBuilder> withInvocation
-      () {
+  public InvocationConfiguration.Builder<? extends WrapperRoutineBuilder> withInvocation() {
     final InvocationConfiguration config = mInvocationConfiguration;
     return new InvocationConfiguration.Builder<WrapperRoutineBuilder>(
         new InvocationConfiguration.Configurable<WrapperRoutineBuilder>() {
 
           @NotNull
-          public WrapperRoutineBuilder withConfiguration(@NotNull final InvocationConfiguration configuration) {
+          public WrapperRoutineBuilder withConfiguration(
+              @NotNull final InvocationConfiguration configuration) {
             return DefaultWrapperRoutineBuilder.this.withConfiguration(configuration);
           }
         }, config);
@@ -106,59 +144,23 @@ class DefaultWrapperRoutineBuilder implements WrapperRoutineBuilder {
         new WrapperConfiguration.Configurable<WrapperRoutineBuilder>() {
 
           @NotNull
-          public WrapperRoutineBuilder withConfiguration(@NotNull final WrapperConfiguration configuration) {
+          public WrapperRoutineBuilder withConfiguration(
+              @NotNull final WrapperConfiguration configuration) {
             return DefaultWrapperRoutineBuilder.this.withConfiguration(configuration);
           }
         }, config);
   }
 
   @NotNull
-  public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
-    final ProxyStrategyType proxyStrategyType = mProxyStrategyType;
-    if (proxyStrategyType == null) {
-      final Proxy proxyAnnotation = itf.getAnnotation(Proxy.class);
-      if ((proxyAnnotation != null) && mTarget.isAssignableTo(proxyAnnotation.value())) {
-        return newProxyBuilder().buildProxy(itf);
-      }
-
-      return newReflectionBuilder().buildProxy(itf);
-
-    } else if (proxyStrategyType == ProxyStrategyType.CODE_GENERATION) {
-      return newProxyBuilder().buildProxy(itf);
-    }
-
-    return newReflectionBuilder().buildProxy(itf);
-  }
-
-  @NotNull
-  public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
-    return buildProxy(itf.getRawClass());
-  }
-
-  @NotNull
-  public <IN, OUT> Routine<IN, OUT> method(@NotNull final String name) {
-    return newReflectionBuilder().method(name);
-  }
-
-  @NotNull
-  public <IN, OUT> Routine<IN, OUT> method(@NotNull final String name,
-      @NotNull final Class<?>... parameterTypes) {
-    return newReflectionBuilder().method(name, parameterTypes);
-  }
-
-  @NotNull
-  public <IN, OUT> Routine<IN, OUT> method(@NotNull final Method method) {
-    return newReflectionBuilder().method(method);
-  }
-
-  @NotNull
   private ProxyRoutineBuilder newProxyBuilder() {
-    return JRoutineProxy.with(mTarget).withConfiguration(mInvocationConfiguration).withConfiguration(mWrapperConfiguration);
+    return JRoutineProxy.wrapperOn(mExecutor)
+                        .withConfiguration(mInvocationConfiguration)
+                        .withConfiguration(mWrapperConfiguration);
   }
 
   @NotNull
   private ReflectionRoutineBuilder newReflectionBuilder() {
-    return JRoutineReflection.with(mTarget)
+    return JRoutineReflection.wrapperOn(mExecutor)
                              .withConfiguration(mInvocationConfiguration)
                              .withConfiguration(mWrapperConfiguration);
   }

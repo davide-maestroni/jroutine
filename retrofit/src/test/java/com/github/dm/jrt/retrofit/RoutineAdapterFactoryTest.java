@@ -16,10 +16,11 @@
 
 package com.github.dm.jrt.retrofit;
 
-import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.InvocationException;
+import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.function.util.Consumer;
 import com.github.dm.jrt.operator.JRoutineOperators;
+import com.github.dm.jrt.stream.routine.StreamRoutine;
 
 import org.junit.Test;
 
@@ -37,6 +38,8 @@ import retrofit2.Retrofit;
 import retrofit2.Retrofit.Builder;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import static com.github.dm.jrt.core.JRoutineCore.routineOn;
+import static com.github.dm.jrt.core.executor.ScheduledExecutors.immediateExecutor;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static com.github.dm.jrt.function.JRoutineFunction.onOutput;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -52,8 +55,7 @@ public class RoutineAdapterFactoryTest {
       + " \"name\":\"Repo2\"}, {\"id\":\"3\", \"name\":\"Repo3\", \"isPrivate\":true}]";
 
   @Test
-  public void testOutputChannelAdapter() throws IOException {
-
+  public void testRoutineAdapter() throws IOException {
     final MockWebServer server = new MockWebServer();
     server.enqueue(new MockResponse().setBody(BODY));
     server.enqueue(new MockResponse().setBody(BODY));
@@ -62,18 +64,18 @@ public class RoutineAdapterFactoryTest {
     try {
       {
         final RoutineAdapterFactory adapterFactory = //
-            RoutineAdapterFactory.builder()
+            RoutineAdapterFactory.factory()
                                  .withInvocation()
                                  .withOutputTimeout(seconds(3))
                                  .configuration()
-                                 .buildFactory();
+                                 .create();
         final GsonConverterFactory converterFactory = GsonConverterFactory.create();
         final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + server.getPort())
                                                .addCallAdapterFactory(adapterFactory)
                                                .addConverterFactory(converterFactory)
                                                .build();
         final GitHubService service = retrofit.create(GitHubService.class);
-        final List<Repo> repos = service.listRepos("octocat").next();
+        final List<Repo> repos = service.listRepos("octocat").invoke().close().next();
         assertThat(repos).hasSize(3);
         assertThat(repos.get(0).getId()).isEqualTo("1");
         assertThat(repos.get(0).getName()).isEqualTo("Repo1");
@@ -87,21 +89,21 @@ public class RoutineAdapterFactoryTest {
       }
 
       {
-        final RoutineAdapterFactory factory = RoutineAdapterFactory.buildFactory();
+        final RoutineAdapterFactory factory = RoutineAdapterFactory.defaultFactory();
         final RoutineAdapterFactory adapterFactory = //
-            RoutineAdapterFactory.builder()
-                                 .delegateFactory(factory)
+            RoutineAdapterFactory.factory()
+                                 .withDelegate(factory)
                                  .withInvocation()
                                  .withOutputTimeout(seconds(3))
                                  .configuration()
-                                 .buildFactory();
+                                 .create();
         final GsonConverterFactory converterFactory = GsonConverterFactory.create();
         final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + server.getPort())
                                                .addCallAdapterFactory(adapterFactory)
                                                .addConverterFactory(converterFactory)
                                                .build();
         final GitHubService service = retrofit.create(GitHubService.class);
-        final List<Repo> repos = service.listRepos("octocat").next();
+        final List<Repo> repos = service.listRepos("octocat").invoke().close().next();
         assertThat(repos).hasSize(3);
         assertThat(repos.get(0).getId()).isEqualTo("1");
         assertThat(repos.get(0).getName()).isEqualTo("Repo1");
@@ -117,19 +119,19 @@ public class RoutineAdapterFactoryTest {
       {
         final BodyAdapterFactory factory = new BodyAdapterFactory();
         final RoutineAdapterFactory adapterFactory = //
-            RoutineAdapterFactory.builder()
-                                 .delegateFactory(factory)
+            RoutineAdapterFactory.factory()
+                                 .withDelegate(factory)
                                  .withInvocation()
                                  .withOutputTimeout(seconds(3))
                                  .configuration()
-                                 .buildFactory();
+                                 .create();
         final GsonConverterFactory converterFactory = GsonConverterFactory.create();
         final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + server.getPort())
                                                .addCallAdapterFactory(adapterFactory)
                                                .addConverterFactory(converterFactory)
                                                .build();
         final GitHubService service = retrofit.create(GitHubService.class);
-        final List<Repo> repos = service.listRepos("octocat").next();
+        final List<Repo> repos = service.listRepos("octocat").invoke().close().next();
         assertThat(repos).hasSize(3);
         assertThat(repos.get(0).getId()).isEqualTo("1");
         assertThat(repos.get(0).getName()).isEqualTo("Repo1");
@@ -148,8 +150,7 @@ public class RoutineAdapterFactoryTest {
   }
 
   @Test
-  public void testStreamBuilderAdapter() throws IOException {
-
+  public void testStreamRoutineAdapter() throws IOException {
     final MockWebServer server = new MockWebServer();
     server.enqueue(new MockResponse().setBody(BODY));
     server.enqueue(new MockResponse().setBody(BODY));
@@ -157,7 +158,7 @@ public class RoutineAdapterFactoryTest {
     server.start();
     try {
       {
-        final RoutineAdapterFactory adapterFactory = RoutineAdapterFactory.buildFactory();
+        final RoutineAdapterFactory adapterFactory = RoutineAdapterFactory.defaultFactory();
         final GsonConverterFactory converterFactory = GsonConverterFactory.create();
         final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + server.getPort())
                                                .addCallAdapterFactory(adapterFactory)
@@ -165,7 +166,7 @@ public class RoutineAdapterFactoryTest {
                                                .build();
         final GitHubService service = retrofit.create(GitHubService.class);
         assertThat(service.streamRepos("octocat")
-                          .map(JRoutineOperators.<Repo>unfold())
+                          .map(routineOn(immediateExecutor()).of(JRoutineOperators.<Repo>unfold()))
                           .invoke()
                           .consume(onOutput(new Consumer<Repo>() {
 
@@ -183,9 +184,9 @@ public class RoutineAdapterFactoryTest {
       }
 
       {
-        final RoutineAdapterFactory factory = RoutineAdapterFactory.buildFactory();
+        final RoutineAdapterFactory factory = RoutineAdapterFactory.defaultFactory();
         final RoutineAdapterFactory adapterFactory =
-            RoutineAdapterFactory.builder().delegateFactory(factory).buildFactory();
+            RoutineAdapterFactory.factory().withDelegate(factory).create();
         final GsonConverterFactory converterFactory = GsonConverterFactory.create();
         final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + server.getPort())
                                                .addCallAdapterFactory(adapterFactory)
@@ -193,7 +194,7 @@ public class RoutineAdapterFactoryTest {
                                                .build();
         final GitHubService service = retrofit.create(GitHubService.class);
         assertThat(service.streamRepos("octocat")
-                          .map(JRoutineOperators.<Repo>unfold())
+                          .map(routineOn(immediateExecutor()).of(JRoutineOperators.<Repo>unfold()))
                           .invoke()
                           .consume(onOutput(new Consumer<Repo>() {
 
@@ -213,7 +214,7 @@ public class RoutineAdapterFactoryTest {
       {
         final BodyAdapterFactory factory = new BodyAdapterFactory();
         final RoutineAdapterFactory adapterFactory =
-            RoutineAdapterFactory.builder().delegateFactory(factory).buildFactory();
+            RoutineAdapterFactory.factory().withDelegate(factory).create();
         final GsonConverterFactory converterFactory = GsonConverterFactory.create();
         final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + server.getPort())
                                                .addCallAdapterFactory(adapterFactory)
@@ -221,7 +222,7 @@ public class RoutineAdapterFactoryTest {
                                                .build();
         final GitHubService service = retrofit.create(GitHubService.class);
         assertThat(service.streamRepos("octocat")
-                          .map(JRoutineOperators.<Repo>unfold())
+                          .map(routineOn(immediateExecutor()).of(JRoutineOperators.<Repo>unfold()))
                           .invoke()
                           .consume(onOutput(new Consumer<Repo>() {
 
@@ -248,25 +249,23 @@ public class RoutineAdapterFactoryTest {
     @Override
     public CallAdapter<?> get(final Type returnType, final Annotation[] annotations,
         final Retrofit retrofit) {
-
       if (returnType instanceof ParameterizedType) {
-        if (((ParameterizedType) returnType).getRawType() == Channel.class) {
+        final Type rawType = ((ParameterizedType) returnType).getRawType();
+        if ((rawType == Routine.class) || (rawType == StreamRoutine.class)) {
           return null;
         }
 
-      } else if (returnType == Channel.class) {
+      } else if ((returnType == Routine.class) || (returnType == StreamRoutine.class)) {
         return null;
       }
 
       return new CallAdapter<Object>() {
 
         public Type responseType() {
-
           return returnType;
         }
 
         public <R> Object adapt(final Call<R> call) {
-
           try {
             return call.execute().body();
 

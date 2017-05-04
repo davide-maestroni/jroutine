@@ -16,11 +16,13 @@
 
 package com.github.dm.jrt.swagger.generator;
 
-import com.github.dm.jrt.core.channel.Channel;
+import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.invocation.InvocationException;
+import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.function.util.Consumer;
 import com.github.dm.jrt.operator.JRoutineOperators;
 import com.github.dm.jrt.retrofit.RoutineAdapterFactory;
+import com.github.dm.jrt.stream.routine.StreamRoutine;
 import com.github.dm.jrt.swagger.client.UsersApiClient;
 import com.github.dm.jrt.swagger.client.api.UsersApi;
 import com.github.dm.jrt.swagger.client.model.Repo;
@@ -39,6 +41,7 @@ import retrofit2.Call;
 import retrofit2.CallAdapter;
 import retrofit2.Retrofit;
 
+import static com.github.dm.jrt.core.executor.ScheduledExecutors.immediateExecutor;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static com.github.dm.jrt.function.JRoutineFunction.onOutput;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -54,7 +57,7 @@ public class JRoutineCodegenTest {
       + " \"name\":\"Repo2\"}, {\"id\":\"3\", \"name\":\"Repo3\", \"private\":true}]";
 
   @Test
-  public void testOutputChannelAdapter() throws IOException {
+  public void testRoutineAdapter() throws IOException {
     final MockWebServer server = new MockWebServer();
     server.enqueue(new MockResponse().setBody(BODY));
     server.enqueue(new MockResponse().setBody(BODY));
@@ -65,7 +68,7 @@ public class JRoutineCodegenTest {
         final UsersApi service =
             new UsersApiClient().withBaseUrl("http://localhost:" + server.getPort())
                                 .createService(UsersApi.class);
-        final Repos repos = service.getRepos("octocat", null, null, null).next();
+        final Repos repos = service.getRepos("octocat", null, null, null).invoke().close().next();
         assertThat(repos).hasSize(3);
         assertThat(repos.get(0).getId()).isEqualTo("1");
         assertThat(repos.get(0).getName()).isEqualTo("Repo1");
@@ -79,19 +82,19 @@ public class JRoutineCodegenTest {
       }
 
       {
-        final RoutineAdapterFactory factory = RoutineAdapterFactory.buildFactory();
+        final RoutineAdapterFactory factory = RoutineAdapterFactory.defaultFactory();
         final RoutineAdapterFactory adapterFactory = //
-            RoutineAdapterFactory.builder()
-                                 .delegateFactory(factory)
+            RoutineAdapterFactory.factory()
+                                 .withDelegate(factory)
                                  .withInvocation()
                                  .withOutputTimeout(seconds(3))
                                  .configuration()
-                                 .buildFactory();
+                                 .create();
         final UsersApi service =
             new UsersApiClient().withBaseUrl("http://localhost:" + server.getPort())
                                 .withAdapterFactory(adapterFactory)
                                 .createService(UsersApi.class);
-        final Repos repos = service.getRepos("octocat", null, null, null).next();
+        final Repos repos = service.getRepos("octocat", null, null, null).invoke().close().next();
         assertThat(repos).hasSize(3);
         assertThat(repos.get(0).getId()).isEqualTo("1");
         assertThat(repos.get(0).getName()).isEqualTo("Repo1");
@@ -107,17 +110,17 @@ public class JRoutineCodegenTest {
       {
         final BodyAdapterFactory factory = new BodyAdapterFactory();
         final RoutineAdapterFactory adapterFactory = //
-            RoutineAdapterFactory.builder()
-                                 .delegateFactory(factory)
+            RoutineAdapterFactory.factory()
+                                 .withDelegate(factory)
                                  .withInvocation()
                                  .withOutputTimeout(seconds(3))
                                  .configuration()
-                                 .buildFactory();
+                                 .create();
         final UsersApi service =
             new UsersApiClient().withBaseUrl("http://localhost:" + server.getPort())
                                 .withAdapterFactory(adapterFactory)
                                 .createService(UsersApi.class);
-        final Repos repos = service.getRepos("octocat", null, null, null).next();
+        final Repos repos = service.getRepos("octocat", null, null, null).invoke().close().next();
         assertThat(repos).hasSize(3);
         assertThat(repos.get(0).getId()).isEqualTo("1");
         assertThat(repos.get(0).getName()).isEqualTo("Repo1");
@@ -147,8 +150,9 @@ public class JRoutineCodegenTest {
         final UsersApi service =
             new UsersApiClient().withBaseUrl("http://localhost:" + server.getPort())
                                 .createService(UsersApi.class);
-        assertThat(service.getReposStream("octocat", null, null, null)
-                          .map(JRoutineOperators.<Repo>unfold())
+        assertThat(service.getRepos("octocat", null, null, null)
+                          .map(JRoutineCore.routineOn(immediateExecutor())
+                                           .of(JRoutineOperators.<Repo>unfold()))
                           .invoke()
                           .consume(onOutput(new Consumer<Repo>() {
 
@@ -165,15 +169,16 @@ public class JRoutineCodegenTest {
       }
 
       {
-        final RoutineAdapterFactory factory = RoutineAdapterFactory.buildFactory();
+        final RoutineAdapterFactory factory = RoutineAdapterFactory.defaultFactory();
         final RoutineAdapterFactory adapterFactory =
-            RoutineAdapterFactory.builder().delegateFactory(factory).buildFactory();
+            RoutineAdapterFactory.factory().withDelegate(factory).create();
         final UsersApi service =
             new UsersApiClient().withBaseUrl("http://localhost:" + server.getPort())
                                 .withAdapterFactory(adapterFactory)
                                 .createService(UsersApi.class);
-        assertThat(service.getReposStream("octocat", null, null, null)
-                          .map(JRoutineOperators.<Repo>unfold())
+        assertThat(service.getRepos("octocat", null, null, null)
+                          .map(JRoutineCore.routineOn(immediateExecutor())
+                                           .of(JRoutineOperators.<Repo>unfold()))
                           .invoke()
                           .consume(onOutput(new Consumer<Repo>() {
 
@@ -192,13 +197,14 @@ public class JRoutineCodegenTest {
       {
         final BodyAdapterFactory factory = new BodyAdapterFactory();
         final RoutineAdapterFactory adapterFactory =
-            RoutineAdapterFactory.builder().delegateFactory(factory).buildFactory();
+            RoutineAdapterFactory.factory().withDelegate(factory).create();
         final UsersApi service =
             new UsersApiClient().withBaseUrl("http://localhost:" + server.getPort())
                                 .withAdapterFactory(adapterFactory)
                                 .createService(UsersApi.class);
-        assertThat(service.getReposStream("octocat", null, null, null)
-                          .map(JRoutineOperators.<Repo>unfold())
+        assertThat(service.getRepos("octocat", null, null, null)
+                          .map(JRoutineCore.routineOn(immediateExecutor())
+                                           .of(JRoutineOperators.<Repo>unfold()))
                           .invoke()
                           .consume(onOutput(new Consumer<Repo>() {
 
@@ -225,11 +231,12 @@ public class JRoutineCodegenTest {
     public CallAdapter<?> get(final Type returnType, final Annotation[] annotations,
         final Retrofit retrofit) {
       if (returnType instanceof ParameterizedType) {
-        if (((ParameterizedType) returnType).getRawType() == Channel.class) {
+        final Type rawType = ((ParameterizedType) returnType).getRawType();
+        if ((rawType == Routine.class) || (rawType == StreamRoutine.class)) {
           return null;
         }
 
-      } else if (returnType == Channel.class) {
+      } else if ((returnType == Routine.class) || (returnType == StreamRoutine.class)) {
         return null;
       }
 

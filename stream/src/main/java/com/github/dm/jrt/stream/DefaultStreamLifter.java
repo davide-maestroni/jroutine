@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.stream.transform;
+package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.Backoff;
@@ -30,6 +30,8 @@ import com.github.dm.jrt.function.util.Action;
 import com.github.dm.jrt.function.util.BiConsumer;
 import com.github.dm.jrt.function.util.BiFunction;
 import com.github.dm.jrt.function.util.Function;
+import com.github.dm.jrt.stream.transform.LiftingFunction;
+import com.github.dm.jrt.stream.transform.StreamLifter;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -38,11 +40,11 @@ import java.util.concurrent.TimeUnit;
 import static com.github.dm.jrt.core.util.DurationMeasure.indefiniteTime;
 
 /**
- * Default implementation of a channel transformer.
+ * Default implementation of a stream lifter.
  * <p>
  * Created by davide-maestroni on 05/01/2017.
  */
-class DefaultChannelTransformer implements ChannelTransformer {
+class DefaultStreamLifter implements StreamLifter {
 
   private final ScheduledExecutor mExecutor;
 
@@ -53,7 +55,7 @@ class DefaultChannelTransformer implements ChannelTransformer {
    *
    * @param executor the executor instance.
    */
-  DefaultChannelTransformer(@NotNull final ScheduledExecutor executor) {
+  DefaultStreamLifter(@NotNull final ScheduledExecutor executor) {
     mExecutor = ConstantConditions.notNull("executor instance", executor);
   }
 
@@ -177,12 +179,12 @@ class DefaultChannelTransformer implements ChannelTransformer {
   }
 
   @NotNull
-  public Builder<? extends ChannelTransformer> withChannel() {
-    return new Builder<ChannelTransformer>(this, mConfiguration);
+  public Builder<? extends StreamLifter> withChannel() {
+    return new Builder<StreamLifter>(this, mConfiguration);
   }
 
   @NotNull
-  public ChannelTransformer withConfiguration(@NotNull final ChannelConfiguration configuration) {
+  public StreamLifter withConfiguration(@NotNull final ChannelConfiguration configuration) {
     mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
     return this;
   }

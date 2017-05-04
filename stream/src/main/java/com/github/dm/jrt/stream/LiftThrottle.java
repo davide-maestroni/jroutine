@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Davide Maestroni
+ * Copyright 2017 Davide Maestroni
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.stream.transform;
+package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
@@ -24,7 +24,8 @@ import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.SimpleQueue;
 import com.github.dm.jrt.function.util.Supplier;
-import com.github.dm.jrt.stream.transform.ThrottleChannelConsumer.CompletionHandler;
+import com.github.dm.jrt.stream.ThrottleChannelConsumer.CompletionHandler;
+import com.github.dm.jrt.stream.transform.LiftingFunction;
 
 import org.jetbrains.annotations.NotNull;
 

@@ -18,6 +18,8 @@ package com.github.dm.jrt.retrofit;
 
 import com.github.dm.jrt.core.config.InvocationConfigurable;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.executor.ScheduledExecutor;
+import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.reflect.util.InvocationReflection;
 
@@ -27,13 +29,14 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.annotation.Annotation;
 
 import retrofit2.CallAdapter;
+import retrofit2.CallAdapter.Factory;
 
 /**
- * Abstract implementation of a call adapter factory supporting {@code Channel} and
- * {@code StreamBuilder} return types.
+ * Implementation of a Call adapter factory supporting {@code Routine} and {@code StreamRoutine}
+ * return types.
  * <br>
- * Note that the routines generated through stream builders must be invoked and the returned channel
- * closed before any result is produced.
+ * Note that the generated routines must be invoked and the returned channel closed before any
+ * result is produced.
  * <p>
  * Created by davide-maestroni on 03/26/2016.
  */
@@ -41,17 +44,20 @@ import retrofit2.CallAdapter;
 public class RoutineAdapterFactory extends AbstractAdapterFactory {
 
   private static final RoutineAdapterFactory sFactory =
-      new RoutineAdapterFactory(null, InvocationConfiguration.defaultConfiguration());
+      new RoutineAdapterFactory(ScheduledExecutors.defaultExecutor(),
+          InvocationConfiguration.defaultConfiguration(), null);
 
   /**
    * Constructor.
    *
-   * @param delegateFactory the delegate factory.
+   * @param executor        the executor instance.
    * @param configuration   the invocation configuration.
+   * @param delegateFactory the delegate factory.
    */
-  private RoutineAdapterFactory(@Nullable final CallAdapter.Factory delegateFactory,
-      @NotNull final InvocationConfiguration configuration) {
-    super(delegateFactory, configuration);
+  private RoutineAdapterFactory(@NotNull final ScheduledExecutor executor,
+      @NotNull final InvocationConfiguration configuration,
+      @Nullable final Factory delegateFactory) {
+    super(executor, configuration, delegateFactory);
   }
 
   /**
@@ -60,18 +66,29 @@ public class RoutineAdapterFactory extends AbstractAdapterFactory {
    * @return the factory instance.
    */
   @NotNull
-  public static RoutineAdapterFactory buildFactory() {
+  public static RoutineAdapterFactory defaultFactory() {
     return sFactory;
   }
 
   /**
-   * Returns an adapter factory builder.
+   * Returns builder of adapter factories.
    *
    * @return the builder instance.
    */
   @NotNull
-  public static Builder builder() {
-    return new Builder();
+  public static Builder factory() {
+    return factoryOn(ScheduledExecutors.defaultExecutor());
+  }
+
+  /**
+   * Returns builder of adapter factories employing the specified executor.
+   *
+   * @param executor the executor instance.
+   * @return the builder instance.
+   */
+  @NotNull
+  public static Builder factoryOn(@NotNull final ScheduledExecutor executor) {
+    return new Builder(executor);
   }
 
   /**
@@ -84,14 +101,29 @@ public class RoutineAdapterFactory extends AbstractAdapterFactory {
    */
   public static class Builder implements InvocationConfigurable<Builder> {
 
+    private final ScheduledExecutor mExecutor;
+
     private InvocationConfiguration mConfiguration = InvocationConfiguration.defaultConfiguration();
 
     private CallAdapter.Factory mDelegateFactory;
 
     /**
      * Constructor.
+     *
+     * @param executor the executor instance.
      */
-    private Builder() {
+    private Builder(@NotNull final ScheduledExecutor executor) {
+      mExecutor = ConstantConditions.notNull("executor instance", executor);
+    }
+
+    /**
+     * Builds and return a new factory instance.
+     *
+     * @return the factory instance.
+     */
+    @NotNull
+    public RoutineAdapterFactory create() {
+      return new RoutineAdapterFactory(mExecutor, mConfiguration, mDelegateFactory);
     }
 
     @NotNull
@@ -101,23 +133,13 @@ public class RoutineAdapterFactory extends AbstractAdapterFactory {
     }
 
     /**
-     * Builds and return a new factory instance.
-     *
-     * @return the factory instance.
-     */
-    @NotNull
-    public RoutineAdapterFactory buildFactory() {
-      return new RoutineAdapterFactory(mDelegateFactory, mConfiguration);
-    }
-
-    /**
      * Sets the delegate factory to be used to execute the calls.
      *
      * @param factory the factory instance.
      * @return this builder.
      */
     @NotNull
-    public Builder delegateFactory(@Nullable final CallAdapter.Factory factory) {
+    public Builder withDelegate(@Nullable final CallAdapter.Factory factory) {
       mDelegateFactory = factory;
       return this;
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Davide Maestroni
+ * Copyright 2017 Davide Maestroni
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.reflect.builder;
+package com.github.dm.jrt.reflect.util;
 
 import com.github.dm.jrt.reflect.config.WrapperConfiguration;
 import com.github.dm.jrt.reflect.config.WrapperConfiguration.Builder;
-import com.github.dm.jrt.reflect.util.InvocationReflection;
 
 import org.junit.Test;
 
@@ -76,7 +75,8 @@ public class WrapperConfigurationTest {
     final WrapperConfiguration configuration = builder().withSharedFields("test").configuration();
     assertThat(builder().withPatch(configuration).configuration()).isEqualTo(configuration);
     assertThat(configuration.builderFrom().configuration()).isEqualTo(configuration);
-    assertThat(configuration.builderFrom().withPatch(null).configuration()).isEqualTo(configuration);
+    assertThat(configuration.builderFrom().withPatch(null).configuration()).isEqualTo(
+        configuration);
     assertThat(configuration.builderFrom().withDefaults().configuration()).isEqualTo(
         WrapperConfiguration.defaultConfiguration());
   }

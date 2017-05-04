@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Davide Maestroni
+ * Copyright 2017 Davide Maestroni
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.stream.transform;
+package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
@@ -22,21 +22,22 @@ import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.executor.ScheduledExecutor;
+import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.util.Action;
+import com.github.dm.jrt.function.util.BiConsumer;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Try/finally channel consumer implementation.
+ * Try/catch channel consumer implementation.
  * <p>
- * Created by davide-maestroni on 04/21/2016.
+ * Created by davide-maestroni on 04/19/2016.
  *
  * @param <OUT> the output data type.
  */
-class TryFinallyChannelConsumer<OUT> implements ChannelConsumer<OUT> {
+class TryCatchChannelConsumer<OUT> implements ChannelConsumer<OUT> {
 
-  private final Action mFinallyAction;
+  private final BiConsumer<? super RoutineException, ? super Channel<OUT, ?>> mCatchConsumer;
 
   private final Channel<OUT, OUT> mOutputChannel;
 
@@ -45,32 +46,31 @@ class TryFinallyChannelConsumer<OUT> implements ChannelConsumer<OUT> {
    *
    * @param executor      the executor instance.
    * @param configuration the channel configuration.
-   * @param finallyAction the action instance.
+   * @param catchConsumer the consumer instance.
    * @param outputChannel the output channel.
    */
-  TryFinallyChannelConsumer(@NotNull final ScheduledExecutor executor,
-      @NotNull final ChannelConfiguration configuration, @NotNull final Action finallyAction,
+  TryCatchChannelConsumer(@NotNull final ScheduledExecutor executor,
+      @NotNull final ChannelConfiguration configuration,
+      @NotNull final BiConsumer<? super RoutineException, ? super Channel<OUT, ?>> catchConsumer,
       @NotNull final Channel<OUT, ?> outputChannel) {
-    mFinallyAction = ConstantConditions.notNull("action instance", finallyAction);
+    mCatchConsumer = ConstantConditions.notNull("bi-consumer instance", catchConsumer);
     outputChannel.pass(mOutputChannel =
         JRoutineCore.channelOn(executor).withConfiguration(configuration).ofType());
   }
 
-  public void onComplete() throws Exception {
-    try {
-      mFinallyAction.perform();
-
-    } finally {
-      mOutputChannel.close();
-    }
+  public void onComplete() {
+    mOutputChannel.close();
   }
 
-  public void onError(@NotNull final RoutineException error) throws Exception {
+  public void onError(@NotNull final RoutineException error) {
+    final Channel<OUT, ?> channel = mOutputChannel;
     try {
-      mFinallyAction.perform();
+      mCatchConsumer.accept(error, channel);
+      channel.close();
 
-    } finally {
-      mOutputChannel.abort(error);
+    } catch (final Throwable t) {
+      channel.abort(t);
+      InterruptedInvocationException.throwIfInterrupt(t);
     }
   }
 

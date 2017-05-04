@@ -19,12 +19,14 @@ package com.github.dm.jrt.retrofit;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.executor.ScheduledExecutor;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
+import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.reflect.util.InvocationReflection;
 import com.github.dm.jrt.stream.JRoutineStream;
-import com.github.dm.jrt.stream.builder.StreamBuilder;
+import com.github.dm.jrt.stream.routine.StreamRoutine;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -36,17 +38,19 @@ import java.lang.reflect.Type;
 
 import retrofit2.Call;
 import retrofit2.CallAdapter;
+import retrofit2.CallAdapter.Factory;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
+import static com.github.dm.jrt.core.executor.ScheduledExecutors.immediateExecutor;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
- * Abstract implementation of a call adapter factory supporting {@code Channel} and
- * {@code StreamBuilder} return types.
+ * Abstract implementation of a Call adapter factory supporting {@code Routine} and
+ * {@code StreamRoutine} return types.
  * <br>
- * Note that the routines generated through stream builders must be invoked and the returned channel
- * closed before any result is produced.
+ * Note that the generated routines must be invoked and the returned channel closed before any
+ * result is produced.
  * <p>
  * Created by davide-maestroni on 05/19/2016.
  */
@@ -71,16 +75,21 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
 
   private final CallAdapter.Factory mDelegateFactory;
 
+  private final ScheduledExecutor mExecutor;
+
   /**
    * Constructor.
    *
-   * @param delegateFactory the delegate factory.
+   * @param executor        the executor instance.
    * @param configuration   the invocation configuration.
+   * @param delegateFactory the delegate factory.
    */
-  protected AbstractAdapterFactory(@Nullable final CallAdapter.Factory delegateFactory,
-      @NotNull final InvocationConfiguration configuration) {
-    mDelegateFactory = delegateFactory;
+  protected AbstractAdapterFactory(@NotNull final ScheduledExecutor executor,
+      @NotNull final InvocationConfiguration configuration,
+      @Nullable final Factory delegateFactory) {
+    mExecutor = ConstantConditions.notNull("executor instance", executor);
     mConfiguration = ConstantConditions.notNull("invocation configuration", configuration);
+    mDelegateFactory = delegateFactory;
   }
 
   /**
@@ -91,7 +100,7 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
    */
   @NotNull
   protected static ParameterizedType getChannelType(@NotNull final Type outputType) {
-    return new ChannelType(ConstantConditions.notNull("outputs type", outputType));
+    return new RoutineType(ConstantConditions.notNull("outputs type", outputType));
   }
 
   @Override
@@ -101,12 +110,12 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
       final ParameterizedType parameterizedType = (ParameterizedType) returnType;
       final Type responseType = extractResponseType(parameterizedType);
       if (responseType != null) {
-        return get(mConfiguration, parameterizedType.getRawType(), responseType, annotations,
-            retrofit);
+        return get(mExecutor, mConfiguration, parameterizedType.getRawType(), responseType,
+            annotations, retrofit);
       }
 
     } else if (returnType instanceof Class) {
-      return get(mConfiguration, returnType, Object.class, annotations, retrofit);
+      return get(mExecutor, mConfiguration, returnType, Object.class, annotations, retrofit);
     }
 
     return null;
@@ -115,6 +124,7 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
   /**
    * Builds and returns a routine instance handling Retrofit calls.
    *
+   * @param executor      the executor instance.
    * @param configuration the invocation configuration.
    * @param returnRawType the return raw type to be adapted.
    * @param responseType  the type of the call response.
@@ -124,7 +134,7 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
    */
   @NotNull
   @SuppressWarnings("UnusedParameters")
-  protected Routine<? extends Call<?>, ?> buildRoutine(
+  protected Routine<? extends Call<?>, ?> buildRoutine(@NotNull final ScheduledExecutor executor,
       @NotNull final InvocationConfiguration configuration, @NotNull final Type returnRawType,
       @NotNull final Type responseType, @NotNull final Annotation[] annotations,
       @NotNull final Retrofit retrofit) {
@@ -133,7 +143,7 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
         InvocationReflection.withAnnotations(configuration, annotations);
     final MappingInvocation<Call<Object>, Object> factory =
         getFactory(configuration, responseType, annotations, retrofit);
-    return JRoutineCore.with(factory).apply(invocationConfiguration).buildRoutine();
+    return JRoutineCore.routineOn(executor).withConfiguration(invocationConfiguration).of(factory);
   }
 
   /**
@@ -145,7 +155,7 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
   @Nullable
   protected Type extractResponseType(@NotNull final ParameterizedType returnType) {
     final Type rawType = returnType.getRawType();
-    if ((Channel.class == rawType) || (StreamBuilder.class == rawType)) {
+    if ((Routine.class == rawType) || (StreamRoutine.class == rawType)) {
       return returnType.getActualTypeArguments()[1];
     }
 
@@ -155,6 +165,7 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
   /**
    * Gets the adapter used to convert a Retrofit call into the method return type.
    *
+   * @param executor      the executor instance.
    * @param configuration the invocation configuration.
    * @param returnRawType the return raw type to be adapted.
    * @param responseType  the type of the call response.
@@ -163,17 +174,13 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
    * @return the call adapter or null.
    */
   @Nullable
-  protected CallAdapter<?> get(@NotNull final InvocationConfiguration configuration,
-      @NotNull final Type returnRawType, @NotNull final Type responseType,
-      @NotNull final Annotation[] annotations, @NotNull final Retrofit retrofit) {
-    if (Channel.class == returnRawType) {
-      return new ChannelAdapter(
-          buildRoutine(configuration, returnRawType, responseType, annotations, retrofit),
-          responseType);
-
-    } else if (StreamBuilder.class == returnRawType) {
-      return new StreamBuilderAdapter(
-          buildRoutine(configuration, returnRawType, responseType, annotations, retrofit),
+  protected CallAdapter<?> get(@NotNull final ScheduledExecutor executor,
+      @NotNull final InvocationConfiguration configuration, @NotNull final Type returnRawType,
+      @NotNull final Type responseType, @NotNull final Annotation[] annotations,
+      @NotNull final Retrofit retrofit) {
+    if ((Routine.class == returnRawType) || (StreamRoutine.class == returnRawType)) {
+      return new RoutineAdapter(
+          buildRoutine(executor, configuration, returnRawType, responseType, annotations, retrofit),
           responseType);
     }
 
@@ -189,13 +196,22 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
       return sCallInvocation;
     }
 
-    @SuppressWarnings("unchecked") final CallAdapter<Channel<?, ?>> channelAdapter =
-        (CallAdapter<Channel<?, ?>>) delegateFactory.get(new ChannelType(responseType), annotations,
+    @SuppressWarnings("unchecked") final CallAdapter<Routine<?, ?>> routineAdapter =
+        (CallAdapter<Routine<?, ?>>) delegateFactory.get(new RoutineType(responseType), annotations,
             retrofit);
-    if (channelAdapter != null) {
-      return new ChannelAdapterInvocation(
+    if (routineAdapter != null) {
+      return new RoutineAdapterInvocation(
           asArgs(delegateFactory, configuration, responseType, annotations, retrofit),
-          channelAdapter);
+          routineAdapter);
+    }
+
+    @SuppressWarnings("unchecked") final CallAdapter<StreamRoutine<?, ?>> streamRoutineAdapter =
+        (CallAdapter<StreamRoutine<?, ?>>) delegateFactory.get(new StreamRoutineType(responseType),
+            annotations, retrofit);
+    if (streamRoutineAdapter != null) {
+      return new RoutineAdapterInvocation(
+          asArgs(delegateFactory, configuration, responseType, annotations, retrofit),
+          streamRoutineAdapter);
     }
 
     final CallAdapter<?> bodyAdapter = delegateFactory.get(responseType, annotations, retrofit);
@@ -272,9 +288,36 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
   }
 
   /**
-   * Channel adapter implementation.
+   * Invocation allowing a single Call object as input.
    */
-  private static class ChannelAdapter extends BaseAdapter<Channel> {
+  private static class InputCallInvocation extends TemplateInvocation<Call<?>, Call<?>> {
+
+    private final Call<?> mCall;
+
+    /**
+     * Constructor.
+     *
+     * @param call the input Call.
+     */
+    private InputCallInvocation(@Nullable final Call<?> call) {
+      mCall = call;
+    }
+
+    @Override
+    public void onComplete(@NotNull final Channel<Call<?>, ?> result) {
+      result.pass(mCall);
+    }
+
+    @Override
+    public void onInput(final Call<?> input, @NotNull final Channel<Call<?>, ?> result) {
+      result.abort(new IllegalArgumentException("no input is allowed"));
+    }
+  }
+
+  /**
+   * Routine adapter implementation.
+   */
+  private static class RoutineAdapter extends BaseAdapter<Routine> {
 
     /**
      * Constructor.
@@ -282,44 +325,48 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
      * @param routine      the routine instance.
      * @param responseType the response type.
      */
-    private ChannelAdapter(@NotNull final Routine<? extends Call<?>, ?> routine,
+    private RoutineAdapter(@NotNull final Routine<? extends Call<?>, ?> routine,
         @NotNull final Type responseType) {
       super(routine, responseType);
     }
 
-    public <OUT> Channel adapt(final Call<OUT> call) {
-      return getRoutine().invoke().pass(call).close();
+    public <OUT> Routine adapt(final Call<OUT> call) {
+      return JRoutineStream.streamOf(
+          JRoutineCore.routineOn(immediateExecutor()).ofSingleton(new InputCallInvocation(call)))
+                           .map(getRoutine());
     }
   }
 
   /**
    * Mapping invocation employing a call adapter.
    */
-  private static class ChannelAdapterInvocation extends MappingInvocation<Call<Object>, Object> {
+  private static class RoutineAdapterInvocation extends MappingInvocation<Call<Object>, Object> {
 
-    private final CallAdapter<Channel<?, ?>> mCallAdapter;
+    private final CallAdapter<? extends Routine<?, ?>> mCallAdapter;
 
     /**
      * Constructor.
      *
      * @param args        the factory arguments.
-     * @param callAdapter the call adapter instance.
+     * @param callAdapter the Call adapter instance.
      */
-    private ChannelAdapterInvocation(@Nullable final Object[] args,
-        @NotNull final CallAdapter<Channel<?, ?>> callAdapter) {
+    private RoutineAdapterInvocation(@Nullable final Object[] args,
+        @NotNull final CallAdapter<? extends Routine<?, ?>> callAdapter) {
       super(args);
       mCallAdapter = callAdapter;
     }
 
     public void onInput(final Call<Object> input, @NotNull final Channel<Object, ?> result) {
-      result.pass(mCallAdapter.adapt(input));
+      final Channel<?, ?> channel = mCallAdapter.adapt(input).invoke();
+      result.pass(channel);
+      channel.close();
     }
   }
 
   /**
-   * Parameterized type implementation mimicking a channel type.
+   * Parameterized type implementation mimicking a routine type.
    */
-  private static class ChannelType implements ParameterizedType {
+  private static class RoutineType implements ParameterizedType {
 
     private final Type[] mTypeArguments;
 
@@ -328,7 +375,7 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
      *
      * @param outputType the output data type.
      */
-    private ChannelType(@NotNull final Type outputType) {
+    private RoutineType(@NotNull final Type outputType) {
       mTypeArguments = new Type[]{Object.class, outputType};
     }
 
@@ -337,7 +384,7 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
     }
 
     public Type getRawType() {
-      return Channel.class;
+      return Routine.class;
     }
 
     public Type getOwnerType() {
@@ -346,23 +393,31 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
   }
 
   /**
-   * Stream builder adapter implementation.
+   * Parameterized type implementation mimicking a stream routine type.
    */
-  private static class StreamBuilderAdapter extends BaseAdapter<StreamBuilder> {
+  private static class StreamRoutineType implements ParameterizedType {
+
+    private final Type[] mTypeArguments;
 
     /**
      * Constructor.
      *
-     * @param routine      the routine instance.
-     * @param responseType the response type.
+     * @param outputType the output data type.
      */
-    private StreamBuilderAdapter(@NotNull final Routine<? extends Call<?>, ?> routine,
-        @NotNull final Type responseType) {
-      super(routine, responseType);
+    private StreamRoutineType(@NotNull final Type outputType) {
+      mTypeArguments = new Type[]{Object.class, outputType};
     }
 
-    public <OUT> StreamBuilder adapt(final Call<OUT> call) {
-      return JRoutineStream.<Call<?>>withStreamOf(call).map(getRoutine());
+    public Type[] getActualTypeArguments() {
+      return mTypeArguments.clone();
+    }
+
+    public Type getRawType() {
+      return StreamRoutine.class;
+    }
+
+    public Type getOwnerType() {
+      return null;
     }
   }
 }

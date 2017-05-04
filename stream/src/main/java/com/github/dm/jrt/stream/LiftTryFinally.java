@@ -14,51 +14,51 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.stream.transform;
+package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.executor.ScheduledExecutor;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.util.BiConsumer;
+import com.github.dm.jrt.function.util.Action;
 import com.github.dm.jrt.function.util.Function;
 import com.github.dm.jrt.function.util.Supplier;
+import com.github.dm.jrt.stream.transform.LiftingFunction;
 
 import org.jetbrains.annotations.NotNull;
 
 import static com.github.dm.jrt.function.util.SupplierDecorator.wrapSupplier;
 
 /**
- * Lifting function concatenating to the stream a consumer handling invocation exceptions.
+ * Lifting function concatenating to the stream an action always performed when the invocation
+ * completes, even if an error occurred.
  * <p>
  * Created by davide-maestroni on 05/02/2017.
  *
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class LiftTryCatch<IN, OUT> implements LiftingFunction<IN, OUT, IN, OUT> {
-
-  private final BiConsumer<? super RoutineException, ? super Channel<OUT, ?>> mCatchConsumer;
+class LiftTryFinally<IN, OUT> implements LiftingFunction<IN, OUT, IN, OUT> {
 
   private final ChannelConfiguration mConfiguration;
 
   private final ScheduledExecutor mExecutor;
+
+  private final Action mFinallyAction;
 
   /**
    * Constructor.
    *
    * @param executor      the executor instance.
    * @param configuration the channel configuration.
-   * @param catchConsumer the error consumer instance.
+   * @param finallyAction the finally action.
    */
-  LiftTryCatch(@NotNull final ScheduledExecutor executor,
-      @NotNull final ChannelConfiguration configuration,
-      @NotNull final BiConsumer<? super RoutineException, ? super Channel<OUT, ?>> catchConsumer) {
+  LiftTryFinally(@NotNull final ScheduledExecutor executor,
+      @NotNull final ChannelConfiguration configuration, @NotNull final Action finallyAction) {
     mExecutor = ConstantConditions.notNull("executor instance", executor);
     mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
-    mCatchConsumer = ConstantConditions.notNull("consumer instance", catchConsumer);
+    mFinallyAction = ConstantConditions.notNull("action instance", finallyAction);
   }
 
   public Supplier<? extends Channel<IN, OUT>> apply(
@@ -67,8 +67,9 @@ class LiftTryCatch<IN, OUT> implements LiftingFunction<IN, OUT, IN, OUT> {
 
       public Channel<IN, OUT> apply(final Channel<IN, OUT> channel) throws Exception {
         final Channel<OUT, OUT> outputChannel = JRoutineCore.channelOn(mExecutor).ofType();
-        channel.consume(new TryCatchChannelConsumer<OUT>(mExecutor, mConfiguration, mCatchConsumer,
-            outputChannel));
+        channel.consume(
+            new TryFinallyChannelConsumer<OUT>(mExecutor, mConfiguration, mFinallyAction,
+                outputChannel));
         return JRoutineCore.flattenChannels(channel, outputChannel);
       }
     });

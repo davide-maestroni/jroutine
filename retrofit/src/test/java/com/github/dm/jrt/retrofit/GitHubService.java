@@ -16,9 +16,9 @@
 
 package com.github.dm.jrt.retrofit;
 
-import com.github.dm.jrt.core.channel.Channel;
+import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.retrofit.annotation.CallAdapterFactory;
-import com.github.dm.jrt.stream.builder.StreamBuilder;
+import com.github.dm.jrt.stream.routine.StreamRoutine;
 
 import java.util.List;
 
@@ -33,13 +33,13 @@ import retrofit2.http.Path;
 public interface GitHubService {
 
   @GET("users/{user}/repos")
-  Channel<Object, List<Repo>> getRepos(@Path("user") String user);
+  Routine<Object, List<Repo>> getRepos(@Path("user") String user);
 
   @CallAdapterFactory("list")
   @GET("users/{user}/repos")
-  Channel<Object, List<Repo>> listRepos(@Path("user") String user);
+  Routine<Object, List<Repo>> listRepos(@Path("user") String user);
 
   @CallAdapterFactory("stream")
   @GET("users/{user}/repos")
-  StreamBuilder<Object, List<Repo>> streamRepos(@Path("user") String user);
+  StreamRoutine<Object, List<Repo>> streamRepos(@Path("user") String user);
 }

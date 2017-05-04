@@ -32,7 +32,7 @@ import retrofit2.CallAdapter;
 import retrofit2.Retrofit;
 
 /**
- * Implementation of a call adapter factory selecting other factory instances.
+ * Implementation of a Call adapter factory proxying other factory instances.
  * <br>
  * The factory will scan the method annotations searching for {@code CallAdapterFactory} one. If
  * found and a factory with the corresponding name has been registered, it will be employed to
@@ -72,7 +72,7 @@ public class ProviderAdapterFactory extends CallAdapter.Factory {
    * @return the builder instance.
    */
   @NotNull
-  public static Builder builder() {
+  public static Builder factory() {
     return new Builder();
   }
 
@@ -84,7 +84,7 @@ public class ProviderAdapterFactory extends CallAdapter.Factory {
    * @return the filter adapter factory.
    */
   @NotNull
-  public static ProviderAdapterFactory withFactory(@NotNull final String name,
+  public static ProviderAdapterFactory factoryOf(@NotNull final String name,
       @NotNull final CallAdapter.Factory factory) {
     return new ProviderAdapterFactory(null, null,
         Collections.singletonMap(ConstantConditions.notNull("factory name", name),
@@ -154,7 +154,7 @@ public class ProviderAdapterFactory extends CallAdapter.Factory {
      * @return the factory instance.
      */
     @NotNull
-    public ProviderAdapterFactory buildFactory() {
+    public ProviderAdapterFactory create() {
       return new ProviderAdapterFactory(mMissingAnnotationFactory, mMissingNameFactory,
           new HashMap<String, CallAdapter.Factory>(mFactories));
     }
@@ -166,7 +166,7 @@ public class ProviderAdapterFactory extends CallAdapter.Factory {
      * @return this builder.
      */
     @NotNull
-    public Builder whenMissing(@Nullable final CallAdapter.Factory factory) {
+    public Builder withDefault(@Nullable final CallAdapter.Factory factory) {
       mMissingAnnotationFactory = factory;
       mMissingNameFactory = factory;
       return this;
@@ -179,7 +179,7 @@ public class ProviderAdapterFactory extends CallAdapter.Factory {
      * @return this builder.
      */
     @NotNull
-    public Builder whenMissingAnnotation(@Nullable final CallAdapter.Factory factory) {
+    public Builder withDefaultWhenMissing(@Nullable final CallAdapter.Factory factory) {
       mMissingAnnotationFactory = factory;
       return this;
     }
@@ -191,7 +191,7 @@ public class ProviderAdapterFactory extends CallAdapter.Factory {
      * @return this builder.
      */
     @NotNull
-    public Builder whenMissingName(@Nullable final CallAdapter.Factory factory) {
+    public Builder withDefaultWhenNoMatch(@Nullable final CallAdapter.Factory factory) {
       mMissingNameFactory = factory;
       return this;
     }

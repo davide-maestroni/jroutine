@@ -25,6 +25,7 @@ import com.github.dm.jrt.core.util.DurationMeasure;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -40,6 +41,8 @@ import java.util.concurrent.TimeUnit;
  */
 class FlatChannel<IN, OUT> implements Channel<IN, OUT> {
 
+  private final ArrayList<Channel<?, ?>> mChannels = new ArrayList<Channel<?, ?>>();
+
   private final Channel<IN, ?> mInputChannel;
 
   private final Channel<?, OUT> mOutputChannel;
@@ -53,12 +56,25 @@ class FlatChannel<IN, OUT> implements Channel<IN, OUT> {
   @SuppressWarnings("unchecked")
   FlatChannel(@NotNull final Channel<IN, ?> inputChannel,
       @NotNull final Channel<?, OUT> outputChannel) {
-    mInputChannel = ConstantConditions.notNull("input channel",
-        (inputChannel instanceof FlatChannel) ? ((FlatChannel<IN, ?>) inputChannel).mInputChannel
-            : inputChannel);
-    mOutputChannel = ConstantConditions.notNull("output channel",
-        (outputChannel instanceof FlatChannel)
-            ? ((FlatChannel<?, OUT>) outputChannel).mOutputChannel : outputChannel);
+    if (outputChannel instanceof FlatChannel) {
+      final FlatChannel<?, OUT> flatChannel = (FlatChannel<?, OUT>) outputChannel;
+      mChannels.addAll(flatChannel.mChannels);
+      mOutputChannel = flatChannel.mOutputChannel;
+
+    } else {
+      mOutputChannel = ConstantConditions.notNull("output channel", outputChannel);
+      mChannels.add(outputChannel);
+    }
+
+    if (inputChannel instanceof FlatChannel) {
+      final FlatChannel<IN, ?> flatChannel = (FlatChannel<IN, ?>) inputChannel;
+      mChannels.addAll(flatChannel.mChannels);
+      mInputChannel = flatChannel.mInputChannel;
+
+    } else {
+      mInputChannel = ConstantConditions.notNull("input channel", inputChannel);
+      mChannels.add(inputChannel);
+    }
   }
 
   public boolean abort() {
@@ -100,8 +116,10 @@ class FlatChannel<IN, OUT> implements Channel<IN, OUT> {
 
   @NotNull
   public Channel<IN, OUT> close() {
-    mInputChannel.close();
-    mOutputChannel.close();
+    for (final Channel<?, ?> channel : mChannels) {
+      channel.close();
+    }
+
     return this;
   }
 
@@ -230,8 +248,10 @@ class FlatChannel<IN, OUT> implements Channel<IN, OUT> {
   }
 
   @NotNull
+  @SuppressWarnings("unchecked")
   public <AFTER> Channel<IN, AFTER> pipe(@NotNull final Channel<? super OUT, AFTER> channel) {
-    return new FlatChannel<IN, AFTER>(mInputChannel, channel);
+    ((Channel<OUT, AFTER>) channel).pass(this);
+    return new FlatChannel<IN, AFTER>(this, channel);
   }
 
   public int size() {

@@ -87,7 +87,7 @@ public abstract class ContextAdapterFactory extends AbstractAdapterFactory {
    */
   protected ContextAdapterFactory(@Nullable final CallAdapter.Factory delegateFactory,
       @NotNull final InvocationConfiguration configuration) {
-    super(delegateFactory, configuration);
+    super(configuration, delegateFactory);
     mDelegateFactory = delegateFactory;
   }
 

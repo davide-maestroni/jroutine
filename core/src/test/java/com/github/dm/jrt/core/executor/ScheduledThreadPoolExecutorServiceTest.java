@@ -21,6 +21,7 @@ import org.junit.Test;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,17 +38,20 @@ public class ScheduledThreadPoolExecutorServiceTest {
   public void testEquals() {
 
     final ExecutorService pool = Executors.newCachedThreadPool();
-    final ScheduledThreadPoolExecutorService executor = new ScheduledThreadPoolExecutorService(pool);
+    final ScheduledThreadPoolExecutorService executor =
+        new ScheduledThreadPoolExecutorService(pool);
     assertThat(executor).isEqualTo(executor);
     assertThat(executor).isNotEqualTo(null);
     assertThat(executor).isNotEqualTo("test");
-    assertThat(executor).isNotEqualTo(new ScheduledThreadPoolExecutorService(Executors.newCachedThreadPool()));
+    assertThat(executor).isNotEqualTo(
+        new ScheduledThreadPoolExecutorService(Executors.newCachedThreadPool()));
     assertThat(executor).isEqualTo(new ScheduledThreadPoolExecutorService(pool));
-    assertThat(executor.hashCode()).isEqualTo(new ScheduledThreadPoolExecutorService(pool).hashCode());
+    assertThat(executor.hashCode()).isEqualTo(
+        new ScheduledThreadPoolExecutorService(pool).hashCode());
   }
 
   @Test
-  public void testUnsupportedMethods() {
+  public void testUnsupportedMethods() throws InterruptedException {
 
     final ScheduledThreadPoolExecutorService executor =
         new ScheduledThreadPoolExecutorService(Executors.newCachedThreadPool());
@@ -65,30 +69,22 @@ public class ScheduledThreadPoolExecutorServiceTest {
 
     }
 
-    try {
-      executor.scheduleAtFixedRate(new Runnable() {
+    final Semaphore semaphore = new Semaphore(0);
+    executor.scheduleAtFixedRate(new Runnable() {
 
-        public void run() {
+      public void run() {
+        semaphore.release();
+      }
+    }, 0, 1, TimeUnit.SECONDS);
+    semaphore.acquire();
 
-        }
-      }, 0, 1, TimeUnit.SECONDS);
-      fail();
+    executor.scheduleWithFixedDelay(new Runnable() {
 
-    } catch (final UnsupportedOperationException ignored) {
-
-    }
-
-    try {
-      executor.scheduleWithFixedDelay(new Runnable() {
-
-        public void run() {
-
-        }
-      }, 0, 1, TimeUnit.SECONDS);
-      fail();
-
-    } catch (final UnsupportedOperationException ignored) {
-
-    }
+      public void run() {
+        semaphore.release();
+      }
+    }, 0, 1, TimeUnit.SECONDS);
+    semaphore.acquire();
+    executor.shutdown();
   }
 }

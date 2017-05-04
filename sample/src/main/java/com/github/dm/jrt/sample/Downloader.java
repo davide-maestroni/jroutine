@@ -62,14 +62,14 @@ public class Downloader {
    * @param maxParallelDownloads the max number of parallel downloads running at the same time.
    */
   public Downloader(final int maxParallelDownloads) {
-    // The read connection invocation is stateless so we can just use a single instance of it
-    mReadConnection = JRoutineCore.with(new ReadConnection()).invocationConfiguration()
-                                  // Since each download may take a long time to complete, we use a
-                                  // dedicated executor
-                                  .withExecutor(sReadExecutor)
+    // Since each download may take a long time to complete, let's use a dedicated executor
+    mReadConnection = JRoutineCore.routineOn(sReadExecutor).withInvocation()
                                   // By setting the maximum number of parallel invocations we
                                   // effectively limit the number of parallel downloads
-                                  .withMaxInvocations(maxParallelDownloads).apply().buildRoutine();
+                                  .withMaxInvocations(maxParallelDownloads).configuration()
+                                  // The read connection invocation is stateless so we can just use
+                                  // a single instance of it
+                                  .of(new ReadConnection());
   }
 
   /**
@@ -151,15 +151,13 @@ public class Downloader {
       // specific routine
       // That's why we store the routine channel in an internal map
       final Routine<ByteChunk, Boolean> writeFile =
-          JRoutineCore.with(factoryOf(WriteFile.class, dstFile))
-                      .invocationConfiguration()
-                      // Since we want to limit the number of allocated chunks, we have to make the
-                      // writing happen in a dedicated executor, so that waiting for available space
-                      // becomes allowed
-                      .withExecutor(sWriteExecutor)
+          // Since we want to limit the number of allocated chunks, we have to make the writing
+          // happen in a dedicated executor, so that waiting for available space becomes allowed
+          JRoutineCore.routineOn(sWriteExecutor)
+                      .withInvocation()
                       .withInputBackoff(afterCount(32).linearDelay(seconds(3)))
-                      .apply()
-                      .buildRoutine();
+                      .configuration()
+                      .of(factoryOf(WriteFile.class, dstFile));
       downloads.put(uri,
           writeFile.invoke().pass(mReadConnection.invoke().pass(uri).close()).close());
     }

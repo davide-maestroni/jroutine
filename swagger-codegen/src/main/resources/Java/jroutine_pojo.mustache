@@ -30,6 +30,53 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#parcela
   private {{{datatypeWithEnum}}} {{name}} = {{{defaultValue}}};
 
   {{/vars}}
+  {{#isContainer}}{{#isArrayModel}}
+  public {{classname}}() {
+  }
+
+  public {{classname}}(int initialCapacity) {
+    super(initialCapacity);
+  }
+
+  public {{classname}}(java.util.Collection<? extends {{{items.datatypeWithEnum}}}> c) {
+    super(c);
+  }
+
+  public {{classname}} addItem({{{items.datatypeWithEnum}}} item) {
+    add(item);
+    return this;
+  }
+
+  public {{classname}} addAllItems(java.util.Collection<? extends {{{items.datatypeWithEnum}}}> items) {
+    addAll(items);
+    return this;
+  }
+  {{/isArrayModel}}{{^isArrayModel}}
+  public {{classname}}() {
+  }
+
+  public {{classname}}(int initialCapacity) {
+    super(initialCapacity);
+  }
+
+  public {{classname}}(int initialCapacity, float loadFactor) {
+    super(initialCapacity, loadFactor);
+  }
+
+  public {{classname}}(Map<? extends String, ? extends {{{items.datatypeWithEnum}}}> m) {
+    super(m);
+  }
+
+  public {{classname}} putItem(String key, {{{items.datatypeWithEnum}}} item) {
+    put(key, item);
+    return this;
+  }
+
+  public {{classname}} putAllItems(Map<? extends String, ? extends {{{items.datatypeWithEnum}}}> items) {
+    putAll(items);
+    return this;
+  }
+  {{/isArrayModel}}{{/isContainer}}
   {{#vars}}
   {{^isReadOnly}}
   public {{classname}} with{{nameInCamelCase}}({{{datatypeWithEnum}}} {{name}}) {
@@ -39,11 +86,17 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#parcela
   {{#isListContainer}}
 
   public {{classname}} add{{nameInCamelCase}}Item({{{items.datatypeWithEnum}}} {{name}}Item) {
+    if (this.{{name}} == null) {
+      this.{{name}} = {{{defaultValue}}};
+    }
     this.{{name}}.add({{name}}Item);
     return this;
   }
 
-  public {{classname}} addAll{{nameInCamelCase}}Items(java.util.Collection<{{{items.datatypeWithEnum}}}> {{name}}Items) {
+  public {{classname}} addAll{{nameInCamelCase}}Items(java.util.Collection<? extends {{{items.datatypeWithEnum}}}> {{name}}Items) {
+    if (this.{{name}} == null) {
+      this.{{name}} = {{{defaultValue}}};
+    }
     this.{{name}}.addAll({{name}}Items);
     return this;
   }
@@ -51,11 +104,17 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#parcela
   {{#isMapContainer}}
 
   public {{classname}} put{{nameInCamelCase}}Item(String key, {{{items.datatypeWithEnum}}} {{name}}Item) {
+    if (this.{{name}} == null) {
+      this.{{name}} = {{{defaultValue}}};
+    }
     this.{{name}}.put(key, {{name}}Item);
     return this;
   }
 
-  public {{classname}} putAll{{nameInCamelCase}}Items(java.util.Map<String, {{{items.datatypeWithEnum}}}> {{name}}Items) {
+  public {{classname}} putAll{{nameInCamelCase}}Items(Map<? extends String, ? extends {{{items.datatypeWithEnum}}}> {{name}}Items) {
+    if (this.{{name}} == null) {
+      this.{{name}} = {{{defaultValue}}};
+    }
     this.{{name}}.putAll({{name}}Items);
     return this;
   }
@@ -105,8 +164,9 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#parcela
     {{classname}} {{classVarName}} = ({{classname}}) o;
     return {{#vars}}Objects.equals(this.{{name}}, {{classVarName}}.{{name}}){{#hasMore}} &&
         {{/hasMore}}{{/vars}}{{#parent}} &&
-        super.equals(o){{/parent}};{{/hasVars}}{{^hasVars}}
-    return {{#parent}}super.equals(o){{/parent}}{{^parent}}true{{/parent}};{{/hasVars}}
+        super.equals(o){{/parent}}{{^parent}}{{#isContainer}} &&
+        super.equals(o){{/isContainer}}{{/parent}};{{/hasVars}}{{^hasVars}}
+    return {{#parent}}super.equals(o){{/parent}}{{^parent}}{{#isContainer}}super.equals(o){{/isContainer}}{{^isContainer}}true{{/isContainer}}{{/parent}};{{/hasVars}}
   }
 
   @Override

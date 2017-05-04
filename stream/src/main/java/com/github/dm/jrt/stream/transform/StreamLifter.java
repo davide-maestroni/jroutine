@@ -32,12 +32,14 @@ import org.jetbrains.annotations.NotNull;
 import java.util.concurrent.TimeUnit;
 
 /**
- * TODO javadoc
+ * Interface defining a builder of stream lifting functions.
  * <p>
  * Created by davide-maestroni on 05/01/2017.
+ *
+ * @see com.github.dm.jrt.stream.routine.StreamRoutine#lift(Function)
  */
 @SuppressWarnings("WeakerAccess")
-public interface ChannelTransformer extends ChannelConfigurable<ChannelTransformer> {
+public interface StreamLifter extends ChannelConfigurable<StreamLifter> {
 
   /**
    * Returns a function adding a delay at the beginning of the stream, so that any data, exception
@@ -48,7 +50,6 @@ public interface ChannelTransformer extends ChannelConfigurable<ChannelTransform
    * @param <IN>  the input data type.
    * @param <OUT> the output data type.
    * @return the lifting function.
-   * @see com.github.dm.jrt.stream.routine.StreamRoutine#lift(Function)
    */
   @NotNull
   <IN, OUT> LiftingFunction<IN, OUT, IN, OUT> delayInputsOf(@NotNull DurationMeasure delay);
@@ -64,7 +65,6 @@ public interface ChannelTransformer extends ChannelConfigurable<ChannelTransform
    * @param <OUT>    the output data type.
    * @return the lifting function.
    * @throws java.lang.IllegalArgumentException if the specified delay is negative.
-   * @see com.github.dm.jrt.stream.routine.StreamRoutine#lift(Function)
    */
   @NotNull
   <IN, OUT> LiftingFunction<IN, OUT, IN, OUT> delayInputsOf(long delay, @NotNull TimeUnit timeUnit);
@@ -78,7 +78,6 @@ public interface ChannelTransformer extends ChannelConfigurable<ChannelTransform
    * @param <IN>  the input data type.
    * @param <OUT> the output data type.
    * @return the lifting function.
-   * @see com.github.dm.jrt.stream.routine.StreamRoutine#lift(Function)
    */
   @NotNull
   <IN, OUT> LiftingFunction<IN, OUT, IN, OUT> delayOutputsOf(@NotNull DurationMeasure delay);
@@ -94,7 +93,6 @@ public interface ChannelTransformer extends ChannelConfigurable<ChannelTransform
    * @param <OUT>    the output data type.
    * @return the lifting function.
    * @throws java.lang.IllegalArgumentException if the specified delay is negative.
-   * @see com.github.dm.jrt.stream.routine.StreamRoutine#lift(Function)
    */
   @NotNull
   <IN, OUT> LiftingFunction<IN, OUT, IN, OUT> delayOutputsOf(long delay,
@@ -116,7 +114,6 @@ public interface ChannelTransformer extends ChannelConfigurable<ChannelTransform
    * @param <IN>            the input data type.
    * @param <OUT>           the output data type.
    * @return the lifting function.
-   * @see com.github.dm.jrt.stream.routine.StreamRoutine#lift(Function)
    */
   @NotNull
   <IN, OUT> LiftingFunction<IN, OUT, IN, OUT> retry(
@@ -132,7 +129,6 @@ public interface ChannelTransformer extends ChannelConfigurable<ChannelTransform
    * @param <OUT>    the output data type.
    * @return the lifting function.
    * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
-   * @see com.github.dm.jrt.stream.routine.StreamRoutine#lift(Function)
    */
   @NotNull
   <IN, OUT> LiftingFunction<IN, OUT, IN, OUT> retry(int maxCount);
@@ -149,7 +145,6 @@ public interface ChannelTransformer extends ChannelConfigurable<ChannelTransform
    * @param <OUT>    the output data type.
    * @return the lifting function.
    * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
-   * @see com.github.dm.jrt.stream.routine.StreamRoutine#lift(Function)
    */
   @NotNull
   <IN, OUT> LiftingFunction<IN, OUT, IN, OUT> retry(int maxCount, @NotNull Backoff backoff);
@@ -169,7 +164,6 @@ public interface ChannelTransformer extends ChannelConfigurable<ChannelTransform
    * @param <OUT>       the output data type.
    * @param <AFTER>     the new output type.
    * @return the lifting function.
-   * @see com.github.dm.jrt.stream.routine.StreamRoutine#lift(Function)
    */
   @NotNull
   <IN, OUT, AFTER> LiftingFunction<IN, OUT, IN, AFTER> splitBy(
@@ -192,7 +186,6 @@ public interface ChannelTransformer extends ChannelConfigurable<ChannelTransform
    * @param <AFTER>         the new output type.
    * @return the lifting function.
    * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
-   * @see com.github.dm.jrt.stream.routine.StreamRoutine#lift(Function)
    */
   @NotNull
   <IN, OUT, AFTER> LiftingFunction<IN, OUT, IN, AFTER> splitIn(int invocationCount,
@@ -209,7 +202,6 @@ public interface ChannelTransformer extends ChannelConfigurable<ChannelTransform
    * @param <IN>           the input data type.
    * @param <OUT>          the output data type.
    * @return the lifting function.
-   * @see com.github.dm.jrt.stream.routine.StreamRoutine#lift(Function)
    */
   @NotNull
   <IN, OUT> LiftingFunction<IN, OUT, IN, OUT> throttle(int maxInvocations);
@@ -226,7 +218,6 @@ public interface ChannelTransformer extends ChannelConfigurable<ChannelTransform
    * @param <IN>           the input data type.
    * @param <OUT>          the output data type.
    * @return the lifting function.
-   * @see com.github.dm.jrt.stream.routine.StreamRoutine#lift(Function)
    */
   @NotNull
   <IN, OUT> LiftingFunction<IN, OUT, IN, OUT> throttle(int maxInvocations,
@@ -245,7 +236,6 @@ public interface ChannelTransformer extends ChannelConfigurable<ChannelTransform
    * @param <IN>           the input data type.
    * @param <OUT>          the output data type.
    * @return the lifting function.
-   * @see com.github.dm.jrt.stream.routine.StreamRoutine#lift(Function)
    */
   @NotNull
   <IN, OUT> LiftingFunction<IN, OUT, IN, OUT> throttle(int maxInvocations, long range,
@@ -260,7 +250,6 @@ public interface ChannelTransformer extends ChannelConfigurable<ChannelTransform
    * @param <IN>          the input data type.
    * @param <OUT>         the output data type.
    * @return the lifting function.
-   * @see com.github.dm.jrt.stream.routine.StreamRoutine#lift(Function)
    */
   @NotNull
   <IN, OUT> LiftingFunction<IN, OUT, IN, OUT> timeoutAfter(@NotNull DurationMeasure outputTimeout);
@@ -276,7 +265,6 @@ public interface ChannelTransformer extends ChannelConfigurable<ChannelTransform
    * @param <IN>          the input data type.
    * @param <OUT>         the output data type.
    * @return the lifting function.
-   * @see com.github.dm.jrt.stream.routine.StreamRoutine#lift(Function)
    */
   @NotNull
   <IN, OUT> LiftingFunction<IN, OUT, IN, OUT> timeoutAfter(@NotNull DurationMeasure outputTimeout,
@@ -292,7 +280,6 @@ public interface ChannelTransformer extends ChannelConfigurable<ChannelTransform
    * @param <IN>           the input data type.
    * @param <OUT>          the output data type.
    * @return the lifting function.
-   * @see com.github.dm.jrt.stream.routine.StreamRoutine#lift(Function)
    */
   @NotNull
   <IN, OUT> LiftingFunction<IN, OUT, IN, OUT> timeoutAfter(long outputTimeout,
@@ -311,7 +298,6 @@ public interface ChannelTransformer extends ChannelConfigurable<ChannelTransform
    * @param <IN>           the input data type.
    * @param <OUT>          the output data type.
    * @return the lifting function.
-   * @see com.github.dm.jrt.stream.routine.StreamRoutine#lift(Function)
    */
   @NotNull
   <IN, OUT> LiftingFunction<IN, OUT, IN, OUT> timeoutAfter(long outputTimeout,
@@ -326,7 +312,6 @@ public interface ChannelTransformer extends ChannelConfigurable<ChannelTransform
    * @param <IN>          the input data type.
    * @param <OUT>         the output data type.
    * @return the lifting function.
-   * @see com.github.dm.jrt.stream.routine.StreamRoutine#lift(Function)
    */
   @NotNull
   <IN, OUT> LiftingFunction<IN, OUT, IN, OUT> tryCatch(
@@ -344,7 +329,6 @@ public interface ChannelTransformer extends ChannelConfigurable<ChannelTransform
    * @param <IN>          the input data type.
    * @param <OUT>         the output data type.
    * @return the lifting function.
-   * @see com.github.dm.jrt.stream.routine.StreamRoutine#lift(Function)
    */
   @NotNull
   <IN, OUT> LiftingFunction<IN, OUT, IN, OUT> tryCatchAccept(
@@ -360,7 +344,6 @@ public interface ChannelTransformer extends ChannelConfigurable<ChannelTransform
    * @param <IN>          the input data type.
    * @param <OUT>         the output data type.
    * @return the lifting function.
-   * @see com.github.dm.jrt.stream.routine.StreamRoutine#lift(Function)
    */
   @NotNull
   <IN, OUT> LiftingFunction<IN, OUT, IN, OUT> tryFinally(@NotNull Action finallyAction);

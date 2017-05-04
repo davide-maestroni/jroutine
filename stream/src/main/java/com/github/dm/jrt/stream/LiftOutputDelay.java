@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.stream.transform;
+package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
@@ -23,6 +23,7 @@ import com.github.dm.jrt.core.executor.ScheduledExecutor;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.util.Function;
 import com.github.dm.jrt.function.util.Supplier;
+import com.github.dm.jrt.stream.transform.LiftingFunction;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -31,14 +32,14 @@ import java.util.concurrent.TimeUnit;
 import static com.github.dm.jrt.function.util.SupplierDecorator.wrapSupplier;
 
 /**
- * Lifting function adding a delay at the beginning of the stream.
+ * Lifting function adding a delay at the end of the stream.
  * <p>
  * Created by davide-maestroni on 05/02/2017.
  *
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class LiftInputDelay<IN, OUT> implements LiftingFunction<IN, OUT, IN, OUT> {
+class LiftOutputDelay<IN, OUT> implements LiftingFunction<IN, OUT, IN, OUT> {
 
   private final ChannelConfiguration mConfiguration;
 
@@ -56,7 +57,7 @@ class LiftInputDelay<IN, OUT> implements LiftingFunction<IN, OUT, IN, OUT> {
    * @param delay         the delay value.
    * @param timeUnit      the delay time unit.
    */
-  LiftInputDelay(@NotNull final ScheduledExecutor executor,
+  LiftOutputDelay(@NotNull final ScheduledExecutor executor,
       @NotNull final ChannelConfiguration configuration, final long delay,
       @NotNull final TimeUnit timeUnit) {
     mExecutor = ConstantConditions.notNull("executor instance", executor);
@@ -70,9 +71,9 @@ class LiftInputDelay<IN, OUT> implements LiftingFunction<IN, OUT, IN, OUT> {
     return wrapSupplier(supplier).andThen(new Function<Channel<IN, OUT>, Channel<IN, OUT>>() {
 
       public Channel<IN, OUT> apply(final Channel<IN, OUT> channel) {
-        final Channel<IN, IN> outputChannel =
-            JRoutineCore.channelOn(mExecutor).withConfiguration(mConfiguration).ofType();
-        return outputChannel.after(mDelay, mTimeUnit).pipe(channel).afterNoDelay();
+        return channel.pipe(
+            JRoutineCore.channelOn(mExecutor).withConfiguration(mConfiguration).<OUT>ofType().after(
+                mDelay, mTimeUnit));
       }
     });
   }

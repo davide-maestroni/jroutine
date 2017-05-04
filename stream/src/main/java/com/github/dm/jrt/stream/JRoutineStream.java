@@ -16,11 +16,15 @@
 
 package com.github.dm.jrt.stream;
 
+import com.github.dm.jrt.core.executor.ScheduledExecutor;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.stream.routine.StreamRoutine;
+import com.github.dm.jrt.stream.transform.StreamLifter;
 
 import org.jetbrains.annotations.NotNull;
+
+import static com.github.dm.jrt.core.executor.ScheduledExecutors.defaultExecutor;
 
 /**
  * Utility class acting as a factory of stream routine builders.
@@ -46,6 +50,27 @@ public class JRoutineStream {
    */
   protected JRoutineStream() {
     ConstantConditions.avoid();
+  }
+
+  /**
+   * Returns a builder of lifting functions.
+   *
+   * @return the builder instance.
+   */
+  @NotNull
+  public static StreamLifter streamLifter() {
+    return streamLifterOn(defaultExecutor());
+  }
+
+  /**
+   * Returns a builder of lifting functions employing the specified executor.
+   *
+   * @param executor the executor instance.
+   * @return the builder instance.
+   */
+  @NotNull
+  public static StreamLifter streamLifterOn(@NotNull final ScheduledExecutor executor) {
+    return new DefaultStreamLifter(executor);
   }
 
   /**

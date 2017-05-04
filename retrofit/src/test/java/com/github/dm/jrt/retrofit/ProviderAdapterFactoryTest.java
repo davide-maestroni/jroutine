@@ -16,14 +16,12 @@
 
 package com.github.dm.jrt.retrofit;
 
-import com.github.dm.jrt.core.channel.Channel;
+import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.stream.JRoutineStream;
-import com.github.dm.jrt.stream.builder.StreamBuilder;
 
 import org.junit.Test;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collections;
 
@@ -33,7 +31,9 @@ import retrofit2.Retrofit;
 import retrofit2.Retrofit.Builder;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import static com.github.dm.jrt.core.executor.ScheduledExecutors.immediateExecutor;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
+import static com.github.dm.jrt.operator.JRoutineOperators.append;
 import static junit.framework.TestCase.fail;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -46,24 +46,23 @@ public class ProviderAdapterFactoryTest {
 
   @Test
   public void testDefault() {
-
     final TestAdapterFactory defaultFactory = new TestAdapterFactory();
     final TestAdapterFactory factory1 = new TestAdapterFactory();
     final TestAdapterFactory factory2 = new TestAdapterFactory();
     {
       final ProviderAdapterFactory adapterFactory = //
-          ProviderAdapterFactory.builder()
-                                .whenMissingAnnotation(defaultFactory)
+          ProviderAdapterFactory.factory()
+                                .withDefaultWhenMissing(defaultFactory)
                                 .add("list", factory1)
                                 .add("stream", factory2)
-                                .buildFactory();
+                                .create();
       final GsonConverterFactory converterFactory = GsonConverterFactory.create();
       final Retrofit retrofit = new Builder().baseUrl("http://localhost")
                                              .addCallAdapterFactory(adapterFactory)
                                              .addConverterFactory(converterFactory)
                                              .build();
       final GitHubService service = retrofit.create(GitHubService.class);
-      service.listRepos("octocat").in(seconds(1)).next();
+      service.listRepos("octocat").invoke().close().in(seconds(1)).next();
       assertThat(factory1.isCalled()).isTrue();
       assertThat(factory2.isCalled()).isFalse();
       assertThat(defaultFactory.isCalled()).isFalse();
@@ -82,17 +81,17 @@ public class ProviderAdapterFactoryTest {
 
     {
       final ProviderAdapterFactory adapterFactory = //
-          ProviderAdapterFactory.builder()
-                                .whenMissingName(defaultFactory)
+          ProviderAdapterFactory.factory()
+                                .withDefaultWhenNoMatch(defaultFactory)
                                 .add("list", factory1)
-                                .buildFactory();
+                                .create();
       final GsonConverterFactory converterFactory = GsonConverterFactory.create();
       final Retrofit retrofit = new Builder().baseUrl("http://localhost")
                                              .addCallAdapterFactory(adapterFactory)
                                              .addConverterFactory(converterFactory)
                                              .build();
       final GitHubService service = retrofit.create(GitHubService.class);
-      service.listRepos("octocat").in(seconds(1)).next();
+      service.listRepos("octocat").invoke().close().in(seconds(1)).next();
       assertThat(factory1.isCalled()).isTrue();
       assertThat(defaultFactory.isCalled()).isFalse();
       factory1.setCalled(false);
@@ -111,17 +110,17 @@ public class ProviderAdapterFactoryTest {
 
     {
       final ProviderAdapterFactory adapterFactory = //
-          ProviderAdapterFactory.builder()
-                                .whenMissing(defaultFactory)
+          ProviderAdapterFactory.factory()
+                                .withDefault(defaultFactory)
                                 .add("list", factory1)
-                                .buildFactory();
+                                .create();
       final GsonConverterFactory converterFactory = GsonConverterFactory.create();
       final Retrofit retrofit = new Builder().baseUrl("http://localhost")
                                              .addCallAdapterFactory(adapterFactory)
                                              .addConverterFactory(converterFactory)
                                              .build();
       final GitHubService service = retrofit.create(GitHubService.class);
-      service.listRepos("octocat").in(seconds(1)).next();
+      service.listRepos("octocat").invoke().close().in(seconds(1)).next();
       assertThat(factory1.isCalled()).isTrue();
       assertThat(defaultFactory.isCalled()).isFalse();
       factory1.setCalled(false);
@@ -138,14 +137,10 @@ public class ProviderAdapterFactoryTest {
 
   @Test
   public void testNotAnnotated() {
-
     final TestAdapterFactory factory1 = new TestAdapterFactory();
     final TestAdapterFactory factory2 = new TestAdapterFactory();
     final ProviderAdapterFactory adapterFactory = //
-        ProviderAdapterFactory.builder()
-                              .add("list", factory1)
-                              .add("stream", factory2)
-                              .buildFactory();
+        ProviderAdapterFactory.factory().add("list", factory1).add("stream", factory2).create();
     final GsonConverterFactory converterFactory = GsonConverterFactory.create();
     final Retrofit retrofit = new Builder().baseUrl("http://localhost")
                                            .addCallAdapterFactory(adapterFactory)
@@ -157,39 +152,33 @@ public class ProviderAdapterFactoryTest {
       fail();
 
     } catch (final IllegalArgumentException ignored) {
-
     }
   }
 
   @Test
   public void testSingle() {
-
     final TestAdapterFactory factory = new TestAdapterFactory();
-    final ProviderAdapterFactory adapterFactory =
-        ProviderAdapterFactory.withFactory("list", factory);
+    final ProviderAdapterFactory adapterFactory = ProviderAdapterFactory.factoryOf("list", factory);
     final GsonConverterFactory converterFactory = GsonConverterFactory.create();
     final Retrofit retrofit = new Builder().baseUrl("http://localhost")
                                            .addCallAdapterFactory(adapterFactory)
                                            .addConverterFactory(converterFactory)
                                            .build();
     final GitHubService service = retrofit.create(GitHubService.class);
-    service.listRepos("octocat").in(seconds(1)).next();
+    service.listRepos("octocat").invoke().close().in(seconds(1)).next();
     assertThat(factory.isCalled()).isTrue();
     try {
       service.streamRepos("octocat");
       fail();
 
     } catch (final IllegalArgumentException ignored) {
-
     }
   }
 
   @Test
   public void testWrongName() {
-
     final TestAdapterFactory factory = new TestAdapterFactory();
-    final ProviderAdapterFactory adapterFactory =
-        ProviderAdapterFactory.withFactory("test", factory);
+    final ProviderAdapterFactory adapterFactory = ProviderAdapterFactory.factoryOf("test", factory);
     final GsonConverterFactory converterFactory = GsonConverterFactory.create();
     final Retrofit retrofit = new Builder().baseUrl("http://localhost")
                                            .addCallAdapterFactory(adapterFactory)
@@ -201,7 +190,6 @@ public class ProviderAdapterFactoryTest {
       fail();
 
     } catch (final IllegalArgumentException ignored) {
-
     }
 
     try {
@@ -209,7 +197,6 @@ public class ProviderAdapterFactoryTest {
       fail();
 
     } catch (final IllegalArgumentException ignored) {
-
     }
   }
 
@@ -220,9 +207,8 @@ public class ProviderAdapterFactoryTest {
     @Override
     public CallAdapter<?> get(final Type returnType, final Annotation[] annotations,
         final Retrofit retrofit) {
-
       mCalled = true;
-      final RoutineAdapterFactory factory = RoutineAdapterFactory.buildFactory();
+      final RoutineAdapterFactory factory = RoutineAdapterFactory.defaultFactory();
       final Type responseType = factory.get(returnType, annotations, retrofit).responseType();
       return new CallAdapter<Object>() {
 
@@ -231,13 +217,8 @@ public class ProviderAdapterFactoryTest {
         }
 
         public <R> Object adapt(final Call<R> call) {
-          final StreamBuilder<?, ?> builder =
-              JRoutineStream.withStreamOf((Object) Collections.emptyList());
-          if (((ParameterizedType) returnType).getRawType() == Channel.class) {
-            return builder.invoke().close();
-          }
-
-          return builder;
+          return JRoutineStream.streamOf(JRoutineCore.routineOn(immediateExecutor())
+                                                     .of(append((Object) Collections.emptyList())));
         }
       };
     }

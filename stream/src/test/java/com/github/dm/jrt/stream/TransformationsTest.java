@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Davide Maestroni
+ * Copyright 2017 Davide Maestroni
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.stream.transform;
+package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.BackoffBuilder;
 import com.github.dm.jrt.core.common.RoutineException;
+import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.executor.ScheduledExecutor;
 import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.InvocationException;
-import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.routine.Routine;
@@ -35,9 +34,10 @@ import com.github.dm.jrt.function.util.BiConsumer;
 import com.github.dm.jrt.function.util.BiFunction;
 import com.github.dm.jrt.function.util.Function;
 import com.github.dm.jrt.function.util.FunctionDecorator;
+import com.github.dm.jrt.function.util.Supplier;
 import com.github.dm.jrt.operator.JRoutineOperators;
-import com.github.dm.jrt.stream.JRoutineStream;
 import com.github.dm.jrt.stream.routine.StreamRoutine;
+import com.github.dm.jrt.stream.transform.ResultTimeoutException;
 
 import org.assertj.core.api.Assertions;
 import org.assertj.core.data.Offset;
@@ -57,9 +57,7 @@ import static com.github.dm.jrt.operator.JRoutineOperators.appendAccept;
 import static com.github.dm.jrt.operator.JRoutineOperators.reduce;
 import static com.github.dm.jrt.operator.JRoutineOperators.unary;
 import static com.github.dm.jrt.operator.sequence.Sequences.range;
-import static com.github.dm.jrt.stream.transform.JRoutineTransformations.channelTransformer;
-import static com.github.dm.jrt.stream.transform.Transformations.throttle;
-import static com.github.dm.jrt.stream.transform.Transformations.timeoutAfter;
+import static com.github.dm.jrt.stream.JRoutineStream.streamLifter;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -84,28 +82,28 @@ public class TransformationsTest {
   @Test
   public void testBackoff() {
     Assertions.assertThat( //
-        JRoutineStream.streamOf(JRoutineCore.routineOn(getSingleThreadExecutor())
-                                            .withInvocation()
-                                            .withInputBackoff(BackoffBuilder.afterCount(2)
-                                                                            .linearDelay(
-                                                                                seconds(10)))
-                                            .configuration()
-                                            .of(appendAccept(range(1, 1000))))
-                      .map(JRoutineCore.routine().of(JRoutineOperators.<Number>identity()))
-                      .map(JRoutineCore.routine().of(unary(new Function<Number, Double>() {
-
-                        public Double apply(final Number number) {
-                          final double value = number.doubleValue();
-                          return Math.sqrt(value);
-                        }
-                      })))
+        JRoutineStream.streamOf(
+            JRoutineCore.routineOn(getSingleThreadExecutor()).of(appendAccept(range(1, 1000))))
+                      .map(JRoutineCore.routine()
+                                       .withInvocation()
+                                       .withInputBackoff(
+                                           BackoffBuilder.afterCount(2).linearDelay(seconds(10)))
+                                       .configuration()
+                                       .of(JRoutineOperators.<Number>identity()))
                       .map(JRoutineCore.routineOn(syncExecutor())
-                                       .of(unary(new Function<Double, SumData>() {
+                                       .of(unary(new Function<Number, Double>() {
 
-                                         public SumData apply(final Double aDouble) {
-                                           return new SumData(aDouble, 1);
+                                         public Double apply(final Number number) {
+                                           final double value = number.doubleValue();
+                                           return Math.sqrt(value);
                                          }
                                        })))
+                      .map(JRoutineCore.routine().of(unary(new Function<Double, SumData>() {
+
+                        public SumData apply(final Double aDouble) {
+                          return new SumData(aDouble, 1);
+                        }
+                      })))
                       .map(JRoutineCore.routineOn(syncExecutor())
                                        .of(reduce(new BiFunction<SumData, SumData, SumData>() {
 
@@ -135,20 +133,20 @@ public class TransformationsTest {
                                             .configuration()
                                             .of(appendAccept(range(1, 1000))))
                       .map(JRoutineCore.routine().of(JRoutineOperators.<Number>identity()))
-                      .map(JRoutineCore.routine().of(unary(new Function<Number, Double>() {
-
-                        public Double apply(final Number number) {
-                          final double value = number.doubleValue();
-                          return Math.sqrt(value);
-                        }
-                      })))
                       .map(JRoutineCore.routineOn(syncExecutor())
-                                       .of(unary(new Function<Double, SumData>() {
+                                       .of(unary(new Function<Number, Double>() {
 
-                                         public SumData apply(final Double aDouble) {
-                                           return new SumData(aDouble, 1);
+                                         public Double apply(final Number number) {
+                                           final double value = number.doubleValue();
+                                           return Math.sqrt(value);
                                          }
                                        })))
+                      .map(JRoutineCore.routine().of(unary(new Function<Double, SumData>() {
+
+                        public SumData apply(final Double aDouble) {
+                          return new SumData(aDouble, 1);
+                        }
+                      })))
                       .map(JRoutineCore.routineOn(syncExecutor())
                                        .of(reduce(new BiFunction<SumData, SumData, SumData>() {
 
@@ -172,24 +170,11 @@ public class TransformationsTest {
   }
 
   @Test
-  public void testConstructor() {
-    boolean failed = false;
-    try {
-      new JRoutineTransformations();
-      failed = true;
-
-    } catch (final Throwable ignored) {
-    }
-
-    assertThat(failed).isFalse();
-  }
-
-  @Test
   public void testDelayInputs() {
     long startTime = System.currentTimeMillis();
     assertThat(
         JRoutineStream.streamOf(JRoutineCore.routine().of(JRoutineOperators.<String>identity()))
-                      .lift(channelTransformer().<String, String>delayInputsOf(1, TimeUnit.SECONDS))
+                      .lift(streamLifter().<String, String>delayInputsOf(1, TimeUnit.SECONDS))
                       .invoke()
                       .pass("test")
                       .close()
@@ -199,7 +184,7 @@ public class TransformationsTest {
     startTime = System.currentTimeMillis();
     assertThat(
         JRoutineStream.streamOf(JRoutineCore.routine().of(JRoutineOperators.<String>identity()))
-                      .lift(channelTransformer().<String, String>delayInputsOf(seconds(1)))
+                      .lift(streamLifter().<String, String>delayInputsOf(seconds(1)))
                       .invoke()
                       .pass("test")
                       .close()
@@ -209,7 +194,7 @@ public class TransformationsTest {
     startTime = System.currentTimeMillis();
     assertThat(
         JRoutineStream.streamOf(JRoutineCore.routine().of(JRoutineOperators.<String>identity()))
-                      .lift(channelTransformer().<String, String>delayInputsOf(1, TimeUnit.SECONDS))
+                      .lift(streamLifter().<String, String>delayInputsOf(1, TimeUnit.SECONDS))
                       .invoke()
                       .close()
                       .in(seconds(3))
@@ -218,7 +203,7 @@ public class TransformationsTest {
     startTime = System.currentTimeMillis();
     assertThat(
         JRoutineStream.streamOf(JRoutineCore.routine().of(JRoutineOperators.<String>identity()))
-                      .lift(channelTransformer().<String, String>delayInputsOf(seconds(1)))
+                      .lift(streamLifter().<String, String>delayInputsOf(seconds(1)))
                       .invoke()
                       .close()
                       .in(seconds(3))
@@ -230,7 +215,7 @@ public class TransformationsTest {
   @SuppressWarnings("ConstantConditions")
   public void testDelayNullPointerError() {
     try {
-      channelTransformer().delayInputsOf(1, null);
+      streamLifter().delayInputsOf(1, null);
       fail();
 
     } catch (final NullPointerException ignored) {
@@ -242,8 +227,7 @@ public class TransformationsTest {
     long startTime = System.currentTimeMillis();
     assertThat(
         JRoutineStream.streamOf(JRoutineCore.routine().of(JRoutineOperators.<String>identity()))
-                      .lift(
-                          channelTransformer().<String, String>delayOutputsOf(1, TimeUnit.SECONDS))
+                      .lift(streamLifter().<String, String>delayOutputsOf(1, TimeUnit.SECONDS))
                       .invoke()
                       .pass("test")
                       .close()
@@ -253,7 +237,7 @@ public class TransformationsTest {
     startTime = System.currentTimeMillis();
     assertThat(
         JRoutineStream.streamOf(JRoutineCore.routine().of(JRoutineOperators.<String>identity()))
-                      .lift(channelTransformer().<String, String>delayOutputsOf(seconds(1)))
+                      .lift(streamLifter().<String, String>delayOutputsOf(seconds(1)))
                       .invoke()
                       .pass("test")
                       .close()
@@ -263,8 +247,7 @@ public class TransformationsTest {
     startTime = System.currentTimeMillis();
     assertThat(
         JRoutineStream.streamOf(JRoutineCore.routine().of(JRoutineOperators.<String>identity()))
-                      .lift(
-                          channelTransformer().<String, String>delayOutputsOf(1, TimeUnit.SECONDS))
+                      .lift(streamLifter().<String, String>delayOutputsOf(1, TimeUnit.SECONDS))
                       .invoke()
                       .close()
                       .in(seconds(3))
@@ -273,7 +256,7 @@ public class TransformationsTest {
     startTime = System.currentTimeMillis();
     assertThat(
         JRoutineStream.streamOf(JRoutineCore.routine().of(JRoutineOperators.<String>identity()))
-                      .lift(channelTransformer().<String, String>delayOutputsOf(seconds(1)))
+                      .lift(streamLifter().<String, String>delayOutputsOf(seconds(1)))
                       .invoke()
                       .close()
                       .in(seconds(3))
@@ -285,7 +268,7 @@ public class TransformationsTest {
   @SuppressWarnings("ConstantConditions")
   public void testLagNullPointerError() {
     try {
-      channelTransformer().delayOutputsOf(1, null);
+      streamLifter().delayOutputsOf(1, null);
       fail();
 
     } catch (final NullPointerException ignored) {
@@ -303,33 +286,33 @@ public class TransformationsTest {
           }
         })));
     assertThat(JRoutineStream.streamOf(JRoutineCore.routine().of(appendAccept(range(1, 3))))
-                             .lift(channelTransformer().<Integer, Integer, Long>splitIn(2, sqr))
+                             .lift(streamLifter().<Integer, Integer, Long>splitIn(2, sqr))
                              .invoke()
                              .close()
                              .in(seconds(3))
                              .all()).containsOnly(1L, 4L, 9L);
     assertThat(JRoutineStream.streamOf(JRoutineCore.routine().of(appendAccept(range(1, 3))))
-                             .lift(channelTransformer().<Integer, Integer, Long>splitIn(2, sqr))
+                             .lift(streamLifter().<Integer, Integer, Long>splitIn(2, sqr))
                              .invoke()
                              .close()
                              .in(seconds(3))
                              .all()).containsOnly(1L, 4L, 9L);
     assertThat(JRoutineStream.streamOf(JRoutineCore.routine().of(appendAccept(range(1, 3))))
-                             .lift(channelTransformer().<Integer, Integer, Integer>splitIn(2,
+                             .lift(streamLifter().<Integer, Integer, Integer>splitIn(2,
                                  JRoutineCore.routine().of(IdentityInvocation.<Integer>factory())))
                              .invoke()
                              .close()
                              .in(seconds(3))
                              .all()).containsOnly(1, 2, 3);
     assertThat(JRoutineStream.streamOf(JRoutineCore.routine().of(appendAccept(range(1, 3))))
-                             .lift(channelTransformer().<Integer, Integer, Long>splitBy(
+                             .lift(streamLifter().<Integer, Integer, Long>splitBy(
                                  FunctionDecorator.<Integer>identity(), sqr))
                              .invoke()
                              .close()
                              .in(seconds(3))
                              .all()).containsOnly(1L, 4L, 9L);
     assertThat(JRoutineStream.streamOf(JRoutineCore.routine().of(appendAccept(range(1, 3))))
-                             .lift(channelTransformer().<Integer, Integer, Integer>splitBy(
+                             .lift(streamLifter().<Integer, Integer, Integer>splitBy(
                                  FunctionDecorator.<Integer>identity(),
                                  JRoutineCore.routine().of(IdentityInvocation.<Integer>factory())))
                              .invoke()
@@ -342,56 +325,21 @@ public class TransformationsTest {
   @SuppressWarnings("ConstantConditions")
   public void testParallelSplitNullPointerError() {
     try {
-      Transformations.parallel(1, (InvocationFactory<Object, ?>) null);
+      streamLifter().splitIn(1, null);
       fail();
 
     } catch (final NullPointerException ignored) {
     }
 
     try {
-      Transformations.parallel(1, (Routine<Object, ?>) null);
+      streamLifter().splitBy(null, JRoutineCore.routine().of(IdentityInvocation.factory()));
       fail();
 
     } catch (final NullPointerException ignored) {
     }
 
     try {
-      Transformations.parallel(1, (RoutineBuilder<Object, ?>) null);
-      fail();
-
-    } catch (final NullPointerException ignored) {
-    }
-
-    try {
-      Transformations.parallelBy(null, JRoutineStream.withStream().buildRoutine());
-      fail();
-
-    } catch (final NullPointerException ignored) {
-    }
-
-    try {
-      Transformations.parallelBy(null, JRoutineStream.withStream());
-      fail();
-
-    } catch (final NullPointerException ignored) {
-    }
-
-    try {
-      Transformations.parallelBy(Functions.identity(), (InvocationFactory<Object, ?>) null);
-      fail();
-
-    } catch (final NullPointerException ignored) {
-    }
-
-    try {
-      Transformations.parallelBy(Functions.identity(), (Routine<Object, ?>) null);
-      fail();
-
-    } catch (final NullPointerException ignored) {
-    }
-
-    try {
-      Transformations.parallelBy(Functions.identity(), (RoutineBuilder<Object, ?>) null);
+      streamLifter().splitBy(FunctionDecorator.identity(), null);
       fail();
 
     } catch (final NullPointerException ignored) {
@@ -402,14 +350,14 @@ public class TransformationsTest {
   public void testRetry() {
     final AtomicInteger count1 = new AtomicInteger();
     try {
-      JRoutineStream.<String>withStream().map(new UpperCase())
-                                         .map(factoryOf(ThrowException.class, count1))
-                                         .lift(Transformations.<String, Object>retry(2))
-                                         .invoke()
-                                         .pass("test")
-                                         .close()
-                                         .in(seconds(3))
-                                         .throwError();
+      JRoutineStream.streamOf(JRoutineCore.routine().of(new UpperCase()))
+                    .map(JRoutineCore.routine().of(factoryOf(ThrowException.class, count1)))
+                    .lift(streamLifter().<String, Object>retry(2))
+                    .invoke()
+                    .pass("test")
+                    .close()
+                    .in(seconds(3))
+                    .throwError();
       fail();
 
     } catch (final InvocationException e) {
@@ -417,25 +365,26 @@ public class TransformationsTest {
     }
 
     final AtomicInteger count2 = new AtomicInteger();
-    assertThat(JRoutineStream.<String>withStream().map(new UpperCase())
-                                                  .map(factoryOf(ThrowException.class, count2, 1))
-                                                  .lift(Transformations.<String, Object>retry(1))
-                                                  .invoke()
-                                                  .pass("test")
-                                                  .close()
-                                                  .in(seconds(3))
-                                                  .all()).containsExactly("TEST");
+    assertThat(JRoutineStream.streamOf(JRoutineCore.routine().of(new UpperCase()))
+                             .map(JRoutineCore.routine()
+                                              .of(factoryOf(ThrowException.class, count2, 1)))
+                             .lift(streamLifter().<String, Object>retry(1))
+                             .invoke()
+                             .pass("test")
+                             .close()
+                             .in(seconds(3))
+                             .all()).containsExactly("TEST");
 
     final AtomicInteger count3 = new AtomicInteger();
     try {
-      JRoutineStream.<String>withStream().map(new AbortInvocation())
-                                         .map(factoryOf(ThrowException.class, count3))
-                                         .lift(Transformations.<String, Object>retry(2))
-                                         .invoke()
-                                         .pass("test")
-                                         .close()
-                                         .in(seconds(3))
-                                         .throwError();
+      JRoutineStream.streamOf(JRoutineCore.routine().of(new AbortInvocation()))
+                    .map(JRoutineCore.routine().of(factoryOf(ThrowException.class, count3)))
+                    .lift(streamLifter().retry(2))
+                    .invoke()
+                    .pass("test")
+                    .close()
+                    .in(seconds(3))
+                    .throwError();
       fail();
 
     } catch (final AbortException e) {
@@ -445,40 +394,40 @@ public class TransformationsTest {
 
   @Test
   public void testRetryConsumerError() {
-    final Channel<Object, Object> inputChannel = JRoutineCore.ofData().buildChannel();
-    final Channel<Object, Object> outputChannel = JRoutineCore.ofData().buildChannel();
-    new RetryChannelConsumer<Object, Object>(syncExecutor(), inputChannel, outputChannel,
-        new Function<Channel<?, Object>, Channel<?, Object>>() {
+    final Channel<Object, Object> inputChannel = JRoutineCore.channel().ofType();
+    final Channel<Object, Object> outputChannel = JRoutineCore.channel().ofType();
+    new RetryChannelConsumer<Object, Object>(syncExecutor(),
+        ChannelConfiguration.defaultConfiguration(), new Supplier<Channel<Object, Object>>() {
 
-          public Channel<?, Object> apply(final Channel<?, Object> channel) throws Exception {
-            throw new NullPointerException();
-          }
-        }, new BiFunction<Integer, RoutineException, Long>() {
+      public Channel<Object, Object> get() throws Exception {
+        throw new NullPointerException();
+      }
+    }, new BiFunction<Integer, RoutineException, Long>() {
 
       public Long apply(final Integer integer, final RoutineException e) {
         return 0L;
       }
-    }).run();
+    }, inputChannel, outputChannel).run();
     assertThat(inputChannel.getError()).isNotNull();
     assertThat(outputChannel.getError()).isNotNull();
   }
 
   @Test
   public void testRetryConsumerError2() {
-    final Channel<Object, Object> inputChannel = JRoutineCore.ofData().buildChannel();
-    final Channel<Object, Object> outputChannel = JRoutineCore.ofData().buildChannel();
-    new RetryChannelConsumer<Object, Object>(syncExecutor(), inputChannel, outputChannel,
-        new Function<Channel<?, Object>, Channel<?, Object>>() {
+    final Channel<Object, Object> inputChannel = JRoutineCore.channel().ofType();
+    final Channel<Object, Object> outputChannel = JRoutineCore.channel().ofType();
+    new RetryChannelConsumer<Object, Object>(syncExecutor(),
+        ChannelConfiguration.defaultConfiguration(), new Supplier<Channel<Object, Object>>() {
 
-          public Channel<?, Object> apply(final Channel<?, Object> channel) {
-            return channel;
-          }
-        }, new BiFunction<Integer, RoutineException, Long>() {
+      public Channel<Object, Object> get() {
+        return JRoutineCore.channel().ofType();
+      }
+    }, new BiFunction<Integer, RoutineException, Long>() {
 
       public Long apply(final Integer integer, final RoutineException e) throws Exception {
         throw new NullPointerException();
       }
-    }).run();
+    }, inputChannel, outputChannel).run();
     inputChannel.abort(new RoutineException());
     assertThat(inputChannel.getError()).isNotNull();
     assertThat(outputChannel.getError()).isNotNull();
@@ -488,14 +437,14 @@ public class TransformationsTest {
   @SuppressWarnings("ConstantConditions")
   public void testRetryNullPointerError() {
     try {
-      Transformations.retry(1, null);
+      streamLifter().retry(1, null);
       fail();
 
     } catch (final NullPointerException ignored) {
     }
 
     try {
-      Transformations.retry(null);
+      streamLifter().retry(null);
       fail();
 
     } catch (final NullPointerException ignored) {
@@ -504,13 +453,9 @@ public class TransformationsTest {
 
   @Test
   public void testThrottle() throws InterruptedException {
-    final Routine<Object, Object> routine = JRoutineStream.withStream()
-                                                          .lift(throttle(1))
-                                                          .withInvocation()
-                                                          .withExecutor(
-                                                              ScheduledExecutors.poolExecutor(1))
-                                                          .configured()
-                                                          .buildRoutine();
+    final Routine<Object, Object> routine = JRoutineStream.streamOf(
+        JRoutineCore.routineOn(ScheduledExecutors.poolExecutor(1)).of(IdentityInvocation.factory()))
+                                                          .lift(streamLifter().throttle(1));
     final Channel<Object, Object> channel1 = routine.invoke().pass("test1");
     final Channel<Object, Object> channel2 = routine.invoke().pass("test2");
     seconds(0.5).sleepAtLeast();
@@ -520,13 +465,9 @@ public class TransformationsTest {
 
   @Test
   public void testThrottleAbort() throws InterruptedException {
-    final Routine<Object, Object> routine = JRoutineStream.withStream()
-                                                          .lift(throttle(1))
-                                                          .withInvocation()
-                                                          .withExecutor(
-                                                              ScheduledExecutors.poolExecutor(1))
-                                                          .configured()
-                                                          .buildRoutine();
+    final Routine<Object, Object> routine = JRoutineStream.streamOf(
+        JRoutineCore.routineOn(ScheduledExecutors.poolExecutor(1)).of(IdentityInvocation.factory()))
+                                                          .lift(streamLifter().throttle(1));
     final Channel<Object, Object> channel1 = routine.invoke().pass("test1");
     final Channel<Object, Object> channel2 = routine.invoke().pass("test2");
     seconds(0.5).sleepAtLeast();
@@ -537,7 +478,8 @@ public class TransformationsTest {
   @Test
   public void testTimeThrottle() {
     final Routine<Object, Object> routine =
-        JRoutineStream.withStream().lift(throttle(1, seconds(1))).buildRoutine();
+        JRoutineStream.streamOf(JRoutineCore.routine().of(IdentityInvocation.factory()))
+                      .lift(streamLifter().throttle(1, seconds(1)));
     final Channel<Object, Object> channel1 = routine.invoke().pass("test1").close();
     final Channel<Object, Object> channel2 = routine.invoke().pass("test2").close();
     assertThat(channel1.in(seconds(1.5)).next()).isEqualTo("test1");
@@ -546,21 +488,21 @@ public class TransformationsTest {
 
   @Test
   public void testTimeout() {
-    assertThat(JRoutineStream.withStream()
-                             .lift(timeoutAfter(seconds(1)))
+    assertThat(JRoutineStream.streamOf(JRoutineCore.routine().of(IdentityInvocation.factory()))
+                             .lift(streamLifter().timeoutAfter(seconds(1)))
                              .invoke()
                              .pass("test")
                              .close()
                              .in(seconds(1))
                              .all()).containsExactly("test");
-    assertThat(JRoutineStream.withStream()
-                             .lift(timeoutAfter(millis(1)))
+    assertThat(JRoutineStream.streamOf(JRoutineCore.routine().of(IdentityInvocation.factory()))
+                             .lift(streamLifter().timeoutAfter(millis(1)))
                              .invoke()
                              .pass("test")
                              .in(seconds(1))
                              .getError()).isExactlyInstanceOf(ResultTimeoutException.class);
-    assertThat(JRoutineStream.withStream()
-                             .lift(timeoutAfter(indefiniteTime(), millis(1)))
+    assertThat(JRoutineStream.streamOf(JRoutineCore.routine().of(IdentityInvocation.factory()))
+                             .lift(streamLifter().timeoutAfter(indefiniteTime(), millis(1)))
                              .invoke()
                              .pass("test")
                              .in(seconds(1))
@@ -569,58 +511,51 @@ public class TransformationsTest {
 
   @Test
   public void testTryCatch() {
-    assertThat(JRoutineStream.<String>withStream().sync()
-                                                  .map(new Function<Object, Object>() {
+    assertThat(JRoutineStream.streamOf(
+        JRoutineCore.routineOn(syncExecutor()).of(unary(new Function<Object, Object>() {
 
-                                                    public Object apply(final Object o) {
-                                                      throw new NullPointerException();
-                                                    }
-                                                  })
-                                                  .lift(
-                                                      Transformations.<String,
-                                                          Object>tryCatchAccept(
-                                                          new BiConsumer<RoutineException,
-                                                              Channel<Object, ?>>() {
+          public Object apply(final Object o) {
+            throw new NullPointerException();
+          }
+        })))
+                             .lift(streamLifter().tryCatchAccept(
+                                 new BiConsumer<RoutineException, Channel<Object, ?>>() {
 
-                                                            public void accept(
-                                                                final RoutineException e,
-                                                                final Channel<Object, ?> channel) {
-                                                              channel.pass("exception");
-                                                            }
-                                                          }))
-                                                  .invoke()
-                                                  .pass("test")
-                                                  .close()
-                                                  .next()).isEqualTo("exception");
-    assertThat(JRoutineStream.<String>withStream().sync()
-                                                  .map(new Function<Object, Object>() {
+                                   public void accept(final RoutineException e,
+                                       final Channel<Object, ?> channel) {
+                                     channel.pass("exception");
+                                   }
+                                 }))
+                             .invoke()
+                             .pass("test")
+                             .close()
+                             .next()).isEqualTo("exception");
+    assertThat(JRoutineStream.streamOf(
+        JRoutineCore.routineOn(syncExecutor()).of(unary(new Function<Object, Object>() {
 
-                                                    public Object apply(final Object o) {
-                                                      return o;
-                                                    }
-                                                  })
-                                                  .lift(
-                                                      Transformations.<String,
-                                                          Object>tryCatchAccept(
-                                                          new BiConsumer<RoutineException,
-                                                              Channel<Object, ?>>() {
+          public Object apply(final Object o) {
+            return o;
+          }
+        })))
+                             .lift(streamLifter().tryCatchAccept(
+                                 new BiConsumer<RoutineException, Channel<Object, ?>>() {
 
-                                                            public void accept(
-                                                                final RoutineException e,
-                                                                final Channel<Object, ?> channel) {
-                                                              channel.pass("exception");
-                                                            }
-                                                          }))
-                                                  .invoke()
-                                                  .pass("test")
-                                                  .close()
-                                                  .next()).isEqualTo("test");
-    assertThat(JRoutineStream.<String>withStream().sync().map(new Function<Object, Object>() {
+                                   public void accept(final RoutineException e,
+                                       final Channel<Object, ?> channel) {
+                                     channel.pass("exception");
+                                   }
+                                 }))
+                             .invoke()
+                             .pass("test")
+                             .close()
+                             .next()).isEqualTo("test");
+    assertThat(JRoutineStream.streamOf(
+        JRoutineCore.routineOn(syncExecutor()).of(unary(new Function<Object, Object>() {
 
-      public Object apply(final Object o) {
-        throw new NullPointerException();
-      }
-    }).lift(Transformations.<String, Object>tryCatch(new Function<RoutineException, Object>() {
+          public Object apply(final Object o) {
+            throw new NullPointerException();
+          }
+        }))).lift(streamLifter().tryCatch(new Function<RoutineException, Object>() {
 
       public Object apply(final RoutineException e) {
         return "exception";
@@ -632,14 +567,14 @@ public class TransformationsTest {
   @SuppressWarnings("ConstantConditions")
   public void testTryCatchNullPointerError() {
     try {
-      Transformations.tryCatchAccept(null);
+      streamLifter().tryCatchAccept(null);
       fail();
 
     } catch (final NullPointerException ignored) {
     }
 
     try {
-      Transformations.tryCatch(null);
+      streamLifter().tryCatch(null);
       fail();
 
     } catch (final NullPointerException ignored) {
@@ -650,12 +585,13 @@ public class TransformationsTest {
   public void testTryFinally() {
     final AtomicBoolean isRun = new AtomicBoolean(false);
     try {
-      JRoutineStream.<String>withStream().sync().map(new Function<Object, Object>() {
+      JRoutineStream.streamOf(
+          JRoutineCore.routineOn(syncExecutor()).of(unary(new Function<Object, Object>() {
 
-        public Object apply(final Object o) {
-          throw new NullPointerException();
-        }
-      }).lift(Transformations.<String, Object>tryFinally(new Action() {
+            public Object apply(final Object o) {
+              throw new NullPointerException();
+            }
+          }))).lift(streamLifter().tryFinally(new Action() {
 
         public void perform() {
           isRun.set(true);
@@ -666,12 +602,13 @@ public class TransformationsTest {
     }
 
     assertThat(isRun.getAndSet(false)).isTrue();
-    assertThat(JRoutineStream.<String>withStream().sync().map(new Function<Object, Object>() {
+    assertThat(JRoutineStream.streamOf(
+        JRoutineCore.routineOn(syncExecutor()).of(unary(new Function<Object, Object>() {
 
-      public Object apply(final Object o) {
-        return o;
-      }
-    }).lift(Transformations.<String, Object>tryFinally(new Action() {
+          public Object apply(final Object o) {
+            return o;
+          }
+        }))).lift(streamLifter().tryFinally(new Action() {
 
       public void perform() {
         isRun.set(true);
@@ -684,7 +621,7 @@ public class TransformationsTest {
   @SuppressWarnings("ConstantConditions")
   public void testTryFinallyNullPointerError() {
     try {
-      Transformations.tryFinally(null);
+      streamLifter().tryFinally(null);
       fail();
 
     } catch (final NullPointerException ignored) {

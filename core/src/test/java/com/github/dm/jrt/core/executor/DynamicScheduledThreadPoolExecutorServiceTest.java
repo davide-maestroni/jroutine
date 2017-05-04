@@ -19,6 +19,7 @@ package com.github.dm.jrt.core.executor;
 import org.junit.Test;
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.fail;
@@ -31,7 +32,7 @@ import static org.junit.Assert.fail;
 public class DynamicScheduledThreadPoolExecutorServiceTest {
 
   @Test
-  public void testUnsupportedMethods() {
+  public void testUnsupportedMethods() throws InterruptedException {
 
     final DynamicScheduledThreadPoolExecutorService executor =
         new DynamicScheduledThreadPoolExecutorService(1, 1, 1, TimeUnit.SECONDS);
@@ -49,30 +50,22 @@ public class DynamicScheduledThreadPoolExecutorServiceTest {
 
     }
 
-    try {
-      executor.scheduleAtFixedRate(new Runnable() {
+    final Semaphore semaphore = new Semaphore(0);
+    executor.scheduleAtFixedRate(new Runnable() {
 
-        public void run() {
+      public void run() {
+        semaphore.release();
+      }
+    }, 0, 1, TimeUnit.SECONDS);
+    semaphore.acquire();
 
-        }
-      }, 0, 1, TimeUnit.SECONDS);
-      fail();
+    executor.scheduleWithFixedDelay(new Runnable() {
 
-    } catch (final UnsupportedOperationException ignored) {
-
-    }
-
-    try {
-      executor.scheduleWithFixedDelay(new Runnable() {
-
-        public void run() {
-
-        }
-      }, 0, 1, TimeUnit.SECONDS);
-      fail();
-
-    } catch (final UnsupportedOperationException ignored) {
-
-    }
+      public void run() {
+        semaphore.release();
+      }
+    }, 0, 1, TimeUnit.SECONDS);
+    semaphore.acquire();
+    executor.shutdown();
   }
 }

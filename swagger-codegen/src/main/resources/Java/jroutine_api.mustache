@@ -3,8 +3,10 @@ package {{package}};
 
 import {{invokerPackage}}.CollectionFormats.*;
 
-import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.stream.builder.StreamBuilder;
+{{^enableStreams}}
+import com.github.dm.jrt.core.routine.Routine;{{/enableStreams}}
+{{#enableStreams}}
+import com.github.dm.jrt.stream.routine.StreamRoutine;{{/enableStreams}}
 
 import retrofit2.http.*;
 
@@ -27,28 +29,6 @@ public interface {{classname}} {
    * {{summary}}
    * {{notes}}
 {{#allParams}}   * @param {{paramName}} {{description}}{{#required}} (required){{/required}}{{^required}} (optional{{#defaultValue}}, default to {{{.}}}{{/defaultValue}}){{/required}}
-{{/allParams}}   * @return Channel&lt;Object, {{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Void{{/returnType}}&gt;
-   */
-{{>jroutine_annotations}}  {{#formParams}}{{#-first}}
-  {{#isMultipart}}@retrofit2.http.Multipart{{/isMultipart}}{{^isMultipart}}@retrofit2.http.FormUrlEncoded{{/isMultipart}}{{/-first}}{{/formParams}}
-  {{^formParams}}
-  {{#prioritizedContentTypes}}
-  {{#-first}}
-  @Headers({
-  	"Content-Type:{{mediaType}}" 
-  })
-  {{/-first}}
-  {{/prioritizedContentTypes}}
-  {{/formParams}}  
-  @{{httpMethod}}("{{path}}")
-  Channel<Object, {{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Void{{/returnType}}> {{operationId}}({{^allParams}});{{/allParams}}
-    {{#allParams}}{{>libraries/retrofit2/queryParams}}{{>libraries/retrofit2/pathParams}}{{>libraries/retrofit2/headerParams}}{{>libraries/retrofit2/bodyParams}}{{>libraries/retrofit2/formParams}}{{#hasMore}}, {{/hasMore}}{{^hasMore}}
-  );{{/hasMore}}{{/allParams}}
-{{#enableStreams}}
-  /**
-   * {{summary}}
-   * {{notes}}
-{{#allParams}}   * @param {{paramName}} {{description}}{{#required}} (required){{/required}}{{^required}} (optional{{#defaultValue}}, default to {{{.}}}{{/defaultValue}}){{/required}}
 {{/allParams}}   * @return StreamBuilder&lt;Object, {{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Void{{/returnType}}&gt;
    */
 {{>jroutine_annotations}}  {{#formParams}}{{#-first}}
@@ -63,10 +43,9 @@ public interface {{classname}} {
   {{/prioritizedContentTypes}}
   {{/formParams}}
   @{{httpMethod}}("{{path}}")
-  StreamBuilder<Object, {{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Void{{/returnType}}> {{operationId}}Stream({{^allParams}});{{/allParams}}
+  {{#enableStreams}}Stream{{/enableStreams}}Routine<Object, {{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Void{{/returnType}}> {{operationId}}({{^allParams}});{{/allParams}}
     {{#allParams}}{{>libraries/retrofit2/queryParams}}{{>libraries/retrofit2/pathParams}}{{>libraries/retrofit2/headerParams}}{{>libraries/retrofit2/bodyParams}}{{>libraries/retrofit2/formParams}}{{#hasMore}}, {{/hasMore}}{{^hasMore}}
   );{{/hasMore}}{{/allParams}}
-{{/enableStreams}}
   {{/operation}}
 }
 {{/operations}}

@@ -141,7 +141,7 @@ public class {{projectPrefix}}ApiClient {
   }
 
   public {{projectPrefix}}ApiClient withDefaultAdapterFactory() {
-    return withAdapterFactory(RoutineAdapterFactory.buildFactory());
+    return withAdapterFactory(RoutineAdapterFactory.defaultFactory());
   }
 
   public {{projectPrefix}}ApiClient withAdapterFactory(CallAdapter.Factory factory) {

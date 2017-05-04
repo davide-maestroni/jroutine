@@ -26,10 +26,9 @@ import org.jetbrains.annotations.NotNull;
  * <p>
  * Created by davide-maestroni on 02/09/2017.
  *
- * @param <IN>   the input data type.
  * @param <TYPE> the configurable object type.
  */
-public interface FlowableConfigurable<IN, TYPE> extends Configurable<IN, TYPE> {
+public interface FlowableConfigurable<TYPE> extends Configurable<TYPE> {
 
   /**
    * Gets the Flowable configuration builder related to the instance.
@@ -41,5 +40,5 @@ public interface FlowableConfigurable<IN, TYPE> extends Configurable<IN, TYPE> {
    * @return the Flowable configuration builder.
    */
   @NotNull
-  Builder<IN, TYPE> flowableConfiguration();
+  Builder<TYPE> flowableConfiguration();
 }

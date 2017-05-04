@@ -19,16 +19,12 @@ package com.github.dm.jrt.rx;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.invocation.CommandInvocation;
 import com.github.dm.jrt.core.invocation.InvocationException;
-import com.github.dm.jrt.core.invocation.MappingInvocation;
 
-import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 
-import java.util.Arrays;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -53,118 +49,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class JRoutineFlowableTest {
 
   @Test
-  public void testBuilder0() throws InterruptedException {
+  public void testBuilder() throws InterruptedException {
     final Semaphore semaphore = new Semaphore(0);
     final AtomicReference<String> reference = new AtomicReference<String>();
-    JRoutineFlowable.from(JRoutineCore.with(new CommandInvocation<String>(null) {
-
-      public void onComplete(@NotNull final Channel<String, ?> result) {
-        result.pass("test");
-      }
-    })).buildFlowable().map(new Function<String, String>() {
-
-      public String apply(final String s) {
-        return s.toUpperCase();
-      }
-
-    }).subscribe(new Consumer<String>() {
-
-      public void accept(final String s) {
-        reference.set(s);
-        semaphore.release();
-      }
-    });
-    semaphore.tryAcquire(1, TimeUnit.SECONDS);
-    assertThat(reference.get()).isEqualTo("TEST");
-  }
-
-  @Test
-  public void testBuilder1() throws InterruptedException {
-    final Semaphore semaphore = new Semaphore(0);
-    final AtomicReference<String> reference = new AtomicReference<String>();
-    JRoutineFlowable.from(JRoutineCore.with(new MappingInvocation<String, String>(null) {
-
-      public void onInput(final String input, @NotNull final Channel<String, ?> result) {
-        if (input != null) {
-          result.pass(input);
-        }
-      }
-    }))
-                    .flowableConfiguration()
-                    .withInput("test")
-                    .apply()
-                    .buildFlowable()
+    JRoutineFlowable.flowable()
+                    .of(JRoutineCore.channel().of("test"))
                     .map(new Function<String, String>() {
 
                       public String apply(final String s) {
                         return s.toUpperCase();
                       }
-                    })
-                    .subscribe(new Consumer<String>() {
 
-                      public void accept(final String s) {
-                        reference.set(s);
-                        semaphore.release();
-                      }
-                    });
-    semaphore.tryAcquire(1, TimeUnit.SECONDS);
-    assertThat(reference.get()).isEqualTo("TEST");
-  }
-
-  @Test
-  public void testBuilder2() throws InterruptedException {
-    final Semaphore semaphore = new Semaphore(0);
-    final AtomicReference<String> reference = new AtomicReference<String>();
-    JRoutineFlowable.from(JRoutineCore.with(new MappingInvocation<String, String>(null) {
-
-      public void onInput(final String input, @NotNull final Channel<String, ?> result) {
-        if (input != null) {
-          result.pass(input);
-        }
-      }
-    }))
-                    .flowableConfiguration()
-                    .withInputs(null, "test")
-                    .apply()
-                    .buildFlowable()
-                    .map(new Function<String, String>() {
-
-                      public String apply(final String s) {
-                        return s.toUpperCase();
-                      }
-                    })
-                    .subscribe(new Consumer<String>() {
-
-                      public void accept(final String s) {
-                        reference.set(s);
-                        semaphore.release();
-                      }
-                    });
-    semaphore.tryAcquire(1, TimeUnit.SECONDS);
-    assertThat(reference.get()).isEqualTo("TEST");
-  }
-
-  @Test
-  public void testBuilder3() throws InterruptedException {
-    final Semaphore semaphore = new Semaphore(0);
-    final AtomicReference<String> reference = new AtomicReference<String>();
-    JRoutineFlowable.from(JRoutineCore.with(new MappingInvocation<String, String>(null) {
-
-      public void onInput(final String input, @NotNull final Channel<String, ?> result) {
-        if (input != null) {
-          result.pass(input);
-        }
-      }
-    }))
-                    .flowableConfiguration()
-                    .withInputs(Arrays.asList(null, "test"))
-                    .apply()
-                    .buildFlowable()
-                    .map(new Function<String, String>() {
-
-                      public String apply(final String s) {
-                        return s.toUpperCase();
-                      }
                     })
                     .subscribe(new Consumer<String>() {
 
@@ -179,55 +74,55 @@ public class JRoutineFlowableTest {
 
   @Test
   public void testChannelAbortCompletable() {
-    final Channel<?, ?> channel =
-        JRoutineFlowable.with(Completable.complete().delay(1, TimeUnit.SECONDS))
-                        .withChannel()
-                        .withMaxSize(2)
-                        .configuration()
-                        .buildChannel();
+    final Channel<?, ?> channel = JRoutineFlowable.channel()
+                                                  .withChannel()
+                                                  .withMaxSize(2)
+                                                  .configuration()
+                                                  .of(Completable.complete()
+                                                                 .delay(1, TimeUnit.SECONDS));
     assertThat(channel.abort()).isTrue();
   }
 
   @Test
   public void testChannelAbortFlowable() {
-    final Channel<?, String> channel =
-        JRoutineFlowable.with(Flowable.just("test1", "test2").delay(1, TimeUnit.SECONDS))
-                        .withChannel()
-                        .withMaxSize(2)
-                        .configuration()
-                        .buildChannel();
+    final Channel<?, String> channel = JRoutineFlowable.channel()
+                                                       .withChannel()
+                                                       .withMaxSize(2)
+                                                       .configuration()
+                                                       .of(Flowable.just("test1", "test2")
+                                                                   .delay(1, TimeUnit.SECONDS));
     assertThat(channel.abort()).isTrue();
   }
 
   @Test
   public void testChannelAbortObservable() {
-    final Channel<?, String> channel =
-        JRoutineFlowable.with(Observable.just("test1", "test2").delay(1, TimeUnit.SECONDS))
-                        .withChannel()
-                        .withMaxSize(2)
-                        .configuration()
-                        .buildChannel();
+    final Channel<?, String> channel = JRoutineFlowable.channel()
+                                                       .withChannel()
+                                                       .withMaxSize(2)
+                                                       .configuration()
+                                                       .of(Observable.just("test1", "test2")
+                                                                     .delay(1, TimeUnit.SECONDS));
     assertThat(channel.abort()).isTrue();
   }
 
   @Test
   public void testChannelAbortSingle() {
-    final Channel<?, String> channel =
-        JRoutineFlowable.with(Single.just("test1").delay(1, TimeUnit.SECONDS))
-                        .withChannel()
-                        .withMaxSize(2)
-                        .configuration()
-                        .buildChannel();
+    final Channel<?, String> channel = JRoutineFlowable.channel()
+                                                       .withChannel()
+                                                       .withMaxSize(2)
+                                                       .configuration()
+                                                       .of(Single.just("test1")
+                                                                 .delay(1, TimeUnit.SECONDS));
     assertThat(channel.abort()).isTrue();
   }
 
   @Test
   public void testChannelCompletable() {
-    final Channel<?, ?> channel = JRoutineFlowable.with(Completable.complete())
+    final Channel<?, ?> channel = JRoutineFlowable.channel()
                                                   .withChannel()
                                                   .withMaxSize(2)
                                                   .configuration()
-                                                  .buildChannel();
+                                                  .of(Completable.complete());
     assertThat(channel.all()).isEmpty();
   }
 
@@ -235,12 +130,12 @@ public class JRoutineFlowableTest {
   @SuppressWarnings({"ThrowableResultOfMethodCallIgnored", "ConstantConditions"})
   public void testChannelErrorFlowable() {
     final Channel<?, String> channel =
-        JRoutineFlowable.with(Flowable.just("test").map(new Function<String, String>() {
+        JRoutineFlowable.channel().of(Flowable.just("test").map(new Function<String, String>() {
 
           public String apply(final String s) {
             throw new IllegalStateException(s);
           }
-        })).buildChannel();
+        }));
     assertThat(channel.getError()).isExactlyInstanceOf(InvocationException.class);
     assertThat(channel.getError().getCause()).isExactlyInstanceOf(IllegalStateException.class);
     assertThat(channel.getError().getCause().getMessage()).isEqualTo("test");
@@ -250,12 +145,12 @@ public class JRoutineFlowableTest {
   @SuppressWarnings({"ThrowableResultOfMethodCallIgnored", "ConstantConditions"})
   public void testChannelErrorObservable() {
     final Channel<?, String> channel =
-        JRoutineFlowable.with(Observable.just("test").map(new Function<String, String>() {
+        JRoutineFlowable.channel().of(Observable.just("test").map(new Function<String, String>() {
 
           public String apply(final String s) {
             throw new IllegalStateException(s);
           }
-        })).buildChannel();
+        }));
     assertThat(channel.getError()).isExactlyInstanceOf(InvocationException.class);
     assertThat(channel.getError().getCause()).isExactlyInstanceOf(IllegalStateException.class);
     assertThat(channel.getError().getCause().getMessage()).isEqualTo("test");
@@ -265,12 +160,12 @@ public class JRoutineFlowableTest {
   @SuppressWarnings({"ThrowableResultOfMethodCallIgnored", "ConstantConditions"})
   public void testChannelErrorSingle() {
     final Channel<?, String> channel =
-        JRoutineFlowable.with(Single.just("test").map(new Function<String, String>() {
+        JRoutineFlowable.channel().of(Single.just("test").map(new Function<String, String>() {
 
           public String apply(final String s) {
             throw new IllegalStateException(s);
           }
-        })).buildChannel();
+        }));
     assertThat(channel.getError()).isExactlyInstanceOf(InvocationException.class);
     assertThat(channel.getError().getCause()).isExactlyInstanceOf(IllegalStateException.class);
     assertThat(channel.getError().getCause().getMessage()).isEqualTo("test");
@@ -278,39 +173,39 @@ public class JRoutineFlowableTest {
 
   @Test
   public void testChannelFlowable() {
-    final Channel<?, String> channel = JRoutineFlowable.with(Flowable.just("test1", "test2"))
+    final Channel<?, String> channel = JRoutineFlowable.channel()
                                                        .withChannel()
                                                        .withMaxSize(2)
                                                        .configuration()
-                                                       .buildChannel();
+                                                       .of(Flowable.just("test1", "test2"));
     assertThat(channel.all()).containsExactly("test1", "test2");
   }
 
   @Test
   public void testChannelObservable() {
-    final Channel<?, String> channel = JRoutineFlowable.with(Observable.just("test1", "test2"))
+    final Channel<?, String> channel = JRoutineFlowable.channel()
                                                        .withChannel()
                                                        .withMaxSize(2)
                                                        .configuration()
-                                                       .buildChannel();
+                                                       .of(Observable.just("test1", "test2"));
     assertThat(channel.all()).containsExactly("test1", "test2");
   }
 
   @Test
   public void testChannelSingle() {
-    final Channel<?, String> channel = JRoutineFlowable.with(Single.just("test1"))
+    final Channel<?, String> channel = JRoutineFlowable.channel()
                                                        .withChannel()
                                                        .withMaxSize(2)
                                                        .configuration()
-                                                       .buildChannel();
+                                                       .of(Single.just("test1"));
     assertThat(channel.all()).containsExactly("test1");
   }
 
   @Test
   public void testFlowable() {
     final AtomicReference<String> reference = new AtomicReference<String>();
-    JRoutineFlowable.from(JRoutineCore.of("test").buildChannel())
-                    .buildFlowable()
+    JRoutineFlowable.flowable()
+                    .of(JRoutineCore.channel().of("test"))
                     .map(new Function<String, String>() {
 
                       public String apply(final String s) {
@@ -331,8 +226,8 @@ public class JRoutineFlowableTest {
   public void testFlowableError() {
     final AtomicReference<String> reference = new AtomicReference<String>();
     final AtomicReference<Throwable> errorReference = new AtomicReference<Throwable>();
-    JRoutineFlowable.from(JRoutineCore.of("test").buildChannel())
-                    .buildFlowable()
+    JRoutineFlowable.flowable()
+                    .of(JRoutineCore.channel().of("test"))
                     .map(new Function<String, String>() {
 
                       public String apply(final String s) {
@@ -365,9 +260,9 @@ public class JRoutineFlowableTest {
   public void testFlowableError2() {
     final AtomicReference<String> reference = new AtomicReference<String>();
     final AtomicReference<Throwable> errorReference = new AtomicReference<Throwable>();
-    final Channel<String, String> channel = JRoutineCore.<String>ofData().buildChannel();
+    final Channel<String, String> channel = JRoutineCore.channel().ofType();
     channel.abort();
-    JRoutineFlowable.from(channel).buildFlowable().map(new Function<String, String>() {
+    JRoutineFlowable.flowable().of(channel).map(new Function<String, String>() {
 
       public String apply(final String s) {
         return s.toUpperCase();
@@ -397,9 +292,9 @@ public class JRoutineFlowableTest {
   public void testFlowableUnsubscribe() throws InterruptedException {
     final AtomicReference<String> reference = new AtomicReference<String>();
     final AtomicReference<Throwable> errorReference = new AtomicReference<Throwable>();
-    final Channel<String, String> channel = JRoutineCore.<String>ofData().buildChannel();
-    final Disposable disposable = JRoutineFlowable.from(channel.after(seconds(2)).pass("test"))
-                                                  .buildFlowable()
+    final Channel<String, String> channel = JRoutineCore.channel().ofType();
+    final Disposable disposable = JRoutineFlowable.flowable()
+                                                  .of(channel.after(seconds(2)).pass("test"))
                                                   .map(new Function<String, String>() {
 
                                                     public String apply(final String s) {

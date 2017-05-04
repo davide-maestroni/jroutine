@@ -37,39 +37,40 @@ public class FlowableConfigurationTest {
   @Test
   public void testBackpressureEquals() {
     final FlowableConfiguration configuration =
-        builder().withBackpressure(BackpressureStrategy.MISSING).apply();
+        builder().withBackpressure(BackpressureStrategy.MISSING).configuration();
     assertThat(configuration).isNotEqualTo(
-        builder().withBackpressure(BackpressureStrategy.DROP).apply());
-    assertThat(
-        configuration.builderFrom().withBackpressure(BackpressureStrategy.DROP).apply()).isEqualTo(
-        FlowableConfiguration.<String>builder().withBackpressure(BackpressureStrategy.DROP)
-                                               .apply());
+        builder().withBackpressure(BackpressureStrategy.DROP).configuration());
+    assertThat(configuration.builderFrom()
+                            .withBackpressure(BackpressureStrategy.DROP)
+                            .configuration()).isEqualTo(
+        builder().withBackpressure(BackpressureStrategy.DROP).configuration());
     assertThat(configuration).isNotEqualTo(
-        FlowableConfiguration.<String>builder().withBackpressure(BackpressureStrategy.DROP)
-                                               .apply());
+        builder().withBackpressure(BackpressureStrategy.DROP).configuration());
   }
 
   @Test
   public void testBuildFrom() {
     final FlowableConfiguration configuration =
-        builder().withBackpressure(BackpressureStrategy.MISSING).apply();
-    assertThat(configuration.builderFrom().apply()).isEqualTo(configuration);
-    assertThat(configuration.builderFrom().apply().hashCode()).isEqualTo(configuration.hashCode());
-    assertThat(builderFrom(null).apply()).isEqualTo(FlowableConfiguration.defaultConfiguration());
+        builder().withBackpressure(BackpressureStrategy.MISSING).configuration();
+    assertThat(configuration.builderFrom().configuration()).isEqualTo(configuration);
+    assertThat(configuration.builderFrom().configuration().hashCode()).isEqualTo(
+        configuration.hashCode());
+    assertThat(builderFrom(null).configuration()).isEqualTo(
+        FlowableConfiguration.defaultConfiguration());
   }
 
   @Test
   @SuppressWarnings("ConstantConditions")
   public void testBuildNullPointerError() {
     try {
-      new Builder<Object, Object>(null);
+      new Builder<Object>(null);
       fail();
 
     } catch (final NullPointerException ignored) {
     }
 
     try {
-      new Builder<Object, Object>(null, FlowableConfiguration.defaultConfiguration());
+      new Builder<Object>(null, FlowableConfiguration.defaultConfiguration());
       fail();
 
     } catch (final NullPointerException ignored) {
@@ -78,30 +79,13 @@ public class FlowableConfigurationTest {
 
   @Test
   public void testBuilderFromEquals() {
-    final FlowableConfiguration<String> configuration =
-        FlowableConfiguration.<String>builder().withInput("test").apply();
-    assertThat(FlowableConfiguration.<String>builder().withPatch(configuration).apply()).isEqualTo(
+    final FlowableConfiguration configuration =
+        builder().withBackpressure(BackpressureStrategy.BUFFER).configuration();
+    assertThat(builder().withPatch(configuration).configuration()).isEqualTo(configuration);
+    assertThat(configuration.builderFrom().configuration()).isEqualTo(configuration);
+    assertThat(configuration.builderFrom().withPatch(null).configuration()).isEqualTo(
         configuration);
-    assertThat(configuration.builderFrom().apply()).isEqualTo(configuration);
-    assertThat(configuration.builderFrom().withPatch(null).apply()).isEqualTo(configuration);
-    assertThat(configuration.builderFrom().withDefaults().apply()).isEqualTo(
+    assertThat(configuration.builderFrom().withDefaults().configuration()).isEqualTo(
         FlowableConfiguration.defaultConfiguration());
-  }
-
-  @Test
-  public void testInputsEquals() {
-    final FlowableConfiguration<String> configuration =
-        FlowableConfiguration.<String>builder().withInputs("test", "test").apply();
-    assertThat(configuration).isNotEqualTo(
-        FlowableConfiguration.<String>builder().withInput("test").apply());
-    assertThat(configuration.builderFrom().withInput("test").apply()).isEqualTo(
-        FlowableConfiguration.<String>builder().withInput("test").apply());
-    assertThat(configuration).isNotEqualTo(
-        FlowableConfiguration.<String>builder().withInput("test").apply());
-  }
-
-  @Test
-  public void testToString() {
-    assertThat(builder().withInput("test123").apply().toString()).contains("test123");
   }
 }

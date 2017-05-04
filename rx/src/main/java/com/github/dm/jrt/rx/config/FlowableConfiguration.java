@@ -22,11 +22,6 @@ import com.github.dm.jrt.core.util.DeepEqualObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
 import io.reactivex.BackpressureStrategy;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
@@ -44,71 +39,57 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * </ul>
  * <p>
  * Created by davide-maestroni on 02/09/2017.
- *
- * @param <IN> the input data type.
  */
 @SuppressWarnings("WeakerAccess")
-public class FlowableConfiguration<IN> extends DeepEqualObject {
+public class FlowableConfiguration extends DeepEqualObject {
 
-  private static final DefaultConfigurable<?> sDefaultConfigurable =
-      new DefaultConfigurable<Object>();
+  private static final DefaultConfigurable sDefaultConfigurable = new DefaultConfigurable();
 
   private final BackpressureStrategy mBackpressure;
-
-  private final List<IN> mInputs;
 
   /**
    * Constructor.
    *
    * @param backpressureStrategy the back-pressure strategy.
-   * @param inputs               the input data.
    */
-  private FlowableConfiguration(@Nullable final BackpressureStrategy backpressureStrategy,
-      @Nullable final List<IN> inputs) {
-    super(asArgs(backpressureStrategy, inputs));
+  private FlowableConfiguration(@Nullable final BackpressureStrategy backpressureStrategy) {
+    super(asArgs(backpressureStrategy));
     mBackpressure = backpressureStrategy;
-    mInputs = inputs;
   }
 
   /**
    * Returns an Flowable configuration builder.
    *
-   * @param <IN> the input data type.
    * @return the builder.
    */
   @NotNull
   @SuppressWarnings("unchecked")
-  public static <IN> Builder<IN, FlowableConfiguration<IN>> builder() {
-    return new Builder<IN, FlowableConfiguration<IN>>(
-        (Configurable<IN, ? extends FlowableConfiguration<IN>>) sDefaultConfigurable);
+  public static Builder<FlowableConfiguration> builder() {
+    return new Builder<FlowableConfiguration>(sDefaultConfigurable);
   }
 
   /**
    * Returns an Flowable configuration builder initialized with the specified configuration.
    *
    * @param initialConfiguration the initial Flowable configuration.
-   * @param <IN>                 the input data type.
    * @return the builder.
    */
   @NotNull
   @SuppressWarnings("unchecked")
-  public static <IN> Builder<IN, FlowableConfiguration<IN>> builderFrom(
-      @Nullable final FlowableConfiguration<IN> initialConfiguration) {
-    return (initialConfiguration == null) ? FlowableConfiguration.<IN>builder()
-        : new Builder<IN, FlowableConfiguration<IN>>(
-            (Configurable<IN, ? extends FlowableConfiguration<IN>>) sDefaultConfigurable,
-            initialConfiguration);
+  public static Builder<FlowableConfiguration> builderFrom(
+      @Nullable final FlowableConfiguration initialConfiguration) {
+    return (initialConfiguration == null) ? FlowableConfiguration.builder()
+        : new Builder<FlowableConfiguration>(sDefaultConfigurable, initialConfiguration);
   }
 
   /**
    * Returns a configuration with all the options set to their default.
    *
-   * @param <IN> the input data type.
    * @return the configuration instance.
    */
   @NotNull
-  public static <IN> FlowableConfiguration<IN> defaultConfiguration() {
-    return FlowableConfiguration.<IN>builder().buildConfiguration();
+  public static FlowableConfiguration defaultConfiguration() {
+    return FlowableConfiguration.builder().buildConfiguration();
   }
 
   /**
@@ -117,7 +98,7 @@ public class FlowableConfiguration<IN> extends DeepEqualObject {
    * @return the builder.
    */
   @NotNull
-  public Builder<IN, FlowableConfiguration<IN>> builderFrom() {
+  public Builder<FlowableConfiguration> builderFrom() {
     return builderFrom(this);
   }
 
@@ -134,24 +115,11 @@ public class FlowableConfiguration<IN> extends DeepEqualObject {
   }
 
   /**
-   * Returns the inputs (null by default).
-   *
-   * @param valueIfNotSet the default value if none was set.
-   * @return the inputs.
-   */
-  public Collection<? extends IN> getInputsOrElse(
-      @Nullable final Collection<? extends IN> valueIfNotSet) {
-    final List<IN> inputs = mInputs;
-    return (inputs != null) ? inputs : valueIfNotSet;
-  }
-
-  /**
    * Interface defining a configurable object.
    *
-   * @param <IN>   the input data type.
    * @param <TYPE> the configurable object type.
    */
-  public interface Configurable<IN, TYPE> {
+  public interface Configurable<TYPE> {
 
     /**
      * Sets the specified configuration and returns the configurable instance.
@@ -160,29 +128,26 @@ public class FlowableConfiguration<IN> extends DeepEqualObject {
      * @return the configurable instance.
      */
     @NotNull
-    TYPE apply(@NotNull FlowableConfiguration<IN> configuration);
+    TYPE withConfiguration(@NotNull FlowableConfiguration configuration);
   }
 
   /**
    * Builder of Flowable configurations.
    *
-   * @param <IN>   the input data type.
    * @param <TYPE> the configurable object type.
    */
-  public static final class Builder<IN, TYPE> {
+  public static final class Builder<TYPE> {
 
-    private final Configurable<IN, ? extends TYPE> mConfigurable;
+    private final Configurable<? extends TYPE> mConfigurable;
 
     private BackpressureStrategy mBackpressure;
-
-    private List<IN> mInputs;
 
     /**
      * Constructor.
      *
      * @param configurable the configurable instance.
      */
-    public Builder(@NotNull final Configurable<IN, ? extends TYPE> configurable) {
+    public Builder(@NotNull final Configurable<? extends TYPE> configurable) {
       mConfigurable = ConstantConditions.notNull("configurable instance", configurable);
     }
 
@@ -192,8 +157,8 @@ public class FlowableConfiguration<IN> extends DeepEqualObject {
      * @param configurable         the configurable instance.
      * @param initialConfiguration the initial Flowable configuration.
      */
-    public Builder(@NotNull final Configurable<IN, ? extends TYPE> configurable,
-        @NotNull final FlowableConfiguration<IN> initialConfiguration) {
+    public Builder(@NotNull final Configurable<? extends TYPE> configurable,
+        @NotNull final FlowableConfiguration initialConfiguration) {
       mConfigurable = ConstantConditions.notNull("configurable instance", configurable);
       setConfiguration(initialConfiguration);
     }
@@ -204,8 +169,8 @@ public class FlowableConfiguration<IN> extends DeepEqualObject {
      * @return the configured object.
      */
     @NotNull
-    public TYPE apply() {
-      return mConfigurable.apply(buildConfiguration());
+    public TYPE configuration() {
+      return mConfigurable.withConfiguration(buildConfiguration());
     }
 
     /**
@@ -215,7 +180,7 @@ public class FlowableConfiguration<IN> extends DeepEqualObject {
      * @return this builder.
      */
     @NotNull
-    public Builder<IN, TYPE> withBackpressure(@Nullable final BackpressureStrategy backpressure) {
+    public Builder<TYPE> withBackpressure(@Nullable final BackpressureStrategy backpressure) {
       mBackpressure = backpressure;
       return this;
     }
@@ -226,63 +191,8 @@ public class FlowableConfiguration<IN> extends DeepEqualObject {
      * @return this builder.
      */
     @NotNull
-    public Builder<IN, TYPE> withDefaults() {
-      setConfiguration(FlowableConfiguration.<IN>defaultConfiguration());
-      return this;
-    }
-
-    /**
-     * Sets the input to be passed to the routine invocation.
-     *
-     * @param input the input.
-     * @return this builder.
-     */
-    @NotNull
-    public Builder<IN, TYPE> withInput(@Nullable final IN input) {
-      mInputs = Collections.singletonList(input);
-      return this;
-    }
-
-    /**
-     * Sets the inputs to be passed to the routine invocation.
-     *
-     * @param inputs the iterable returning the input data.
-     * @return this builder.
-     */
-    @NotNull
-    public Builder<IN, TYPE> withInputs(@Nullable final Iterable<? extends IN> inputs) {
-      if (inputs != null) {
-        final ArrayList<IN> inputList = new ArrayList<IN>();
-        for (final IN input : inputs) {
-          inputList.add(input);
-        }
-
-        mInputs = Collections.unmodifiableList(inputList);
-
-      } else {
-        mInputs = null;
-      }
-
-      return this;
-    }
-
-    /**
-     * Sets the inputs to be passed to the routine invocation.
-     *
-     * @param inputs the input data.
-     * @return this builder.
-     */
-    @NotNull
-    public Builder<IN, TYPE> withInputs(@Nullable final IN... inputs) {
-      if (inputs != null) {
-        final ArrayList<IN> inputList = new ArrayList<IN>();
-        Collections.addAll(inputList, inputs);
-        mInputs = Collections.unmodifiableList(inputList);
-
-      } else {
-        mInputs = null;
-      }
-
+    public Builder<TYPE> withDefaults() {
+      setConfiguration(defaultConfiguration());
       return this;
     }
 
@@ -294,7 +204,7 @@ public class FlowableConfiguration<IN> extends DeepEqualObject {
      * @return this builder.
      */
     @NotNull
-    public Builder<IN, TYPE> withPatch(@Nullable final FlowableConfiguration<IN> configuration) {
+    public Builder<TYPE> withPatch(@Nullable final FlowableConfiguration configuration) {
       if (configuration == null) {
         return this;
       }
@@ -304,35 +214,27 @@ public class FlowableConfiguration<IN> extends DeepEqualObject {
         withBackpressure(backpressure);
       }
 
-      final Iterable<? extends IN> inputs = configuration.mInputs;
-      if (inputs != null) {
-        withInputs(inputs);
-      }
-
       return this;
     }
 
     @NotNull
-    private FlowableConfiguration<IN> buildConfiguration() {
-      return new FlowableConfiguration<IN>(mBackpressure, mInputs);
+    private FlowableConfiguration buildConfiguration() {
+      return new FlowableConfiguration(mBackpressure);
     }
 
-    private void setConfiguration(@NotNull final FlowableConfiguration<IN> configuration) {
+    private void setConfiguration(@NotNull final FlowableConfiguration configuration) {
       mBackpressure = configuration.mBackpressure;
-      mInputs = configuration.mInputs;
     }
   }
 
   /**
    * Default configurable implementation.
-   *
-   * @param <IN> the input data type.
    */
-  private static class DefaultConfigurable<IN>
-      implements Configurable<IN, FlowableConfiguration<IN>> {
+  private static class DefaultConfigurable implements Configurable<FlowableConfiguration> {
 
     @NotNull
-    public FlowableConfiguration<IN> apply(@NotNull final FlowableConfiguration<IN> configuration) {
+    public FlowableConfiguration withConfiguration(
+        @NotNull final FlowableConfiguration configuration) {
       return configuration;
     }
   }

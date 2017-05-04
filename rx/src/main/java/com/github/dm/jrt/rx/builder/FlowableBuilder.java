@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.rx.builder;
 
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.rx.config.FlowableConfigurable;
 
 import org.jetbrains.annotations.NotNull;
@@ -26,18 +27,16 @@ import io.reactivex.Flowable;
  * Interface defining a builder of Flowables.
  * <p>
  * Created by davide-maestroni on 02/09/2017.
- *
- * @param <IN>  the input data type.
- * @param <OUT> the output data type.
  */
-public interface FlowableBuilder<IN, OUT>
-    extends FlowableConfigurable<IN, FlowableBuilder<IN, OUT>> {
+public interface FlowableBuilder extends FlowableConfigurable<FlowableBuilder> {
 
   /**
-   * Builds and returns an Flowable instance.
+   * Builds and returns a Flowable fed by the specified channel.
    *
-   * @return the newly created Flowable.
+   * @param channel the channel instance.
+   * @param <OUT>   the output data type.
+   * @return the newly created Flowable instance.
    */
   @NotNull
-  Flowable<OUT> buildFlowable();
+  <OUT> Flowable<OUT> of(@NotNull Channel<?, OUT> channel);
 }

@@ -108,7 +108,7 @@ public class JRoutineLoaderFlowableCompat {
 
     @NotNull
     @Override
-    public LoaderFlowable<DATA> apply(@NotNull final FlowableConfiguration<Void> configuration) {
+    public LoaderFlowable<DATA> withConfiguration(@NotNull final FlowableConfiguration<Void> configuration) {
       mFlowableConfiguration = ConstantConditions.notNull("Flowable configuration", configuration);
       return this;
     }

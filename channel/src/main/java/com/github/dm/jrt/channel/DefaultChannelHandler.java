@@ -44,6 +44,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
+import static com.github.dm.jrt.core.JRoutineCore.readOnly;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
@@ -480,7 +481,7 @@ class DefaultChannelHandler implements ChannelHandler {
     final Channel<Flow<OUT>, Flow<OUT>> outputChannel =
         JRoutineCore.channelOn(mExecutor).withConfiguration(mConfiguration).ofType();
     channel.consume(new FlowChannelConsumer<OUT, OUT>(outputChannel, id));
-    return outputChannel;
+    return readOnly(outputChannel);
   }
 
   @NotNull
@@ -529,53 +530,6 @@ class DefaultChannelHandler implements ChannelHandler {
   }
 
   @NotNull
-  @SuppressWarnings("unchecked")
-  public <OUT> Map<Integer, Channel<?, OUT>> internalFlowOutput(
-      @NotNull final Channel<?, ? extends Flow<? extends OUT>> channel,
-      @NotNull final HashSet<Integer> ids) {
-    synchronized (sOutputChannels) {
-      final WeakIdentityHashMap<Channel<?, ?>, HashMap<FlowInfo, HashMap<Integer, Channel<?, ?>>>>
-          outputChannels = sOutputChannels;
-      HashMap<FlowInfo, HashMap<Integer, Channel<?, ?>>> channelMaps = outputChannels.get(channel);
-      if (channelMaps == null) {
-        channelMaps = new HashMap<FlowInfo, HashMap<Integer, Channel<?, ?>>>();
-        outputChannels.put(channel, channelMaps);
-      }
-
-      final int size = ids.size();
-      final ScheduledExecutor executor = mExecutor;
-      final ChannelConfiguration configuration = mConfiguration;
-      final FlowInfo flowInfo = new FlowInfo(executor, configuration, ids);
-      final HashMap<Integer, Channel<?, OUT>> channelMap =
-          new HashMap<Integer, Channel<?, OUT>>(size);
-      HashMap<Integer, Channel<?, ?>> channels = channelMaps.get(flowInfo);
-      if (channels != null) {
-        for (final Entry<Integer, Channel<?, ?>> entry : channels.entrySet()) {
-          channelMap.put(entry.getKey(), (Channel<OUT, OUT>) entry.getValue());
-        }
-
-      } else {
-        final ChannelBuilder channelBuilder =
-            JRoutineCore.channelOn(executor).withConfiguration(configuration);
-        final HashMap<Integer, Channel<OUT, ?>> inputMap =
-            new HashMap<Integer, Channel<OUT, ?>>(size);
-        channels = new HashMap<Integer, Channel<?, ?>>(size);
-        for (final Integer id : ids) {
-          final Channel<OUT, OUT> outputChannel = channelBuilder.ofType();
-          inputMap.put(id, outputChannel);
-          channelMap.put(id, outputChannel);
-          channels.put(id, outputChannel);
-        }
-
-        channel.consume(new SortingMapChannelConsumer<OUT>(inputMap));
-        channelMaps.put(flowInfo, channels);
-      }
-
-      return channelMap;
-    }
-  }
-
-  @NotNull
   public Builder<? extends ChannelHandler> withChannel() {
     return new Builder<ChannelHandler>(this, mConfiguration);
   }
@@ -597,6 +551,53 @@ class DefaultChannelHandler implements ChannelHandler {
     }
 
     return channelMap;
+  }
+
+  @NotNull
+  @SuppressWarnings("unchecked")
+  private <OUT> Map<Integer, Channel<?, OUT>> internalFlowOutput(
+      @NotNull final Channel<?, ? extends Flow<? extends OUT>> channel,
+      @NotNull final HashSet<Integer> ids) {
+    synchronized (sOutputChannels) {
+      final WeakIdentityHashMap<Channel<?, ?>, HashMap<FlowInfo, HashMap<Integer, Channel<?, ?>>>>
+          outputChannels = sOutputChannels;
+      HashMap<FlowInfo, HashMap<Integer, Channel<?, ?>>> channelMaps = outputChannels.get(channel);
+      if (channelMaps == null) {
+        channelMaps = new HashMap<FlowInfo, HashMap<Integer, Channel<?, ?>>>();
+        outputChannels.put(channel, channelMaps);
+      }
+
+      final int size = ids.size();
+      final ScheduledExecutor executor = mExecutor;
+      final ChannelConfiguration configuration = mConfiguration;
+      final FlowInfo flowInfo = new FlowInfo(executor, configuration, ids);
+      final HashMap<Integer, Channel<?, OUT>> channelMap =
+          new HashMap<Integer, Channel<?, OUT>>(size);
+      HashMap<Integer, Channel<?, ?>> channels = channelMaps.get(flowInfo);
+      if (channels != null) {
+        for (final Entry<Integer, Channel<?, ?>> entry : channels.entrySet()) {
+          channelMap.put(entry.getKey(), readOnly((Channel<OUT, OUT>) entry.getValue()));
+        }
+
+      } else {
+        final ChannelBuilder channelBuilder =
+            JRoutineCore.channelOn(executor).withConfiguration(configuration);
+        final HashMap<Integer, Channel<OUT, ?>> inputMap =
+            new HashMap<Integer, Channel<OUT, ?>>(size);
+        channels = new HashMap<Integer, Channel<?, ?>>(size);
+        for (final Integer id : ids) {
+          final Channel<OUT, OUT> outputChannel = channelBuilder.ofType();
+          inputMap.put(id, outputChannel);
+          channelMap.put(id, readOnly(outputChannel));
+          channels.put(id, outputChannel);
+        }
+
+        channel.consume(new SortingMapChannelConsumer<OUT>(inputMap));
+        channelMaps.put(flowInfo, channels);
+      }
+
+      return channelMap;
+    }
   }
 
   @NotNull
@@ -690,7 +691,7 @@ class DefaultChannelHandler implements ChannelHandler {
               isFlush, placeholder));
     }
 
-    return outputChannel;
+    return readOnly(outputChannel);
   }
 
   @NotNull
@@ -725,7 +726,7 @@ class DefaultChannelHandler implements ChannelHandler {
               isFlush, placeholder));
     }
 
-    return outputChannel;
+    return readOnly(outputChannel);
   }
 
   /**

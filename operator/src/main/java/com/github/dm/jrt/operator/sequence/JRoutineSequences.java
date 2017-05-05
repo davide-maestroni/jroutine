@@ -37,12 +37,12 @@ import static com.github.dm.jrt.operator.math.Numbers.getOperation;
  * <p>
  * Created by davide-maestroni on 07/02/2016.
  */
-public class Sequences {
+public class JRoutineSequences {
 
   /**
    * Avoid explicit instantiation.
    */
-  protected Sequences() {
+  protected JRoutineSequences() {
     ConstantConditions.avoid();
   }
 

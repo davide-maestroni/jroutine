@@ -89,21 +89,19 @@ class LiftThrottle<IN, OUT> implements LiftingFunction<IN, OUT, IN, OUT> {
     public Channel<IN, OUT> get() throws Exception {
       final ScheduledExecutor executor = mExecutor;
       final Channel<IN, IN> inputChannel = JRoutineCore.channelOn(executor).ofType();
-      final Channel<OUT, OUT> outputChannel = JRoutineCore.channelOn(executor).ofType();
+      final Channel<OUT, OUT> outputChannel =
+          JRoutineCore.channelOn(executor).withConfiguration(mConfiguration).ofType();
       final boolean isBind;
       synchronized (mMutex) {
         isBind = (++mCount <= mMaxCount);
         if (!isBind) {
-          final Channel<OUT, OUT> consumerChannel =
-              JRoutineCore.channelOn(executor).withConfiguration(mConfiguration).ofType();
-          outputChannel.pass(consumerChannel);
           mQueue.add(new Runnable() {
 
             public void run() {
               try {
                 mChannelSupplier.get()
                                 .consume(new ThrottleChannelConsumer<OUT>(ThrottleSupplier.this,
-                                    consumerChannel))
+                                    outputChannel))
                                 .pass(inputChannel)
                                 .close();
 
@@ -118,16 +116,13 @@ class LiftThrottle<IN, OUT> implements LiftingFunction<IN, OUT, IN, OUT> {
       }
 
       if (isBind) {
-        final Channel<OUT, OUT> consumerChannel =
-            JRoutineCore.channelOn(executor).withConfiguration(mConfiguration).ofType();
-        outputChannel.pass(consumerChannel);
         mChannelSupplier.get()
-                        .consume(new ThrottleChannelConsumer<OUT>(this, consumerChannel))
+                        .consume(new ThrottleChannelConsumer<OUT>(this, outputChannel))
                         .pass(inputChannel)
                         .close();
       }
 
-      return JRoutineCore.flattenChannels(inputChannel, outputChannel);
+      return JRoutineCore.flatten(inputChannel, JRoutineCore.readOnly(outputChannel));
     }
 
     public void onComplete() {

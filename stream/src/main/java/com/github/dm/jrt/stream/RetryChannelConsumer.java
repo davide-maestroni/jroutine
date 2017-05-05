@@ -22,7 +22,6 @@ import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.common.RoutineException;
-import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.executor.ScheduledExecutor;
 import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
 import com.github.dm.jrt.core.invocation.InvocationException;
@@ -52,7 +51,7 @@ class RetryChannelConsumer<IN, OUT> implements Runnable, ChannelConsumer<OUT> {
 
   private final ScheduledExecutor mExecutor;
 
-  private final Channel<OUT, OUT> mOutputChannel;
+  private final Channel<OUT, ?> mOutputChannel;
 
   private final ArrayList<OUT> mOutputs = new ArrayList<OUT>();
 
@@ -64,14 +63,12 @@ class RetryChannelConsumer<IN, OUT> implements Runnable, ChannelConsumer<OUT> {
    * Constructor.
    *
    * @param executor        the executor instance.
-   * @param configuration   the channel configuration.
    * @param channelSupplier the binding function.
    * @param backoffFunction the backoff function.
    * @param inputChannel    the input channel.
    * @param outputChannel   the output channel.
    */
   RetryChannelConsumer(@NotNull final ScheduledExecutor executor,
-      @NotNull final ChannelConfiguration configuration,
       @NotNull final Supplier<? extends Channel<IN, OUT>> channelSupplier,
       @NotNull final BiFunction<? super Integer, ? super RoutineException, ? extends Long>
           backoffFunction,
@@ -80,8 +77,7 @@ class RetryChannelConsumer<IN, OUT> implements Runnable, ChannelConsumer<OUT> {
     mChannelSupplier = ConstantConditions.notNull("binding function", channelSupplier);
     mBackoffFunction = ConstantConditions.notNull("backoff function", backoffFunction);
     mReplayChannel = JRoutineChannels.channelHandler().replayOutputOf(inputChannel);
-    outputChannel.pass(mOutputChannel =
-        JRoutineCore.channelOn(executor).withConfiguration(configuration).ofType());
+    mOutputChannel = ConstantConditions.notNull("channel instance", outputChannel);
   }
 
   public void onComplete() {

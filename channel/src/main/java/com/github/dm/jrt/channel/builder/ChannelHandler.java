@@ -44,7 +44,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    * Note that the builder will successfully create only one channel instance, and that the passed
    * ones will be bound as a result of the creation.
    * <br>
-   * Note also that the returned channel will be already closed.
+   * Note also that the returned channel will be read-only.
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
    * <pre><code>
@@ -67,7 +67,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    * Note that the builder will successfully create only one channel instance, and that the passed
    * ones will be bound as a result of the creation.
    * <br>
-   * Note also that the returned channel will be already closed.
+   * Note also that the returned channel will be read-only.
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
    * <pre><code>
@@ -87,6 +87,8 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
 
   /**
    * Returns a channel producing the result of the specified Callable.
+   * <br>
+   * Note that the returned channel will be read-only.
    *
    * @param callable the Callable instance.
    * @param <OUT>    the output data type.
@@ -103,7 +105,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    * <p>
    * Note that the configured executor will be employed to wait for the Future to complete.
    * <br>
-   * Note also that the returned channel will be already closed.
+   * Note also that the returned channel will be read-only.
    *
    * @param future the Future instance.
    * @param <OUT>  the output data type.
@@ -120,7 +122,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    * <p>
    * Note that the configured executor will be employed to wait for the Future to complete.
    * <br>
-   * Note also that the returned channel will be already closed.
+   * Note also that the returned channel will be read-only.
    *
    * @param future                the Future instance.
    * @param mayInterruptIfRunning true if the thread executing the Future task should be
@@ -150,7 +152,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    * Note that the builder will successfully create only one channel instance, and that the passed
    * ones will be bound as a result of the creation.
    * <br>
-   * Note also that the returned channel will be already closed.
+   * Note also that the returned channel will be read-only.
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
    * <pre><code>
@@ -174,7 +176,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    * Note that the builder will successfully create only one channel instance, and that the passed
    * ones will be bound as a result of the creation.
    * <br>
-   * Note also that the returned channel will be already closed.
+   * Note also that the returned channel will be read-only.
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
    * <pre><code>
@@ -411,7 +413,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    * Note that the builder will successfully create only one channel instance, and that the passed
    * ones will be bound as a result of the creation.
    * <br>
-   * Note also that the returned channel will be already closed.
+   * Note also that the returned channel will be read-only.
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
    * <pre><code>
@@ -436,7 +438,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    * Note that the builder will successfully create only one channel instance, and that the passed
    * ones will be bound as a result of the creation.
    * <br>
-   * Note also that the returned channel will be already closed.
+   * Note also that the returned channel will be read-only.
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
    * <pre><code>
@@ -465,7 +467,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    * Note that the builder will successfully create only one channel instance, and that the passed
    * ones will be bound as a result of the creation.
    * <br>
-   * Note also that the returned channel will be already closed.
+   * Note also that the returned channel will be read-only.
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
    * <pre><code>
@@ -495,7 +497,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    * Note that the builder will successfully create only one channel instance, and that the passed
    * ones will be bound as a result of the creation.
    * <br>
-   * Note also that the returned channel will be already closed.
+   * Note also that the returned channel will be read-only.
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
    * <pre><code>
@@ -648,7 +650,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    * Note that the builder will successfully create only one channel instance, and that the passed
    * ones will be bound as a result of the creation.
    * <br>
-   * Note also that the returned channel will be already closed.
+   * Note also that the returned channel will be read-only.
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
    * <pre><code>
@@ -673,7 +675,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    * Note that the builder will successfully create only one channel instance, and that the passed
    * ones will be bound as a result of the creation.
    * <br>
-   * Note also that the returned channel will be already closed.
+   * Note also that the returned channel will be read-only.
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
    * <pre><code>
@@ -700,7 +702,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    * Note that the builder will successfully create only one channel instance, and that the passed
    * ones will be bound as a result of the creation.
    * <br>
-   * Note also that the returned channel will be already closed.
+   * Note also that the returned channel will be read-only.
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
    * <pre><code>
@@ -727,7 +729,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    * Note that the builder will successfully create only one channel instance, and that the passed
    * ones will be bound as a result of the creation.
    * <br>
-   * Note also that the returned channel will be already closed.
+   * Note also that the returned channel will be read-only.
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
    * <pre><code>
@@ -753,7 +755,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    * Note that the builder will successfully create only one channel instance, and that the passed
    * ones will be bound as a result of the creation.
    * <br>
-   * Note also that the returned channel will be already closed.
+   * Note also that the returned channel will be read-only.
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
    * <pre><code>
@@ -779,7 +781,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    * Note that the builder will successfully create only one channel instance, and that the passed
    * one will be bound as a result of the creation.
    * <br>
-   * Note also that the returned channel will be already closed.
+   * Note also that the returned channel will be read-only.
    * <p>
    * Given channel {@code A}, the final output will be:
    * <pre><code>
@@ -801,7 +803,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    * Note that the builder will return the same map for the same inputs and equal configuration,
    * and that the passed channels will be bound as a result of the creation.
    * <br>
-   * Note also that the returned channels will be already closed.
+   * Note also that the returned channels will be read-only.
    * <p>
    * Given channels {@code A}, {@code B} and {@code C} in the returned map, the final output will
    * be:
@@ -828,7 +830,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    * Note that the builder will return the same map for the same inputs and equal configuration,
    * and that the passed channels will be bound as a result of the creation.
    * <br>
-   * Note also that the returned channels will be already closed.
+   * Note also that the returned channels will be read-only.
    * <p>
    * Given channels {@code A}, {@code B} and {@code C} in the returned map, the final output will
    * be:
@@ -856,7 +858,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    * Note that the builder will return the same map for the same inputs and equal configuration,
    * and that the passed channels will be bound as a result of the creation.
    * <br>
-   * Note also that the returned channels will be already closed.
+   * Note also that the returned channels will be read-only.
    * <p>
    * Given channels {@code A}, {@code B} and {@code C} in the returned map, the final output will
    * be:
@@ -890,7 +892,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    * Note that the builder will successfully create only one channel instance, and that the passed
    * one will be bound as a result of the creation.
    * <br>
-   * Note also that the returned channel will be already closed.
+   * Note also that the returned channel will be read-only.
    * <p>
    * Given channel {@code A}, the final output will be:
    * <pre><code>

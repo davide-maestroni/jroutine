@@ -22,9 +22,8 @@ import com.github.dm.jrt.core.common.RoutineException;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -36,7 +35,7 @@ import java.util.Random;
  */
 class SplitInChannelConsumer<OUT> implements ChannelConsumer<OUT> {
 
-  private final HashMap<Channel<OUT, ?>, Channel<?, ?>> mChannels;
+  private final ArrayList<Channel<OUT, ?>> mChannels;
 
   private final Channel<OUT, ?>[] mInputs;
 
@@ -48,20 +47,19 @@ class SplitInChannelConsumer<OUT> implements ChannelConsumer<OUT> {
    * @param channels the map of input and invocation channels.
    */
   @SuppressWarnings("unchecked")
-  SplitInChannelConsumer(
-      @NotNull final Map<? extends Channel<OUT, ?>, ? extends Channel<?, ?>> channels) {
-    mChannels = new HashMap<Channel<OUT, ?>, Channel<?, ?>>(channels);
+  SplitInChannelConsumer(@NotNull final List<? extends Channel<OUT, ?>> channels) {
+    mChannels = new ArrayList<Channel<OUT, ?>>(channels);
     mInputs = new Channel[channels.size()];
   }
 
   public void onComplete() {
-    for (final Channel<OUT, ?> channel : mChannels.keySet()) {
+    for (final Channel<OUT, ?> channel : mChannels) {
       channel.close();
     }
   }
 
   public void onError(@NotNull final RoutineException error) {
-    for (final Channel<OUT, ?> channel : mChannels.keySet()) {
+    for (final Channel<OUT, ?> channel : mChannels) {
       channel.abort(error);
     }
   }
@@ -70,16 +68,15 @@ class SplitInChannelConsumer<OUT> implements ChannelConsumer<OUT> {
     int count = 0;
     int minSize = Integer.MAX_VALUE;
     final Channel<OUT, ?>[] inputs = mInputs;
-    final HashMap<Channel<OUT, ?>, Channel<?, ?>> channels = mChannels;
-    for (final Entry<Channel<OUT, ?>, Channel<?, ?>> entry : channels.entrySet()) {
-      final int channelSize = entry.getValue().size();
+    for (final Channel<OUT, ?> channel : mChannels) {
+      final int channelSize = channel.size();
       if (channelSize < minSize) {
         count = 1;
-        inputs[0] = entry.getKey();
+        inputs[0] = channel;
         minSize = channelSize;
 
       } else if (channelSize == minSize) {
-        inputs[count++] = entry.getKey();
+        inputs[count++] = channel;
       }
     }
 

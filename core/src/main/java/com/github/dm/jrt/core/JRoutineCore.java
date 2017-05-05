@@ -143,9 +143,27 @@ public class JRoutineCore {
    * @return the new channel instance.
    */
   @NotNull
-  public static <IN, OUT> Channel<IN, OUT> flattenChannels(
-      @NotNull final Channel<IN, ?> inputChannel, @NotNull final Channel<?, OUT> outputChannel) {
+  public static <IN, OUT> Channel<IN, OUT> flatten(@NotNull final Channel<IN, ?> inputChannel,
+      @NotNull final Channel<?, OUT> outputChannel) {
     return new FlatChannel<IN, OUT>(inputChannel, outputChannel);
+  }
+
+  /**
+   * Returns a channel making the wrapped one read-only.
+   * <br>
+   * The returned channel will fail on any attempt to pass input data, and will ignore any closing
+   * command.
+   * <br>
+   * Note, however, that abort operations will be fulfilled.
+   *
+   * @param channel the wrapped channel.
+   * @param <IN>    the input data type.
+   * @param <OUT>   the output data type.
+   * @return the new channel instance.
+   */
+  @NotNull
+  public static <IN, OUT> Channel<IN, OUT> readOnly(@NotNull final Channel<IN, OUT> channel) {
+    return new ReadOnlyChannel<IN, OUT>(channel);
   }
 
   /**

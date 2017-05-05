@@ -26,8 +26,6 @@ import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.ChannelBuilder;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.common.BackoffBuilder;
-import com.github.dm.jrt.core.common.BackoffBuilder.DefaultBackoff;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.executor.ScheduledExecutor;
 import com.github.dm.jrt.core.routine.Routine;
@@ -59,18 +57,6 @@ public class JRoutine {
    */
   protected JRoutine() {
     ConstantConditions.avoid();
-  }
-
-  /**
-   * Returns a builder of backoff instances applying a delay when the passed count exceeds the
-   * specified value.
-   *
-   * @param count the count value.
-   * @return the builder instance.
-   */
-  @NotNull
-  public static BackoffBuilder afterCount(final int count) {
-    return BackoffBuilder.afterCount(count);
   }
 
   /**
@@ -129,9 +115,9 @@ public class JRoutine {
    * @return the new channel instance.
    */
   @NotNull
-  public static <IN, OUT> Channel<IN, OUT> flattenChannels(
-      @NotNull final Channel<IN, ?> inputChannel, @NotNull final Channel<?, OUT> outputChannel) {
-    return JRoutineCore.flattenChannels(inputChannel, outputChannel);
+  public static <IN, OUT> Channel<IN, OUT> flatten(@NotNull final Channel<IN, ?> inputChannel,
+      @NotNull final Channel<?, OUT> outputChannel) {
+    return JRoutineCore.flatten(inputChannel, outputChannel);
   }
 
   /**
@@ -180,18 +166,6 @@ public class JRoutine {
   @NotNull
   public static ByteChunkInputStream inputStream(@NotNull final ByteChunk buffer) {
     return ByteChannel.inputStream(buffer);
-  }
-
-  /**
-   * Returns the no delay backoff instance.
-   * <br>
-   * The backoff will always return {@code NO_DELAY}.
-   *
-   * @return the backoff instance.
-   */
-  @NotNull
-  public static DefaultBackoff noDelay() {
-    return BackoffBuilder.noDelay();
   }
 
   /**
@@ -276,6 +250,24 @@ public class JRoutine {
   @NotNull
   public static ByteChunkOutputStreamBuilder outputStream() {
     return ByteChannel.outputStream();
+  }
+
+  /**
+   * Returns a channel making the wrapped one read-only.
+   * <br>
+   * The returned channel will fail on any attempt to pass input data, and will ignore any closing
+   * command.
+   * <br>
+   * Note, however, that abort operations will be fulfilled.
+   *
+   * @param channel the wrapped channel.
+   * @param <IN>    the input data type.
+   * @param <OUT>   the output data type.
+   * @return the new channel instance.
+   */
+  @NotNull
+  public static <IN, OUT> Channel<IN, OUT> readOnly(@NotNull final Channel<IN, OUT> channel) {
+    return JRoutineCore.readOnly(channel);
   }
 
   /**

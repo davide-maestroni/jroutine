@@ -21,7 +21,6 @@ import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.BackoffBuilder;
 import com.github.dm.jrt.core.common.RoutineException;
-import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.executor.ScheduledExecutor;
 import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
@@ -56,7 +55,7 @@ import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static com.github.dm.jrt.operator.JRoutineOperators.appendAccept;
 import static com.github.dm.jrt.operator.JRoutineOperators.reduce;
 import static com.github.dm.jrt.operator.JRoutineOperators.unary;
-import static com.github.dm.jrt.operator.sequence.Sequences.range;
+import static com.github.dm.jrt.operator.sequence.JRoutineSequences.range;
 import static com.github.dm.jrt.stream.JRoutineStream.streamLifter;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
@@ -397,12 +396,12 @@ public class TransformationsTest {
     final Channel<Object, Object> inputChannel = JRoutineCore.channel().ofType();
     final Channel<Object, Object> outputChannel = JRoutineCore.channel().ofType();
     new RetryChannelConsumer<Object, Object>(syncExecutor(),
-        ChannelConfiguration.defaultConfiguration(), new Supplier<Channel<Object, Object>>() {
+        new Supplier<Channel<Object, Object>>() {
 
-      public Channel<Object, Object> get() throws Exception {
-        throw new NullPointerException();
-      }
-    }, new BiFunction<Integer, RoutineException, Long>() {
+          public Channel<Object, Object> get() throws Exception {
+            throw new NullPointerException();
+          }
+        }, new BiFunction<Integer, RoutineException, Long>() {
 
       public Long apply(final Integer integer, final RoutineException e) {
         return 0L;
@@ -417,12 +416,12 @@ public class TransformationsTest {
     final Channel<Object, Object> inputChannel = JRoutineCore.channel().ofType();
     final Channel<Object, Object> outputChannel = JRoutineCore.channel().ofType();
     new RetryChannelConsumer<Object, Object>(syncExecutor(),
-        ChannelConfiguration.defaultConfiguration(), new Supplier<Channel<Object, Object>>() {
+        new Supplier<Channel<Object, Object>>() {
 
-      public Channel<Object, Object> get() {
-        return JRoutineCore.channel().ofType();
-      }
-    }, new BiFunction<Integer, RoutineException, Long>() {
+          public Channel<Object, Object> get() {
+            return JRoutineCore.channel().ofType();
+          }
+        }, new BiFunction<Integer, RoutineException, Long>() {
 
       public Long apply(final Integer integer, final RoutineException e) throws Exception {
         throw new NullPointerException();

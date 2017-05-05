@@ -73,7 +73,7 @@ import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static com.github.dm.jrt.function.util.SupplierDecorator.constant;
 import static com.github.dm.jrt.operator.JRoutineOperators.appendAccept;
-import static com.github.dm.jrt.operator.sequence.Sequences.range;
+import static com.github.dm.jrt.operator.sequence.JRoutineSequences.range;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**

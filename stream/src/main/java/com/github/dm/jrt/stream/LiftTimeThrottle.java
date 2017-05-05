@@ -98,7 +98,8 @@ class LiftTimeThrottle<IN, OUT> implements LiftingFunction<IN, OUT, IN, OUT> {
     public Channel<IN, OUT> get() throws Exception {
       final ScheduledExecutor executor = mExecutor;
       final Channel<IN, IN> inputChannel = JRoutineCore.channelOn(executor).ofType();
-      final Channel<OUT, OUT> outputChannel;
+      final Channel<OUT, OUT> outputChannel =
+          JRoutineCore.channelOn(executor).withConfiguration(mConfiguration).ofType();
       final long delay;
       final boolean isBind;
       synchronized (mMutex) {
@@ -114,19 +115,16 @@ class LiftTimeThrottle<IN, OUT> implements LiftingFunction<IN, OUT, IN, OUT> {
         isBind = (++mCount <= maxCount);
         if (!isBind) {
           final SimpleQueue<Runnable> queue = mQueue;
-          final Channel<OUT, OUT> consumerChannel =
-              JRoutineCore.channelOn(executor).withConfiguration(mConfiguration).ofType();
-          outputChannel = JRoutineCore.channelOn(executor).<OUT>ofType().pass(consumerChannel);
           queue.add(new Runnable() {
 
             public void run() {
               try {
                 final Channel<IN, OUT> invocationChannel = mChannelSupplier.get();
-                consumerChannel.pass(invocationChannel);
+                outputChannel.pass(invocationChannel).close();
                 invocationChannel.pass(inputChannel).close();
 
               } catch (final Throwable t) {
-                consumerChannel.abort(t);
+                outputChannel.abort(t);
                 InterruptedInvocationException.throwIfInterrupt(t);
               }
             }
@@ -135,22 +133,20 @@ class LiftTimeThrottle<IN, OUT> implements LiftingFunction<IN, OUT, IN, OUT> {
           delay = (((queue.size() - 1) / maxCount) + 1) * rangeMillis;
 
         } else {
-          outputChannel =
-              JRoutineCore.channelOn(executor).withConfiguration(mConfiguration).ofType();
           delay = 0;
         }
       }
 
       if (isBind) {
         final Channel<IN, OUT> invocationChannel = mChannelSupplier.get();
-        outputChannel.pass(invocationChannel);
+        outputChannel.pass(invocationChannel).close();
         invocationChannel.pass(inputChannel).close();
 
       } else {
         executor.execute(this, delay, TimeUnit.MILLISECONDS);
       }
 
-      return JRoutineCore.flattenChannels(inputChannel, outputChannel);
+      return JRoutineCore.flatten(inputChannel, JRoutineCore.readOnly(outputChannel));
     }
 
     public void run() {

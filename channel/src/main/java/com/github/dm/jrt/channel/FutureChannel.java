@@ -365,29 +365,29 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
 
   @NotNull
   public Channel<OUT, OUT> pass(@Nullable final Channel<?, ? extends OUT> channel) {
-    return failPass();
+    return illegalInput();
   }
 
   @NotNull
   public Channel<OUT, OUT> pass(@Nullable final Iterable<? extends OUT> inputs) {
-    return failPass();
+    return illegalInput();
   }
 
   @NotNull
   public Channel<OUT, OUT> pass(@Nullable final OUT input) {
-    return failPass();
+    return illegalInput();
   }
 
   @NotNull
   public Channel<OUT, OUT> pass(@Nullable final OUT... inputs) {
-    return failPass();
+    return illegalInput();
   }
 
   @NotNull
   @SuppressWarnings("unchecked")
   public <AFTER> Channel<OUT, AFTER> pipe(@NotNull final Channel<? super OUT, AFTER> channel) {
     ((Channel<OUT, AFTER>) channel).pass(this);
-    return JRoutineCore.flattenChannels(this, channel);
+    return JRoutineCore.flatten(this, channel);
   }
 
   public int size() {
@@ -447,11 +447,7 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
   }
 
   @NotNull
-  private Channel<OUT, OUT> failPass() {
-    if (mFuture.isCancelled()) {
-      throw AbortException.wrapIfNeeded(mAbortException);
-    }
-
+  private Channel<OUT, OUT> illegalInput() {
     throw new IllegalStateException("the channel is closed");
   }
 

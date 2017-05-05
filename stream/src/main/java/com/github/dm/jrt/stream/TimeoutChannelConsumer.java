@@ -16,11 +16,9 @@
 
 package com.github.dm.jrt.stream;
 
-import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.common.RoutineException;
-import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.executor.ScheduledExecutor;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.stream.transform.ResultTimeoutException;
@@ -43,7 +41,7 @@ class TimeoutChannelConsumer<OUT> implements ChannelConsumer<OUT> {
 
   private final ScheduledExecutor mExecutor;
 
-  private final Channel<OUT, OUT> mOutputChannel;
+  private final Channel<OUT, ?> mOutputChannel;
 
   private final long mOutputTimeout;
 
@@ -55,15 +53,13 @@ class TimeoutChannelConsumer<OUT> implements ChannelConsumer<OUT> {
    * Constructor.
    *
    * @param executor       the executor instance.
-   * @param configuration  the channel configuration.
    * @param outputTimeout  the new output timeout value.
    * @param outputTimeUnit the new output timeout unit.
    * @param totalTimeout   the total timeout value.
    * @param totalTimeUnit  the total timeout unit.
    * @param outputChannel  the output channel.
    */
-  TimeoutChannelConsumer(@NotNull final ScheduledExecutor executor,
-      @NotNull final ChannelConfiguration configuration, final long outputTimeout,
+  TimeoutChannelConsumer(@NotNull final ScheduledExecutor executor, final long outputTimeout,
       @NotNull final TimeUnit outputTimeUnit, final long totalTimeout,
       @NotNull final TimeUnit totalTimeUnit, @NotNull final Channel<OUT, ?> outputChannel) {
     mExecutor = ConstantConditions.notNull("executor instance", executor);
@@ -71,8 +67,7 @@ class TimeoutChannelConsumer<OUT> implements ChannelConsumer<OUT> {
     ConstantConditions.notNull("total time unit", totalTimeUnit);
     mOutputTimeout = ConstantConditions.notNegative("output timeout value", outputTimeout);
     mOutputTimeoutUnit = ConstantConditions.notNull("output time unit", outputTimeUnit);
-    outputChannel.pass(mOutputChannel =
-        JRoutineCore.channelOn(executor).withConfiguration(configuration).ofType());
+    mOutputChannel = ConstantConditions.notNull("channel instance", outputChannel);
     executor.execute(mExecution, outputTimeout, outputTimeUnit);
     executor.execute(new Runnable() {
 

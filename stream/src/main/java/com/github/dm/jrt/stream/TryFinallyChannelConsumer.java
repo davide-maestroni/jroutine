@@ -16,12 +16,9 @@
 
 package com.github.dm.jrt.stream;
 
-import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.common.RoutineException;
-import com.github.dm.jrt.core.config.ChannelConfiguration;
-import com.github.dm.jrt.core.executor.ScheduledExecutor;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.util.Action;
 
@@ -38,22 +35,18 @@ class TryFinallyChannelConsumer<OUT> implements ChannelConsumer<OUT> {
 
   private final Action mFinallyAction;
 
-  private final Channel<OUT, OUT> mOutputChannel;
+  private final Channel<OUT, ?> mOutputChannel;
 
   /**
    * Constructor.
    *
-   * @param executor      the executor instance.
-   * @param configuration the channel configuration.
    * @param finallyAction the action instance.
    * @param outputChannel the output channel.
    */
-  TryFinallyChannelConsumer(@NotNull final ScheduledExecutor executor,
-      @NotNull final ChannelConfiguration configuration, @NotNull final Action finallyAction,
+  TryFinallyChannelConsumer(@NotNull final Action finallyAction,
       @NotNull final Channel<OUT, ?> outputChannel) {
     mFinallyAction = ConstantConditions.notNull("action instance", finallyAction);
-    outputChannel.pass(mOutputChannel =
-        JRoutineCore.channelOn(executor).withConfiguration(configuration).ofType());
+    mOutputChannel = ConstantConditions.notNull("channel instance", outputChannel);
   }
 
   public void onComplete() throws Exception {

@@ -21,6 +21,8 @@ import com.github.dm.jrt.channel.io.ByteChannel.ByteChunk;
 import com.github.dm.jrt.channel.io.ByteChannel.ByteChunkInputStream;
 import com.github.dm.jrt.channel.io.ByteChannel.ByteChunkOutputStream;
 import com.github.dm.jrt.core.channel.Channel;
+import com.github.dm.jrt.core.channel.ChannelConsumer;
+import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.ChannelConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.core.invocation.CallInvocation;
@@ -32,6 +34,8 @@ import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.NullLog;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.DurationMeasure;
+import com.github.dm.jrt.function.builder.FunctionalChannelConsumer;
+import com.github.dm.jrt.function.util.Action;
 import com.github.dm.jrt.function.util.BiConsumer;
 import com.github.dm.jrt.function.util.BiFunction;
 import com.github.dm.jrt.function.util.Consumer;
@@ -39,6 +43,7 @@ import com.github.dm.jrt.function.util.Function;
 import com.github.dm.jrt.function.util.Predicate;
 import com.github.dm.jrt.function.util.Supplier;
 import com.github.dm.jrt.function.util.SupplierDecorator;
+import com.github.dm.jrt.operator.JRoutineOperators;
 import com.github.dm.jrt.proxy.annotation.Proxy;
 import com.github.dm.jrt.reflect.annotation.Alias;
 import com.github.dm.jrt.reflect.annotation.AsyncOutput;
@@ -53,18 +58,28 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
+import static com.github.dm.jrt.JRoutine.onComplete;
+import static com.github.dm.jrt.JRoutine.onError;
+import static com.github.dm.jrt.JRoutine.onOutput;
+import static com.github.dm.jrt.JRoutine.streamLifter;
+import static com.github.dm.jrt.JRoutine.streamLifterOn;
+import static com.github.dm.jrt.core.executor.ScheduledExecutors.immediateExecutor;
 import static com.github.dm.jrt.core.executor.ScheduledExecutors.syncExecutor;
 import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
 import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
 import static com.github.dm.jrt.core.util.DurationMeasure.millis;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
+import static com.github.dm.jrt.function.util.ActionDecorator.wrapAction;
+import static com.github.dm.jrt.function.util.ConsumerDecorator.wrapConsumer;
 import static com.github.dm.jrt.operator.JRoutineOperators.appendAccept;
 import static com.github.dm.jrt.operator.JRoutineOperators.average;
 import static com.github.dm.jrt.operator.JRoutineOperators.filter;
 import static com.github.dm.jrt.operator.JRoutineOperators.unary;
-import static com.github.dm.jrt.operator.sequence.Sequences.range;
+import static com.github.dm.jrt.operator.sequence.JRoutineSequences.range;
 import static com.github.dm.jrt.reflect.InvocationTarget.classOfType;
 import static com.github.dm.jrt.reflect.InvocationTarget.instance;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -179,6 +194,22 @@ public class JRoutineTest {
                          .close()
                          .in(timeout)
                          .all()).containsExactly(30);
+  }
+
+  @Test
+  public void testChannelHandler() {
+    assertThat(JRoutine.channelHandlerOn(immediateExecutor()).channelOf(new Callable<String>() {
+
+      public String call() {
+        return "test";
+      }
+    }).next()).isEqualTo("test");
+    assertThat(JRoutine.channelHandler().channelOf(new Callable<String>() {
+
+      public String call() {
+        return "test";
+      }
+    }).in(seconds(1)).next()).isEqualTo("test");
   }
 
   @Test
@@ -300,6 +331,31 @@ public class JRoutineTest {
             }).routine();
     assertThat(routine.invoke().pass("test", 1).close().in(seconds(1)).all()).containsOnly("test",
         "1");
+  }
+
+  @Test
+  public void testFlatten() {
+    final Channel<String, String> outputChannel = JRoutine.channel().ofType();
+    final Channel<Integer, Integer> inputChannel = JRoutine.channel().ofType();
+    inputChannel.consume(new ChannelConsumer<Integer>() {
+
+      public void onComplete() {
+        outputChannel.close();
+      }
+
+      public void onError(@NotNull final RoutineException error) {
+        outputChannel.abort(error);
+      }
+
+      public void onOutput(final Integer output) {
+        outputChannel.pass(output.toString());
+      }
+    });
+    assertThat(JRoutine.flatten(inputChannel, outputChannel)
+                       .pass(1, 2, 3)
+                       .close()
+                       .in(seconds(1))
+                       .all()).containsExactly("1", "2", "3");
   }
 
   @Test
@@ -484,6 +540,198 @@ public class JRoutineTest {
   }
 
   @Test
+  public void testOnComplete() throws Exception {
+    final TestAction action1 = new TestAction();
+    final TestAction action2 = new TestAction();
+    final TestAction action3 = new TestAction();
+    FunctionalChannelConsumer<Object> channelConsumer = onComplete(action1);
+    channelConsumer.onOutput("test");
+    assertThat(action1.isCalled()).isFalse();
+    channelConsumer.onError(new RoutineException());
+    assertThat(action1.isCalled()).isFalse();
+    channelConsumer.onComplete();
+    assertThat(action1.isCalled()).isTrue();
+    action1.reset();
+    channelConsumer = channelConsumer.andOnComplete(action2);
+    channelConsumer.onOutput("test");
+    assertThat(action1.isCalled()).isFalse();
+    assertThat(action2.isCalled()).isFalse();
+    channelConsumer.onError(new RoutineException());
+    assertThat(action1.isCalled()).isFalse();
+    assertThat(action2.isCalled()).isFalse();
+    channelConsumer.onComplete();
+    assertThat(action1.isCalled()).isTrue();
+    assertThat(action2.isCalled()).isTrue();
+    action1.reset();
+    action2.reset();
+    channelConsumer = onComplete(action1).andOnComplete(wrapAction(action2).andThen(action3));
+    channelConsumer.onOutput("test");
+    assertThat(action1.isCalled()).isFalse();
+    assertThat(action2.isCalled()).isFalse();
+    assertThat(action3.isCalled()).isFalse();
+    channelConsumer.onError(new RoutineException());
+    assertThat(action1.isCalled()).isFalse();
+    assertThat(action2.isCalled()).isFalse();
+    assertThat(action3.isCalled()).isFalse();
+    channelConsumer.onComplete();
+    assertThat(action1.isCalled()).isTrue();
+    assertThat(action2.isCalled()).isTrue();
+    assertThat(action3.isCalled()).isTrue();
+    action1.reset();
+    final TestConsumer<Object> outConsumer = new TestConsumer<Object>();
+    final TestConsumer<RoutineException> errorConsumer = new TestConsumer<RoutineException>();
+    channelConsumer = onComplete(action1).andOnOutput(outConsumer).andOnError(errorConsumer);
+    channelConsumer.onOutput("test");
+    assertThat(action1.isCalled()).isFalse();
+    assertThat(outConsumer.isCalled()).isTrue();
+    assertThat(errorConsumer.isCalled()).isFalse();
+    channelConsumer.onError(new RoutineException());
+    assertThat(action1.isCalled()).isFalse();
+    assertThat(errorConsumer.isCalled()).isTrue();
+    channelConsumer.onComplete();
+    assertThat(action1.isCalled()).isTrue();
+  }
+
+  @Test
+  public void testOnError() throws Exception {
+    final TestConsumer<RoutineException> consumer1 = new TestConsumer<RoutineException>();
+    final TestConsumer<RoutineException> consumer2 = new TestConsumer<RoutineException>();
+    final TestConsumer<RoutineException> consumer3 = new TestConsumer<RoutineException>();
+    FunctionalChannelConsumer<Object> channelConsumer = onError(consumer1);
+    channelConsumer.onOutput("test");
+    assertThat(consumer1.isCalled()).isFalse();
+    channelConsumer.onComplete();
+    assertThat(consumer1.isCalled()).isFalse();
+    channelConsumer.onError(new RoutineException());
+    assertThat(consumer1.isCalled()).isTrue();
+    consumer1.reset();
+    channelConsumer = channelConsumer.andOnError(consumer2);
+    channelConsumer.onOutput("test");
+    assertThat(consumer1.isCalled()).isFalse();
+    assertThat(consumer2.isCalled()).isFalse();
+    channelConsumer.onComplete();
+    assertThat(consumer1.isCalled()).isFalse();
+    assertThat(consumer2.isCalled()).isFalse();
+    channelConsumer.onError(new RoutineException());
+    assertThat(consumer1.isCalled()).isTrue();
+    assertThat(consumer2.isCalled()).isTrue();
+    consumer1.reset();
+    consumer2.reset();
+    channelConsumer = onError(consumer1).andOnError(wrapConsumer(consumer2).andThen(consumer3));
+    channelConsumer.onOutput("test");
+    assertThat(consumer1.isCalled()).isFalse();
+    assertThat(consumer2.isCalled()).isFalse();
+    assertThat(consumer3.isCalled()).isFalse();
+    channelConsumer.onComplete();
+    assertThat(consumer1.isCalled()).isFalse();
+    assertThat(consumer2.isCalled()).isFalse();
+    assertThat(consumer3.isCalled()).isFalse();
+    channelConsumer.onError(new RoutineException());
+    assertThat(consumer1.isCalled()).isTrue();
+    assertThat(consumer2.isCalled()).isTrue();
+    assertThat(consumer3.isCalled()).isTrue();
+    consumer1.reset();
+    final TestConsumer<Object> outConsumer = new TestConsumer<Object>();
+    final TestAction completeAction = new TestAction();
+    channelConsumer = onError(consumer1).andOnOutput(outConsumer).andOnComplete(completeAction);
+    channelConsumer.onOutput("test");
+    assertThat(consumer1.isCalled()).isFalse();
+    assertThat(outConsumer.isCalled()).isTrue();
+    assertThat(completeAction.isCalled()).isFalse();
+    channelConsumer.onComplete();
+    assertThat(consumer1.isCalled()).isFalse();
+    assertThat(completeAction.isCalled()).isTrue();
+    channelConsumer.onError(new RoutineException());
+    assertThat(consumer1.isCalled()).isTrue();
+  }
+
+  @Test
+  public void testOnOutput() throws Exception {
+    final TestConsumer<Object> consumer1 = new TestConsumer<Object>();
+    final TestConsumer<Object> consumer2 = new TestConsumer<Object>();
+    final TestConsumer<Object> consumer3 = new TestConsumer<Object>();
+    FunctionalChannelConsumer<Object> channelConsumer = onOutput(consumer1);
+    channelConsumer.onError(new RoutineException());
+    assertThat(consumer1.isCalled()).isFalse();
+    channelConsumer.onComplete();
+    assertThat(consumer1.isCalled()).isFalse();
+    channelConsumer.onOutput("test");
+    assertThat(consumer1.isCalled()).isTrue();
+    consumer1.reset();
+    channelConsumer = channelConsumer.andOnOutput(consumer2);
+    channelConsumer.onError(new RoutineException());
+    assertThat(consumer1.isCalled()).isFalse();
+    assertThat(consumer2.isCalled()).isFalse();
+    channelConsumer.onComplete();
+    assertThat(consumer1.isCalled()).isFalse();
+    assertThat(consumer2.isCalled()).isFalse();
+    channelConsumer.onOutput("test");
+    assertThat(consumer1.isCalled()).isTrue();
+    assertThat(consumer2.isCalled()).isTrue();
+    consumer1.reset();
+    consumer2.reset();
+    channelConsumer = onOutput(consumer1).andOnOutput(wrapConsumer(consumer2).andThen(consumer3));
+    channelConsumer.onError(new RoutineException());
+    assertThat(consumer1.isCalled()).isFalse();
+    assertThat(consumer2.isCalled()).isFalse();
+    assertThat(consumer3.isCalled()).isFalse();
+    channelConsumer.onComplete();
+    assertThat(consumer1.isCalled()).isFalse();
+    assertThat(consumer2.isCalled()).isFalse();
+    assertThat(consumer3.isCalled()).isFalse();
+    channelConsumer.onOutput("test");
+    assertThat(consumer1.isCalled()).isTrue();
+    assertThat(consumer2.isCalled()).isTrue();
+    assertThat(consumer3.isCalled()).isTrue();
+    consumer1.reset();
+    final TestConsumer<RoutineException> errorConsumer = new TestConsumer<RoutineException>();
+    final TestAction completeAction = new TestAction();
+    channelConsumer = onOutput(consumer1).andOnError(errorConsumer).andOnComplete(completeAction);
+    channelConsumer.onError(new RoutineException());
+    assertThat(consumer1.isCalled()).isFalse();
+    assertThat(errorConsumer.isCalled()).isTrue();
+    assertThat(completeAction.isCalled()).isFalse();
+    channelConsumer.onComplete();
+    assertThat(consumer1.isCalled()).isFalse();
+    assertThat(completeAction.isCalled()).isTrue();
+    channelConsumer.onOutput("test");
+    assertThat(consumer1.isCalled()).isTrue();
+    consumer1.reset();
+    errorConsumer.reset();
+    completeAction.reset();
+    channelConsumer = onOutput(consumer1, errorConsumer);
+    channelConsumer.onOutput("test");
+    assertThat(consumer1.isCalled()).isTrue();
+    assertThat(errorConsumer.isCalled()).isFalse();
+    assertThat(completeAction.isCalled()).isFalse();
+    consumer1.reset();
+    channelConsumer.onError(new RoutineException());
+    assertThat(consumer1.isCalled()).isFalse();
+    assertThat(errorConsumer.isCalled()).isTrue();
+    assertThat(completeAction.isCalled()).isFalse();
+    errorConsumer.reset();
+    channelConsumer.onComplete();
+    assertThat(consumer1.isCalled()).isFalse();
+    assertThat(errorConsumer.isCalled()).isFalse();
+    assertThat(completeAction.isCalled()).isFalse();
+    channelConsumer = onOutput(consumer1, errorConsumer, completeAction);
+    channelConsumer.onOutput("test");
+    assertThat(consumer1.isCalled()).isTrue();
+    assertThat(errorConsumer.isCalled()).isFalse();
+    assertThat(completeAction.isCalled()).isFalse();
+    consumer1.reset();
+    channelConsumer.onError(new RoutineException());
+    assertThat(consumer1.isCalled()).isFalse();
+    assertThat(errorConsumer.isCalled()).isTrue();
+    assertThat(completeAction.isCalled()).isFalse();
+    errorConsumer.reset();
+    channelConsumer.onComplete();
+    assertThat(consumer1.isCalled()).isFalse();
+    assertThat(errorConsumer.isCalled()).isFalse();
+    assertThat(completeAction.isCalled()).isTrue();
+  }
+
+  @Test
   public void testPendingInputs() {
 
     final Channel<Object, Object> channel =
@@ -564,6 +812,18 @@ public class JRoutineTest {
   }
 
   @Test
+  public void testReadOnly() {
+    final Channel<String, String> wrapped =
+        JRoutine.channel().<String>ofType().after(millis(200)).pass("test");
+    final Channel<String, String> channel = JRoutine.readOnly(wrapped);
+    assertThat(channel.isOpen()).isTrue();
+    assertThat(channel.close().isOpen()).isTrue();
+    channel.after(10, TimeUnit.MILLISECONDS).close();
+    assertThat(channel.in(millis(100)).getComplete()).isFalse();
+    assertThat(channel.isOpen()).isTrue();
+  }
+
+  @Test
   public void testStream() {
     assertThat(JRoutine.streamOf(JRoutine.routine().of(appendAccept(range(1, 1000))))
                        .map(JRoutine.routine().of(unary(new Function<Number, Double>() {
@@ -603,6 +863,35 @@ public class JRoutineTest {
           }
         }));
     assertThat(routine.invoke().pass("TEST").close().in(seconds(1)).all()).containsOnly("test");
+  }
+
+  @Test
+  public void testTryCatch() {
+    assertThat(JRoutine.streamOf(
+        JRoutine.routineOn(syncExecutor()).of(unary(new Function<Object, Object>() {
+
+          public Object apply(final Object o) {
+            throw new NullPointerException();
+          }
+        }))).lift(streamLifter().tryCatch(new Function<RoutineException, Object>() {
+
+      public Object apply(final RoutineException e) {
+        return "exception";
+      }
+    })).invoke().pass("test").close().next()).isEqualTo("exception");
+    assertThat(
+        JRoutine.streamOf(JRoutine.routineOn(syncExecutor()).of(JRoutineOperators.identity()))
+                .lift(streamLifterOn(immediateExecutor()).tryCatch(
+                    new Function<RoutineException, Object>() {
+
+                      public Object apply(final RoutineException e) {
+                        return "exception";
+                      }
+                    }))
+                .invoke()
+                .pass("test")
+                .close()
+                .next()).isEqualTo("test");
   }
 
   public interface TestItf {
@@ -680,5 +969,40 @@ public class JRoutineTest {
     public void onInput(final String input, @NotNull final Channel<String, ?> result) {
       result.pass(mIsUpper ? input.toUpperCase() : input.toLowerCase());
     }
+  }
+
+  private static class TestAction implements Action {
+
+    private boolean mIsCalled;
+
+    public boolean isCalled() {
+      return mIsCalled;
+    }
+
+    public void perform() {
+      mIsCalled = true;
+    }
+
+    public void reset() {
+      mIsCalled = false;
+    }
+  }
+
+  private static class TestConsumer<OUT> implements Consumer<OUT> {
+
+    private boolean mIsCalled;
+
+    public boolean isCalled() {
+      return mIsCalled;
+    }
+
+    public void reset() {
+      mIsCalled = false;
+    }
+
+    public void accept(final OUT out) {
+      mIsCalled = true;
+    }
+
   }
 }

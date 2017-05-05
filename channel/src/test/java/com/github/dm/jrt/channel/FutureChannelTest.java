@@ -693,28 +693,28 @@ public class FutureChannelTest {
       channel.sorted().pass("test");
       fail();
 
-    } catch (final AbortException ignored) {
+    } catch (final IllegalStateException ignored) {
     }
 
     try {
       channel.unsorted().pass("test", "test");
       fail();
 
-    } catch (final AbortException ignored) {
+    } catch (final IllegalStateException ignored) {
     }
 
     try {
       channel.unsorted().pass(Arrays.asList("test", "test"));
       fail();
 
-    } catch (final AbortException ignored) {
+    } catch (final IllegalStateException ignored) {
     }
 
     try {
       channel.unsorted().pass(JRoutineCore.channel().ofType());
       fail();
 
-    } catch (final AbortException ignored) {
+    } catch (final IllegalStateException ignored) {
     }
   }
 

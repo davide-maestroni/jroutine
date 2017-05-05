@@ -740,7 +740,7 @@ public class FlatChannelTest {
         outputChannel.pass(output.toString());
       }
     });
-    assertThat(JRoutineCore.flattenChannels(inputChannel, outputChannel)
+    assertThat(JRoutineCore.flatten(inputChannel, outputChannel)
                            .pass(1, 2, 3)
                            .close()
                            .in(seconds(1))

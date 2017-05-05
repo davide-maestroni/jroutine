@@ -66,11 +66,10 @@ class LiftTryFinally<IN, OUT> implements LiftingFunction<IN, OUT, IN, OUT> {
     return wrapSupplier(supplier).andThen(new Function<Channel<IN, OUT>, Channel<IN, OUT>>() {
 
       public Channel<IN, OUT> apply(final Channel<IN, OUT> channel) throws Exception {
-        final Channel<OUT, OUT> outputChannel = JRoutineCore.channelOn(mExecutor).ofType();
-        channel.consume(
-            new TryFinallyChannelConsumer<OUT>(mExecutor, mConfiguration, mFinallyAction,
-                outputChannel));
-        return JRoutineCore.flattenChannels(channel, outputChannel);
+        final Channel<OUT, OUT> outputChannel =
+            JRoutineCore.channelOn(mExecutor).withConfiguration(mConfiguration).ofType();
+        channel.consume(new TryFinallyChannelConsumer<OUT>(mFinallyAction, outputChannel));
+        return JRoutineCore.flatten(channel, JRoutineCore.readOnly(outputChannel));
       }
     });
   }

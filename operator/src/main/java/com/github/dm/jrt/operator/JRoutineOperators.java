@@ -175,7 +175,7 @@ public class JRoutineOperators {
    * @param outputsConsumer the consumer instance.
    * @param <DATA>          the data type.
    * @return the invocation factory instance.
-   * @see com.github.dm.jrt.operator.sequence.Sequences Sequences
+   * @see com.github.dm.jrt.operator.sequence.JRoutineSequences JRoutineSequences
    */
   @NotNull
   public static <DATA> InvocationFactory<DATA, DATA> appendAccept(
@@ -198,7 +198,7 @@ public class JRoutineOperators {
    * @param <DATA>          the data type.
    * @return the invocation factory instance.
    * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
-   * @see com.github.dm.jrt.operator.sequence.Sequences Sequences
+   * @see com.github.dm.jrt.operator.sequence.JRoutineSequences JRoutineSequences
    */
   @NotNull
   public static <DATA> InvocationFactory<DATA, DATA> appendAccept(final long count,
@@ -987,7 +987,7 @@ public class JRoutineOperators {
    * @param outputsConsumer the consumer instance.
    * @param <DATA>          the data type.
    * @return the invocation factory instance.
-   * @see com.github.dm.jrt.operator.sequence.Sequences Sequences
+   * @see com.github.dm.jrt.operator.sequence.JRoutineSequences JRoutineSequences
    */
   @NotNull
   public static <DATA> InvocationFactory<DATA, DATA> prependAccept(
@@ -1012,7 +1012,7 @@ public class JRoutineOperators {
    * @param <DATA>          the data type.
    * @return the invocation factory instance.
    * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
-   * @see com.github.dm.jrt.operator.sequence.Sequences Sequences
+   * @see com.github.dm.jrt.operator.sequence.JRoutineSequences JRoutineSequences
    */
   @NotNull
   public static <DATA> InvocationFactory<DATA, DATA> prependAccept(final long count,

@@ -280,6 +280,25 @@ class FlatChannel<IN, OUT> implements Channel<IN, OUT> {
     return this;
   }
 
+  @Override
+  public int hashCode() {
+    return mChannels.hashCode();
+  }
+
+  @Override
+  public boolean equals(final Object o) {
+    if (this == o) {
+      return true;
+    }
+
+    if ((o == null) || (getClass() != o.getClass())) {
+      return false;
+    }
+
+    final FlatChannel<?, ?> that = (FlatChannel<?, ?>) o;
+    return mChannels.equals(that.mChannels);
+  }
+
   public Iterator<OUT> iterator() {
     return mOutputChannel.iterator();
   }

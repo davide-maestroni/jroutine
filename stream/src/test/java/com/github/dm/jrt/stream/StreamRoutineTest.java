@@ -60,7 +60,7 @@ import static com.github.dm.jrt.operator.JRoutineOperators.appendAccept;
 import static com.github.dm.jrt.operator.JRoutineOperators.average;
 import static com.github.dm.jrt.operator.JRoutineOperators.reduce;
 import static com.github.dm.jrt.operator.JRoutineOperators.unary;
-import static com.github.dm.jrt.operator.sequence.Sequences.range;
+import static com.github.dm.jrt.operator.sequence.JRoutineSequences.range;
 import static com.github.dm.jrt.stream.JRoutineStream.streamLifter;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;

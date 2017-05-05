@@ -73,12 +73,11 @@ class LiftSplitBy<IN, OUT, AFTER> implements LiftingFunction<IN, OUT, IN, AFTER>
     return wrapSupplier(supplier).andThen(new Function<Channel<IN, OUT>, Channel<IN, AFTER>>() {
 
       public Channel<IN, AFTER> apply(final Channel<IN, OUT> channel) {
-        final ScheduledExecutor executor = mExecutor;
-        final Channel<AFTER, AFTER> outputChannel = JRoutineCore.channelOn(executor).ofType();
+        final Channel<AFTER, AFTER> outputChannel =
+            JRoutineCore.channelOn(mExecutor).withConfiguration(mConfiguration).ofType();
         channel.consume(
-            new SplitByChannelConsumer<OUT, AFTER>(executor, mConfiguration, mKeyFunction, mRoutine,
-                outputChannel));
-        return JRoutineCore.flattenChannels(channel, outputChannel);
+            new SplitByChannelConsumer<OUT, AFTER>(mKeyFunction, mRoutine, outputChannel));
+        return JRoutineCore.flatten(channel, JRoutineCore.readOnly(outputChannel));
       }
     });
   }

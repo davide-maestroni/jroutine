@@ -28,7 +28,7 @@ import com.github.dm.jrt.stream.transform.LiftingFunction;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 
 import static com.github.dm.jrt.function.util.SupplierDecorator.wrapSupplier;
 
@@ -75,22 +75,19 @@ class LiftSplitIn<IN, OUT, AFTER> implements LiftingFunction<IN, OUT, IN, AFTER>
 
       public Channel<IN, AFTER> apply(final Channel<IN, OUT> channel) {
         final int count = mCount;
-        final ScheduledExecutor executor = mExecutor;
+        @SuppressWarnings("unchecked") final Routine<OUT, AFTER> routine =
+            (Routine<OUT, AFTER>) mRoutine;
         final Channel<AFTER, AFTER> outputChannel =
-            JRoutineCore.channelOn(executor).withConfiguration(mConfiguration).ofType();
-        final HashMap<Channel<OUT, OUT>, Channel<?, AFTER>> channels =
-            new HashMap<Channel<OUT, OUT>, Channel<?, AFTER>>(count);
+            JRoutineCore.channelOn(mExecutor).withConfiguration(mConfiguration).ofType();
+        final ArrayList<Channel<OUT, AFTER>> channels = new ArrayList<Channel<OUT, AFTER>>(count);
         for (int i = 0; i < count; ++i) {
-          final Channel<OUT, OUT> inputChannel = JRoutineCore.channelOn(executor).ofType();
-          @SuppressWarnings("unchecked") final Channel<OUT, AFTER> invocationChannel =
-              ((Routine<OUT, AFTER>) mRoutine).invoke();
-          channels.put(inputChannel, invocationChannel);
-          outputChannel.pass(invocationChannel);
-          invocationChannel.pass(inputChannel).close();
+          final Channel<OUT, AFTER> inputChannel = (routine).invoke();
+          channels.add(inputChannel);
+          outputChannel.pass(inputChannel);
         }
 
         channel.consume(new SplitInChannelConsumer<OUT>(channels));
-        return JRoutineCore.flattenChannels(channel, outputChannel);
+        return JRoutineCore.flatten(channel, outputChannel.close());
       }
     });
   }

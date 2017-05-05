@@ -68,10 +68,11 @@ class LiftRetry<IN, OUT> implements LiftingFunction<IN, OUT, IN, OUT> {
       public Channel<IN, OUT> get() {
         final ScheduledExecutor executor = mExecutor;
         final Channel<IN, IN> inputChannel = JRoutineCore.channelOn(executor).ofType();
-        final Channel<OUT, OUT> outputChannel = JRoutineCore.channelOn(executor).ofType();
-        new RetryChannelConsumer<IN, OUT>(executor, mConfiguration, supplier, mBackoffFunction,
-            inputChannel, outputChannel).run();
-        return JRoutineCore.flattenChannels(inputChannel, outputChannel);
+        final Channel<OUT, OUT> outputChannel =
+            JRoutineCore.channelOn(executor).withConfiguration(mConfiguration).ofType();
+        new RetryChannelConsumer<IN, OUT>(executor, supplier, mBackoffFunction, inputChannel,
+            outputChannel).run();
+        return JRoutineCore.flatten(inputChannel, JRoutineCore.readOnly(outputChannel));
       }
     };
   }

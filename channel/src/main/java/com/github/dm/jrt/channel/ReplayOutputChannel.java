@@ -303,7 +303,7 @@ class ReplayOutputChannel<OUT> implements Channel<OUT, OUT>, ChannelConsumer<OUT
       pipeChannel = channels.get(channel);
       if (pipeChannel == null) {
         ((Channel<OUT, AFTER>) channel).pass(this);
-        pipeChannel = JRoutineCore.flattenChannels(this, channel);
+        pipeChannel = JRoutineCore.flatten(this, channel);
         channels.put(channel, pipeChannel);
       }
     }

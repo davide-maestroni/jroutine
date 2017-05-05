@@ -82,10 +82,12 @@ class LiftTimeout<IN, OUT> implements LiftingFunction<IN, OUT, IN, OUT> {
 
       public Channel<IN, OUT> apply(final Channel<IN, OUT> channel) throws Exception {
         final ScheduledExecutor executor = mExecutor;
-        final Channel<OUT, OUT> outputChannel = JRoutineCore.channelOn(executor).ofType();
-        channel.consume(new TimeoutChannelConsumer<OUT>(executor, mConfiguration, mOutputTimeout,
-            mOutputTimeoutUnit, mTotalTimeout, mTotalTimeoutUnit, outputChannel));
-        return JRoutineCore.flattenChannels(channel, outputChannel);
+        final Channel<OUT, OUT> outputChannel =
+            JRoutineCore.channelOn(executor).withConfiguration(mConfiguration).ofType();
+        channel.consume(
+            new TimeoutChannelConsumer<OUT>(executor, mOutputTimeout, mOutputTimeoutUnit,
+                mTotalTimeout, mTotalTimeoutUnit, outputChannel));
+        return JRoutineCore.flatten(channel, JRoutineCore.readOnly(outputChannel));
       }
     });
   }

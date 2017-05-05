@@ -67,10 +67,10 @@ class LiftTryCatch<IN, OUT> implements LiftingFunction<IN, OUT, IN, OUT> {
     return wrapSupplier(supplier).andThen(new Function<Channel<IN, OUT>, Channel<IN, OUT>>() {
 
       public Channel<IN, OUT> apply(final Channel<IN, OUT> channel) throws Exception {
-        final Channel<OUT, OUT> outputChannel = JRoutineCore.channelOn(mExecutor).ofType();
-        channel.consume(new TryCatchChannelConsumer<OUT>(mExecutor, mConfiguration, mCatchConsumer,
-            outputChannel));
-        return JRoutineCore.flattenChannels(channel, outputChannel);
+        final Channel<OUT, OUT> outputChannel =
+            JRoutineCore.channelOn(mExecutor).withConfiguration(mConfiguration).ofType();
+        channel.consume(new TryCatchChannelConsumer<OUT>(mCatchConsumer, outputChannel));
+        return JRoutineCore.flatten(channel, JRoutineCore.readOnly(outputChannel));
       }
     });
   }

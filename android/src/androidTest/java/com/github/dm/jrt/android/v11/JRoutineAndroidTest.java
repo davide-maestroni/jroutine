@@ -177,7 +177,8 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
   }
 
   private static void testStream(@NotNull final Activity activity) {
-    assertThat(JRoutineAndroid.<Integer>withStream().map(appendAccept(range(1, 1000)))
+    assertThat(JRoutineAndroid.<Integer>withStream().map(
+        JRoutineOperators.appendOutputsOf(range(1, 1000)))
                                                     .map(new Function<Number, Double>() {
 
                                                       public Double apply(final Number number) {

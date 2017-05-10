@@ -28,6 +28,7 @@ import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.executor.ScheduledExecutor;
 import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
+import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.function.JRoutineFunction;
@@ -36,6 +37,7 @@ import com.github.dm.jrt.function.util.BiFunction;
 import com.github.dm.jrt.function.util.Consumer;
 import com.github.dm.jrt.function.util.Function;
 import com.github.dm.jrt.function.util.Supplier;
+import com.github.dm.jrt.operator.JRoutineOperators;
 import com.github.dm.jrt.stream.routine.StreamRoutine;
 import com.github.dm.jrt.stream.transform.TransformingFunction;
 
@@ -56,7 +58,6 @@ import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static com.github.dm.jrt.function.JRoutineFunction.onOutput;
 import static com.github.dm.jrt.function.util.SupplierDecorator.wrapSupplier;
 import static com.github.dm.jrt.operator.JRoutineOperators.append;
-import static com.github.dm.jrt.operator.JRoutineOperators.appendAccept;
 import static com.github.dm.jrt.operator.JRoutineOperators.average;
 import static com.github.dm.jrt.operator.JRoutineOperators.reduce;
 import static com.github.dm.jrt.operator.JRoutineOperators.unary;
@@ -427,8 +428,9 @@ public class StreamRoutineTest {
 
   @Test
   public void testImmediate() {
-    assertThat(JRoutineStream.streamOf(
-        JRoutineCore.routineOn(immediateExecutor()).of(appendAccept(range(1, 1000))))
+    assertThat(JRoutineStream.streamOf(JRoutineCore.routineOn(immediateExecutor())
+                                                   .of(JRoutineOperators.appendOutputsOf(
+                                                       range(1, 1000))))
                              .map(JRoutineCore.routineOn(immediateExecutor())
                                               .withInvocation()
                                               .withInputMaxSize(1)
@@ -449,8 +451,9 @@ public class StreamRoutineTest {
                              .invoke()
                              .close()
                              .next()).isCloseTo(21, Offset.offset(0.1));
-    assertThat(JRoutineStream.streamOf(
-        JRoutineCore.routineOn(immediateExecutor()).of((appendAccept(range(1, 1000)))))
+    assertThat(JRoutineStream.streamOf(JRoutineCore.routineOn(immediateExecutor())
+                                                   .of((JRoutineOperators.appendOutputsOf(
+                                                       range(1, 1000)))))
                              .map(JRoutineCore.routineOn(immediateExecutor())
                                               .withInvocation()
                                               .withInputMaxSize(1)
@@ -585,6 +588,25 @@ public class StreamRoutineTest {
   }
 
   @Test
+  public void testMapFactory() {
+    assertThat(
+        JRoutineStream.streamOf(JRoutineCore.routine().of(IdentityInvocation.<String>factory()))
+                      .map(new UpperCase())
+                      .invoke()
+                      .pass("test1", "test2")
+                      .close()
+                      .in(seconds(3))
+                      .all()).containsExactly("TEST1", "TEST2");
+  }
+
+  @Test(expected = NullPointerException.class)
+  @SuppressWarnings("ConstantConditions")
+  public void testMapFactoryNullPointerError() {
+    JRoutineStream.streamOf(JRoutineCore.routine().of(IdentityInvocation.factory()))
+                  .map((InvocationFactory<Object, ?>) null);
+  }
+
+  @Test
   public void testMapRetry() {
     final Routine<Object, String> routine =
         JRoutineCore.routine().of(unary(new Function<Object, String>() {
@@ -667,15 +689,11 @@ public class StreamRoutineTest {
                              .all()).containsExactly("TEST1", "TEST2");
   }
 
-  @Test
+  @Test(expected = NullPointerException.class)
   @SuppressWarnings("ConstantConditions")
   public void testMapRoutineNullPointerError() {
-    try {
-      JRoutineStream.streamOf(JRoutineCore.routine().of(IdentityInvocation.factory())).map(null);
-      fail();
-
-    } catch (final NullPointerException ignored) {
-    }
+    JRoutineStream.streamOf(JRoutineCore.routine().of(IdentityInvocation.factory()))
+                  .map((Routine<Object, ?>) null);
   }
 
   @Test
@@ -686,8 +704,9 @@ public class StreamRoutineTest {
                                  .withInputBackoff(afterCount(2).linearDelay(seconds(3)))
                                  .withOutputBackoff(afterCount(2).linearDelay(seconds(3)))
                                  .configuration();
-      assertThat(JRoutineStream.streamOf(
-          JRoutineCore.routineOn(getSingleThreadExecutor()).of(appendAccept(range(1, 1000))))
+      assertThat(JRoutineStream.streamOf(JRoutineCore.routineOn(getSingleThreadExecutor())
+                                                     .of(JRoutineOperators.appendOutputsOf(
+                                                         range(1, 1000))))
                                .map(JRoutineCore.routineOn(getSingleThreadExecutor())
                                                 .withConfiguration(configuration)
                                                 .of(IdentityInvocation.<Number>factory()))
@@ -741,8 +760,9 @@ public class StreamRoutineTest {
           InvocationConfiguration.builder()
                                  .withInputBackoff(afterCount(2).linearDelay(seconds(3)))
                                  .configuration();
-      assertThat(JRoutineStream.streamOf(
-          JRoutineCore.routineOn(getSingleThreadExecutor()).of(appendAccept(range(1, 1000))))
+      assertThat(JRoutineStream.streamOf(JRoutineCore.routineOn(getSingleThreadExecutor())
+                                                     .of(JRoutineOperators.appendOutputsOf(
+                                                         range(1, 1000))))
                                .map(JRoutineCore.routineOn(getSingleThreadExecutor())
                                                 .withConfiguration(configuration)
                                                 .of(IdentityInvocation.<Number>factory()))

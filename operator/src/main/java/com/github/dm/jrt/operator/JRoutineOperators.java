@@ -23,7 +23,6 @@ import com.github.dm.jrt.core.common.BackoffBuilder;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
-import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DurationMeasure;
@@ -36,6 +35,7 @@ import com.github.dm.jrt.function.util.Function;
 import com.github.dm.jrt.function.util.FunctionDecorator;
 import com.github.dm.jrt.function.util.Predicate;
 import com.github.dm.jrt.function.util.Supplier;
+import com.github.dm.jrt.operator.sequence.Sequence;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -82,14 +82,14 @@ public class JRoutineOperators {
   @SuppressWarnings("unchecked")
   private static final InvocationFactory<?, ?> sMin = binary(BiFunctionDecorator.min());
 
-  private static final MappingInvocation<? extends Iterable<?>, ?> sUnfoldInvocation =
-      new MappingInvocation<Iterable<?>, Object>(null) {
+  private static final InvocationFactory<? extends Iterable<?>, ?> sUnfold =
+      projection(new BiConsumer<Iterable<?>, Channel<Object, ?>>() {
 
         @SuppressWarnings("unchecked")
-        public void onInput(final Iterable<?> input, @NotNull final Channel<Object, ?> result) {
+        public void accept(final Iterable<?> input, final Channel<Object, ?> result) {
           result.pass((Iterable<Object>) input);
         }
-      };
+      });
 
   /**
    * Avoid explicit instantiation.
@@ -164,6 +164,74 @@ public class JRoutineOperators {
   }
 
   /**
+   * Returns a factory of invocations appending the outputs returned by the specified sequence to
+   * the invocation ones.
+   * <br>
+   * The sequence will be called {@code count} number of times only when the routine invocation
+   * completes. The count number must be positive.
+   *
+   * @param count    the number of generated outputs.
+   * @param sequence the sequence instance.
+   * @param <DATA>   the data type.
+   * @return the invocation factory instance.
+   * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
+   */
+  @NotNull
+  public static <DATA> InvocationFactory<DATA, DATA> append(final long count,
+      @NotNull final Sequence<DATA> sequence) {
+    return appendOutputsOf(count, sequence);
+  }
+
+  /**
+   * Returns a factory of invocations appending the outputs returned by the specified sequence to
+   * the invocation ones.
+   *
+   * @param sequence the sequence instance.
+   * @param <DATA>   the data type.
+   * @return the invocation factory instance.
+   */
+  @NotNull
+  public static <DATA> InvocationFactory<DATA, DATA> append(
+      @NotNull final Sequence<DATA> sequence) {
+    return append(1, sequence);
+  }
+
+  /**
+   * Returns a factory of invocations appending the outputs returned by the specified supplier to
+   * the invocation ones.
+   * <br>
+   * The supplier will be called {@code count} number of times only when the routine invocation
+   * completes. The count number must be positive.
+   *
+   * @param count          the number of generated outputs.
+   * @param outputSupplier the supplier instance.
+   * @param <DATA>         the data type.
+   * @return the invocation factory instance.
+   * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
+   */
+  @NotNull
+  public static <DATA> InvocationFactory<DATA, DATA> appendOutputOf(final long count,
+      @NotNull final Supplier<? extends DATA> outputSupplier) {
+    return new AppendSupplierInvocation<DATA>(count, outputSupplier);
+  }
+
+  /**
+   * Returns a factory of invocations appending the outputs returned by the specified supplier to
+   * the invocation ones.
+   * <br>
+   * The supplier will be called only when the routine invocation completes.
+   *
+   * @param outputSupplier the supplier instance.
+   * @param <DATA>         the data type.
+   * @return the invocation factory instance.
+   */
+  @NotNull
+  public static <DATA> InvocationFactory<DATA, DATA> appendOutputOf(
+      @NotNull final Supplier<? extends DATA> outputSupplier) {
+    return appendOutputOf(1, outputSupplier);
+  }
+
+  /**
    * Returns a factory of invocations appending the outputs returned by the specified consumer to
    * the invocation ones.
    * <br>
@@ -175,12 +243,11 @@ public class JRoutineOperators {
    * @param outputsConsumer the consumer instance.
    * @param <DATA>          the data type.
    * @return the invocation factory instance.
-   * @see com.github.dm.jrt.operator.sequence.JRoutineSequences JRoutineSequences
    */
   @NotNull
-  public static <DATA> InvocationFactory<DATA, DATA> appendAccept(
+  public static <DATA> InvocationFactory<DATA, DATA> appendOutputsOf(
       @NotNull final Consumer<? super Channel<DATA, ?>> outputsConsumer) {
-    return appendAccept(1, outputsConsumer);
+    return appendOutputsOf(1, outputsConsumer);
   }
 
   /**
@@ -198,47 +265,11 @@ public class JRoutineOperators {
    * @param <DATA>          the data type.
    * @return the invocation factory instance.
    * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
-   * @see com.github.dm.jrt.operator.sequence.JRoutineSequences JRoutineSequences
    */
   @NotNull
-  public static <DATA> InvocationFactory<DATA, DATA> appendAccept(final long count,
+  public static <DATA> InvocationFactory<DATA, DATA> appendOutputsOf(final long count,
       @NotNull final Consumer<? super Channel<DATA, ?>> outputsConsumer) {
     return new AppendConsumerInvocation<DATA>(count, outputsConsumer);
-  }
-
-  /**
-   * Returns a factory of invocations appending the outputs returned by the specified supplier to
-   * the invocation ones.
-   * <br>
-   * The supplier will be called {@code count} number of times only when the routine invocation
-   * completes. The count number must be positive.
-   *
-   * @param count          the number of generated outputs.
-   * @param outputSupplier the supplier instance.
-   * @param <DATA>         the data type.
-   * @return the invocation factory instance.
-   * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
-   */
-  @NotNull
-  public static <DATA> InvocationFactory<DATA, DATA> appendGet(final long count,
-      @NotNull final Supplier<? extends DATA> outputSupplier) {
-    return new AppendSupplierInvocation<DATA>(count, outputSupplier);
-  }
-
-  /**
-   * Returns a factory of invocations appending the outputs returned by the specified supplier to
-   * the invocation ones.
-   * <br>
-   * The supplier will be called only when the routine invocation completes.
-   *
-   * @param outputSupplier the supplier instance.
-   * @param <DATA>         the data type.
-   * @return the invocation factory instance.
-   */
-  @NotNull
-  public static <DATA> InvocationFactory<DATA, DATA> appendGet(
-      @NotNull final Supplier<? extends DATA> outputSupplier) {
-    return appendGet(1, outputSupplier);
   }
 
   /**
@@ -790,6 +821,74 @@ public class JRoutineOperators {
   }
 
   /**
+   * Returns a factory of invocations producing the outputs returned by the specified sequence in
+   * case the invocation produced none.
+   * <br>
+   * The sequence will be called {@code count} number of times only when the routine invocation
+   * completes. The count number must be positive.
+   *
+   * @param count    the number of generated outputs.
+   * @param sequence the sequence instance.
+   * @param <DATA>   the data type.
+   * @return the invocation factory instance.
+   * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
+   */
+  @NotNull
+  public static <DATA> InvocationFactory<DATA, DATA> orElse(final long count,
+      @NotNull final Sequence<DATA> sequence) {
+    return orElseOutputsOf(count, sequence);
+  }
+
+  /**
+   * Returns a factory of invocations producing the outputs returned by the specified sequence in
+   * case the invocation produced none.
+   *
+   * @param sequence the sequence instance.
+   * @param <DATA>   the data type.
+   * @return the invocation factory instance.
+   */
+  @NotNull
+  public static <DATA> InvocationFactory<DATA, DATA> orElse(
+      @NotNull final Sequence<DATA> sequence) {
+    return orElse(1, sequence);
+  }
+
+  /**
+   * Returns a factory of invocations producing the outputs returned by the specified supplier in
+   * case the invocation produced none.
+   * <br>
+   * The supplier will be called {@code count} number of times only when the routine invocation
+   * completes. The count number must be positive.
+   *
+   * @param count          the number of generated outputs.
+   * @param outputSupplier the supplier instance.
+   * @param <DATA>         the data type.
+   * @return the invocation factory instance.
+   * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
+   */
+  @NotNull
+  public static <DATA> InvocationFactory<DATA, DATA> orElseOutputOf(final long count,
+      @NotNull final Supplier<? extends DATA> outputSupplier) {
+    return new OrElseSupplierInvocationFactory<DATA>(count, outputSupplier);
+  }
+
+  /**
+   * Returns a factory of invocations producing the outputs returned by the specified supplier in
+   * case the invocation produced none.
+   * <br>
+   * The supplier will be called only when the routine invocation completes.
+   *
+   * @param outputSupplier the supplier instance.
+   * @param <DATA>         the data type.
+   * @return the invocation factory instance.
+   */
+  @NotNull
+  public static <DATA> InvocationFactory<DATA, DATA> orElseOutputOf(
+      @NotNull final Supplier<? extends DATA> outputSupplier) {
+    return orElseOutputOf(1, outputSupplier);
+  }
+
+  /**
    * Returns a factory of invocations producing the outputs returned by the specified consumer in
    * case the invocation produced none.
    * <br>
@@ -803,9 +902,9 @@ public class JRoutineOperators {
    * @return the invocation factory instance.
    */
   @NotNull
-  public static <DATA> InvocationFactory<DATA, DATA> orElseAccept(
+  public static <DATA> InvocationFactory<DATA, DATA> orElseOutputsOf(
       @NotNull final Consumer<? super Channel<DATA, ?>> outputsConsumer) {
-    return orElseAccept(1, outputsConsumer);
+    return orElseOutputsOf(1, outputsConsumer);
   }
 
   /**
@@ -825,44 +924,9 @@ public class JRoutineOperators {
    * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
    */
   @NotNull
-  public static <DATA> InvocationFactory<DATA, DATA> orElseAccept(final long count,
+  public static <DATA> InvocationFactory<DATA, DATA> orElseOutputsOf(final long count,
       @NotNull final Consumer<? super Channel<DATA, ?>> outputsConsumer) {
     return new OrElseConsumerInvocationFactory<DATA>(count, outputsConsumer);
-  }
-
-  /**
-   * Returns a factory of invocations producing the outputs returned by the specified supplier in
-   * case the invocation produced none.
-   * <br>
-   * The supplier will be called {@code count} number of times only when the routine invocation
-   * completes. The count number must be positive.
-   *
-   * @param count          the number of generated outputs.
-   * @param outputSupplier the supplier instance.
-   * @param <DATA>         the data type.
-   * @return the invocation factory instance.
-   * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
-   */
-  @NotNull
-  public static <DATA> InvocationFactory<DATA, DATA> orElseGet(final long count,
-      @NotNull final Supplier<? extends DATA> outputSupplier) {
-    return new OrElseSupplierInvocationFactory<DATA>(count, outputSupplier);
-  }
-
-  /**
-   * Returns a factory of invocations producing the outputs returned by the specified supplier in
-   * case the invocation produced none.
-   * <br>
-   * The supplier will be called only when the routine invocation completes.
-   *
-   * @param outputSupplier the supplier instance.
-   * @param <DATA>         the data type.
-   * @return the invocation factory instance.
-   */
-  @NotNull
-  public static <DATA> InvocationFactory<DATA, DATA> orElseGet(
-      @NotNull final Supplier<? extends DATA> outputSupplier) {
-    return orElseGet(1, outputSupplier);
   }
 
   /**
@@ -975,6 +1039,82 @@ public class JRoutineOperators {
   }
 
   /**
+   * Returns a factory of invocations prepending the outputs returned by the specified sequence to
+   * the invocation ones.
+   * <br>
+   * If no input is passed to the invocation, the outputs will be produced only when the invocation
+   * completes.
+   * <br>
+   * The sequence will be called {@code count} number of times. The count number must be positive.
+   *
+   * @param count    the number of generated outputs.
+   * @param sequence the sequence instance.
+   * @param <DATA>   the data type.
+   * @return the invocation factory instance.
+   * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
+   */
+  @NotNull
+  public static <DATA> InvocationFactory<DATA, DATA> prepend(final long count,
+      @NotNull final Sequence<DATA> sequence) {
+    return prependOutputsOf(count, sequence);
+  }
+
+  /**
+   * Returns a factory of invocations prepending the outputs returned by the specified sequence to
+   * the invocation ones.
+   * <br>
+   * If no input is passed to the invocation, the outputs will be produced only when the invocation
+   * completes.
+   *
+   * @param sequence the sequence instance.
+   * @param <DATA>   the data type.
+   * @return the invocation factory instance.
+   */
+  @NotNull
+  public static <DATA> InvocationFactory<DATA, DATA> prepend(
+      @NotNull final Sequence<DATA> sequence) {
+    return prepend(1, sequence);
+  }
+
+  /**
+   * Returns a factory of invocations prepending the outputs returned by the specified supplier to
+   * the invocation ones.
+   * <br>
+   * If no input is passed to the invocation, the outputs will be produced only when the invocation
+   * completes.
+   * <br>
+   * The supplier will be called {@code count} number of times. The count number must be positive.
+   *
+   * @param count          the number of generated outputs.
+   * @param outputSupplier the supplier instance.
+   * @param <DATA>         the data type.
+   * @return the invocation factory instance.
+   * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
+   */
+  @NotNull
+  public static <DATA> InvocationFactory<DATA, DATA> prependOutputOf(final long count,
+      @NotNull final Supplier<? extends DATA> outputSupplier) {
+    return new PrependSupplierInvocationFactory<DATA>(count, outputSupplier);
+  }
+
+  /**
+   * Returns a factory of invocations prepending the outputs returned by the specified supplier to
+   * the invocation ones.
+   * <br>
+   * If no input is passed to the invocation, the outputs will be produced only when the invocation
+   * completes.
+   *
+   * @param outputSupplier the supplier instance.
+   * @param <DATA>         the data type.
+   * @return the invocation factory instance.
+   */
+  @NotNull
+  public static <DATA> InvocationFactory<DATA, DATA> prependOutputOf(
+      @NotNull final Supplier<? extends DATA> outputSupplier) {
+    return prependOutputOf(1, outputSupplier);
+  }
+
+  /**
    * Returns a factory of invocations prepending the outputs returned by the specified consumer to
    * the invocation ones.
    * <br>
@@ -987,12 +1127,11 @@ public class JRoutineOperators {
    * @param outputsConsumer the consumer instance.
    * @param <DATA>          the data type.
    * @return the invocation factory instance.
-   * @see com.github.dm.jrt.operator.sequence.JRoutineSequences JRoutineSequences
    */
   @NotNull
-  public static <DATA> InvocationFactory<DATA, DATA> prependAccept(
+  public static <DATA> InvocationFactory<DATA, DATA> prependOutputsOf(
       @NotNull final Consumer<? super Channel<DATA, ?>> outputsConsumer) {
-    return prependAccept(1, outputsConsumer);
+    return prependOutputsOf(1, outputsConsumer);
   }
 
   /**
@@ -1012,50 +1151,25 @@ public class JRoutineOperators {
    * @param <DATA>          the data type.
    * @return the invocation factory instance.
    * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
-   * @see com.github.dm.jrt.operator.sequence.JRoutineSequences JRoutineSequences
    */
   @NotNull
-  public static <DATA> InvocationFactory<DATA, DATA> prependAccept(final long count,
+  public static <DATA> InvocationFactory<DATA, DATA> prependOutputsOf(final long count,
       @NotNull final Consumer<? super Channel<DATA, ?>> outputsConsumer) {
     return new PrependConsumerInvocationFactory<DATA>(count, outputsConsumer);
   }
 
   /**
-   * Returns a factory of invocations prepending the outputs returned by the specified supplier to
-   * the invocation ones.
-   * <br>
-   * If no input is passed to the invocation, the outputs will be produced only when the invocation
-   * completes.
-   * <br>
-   * The supplier will be called {@code count} number of times. The count number must be positive.
+   * Returns a factory of invocations applying the specified projection function to each input.
    *
-   * @param count          the number of generated outputs.
-   * @param outputSupplier the supplier instance.
-   * @param <DATA>         the data type.
-   * @return the invocation factory instance.
-   * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
-   */
-  @NotNull
-  public static <DATA> InvocationFactory<DATA, DATA> prependGet(final long count,
-      @NotNull final Supplier<? extends DATA> outputSupplier) {
-    return new PrependSupplierInvocationFactory<DATA>(count, outputSupplier);
-  }
-
-  /**
-   * Returns a factory of invocations prepending the outputs returned by the specified supplier to
-   * the invocation ones.
-   * <br>
-   * If no input is passed to the invocation, the outputs will be produced only when the invocation
-   * completes.
-   *
-   * @param outputSupplier the supplier instance.
-   * @param <DATA>         the data type.
+   * @param projectionConsumer the consumer insatnce.
+   * @param <IN>               the input data type.
+   * @param <OUT>              the output data type.
    * @return the invocation factory instance.
    */
   @NotNull
-  public static <DATA> InvocationFactory<DATA, DATA> prependGet(
-      @NotNull final Supplier<? extends DATA> outputSupplier) {
-    return prependGet(1, outputSupplier);
+  public static <IN, OUT> InvocationFactory<IN, OUT> projection(
+      @NotNull final BiConsumer<? super IN, ? super Channel<OUT, ?>> projectionConsumer) {
+    return new ProjectionInvocation<IN, OUT>(projectionConsumer);
   }
 
   /**
@@ -1123,6 +1237,22 @@ public class JRoutineOperators {
 
   /**
    * Returns a factory of invocations replacing all the data satisfying the specified predicate
+   * with the outputs returned by the passed function.
+   *
+   * @param predicate           the predicate instance.
+   * @param replacementFunction the replacement function instance.
+   * @param <DATA>              the data type.
+   * @return the invocation factory instance.
+   */
+  @NotNull
+  public static <DATA> InvocationFactory<DATA, DATA> replaceWithOutputIf(
+      @NotNull final Predicate<? super DATA> predicate,
+      @NotNull final Function<DATA, ? extends DATA> replacementFunction) {
+    return new ReplaceFunctionInvocation<DATA>(predicate, replacementFunction);
+  }
+
+  /**
+   * Returns a factory of invocations replacing all the data satisfying the specified predicate
    * with the outputs published by the passed consumer.
    *
    * @param predicate           the predicate instance.
@@ -1132,26 +1262,10 @@ public class JRoutineOperators {
    */
   @NotNull
   @SuppressWarnings("unchecked")
-  public static <DATA> InvocationFactory<DATA, DATA> replacementAcceptIf(
+  public static <DATA> InvocationFactory<DATA, DATA> replaceWithOutputsIf(
       @NotNull final Predicate<? super DATA> predicate,
       @NotNull final BiConsumer<DATA, ? super Channel<DATA, ?>> replacementConsumer) {
     return new ReplaceConsumerInvocation<DATA>(predicate, replacementConsumer);
-  }
-
-  /**
-   * Returns a factory of invocations replacing all the data satisfying the specified predicate
-   * with the outputs returned by the passed function.
-   *
-   * @param predicate           the predicate instance.
-   * @param replacementFunction the replacement function instance.
-   * @param <DATA>              the data type.
-   * @return the invocation factory instance.
-   */
-  @NotNull
-  public static <DATA> InvocationFactory<DATA, DATA> replacementApplyIf(
-      @NotNull final Predicate<? super DATA> predicate,
-      @NotNull final Function<DATA, ? extends DATA> replacementFunction) {
-    return new ReplaceFunctionInvocation<DATA>(predicate, replacementFunction);
   }
 
   /**
@@ -1295,6 +1409,79 @@ public class JRoutineOperators {
   }
 
   /**
+   * Returns a factory of invocations generating the outputs returned by the specified sequence
+   * after the invocation completes.
+   * <br>
+   * The sequence will be called {@code count} number of times. The count number must be positive.
+   * <br>
+   * The invocation inputs will be ignored.
+   *
+   * @param count    the number of generated outputs.
+   * @param sequence the sequence instance.
+   * @param <DATA>   the data type.
+   * @return the invocation factory instance.
+   * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
+   */
+  @NotNull
+  public static <DATA> InvocationFactory<DATA, DATA> then(final long count,
+      @NotNull final Sequence<DATA> sequence) {
+    return thenOutputsOf(count, sequence);
+  }
+
+  /**
+   * Returns a factory of invocations generating the outputs returned by the specified sequence
+   * after the invocation completes.
+   * <br>
+   * The invocation inputs will be ignored.
+   *
+   * @param sequence the sequence instance.
+   * @param <DATA>   the data type.
+   * @return the invocation factory instance.
+   */
+  @NotNull
+  public static <DATA> InvocationFactory<DATA, DATA> then(@NotNull final Sequence<DATA> sequence) {
+    return then(1, sequence);
+  }
+
+  /**
+   * Returns a factory of invocations generating the outputs returned by the specified supplier
+   * after the invocation completes.
+   * <br>
+   * The supplier will be called {@code count} number of times. The count number must be positive.
+   * <br>
+   * The invocation inputs will be ignored.
+   *
+   * @param count          the number of generated outputs.
+   * @param outputSupplier the supplier instance.
+   * @param <IN>           the input data type.
+   * @param <OUT>          the output data type.
+   * @return the invocation factory instance.
+   * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
+   */
+  @NotNull
+  public static <IN, OUT> InvocationFactory<IN, OUT> thenOutputOf(final long count,
+      @NotNull final Supplier<? extends OUT> outputSupplier) {
+    return new ThenSupplierInvocation<IN, OUT>(count, outputSupplier);
+  }
+
+  /**
+   * Returns a factory of invocations generating the outputs returned by the specified supplier
+   * after the invocation completes.
+   * <br>
+   * The invocation inputs will be ignored.
+   *
+   * @param outputSupplier the supplier instance.
+   * @param <IN>           the input data type.
+   * @param <OUT>          the output data type.
+   * @return the invocation factory instance.
+   */
+  @NotNull
+  public static <IN, OUT> InvocationFactory<IN, OUT> thenOutputOf(
+      @NotNull final Supplier<? extends OUT> outputSupplier) {
+    return thenOutputOf(1, outputSupplier);
+  }
+
+  /**
    * Returns a factory of invocations generating the outputs returned by the specified consumer
    * after the invocation completes.
    * <br>
@@ -1309,9 +1496,9 @@ public class JRoutineOperators {
    * @return the invocation factory instance.
    */
   @NotNull
-  public static <IN, OUT> InvocationFactory<IN, OUT> thenAccept(
+  public static <IN, OUT> InvocationFactory<IN, OUT> thenOutputsOf(
       @NotNull final Consumer<? super Channel<OUT, ?>> outputsConsumer) {
-    return thenAccept(1, outputsConsumer);
+    return thenOutputsOf(1, outputsConsumer);
   }
 
   /**
@@ -1333,47 +1520,9 @@ public class JRoutineOperators {
    * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
    */
   @NotNull
-  public static <IN, OUT> InvocationFactory<IN, OUT> thenAccept(final long count,
+  public static <IN, OUT> InvocationFactory<IN, OUT> thenOutputsOf(final long count,
       @NotNull final Consumer<? super Channel<OUT, ?>> outputsConsumer) {
     return new ThenConsumerInvocation<IN, OUT>(count, outputsConsumer);
-  }
-
-  /**
-   * Returns a factory of invocations generating the outputs returned by the specified supplier
-   * after the invocation completes.
-   * <br>
-   * The supplier will be called {@code count} number of times. The count number must be positive.
-   * <br>
-   * The invocation inputs will be ignored.
-   *
-   * @param count          the number of generated outputs.
-   * @param outputSupplier the supplier instance.
-   * @param <IN>           the input data type.
-   * @param <OUT>          the output data type.
-   * @return the invocation factory instance.
-   * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
-   */
-  @NotNull
-  public static <IN, OUT> InvocationFactory<IN, OUT> thenGet(final long count,
-      @NotNull final Supplier<? extends OUT> outputSupplier) {
-    return new ThenSupplierInvocation<IN, OUT>(count, outputSupplier);
-  }
-
-  /**
-   * Returns a factory of invocations generating the outputs returned by the specified supplier
-   * after the invocation completes.
-   * <br>
-   * The invocation inputs will be ignored.
-   *
-   * @param outputSupplier the supplier instance.
-   * @param <IN>           the input data type.
-   * @param <OUT>          the output data type.
-   * @return the invocation factory instance.
-   */
-  @NotNull
-  public static <IN, OUT> InvocationFactory<IN, OUT> thenGet(
-      @NotNull final Supplier<? extends OUT> outputSupplier) {
-    return thenGet(1, outputSupplier);
   }
 
   /**
@@ -1490,7 +1639,7 @@ public class JRoutineOperators {
   @NotNull
   @SuppressWarnings("unchecked")
   public static <IN> InvocationFactory<Iterable<? extends IN>, IN> unfold() {
-    return (InvocationFactory<Iterable<? extends IN>, IN>) sUnfoldInvocation;
+    return (InvocationFactory<Iterable<? extends IN>, IN>) sUnfold;
   }
 
   @Nullable

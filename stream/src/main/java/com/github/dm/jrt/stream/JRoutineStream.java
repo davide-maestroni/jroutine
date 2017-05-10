@@ -17,6 +17,8 @@
 package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.core.executor.ScheduledExecutor;
+import com.github.dm.jrt.core.invocation.Invocation;
+import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.stream.routine.StreamRoutine;
@@ -37,7 +39,7 @@ import static com.github.dm.jrt.core.executor.ScheduledExecutors.defaultExecutor
  * final Routine&lt;Integer, Double&gt; rms =
  *         JRoutineStream.&lt;Integer, Integer&gt;streamOf(routine().of(unary(i -&gt; i * i))
  *                       .map(routine().of(average(Float.class)))
- *                       .map(routineOn(immediateExecutor()).of(unary(Math::sqrt)));
+ *                       .map(unary(Math::sqrt));
  * </code></pre>
  * <p>
  * Created by davide-maestroni on 07/01/2016.
@@ -71,6 +73,38 @@ public class JRoutineStream {
   @NotNull
   public static StreamLifter streamLifterOn(@NotNull final ScheduledExecutor executor) {
     return new DefaultStreamLifter(executor);
+  }
+
+  /**
+   * Returns a stream routine wrapping the specified invocation.
+   * <br>
+   * Note that the returned routine can be called only once.
+   *
+   * @param invocation the invocation instance.
+   * @param <IN>       the input data type.
+   * @param <OUT>      the output data type.
+   * @return the stream routine.
+   */
+  // TODO: 07/05/2017 test
+  @NotNull
+  public static <IN, OUT> StreamRoutine<IN, OUT> streamOf(
+      @NotNull final Invocation<IN, OUT> invocation) {
+    return new DefaultStreamRoutine<IN, OUT>(invocation);
+  }
+
+  /**
+   * Returns a stream routine wrapping the specified factory of invocations.
+   *
+   * @param factory the invocation factory instance.
+   * @param <IN>    the input data type.
+   * @param <OUT>   the output data type.
+   * @return the stream routine.
+   */
+  // TODO: 07/05/2017 test
+  @NotNull
+  public static <IN, OUT> StreamRoutine<IN, OUT> streamOf(
+      @NotNull final InvocationFactory<IN, OUT> factory) {
+    return new DefaultStreamRoutine<IN, OUT>(factory);
   }
 
   /**

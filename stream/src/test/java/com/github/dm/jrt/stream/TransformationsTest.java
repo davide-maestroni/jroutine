@@ -52,7 +52,7 @@ import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
 import static com.github.dm.jrt.core.util.DurationMeasure.indefiniteTime;
 import static com.github.dm.jrt.core.util.DurationMeasure.millis;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
-import static com.github.dm.jrt.operator.JRoutineOperators.appendAccept;
+import static com.github.dm.jrt.operator.JRoutineOperators.appendOutputsOf;
 import static com.github.dm.jrt.operator.JRoutineOperators.reduce;
 import static com.github.dm.jrt.operator.JRoutineOperators.unary;
 import static com.github.dm.jrt.operator.sequence.JRoutineSequences.range;
@@ -82,7 +82,7 @@ public class TransformationsTest {
   public void testBackoff() {
     Assertions.assertThat( //
         JRoutineStream.streamOf(
-            JRoutineCore.routineOn(getSingleThreadExecutor()).of(appendAccept(range(1, 1000))))
+            JRoutineCore.routineOn(getSingleThreadExecutor()).of(appendOutputsOf(range(1, 1000))))
                       .map(JRoutineCore.routine()
                                        .withInvocation()
                                        .withInputBackoff(
@@ -130,7 +130,7 @@ public class TransformationsTest {
                                                                             .constantDelay(
                                                                                 seconds(10)))
                                             .configuration()
-                                            .of(appendAccept(range(1, 1000))))
+                                            .of(appendOutputsOf(range(1, 1000))))
                       .map(JRoutineCore.routine().of(JRoutineOperators.<Number>identity()))
                       .map(JRoutineCore.routineOn(syncExecutor())
                                        .of(unary(new Function<Number, Double>() {
@@ -284,33 +284,33 @@ public class TransformationsTest {
             return value * value;
           }
         })));
-    assertThat(JRoutineStream.streamOf(JRoutineCore.routine().of(appendAccept(range(1, 3))))
+    assertThat(JRoutineStream.streamOf(JRoutineCore.routine().of(appendOutputsOf(range(1, 3))))
                              .lift(streamLifter().<Integer, Integer, Long>splitIn(2, sqr))
                              .invoke()
                              .close()
                              .in(seconds(3))
                              .all()).containsOnly(1L, 4L, 9L);
-    assertThat(JRoutineStream.streamOf(JRoutineCore.routine().of(appendAccept(range(1, 3))))
+    assertThat(JRoutineStream.streamOf(JRoutineCore.routine().of(appendOutputsOf(range(1, 3))))
                              .lift(streamLifter().<Integer, Integer, Long>splitIn(2, sqr))
                              .invoke()
                              .close()
                              .in(seconds(3))
                              .all()).containsOnly(1L, 4L, 9L);
-    assertThat(JRoutineStream.streamOf(JRoutineCore.routine().of(appendAccept(range(1, 3))))
+    assertThat(JRoutineStream.streamOf(JRoutineCore.routine().of(appendOutputsOf(range(1, 3))))
                              .lift(streamLifter().<Integer, Integer, Integer>splitIn(2,
                                  JRoutineCore.routine().of(IdentityInvocation.<Integer>factory())))
                              .invoke()
                              .close()
                              .in(seconds(3))
                              .all()).containsOnly(1, 2, 3);
-    assertThat(JRoutineStream.streamOf(JRoutineCore.routine().of(appendAccept(range(1, 3))))
+    assertThat(JRoutineStream.streamOf(JRoutineCore.routine().of(appendOutputsOf(range(1, 3))))
                              .lift(streamLifter().<Integer, Integer, Long>splitBy(
                                  FunctionDecorator.<Integer>identity(), sqr))
                              .invoke()
                              .close()
                              .in(seconds(3))
                              .all()).containsOnly(1L, 4L, 9L);
-    assertThat(JRoutineStream.streamOf(JRoutineCore.routine().of(appendAccept(range(1, 3))))
+    assertThat(JRoutineStream.streamOf(JRoutineCore.routine().of(appendOutputsOf(range(1, 3))))
                              .lift(streamLifter().<Integer, Integer, Integer>splitBy(
                                  FunctionDecorator.<Integer>identity(),
                                  JRoutineCore.routine().of(IdentityInvocation.<Integer>factory())))

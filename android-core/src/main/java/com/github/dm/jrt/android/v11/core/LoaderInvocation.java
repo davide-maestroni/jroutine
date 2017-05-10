@@ -350,6 +350,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
 
     final LoaderContextInvocationFactory<IN, OUT> factory =
         new LoaderContextInvocationFactory<IN, OUT>(this, mLoaderId);
+    // TODO: 06/05/2017 mimick invocation lifecycle
     final Routine<IN, OUT> routine =
         JRoutineCore.with(fromFactory(loaderContext.getApplicationContext(), factory))
                     .invocationConfiguration()

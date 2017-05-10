@@ -36,8 +36,8 @@ import java.util.Arrays;
 import static com.github.dm.jrt.core.executor.ScheduledExecutors.syncExecutor;
 import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOfParallel;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
-import static com.github.dm.jrt.operator.sequence.JRoutineSequences.range;
-import static com.github.dm.jrt.operator.sequence.JRoutineSequences.sequence;
+import static com.github.dm.jrt.operator.sequence.Sequence.range;
+import static com.github.dm.jrt.operator.sequence.Sequence.sequence;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -46,7 +46,7 @@ import static org.junit.Assert.fail;
  * <p>
  * Created by davide-maestroni on 07/07/2016.
  */
-public class JRoutineSequencesTest {
+public class SequenceTest {
 
   @NotNull
   private static <DATA> Routine<DATA, DATA> commandRoutine(
@@ -140,7 +140,7 @@ public class JRoutineSequencesTest {
   @Test
   public void testRangeEquals() {
     final Consumer<? extends Channel<? extends Number, ?>> range1 =
-        JRoutineSequences.range(BigDecimal.ONE, 10);
+        Sequence.range(BigDecimal.ONE, 10);
     assertThat(range1).isEqualTo(range1);
     assertThat(range1).isNotEqualTo(null);
     assertThat(range1).isNotEqualTo("test");
@@ -149,7 +149,7 @@ public class JRoutineSequencesTest {
     assertThat(range1.hashCode()).isEqualTo(range(BigDecimal.ONE, 10).hashCode());
 
     final Consumer<? extends Channel<? extends Number, ?>> range2 =
-        JRoutineSequences.range(BigInteger.ONE, 10);
+        Sequence.range(BigInteger.ONE, 10);
     assertThat(range2).isEqualTo(range2);
     assertThat(range2).isNotEqualTo(null);
     assertThat(range2).isNotEqualTo("test");
@@ -157,7 +157,7 @@ public class JRoutineSequencesTest {
     assertThat(range2).isEqualTo(range(BigInteger.ONE, 10));
     assertThat(range2.hashCode()).isEqualTo(range(BigInteger.ONE, 10).hashCode());
 
-    final Consumer<? extends Channel<? extends Number, ?>> range3 = JRoutineSequences.range(1, 10);
+    final Consumer<? extends Channel<? extends Number, ?>> range3 = Sequence.range(1, 10);
     assertThat(range3).isEqualTo(range3);
     assertThat(range3).isNotEqualTo(null);
     assertThat(range3).isNotEqualTo("test");
@@ -165,7 +165,7 @@ public class JRoutineSequencesTest {
     assertThat(range3).isEqualTo(range(1, 10));
     assertThat(range3.hashCode()).isEqualTo(range(1, 10).hashCode());
 
-    final Consumer<? extends Channel<? extends Number, ?>> range4 = JRoutineSequences.range(1, 10, -2);
+    final Consumer<? extends Channel<? extends Number, ?>> range4 = Sequence.range(1, 10, -2);
     assertThat(range4).isEqualTo(range4);
     assertThat(range4).isNotEqualTo(null);
     assertThat(range4).isNotEqualTo("test");
@@ -180,7 +180,7 @@ public class JRoutineSequencesTest {
       }
     };
     final Consumer<? extends Channel<? extends Character, ?>> range5 =
-        JRoutineSequences.range('a', 'f', function);
+        Sequence.range('a', 'f', function);
     assertThat(range5).isEqualTo(range5);
     assertThat(range5).isNotEqualTo(null);
     assertThat(range5).isNotEqualTo("test");
@@ -193,7 +193,7 @@ public class JRoutineSequencesTest {
   @SuppressWarnings("ConstantConditions")
   public void testRangeError() {
     try {
-      JRoutineSequences.range(null, 'f', new Function<Character, Character>() {
+      Sequence.range(null, 'f', new Function<Character, Character>() {
 
         public Character apply(final Character character) {
           return (char) (character + 1);
@@ -205,7 +205,7 @@ public class JRoutineSequencesTest {
     }
 
     try {
-      JRoutineSequences.range('a', null, new Function<Character, Character>() {
+      Sequence.range('a', null, new Function<Character, Character>() {
 
         public Character apply(final Character character) {
           return (char) (character + 1);
@@ -217,28 +217,28 @@ public class JRoutineSequencesTest {
     }
 
     try {
-      JRoutineSequences.range('a', 'f', null);
+      Sequence.range('a', 'f', null);
       fail();
 
     } catch (final NullPointerException ignored) {
     }
 
     try {
-      JRoutineSequences.range(null, 1, 1);
+      Sequence.range(null, 1, 1);
       fail();
 
     } catch (final NullPointerException ignored) {
     }
 
     try {
-      JRoutineSequences.range(1, null, 1);
+      Sequence.range(1, null, 1);
       fail();
 
     } catch (final NullPointerException ignored) {
     }
 
     try {
-      JRoutineSequences.range(1, 1, (Number) null);
+      Sequence.range(1, 1, (Number) null);
       fail();
 
     } catch (final NullPointerException ignored) {
@@ -268,14 +268,14 @@ public class JRoutineSequencesTest {
     };
 
     try {
-      JRoutineSequences.range(number, number, number);
+      Sequence.range(number, number, number);
       fail();
 
     } catch (final IllegalArgumentException ignored) {
     }
 
     try {
-      JRoutineSequences.range(number, number);
+      Sequence.range(number, number);
       fail();
 
     } catch (final IllegalArgumentException ignored) {

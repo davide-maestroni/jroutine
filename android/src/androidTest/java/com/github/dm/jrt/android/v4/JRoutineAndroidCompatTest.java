@@ -180,7 +180,8 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
   }
 
   private static void testStream(@NotNull final FragmentActivity activity) {
-    assertThat(JRoutineAndroidCompat.<Integer>withStream().map(appendAccept(range(1, 1000)))
+    assertThat(JRoutineAndroidCompat.<Integer>withStream().map(
+        JRoutineOperators.appendOutputsOf(range(1, 1000)))
                                                           .map(new Function<Number, Double>() {
 
                                                             public Double apply(

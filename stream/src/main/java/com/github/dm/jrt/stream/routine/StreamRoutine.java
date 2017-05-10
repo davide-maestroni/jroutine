@@ -17,6 +17,8 @@
 package com.github.dm.jrt.stream.routine;
 
 import com.github.dm.jrt.core.channel.Channel;
+import com.github.dm.jrt.core.invocation.Invocation;
+import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.function.util.Function;
 import com.github.dm.jrt.function.util.Supplier;
@@ -46,6 +48,25 @@ public interface StreamRoutine<IN, OUT> extends Routine<IN, OUT> {
   <BEFORE, AFTER> StreamRoutine<BEFORE, AFTER> lift(
       @NotNull Function<? super Supplier<? extends Channel<IN, OUT>>, ? extends Supplier<?
           extends Channel<BEFORE, AFTER>>> liftingFunction);
+
+  // TODO: 07/05/2017 javadoc
+  @NotNull
+  <AFTER> StreamRoutine<IN, AFTER> map(
+      @NotNull Invocation<? super OUT, ? extends AFTER> invocation);
+
+  /**
+   * Concatenates the invocations returned by the specified factory to the stream.
+   * <br>
+   * The invocations will be executed synchronously on the same thread as the last routine
+   * invocation.
+   *
+   * @param factory the invocation factory instance.
+   * @param <AFTER> the output type of the resulting routine.
+   * @return the new routine.
+   */
+  @NotNull
+  <AFTER> StreamRoutine<IN, AFTER> map(
+      @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
 
   /**
    * Concatenates the specified routine mapping this one outputs.

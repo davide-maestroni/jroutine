@@ -825,7 +825,7 @@ public class JRoutineTest {
 
   @Test
   public void testStream() {
-    assertThat(JRoutine.streamOf(JRoutine.routine().of(appendAccept(range(1, 1000))))
+    assertThat(JRoutine.streamOf(JRoutine.routine().of(JRoutineOperators.appendOutputsOf(range(1, 1000))))
                        .map(JRoutine.routine().of(unary(new Function<Number, Double>() {
 
                          public Double apply(final Number number) {

@@ -25,6 +25,7 @@ import com.github.dm.jrt.function.util.Function;
 import com.github.dm.jrt.operator.math.Operation;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.function.util.BiFunctionDecorator.wrapBiFunction;
@@ -33,17 +34,21 @@ import static com.github.dm.jrt.operator.math.Numbers.getHigherPrecisionOperatio
 import static com.github.dm.jrt.operator.math.Numbers.getOperation;
 
 /**
- * Utility class providing functions that produce sequences of data.
+ * Utility class providing producing sequences of data.
  * <p>
- * Created by davide-maestroni on 07/02/2016.
+ * Created by davide-maestroni on 05/09/2017.
+ *
+ * @param <DATA> the data type.
  */
-public class JRoutineSequences {
+public abstract class Sequence<DATA> extends DeepEqualObject implements Consumer<Channel<DATA, ?>> {
 
   /**
-   * Avoid explicit instantiation.
+   * Constructor.
+   *
+   * @param args the constructor arguments.
    */
-  protected JRoutineSequences() {
-    ConstantConditions.avoid();
+  private Sequence(@Nullable final Object[] args) {
+    super(args);
   }
 
   /**
@@ -59,7 +64,7 @@ public class JRoutineSequences {
    * @return the consumer instance.
    */
   @NotNull
-  public static <DATA extends Comparable<? super DATA>> Consumer<Channel<DATA, ?>> range(
+  public static <DATA extends Comparable<? super DATA>> Sequence<DATA> range(
       @NotNull final DATA start, @NotNull final DATA end,
       @NotNull final Function<DATA, DATA> incrementFunction) {
     return new RangeConsumer<DATA>(start, end, incrementFunction);
@@ -84,8 +89,7 @@ public class JRoutineSequences {
    */
   @NotNull
   @SuppressWarnings("unchecked")
-  public static <N extends Number> Consumer<Channel<N, ?>> range(@NotNull final N start,
-      @NotNull final N end) {
+  public static <N extends Number> Sequence<N> range(@NotNull final N start, @NotNull final N end) {
     final Operation<?> operation = getHigherPrecisionOperation(start.getClass(), end.getClass());
     return range(start, end,
         (N) getOperation(start.getClass()).convert((operation.compare(start, end) <= 0) ? 1 : -1));
@@ -108,8 +112,8 @@ public class JRoutineSequences {
    */
   @NotNull
   @SuppressWarnings("unchecked")
-  public static <N extends Number> Consumer<Channel<N, ?>> range(@NotNull final N start,
-      @NotNull final N end, @NotNull final N increment) {
+  public static <N extends Number> Sequence<N> range(@NotNull final N start, @NotNull final N end,
+      @NotNull final N increment) {
     return new NumberRangeConsumer<N>(start, end, increment);
   }
 
@@ -120,15 +124,15 @@ public class JRoutineSequences {
    * of elements, by computing each next one through the specified function.
    *
    * @param start        the first element of the sequence.
-   * @param count        the number of generated elements.
+   * @param count        the size of the sequence.
    * @param nextFunction the function computing the next element.
    * @param <DATA>       the data type.
    * @return the consumer instance.
    * @throws java.lang.IllegalArgumentException if the count is not positive.
    */
   @NotNull
-  public static <DATA> Consumer<Channel<DATA, ?>> sequence(@NotNull final DATA start,
-      final long count, @NotNull final BiFunction<DATA, Long, DATA> nextFunction) {
+  public static <DATA> Sequence<DATA> sequence(@NotNull final DATA start, final long count,
+      @NotNull final BiFunction<DATA, Long, DATA> nextFunction) {
     return new SequenceConsumer<DATA>(start, count, nextFunction);
   }
 
@@ -137,8 +141,7 @@ public class JRoutineSequences {
    *
    * @param <N> the number type.
    */
-  private static class NumberRangeConsumer<N extends Number> extends DeepEqualObject
-      implements Consumer<Channel<N, ?>> {
+  private static class NumberRangeConsumer<N extends Number> extends Sequence<N> {
 
     private final Operation<? extends Number> mAddOperation;
 
@@ -207,8 +210,7 @@ public class JRoutineSequences {
    *
    * @param <OUT> the output data type.
    */
-  private static class RangeConsumer<OUT extends Comparable<? super OUT>> extends DeepEqualObject
-      implements Consumer<Channel<OUT, ?>> {
+  private static class RangeConsumer<OUT extends Comparable<? super OUT>> extends Sequence<OUT> {
 
     private final OUT mEnd;
 
@@ -257,8 +259,7 @@ public class JRoutineSequences {
    *
    * @param <OUT> the output data type.
    */
-  private static class SequenceConsumer<OUT> extends DeepEqualObject
-      implements Consumer<Channel<OUT, ?>> {
+  private static class SequenceConsumer<OUT> extends Sequence<OUT> {
 
     private final long mCount;
 

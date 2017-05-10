@@ -134,6 +134,7 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
         new InvocationChannelConsumer<OUT>(this, logger);
     final LoaderContextInvocationFactory<IN, OUT> factory =
         new LoaderContextInvocationFactory<IN, OUT>(mInvocation);
+    // TODO: 06/05/2017 mimick invocation lifecycle
     JRoutineCore.with(fromFactory(getContext(), factory))
                 .invocationConfiguration()
                 .withExecutor(mExecutor)

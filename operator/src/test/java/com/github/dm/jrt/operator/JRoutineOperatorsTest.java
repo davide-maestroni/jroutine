@@ -58,6 +58,7 @@ import static com.github.dm.jrt.function.util.PredicateDecorator.isNull;
 import static com.github.dm.jrt.function.util.PredicateDecorator.isSameAs;
 import static com.github.dm.jrt.function.util.PredicateDecorator.negative;
 import static com.github.dm.jrt.operator.JRoutineOperators.append;
+import static com.github.dm.jrt.operator.JRoutineOperators.appendElementsOf;
 import static com.github.dm.jrt.operator.JRoutineOperators.appendOutputOf;
 import static com.github.dm.jrt.operator.JRoutineOperators.appendOutputsOf;
 import static com.github.dm.jrt.operator.JRoutineOperators.collect;
@@ -66,6 +67,7 @@ import static com.github.dm.jrt.operator.JRoutineOperators.failIf;
 import static com.github.dm.jrt.operator.JRoutineOperators.failOnComplete;
 import static com.github.dm.jrt.operator.JRoutineOperators.filter;
 import static com.github.dm.jrt.operator.JRoutineOperators.orElse;
+import static com.github.dm.jrt.operator.JRoutineOperators.orElseElementsOf;
 import static com.github.dm.jrt.operator.JRoutineOperators.orElseOutputOf;
 import static com.github.dm.jrt.operator.JRoutineOperators.orElseOutputsOf;
 import static com.github.dm.jrt.operator.JRoutineOperators.orElseThrow;
@@ -73,6 +75,7 @@ import static com.github.dm.jrt.operator.JRoutineOperators.peekComplete;
 import static com.github.dm.jrt.operator.JRoutineOperators.peekError;
 import static com.github.dm.jrt.operator.JRoutineOperators.peekOutput;
 import static com.github.dm.jrt.operator.JRoutineOperators.prepend;
+import static com.github.dm.jrt.operator.JRoutineOperators.prependElementsOf;
 import static com.github.dm.jrt.operator.JRoutineOperators.prependOutputOf;
 import static com.github.dm.jrt.operator.JRoutineOperators.prependOutputsOf;
 import static com.github.dm.jrt.operator.JRoutineOperators.reduce;
@@ -80,6 +83,7 @@ import static com.github.dm.jrt.operator.JRoutineOperators.replaceIf;
 import static com.github.dm.jrt.operator.JRoutineOperators.replaceWithOutputIf;
 import static com.github.dm.jrt.operator.JRoutineOperators.replaceWithOutputsIf;
 import static com.github.dm.jrt.operator.JRoutineOperators.then;
+import static com.github.dm.jrt.operator.JRoutineOperators.thenElementsOf;
 import static com.github.dm.jrt.operator.JRoutineOperators.thenOutputOf;
 import static com.github.dm.jrt.operator.JRoutineOperators.thenOutputsOf;
 import static com.github.dm.jrt.operator.JRoutineOperators.unary;
@@ -169,12 +173,13 @@ public class JRoutineOperatorsTest {
                            .in(seconds(3))
                            .all()).containsExactly("test1", "test2", "test3");
     assertThat(JRoutineCore.routine()
-                           .of(append(sequence("test2", 2, new BiFunction<String, Long, String>() {
+                           .of(appendElementsOf(
+                               sequence("test2", 2, new BiFunction<String, Long, String>() {
 
-                             public String apply(final String s, final Long step) {
-                               return "test" + (step + 3);
-                             }
-                           })))
+                                 public String apply(final String s, final Long step) {
+                                   return "test" + (step + 3);
+                                 }
+                               })))
                            .invoke()
                            .pass("test1")
                            .close()
@@ -191,29 +196,23 @@ public class JRoutineOperatorsTest {
       }
     })).invoke().pass("test1").close().all()).containsExactly("test1", "TEST2");
     assertThat(JRoutineCore.routineOn(syncExecutor())
-                           .of(JRoutineOperators.appendOutputsOf(
-                               new Consumer<Channel<String, ?>>() {
+                           .of(appendOutputsOf(new Consumer<Channel<String, ?>>() {
 
-                                 public void accept(final Channel<String, ?> resultChannel) {
-                                   resultChannel.pass("TEST2");
-                                 }
-                               }))
-                           .invoke()
-                           .pass("test1")
-                           .close()
-                           .all()).containsExactly("test1", "TEST2");
-    assertThat(JRoutineCore.routineOn(syncExecutor())
-                           .of(JRoutineOperators.appendOutputOf(3, new Supplier<String>() {
-
-                             public String get() {
-                               return "TEST2";
+                             public void accept(final Channel<String, ?> resultChannel) {
+                               resultChannel.pass("TEST2");
                              }
                            }))
                            .invoke()
                            .pass("test1")
                            .close()
-                           .in(seconds(3))
-                           .all()).containsExactly("test1", "TEST2", "TEST2", "TEST2");
+                           .all()).containsExactly("test1", "TEST2");
+    assertThat(JRoutineCore.routineOn(syncExecutor()).of(appendOutputOf(3, new Supplier<String>() {
+
+      public String get() {
+        return "TEST2";
+      }
+    })).invoke().pass("test1").close().in(seconds(3)).all()).containsExactly("test1", "TEST2",
+        "TEST2", "TEST2");
     assertThat(JRoutineCore.routineOn(syncExecutor())
                            .of(appendOutputsOf(3, new Consumer<Channel<String, ?>>() {
 
@@ -231,26 +230,18 @@ public class JRoutineOperatorsTest {
         return "TEST2";
       }
     })).invoke().pass("test1").close().in(seconds(3)).all()).containsExactly("test1", "TEST2");
-    assertThat(JRoutineCore.routine()
-                           .of(JRoutineOperators.appendOutputsOf(
-                               new Consumer<Channel<String, ?>>() {
+    assertThat(JRoutineCore.routine().of(appendOutputsOf(new Consumer<Channel<String, ?>>() {
 
-                                 public void accept(final Channel<String, ?> resultChannel) {
-                                   resultChannel.pass("TEST2");
-                                 }
-                               }))
-                           .invoke()
-                           .pass("test1")
-                           .close()
-                           .in(seconds(3))
-                           .all()).containsExactly("test1", "TEST2");
-    assertThat(
-        JRoutineCore.routine().of(JRoutineOperators.appendOutputOf(3, new Supplier<String>() {
+      public void accept(final Channel<String, ?> resultChannel) {
+        resultChannel.pass("TEST2");
+      }
+    })).invoke().pass("test1").close().in(seconds(3)).all()).containsExactly("test1", "TEST2");
+    assertThat(JRoutineCore.routine().of(appendOutputOf(3, new Supplier<String>() {
 
-          public String get() {
-            return "TEST2";
-          }
-        })).invoke().pass("test1").close().in(seconds(3)).all()).containsExactly("test1", "TEST2",
+      public String get() {
+        return "TEST2";
+      }
+    })).invoke().pass("test1").close().in(seconds(3)).all()).containsExactly("test1", "TEST2",
         "TEST2", "TEST2");
     assertThat(JRoutineCore.routine().of(appendOutputsOf(3, new Consumer<Channel<String, ?>>() {
 
@@ -274,7 +265,7 @@ public class JRoutineOperatorsTest {
                            .all()).containsExactly("test1", "TEST2");
     assertThat(JRoutineCore.routine()
                            .of(factoryOfParallel(JRoutineCore.routine()
-                                                             .of(JRoutineOperators.appendOutputsOf(
+                                                             .of(appendOutputsOf(
                                                                  new Consumer<Channel<String, ?>>
                                                                      () {
 
@@ -290,14 +281,13 @@ public class JRoutineOperatorsTest {
                            .in(seconds(3))
                            .all()).containsExactly("test1", "TEST2");
     assertThat(JRoutineCore.routine()
-                           .of(factoryOfParallel(JRoutineCore.routine()
-                                                             .of(JRoutineOperators.appendOutputOf(3,
-                                                                 new Supplier<String>() {
+                           .of(factoryOfParallel(
+                               JRoutineCore.routine().of(appendOutputOf(3, new Supplier<String>() {
 
-                                                                   public String get() {
-                                                                     return "TEST2";
-                                                                   }
-                                                                 }))))
+                                 public String get() {
+                                   return "TEST2";
+                                 }
+                               }))))
                            .invoke()
                            .pass("test1")
                            .close()
@@ -1828,12 +1818,13 @@ public class JRoutineOperatorsTest {
                            .in(seconds(3))
                            .all()).containsExactly("test");
     assertThat(JRoutineCore.routine()
-                           .of(orElse(sequence("est1", 2, new BiFunction<String, Long, String>() {
+                           .of(orElseElementsOf(
+                               sequence("est1", 2, new BiFunction<String, Long, String>() {
 
-                             public String apply(final String s, final Long step) {
-                               return "est" + (step + 2);
-                             }
-                           })))
+                                 public String apply(final String s, final Long step) {
+                                   return "est" + (step + 2);
+                                 }
+                               })))
                            .invoke()
                            .pass("test")
                            .close()
@@ -1885,12 +1876,13 @@ public class JRoutineOperatorsTest {
                            .in(seconds(3))
                            .all()).containsExactly("test");
     assertThat(JRoutineCore.routineOn(syncExecutor())
-                           .of(orElse(sequence("est1", 2, new BiFunction<String, Long, String>() {
+                           .of(orElseElementsOf(
+                               sequence("est1", 2, new BiFunction<String, Long, String>() {
 
-                             public String apply(final String s, final Long step) {
-                               return "est" + (step + 2);
-                             }
-                           })))
+                                 public String apply(final String s, final Long step) {
+                                   return "est" + (step + 2);
+                                 }
+                               })))
                            .invoke()
                            .close()
                            .in(seconds(3))
@@ -2101,12 +2093,13 @@ public class JRoutineOperatorsTest {
                            .in(seconds(3))
                            .all()).containsExactly("test2", "test3", "test1");
     assertThat(JRoutineCore.routine()
-                           .of(prepend(sequence("test2", 2, new BiFunction<String, Long, String>() {
+                           .of(prependElementsOf(
+                               sequence("test2", 2, new BiFunction<String, Long, String>() {
 
-                             public String apply(final String s, final Long step) {
-                               return "test" + (step + 3);
-                             }
-                           })))
+                                 public String apply(final String s, final Long step) {
+                                   return "test" + (step + 3);
+                                 }
+                               })))
                            .invoke()
                            .pass("test1")
                            .close()
@@ -2715,13 +2708,19 @@ public class JRoutineOperatorsTest {
                            .close()
                            .in(seconds(3))
                            .all()).containsExactly("test2", "test3");
-    assertThat(
-        JRoutineCore.routine().of(then(sequence("test2", 2, new BiFunction<String, Long, String>() {
+    assertThat(JRoutineCore.routine()
+                           .of(thenElementsOf(
+                               sequence("test2", 2, new BiFunction<String, Long, String>() {
 
-          public String apply(final String s, final Long step) {
-            return "test" + (step + 3);
-          }
-        }))).invoke().pass("test1").close().in(seconds(3)).all()).containsExactly("test2", "test3");
+                                 public String apply(final String s, final Long step) {
+                                   return "test" + (step + 3);
+                                 }
+                               })))
+                           .invoke()
+                           .pass("test1")
+                           .close()
+                           .in(seconds(3))
+                           .all()).containsExactly("test2", "test3");
   }
 
   @Test

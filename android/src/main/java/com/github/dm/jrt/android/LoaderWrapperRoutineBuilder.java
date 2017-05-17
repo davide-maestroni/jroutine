@@ -83,12 +83,12 @@ public interface LoaderWrapperRoutineBuilder
    */
   @NotNull
   @Override
-  LoaderWrapperRoutineBuilder apply(@NotNull LoaderConfiguration configuration);
+  LoaderWrapperRoutineBuilder withConfiguration(@NotNull LoaderConfiguration configuration);
 
   /**
    * {@inheritDoc}
    */
   @NotNull
   @Override
-  LoaderConfiguration.Builder<? extends LoaderWrapperRoutineBuilder> loaderConfiguration();
+  LoaderConfiguration.Builder<? extends LoaderWrapperRoutineBuilder> withLoader();
 }

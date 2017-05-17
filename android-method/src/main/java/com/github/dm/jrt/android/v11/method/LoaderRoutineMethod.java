@@ -26,7 +26,7 @@ import com.github.dm.jrt.android.core.invocation.ContextInvocation;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.reflect.ContextInvocationTarget;
 import com.github.dm.jrt.android.v11.core.JRoutineLoader;
-import com.github.dm.jrt.android.v11.core.LoaderContext;
+import com.github.dm.jrt.android.v11.core.LoaderSource;
 import com.github.dm.jrt.android.v11.reflect.JRoutineLoaderReflection;
 import com.github.dm.jrt.channel.Flow;
 import com.github.dm.jrt.core.JRoutineCore;
@@ -107,7 +107,7 @@ public class LoaderRoutineMethod extends RoutineMethod
 
   private final Constructor<? extends LoaderRoutineMethod> mConstructor;
 
-  private final LoaderContext mContext;
+  private final LoaderSource mContext;
 
   private final AtomicBoolean mIsFirstCall = new AtomicBoolean(true);
 
@@ -126,7 +126,7 @@ public class LoaderRoutineMethod extends RoutineMethod
    *
    * @param context the Loader context.
    */
-  public LoaderRoutineMethod(@NotNull final LoaderContext context) {
+  public LoaderRoutineMethod(@NotNull final LoaderSource context) {
     this(context, (Object[]) null);
   }
 
@@ -136,7 +136,7 @@ public class LoaderRoutineMethod extends RoutineMethod
    * @param context the Loader context.
    * @param args    the constructor arguments.
    */
-  public LoaderRoutineMethod(@NotNull final LoaderContext context, @Nullable final Object... args) {
+  public LoaderRoutineMethod(@NotNull final LoaderSource context, @Nullable final Object... args) {
     mContext = ConstantConditions.notNull("Loader context", context);
     final Class<? extends LoaderRoutineMethod> type = getClass();
     if (!Reflection.hasStaticScope(type)) {
@@ -186,7 +186,7 @@ public class LoaderRoutineMethod extends RoutineMethod
    * @throws java.lang.IllegalArgumentException if the specified method is not static.
    */
   @NotNull
-  public static ReflectionLoaderRoutineMethod from(@NotNull final LoaderContext context,
+  public static ReflectionLoaderRoutineMethod from(@NotNull final LoaderSource context,
       @NotNull final Method method) {
     if (!Modifier.isStatic(method.getModifiers())) {
       throw new IllegalArgumentException("the method is not static: " + method);
@@ -206,7 +206,7 @@ public class LoaderRoutineMethod extends RoutineMethod
    *                                            target instance.
    */
   @NotNull
-  public static ReflectionLoaderRoutineMethod from(@NotNull final LoaderContext context,
+  public static ReflectionLoaderRoutineMethod from(@NotNull final LoaderSource context,
       @NotNull final ContextInvocationTarget<?> target, @NotNull final Method method) {
     if (!method.getDeclaringClass().isAssignableFrom(target.getTargetClass())) {
       throw new IllegalArgumentException(
@@ -227,7 +227,7 @@ public class LoaderRoutineMethod extends RoutineMethod
    * @throws java.lang.NoSuchMethodException if no method with the specified signature is found.
    */
   @NotNull
-  public static ReflectionLoaderRoutineMethod from(@NotNull final LoaderContext context,
+  public static ReflectionLoaderRoutineMethod from(@NotNull final LoaderSource context,
       @NotNull final ContextInvocationTarget<?> target, @NotNull final String name,
       @Nullable final Class<?>... parameterTypes) throws NoSuchMethodException {
     return from(context, target, target.getTargetClass().getMethod(name, parameterTypes));
@@ -316,14 +316,14 @@ public class LoaderRoutineMethod extends RoutineMethod
 
   @NotNull
   @Override
-  public LoaderRoutineMethod apply(@NotNull final LoaderConfiguration configuration) {
+  public LoaderRoutineMethod withConfiguration(@NotNull final LoaderConfiguration configuration) {
     mConfiguration = ConstantConditions.notNull("Loader configuration", configuration);
     return this;
   }
 
   @NotNull
   @Override
-  public Builder<? extends LoaderRoutineMethod> loaderConfiguration() {
+  public Builder<? extends LoaderRoutineMethod> withLoader() {
     return new Builder<LoaderRoutineMethod>(this, mConfiguration);
   }
 
@@ -379,7 +379,7 @@ public class LoaderRoutineMethod extends RoutineMethod
                                                                             .with(factory)
                                                                             .withConfiguration(
                                                                                 getConfiguration())
-                                                                            .apply(
+                                                                            .withConfiguration(
                                                                                 getLoaderConfiguration())
                                                                             .invoke()
                                                                             .pass(inputChannel)
@@ -419,7 +419,7 @@ public class LoaderRoutineMethod extends RoutineMethod
   public static class ReflectionLoaderRoutineMethod extends LoaderRoutineMethod
       implements WrapperConfigurable<ReflectionLoaderRoutineMethod> {
 
-    private final LoaderContext mContext;
+    private final LoaderSource mContext;
 
     private final Method mMethod;
 
@@ -434,7 +434,7 @@ public class LoaderRoutineMethod extends RoutineMethod
      * @param target  the invocation target.
      * @param method  the method instance.
      */
-    private ReflectionLoaderRoutineMethod(@NotNull final LoaderContext context,
+    private ReflectionLoaderRoutineMethod(@NotNull final LoaderSource context,
         @NotNull final ContextInvocationTarget<?> target, @NotNull final Method method) {
       super(context);
       mContext = context;
@@ -471,7 +471,7 @@ public class LoaderRoutineMethod extends RoutineMethod
       final Routine<Object, Object> routine = JRoutineLoaderReflection.on(mContext)
                                                                       .with(mTarget)
                                                                       .withConfiguration(getConfiguration())
-                                                                      .apply(
+                                                                      .withConfiguration(
                                                                           getLoaderConfiguration())
                                                                       .withConfiguration(mConfiguration)
                                                                       .method(method);
@@ -499,15 +499,15 @@ public class LoaderRoutineMethod extends RoutineMethod
 
     @NotNull
     @Override
-    public ReflectionLoaderRoutineMethod apply(@NotNull final LoaderConfiguration configuration) {
-      return (ReflectionLoaderRoutineMethod) super.apply(configuration);
+    public ReflectionLoaderRoutineMethod withConfiguration(@NotNull final LoaderConfiguration configuration) {
+      return (ReflectionLoaderRoutineMethod) super.withConfiguration(configuration);
     }
 
     @NotNull
     @Override
     @SuppressWarnings("unchecked")
-    public Builder<? extends ReflectionLoaderRoutineMethod> loaderConfiguration() {
-      return (Builder<? extends ReflectionLoaderRoutineMethod>) super.loaderConfiguration();
+    public Builder<? extends ReflectionLoaderRoutineMethod> withLoader() {
+      return (Builder<? extends ReflectionLoaderRoutineMethod>) super.withLoader();
     }
 
     @NotNull

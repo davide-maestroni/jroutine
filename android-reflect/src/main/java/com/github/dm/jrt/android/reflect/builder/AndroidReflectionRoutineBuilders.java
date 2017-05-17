@@ -73,7 +73,7 @@ public class AndroidReflectionRoutineBuilders {
     final LoaderConfiguration.Builder<LoaderConfiguration> builder =
         LoaderConfiguration.builderFrom(configuration);
     if (annotations == null) {
-      return builder.apply();
+      return builder.configuration();
     }
 
     for (final Annotation annotation : annotations) {
@@ -99,7 +99,7 @@ public class AndroidReflectionRoutineBuilders {
       }
     }
 
-    return builder.apply();
+    return builder.configuration();
   }
 
   /**
@@ -139,7 +139,7 @@ public class AndroidReflectionRoutineBuilders {
     final ServiceConfiguration.Builder<ServiceConfiguration> builder =
         ServiceConfiguration.builderFrom(configuration);
     if (annotations == null) {
-      return builder.apply();
+      return builder.configuration();
     }
 
     for (final Annotation annotation : annotations) {
@@ -153,7 +153,7 @@ public class AndroidReflectionRoutineBuilders {
       }
     }
 
-    return builder.apply();
+    return builder.configuration();
   }
 
   /**

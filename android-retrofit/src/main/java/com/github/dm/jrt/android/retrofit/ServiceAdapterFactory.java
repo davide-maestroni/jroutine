@@ -18,7 +18,7 @@ package com.github.dm.jrt.android.retrofit;
 
 import com.github.dm.jrt.android.channel.ParcelableFlow;
 import com.github.dm.jrt.android.core.JRoutineService;
-import com.github.dm.jrt.android.core.ServiceContext;
+import com.github.dm.jrt.android.core.ServiceSource;
 import com.github.dm.jrt.android.core.config.ServiceConfigurable;
 import com.github.dm.jrt.android.core.config.ServiceConfiguration;
 import com.github.dm.jrt.android.reflect.builder.AndroidReflectionRoutineBuilders;
@@ -48,7 +48,7 @@ import retrofit2.CallAdapter;
 import retrofit2.Converter;
 import retrofit2.Retrofit;
 
-import static com.github.dm.jrt.android.core.invocation.TargetInvocationFactory.factoryOf;
+import static com.github.dm.jrt.android.core.invocation.InvocationFactoryReference.factoryOf;
 import static com.github.dm.jrt.function.Functions.decorate;
 
 /**
@@ -95,19 +95,19 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
 
   private final ServiceConfiguration mServiceConfiguration;
 
-  private final ServiceContext mServiceContext;
+  private final ServiceSource mServiceSource;
 
   /**
    * Constructor.
    *
-   * @param context                 the Service context.
+   * @param serviceSource           the Service context.
    * @param invocationConfiguration the invocation configuration.
    * @param serviceConfiguration    the Service configuration.
    */
-  private ServiceAdapterFactory(@NotNull final ServiceContext context,
+  private ServiceAdapterFactory(@NotNull final ServiceSource serviceSource,
       @NotNull final InvocationConfiguration invocationConfiguration,
       @NotNull final ServiceConfiguration serviceConfiguration) {
-    mServiceContext = context;
+    mServiceSource = serviceSource;
     mInvocationConfiguration = invocationConfiguration;
     mServiceConfiguration = serviceConfiguration;
   }
@@ -119,7 +119,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
    * @return the builder instance.
    */
   @NotNull
-  public static Builder on(@NotNull final ServiceContext context) {
+  public static Builder on(@NotNull final ServiceSource context) {
     return new Builder(context);
   }
 
@@ -164,7 +164,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
   private Routine<ParcelableFlow<Object>, ParcelableFlow<Object>> buildRoutine(
       @NotNull final InvocationConfiguration invocationConfiguration,
       @NotNull final ServiceConfiguration serviceConfiguration) {
-    return JRoutineService.on(mServiceContext)
+    return JRoutineService.on(mServiceSource)
                           .with(factoryOf(ServiceCallInvocation.class))
                           .withConfiguration(invocationConfiguration)
                           .apply(serviceConfiguration)
@@ -183,7 +183,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
   public static class Builder
       implements ServiceConfigurable<Builder>, InvocationConfigurable<Builder> {
 
-    private final ServiceContext mServiceContext;
+    private final ServiceSource mServiceSource;
 
     private InvocationConfiguration mInvocationConfiguration =
         InvocationConfiguration.defaultConfiguration();
@@ -196,8 +196,26 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
      *
      * @param context the Service context.
      */
-    private Builder(@NotNull final ServiceContext context) {
-      mServiceContext = ConstantConditions.notNull("Service context", context);
+    private Builder(@NotNull final ServiceSource context) {
+      mServiceSource = ConstantConditions.notNull("Service context", context);
+    }
+
+    /**
+     * Builds and return a new factory instance.
+     *
+     * @return the factory instance.
+     */
+    @NotNull
+    public ServiceAdapterFactory buildFactory() {
+      return new ServiceAdapterFactory(mServiceSource, mInvocationConfiguration,
+          mServiceConfiguration);
+    }
+
+    @NotNull
+    @Override
+    public Builder withConfiguration(@NotNull final ServiceConfiguration configuration) {
+      mServiceConfiguration = ConstantConditions.notNull("Service configuration", configuration);
+      return this;
     }
 
     @NotNull
@@ -210,31 +228,13 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
 
     @NotNull
     @Override
-    public Builder apply(@NotNull final ServiceConfiguration configuration) {
-      mServiceConfiguration = ConstantConditions.notNull("Service configuration", configuration);
-      return this;
-    }
-
-    /**
-     * Builds and return a new factory instance.
-     *
-     * @return the factory instance.
-     */
-    @NotNull
-    public ServiceAdapterFactory buildFactory() {
-      return new ServiceAdapterFactory(mServiceContext, mInvocationConfiguration,
-          mServiceConfiguration);
-    }
-
-    @NotNull
-    @Override
     public InvocationConfiguration.Builder<? extends Builder> withInvocation() {
       return new InvocationConfiguration.Builder<Builder>(this, mInvocationConfiguration);
     }
 
     @NotNull
     @Override
-    public ServiceConfiguration.Builder<? extends Builder> serviceConfiguration() {
+    public ServiceConfiguration.Builder<? extends Builder> withService() {
       return new ServiceConfiguration.Builder<Builder>(this, mServiceConfiguration);
     }
   }

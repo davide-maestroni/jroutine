@@ -226,15 +226,14 @@ public interface StatefulLoaderRoutineBuilder<IN, OUT, STATE>
    */
   @NotNull
   @Override
-  StatefulLoaderRoutineBuilder<IN, OUT, STATE> apply(@NotNull LoaderConfiguration configuration);
+  StatefulLoaderRoutineBuilder<IN, OUT, STATE> withConfiguration(@NotNull LoaderConfiguration configuration);
 
   /**
    * {@inheritDoc}
    */
   @NotNull
   @Override
-  LoaderConfiguration.Builder<? extends StatefulLoaderRoutineBuilder<IN, OUT, STATE>>
-  loaderConfiguration();
+  LoaderConfiguration.Builder<? extends StatefulLoaderRoutineBuilder<IN, OUT, STATE>> withLoader();
 
   /**
    * Sets the function to call when the Context instance is passed to the invocation.

@@ -18,10 +18,8 @@ package com.github.dm.jrt.android.core;
 
 import com.github.dm.jrt.android.core.builder.ServiceRoutineBuilder;
 import com.github.dm.jrt.android.core.config.ServiceConfiguration;
-import com.github.dm.jrt.android.core.invocation.TargetInvocationFactory;
-import com.github.dm.jrt.core.builder.AbstractRoutineBuilder;
+import com.github.dm.jrt.android.core.invocation.InvocationFactoryReference;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
-import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
@@ -31,65 +29,59 @@ import org.jetbrains.annotations.NotNull;
  * Class implementing a builder of routine objects executed in a dedicated Service.
  * <p>
  * Created by davide-maestroni on 01/08/2015.
- *
- * @param <IN>  the input data type.
- * @param <OUT> the output data type.
  */
-class DefaultServiceRoutineBuilder<IN, OUT> extends AbstractRoutineBuilder<IN, OUT>
-    implements ServiceRoutineBuilder<IN, OUT> {
+class DefaultServiceRoutineBuilder implements ServiceRoutineBuilder {
 
-  private final ServiceContext mContext;
+  private final ServiceSource mServiceSource;
 
-  private final TargetInvocationFactory<IN, OUT> mTargetFactory;
+  private InvocationConfiguration mInvocationConfiguration =
+      InvocationConfiguration.defaultConfiguration();
 
   private ServiceConfiguration mServiceConfiguration = ServiceConfiguration.defaultConfiguration();
 
   /**
    * Constructor.
    *
-   * @param context the routine context.
-   * @param target  the invocation factory target.
+   * @param serviceSource the Service source.
    */
-  DefaultServiceRoutineBuilder(@NotNull final ServiceContext context,
-      @NotNull final TargetInvocationFactory<IN, OUT> target) {
-    mContext = ConstantConditions.notNull("Service context", context);
-    mTargetFactory = ConstantConditions.notNull("target invocation factory", target);
+  DefaultServiceRoutineBuilder(@NotNull final ServiceSource serviceSource) {
+    mServiceSource = ConstantConditions.notNull("Service source", serviceSource);
   }
 
   @NotNull
   @Override
-  public ServiceRoutineBuilder<IN, OUT> withConfiguration(
-      @NotNull final InvocationConfiguration configuration) {
-    super.withConfiguration(configuration);
-    return this;
+  public <IN, OUT> Routine<IN, OUT> of(@NotNull final InvocationFactoryReference<IN, OUT> target) {
+    return new ServiceRoutine<IN, OUT>(mServiceSource, target, mInvocationConfiguration,
+        mServiceConfiguration);
   }
 
   @NotNull
   @Override
-  @SuppressWarnings("unchecked")
-  public InvocationConfiguration.Builder<? extends ServiceRoutineBuilder<IN, OUT>> withInvocation() {
-    return (Builder<? extends ServiceRoutineBuilder<IN, OUT>>) super.withInvocation();
-  }
-
-  @NotNull
-  @Override
-  public ServiceRoutineBuilder<IN, OUT> apply(@NotNull final ServiceConfiguration configuration) {
+  public ServiceRoutineBuilder withConfiguration(
+      @NotNull final ServiceConfiguration configuration) {
     mServiceConfiguration = ConstantConditions.notNull("Service configuration", configuration);
     return this;
   }
 
   @NotNull
   @Override
-  public Routine<IN, OUT> buildRoutine() {
-    return new ServiceRoutine<IN, OUT>(mContext, mTargetFactory, getConfiguration(),
-        mServiceConfiguration);
+  public ServiceRoutineBuilder withConfiguration(
+      @NotNull final InvocationConfiguration configuration) {
+    mInvocationConfiguration =
+        ConstantConditions.notNull("invocation configuration", configuration);
+    return this;
   }
 
   @NotNull
   @Override
-  public ServiceConfiguration.Builder<? extends ServiceRoutineBuilder<IN, OUT>>
-  serviceConfiguration() {
-    final ServiceConfiguration config = mServiceConfiguration;
-    return new ServiceConfiguration.Builder<ServiceRoutineBuilder<IN, OUT>>(this, config);
+  public InvocationConfiguration.Builder<? extends ServiceRoutineBuilder> withInvocation() {
+    return new InvocationConfiguration.Builder<ServiceRoutineBuilder>(this,
+        mInvocationConfiguration);
+  }
+
+  @NotNull
+  @Override
+  public ServiceConfiguration.Builder<? extends ServiceRoutineBuilder> withService() {
+    return new ServiceConfiguration.Builder<ServiceRoutineBuilder>(this, mServiceConfiguration);
   }
 }

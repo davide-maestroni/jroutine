@@ -20,14 +20,14 @@ ${generatedPackage}
 
 public final class ${generatedClassName}${genericTypes} implements ${interfaceFullName} {
 
-  private final com.github.dm.jrt.android.v4.core.LoaderContextCompat mContext;
+  private final com.github.dm.jrt.android.v4.core.LoaderSourceCompat mLoaderSource;
 
-  public ${generatedClassName}(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.v4.core.LoaderContextCompat context,
+  public ${generatedClassName}(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.v4.core.LoaderSourceCompat loaderSource,
       @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.reflect.ContextInvocationTarget<?> target,
       @org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.config.InvocationConfiguration invocationConfiguration,
       @org.jetbrains.annotations.NotNull final com.github.dm.jrt.reflect.config.WrapperConfiguration wrapperConfiguration,
       @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.config.LoaderConfiguration loaderConfiguration) {
-    com.github.dm.jrt.core.util.ConstantConditions.notNull("Loader context", context);
+    com.github.dm.jrt.core.util.ConstantConditions.notNull("Loader source", loaderSource);
     com.github.dm.jrt.core.util.ConstantConditions.notNull("invocation configuration", invocationConfiguration);
     com.github.dm.jrt.core.util.ConstantConditions.notNull("wrapper configuration", wrapperConfiguration);
     com.github.dm.jrt.core.util.ConstantConditions.notNull("Loader configuration", loaderConfiguration);
@@ -35,28 +35,28 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
       throw new IllegalArgumentException("the invocation target must be the class or an instance of ${classFullName}");
     }
 
-    mContext = context;
+    mLoaderSource = loaderSource;
     ${routineFieldsInit}
   }
 
   @org.jetbrains.annotations.NotNull
-  public static ContextBuilder on(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.v4.core.LoaderContextCompat context) {
-    return new ContextBuilder(context);
+  public static ContextBuilder on(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.v4.core.LoaderSourceCompat loaderSource) {
+    return new ContextBuilder(loaderSource);
   }
 
   @org.jetbrains.annotations.NotNull
   private static <OUT> com.github.dm.jrt.android.core.builder.LoaderRoutineBuilder<Object, OUT> getBuilder(
-      @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.v4.core.LoaderContextCompat context,
+      @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.v4.core.LoaderSourceCompat loaderSource,
       @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.invocation.ContextInvocationFactory<Object, OUT> factory) {
-    return com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat.on(context).with(factory);
+    return com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat.on(loaderSource).with(factory);
   }
 
   public static class ContextBuilder {
 
-    private final com.github.dm.jrt.android.v4.core.LoaderContextCompat mContext;
+    private final com.github.dm.jrt.android.v4.core.LoaderSourceCompat mLoaderSource;
 
-    private ContextBuilder(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.v4.core.LoaderContextCompat context) {
-      mContext = com.github.dm.jrt.core.util.ConstantConditions.notNull("Loader context", context);
+    private ContextBuilder(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.v4.core.LoaderSourceCompat loaderSource) {
+      mLoaderSource = com.github.dm.jrt.core.util.ConstantConditions.notNull("Loader source", loaderSource);
     }
 
     @org.jetbrains.annotations.NotNull
@@ -65,19 +65,19 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
         throw new IllegalArgumentException("the invocation target must be the class or an instance of ${classFullName}");
       }
 
-      return new LoaderProxyObjectBuilder${genericTypes}(mContext, target);
+      return new LoaderProxyObjectBuilder${genericTypes}(mLoaderSource, target);
     }
   }
 
   private static class LoaderProxyObjectBuilder${genericTypes} extends com.github.dm.jrt.android.proxy.builder.AbstractLoaderProxyObjectBuilder<${interfaceFullName}> {
 
-    private final com.github.dm.jrt.android.v4.core.LoaderContextCompat mContext;
+    private final com.github.dm.jrt.android.v4.core.LoaderSourceCompat mLoaderSource;
 
     private final com.github.dm.jrt.android.reflect.ContextInvocationTarget<?> mTarget;
 
-    private LoaderProxyObjectBuilder(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.v4.core.LoaderContextCompat context,
+    private LoaderProxyObjectBuilder(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.v4.core.LoaderSourceCompat loaderSource,
         @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.reflect.ContextInvocationTarget<?> target) {
-      mContext = com.github.dm.jrt.core.util.ConstantConditions.notNull("Loader context", context);
+      mLoaderSource = com.github.dm.jrt.core.util.ConstantConditions.notNull("Loader source", loaderSource);
       mTarget = com.github.dm.jrt.core.util.ConstantConditions.notNull("invocation target", target);
     }
 
@@ -90,7 +90,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
     @Override
     @org.jetbrains.annotations.Nullable
     protected Object getInvocationContext() {
-      return mContext.getComponent();
+      return mLoaderSource.getComponent();
     }
 
     @Override
@@ -105,6 +105,6 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
         @org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.config.InvocationConfiguration invocationConfiguration,
         @org.jetbrains.annotations.NotNull final com.github.dm.jrt.reflect.config.WrapperConfiguration wrapperConfiguration,
         @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.config.LoaderConfiguration loaderConfiguration) {
-      return new ${generatedClassName}${genericTypes}(mContext, mTarget, invocationConfiguration, wrapperConfiguration, loaderConfiguration);
+      return new ${generatedClassName}${genericTypes}(mLoaderSource, mTarget, invocationConfiguration, wrapperConfiguration, loaderConfiguration);
     }
   }

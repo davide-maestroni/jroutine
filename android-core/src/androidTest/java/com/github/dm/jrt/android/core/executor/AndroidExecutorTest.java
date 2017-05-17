@@ -182,14 +182,13 @@ public class AndroidExecutorTest extends AndroidTestCase {
         result.pass(new Handler());
       }
     };
-    final Channel<?, Handler> channel = JRoutineCore.with(factoryOf(invocation, this, null))
-                                                    .invocationConfiguration()
-                                                    .withExecutor(AndroidExecutors.handlerExecutor(
-                                                        new HandlerThread("test")))
-                                                    .apply()
-                                                    .invoke()
-                                                    .close();
-    assertThat(JRoutineCore.with(new HandlerInvocationFactory())
+    final Channel<?, Handler> channel =
+        JRoutineCore.routineOn(AndroidExecutors.handlerExecutor(new HandlerThread("test")))
+                    .of(factoryOf(invocation, this, null))
+                    .invoke()
+                    .close();
+    assertThat(JRoutineCore.routine()
+                           .of(new HandlerInvocationFactory())
                            .invoke()
                            .pass(channel)
                            .close()
@@ -207,14 +206,13 @@ public class AndroidExecutorTest extends AndroidTestCase {
         result.pass(Looper.myLooper()).pass(AndroidExecutors.myExecutor());
       }
     };
-    final Channel<?, Object> channel = JRoutineCore.with(factoryOf(invocation, this))
-                                                   .invocationConfiguration()
-                                                   .withExecutor(AndroidExecutors.handlerExecutor(
-                                                       new HandlerThread("test")))
-                                                   .apply()
-                                                   .invoke()
-                                                   .close();
-    assertThat(JRoutineCore.with(new LooperInvocationFactory())
+    final Channel<?, Object> channel =
+        JRoutineCore.routineOn(AndroidExecutors.handlerExecutor(new HandlerThread("test")))
+                    .of(factoryOf(invocation, this))
+                    .invoke()
+                    .close();
+    assertThat(JRoutineCore.routine()
+                           .of(new LooperInvocationFactory())
                            .invoke()
                            .pass(channel)
                            .close()
@@ -227,7 +225,8 @@ public class AndroidExecutorTest extends AndroidTestCase {
     testExecutor(AndroidExecutors.mainExecutor());
     testExecutor(new MainExecutor());
     testExecutor(AndroidExecutors.looperExecutor(Looper.getMainLooper()));
-    testExecutor(new ScheduledExecutorDecorator(AndroidExecutors.looperExecutor(Looper.getMainLooper())));
+    testExecutor(
+        new ScheduledExecutorDecorator(AndroidExecutors.looperExecutor(Looper.getMainLooper())));
   }
 
   public void testTaskExecutor() throws InterruptedException {
@@ -235,8 +234,8 @@ public class AndroidExecutorTest extends AndroidTestCase {
     testExecutor(new AsyncTaskExecutor(null));
     testExecutor(AndroidExecutors.taskExecutor());
     testExecutor(AndroidExecutors.taskExecutor(Executors.newCachedThreadPool()));
-    testExecutor(
-        new ScheduledExecutorDecorator(AndroidExecutors.taskExecutor(Executors.newSingleThreadExecutor())));
+    testExecutor(new ScheduledExecutorDecorator(
+        AndroidExecutors.taskExecutor(Executors.newSingleThreadExecutor())));
   }
 
   public void testThreadExecutor() throws InterruptedException {

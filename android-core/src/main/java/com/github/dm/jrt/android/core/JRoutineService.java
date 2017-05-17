@@ -17,7 +17,6 @@
 package com.github.dm.jrt.android.core;
 
 import com.github.dm.jrt.android.core.builder.ServiceRoutineBuilder;
-import com.github.dm.jrt.android.core.invocation.TargetInvocationFactory;
 import com.github.dm.jrt.android.core.log.AndroidLogs;
 import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -50,9 +49,8 @@ import org.jetbrains.annotations.NotNull;
  *   super.onCreate(savedInstanceState);
  *   setContentView(R.layout.my_activity_layout);
  *   final Routine&lt;URI, MyResource&gt; routine =
- *       JRoutineService.on(serviceFrom(this))
- *                      .with(factoryOf(LoadResourceUri.class))
- *                      .buildRoutine();
+ *       JRoutineService.routineOn(serviceOf(this))
+ *                      .of(factoryOf(LoadResourceUri.class));
  *   routine.invoke()
  *          .consume(new TemplateChannelConsumer&lt;MyResource&gt;() {
  *
@@ -83,54 +81,14 @@ public class JRoutineService {
   }
 
   /**
-   * Returns a Context based builder of Service routine builders.
+   * Returns a Context based builder of Service routines.
    *
-   * @param context the Service context.
-   * @return the Context based builder.
+   * @param serviceSource the Service source.
+   * @return the routine builder.
    */
   @NotNull
-  public static ServiceBuilder on(@NotNull final ServiceContext context) {
-    return new ServiceBuilder(context);
-  }
-
-  /**
-   * Context based builder of Service routine builders.
-   */
-  @SuppressWarnings("WeakerAccess")
-  public static class ServiceBuilder {
-
-    private final ServiceContext mContext;
-
-    /**
-     * Constructor.
-     *
-     * @param context the Service context.
-     */
-    private ServiceBuilder(@NotNull final ServiceContext context) {
-      mContext = ConstantConditions.notNull("Service context", context);
-    }
-
-    /**
-     * Returns a builder of routines running in a Service based on the builder context.
-     * <br>
-     * In order to customize the invocation creation, the caller must override the method
-     * {@link com.github.dm.jrt.android.core.service.InvocationService#getInvocationFactory(
-     *Class, Object...) getInvocationFactory(Class, Object...)} of the routine Service.
-     * <p>
-     * Note that the built routine results will be dispatched into the configured Looper, thus,
-     * waiting for the outputs on the very same Looper thread, immediately after its invocation,
-     * will result in a deadlock. By default output results are dispatched in the main Looper.
-     *
-     * @param target the invocation target.
-     * @param <IN>   the input data type.
-     * @param <OUT>  the output data type.
-     * @return the routine builder instance.
-     */
-    @NotNull
-    public <IN, OUT> ServiceRoutineBuilder<IN, OUT> with(
-        @NotNull final TargetInvocationFactory<IN, OUT> target) {
-      return new DefaultServiceRoutineBuilder<IN, OUT>(mContext, target);
-    }
+  public static ServiceRoutineBuilder routineOn(@NotNull final ServiceSource serviceSource) {
+    return new DefaultServiceRoutineBuilder(serviceSource);
   }
 
   static {

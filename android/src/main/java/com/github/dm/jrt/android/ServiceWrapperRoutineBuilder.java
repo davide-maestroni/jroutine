@@ -83,12 +83,12 @@ public interface ServiceWrapperRoutineBuilder
    */
   @NotNull
   @Override
-  ServiceWrapperRoutineBuilder apply(@NotNull ServiceConfiguration configuration);
+  ServiceWrapperRoutineBuilder withConfiguration(@NotNull ServiceConfiguration configuration);
 
   /**
    * {@inheritDoc}
    */
   @NotNull
   @Override
-  ServiceConfiguration.Builder<? extends ServiceWrapperRoutineBuilder> serviceConfiguration();
+  ServiceConfiguration.Builder<? extends ServiceWrapperRoutineBuilder> withService();
 }

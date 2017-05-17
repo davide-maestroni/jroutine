@@ -22,7 +22,7 @@ import android.support.v4.app.FragmentActivity;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.github.dm.jrt.android.method.app.TestApp;
-import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
+import com.github.dm.jrt.android.v4.core.LoaderSourceCompat;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
@@ -35,7 +35,7 @@ import java.util.Locale;
 
 import static com.github.dm.jrt.android.reflect.ContextInvocationTarget.classOfType;
 import static com.github.dm.jrt.android.reflect.ContextInvocationTarget.instanceOf;
-import static com.github.dm.jrt.android.v4.core.LoaderContextCompat.loaderFrom;
+import static com.github.dm.jrt.android.v4.core.LoaderSourceCompat.loaderFrom;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -60,7 +60,7 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
     final Channel<Integer, Integer> inputChannel1 = JRoutineCore.<Integer>ofData().buildChannel();
     final Channel<Integer, Integer> inputChannel2 = JRoutineCore.<Integer>ofData().buildChannel();
     final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
-    new LoaderRoutineMethodCompat(loaderFrom(activity)) {
+    new LoaderRoutineMethodCompat(LoaderSourceCompat.loaderOf(activity)) {
 
       private int mSum;
 
@@ -84,7 +84,7 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
     final Channel<Integer, Integer> inputChannel1 = JRoutineCore.<Integer>ofData().buildChannel();
     final Channel<Integer, Integer> inputChannel2 = JRoutineCore.<Integer>ofData().buildChannel();
     final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
-    new LoaderRoutineMethodCompat(loaderFrom(activity)) {
+    new LoaderRoutineMethodCompat(LoaderSourceCompat.loaderOf(activity)) {
 
       private int mSum;
 
@@ -107,7 +107,7 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
 
   private static void testContext(@NotNull final FragmentActivity activity) {
     final Channel<Boolean, Boolean> outputChannel = JRoutineCore.<Boolean>ofData().buildChannel();
-    new LoaderRoutineMethodCompat(loaderFrom(activity)) {
+    new LoaderRoutineMethodCompat(LoaderSourceCompat.loaderOf(activity)) {
 
       void test(@Output final Channel<Boolean, ?> output) {
         output.pass(getContext() instanceof TestApp);
@@ -117,7 +117,7 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
   }
 
   private static void testNoInputs(@NotNull final FragmentActivity activity) {
-    final LoaderContextCompat context = loaderFrom(activity);
+    final LoaderSourceCompat context = LoaderSourceCompat.loaderOf(activity);
     assertThat(new LoaderRoutineMethodCompat(context) {
 
       String get() {
@@ -137,7 +137,7 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
   private static void testParams2(@NotNull final FragmentActivity activity) {
     final Locale locale = Locale.getDefault();
     final LoaderRoutineMethodCompat method =
-        new LoaderRoutineMethodCompat(loaderFrom(activity), locale) {
+        new LoaderRoutineMethodCompat(LoaderSourceCompat.loaderOf(activity), locale) {
 
           String switchCase(@Input final Channel<?, String> input, final boolean isUpper) {
             if (input.hasNext()) {
@@ -158,7 +158,8 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
 
   private static void testParams3(@NotNull final FragmentActivity activity) {
     final Locale locale = Locale.getDefault();
-    final LoaderRoutineMethodCompat method = new LoaderRoutineMethodCompat(loaderFrom(activity)) {
+    final LoaderRoutineMethodCompat method = new LoaderRoutineMethodCompat(
+        LoaderSourceCompat.loaderOf(activity)) {
 
       String switchCase(@Input final Channel<?, String> input, final boolean isUpper) {
         if (input.hasNext()) {
@@ -182,7 +183,8 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
 
   private static void testReturnValue(@NotNull final FragmentActivity activity) {
     final Channel<String, String> inputStrings = JRoutineCore.<String>ofData().buildChannel();
-    final Channel<?, Object> outputChannel = new LoaderRoutineMethodCompat(loaderFrom(activity)) {
+    final Channel<?, Object> outputChannel = new LoaderRoutineMethodCompat(
+        LoaderSourceCompat.loaderOf(activity)) {
 
       int length(@Input final Channel<?, String> input) {
         if (input.hasNext()) {
@@ -199,7 +201,7 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
     final Channel<Integer, Integer> inputInts = JRoutineCore.<Integer>ofData().buildChannel();
     final Channel<String, String> inputStrings = JRoutineCore.<String>ofData().buildChannel();
     final Channel<String, String> outputChannel = JRoutineCore.<String>ofData().buildChannel();
-    new LoaderRoutineMethodCompat(loaderFrom(activity)) {
+    new LoaderRoutineMethodCompat(LoaderSourceCompat.loaderOf(activity)) {
 
       void run(@Input final Channel<?, Integer> inputInts,
           @Input final Channel<?, String> inputStrings, @Output final Channel<String, ?> output) {
@@ -218,7 +220,7 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
     final Channel<Integer, Integer> inputInts = JRoutineCore.<Integer>ofData().buildChannel();
     final Channel<String, String> inputStrings = JRoutineCore.<String>ofData().buildChannel();
     final Channel<String, String> outputChannel = JRoutineCore.<String>ofData().buildChannel();
-    new LoaderRoutineMethodCompat(loaderFrom(activity)) {
+    new LoaderRoutineMethodCompat(LoaderSourceCompat.loaderOf(activity)) {
 
       void run(@Input final Channel<?, Integer> inputInts,
           @Input final Channel<?, String> inputStrings, @Output final Channel<String, ?> output) {
@@ -236,7 +238,7 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
   public void testAbort() {
     final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
-    new SumRoutine(loaderFrom(getActivity())).call(inputChannel, outputChannel);
+    new SumRoutine(LoaderSourceCompat.loaderOf(getActivity())).call(inputChannel, outputChannel);
     inputChannel.pass(1, 2, 3, 4).abort();
     assertThat(outputChannel.in(seconds(10)).getError()).isExactlyInstanceOf(AbortException.class);
   }
@@ -250,7 +252,7 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
   }
 
   public void testBind() {
-    final LoaderContextCompat context = loaderFrom(getActivity());
+    final LoaderSourceCompat context = LoaderSourceCompat.loaderOf(getActivity());
     final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     new SquareRoutine(context).call(inputChannel, outputChannel);
@@ -263,7 +265,7 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
   public void testCall() {
     final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
-    new SumRoutine(loaderFrom(getActivity())).call(inputChannel, outputChannel);
+    new SumRoutine(LoaderSourceCompat.loaderOf(getActivity())).call(inputChannel, outputChannel);
     inputChannel.pass(1, 2, 3, 4, 5).close();
     assertThat(outputChannel.in(seconds(10)).all()).containsExactly(15);
   }
@@ -273,12 +275,12 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
   }
 
   public void testFromClass() throws NoSuchMethodException {
-    assertThat(LoaderRoutineMethodCompat.from(loaderFrom(getActivity()),
+    assertThat(LoaderRoutineMethodCompat.from(LoaderSourceCompat.loaderOf(getActivity()),
         LoaderRoutineMethodCompatTest.class.getMethod("length", String.class))
                                         .call("test")
                                         .in(seconds(10))
                                         .next()).isEqualTo(4);
-    assertThat(LoaderRoutineMethodCompat.from(loaderFrom(getActivity()),
+    assertThat(LoaderRoutineMethodCompat.from(LoaderSourceCompat.loaderOf(getActivity()),
         LoaderRoutineMethodCompatTest.class.getMethod("length", String.class))
                                         .call(JRoutineCore.of("test").buildChannel())
                                         .in(seconds(10))
@@ -286,19 +288,19 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
   }
 
   public void testFromClass2() throws NoSuchMethodException {
-    assertThat(LoaderRoutineMethodCompat.from(loaderFrom(getActivity()),
+    assertThat(LoaderRoutineMethodCompat.from(LoaderSourceCompat.loaderOf(getActivity()),
         classOfType(LoaderRoutineMethodCompatTest.class), "length", String.class)
                                         .call("test")
                                         .in(seconds(10))
                                         .next()).isEqualTo(4);
-    assertThat(LoaderRoutineMethodCompat.from(loaderFrom(getActivity()),
+    assertThat(LoaderRoutineMethodCompat.from(LoaderSourceCompat.loaderOf(getActivity()),
         classOfType(LoaderRoutineMethodCompatTest.class), "length", String.class)
                                         .call(JRoutineCore.of("test").buildChannel())
                                         .in(seconds(10))
                                         .next()).isEqualTo(4);
     final Channel<String, String> inputChannel = JRoutineCore.<String>ofData().buildChannel();
     final Channel<?, Object> outputChannel =
-        LoaderRoutineMethodCompat.from(loaderFrom(getActivity()),
+        LoaderRoutineMethodCompat.from(LoaderSourceCompat.loaderOf(getActivity()),
             classOfType(LoaderRoutineMethodCompatTest.class), "length", String.class)
                                  .call(inputChannel);
     inputChannel.pass("test").close();
@@ -307,14 +309,15 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
 
   public void testFromError() throws NoSuchMethodException {
     try {
-      LoaderRoutineMethodCompat.from(loaderFrom(getActivity()), String.class.getMethod("toString"));
+      LoaderRoutineMethodCompat.from(LoaderSourceCompat.loaderOf(getActivity()), String.class.getMethod("toString"));
       fail();
 
     } catch (final IllegalArgumentException ignored) {
     }
 
     try {
-      LoaderRoutineMethodCompat.from(loaderFrom(getActivity()), instanceOf(String.class, "test"),
+      LoaderRoutineMethodCompat.from(
+          LoaderSourceCompat.loaderOf(getActivity()), instanceOf(String.class, "test"),
           LoaderRoutineMethodCompatTest.class.getMethod("length", String.class));
       fail();
 
@@ -325,10 +328,12 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
   public void testFromInstance() throws NoSuchMethodException {
     final String test = "test";
     assertThat(
-        LoaderRoutineMethodCompat.from(loaderFrom(getActivity()), instanceOf(String.class, test),
+        LoaderRoutineMethodCompat.from(
+            LoaderSourceCompat.loaderOf(getActivity()), instanceOf(String.class, test),
             String.class.getMethod("toString")).call().in(seconds(10)).next()).isEqualTo("test");
     assertThat(
-        LoaderRoutineMethodCompat.from(loaderFrom(getActivity()), instanceOf(String.class, test),
+        LoaderRoutineMethodCompat.from(
+            LoaderSourceCompat.loaderOf(getActivity()), instanceOf(String.class, test),
             String.class.getMethod("toString"))
                                  .withWrapper()
                                  .withSharedFields()
@@ -341,10 +346,12 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
   public void testFromInstance2() throws NoSuchMethodException {
     final String test = "test";
     assertThat(
-        LoaderRoutineMethodCompat.from(loaderFrom(getActivity()), instanceOf(String.class, test),
+        LoaderRoutineMethodCompat.from(
+            LoaderSourceCompat.loaderOf(getActivity()), instanceOf(String.class, test),
             "toString").call().in(seconds(10)).next()).isEqualTo("test");
     assertThat(
-        LoaderRoutineMethodCompat.from(loaderFrom(getActivity()), instanceOf(String.class, test),
+        LoaderRoutineMethodCompat.from(
+            LoaderSourceCompat.loaderOf(getActivity()), instanceOf(String.class, test),
             "toString")
                                  .withWrapper()
                                  .withSharedFields()
@@ -359,7 +366,7 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
   }
 
   public void testParams() {
-    final SwitchCase method = new SwitchCase(loaderFrom(getActivity()));
+    final SwitchCase method = new SwitchCase(LoaderSourceCompat.loaderOf(getActivity()));
     Channel<Object, Object> inputChannel =
         JRoutineCore.ofData().buildChannel().pass("test").close();
     Channel<?, String> outputChannel = method.call(inputChannel, true);
@@ -383,7 +390,7 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
 
   public void testStaticScopeError() {
     try {
-      new LoaderRoutineMethodCompat(loaderFrom(getActivity())) {};
+      new LoaderRoutineMethodCompat(LoaderSourceCompat.loaderOf(getActivity())) {};
       fail();
 
     } catch (final IllegalStateException ignored) {
@@ -400,7 +407,7 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
 
   private static class SquareRoutine extends LoaderRoutineMethodCompat {
 
-    public SquareRoutine(@NotNull final LoaderContextCompat context) {
+    public SquareRoutine(@NotNull final LoaderSourceCompat context) {
       super(context);
     }
 
@@ -417,7 +424,7 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
 
     private int mSum;
 
-    public SumRoutine(@NotNull final LoaderContextCompat context) {
+    public SumRoutine(@NotNull final LoaderSourceCompat context) {
       super(context);
     }
 
@@ -434,7 +441,7 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
 
   private static class SwitchCase extends LoaderRoutineMethodCompat {
 
-    public SwitchCase(@NotNull final LoaderContextCompat context) {
+    public SwitchCase(@NotNull final LoaderSourceCompat context) {
       super(context);
     }
 

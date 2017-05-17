@@ -29,7 +29,7 @@ import android.os.RemoteException;
 
 import com.github.dm.jrt.android.core.config.ServiceConfiguration;
 import com.github.dm.jrt.android.core.invocation.ContextInvocation;
-import com.github.dm.jrt.android.core.invocation.TargetInvocationFactory;
+import com.github.dm.jrt.android.core.invocation.InvocationFactoryReference;
 import com.github.dm.jrt.android.core.service.InvocationService;
 import com.github.dm.jrt.android.core.service.ServiceDisconnectedException;
 import com.github.dm.jrt.core.AbstractRoutine;
@@ -70,18 +70,18 @@ import static java.util.UUID.randomUUID;
  */
 class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
 
-  private final ServiceContext mContext;
-
   private final InvocationConfiguration mInvocationConfiguration;
 
   private final ServiceConfiguration mServiceConfiguration;
 
-  private final TargetInvocationFactory<IN, OUT> mTargetFactory;
+  private final ServiceSource mServiceSource;
+
+  private final InvocationFactoryReference<IN, OUT> mTargetFactory;
 
   /**
    * Constructor.
    *
-   * @param context                 the Service context.
+   * @param serviceSource           the Service source.
    * @param target                  the invocation factory target.
    * @param invocationConfiguration the invocation configuration.
    * @param serviceConfiguration    the Service configuration.
@@ -90,12 +90,12 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
    *                                            configured executor.
    * @throws java.lang.IllegalStateException    if the specified context is no more valid.
    */
-  ServiceRoutine(@NotNull final ServiceContext context,
-      @NotNull final TargetInvocationFactory<IN, OUT> target,
+  ServiceRoutine(@NotNull final ServiceSource serviceSource,
+      @NotNull final InvocationFactoryReference<IN, OUT> target,
       @NotNull final InvocationConfiguration invocationConfiguration,
       @NotNull final ServiceConfiguration serviceConfiguration) {
-    super(invocationConfiguration);
-    final Context serviceContext = context.getServiceContext();
+    super(invocationConfiguration, mainExecutor());
+    final Context serviceContext = serviceSource.getContext();
     if (serviceContext == null) {
       throw new IllegalStateException("the Service Context has been destroyed");
     }
@@ -112,7 +112,7 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
       findBestMatchingConstructor(logClass, serviceConfiguration.getLogArgsOrElse(NO_ARGS));
     }
 
-    mContext = context;
+    mServiceSource = serviceSource;
     mTargetFactory = target;
     mInvocationConfiguration = invocationConfiguration;
     mServiceConfiguration = serviceConfiguration;
@@ -124,7 +124,7 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
   @NotNull
   @Override
   protected Invocation<IN, OUT> newInvocation() {
-    return new ServiceInvocation<IN, OUT>(mContext, mTargetFactory, mInvocationConfiguration,
+    return new ServiceInvocation<IN, OUT>(mServiceSource, mTargetFactory, mInvocationConfiguration,
         mServiceConfiguration, getLogger());
   }
 
@@ -187,7 +187,7 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
    */
   private static class IncomingHandler<OUT> extends Handler {
 
-    private final ServiceContext mContext;
+    private final ServiceSource mContext;
 
     private final Logger mLogger;
 
@@ -205,7 +205,7 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
      * @param outputChannel the output channel.
      * @param logger        the logger instance.
      */
-    private IncomingHandler(@NotNull final Looper looper, @NotNull final ServiceContext context,
+    private IncomingHandler(@NotNull final Looper looper, @NotNull final ServiceSource context,
         @NotNull final Channel<OUT, OUT> outputChannel, @NotNull final Logger logger) {
       super(looper);
       mContext = context;
@@ -256,7 +256,7 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
       }
 
       mIsUnbound = true;
-      final Context serviceContext = mContext.getServiceContext();
+      final Context serviceContext = mContext.getContext();
       if (serviceContext != null) {
         // Unbind on main thread to avoid crashing the IPC
         ScheduledExecutors.zeroDelayExecutor(mainExecutor()).execute(new Runnable() {
@@ -299,7 +299,7 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
 
     private final ServiceConfiguration mServiceConfiguration;
 
-    private final TargetInvocationFactory<IN, OUT> mTargetFactory;
+    private final InvocationFactoryReference<IN, OUT> mTargetFactory;
 
     /**
      * Constructor.
@@ -314,7 +314,7 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
      * @param logger                  the logger instance.
      */
     private RoutineServiceConnection(@NotNull final String invocationId,
-        @NotNull final TargetInvocationFactory<IN, OUT> target,
+        @NotNull final InvocationFactoryReference<IN, OUT> target,
         @NotNull final InvocationConfiguration invocationConfiguration,
         @NotNull final ServiceConfiguration serviceConfiguration,
         @NotNull final IncomingHandler<OUT> handler, @NotNull final Channel<IN, IN> inputChannel,
@@ -337,7 +337,7 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
       final Message message = Message.obtain(null, InvocationService.MSG_INIT);
       logger.dbg("sending async invocation message");
       final String invocationId = mInvocationId;
-      final TargetInvocationFactory<IN, OUT> targetFactory = mTargetFactory;
+      final InvocationFactoryReference<IN, OUT> targetFactory = mTargetFactory;
       final ServiceConfiguration serviceConfiguration = mServiceConfiguration;
       putInvocation(message.getData(), invocationId, targetFactory.getInvocationClass(),
           targetFactory.getFactoryArgs(), mInvocationConfiguration,
@@ -375,7 +375,7 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
    */
   private static class ServiceInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> {
 
-    private final ServiceContext mContext;
+    private final ServiceSource mContext;
 
     private final InvocationConfiguration mInvocationConfiguration;
 
@@ -383,7 +383,7 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
 
     private final ServiceConfiguration mServiceConfiguration;
 
-    private final TargetInvocationFactory<IN, OUT> mTargetFactory;
+    private final InvocationFactoryReference<IN, OUT> mTargetFactory;
 
     private Channel<IN, IN> mInputChannel;
 
@@ -398,8 +398,8 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
      * @param serviceConfiguration    the Service configuration.
      * @param logger                  the logger instance.
      */
-    private ServiceInvocation(@NotNull final ServiceContext context,
-        @NotNull final TargetInvocationFactory<IN, OUT> target,
+    private ServiceInvocation(@NotNull final ServiceSource context,
+        @NotNull final InvocationFactoryReference<IN, OUT> target,
         @NotNull final InvocationConfiguration invocationConfiguration,
         @NotNull final ServiceConfiguration serviceConfiguration, @NotNull final Logger logger) {
       mContext = context;
@@ -436,16 +436,18 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
     @Override
     public void onStart() {
       final Logger logger = mLogger;
-      mInputChannel = JRoutineCore.<IN>ofData().channelConfiguration()
-                                               .withLog(logger.getLog())
-                                               .withLogLevel(logger.getLogLevel())
-                                               .apply()
-                                               .buildChannel();
-      mOutputChannel = JRoutineCore.<OUT>ofData().channelConfiguration()
-                                                 .withLog(logger.getLog())
-                                                 .withLogLevel(logger.getLogLevel())
-                                                 .apply()
-                                                 .buildChannel();
+      mInputChannel = JRoutineCore.channel()
+                                  .withChannel()
+                                  .withLog(logger.getLog())
+                                  .withLogLevel(logger.getLogLevel())
+                                  .configuration()
+                                  .ofType();
+      mOutputChannel = JRoutineCore.channel()
+                                   .withChannel()
+                                   .withLog(logger.getLog())
+                                   .withLogLevel(logger.getLogLevel())
+                                   .configuration()
+                                   .ofType();
       final Looper looper = mServiceConfiguration.getMessageLooperOrElse(Looper.getMainLooper());
       final IncomingHandler<OUT> handler =
           new IncomingHandler<OUT>(looper, mContext, mOutputChannel, logger);
@@ -461,13 +463,13 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
 
     @NotNull
     private ServiceConnection bindService(@NotNull final IncomingHandler<OUT> handler) {
-      final ServiceContext context = mContext;
-      final Context serviceContext = context.getServiceContext();
+      final ServiceSource context = mContext;
+      final Context serviceContext = context.getContext();
       if (serviceContext == null) {
         throw new IllegalStateException("the Service Context has been destroyed");
       }
 
-      final Intent intent = context.getServiceIntent();
+      final Intent intent = context.getIntent();
       final RoutineServiceConnection<IN, OUT> connection =
           new RoutineServiceConnection<IN, OUT>(randomUUID().toString(), mTargetFactory,
               mInvocationConfiguration, mServiceConfiguration, handler, mInputChannel,

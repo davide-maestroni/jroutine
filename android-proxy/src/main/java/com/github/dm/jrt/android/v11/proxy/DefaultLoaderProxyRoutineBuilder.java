@@ -21,7 +21,7 @@ import com.github.dm.jrt.android.proxy.annotation.LoaderProxy;
 import com.github.dm.jrt.android.proxy.builder.AbstractLoaderProxyObjectBuilder;
 import com.github.dm.jrt.android.proxy.builder.LoaderProxyRoutineBuilder;
 import com.github.dm.jrt.android.reflect.ContextInvocationTarget;
-import com.github.dm.jrt.android.v11.core.LoaderContext;
+import com.github.dm.jrt.android.v11.core.LoaderSource;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -42,7 +42,7 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingConstructor
  */
 class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder {
 
-  private final LoaderContext mContext;
+  private final LoaderSource mContext;
 
   private final ContextInvocationTarget<?> mTarget;
 
@@ -59,7 +59,7 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder {
    * @param context the routine context.
    * @param target  the invocation target.
    */
-  DefaultLoaderProxyRoutineBuilder(@NotNull final LoaderContext context,
+  DefaultLoaderProxyRoutineBuilder(@NotNull final LoaderSource context,
       @NotNull final ContextInvocationTarget<?> target) {
     mContext = ConstantConditions.notNull("Loader context", context);
     mTarget = ConstantConditions.notNull("Context invocation target", target);
@@ -67,7 +67,7 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder {
 
   @NotNull
   @Override
-  public LoaderProxyRoutineBuilder apply(@NotNull final LoaderConfiguration configuration) {
+  public LoaderProxyRoutineBuilder withConfiguration(@NotNull final LoaderConfiguration configuration) {
     mLoaderConfiguration = ConstantConditions.notNull("Loader configuration", configuration);
     return this;
   }
@@ -105,7 +105,7 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder {
         new TargetLoaderProxyObjectBuilder<TYPE>(mContext, mTarget, itf);
     return builder.withConfiguration(mInvocationConfiguration)
                   .withConfiguration(mWrapperConfiguration)
-                  .apply(mLoaderConfiguration)
+                  .withConfiguration(mLoaderConfiguration)
                   .buildProxy();
   }
 
@@ -149,7 +149,7 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder {
 
   @NotNull
   @Override
-  public LoaderConfiguration.Builder<? extends LoaderProxyRoutineBuilder> loaderConfiguration() {
+  public LoaderConfiguration.Builder<? extends LoaderProxyRoutineBuilder> withLoader() {
     final LoaderConfiguration config = mLoaderConfiguration;
     return new LoaderConfiguration.Builder<LoaderProxyRoutineBuilder>(this, config);
   }
@@ -162,7 +162,7 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder {
   private static class TargetLoaderProxyObjectBuilder<TYPE>
       extends AbstractLoaderProxyObjectBuilder<TYPE> {
 
-    private final LoaderContext mContext;
+    private final LoaderSource mContext;
 
     private final Class<? super TYPE> mInterfaceClass;
 
@@ -175,7 +175,7 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder {
      * @param target         the invocation target.
      * @param interfaceClass the proxy interface class.
      */
-    private TargetLoaderProxyObjectBuilder(@NotNull final LoaderContext context,
+    private TargetLoaderProxyObjectBuilder(@NotNull final LoaderSource context,
         @NotNull final ContextInvocationTarget<?> target,
         @NotNull final Class<? super TYPE> interfaceClass) {
       mContext = context;
@@ -207,7 +207,7 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder {
     protected TYPE newProxy(@NotNull final InvocationConfiguration invocationConfiguration,
         @NotNull final WrapperConfiguration wrapperConfiguration,
         @NotNull final LoaderConfiguration loaderConfiguration) throws Exception {
-      final LoaderContext context = mContext;
+      final LoaderSource context = mContext;
       final ContextInvocationTarget<?> target = mTarget;
       final Class<? super TYPE> interfaceClass = mInterfaceClass;
       final LoaderProxy annotation = interfaceClass.getAnnotation(LoaderProxy.class);

@@ -23,7 +23,7 @@ import com.github.dm.jrt.android.reflect.builder.AndroidReflectionRoutineBuilder
 import com.github.dm.jrt.android.retrofit.ComparableCall;
 import com.github.dm.jrt.android.retrofit.ContextAdapterFactory;
 import com.github.dm.jrt.android.v11.core.JRoutineLoader;
-import com.github.dm.jrt.android.v11.core.LoaderContext;
+import com.github.dm.jrt.android.v11.core.LoaderSource;
 import com.github.dm.jrt.core.config.InvocationConfigurable;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.routine.Routine;
@@ -60,7 +60,7 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
 
   private final LoaderConfiguration mLoaderConfiguration;
 
-  private final LoaderContext mLoaderContext;
+  private final LoaderSource mLoaderSource;
 
   /**
    * Constructor.
@@ -70,12 +70,12 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
    * @param invocationConfiguration the invocation configuration.
    * @param loaderConfiguration     the Loader configuration.
    */
-  private LoaderAdapterFactory(@NotNull final LoaderContext context,
+  private LoaderAdapterFactory(@NotNull final LoaderSource context,
       @Nullable final CallAdapter.Factory delegateFactory,
       @NotNull final InvocationConfiguration invocationConfiguration,
       @NotNull final LoaderConfiguration loaderConfiguration) {
     super(delegateFactory, invocationConfiguration);
-    mLoaderContext = context;
+    mLoaderSource = context;
     mLoaderConfiguration = loaderConfiguration;
   }
 
@@ -86,7 +86,7 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
    * @return the builder instance.
    */
   @NotNull
-  public static Builder on(@NotNull final LoaderContext context) {
+  public static Builder on(@NotNull final LoaderSource context) {
     return new Builder(context);
   }
 
@@ -103,10 +103,10 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
         AndroidReflectionRoutineBuilders.withAnnotations(mLoaderConfiguration, annotations);
     final ContextInvocationFactory<Call<Object>, Object> factory =
         getFactory(configuration, responseType, annotations, retrofit);
-    return JRoutineLoader.on(mLoaderContext)
+    return JRoutineLoader.on(mLoaderSource)
                          .with(factory)
                          .withConfiguration(invocationConfiguration)
-                         .apply(loaderConfiguration)
+                         .withConfiguration(loaderConfiguration)
                          .buildRoutine();
   }
 
@@ -132,7 +132,7 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
   public static class Builder
       implements InvocationConfigurable<Builder>, LoaderConfigurable<Builder> {
 
-    private final LoaderContext mLoaderContext;
+    private final LoaderSource mLoaderSource;
 
     private CallAdapter.Factory mDelegateFactory;
 
@@ -146,8 +146,8 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
      *
      * @param context the Loader context.
      */
-    private Builder(@NotNull final LoaderContext context) {
-      mLoaderContext = ConstantConditions.notNull("Loader context", context);
+    private Builder(@NotNull final LoaderSource context) {
+      mLoaderSource = ConstantConditions.notNull("Loader context", context);
     }
 
     @NotNull
@@ -160,7 +160,7 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
 
     @NotNull
     @Override
-    public Builder apply(@NotNull final LoaderConfiguration configuration) {
+    public Builder withConfiguration(@NotNull final LoaderConfiguration configuration) {
       mLoaderConfiguration = ConstantConditions.notNull("Loader configuration", configuration);
       return this;
     }
@@ -172,7 +172,7 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
      */
     @NotNull
     public LoaderAdapterFactory buildFactory() {
-      return new LoaderAdapterFactory(mLoaderContext, mDelegateFactory, mInvocationConfiguration,
+      return new LoaderAdapterFactory(mLoaderSource, mDelegateFactory, mInvocationConfiguration,
           mLoaderConfiguration);
     }
 
@@ -196,7 +196,7 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
 
     @NotNull
     @Override
-    public LoaderConfiguration.Builder<? extends Builder> loaderConfiguration() {
+    public LoaderConfiguration.Builder<? extends Builder> withLoader() {
       return new LoaderConfiguration.Builder<Builder>(this, mLoaderConfiguration);
     }
   }

@@ -23,7 +23,7 @@ import com.github.dm.jrt.android.core.invocation.ContextInvocation;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.reflect.ContextInvocationTarget;
 import com.github.dm.jrt.android.v11.core.JRoutineLoader;
-import com.github.dm.jrt.android.v11.core.LoaderContext;
+import com.github.dm.jrt.android.v11.core.LoaderSource;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.CommandInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
@@ -67,14 +67,14 @@ import static com.github.dm.jrt.function.Functions.supplierFactory;
 @SuppressWarnings("WeakerAccess")
 public class LoaderBuilder {
 
-  private final LoaderContext mContext;
+  private final LoaderSource mContext;
 
   /**
    * Constructor.
    *
    * @param context the Loader context.
    */
-  LoaderBuilder(@NotNull final LoaderContext context) {
+  LoaderBuilder(@NotNull final LoaderSource context) {
     mContext = ConstantConditions.notNull("Loader context", context);
   }
 

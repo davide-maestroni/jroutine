@@ -23,7 +23,6 @@ import com.github.dm.jrt.android.core.routine.LoaderRoutine;
 import com.github.dm.jrt.core.AbstractRoutine;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
-import com.github.dm.jrt.core.executor.ScheduledExecutor;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
@@ -53,45 +52,42 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
 
   private final LoaderConfiguration mConfiguration;
 
-  private final LoaderContextCompat mContext;
-
   private final ContextInvocationFactory<IN, OUT> mFactory;
 
   private final int mLoaderId;
 
-  private final OrderType mOrderType;
+  private final LoaderSourceCompat mLoaderSource;
 
-  private final ScheduledExecutor mExecutor;
+  private final OrderType mOrderType;
 
   /**
    * Constructor.
    *
-   * @param context                 the routine context.
+   * @param loaderSource            the Loader source.
    * @param factory                 the invocation factory.
    * @param invocationConfiguration the invocation configuration.
    * @param loaderConfiguration     the Loader configuration.
    */
-  DefaultLoaderRoutine(@NotNull final LoaderContextCompat context,
+  DefaultLoaderRoutine(@NotNull final LoaderSourceCompat loaderSource,
       @NotNull final ContextInvocationFactory<IN, OUT> factory,
       @NotNull final InvocationConfiguration invocationConfiguration,
       @NotNull final LoaderConfiguration loaderConfiguration) {
-    super(invocationConfiguration.builderFrom().withExecutor(zeroDelayExecutor(mainExecutor())).configured());
+    super(invocationConfiguration, zeroDelayExecutor(mainExecutor()));
     final int invocationId = loaderConfiguration.getInvocationIdOrElse(LoaderConfiguration.AUTO);
-    mContext = ConstantConditions.notNull("Loader context", context);
+    mLoaderSource = ConstantConditions.notNull("Loader source", loaderSource);
     ConstantConditions.notNull("Context invocation factory", factory);
     mFactory = (invocationId == LoaderConfiguration.AUTO) ? factory
         : new FactoryWrapper<IN, OUT>(factory, invocationId);
     mConfiguration = loaderConfiguration;
     mLoaderId = loaderConfiguration.getLoaderIdOrElse(LoaderConfiguration.AUTO);
     mOrderType = invocationConfiguration.getOutputOrderTypeOrElse(null);
-    mExecutor = invocationConfiguration.getExecutorOrElse(null);
     getLogger().dbg("building Context routine with configuration: %s", loaderConfiguration);
   }
 
   @Override
   public void clear() {
     super.clear();
-    final LoaderContextCompat context = mContext;
+    final LoaderSourceCompat context = mLoaderSource;
     if (context.getComponent() != null) {
       clearLoaders(context, mLoaderId, mFactory);
     }
@@ -100,20 +96,20 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
   @NotNull
   @Override
   protected Invocation<IN, OUT> newInvocation() {
-    return new LoaderInvocation<IN, OUT>(mContext, mFactory, mConfiguration, mExecutor, mOrderType,
+    return new LoaderInvocation<IN, OUT>(mLoaderSource, mFactory, mConfiguration, mOrderType,
         getLogger());
   }
 
   @Override
   public void clear(@Nullable final IN input) {
-    final LoaderContextCompat context = mContext;
+    final LoaderSourceCompat context = mLoaderSource;
     if (context.getComponent() != null) {
       clearLoaders(context, mLoaderId, mFactory, Collections.singletonList(input));
     }
   }
 
   public void clear(@Nullable final IN... inputs) {
-    final LoaderContextCompat context = mContext;
+    final LoaderSourceCompat context = mLoaderSource;
     if (context.getComponent() != null) {
       final List<IN> inputList;
       if (inputs == null) {
@@ -129,7 +125,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
 
   @Override
   public void clear(@Nullable final Iterable<? extends IN> inputs) {
-    final LoaderContextCompat context = mContext;
+    final LoaderSourceCompat context = mLoaderSource;
     if (context.getComponent() != null) {
       final List<IN> inputList;
       if (inputs == null) {

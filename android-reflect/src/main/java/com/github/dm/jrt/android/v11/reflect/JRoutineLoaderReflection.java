@@ -18,7 +18,7 @@ package com.github.dm.jrt.android.v11.reflect;
 
 import com.github.dm.jrt.android.reflect.ContextInvocationTarget;
 import com.github.dm.jrt.android.reflect.builder.LoaderReflectionRoutineBuilder;
-import com.github.dm.jrt.android.v11.core.LoaderContext;
+import com.github.dm.jrt.android.v11.core.LoaderSource;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
@@ -88,7 +88,7 @@ public class JRoutineLoaderReflection {
    * @return the Context based builder.
    */
   @NotNull
-  public static LoaderReflectionBuilder on(@NotNull final LoaderContext context) {
+  public static LoaderReflectionBuilder on(@NotNull final LoaderSource context) {
     return new LoaderReflectionBuilder(context);
   }
 
@@ -98,14 +98,14 @@ public class JRoutineLoaderReflection {
   @SuppressWarnings("WeakerAccess")
   public static class LoaderReflectionBuilder {
 
-    private final LoaderContext mContext;
+    private final LoaderSource mContext;
 
     /**
      * Constructor.
      *
      * @param context the Loader context.
      */
-    private LoaderReflectionBuilder(@NotNull final LoaderContext context) {
+    private LoaderReflectionBuilder(@NotNull final LoaderSource context) {
       mContext = ConstantConditions.notNull("Loader context", context);
     }
 

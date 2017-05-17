@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.android.proxy;
 
-import com.github.dm.jrt.android.core.ServiceContext;
+import com.github.dm.jrt.android.core.ServiceSource;
 import com.github.dm.jrt.android.proxy.builder.ServiceProxyRoutineBuilder;
 import com.github.dm.jrt.android.reflect.ContextInvocationTarget;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -50,12 +50,12 @@ public class JRoutineServiceProxy {
   /**
    * Returns a Context based builder of Service proxy routine builders.
    *
-   * @param context the Service context.
+   * @param serviceSource the Service source.
    * @return the Context based builder.
    */
   @NotNull
-  public static ServiceProxyBuilder on(@NotNull final ServiceContext context) {
-    return new ServiceProxyBuilder(context);
+  public static ServiceProxyBuilder on(@NotNull final ServiceSource serviceSource) {
+    return new ServiceProxyBuilder(serviceSource);
   }
 
   /**
@@ -64,15 +64,15 @@ public class JRoutineServiceProxy {
   @SuppressWarnings("WeakerAccess")
   public static class ServiceProxyBuilder {
 
-    private final ServiceContext mContext;
+    private final ServiceSource mmServiceSource;
 
     /**
      * Constructor.
      *
-     * @param context the Service context.
+     * @param serviceSource the Service source.
      */
-    private ServiceProxyBuilder(@NotNull final ServiceContext context) {
-      mContext = ConstantConditions.notNull("Service context", context);
+    private ServiceProxyBuilder(@NotNull final ServiceSource serviceSource) {
+      mmServiceSource = ConstantConditions.notNull("Service source", serviceSource);
     }
 
     /**
@@ -92,7 +92,7 @@ public class JRoutineServiceProxy {
      */
     @NotNull
     public ServiceProxyRoutineBuilder with(@NotNull final ContextInvocationTarget<?> target) {
-      return new DefaultServiceProxyRoutineBuilder(mContext, target);
+      return new DefaultServiceProxyRoutineBuilder(mmServiceSource, target);
     }
   }
 }

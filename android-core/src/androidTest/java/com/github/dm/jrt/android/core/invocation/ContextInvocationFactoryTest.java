@@ -23,8 +23,6 @@ import android.test.ActivityInstrumentationTestCase2;
 import com.github.dm.jrt.android.core.TestActivity;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.config.InvocationConfiguration;
-import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
@@ -35,6 +33,7 @@ import org.jetbrains.annotations.NotNull;
 import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.factoryFrom;
 import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.factoryOf;
 import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.fromFactory;
+import static com.github.dm.jrt.core.executor.ScheduledExecutors.syncExecutor;
 import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -52,16 +51,14 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
   }
 
   public void testClass() {
-    final InvocationConfiguration configuration =
-        InvocationConfiguration.builder().withExecutor(ScheduledExecutors.syncExecutor()).configured();
-    assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(Case.class)))
-                           .apply(configuration)
+    assertThat(JRoutineCore.routineOn(syncExecutor())
+                           .of(fromFactory(getActivity(), factoryOf(Case.class)))
                            .invoke()
                            .pass("TEST")
                            .close()
                            .all()).containsExactly("test");
-    assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(Case.class, true)))
-                           .apply(configuration)
+    assertThat(JRoutineCore.routineOn(syncExecutor())
+                           .of(fromFactory(getActivity(), factoryOf(Case.class, true)))
                            .invoke()
                            .pass("test")
                            .close()
@@ -92,10 +89,8 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
 
     final InvocationFactory<String, String> factory =
         fromFactory(getActivity(), factoryOf(tokenOf(Case.class)));
-    assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryFrom(factory)))
-                           .invocationConfiguration()
-                           .withExecutor(ScheduledExecutors.syncExecutor())
-                           .apply()
+    assertThat(JRoutineCore.routineOn(syncExecutor())
+                           .of(fromFactory(getActivity(), factoryFrom(factory)))
                            .invoke()
                            .pass("TEST")
                            .close()
@@ -145,26 +140,22 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
   }
 
   public void testTemplateInvocation() {
-    final InvocationConfiguration configuration =
-        InvocationConfiguration.builder().withExecutor(ScheduledExecutors.syncExecutor()).configured();
-    assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(ContextTest.class)))
-                           .apply(configuration)
+    assertThat(JRoutineCore.routineOn(syncExecutor())
+                           .of(fromFactory(getActivity(), factoryOf(ContextTest.class)))
                            .invoke()
                            .close()
                            .getError()).isNull();
   }
 
   public void testToken() {
-    final InvocationConfiguration configuration =
-        InvocationConfiguration.builder().withExecutor(ScheduledExecutors.syncExecutor()).configured();
-    assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(tokenOf(Case.class))))
-                           .apply(configuration)
+    assertThat(JRoutineCore.routineOn(syncExecutor())
+                           .of(fromFactory(getActivity(), factoryOf(tokenOf(Case.class))))
                            .invoke()
                            .pass("TEST")
                            .close()
                            .all()).containsExactly("test");
-    assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(tokenOf(Case.class), true)))
-                           .apply(configuration)
+    assertThat(JRoutineCore.routineOn(syncExecutor())
+                           .of(fromFactory(getActivity(), factoryOf(tokenOf(Case.class), true)))
                            .invoke()
                            .pass("test")
                            .close()
@@ -192,16 +183,14 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
   }
 
   public void testWrapper() {
-    final InvocationConfiguration configuration =
-        InvocationConfiguration.builder().withExecutor(ScheduledExecutors.syncExecutor()).configured();
-    assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(CaseWrapper.class)))
-                           .apply(configuration)
+    assertThat(JRoutineCore.routineOn(syncExecutor())
+                           .of(fromFactory(getActivity(), factoryOf(CaseWrapper.class)))
                            .invoke()
                            .pass("TEST")
                            .close()
                            .all()).containsExactly("test");
-    assertThat(JRoutineCore.with(fromFactory(getActivity(), factoryOf(CaseWrapper.class, true)))
-                           .apply(configuration)
+    assertThat(JRoutineCore.routineOn(syncExecutor())
+                           .of(fromFactory(getActivity(), factoryOf(CaseWrapper.class, true)))
                            .invoke()
                            .pass("test")
                            .close()

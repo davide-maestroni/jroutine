@@ -34,7 +34,7 @@ import static com.github.dm.jrt.core.util.Reflection.cloneArgs;
 import static com.github.dm.jrt.core.util.Reflection.newInstanceOf;
 
 /**
- * Class representing a Context invocation factory target.
+ * Class representing a reference to a Context invocation factory.
  * <p>
  * Note that, in case a class not representing a {@link ContextInvocation} is passed to the factory,
  * the specified invocation class will be passed as the first argument to a special Context
@@ -58,17 +58,15 @@ import static com.github.dm.jrt.core.util.Reflection.newInstanceOf;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-public abstract class TargetInvocationFactory<IN, OUT> extends DeepEqualObject
+public abstract class InvocationFactoryReference<IN, OUT> extends DeepEqualObject
     implements Parcelable {
-
-  // TODO: 30/04/2017 rename (TargetFactory, InvocationFactoryReference)
 
   /**
    * Constructor.
    *
    * @param args the constructor arguments.
    */
-  private TargetInvocationFactory(@Nullable final Object[] args) {
+  private InvocationFactoryReference(@Nullable final Object[] args) {
     super(args);
   }
 
@@ -89,7 +87,7 @@ public abstract class TargetInvocationFactory<IN, OUT> extends DeepEqualObject
    *                                            not a static scope.
    */
   @NotNull
-  public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryOf(
+  public static <IN, OUT> InvocationFactoryReference<IN, OUT> factoryOf(
       @NotNull final Class<? extends Invocation<IN, OUT>> targetClass) {
     return factoryOf(targetClass, (Object[]) null);
   }
@@ -113,7 +111,7 @@ public abstract class TargetInvocationFactory<IN, OUT> extends DeepEqualObject
    */
   @NotNull
   @SuppressWarnings("unchecked")
-  public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryOf(
+  public static <IN, OUT> InvocationFactoryReference<IN, OUT> factoryOf(
       @NotNull final Class<? extends Invocation<IN, OUT>> targetClass,
       @Nullable final Object... factoryArgs) {
     if (!Reflection.hasStaticScope(targetClass)) {
@@ -122,13 +120,13 @@ public abstract class TargetInvocationFactory<IN, OUT> extends DeepEqualObject
     }
 
     if (ContextInvocation.class.isAssignableFrom(targetClass)) {
-      return new DefaultTargetInvocationFactory<IN, OUT>(
+      return new DefaultInvocationFactoryReference<IN, OUT>(
           (Class<? extends ContextInvocation<IN, OUT>>) targetClass, factoryArgs);
     }
 
     final Class<? extends TargetInvocationWrapper<IN, OUT>> targetWrapper =
         new ClassToken<TargetInvocationWrapper<IN, OUT>>() {}.getRawClass();
-    return new DefaultTargetInvocationFactory<IN, OUT>(targetWrapper,
+    return new DefaultInvocationFactoryReference<IN, OUT>(targetWrapper,
         asArgs(targetClass, factoryArgs));
   }
 
@@ -149,7 +147,7 @@ public abstract class TargetInvocationFactory<IN, OUT> extends DeepEqualObject
    *                                            not a static scope.
    */
   @NotNull
-  public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryOf(
+  public static <IN, OUT> InvocationFactoryReference<IN, OUT> factoryOf(
       @NotNull final ClassToken<? extends Invocation<IN, OUT>> targetToken) {
     return factoryOf(targetToken.getRawClass());
   }
@@ -172,7 +170,7 @@ public abstract class TargetInvocationFactory<IN, OUT> extends DeepEqualObject
    *                                            not a static scope.
    */
   @NotNull
-  public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryOf(
+  public static <IN, OUT> InvocationFactoryReference<IN, OUT> factoryOf(
       @NotNull final ClassToken<? extends Invocation<IN, OUT>> targetToken,
       @Nullable final Object... factoryArgs) {
     return factoryOf(targetToken.getRawClass(), factoryArgs);
@@ -195,7 +193,7 @@ public abstract class TargetInvocationFactory<IN, OUT> extends DeepEqualObject
    *                                            not a static scope.
    */
   @NotNull
-  public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryOf(
+  public static <IN, OUT> InvocationFactoryReference<IN, OUT> factoryOf(
       @NotNull final Invocation<IN, OUT> targetInvocation) {
     return factoryOf(tokenOf(targetInvocation));
   }
@@ -218,7 +216,7 @@ public abstract class TargetInvocationFactory<IN, OUT> extends DeepEqualObject
    *                                            not a static scope.
    */
   @NotNull
-  public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryOf(
+  public static <IN, OUT> InvocationFactoryReference<IN, OUT> factoryOf(
       @NotNull final Invocation<IN, OUT> targetInvocation, @Nullable final Object... factoryArgs) {
     return factoryOf(tokenOf(targetInvocation), factoryArgs);
   }
@@ -245,23 +243,23 @@ public abstract class TargetInvocationFactory<IN, OUT> extends DeepEqualObject
    * @param <IN>  the input data type.
    * @param <OUT> the output data type.
    */
-  private static class DefaultTargetInvocationFactory<IN, OUT>
-      extends TargetInvocationFactory<IN, OUT> {
+  private static class DefaultInvocationFactoryReference<IN, OUT>
+      extends InvocationFactoryReference<IN, OUT> {
 
     /**
      * Creator instance needed by the parcelable protocol.
      */
-    public static final Creator<DefaultTargetInvocationFactory> CREATOR =
-        new Creator<DefaultTargetInvocationFactory>() {
+    public static final Creator<DefaultInvocationFactoryReference> CREATOR =
+        new Creator<DefaultInvocationFactoryReference>() {
 
           @Override
-          public DefaultTargetInvocationFactory createFromParcel(final Parcel source) {
-            return new DefaultTargetInvocationFactory(source);
+          public DefaultInvocationFactoryReference createFromParcel(final Parcel source) {
+            return new DefaultInvocationFactoryReference(source);
           }
 
           @Override
-          public DefaultTargetInvocationFactory[] newArray(final int size) {
-            return new DefaultTargetInvocationFactory[size];
+          public DefaultInvocationFactoryReference[] newArray(final int size) {
+            return new DefaultInvocationFactoryReference[size];
           }
         };
 
@@ -275,9 +273,9 @@ public abstract class TargetInvocationFactory<IN, OUT> extends DeepEqualObject
      * @param source the source parcel.
      */
     @SuppressWarnings("unchecked")
-    private DefaultTargetInvocationFactory(@NotNull final Parcel source) {
+    private DefaultInvocationFactoryReference(@NotNull final Parcel source) {
       this((Class<? extends ContextInvocation<IN, OUT>>) source.readSerializable(),
-          source.readArray(TargetInvocationFactory.class.getClassLoader()));
+          source.readArray(InvocationFactoryReference.class.getClassLoader()));
     }
 
     /**
@@ -286,7 +284,7 @@ public abstract class TargetInvocationFactory<IN, OUT> extends DeepEqualObject
      * @param targetClass the target invocation class.
      * @param factoryArgs the invocation factory arguments.
      */
-    private DefaultTargetInvocationFactory(
+    private DefaultInvocationFactoryReference(
         @NotNull final Class<? extends ContextInvocation<IN, OUT>> targetClass,
         @Nullable final Object[] factoryArgs) {
       super(asArgs(ConstantConditions.notNull("target invocation class", targetClass),

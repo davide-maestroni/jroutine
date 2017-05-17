@@ -24,6 +24,7 @@ import android.test.ActivityInstrumentationTestCase2;
 import com.github.dm.jrt.android.proxy.annotation.LoaderProxy;
 import com.github.dm.jrt.android.proxy.builder.LoaderProxyObjectBuilder;
 import com.github.dm.jrt.android.proxy.builder.LoaderProxyRoutineBuilder;
+import com.github.dm.jrt.android.v11.core.LoaderSource;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
@@ -56,7 +57,7 @@ import java.util.List;
 
 import static com.github.dm.jrt.android.reflect.ContextInvocationTarget.classOfType;
 import static com.github.dm.jrt.android.reflect.ContextInvocationTarget.instanceOf;
-import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
+import static com.github.dm.jrt.android.v11.core.LoaderSource.loaderFrom;
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builder;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -81,7 +82,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
       return;
     }
 
-    final TestStatic testStatic = JRoutineLoaderProxy.on(loaderFrom(getActivity()))
+    final TestStatic testStatic = JRoutineLoaderProxy.on(LoaderSource.loaderOf(getActivity()))
                                                      .with(classOfType(TestClass.class))
                                                      .withInvocation()
                                                      .withExecutor(ScheduledExecutors.poolExecutor())
@@ -124,7 +125,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
       return;
     }
 
-    final LoaderProxyRoutineBuilder builder = JRoutineLoaderProxy.on(loaderFrom(getActivity()))
+    final LoaderProxyRoutineBuilder builder = JRoutineLoaderProxy.on(LoaderSource.loaderOf(getActivity()))
                                                                  .with(instanceOf(TestList.class))
                                                                  .withInvocation()
                                                                  .withOutputTimeout(seconds(10))
@@ -157,7 +158,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
     }
 
     final ClassToken<TestInterfaceProxy> token = ClassToken.tokenOf(TestInterfaceProxy.class);
-    final TestInterfaceProxy testProxy = JRoutineLoaderProxy.on(loaderFrom(getActivity()))
+    final TestInterfaceProxy testProxy = JRoutineLoaderProxy.on(LoaderSource.loaderOf(getActivity()))
                                                             .with(instanceOf(TestClass.class))
                                                             .buildProxy(token);
 
@@ -174,7 +175,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
 
     try {
 
-      JRoutineLoaderProxy.on(loaderFrom(getActivity()))
+      JRoutineLoaderProxy.on(LoaderSource.loaderOf(getActivity()))
                          .with(instanceOf(TestClass.class))
                          .buildProxy((Class<?>) null);
 
@@ -186,7 +187,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
 
     try {
 
-      JRoutineLoaderProxy.on(loaderFrom(getActivity()))
+      JRoutineLoaderProxy.on(LoaderSource.loaderOf(getActivity()))
                          .with(instanceOf(TestClass.class))
                          .buildProxy((ClassToken<?>) null);
 
@@ -204,7 +205,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
       return;
     }
 
-    final TestStatic testStatic = JRoutineLoaderProxy.on(loaderFrom(getActivity()))
+    final TestStatic testStatic = JRoutineLoaderProxy.on(LoaderSource.loaderOf(getActivity()))
                                                      .with(instanceOf(TestClass.class))
                                                      .withInvocation()
                                                      .withExecutor(ScheduledExecutors.poolExecutor())
@@ -226,7 +227,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
 
     final NullLog log = new NullLog();
     final ScheduledExecutor executor = ScheduledExecutors.poolExecutor();
-    final TestProxy testProxy = JRoutineLoaderProxy.on(loaderFrom(getActivity()))
+    final TestProxy testProxy = JRoutineLoaderProxy.on(LoaderSource.loaderOf(getActivity()))
                                                    .with(instanceOf(TestClass.class))
                                                    .withInvocation()
                                                    .withExecutor(executor)
@@ -257,7 +258,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
     final InvocationConfiguration configuration =
         builder().withExecutor(executor).withLogLevel(Level.DEBUG).withLog(log).configured();
     final LoaderProxyObjectBuilder<TestProxy> builder =
-        com.github.dm.jrt.android.proxy.LoaderProxy_TestActivity.on(loaderFrom(getActivity()))
+        com.github.dm.jrt.android.proxy.LoaderProxy_TestActivity.on(LoaderSource.loaderOf(getActivity()))
                                                                 .with(instanceOf(TestClass.class));
     final TestProxy testProxy = builder.withInvocation()
                                        .withPatch(configuration)
@@ -265,9 +266,9 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
                                        .withWrapper()
                                        .withSharedFields()
                                        .configuration()
-                                       .loaderConfiguration()
+                                       .withLoader()
                                        .withInvocationId(11)
-                                       .apply()
+                                       .configuration()
                                        .buildProxy();
 
     assertThat(testProxy.getOne().next()).isEqualTo(1);
@@ -279,7 +280,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
 
     assertThat(testProxy.getString(JRoutineCore.of(3).buildChannel())).isEqualTo("3");
 
-    assertThat(JRoutineLoaderProxy.on(loaderFrom(getActivity()))
+    assertThat(JRoutineLoaderProxy.on(LoaderSource.loaderOf(getActivity()))
                                   .with(instanceOf(TestClass.class))
                                   .withInvocation()
                                   .withPatch(configuration)
@@ -287,9 +288,9 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
                                   .withWrapper()
                                   .withSharedFields()
                                   .configuration()
-                                  .loaderConfiguration()
+                                  .withLoader()
                                   .withInvocationId(11)
-                                  .apply()
+                                  .configuration()
                                   .buildProxy(ClassToken.tokenOf(TestProxy.class))).isSameAs(
         testProxy);
   }
@@ -305,14 +306,14 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
     final ScheduledExecutor executor = ScheduledExecutors.poolExecutor();
     final InvocationConfiguration configuration =
         builder().withExecutor(executor).withLogLevel(Level.DEBUG).withLog(log).configured();
-    final TestProxy testProxy = JRoutineLoaderProxy.on(loaderFrom(getActivity()))
+    final TestProxy testProxy = JRoutineLoaderProxy.on(LoaderSource.loaderOf(getActivity()))
                                                    .with(instanceOf(TestClass.class))
                                                    .withInvocation()
                                                    .withPatch(configuration)
                                                    .configuration()
                                                    .buildProxy(ClassToken.tokenOf(TestProxy.class));
 
-    assertThat(JRoutineLoaderProxy.on(loaderFrom(getActivity()))
+    assertThat(JRoutineLoaderProxy.on(LoaderSource.loaderOf(getActivity()))
                                   .with(instanceOf(TestClass.class))
                                   .withInvocation()
                                   .withPatch(configuration)
@@ -330,7 +331,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
 
     try {
 
-      JRoutineLoaderProxy.on(loaderFrom(getActivity()))
+      JRoutineLoaderProxy.on(LoaderSource.loaderOf(getActivity()))
                          .with(instanceOf(TestClass.class))
                          .buildProxy(TestClass.class);
 
@@ -342,7 +343,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
 
     try {
 
-      JRoutineLoaderProxy.on(loaderFrom(getActivity()))
+      JRoutineLoaderProxy.on(LoaderSource.loaderOf(getActivity()))
                          .with(instanceOf(TestClass.class))
                          .buildProxy(ClassToken.tokenOf(TestClass.class));
 
@@ -360,7 +361,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
       return;
     }
 
-    final LoaderProxyRoutineBuilder builder = JRoutineLoaderProxy.on(loaderFrom(getActivity()))
+    final LoaderProxyRoutineBuilder builder = JRoutineLoaderProxy.on(LoaderSource.loaderOf(getActivity()))
                                                                  .with(instanceOf(TestClass2.class))
                                                                  .withInvocation()
                                                                  .withOutputTimeout(seconds(10))
@@ -402,7 +403,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
       return;
     }
 
-    final Itf itf = JRoutineLoaderProxy.on(loaderFrom(getActivity()))
+    final Itf itf = JRoutineLoaderProxy.on(LoaderSource.loaderOf(getActivity()))
                                        .with(instanceOf(Impl.class))
                                        .withInvocation()
                                        .withOutputTimeout(seconds(10))
@@ -536,7 +537,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
       return;
     }
 
-    assertThat(JRoutineLoaderProxy.on(loaderFrom(getActivity()))
+    assertThat(JRoutineLoaderProxy.on(LoaderSource.loaderOf(getActivity()))
                                   .with(instanceOf(TestTimeout.class))
                                   .withInvocation()
                                   .withOutputTimeout(seconds(10))
@@ -546,7 +547,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
 
     try {
 
-      JRoutineLoaderProxy.on(loaderFrom(getActivity()))
+      JRoutineLoaderProxy.on(LoaderSource.loaderOf(getActivity()))
                          .with(instanceOf(TestTimeout.class))
                          .withInvocation()
                          .withOutputTimeoutAction(TimeoutActionType.FAIL)

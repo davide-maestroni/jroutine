@@ -17,9 +17,9 @@
 package com.github.dm.jrt.android;
 
 import com.github.dm.jrt.android.core.JRoutineService;
-import com.github.dm.jrt.android.core.ServiceContext;
+import com.github.dm.jrt.android.core.ServiceSource;
 import com.github.dm.jrt.android.core.builder.ServiceRoutineBuilder;
-import com.github.dm.jrt.android.core.invocation.TargetInvocationFactory;
+import com.github.dm.jrt.android.core.invocation.InvocationFactoryReference;
 import com.github.dm.jrt.android.reflect.ContextInvocationTarget;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.invocation.Invocation;
@@ -29,7 +29,7 @@ import com.github.dm.jrt.core.util.ConstantConditions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static com.github.dm.jrt.android.core.invocation.TargetInvocationFactory.factoryOf;
+import static com.github.dm.jrt.android.core.invocation.InvocationFactoryReference.factoryOf;
 import static com.github.dm.jrt.android.reflect.ContextInvocationTarget.classOfType;
 import static com.github.dm.jrt.android.reflect.ContextInvocationTarget.instanceOf;
 import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
@@ -41,15 +41,15 @@ import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
  */
 public class ServiceBuilder {
 
-  private final ServiceContext mContext;
+  private final ServiceSource mServiceSource;
 
   /**
    * Constructor.
    *
-   * @param context the Service context.
+   * @param serviceSource the Service source.
    */
-  protected ServiceBuilder(@NotNull final ServiceContext context) {
-    mContext = ConstantConditions.notNull("Service context", context);
+  protected ServiceBuilder(@NotNull final ServiceSource serviceSource) {
+    mServiceSource = ConstantConditions.notNull("Service source", serviceSource);
   }
 
   /**
@@ -197,7 +197,7 @@ public class ServiceBuilder {
    */
   @NotNull
   public ServiceWrapperRoutineBuilder with(@NotNull final ContextInvocationTarget<?> target) {
-    return new DefaultServiceWrapperRoutineBuilder(mContext, target);
+    return new DefaultServiceWrapperRoutineBuilder(mServiceSource, target);
   }
 
   /**
@@ -218,8 +218,8 @@ public class ServiceBuilder {
    */
   @NotNull
   public <IN, OUT> ServiceRoutineBuilder<IN, OUT> with(
-      @NotNull final TargetInvocationFactory<IN, OUT> target) {
-    return JRoutineService.on(mContext).with(target);
+      @NotNull final InvocationFactoryReference<IN, OUT> target) {
+    return JRoutineService.on(mServiceSource).with(target);
   }
 
   /**

@@ -18,31 +18,32 @@ package com.github.dm.jrt.android.v11.core;
 
 import com.github.dm.jrt.android.core.builder.LoaderRoutineBuilder;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
+import com.github.dm.jrt.android.core.invocation.ContextInvocation;
+import com.github.dm.jrt.android.core.invocation.ContextInvocationDecorator;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.core.routine.LoaderRoutine;
 import com.github.dm.jrt.core.builder.AbstractRoutineBuilder;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
+import com.github.dm.jrt.core.invocation.Invocation;
+import com.github.dm.jrt.core.invocation.InvocationDecorator;
+import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.Reflection;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+
+import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.factoryFrom;
+import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
  * Default implementation of a Loader routine builder.
  * <p>
  * Created by davide-maestroni on 12/09/2014.
- *
- * @param <IN>  the input data type.
- * @param <OUT> the output data type.
  */
-class DefaultLoaderRoutineBuilder<IN, OUT> extends AbstractRoutineBuilder<IN, OUT>
-    implements LoaderRoutineBuilder<IN, OUT> {
+class DefaultLoaderRoutineBuilder extends AbstractRoutineBuilder implements LoaderRoutineBuilder {
 
-  private final LoaderContext mContext;
-
-  private final ContextInvocationFactory<IN, OUT> mFactory;
+  private final LoaderSource mContext;
 
   private LoaderConfiguration mLoaderConfiguration = LoaderConfiguration.defaultConfiguration();
 
@@ -50,74 +51,200 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends AbstractRoutineBuilder<IN, OU
    * Constructor.
    *
    * @param context the routine context.
-   * @param factory the invocation factory.
-   * @throws java.lang.IllegalArgumentException if the class of the specified factory has not a
-   *                                            static scope.
    */
-  DefaultLoaderRoutineBuilder(@NotNull final LoaderContext context,
-      @NotNull final ContextInvocationFactory<IN, OUT> factory) {
+  DefaultLoaderRoutineBuilder(@NotNull final LoaderSource context) {
     mContext = ConstantConditions.notNull("Loader context", context);
+  }
+
+  @NotNull
+  @Override
+  public <IN, OUT> LoaderRoutine<IN, OUT> of(@NotNull final InvocationFactory<IN, OUT> factory) {
+    final Class<? extends InvocationFactory> factoryClass = factory.getClass();
+    if (!Reflection.hasStaticScope(factoryClass)) {
+      throw new IllegalArgumentException(
+          "the factory class must have a static scope: " + factoryClass.getName());
+    }
+
+    return new DefaultLoaderRoutine<IN, OUT>(mContext, factoryFrom(factory), getConfiguration(),
+        mLoaderConfiguration);
+  }
+
+  @NotNull
+  @Override
+  public <IN, OUT> LoaderRoutine<IN, OUT> ofSingleton(
+      @NotNull final Invocation<IN, OUT> invocation) {
+    return of(new SingletonInvocationFactory<IN, OUT>(invocation));
+  }
+
+  @Override
+  public <IN, OUT> LoaderRoutine<IN, OUT> of(
+      @NotNull final ContextInvocationFactory<IN, OUT> factory) {
     final Class<? extends ContextInvocationFactory> factoryClass = factory.getClass();
     if (!Reflection.hasStaticScope(factoryClass)) {
       throw new IllegalArgumentException(
           "the factory class must have a static scope: " + factoryClass.getName());
     }
 
-    mFactory = factory;
+    return new DefaultLoaderRoutine<IN, OUT>(mContext, factory, getConfiguration(),
+        mLoaderConfiguration);
+  }
+
+  @Override
+  public <IN, OUT> LoaderRoutine<IN, OUT> ofSingleton(
+      @NotNull final ContextInvocation<IN, OUT> invocation) {
+    return of(new SingletonContextInvocationFactory<IN, OUT>(invocation));
   }
 
   @NotNull
   @Override
-  public LoaderRoutineBuilder<IN, OUT> withConfiguration(@NotNull final InvocationConfiguration configuration) {
+  public LoaderRoutineBuilder withConfiguration(
+      @NotNull final InvocationConfiguration configuration) {
     super.withConfiguration(configuration);
     return this;
-  }
-
-  @Override
-  public void clear() {
-    buildRoutine().clear();
   }
 
   @NotNull
   @Override
   @SuppressWarnings("unchecked")
-  public InvocationConfiguration.Builder<? extends LoaderRoutineBuilder<IN, OUT>> withInvocation() {
-    return (Builder<? extends LoaderRoutineBuilder<IN, OUT>>) super.withInvocation();
+  public InvocationConfiguration.Builder<? extends LoaderRoutineBuilder> withInvocation() {
+    return (Builder<? extends LoaderRoutineBuilder>) super.withInvocation();
   }
 
   @NotNull
   @Override
-  public LoaderRoutineBuilder<IN, OUT> apply(@NotNull final LoaderConfiguration configuration) {
+  public LoaderRoutineBuilder withConfiguration(@NotNull final LoaderConfiguration configuration) {
     mLoaderConfiguration = ConstantConditions.notNull("Loader configuration", configuration);
     return this;
   }
 
   @NotNull
   @Override
-  public LoaderRoutine<IN, OUT> buildRoutine() {
-    return new DefaultLoaderRoutine<IN, OUT>(mContext, mFactory, getConfiguration(),
-        mLoaderConfiguration);
-  }
-
-  @Override
-  public void clear(@Nullable final IN input) {
-    buildRoutine().clear(input);
-  }
-
-  public void clear(@Nullable final IN... inputs) {
-    buildRoutine().clear(inputs);
-  }
-
-  @Override
-  public void clear(@Nullable final Iterable<? extends IN> inputs) {
-    buildRoutine().clear(inputs);
-  }
-
-  @NotNull
-  @Override
-  public LoaderConfiguration.Builder<? extends LoaderRoutineBuilder<IN, OUT>> loaderConfiguration
-      () {
+  public LoaderConfiguration.Builder<? extends LoaderRoutineBuilder> withLoader() {
     final LoaderConfiguration config = mLoaderConfiguration;
-    return new LoaderConfiguration.Builder<LoaderRoutineBuilder<IN, OUT>>(this, config);
+    return new LoaderConfiguration.Builder<LoaderRoutineBuilder>(this, config);
+  }
+
+  /**
+   * Context invocation decorator ensuring that a destroyed instance will not be reused.
+   *
+   * @param <IN>  the input data type.
+   * @param <OUT> the output data type.
+   */
+  private static class SingletonContextInvocation<IN, OUT>
+      extends ContextInvocationDecorator<IN, OUT> {
+
+    private boolean mIsDestroyed;
+
+    /**
+     * Constructor.
+     *
+     * @param wrapped the wrapped invocation instance.
+     */
+    private SingletonContextInvocation(@NotNull final ContextInvocation<IN, OUT> wrapped) {
+      super(wrapped);
+    }
+
+    @Override
+    public void onDestroy() throws Exception {
+      mIsDestroyed = true;
+      super.onDestroy();
+    }
+
+    @Override
+    public void onStart() throws Exception {
+      if (mIsDestroyed) {
+        throw new IllegalStateException("the invocation has been destroyed");
+      }
+
+      super.onStart();
+    }
+  }
+
+  /**
+   * Factory wrapping an invocation instance so that, once destroyed, it will not be reused.
+   *
+   * @param <IN>  the input data type.
+   * @param <OUT> the output data type.
+   */
+  private static class SingletonContextInvocationFactory<IN, OUT>
+      extends ContextInvocationFactory<IN, OUT> {
+
+    private final SingletonContextInvocation<IN, OUT> mInvocation;
+
+    /**
+     * Constructor.
+     *
+     * @param wrapped the wrapped invocation instance.
+     */
+    private SingletonContextInvocationFactory(@NotNull final ContextInvocation<IN, OUT> wrapped) {
+      super(asArgs(wrapped));
+      mInvocation = new SingletonContextInvocation<IN, OUT>(wrapped);
+    }
+
+    @NotNull
+    public ContextInvocation<IN, OUT> newInvocation() {
+      return mInvocation;
+    }
+  }
+
+  /**
+   * Invocation decorator ensuring that a destroyed instance will not be reused.
+   *
+   * @param <IN>  the input data type.
+   * @param <OUT> the output data type.
+   */
+  private static class SingletonInvocation<IN, OUT> extends InvocationDecorator<IN, OUT> {
+
+    private boolean mIsDestroyed;
+
+    /**
+     * Constructor.
+     *
+     * @param wrapped the wrapped invocation instance.
+     */
+    private SingletonInvocation(@NotNull final Invocation<IN, OUT> wrapped) {
+      super(wrapped);
+    }
+
+    @Override
+    public void onDestroy() throws Exception {
+      mIsDestroyed = true;
+      super.onDestroy();
+    }
+
+    @Override
+    public void onStart() throws Exception {
+      if (mIsDestroyed) {
+        throw new IllegalStateException("the invocation has been destroyed");
+      }
+
+      super.onStart();
+    }
+  }
+
+  /**
+   * Factory wrapping an invocation instance so that, once destroyed, it will not be reused.
+   *
+   * @param <IN>  the input data type.
+   * @param <OUT> the output data type.
+   */
+  private static class SingletonInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
+
+    private final SingletonInvocation<IN, OUT> mInvocation;
+
+    /**
+     * Constructor.
+     *
+     * @param wrapped the wrapped invocation instance.
+     */
+    private SingletonInvocationFactory(@NotNull final Invocation<IN, OUT> wrapped) {
+      super(asArgs(wrapped));
+      mInvocation = new SingletonInvocation<IN, OUT>(wrapped);
+    }
+
+    @NotNull
+    public Invocation<IN, OUT> newInvocation() {
+      return mInvocation;
+    }
   }
 }

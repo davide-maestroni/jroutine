@@ -25,8 +25,6 @@ import com.github.dm.jrt.android.core.invocation.ContextInvocation;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
-import com.github.dm.jrt.core.executor.ScheduledExecutor;
-import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
 import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -37,6 +35,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.fromFactory;
+import static com.github.dm.jrt.core.executor.ScheduledExecutors.syncExecutor;
 
 /**
  * Loader implementation performing the routine invocation.
@@ -48,8 +47,6 @@ import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory
  */
 @TargetApi(VERSION_CODES.HONEYCOMB)
 class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
-
-  private final ScheduledExecutor mExecutor;
 
   private final ContextInvocationFactory<IN, OUT> mFactory;
 
@@ -72,20 +69,17 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
    * @param inputs     the input data.
    * @param invocation the invocation instance.
    * @param factory    the invocation factory.
-   * @param executor   the invocation executor.
    * @param order      the data order.
    * @param logger     the logger instance.
    */
   InvocationLoader(@NotNull final Context context, @NotNull final List<? extends IN> inputs,
       @NotNull final ContextInvocation<IN, OUT> invocation,
-      @NotNull final ContextInvocationFactory<IN, OUT> factory,
-      @Nullable final ScheduledExecutor executor, @Nullable final OrderType order,
+      @NotNull final ContextInvocationFactory<IN, OUT> factory, @Nullable final OrderType order,
       @NotNull final Logger logger) {
     super(context);
     mInputs = ConstantConditions.notNull("list of input data", inputs);
     mInvocation = ConstantConditions.notNull("invocation instance", invocation);
     mFactory = ConstantConditions.notNull("Context invocation factory", factory);
-    mExecutor = (executor != null) ? executor : ScheduledExecutors.syncExecutor();
     mOrderType = order;
     mLogger = logger.subContextLogger(this);
   }
@@ -135,13 +129,13 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
     final LoaderContextInvocationFactory<IN, OUT> factory =
         new LoaderContextInvocationFactory<IN, OUT>(mInvocation);
     // TODO: 06/05/2017 mimick invocation lifecycle
-    JRoutineCore.with(fromFactory(getContext(), factory))
-                .invocationConfiguration()
-                .withExecutor(mExecutor)
+    JRoutineCore.routineOn(syncExecutor())
+                .withInvocation()
                 .withOutputOrder(mOrderType)
                 .withLog(logger.getLog())
                 .withLogLevel(logger.getLogLevel())
-                .apply()
+                .configuration()
+                .of(fromFactory(getContext(), factory))
                 .invoke()
                 .consume(consumer)
                 .pass(mInputs)

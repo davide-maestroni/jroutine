@@ -17,9 +17,9 @@
 package com.github.dm.jrt.android.core.builder;
 
 import com.github.dm.jrt.android.core.config.ServiceConfigurable;
-import com.github.dm.jrt.core.builder.RoutineBuilder;
-import com.github.dm.jrt.core.config.InvocationConfiguration;
-import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
+import com.github.dm.jrt.android.core.invocation.InvocationFactoryReference;
+import com.github.dm.jrt.core.config.InvocationConfigurable;
+import com.github.dm.jrt.core.routine.Routine;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -33,24 +33,28 @@ import org.jetbrains.annotations.NotNull;
  * The local Context of the invocations will be the specific Service instance.
  * <p>
  * Created by davide-maestroni on 03/07/2015.
- *
- * @param <IN>  the input data type.
- * @param <OUT> the output data type.
  */
-public interface ServiceRoutineBuilder<IN, OUT>
-    extends RoutineBuilder<IN, OUT>, ServiceConfigurable<ServiceRoutineBuilder<IN, OUT>> {
+public interface ServiceRoutineBuilder extends InvocationConfigurable<ServiceRoutineBuilder>,
+    ServiceConfigurable<ServiceRoutineBuilder> {
 
   /**
-   * {@inheritDoc}
+   * Builds a new routine instance based on the specified factory.
+   * <br>
+   * In order to customize the invocation creation, the caller must override the method
+   * {@link com.github.dm.jrt.android.core.service.InvocationService#getInvocationFactory(
+   *Class, Object...) getInvocationFactory(Class, Object...)} of the routine Service.
+   * <p>
+   * Note that the built routine results will be dispatched into the configured Looper, thus,
+   * waiting for the outputs on the very same Looper thread, immediately after its invocation,
+   * will result in a deadlock.
+   * <br>
+   * By default output results are dispatched in the main Looper.
+   *
+   * @param target the invocation target.
+   * @param <IN>   the input data type.
+   * @param <OUT>  the output data type.
+   * @return the routine builder instance.
    */
   @NotNull
-  @Override
-  ServiceRoutineBuilder<IN, OUT> withConfiguration(@NotNull InvocationConfiguration configuration);
-
-  /**
-   * {@inheritDoc}
-   */
-  @NotNull
-  @Override
-  Builder<? extends ServiceRoutineBuilder<IN, OUT>> withInvocation();
+  <IN, OUT> Routine<IN, OUT> of(@NotNull InvocationFactoryReference<IN, OUT> target);
 }

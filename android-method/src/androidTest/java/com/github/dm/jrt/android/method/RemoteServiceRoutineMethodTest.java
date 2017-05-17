@@ -21,7 +21,7 @@ import android.app.Activity;
 import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
-import com.github.dm.jrt.android.core.ServiceContext;
+import com.github.dm.jrt.android.core.ServiceSource;
 import com.github.dm.jrt.android.core.service.InvocationService;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.AbortException;
@@ -33,7 +33,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
 
-import static com.github.dm.jrt.android.core.ServiceContext.serviceFrom;
+import static com.github.dm.jrt.android.core.ServiceSource.serviceFrom;
 import static com.github.dm.jrt.android.reflect.ContextInvocationTarget.classOfType;
 import static com.github.dm.jrt.android.reflect.ContextInvocationTarget.instanceOf;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
@@ -60,7 +60,7 @@ public class RemoteServiceRoutineMethodTest extends ActivityInstrumentationTestC
     final Channel<Integer, Integer> inputChannel1 = JRoutineCore.<Integer>ofData().buildChannel();
     final Channel<Integer, Integer> inputChannel2 = JRoutineCore.<Integer>ofData().buildChannel();
     final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
-    new ServiceRoutineMethod(serviceFrom(activity, RemoteTestService.class)) {
+    new ServiceRoutineMethod(ServiceSource.serviceOf(activity, RemoteTestService.class)) {
 
       private int mSum;
 
@@ -84,7 +84,7 @@ public class RemoteServiceRoutineMethodTest extends ActivityInstrumentationTestC
     final Channel<Integer, Integer> inputChannel1 = JRoutineCore.<Integer>ofData().buildChannel();
     final Channel<Integer, Integer> inputChannel2 = JRoutineCore.<Integer>ofData().buildChannel();
     final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
-    new ServiceRoutineMethod(serviceFrom(activity, RemoteTestService.class)) {
+    new ServiceRoutineMethod(ServiceSource.serviceOf(activity, RemoteTestService.class)) {
 
       private int mSum;
 
@@ -107,7 +107,7 @@ public class RemoteServiceRoutineMethodTest extends ActivityInstrumentationTestC
 
   private static void testContext(@NotNull final Activity activity) {
     final Channel<Boolean, Boolean> outputChannel = JRoutineCore.<Boolean>ofData().buildChannel();
-    new ServiceRoutineMethod(serviceFrom(activity, RemoteTestService.class)) {
+    new ServiceRoutineMethod(ServiceSource.serviceOf(activity, RemoteTestService.class)) {
 
       void test(@Output final Channel<Boolean, ?> output) {
         output.pass(getContext() instanceof InvocationService);
@@ -117,7 +117,7 @@ public class RemoteServiceRoutineMethodTest extends ActivityInstrumentationTestC
   }
 
   private static void testNoInputs(@NotNull final Activity activity) {
-    final ServiceContext context = serviceFrom(activity, RemoteTestService.class);
+    final ServiceSource context = ServiceSource.serviceOf(activity, RemoteTestService.class);
     assertThat(new ServiceRoutineMethod(context) {
 
       String get() {
@@ -137,7 +137,7 @@ public class RemoteServiceRoutineMethodTest extends ActivityInstrumentationTestC
   private static void testParams2(@NotNull final Activity activity) {
     final Locale locale = Locale.getDefault();
     final ServiceRoutineMethod method =
-        new ServiceRoutineMethod(serviceFrom(activity, RemoteTestService.class), locale) {
+        new ServiceRoutineMethod(ServiceSource.serviceOf(activity, RemoteTestService.class), locale) {
 
           String switchCase(@Input final Channel<?, String> input, final boolean isUpper) {
             final String str = input.next();
@@ -159,7 +159,7 @@ public class RemoteServiceRoutineMethodTest extends ActivityInstrumentationTestC
   private static void testReturnValue(@NotNull final Activity activity) {
     final Channel<String, String> inputStrings = JRoutineCore.<String>ofData().buildChannel();
     final Channel<?, Object> outputChannel =
-        new ServiceRoutineMethod(serviceFrom(activity, RemoteTestService.class)) {
+        new ServiceRoutineMethod(ServiceSource.serviceOf(activity, RemoteTestService.class)) {
 
           int length(@Input final Channel<?, String> input) {
             if (input.hasNext()) {
@@ -176,7 +176,7 @@ public class RemoteServiceRoutineMethodTest extends ActivityInstrumentationTestC
     final Channel<Integer, Integer> inputInts = JRoutineCore.<Integer>ofData().buildChannel();
     final Channel<String, String> inputStrings = JRoutineCore.<String>ofData().buildChannel();
     final Channel<String, String> outputChannel = JRoutineCore.<String>ofData().buildChannel();
-    new ServiceRoutineMethod(serviceFrom(activity, RemoteTestService.class)) {
+    new ServiceRoutineMethod(ServiceSource.serviceOf(activity, RemoteTestService.class)) {
 
       void run(@Input final Channel<?, Integer> inputInts,
           @Input final Channel<?, String> inputStrings, @Output final Channel<String, ?> output) {
@@ -194,7 +194,7 @@ public class RemoteServiceRoutineMethodTest extends ActivityInstrumentationTestC
     final Channel<Integer, Integer> inputInts = JRoutineCore.<Integer>ofData().buildChannel();
     final Channel<String, String> inputStrings = JRoutineCore.<String>ofData().buildChannel();
     final Channel<String, String> outputChannel = JRoutineCore.<String>ofData().buildChannel();
-    new ServiceRoutineMethod(serviceFrom(activity, RemoteTestService.class)) {
+    new ServiceRoutineMethod(ServiceSource.serviceOf(activity, RemoteTestService.class)) {
 
       void run(@Input final Channel<?, Integer> inputInts,
           @Input final Channel<?, String> inputStrings, @Output final Channel<String, ?> output) {
@@ -214,7 +214,7 @@ public class RemoteServiceRoutineMethodTest extends ActivityInstrumentationTestC
   public void testAbort() {
     final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
-    new SumRoutine(serviceFrom(getActivity(), RemoteTestService.class)).call(inputChannel,
+    new SumRoutine(ServiceSource.serviceOf(getActivity(), RemoteTestService.class)).call(inputChannel,
         outputChannel);
     inputChannel.pass(1, 2, 3, 4).abort();
     assertThat(outputChannel.in(seconds(10)).getError()).isExactlyInstanceOf(AbortException.class);
@@ -229,7 +229,7 @@ public class RemoteServiceRoutineMethodTest extends ActivityInstrumentationTestC
   }
 
   public void testBind() {
-    final ServiceContext context = serviceFrom(getActivity(), RemoteTestService.class);
+    final ServiceSource context = ServiceSource.serviceOf(getActivity(), RemoteTestService.class);
     final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     new SquareRoutine(context).call(inputChannel, outputChannel);
@@ -242,7 +242,7 @@ public class RemoteServiceRoutineMethodTest extends ActivityInstrumentationTestC
   public void testCall() {
     final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
-    new SumRoutine(serviceFrom(getActivity(), RemoteTestService.class)).call(inputChannel,
+    new SumRoutine(ServiceSource.serviceOf(getActivity(), RemoteTestService.class)).call(inputChannel,
         outputChannel);
     inputChannel.pass(1, 2, 3, 4, 5).close();
     assertThat(outputChannel.in(seconds(10)).all()).containsExactly(15);
@@ -253,12 +253,12 @@ public class RemoteServiceRoutineMethodTest extends ActivityInstrumentationTestC
   }
 
   public void testFromClass() throws NoSuchMethodException {
-    assertThat(ServiceRoutineMethod.from(serviceFrom(getActivity(), RemoteTestService.class),
+    assertThat(ServiceRoutineMethod.from(ServiceSource.serviceOf(getActivity(), RemoteTestService.class),
         ServiceRoutineMethodTest.class.getMethod("length", String.class))
                                    .call("test")
                                    .in(seconds(10))
                                    .next()).isEqualTo(4);
-    assertThat(ServiceRoutineMethod.from(serviceFrom(getActivity(), RemoteTestService.class),
+    assertThat(ServiceRoutineMethod.from(ServiceSource.serviceOf(getActivity(), RemoteTestService.class),
         ServiceRoutineMethodTest.class.getMethod("length", String.class))
                                    .call(JRoutineCore.of("test").buildChannel())
                                    .in(seconds(10))
@@ -266,19 +266,19 @@ public class RemoteServiceRoutineMethodTest extends ActivityInstrumentationTestC
   }
 
   public void testFromClass2() throws NoSuchMethodException {
-    assertThat(ServiceRoutineMethod.from(serviceFrom(getActivity(), RemoteTestService.class),
+    assertThat(ServiceRoutineMethod.from(ServiceSource.serviceOf(getActivity(), RemoteTestService.class),
         classOfType(ServiceRoutineMethodTest.class), "length", String.class)
                                    .call("test")
                                    .in(seconds(10))
                                    .next()).isEqualTo(4);
-    assertThat(ServiceRoutineMethod.from(serviceFrom(getActivity(), RemoteTestService.class),
+    assertThat(ServiceRoutineMethod.from(ServiceSource.serviceOf(getActivity(), RemoteTestService.class),
         classOfType(ServiceRoutineMethodTest.class), "length", String.class)
                                    .call(JRoutineCore.of("test").buildChannel())
                                    .in(seconds(10))
                                    .next()).isEqualTo(4);
     final Channel<String, String> inputChannel = JRoutineCore.<String>ofData().buildChannel();
     final Channel<?, Object> outputChannel =
-        ServiceRoutineMethod.from(serviceFrom(getActivity(), RemoteTestService.class),
+        ServiceRoutineMethod.from(ServiceSource.serviceOf(getActivity(), RemoteTestService.class),
             classOfType(ServiceRoutineMethodTest.class), "length", String.class).call(inputChannel);
     inputChannel.pass("test").close();
     assertThat(outputChannel.in(seconds(10)).next()).isEqualTo(4);
@@ -286,7 +286,7 @@ public class RemoteServiceRoutineMethodTest extends ActivityInstrumentationTestC
 
   public void testFromError() throws NoSuchMethodException {
     try {
-      ServiceRoutineMethod.from(serviceFrom(getActivity(), RemoteTestService.class),
+      ServiceRoutineMethod.from(ServiceSource.serviceOf(getActivity(), RemoteTestService.class),
           String.class.getMethod("toString"));
       fail();
 
@@ -294,7 +294,7 @@ public class RemoteServiceRoutineMethodTest extends ActivityInstrumentationTestC
     }
 
     try {
-      ServiceRoutineMethod.from(serviceFrom(getActivity(), RemoteTestService.class),
+      ServiceRoutineMethod.from(ServiceSource.serviceOf(getActivity(), RemoteTestService.class),
           instanceOf(String.class, "test"),
           ServiceRoutineMethodTest.class.getMethod("length", String.class));
       fail();
@@ -305,12 +305,12 @@ public class RemoteServiceRoutineMethodTest extends ActivityInstrumentationTestC
 
   public void testFromInstance() throws NoSuchMethodException {
     final String test = "test";
-    assertThat(ServiceRoutineMethod.from(serviceFrom(getActivity(), RemoteTestService.class),
+    assertThat(ServiceRoutineMethod.from(ServiceSource.serviceOf(getActivity(), RemoteTestService.class),
         instanceOf(String.class, test), String.class.getMethod("toString"))
                                    .call()
                                    .in(seconds(10))
                                    .next()).isEqualTo("test");
-    assertThat(ServiceRoutineMethod.from(serviceFrom(getActivity(), RemoteTestService.class),
+    assertThat(ServiceRoutineMethod.from(ServiceSource.serviceOf(getActivity(), RemoteTestService.class),
         instanceOf(String.class, test), String.class.getMethod("toString"))
                                    .withWrapper()
                                    .withSharedFields()
@@ -322,10 +322,10 @@ public class RemoteServiceRoutineMethodTest extends ActivityInstrumentationTestC
 
   public void testFromInstance2() throws NoSuchMethodException {
     final String test = "test";
-    assertThat(ServiceRoutineMethod.from(serviceFrom(getActivity(), RemoteTestService.class),
+    assertThat(ServiceRoutineMethod.from(ServiceSource.serviceOf(getActivity(), RemoteTestService.class),
         instanceOf(String.class, test), "toString").call().in(seconds(10)).next()).isEqualTo(
         "test");
-    assertThat(ServiceRoutineMethod.from(serviceFrom(getActivity(), RemoteTestService.class),
+    assertThat(ServiceRoutineMethod.from(ServiceSource.serviceOf(getActivity(), RemoteTestService.class),
         instanceOf(String.class, test), "toString")
                                    .withWrapper()
                                    .withSharedFields()
@@ -340,7 +340,8 @@ public class RemoteServiceRoutineMethodTest extends ActivityInstrumentationTestC
   }
 
   public void testParams() {
-    final SwitchCase method = new SwitchCase(serviceFrom(getActivity(), RemoteTestService.class));
+    final SwitchCase method = new SwitchCase(
+        ServiceSource.serviceOf(getActivity(), RemoteTestService.class));
     Channel<Object, Object> inputChannel = JRoutineCore.ofData().buildChannel().pass("test");
     Channel<?, String> outputChannel = method.call(inputChannel, true);
     assertThat(outputChannel.in(seconds(10)).next()).isEqualTo("TEST");
@@ -363,7 +364,7 @@ public class RemoteServiceRoutineMethodTest extends ActivityInstrumentationTestC
 
   public void testStaticScopeError() {
     try {
-      new ServiceRoutineMethod(serviceFrom(getActivity(), RemoteTestService.class)) {};
+      new ServiceRoutineMethod(ServiceSource.serviceOf(getActivity(), RemoteTestService.class)) {};
       fail();
 
     } catch (final IllegalStateException ignored) {
@@ -380,7 +381,7 @@ public class RemoteServiceRoutineMethodTest extends ActivityInstrumentationTestC
 
   private static class SquareRoutine extends ServiceRoutineMethod {
 
-    public SquareRoutine(@NotNull final ServiceContext context) {
+    public SquareRoutine(@NotNull final ServiceSource context) {
       super(context);
     }
 
@@ -397,7 +398,7 @@ public class RemoteServiceRoutineMethodTest extends ActivityInstrumentationTestC
 
     private int mSum;
 
-    public SumRoutine(@NotNull final ServiceContext context) {
+    public SumRoutine(@NotNull final ServiceSource context) {
       super(context);
     }
 
@@ -414,7 +415,7 @@ public class RemoteServiceRoutineMethodTest extends ActivityInstrumentationTestC
 
   private static class SwitchCase extends ServiceRoutineMethod {
 
-    public SwitchCase(@NotNull final ServiceContext context) {
+    public SwitchCase(@NotNull final ServiceSource context) {
       super(context);
     }
 

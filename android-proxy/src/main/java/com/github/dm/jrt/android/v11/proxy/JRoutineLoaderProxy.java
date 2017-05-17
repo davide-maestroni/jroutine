@@ -18,7 +18,7 @@ package com.github.dm.jrt.android.v11.proxy;
 
 import com.github.dm.jrt.android.proxy.builder.LoaderProxyRoutineBuilder;
 import com.github.dm.jrt.android.reflect.ContextInvocationTarget;
-import com.github.dm.jrt.android.v11.core.LoaderContext;
+import com.github.dm.jrt.android.v11.core.LoaderSource;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
@@ -59,7 +59,7 @@ public class JRoutineLoaderProxy {
    * @return the Context based builder.
    */
   @NotNull
-  public static LoaderProxyBuilder on(@NotNull final LoaderContext context) {
+  public static LoaderProxyBuilder on(@NotNull final LoaderSource context) {
     return new LoaderProxyBuilder(context);
   }
 
@@ -69,14 +69,14 @@ public class JRoutineLoaderProxy {
   @SuppressWarnings("WeakerAccess")
   public static class LoaderProxyBuilder {
 
-    private final LoaderContext mContext;
+    private final LoaderSource mContext;
 
     /**
      * Constructor.
      *
      * @param context the Loader context.
      */
-    private LoaderProxyBuilder(@NotNull final LoaderContext context) {
+    private LoaderProxyBuilder(@NotNull final LoaderSource context) {
       mContext = ConstantConditions.notNull("Loader context", context);
     }
 

@@ -16,14 +16,13 @@
 
 package com.github.dm.jrt.android.v11.stream.transform;
 
-import com.github.dm.jrt.android.core.ChannelContextInvocation;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.core.invocation.ContextInvocation;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.stream.builder.AbstractLoaderTransformationBuilder;
 import com.github.dm.jrt.android.stream.builder.LoaderTransformationBuilder;
 import com.github.dm.jrt.android.v11.core.JRoutineLoader;
-import com.github.dm.jrt.android.v11.core.LoaderContext;
+import com.github.dm.jrt.android.v11.core.LoaderSource;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.util.Function;
@@ -59,7 +58,7 @@ public class LoaderTransformations {
    * <pre><code>
    * JRoutineStream.withStreamOf(data)
    *               .map(getMappingFunction())
-   *               .lift(LoaderTransformations.runOn(loaderFrom(activity))
+   *               .lift(LoaderTransformations.runOn(loaderOf(activity))
    *                                          .loaderConfiguration()
    *                                          .withInvocationId(INVOCATION_ID)
    *                                          .configured()
@@ -78,7 +77,7 @@ public class LoaderTransformations {
    */
   @NotNull
   public static <IN, OUT> LoaderTransformationBuilder<IN, OUT, IN, OUT> runOn(
-      @NotNull final LoaderContext context) {
+      @NotNull final LoaderSource context) {
     ConstantConditions.notNull("Loader context", context);
     return new AbstractLoaderTransformationBuilder<IN, OUT, IN, OUT>() {
 
@@ -95,7 +94,7 @@ public class LoaderTransformations {
             return JRoutineLoader.on(context)
                                  .with(new LoaderContextInvocationFactory<IN, OUT>(function))
                                  .withConfiguration(streamConfiguration.toInvocationConfiguration())
-                                 .apply(loaderConfiguration)
+                                 .withConfiguration(loaderConfiguration)
                                  .invoke()
                                  .pass(channel)
                                  .close();

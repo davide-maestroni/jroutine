@@ -28,6 +28,7 @@ import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.reflect.builder.FactoryContextWrapper;
 import com.github.dm.jrt.android.reflect.builder.LoaderReflectionRoutineBuilder;
 import com.github.dm.jrt.android.v11.core.JRoutineLoader;
+import com.github.dm.jrt.android.v11.core.LoaderSource;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
@@ -65,7 +66,7 @@ import java.util.concurrent.TimeUnit;
 import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.factoryOf;
 import static com.github.dm.jrt.android.reflect.ContextInvocationTarget.classOfType;
 import static com.github.dm.jrt.android.reflect.ContextInvocationTarget.instanceOf;
-import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
+import static com.github.dm.jrt.android.v11.core.LoaderSource.loaderFrom;
 import static com.github.dm.jrt.core.util.DurationMeasure.indefiniteTime;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -104,7 +105,7 @@ public class LoaderReflectionRoutineActivityTest
 
     try {
 
-      JRoutineLoader.on(loaderFrom(getActivity())).with((ContextInvocationFactory<?, ?>) null);
+      JRoutineLoader.on(LoaderSource.loaderOf(getActivity())).with((ContextInvocationFactory<?, ?>) null);
 
       fail();
 
@@ -134,7 +135,7 @@ public class LoaderReflectionRoutineActivityTest
 
     try {
 
-      JRoutineLoaderReflection.on(loaderFrom(getActivity())).with(classOfType((Class<?>) null));
+      JRoutineLoaderReflection.on(LoaderSource.loaderOf(getActivity())).with(classOfType((Class<?>) null));
 
       fail();
 
@@ -144,7 +145,7 @@ public class LoaderReflectionRoutineActivityTest
 
     try {
 
-      JRoutineLoaderReflection.on(loaderFrom(getActivity()))
+      JRoutineLoaderReflection.on(LoaderSource.loaderOf(getActivity()))
                               .with(instanceOf(null, Reflection.NO_ARGS));
 
       fail();
@@ -172,7 +173,7 @@ public class LoaderReflectionRoutineActivityTest
     }
 
     final DurationMeasure timeout = seconds(10);
-    final Routine<Object, Object> routine = JRoutineLoaderReflection.on(loaderFrom(getActivity()))
+    final Routine<Object, Object> routine = JRoutineLoaderReflection.on(LoaderSource.loaderOf(getActivity()))
                                                                     .with(
                                                                         instanceOf(TestClass.class))
                                                                     .withInvocation()
@@ -197,7 +198,7 @@ public class LoaderReflectionRoutineActivityTest
       return;
     }
 
-    assertThat(JRoutineLoaderReflection.on(loaderFrom(getActivity()))
+    assertThat(JRoutineLoaderReflection.on(LoaderSource.loaderOf(getActivity()))
                                        .with(instanceOf(TestArgs.class, 17))
                                        .method("getId")
                                        .invoke()
@@ -214,7 +215,7 @@ public class LoaderReflectionRoutineActivityTest
     }
 
     final DurationMeasure timeout = seconds(10);
-    final SumItf sumAsync = JRoutineLoaderReflection.on(loaderFrom(getActivity()))
+    final SumItf sumAsync = JRoutineLoaderReflection.on(LoaderSource.loaderOf(getActivity()))
                                                     .with(instanceOf(Sum.class))
                                                     .withInvocation()
                                                     .withOutputTimeout(timeout)
@@ -249,7 +250,7 @@ public class LoaderReflectionRoutineActivityTest
     }
 
     final DurationMeasure timeout = seconds(10);
-    final CountItf countAsync = JRoutineLoaderReflection.on(loaderFrom(getActivity()))
+    final CountItf countAsync = JRoutineLoaderReflection.on(LoaderSource.loaderOf(getActivity()))
                                                         .with(instanceOf(Count.class))
                                                         .withInvocation()
                                                         .withOutputTimeout(timeout)
@@ -272,7 +273,7 @@ public class LoaderReflectionRoutineActivityTest
 
     try {
 
-      new DefaultLoaderReflectionRoutineBuilder(loaderFrom(getActivity()),
+      new DefaultLoaderReflectionRoutineBuilder(LoaderSource.loaderOf(getActivity()),
           instanceOf(TestClass.class)).withConfiguration((InvocationConfiguration) null);
 
       fail();
@@ -283,7 +284,7 @@ public class LoaderReflectionRoutineActivityTest
 
     try {
 
-      new DefaultLoaderReflectionRoutineBuilder(loaderFrom(getActivity()),
+      new DefaultLoaderReflectionRoutineBuilder(LoaderSource.loaderOf(getActivity()),
           instanceOf(TestClass.class)).withConfiguration((WrapperConfiguration) null);
 
       fail();
@@ -294,8 +295,8 @@ public class LoaderReflectionRoutineActivityTest
 
     try {
 
-      new DefaultLoaderReflectionRoutineBuilder(loaderFrom(getActivity()),
-          instanceOf(TestClass.class)).apply((LoaderConfiguration) null);
+      new DefaultLoaderReflectionRoutineBuilder(LoaderSource.loaderOf(getActivity()),
+          instanceOf(TestClass.class)).withConfiguration((LoaderConfiguration) null);
 
       fail();
 
@@ -327,7 +328,7 @@ public class LoaderReflectionRoutineActivityTest
 
     final TestActivity activity = getActivity();
     final StringContext contextWrapper = new StringContext(activity);
-    assertThat(JRoutineLoaderReflection.on(loaderFrom(activity, contextWrapper))
+    assertThat(JRoutineLoaderReflection.on(LoaderSource.loaderOf(activity, contextWrapper))
                                        .with(instanceOf(String.class))
                                        .method("toString")
                                        .invoke()
@@ -345,7 +346,7 @@ public class LoaderReflectionRoutineActivityTest
 
     try {
 
-      JRoutineLoaderReflection.on(loaderFrom(getActivity()))
+      JRoutineLoaderReflection.on(LoaderSource.loaderOf(getActivity()))
                               .with(instanceOf(DuplicateAnnotation.class))
                               .method(DuplicateAnnotation.GET);
 
@@ -364,7 +365,7 @@ public class LoaderReflectionRoutineActivityTest
     }
 
     final DurationMeasure timeout = seconds(10);
-    final Routine<Object, Object> routine3 = JRoutineLoaderReflection.on(loaderFrom(getActivity()))
+    final Routine<Object, Object> routine3 = JRoutineLoaderReflection.on(LoaderSource.loaderOf(getActivity()))
                                                                      .with(instanceOf(
                                                                          TestClass.class))
                                                                      .method(TestClass.THROW);
@@ -391,7 +392,7 @@ public class LoaderReflectionRoutineActivityTest
 
     try {
 
-      JRoutineLoaderReflection.on(loaderFrom(getActivity()))
+      JRoutineLoaderReflection.on(LoaderSource.loaderOf(getActivity()))
                               .with(instanceOf(TestClass.class))
                               .buildProxy(TestClass.class);
 
@@ -403,7 +404,7 @@ public class LoaderReflectionRoutineActivityTest
 
     try {
 
-      JRoutineLoaderReflection.on(loaderFrom(getActivity()))
+      JRoutineLoaderReflection.on(LoaderSource.loaderOf(getActivity()))
                               .with(instanceOf(TestClass.class))
                               .buildProxy(ClassToken.tokenOf(TestClass.class));
 
@@ -423,7 +424,7 @@ public class LoaderReflectionRoutineActivityTest
 
     try {
 
-      JRoutineLoaderReflection.on(loaderFrom(getActivity()))
+      JRoutineLoaderReflection.on(LoaderSource.loaderOf(getActivity()))
                               .with(instanceOf(Sum.class))
                               .buildProxy(SumError.class)
                               .compute(1, new int[0]);
@@ -436,7 +437,7 @@ public class LoaderReflectionRoutineActivityTest
 
     try {
 
-      JRoutineLoaderReflection.on(loaderFrom(getActivity()))
+      JRoutineLoaderReflection.on(LoaderSource.loaderOf(getActivity()))
                               .with(instanceOf(Sum.class))
                               .buildProxy(SumError.class)
                               .compute(new String[0]);
@@ -449,7 +450,7 @@ public class LoaderReflectionRoutineActivityTest
 
     try {
 
-      JRoutineLoaderReflection.on(loaderFrom(getActivity()))
+      JRoutineLoaderReflection.on(LoaderSource.loaderOf(getActivity()))
                               .with(instanceOf(Sum.class))
                               .buildProxy(SumError.class)
                               .compute(new int[0]);
@@ -462,7 +463,7 @@ public class LoaderReflectionRoutineActivityTest
 
     try {
 
-      JRoutineLoaderReflection.on(loaderFrom(getActivity()))
+      JRoutineLoaderReflection.on(LoaderSource.loaderOf(getActivity()))
                               .with(instanceOf(Sum.class))
                               .buildProxy(SumError.class)
                               .compute(Collections.<Integer>emptyList());
@@ -477,7 +478,7 @@ public class LoaderReflectionRoutineActivityTest
 
     try {
 
-      JRoutineLoaderReflection.on(loaderFrom(getActivity()))
+      JRoutineLoaderReflection.on(LoaderSource.loaderOf(getActivity()))
                               .with(instanceOf(Sum.class))
                               .buildProxy(SumError.class)
                               .compute(channel);
@@ -490,7 +491,7 @@ public class LoaderReflectionRoutineActivityTest
 
     try {
 
-      JRoutineLoaderReflection.on(loaderFrom(getActivity()))
+      JRoutineLoaderReflection.on(LoaderSource.loaderOf(getActivity()))
                               .with(instanceOf(Sum.class))
                               .buildProxy(SumError.class)
                               .compute(1, channel);
@@ -511,7 +512,7 @@ public class LoaderReflectionRoutineActivityTest
 
     try {
 
-      JRoutineLoaderReflection.on(loaderFrom(getActivity()))
+      JRoutineLoaderReflection.on(LoaderSource.loaderOf(getActivity()))
                               .with(instanceOf(TestClass.class))
                               .withInvocation()
                               .withOutputTimeout(indefiniteTime())
@@ -527,7 +528,7 @@ public class LoaderReflectionRoutineActivityTest
 
     try {
 
-      JRoutineLoaderReflection.on(loaderFrom(getActivity()))
+      JRoutineLoaderReflection.on(LoaderSource.loaderOf(getActivity()))
                               .with(instanceOf(TestClass.class))
                               .withInvocation()
                               .withOutputTimeout(indefiniteTime())
@@ -543,7 +544,7 @@ public class LoaderReflectionRoutineActivityTest
 
     try {
 
-      JRoutineLoaderReflection.on(loaderFrom(getActivity()))
+      JRoutineLoaderReflection.on(LoaderSource.loaderOf(getActivity()))
                               .with(instanceOf(TestClass.class))
                               .withInvocation()
                               .withOutputTimeout(indefiniteTime())
@@ -567,7 +568,7 @@ public class LoaderReflectionRoutineActivityTest
 
     try {
 
-      JRoutineLoaderReflection.on(loaderFrom(getActivity()))
+      JRoutineLoaderReflection.on(LoaderSource.loaderOf(getActivity()))
                               .with(instanceOf(Count.class))
                               .buildProxy(CountError.class)
                               .count(3);
@@ -580,7 +581,7 @@ public class LoaderReflectionRoutineActivityTest
 
     try {
 
-      JRoutineLoaderReflection.on(loaderFrom(getActivity()))
+      JRoutineLoaderReflection.on(LoaderSource.loaderOf(getActivity()))
                               .with(instanceOf(Count.class))
                               .buildProxy(CountError.class)
                               .count1(3);
@@ -593,7 +594,7 @@ public class LoaderReflectionRoutineActivityTest
 
     try {
 
-      JRoutineLoaderReflection.on(loaderFrom(getActivity()))
+      JRoutineLoaderReflection.on(LoaderSource.loaderOf(getActivity()))
                               .with(instanceOf(Count.class))
                               .buildProxy(CountError.class)
                               .countList(3);
@@ -606,7 +607,7 @@ public class LoaderReflectionRoutineActivityTest
 
     try {
 
-      JRoutineLoaderReflection.on(loaderFrom(getActivity()))
+      JRoutineLoaderReflection.on(LoaderSource.loaderOf(getActivity()))
                               .with(instanceOf(Count.class))
                               .buildProxy(CountError.class)
                               .countList1(3);
@@ -626,7 +627,7 @@ public class LoaderReflectionRoutineActivityTest
     }
 
     final DurationMeasure timeout = seconds(10);
-    final Routine<Object, Object> routine2 = JRoutineLoaderReflection.on(loaderFrom(getActivity()))
+    final Routine<Object, Object> routine2 = JRoutineLoaderReflection.on(LoaderSource.loaderOf(getActivity()))
                                                                      .with(instanceOf(
                                                                          TestClass.class))
                                                                      .withInvocation()
@@ -653,7 +654,7 @@ public class LoaderReflectionRoutineActivityTest
     }
 
     final DurationMeasure timeout = seconds(10);
-    final Routine<Object, Object> routine1 = JRoutineLoaderReflection.on(loaderFrom(getActivity()))
+    final Routine<Object, Object> routine1 = JRoutineLoaderReflection.on(LoaderSource.loaderOf(getActivity()))
                                                                      .with(instanceOf(
                                                                          TestClass.class))
                                                                      .withInvocation()
@@ -674,7 +675,7 @@ public class LoaderReflectionRoutineActivityTest
 
     try {
 
-      JRoutineLoaderReflection.on(loaderFrom(getActivity()))
+      JRoutineLoaderReflection.on(LoaderSource.loaderOf(getActivity()))
                               .with(instanceOf(TestClass.class))
                               .method("test");
 
@@ -694,7 +695,7 @@ public class LoaderReflectionRoutineActivityTest
 
     try {
 
-      JRoutineLoaderReflection.on(loaderFrom(getActivity()))
+      JRoutineLoaderReflection.on(LoaderSource.loaderOf(getActivity()))
                               .with(instanceOf(TestClass.class))
                               .method("test");
 
@@ -715,7 +716,7 @@ public class LoaderReflectionRoutineActivityTest
 
     try {
 
-      JRoutineLoaderReflection.on(loaderFrom(getActivity())).with(null);
+      JRoutineLoaderReflection.on(LoaderSource.loaderOf(getActivity())).with(null);
 
       fail();
 
@@ -725,7 +726,7 @@ public class LoaderReflectionRoutineActivityTest
 
     try {
 
-      JRoutineLoaderReflection.on(loaderFrom(getActivity())).with(instanceOf(null));
+      JRoutineLoaderReflection.on(LoaderSource.loaderOf(getActivity())).with(instanceOf(null));
 
       fail();
 
@@ -744,7 +745,7 @@ public class LoaderReflectionRoutineActivityTest
 
     try {
 
-      JRoutineLoaderReflection.on(loaderFrom(getActivity()))
+      JRoutineLoaderReflection.on(LoaderSource.loaderOf(getActivity()))
                               .with(instanceOf(TestClass.class))
                               .buildProxy((Class<?>) null);
 
@@ -756,7 +757,7 @@ public class LoaderReflectionRoutineActivityTest
 
     try {
 
-      JRoutineLoaderReflection.on(loaderFrom(getActivity()))
+      JRoutineLoaderReflection.on(LoaderSource.loaderOf(getActivity()))
                               .with(instanceOf(TestClass.class))
                               .buildProxy((ClassToken<?>) null);
 
@@ -775,7 +776,7 @@ public class LoaderReflectionRoutineActivityTest
       return;
     }
 
-    final Itf itf = JRoutineLoaderReflection.on(loaderFrom(getActivity()))
+    final Itf itf = JRoutineLoaderReflection.on(LoaderSource.loaderOf(getActivity()))
                                             .with(instanceOf(Impl.class))
                                             .withInvocation()
                                             .withOutputTimeout(seconds(10))
@@ -906,7 +907,7 @@ public class LoaderReflectionRoutineActivityTest
     }
 
     final DurationMeasure timeout = seconds(10);
-    final SquareItf squareAsync = JRoutineLoaderReflection.on(loaderFrom(getActivity()))
+    final SquareItf squareAsync = JRoutineLoaderReflection.on(LoaderSource.loaderOf(getActivity()))
                                                           .with(instanceOf(Square.class))
                                                           .buildProxy(SquareItf.class);
 
@@ -925,7 +926,7 @@ public class LoaderReflectionRoutineActivityTest
     }
 
     final LoaderReflectionRoutineBuilder builder =
-        JRoutineLoaderReflection.on(loaderFrom(getActivity()))
+        JRoutineLoaderReflection.on(LoaderSource.loaderOf(getActivity()))
                                 .with(instanceOf(TestClass2.class))
                                 .withInvocation()
                                 .withOutputTimeout(seconds(10))
@@ -967,14 +968,14 @@ public class LoaderReflectionRoutineActivityTest
       return;
     }
 
-    assertThat(JRoutineLoaderReflection.on(loaderFrom(getActivity()))
+    assertThat(JRoutineLoaderReflection.on(LoaderSource.loaderOf(getActivity()))
                                        .with(instanceOf(TestTimeout.class))
                                        .withInvocation()
                                        .withOutputTimeout(seconds(10))
                                        .configuration()
-                                       .loaderConfiguration()
+                                       .withLoader()
                                        .withLoaderId(0)
-                                       .apply()
+                                       .configuration()
                                        .method("test")
                                        .invoke()
                                        .close()
@@ -982,14 +983,14 @@ public class LoaderReflectionRoutineActivityTest
 
     try {
 
-      JRoutineLoaderReflection.on(loaderFrom(getActivity()))
+      JRoutineLoaderReflection.on(LoaderSource.loaderOf(getActivity()))
                               .with(instanceOf(TestTimeout.class))
                               .withInvocation()
                               .withOutputTimeoutAction(TimeoutActionType.FAIL)
                               .configuration()
-                              .loaderConfiguration()
+                              .withLoader()
                               .withLoaderId(1)
-                              .apply()
+                              .configuration()
                               .method("test")
                               .invoke()
                               .close()
@@ -1001,14 +1002,14 @@ public class LoaderReflectionRoutineActivityTest
 
     }
 
-    assertThat(JRoutineLoaderReflection.on(loaderFrom(getActivity()))
+    assertThat(JRoutineLoaderReflection.on(LoaderSource.loaderOf(getActivity()))
                                        .with(instanceOf(TestTimeout.class))
                                        .withInvocation()
                                        .withOutputTimeout(seconds(10))
                                        .configuration()
-                                       .loaderConfiguration()
+                                       .withLoader()
                                        .withLoaderId(2)
-                                       .apply()
+                                       .configuration()
                                        .method("getInt")
                                        .invoke()
                                        .close()
@@ -1016,14 +1017,14 @@ public class LoaderReflectionRoutineActivityTest
 
     try {
 
-      JRoutineLoaderReflection.on(loaderFrom(getActivity()))
+      JRoutineLoaderReflection.on(LoaderSource.loaderOf(getActivity()))
                               .with(instanceOf(TestTimeout.class))
                               .withInvocation()
                               .withOutputTimeoutAction(TimeoutActionType.FAIL)
                               .configuration()
-                              .loaderConfiguration()
+                              .withLoader()
                               .withLoaderId(3)
-                              .apply()
+                              .configuration()
                               .method("getInt")
                               .invoke()
                               .close()
@@ -1035,14 +1036,14 @@ public class LoaderReflectionRoutineActivityTest
 
     }
 
-    assertThat(JRoutineLoaderReflection.on(loaderFrom(getActivity()))
+    assertThat(JRoutineLoaderReflection.on(LoaderSource.loaderOf(getActivity()))
                                        .with(instanceOf(TestTimeout.class))
                                        .withInvocation()
                                        .withOutputTimeout(seconds(10))
                                        .configuration()
-                                       .loaderConfiguration()
+                                       .withLoader()
                                        .withLoaderId(4)
-                                       .apply()
+                                       .configuration()
                                        .method(TestTimeout.class.getMethod("getInt"))
                                        .invoke()
                                        .close()
@@ -1050,14 +1051,14 @@ public class LoaderReflectionRoutineActivityTest
 
     try {
 
-      JRoutineLoaderReflection.on(loaderFrom(getActivity()))
+      JRoutineLoaderReflection.on(LoaderSource.loaderOf(getActivity()))
                               .with(instanceOf(TestTimeout.class))
                               .withInvocation()
                               .withOutputTimeoutAction(TimeoutActionType.FAIL)
                               .configuration()
-                              .loaderConfiguration()
+                              .withLoader()
                               .withLoaderId(5)
-                              .apply()
+                              .configuration()
                               .method(TestTimeout.class.getMethod("getInt"))
                               .invoke()
                               .close()
@@ -1069,27 +1070,27 @@ public class LoaderReflectionRoutineActivityTest
 
     }
 
-    assertThat(JRoutineLoaderReflection.on(loaderFrom(getActivity()))
+    assertThat(JRoutineLoaderReflection.on(LoaderSource.loaderOf(getActivity()))
                                        .with(instanceOf(TestTimeout.class))
                                        .withInvocation()
                                        .withOutputTimeout(seconds(10))
                                        .configuration()
-                                       .loaderConfiguration()
+                                       .withLoader()
                                        .withLoaderId(6)
-                                       .apply()
+                                       .configuration()
                                        .buildProxy(TestTimeoutItf.class)
                                        .getInt()).isEqualTo(31);
 
     try {
 
-      JRoutineLoaderReflection.on(loaderFrom(getActivity()))
+      JRoutineLoaderReflection.on(LoaderSource.loaderOf(getActivity()))
                               .with(instanceOf(TestTimeout.class))
                               .withInvocation()
                               .withOutputTimeoutAction(TimeoutActionType.FAIL)
                               .configuration()
-                              .loaderConfiguration()
+                              .withLoader()
                               .withLoaderId(7)
-                              .apply()
+                              .configuration()
                               .buildProxy(TestTimeoutItf.class)
                               .getInt();
 

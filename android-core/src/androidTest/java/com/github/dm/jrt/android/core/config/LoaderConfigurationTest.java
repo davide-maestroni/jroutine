@@ -46,9 +46,10 @@ public class LoaderConfigurationTest extends AndroidTestCase {
                                                        .withMatchResolution(resolutionType)
                                                        .withCacheStrategy(strategyType)
                                                        .withResultStaleTime(1, TimeUnit.SECONDS)
-                                                       .apply();
-    assertThat(configuration.builderFrom().apply()).isEqualTo(configuration);
-    assertThat(builderFrom(null).apply()).isEqualTo(LoaderConfiguration.defaultConfiguration());
+                                                       .configuration();
+    assertThat(configuration.builderFrom().configuration()).isEqualTo(configuration);
+    assertThat(builderFrom(null).configuration()).isEqualTo(
+        LoaderConfiguration.defaultConfiguration());
   }
 
   @SuppressWarnings("ConstantConditions")
@@ -85,11 +86,12 @@ public class LoaderConfigurationTest extends AndroidTestCase {
                                                        .withMatchResolution(resolutionType)
                                                        .withCacheStrategy(strategyType)
                                                        .withResultStaleTime(1, TimeUnit.SECONDS)
-                                                       .apply();
-    assertThat(builder().withPatch(configuration).apply()).isEqualTo(configuration);
-    assertThat(configuration.builderFrom().apply()).isEqualTo(configuration);
-    assertThat(configuration.builderFrom().withPatch(null).apply()).isEqualTo(configuration);
-    assertThat(configuration.builderFrom().withDefaults().apply()).isEqualTo(
+                                                       .configuration();
+    assertThat(builder().withPatch(configuration).configuration()).isEqualTo(configuration);
+    assertThat(configuration.builderFrom().configuration()).isEqualTo(configuration);
+    assertThat(configuration.builderFrom().withPatch(null).configuration()).isEqualTo(
+        configuration);
+    assertThat(configuration.builderFrom().withDefaults().configuration()).isEqualTo(
         LoaderConfiguration.defaultConfiguration());
   }
 
@@ -102,13 +104,13 @@ public class LoaderConfigurationTest extends AndroidTestCase {
                                                        .withMatchResolution(resolutionType)
                                                        .withCacheStrategy(strategyType)
                                                        .withResultStaleTime(1, TimeUnit.SECONDS)
-                                                       .apply();
+                                                       .configuration();
     assertThat(configuration).isNotEqualTo(
-        builder().withCacheStrategy(CacheStrategyType.CLEAR).apply());
+        builder().withCacheStrategy(CacheStrategyType.CLEAR).configuration());
     assertThat(configuration.builderFrom()
                             .withCacheStrategy(CacheStrategyType.CACHE_IF_ERROR)
-                            .apply()).isNotEqualTo(
-        builder().withCacheStrategy(CacheStrategyType.CACHE_IF_ERROR).apply());
+                            .configuration()).isNotEqualTo(
+        builder().withCacheStrategy(CacheStrategyType.CACHE_IF_ERROR).configuration());
   }
 
   public void testClashResolutionEquals() {
@@ -120,13 +122,13 @@ public class LoaderConfigurationTest extends AndroidTestCase {
                                                        .withMatchResolution(resolutionType)
                                                        .withCacheStrategy(strategyType)
                                                        .withResultStaleTime(1, TimeUnit.SECONDS)
-                                                       .apply();
+                                                       .configuration();
     assertThat(configuration).isNotEqualTo(
-        builder().withClashResolution(ClashResolutionType.ABORT_THIS).apply());
+        builder().withClashResolution(ClashResolutionType.ABORT_THIS).configuration());
     assertThat(configuration.builderFrom()
                             .withClashResolution(ClashResolutionType.JOIN)
-                            .apply()).isNotEqualTo(
-        builder().withClashResolution(ClashResolutionType.JOIN).apply());
+                            .configuration()).isNotEqualTo(
+        builder().withClashResolution(ClashResolutionType.JOIN).configuration());
   }
 
   public void testIdEquals() {
@@ -138,10 +140,10 @@ public class LoaderConfigurationTest extends AndroidTestCase {
                                                        .withMatchResolution(resolutionType)
                                                        .withCacheStrategy(strategyType)
                                                        .withResultStaleTime(1, TimeUnit.SECONDS)
-                                                       .apply();
-    assertThat(configuration).isNotEqualTo(builder().withLoaderId(3).apply());
-    assertThat(configuration.builderFrom().withLoaderId(27).apply()).isNotEqualTo(
-        builder().withLoaderId(27).apply());
+                                                       .configuration();
+    assertThat(configuration).isNotEqualTo(builder().withLoaderId(3).configuration());
+    assertThat(configuration.builderFrom().withLoaderId(27).configuration()).isNotEqualTo(
+        builder().withLoaderId(27).configuration());
   }
 
   public void testInvocationIdEquals() {
@@ -154,10 +156,10 @@ public class LoaderConfigurationTest extends AndroidTestCase {
                                                        .withMatchResolution(resolutionType)
                                                        .withCacheStrategy(strategyType)
                                                        .withResultStaleTime(1, TimeUnit.SECONDS)
-                                                       .apply();
-    assertThat(configuration).isNotEqualTo(builder().withInvocationId(3).apply());
-    assertThat(configuration.builderFrom().withInvocationId(27).apply()).isNotEqualTo(
-        builder().withInvocationId(27).apply());
+                                                       .configuration();
+    assertThat(configuration).isNotEqualTo(builder().withInvocationId(3).configuration());
+    assertThat(configuration.builderFrom().withInvocationId(27).configuration()).isNotEqualTo(
+        builder().withInvocationId(27).configuration());
   }
 
   public void testMatchResolutionEquals() {
@@ -169,13 +171,13 @@ public class LoaderConfigurationTest extends AndroidTestCase {
                                                        .withMatchResolution(resolutionType)
                                                        .withCacheStrategy(strategyType)
                                                        .withResultStaleTime(1, TimeUnit.SECONDS)
-                                                       .apply();
+                                                       .configuration();
     assertThat(configuration).isNotEqualTo(
-        builder().withMatchResolution(ClashResolutionType.ABORT_THIS).apply());
+        builder().withMatchResolution(ClashResolutionType.ABORT_THIS).configuration());
     assertThat(configuration.builderFrom()
                             .withMatchResolution(ClashResolutionType.JOIN)
-                            .apply()).isNotEqualTo(
-        builder().withMatchResolution(ClashResolutionType.JOIN).apply());
+                            .configuration()).isNotEqualTo(
+        builder().withMatchResolution(ClashResolutionType.JOIN).configuration());
   }
 
   public void testStaleTimeEquals() {
@@ -187,13 +189,13 @@ public class LoaderConfigurationTest extends AndroidTestCase {
                                                        .withMatchResolution(resolutionType)
                                                        .withCacheStrategy(strategyType)
                                                        .withResultStaleTime(1, TimeUnit.SECONDS)
-                                                       .apply();
+                                                       .configuration();
     assertThat(configuration).isNotEqualTo(
-        builder().withResultStaleTime(DurationMeasure.days(3)).apply());
+        builder().withResultStaleTime(DurationMeasure.days(3)).configuration());
     assertThat(configuration.builderFrom()
                             .withResultStaleTime(DurationMeasure.hours(7))
-                            .apply()).isNotEqualTo(
-        builder().withResultStaleTime(DurationMeasure.hours(7)).apply());
+                            .configuration()).isNotEqualTo(
+        builder().withResultStaleTime(DurationMeasure.hours(7)).configuration());
   }
 
   @SuppressWarnings("ConstantConditions")

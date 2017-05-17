@@ -136,13 +136,12 @@ public interface StatelessLoaderRoutineBuilder<IN, OUT>
    */
   @NotNull
   @Override
-  StatelessLoaderRoutineBuilder<IN, OUT> apply(@NotNull LoaderConfiguration configuration);
+  StatelessLoaderRoutineBuilder<IN, OUT> withConfiguration(@NotNull LoaderConfiguration configuration);
 
   /**
    * {@inheritDoc}
    */
   @NotNull
   @Override
-  LoaderConfiguration.Builder<? extends StatelessLoaderRoutineBuilder<IN, OUT>>
-  loaderConfiguration();
+  LoaderConfiguration.Builder<? extends StatelessLoaderRoutineBuilder<IN, OUT>> withLoader();
 }

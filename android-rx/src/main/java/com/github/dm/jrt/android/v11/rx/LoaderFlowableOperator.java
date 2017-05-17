@@ -23,7 +23,7 @@ import com.github.dm.jrt.android.core.invocation.ContextInvocation;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.core.routine.LoaderRoutine;
 import com.github.dm.jrt.android.v11.core.JRoutineLoader;
-import com.github.dm.jrt.android.v11.core.LoaderContext;
+import com.github.dm.jrt.android.v11.core.LoaderSource;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
@@ -44,7 +44,7 @@ import io.reactivex.FlowableOperator;
  */
 class LoaderFlowableOperator<DATA> implements FlowableOperator<DATA, DATA> {
 
-  private final LoaderContext mContext;
+  private final LoaderSource mContext;
 
   private final InvocationConfiguration mInvocationConfiguration;
 
@@ -57,7 +57,7 @@ class LoaderFlowableOperator<DATA> implements FlowableOperator<DATA, DATA> {
    * @param invocationConfiguration the invocation configuration.
    * @param loaderConfiguration     the Loader configuration.
    */
-  LoaderFlowableOperator(@NotNull final LoaderContext context,
+  LoaderFlowableOperator(@NotNull final LoaderSource context,
       @NotNull final InvocationConfiguration invocationConfiguration,
       @NotNull final LoaderConfiguration loaderConfiguration) {
     mContext = ConstantConditions.notNull("Loader context", context);
@@ -73,7 +73,7 @@ class LoaderFlowableOperator<DATA> implements FlowableOperator<DATA, DATA> {
     return new LoaderSubscriber<DATA>(subscriber, JRoutineLoader.on(mContext)
                                                                 .with(factory)
                                                                 .withConfiguration(mInvocationConfiguration)
-                                                                .apply(mLoaderConfiguration)
+                                                                .withConfiguration(mLoaderConfiguration)
                                                                 .buildRoutine());
   }
 

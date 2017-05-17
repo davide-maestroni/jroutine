@@ -18,7 +18,6 @@ package com.github.dm.jrt.android.v4.core;
 
 import com.github.dm.jrt.android.core.builder.LoaderChannelBuilder;
 import com.github.dm.jrt.android.core.builder.LoaderRoutineBuilder;
-import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
@@ -69,9 +68,8 @@ import org.jetbrains.annotations.NotNull;
  *
  *   } else {
  *     final Routine&lt;URI, MyResource&gt; routine =
- *         JRoutineLoaderCompat.on(loaderFrom(this))
- *                             .with(factoryOf(LoadResource.class))
- *                             .buildRoutine();
+ *         JRoutineLoaderCompat.routineOn(loaderOf(this))
+ *                             .of(factoryOf(LoadResource.class));
  *     routine.invoke()
  *            .consume(new TemplateChannelConsumer&lt;MyResource&gt;() {
  *
@@ -102,15 +100,14 @@ import org.jetbrains.annotations.NotNull;
  * <p>
  * Note that the invocation may be implemented so to run in a dedicated Service:
  * <pre><code>
- * public class LoadResource extends TemplateContextInvocation&lt;URI, MyResource&gt; {
+ * public class LoadResource extends CallContextInvocation&lt;URI, MyResource&gt; {
  *
  *   private Routine&lt;URI, MyResource&gt; mRoutine;
  *
  *   &#64;Override
  *   public void onContext(&#64;Nonnull final Context context) {
- *     mRoutine = JRoutineService.on(serviceFrom(context))
- *                               .with(factoryOf(LoadResourceUri.class))
- *                               .buildRoutine();
+ *     mRoutine = JRoutineService.routineOn(serviceOf(context))
+ *                               .of(factoryOf(LoadResourceUri.class));
  *   }
  *
  *   &#64;Override
@@ -133,80 +130,45 @@ public class JRoutineLoaderCompat {
   }
 
   /**
-   * Returns a Context based builder of Loader routine builders.
+   * Returns a builder of channels bound to the Loader identified by the specified ID.
+   * <br>
+   * If no Loader with the specified ID is running at the time of the channel creation, the
+   * output will be aborted with a
+   * {@link com.github.dm.jrt.android.core.invocation.MissingLoaderException
+   * MissingLoaderException}.
+   * <p>
+   * Note that the built routine results will be always dispatched on the configured Looper
+   * thread, thus waiting for the outputs immediately after its invocation may result in a
+   * deadlock.
    *
-   * @param context the Loader context.
-   * @return the Context based builder.
+   * @param loaderSource the Loader source.
+   * @param loaderId     the Loader ID.
+   * @return the channel builder instance.
    */
   @NotNull
-  public static LoaderBuilderCompat on(@NotNull final LoaderContextCompat context) {
-    return new LoaderBuilderCompat(context);
+  public static LoaderChannelBuilder channelOn(@NotNull final LoaderSourceCompat loaderSource,
+      final int loaderId) {
+    return new DefaultLoaderChannelBuilder(loaderSource).withLoader()
+                                                        .withLoaderId(loaderId)
+                                                        .configuration();
   }
 
   /**
-   * Context based builder of Loader routine builders.
+   * Returns a Context based builder of Loader routines.
+   * <p>
+   * Note that the built routine results will be always dispatched on the configured Looper
+   * thread, thus waiting for the outputs immediately after its invocation may result in a
+   * deadlock.
+   * <br>
+   * Note also that the input data passed to the invocation channel will be cached, and the
+   * results will be produced only after the invocation channel is closed, so be sure to avoid
+   * streaming inputs in order to prevent starvation or out of memory errors.
+   *
+   * @param loaderSource the Loader source.
+   * @return the routine builder instance.
    */
-  @SuppressWarnings("WeakerAccess")
-  public static class LoaderBuilderCompat {
-
-    private final LoaderContextCompat mContext;
-
-    /**
-     * Constructor.
-     *
-     * @param context the Loader context.
-     */
-    private LoaderBuilderCompat(@NotNull final LoaderContextCompat context) {
-      mContext = ConstantConditions.notNull("Loader context", context);
-    }
-
-    /**
-     * Returns a builder of routines bound to the builder context.
-     * <br>
-     * In order to prevent undesired leaks, the class of the specified factory must have a static
-     * scope.
-     * <p>
-     * Note that the built routine results will be always dispatched on the configured Looper
-     * thread, thus waiting for the outputs immediately after its invocation may result in a
-     * deadlock.
-     * <br>
-     * Note also that the input data passed to the invocation channel will be cached, and the
-     * results will be produced only after the invocation channel is closed, so be sure to avoid
-     * streaming inputs in order to prevent starvation or out of memory errors.
-     *
-     * @param factory the invocation factory.
-     * @param <IN>    the input data type.
-     * @param <OUT>   the output data type.
-     * @return the routine builder instance.
-     * @throws java.lang.IllegalArgumentException if the class of the specified factory has not
-     *                                            a static scope.
-     */
-    @NotNull
-    public <IN, OUT> LoaderRoutineBuilder<IN, OUT> with(
-        @NotNull final ContextInvocationFactory<IN, OUT> factory) {
-      return new DefaultLoaderRoutineBuilder<IN, OUT>(mContext, factory);
-    }
-
-    /**
-     * Returns a builder of channels bound to the Loader identified by the specified ID.
-     * <br>
-     * If no Loader with the specified ID is running at the time of the channel creation, the
-     * output will be aborted with a
-     * {@link com.github.dm.jrt.android.core.invocation.MissingLoaderException
-     * MissingLoaderException}.
-     * <p>
-     * Note that the built routine results will be always dispatched on the configured Looper
-     * thread, thus waiting for the outputs immediately after its invocation may result in a
-     * deadlock.
-     *
-     * @param loaderId the Loader ID.
-     * @return the channel builder instance.
-     */
-    @NotNull
-    public LoaderChannelBuilder withId(final int loaderId) {
-      return new DefaultLoaderChannelBuilder(mContext).loaderConfiguration()
-                                                      .withLoaderId(loaderId)
-                                                      .apply();
-    }
+  @NotNull
+  public static LoaderRoutineBuilder routineOn(@NotNull final LoaderSourceCompat loaderSource) {
+    return new DefaultLoaderRoutineBuilder(loaderSource);
   }
 }

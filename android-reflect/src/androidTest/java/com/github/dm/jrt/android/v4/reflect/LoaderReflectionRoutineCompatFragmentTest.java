@@ -28,6 +28,7 @@ import com.github.dm.jrt.android.reflect.builder.FactoryContextWrapper;
 import com.github.dm.jrt.android.reflect.builder.LoaderReflectionRoutineBuilder;
 import com.github.dm.jrt.android.reflect.test.R;
 import com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat;
+import com.github.dm.jrt.android.v4.core.LoaderSourceCompat;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
@@ -65,7 +66,7 @@ import java.util.concurrent.TimeUnit;
 import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.factoryOf;
 import static com.github.dm.jrt.android.reflect.ContextInvocationTarget.classOfType;
 import static com.github.dm.jrt.android.reflect.ContextInvocationTarget.instanceOf;
-import static com.github.dm.jrt.android.v4.core.LoaderContextCompat.loaderFrom;
+import static com.github.dm.jrt.android.v4.core.LoaderSourceCompat.loaderFrom;
 import static com.github.dm.jrt.core.util.DurationMeasure.indefiniteTime;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -89,7 +90,8 @@ public class LoaderReflectionRoutineCompatFragmentTest
     final DurationMeasure timeout = seconds(10);
     final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                               .findFragmentById(R.id.test_fragment);
-    final Routine<Object, Object> routine = JRoutineLoaderReflectionCompat.on(loaderFrom(fragment))
+    final Routine<Object, Object> routine = JRoutineLoaderReflectionCompat.on(
+        LoaderSourceCompat.loaderOf(fragment))
                                                                           .with(instanceOf(
                                                                               TestClass.class))
                                                                           .withInvocation()
@@ -112,7 +114,7 @@ public class LoaderReflectionRoutineCompatFragmentTest
 
     final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                               .findFragmentById(R.id.test_fragment);
-    assertThat(JRoutineLoaderReflectionCompat.on(loaderFrom(fragment))
+    assertThat(JRoutineLoaderReflectionCompat.on(LoaderSourceCompat.loaderOf(fragment))
                                              .with(instanceOf(TestArgs.class, 17))
                                              .method("getId")
                                              .invoke()
@@ -126,7 +128,7 @@ public class LoaderReflectionRoutineCompatFragmentTest
     final DurationMeasure timeout = seconds(10);
     final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                               .findFragmentById(R.id.test_fragment);
-    final SumItf sumAsync = JRoutineLoaderReflectionCompat.on(loaderFrom(fragment))
+    final SumItf sumAsync = JRoutineLoaderReflectionCompat.on(LoaderSourceCompat.loaderOf(fragment))
                                                           .with(instanceOf(Sum.class))
                                                           .withInvocation()
                                                           .withOutputTimeout(timeout)
@@ -158,7 +160,7 @@ public class LoaderReflectionRoutineCompatFragmentTest
     final DurationMeasure timeout = seconds(10);
     final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                               .findFragmentById(R.id.test_fragment);
-    final CountItf countAsync = JRoutineLoaderReflectionCompat.on(loaderFrom(fragment))
+    final CountItf countAsync = JRoutineLoaderReflectionCompat.on(LoaderSourceCompat.loaderOf(fragment))
                                                               .with(instanceOf(Count.class))
                                                               .withInvocation()
                                                               .withOutputTimeout(timeout)
@@ -179,7 +181,7 @@ public class LoaderReflectionRoutineCompatFragmentTest
 
     try {
 
-      new DefaultLoaderReflectionRoutineBuilder(loaderFrom(fragment),
+      new DefaultLoaderReflectionRoutineBuilder(LoaderSourceCompat.loaderOf(fragment),
           instanceOf(TestClass.class)).withConfiguration((InvocationConfiguration) null);
 
       fail();
@@ -190,7 +192,7 @@ public class LoaderReflectionRoutineCompatFragmentTest
 
     try {
 
-      new DefaultLoaderReflectionRoutineBuilder(loaderFrom(fragment),
+      new DefaultLoaderReflectionRoutineBuilder(LoaderSourceCompat.loaderOf(fragment),
           instanceOf(TestClass.class)).withConfiguration((WrapperConfiguration) null);
 
       fail();
@@ -201,8 +203,8 @@ public class LoaderReflectionRoutineCompatFragmentTest
 
     try {
 
-      new DefaultLoaderReflectionRoutineBuilder(loaderFrom(fragment),
-          instanceOf(TestClass.class)).apply((LoaderConfiguration) null);
+      new DefaultLoaderReflectionRoutineBuilder(LoaderSourceCompat.loaderOf(fragment),
+          instanceOf(TestClass.class)).withConfiguration((LoaderConfiguration) null);
 
       fail();
 
@@ -217,7 +219,8 @@ public class LoaderReflectionRoutineCompatFragmentTest
     final TestFragment fragment =
         (TestFragment) activity.getSupportFragmentManager().findFragmentById(R.id.test_fragment);
     final StringContext contextWrapper = new StringContext(activity);
-    assertThat(JRoutineLoaderReflectionCompat.on(loaderFrom(fragment, contextWrapper))
+    assertThat(JRoutineLoaderReflectionCompat.on(
+        LoaderSourceCompat.loaderOf(fragment, contextWrapper))
                                              .with(instanceOf(String.class))
                                              .method("toString")
                                              .invoke()
@@ -233,7 +236,7 @@ public class LoaderReflectionRoutineCompatFragmentTest
 
     try {
 
-      JRoutineLoaderReflectionCompat.on(loaderFrom(fragment))
+      JRoutineLoaderReflectionCompat.on(LoaderSourceCompat.loaderOf(fragment))
                                     .with(instanceOf(DuplicateAnnotation.class))
                                     .method(DuplicateAnnotation.GET);
 
@@ -249,7 +252,8 @@ public class LoaderReflectionRoutineCompatFragmentTest
     final DurationMeasure timeout = seconds(10);
     final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                               .findFragmentById(R.id.test_fragment);
-    final Routine<Object, Object> routine3 = JRoutineLoaderReflectionCompat.on(loaderFrom(fragment))
+    final Routine<Object, Object> routine3 = JRoutineLoaderReflectionCompat.on(
+        LoaderSourceCompat.loaderOf(fragment))
                                                                            .with(instanceOf(
                                                                                TestClass.class))
                                                                            .method(TestClass.THROW);
@@ -285,7 +289,7 @@ public class LoaderReflectionRoutineCompatFragmentTest
 
     try {
 
-      JRoutineLoaderCompat.on(loaderFrom(fragment)).with((ContextInvocationFactory<?, ?>) null);
+      JRoutineLoaderCompat.on(LoaderSourceCompat.loaderOf(fragment)).with((ContextInvocationFactory<?, ?>) null);
 
       fail();
 
@@ -316,7 +320,7 @@ public class LoaderReflectionRoutineCompatFragmentTest
 
     try {
 
-      JRoutineLoaderReflectionCompat.on(loaderFrom(fragment)).with(classOfType((Class<?>) null));
+      JRoutineLoaderReflectionCompat.on(LoaderSourceCompat.loaderOf(fragment)).with(classOfType((Class<?>) null));
 
       fail();
 
@@ -326,7 +330,7 @@ public class LoaderReflectionRoutineCompatFragmentTest
 
     try {
 
-      JRoutineLoaderReflectionCompat.on(loaderFrom(fragment))
+      JRoutineLoaderReflectionCompat.on(LoaderSourceCompat.loaderOf(fragment))
                                     .with(instanceOf(null, Reflection.NO_ARGS));
 
       fail();
@@ -353,7 +357,7 @@ public class LoaderReflectionRoutineCompatFragmentTest
 
     try {
 
-      JRoutineLoaderReflectionCompat.on(loaderFrom(fragment))
+      JRoutineLoaderReflectionCompat.on(LoaderSourceCompat.loaderOf(fragment))
                                     .with(instanceOf(TestClass.class))
                                     .buildProxy(TestClass.class);
 
@@ -365,7 +369,7 @@ public class LoaderReflectionRoutineCompatFragmentTest
 
     try {
 
-      JRoutineLoaderReflectionCompat.on(loaderFrom(fragment))
+      JRoutineLoaderReflectionCompat.on(LoaderSourceCompat.loaderOf(fragment))
                                     .with(instanceOf(TestClass.class))
                                     .buildProxy(ClassToken.tokenOf(TestClass.class));
 
@@ -383,7 +387,7 @@ public class LoaderReflectionRoutineCompatFragmentTest
 
     try {
 
-      JRoutineLoaderReflectionCompat.on(loaderFrom(fragment))
+      JRoutineLoaderReflectionCompat.on(LoaderSourceCompat.loaderOf(fragment))
                                     .with(instanceOf(Sum.class))
                                     .buildProxy(SumError.class)
                                     .compute(1, new int[0]);
@@ -396,7 +400,7 @@ public class LoaderReflectionRoutineCompatFragmentTest
 
     try {
 
-      JRoutineLoaderReflectionCompat.on(loaderFrom(fragment))
+      JRoutineLoaderReflectionCompat.on(LoaderSourceCompat.loaderOf(fragment))
                                     .with(instanceOf(Sum.class))
                                     .buildProxy(SumError.class)
                                     .compute(new String[0]);
@@ -409,7 +413,7 @@ public class LoaderReflectionRoutineCompatFragmentTest
 
     try {
 
-      JRoutineLoaderReflectionCompat.on(loaderFrom(fragment))
+      JRoutineLoaderReflectionCompat.on(LoaderSourceCompat.loaderOf(fragment))
                                     .with(instanceOf(Sum.class))
                                     .buildProxy(SumError.class)
                                     .compute(new int[0]);
@@ -422,7 +426,7 @@ public class LoaderReflectionRoutineCompatFragmentTest
 
     try {
 
-      JRoutineLoaderReflectionCompat.on(loaderFrom(fragment))
+      JRoutineLoaderReflectionCompat.on(LoaderSourceCompat.loaderOf(fragment))
                                     .with(instanceOf(Sum.class))
                                     .buildProxy(SumError.class)
                                     .compute(Collections.<Integer>emptyList());
@@ -437,7 +441,7 @@ public class LoaderReflectionRoutineCompatFragmentTest
 
     try {
 
-      JRoutineLoaderReflectionCompat.on(loaderFrom(fragment))
+      JRoutineLoaderReflectionCompat.on(LoaderSourceCompat.loaderOf(fragment))
                                     .with(instanceOf(Sum.class))
                                     .buildProxy(SumError.class)
                                     .compute(channel);
@@ -450,7 +454,7 @@ public class LoaderReflectionRoutineCompatFragmentTest
 
     try {
 
-      JRoutineLoaderReflectionCompat.on(loaderFrom(fragment))
+      JRoutineLoaderReflectionCompat.on(LoaderSourceCompat.loaderOf(fragment))
                                     .with(instanceOf(Sum.class))
                                     .buildProxy(SumError.class)
                                     .compute(1, channel);
@@ -469,7 +473,7 @@ public class LoaderReflectionRoutineCompatFragmentTest
 
     try {
 
-      JRoutineLoaderReflectionCompat.on(loaderFrom(fragment))
+      JRoutineLoaderReflectionCompat.on(LoaderSourceCompat.loaderOf(fragment))
                                     .with(instanceOf(TestClass.class))
                                     .withInvocation()
                                     .withOutputTimeout(indefiniteTime())
@@ -485,7 +489,7 @@ public class LoaderReflectionRoutineCompatFragmentTest
 
     try {
 
-      JRoutineLoaderReflectionCompat.on(loaderFrom(fragment))
+      JRoutineLoaderReflectionCompat.on(LoaderSourceCompat.loaderOf(fragment))
                                     .with(instanceOf(TestClass.class))
                                     .withInvocation()
                                     .withOutputTimeout(indefiniteTime())
@@ -501,7 +505,7 @@ public class LoaderReflectionRoutineCompatFragmentTest
 
     try {
 
-      JRoutineLoaderReflectionCompat.on(loaderFrom(fragment))
+      JRoutineLoaderReflectionCompat.on(LoaderSourceCompat.loaderOf(fragment))
                                     .with(instanceOf(TestClass.class))
                                     .withInvocation()
                                     .withOutputTimeout(indefiniteTime())
@@ -523,7 +527,7 @@ public class LoaderReflectionRoutineCompatFragmentTest
 
     try {
 
-      JRoutineLoaderReflectionCompat.on(loaderFrom(fragment))
+      JRoutineLoaderReflectionCompat.on(LoaderSourceCompat.loaderOf(fragment))
                                     .with(instanceOf(Count.class))
                                     .buildProxy(CountError.class)
                                     .count(3);
@@ -536,7 +540,7 @@ public class LoaderReflectionRoutineCompatFragmentTest
 
     try {
 
-      JRoutineLoaderReflectionCompat.on(loaderFrom(fragment))
+      JRoutineLoaderReflectionCompat.on(LoaderSourceCompat.loaderOf(fragment))
                                     .with(instanceOf(Count.class))
                                     .buildProxy(CountError.class)
                                     .count1(3);
@@ -549,7 +553,7 @@ public class LoaderReflectionRoutineCompatFragmentTest
 
     try {
 
-      JRoutineLoaderReflectionCompat.on(loaderFrom(fragment))
+      JRoutineLoaderReflectionCompat.on(LoaderSourceCompat.loaderOf(fragment))
                                     .with(instanceOf(Count.class))
                                     .buildProxy(CountError.class)
                                     .countList(3);
@@ -562,7 +566,7 @@ public class LoaderReflectionRoutineCompatFragmentTest
 
     try {
 
-      JRoutineLoaderReflectionCompat.on(loaderFrom(fragment))
+      JRoutineLoaderReflectionCompat.on(LoaderSourceCompat.loaderOf(fragment))
                                     .with(instanceOf(Count.class))
                                     .buildProxy(CountError.class)
                                     .countList1(3);
@@ -579,7 +583,8 @@ public class LoaderReflectionRoutineCompatFragmentTest
     final DurationMeasure timeout = seconds(10);
     final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                               .findFragmentById(R.id.test_fragment);
-    final Routine<Object, Object> routine2 = JRoutineLoaderReflectionCompat.on(loaderFrom(fragment))
+    final Routine<Object, Object> routine2 = JRoutineLoaderReflectionCompat.on(
+        LoaderSourceCompat.loaderOf(fragment))
                                                                            .with(instanceOf(
                                                                                TestClass.class))
                                                                            .withInvocation()
@@ -603,7 +608,8 @@ public class LoaderReflectionRoutineCompatFragmentTest
     final DurationMeasure timeout = seconds(10);
     final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                               .findFragmentById(R.id.test_fragment);
-    final Routine<Object, Object> routine1 = JRoutineLoaderReflectionCompat.on(loaderFrom(fragment))
+    final Routine<Object, Object> routine1 = JRoutineLoaderReflectionCompat.on(
+        LoaderSourceCompat.loaderOf(fragment))
                                                                            .with(instanceOf(
                                                                                TestClass.class))
                                                                            .withInvocation()
@@ -622,7 +628,7 @@ public class LoaderReflectionRoutineCompatFragmentTest
 
     try {
 
-      JRoutineLoaderReflectionCompat.on(loaderFrom(fragment))
+      JRoutineLoaderReflectionCompat.on(LoaderSourceCompat.loaderOf(fragment))
                                     .with(instanceOf(TestClass.class))
                                     .method("test");
 
@@ -640,7 +646,7 @@ public class LoaderReflectionRoutineCompatFragmentTest
 
     try {
 
-      JRoutineLoaderReflectionCompat.on(loaderFrom(fragment))
+      JRoutineLoaderReflectionCompat.on(LoaderSourceCompat.loaderOf(fragment))
                                     .with(instanceOf(TestClass.class))
                                     .method("test");
 
@@ -659,7 +665,7 @@ public class LoaderReflectionRoutineCompatFragmentTest
 
     try {
 
-      JRoutineLoaderReflectionCompat.on(loaderFrom(fragment)).with(null);
+      JRoutineLoaderReflectionCompat.on(LoaderSourceCompat.loaderOf(fragment)).with(null);
 
       fail();
 
@@ -669,7 +675,7 @@ public class LoaderReflectionRoutineCompatFragmentTest
 
     try {
 
-      JRoutineLoaderReflectionCompat.on(loaderFrom(fragment)).with(instanceOf(null));
+      JRoutineLoaderReflectionCompat.on(LoaderSourceCompat.loaderOf(fragment)).with(instanceOf(null));
 
       fail();
 
@@ -686,7 +692,7 @@ public class LoaderReflectionRoutineCompatFragmentTest
 
     try {
 
-      JRoutineLoaderReflectionCompat.on(loaderFrom(fragment))
+      JRoutineLoaderReflectionCompat.on(LoaderSourceCompat.loaderOf(fragment))
                                     .with(instanceOf(TestClass.class))
                                     .buildProxy((Class<?>) null);
 
@@ -698,7 +704,7 @@ public class LoaderReflectionRoutineCompatFragmentTest
 
     try {
 
-      JRoutineLoaderReflectionCompat.on(loaderFrom(fragment))
+      JRoutineLoaderReflectionCompat.on(LoaderSourceCompat.loaderOf(fragment))
                                     .with(instanceOf(TestClass.class))
                                     .buildProxy((ClassToken<?>) null);
 
@@ -714,7 +720,7 @@ public class LoaderReflectionRoutineCompatFragmentTest
 
     final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                               .findFragmentById(R.id.test_fragment);
-    final Itf itf = JRoutineLoaderReflectionCompat.on(loaderFrom(fragment))
+    final Itf itf = JRoutineLoaderReflectionCompat.on(LoaderSourceCompat.loaderOf(fragment))
                                                   .with(instanceOf(Impl.class))
                                                   .withInvocation()
                                                   .withOutputTimeout(seconds(10))
@@ -842,7 +848,7 @@ public class LoaderReflectionRoutineCompatFragmentTest
     final DurationMeasure timeout = seconds(10);
     final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                               .findFragmentById(R.id.test_fragment);
-    final SquareItf squareAsync = JRoutineLoaderReflectionCompat.on(loaderFrom(fragment))
+    final SquareItf squareAsync = JRoutineLoaderReflectionCompat.on(LoaderSourceCompat.loaderOf(fragment))
                                                                 .with(instanceOf(Square.class))
                                                                 .buildProxy(SquareItf.class);
 
@@ -858,7 +864,7 @@ public class LoaderReflectionRoutineCompatFragmentTest
     final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                               .findFragmentById(R.id.test_fragment);
     final LoaderReflectionRoutineBuilder builder =
-        JRoutineLoaderReflectionCompat.on(loaderFrom(fragment))
+        JRoutineLoaderReflectionCompat.on(LoaderSourceCompat.loaderOf(fragment))
                                       .with(instanceOf(TestClass2.class))
                                       .withInvocation()
                                       .withOutputTimeout(seconds(10))
@@ -897,14 +903,14 @@ public class LoaderReflectionRoutineCompatFragmentTest
 
     final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                               .findFragmentById(R.id.test_fragment);
-    assertThat(JRoutineLoaderReflectionCompat.on(loaderFrom(fragment))
+    assertThat(JRoutineLoaderReflectionCompat.on(LoaderSourceCompat.loaderOf(fragment))
                                              .with(instanceOf(TestTimeout.class))
                                              .withInvocation()
                                              .withOutputTimeout(seconds(10))
                                              .configuration()
-                                             .loaderConfiguration()
+                                             .withLoader()
                                              .withLoaderId(0)
-                                             .apply()
+                                             .configuration()
                                              .method("test")
                                              .invoke()
                                              .close()
@@ -912,14 +918,14 @@ public class LoaderReflectionRoutineCompatFragmentTest
 
     try {
 
-      JRoutineLoaderReflectionCompat.on(loaderFrom(fragment))
+      JRoutineLoaderReflectionCompat.on(LoaderSourceCompat.loaderOf(fragment))
                                     .with(instanceOf(TestTimeout.class))
                                     .withInvocation()
                                     .withOutputTimeoutAction(TimeoutActionType.FAIL)
                                     .configuration()
-                                    .loaderConfiguration()
+                                    .withLoader()
                                     .withLoaderId(1)
-                                    .apply()
+                                    .configuration()
                                     .method("test")
                                     .invoke()
                                     .close()
@@ -931,14 +937,14 @@ public class LoaderReflectionRoutineCompatFragmentTest
 
     }
 
-    assertThat(JRoutineLoaderReflectionCompat.on(loaderFrom(fragment))
+    assertThat(JRoutineLoaderReflectionCompat.on(LoaderSourceCompat.loaderOf(fragment))
                                              .with(instanceOf(TestTimeout.class))
                                              .withInvocation()
                                              .withOutputTimeout(seconds(10))
                                              .configuration()
-                                             .loaderConfiguration()
+                                             .withLoader()
                                              .withLoaderId(2)
-                                             .apply()
+                                             .configuration()
                                              .method("getInt")
                                              .invoke()
                                              .close()
@@ -946,14 +952,14 @@ public class LoaderReflectionRoutineCompatFragmentTest
 
     try {
 
-      JRoutineLoaderReflectionCompat.on(loaderFrom(fragment))
+      JRoutineLoaderReflectionCompat.on(LoaderSourceCompat.loaderOf(fragment))
                                     .with(instanceOf(TestTimeout.class))
                                     .withInvocation()
                                     .withOutputTimeoutAction(TimeoutActionType.FAIL)
                                     .configuration()
-                                    .loaderConfiguration()
+                                    .withLoader()
                                     .withLoaderId(3)
-                                    .apply()
+                                    .configuration()
                                     .method("getInt")
                                     .invoke()
                                     .close()
@@ -965,14 +971,14 @@ public class LoaderReflectionRoutineCompatFragmentTest
 
     }
 
-    assertThat(JRoutineLoaderReflectionCompat.on(loaderFrom(fragment))
+    assertThat(JRoutineLoaderReflectionCompat.on(LoaderSourceCompat.loaderOf(fragment))
                                              .with(instanceOf(TestTimeout.class))
                                              .withInvocation()
                                              .withOutputTimeout(seconds(10))
                                              .configuration()
-                                             .loaderConfiguration()
+                                             .withLoader()
                                              .withLoaderId(4)
-                                             .apply()
+                                             .configuration()
                                              .method(TestTimeout.class.getMethod("getInt"))
                                              .invoke()
                                              .close()
@@ -980,14 +986,14 @@ public class LoaderReflectionRoutineCompatFragmentTest
 
     try {
 
-      JRoutineLoaderReflectionCompat.on(loaderFrom(fragment))
+      JRoutineLoaderReflectionCompat.on(LoaderSourceCompat.loaderOf(fragment))
                                     .with(instanceOf(TestTimeout.class))
                                     .withInvocation()
                                     .withOutputTimeoutAction(TimeoutActionType.FAIL)
                                     .configuration()
-                                    .loaderConfiguration()
+                                    .withLoader()
                                     .withLoaderId(5)
-                                    .apply()
+                                    .configuration()
                                     .method(TestTimeout.class.getMethod("getInt"))
                                     .invoke()
                                     .close()
@@ -999,27 +1005,27 @@ public class LoaderReflectionRoutineCompatFragmentTest
 
     }
 
-    assertThat(JRoutineLoaderReflectionCompat.on(loaderFrom(fragment))
+    assertThat(JRoutineLoaderReflectionCompat.on(LoaderSourceCompat.loaderOf(fragment))
                                              .with(instanceOf(TestTimeout.class))
                                              .withInvocation()
                                              .withOutputTimeout(seconds(10))
                                              .configuration()
-                                             .loaderConfiguration()
+                                             .withLoader()
                                              .withLoaderId(6)
-                                             .apply()
+                                             .configuration()
                                              .buildProxy(TestTimeoutItf.class)
                                              .getInt()).isEqualTo(31);
 
     try {
 
-      JRoutineLoaderReflectionCompat.on(loaderFrom(fragment))
+      JRoutineLoaderReflectionCompat.on(LoaderSourceCompat.loaderOf(fragment))
                                     .with(instanceOf(TestTimeout.class))
                                     .withInvocation()
                                     .withOutputTimeoutAction(TimeoutActionType.FAIL)
                                     .configuration()
-                                    .loaderConfiguration()
+                                    .withLoader()
                                     .withLoaderId(7)
-                                    .apply()
+                                    .configuration()
                                     .buildProxy(TestTimeoutItf.class)
                                     .getInt();
 

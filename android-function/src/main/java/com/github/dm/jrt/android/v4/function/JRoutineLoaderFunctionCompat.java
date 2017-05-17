@@ -18,7 +18,7 @@ package com.github.dm.jrt.android.v4.function;
 
 import com.github.dm.jrt.android.function.builder.StatefulLoaderRoutineBuilder;
 import com.github.dm.jrt.android.function.builder.StatelessLoaderRoutineBuilder;
-import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
+import com.github.dm.jrt.android.v4.core.LoaderSourceCompat;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.util.BiConsumer;
 import com.github.dm.jrt.function.util.Supplier;
@@ -63,7 +63,7 @@ public class JRoutineLoaderFunctionCompat {
    * <p>
    * TODO: explain invocationId
    *
-   * @param context      the Loader context.
+   * @param loaderSource the Loader source.
    * @param invocationId the invocation ID.
    * @param <IN>         the input data type.
    * @param <OUT>        the output data type.
@@ -72,9 +72,11 @@ public class JRoutineLoaderFunctionCompat {
    */
   @NotNull
   public static <IN, OUT, STATE> StatefulLoaderRoutineBuilder<IN, OUT, STATE> stateful(
-      @NotNull final LoaderContextCompat context, final int invocationId) {
-    return new DefaultStatefulLoaderRoutineBuilderCompat<IN, OUT, STATE>(
-        context).loaderConfiguration().withInvocationId(invocationId).apply();
+      @NotNull final LoaderSourceCompat loaderSource, final int invocationId) {
+    return new DefaultStatefulLoaderRoutineBuilderCompat<IN, OUT, STATE>(loaderSource).withLoader()
+                                                                                      .withInvocationId(
+                                                                                          invocationId)
+                                                                                      .configuration();
   }
 
   /**
@@ -94,16 +96,16 @@ public class JRoutineLoaderFunctionCompat {
    */
   @NotNull
   public static <IN, OUT> StatefulLoaderRoutineBuilder<IN, OUT, ? extends List<IN>> statefulList(
-      @NotNull final LoaderContextCompat context, final int invocationId) {
+      @NotNull final LoaderSourceCompat context, final int invocationId) {
     final Supplier<? extends List<IN>> onCreate = listSupplier();
     final BiConsumer<? super List<IN>, ? super IN> onNext = listConsumer();
     final DefaultStatefulLoaderRoutineBuilderCompat<IN, OUT, List<IN>> builder =
         new DefaultStatefulLoaderRoutineBuilderCompat<IN, OUT, List<IN>>(context);
     return builder.onCreate(onCreate)
                   .onNextConsume(onNext)
-                  .loaderConfiguration()
+                  .withLoader()
                   .withInvocationId(invocationId)
-                  .apply();
+                  .configuration();
   }
 
   /**
@@ -124,11 +126,11 @@ public class JRoutineLoaderFunctionCompat {
    */
   @NotNull
   public static <IN, OUT> StatelessLoaderRoutineBuilder<IN, OUT> stateless(
-      @NotNull final LoaderContextCompat context, final int invocationId) {
-    return new DefaultStatelessLoaderRoutineBuilderCompat<IN, OUT>(context).loaderConfiguration()
+      @NotNull final LoaderSourceCompat context, final int invocationId) {
+    return new DefaultStatelessLoaderRoutineBuilderCompat<IN, OUT>(context).withLoader()
                                                                            .withInvocationId(
                                                                                invocationId)
-                                                                           .apply();
+                                                                           .configuration();
   }
 
   @NotNull

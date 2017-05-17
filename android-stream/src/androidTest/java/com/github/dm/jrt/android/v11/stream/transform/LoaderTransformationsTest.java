@@ -21,13 +21,14 @@ import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
+import com.github.dm.jrt.android.v11.core.LoaderSource;
 import com.github.dm.jrt.android.v11.stream.TestActivity;
 import com.github.dm.jrt.function.util.Function;
 import com.github.dm.jrt.function.util.Predicate;
 import com.github.dm.jrt.operator.JRoutineOperators;
 import com.github.dm.jrt.stream.JRoutineStream;
 
-import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
+import static com.github.dm.jrt.android.v11.core.LoaderSource.loaderFrom;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 
 /**
@@ -65,10 +66,10 @@ public class LoaderTransformationsTest extends ActivityInstrumentationTestCase2<
                              })
                              .map(JRoutineOperators.<Integer, Integer>sum(Integer.class))
                              .lift(LoaderTransformations.<String, Integer>runOn(
-                                 loaderFrom(getActivity())).loaderConfiguration()
-                                                           .withInvocationId(12)
-                                                           .apply()
-                                                           .buildFunction())
+                                 LoaderSource.loaderOf(getActivity())).withLoader()
+                                                                      .withInvocationId(12)
+                                                                      .configuration()
+                                                                      .buildFunction())
                              .invoke()
                              .close()
                              .in(seconds(10))

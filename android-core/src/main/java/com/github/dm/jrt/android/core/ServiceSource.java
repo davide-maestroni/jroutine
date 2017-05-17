@@ -30,18 +30,18 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.ref.WeakReference;
 
 /**
- * Class representing an Android Service context.
+ * Class representing an Android Service source.
  * <p>
- * No strong reference to the wrapped contexts will be retained by this class implementations.
+ * No strong reference to the wrapped Context will be retained by this class implementations.
  * <p>
  * Created by davide-maestroni on 07/11/2015.
  */
-public abstract class ServiceContext {
+public abstract class ServiceSource {
 
   /**
    * Avoid explicit instantiation.
    */
-  private ServiceContext() {
+  private ServiceSource() {
   }
 
   /**
@@ -54,8 +54,8 @@ public abstract class ServiceContext {
    * @return the Service context.
    */
   @NotNull
-  public static ServiceContext serviceFrom(@NotNull final Context context) {
-    return serviceFrom(context, InvocationService.class);
+  public static ServiceSource serviceOf(@NotNull final Context context) {
+    return serviceOf(context, InvocationService.class);
   }
 
   /**
@@ -66,9 +66,9 @@ public abstract class ServiceContext {
    * @return the Service context.
    */
   @NotNull
-  public static ServiceContext serviceFrom(@NotNull final Context context,
+  public static ServiceSource serviceOf(@NotNull final Context context,
       @NotNull final Class<? extends InvocationService> serviceClass) {
-    return new IntentServiceContext(context, new Intent(context, serviceClass));
+    return new IntentServiceSource(context, new Intent(context, serviceClass));
   }
 
   /**
@@ -82,7 +82,7 @@ public abstract class ServiceContext {
    *                                            inherit from {@link InvocationService}.
    */
   @NotNull
-  public static ServiceContext serviceFrom(@NotNull final Context context,
+  public static ServiceSource serviceOf(@NotNull final Context context,
       @NotNull final Intent service) {
     final ComponentName component = service.getComponent();
     try {
@@ -96,7 +96,7 @@ public abstract class ServiceContext {
       throw new IllegalArgumentException(e);
     }
 
-    return new IntentServiceContext(context, service);
+    return new IntentServiceSource(context, service);
   }
 
   private static boolean bundleEquals(@Nullable final Bundle bundle1,
@@ -161,7 +161,7 @@ public abstract class ServiceContext {
    * @return the Context.
    */
   @Nullable
-  public abstract Context getServiceContext();
+  public abstract Context getContext();
 
   /**
    * Returns the Service Intent.
@@ -169,12 +169,12 @@ public abstract class ServiceContext {
    * @return the Intent.
    */
   @NotNull
-  public abstract Intent getServiceIntent();
+  public abstract Intent getIntent();
 
   /**
    * Service context wrapping a Service Intent.
    */
-  private static class IntentServiceContext extends ServiceContext {
+  private static class IntentServiceSource extends ServiceSource {
 
     private final WeakReference<Context> mContext;
 
@@ -186,7 +186,7 @@ public abstract class ServiceContext {
      * @param context the Context.
      * @param service the Service Intent.
      */
-    private IntentServiceContext(@NotNull final Context context, @NotNull final Intent service) {
+    private IntentServiceSource(@NotNull final Context context, @NotNull final Intent service) {
       mContext = new WeakReference<Context>(ConstantConditions.notNull("Service context", context));
       mIntent = ConstantConditions.notNull("Service Intent", service);
     }
@@ -197,11 +197,11 @@ public abstract class ServiceContext {
         return true;
       }
 
-      if (!(o instanceof IntentServiceContext)) {
+      if (!(o instanceof IntentServiceSource)) {
         return false;
       }
 
-      final IntentServiceContext that = (IntentServiceContext) o;
+      final IntentServiceSource that = (IntentServiceSource) o;
       final Context referent = mContext.get();
       return (referent != null) && referent.equals(that.mContext.get()) && mIntent.filterEquals(
           that.mIntent) && bundleEquals(mIntent.getExtras(), that.mIntent.getExtras());
@@ -218,13 +218,13 @@ public abstract class ServiceContext {
 
     @Nullable
     @Override
-    public Context getServiceContext() {
+    public Context getContext() {
       return mContext.get();
     }
 
     @NotNull
     @Override
-    public Intent getServiceIntent() {
+    public Intent getIntent() {
       return mIntent;
     }
   }

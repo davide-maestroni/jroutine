@@ -57,7 +57,7 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
 
   @NotNull
   @Override
-  public ServiceProxyObjectBuilder<TYPE> apply(@NotNull final ServiceConfiguration configuration) {
+  public ServiceProxyObjectBuilder<TYPE> withConfiguration(@NotNull final ServiceConfiguration configuration) {
     mServiceConfiguration = ConstantConditions.notNull("Service configuration", configuration);
     return this;
   }
@@ -161,8 +161,7 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
 
   @NotNull
   @Override
-  public ServiceConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>>
-  serviceConfiguration() {
+  public ServiceConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>> withService() {
     final ServiceConfiguration config = mServiceConfiguration;
     return new ServiceConfiguration.Builder<ServiceProxyObjectBuilder<TYPE>>(this, config);
   }

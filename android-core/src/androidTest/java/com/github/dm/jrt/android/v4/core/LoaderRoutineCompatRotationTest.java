@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 
 import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.factoryOf;
-import static com.github.dm.jrt.android.v4.core.LoaderContextCompat.loaderFrom;
 import static com.github.dm.jrt.core.util.DurationMeasure.noTime;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -60,16 +59,14 @@ public class LoaderRoutineCompatRotationTest
     }
 
     final DurationMeasure timeout = DurationMeasure.seconds(10);
-    final Routine<String, String> routine = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
-                                                                .with(factoryOf(ToUpperCase.class))
-                                                                .loaderConfiguration()
-                                                                .withLoaderId(0)
-                                                                .withClashResolution(
-                                                                    ClashResolutionType.JOIN)
-                                                                .withResultStaleTime(
-                                                                    DurationMeasure.minutes(1))
-                                                                .apply()
-                                                                .buildRoutine();
+    final Routine<String, String> routine =
+        JRoutineLoaderCompat.routineOn(LoaderSourceCompat.loaderOf(getActivity()))
+                            .withLoader()
+                            .withLoaderId(0)
+                            .withClashResolution(ClashResolutionType.JOIN)
+                            .withResultStaleTime(DurationMeasure.minutes(1))
+                            .configuration()
+                            .of(factoryOf(ToUpperCase.class));
     routine.invoke().pass("test1").close();
 
     simulateRotation();
@@ -85,14 +82,14 @@ public class LoaderRoutineCompatRotationTest
     }
 
     final DurationMeasure timeout = DurationMeasure.seconds(10);
-    JRoutineLoaderCompat.on(loaderFrom(getActivity()))
-                        .with(factoryOf(ToUpperCase.class))
+    JRoutineLoaderCompat.routineOn(LoaderSourceCompat.loaderOf(getActivity()))
                         .withInvocation()
                         .withOutputOrder(OrderType.SORTED)
                         .configuration()
-                        .loaderConfiguration()
+                        .withLoader()
                         .withLoaderId(0)
-                        .apply()
+                        .configuration()
+                        .of(factoryOf(ToUpperCase.class))
                         .invoke()
                         .pass("test1", "test2")
                         .close();
@@ -100,7 +97,7 @@ public class LoaderRoutineCompatRotationTest
     simulateRotation();
 
     final Channel<?, String> channel =
-        JRoutineLoaderCompat.on(loaderFrom(getActivity())).withId(0).buildChannel();
+        JRoutineLoaderCompat.channelOn(LoaderSourceCompat.loaderOf(getActivity()), 0).ofType();
 
     assertThat(channel.in(timeout).all()).containsExactly("TEST1", "TEST2");
   }
@@ -113,17 +110,17 @@ public class LoaderRoutineCompatRotationTest
     }
 
     final DurationMeasure timeout = DurationMeasure.seconds(10);
-    final Routine<String, String> routine1 = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
-                                                                 .with(factoryOf(ToUpperCase.class))
-                                                                 .buildRoutine();
+    final Routine<String, String> routine1 =
+        JRoutineLoaderCompat.routineOn(LoaderSourceCompat.loaderOf(getActivity()))
+                            .of(factoryOf(ToUpperCase.class));
     routine1.invoke().pass("test1").close();
     routine1.invoke().pass("test2").close();
 
     simulateRotation();
 
-    final Routine<String, String> routine2 = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
-                                                                 .with(factoryOf(ToUpperCase.class))
-                                                                 .buildRoutine();
+    final Routine<String, String> routine2 =
+        JRoutineLoaderCompat.routineOn(LoaderSourceCompat.loaderOf(getActivity()))
+                            .of(factoryOf(ToUpperCase.class));
     final Channel<?, String> result1 = routine2.invoke().pass("test1").close().in(timeout);
     final Channel<?, String> result2 = routine2.invoke().pass("test2").close().in(timeout);
 
@@ -140,17 +137,17 @@ public class LoaderRoutineCompatRotationTest
 
     final DurationMeasure timeout = DurationMeasure.seconds(10);
     final Data data1 = new Data();
-    final Routine<Data, Data> routine1 = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
-                                                             .with(factoryOf(Delay.class))
-                                                             .buildRoutine();
+    final Routine<Data, Data> routine1 =
+        JRoutineLoaderCompat.routineOn(LoaderSourceCompat.loaderOf(getActivity()))
+                            .of(factoryOf(Delay.class));
     routine1.invoke().pass(data1).close();
     routine1.invoke().pass(data1).close();
 
     simulateRotation();
 
-    final Routine<Data, Data> routine2 = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
-                                                             .with(factoryOf(Delay.class))
-                                                             .buildRoutine();
+    final Routine<Data, Data> routine2 =
+        JRoutineLoaderCompat.routineOn(LoaderSourceCompat.loaderOf(getActivity()))
+                            .of(factoryOf(Delay.class));
     final Channel<?, Data> result1 = routine2.invoke().pass(data1).close().in(timeout);
     final Channel<?, Data> result2 = routine2.invoke().pass(data1).close().in(timeout);
 
@@ -166,15 +163,14 @@ public class LoaderRoutineCompatRotationTest
     }
 
     final DurationMeasure timeout = DurationMeasure.seconds(10);
-    final Routine<String, String> routine = JRoutineLoaderCompat.on(loaderFrom(getActivity()))
-                                                                .with(factoryOf(ToUpperCase.class))
-                                                                .loaderConfiguration()
-                                                                .withLoaderId(0)
-                                                                .withClashResolution(
-                                                                    ClashResolutionType.JOIN)
-                                                                .withResultStaleTime(noTime())
-                                                                .apply()
-                                                                .buildRoutine();
+    final Routine<String, String> routine =
+        JRoutineLoaderCompat.routineOn(LoaderSourceCompat.loaderOf(getActivity()))
+                            .withLoader()
+                            .withLoaderId(0)
+                            .withClashResolution(ClashResolutionType.JOIN)
+                            .withResultStaleTime(noTime())
+                            .configuration()
+                            .of(factoryOf(ToUpperCase.class));
     routine.invoke().pass("test1").close();
 
     simulateRotation();

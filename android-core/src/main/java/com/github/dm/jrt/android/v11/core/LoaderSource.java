@@ -33,19 +33,19 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.ref.WeakReference;
 
 /**
- * Class representing an Android Loader context (like Activities or Fragments).
+ * Class representing an Android Loader source (like Activities or Fragments).
  * <p>
  * No strong reference to the wrapped objects will be retained by this class implementations.
  * <p>
  * Created by davide-maestroni on 07/08/2015.
  */
 @TargetApi(VERSION_CODES.HONEYCOMB)
-public abstract class LoaderContext {
+public abstract class LoaderSource {
 
   /**
    * Avoid explicit instantiation.
    */
-  private LoaderContext() {
+  private LoaderSource() {
   }
 
   /**
@@ -55,9 +55,9 @@ public abstract class LoaderContext {
    * @return the Loader context.
    */
   @NotNull
-  public static LoaderContext loaderFrom(@NotNull final Activity activity) {
+  public static LoaderSource loaderOf(@NotNull final Activity activity) {
     checkVersion();
-    return new ActivityContext(activity, activity);
+    return new ActivitySource(activity, activity);
   }
 
   /**
@@ -73,10 +73,10 @@ public abstract class LoaderContext {
    *                                            static scope.
    */
   @NotNull
-  public static LoaderContext loaderFrom(@NotNull final Activity activity,
+  public static LoaderSource loaderOf(@NotNull final Activity activity,
       @NotNull final Context context) {
     checkVersion();
-    return new ActivityContext(activity, context);
+    return new ActivitySource(activity, context);
   }
 
   /**
@@ -86,9 +86,9 @@ public abstract class LoaderContext {
    * @return the Loader context.
    */
   @NotNull
-  public static LoaderContext loaderFrom(@NotNull final Fragment fragment) {
+  public static LoaderSource loaderOf(@NotNull final Fragment fragment) {
     checkVersion();
-    return new FragmentContext(fragment, fragment.getActivity());
+    return new FragmentSource(fragment, fragment.getActivity());
   }
 
   /**
@@ -104,10 +104,10 @@ public abstract class LoaderContext {
    *                                            static scope.
    */
   @NotNull
-  public static LoaderContext loaderFrom(@NotNull final Fragment fragment,
+  public static LoaderSource loaderOf(@NotNull final Fragment fragment,
       @NotNull final Context context) {
     checkVersion();
-    return new FragmentContext(fragment, context);
+    return new FragmentSource(fragment, context);
   }
 
   private static void checkVersion() {
@@ -147,7 +147,7 @@ public abstract class LoaderContext {
    * Loader context wrapping an Activity.
    */
   @TargetApi(VERSION_CODES.HONEYCOMB)
-  private static class ActivityContext extends LoaderContext {
+  private static class ActivitySource extends LoaderSource {
 
     private final WeakReference<Activity> mActivity;
 
@@ -161,7 +161,7 @@ public abstract class LoaderContext {
      * @throws java.lang.IllegalArgumentException if the class of the specified Context has not
      *                                            a static scope.
      */
-    private ActivityContext(@NotNull final Activity activity, @NotNull final Context context) {
+    private ActivitySource(@NotNull final Activity activity, @NotNull final Context context) {
       mActivity = new WeakReference<Activity>(ConstantConditions.notNull("Activity", activity));
       final Class<? extends Context> contextClass = context.getClass();
       if (!Reflection.hasStaticScope(contextClass)) {
@@ -178,11 +178,11 @@ public abstract class LoaderContext {
         return true;
       }
 
-      if (!(o instanceof ActivityContext)) {
+      if (!(o instanceof ActivitySource)) {
         return false;
       }
 
-      final ActivityContext that = (ActivityContext) o;
+      final ActivitySource that = (ActivitySource) o;
       final Activity activity = mActivity.get();
       if ((activity == null) || !activity.equals(that.mActivity.get())) {
         return false;
@@ -225,7 +225,7 @@ public abstract class LoaderContext {
    * Loader context wrapping a Fragment.
    */
   @TargetApi(VERSION_CODES.HONEYCOMB)
-  private static class FragmentContext extends LoaderContext {
+  private static class FragmentSource extends LoaderSource {
 
     private final WeakReference<Context> mContext;
 
@@ -239,7 +239,7 @@ public abstract class LoaderContext {
      * @throws java.lang.IllegalArgumentException if the class of the specified Context has not
      *                                            a static scope.
      */
-    private FragmentContext(@NotNull final Fragment fragment, @NotNull final Context context) {
+    private FragmentSource(@NotNull final Fragment fragment, @NotNull final Context context) {
       mFragment = new WeakReference<Fragment>(ConstantConditions.notNull("Fragment", fragment));
       final Class<? extends Context> contextClass = context.getClass();
       if (!Reflection.hasStaticScope(contextClass)) {
@@ -256,11 +256,11 @@ public abstract class LoaderContext {
         return true;
       }
 
-      if (!(o instanceof FragmentContext)) {
+      if (!(o instanceof FragmentSource)) {
         return false;
       }
 
-      final FragmentContext that = (FragmentContext) o;
+      final FragmentSource that = (FragmentSource) o;
       final Fragment fragment = mFragment.get();
       if ((fragment == null) || !fragment.equals(that.mFragment.get())) {
         return false;

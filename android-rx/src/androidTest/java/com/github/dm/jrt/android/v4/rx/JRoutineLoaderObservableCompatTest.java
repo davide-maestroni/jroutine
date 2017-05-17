@@ -21,6 +21,7 @@ import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.github.dm.jrt.android.rx.test.R;
+import com.github.dm.jrt.android.v4.core.LoaderSourceCompat;
 
 import java.util.Arrays;
 import java.util.List;
@@ -34,7 +35,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 
-import static com.github.dm.jrt.android.v4.core.LoaderContextCompat.loaderFrom;
+import static com.github.dm.jrt.android.v4.core.LoaderSourceCompat.loaderFrom;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -72,7 +73,7 @@ public class JRoutineLoaderObservableCompatTest
                                 .loaderConfiguration()
                                 .withResultStaleTime(seconds(10))
                                 .apply()
-                                .observeOn(loaderFrom(getActivity()))
+                                .observeOn(LoaderSourceCompat.loaderOf(getActivity()))
                                 .subscribe(new Consumer<String>() {
 
                                   @Override
@@ -111,7 +112,7 @@ public class JRoutineLoaderObservableCompatTest
                                 .loaderConfiguration()
                                 .withResultStaleTime(seconds(10))
                                 .apply()
-                                .subscribeOn(loaderFrom(getActivity()))
+                                .subscribeOn(LoaderSourceCompat.loaderOf(getActivity()))
                                 .map(new Function<String, String>() {
 
                                   @Override
@@ -157,7 +158,7 @@ public class JRoutineLoaderObservableCompatTest
           public String apply(final String s) {
             return s.toUpperCase();
           }
-        })).observeOn(loaderFrom(fragment)).subscribe(new Consumer<String>() {
+        })).observeOn(LoaderSourceCompat.loaderOf(fragment)).subscribe(new Consumer<String>() {
 
       @Override
       public void accept(final String s) {
@@ -188,7 +189,7 @@ public class JRoutineLoaderObservableCompatTest
     final List<String> expected = Arrays.asList("TEST1", "TEST2", "TEST3");
     final AtomicBoolean isSuccess = new AtomicBoolean(true);
     JRoutineLoaderFlowableCompat.with(Flowable.just("test1", "test2", "test3"))
-                                .subscribeOn(loaderFrom(fragment))
+                                .subscribeOn(LoaderSourceCompat.loaderOf(fragment))
                                 .map(new Function<String, String>() {
 
                                   @Override

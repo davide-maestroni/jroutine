@@ -35,6 +35,7 @@ import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.executor.ScheduledExecutor;
+import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.log.Log;
@@ -364,18 +365,22 @@ public class InvocationService extends Service {
       if (routineState == null) {
         final InvocationConfiguration.Builder<InvocationConfiguration> builder =
             InvocationConfiguration.builder();
+        final ScheduledExecutor executor;
         if (executorClass != null) {
           final ParcelableValue executorValue = data.getParcelable(KEY_EXECUTOR_ARGS);
           final Object[] executorArgs =
               ((executorValue != null) && (executorValue.getValue() != null))
                   ? (Object[]) executorValue.getValue() : Reflection.NO_ARGS;
           try {
-            builder.withExecutor(newInstanceOf(executorClass, executorArgs));
+            executor = newInstanceOf(executorClass, executorArgs);
 
           } catch (final Exception e) {
             mLogger.err(e, "error creating the executor instance");
             throw e;
           }
+
+        } else {
+          executor = ScheduledExecutors.defaultExecutor();
         }
 
         if (logClass != null) {
@@ -394,7 +399,8 @@ public class InvocationService extends Service {
 
         builder.withOutputOrder(outputOrderType).withLogLevel(logLevel);
         final ContextInvocationFactory<?, ?> factory = getInvocationFactory(targetClass, args);
-        final ContextRoutine contextRoutine = new ContextRoutine(this, builder.configuration(), factory);
+        final ContextRoutine contextRoutine =
+            new ContextRoutine(this, executor, builder.configuration(), factory);
         routineState = new RoutineState(contextRoutine);
         routines.put(routineInfo, routineState);
       }
@@ -414,39 +420,40 @@ public class InvocationService extends Service {
 
     private final Context mContext;
 
+    private final ScheduledExecutor mExecutor;
+
     private final ContextInvocationFactory<?, ?> mFactory;
 
     /**
      * Constructor.
      *
      * @param context       the routine Context.
+     * @param executor      the executor instance.
      * @param configuration the invocation configuration.
      * @param factory       the invocation factory.
      */
     private ContextRoutine(@NotNull final Context context,
+        @NotNull final ScheduledExecutor executor,
         @NotNull final InvocationConfiguration configuration,
         @NotNull final ContextInvocationFactory<?, ?> factory) {
-      super(configuration);
+      super(configuration, executor);
       mContext = context;
       mFactory = factory;
+      mExecutor = executor;
     }
 
     @NotNull
     @Override
     @SuppressWarnings("unchecked")
     protected Invocation<Object, Object> newInvocation() throws Exception {
-      final ContextInvocationFactory<?, ?> factory = mFactory;
       getLogger().dbg("creating a new instance");
-      final ContextInvocation<?, ?> invocation = factory.newInvocation();
+      final ContextInvocation<?, ?> invocation = mFactory.newInvocation();
       invocation.onContext(mContext);
       return (Invocation<Object, Object>) invocation;
     }
 
     private void stopExecutor() {
-      final ScheduledExecutor executor = getConfiguration().getExecutorOrElse(null);
-      if (executor != null) {
-        executor.stop();
-      }
+      mExecutor.stop();
     }
   }
 

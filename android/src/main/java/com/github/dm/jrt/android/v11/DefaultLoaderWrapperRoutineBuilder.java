@@ -23,7 +23,7 @@ import com.github.dm.jrt.android.proxy.annotation.LoaderProxy;
 import com.github.dm.jrt.android.proxy.builder.LoaderProxyRoutineBuilder;
 import com.github.dm.jrt.android.reflect.ContextInvocationTarget;
 import com.github.dm.jrt.android.reflect.builder.LoaderReflectionRoutineBuilder;
-import com.github.dm.jrt.android.v11.core.LoaderContext;
+import com.github.dm.jrt.android.v11.core.LoaderSource;
 import com.github.dm.jrt.android.v11.proxy.JRoutineLoaderProxy;
 import com.github.dm.jrt.android.v11.reflect.JRoutineLoaderReflection;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
@@ -44,7 +44,7 @@ import java.lang.reflect.Method;
  */
 class DefaultLoaderWrapperRoutineBuilder implements LoaderWrapperRoutineBuilder {
 
-  private final LoaderContext mContext;
+  private final LoaderSource mContext;
 
   private final ContextInvocationTarget<?> mTarget;
 
@@ -63,7 +63,7 @@ class DefaultLoaderWrapperRoutineBuilder implements LoaderWrapperRoutineBuilder 
    * @param context the Loader context.
    * @param target  the invocation target.
    */
-  DefaultLoaderWrapperRoutineBuilder(@NotNull final LoaderContext context,
+  DefaultLoaderWrapperRoutineBuilder(@NotNull final LoaderSource context,
       @NotNull final ContextInvocationTarget<?> target) {
     mContext = ConstantConditions.notNull("Loader context", context);
     mTarget = ConstantConditions.notNull("invocation target", target);
@@ -124,22 +124,22 @@ class DefaultLoaderWrapperRoutineBuilder implements LoaderWrapperRoutineBuilder 
 
   @NotNull
   @Override
-  public LoaderWrapperRoutineBuilder apply(@NotNull final LoaderConfiguration configuration) {
+  public LoaderWrapperRoutineBuilder withConfiguration(@NotNull final LoaderConfiguration configuration) {
     mLoaderConfiguration = ConstantConditions.notNull("Loader configuration", configuration);
     return this;
   }
 
   @NotNull
   @Override
-  public LoaderConfiguration.Builder<? extends LoaderWrapperRoutineBuilder> loaderConfiguration() {
+  public LoaderConfiguration.Builder<? extends LoaderWrapperRoutineBuilder> withLoader() {
     return new LoaderConfiguration.Builder<LoaderWrapperRoutineBuilder>(
         new LoaderConfiguration.Configurable<LoaderWrapperRoutineBuilder>() {
 
           @NotNull
           @Override
-          public LoaderWrapperRoutineBuilder apply(
+          public LoaderWrapperRoutineBuilder withConfiguration(
               @NotNull final LoaderConfiguration configuration) {
-            return DefaultLoaderWrapperRoutineBuilder.this.apply(configuration);
+            return DefaultLoaderWrapperRoutineBuilder.this.withConfiguration(configuration);
           }
         }, mLoaderConfiguration);
   }
@@ -194,7 +194,7 @@ class DefaultLoaderWrapperRoutineBuilder implements LoaderWrapperRoutineBuilder 
                               .with(mTarget)
                               .withConfiguration(mInvocationConfiguration)
                               .withConfiguration(mWrapperConfiguration)
-                              .apply(mLoaderConfiguration);
+                              .withConfiguration(mLoaderConfiguration);
   }
 
   @NotNull
@@ -203,6 +203,6 @@ class DefaultLoaderWrapperRoutineBuilder implements LoaderWrapperRoutineBuilder 
                                    .with(mTarget)
                                    .withConfiguration(mInvocationConfiguration)
                                    .withConfiguration(mWrapperConfiguration)
-                                   .apply(mLoaderConfiguration);
+                                   .withConfiguration(mLoaderConfiguration);
   }
 }

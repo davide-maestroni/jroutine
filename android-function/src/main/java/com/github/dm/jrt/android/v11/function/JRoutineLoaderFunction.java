@@ -18,7 +18,7 @@ package com.github.dm.jrt.android.v11.function;
 
 import com.github.dm.jrt.android.function.builder.StatefulLoaderRoutineBuilder;
 import com.github.dm.jrt.android.function.builder.StatelessLoaderRoutineBuilder;
-import com.github.dm.jrt.android.v11.core.LoaderContext;
+import com.github.dm.jrt.android.v11.core.LoaderSource;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.util.BiConsumer;
 import com.github.dm.jrt.function.util.Supplier;
@@ -72,11 +72,11 @@ public class JRoutineLoaderFunction {
    */
   @NotNull
   public static <IN, OUT, STATE> StatefulLoaderRoutineBuilder<IN, OUT, STATE> stateful(
-      @NotNull final LoaderContext context, final int invocationId) {
-    return new DefaultStatefulLoaderRoutineBuilder<IN, OUT, STATE>(context).loaderConfiguration()
+      @NotNull final LoaderSource context, final int invocationId) {
+    return new DefaultStatefulLoaderRoutineBuilder<IN, OUT, STATE>(context).withLoader()
                                                                            .withInvocationId(
                                                                                invocationId)
-                                                                           .apply();
+                                                                           .configuration();
   }
 
   /**
@@ -96,16 +96,16 @@ public class JRoutineLoaderFunction {
    */
   @NotNull
   public static <IN, OUT> StatefulLoaderRoutineBuilder<IN, OUT, ? extends List<IN>> statefulList(
-      @NotNull final LoaderContext context, final int invocationId) {
+      @NotNull final LoaderSource context, final int invocationId) {
     final Supplier<? extends List<IN>> onCreate = listSupplier();
     final BiConsumer<? super List<IN>, ? super IN> onNext = listConsumer();
     final DefaultStatefulLoaderRoutineBuilder<IN, OUT, List<IN>> builder =
         new DefaultStatefulLoaderRoutineBuilder<IN, OUT, List<IN>>(context);
     return builder.onCreate(onCreate)
                   .onNextConsume(onNext)
-                  .loaderConfiguration()
+                  .withLoader()
                   .withInvocationId(invocationId)
-                  .apply();
+                  .configuration();
   }
 
   /**
@@ -126,10 +126,10 @@ public class JRoutineLoaderFunction {
    */
   @NotNull
   public static <IN, OUT> StatelessLoaderRoutineBuilder<IN, OUT> stateless(
-      @NotNull final LoaderContext context, final int invocationId) {
-    return new DefaultStatelessLoaderRoutineBuilder<IN, OUT>(context).loaderConfiguration()
+      @NotNull final LoaderSource context, final int invocationId) {
+    return new DefaultStatelessLoaderRoutineBuilder<IN, OUT>(context).withLoader()
                                                                      .withInvocationId(invocationId)
-                                                                     .apply();
+                                                                     .configuration();
   }
 
   @NotNull

@@ -42,7 +42,7 @@ public abstract class AbstractLoaderTransformationBuilder<IN, OUT, BEFORE, AFTER
 
   @NotNull
   @Override
-  public LoaderTransformationBuilder<IN, OUT, BEFORE, AFTER> apply(
+  public LoaderTransformationBuilder<IN, OUT, BEFORE, AFTER> withConfiguration(
       @NotNull final LoaderConfiguration configuration) {
     mConfiguration = ConstantConditions.notNull("Loader configuration", configuration);
     return this;
@@ -56,8 +56,7 @@ public abstract class AbstractLoaderTransformationBuilder<IN, OUT, BEFORE, AFTER
 
   @NotNull
   @Override
-  public Builder<? extends LoaderTransformationBuilder<IN, OUT, BEFORE, AFTER>>
-  loaderConfiguration() {
+  public Builder<? extends LoaderTransformationBuilder<IN, OUT, BEFORE, AFTER>> withLoader() {
     return new Builder<LoaderTransformationBuilder<IN, OUT, BEFORE, AFTER>>(this, mConfiguration);
   }
 

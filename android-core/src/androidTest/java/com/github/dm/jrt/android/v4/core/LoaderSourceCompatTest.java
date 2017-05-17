@@ -25,7 +25,7 @@ import android.test.ActivityInstrumentationTestCase2;
 
 import com.github.dm.jrt.android.core.test.R;
 
-import static com.github.dm.jrt.android.v4.core.LoaderContextCompat.loaderFrom;
+import static com.github.dm.jrt.android.v4.core.LoaderSourceCompat.loaderOf;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -34,9 +34,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Created by davide-maestroni on 03/09/2016.
  */
 @TargetApi(VERSION_CODES.HONEYCOMB)
-public class LoaderContextCompatTest extends ActivityInstrumentationTestCase2<TestActivity> {
+public class LoaderSourceCompatTest extends ActivityInstrumentationTestCase2<TestActivity> {
 
-  public LoaderContextCompatTest() {
+  public LoaderSourceCompatTest() {
 
     super(TestActivity.class);
   }
@@ -44,28 +44,29 @@ public class LoaderContextCompatTest extends ActivityInstrumentationTestCase2<Te
   public void testActivityEquals() {
 
     final ContextWrapper contextWrapper = new ContextWrapper(getActivity());
-    LoaderContextCompat loaderContext = loaderFrom(getActivity());
+    LoaderSourceCompat loaderContext = LoaderSourceCompat.loaderOf(getActivity());
     assertThat(loaderContext).isEqualTo(loaderContext);
     assertThat(loaderContext).isNotEqualTo(null);
     assertThat(loaderContext).isNotEqualTo("test");
-    assertThat(loaderContext).isNotEqualTo(loaderFrom(getActivity(), contextWrapper));
-    assertThat(loaderContext).isEqualTo(loaderFrom(getActivity()));
-    assertThat(loaderContext.hashCode()).isEqualTo(loaderFrom(getActivity()).hashCode());
-    loaderContext = loaderFrom(getActivity(), contextWrapper);
-    assertThat(loaderContext).isEqualTo(loaderContext);
-    assertThat(loaderContext).isNotEqualTo(null);
-    assertThat(loaderContext).isNotEqualTo("test");
-    assertThat(loaderContext).isNotEqualTo(loaderFrom(getActivity(), getActivity()));
-    assertThat(loaderContext).isEqualTo(loaderFrom(getActivity(), contextWrapper));
+    assertThat(loaderContext).isNotEqualTo(loaderOf(getActivity(), contextWrapper));
+    assertThat(loaderContext).isEqualTo(LoaderSourceCompat.loaderOf(getActivity()));
     assertThat(loaderContext.hashCode()).isEqualTo(
-        loaderFrom(getActivity(), contextWrapper).hashCode());
+        LoaderSourceCompat.loaderOf(getActivity()).hashCode());
+    loaderContext = loaderOf(getActivity(), contextWrapper);
+    assertThat(loaderContext).isEqualTo(loaderContext);
+    assertThat(loaderContext).isNotEqualTo(null);
+    assertThat(loaderContext).isNotEqualTo("test");
+    assertThat(loaderContext).isNotEqualTo(loaderOf(getActivity(), getActivity()));
+    assertThat(loaderContext).isEqualTo(loaderOf(getActivity(), contextWrapper));
+    assertThat(loaderContext.hashCode()).isEqualTo(
+        loaderOf(getActivity(), contextWrapper).hashCode());
   }
 
   @SuppressWarnings("ConstantConditions")
   public void testActivityError() {
 
     try {
-      loaderFrom((FragmentActivity) null);
+      LoaderSourceCompat.loaderOf((FragmentActivity) null);
       fail();
 
     } catch (final NullPointerException ignored) {
@@ -73,7 +74,7 @@ public class LoaderContextCompatTest extends ActivityInstrumentationTestCase2<Te
     }
 
     try {
-      loaderFrom(getActivity(), null);
+      loaderOf(getActivity(), null);
       fail();
 
     } catch (final NullPointerException ignored) {
@@ -81,7 +82,7 @@ public class LoaderContextCompatTest extends ActivityInstrumentationTestCase2<Te
     }
 
     try {
-      loaderFrom(getActivity(), new ContextWrapper(getActivity()) {});
+      loaderOf(getActivity(), new ContextWrapper(getActivity()) {});
       fail();
 
     } catch (final IllegalArgumentException ignored) {
@@ -94,20 +95,22 @@ public class LoaderContextCompatTest extends ActivityInstrumentationTestCase2<Te
     final ContextWrapper contextWrapper = new ContextWrapper(getActivity());
     final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                               .findFragmentById(R.id.test_fragment);
-    LoaderContextCompat loaderContext = loaderFrom(fragment);
+    LoaderSourceCompat loaderContext = LoaderSourceCompat.loaderOf(fragment);
     assertThat(loaderContext).isEqualTo(loaderContext);
     assertThat(loaderContext).isNotEqualTo(null);
     assertThat(loaderContext).isNotEqualTo("test");
-    assertThat(loaderContext).isNotEqualTo(loaderFrom(fragment, contextWrapper));
-    assertThat(loaderContext).isEqualTo(loaderFrom(fragment));
-    assertThat(loaderContext.hashCode()).isEqualTo(loaderFrom(fragment).hashCode());
-    loaderContext = loaderFrom(fragment, contextWrapper);
+    assertThat(loaderContext).isNotEqualTo(LoaderSourceCompat.loaderOf(fragment, contextWrapper));
+    assertThat(loaderContext).isEqualTo(LoaderSourceCompat.loaderOf(fragment));
+    assertThat(loaderContext.hashCode()).isEqualTo(
+        LoaderSourceCompat.loaderOf(fragment).hashCode());
+    loaderContext = LoaderSourceCompat.loaderOf(fragment, contextWrapper);
     assertThat(loaderContext).isEqualTo(loaderContext);
     assertThat(loaderContext).isNotEqualTo(null);
     assertThat(loaderContext).isNotEqualTo("test");
-    assertThat(loaderContext).isNotEqualTo(loaderFrom(fragment, getActivity()));
-    assertThat(loaderContext).isEqualTo(loaderFrom(fragment, contextWrapper));
-    assertThat(loaderContext.hashCode()).isEqualTo(loaderFrom(fragment, contextWrapper).hashCode());
+    assertThat(loaderContext).isNotEqualTo(LoaderSourceCompat.loaderOf(fragment, getActivity()));
+    assertThat(loaderContext).isEqualTo(LoaderSourceCompat.loaderOf(fragment, contextWrapper));
+    assertThat(loaderContext.hashCode()).isEqualTo(
+        LoaderSourceCompat.loaderOf(fragment, contextWrapper).hashCode());
   }
 
   @SuppressWarnings("ConstantConditions")
@@ -116,7 +119,7 @@ public class LoaderContextCompatTest extends ActivityInstrumentationTestCase2<Te
     final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                               .findFragmentById(R.id.test_fragment);
     try {
-      loaderFrom((Fragment) null);
+      LoaderSourceCompat.loaderOf((Fragment) null);
       fail();
 
     } catch (final NullPointerException ignored) {
@@ -124,7 +127,7 @@ public class LoaderContextCompatTest extends ActivityInstrumentationTestCase2<Te
     }
 
     try {
-      loaderFrom(fragment, null);
+      LoaderSourceCompat.loaderOf(fragment, null);
       fail();
 
     } catch (final NullPointerException ignored) {
@@ -132,7 +135,7 @@ public class LoaderContextCompatTest extends ActivityInstrumentationTestCase2<Te
     }
 
     try {
-      loaderFrom(fragment, new ContextWrapper(getActivity()) {});
+      LoaderSourceCompat.loaderOf(fragment, new ContextWrapper(getActivity()) {});
       fail();
 
     } catch (final IllegalArgumentException ignored) {

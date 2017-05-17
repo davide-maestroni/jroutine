@@ -20,14 +20,14 @@ ${generatedPackage}
 
 public final class ${generatedClassName}${genericTypes} implements ${interfaceFullName} {
 
-  private final com.github.dm.jrt.android.core.ServiceContext mContext;
+  private final com.github.dm.jrt.android.core.ServiceSource mServiceSource;
 
-  public ${generatedClassName}(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.ServiceContext context,
+  public ${generatedClassName}(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.ServiceSource serviceSource,
       @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.reflect.ContextInvocationTarget<?> target,
       @org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.config.InvocationConfiguration invocationConfiguration,
       @org.jetbrains.annotations.NotNull final com.github.dm.jrt.reflect.config.WrapperConfiguration wrapperConfiguration,
       @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.config.ServiceConfiguration serviceConfiguration) {
-    com.github.dm.jrt.core.util.ConstantConditions.notNull("Service context", context);
+    com.github.dm.jrt.core.util.ConstantConditions.notNull("Service source", serviceSource);
     com.github.dm.jrt.core.util.ConstantConditions.notNull("invocation configuration", invocationConfiguration);
     com.github.dm.jrt.core.util.ConstantConditions.notNull("wrapper configuration", wrapperConfiguration);
     com.github.dm.jrt.core.util.ConstantConditions.notNull("Service configuration", serviceConfiguration);
@@ -40,28 +40,28 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
       throw new IllegalArgumentException("the invocation target must be the class or an instance of ${classFullName}");
     }
 
-    mContext = context;
+    mServiceSource = serviceSource;
     ${routineFieldsInit}
   }
 
   @org.jetbrains.annotations.NotNull
-  public static ContextBuilder on(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.ServiceContext context) {
-    return new ContextBuilder(context);
+  public static ContextBuilder on(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.ServiceSource serviceSource) {
+    return new ContextBuilder(serviceSource);
   }
 
   @org.jetbrains.annotations.NotNull
   private static <OUT> com.github.dm.jrt.android.core.builder.ServiceRoutineBuilder<Object, OUT> getBuilder(
-      @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.ServiceContext context,
-      @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.invocation.TargetInvocationFactory<Object, OUT> target) {
-    return com.github.dm.jrt.android.core.JRoutineService.on(context).with(target);
+      @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.ServiceSource serviceSource,
+      @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.invocation.InvocationFactoryReference<Object, OUT> factory) {
+    return com.github.dm.jrt.android.core.JRoutineService.routineOn(serviceSource).of(factory);
   }
 
   public static class ContextBuilder {
 
-    private final com.github.dm.jrt.android.core.ServiceContext mContext;
+    private final com.github.dm.jrt.android.core.ServiceSource mServiceSource;
 
-    private ContextBuilder(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.ServiceContext context) {
-      mContext = com.github.dm.jrt.core.util.ConstantConditions.notNull("Service context", context);
+    private ContextBuilder(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.ServiceSource serviceSource) {
+      mServiceSource = com.github.dm.jrt.core.util.ConstantConditions.notNull("Service source", serviceSource);
     }
 
     @org.jetbrains.annotations.NotNull
@@ -70,25 +70,25 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
         throw new IllegalArgumentException("the invocation target must be the class or an instance of ${classFullName}");
       }
 
-      return new ServiceProxyObjectBuilder${genericTypes}(mContext, target);
+      return new ServiceProxyObjectBuilder${genericTypes}(mServiceSource, target);
     }
   }
 
   private static class ServiceProxyObjectBuilder${genericTypes} extends com.github.dm.jrt.android.proxy.builder.AbstractServiceProxyObjectBuilder<${interfaceFullName}> {
 
-    private final com.github.dm.jrt.android.core.ServiceContext mContext;
+    private final com.github.dm.jrt.android.core.ServiceSource mServiceSource;
 
     private final com.github.dm.jrt.android.reflect.ContextInvocationTarget<?> mTarget;
 
-    private ServiceProxyObjectBuilder(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.ServiceContext context,
+    private ServiceProxyObjectBuilder(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.ServiceSource serviceSource,
         @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.reflect.ContextInvocationTarget<?> target) {
-      com.github.dm.jrt.core.util.ConstantConditions.notNull("Service context", context);
+      com.github.dm.jrt.core.util.ConstantConditions.notNull("Service source", serviceSource);
       if (target.getTargetClass().isPrimitive()) {
         // The parceling of primitive classes is broken...
         throw new IllegalArgumentException("the target class cannot be primitive");
       }
 
-      mContext = context;
+      mServiceSource = serviceSource;
       mTarget = target;
     }
 
@@ -101,7 +101,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
     @Override
     @org.jetbrains.annotations.Nullable
     protected android.content.Context getInvocationContext() {
-      return mContext.getServiceContext();
+      return mServiceSource.getContext();
     }
 
     @Override
@@ -116,6 +116,6 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
         @org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.config.InvocationConfiguration invocationConfiguration,
         @org.jetbrains.annotations.NotNull final com.github.dm.jrt.reflect.config.WrapperConfiguration wrapperConfiguration,
         @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.config.ServiceConfiguration serviceConfiguration) {
-      return new ${generatedClassName}${genericTypes}(mContext, mTarget, invocationConfiguration, wrapperConfiguration, serviceConfiguration);
+      return new ${generatedClassName}${genericTypes}(mServiceSource, mTarget, invocationConfiguration, wrapperConfiguration, serviceConfiguration);
     }
   }

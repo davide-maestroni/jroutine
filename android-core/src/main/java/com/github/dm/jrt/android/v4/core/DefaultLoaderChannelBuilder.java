@@ -42,7 +42,7 @@ import static com.github.dm.jrt.core.config.InvocationConfiguration.builderFromO
  */
 class DefaultLoaderChannelBuilder implements LoaderChannelBuilder {
 
-  private final LoaderContextCompat mContext;
+  private final LoaderSourceCompat mLoaderSource;
 
   private ChannelConfiguration mChannelConfiguration = ChannelConfiguration.defaultConfiguration();
 
@@ -51,49 +51,15 @@ class DefaultLoaderChannelBuilder implements LoaderChannelBuilder {
   /**
    * Constructor.
    *
-   * @param context the context instance.
+   * @param loaderSource the Loader source.
    */
-  DefaultLoaderChannelBuilder(@NotNull final LoaderContextCompat context) {
-    mContext = ConstantConditions.notNull("Loader context", context);
-  }
-
-  @NotNull
-  @Override
-  public LoaderChannelBuilder apply(@NotNull final LoaderConfiguration configuration) {
-    mLoaderConfiguration = ConstantConditions.notNull("Loader configuration", configuration);
-    return this;
-  }
-
-  @NotNull
-  @Override
-  public <OUT> Channel<?, OUT> buildChannel() {
-    final LoaderConfiguration loaderConfiguration = mLoaderConfiguration;
-    final int loaderId = loaderConfiguration.getLoaderIdOrElse(LoaderConfiguration.AUTO);
-    if (loaderId == LoaderConfiguration.AUTO) {
-      throw new IllegalArgumentException("the Loader ID must not be generated");
-    }
-
-    final LoaderContextCompat context = mContext;
-    final Object component = context.getComponent();
-    if (component == null) {
-      final Channel<OUT, OUT> channel = JRoutineCore.<OUT>ofData().buildChannel();
-      channel.abort(new MissingLoaderException(loaderId));
-      return channel.close();
-    }
-
-    final MissingLoaderInvocationFactory<OUT> factory =
-        new MissingLoaderInvocationFactory<OUT>(loaderId);
-    final DefaultLoaderRoutineBuilder<Void, OUT> builder =
-        new DefaultLoaderRoutineBuilder<Void, OUT>(context, factory);
-    return builder.withConfiguration(builderFromOutput(mChannelConfiguration).configuration())
-                  .apply(loaderConfiguration)
-                  .invoke()
-                  .close();
+  DefaultLoaderChannelBuilder(@NotNull final LoaderSourceCompat loaderSource) {
+    mLoaderSource = ConstantConditions.notNull("Loader source", loaderSource);
   }
 
   @Override
   public void clear(@Nullable final Object... inputs) {
-    final LoaderContextCompat context = mContext;
+    final LoaderSourceCompat context = mLoaderSource;
     if (context.getComponent() != null) {
       final List<Object> inputList;
       if (inputs == null) {
@@ -110,7 +76,7 @@ class DefaultLoaderChannelBuilder implements LoaderChannelBuilder {
 
   @Override
   public void clear(@Nullable final Iterable<?> inputs) {
-    final LoaderContextCompat context = mContext;
+    final LoaderSourceCompat context = mLoaderSource;
     if (context.getComponent() != null) {
       final List<Object> inputList;
       if (inputs == null) {
@@ -130,7 +96,7 @@ class DefaultLoaderChannelBuilder implements LoaderChannelBuilder {
 
   @Override
   public void clear() {
-    final LoaderContextCompat context = mContext;
+    final LoaderSourceCompat context = mLoaderSource;
     if (context.getComponent() != null) {
       clearLoader(context, mLoaderConfiguration.getLoaderIdOrElse(LoaderConfiguration.AUTO));
     }
@@ -138,7 +104,7 @@ class DefaultLoaderChannelBuilder implements LoaderChannelBuilder {
 
   @Override
   public void clear(@Nullable final Object input) {
-    final LoaderContextCompat context = mContext;
+    final LoaderSourceCompat context = mLoaderSource;
     if (context.getComponent() != null) {
       clearLoader(context, mLoaderConfiguration.getLoaderIdOrElse(LoaderConfiguration.AUTO),
           Collections.singletonList(input));
@@ -147,9 +113,36 @@ class DefaultLoaderChannelBuilder implements LoaderChannelBuilder {
 
   @NotNull
   @Override
-  public LoaderConfiguration.Builder<? extends LoaderChannelBuilder> loaderConfiguration() {
-    final LoaderConfiguration config = mLoaderConfiguration;
-    return new LoaderConfiguration.Builder<LoaderChannelBuilder>(this, config);
+  public <OUT> Channel<?, OUT> ofType() {
+    final LoaderConfiguration loaderConfiguration = mLoaderConfiguration;
+    final int loaderId = loaderConfiguration.getLoaderIdOrElse(LoaderConfiguration.AUTO);
+    if (loaderId == LoaderConfiguration.AUTO) {
+      throw new IllegalArgumentException("the Loader ID must not be generated");
+    }
+
+    final LoaderSourceCompat context = mLoaderSource;
+    final Object component = context.getComponent();
+    if (component == null) {
+      final Channel<OUT, OUT> channel = JRoutineCore.channel().ofType();
+      channel.abort(new MissingLoaderException(loaderId));
+      return channel.close();
+    }
+
+    final MissingLoaderInvocationFactory<OUT> factory =
+        new MissingLoaderInvocationFactory<OUT>(loaderId);
+    final DefaultLoaderRoutineBuilder builder = new DefaultLoaderRoutineBuilder(context);
+    return builder.withConfiguration(builderFromOutput(mChannelConfiguration).configuration())
+                  .withConfiguration(loaderConfiguration)
+                  .of(factory)
+                  .invoke()
+                  .close();
+  }
+
+  @NotNull
+  @Override
+  public ChannelConfiguration.Builder<? extends LoaderChannelBuilder> withChannel() {
+    final ChannelConfiguration config = mChannelConfiguration;
+    return new ChannelConfiguration.Builder<LoaderChannelBuilder>(this, config);
   }
 
   @NotNull
@@ -161,8 +154,15 @@ class DefaultLoaderChannelBuilder implements LoaderChannelBuilder {
 
   @NotNull
   @Override
-  public ChannelConfiguration.Builder<? extends LoaderChannelBuilder> withChannel() {
-    final ChannelConfiguration config = mChannelConfiguration;
-    return new ChannelConfiguration.Builder<LoaderChannelBuilder>(this, config);
+  public LoaderChannelBuilder withConfiguration(@NotNull final LoaderConfiguration configuration) {
+    mLoaderConfiguration = ConstantConditions.notNull("Loader configuration", configuration);
+    return this;
+  }
+
+  @NotNull
+  @Override
+  public LoaderConfiguration.Builder<? extends LoaderChannelBuilder> withLoader() {
+    final LoaderConfiguration config = mLoaderConfiguration;
+    return new LoaderConfiguration.Builder<LoaderChannelBuilder>(this, config);
   }
 }

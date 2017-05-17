@@ -23,7 +23,6 @@ import com.github.dm.jrt.android.core.routine.LoaderRoutine;
 import com.github.dm.jrt.core.AbstractRoutine;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
-import com.github.dm.jrt.core.executor.ScheduledExecutor;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
@@ -53,15 +52,13 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
 
   private final LoaderConfiguration mConfiguration;
 
-  private final LoaderContext mContext;
+  private final LoaderSource mContext;
 
   private final ContextInvocationFactory<IN, OUT> mFactory;
 
   private final int mLoaderId;
 
   private final OrderType mOrderType;
-
-  private final ScheduledExecutor mExecutor;
 
   /**
    * Constructor.
@@ -71,11 +68,11 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
    * @param invocationConfiguration the invocation configuration.
    * @param loaderConfiguration     the Loader configuration.
    */
-  DefaultLoaderRoutine(@NotNull final LoaderContext context,
+  DefaultLoaderRoutine(@NotNull final LoaderSource context,
       @NotNull final ContextInvocationFactory<IN, OUT> factory,
       @NotNull final InvocationConfiguration invocationConfiguration,
       @NotNull final LoaderConfiguration loaderConfiguration) {
-    super(invocationConfiguration.builderFrom().withExecutor(zeroDelayExecutor(mainExecutor())).configured());
+    super(invocationConfiguration, zeroDelayExecutor(mainExecutor()));
     final int invocationId = loaderConfiguration.getInvocationIdOrElse(LoaderConfiguration.AUTO);
     mContext = ConstantConditions.notNull("Loader context", context);
     ConstantConditions.notNull("Context invocation factory", factory);
@@ -84,14 +81,13 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
     mConfiguration = loaderConfiguration;
     mLoaderId = loaderConfiguration.getLoaderIdOrElse(LoaderConfiguration.AUTO);
     mOrderType = invocationConfiguration.getOutputOrderTypeOrElse(null);
-    mExecutor = invocationConfiguration.getExecutorOrElse(null);
     getLogger().dbg("building Context routine with configuration: %s", loaderConfiguration);
   }
 
   @Override
   public void clear() {
     super.clear();
-    final LoaderContext context = mContext;
+    final LoaderSource context = mContext;
     if (context.getComponent() != null) {
       clearLoaders(context, mLoaderId, mFactory);
     }
@@ -100,20 +96,20 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
   @NotNull
   @Override
   protected Invocation<IN, OUT> newInvocation() {
-    return new LoaderInvocation<IN, OUT>(mContext, mFactory, mConfiguration, mExecutor, mOrderType,
+    return new LoaderInvocation<IN, OUT>(mContext, mFactory, mConfiguration, mOrderType,
         getLogger());
   }
 
   @Override
   public void clear(@Nullable final IN input) {
-    final LoaderContext context = mContext;
+    final LoaderSource context = mContext;
     if (context.getComponent() != null) {
       clearLoaders(context, mLoaderId, mFactory, Collections.singletonList(input));
     }
   }
 
   public void clear(@Nullable final IN... inputs) {
-    final LoaderContext context = mContext;
+    final LoaderSource context = mContext;
     if (context.getComponent() != null) {
       final List<IN> inputList;
       if (inputs == null) {
@@ -129,7 +125,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
 
   @Override
   public void clear(@Nullable final Iterable<? extends IN> inputs) {
-    final LoaderContext context = mContext;
+    final LoaderSource context = mContext;
     if (context.getComponent() != null) {
       final List<IN> inputList;
       if (inputs == null) {

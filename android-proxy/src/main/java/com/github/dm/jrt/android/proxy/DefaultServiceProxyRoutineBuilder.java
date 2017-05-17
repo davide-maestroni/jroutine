@@ -18,7 +18,7 @@ package com.github.dm.jrt.android.proxy;
 
 import android.content.Context;
 
-import com.github.dm.jrt.android.core.ServiceContext;
+import com.github.dm.jrt.android.core.ServiceSource;
 import com.github.dm.jrt.android.core.config.ServiceConfiguration;
 import com.github.dm.jrt.android.proxy.annotation.ServiceProxy;
 import com.github.dm.jrt.android.proxy.builder.AbstractServiceProxyObjectBuilder;
@@ -44,7 +44,7 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingConstructor
  */
 class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder {
 
-  private final ServiceContext mContext;
+  private final ServiceSource mServiceSource;
 
   private final ContextInvocationTarget<?> mTarget;
 
@@ -58,25 +58,27 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder {
   /**
    * Constructor.
    *
-   * @param context the Service context.
-   * @param target  the invocation target.
+   * @param serviceSource the Service source.
+   * @param target        the invocation target.
    */
-  DefaultServiceProxyRoutineBuilder(@NotNull final ServiceContext context,
+  DefaultServiceProxyRoutineBuilder(@NotNull final ServiceSource serviceSource,
       @NotNull final ContextInvocationTarget<?> target) {
-    mContext = ConstantConditions.notNull("Service context", context);
+    mServiceSource = ConstantConditions.notNull("Service source", serviceSource);
     mTarget = ConstantConditions.notNull("invocation target", target);
   }
 
   @NotNull
   @Override
-  public ServiceProxyRoutineBuilder apply(@NotNull final ServiceConfiguration configuration) {
+  public ServiceProxyRoutineBuilder withConfiguration(
+      @NotNull final ServiceConfiguration configuration) {
     mServiceConfiguration = ConstantConditions.notNull("Service configuration", configuration);
     return this;
   }
 
   @NotNull
   @Override
-  public ServiceProxyRoutineBuilder withConfiguration(@NotNull final InvocationConfiguration configuration) {
+  public ServiceProxyRoutineBuilder withConfiguration(
+      @NotNull final InvocationConfiguration configuration) {
     mInvocationConfiguration =
         ConstantConditions.notNull("invocation configuration", configuration);
     return this;
@@ -84,7 +86,8 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder {
 
   @NotNull
   @Override
-  public ServiceProxyRoutineBuilder withConfiguration(@NotNull final WrapperConfiguration configuration) {
+  public ServiceProxyRoutineBuilder withConfiguration(
+      @NotNull final WrapperConfiguration configuration) {
     mWrapperConfiguration = ConstantConditions.notNull("wrapper configuration", configuration);
     return this;
   }
@@ -104,10 +107,10 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder {
     }
 
     final TargetServiceProxyObjectBuilder<TYPE> builder =
-        new TargetServiceProxyObjectBuilder<TYPE>(mContext, mTarget, itf);
+        new TargetServiceProxyObjectBuilder<TYPE>(mServiceSource, mTarget, itf);
     return builder.withConfiguration(mInvocationConfiguration)
                   .withConfiguration(mWrapperConfiguration)
-                  .apply(mServiceConfiguration)
+                  .withConfiguration(mServiceConfiguration)
                   .buildProxy();
   }
 
@@ -151,7 +154,7 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder {
 
   @NotNull
   @Override
-  public ServiceConfiguration.Builder<? extends ServiceProxyRoutineBuilder> serviceConfiguration() {
+  public ServiceConfiguration.Builder<? extends ServiceProxyRoutineBuilder> withService() {
     final ServiceConfiguration config = mServiceConfiguration;
     return new ServiceConfiguration.Builder<ServiceProxyRoutineBuilder>(this, config);
   }
@@ -164,23 +167,23 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder {
   private static class TargetServiceProxyObjectBuilder<TYPE>
       extends AbstractServiceProxyObjectBuilder<TYPE> {
 
-    private final ServiceContext mContext;
-
     private final Class<? super TYPE> mInterfaceClass;
+
+    private final ServiceSource mService;
 
     private final ContextInvocationTarget<?> mTarget;
 
     /**
      * Constructor.
      *
-     * @param context        the Service context.
+     * @param service        the Service source.
      * @param target         the invocation target.
      * @param interfaceClass the proxy interface class.
      */
-    private TargetServiceProxyObjectBuilder(@NotNull final ServiceContext context,
+    private TargetServiceProxyObjectBuilder(@NotNull final ServiceSource service,
         @NotNull final ContextInvocationTarget<?> target,
         @NotNull final Class<? super TYPE> interfaceClass) {
-      mContext = context;
+      mService = service;
       mTarget = target;
       mInterfaceClass = interfaceClass;
     }
@@ -194,7 +197,7 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder {
     @Nullable
     @Override
     protected Context getInvocationContext() {
-      return mContext.getServiceContext();
+      return mService.getContext();
     }
 
     @NotNull
@@ -209,7 +212,7 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder {
     protected TYPE newProxy(@NotNull final InvocationConfiguration invocationConfiguration,
         @NotNull final WrapperConfiguration wrapperConfiguration,
         @NotNull final ServiceConfiguration serviceConfiguration) throws Exception {
-      final ServiceContext context = mContext;
+      final ServiceSource context = mService;
       final ContextInvocationTarget<?> target = mTarget;
       final Class<? super TYPE> interfaceClass = mInterfaceClass;
       final ServiceProxy annotation = interfaceClass.getAnnotation(ServiceProxy.class);

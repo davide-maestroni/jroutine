@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.android.reflect;
 
-import com.github.dm.jrt.android.core.ServiceContext;
+import com.github.dm.jrt.android.core.ServiceSource;
 import com.github.dm.jrt.android.reflect.builder.ServiceReflectionRoutineBuilder;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
@@ -76,12 +76,12 @@ public class JRoutineServiceReflection {
   /**
    * Returns a Context based builder of Service routine builders.
    *
-   * @param context the Service context.
+   * @param serviceSource the Service source.
    * @return the Context based builder.
    */
   @NotNull
-  public static ServiceReflectionBuilder on(@NotNull final ServiceContext context) {
-    return new ServiceReflectionBuilder(context);
+  public static ServiceReflectionBuilder on(@NotNull final ServiceSource serviceSource) {
+    return new ServiceReflectionBuilder(serviceSource);
   }
 
   /**
@@ -90,14 +90,14 @@ public class JRoutineServiceReflection {
   @SuppressWarnings("WeakerAccess")
   public static class ServiceReflectionBuilder {
 
-    private final ServiceContext mContext;
+    private final ServiceSource mContext;
 
     /**
      * Constructor.
      *
      * @param context the Service context.
      */
-    private ServiceReflectionBuilder(@NotNull final ServiceContext context) {
+    private ServiceReflectionBuilder(@NotNull final ServiceSource context) {
       mContext = ConstantConditions.notNull("Service context", context);
     }
 

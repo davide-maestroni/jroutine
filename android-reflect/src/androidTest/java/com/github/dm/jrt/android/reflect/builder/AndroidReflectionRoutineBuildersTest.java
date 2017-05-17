@@ -57,14 +57,14 @@ public class AndroidReflectionRoutineBuildersTest extends AndroidTestCase {
                            .withMatchResolution(ClashResolutionType.ABORT_THIS)
                            .withLoaderId(-77)
                            .withResultStaleTime(DurationMeasure.millis(333))
-                           .apply());
+                           .configuration());
     assertThat(
-        withAnnotations(ServiceConfiguration.builder().withExecutorArgs(1).withLogArgs(1).apply(),
+        withAnnotations(ServiceConfiguration.builder().withExecutorArgs(1).withLogArgs(1).configuration(),
             AnnotationItf.class.getMethod("toString"))).isEqualTo( //
         ServiceConfiguration.builder()
                             .withLogClass(NullLog.class)
                             .withExecutorClass(MyExecutor.class)
-                            .apply());
+                            .configuration());
   }
 
   public void testConstructor() {

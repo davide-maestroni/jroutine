@@ -177,7 +177,7 @@ public class JRoutineOperators {
    * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
    */
   @NotNull
-  public static <DATA> InvocationFactory<DATA, DATA> append(final long count,
+  public static <DATA> InvocationFactory<DATA, DATA> appendElementsOf(final long count,
       @NotNull final Sequence<DATA> sequence) {
     return appendOutputsOf(count, sequence);
   }
@@ -191,9 +191,9 @@ public class JRoutineOperators {
    * @return the invocation factory instance.
    */
   @NotNull
-  public static <DATA> InvocationFactory<DATA, DATA> append(
+  public static <DATA> InvocationFactory<DATA, DATA> appendElementsOf(
       @NotNull final Sequence<DATA> sequence) {
-    return append(1, sequence);
+    return appendElementsOf(1, sequence);
   }
 
   /**
@@ -834,7 +834,7 @@ public class JRoutineOperators {
    * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
    */
   @NotNull
-  public static <DATA> InvocationFactory<DATA, DATA> orElse(final long count,
+  public static <DATA> InvocationFactory<DATA, DATA> orElseElementsOf(final long count,
       @NotNull final Sequence<DATA> sequence) {
     return orElseOutputsOf(count, sequence);
   }
@@ -848,9 +848,9 @@ public class JRoutineOperators {
    * @return the invocation factory instance.
    */
   @NotNull
-  public static <DATA> InvocationFactory<DATA, DATA> orElse(
+  public static <DATA> InvocationFactory<DATA, DATA> orElseElementsOf(
       @NotNull final Sequence<DATA> sequence) {
-    return orElse(1, sequence);
+    return orElseElementsOf(1, sequence);
   }
 
   /**
@@ -1054,7 +1054,7 @@ public class JRoutineOperators {
    * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
    */
   @NotNull
-  public static <DATA> InvocationFactory<DATA, DATA> prepend(final long count,
+  public static <DATA> InvocationFactory<DATA, DATA> prependElementsOf(final long count,
       @NotNull final Sequence<DATA> sequence) {
     return prependOutputsOf(count, sequence);
   }
@@ -1071,9 +1071,9 @@ public class JRoutineOperators {
    * @return the invocation factory instance.
    */
   @NotNull
-  public static <DATA> InvocationFactory<DATA, DATA> prepend(
+  public static <DATA> InvocationFactory<DATA, DATA> prependElementsOf(
       @NotNull final Sequence<DATA> sequence) {
-    return prepend(1, sequence);
+    return prependElementsOf(1, sequence);
   }
 
   /**
@@ -1423,7 +1423,7 @@ public class JRoutineOperators {
    * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
    */
   @NotNull
-  public static <DATA> InvocationFactory<DATA, DATA> then(final long count,
+  public static <DATA> InvocationFactory<DATA, DATA> thenElementsOf(final long count,
       @NotNull final Sequence<DATA> sequence) {
     return thenOutputsOf(count, sequence);
   }
@@ -1439,8 +1439,9 @@ public class JRoutineOperators {
    * @return the invocation factory instance.
    */
   @NotNull
-  public static <DATA> InvocationFactory<DATA, DATA> then(@NotNull final Sequence<DATA> sequence) {
-    return then(1, sequence);
+  public static <DATA> InvocationFactory<DATA, DATA> thenElementsOf(
+      @NotNull final Sequence<DATA> sequence) {
+    return thenElementsOf(1, sequence);
   }
 
   /**

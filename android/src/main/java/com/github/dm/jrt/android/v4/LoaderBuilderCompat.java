@@ -23,7 +23,7 @@ import com.github.dm.jrt.android.core.invocation.ContextInvocation;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.reflect.ContextInvocationTarget;
 import com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat;
-import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
+import com.github.dm.jrt.android.v4.core.LoaderSourceCompat;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.CommandInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
@@ -67,15 +67,15 @@ import static com.github.dm.jrt.function.Functions.supplierFactory;
 @SuppressWarnings("WeakerAccess")
 public class LoaderBuilderCompat {
 
-  private final LoaderContextCompat mContext;
+  private final LoaderSourceCompat mLoaderSource;
 
   /**
    * Constructor.
    *
-   * @param context the Loader context.
+   * @param loaderSource the Loader source.
    */
-  LoaderBuilderCompat(@NotNull final LoaderContextCompat context) {
-    mContext = ConstantConditions.notNull("Loader context", context);
+  LoaderBuilderCompat(@NotNull final LoaderSourceCompat loaderSource) {
+    mLoaderSource = ConstantConditions.notNull("Loader source", loaderSource);
   }
 
   private static void checkStatic(@NotNull final Decorator decorator,
@@ -291,7 +291,7 @@ public class LoaderBuilderCompat {
   @NotNull
   public <IN, OUT> LoaderRoutineBuilder<IN, OUT> with(
       @NotNull final ContextInvocationFactory<IN, OUT> factory) {
-    return JRoutineLoaderCompat.on(mContext).with(factory);
+    return JRoutineLoaderCompat.on(mLoaderSource).with(factory);
   }
 
   /**
@@ -310,7 +310,7 @@ public class LoaderBuilderCompat {
    */
   @NotNull
   public LoaderWrapperRoutineBuilder with(@NotNull final ContextInvocationTarget<?> target) {
-    return new DefaultLoaderWrapperRoutineBuilderCompat(mContext, target);
+    return new DefaultLoaderWrapperRoutineBuilderCompat(mLoaderSource, target);
   }
 
   /**
@@ -492,7 +492,7 @@ public class LoaderBuilderCompat {
    */
   @NotNull
   public LoaderChannelBuilder withId(final int loaderId) {
-    return JRoutineLoaderCompat.on(mContext).withId(loaderId);
+    return JRoutineLoaderCompat.on(mLoaderSource).withId(loaderId);
   }
 
   /**

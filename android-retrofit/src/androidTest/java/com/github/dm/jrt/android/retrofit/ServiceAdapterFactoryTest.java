@@ -20,7 +20,7 @@ import android.annotation.TargetApi;
 import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
-import com.github.dm.jrt.android.core.ServiceContext;
+import com.github.dm.jrt.android.core.ServiceSource;
 import com.github.dm.jrt.android.retrofit.service.RemoteTestService;
 import com.github.dm.jrt.android.retrofit.service.TestService;
 import com.github.dm.jrt.function.util.Consumer;
@@ -38,7 +38,7 @@ import retrofit2.Retrofit;
 import retrofit2.Retrofit.Builder;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-import static com.github.dm.jrt.android.core.ServiceContext.serviceFrom;
+import static com.github.dm.jrt.android.core.ServiceSource.serviceFrom;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static com.github.dm.jrt.function.JRoutineFunction.onOutput;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -59,7 +59,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
     super(TestActivity.class);
   }
 
-  private static void testOutputChannelAdapter(@NotNull final ServiceContext context) throws
+  private static void testOutputChannelAdapter(@NotNull final ServiceSource context) throws
       IOException {
 
     final MockWebServer server = new MockWebServer();
@@ -95,7 +95,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
     }
   }
 
-  private static void testPostAdapter(@NotNull final ServiceContext context) throws IOException {
+  private static void testPostAdapter(@NotNull final ServiceSource context) throws IOException {
 
     final Repo repo = new Repo();
     repo.setName("Test Repo");
@@ -131,7 +131,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
     }
   }
 
-  private static void testStreamBuilderAdapter(@NotNull final ServiceContext context) throws
+  private static void testStreamBuilderAdapter(@NotNull final ServiceSource context) throws
       IOException {
 
     final MockWebServer server = new MockWebServer();
@@ -169,31 +169,31 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
 
   public void testOutputChannelAdapter() throws IOException {
 
-    testOutputChannelAdapter(serviceFrom(getActivity(), TestService.class));
+    testOutputChannelAdapter(ServiceSource.serviceOf(getActivity(), TestService.class));
   }
 
   public void testOutputChannelAdapterRemote() throws IOException {
 
-    testOutputChannelAdapter(serviceFrom(getActivity(), RemoteTestService.class));
+    testOutputChannelAdapter(ServiceSource.serviceOf(getActivity(), RemoteTestService.class));
   }
 
   public void testPostAdapter() throws IOException {
 
-    testPostAdapter(serviceFrom(getActivity(), TestService.class));
+    testPostAdapter(ServiceSource.serviceOf(getActivity(), TestService.class));
   }
 
   public void testPostAdapterRemote() throws IOException {
 
-    testPostAdapter(serviceFrom(getActivity(), RemoteTestService.class));
+    testPostAdapter(ServiceSource.serviceOf(getActivity(), RemoteTestService.class));
   }
 
   public void testStreamBuilderAdapter() throws IOException {
 
-    testStreamBuilderAdapter(serviceFrom(getActivity(), TestService.class));
+    testStreamBuilderAdapter(ServiceSource.serviceOf(getActivity(), TestService.class));
   }
 
   public void testStreamBuilderAdapterRemote() throws IOException {
 
-    testStreamBuilderAdapter(serviceFrom(getActivity(), RemoteTestService.class));
+    testStreamBuilderAdapter(ServiceSource.serviceOf(getActivity(), RemoteTestService.class));
   }
 }

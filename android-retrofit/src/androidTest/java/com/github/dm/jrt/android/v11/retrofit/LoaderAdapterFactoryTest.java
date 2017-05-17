@@ -21,13 +21,14 @@ import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
+import com.github.dm.jrt.android.core.ServiceSource;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.CacheStrategyType;
 import com.github.dm.jrt.android.retrofit.GitHubService;
 import com.github.dm.jrt.android.retrofit.Repo;
 import com.github.dm.jrt.android.retrofit.ServiceAdapterFactory;
 import com.github.dm.jrt.android.retrofit.service.TestService;
 import com.github.dm.jrt.android.retrofit.test.R;
-import com.github.dm.jrt.android.v11.core.LoaderContext;
+import com.github.dm.jrt.android.v11.core.LoaderSource;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -50,8 +51,8 @@ import retrofit2.Retrofit;
 import retrofit2.Retrofit.Builder;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-import static com.github.dm.jrt.android.core.ServiceContext.serviceFrom;
-import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
+import static com.github.dm.jrt.android.core.ServiceSource.serviceFrom;
+import static com.github.dm.jrt.android.v11.core.LoaderSource.loaderFrom;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static com.github.dm.jrt.function.JRoutineFunction.onOutput;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -71,7 +72,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
     super(TestActivity.class);
   }
 
-  private static void testBodyDelegate(@NotNull final LoaderContext context) throws IOException {
+  private static void testBodyDelegate(@NotNull final LoaderSource context) throws IOException {
     final MockWebServer server = new MockWebServer();
     server.enqueue(new MockResponse().setBody(BODY));
     server.enqueue(new MockResponse().setBody(BODY));
@@ -84,9 +85,9 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                               .withInvocation()
                               .withOutputTimeout(seconds(10))
                               .configuration()
-                              .loaderConfiguration()
+                              .withLoader()
                               .withCacheStrategy(CacheStrategyType.CLEAR)
-                              .apply()
+                              .configuration()
                               .buildFactory();
       final GsonConverterFactory converterFactory = GsonConverterFactory.create();
       final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + server.getPort())
@@ -133,7 +134,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
     }
   }
 
-  private static void testOutputChannelAdapter(@NotNull final LoaderContext context) throws
+  private static void testOutputChannelAdapter(@NotNull final LoaderSource context) throws
       IOException {
     final MockWebServer server = new MockWebServer();
     server.enqueue(new MockResponse().setBody(BODY));
@@ -168,14 +169,14 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
     }
   }
 
-  private static void testServiceDelegate(@NotNull final LoaderContext context) throws IOException {
+  private static void testServiceDelegate(@NotNull final LoaderSource context) throws IOException {
     final MockWebServer server = new MockWebServer();
     server.enqueue(new MockResponse().setBody(BODY));
     server.enqueue(new MockResponse().setBody(BODY));
     server.start();
     try {
       final ServiceAdapterFactory factory = ServiceAdapterFactory.on(
-          serviceFrom(ConstantConditions.notNull(context.getLoaderContext()), TestService.class))
+          ServiceSource.serviceOf(ConstantConditions.notNull(context.getLoaderContext()), TestService.class))
                                                                  .buildFactory();
       final LoaderAdapterFactory adapterFactory = //
           LoaderAdapterFactory.on(context)
@@ -183,9 +184,9 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                               .withInvocation()
                               .withOutputTimeout(seconds(10))
                               .configuration()
-                              .loaderConfiguration()
+                              .withLoader()
                               .withCacheStrategy(CacheStrategyType.CLEAR)
-                              .apply()
+                              .configuration()
                               .buildFactory();
       final GsonConverterFactory converterFactory = GsonConverterFactory.create();
       final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + server.getPort())
@@ -232,7 +233,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
     }
   }
 
-  private static void testStreamBuilderAdapter(@NotNull final LoaderContext context) throws
+  private static void testStreamBuilderAdapter(@NotNull final LoaderSource context) throws
       IOException {
     final MockWebServer server = new MockWebServer();
     server.enqueue(new MockResponse().setBody(BODY));
@@ -272,7 +273,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
       return;
     }
 
-    testBodyDelegate(loaderFrom(getActivity()));
+    testBodyDelegate(LoaderSource.loaderOf(getActivity()));
   }
 
   public void testBodyDelegateFragment() throws IOException {
@@ -282,7 +283,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
 
     final TestFragment fragment =
         (TestFragment) getActivity().getFragmentManager().findFragmentById(R.id.test_fragment);
-    testBodyDelegate(loaderFrom(fragment));
+    testBodyDelegate(LoaderSource.loaderOf(fragment));
   }
 
   public void testOutputChannelAdapter() throws IOException {
@@ -290,7 +291,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
       return;
     }
 
-    testOutputChannelAdapter(loaderFrom(getActivity()));
+    testOutputChannelAdapter(LoaderSource.loaderOf(getActivity()));
   }
 
   public void testOutputChannelAdapterFragment() throws IOException {
@@ -300,7 +301,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
 
     final TestFragment fragment =
         (TestFragment) getActivity().getFragmentManager().findFragmentById(R.id.test_fragment);
-    testOutputChannelAdapter(loaderFrom(fragment));
+    testOutputChannelAdapter(LoaderSource.loaderOf(fragment));
   }
 
   public void testServiceDelegate() throws IOException {
@@ -308,7 +309,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
       return;
     }
 
-    testServiceDelegate(loaderFrom(getActivity()));
+    testServiceDelegate(LoaderSource.loaderOf(getActivity()));
   }
 
   public void testServiceDelegateFragment() throws IOException {
@@ -318,7 +319,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
 
     final TestFragment fragment =
         (TestFragment) getActivity().getFragmentManager().findFragmentById(R.id.test_fragment);
-    testServiceDelegate(loaderFrom(fragment));
+    testServiceDelegate(LoaderSource.loaderOf(fragment));
   }
 
   public void testStreamBuilderAdapter() throws IOException {
@@ -326,7 +327,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
       return;
     }
 
-    testStreamBuilderAdapter(loaderFrom(getActivity()));
+    testStreamBuilderAdapter(LoaderSource.loaderOf(getActivity()));
   }
 
   public void testStreamBuilderAdapterFragment() throws IOException {
@@ -336,7 +337,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
 
     final TestFragment fragment =
         (TestFragment) getActivity().getFragmentManager().findFragmentById(R.id.test_fragment);
-    testStreamBuilderAdapter(loaderFrom(fragment));
+    testStreamBuilderAdapter(LoaderSource.loaderOf(fragment));
   }
 
   private static class BodyAdapterFactory extends CallAdapter.Factory {

@@ -24,7 +24,7 @@ import com.github.dm.jrt.android.core.routine.LoaderRoutine;
 import com.github.dm.jrt.android.function.builder.AbstractStatefulLoaderRoutineBuilder;
 import com.github.dm.jrt.android.function.builder.StatefulLoaderRoutineBuilder;
 import com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat;
-import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
+import com.github.dm.jrt.android.v4.core.LoaderSourceCompat;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -50,26 +50,26 @@ class DefaultStatefulLoaderRoutineBuilderCompat<IN, OUT, STATE> extends
     AbstractStatefulLoaderRoutineBuilder<IN, OUT, STATE, StatefulLoaderRoutineBuilder<IN, OUT,
         STATE>> {
 
-  private final LoaderContextCompat mLoaderContext;
+  private final LoaderSourceCompat mLoaderSource;
 
   /**
    * Constructor.
    *
-   * @param loaderContext the Loader context.
+   * @param loaderSource the Loader source.
    */
-  DefaultStatefulLoaderRoutineBuilderCompat(@NotNull final LoaderContextCompat loaderContext) {
-    mLoaderContext = ConstantConditions.notNull("Loader context", loaderContext);
+  DefaultStatefulLoaderRoutineBuilderCompat(@NotNull final LoaderSourceCompat loaderSource) {
+    mLoaderSource = ConstantConditions.notNull("Loader source", loaderSource);
   }
 
   @NotNull
   @Override
   public LoaderRoutine<IN, OUT> buildRoutine() {
-    return JRoutineLoaderCompat.on(mLoaderContext)
+    return JRoutineLoaderCompat.on(mLoaderSource)
                                .with(new StatefulContextInvocationFactory<IN, OUT, STATE>(
                                    getOnContext(), getOnCreateState(), getOnNext(), getOnError(),
                                    getOnComplete(), getOnFinalize(), getOnDestroy()))
                                .withConfiguration(getConfiguration())
-                               .apply(getLoaderConfiguration())
+                               .withConfiguration(getLoaderConfiguration())
                                .buildRoutine();
   }
 

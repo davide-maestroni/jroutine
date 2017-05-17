@@ -17,8 +17,6 @@
 package com.github.dm.jrt.android.core.builder;
 
 import com.github.dm.jrt.android.core.config.LoaderConfigurable;
-import com.github.dm.jrt.android.core.config.LoaderConfiguration;
-import com.github.dm.jrt.android.core.config.LoaderConfiguration.Builder;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfigurable;
 
@@ -37,23 +35,6 @@ import org.jetbrains.annotations.Nullable;
  */
 public interface LoaderChannelBuilder
     extends ChannelConfigurable<LoaderChannelBuilder>, LoaderConfigurable<LoaderChannelBuilder> {
-
-  /**
-   * {@inheritDoc}
-   */
-  @NotNull
-  @Override
-  LoaderChannelBuilder apply(@NotNull LoaderConfiguration configuration);
-
-  /**
-   * Builds and returns a channel bound to the routine invocation.
-   *
-   * @param <OUT> the output data type.
-   * @return the newly created channel.
-   * @throws java.lang.IllegalArgumentException if the configured Loader ID is equal to AUTO.
-   */
-  @NotNull
-  <OUT> Channel<?, OUT> buildChannel();
 
   /**
    * Makes the builder discard the cached invocation instances with the specified inputs.
@@ -82,9 +63,12 @@ public interface LoaderChannelBuilder
   void clear(@Nullable Object input);
 
   /**
-   * {@inheritDoc}
+   * Builds and returns a channel bound to the routine invocation.
+   *
+   * @param <OUT> the output data type.
+   * @return the newly created channel.
+   * @throws java.lang.IllegalArgumentException if the configured Loader ID is equal to AUTO.
    */
   @NotNull
-  @Override
-  Builder<? extends LoaderChannelBuilder> loaderConfiguration();
+  <OUT> Channel<?, OUT> ofType();
 }

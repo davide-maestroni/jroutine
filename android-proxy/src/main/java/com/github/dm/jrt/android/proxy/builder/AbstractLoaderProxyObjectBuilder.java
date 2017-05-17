@@ -55,7 +55,7 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
 
   @NotNull
   @Override
-  public LoaderProxyObjectBuilder<TYPE> apply(@NotNull final LoaderConfiguration configuration) {
+  public LoaderProxyObjectBuilder<TYPE> withConfiguration(@NotNull final LoaderConfiguration configuration) {
     mLoaderConfiguration = ConstantConditions.notNull("Loader configuration", configuration);
     return this;
   }
@@ -165,8 +165,7 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
 
   @NotNull
   @Override
-  public LoaderConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>>
-  loaderConfiguration() {
+  public LoaderConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>> withLoader() {
     final LoaderConfiguration config = mLoaderConfiguration;
     return new LoaderConfiguration.Builder<LoaderProxyObjectBuilder<TYPE>>(this, config);
   }

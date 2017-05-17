@@ -66,8 +66,8 @@ public abstract class AbstractStatefulLoaderRoutineBuilder<IN, OUT, STATE, TYPE 
   private final Configurable<TYPE> mConfigurable = new Configurable<TYPE>() {
 
     @NotNull
-    public TYPE apply(@NotNull final LoaderConfiguration configuration) {
-      return AbstractStatefulLoaderRoutineBuilder.this.apply(configuration);
+    public TYPE withConfiguration(@NotNull final LoaderConfiguration configuration) {
+      return AbstractStatefulLoaderRoutineBuilder.this.withConfiguration(configuration);
     }
   };
 
@@ -87,14 +87,14 @@ public abstract class AbstractStatefulLoaderRoutineBuilder<IN, OUT, STATE, TYPE 
   @NotNull
   @Override
   @SuppressWarnings("unchecked")
-  public TYPE apply(@NotNull final LoaderConfiguration configuration) {
+  public TYPE withConfiguration(@NotNull final LoaderConfiguration configuration) {
     mConfiguration = ConstantConditions.notNull("loader configuration", configuration);
     return (TYPE) this;
   }
 
   @NotNull
   @Override
-  public Builder<? extends TYPE> loaderConfiguration() {
+  public Builder<? extends TYPE> withLoader() {
     return new Builder<TYPE>(mConfigurable, mConfiguration);
   }
 

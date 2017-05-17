@@ -25,10 +25,10 @@ import com.github.dm.jrt.JRoutine;
 import com.github.dm.jrt.android.ServiceBuilder;
 import com.github.dm.jrt.android.channel.io.ParcelableByteChannel;
 import com.github.dm.jrt.android.channel.io.ParcelableByteChannel.ParcelableByteChunk;
-import com.github.dm.jrt.android.core.ServiceContext;
+import com.github.dm.jrt.android.core.ServiceSource;
 import com.github.dm.jrt.android.core.service.InvocationService;
 import com.github.dm.jrt.android.v4.channel.SparseChannelsCompat;
-import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
+import com.github.dm.jrt.android.v4.core.LoaderSourceCompat;
 import com.github.dm.jrt.channel.io.ByteChannel.ByteChunkInputStream;
 import com.github.dm.jrt.core.builder.ChannelBuilder;
 import com.github.dm.jrt.core.channel.Channel;
@@ -41,8 +41,8 @@ import com.github.dm.jrt.stream.builder.StreamBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static com.github.dm.jrt.android.core.ServiceContext.serviceFrom;
-import static com.github.dm.jrt.android.v4.core.LoaderContextCompat.loaderFrom;
+import static com.github.dm.jrt.android.core.ServiceSource.serviceFrom;
+import static com.github.dm.jrt.android.v4.core.LoaderSourceCompat.loaderFrom;
 
 /**
  * Class acting as a fa&ccedil;ade of all the JRoutine library features, with support for the
@@ -182,7 +182,7 @@ public class JRoutineAndroidCompat extends SparseChannelsCompat {
    */
   @NotNull
   public static ServiceBuilder on(@NotNull final Context context) {
-    return on(serviceFrom(context));
+    return on(ServiceSource.serviceOf(context));
   }
 
   /**
@@ -195,7 +195,7 @@ public class JRoutineAndroidCompat extends SparseChannelsCompat {
   @NotNull
   public static ServiceBuilder on(@NotNull final Context context,
       @NotNull final Class<? extends InvocationService> serviceClass) {
-    return on(serviceFrom(context, serviceClass));
+    return on(ServiceSource.serviceOf(context, serviceClass));
   }
 
   /**
@@ -207,7 +207,7 @@ public class JRoutineAndroidCompat extends SparseChannelsCompat {
    */
   @NotNull
   public static ServiceBuilder on(@NotNull final Context context, @NotNull final Intent service) {
-    return on(serviceFrom(context, service));
+    return on(serviceOf(context, service));
   }
 
   /**
@@ -218,7 +218,7 @@ public class JRoutineAndroidCompat extends SparseChannelsCompat {
    */
   @NotNull
   public static LoaderBuilderCompat on(@NotNull final Fragment fragment) {
-    return on(loaderFrom(fragment));
+    return on(LoaderSourceCompat.loaderOf(fragment));
   }
 
   /**
@@ -231,7 +231,7 @@ public class JRoutineAndroidCompat extends SparseChannelsCompat {
   @NotNull
   public static LoaderBuilderCompat on(@NotNull final Fragment fragment,
       @NotNull final Context context) {
-    return on(loaderFrom(fragment, context));
+    return on(LoaderSourceCompat.loaderOf(fragment, context));
   }
 
   /**
@@ -242,7 +242,7 @@ public class JRoutineAndroidCompat extends SparseChannelsCompat {
    */
   @NotNull
   public static LoaderBuilderCompat on(@NotNull final FragmentActivity activity) {
-    return on(loaderFrom(activity));
+    return on(LoaderSourceCompat.loaderOf(activity));
   }
 
   /**
@@ -255,7 +255,7 @@ public class JRoutineAndroidCompat extends SparseChannelsCompat {
   @NotNull
   public static LoaderBuilderCompat on(@NotNull final FragmentActivity activity,
       @NotNull final Context context) {
-    return on(loaderFrom(activity, context));
+    return on(loaderOf(activity, context));
   }
 
   /**
@@ -265,7 +265,7 @@ public class JRoutineAndroidCompat extends SparseChannelsCompat {
    * @return the Context based builder.
    */
   @NotNull
-  public static LoaderBuilderCompat on(@NotNull final LoaderContextCompat context) {
+  public static LoaderBuilderCompat on(@NotNull final LoaderSourceCompat context) {
     return new LoaderBuilderCompat(context);
   }
 
@@ -276,7 +276,7 @@ public class JRoutineAndroidCompat extends SparseChannelsCompat {
    * @return the Context based builder.
    */
   @NotNull
-  public static ServiceBuilder on(@NotNull final ServiceContext context) {
+  public static ServiceBuilder on(@NotNull final ServiceSource context) {
     return new ServiceBuilder(context) {};
   }
 

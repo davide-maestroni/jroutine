@@ -23,7 +23,7 @@ import com.github.dm.jrt.android.proxy.annotation.LoaderProxyCompat;
 import com.github.dm.jrt.android.proxy.builder.LoaderProxyRoutineBuilder;
 import com.github.dm.jrt.android.reflect.ContextInvocationTarget;
 import com.github.dm.jrt.android.reflect.builder.LoaderReflectionRoutineBuilder;
-import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
+import com.github.dm.jrt.android.v4.core.LoaderSourceCompat;
 import com.github.dm.jrt.android.v4.proxy.JRoutineLoaderProxyCompat;
 import com.github.dm.jrt.android.v4.reflect.JRoutineLoaderReflectionCompat;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
@@ -44,7 +44,7 @@ import java.lang.reflect.Method;
  */
 class DefaultLoaderWrapperRoutineBuilderCompat implements LoaderWrapperRoutineBuilder {
 
-  private final LoaderContextCompat mContext;
+  private final LoaderSourceCompat mLoaderSource;
 
   private final ContextInvocationTarget<?> mTarget;
 
@@ -60,88 +60,13 @@ class DefaultLoaderWrapperRoutineBuilderCompat implements LoaderWrapperRoutineBu
   /**
    * Constructor.
    *
-   * @param context the Loader context.
-   * @param target  the invocation target.
+   * @param loaderSource the Loader source.
+   * @param target       the invocation target.
    */
-  DefaultLoaderWrapperRoutineBuilderCompat(@NotNull final LoaderContextCompat context,
+  DefaultLoaderWrapperRoutineBuilderCompat(@NotNull final LoaderSourceCompat loaderSource,
       @NotNull final ContextInvocationTarget<?> target) {
-    mContext = ConstantConditions.notNull("Loader context", context);
+    mLoaderSource = ConstantConditions.notNull("Loader source", loaderSource);
     mTarget = ConstantConditions.notNull("invocation target", target);
-  }
-
-  @NotNull
-  @Override
-  public LoaderWrapperRoutineBuilder withConfiguration(@NotNull final InvocationConfiguration configuration) {
-    mInvocationConfiguration =
-        ConstantConditions.notNull("invocation configuration", configuration);
-    return this;
-  }
-
-  @NotNull
-  @Override
-  public LoaderWrapperRoutineBuilder withConfiguration(@NotNull final WrapperConfiguration configuration) {
-    mWrapperConfiguration = ConstantConditions.notNull("wrapper configuration", configuration);
-    return this;
-  }
-
-  @NotNull
-  @Override
-  public Builder<? extends LoaderWrapperRoutineBuilder> withInvocation() {
-    return new InvocationConfiguration.Builder<LoaderWrapperRoutineBuilder>(
-        new InvocationConfiguration.Configurable<LoaderWrapperRoutineBuilder>() {
-
-          @NotNull
-          @Override
-          public LoaderWrapperRoutineBuilder withConfiguration(
-              @NotNull final InvocationConfiguration configuration) {
-            return DefaultLoaderWrapperRoutineBuilderCompat.this.withConfiguration(configuration);
-          }
-        }, mInvocationConfiguration);
-  }
-
-  @NotNull
-  @Override
-  public LoaderWrapperRoutineBuilder withStrategy(@Nullable final ProxyStrategyType strategyType) {
-    mProxyStrategyType = strategyType;
-    return this;
-  }
-
-  @NotNull
-  @Override
-  public WrapperConfiguration.Builder<? extends LoaderWrapperRoutineBuilder> withWrapper
-      () {
-    return new WrapperConfiguration.Builder<LoaderWrapperRoutineBuilder>(
-        new WrapperConfiguration.Configurable<LoaderWrapperRoutineBuilder>() {
-
-          @NotNull
-          @Override
-          public LoaderWrapperRoutineBuilder withConfiguration(
-              @NotNull final WrapperConfiguration configuration) {
-            return DefaultLoaderWrapperRoutineBuilderCompat.this.withConfiguration(configuration);
-          }
-        }, mWrapperConfiguration);
-  }
-
-  @NotNull
-  @Override
-  public LoaderWrapperRoutineBuilder apply(@NotNull final LoaderConfiguration configuration) {
-    mLoaderConfiguration = ConstantConditions.notNull("Loader configuration", configuration);
-    return this;
-  }
-
-  @NotNull
-  @Override
-  public LoaderConfiguration.Builder<? extends LoaderWrapperRoutineBuilder> loaderConfiguration() {
-    return new LoaderConfiguration.Builder<LoaderWrapperRoutineBuilder>(
-        new LoaderConfiguration.Configurable<LoaderWrapperRoutineBuilder>() {
-
-          @NotNull
-          @Override
-          public LoaderWrapperRoutineBuilder apply(
-              @NotNull final LoaderConfiguration configuration) {
-            return DefaultLoaderWrapperRoutineBuilderCompat.this.apply(configuration);
-          }
-        }, mLoaderConfiguration);
   }
 
   @NotNull
@@ -189,20 +114,97 @@ class DefaultLoaderWrapperRoutineBuilderCompat implements LoaderWrapperRoutineBu
   }
 
   @NotNull
+  @Override
+  public LoaderWrapperRoutineBuilder withConfiguration(
+      @NotNull final InvocationConfiguration configuration) {
+    mInvocationConfiguration =
+        ConstantConditions.notNull("invocation configuration", configuration);
+    return this;
+  }
+
+  @NotNull
+  @Override
+  public LoaderWrapperRoutineBuilder withConfiguration(
+      @NotNull final WrapperConfiguration configuration) {
+    mWrapperConfiguration = ConstantConditions.notNull("wrapper configuration", configuration);
+    return this;
+  }
+
+  @NotNull
+  @Override
+  public Builder<? extends LoaderWrapperRoutineBuilder> withInvocation() {
+    return new InvocationConfiguration.Builder<LoaderWrapperRoutineBuilder>(
+        new InvocationConfiguration.Configurable<LoaderWrapperRoutineBuilder>() {
+
+          @NotNull
+          @Override
+          public LoaderWrapperRoutineBuilder withConfiguration(
+              @NotNull final InvocationConfiguration configuration) {
+            return DefaultLoaderWrapperRoutineBuilderCompat.this.withConfiguration(configuration);
+          }
+        }, mInvocationConfiguration);
+  }
+
+  @NotNull
+  @Override
+  public LoaderWrapperRoutineBuilder withStrategy(@Nullable final ProxyStrategyType strategyType) {
+    mProxyStrategyType = strategyType;
+    return this;
+  }
+
+  @NotNull
+  @Override
+  public WrapperConfiguration.Builder<? extends LoaderWrapperRoutineBuilder> withWrapper() {
+    return new WrapperConfiguration.Builder<LoaderWrapperRoutineBuilder>(
+        new WrapperConfiguration.Configurable<LoaderWrapperRoutineBuilder>() {
+
+          @NotNull
+          @Override
+          public LoaderWrapperRoutineBuilder withConfiguration(
+              @NotNull final WrapperConfiguration configuration) {
+            return DefaultLoaderWrapperRoutineBuilderCompat.this.withConfiguration(configuration);
+          }
+        }, mWrapperConfiguration);
+  }
+
+  @NotNull
+  @Override
+  public LoaderWrapperRoutineBuilder withConfiguration(
+      @NotNull final LoaderConfiguration configuration) {
+    mLoaderConfiguration = ConstantConditions.notNull("Loader configuration", configuration);
+    return this;
+  }
+
+  @NotNull
+  @Override
+  public LoaderConfiguration.Builder<? extends LoaderWrapperRoutineBuilder> withLoader() {
+    return new LoaderConfiguration.Builder<LoaderWrapperRoutineBuilder>(
+        new LoaderConfiguration.Configurable<LoaderWrapperRoutineBuilder>() {
+
+          @NotNull
+          @Override
+          public LoaderWrapperRoutineBuilder withConfiguration(
+              @NotNull final LoaderConfiguration configuration) {
+            return DefaultLoaderWrapperRoutineBuilderCompat.this.withConfiguration(configuration);
+          }
+        }, mLoaderConfiguration);
+  }
+
+  @NotNull
   private LoaderProxyRoutineBuilder newProxyBuilder() {
-    return JRoutineLoaderProxyCompat.on(mContext)
+    return JRoutineLoaderProxyCompat.on(mLoaderSource)
                                     .with(mTarget)
                                     .withConfiguration(mInvocationConfiguration)
                                     .withConfiguration(mWrapperConfiguration)
-                                    .apply(mLoaderConfiguration);
+                                    .withConfiguration(mLoaderConfiguration);
   }
 
   @NotNull
   private LoaderReflectionRoutineBuilder newReflectionBuilder() {
-    return JRoutineLoaderReflectionCompat.on(mContext)
+    return JRoutineLoaderReflectionCompat.on(mLoaderSource)
                                          .with(mTarget)
                                          .withConfiguration(mInvocationConfiguration)
                                          .withConfiguration(mWrapperConfiguration)
-                                         .apply(mLoaderConfiguration);
+                                         .withConfiguration(mLoaderConfiguration);
   }
 }

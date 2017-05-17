@@ -21,7 +21,7 @@ import android.content.Context;
 import com.github.dm.jrt.android.channel.AndroidChannels;
 import com.github.dm.jrt.android.channel.ParcelableFlow;
 import com.github.dm.jrt.android.core.JRoutineService;
-import com.github.dm.jrt.android.core.ServiceContext;
+import com.github.dm.jrt.android.core.ServiceSource;
 import com.github.dm.jrt.android.core.config.ServiceConfigurable;
 import com.github.dm.jrt.android.core.config.ServiceConfiguration;
 import com.github.dm.jrt.android.core.config.ServiceConfiguration.Builder;
@@ -56,7 +56,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import static com.github.dm.jrt.android.core.invocation.TargetInvocationFactory.factoryOf;
+import static com.github.dm.jrt.android.core.invocation.InvocationFactoryReference.factoryOf;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.core.util.Reflection.boxingClass;
 import static com.github.dm.jrt.core.util.Reflection.boxingDefault;
@@ -83,7 +83,7 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * <pre><code>
  * public static class MyMethod extends ServiceRoutineMethod {
  *
- *   public MyMethod(final ServiceContext context) {
+ *   public MyMethod(final ServiceSource context) {
  *     super(context);
  *   }
  *
@@ -103,13 +103,13 @@ public class ServiceRoutineMethod extends RoutineMethod
 
   private final Object[] mArgs;
 
-  private final ServiceContext mContext;
-
   private final ThreadLocal<Channel<?, ?>> mLocalChannel = new ThreadLocal<Channel<?, ?>>();
 
   private final ThreadLocal<Context> mLocalContext = new ThreadLocal<Context>();
 
   private final ThreadLocal<Boolean> mLocalIgnore = new ThreadLocal<Boolean>();
+
+  private final ServiceSource mServiceSource;
 
   private ServiceConfiguration mConfiguration = ServiceConfiguration.defaultConfiguration();
 
@@ -118,21 +118,21 @@ public class ServiceRoutineMethod extends RoutineMethod
   /**
    * Constructor.
    *
-   * @param context the Service context.
+   * @param serviceSource the Service source.
    */
-  public ServiceRoutineMethod(@NotNull final ServiceContext context) {
-    this(context, (Object[]) null);
+  public ServiceRoutineMethod(@NotNull final ServiceSource serviceSource) {
+    this(serviceSource, (Object[]) null);
   }
 
   /**
    * Constructor.
    *
-   * @param context the Service context.
-   * @param args    the constructor arguments.
+   * @param serviceSource the Service context.
+   * @param args          the constructor arguments.
    */
-  public ServiceRoutineMethod(@NotNull final ServiceContext context,
+  public ServiceRoutineMethod(@NotNull final ServiceSource serviceSource,
       @Nullable final Object... args) {
-    mContext = ConstantConditions.notNull("Service context", context);
+    mServiceSource = ConstantConditions.notNull("Service context", serviceSource);
     final Class<? extends RoutineMethod> type = getClass();
     if (!Reflection.hasStaticScope(type)) {
       throw new IllegalStateException(
@@ -157,7 +157,7 @@ public class ServiceRoutineMethod extends RoutineMethod
 
     final Object[] constructorArgs = new Object[additionalArgs.length + 1];
     System.arraycopy(additionalArgs, 0, constructorArgs, 1, additionalArgs.length);
-    constructorArgs[0] = context;
+    constructorArgs[0] = serviceSource;
     Reflection.findBestMatchingConstructor(type, constructorArgs);
     mArgs = additionalArgs;
   }
@@ -171,7 +171,7 @@ public class ServiceRoutineMethod extends RoutineMethod
    * @throws java.lang.IllegalArgumentException if the specified method is not static.
    */
   @NotNull
-  public static ReflectionServiceRoutineMethod from(@NotNull final ServiceContext context,
+  public static ReflectionServiceRoutineMethod from(@NotNull final ServiceSource context,
       @NotNull final Method method) {
     if (!Modifier.isStatic(method.getModifiers())) {
       throw new IllegalArgumentException("the method is not static: " + method);
@@ -191,7 +191,7 @@ public class ServiceRoutineMethod extends RoutineMethod
    *                                            target instance.
    */
   @NotNull
-  public static ReflectionServiceRoutineMethod from(@NotNull final ServiceContext context,
+  public static ReflectionServiceRoutineMethod from(@NotNull final ServiceSource context,
       @NotNull final ContextInvocationTarget<?> target, @NotNull final Method method) {
     if (!method.getDeclaringClass().isAssignableFrom(target.getTargetClass())) {
       throw new IllegalArgumentException(
@@ -212,16 +212,10 @@ public class ServiceRoutineMethod extends RoutineMethod
    * @throws java.lang.NoSuchMethodException if no method with the specified signature is found.
    */
   @NotNull
-  public static ReflectionServiceRoutineMethod from(@NotNull final ServiceContext context,
+  public static ReflectionServiceRoutineMethod from(@NotNull final ServiceSource context,
       @NotNull final ContextInvocationTarget<?> target, @NotNull final String name,
       @Nullable final Class<?>... parameterTypes) throws NoSuchMethodException {
     return from(context, target, target.getTargetClass().getMethod(name, parameterTypes));
-  }
-
-  @NotNull
-  @Override
-  public ServiceRoutineMethod withConfiguration(@NotNull final InvocationConfiguration configuration) {
-    return (ServiceRoutineMethod) super.withConfiguration(configuration);
   }
 
   /**
@@ -246,10 +240,16 @@ public class ServiceRoutineMethod extends RoutineMethod
 
   @NotNull
   @Override
+  public ServiceRoutineMethod withConfiguration(
+      @NotNull final InvocationConfiguration configuration) {
+    return (ServiceRoutineMethod) super.withConfiguration(configuration);
+  }
+
+  @NotNull
+  @Override
   @SuppressWarnings("unchecked")
   public InvocationConfiguration.Builder<? extends ServiceRoutineMethod> withInvocation() {
-    return (InvocationConfiguration.Builder<? extends ServiceRoutineMethod>) super
-        .withInvocation();
+    return (InvocationConfiguration.Builder<? extends ServiceRoutineMethod>) super.withInvocation();
   }
 
   /**
@@ -283,14 +283,14 @@ public class ServiceRoutineMethod extends RoutineMethod
 
   @NotNull
   @Override
-  public ServiceRoutineMethod apply(@NotNull final ServiceConfiguration configuration) {
+  public ServiceRoutineMethod withConfiguration(@NotNull final ServiceConfiguration configuration) {
     mConfiguration = ConstantConditions.notNull("Service configuration", configuration);
     return this;
   }
 
   @NotNull
   @Override
-  public Builder<? extends ServiceRoutineMethod> serviceConfiguration() {
+  public Builder<? extends ServiceRoutineMethod> withService() {
     return new Builder<ServiceRoutineMethod>(this, mConfiguration);
   }
 
@@ -342,7 +342,7 @@ public class ServiceRoutineMethod extends RoutineMethod
                                                     .buildChannel()
             : JRoutineCore.<ParcelableFlow<Object>>of().buildChannel();
     final Channel<ParcelableFlow<Object>, ParcelableFlow<Object>> outputChannel =
-        JRoutineService.on(mContext)
+        JRoutineService.on(mServiceSource)
                        .with(factoryOf(ServiceInvocation.class, getClass(), mArgs, params))
                        .withConfiguration(getConfiguration())
                        .apply(getServiceConfiguration())
@@ -384,7 +384,7 @@ public class ServiceRoutineMethod extends RoutineMethod
   public static class ReflectionServiceRoutineMethod extends ServiceRoutineMethod
       implements WrapperConfigurable<ReflectionServiceRoutineMethod> {
 
-    private final ServiceContext mContext;
+    private final ServiceSource mContext;
 
     private final Method mMethod;
 
@@ -399,19 +399,12 @@ public class ServiceRoutineMethod extends RoutineMethod
      * @param target  the invocation target.
      * @param method  the method instance.
      */
-    private ReflectionServiceRoutineMethod(@NotNull final ServiceContext context,
+    private ReflectionServiceRoutineMethod(@NotNull final ServiceSource context,
         @NotNull final ContextInvocationTarget<?> target, @NotNull final Method method) {
       super(context, target, method);
       mContext = context;
       mTarget = target;
       mMethod = method;
-    }
-
-    @NotNull
-    @Override
-    public ReflectionServiceRoutineMethod withConfiguration(
-        @NotNull final InvocationConfiguration configuration) {
-      return (ReflectionServiceRoutineMethod) super.withConfiguration(configuration);
     }
 
     @NotNull
@@ -428,10 +421,12 @@ public class ServiceRoutineMethod extends RoutineMethod
 
       final Routine<Object, Object> routine = JRoutineServiceReflection.on(mContext)
                                                                        .with(mTarget)
-                                                                       .withConfiguration(getConfiguration())
-                                                                       .apply(
+                                                                       .withConfiguration(
+                                                                           getConfiguration())
+                                                                       .withConfiguration(
                                                                            getServiceConfiguration())
-                                                                       .withConfiguration(mConfiguration)
+                                                                       .withConfiguration(
+                                                                           mConfiguration)
                                                                        .method(method);
       final Channel<Object, Object> channel = routine.invoke().sorted();
       for (final Object param : safeParams) {
@@ -448,8 +443,16 @@ public class ServiceRoutineMethod extends RoutineMethod
 
     @NotNull
     @Override
+    public ReflectionServiceRoutineMethod withConfiguration(
+        @NotNull final InvocationConfiguration configuration) {
+      return (ReflectionServiceRoutineMethod) super.withConfiguration(configuration);
+    }
+
+    @NotNull
+    @Override
     @SuppressWarnings("unchecked")
-    public InvocationConfiguration.Builder<? extends ReflectionServiceRoutineMethod> withInvocation() {
+    public InvocationConfiguration.Builder<? extends ReflectionServiceRoutineMethod>
+    withInvocation() {
 
       return (InvocationConfiguration.Builder<? extends ReflectionServiceRoutineMethod>) super
           .withInvocation();
@@ -457,20 +460,22 @@ public class ServiceRoutineMethod extends RoutineMethod
 
     @NotNull
     @Override
-    public ReflectionServiceRoutineMethod apply(@NotNull final ServiceConfiguration configuration) {
-      return (ReflectionServiceRoutineMethod) super.apply(configuration);
+    public ReflectionServiceRoutineMethod withConfiguration(
+        @NotNull final ServiceConfiguration configuration) {
+      return (ReflectionServiceRoutineMethod) super.withConfiguration(configuration);
     }
 
     @NotNull
     @Override
     @SuppressWarnings("unchecked")
-    public Builder<? extends ReflectionServiceRoutineMethod> serviceConfiguration() {
-      return (Builder<? extends ReflectionServiceRoutineMethod>) super.serviceConfiguration();
+    public Builder<? extends ReflectionServiceRoutineMethod> withService() {
+      return (Builder<? extends ReflectionServiceRoutineMethod>) super.withService();
     }
 
     @NotNull
     @Override
-    public ReflectionServiceRoutineMethod withConfiguration(@NotNull final WrapperConfiguration configuration) {
+    public ReflectionServiceRoutineMethod withConfiguration(
+        @NotNull final WrapperConfiguration configuration) {
       mConfiguration = ConstantConditions.notNull("wrapper configuration", configuration);
       return this;
     }
@@ -660,7 +665,7 @@ public class ServiceRoutineMethod extends RoutineMethod
       final Object[] additionalArgs = mArgs;
       final Object[] constructorArgs = (mConstructorArgs = new Object[additionalArgs.length + 1]);
       System.arraycopy(additionalArgs, 0, constructorArgs, 1, additionalArgs.length);
-      constructorArgs[0] = ServiceContext.serviceFrom(context);
+      constructorArgs[0] = ServiceSource.serviceOf(context);
       mConstructor = Reflection.findBestMatchingConstructor(mType, constructorArgs);
     }
 

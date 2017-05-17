@@ -26,10 +26,10 @@
       @org.jetbrains.annotations.NotNull final com.github.dm.jrt.reflect.config.WrapperConfiguration wrapperConfiguration,
       @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.config.ServiceConfiguration serviceConfiguration) {
     final java.util.Set<String> sharedFields = ${sharedFields};
-    final com.github.dm.jrt.android.core.invocation.TargetInvocationFactory<Object, ${resultClassName}> targetFactory = com.github.dm.jrt.android.core.invocation.TargetInvocationFactory.factoryOf(
+    final com.github.dm.jrt.android.core.invocation.InvocationFactoryReference<Object, ${resultClassName}> factory = com.github.dm.jrt.android.core.invocation.InvocationFactoryReference.factoryOf(
         // We need to work around Proguard stripping away generics information, so the use of a ClassToken is not an option
         (Class<? extends com.github.dm.jrt.android.core.invocation.ContextInvocation<Object, ${resultClassName}>>) new ContextInvocation${methodCount}${genericTypes}(sharedFields, target).getClass(), sharedFields, target);
-    return getBuilder(mContext, targetFactory).invocationConfiguration()
+    return getBuilder(mServiceSource, factory).invocationConfiguration()
                                               .withPatch(invocationConfiguration)
                                               ${routineBuilderOptions}
                                               .apply()

@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.android;
 
-import com.github.dm.jrt.android.core.ServiceContext;
+import com.github.dm.jrt.android.core.ServiceSource;
 import com.github.dm.jrt.android.core.config.ServiceConfiguration;
 import com.github.dm.jrt.android.proxy.JRoutineServiceProxy;
 import com.github.dm.jrt.android.proxy.annotation.ServiceProxy;
@@ -42,7 +42,7 @@ import java.lang.reflect.Method;
  */
 class DefaultServiceWrapperRoutineBuilder implements ServiceWrapperRoutineBuilder {
 
-  private final ServiceContext mContext;
+  private final ServiceSource mServiceSource;
 
   private final ContextInvocationTarget<?> mTarget;
 
@@ -58,88 +58,13 @@ class DefaultServiceWrapperRoutineBuilder implements ServiceWrapperRoutineBuilde
   /**
    * Constructor.
    *
-   * @param context the Service context.
-   * @param target  the invocation target.
+   * @param serviceSource the Service source.
+   * @param target        the invocation target.
    */
-  DefaultServiceWrapperRoutineBuilder(@NotNull final ServiceContext context,
+  DefaultServiceWrapperRoutineBuilder(@NotNull final ServiceSource serviceSource,
       @NotNull final ContextInvocationTarget<?> target) {
-    mContext = ConstantConditions.notNull("Service context", context);
+    mServiceSource = ConstantConditions.notNull("Service source", serviceSource);
     mTarget = ConstantConditions.notNull("invocation target", target);
-  }
-
-  @NotNull
-  @Override
-  public ServiceWrapperRoutineBuilder withConfiguration(@NotNull final InvocationConfiguration configuration) {
-    mInvocationConfiguration =
-        ConstantConditions.notNull("invocation configuration", configuration);
-    return this;
-  }
-
-  @NotNull
-  @Override
-  public ServiceWrapperRoutineBuilder withConfiguration(@NotNull final WrapperConfiguration configuration) {
-    mWrapperConfiguration = ConstantConditions.notNull("wrapper configuration", configuration);
-    return this;
-  }
-
-  @NotNull
-  @Override
-  public InvocationConfiguration.Builder<? extends ServiceWrapperRoutineBuilder> withInvocation() {
-    return new InvocationConfiguration.Builder<ServiceWrapperRoutineBuilder>(
-        new InvocationConfiguration.Configurable<ServiceWrapperRoutineBuilder>() {
-
-          @NotNull
-          @Override
-          public ServiceWrapperRoutineBuilder withConfiguration(
-              @NotNull final InvocationConfiguration configuration) {
-            return DefaultServiceWrapperRoutineBuilder.this.withConfiguration(configuration);
-          }
-        }, mInvocationConfiguration);
-  }
-
-  @NotNull
-  @Override
-  public ServiceWrapperRoutineBuilder withStrategy(@Nullable final ProxyStrategyType strategyType) {
-    mProxyStrategyType = strategyType;
-    return this;
-  }
-
-  @NotNull
-  @Override
-  public WrapperConfiguration.Builder<? extends ServiceWrapperRoutineBuilder> withWrapper() {
-    return new WrapperConfiguration.Builder<ServiceWrapperRoutineBuilder>(
-        new WrapperConfiguration.Configurable<ServiceWrapperRoutineBuilder>() {
-
-          @NotNull
-          @Override
-          public ServiceWrapperRoutineBuilder withConfiguration(
-              @NotNull final WrapperConfiguration configuration) {
-            return DefaultServiceWrapperRoutineBuilder.this.withConfiguration(configuration);
-          }
-        }, mWrapperConfiguration);
-  }
-
-  @NotNull
-  @Override
-  public ServiceWrapperRoutineBuilder apply(@NotNull final ServiceConfiguration configuration) {
-    mServiceConfiguration = ConstantConditions.notNull("Service configuration", configuration);
-    return this;
-  }
-
-  @NotNull
-  @Override
-  public ServiceConfiguration.Builder<? extends ServiceWrapperRoutineBuilder>
-  serviceConfiguration() {
-    return new ServiceConfiguration.Builder<ServiceWrapperRoutineBuilder>(
-        new ServiceConfiguration.Configurable<ServiceWrapperRoutineBuilder>() {
-
-          @NotNull
-          @Override
-          public ServiceWrapperRoutineBuilder apply(
-              @NotNull final ServiceConfiguration configuration) {
-            return DefaultServiceWrapperRoutineBuilder.this.apply(configuration);
-          }
-        }, mServiceConfiguration);
   }
 
   @NotNull
@@ -187,20 +112,97 @@ class DefaultServiceWrapperRoutineBuilder implements ServiceWrapperRoutineBuilde
   }
 
   @NotNull
+  @Override
+  public ServiceWrapperRoutineBuilder withConfiguration(
+      @NotNull final InvocationConfiguration configuration) {
+    mInvocationConfiguration =
+        ConstantConditions.notNull("invocation configuration", configuration);
+    return this;
+  }
+
+  @NotNull
+  @Override
+  public ServiceWrapperRoutineBuilder withConfiguration(
+      @NotNull final WrapperConfiguration configuration) {
+    mWrapperConfiguration = ConstantConditions.notNull("wrapper configuration", configuration);
+    return this;
+  }
+
+  @NotNull
+  @Override
+  public InvocationConfiguration.Builder<? extends ServiceWrapperRoutineBuilder> withInvocation() {
+    return new InvocationConfiguration.Builder<ServiceWrapperRoutineBuilder>(
+        new InvocationConfiguration.Configurable<ServiceWrapperRoutineBuilder>() {
+
+          @NotNull
+          @Override
+          public ServiceWrapperRoutineBuilder withConfiguration(
+              @NotNull final InvocationConfiguration configuration) {
+            return DefaultServiceWrapperRoutineBuilder.this.withConfiguration(configuration);
+          }
+        }, mInvocationConfiguration);
+  }
+
+  @NotNull
+  @Override
+  public ServiceWrapperRoutineBuilder withStrategy(@Nullable final ProxyStrategyType strategyType) {
+    mProxyStrategyType = strategyType;
+    return this;
+  }
+
+  @NotNull
+  @Override
+  public WrapperConfiguration.Builder<? extends ServiceWrapperRoutineBuilder> withWrapper() {
+    return new WrapperConfiguration.Builder<ServiceWrapperRoutineBuilder>(
+        new WrapperConfiguration.Configurable<ServiceWrapperRoutineBuilder>() {
+
+          @NotNull
+          @Override
+          public ServiceWrapperRoutineBuilder withConfiguration(
+              @NotNull final WrapperConfiguration configuration) {
+            return DefaultServiceWrapperRoutineBuilder.this.withConfiguration(configuration);
+          }
+        }, mWrapperConfiguration);
+  }
+
+  @NotNull
+  @Override
+  public ServiceWrapperRoutineBuilder withConfiguration(
+      @NotNull final ServiceConfiguration configuration) {
+    mServiceConfiguration = ConstantConditions.notNull("Service configuration", configuration);
+    return this;
+  }
+
+  @NotNull
+  @Override
+  public ServiceConfiguration.Builder<? extends ServiceWrapperRoutineBuilder> withService() {
+    return new ServiceConfiguration.Builder<ServiceWrapperRoutineBuilder>(
+        new ServiceConfiguration.Configurable<ServiceWrapperRoutineBuilder>() {
+
+          @NotNull
+          @Override
+          public ServiceWrapperRoutineBuilder withConfiguration(
+              @NotNull final ServiceConfiguration configuration) {
+            return DefaultServiceWrapperRoutineBuilder.this.withConfiguration(configuration);
+          }
+        }, mServiceConfiguration);
+  }
+
+  @NotNull
   private ServiceProxyRoutineBuilder newProxyBuilder() {
-    return JRoutineServiceProxy.on(mContext)
+    return JRoutineServiceProxy.on(mServiceSource)
                                .with(mTarget)
                                .withConfiguration(mInvocationConfiguration)
                                .withConfiguration(mWrapperConfiguration)
-                               .apply(mServiceConfiguration);
+                               .withConfiguration(mServiceConfiguration);
   }
 
   @NotNull
   private ServiceReflectionRoutineBuilder newReflectionBuilder() {
-    return JRoutineServiceReflection.on(mContext)
+    return JRoutineServiceReflection.on(mServiceSource)
                                     .with(mTarget)
                                     .withConfiguration(mInvocationConfiguration)
                                     .withConfiguration(mWrapperConfiguration)
-                                    .apply(mServiceConfiguration);
+                                    .withConfiguration(mServiceConfiguration);
   }
 }

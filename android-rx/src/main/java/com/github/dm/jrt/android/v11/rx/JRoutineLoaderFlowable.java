@@ -19,7 +19,7 @@ package com.github.dm.jrt.android.v11.rx;
 import com.github.dm.jrt.android.core.config.LoaderConfigurable;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.v11.core.JRoutineLoader;
-import com.github.dm.jrt.android.v11.core.LoaderContext;
+import com.github.dm.jrt.android.v11.core.LoaderSource;
 import com.github.dm.jrt.core.config.InvocationConfigurable;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -40,7 +40,7 @@ import io.reactivex.Flowable;
  *                       .loaderConfiguration()
  *                       .withInvocationId(INVOCATION_ID)
  *                       .configured()
- *                       .observeOn(loaderFrom(activity))
+ *                       .observeOn(loaderOf(activity))
  *                       .subscribe(getConsumer());
  * </code></pre>
  * Note that the Loader ID, by default, will only depend on the inputs, so, in order to avoid
@@ -97,7 +97,7 @@ public class JRoutineLoaderFlowable {
 
     @NotNull
     @Override
-    public LoaderFlowable<DATA> apply(@NotNull final LoaderConfiguration configuration) {
+    public LoaderFlowable<DATA> withConfiguration(@NotNull final LoaderConfiguration configuration) {
       mLoaderConfiguration = ConstantConditions.notNull("Loader configuration", configuration);
       return this;
     }
@@ -133,7 +133,7 @@ public class JRoutineLoaderFlowable {
 
     @NotNull
     @Override
-    public LoaderConfiguration.Builder<? extends LoaderFlowable<DATA>> loaderConfiguration() {
+    public LoaderConfiguration.Builder<? extends LoaderFlowable<DATA>> withLoader() {
       return new LoaderConfiguration.Builder<LoaderFlowable<DATA>>(this, mLoaderConfiguration);
     }
 
@@ -146,13 +146,13 @@ public class JRoutineLoaderFlowable {
      * @return the Observable.
      */
     @NotNull
-    public Flowable<DATA> observeOn(@NotNull final LoaderContext context) {
+    public Flowable<DATA> observeOn(@NotNull final LoaderSource context) {
       final FlowableInvocationFactory<DATA> factory =
           new FlowableInvocationFactory<DATA>(mFlowable);
       return JRoutineFlowable.from(JRoutineLoader.on(context)
                                                  .with(factory)
                                                  .withConfiguration(mInvocationConfiguration)
-                                                 .apply(mLoaderConfiguration))
+                                                 .withConfiguration(mLoaderConfiguration))
                              .apply(mFlowableConfiguration)
                              .buildFlowable();
     }
@@ -164,7 +164,7 @@ public class JRoutineLoaderFlowable {
      * @return the Observable.
      */
     @NotNull
-    public Flowable<DATA> subscribeOn(@NotNull final LoaderContext context) {
+    public Flowable<DATA> subscribeOn(@NotNull final LoaderSource context) {
       return mFlowable.lift(new LoaderFlowableOperator<DATA>(context, mInvocationConfiguration,
           mLoaderConfiguration));
     }

@@ -17,10 +17,14 @@
 package com.github.dm.jrt.android.core.builder;
 
 import com.github.dm.jrt.android.core.config.LoaderConfigurable;
+import com.github.dm.jrt.android.core.invocation.ContextInvocation;
+import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.core.routine.LoaderRoutine;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
+import com.github.dm.jrt.core.invocation.Invocation;
+import com.github.dm.jrt.core.invocation.InvocationFactory;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -42,32 +46,46 @@ import org.jetbrains.annotations.NotNull;
  * The local Context of the invocations will always be the application one.
  * <p>
  * Created by davide-maestroni on 12/09/2014.
- *
- * @param <IN>  the input data type.
- * @param <OUT> the output data type.
  */
-public interface LoaderRoutineBuilder<IN, OUT>
-    extends RoutineBuilder<IN, OUT>, LoaderConfigurable<LoaderRoutineBuilder<IN, OUT>>,
-    LoaderRoutine<IN, OUT> {
+public interface LoaderRoutineBuilder
+    extends RoutineBuilder, LoaderConfigurable<LoaderRoutineBuilder> {
+
+  /**
+   * {@inheritDoc}
+   *
+   * @throws java.lang.IllegalArgumentException if the class of the specified factory has not a
+   *                                            static scope.
+   */
+  @NotNull
+  @Override
+  <IN, OUT> LoaderRoutine<IN, OUT> of(@NotNull InvocationFactory<IN, OUT> factory);
+
+  /**
+   * {@inheritDoc}
+   *
+   * @throws java.lang.IllegalArgumentException if the class of the specified factory has not a
+   *                                            static scope.
+   */
+  @NotNull
+  @Override
+  <IN, OUT> LoaderRoutine<IN, OUT> ofSingleton(@NotNull Invocation<IN, OUT> invocation);
+
+  // TODO: 13/05/2017 Javadoc
+  <IN, OUT> LoaderRoutine<IN, OUT> of(@NotNull ContextInvocationFactory<IN, OUT> factory);
+
+  <IN, OUT> LoaderRoutine<IN, OUT> ofSingleton(@NotNull ContextInvocation<IN, OUT> invocation);
 
   /**
    * {@inheritDoc}
    */
   @NotNull
   @Override
-  LoaderRoutineBuilder<IN, OUT> withConfiguration(@NotNull InvocationConfiguration configuration);
+  LoaderRoutineBuilder withConfiguration(@NotNull InvocationConfiguration configuration);
 
   /**
    * {@inheritDoc}
    */
   @NotNull
   @Override
-  LoaderRoutine<IN, OUT> buildRoutine();
-
-  /**
-   * {@inheritDoc}
-   */
-  @NotNull
-  @Override
-  Builder<? extends LoaderRoutineBuilder<IN, OUT>> withInvocation();
+  Builder<? extends LoaderRoutineBuilder> withInvocation();
 }

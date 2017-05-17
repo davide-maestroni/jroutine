@@ -28,7 +28,7 @@ import com.github.dm.jrt.android.reflect.ContextInvocationTarget;
 import com.github.dm.jrt.android.reflect.builder.AndroidReflectionRoutineBuilders;
 import com.github.dm.jrt.android.reflect.builder.LoaderReflectionRoutineBuilder;
 import com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat;
-import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
+import com.github.dm.jrt.android.v4.core.LoaderSourceCompat;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
@@ -67,7 +67,7 @@ import static com.github.dm.jrt.reflect.util.InvocationReflection.getAnnotatedMe
  */
 class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBuilder {
 
-  private final LoaderContextCompat mContext;
+  private final LoaderSourceCompat mContext;
 
   private final ContextInvocationTarget<?> mTarget;
 
@@ -84,7 +84,7 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
    * @param context the routine context.
    * @param target  the invocation target.
    */
-  DefaultLoaderReflectionRoutineBuilder(@NotNull final LoaderContextCompat context,
+  DefaultLoaderReflectionRoutineBuilder(@NotNull final LoaderSourceCompat context,
       @NotNull final ContextInvocationTarget<?> target) {
     mContext = ConstantConditions.notNull("Loader context", context);
     mTarget = ConstantConditions.notNull("Context invocation target", target);
@@ -92,7 +92,7 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
 
   @NotNull
   @Override
-  public LoaderReflectionRoutineBuilder apply(@NotNull final LoaderConfiguration configuration) {
+  public LoaderReflectionRoutineBuilder withConfiguration(@NotNull final LoaderConfiguration configuration) {
     mLoaderConfiguration = ConstantConditions.notNull("Loader configuration", configuration);
     return this;
   }
@@ -152,7 +152,7 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
     return JRoutineLoaderCompat.on(mContext)
                                .with(factory)
                                .withConfiguration(invocationConfiguration)
-                               .apply(loaderConfiguration)
+                               .withConfiguration(loaderConfiguration)
                                .buildRoutine();
   }
 
@@ -178,7 +178,7 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
     return JRoutineLoaderCompat.on(mContext)
                                .with(factory)
                                .withConfiguration(invocationConfiguration)
-                               .apply(loaderConfiguration)
+                               .withConfiguration(loaderConfiguration)
                                .buildRoutine();
   }
 
@@ -216,8 +216,7 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
 
   @NotNull
   @Override
-  public LoaderConfiguration.Builder<? extends LoaderReflectionRoutineBuilder>
-  loaderConfiguration() {
+  public LoaderConfiguration.Builder<? extends LoaderReflectionRoutineBuilder> withLoader() {
     final LoaderConfiguration config = mLoaderConfiguration;
     return new LoaderConfiguration.Builder<LoaderReflectionRoutineBuilder>(this, config);
   }
@@ -590,7 +589,7 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
    */
   private static class ProxyInvocationHandler implements InvocationHandler {
 
-    private final LoaderContextCompat mContext;
+    private final LoaderSourceCompat mContext;
 
     private final InvocationConfiguration mInvocationConfiguration;
 
@@ -634,7 +633,7 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
       final LoaderRoutineBuilder<Object, Object> builder =
           JRoutineLoaderCompat.on(mContext).with(factory);
       final LoaderRoutine<Object, Object> routine =
-          builder.withConfiguration(invocationConfiguration).apply(loaderConfiguration).buildRoutine();
+          builder.withConfiguration(invocationConfiguration).withConfiguration(loaderConfiguration).buildRoutine();
       return InvocationReflection.invokeRoutine(routine, method, asArgs(args), inputMode,
           outputMode);
     }

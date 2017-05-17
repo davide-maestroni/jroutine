@@ -24,7 +24,7 @@ import android.test.ActivityInstrumentationTestCase2;
 
 import com.github.dm.jrt.android.method.TestActivity;
 import com.github.dm.jrt.android.method.app.TestApp;
-import com.github.dm.jrt.android.v11.core.LoaderContext;
+import com.github.dm.jrt.android.v11.core.LoaderSource;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
@@ -37,7 +37,7 @@ import java.util.Locale;
 
 import static com.github.dm.jrt.android.reflect.ContextInvocationTarget.classOfType;
 import static com.github.dm.jrt.android.reflect.ContextInvocationTarget.instanceOf;
-import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
+import static com.github.dm.jrt.android.v11.core.LoaderSource.loaderFrom;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -62,7 +62,7 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
     final Channel<Integer, Integer> inputChannel1 = JRoutineCore.<Integer>ofData().buildChannel();
     final Channel<Integer, Integer> inputChannel2 = JRoutineCore.<Integer>ofData().buildChannel();
     final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
-    new LoaderRoutineMethod(loaderFrom(activity)) {
+    new LoaderRoutineMethod(LoaderSource.loaderOf(activity)) {
 
       private int mSum;
 
@@ -86,7 +86,7 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
     final Channel<Integer, Integer> inputChannel1 = JRoutineCore.<Integer>ofData().buildChannel();
     final Channel<Integer, Integer> inputChannel2 = JRoutineCore.<Integer>ofData().buildChannel();
     final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
-    new LoaderRoutineMethod(loaderFrom(activity)) {
+    new LoaderRoutineMethod(LoaderSource.loaderOf(activity)) {
 
       private int mSum;
 
@@ -109,7 +109,7 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
 
   private static void testContext(@NotNull final Activity activity) {
     final Channel<Boolean, Boolean> outputChannel = JRoutineCore.<Boolean>ofData().buildChannel();
-    new LoaderRoutineMethod(loaderFrom(activity)) {
+    new LoaderRoutineMethod(LoaderSource.loaderOf(activity)) {
 
       void test(@Output final Channel<Boolean, ?> output) {
         output.pass(getContext() instanceof TestApp);
@@ -119,7 +119,7 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
   }
 
   private static void testNoInputs(@NotNull final Activity activity) {
-    final LoaderContext context = loaderFrom(activity);
+    final LoaderSource context = LoaderSource.loaderOf(activity);
     assertThat(new LoaderRoutineMethod(context) {
 
       String get() {
@@ -138,7 +138,7 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
 
   private static void testParams2(@NotNull final Activity activity) {
     final Locale locale = Locale.getDefault();
-    final LoaderRoutineMethod method = new LoaderRoutineMethod(loaderFrom(activity), locale) {
+    final LoaderRoutineMethod method = new LoaderRoutineMethod(LoaderSource.loaderOf(activity), locale) {
 
       String switchCase(@Input final Channel<?, String> input, final boolean isUpper) {
         if (input.hasNext()) {
@@ -159,7 +159,7 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
 
   private static void testParams3(@NotNull final Activity activity) {
     final Locale locale = Locale.getDefault();
-    final LoaderRoutineMethod method = new LoaderRoutineMethod(loaderFrom(activity)) {
+    final LoaderRoutineMethod method = new LoaderRoutineMethod(LoaderSource.loaderOf(activity)) {
 
       String switchCase(@Input final Channel<?, String> input, final boolean isUpper) {
         if (input.hasNext()) {
@@ -183,7 +183,7 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
 
   private static void testReturnValue(@NotNull final Activity activity) {
     final Channel<String, String> inputStrings = JRoutineCore.<String>ofData().buildChannel();
-    final Channel<?, Object> outputChannel = new LoaderRoutineMethod(loaderFrom(activity)) {
+    final Channel<?, Object> outputChannel = new LoaderRoutineMethod(LoaderSource.loaderOf(activity)) {
 
       int length(@Input final Channel<?, String> input) {
         if (input.hasNext()) {
@@ -200,7 +200,7 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
     final Channel<Integer, Integer> inputInts = JRoutineCore.<Integer>ofData().buildChannel();
     final Channel<String, String> inputStrings = JRoutineCore.<String>ofData().buildChannel();
     final Channel<String, String> outputChannel = JRoutineCore.<String>ofData().buildChannel();
-    new LoaderRoutineMethod(loaderFrom(activity)) {
+    new LoaderRoutineMethod(LoaderSource.loaderOf(activity)) {
 
       void run(@Input final Channel<?, Integer> inputInts,
           @Input final Channel<?, String> inputStrings, @Output final Channel<String, ?> output) {
@@ -219,7 +219,7 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
     final Channel<Integer, Integer> inputInts = JRoutineCore.<Integer>ofData().buildChannel();
     final Channel<String, String> inputStrings = JRoutineCore.<String>ofData().buildChannel();
     final Channel<String, String> outputChannel = JRoutineCore.<String>ofData().buildChannel();
-    new LoaderRoutineMethod(loaderFrom(activity)) {
+    new LoaderRoutineMethod(LoaderSource.loaderOf(activity)) {
 
       void run(@Input final Channel<?, Integer> inputInts,
           @Input final Channel<?, String> inputStrings, @Output final Channel<String, ?> output) {
@@ -241,7 +241,7 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
 
     final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
-    new SumRoutine(loaderFrom(getActivity())).call(inputChannel, outputChannel);
+    new SumRoutine(LoaderSource.loaderOf(getActivity())).call(inputChannel, outputChannel);
     inputChannel.pass(1, 2, 3, 4).abort();
     assertThat(outputChannel.in(seconds(10)).getError()).isExactlyInstanceOf(AbortException.class);
   }
@@ -267,7 +267,7 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
       return;
     }
 
-    final LoaderContext context = loaderFrom(getActivity());
+    final LoaderSource context = LoaderSource.loaderOf(getActivity());
     final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     new SquareRoutine(context).call(inputChannel, outputChannel);
@@ -284,7 +284,7 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
 
     final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofData().buildChannel();
     final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
-    new SumRoutine(loaderFrom(getActivity())).call(inputChannel, outputChannel);
+    new SumRoutine(LoaderSource.loaderOf(getActivity())).call(inputChannel, outputChannel);
     inputChannel.pass(1, 2, 3, 4, 5).close();
     assertThat(outputChannel.in(seconds(10)).all()).containsExactly(15);
   }
@@ -302,12 +302,12 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
       return;
     }
 
-    assertThat(LoaderRoutineMethod.from(loaderFrom(getActivity()),
+    assertThat(LoaderRoutineMethod.from(LoaderSource.loaderOf(getActivity()),
         LoaderRoutineMethodTest.class.getMethod("length", String.class))
                                   .call("test")
                                   .in(seconds(10))
                                   .next()).isEqualTo(4);
-    assertThat(LoaderRoutineMethod.from(loaderFrom(getActivity()),
+    assertThat(LoaderRoutineMethod.from(LoaderSource.loaderOf(getActivity()),
         LoaderRoutineMethodTest.class.getMethod("length", String.class))
                                   .call(JRoutineCore.of("test").buildChannel())
                                   .in(seconds(10))
@@ -319,18 +319,18 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
       return;
     }
 
-    assertThat(LoaderRoutineMethod.from(loaderFrom(getActivity()),
+    assertThat(LoaderRoutineMethod.from(LoaderSource.loaderOf(getActivity()),
         classOfType(LoaderRoutineMethodTest.class), "length", String.class)
                                   .call("test")
                                   .in(seconds(10))
                                   .next()).isEqualTo(4);
-    assertThat(LoaderRoutineMethod.from(loaderFrom(getActivity()),
+    assertThat(LoaderRoutineMethod.from(LoaderSource.loaderOf(getActivity()),
         classOfType(LoaderRoutineMethodTest.class), "length", String.class)
                                   .call(JRoutineCore.of("test").buildChannel())
                                   .in(seconds(10))
                                   .next()).isEqualTo(4);
     final Channel<String, String> inputChannel = JRoutineCore.<String>ofData().buildChannel();
-    final Channel<?, Object> outputChannel = LoaderRoutineMethod.from(loaderFrom(getActivity()),
+    final Channel<?, Object> outputChannel = LoaderRoutineMethod.from(LoaderSource.loaderOf(getActivity()),
         classOfType(LoaderRoutineMethodTest.class), "length", String.class).call(inputChannel);
     inputChannel.pass("test").close();
     assertThat(outputChannel.in(seconds(10)).next()).isEqualTo(4);
@@ -342,14 +342,15 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
     }
 
     try {
-      LoaderRoutineMethod.from(loaderFrom(getActivity()), String.class.getMethod("toString"));
+      LoaderRoutineMethod.from(LoaderSource.loaderOf(getActivity()), String.class.getMethod("toString"));
       fail();
 
     } catch (final IllegalArgumentException ignored) {
     }
 
     try {
-      LoaderRoutineMethod.from(loaderFrom(getActivity()), instanceOf(String.class, "test"),
+      LoaderRoutineMethod.from(
+          LoaderSource.loaderOf(getActivity()), instanceOf(String.class, "test"),
           LoaderRoutineMethodTest.class.getMethod("length", String.class));
       fail();
 
@@ -363,9 +364,11 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
     }
 
     final String test = "test";
-    assertThat(LoaderRoutineMethod.from(loaderFrom(getActivity()), instanceOf(String.class, test),
+    assertThat(LoaderRoutineMethod.from(
+        LoaderSource.loaderOf(getActivity()), instanceOf(String.class, test),
         String.class.getMethod("toString")).call().in(seconds(10)).next()).isEqualTo("test");
-    assertThat(LoaderRoutineMethod.from(loaderFrom(getActivity()), instanceOf(String.class, test),
+    assertThat(LoaderRoutineMethod.from(
+        LoaderSource.loaderOf(getActivity()), instanceOf(String.class, test),
         String.class.getMethod("toString"))
                                   .withWrapper()
                                   .withSharedFields()
@@ -381,9 +384,11 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
     }
 
     final String test = "test";
-    assertThat(LoaderRoutineMethod.from(loaderFrom(getActivity()), instanceOf(String.class, test),
+    assertThat(LoaderRoutineMethod.from(
+        LoaderSource.loaderOf(getActivity()), instanceOf(String.class, test),
         "toString").call().in(seconds(10)).next()).isEqualTo("test");
-    assertThat(LoaderRoutineMethod.from(loaderFrom(getActivity()), instanceOf(String.class, test),
+    assertThat(LoaderRoutineMethod.from(
+        LoaderSource.loaderOf(getActivity()), instanceOf(String.class, test),
         "toString").withWrapper().withSharedFields().configuration().call().in(seconds(10)).next())
         .isEqualTo("test");
   }
@@ -401,7 +406,7 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
       return;
     }
 
-    final SwitchCase method = new SwitchCase(loaderFrom(getActivity()));
+    final SwitchCase method = new SwitchCase(LoaderSource.loaderOf(getActivity()));
     Channel<Object, Object> inputChannel =
         JRoutineCore.ofData().buildChannel().pass("test").close();
     Channel<?, String> outputChannel = method.call(inputChannel, true);
@@ -441,7 +446,7 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
     }
 
     try {
-      new LoaderRoutineMethod(loaderFrom(getActivity())) {};
+      new LoaderRoutineMethod(LoaderSource.loaderOf(getActivity())) {};
       fail();
 
     } catch (final IllegalStateException ignored) {
@@ -466,7 +471,7 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
 
   private static class SquareRoutine extends LoaderRoutineMethod {
 
-    public SquareRoutine(@NotNull final LoaderContext context) {
+    public SquareRoutine(@NotNull final LoaderSource context) {
       super(context);
     }
 
@@ -483,7 +488,7 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
 
     private int mSum;
 
-    public SumRoutine(@NotNull final LoaderContext context) {
+    public SumRoutine(@NotNull final LoaderSource context) {
       super(context);
     }
 
@@ -500,7 +505,7 @@ public class LoaderRoutineMethodTest extends ActivityInstrumentationTestCase2<Te
 
   private static class SwitchCase extends LoaderRoutineMethod {
 
-    public SwitchCase(@NotNull final LoaderContext context) {
+    public SwitchCase(@NotNull final LoaderSource context) {
       super(context);
     }
 

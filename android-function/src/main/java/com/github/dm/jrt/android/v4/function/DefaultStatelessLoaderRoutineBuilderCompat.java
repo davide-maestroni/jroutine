@@ -24,7 +24,7 @@ import com.github.dm.jrt.android.core.routine.LoaderRoutine;
 import com.github.dm.jrt.android.function.builder.AbstractStatelessLoaderRoutineBuilder;
 import com.github.dm.jrt.android.function.builder.StatelessLoaderRoutineBuilder;
 import com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat;
-import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
+import com.github.dm.jrt.android.v4.core.LoaderSourceCompat;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -46,25 +46,25 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
 class DefaultStatelessLoaderRoutineBuilderCompat<IN, OUT>
     extends AbstractStatelessLoaderRoutineBuilder<IN, OUT, StatelessLoaderRoutineBuilder<IN, OUT>> {
 
-  private final LoaderContextCompat mLoaderContext;
+  private final LoaderSourceCompat mLoaderSource;
 
   /**
    * Constructor.
    *
-   * @param loaderContext the Loader context.
+   * @param loaderSource the Loader source.
    */
-  DefaultStatelessLoaderRoutineBuilderCompat(@NotNull final LoaderContextCompat loaderContext) {
-    mLoaderContext = ConstantConditions.notNull("Loader context", loaderContext);
+  DefaultStatelessLoaderRoutineBuilderCompat(@NotNull final LoaderSourceCompat loaderSource) {
+    mLoaderSource = ConstantConditions.notNull("Loader source", loaderSource);
   }
 
   @NotNull
   @Override
   public LoaderRoutine<IN, OUT> buildRoutine() {
-    return JRoutineLoaderCompat.on(mLoaderContext)
+    return JRoutineLoaderCompat.on(mLoaderSource)
                                .with(new StatelessContextInvocation<IN, OUT>(getOnNext(),
                                    getOnError(), getOnComplete()))
                                .withConfiguration(getConfiguration())
-                               .apply(getLoaderConfiguration())
+                               .withConfiguration(getLoaderConfiguration())
                                .buildRoutine();
   }
 

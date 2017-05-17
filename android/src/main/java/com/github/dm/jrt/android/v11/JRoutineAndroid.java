@@ -25,10 +25,10 @@ import com.github.dm.jrt.JRoutine;
 import com.github.dm.jrt.android.ServiceBuilder;
 import com.github.dm.jrt.android.channel.io.ParcelableByteChannel;
 import com.github.dm.jrt.android.channel.io.ParcelableByteChannel.ParcelableByteChunk;
-import com.github.dm.jrt.android.core.ServiceContext;
+import com.github.dm.jrt.android.core.ServiceSource;
 import com.github.dm.jrt.android.core.service.InvocationService;
 import com.github.dm.jrt.android.v11.channel.SparseChannels;
-import com.github.dm.jrt.android.v11.core.LoaderContext;
+import com.github.dm.jrt.android.v11.core.LoaderSource;
 import com.github.dm.jrt.channel.io.ByteChannel.ByteChunkInputStream;
 import com.github.dm.jrt.core.builder.ChannelBuilder;
 import com.github.dm.jrt.core.channel.Channel;
@@ -41,8 +41,8 @@ import com.github.dm.jrt.stream.builder.StreamBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static com.github.dm.jrt.android.core.ServiceContext.serviceFrom;
-import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
+import static com.github.dm.jrt.android.core.ServiceSource.serviceFrom;
+import static com.github.dm.jrt.android.v11.core.LoaderSource.loaderFrom;
 
 /**
  * Class acting as a fa&ccedil;ade of all the JRoutine library features, specific to the Android
@@ -185,7 +185,7 @@ public class JRoutineAndroid extends SparseChannels {
    */
   @NotNull
   public static LoaderBuilder on(@NotNull final Activity activity) {
-    return on(loaderFrom(activity));
+    return on(LoaderSource.loaderOf(activity));
   }
 
   /**
@@ -197,7 +197,7 @@ public class JRoutineAndroid extends SparseChannels {
    */
   @NotNull
   public static LoaderBuilder on(@NotNull final Activity activity, @NotNull final Context context) {
-    return on(loaderFrom(activity, context));
+    return on(LoaderSource.loaderOf(activity, context));
   }
 
   /**
@@ -208,7 +208,7 @@ public class JRoutineAndroid extends SparseChannels {
    */
   @NotNull
   public static ServiceBuilder on(@NotNull final Context context) {
-    return on(serviceFrom(context));
+    return on(ServiceSource.serviceOf(context));
   }
 
   /**
@@ -221,7 +221,7 @@ public class JRoutineAndroid extends SparseChannels {
   @NotNull
   public static ServiceBuilder on(@NotNull final Context context,
       @NotNull final Class<? extends InvocationService> serviceClass) {
-    return on(serviceFrom(context, serviceClass));
+    return on(ServiceSource.serviceOf(context, serviceClass));
   }
 
   /**
@@ -233,7 +233,7 @@ public class JRoutineAndroid extends SparseChannels {
    */
   @NotNull
   public static ServiceBuilder on(@NotNull final Context context, @NotNull final Intent service) {
-    return on(serviceFrom(context, service));
+    return on(serviceOf(context, service));
   }
 
   /**
@@ -244,7 +244,7 @@ public class JRoutineAndroid extends SparseChannels {
    */
   @NotNull
   public static LoaderBuilder on(@NotNull final Fragment fragment) {
-    return on(loaderFrom(fragment));
+    return on(LoaderSource.loaderOf(fragment));
   }
 
   /**
@@ -256,7 +256,7 @@ public class JRoutineAndroid extends SparseChannels {
    */
   @NotNull
   public static LoaderBuilder on(@NotNull final Fragment fragment, @NotNull final Context context) {
-    return on(loaderFrom(fragment, context));
+    return on(loaderOf(fragment, context));
   }
 
   /**
@@ -266,7 +266,7 @@ public class JRoutineAndroid extends SparseChannels {
    * @return the Context based builder.
    */
   @NotNull
-  public static LoaderBuilder on(@NotNull final LoaderContext context) {
+  public static LoaderBuilder on(@NotNull final LoaderSource context) {
     return new LoaderBuilder(context);
   }
 
@@ -277,7 +277,7 @@ public class JRoutineAndroid extends SparseChannels {
    * @return the Context based builder.
    */
   @NotNull
-  public static ServiceBuilder on(@NotNull final ServiceContext context) {
+  public static ServiceBuilder on(@NotNull final ServiceSource context) {
     return new ServiceBuilder(context) {};
   }
 

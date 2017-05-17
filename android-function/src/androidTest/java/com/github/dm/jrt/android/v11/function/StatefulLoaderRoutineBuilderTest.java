@@ -24,11 +24,13 @@ import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.github.dm.jrt.android.core.JRoutineService;
+import com.github.dm.jrt.android.core.ServiceSource;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.CacheStrategyType;
 import com.github.dm.jrt.android.core.routine.LoaderRoutine;
 import com.github.dm.jrt.android.core.service.InvocationService;
 import com.github.dm.jrt.android.function.RemoteInvocationService;
 import com.github.dm.jrt.android.function.builder.StatefulLoaderRoutineBuilder;
+import com.github.dm.jrt.android.v11.core.LoaderSource;
 import com.github.dm.jrt.android.v4.function.TestActivity;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
@@ -54,9 +56,9 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static com.github.dm.jrt.android.core.ServiceContext.serviceFrom;
-import static com.github.dm.jrt.android.core.invocation.TargetInvocationFactory.factoryOf;
-import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
+import static com.github.dm.jrt.android.core.ServiceSource.serviceFrom;
+import static com.github.dm.jrt.android.core.invocation.InvocationFactoryReference.factoryOf;
+import static com.github.dm.jrt.android.v11.core.LoaderSource.loaderFrom;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -76,7 +78,7 @@ public class StatefulLoaderRoutineBuilderTest
 
   private static void testCompleteState(final Activity activity) {
     final AtomicBoolean state = new AtomicBoolean(true);
-    assertThat(JRoutineLoaderFunction.<String, Void, AtomicBoolean>stateful(loaderFrom(activity), 0)
+    assertThat(JRoutineLoaderFunction.<String, Void, AtomicBoolean>stateful(LoaderSource.loaderOf(activity), 0)
         .onCreate(new Supplier<AtomicBoolean>() {
 
           public AtomicBoolean get() {
@@ -102,7 +104,7 @@ public class StatefulLoaderRoutineBuilderTest
 
   private static void testContextConsume(final Activity activity) {
     final AtomicBoolean state = new AtomicBoolean(true);
-    assertThat(JRoutineLoaderFunction.<String, Void, AtomicBoolean>stateful(loaderFrom(activity), 0)
+    assertThat(JRoutineLoaderFunction.<String, Void, AtomicBoolean>stateful(LoaderSource.loaderOf(activity), 0)
         .onContextConsume(new Consumer<Context>() {
 
           @Override
@@ -120,7 +122,7 @@ public class StatefulLoaderRoutineBuilderTest
   private static void testDestroy(final Activity activity) throws InterruptedException {
     final AtomicBoolean state = new AtomicBoolean(true);
     final StatefulLoaderRoutineBuilder<String, Void, AtomicBoolean> builder =
-        JRoutineLoaderFunction.stateful(loaderFrom(activity), 0);
+        JRoutineLoaderFunction.stateful(LoaderSource.loaderOf(activity), 0);
     final LoaderRoutine<String, Void> routine = builder.onCreate(new Supplier<AtomicBoolean>() {
 
       public AtomicBoolean get() {
@@ -155,7 +157,7 @@ public class StatefulLoaderRoutineBuilderTest
   private static void testError(final Activity activity) {
     final AtomicReference<RoutineException> reference = new AtomicReference<RoutineException>();
     final Channel<Void, Void> channel =
-        JRoutineLoaderFunction.<Void, Void, RoutineException>stateful(loaderFrom(activity),
+        JRoutineLoaderFunction.<Void, Void, RoutineException>stateful(LoaderSource.loaderOf(activity),
             0).onError(new BiFunction<RoutineException, RoutineException, RoutineException>() {
 
           public RoutineException apply(final RoutineException state, final RoutineException e) {
@@ -174,7 +176,7 @@ public class StatefulLoaderRoutineBuilderTest
   private static void testErrorConsume(final Activity activity) {
     final AtomicReference<RoutineException> reference = new AtomicReference<RoutineException>();
     final Channel<Void, Void> channel =
-        JRoutineLoaderFunction.<Void, Void, RoutineException>stateful(loaderFrom(activity),
+        JRoutineLoaderFunction.<Void, Void, RoutineException>stateful(LoaderSource.loaderOf(activity),
             0).onErrorConsume(new BiConsumer<RoutineException, RoutineException>() {
 
           public void accept(final RoutineException state, final RoutineException e) {
@@ -192,7 +194,7 @@ public class StatefulLoaderRoutineBuilderTest
   private static void testErrorException(final Activity activity) {
     final AtomicReference<RoutineException> reference = new AtomicReference<RoutineException>();
     final Channel<Void, Void> channel =
-        JRoutineLoaderFunction.<Void, Void, RoutineException>stateful(loaderFrom(activity),
+        JRoutineLoaderFunction.<Void, Void, RoutineException>stateful(LoaderSource.loaderOf(activity),
             0).onErrorException(new Function<RoutineException, RoutineException>() {
 
           public RoutineException apply(final RoutineException e) {
@@ -210,7 +212,7 @@ public class StatefulLoaderRoutineBuilderTest
   private static void testErrorState(final Activity activity) {
     final AtomicBoolean state = new AtomicBoolean(true);
     final Channel<Void, Void> channel =
-        JRoutineLoaderFunction.<Void, Void, AtomicBoolean>stateful(loaderFrom(activity),
+        JRoutineLoaderFunction.<Void, Void, AtomicBoolean>stateful(LoaderSource.loaderOf(activity),
             0).onCreate(new Supplier<AtomicBoolean>() {
 
           public AtomicBoolean get() {
@@ -232,7 +234,7 @@ public class StatefulLoaderRoutineBuilderTest
   private static void testFinalizeConsume(final Activity activity) {
     final AtomicBoolean state = new AtomicBoolean(true);
     final StatefulLoaderRoutineBuilder<String, Void, AtomicBoolean> builder =
-        JRoutineLoaderFunction.stateful(loaderFrom(activity), 0);
+        JRoutineLoaderFunction.stateful(LoaderSource.loaderOf(activity), 0);
     final LoaderRoutine<String, Void> routine = builder.onCreate(new Supplier<AtomicBoolean>() {
 
       public AtomicBoolean get() {
@@ -250,7 +252,7 @@ public class StatefulLoaderRoutineBuilderTest
 
   private static void testIncrementArray(final Activity activity) {
     final StatefulLoaderRoutineBuilder<Integer, Integer, Integer> routine =
-        JRoutineLoaderFunction.<Integer, Integer, Integer>stateful(loaderFrom(activity),
+        JRoutineLoaderFunction.<Integer, Integer, Integer>stateful(LoaderSource.loaderOf(activity),
             0).onCreate(new Supplier<Integer>() {
 
           public Integer get() {
@@ -270,7 +272,7 @@ public class StatefulLoaderRoutineBuilderTest
 
   private static void testIncrementIterable(final Activity activity) {
     final StatefulLoaderRoutineBuilder<Integer, Integer, Integer> routine =
-        JRoutineLoaderFunction.<Integer, Integer, Integer>stateful(loaderFrom(activity),
+        JRoutineLoaderFunction.<Integer, Integer, Integer>stateful(LoaderSource.loaderOf(activity),
             0).onCreate(new Supplier<Integer>() {
 
           public Integer get() {
@@ -289,7 +291,8 @@ public class StatefulLoaderRoutineBuilderTest
   @SuppressWarnings("unchecked")
   private static void testIncrementList(final Activity activity) {
     final StatefulLoaderRoutineBuilder<Integer, List<Integer>, List<Integer>> routine =
-        JRoutineLoaderFunction.<Integer, List<Integer>, List<Integer>>stateful(loaderFrom(activity),
+        JRoutineLoaderFunction.<Integer, List<Integer>, List<Integer>>stateful(
+            LoaderSource.loaderOf(activity),
             0).onCreate(new Supplier<List<Integer>>() {
 
           public List<Integer> get() {
@@ -307,7 +310,7 @@ public class StatefulLoaderRoutineBuilderTest
 
   private static void testIncrementOutput(final Activity activity) {
     final StatefulLoaderRoutineBuilder<Integer, Integer, Integer> routine =
-        JRoutineLoaderFunction.<Integer, Integer, Integer>stateful(loaderFrom(activity),
+        JRoutineLoaderFunction.<Integer, Integer, Integer>stateful(LoaderSource.loaderOf(activity),
             0).onCreate(new Supplier<Integer>() {
 
           public Integer get() {
@@ -325,7 +328,7 @@ public class StatefulLoaderRoutineBuilderTest
 
   private static void testIncrementRemoteService(final Activity activity) {
     final StatefulLoaderRoutineBuilder<Integer, Integer, ServiceState> routine =
-        JRoutineLoaderFunction.<Integer, Integer, ServiceState>stateful(loaderFrom(activity),
+        JRoutineLoaderFunction.<Integer, Integer, ServiceState>stateful(LoaderSource.loaderOf(activity),
             0).onContext(new Function<Context, ServiceState>() {
 
           @Override
@@ -377,7 +380,7 @@ public class StatefulLoaderRoutineBuilderTest
 
   private static void testIncrementService(final Activity activity) {
     final StatefulLoaderRoutineBuilder<Integer, Integer, ServiceState> routine =
-        JRoutineLoaderFunction.<Integer, Integer, ServiceState>stateful(loaderFrom(activity),
+        JRoutineLoaderFunction.<Integer, Integer, ServiceState>stateful(LoaderSource.loaderOf(activity),
             0).onContext(new Function<Context, ServiceState>() {
 
           @Override
@@ -429,7 +432,7 @@ public class StatefulLoaderRoutineBuilderTest
 
   private static void testList(final Activity activity) {
     final LoaderRoutine<Integer, Integer> routine =
-        JRoutineLoaderFunction.<Integer, Integer>statefulList(loaderFrom(activity),
+        JRoutineLoaderFunction.<Integer, Integer>statefulList(LoaderSource.loaderOf(activity),
             0).onCompleteOutput(new Function<List<Integer>, Integer>() {
 
           public Integer apply(final List<Integer> list) {
@@ -441,7 +444,7 @@ public class StatefulLoaderRoutineBuilderTest
 
   private static void testSumArray(final Activity activity) {
     final StatefulLoaderRoutineBuilder<Integer, Integer, Integer> routine =
-        JRoutineLoaderFunction.<Integer, Integer, Integer>stateful(loaderFrom(activity),
+        JRoutineLoaderFunction.<Integer, Integer, Integer>stateful(LoaderSource.loaderOf(activity),
             0).onCreate(new Supplier<Integer>() {
 
           public Integer get() {
@@ -465,7 +468,7 @@ public class StatefulLoaderRoutineBuilderTest
 
   private static void testSumConsume(final Activity activity) {
     final StatefulLoaderRoutineBuilder<Integer, Integer, Integer> routine =
-        JRoutineLoaderFunction.<Integer, Integer, Integer>stateful(loaderFrom(activity),
+        JRoutineLoaderFunction.<Integer, Integer, Integer>stateful(LoaderSource.loaderOf(activity),
             0).onCreate(new Supplier<Integer>() {
 
           public Integer get() {
@@ -488,7 +491,7 @@ public class StatefulLoaderRoutineBuilderTest
 
   private static void testSumDefault(final Activity activity) {
     final StatefulLoaderRoutineBuilder<Integer, Integer, Integer> routine =
-        JRoutineLoaderFunction.<Integer, Integer, Integer>stateful(loaderFrom(activity),
+        JRoutineLoaderFunction.<Integer, Integer, Integer>stateful(LoaderSource.loaderOf(activity),
             0).onCreate(new Supplier<Integer>() {
 
           public Integer get() {
@@ -512,7 +515,7 @@ public class StatefulLoaderRoutineBuilderTest
 
   private static void testSumIterable(final Activity activity) {
     final StatefulLoaderRoutineBuilder<Integer, Integer, Integer> routine =
-        JRoutineLoaderFunction.<Integer, Integer, Integer>stateful(loaderFrom(activity),
+        JRoutineLoaderFunction.<Integer, Integer, Integer>stateful(LoaderSource.loaderOf(activity),
             0).onCreate(new Supplier<Integer>() {
 
           public Integer get() {
@@ -534,7 +537,7 @@ public class StatefulLoaderRoutineBuilderTest
 
   private static void testSumOutput(final Activity activity) {
     final StatefulLoaderRoutineBuilder<Integer, Integer, Integer> routine =
-        JRoutineLoaderFunction.<Integer, Integer, Integer>stateful(loaderFrom(activity),
+        JRoutineLoaderFunction.<Integer, Integer, Integer>stateful(LoaderSource.loaderOf(activity),
             0).onCreate(new Supplier<Integer>() {
 
           public Integer get() {
@@ -551,7 +554,7 @@ public class StatefulLoaderRoutineBuilderTest
 
   private static void testSumState(final Activity activity) {
     final StatefulLoaderRoutineBuilder<Integer, Integer, Integer> routine =
-        JRoutineLoaderFunction.<Integer, Integer, Integer>stateful(loaderFrom(activity),
+        JRoutineLoaderFunction.<Integer, Integer, Integer>stateful(LoaderSource.loaderOf(activity),
             0).onCreate(new Supplier<Integer>() {
 
           public Integer get() {
@@ -762,7 +765,7 @@ public class StatefulLoaderRoutineBuilderTest
     private Channel<Integer, Integer> mChannel;
 
     private ServiceState(final Context context, final Class<? extends InvocationService> service) {
-      mRoutine = JRoutineService.on(serviceFrom(context, service))
+      mRoutine = JRoutineService.on(ServiceSource.serviceOf(context, service))
                                 .with(factoryOf(IncrementInvocation.class, 1))
                                 .buildRoutine();
     }

@@ -24,7 +24,7 @@ import com.github.dm.jrt.android.core.routine.LoaderRoutine;
 import com.github.dm.jrt.android.function.builder.AbstractStatefulLoaderRoutineBuilder;
 import com.github.dm.jrt.android.function.builder.StatefulLoaderRoutineBuilder;
 import com.github.dm.jrt.android.v11.core.JRoutineLoader;
-import com.github.dm.jrt.android.v11.core.LoaderContext;
+import com.github.dm.jrt.android.v11.core.LoaderSource;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -50,26 +50,26 @@ class DefaultStatefulLoaderRoutineBuilder<IN, OUT, STATE> extends
     AbstractStatefulLoaderRoutineBuilder<IN, OUT, STATE, StatefulLoaderRoutineBuilder<IN, OUT,
         STATE>> {
 
-  private final LoaderContext mLoaderContext;
+  private final LoaderSource mLoaderSource;
 
   /**
    * Constructor.
    *
-   * @param loaderContext the Loader context.
+   * @param loaderSource the Loader context.
    */
-  DefaultStatefulLoaderRoutineBuilder(@NotNull final LoaderContext loaderContext) {
-    mLoaderContext = ConstantConditions.notNull("Loader context", loaderContext);
+  DefaultStatefulLoaderRoutineBuilder(@NotNull final LoaderSource loaderSource) {
+    mLoaderSource = ConstantConditions.notNull("Loader context", loaderSource);
   }
 
   @NotNull
   @Override
   public LoaderRoutine<IN, OUT> buildRoutine() {
-    return JRoutineLoader.on(mLoaderContext)
+    return JRoutineLoader.on(mLoaderSource)
                          .with(new StatefulContextInvocationFactory<IN, OUT, STATE>(getOnContext(),
                              getOnCreateState(), getOnNext(), getOnError(), getOnComplete(),
                              getOnFinalize(), getOnDestroy()))
                          .withConfiguration(getConfiguration())
-                         .apply(getLoaderConfiguration())
+                         .withConfiguration(getLoaderConfiguration())
                          .buildRoutine();
   }
 

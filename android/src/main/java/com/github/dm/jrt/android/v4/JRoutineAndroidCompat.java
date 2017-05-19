@@ -27,7 +27,7 @@ import com.github.dm.jrt.android.channel.io.ParcelableByteChannel;
 import com.github.dm.jrt.android.channel.io.ParcelableByteChannel.ParcelableByteChunk;
 import com.github.dm.jrt.android.core.ServiceSource;
 import com.github.dm.jrt.android.core.service.InvocationService;
-import com.github.dm.jrt.android.v4.channel.SparseChannelsCompat;
+import com.github.dm.jrt.android.v4.channel.JRoutineSparseChannelsCompat;
 import com.github.dm.jrt.android.v4.core.LoaderSourceCompat;
 import com.github.dm.jrt.channel.io.ByteChannel.ByteChunkInputStream;
 import com.github.dm.jrt.core.builder.ChannelBuilder;
@@ -41,9 +41,6 @@ import com.github.dm.jrt.stream.builder.StreamBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static com.github.dm.jrt.android.core.ServiceSource.serviceFrom;
-import static com.github.dm.jrt.android.v4.core.LoaderSourceCompat.loaderFrom;
-
 /**
  * Class acting as a fa&ccedil;ade of all the JRoutine library features, with support for the
  * Android compatibility library.
@@ -51,7 +48,7 @@ import static com.github.dm.jrt.android.v4.core.LoaderSourceCompat.loaderFrom;
  * Created by davide-maestroni on 03/06/2016.
  */
 @SuppressWarnings("WeakerAccess")
-public class JRoutineAndroidCompat extends SparseChannelsCompat {
+public class JRoutineAndroidCompat extends JRoutineSparseChannelsCompat {
 
   /**
    * Avoid explicit instantiation.
@@ -73,7 +70,7 @@ public class JRoutineAndroidCompat extends SparseChannelsCompat {
    */
   @NotNull
   public static ByteChunkInputStream getInputStream(@NotNull final ParcelableByteChunk... buffers) {
-    return ParcelableByteChannel.getInputStream(buffers);
+    return ParcelableByteChannel.inputStream(buffers);
   }
 
   /**
@@ -90,7 +87,7 @@ public class JRoutineAndroidCompat extends SparseChannelsCompat {
   @NotNull
   public static ByteChunkInputStream getInputStream(
       @NotNull final Iterable<? extends ParcelableByteChunk> buffers) {
-    return ParcelableByteChannel.getInputStream(buffers);
+    return ParcelableByteChannel.inputStream(buffers);
   }
 
   /**
@@ -105,7 +102,7 @@ public class JRoutineAndroidCompat extends SparseChannelsCompat {
    */
   @NotNull
   public static ByteChunkInputStream getInputStream(@NotNull final ParcelableByteChunk buffer) {
-    return ParcelableByteChannel.getInputStream(buffer);
+    return ParcelableByteChannel.inputStream(buffer);
   }
 
   /**

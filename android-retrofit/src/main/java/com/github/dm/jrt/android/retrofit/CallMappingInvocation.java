@@ -16,8 +16,8 @@
 
 package com.github.dm.jrt.android.retrofit;
 
-import com.github.dm.jrt.android.channel.AndroidChannels;
-import com.github.dm.jrt.android.channel.ParcelableFlow;
+import com.github.dm.jrt.android.channel.JRoutineAndroidChannels;
+import com.github.dm.jrt.android.channel.ParcelableFlowData;
 import com.github.dm.jrt.android.channel.io.ParcelableByteChannel;
 import com.github.dm.jrt.channel.config.ByteChunkStreamConfiguration.CloseActionType;
 import com.github.dm.jrt.channel.io.ByteChannel.ByteChunkOutputStream;
@@ -45,7 +45,7 @@ import static com.github.dm.jrt.android.retrofit.ServiceCallInvocation.REQUEST_D
  * <p>
  * Created by davide-maestroni on 05/19/2016.
  */
-class CallMappingInvocation extends MappingInvocation<Call<?>, ParcelableFlow<Object>> {
+class CallMappingInvocation extends MappingInvocation<Call<?>, ParcelableFlowData<Object>> {
 
   /**
    * Constructor.
@@ -56,16 +56,16 @@ class CallMappingInvocation extends MappingInvocation<Call<?>, ParcelableFlow<Ob
 
   @Override
   public void onInput(final Call<?> input,
-      @NotNull final Channel<ParcelableFlow<Object>, ?> result) throws IOException {
+      @NotNull final Channel<ParcelableFlowData<Object>, ?> result) throws IOException {
     final Request request = input.request();
-    result.pass(new ParcelableFlow<Object>(REQUEST_DATA_ID, RequestData.of(request)));
+    result.pass(new ParcelableFlowData<Object>(REQUEST_DATA_ID, RequestData.of(request)));
     final RequestBody body = request.body();
     if (body != null) {
       final MediaType mediaType = body.contentType();
-      result.pass(new ParcelableFlow<Object>(MEDIA_TYPE_ID,
+      result.pass(new ParcelableFlowData<Object>(MEDIA_TYPE_ID,
           (mediaType != null) ? mediaType.toString() : null));
       final Channel<Object, ?> channel =
-          AndroidChannels.parcelableFlowInput(result, BYTES_ID).buildChannel();
+          JRoutineAndroidChannels.parcelableFlowInput(result, BYTES_ID).buildChannel();
       final ByteChunkOutputStream outputStream = ParcelableByteChannel.withOutput(channel)
                                                                       .chunkStreamConfiguration()
                                                                       .withOnClose(

@@ -32,7 +32,7 @@ import java.util.Map;
  *
  * @param <OUT> the output data type.
  */
-class SortingMapChannelConsumer<OUT> implements ChannelConsumer<Flow<? extends OUT>> {
+class SortingMapChannelConsumer<OUT> implements ChannelConsumer<FlowData<? extends OUT>> {
 
   private final HashMap<Integer, Channel<OUT, ?>> mChannels;
 
@@ -65,10 +65,10 @@ class SortingMapChannelConsumer<OUT> implements ChannelConsumer<Flow<? extends O
     }
   }
 
-  public void onOutput(final Flow<? extends OUT> flow) {
-    final Channel<OUT, ?> channel = mChannels.get(flow.id);
+  public void onOutput(final FlowData<? extends OUT> flowData) {
+    final Channel<OUT, ?> channel = mChannels.get(flowData.id);
     if (channel != null) {
-      channel.pass(flow.data);
+      channel.pass(flowData.data);
     }
   }
 }

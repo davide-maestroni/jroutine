@@ -42,7 +42,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 /**
- * Sequences unit tests.
+ * Sequence unit tests.
  * <p>
  * Created by davide-maestroni on 07/07/2016.
  */

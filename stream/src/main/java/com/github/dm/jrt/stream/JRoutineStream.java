@@ -76,31 +76,15 @@ public class JRoutineStream {
   }
 
   /**
-   * Returns a stream routine wrapping the specified invocation.
-   * <br>
-   * Note that the returned routine can be called only once.
-   *
-   * @param invocation the invocation instance.
-   * @param <IN>       the input data type.
-   * @param <OUT>      the output data type.
-   * @return the stream routine.
-   */
-  // TODO: 07/05/2017 test
-  @NotNull
-  public static <IN, OUT> StreamRoutine<IN, OUT> streamOf(
-      @NotNull final Invocation<IN, OUT> invocation) {
-    return new DefaultStreamRoutine<IN, OUT>(invocation);
-  }
-
-  /**
    * Returns a stream routine wrapping the specified factory of invocations.
+   * <br>
+   * The invocations will be executed synchronously on the same thread as the routine invocation.
    *
    * @param factory the invocation factory instance.
    * @param <IN>    the input data type.
    * @param <OUT>   the output data type.
    * @return the stream routine.
    */
-  // TODO: 07/05/2017 test
   @NotNull
   public static <IN, OUT> StreamRoutine<IN, OUT> streamOf(
       @NotNull final InvocationFactory<IN, OUT> factory) {
@@ -122,5 +106,23 @@ public class JRoutineStream {
     }
 
     return new DefaultStreamRoutine<IN, OUT>(routine);
+  }
+
+  /**
+   * Returns a stream routine wrapping the specified invocation.
+   * <br>
+   * The invocations will be executed synchronously on the same thread as the routine invocation.
+   * <br>
+   * Note that the returned routine can be called only once.
+   *
+   * @param invocation the invocation instance.
+   * @param <IN>       the input data type.
+   * @param <OUT>      the output data type.
+   * @return the stream routine.
+   */
+  @NotNull
+  public static <IN, OUT> StreamRoutine<IN, OUT> streamOfSingleton(
+      @NotNull final Invocation<IN, OUT> invocation) {
+    return new DefaultStreamRoutine<IN, OUT>(invocation);
   }
 }

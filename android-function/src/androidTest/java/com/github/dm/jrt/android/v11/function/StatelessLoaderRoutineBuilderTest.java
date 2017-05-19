@@ -22,12 +22,11 @@ import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
+import com.github.dm.jrt.android.core.routine.LoaderRoutine;
 import com.github.dm.jrt.android.v11.core.LoaderSource;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.RoutineException;
-import com.github.dm.jrt.core.executor.ScheduledExecutors;
-import com.github.dm.jrt.function.builder.StatelessRoutineBuilder;
 import com.github.dm.jrt.function.util.BiConsumer;
 import com.github.dm.jrt.function.util.Consumer;
 import com.github.dm.jrt.function.util.Function;
@@ -40,7 +39,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static com.github.dm.jrt.android.v11.core.LoaderSource.loaderFrom;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -61,13 +59,13 @@ public class StatelessLoaderRoutineBuilderTest
   private static void testError(final Activity activity) {
     final AtomicReference<RoutineException> reference = new AtomicReference<RoutineException>();
     final Channel<Void, Void> channel =
-        JRoutineLoaderFunction.<Void, Void>stateless(LoaderSource.loaderOf(activity), 0).onError(
+        JRoutineLoaderFunction.<Void, Void>statelessOn(LoaderSource.loaderOf(activity), 0).onError(
             new Consumer<RoutineException>() {
 
               public void accept(final RoutineException e) throws Exception {
                 reference.set(e);
               }
-            }).withInvocation().withExecutor(ScheduledExecutors.immediateExecutor()).configured().invoke();
+            }).routine().invoke();
     assertThat(reference.get()).isNull();
     channel.abort(new IOException());
     assertThat(channel.in(seconds(10)).getComplete()).isTrue();
@@ -76,42 +74,42 @@ public class StatelessLoaderRoutineBuilderTest
   }
 
   private static void testIncrement(final Activity activity) {
-    final StatelessRoutineBuilder<Integer, Integer> routine =
-        JRoutineLoaderFunction.<Integer, Integer>stateless(LoaderSource.loaderOf(activity), 0).onNext(
-            new BiConsumer<Integer, Channel<Integer, ?>>() {
+    final LoaderRoutine<Integer, Integer> routine =
+        JRoutineLoaderFunction.<Integer, Integer>statelessOn(LoaderSource.loaderOf(activity),
+            0).onNext(new BiConsumer<Integer, Channel<Integer, ?>>() {
 
-              public void accept(final Integer integer, final Channel<Integer, ?> result) {
-                result.pass(integer + 1);
-              }
-            });
+          public void accept(final Integer integer, final Channel<Integer, ?> result) {
+            result.pass(integer + 1);
+          }
+        }).routine();
     assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(10)).all()).containsExactly(2,
         3, 4, 5);
   }
 
   private static void testIncrementArray(final Activity activity) {
-    final StatelessRoutineBuilder<Integer, Integer> routine =
-        JRoutineLoaderFunction.<Integer, Integer>stateless(LoaderSource.loaderOf(activity), 0).onNextArray(
-            new Function<Integer, Integer[]>() {
+    final LoaderRoutine<Integer, Integer> routine =
+        JRoutineLoaderFunction.<Integer, Integer>statelessOn(LoaderSource.loaderOf(activity),
+            0).onNextArray(new Function<Integer, Integer[]>() {
 
-              public Integer[] apply(final Integer integer) {
-                final Integer[] integers = new Integer[1];
-                integers[0] = integer + 1;
-                return integers;
-              }
-            });
+          public Integer[] apply(final Integer integer) {
+            final Integer[] integers = new Integer[1];
+            integers[0] = integer + 1;
+            return integers;
+          }
+        }).routine();
     assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(10)).all()).containsExactly(2,
         3, 4, 5);
   }
 
   private static void testIncrementIterable(final Activity activity) {
-    final StatelessRoutineBuilder<Integer, Integer> routine =
-        JRoutineLoaderFunction.<Integer, Integer>stateless(LoaderSource.loaderOf(activity), 0).onNextIterable(
-            new Function<Integer, Iterable<? extends Integer>>() {
+    final LoaderRoutine<Integer, Integer> routine =
+        JRoutineLoaderFunction.<Integer, Integer>statelessOn(LoaderSource.loaderOf(activity),
+            0).onNextIterable(new Function<Integer, Iterable<? extends Integer>>() {
 
-              public Iterable<? extends Integer> apply(final Integer integer) {
-                return Collections.singleton(integer + 1);
-              }
-            });
+          public Iterable<? extends Integer> apply(final Integer integer) {
+            return Collections.singleton(integer + 1);
+          }
+        }).routine();
     assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(10)).all()).containsExactly(2,
         3, 4, 5);
   }
@@ -119,8 +117,8 @@ public class StatelessLoaderRoutineBuilderTest
   @SuppressWarnings("unchecked")
   private static void testIncrementList(final Activity activity) {
     final ArrayList<Integer> list = new ArrayList<Integer>();
-    final StatelessRoutineBuilder<Integer, List<Integer>> routine =
-        JRoutineLoaderFunction.<Integer, List<Integer>>stateless(LoaderSource.loaderOf(activity),
+    final LoaderRoutine<Integer, List<Integer>> routine =
+        JRoutineLoaderFunction.<Integer, List<Integer>>statelessOn(LoaderSource.loaderOf(activity),
             0).onNextConsume(new Consumer<Integer>() {
 
           public void accept(final Integer integer) {
@@ -131,59 +129,59 @@ public class StatelessLoaderRoutineBuilderTest
           public List<Integer> get() {
             return list;
           }
-        }).withInvocation().withExecutor(ScheduledExecutors.immediateExecutor()).configured();
+        }).routine();
     assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(10)).all()).containsOnly(
         Arrays.asList(2, 3, 4, 5));
   }
 
   private static void testIncrementOutput(final Activity activity) {
-    final StatelessRoutineBuilder<Integer, Integer> routine =
-        JRoutineLoaderFunction.<Integer, Integer>stateless(LoaderSource.loaderOf(activity), 0).onNextOutput(
-            new Function<Integer, Integer>() {
+    final LoaderRoutine<Integer, Integer> routine =
+        JRoutineLoaderFunction.<Integer, Integer>statelessOn(LoaderSource.loaderOf(activity),
+            0).onNextOutput(new Function<Integer, Integer>() {
 
-              public Integer apply(final Integer integer) {
-                return integer + 1;
-              }
-            });
+          public Integer apply(final Integer integer) {
+            return integer + 1;
+          }
+        }).routine();
     assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(10)).all()).containsExactly(2,
         3, 4, 5);
   }
 
   private static void testProduceArray(final Activity activity) {
-    final StatelessRoutineBuilder<Integer, Integer> routine =
-        JRoutineLoaderFunction.<Integer, Integer>stateless(LoaderSource.loaderOf(activity), 0).onCompleteArray(
-            new Supplier<Integer[]>() {
+    final LoaderRoutine<Integer, Integer> routine =
+        JRoutineLoaderFunction.<Integer, Integer>statelessOn(LoaderSource.loaderOf(activity),
+            0).onCompleteArray(new Supplier<Integer[]>() {
 
-              public Integer[] get() {
-                final Integer[] integers = new Integer[1];
-                integers[0] = 17;
-                return integers;
-              }
-            });
+          public Integer[] get() {
+            final Integer[] integers = new Integer[1];
+            integers[0] = 17;
+            return integers;
+          }
+        }).routine();
     assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(10)).all()).containsExactly(17);
   }
 
   private static void testProduceIterable(final Activity activity) {
-    final StatelessRoutineBuilder<Integer, Integer> routine =
-        JRoutineLoaderFunction.<Integer, Integer>stateless(LoaderSource.loaderOf(activity),
+    final LoaderRoutine<Integer, Integer> routine =
+        JRoutineLoaderFunction.<Integer, Integer>statelessOn(LoaderSource.loaderOf(activity),
             0).onCompleteIterable(new Supplier<Iterable<? extends Integer>>() {
 
           public Iterable<? extends Integer> get() {
             return Collections.singleton(17);
           }
-        });
+        }).routine();
     assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(10)).all()).containsExactly(17);
   }
 
   private static void testProduceOutput(final Activity activity) {
-    final StatelessRoutineBuilder<Integer, Integer> routine =
-        JRoutineLoaderFunction.<Integer, Integer>stateless(LoaderSource.loaderOf(activity),
+    final LoaderRoutine<Integer, Integer> routine =
+        JRoutineLoaderFunction.<Integer, Integer>statelessOn(LoaderSource.loaderOf(activity),
             0).onCompleteOutput(new Supplier<Integer>() {
 
           public Integer get() {
             return 17;
           }
-        });
+        }).routine();
     assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(10)).all()).containsExactly(17);
   }
 

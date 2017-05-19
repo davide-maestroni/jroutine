@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.android.retrofit;
 
-import com.github.dm.jrt.android.channel.ParcelableFlow;
+import com.github.dm.jrt.android.channel.ParcelableFlowData;
 import com.github.dm.jrt.android.channel.io.ParcelableByteChannel;
 import com.github.dm.jrt.android.channel.io.ParcelableByteChannel.ParcelableByteChunk;
 import com.github.dm.jrt.channel.io.ByteChannel.ByteChunkInputStream;
@@ -49,7 +49,7 @@ import static com.github.dm.jrt.core.util.DurationMeasure.indefiniteTime;
  * <p>
  * Created by davide-maestroni on 05/18/2016.
  */
-class ConverterChannelConsumer implements ChannelConsumer<ParcelableFlow<Object>> {
+class ConverterChannelConsumer implements ChannelConsumer<ParcelableFlowData<Object>> {
 
   /**
    * The ID of the flow dedicated to the transfer of request and response body bytes.
@@ -121,7 +121,7 @@ class ConverterChannelConsumer implements ChannelConsumer<ParcelableFlow<Object>
   }
 
   @Override
-  public void onOutput(final ParcelableFlow<Object> output) {
+  public void onOutput(final ParcelableFlowData<Object> output) {
     switch (output.id) {
       case MEDIA_TYPE_ID:
         final String mediaType = output.data();
@@ -202,7 +202,7 @@ class ConverterChannelConsumer implements ChannelConsumer<ParcelableFlow<Object>
         if (mInputStream == null) {
           final Channel<ParcelableByteChunk, ParcelableByteChunk> channel = mChannel;
           if (channel.in(indefiniteTime()).hasNext()) {
-            mInputStream = ParcelableByteChannel.getInputStream(channel.next());
+            mInputStream = ParcelableByteChannel.inputStream(channel.next());
 
           } else {
             return -1;

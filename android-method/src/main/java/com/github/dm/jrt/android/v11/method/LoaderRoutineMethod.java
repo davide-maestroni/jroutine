@@ -18,7 +18,7 @@ package com.github.dm.jrt.android.v11.method;
 
 import android.content.Context;
 
-import com.github.dm.jrt.android.channel.AndroidChannels;
+import com.github.dm.jrt.android.channel.JRoutineAndroidChannels;
 import com.github.dm.jrt.android.core.config.LoaderConfigurable;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.Builder;
@@ -28,7 +28,7 @@ import com.github.dm.jrt.android.reflect.ContextInvocationTarget;
 import com.github.dm.jrt.android.v11.core.JRoutineLoader;
 import com.github.dm.jrt.android.v11.core.LoaderSource;
 import com.github.dm.jrt.android.v11.reflect.JRoutineLoaderReflection;
-import com.github.dm.jrt.channel.Flow;
+import com.github.dm.jrt.channel.FlowData;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.RoutineException;
@@ -258,7 +258,7 @@ public class LoaderRoutineMethod extends RoutineMethod
     final Object[] safeParams = asArgs(params);
     final Class<? extends LoaderRoutineMethod> type = getClass();
     final Method method = findBestMatchingMethod(type, safeParams);
-    final ContextInvocationFactory<Flow<Object>, Flow<Object>> factory;
+    final ContextInvocationFactory<FlowData<Object>, FlowData<Object>> factory;
     final Constructor<? extends LoaderRoutineMethod> constructor = mConstructor;
     if (constructor != null) {
       factory = new MultiInvocationFactory(type, constructor, mArgs, method, safeParams);
@@ -352,7 +352,7 @@ public class LoaderRoutineMethod extends RoutineMethod
   @NotNull
   @SuppressWarnings("unchecked")
   private <OUT> Channel<?, OUT> call(
-      @NotNull final ContextInvocationFactory<Flow<Object>, Flow<Object>> factory,
+      @NotNull final ContextInvocationFactory<FlowData<Object>, FlowData<Object>> factory,
       @NotNull final Method method, @NotNull final Object[] params) {
     final ArrayList<Channel<?, ?>> inputChannels = new ArrayList<Channel<?, ?>>();
     final ArrayList<Channel<?, ?>> outputChannels = new ArrayList<Channel<?, ?>>();
@@ -371,21 +371,21 @@ public class LoaderRoutineMethod extends RoutineMethod
 
     final Channel<?, OUT> resultChannel = JRoutineCore.<OUT>ofData().buildChannel();
     outputChannels.add(resultChannel);
-    final Channel<?, ? extends Flow<Object>> inputChannel =
-        (!inputChannels.isEmpty()) ? AndroidChannels.mergeParcelableOutput(inputChannels)
-                                                    .buildChannel()
-            : JRoutineCore.<Flow<Object>>of().buildChannel();
-    final Channel<Flow<Object>, Flow<Object>> outputChannel = JRoutineLoader.on(mContext)
-                                                                            .with(factory)
-                                                                            .withConfiguration(
+    final Channel<?, ? extends FlowData<Object>> inputChannel =
+        (!inputChannels.isEmpty()) ? JRoutineAndroidChannels.mergeParcelableOutput(inputChannels)
+                                                            .buildChannel()
+            : JRoutineCore.<FlowData<Object>>of().buildChannel();
+    final Channel<FlowData<Object>, FlowData<Object>> outputChannel = JRoutineLoader.on(mContext)
+                                                                                    .with(factory)
+                                                                                    .withConfiguration(
                                                                                 getConfiguration())
-                                                                            .withConfiguration(
+                                                                                    .withConfiguration(
                                                                                 getLoaderConfiguration())
-                                                                            .invoke()
-                                                                            .pass(inputChannel)
-                                                                            .close();
+                                                                                    .invoke()
+                                                                                    .pass(inputChannel)
+                                                                                    .close();
     final Map<Integer, ? extends Channel<?, Object>> channelMap =
-        AndroidChannels.flowOutput(0, outputChannels.size(), outputChannel).buildChannelMap();
+        JRoutineAndroidChannels.flowOutput(0, outputChannels.size(), outputChannel).buildChannelMap();
     for (final Entry<Integer, ? extends Channel<?, Object>> entry : channelMap.entrySet()) {
       ((Channel<Object, Object>) outputChannels.get(entry.getKey())).pass(entry.getValue()).close();
     }
@@ -521,7 +521,7 @@ public class LoaderRoutineMethod extends RoutineMethod
    * Base invocation implementation.
    */
   private static abstract class AbstractInvocation
-      implements ContextInvocation<Flow<Object>, Flow<Object>> {
+      implements ContextInvocation<FlowData<Object>, FlowData<Object>> {
 
     private final boolean mReturnResults;
 
@@ -562,7 +562,7 @@ public class LoaderRoutineMethod extends RoutineMethod
     }
 
     @Override
-    public void onComplete(@NotNull final Channel<Flow<Object>, ?> result) throws Exception {
+    public void onComplete(@NotNull final Channel<FlowData<Object>, ?> result) throws Exception {
       bind(result);
       mIsComplete = true;
       if (!mIsAborted) {
@@ -577,7 +577,7 @@ public class LoaderRoutineMethod extends RoutineMethod
           final Object methodResult =
               internalInvoke((!inputChannels.isEmpty()) ? inputChannels.get(0) : null);
           if (mReturnResults && !isIgnoreReturnValue()) {
-            result.pass(new Flow<Object>(outputChannels.size(), methodResult));
+            result.pass(new FlowData<Object>(outputChannels.size(), methodResult));
           }
 
         } finally {
@@ -595,8 +595,8 @@ public class LoaderRoutineMethod extends RoutineMethod
     }
 
     @Override
-    public void onInput(final Flow<Object> input,
-        @NotNull final Channel<Flow<Object>, ?> result) throws Exception {
+    public void onInput(final FlowData<Object> input,
+        @NotNull final Channel<FlowData<Object>, ?> result) throws Exception {
       bind(result);
       @SuppressWarnings("unchecked") final Channel<Object, Object> inputChannel =
           (Channel<Object, Object>) getInputChannels().get(input.id);
@@ -605,7 +605,7 @@ public class LoaderRoutineMethod extends RoutineMethod
         resetIgnoreReturnValue();
         final Object methodResult = internalInvoke(inputChannel);
         if (mReturnResults && !isIgnoreReturnValue()) {
-          result.pass(new Flow<Object>(getOutputChannels().size(), methodResult));
+          result.pass(new FlowData<Object>(getOutputChannels().size(), methodResult));
         }
 
       } finally {
@@ -651,7 +651,7 @@ public class LoaderRoutineMethod extends RoutineMethod
      */
     protected abstract void resetIgnoreReturnValue();
 
-    private void bind(@NotNull final Channel<Flow<Object>, ?> result) {
+    private void bind(@NotNull final Channel<FlowData<Object>, ?> result) {
       if (!mIsBound) {
         mIsBound = true;
         final List<Channel<?, ?>> outputChannels = getOutputChannels();
@@ -783,7 +783,7 @@ public class LoaderRoutineMethod extends RoutineMethod
    * Invocation factory supporting multiple invocation of the routine method.
    */
   private static class MultiInvocationFactory
-      extends ContextInvocationFactory<Flow<Object>, Flow<Object>> {
+      extends ContextInvocationFactory<FlowData<Object>, FlowData<Object>> {
 
     private final Object[] mArgs;
 
@@ -815,7 +815,7 @@ public class LoaderRoutineMethod extends RoutineMethod
 
     @NotNull
     @Override
-    public ContextInvocation<Flow<Object>, Flow<Object>> newInvocation() {
+    public ContextInvocation<FlowData<Object>, FlowData<Object>> newInvocation() {
       return new MultiInvocation(mConstructor, mArgs, mMethod, mParams);
     }
   }
@@ -910,7 +910,7 @@ public class LoaderRoutineMethod extends RoutineMethod
    * Invocation factory supporting single invocation of the routine method.
    */
   private static class SingleInvocationFactory
-      extends ContextInvocationFactory<Flow<Object>, Flow<Object>> {
+      extends ContextInvocationFactory<FlowData<Object>, FlowData<Object>> {
 
     private final ArrayList<Channel<?, ?>> mInputChannels;
 
@@ -943,7 +943,7 @@ public class LoaderRoutineMethod extends RoutineMethod
 
     @NotNull
     @Override
-    public ContextInvocation<Flow<Object>, Flow<Object>> newInvocation() {
+    public ContextInvocation<FlowData<Object>, FlowData<Object>> newInvocation() {
       return new SingleInvocation(mInputChannels, mOutputChannels, mInstance, mMethod, mParams);
     }
   }

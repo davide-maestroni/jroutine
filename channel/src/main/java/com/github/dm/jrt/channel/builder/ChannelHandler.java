@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.channel.builder;
 
-import com.github.dm.jrt.channel.Flow;
+import com.github.dm.jrt.channel.FlowData;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfigurable;
 
@@ -59,7 +59,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    *                                            object.
    */
   @NotNull
-  <OUT> Channel<?, OUT> blendOutputOf(@NotNull final Channel<?, ?>... channels);
+  <OUT> Channel<?, OUT> blendOutputOf(@NotNull Channel<?, ?>... channels);
 
   /**
    * Returns a channel blending the outputs coming from the specified ones.
@@ -83,7 +83,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    */
   @NotNull
   <OUT> Channel<?, OUT> blendOutputOf(
-      @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels);
+      @NotNull Iterable<? extends Channel<?, ? extends OUT>> channels);
 
   /**
    * Returns a channel producing the result of the specified Callable.
@@ -95,7 +95,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    * @return the channel instance.
    */
   @NotNull
-  <OUT> Channel<?, OUT> channelOf(@NotNull final Callable<OUT> callable);
+  <OUT> Channel<?, OUT> channelOf(@NotNull Callable<OUT> callable);
 
   /**
    * Returns a builder of channels producing the result of the specified Future.
@@ -112,7 +112,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    * @return the channel instance.
    */
   @NotNull
-  <OUT> Channel<?, OUT> channelOf(@NotNull final Future<OUT> future);
+  <OUT> Channel<?, OUT> channelOf(@NotNull Future<OUT> future);
 
   /**
    * Returns a channel producing the result of the specified Future.
@@ -131,8 +131,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    * @return the channel instance.
    */
   @NotNull
-  <OUT> Channel<?, OUT> channelOf(@NotNull final Future<OUT> future,
-      final boolean mayInterruptIfRunning);
+  <OUT> Channel<?, OUT> channelOf(@NotNull Future<OUT> future, boolean mayInterruptIfRunning);
 
   /**
    * Returns a list of channels.
@@ -143,7 +142,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    * @throws java.lang.IllegalArgumentException if the specified count is negative.
    */
   @NotNull
-  <DATA> List<Channel<DATA, DATA>> channels(final int count);
+  <DATA> List<Channel<DATA, DATA>> channels(int count);
 
   /**
    * Returns a channel concatenating the outputs coming from the specified ones, so that, all the
@@ -167,7 +166,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    *                                            object.
    */
   @NotNull
-  <OUT> Channel<?, OUT> concatOutputOf(@NotNull final Channel<?, ?>... channels);
+  <OUT> Channel<?, OUT> concatOutputOf(@NotNull Channel<?, ?>... channels);
 
   /**
    * Returns a channel concatenating the outputs coming from the specified ones, so that, all the
@@ -192,7 +191,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    */
   @NotNull
   <OUT> Channel<?, OUT> concatOutputOf(
-      @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels);
+      @NotNull Iterable<? extends Channel<?, ? extends OUT>> channels);
 
   /**
    * Returns a channel of flows feeding the specified one.
@@ -203,7 +202,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    * <p>
    * Given channel {@code A}, its final output will be:
    * <pre><code>
-   * A =&gt; [Flow(id, IN).data, Flow(id, IN).data, ...]
+   * A =&gt; [FlowData(id, IN).data, FlowData(id, IN).data, ...]
    * </code></pre>
    *
    * @param channel the channel to feed.
@@ -212,8 +211,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    * @return the channel instance.
    */
   @NotNull
-  <IN> Channel<Flow<IN>, ?> inputFlowOf(@NotNull final Channel<? super IN, ?> channel,
-      final int id);
+  <IN> Channel<FlowData<IN>, ?> inputFlowOf(@NotNull Channel<? super IN, ?> channel, int id);
 
   /**
    * Returns a channel transforming the input data into flow ones.
@@ -222,7 +220,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    * <p>
    * Given channel {@code A}, its final output will be:
    * <pre><code>
-   * A =&gt; [Flow(id, IN), Flow(id, IN), Flow(id, IN), ...]
+   * A =&gt; [FlowData(id, IN), FlowData(id, IN), FlowData(id, IN), ...]
    * </code></pre>
    *
    * @param channel the flow channel.
@@ -233,7 +231,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    */
   @NotNull
   <DATA, IN extends DATA> Channel<IN, ?> inputOfFlow(
-      @NotNull final Channel<? super Flow<DATA>, ?> channel, final int id);
+      @NotNull Channel<? super FlowData<DATA>, ?> channel, int id);
 
   /**
    * Returns a map of channels accepting the data identified by the specified IDs.
@@ -243,7 +241,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    * Given channel {@code A} and channels {@code IN1}, {@code IN2} and {@code IN3} in the returned
    * map, the final output of {@code A} will be:
    * <pre><code>
-   * A =&gt; [Flow(ids[1], IN2), Flow(ids[0], IN1), Flow(ids[2], IN3), ...]
+   * A =&gt; [FlowData(ids[1], IN2), FlowData(ids[0], IN1), FlowData(ids[2], IN3), ...]
    * </code></pre>
    *
    * @param channel the flow channel.
@@ -256,7 +254,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    */
   @NotNull
   <DATA, IN extends DATA> Map<Integer, Channel<IN, ?>> inputOfFlow(
-      @NotNull final Channel<? super Flow<DATA>, ?> channel, @NotNull final int... ids);
+      @NotNull Channel<? super FlowData<DATA>, ?> channel, @NotNull int... ids);
 
   /**
    * Returns a map of channels accepting the data identified by the specified IDs.
@@ -266,7 +264,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    * Given channel {@code A} and channels {@code IN1}, {@code IN2} and {@code IN3} in the returned
    * map, the final output of {@code A} will be:
    * <pre><code>
-   * A =&gt; [Flow(ids[1], IN2), Flow(ids[0], IN1), Flow(ids[2], IN3), ...]
+   * A =&gt; [FlowData(ids[1], IN2), FlowData(ids[0], IN1), FlowData(ids[2], IN3), ...]
    * </code></pre>
    *
    * @param channel the flow channel.
@@ -279,7 +277,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    */
   @NotNull
   <DATA, IN extends DATA> Map<Integer, Channel<IN, ?>> inputOfFlow(
-      @NotNull final Channel<? super Flow<DATA>, ?> channel, @NotNull final Iterable<Integer> ids);
+      @NotNull Channel<? super FlowData<DATA>, ?> channel, @NotNull Iterable<Integer> ids);
 
   /**
    * Returns a map of channels accepting the data identified by the specified IDs.
@@ -289,7 +287,8 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    * Given channel {@code A} and channels {@code IN1}, {@code IN2} and {@code IN3} in the returned
    * map, the final output of {@code A} will be:
    * <pre><code>
-   * A =&gt; [Flow(startId + 1, IN2), Flow(startId + 0, IN1), Flow(startId + 2, IN3), ...]
+   * A =&gt; [FlowData(startId + 1, IN2), FlowData(startId + 0, IN1), FlowData(startId + 2, IN3),
+   * ...]
    * </code></pre>
    *
    * @param startId   the flow start ID.
@@ -301,8 +300,8 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    * @throws java.lang.IllegalArgumentException if the specified range size is not positive.
    */
   @NotNull
-  <DATA, IN extends DATA> Map<Integer, Channel<IN, ?>> inputOfFlow(final int startId,
-      final int rangeSize, @NotNull final Channel<? super Flow<DATA>, ?> channel);
+  <DATA, IN extends DATA> Map<Integer, Channel<IN, ?>> inputOfFlow(int startId, int rangeSize,
+      @NotNull Channel<? super FlowData<DATA>, ?> channel);
 
   /**
    * Returns a channel distributing the input data among the specified ones. If the list of data
@@ -325,7 +324,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    *                                            object.
    */
   @NotNull
-  <IN> Channel<List<? extends IN>, ?> joinInputOf(@NotNull final Channel<?, ?>... channels);
+  <IN> Channel<List<? extends IN>, ?> joinInputOf(@NotNull Channel<?, ?>... channels);
 
   /**
    * Returns a channel distributing the input data among the specified ones. If the list of data is
@@ -351,8 +350,8 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    *                                            object.
    */
   @NotNull
-  <IN> Channel<List<? extends IN>, ?> joinInputOf(@Nullable final IN placeholder,
-      @NotNull final Channel<?, ?>... channels);
+  <IN> Channel<List<? extends IN>, ?> joinInputOf(@Nullable IN placeholder,
+      @NotNull Channel<?, ?>... channels);
 
   /**
    * Returns a channel distributing the input data among the specified ones. If the list of data is
@@ -378,8 +377,8 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    *                                            null object.
    */
   @NotNull
-  <IN> Channel<List<? extends IN>, ?> joinInputOf(@Nullable final IN placeholder,
-      @NotNull final Iterable<? extends Channel<? extends IN, ?>> channels);
+  <IN> Channel<List<? extends IN>, ?> joinInputOf(@Nullable IN placeholder,
+      @NotNull Iterable<? extends Channel<? extends IN, ?>> channels);
 
   /**
    * Returns a channel distributing the input data among the specified ones. If the list of data
@@ -403,7 +402,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    */
   @NotNull
   <IN> Channel<List<? extends IN>, ?> joinInputOf(
-      @NotNull final Iterable<? extends Channel<? extends IN, ?>> channels);
+      @NotNull Iterable<? extends Channel<? extends IN, ?>> channels);
 
   /**
    * Returns a channel joining the data coming from the specified ones.
@@ -428,7 +427,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    *                                            object.
    */
   @NotNull
-  <OUT> Channel<?, List<OUT>> joinOutputOf(@NotNull final Channel<?, ?>... channels);
+  <OUT> Channel<?, List<OUT>> joinOutputOf(@NotNull Channel<?, ?>... channels);
 
   /**
    * Returns a channel joining the data coming from the specified ones.
@@ -454,7 +453,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    */
   @NotNull
   <OUT> Channel<?, List<OUT>> joinOutputOf(
-      @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels);
+      @NotNull Iterable<? extends Channel<?, ? extends OUT>> channels);
 
   /**
    * Returns a channel joining the data coming from the specified ones.
@@ -483,8 +482,8 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    *                                            object.
    */
   @NotNull
-  <OUT> Channel<?, List<OUT>> joinOutputOf(@Nullable final OUT placeholder,
-      @NotNull final Channel<?, ?>... channels);
+  <OUT> Channel<?, List<OUT>> joinOutputOf(@Nullable OUT placeholder,
+      @NotNull Channel<?, ?>... channels);
 
   /**
    * Returns a channel joining the data coming from the specified ones.
@@ -513,8 +512,8 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    *                                            null object.
    */
   @NotNull
-  <OUT> Channel<?, List<OUT>> joinOutputOf(@Nullable final OUT placeholder,
-      @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels);
+  <OUT> Channel<?, List<OUT>> joinOutputOf(@Nullable OUT placeholder,
+      @NotNull Iterable<? extends Channel<?, ? extends OUT>> channels);
 
   /**
    * Returns a channel merging the specified instances into a flow one.
@@ -525,9 +524,9 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, their final output will be:
    * <pre><code>
-   * A =&gt; [Flow(0, IN).data, Flow(0, IN).data, Flow(0, IN).data, ...]
-   * B =&gt; [Flow(1, IN).data, Flow(1, IN).data, Flow(1, IN).data, ...]
-   * C =&gt; [Flow(2, IN).data, Flow(2, IN).data, Flow(2, IN).data, ...]
+   * A =&gt; [FlowData(0, IN).data, FlowData(0, IN).data, FlowData(0, IN).data, ...]
+   * B =&gt; [FlowData(1, IN).data, FlowData(1, IN).data, FlowData(1, IN).data, ...]
+   * C =&gt; [FlowData(2, IN).data, FlowData(2, IN).data, FlowData(2, IN).data, ...]
    * </code></pre>
    *
    * @param channels the array of channels.
@@ -538,7 +537,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    *                                            object.
    */
   @NotNull
-  <IN> Channel<Flow<? extends IN>, ?> mergeInputOf(@NotNull final Channel<?, ?>... channels);
+  <IN> Channel<FlowData<? extends IN>, ?> mergeInputOf(@NotNull Channel<?, ?>... channels);
 
   /**
    * Returns a channel merging the specified instances into a flow one.
@@ -549,9 +548,9 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, their final output will be:
    * <pre><code>
-   * A =&gt; [Flow(startId + 0, IN).data, Flow(startId + 0, IN).data, ...]
-   * B =&gt; [Flow(startId + 1, IN).data, Flow(startId + 1, IN).data, ...]
-   * C =&gt; [Flow(startId + 2, IN).data, Flow(startId + 2, IN).data, ...]
+   * A =&gt; [FlowData(startId + 0, IN).data, FlowData(startId + 0, IN).data, ...]
+   * B =&gt; [FlowData(startId + 1, IN).data, FlowData(startId + 1, IN).data, ...]
+   * C =&gt; [FlowData(startId + 2, IN).data, FlowData(startId + 2, IN).data, ...]
    * </code></pre>
    *
    * @param startId  the flow start ID.
@@ -563,8 +562,8 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    *                                            object.
    */
   @NotNull
-  <IN> Channel<Flow<? extends IN>, ?> mergeInputOf(final int startId,
-      @NotNull final Channel<?, ?>... channels);
+  <IN> Channel<FlowData<? extends IN>, ?> mergeInputOf(int startId,
+      @NotNull Channel<?, ?>... channels);
 
   /**
    * Returns a channel merging the specified instances into a flow one.
@@ -575,9 +574,9 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, their final output will be:
    * <pre><code>
-   * A =&gt; [Flow(startId + 0, IN).data, Flow(startId + 0, IN).data, ...]
-   * B =&gt; [Flow(startId + 1, IN).data, Flow(startId + 1, IN).data, ...]
-   * C =&gt; [Flow(startId + 2, IN).data, Flow(startId + 2, IN).data, ...]
+   * A =&gt; [FlowData(startId + 0, IN).data, FlowData(startId + 0, IN).data, ...]
+   * B =&gt; [FlowData(startId + 1, IN).data, FlowData(startId + 1, IN).data, ...]
+   * C =&gt; [FlowData(startId + 2, IN).data, FlowData(startId + 2, IN).data, ...]
    * </code></pre>
    *
    * @param startId  the flow start ID.
@@ -589,8 +588,8 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    *                                            null object.
    */
   @NotNull
-  <IN> Channel<Flow<? extends IN>, ?> mergeInputOf(final int startId,
-      @NotNull final Iterable<? extends Channel<? extends IN, ?>> channels);
+  <IN> Channel<FlowData<? extends IN>, ?> mergeInputOf(int startId,
+      @NotNull Iterable<? extends Channel<? extends IN, ?>> channels);
 
   /**
    * Returns a channel merging the specified instances into a flow one.
@@ -601,9 +600,9 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, their final output will be:
    * <pre><code>
-   * A =&gt; [Flow(0, IN).data, Flow(0, IN).data, Flow(0, IN).data, ...]
-   * B =&gt; [Flow(1, IN).data, Flow(1, IN).data, Flow(1, IN).data, ...]
-   * C =&gt; [Flow(2, IN).data, Flow(2, IN).data, Flow(2, IN).data, ...]
+   * A =&gt; [FlowData(0, IN).data, FlowData(0, IN).data, FlowData(0, IN).data, ...]
+   * B =&gt; [FlowData(1, IN).data, FlowData(1, IN).data, FlowData(1, IN).data, ...]
+   * C =&gt; [FlowData(2, IN).data, FlowData(2, IN).data, FlowData(2, IN).data, ...]
    * </code></pre>
    *
    * @param channels the iterable of channels.
@@ -614,8 +613,8 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    *                                            null object.
    */
   @NotNull
-  <IN> Channel<Flow<? extends IN>, ?> mergeInputOf(
-      @NotNull final Iterable<? extends Channel<? extends IN, ?>> channels);
+  <IN> Channel<FlowData<? extends IN>, ?> mergeInputOf(
+      @NotNull Iterable<? extends Channel<? extends IN, ?>> channels);
 
   /**
    * Returns a channel merging the specified instances into a flow one.
@@ -626,9 +625,9 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, their final output will be:
    * <pre><code>
-   * A =&gt; [Flow(key(A), IN).data, Flow(key(A), IN).data, ...]
-   * B =&gt; [Flow(key(B), IN).data, Flow(key(B), IN).data, ...]
-   * C =&gt; [Flow(key(C), IN).data, Flow(key(C), IN).data, ...]
+   * A =&gt; [FlowData(key(A), IN).data, FlowData(key(A), IN).data, ...]
+   * B =&gt; [FlowData(key(B), IN).data, FlowData(key(B), IN).data, ...]
+   * C =&gt; [FlowData(key(C), IN).data, FlowData(key(C), IN).data, ...]
    * </code></pre>
    *
    * @param channels the map of IDs and channels.
@@ -639,8 +638,8 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    *                                            object.
    */
   @NotNull
-  <IN> Channel<Flow<? extends IN>, ?> mergeInputOf(
-      @NotNull final Map<Integer, ? extends Channel<? extends IN, ?>> channels);
+  <IN> Channel<FlowData<? extends IN>, ?> mergeInputOf(
+      @NotNull Map<Integer, ? extends Channel<? extends IN, ?>> channels);
 
   /**
    * Returns a channel merging the specified instances into a flow one.
@@ -654,7 +653,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
    * <pre><code>
-   * =&gt; [Flow(1, B), Flow(0, A), Flow(2, C), Flow(0, A), ...]
+   * =&gt; [FlowData(1, B), FlowData(0, A), FlowData(2, C), FlowData(0, A), ...]
    * </code></pre>
    *
    * @param channels the channels to merge.
@@ -665,7 +664,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    *                                            object.
    */
   @NotNull
-  <OUT> Channel<?, Flow<OUT>> mergeOutputOf(@NotNull final Channel<?, ?>... channels);
+  <OUT> Channel<?, FlowData<OUT>> mergeOutputOf(@NotNull Channel<?, ?>... channels);
 
   /**
    * Returns a channel merging the specified instances into a flow one.
@@ -679,7 +678,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
    * <pre><code>
-   * =&gt; [Flow(startId + 1, B), Flow(startId + 0, A), Flow(startId + 2, C), ...]
+   * =&gt; [FlowData(startId + 1, B), FlowData(startId + 0, A), FlowData(startId + 2, C), ...]
    * </code></pre>
    *
    * @param startId  the flow start ID.
@@ -691,8 +690,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    *                                            object.
    */
   @NotNull
-  <OUT> Channel<?, Flow<OUT>> mergeOutputOf(final int startId,
-      @NotNull final Channel<?, ?>... channels);
+  <OUT> Channel<?, FlowData<OUT>> mergeOutputOf(int startId, @NotNull Channel<?, ?>... channels);
 
   /**
    * Returns a channel merging the specified instances into a flow one.
@@ -706,7 +704,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
    * <pre><code>
-   * =&gt; [Flow(startId + 1, B), Flow(startId + 0, A), Flow(startId + 2, C), ...]
+   * =&gt; [FlowData(startId + 1, B), FlowData(startId + 0, A), FlowData(startId + 2, C), ...]
    * </code></pre>
    *
    * @param startId  the flow start ID.
@@ -718,8 +716,8 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    *                                            null object.
    */
   @NotNull
-  <OUT> Channel<?, Flow<OUT>> mergeOutputOf(final int startId,
-      @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels);
+  <OUT> Channel<?, FlowData<OUT>> mergeOutputOf(int startId,
+      @NotNull Iterable<? extends Channel<?, ? extends OUT>> channels);
 
   /**
    * Returns a channel merging the specified instances into a flow one.
@@ -733,7 +731,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
    * <pre><code>
-   * =&gt; [Flow(1, B), Flow(0, A), Flow(2, C), Flow(0, A), ...]
+   * =&gt; [FlowData(1, B), FlowData(0, A), FlowData(2, C), FlowData(0, A), ...]
    * </code></pre>
    *
    * @param channels the channels to merge.
@@ -744,8 +742,8 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    *                                            null object.
    */
   @NotNull
-  <OUT> Channel<?, Flow<OUT>> mergeOutputOf(
-      @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels);
+  <OUT> Channel<?, FlowData<OUT>> mergeOutputOf(
+      @NotNull Iterable<? extends Channel<?, ? extends OUT>> channels);
 
   /**
    * Returns a channel merging the specified instances into a flow one.
@@ -759,7 +757,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    * <p>
    * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
    * <pre><code>
-   * =&gt; [Flow(key(B), B), Flow(key(A), A), Flow(key(C), C), ...]
+   * =&gt; [FlowData(key(B), B), FlowData(key(A), A), FlowData(key(C), C), ...]
    * </code></pre>
    *
    * @param channels the map of IDs and channels.
@@ -770,8 +768,8 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    *                                            object.
    */
   @NotNull
-  <OUT> Channel<?, Flow<OUT>> mergeOutputOf(
-      @NotNull final Map<Integer, ? extends Channel<?, ? extends OUT>> channels);
+  <OUT> Channel<?, FlowData<OUT>> mergeOutputOf(
+      @NotNull Map<Integer, ? extends Channel<?, ? extends OUT>> channels);
 
   /**
    * Returns a channel making the data of the specified one a flow.
@@ -785,7 +783,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    * <p>
    * Given channel {@code A}, the final output will be:
    * <pre><code>
-   * =&gt; [Flow(id, A), Flow(id, A), Flow(id, A), ...]
+   * =&gt; [FlowData(id, A), FlowData(id, A), FlowData(id, A), ...]
    * </code></pre>
    *
    * @param channel the channel.
@@ -794,8 +792,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    * @return the channel instance.
    */
   @NotNull
-  <OUT> Channel<?, Flow<OUT>> outputFlowOf(@NotNull final Channel<?, ? extends OUT> channel,
-      final int id);
+  <OUT> Channel<?, FlowData<OUT>> outputFlowOf(@NotNull Channel<?, ? extends OUT> channel, int id);
 
   /**
    * Returns a map of channels returning the output data filtered by the specified IDs.
@@ -808,9 +805,9 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    * Given channels {@code A}, {@code B} and {@code C} in the returned map, the final output will
    * be:
    * <pre><code>
-   * A =&gt; [Flow(ids[0], IN).data, Flow(ids[0], IN).data, ...]
-   * B =&gt; [Flow(ids[1], IN).data, Flow(ids[1], IN).data, ...]
-   * C =&gt; [Flow(ids[2], IN).data, Flow(ids[2], IN).data, ...]
+   * A =&gt; [FlowData(ids[0], IN).data, FlowData(ids[0], IN).data, ...]
+   * B =&gt; [FlowData(ids[1], IN).data, FlowData(ids[1], IN).data, ...]
+   * C =&gt; [FlowData(ids[2], IN).data, FlowData(ids[2], IN).data, ...]
    * </code></pre>
    *
    * @param channel the flow channel.
@@ -822,7 +819,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    */
   @NotNull
   <OUT> Map<Integer, Channel<?, OUT>> outputOfFlow(
-      @NotNull final Channel<?, ? extends Flow<? extends OUT>> channel, @NotNull final int... ids);
+      @NotNull Channel<?, ? extends FlowData<? extends OUT>> channel, @NotNull int... ids);
 
   /**
    * Returns a map of channels returning the output data filtered by the specified IDs.
@@ -835,9 +832,9 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    * Given channels {@code A}, {@code B} and {@code C} in the returned map, the final output will
    * be:
    * <pre><code>
-   * A =&gt; [Flow(ids[0], IN).data, Flow(ids[0], IN).data, ...]
-   * B =&gt; [Flow(ids[1], IN).data, Flow(ids[1], IN).data, ...]
-   * C =&gt; [Flow(ids[2], IN).data, Flow(ids[2], IN).data, ...]
+   * A =&gt; [FlowData(ids[0], IN).data, FlowData(ids[0], IN).data, ...]
+   * B =&gt; [FlowData(ids[1], IN).data, FlowData(ids[1], IN).data, ...]
+   * C =&gt; [FlowData(ids[2], IN).data, FlowData(ids[2], IN).data, ...]
    * </code></pre>
    *
    * @param channel the flow channel.
@@ -849,8 +846,8 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    */
   @NotNull
   <OUT> Map<Integer, Channel<?, OUT>> outputOfFlow(
-      @NotNull final Channel<?, ? extends Flow<? extends OUT>> channel,
-      @NotNull final Iterable<Integer> ids);
+      @NotNull Channel<?, ? extends FlowData<? extends OUT>> channel,
+      @NotNull Iterable<Integer> ids);
 
   /**
    * Returns a map of channels returning the output data filtered by the specified IDs.
@@ -863,9 +860,9 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    * Given channels {@code A}, {@code B} and {@code C} in the returned map, the final output will
    * be:
    * <pre><code>
-   * A =&gt; [Flow(startId + 0, IN).data, Flow(startId + 0, IN).data, ...]
-   * B =&gt; [Flow(startId + 1, IN).data, Flow(startId + 1, IN).data, ...]
-   * C =&gt; [Flow(startId + 2, IN).data, Flow(startId + 2, IN).data, ...]
+   * A =&gt; [FlowData(startId + 0, IN).data, FlowData(startId + 0, IN).data, ...]
+   * B =&gt; [FlowData(startId + 1, IN).data, FlowData(startId + 1, IN).data, ...]
+   * C =&gt; [FlowData(startId + 2, IN).data, FlowData(startId + 2, IN).data, ...]
    * </code></pre>
    *
    * @param startId   the flow start ID.
@@ -876,8 +873,8 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    * @throws java.lang.IllegalArgumentException if the specified range size is not positive.
    */
   @NotNull
-  <OUT> Map<Integer, Channel<?, OUT>> outputOfFlow(final int startId, final int rangeSize,
-      @NotNull final Channel<?, ? extends Flow<? extends OUT>> channel);
+  <OUT> Map<Integer, Channel<?, OUT>> outputOfFlow(int startId, int rangeSize,
+      @NotNull Channel<?, ? extends FlowData<? extends OUT>> channel);
 
   /**
    * Returns a channel repeating the output data to any newly bound channel or
@@ -904,5 +901,5 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    * @return the replaying channel instance.
    */
   @NotNull
-  <OUT> Channel<?, OUT> replayOutputOf(@NotNull final Channel<?, OUT> channel);
+  <OUT> Channel<?, OUT> replayOutputOf(@NotNull Channel<?, OUT> channel);
 }

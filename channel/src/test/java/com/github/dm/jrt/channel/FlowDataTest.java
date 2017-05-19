@@ -21,22 +21,22 @@ import org.junit.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Flow unit test.
+ * FlowData unit test.
  * <p>
  * Created by davide-maestroni on 02/24/2016.
  */
-public class FlowTest {
+public class FlowDataTest {
 
   @Test
   public void testEquals() {
-    final Flow<Object> flow = new Flow<Object>(0, "test");
-    assertThat(flow).isEqualTo(flow);
-    assertThat(flow).isNotEqualTo(null);
-    assertThat(flow).isNotEqualTo("test");
-    assertThat(flow).isNotEqualTo(new Flow<Object>(0, "test1"));
-    assertThat(flow).isNotEqualTo(new Flow<Object>(1, "test"));
-    assertThat(flow).isEqualTo(new Flow<Object>(0, "test"));
-    assertThat(flow.hashCode()).isEqualTo(new Flow<Object>(0, "test").hashCode());
-    assertThat(flow.toString()).isEqualTo(new Flow<Object>(0, "test").toString());
+    final FlowData<Object> flowData = new FlowData<Object>(0, "test");
+    assertThat(flowData).isEqualTo(flowData);
+    assertThat(flowData).isNotEqualTo(null);
+    assertThat(flowData).isNotEqualTo("test");
+    assertThat(flowData).isNotEqualTo(new FlowData<Object>(0, "test1"));
+    assertThat(flowData).isNotEqualTo(new FlowData<Object>(1, "test"));
+    assertThat(flowData).isEqualTo(new FlowData<Object>(0, "test"));
+    assertThat(flowData.hashCode()).isEqualTo(new FlowData<Object>(0, "test").hashCode());
+    assertThat(flowData.toString()).isEqualTo(new FlowData<Object>(0, "test").toString());
   }
 }

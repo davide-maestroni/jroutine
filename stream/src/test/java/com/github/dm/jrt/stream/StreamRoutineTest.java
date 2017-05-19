@@ -27,7 +27,6 @@ import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.executor.ScheduledExecutor;
 import com.github.dm.jrt.core.executor.ScheduledExecutors;
-import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.routine.Routine;
@@ -59,9 +58,10 @@ import static com.github.dm.jrt.function.JRoutineFunction.onOutput;
 import static com.github.dm.jrt.function.util.SupplierDecorator.wrapSupplier;
 import static com.github.dm.jrt.operator.JRoutineOperators.append;
 import static com.github.dm.jrt.operator.JRoutineOperators.average;
+import static com.github.dm.jrt.operator.JRoutineOperators.identity;
 import static com.github.dm.jrt.operator.JRoutineOperators.reduce;
 import static com.github.dm.jrt.operator.JRoutineOperators.unary;
-import static com.github.dm.jrt.operator.sequence.JRoutineSequences.range;
+import static com.github.dm.jrt.operator.sequence.Sequence.range;
 import static com.github.dm.jrt.stream.JRoutineStream.streamLifter;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
@@ -89,7 +89,7 @@ public class StreamRoutineTest {
   public void testAbort() {
     final Channel<Object, Object> channel = JRoutineCore.channel().ofType();
     final Channel<Object, Object> streamChannel =
-        JRoutineStream.streamOf(JRoutineCore.routine().of(IdentityInvocation.factory()))
+        JRoutineStream.streamOf(JRoutineCore.routine().of(identity()))
                       .invoke()
                       .pass(channel)
                       .close();
@@ -108,32 +108,32 @@ public class StreamRoutineTest {
   @Test
   public void testChannel() {
     try {
-      JRoutineStream.streamOf(
-          JRoutineCore.routineOn(syncExecutor()).of(IdentityInvocation.factory())).invoke().all();
+      JRoutineStream.streamOf(JRoutineCore.routineOn(syncExecutor()).of(identity())).invoke().all();
       fail();
 
     } catch (final TimeoutException ignored) {
     }
 
     try {
-      JRoutineStream.streamOf(
-          JRoutineCore.routineOn(syncExecutor()).of(IdentityInvocation.factory())).invoke().next();
+      JRoutineStream.streamOf(JRoutineCore.routineOn(syncExecutor()).of(identity()))
+                    .invoke()
+                    .next();
       fail();
 
     } catch (final TimeoutException ignored) {
     }
 
     try {
-      JRoutineStream.streamOf(
-          JRoutineCore.routineOn(syncExecutor()).of(IdentityInvocation.factory())).invoke().next(2);
+      JRoutineStream.streamOf(JRoutineCore.routineOn(syncExecutor()).of(identity()))
+                    .invoke()
+                    .next(2);
       fail();
 
     } catch (final TimeoutException ignored) {
     }
 
     try {
-      JRoutineStream.streamOf(
-          JRoutineCore.routineOn(syncExecutor()).of(IdentityInvocation.factory()))
+      JRoutineStream.streamOf(JRoutineCore.routineOn(syncExecutor()).of(identity()))
                     .invoke()
                     .nextOrElse(2);
       fail();
@@ -142,8 +142,7 @@ public class StreamRoutineTest {
     }
 
     try {
-      JRoutineStream.streamOf(
-          JRoutineCore.routineOn(syncExecutor()).of(IdentityInvocation.factory()))
+      JRoutineStream.streamOf(JRoutineCore.routineOn(syncExecutor()).of(identity()))
                     .invoke()
                     .skipNext(2);
       fail();
@@ -151,16 +150,13 @@ public class StreamRoutineTest {
     } catch (final TimeoutException ignored) {
     }
 
-    assertThat(JRoutineStream.streamOf(
-        JRoutineCore.routineOn(syncExecutor()).of(IdentityInvocation.factory()))
+    assertThat(JRoutineStream.streamOf(JRoutineCore.routineOn(syncExecutor()).of(identity()))
                              .invoke()
                              .abort()).isTrue();
-    assertThat(JRoutineStream.streamOf(
-        JRoutineCore.routineOn(syncExecutor()).of(IdentityInvocation.factory()))
+    assertThat(JRoutineStream.streamOf(JRoutineCore.routineOn(syncExecutor()).of(identity()))
                              .invoke()
                              .abort(new IllegalStateException())).isTrue();
-    assertThat(JRoutineStream.streamOf(
-        JRoutineCore.routineOn(syncExecutor()).of(IdentityInvocation.factory()))
+    assertThat(JRoutineStream.streamOf(JRoutineCore.routineOn(syncExecutor()).of(identity()))
                              .map(
                                  JRoutineCore.routineOn(syncExecutor()).of(append((Object) "test")))
                              .invoke()
@@ -168,8 +164,7 @@ public class StreamRoutineTest {
                              .inNoTime()
                              .close()
                              .next()).isEqualTo("test");
-    assertThat(JRoutineStream.streamOf(
-        JRoutineCore.routineOn(syncExecutor()).of(IdentityInvocation.factory()))
+    assertThat(JRoutineStream.streamOf(JRoutineCore.routineOn(syncExecutor()).of(identity()))
                              .map(
                                  JRoutineCore.routineOn(syncExecutor()).of(append((Object) "test")))
                              .invoke()
@@ -180,7 +175,7 @@ public class StreamRoutineTest {
     try {
       final ArrayList<String> results = new ArrayList<String>();
       JRoutineStream.streamOf(
-          JRoutineCore.routineOn(syncExecutor()).of(IdentityInvocation.<String>factory()))
+          JRoutineCore.routineOn(syncExecutor()).of(JRoutineOperators.<String>identity()))
                     .map(JRoutineCore.routineOn(syncExecutor()).of(append("test")))
                     .invoke()
                     .allInto(results)
@@ -191,8 +186,7 @@ public class StreamRoutineTest {
     }
 
     try {
-      JRoutineStream.streamOf(
-          JRoutineCore.routineOn(syncExecutor()).of(IdentityInvocation.factory()))
+      JRoutineStream.streamOf(JRoutineCore.routineOn(syncExecutor()).of(identity()))
                     .map(JRoutineCore.routineOn(syncExecutor()).of(append((Object) "test")))
                     .invoke()
                     .pipe(JRoutineCore.channel().ofType())
@@ -203,7 +197,7 @@ public class StreamRoutineTest {
     }
 
     assertThat(JRoutineStream.streamOf(
-        JRoutineCore.routineOn(syncExecutor()).of(IdentityInvocation.<String>factory()))
+        JRoutineCore.routineOn(syncExecutor()).of(JRoutineOperators.<String>identity()))
                              .map(JRoutineCore.routineOn(syncExecutor()).of(append("test")))
                              .invoke()
                              .consume(onOutput(new Consumer<String>() {
@@ -214,16 +208,14 @@ public class StreamRoutineTest {
                              }))
                              .close()
                              .getError()).isNull();
-    assertThat(JRoutineStream.streamOf(
-        JRoutineCore.routineOn(syncExecutor()).of(IdentityInvocation.factory()))
+    assertThat(JRoutineStream.streamOf(JRoutineCore.routineOn(syncExecutor()).of(identity()))
                              .map(
                                  JRoutineCore.routineOn(syncExecutor()).of(append((Object) "test")))
                              .invoke()
                              .close()
                              .next()).isEqualTo("test");
     try {
-      JRoutineStream.streamOf(
-          JRoutineCore.routineOn(syncExecutor()).of(IdentityInvocation.factory()))
+      JRoutineStream.streamOf(JRoutineCore.routineOn(syncExecutor()).of(identity()))
                     .map(JRoutineCore.routineOn(syncExecutor()).of(append((Object) "test")))
                     .invoke()
                     .expiringIterator()
@@ -234,8 +226,7 @@ public class StreamRoutineTest {
     }
 
     try {
-      JRoutineStream.streamOf(
-          JRoutineCore.routineOn(syncExecutor()).of(IdentityInvocation.factory()))
+      JRoutineStream.streamOf(JRoutineCore.routineOn(syncExecutor()).of(identity()))
                     .map(JRoutineCore.routineOn(syncExecutor()).of(append((Object) "test")))
                     .invoke()
                     .iterator()
@@ -245,49 +236,42 @@ public class StreamRoutineTest {
     } catch (final TimeoutException ignored) {
     }
 
-    assertThat(JRoutineStream.streamOf(
-        JRoutineCore.routineOn(syncExecutor()).of(IdentityInvocation.factory()))
+    assertThat(JRoutineStream.streamOf(JRoutineCore.routineOn(syncExecutor()).of(identity()))
                              .map(
                                  JRoutineCore.routineOn(syncExecutor()).of(append((Object) "test")))
                              .invoke()
                              .eventuallyAbort()
                              .close()
                              .next()).isEqualTo("test");
-    assertThat(JRoutineStream.streamOf(
-        JRoutineCore.routineOn(syncExecutor()).of(IdentityInvocation.factory()))
+    assertThat(JRoutineStream.streamOf(JRoutineCore.routineOn(syncExecutor()).of(identity()))
                              .map(
                                  JRoutineCore.routineOn(syncExecutor()).of(append((Object) "test")))
                              .invoke()
                              .eventuallyAbort(new IllegalStateException())
                              .close()
                              .next()).isEqualTo("test");
-    assertThat(JRoutineStream.streamOf(
-        JRoutineCore.routineOn(syncExecutor()).of(IdentityInvocation.factory()))
+    assertThat(JRoutineStream.streamOf(JRoutineCore.routineOn(syncExecutor()).of(identity()))
                              .map(
                                  JRoutineCore.routineOn(syncExecutor()).of(append((Object) "test")))
                              .invoke()
                              .eventuallyContinue()
                              .close()
                              .next()).isEqualTo("test");
-    assertThat(JRoutineStream.streamOf(
-        JRoutineCore.routineOn(syncExecutor()).of(IdentityInvocation.factory()))
+    assertThat(JRoutineStream.streamOf(JRoutineCore.routineOn(syncExecutor()).of(identity()))
                              .map(
                                  JRoutineCore.routineOn(syncExecutor()).of(append((Object) "test")))
                              .invoke()
                              .eventuallyFail()
                              .close()
                              .next()).isEqualTo("test");
-    assertThat(JRoutineStream.streamOf(
-        JRoutineCore.routineOn(syncExecutor()).of(IdentityInvocation.factory()))
+    assertThat(JRoutineStream.streamOf(JRoutineCore.routineOn(syncExecutor()).of(identity()))
                              .invoke()
                              .getError()).isNull();
-    assertThat(JRoutineStream.streamOf(
-        JRoutineCore.routineOn(syncExecutor()).of(IdentityInvocation.factory()))
+    assertThat(JRoutineStream.streamOf(JRoutineCore.routineOn(syncExecutor()).of(identity()))
                              .invoke()
                              .getComplete()).isFalse();
     try {
-      JRoutineStream.streamOf(
-          JRoutineCore.routineOn(syncExecutor()).of(IdentityInvocation.factory()))
+      JRoutineStream.streamOf(JRoutineCore.routineOn(syncExecutor()).of(identity()))
                     .invoke()
                     .hasNext();
       fail();
@@ -295,74 +279,62 @@ public class StreamRoutineTest {
     } catch (final TimeoutException ignored) {
     }
 
-    assertThat(JRoutineStream.streamOf(
-        JRoutineCore.routineOn(syncExecutor()).of(IdentityInvocation.factory()))
+    assertThat(JRoutineStream.streamOf(JRoutineCore.routineOn(syncExecutor()).of(identity()))
                              .map(
                                  JRoutineCore.routineOn(syncExecutor()).of(append((Object) "test")))
                              .invoke()
                              .afterNoDelay()
                              .close()
                              .next()).isEqualTo("test");
-    assertThat(JRoutineStream.streamOf(
-        JRoutineCore.routineOn(syncExecutor()).of(IdentityInvocation.factory()))
+    assertThat(JRoutineStream.streamOf(JRoutineCore.routineOn(syncExecutor()).of(identity()))
                              .invoke()
                              .inputSize()).isZero();
-    assertThat(JRoutineStream.streamOf(
-        JRoutineCore.routineOn(syncExecutor()).of(IdentityInvocation.factory()))
+    assertThat(JRoutineStream.streamOf(JRoutineCore.routineOn(syncExecutor()).of(identity()))
                              .invoke()
                              .outputSize()).isZero();
-    assertThat(JRoutineStream.streamOf(
-        JRoutineCore.routineOn(syncExecutor()).of(IdentityInvocation.factory()))
+    assertThat(JRoutineStream.streamOf(JRoutineCore.routineOn(syncExecutor()).of(identity()))
                              .invoke()
                              .size()).isZero();
-    assertThat(JRoutineStream.streamOf(
-        JRoutineCore.routineOn(syncExecutor()).of(IdentityInvocation.factory())).invoke().isBound())
-        .isFalse();
-    assertThat(JRoutineStream.streamOf(
-        JRoutineCore.routineOn(syncExecutor()).of(IdentityInvocation.factory())).invoke().isEmpty())
-        .isTrue();
-    assertThat(JRoutineStream.streamOf(
-        JRoutineCore.routineOn(syncExecutor()).of(IdentityInvocation.factory()))
+    assertThat(JRoutineStream.streamOf(JRoutineCore.routineOn(syncExecutor()).of(identity()))
+                             .invoke()
+                             .isBound()).isFalse();
+    assertThat(JRoutineStream.streamOf(JRoutineCore.routineOn(syncExecutor()).of(identity()))
+                             .invoke()
+                             .isEmpty()).isTrue();
+    assertThat(JRoutineStream.streamOf(JRoutineCore.routineOn(syncExecutor()).of(identity()))
                              .invoke()
                              .isOpen()).isTrue();
-    assertThat(JRoutineStream.streamOf(
-        JRoutineCore.routineOn(syncExecutor()).of(IdentityInvocation.factory()))
+    assertThat(JRoutineStream.streamOf(JRoutineCore.routineOn(syncExecutor()).of(identity()))
                              .invoke()
                              .pass("test")
                              .next()).isEqualTo("test");
-    assertThat(JRoutineStream.streamOf(
-        JRoutineCore.routineOn(syncExecutor()).of(IdentityInvocation.factory()))
+    assertThat(JRoutineStream.streamOf(JRoutineCore.routineOn(syncExecutor()).of(identity()))
                              .invoke()
                              .pass("test", "test")
                              .next()).isEqualTo("test");
-    assertThat(JRoutineStream.streamOf(
-        JRoutineCore.routineOn(syncExecutor()).of(IdentityInvocation.factory()))
+    assertThat(JRoutineStream.streamOf(JRoutineCore.routineOn(syncExecutor()).of(identity()))
                              .invoke()
                              .pass(Arrays.asList("test", "test"))
                              .next()).isEqualTo("test");
-    assertThat(JRoutineStream.streamOf(
-        JRoutineCore.routineOn(syncExecutor()).of(IdentityInvocation.factory()))
+    assertThat(JRoutineStream.streamOf(JRoutineCore.routineOn(syncExecutor()).of(identity()))
                              .invoke()
                              .pass(JRoutineCore.channel().of("test"))
                              .next()).isEqualTo("test");
-    assertThat(JRoutineStream.streamOf(
-        JRoutineCore.routineOn(syncExecutor()).of(IdentityInvocation.factory()))
+    assertThat(JRoutineStream.streamOf(JRoutineCore.routineOn(syncExecutor()).of(identity()))
                              .invoke()
                              .sorted()
                              .pass("test")
                              .next()).isEqualTo("test");
-    assertThat(JRoutineStream.streamOf(
-        JRoutineCore.routineOn(syncExecutor()).of(IdentityInvocation.factory()))
+    assertThat(JRoutineStream.streamOf(JRoutineCore.routineOn(syncExecutor()).of(identity()))
                              .invoke()
                              .unsorted()
                              .pass("test")
                              .next()).isEqualTo("test");
-    JRoutineStream.streamOf(JRoutineCore.routineOn(syncExecutor()).of(IdentityInvocation.factory()))
+    JRoutineStream.streamOf(JRoutineCore.routineOn(syncExecutor()).of(identity()))
                   .invoke()
                   .throwError();
     try {
-      JRoutineStream.streamOf(
-          JRoutineCore.routineOn(syncExecutor()).of(IdentityInvocation.factory()))
+      JRoutineStream.streamOf(JRoutineCore.routineOn(syncExecutor()).of(identity()))
                     .invoke()
                     .remove();
       fail();
@@ -388,7 +360,7 @@ public class StreamRoutineTest {
   public void testDelay() {
     long startTime = System.currentTimeMillis();
     assertThat(
-        JRoutineStream.streamOf(JRoutineCore.routine().of(IdentityInvocation.<String>factory()))
+        JRoutineStream.streamOf(JRoutineCore.routine().of(JRoutineOperators.<String>identity()))
                       .lift(streamLifter().<String, String>delayInputsOf(1, TimeUnit.SECONDS))
                       .invoke()
                       .pass("test")
@@ -398,7 +370,7 @@ public class StreamRoutineTest {
     assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
     startTime = System.currentTimeMillis();
     assertThat(
-        JRoutineStream.streamOf(JRoutineCore.routine().of(IdentityInvocation.<String>factory()))
+        JRoutineStream.streamOf(JRoutineCore.routine().of(JRoutineOperators.<String>identity()))
                       .lift(streamLifter().<String, String>delayInputsOf(seconds(1)))
                       .invoke()
                       .pass("test")
@@ -408,7 +380,7 @@ public class StreamRoutineTest {
     assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
     startTime = System.currentTimeMillis();
     assertThat(
-        JRoutineStream.streamOf(JRoutineCore.routine().of(IdentityInvocation.<String>factory()))
+        JRoutineStream.streamOf(JRoutineCore.routine().of(JRoutineOperators.<String>identity()))
                       .lift(streamLifter().<String, String>delayOutputsOf(1, TimeUnit.SECONDS))
                       .invoke()
                       .close()
@@ -417,7 +389,7 @@ public class StreamRoutineTest {
     assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
     startTime = System.currentTimeMillis();
     assertThat(
-        JRoutineStream.streamOf(JRoutineCore.routine().of(IdentityInvocation.<String>factory()))
+        JRoutineStream.streamOf(JRoutineCore.routine().of(JRoutineOperators.<String>identity()))
                       .lift(streamLifter().<String, String>delayOutputsOf(seconds(1)))
                       .invoke()
                       .close()
@@ -493,10 +465,8 @@ public class StreamRoutineTest {
       final Function<String, Object> function = new Function<String, Object>() {
 
         public Object apply(final String s) {
-          return JRoutineStream.streamOf(
-              JRoutineCore.routineOn(executor1).of(IdentityInvocation.factory()))
-                               .map(JRoutineCore.routineOn(executor2)
-                                                .of(IdentityInvocation.factory()))
+          return JRoutineStream.streamOf(JRoutineCore.routineOn(executor1).of(identity()))
+                               .map(JRoutineCore.routineOn(executor2).of(identity()))
                                .invoke()
                                .pass(s)
                                .close()
@@ -519,7 +489,7 @@ public class StreamRoutineTest {
   @Test
   public void testLift() {
     assertThat(
-        JRoutineStream.streamOf(JRoutineCore.routine().of(IdentityInvocation.<String>factory()))
+        JRoutineStream.streamOf(JRoutineCore.routine().of(JRoutineOperators.<String>identity()))
                       .lift(
                           new Function<Supplier<? extends Channel<String, String>>, Supplier<?
                               extends Channel<String, String>>>() {
@@ -545,7 +515,7 @@ public class StreamRoutineTest {
                       .in(seconds(3))
                       .next()).isEqualTo("TEST");
     try {
-      JRoutineStream.streamOf(JRoutineCore.routine().of(IdentityInvocation.<String>factory()))
+      JRoutineStream.streamOf(JRoutineCore.routine().of(JRoutineOperators.<String>identity()))
                     .lift(
                         new Function<Supplier<? extends Channel<String, String>>, Supplier<?
                             extends Channel<String, String>>>() {
@@ -563,7 +533,7 @@ public class StreamRoutineTest {
 
     final StreamRoutine<String, String> routine = //
         JRoutineStream.streamOf(
-            JRoutineCore.routineOn(syncExecutor()).of(IdentityInvocation.<String>factory()))
+            JRoutineCore.routineOn(syncExecutor()).of(JRoutineOperators.<String>identity()))
                       .lift(
                           new Function<Supplier<? extends Channel<String, String>>, Supplier<?
                               extends Channel<String, String>>>() {
@@ -590,7 +560,7 @@ public class StreamRoutineTest {
   @Test
   public void testMapFactory() {
     assertThat(
-        JRoutineStream.streamOf(JRoutineCore.routine().of(IdentityInvocation.<String>factory()))
+        JRoutineStream.streamOf(JRoutineCore.routine().of(JRoutineOperators.<String>identity()))
                       .map(new UpperCase())
                       .invoke()
                       .pass("test1", "test2")
@@ -602,7 +572,7 @@ public class StreamRoutineTest {
   @Test(expected = NullPointerException.class)
   @SuppressWarnings("ConstantConditions")
   public void testMapFactoryNullPointerError() {
-    JRoutineStream.streamOf(JRoutineCore.routine().of(IdentityInvocation.factory()))
+    JRoutineStream.streamOf(JRoutineCore.routine().of(identity()))
                   .map((InvocationFactory<Object, ?>) null);
   }
 
@@ -692,8 +662,25 @@ public class StreamRoutineTest {
   @Test(expected = NullPointerException.class)
   @SuppressWarnings("ConstantConditions")
   public void testMapRoutineNullPointerError() {
-    JRoutineStream.streamOf(JRoutineCore.routine().of(IdentityInvocation.factory()))
-                  .map((Routine<Object, ?>) null);
+    JRoutineStream.streamOf(JRoutineCore.routine().of(identity())).map((Routine<Object, ?>) null);
+  }
+
+  @Test
+  public void testMapSingleton() {
+    assertThat(
+        JRoutineStream.streamOf(JRoutineCore.routine().of(JRoutineOperators.<String>identity()))
+                      .mapSingleton(new UpperCase())
+                      .invoke()
+                      .pass("test1", "test2")
+                      .close()
+                      .in(seconds(3))
+                      .all()).containsExactly("TEST1", "TEST2");
+  }
+
+  @Test(expected = NullPointerException.class)
+  @SuppressWarnings("ConstantConditions")
+  public void testMapSingletonNullPointerError() {
+    JRoutineStream.streamOf(JRoutineCore.routine().of(identity())).mapSingleton(null);
   }
 
   @Test
@@ -709,7 +696,7 @@ public class StreamRoutineTest {
                                                          range(1, 1000))))
                                .map(JRoutineCore.routineOn(getSingleThreadExecutor())
                                                 .withConfiguration(configuration)
-                                                .of(IdentityInvocation.<Number>factory()))
+                                                .of(JRoutineOperators.<Number>identity()))
                                .map(JRoutineCore.routineOn(getSingleThreadExecutor())
                                                 .withConfiguration(configuration)
                                                 .of(unary(new Function<Number, Double>() {
@@ -765,7 +752,7 @@ public class StreamRoutineTest {
                                                          range(1, 1000))))
                                .map(JRoutineCore.routineOn(getSingleThreadExecutor())
                                                 .withConfiguration(configuration)
-                                                .of(IdentityInvocation.<Number>factory()))
+                                                .of(JRoutineOperators.<Number>identity()))
                                .map(JRoutineCore.routineOn(getSingleThreadExecutor())
                                                 .withConfiguration(configuration)
                                                 .of(unary(new Function<Number, Double>() {
@@ -813,9 +800,31 @@ public class StreamRoutineTest {
   }
 
   @Test
+  public void testStream() throws Exception {
+    assertThat(
+        JRoutineStream.streamOf(JRoutineCore.routine().of(JRoutineOperators.<String>identity()))
+                      .invoke()
+                      .pass("test1", "test2")
+                      .close()
+                      .in(seconds(3))
+                      .all()).containsExactly("test1", "test2");
+    assertThat(JRoutineStream.streamOf(JRoutineOperators.<String>identity())
+                             .invoke()
+                             .pass("test1", "test2")
+                             .close()
+                             .all()).containsExactly("test1", "test2");
+    assertThat(
+        JRoutineStream.streamOfSingleton(JRoutineOperators.<String>identity().newInvocation())
+                      .invoke()
+                      .pass("test1", "test2")
+                      .close()
+                      .all()).containsExactly("test1", "test2");
+  }
+
+  @Test
   public void testTransform() {
     assertThat(
-        JRoutineStream.streamOf(JRoutineCore.routine().of(IdentityInvocation.<String>factory()))
+        JRoutineStream.streamOf(JRoutineCore.routine().of(JRoutineOperators.<String>identity()))
                       .transform(new TransformingFunction<String, String, String, String>() {
 
                         public StreamRoutine<String, String> apply(
@@ -830,7 +839,7 @@ public class StreamRoutineTest {
                       .all()).containsExactly("test1", "test2");
 
     try {
-      JRoutineStream.streamOf(JRoutineCore.routine().of(IdentityInvocation.factory()))
+      JRoutineStream.streamOf(JRoutineCore.routine().of(identity()))
                     .transform(new TransformingFunction<Object, Object, Object, Object>() {
 
                       public StreamRoutine<Object, Object> apply(
@@ -846,7 +855,7 @@ public class StreamRoutineTest {
     }
 
     assertThat(
-        JRoutineStream.streamOf(JRoutineCore.routine().of(IdentityInvocation.<String>factory()))
+        JRoutineStream.streamOf(JRoutineCore.routine().of(JRoutineOperators.<String>identity()))
                       .transform(new TransformingFunction<String, String, String, String>() {
 
                         public StreamRoutine<String, String> apply(
@@ -861,7 +870,7 @@ public class StreamRoutineTest {
                       .all()).containsExactly("test1", "test2");
 
     try {
-      JRoutineStream.streamOf(JRoutineCore.routine().of(IdentityInvocation.factory()))
+      JRoutineStream.streamOf(JRoutineCore.routine().of(identity()))
                     .transform(new TransformingFunction<Object, Object, Object, Object>() {
 
                       public StreamRoutine<Object, Object> apply(

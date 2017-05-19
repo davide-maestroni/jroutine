@@ -36,7 +36,6 @@ import com.github.dm.jrt.core.channel.OutputTimeoutException;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.ChannelConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
-import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
@@ -628,7 +627,13 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
   private static class PassingWrapper<DATA> extends ContextInvocationWrapper<DATA, DATA> {
 
     public PassingWrapper() {
-      super(IdentityInvocation.<DATA>factory().newInvocation());
+      super(new MappingInvocation<DATA, DATA>(null) {
+
+        @Override
+        public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) {
+          result.pass(input);
+        }
+      });
     }
   }
 

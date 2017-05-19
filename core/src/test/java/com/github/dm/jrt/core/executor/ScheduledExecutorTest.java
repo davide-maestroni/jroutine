@@ -161,7 +161,6 @@ public class ScheduledExecutorTest {
 
   @Test
   public void testPriorityExecutor() throws InterruptedException {
-    // TODO: 29/04/2017 why so long?
     testExecutor(ScheduledExecutors.priorityExecutor(ScheduledExecutors.defaultExecutor())
                                    .ofPriority(AgingPriority.NORMAL_PRIORITY));
     testExecutor(ScheduledExecutors.priorityExecutor(ScheduledExecutors.syncExecutor())

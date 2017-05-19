@@ -36,7 +36,6 @@ import com.github.dm.jrt.function.util.Supplier;
 import com.github.dm.jrt.function.util.TriFunction;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.function.util.BiConsumerDecorator.wrapBiConsumer;
@@ -82,64 +81,6 @@ public abstract class AbstractStatefulLoaderRoutineBuilder<IN, OUT, STATE, TYPE 
     }
 
     return decorator;
-  }
-
-  @NotNull
-  @Override
-  @SuppressWarnings("unchecked")
-  public TYPE withConfiguration(@NotNull final LoaderConfiguration configuration) {
-    mConfiguration = ConstantConditions.notNull("loader configuration", configuration);
-    return (TYPE) this;
-  }
-
-  @NotNull
-  @Override
-  public Builder<? extends TYPE> withLoader() {
-    return new Builder<TYPE>(mConfigurable, mConfiguration);
-  }
-
-  @NotNull
-  @Override
-  @SuppressWarnings("unchecked")
-  public TYPE onContext(@NotNull final Function<? super Context, ? extends STATE> onContext) {
-    mOnContext = checkStaticScope(wrapFunction(onContext));
-    return (TYPE) this;
-  }
-
-  @NotNull
-  @Override
-  @SuppressWarnings("unchecked")
-  public TYPE onContextConsume(@NotNull final Consumer<? super Context> onContext) {
-    mOnContext = checkStaticScope(wrapFunction(new ContextConsumer<STATE>(onContext)));
-    return (TYPE) this;
-  }
-
-  @NotNull
-  @Override
-  @SuppressWarnings("unchecked")
-  public TYPE onCreateState(@NotNull final Function<? super STATE, ? extends STATE> onCreate) {
-    mOnCreate = checkStaticScope(wrapFunction(onCreate));
-    return (TYPE) this;
-  }
-
-  @Override
-  public void clear(@Nullable final IN input) {
-    buildRoutine().clear(input);
-  }
-
-  @Override
-  public void clear(@Nullable final IN... inputs) {
-    buildRoutine().clear(inputs);
-  }
-
-  @Override
-  public void clear(@Nullable final Iterable<? extends IN> inputs) {
-    buildRoutine().clear(inputs);
-  }
-
-  @Override
-  public void clear() {
-    buildRoutine().clear();
   }
 
   @NotNull
@@ -270,6 +211,36 @@ public abstract class AbstractStatefulLoaderRoutineBuilder<IN, OUT, STATE, TYPE 
     return super.onNextState(checkStaticScope(wrapBiFunction(onNext)));
   }
 
+  @NotNull
+  @Override
+  @SuppressWarnings("unchecked")
+  public TYPE onContext(@NotNull final Function<? super Context, ? extends STATE> onContext) {
+    mOnContext = checkStaticScope(wrapFunction(onContext));
+    return (TYPE) this;
+  }
+
+  @NotNull
+  @Override
+  @SuppressWarnings("unchecked")
+  public TYPE onContextConsume(@NotNull final Consumer<? super Context> onContext) {
+    mOnContext = checkStaticScope(wrapFunction(new ContextConsumer<STATE>(onContext)));
+    return (TYPE) this;
+  }
+
+  @NotNull
+  @Override
+  @SuppressWarnings("unchecked")
+  public TYPE onCreateState(@NotNull final Function<? super STATE, ? extends STATE> onCreate) {
+    mOnCreate = checkStaticScope(wrapFunction(onCreate));
+    return (TYPE) this;
+  }
+
+  @NotNull
+  @Override
+  public Builder<? extends TYPE> withLoader() {
+    return new Builder<TYPE>(mConfigurable, mConfiguration);
+  }
+
   /**
    * Returns the current Loader configuration.
    *
@@ -351,5 +322,13 @@ public abstract class AbstractStatefulLoaderRoutineBuilder<IN, OUT, STATE, TYPE 
     public STATE apply(final STATE state) throws Exception {
       return (state != null) ? state : mOnCreate.get();
     }
+  }
+
+  @NotNull
+  @Override
+  @SuppressWarnings("unchecked")
+  public TYPE withConfiguration(@NotNull final LoaderConfiguration configuration) {
+    mConfiguration = ConstantConditions.notNull("loader configuration", configuration);
+    return (TYPE) this;
   }
 }

@@ -27,7 +27,6 @@ import com.github.dm.jrt.core.config.ChannelConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.core.invocation.CallInvocation;
 import com.github.dm.jrt.core.invocation.CommandInvocation;
-import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.log.Log.Level;
@@ -75,11 +74,10 @@ import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.function.util.ActionDecorator.wrapAction;
 import static com.github.dm.jrt.function.util.ConsumerDecorator.wrapConsumer;
-import static com.github.dm.jrt.operator.JRoutineOperators.appendAccept;
 import static com.github.dm.jrt.operator.JRoutineOperators.average;
 import static com.github.dm.jrt.operator.JRoutineOperators.filter;
 import static com.github.dm.jrt.operator.JRoutineOperators.unary;
-import static com.github.dm.jrt.operator.sequence.JRoutineSequences.range;
+import static com.github.dm.jrt.operator.sequence.Sequence.range;
 import static com.github.dm.jrt.reflect.InvocationTarget.classOfType;
 import static com.github.dm.jrt.reflect.InvocationTarget.instance;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -735,7 +733,7 @@ public class JRoutineTest {
   public void testPendingInputs() {
 
     final Channel<Object, Object> channel =
-        JRoutine.routine().of(IdentityInvocation.factory()).invoke();
+        JRoutine.routine().of(JRoutineOperators.identity()).invoke();
     assertThat(channel.isOpen()).isTrue();
     channel.pass("test");
     assertThat(channel.isOpen()).isTrue();
@@ -825,18 +823,19 @@ public class JRoutineTest {
 
   @Test
   public void testStream() {
-    assertThat(JRoutine.streamOf(JRoutine.routine().of(JRoutineOperators.appendOutputsOf(range(1, 1000))))
-                       .map(JRoutine.routine().of(unary(new Function<Number, Double>() {
+    assertThat(
+        JRoutine.streamOf(JRoutine.routine().of(JRoutineOperators.appendOutputsOf(range(1, 1000))))
+                .map(JRoutine.routine().of(unary(new Function<Number, Double>() {
 
-                         public Double apply(final Number number) {
-                           return Math.sqrt(number.doubleValue());
-                         }
-                       })))
-                       .map(JRoutine.routineOn(syncExecutor()).of(average(Double.class)))
-                       .invoke()
-                       .close()
-                       .in(seconds(3))
-                       .next()).isCloseTo(21, Offset.offset(0.1));
+                  public Double apply(final Number number) {
+                    return Math.sqrt(number.doubleValue());
+                  }
+                })))
+                .map(JRoutine.routineOn(syncExecutor()).of(average(Double.class)))
+                .invoke()
+                .close()
+                .in(seconds(3))
+                .next()).isCloseTo(21, Offset.offset(0.1));
   }
 
   @Test

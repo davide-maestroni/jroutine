@@ -28,14 +28,18 @@ import com.github.dm.jrt.android.v4.core.LoaderSourceCompat;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.util.BiFunctionDecorator;
-import com.github.dm.jrt.function.util.ConsumerDecorator;
-import com.github.dm.jrt.function.util.FunctionDecorator;
-import com.github.dm.jrt.function.util.TriFunctionDecorator;
+import com.github.dm.jrt.function.util.BiFunction;
+import com.github.dm.jrt.function.util.Consumer;
+import com.github.dm.jrt.function.util.Function;
+import com.github.dm.jrt.function.util.TriFunction;
 
 import org.jetbrains.annotations.NotNull;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
+import static com.github.dm.jrt.function.util.BiFunctionDecorator.wrapBiFunction;
+import static com.github.dm.jrt.function.util.ConsumerDecorator.wrapConsumer;
+import static com.github.dm.jrt.function.util.FunctionDecorator.wrapFunction;
+import static com.github.dm.jrt.function.util.TriFunctionDecorator.wrapTriFunction;
 
 /**
  * Default implementation of a stateful Loader routine builder.
@@ -63,14 +67,13 @@ class DefaultStatefulLoaderRoutineBuilderCompat<IN, OUT, STATE> extends
 
   @NotNull
   @Override
-  public LoaderRoutine<IN, OUT> buildRoutine() {
-    return JRoutineLoaderCompat.on(mLoaderSource)
-                               .with(new StatefulContextInvocationFactory<IN, OUT, STATE>(
-                                   getOnContext(), getOnCreateState(), getOnNext(), getOnError(),
-                                   getOnComplete(), getOnFinalize(), getOnDestroy()))
+  public LoaderRoutine<IN, OUT> routine() {
+    return JRoutineLoaderCompat.routineOn(mLoaderSource)
                                .withConfiguration(getConfiguration())
                                .withConfiguration(getLoaderConfiguration())
-                               .buildRoutine();
+                               .of(new StatefulContextInvocationFactory<IN, OUT, STATE>(
+                                   getOnContext(), getOnCreateState(), getOnNext(), getOnError(),
+                                   getOnComplete(), getOnFinalize(), getOnDestroy()));
   }
 
   /**
@@ -83,22 +86,19 @@ class DefaultStatefulLoaderRoutineBuilderCompat<IN, OUT, STATE> extends
   private static class StatefulContextInvocation<IN, OUT, STATE>
       implements ContextInvocation<IN, OUT> {
 
-    private final BiFunctionDecorator<? super STATE, ? super Channel<OUT, ?>, ? extends STATE>
-        mOnComplete;
+    private final BiFunction<? super STATE, ? super Channel<OUT, ?>, ? extends STATE> mOnComplete;
 
-    private final FunctionDecorator<? super Context, ? extends STATE> mOnContext;
+    private final Function<? super Context, ? extends STATE> mOnContext;
 
-    private final FunctionDecorator<? super STATE, ? extends STATE> mOnCreate;
+    private final Function<? super STATE, ? extends STATE> mOnCreate;
 
-    private final ConsumerDecorator<? super STATE> mOnDestroy;
+    private final Consumer<? super STATE> mOnDestroy;
 
-    private final BiFunctionDecorator<? super STATE, ? super RoutineException, ? extends STATE>
-        mOnError;
+    private final BiFunction<? super STATE, ? super RoutineException, ? extends STATE> mOnError;
 
-    private final FunctionDecorator<? super STATE, ? extends STATE> mOnFinalize;
+    private final Function<? super STATE, ? extends STATE> mOnFinalize;
 
-    private final TriFunctionDecorator<? super STATE, ? super IN, ? super Channel<OUT, ?>, ?
-        extends STATE>
+    private final TriFunction<? super STATE, ? super IN, ? super Channel<OUT, ?>, ? extends STATE>
         mOnNext;
 
     private STATE mState;
@@ -115,16 +115,15 @@ class DefaultStatefulLoaderRoutineBuilderCompat<IN, OUT, STATE> extends
      * @param onDestroy  the destroy consumer.
      */
     private StatefulContextInvocation(
-        @NotNull final FunctionDecorator<? super Context, ? extends STATE> onContext,
-        @NotNull final FunctionDecorator<? super STATE, ? extends STATE> onCreate,
-        @NotNull final TriFunctionDecorator<? super STATE, ? super IN, ? super Channel<OUT, ?>, ?
-            extends STATE> onNext,
-        @NotNull final BiFunctionDecorator<? super STATE, ? super RoutineException, ? extends
-            STATE> onError,
-        @NotNull final BiFunctionDecorator<? super STATE, ? super Channel<OUT, ?>, ? extends
-            STATE> onComplete,
-        @NotNull final FunctionDecorator<? super STATE, ? extends STATE> onFinalize,
-        @NotNull final ConsumerDecorator<? super STATE> onDestroy) {
+        @NotNull final Function<? super Context, ? extends STATE> onContext,
+        @NotNull final Function<? super STATE, ? extends STATE> onCreate,
+        @NotNull final TriFunction<? super STATE, ? super IN, ? super Channel<OUT, ?>, ? extends
+            STATE> onNext,
+        @NotNull final BiFunction<? super STATE, ? super RoutineException, ? extends STATE> onError,
+        @NotNull final BiFunction<? super STATE, ? super Channel<OUT, ?>, ? extends STATE>
+            onComplete,
+        @NotNull final Function<? super STATE, ? extends STATE> onFinalize,
+        @NotNull final Consumer<? super STATE> onDestroy) {
       mOnContext = onContext;
       mOnCreate = onCreate;
       mOnNext = onNext;
@@ -175,22 +174,19 @@ class DefaultStatefulLoaderRoutineBuilderCompat<IN, OUT, STATE> extends
   private static class StatefulContextInvocationFactory<IN, OUT, STATE>
       extends ContextInvocationFactory<IN, OUT> {
 
-    private final BiFunctionDecorator<? super STATE, ? super Channel<OUT, ?>, ? extends STATE>
-        mOnComplete;
+    private final BiFunction<? super STATE, ? super Channel<OUT, ?>, ? extends STATE> mOnComplete;
 
-    private final FunctionDecorator<? super Context, ? extends STATE> mOnContext;
+    private final Function<? super Context, ? extends STATE> mOnContext;
 
-    private final FunctionDecorator<? super STATE, ? extends STATE> mOnCreate;
+    private final Function<? super STATE, ? extends STATE> mOnCreate;
 
-    private final ConsumerDecorator<? super STATE> mOnDestroy;
+    private final Consumer<? super STATE> mOnDestroy;
 
-    private final BiFunctionDecorator<? super STATE, ? super RoutineException, ? extends STATE>
-        mOnError;
+    private final BiFunction<? super STATE, ? super RoutineException, ? extends STATE> mOnError;
 
-    private final FunctionDecorator<? super STATE, ? extends STATE> mOnFinalize;
+    private final Function<? super STATE, ? extends STATE> mOnFinalize;
 
-    private final TriFunctionDecorator<? super STATE, ? super IN, ? super Channel<OUT, ?>, ?
-        extends STATE>
+    private final TriFunction<? super STATE, ? super IN, ? super Channel<OUT, ?>, ? extends STATE>
         mOnNext;
 
     /**
@@ -205,17 +201,18 @@ class DefaultStatefulLoaderRoutineBuilderCompat<IN, OUT, STATE> extends
      * @param onDestroy  the destroy consumer.
      */
     private StatefulContextInvocationFactory(
-        @NotNull final FunctionDecorator<? super Context, ? extends STATE> onContext,
-        @NotNull final FunctionDecorator<? super STATE, ? extends STATE> onCreate,
-        @NotNull final TriFunctionDecorator<? super STATE, ? super IN, ? super Channel<OUT, ?>, ?
-            extends STATE> onNext,
-        @NotNull final BiFunctionDecorator<? super STATE, ? super RoutineException, ? extends
-            STATE> onError,
-        @NotNull final BiFunctionDecorator<? super STATE, ? super Channel<OUT, ?>, ? extends
-            STATE> onComplete,
-        @NotNull final FunctionDecorator<? super STATE, ? extends STATE> onFinalize,
-        @NotNull final ConsumerDecorator<? super STATE> onDestroy) {
-      super(asArgs(onContext, onCreate, onNext, onError, onComplete, onFinalize, onDestroy));
+        @NotNull final Function<? super Context, ? extends STATE> onContext,
+        @NotNull final Function<? super STATE, ? extends STATE> onCreate,
+        @NotNull final TriFunction<? super STATE, ? super IN, ? super Channel<OUT, ?>, ? extends
+            STATE> onNext,
+        @NotNull final BiFunction<? super STATE, ? super RoutineException, ? extends STATE> onError,
+        @NotNull final BiFunction<? super STATE, ? super Channel<OUT, ?>, ? extends STATE>
+            onComplete,
+        @NotNull final Function<? super STATE, ? extends STATE> onFinalize,
+        @NotNull final Consumer<? super STATE> onDestroy) {
+      super(asArgs(wrapFunction(onContext), wrapFunction(onCreate), wrapTriFunction(onNext),
+          wrapBiFunction(onError), wrapBiFunction(onComplete), wrapFunction(onFinalize),
+          wrapConsumer(onDestroy)));
       mOnContext = onContext;
       mOnCreate = onCreate;
       mOnNext = onNext;

@@ -20,48 +20,52 @@ import com.github.dm.jrt.android.function.builder.StatefulLoaderRoutineBuilder;
 import com.github.dm.jrt.android.function.builder.StatelessLoaderRoutineBuilder;
 import com.github.dm.jrt.android.v4.core.LoaderSourceCompat;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.util.BiConsumer;
-import com.github.dm.jrt.function.util.Supplier;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
+ * This utility class provides a few ways to easily implement Loader routines through functional
+ * interfaces.
+ * <p>
+ * For example, a routine concatenating strings through a {@code StringBuilder} can be implemented
+ * as follows:
+ * <pre><code>
+ * JRoutineLoaderFunctionCompat.&lt;String, String, StringBuilder&gt;statefulOn(loaderOf(activity))
+ *                             .onCreate(StringBuilder::new)
+ *                             .onNextState(StringBuilder::append)
+ *                             .onCompleteOutput(StringBuilder::toString)
+ *                             .routine();
+ * </code></pre>
+ * <p>
+ * In a similar way, a routine switching strings to upper-case can be implemented as follows:
+ * <pre><code>
+ * JRoutineLoaderFunctionCompat.&lt;String, String,&gt;statelessOn(loaderOf(activity))
+ *                             .onNextOutput(String::toUpperCase)
+ *                             .routine();
+ * </code></pre>
+ * <p>
  * Created by davide-maestroni on 03/07/2017.
  */
 public class JRoutineLoaderFunctionCompat {
 
-  private static final BiConsumer<? extends List<?>, ?> sListConsumer =
-      new BiConsumer<List<Object>, Object>() {
-
-        public void accept(final List<Object> list, final Object input) {
-          list.add(input);
-        }
-      };
-
-  private static final Supplier<? extends List<?>> sListSupplier = new Supplier<List<?>>() {
-
-    public List<?> get() {
-      return new ArrayList<Object>();
-    }
-  };
-
+  /**
+   * Avoid explicit instantiation.
+   */
   private JRoutineLoaderFunctionCompat() {
     ConstantConditions.avoid();
   }
 
   /**
    * Returns a builder of stateful Loader routines.
+   * <br>
+   * The specified invocation ID will be used to uniquely identify the built routine, so to make an
+   * invocation survive configuration changes.
    * <p>
    * This type of routines are based on invocations retaining a mutable state during their
    * lifecycle.
    * <br>
    * A typical example of stateful routine is the one computing a final result by accumulating the
    * input data (for instance, computing the sum of input numbers).
-   * <p>
-   * TODO: explain invocationId
    *
    * @param loaderSource the Loader source.
    * @param invocationId the invocation ID.
@@ -71,7 +75,7 @@ public class JRoutineLoaderFunctionCompat {
    * @return the routine builder.
    */
   @NotNull
-  public static <IN, OUT, STATE> StatefulLoaderRoutineBuilder<IN, OUT, STATE> stateful(
+  public static <IN, OUT, STATE> StatefulLoaderRoutineBuilder<IN, OUT, STATE> statefulOn(
       @NotNull final LoaderSourceCompat loaderSource, final int invocationId) {
     return new DefaultStatefulLoaderRoutineBuilderCompat<IN, OUT, STATE>(loaderSource).withLoader()
                                                                                       .withInvocationId(
@@ -80,43 +84,15 @@ public class JRoutineLoaderFunctionCompat {
   }
 
   /**
-   * Returns a builder of stateful Loader routines already configured to accumulate the inputs into
-   * a list.
-   * <br>
-   * In order to finalize the invocation implementation, it will be sufficient to set the function
-   * to call when the invocation completes by calling the proper {@code onComplete} method.
-   * <p>
-   * TODO: explain invocationId
-   *
-   * @param context      the Loader context.
-   * @param invocationId the invocation ID.
-   * @param <IN>         the input data type.
-   * @param <OUT>        the output data type.
-   * @return the routine builder.
-   */
-  @NotNull
-  public static <IN, OUT> StatefulLoaderRoutineBuilder<IN, OUT, ? extends List<IN>> statefulList(
-      @NotNull final LoaderSourceCompat context, final int invocationId) {
-    final Supplier<? extends List<IN>> onCreate = listSupplier();
-    final BiConsumer<? super List<IN>, ? super IN> onNext = listConsumer();
-    final DefaultStatefulLoaderRoutineBuilderCompat<IN, OUT, List<IN>> builder =
-        new DefaultStatefulLoaderRoutineBuilderCompat<IN, OUT, List<IN>>(context);
-    return builder.onCreate(onCreate)
-                  .onNextConsume(onNext)
-                  .withLoader()
-                  .withInvocationId(invocationId)
-                  .configuration();
-  }
-
-  /**
    * Returns a builder of stateless Loader routines.
+   * <br>
+   * The specified invocation ID will be used to uniquely identify the built routine, so to make an
+   * invocation survive configuration changes.
    * <p>
    * This type of routines are based on invocations not retaining a mutable internal state.
    * <br>
    * A typical example of stateless routine is the one processing each input separately (for
    * instance, computing the square of input numbers).
-   * <p>
-   * TODO: explain invocationId
    *
    * @param context      the Loader context.
    * @param invocationId the invocation ID.
@@ -125,23 +101,11 @@ public class JRoutineLoaderFunctionCompat {
    * @return the routine builder.
    */
   @NotNull
-  public static <IN, OUT> StatelessLoaderRoutineBuilder<IN, OUT> stateless(
+  public static <IN, OUT> StatelessLoaderRoutineBuilder<IN, OUT> statelessOn(
       @NotNull final LoaderSourceCompat context, final int invocationId) {
     return new DefaultStatelessLoaderRoutineBuilderCompat<IN, OUT>(context).withLoader()
                                                                            .withInvocationId(
                                                                                invocationId)
                                                                            .configuration();
-  }
-
-  @NotNull
-  @SuppressWarnings("unchecked")
-  private static <IN> BiConsumer<? super List<IN>, ? super IN> listConsumer() {
-    return (BiConsumer<? super List<IN>, ? super IN>) sListConsumer;
-  }
-
-  @NotNull
-  @SuppressWarnings("unchecked")
-  private static <IN> Supplier<? extends List<IN>> listSupplier() {
-    return (Supplier<? extends List<IN>>) sListSupplier;
   }
 }

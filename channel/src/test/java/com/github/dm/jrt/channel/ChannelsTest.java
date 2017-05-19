@@ -22,7 +22,6 @@ import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.DeadlockException;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
-import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
@@ -357,14 +356,14 @@ public class ChannelsTest {
                                .withLogLevel(Level.DEBUG)
                                .configuration()
                                .outputFlowOf(channel, 3)
-                               .all()).containsExactly(new Flow<String>(3, "test"));
+                               .all()).containsExactly(new FlowData<String>(3, "test"));
     assertThat(testLog.mLogCount).isGreaterThan(0);
   }
 
   @Test
   @SuppressWarnings("unchecked")
   public void testConfigurationMap() {
-    final Channel<Flow<String>, Flow<String>> channel = JRoutineCore.channel().ofType();
+    final Channel<FlowData<String>, FlowData<String>> channel = JRoutineCore.channel().ofType();
     final TestLog testLog = new TestLog();
     JRoutineChannels.channelHandler()
                     .withChannel()
@@ -375,7 +374,7 @@ public class ChannelsTest {
                     .get(3)
                     .pass("test")
                     .close();
-    assertThat(channel.close().all()).containsExactly(new Flow<String>(3, "test"));
+    assertThat(channel.close().all()).containsExactly(new FlowData<String>(3, "test"));
     assertThat(testLog.mLogCount).isGreaterThan(0);
   }
 
@@ -386,8 +385,8 @@ public class ChannelsTest {
     final Channel<String, String> channel = JRoutineCore.channel().ofType();
     JRoutineChannels.channelHandler()
                     .inputFlowOf(channel, 33)
-                    .pass(new Flow<String>(33, "test1"), new Flow<String>(-33, "test2"),
-                        new Flow<String>(33, "test3"), new Flow<String>(333, "test4"))
+                    .pass(new FlowData<String>(33, "test1"), new FlowData<String>(-33, "test2"),
+                        new FlowData<String>(33, "test3"), new FlowData<String>(333, "test4"))
                     .close();
     assertThat(channel.close().in(seconds(1)).all()).containsExactly("test1", "test3");
   }
@@ -412,12 +411,12 @@ public class ChannelsTest {
   @Test
   public void testInputMap() {
 
-    final ArrayList<Flow<Object>> outputs = new ArrayList<Flow<Object>>();
-    outputs.add(new Flow<Object>(Sort.STRING, "test21"));
-    outputs.add(new Flow<Object>(Sort.INTEGER, -11));
-    final Routine<Flow<Object>, Flow<Object>> routine = JRoutineCore.routine().of(new Sort());
+    final ArrayList<FlowData<Object>> outputs = new ArrayList<FlowData<Object>>();
+    outputs.add(new FlowData<Object>(Sort.STRING, "test21"));
+    outputs.add(new FlowData<Object>(Sort.INTEGER, -11));
+    final Routine<FlowData<Object>, FlowData<Object>> routine = JRoutineCore.routine().of(new Sort());
     Map<Integer, ? extends Channel<Object, ?>> channelMap;
-    Channel<Flow<Object>, Flow<Object>> channel;
+    Channel<FlowData<Object>, FlowData<Object>> channel;
     channel = routine.invoke();
     channelMap = JRoutineChannels.channelHandler()
                                  .inputOfFlow(channel, Arrays.asList(Sort.INTEGER, Sort.STRING));
@@ -440,9 +439,9 @@ public class ChannelsTest {
   @Test
   public void testInputMapAbort() {
 
-    final Routine<Flow<Object>, Flow<Object>> routine = JRoutineCore.routine().of(new Sort());
+    final Routine<FlowData<Object>, FlowData<Object>> routine = JRoutineCore.routine().of(new Sort());
     Map<Integer, ? extends Channel<Object, ?>> channelMap;
-    Channel<Flow<Object>, Flow<Object>> channel;
+    Channel<FlowData<Object>, FlowData<Object>> channel;
     channel = routine.invoke();
     channelMap = JRoutineChannels.channelHandler()
                                  .inputOfFlow(channel, Arrays.asList(Sort.INTEGER, Sort.STRING));
@@ -508,19 +507,19 @@ public class ChannelsTest {
   @SuppressWarnings("unchecked")
   public void testInputSelect() {
 
-    final Channel<Flow<String>, Flow<String>> channel = JRoutineCore.channel().ofType();
+    final Channel<FlowData<String>, FlowData<String>> channel = JRoutineCore.channel().ofType();
     JRoutineChannels.channelHandler()
                     .inputOfFlow(channel, 33)
                     .pass("test1", "test2", "test3")
                     .close();
-    assertThat(channel.close().in(seconds(1)).all()).containsExactly(new Flow<String>(33, "test1"),
-        new Flow<String>(33, "test2"), new Flow<String>(33, "test3"));
+    assertThat(channel.close().in(seconds(1)).all()).containsExactly(new FlowData<String>(33, "test1"),
+        new FlowData<String>(33, "test2"), new FlowData<String>(33, "test3"));
   }
 
   @Test
   public void testInputSelectAbort() {
 
-    final Channel<Flow<String>, Flow<String>> channel = JRoutineCore.channel().ofType();
+    final Channel<FlowData<String>, FlowData<String>> channel = JRoutineCore.channel().ofType();
     JRoutineChannels.channelHandler()
                     .inputOfFlow(channel, 33)
                     .pass("test1", "test2", "test3")
@@ -541,7 +540,7 @@ public class ChannelsTest {
   @SuppressWarnings("ConstantConditions")
   public void testInputSelectError() {
 
-    final Channel<Flow<String>, Flow<String>> channel = JRoutineCore.channel().ofType();
+    final Channel<FlowData<String>, FlowData<String>> channel = JRoutineCore.channel().ofType();
 
     try {
       JRoutineChannels.channelHandler().inputOfFlow(channel, (int[]) null);
@@ -1183,19 +1182,19 @@ public class ChannelsTest {
     final Channel<String, String> channel1 = builder.ofType();
     final Channel<Integer, Integer> channel2 = builder.ofType();
 
-    final Channel<?, ? extends Flow<Object>> channel = JRoutineChannels.channelHandler()
-                                                                       .mergeOutputOf(
+    final Channel<?, ? extends FlowData<Object>> channel = JRoutineChannels.channelHandler()
+                                                                           .mergeOutputOf(
                                                                            Arrays.<Channel<?,
                                                                                ?>>asList(
                                                                                channel1, channel2));
-    final Channel<?, Flow<Object>> output = JRoutineCore.routine()
-                                                        .withInvocation()
-                                                        .withInputOrder(OrderType.SORTED)
-                                                        .configuration()
-                                                        .of(new Sort())
-                                                        .invoke()
-                                                        .pass(channel)
-                                                        .close();
+    final Channel<?, FlowData<Object>> output = JRoutineCore.routine()
+                                                            .withInvocation()
+                                                            .withInputOrder(OrderType.SORTED)
+                                                            .configuration()
+                                                            .of(new Sort())
+                                                            .invoke()
+                                                            .pass(channel)
+                                                            .close();
     final Map<Integer, ? extends Channel<?, Object>> channelMap =
         JRoutineChannels.channelHandler().outputOfFlow(output, Sort.INTEGER, Sort.STRING);
 
@@ -1221,14 +1220,14 @@ public class ChannelsTest {
         JRoutineCore.channel().withChannel().withOrder(OrderType.SORTED).configuration();
     Channel<String, String> channel1;
     Channel<Integer, Integer> channel2;
-    Channel<?, ? extends Flow<?>> outputChannel;
+    Channel<?, ? extends FlowData<?>> outputChannel;
     channel1 = builder.ofType();
     channel2 = builder.ofType();
     outputChannel = JRoutineChannels.channelHandler().mergeOutputOf(-7, channel1, channel2);
     channel1.pass("test1").close();
     channel2.pass(13).close();
-    assertThat(outputChannel.in(seconds(1)).all()).containsOnly(new Flow<String>(-7, "test1"),
-        new Flow<Integer>(-6, 13));
+    assertThat(outputChannel.in(seconds(1)).all()).containsOnly(new FlowData<String>(-7, "test1"),
+        new FlowData<Integer>(-6, 13));
     channel1 = builder.ofType();
     channel2 = builder.ofType();
     outputChannel = JRoutineChannels.channelHandler()
@@ -1236,15 +1235,15 @@ public class ChannelsTest {
                                         Arrays.<Channel<?, ?>>asList(channel1, channel2));
     channel2.pass(13).close();
     channel1.pass("test1").close();
-    assertThat(outputChannel.in(seconds(1)).all()).containsOnly(new Flow<String>(11, "test1"),
-        new Flow<Integer>(12, 13));
+    assertThat(outputChannel.in(seconds(1)).all()).containsOnly(new FlowData<String>(11, "test1"),
+        new FlowData<Integer>(12, 13));
     channel1 = builder.ofType();
     channel2 = builder.ofType();
     outputChannel = JRoutineChannels.channelHandler().mergeOutputOf(channel1, channel2);
     channel1.pass("test2").close();
     channel2.pass(-17).close();
-    assertThat(outputChannel.in(seconds(1)).all()).containsOnly(new Flow<String>(0, "test2"),
-        new Flow<Integer>(1, -17));
+    assertThat(outputChannel.in(seconds(1)).all()).containsOnly(new FlowData<String>(0, "test2"),
+        new FlowData<Integer>(1, -17));
     channel1 = builder.ofType();
     channel2 = builder.ofType();
     outputChannel = JRoutineChannels.channelHandler()
@@ -1252,8 +1251,8 @@ public class ChannelsTest {
                                         Arrays.<Channel<?, ?>>asList(channel1, channel2));
     channel1.pass("test2").close();
     channel2.pass(-17).close();
-    assertThat(outputChannel.in(seconds(1)).all()).containsOnly(new Flow<String>(0, "test2"),
-        new Flow<Integer>(1, -17));
+    assertThat(outputChannel.in(seconds(1)).all()).containsOnly(new FlowData<String>(0, "test2"),
+        new FlowData<Integer>(1, -17));
     channel1 = builder.ofType();
     channel2 = builder.ofType();
     final HashMap<Integer, Channel<?, ?>> channelMap = new HashMap<Integer, Channel<?, ?>>(2);
@@ -1262,8 +1261,8 @@ public class ChannelsTest {
     outputChannel = JRoutineChannels.channelHandler().mergeOutputOf(channelMap);
     channel1.pass("test3").close();
     channel2.pass(111).close();
-    assertThat(outputChannel.in(seconds(1)).all()).containsOnly(new Flow<String>(7, "test3"),
-        new Flow<Integer>(-3, 111));
+    assertThat(outputChannel.in(seconds(1)).all()).containsOnly(new FlowData<String>(7, "test3"),
+        new FlowData<Integer>(-3, 111));
   }
 
   @Test
@@ -1277,7 +1276,7 @@ public class ChannelsTest {
     final Channel<String, String> channel3 = builder.ofType();
     final Channel<String, String> channel4 = builder.ofType();
 
-    final Routine<Flow<String>, String> routine =
+    final Routine<FlowData<String>, String> routine =
         JRoutineCore.routine().of(factoryOf(new ClassToken<Amb<String>>() {}));
     final Channel<?, String> outputChannel = routine.invoke()
                                                     .pass(JRoutineChannels.channelHandler()
@@ -1313,7 +1312,7 @@ public class ChannelsTest {
         JRoutineCore.channel().withChannel().withOrder(OrderType.SORTED).configuration();
     Channel<String, String> channel1;
     Channel<Integer, Integer> channel2;
-    Channel<?, ? extends Flow<?>> outputChannel;
+    Channel<?, ? extends FlowData<?>> outputChannel;
     channel1 = builder.ofType();
     channel2 = builder.ofType();
     outputChannel = JRoutineChannels.channelHandler().mergeOutputOf(-7, channel1, channel2);
@@ -1520,31 +1519,31 @@ public class ChannelsTest {
         JRoutineCore.routine().of(IdentityInvocation.<Integer>factory()).invoke().sorted();
     JRoutineChannels.channelHandler()
                     .mergeInputOf(channel1, channel2)
-                    .pass(new Flow<String>(0, "test1"))
-                    .pass(new Flow<Integer>(1, 1))
+                    .pass(new FlowData<String>(0, "test1"))
+                    .pass(new FlowData<Integer>(1, 1))
                     .close();
     JRoutineChannels.channelHandler()
                     .mergeInputOf(3, channel1, channel2)
-                    .pass(new Flow<String>(3, "test2"))
-                    .pass(new Flow<Integer>(4, 2))
+                    .pass(new FlowData<String>(3, "test2"))
+                    .pass(new FlowData<Integer>(4, 2))
                     .close();
     JRoutineChannels.channelHandler()
                     .mergeInputOf(Arrays.<Channel<?, ?>>asList(channel1, channel2))
-                    .pass(new Flow<String>(0, "test3"))
-                    .pass(new Flow<Integer>(1, 3))
+                    .pass(new FlowData<String>(0, "test3"))
+                    .pass(new FlowData<Integer>(1, 3))
                     .close();
     JRoutineChannels.channelHandler()
                     .mergeInputOf(-5, Arrays.<Channel<?, ?>>asList(channel1, channel2))
-                    .pass(new Flow<String>(-5, "test4"))
-                    .pass(new Flow<Integer>(-4, 4))
+                    .pass(new FlowData<String>(-5, "test4"))
+                    .pass(new FlowData<Integer>(-4, 4))
                     .close();
     final HashMap<Integer, Channel<?, ?>> map = new HashMap<Integer, Channel<?, ?>>(2);
     map.put(31, channel1);
     map.put(17, channel2);
     JRoutineChannels.channelHandler()
                     .mergeInputOf(map)
-                    .pass(new Flow<String>(31, "test5"))
-                    .pass(new Flow<Integer>(17, 5))
+                    .pass(new FlowData<String>(31, "test5"))
+                    .pass(new FlowData<Integer>(17, 5))
                     .close();
     assertThat(channel1.close().in(seconds(1)).all()).containsExactly("test1", "test2", "test3",
         "test4", "test5");
@@ -1801,8 +1800,8 @@ public class ChannelsTest {
     assertThat(JRoutineChannels.channelHandler()
                                .outputFlowOf(channel, 33)
                                .in(seconds(1))
-                               .all()).containsExactly(new Flow<String>(33, "test1"),
-        new Flow<String>(33, "test2"), new Flow<String>(33, "test3"));
+                               .all()).containsExactly(new FlowData<String>(33, "test1"),
+        new FlowData<String>(33, "test2"), new FlowData<String>(33, "test3"));
   }
 
   @Test
@@ -1826,28 +1825,28 @@ public class ChannelsTest {
   @SuppressWarnings("unchecked")
   public void testOutputMap() {
 
-    final Routine<Flow<Object>, Flow<Object>> routine =
+    final Routine<FlowData<Object>, FlowData<Object>> routine =
         JRoutineCore.routineOn(syncExecutor()).of(new Sort());
     Map<Integer, ? extends Channel<?, Object>> channelMap;
-    Channel<?, Flow<Object>> channel;
+    Channel<?, FlowData<Object>> channel;
     channel = routine.invoke()
-                     .pass(new Flow<Object>(Sort.STRING, "test21"),
-                         new Flow<Object>(Sort.INTEGER, -11))
+                     .pass(new FlowData<Object>(Sort.STRING, "test21"),
+                         new FlowData<Object>(Sort.INTEGER, -11))
                      .close();
     channelMap = JRoutineChannels.channelHandler()
                                  .outputOfFlow(channel, Arrays.asList(Sort.INTEGER, Sort.STRING));
     assertThat(channelMap.get(Sort.INTEGER).in(seconds(1)).all()).containsOnly(-11);
     assertThat(channelMap.get(Sort.STRING).in(seconds(1)).all()).containsOnly("test21");
     channel = routine.invoke()
-                     .pass(new Flow<Object>(Sort.INTEGER, -11),
-                         new Flow<Object>(Sort.STRING, "test21"))
+                     .pass(new FlowData<Object>(Sort.INTEGER, -11),
+                         new FlowData<Object>(Sort.STRING, "test21"))
                      .close();
     channelMap = JRoutineChannels.channelHandler().outputOfFlow(channel, Sort.INTEGER, Sort.STRING);
     assertThat(channelMap.get(Sort.INTEGER).in(seconds(1)).all()).containsOnly(-11);
     assertThat(channelMap.get(Sort.STRING).in(seconds(1)).all()).containsOnly("test21");
     channel = routine.invoke()
-                     .pass(new Flow<Object>(Sort.STRING, "test21"),
-                         new Flow<Object>(Sort.INTEGER, -11))
+                     .pass(new FlowData<Object>(Sort.STRING, "test21"),
+                         new FlowData<Object>(Sort.INTEGER, -11))
                      .close();
     channelMap = JRoutineChannels.channelHandler()
                                  .outputOfFlow(Math.min(Sort.INTEGER, Sort.STRING), 2, channel);
@@ -1859,13 +1858,13 @@ public class ChannelsTest {
   @SuppressWarnings("unchecked")
   public void testOutputMapAbort() {
 
-    final Routine<Flow<Object>, Flow<Object>> routine = JRoutineCore.routine().of(new Sort());
+    final Routine<FlowData<Object>, FlowData<Object>> routine = JRoutineCore.routine().of(new Sort());
     Map<Integer, ? extends Channel<?, Object>> channelMap;
-    Channel<?, Flow<Object>> channel;
+    Channel<?, FlowData<Object>> channel;
     channel = routine.invoke()
                      .after(millis(100))
-                     .pass(new Flow<Object>(Sort.STRING, "test21"),
-                         new Flow<Object>(Sort.INTEGER, -11));
+                     .pass(new FlowData<Object>(Sort.STRING, "test21"),
+                         new FlowData<Object>(Sort.INTEGER, -11));
     channelMap = JRoutineChannels.channelHandler()
                                  .outputOfFlow(channel, Arrays.asList(Sort.INTEGER, Sort.STRING));
     channel.abort();
@@ -1892,8 +1891,8 @@ public class ChannelsTest {
 
     channel = routine.invoke()
                      .after(millis(100))
-                     .pass(new Flow<Object>(Sort.INTEGER, -11),
-                         new Flow<Object>(Sort.STRING, "test21"));
+                     .pass(new FlowData<Object>(Sort.INTEGER, -11),
+                         new FlowData<Object>(Sort.STRING, "test21"));
     channelMap = JRoutineChannels.channelHandler().outputOfFlow(channel, Sort.INTEGER, Sort.STRING);
     channel.abort();
 
@@ -1919,8 +1918,8 @@ public class ChannelsTest {
 
     channel = routine.invoke()
                      .after(millis(100))
-                     .pass(new Flow<Object>(Sort.STRING, "test21"),
-                         new Flow<Object>(Sort.INTEGER, -11));
+                     .pass(new FlowData<Object>(Sort.STRING, "test21"),
+                         new FlowData<Object>(Sort.INTEGER, -11));
     channelMap = JRoutineChannels.channelHandler()
                                  .outputOfFlow(Math.min(Sort.INTEGER, Sort.STRING), 2, channel);
     channel.abort();
@@ -1949,9 +1948,9 @@ public class ChannelsTest {
   @Test
   public void testOutputMapCache() {
 
-    final Routine<Flow<Object>, Flow<Object>> routine =
+    final Routine<FlowData<Object>, FlowData<Object>> routine =
         JRoutineCore.routine().of(factoryOf(Sort.class));
-    final Channel<?, Flow<Object>> channel = routine.invoke();
+    final Channel<?, FlowData<Object>> channel = routine.invoke();
     final Map<Integer, ? extends Channel<?, Object>> channelMap = JRoutineChannels.channelHandler()
                                                                                   .outputOfFlow(
                                                                                       channel,
@@ -1979,11 +1978,11 @@ public class ChannelsTest {
   @SuppressWarnings("unchecked")
   public void testOutputSelect() {
 
-    final Channel<Flow<String>, Flow<String>> channel = JRoutineCore.channel().ofType();
+    final Channel<FlowData<String>, FlowData<String>> channel = JRoutineCore.channel().ofType();
     final Channel<?, String> outputChannel =
         JRoutineChannels.channelHandler().outputOfFlow(channel, 33).get(33);
-    channel.pass(new Flow<String>(33, "test1"), new Flow<String>(-33, "test2"),
-        new Flow<String>(33, "test3"), new Flow<String>(333, "test4"));
+    channel.pass(new FlowData<String>(33, "test1"), new FlowData<String>(-33, "test2"),
+        new FlowData<String>(33, "test3"), new FlowData<String>(333, "test4"));
     channel.close();
     assertThat(outputChannel.in(seconds(1)).all()).containsExactly("test1", "test3");
   }
@@ -1991,7 +1990,7 @@ public class ChannelsTest {
   @Test
   public void testOutputSelectAbort() {
 
-    final Channel<Flow<String>, Flow<String>> channel = JRoutineCore.channel().ofType();
+    final Channel<FlowData<String>, FlowData<String>> channel = JRoutineCore.channel().ofType();
     final Channel<?, String> outputChannel =
         JRoutineChannels.channelHandler().outputOfFlow(channel, 33).get(33);
     channel.abort();
@@ -2011,7 +2010,7 @@ public class ChannelsTest {
   @SuppressWarnings("ConstantConditions")
   public void testOutputSelectError() {
 
-    final Channel<Flow<String>, Flow<String>> channel = JRoutineCore.channel().ofType();
+    final Channel<FlowData<String>, FlowData<String>> channel = JRoutineCore.channel().ofType();
 
     try {
       JRoutineChannels.channelHandler().outputOfFlow(channel, (int[]) null);
@@ -2056,9 +2055,9 @@ public class ChannelsTest {
   @SuppressWarnings("unchecked")
   public void testSelectMap() {
 
-    final Routine<Flow<Object>, Flow<Object>> routine = JRoutineCore.routine().of(new Sort());
-    final Channel<Flow<Object>, Flow<Object>> inputChannel = JRoutineCore.channel().ofType();
-    final Channel<?, Flow<Object>> outputChannel = routine.invoke().pass(inputChannel).close();
+    final Routine<FlowData<Object>, FlowData<Object>> routine = JRoutineCore.routine().of(new Sort());
+    final Channel<FlowData<Object>, FlowData<Object>> inputChannel = JRoutineCore.channel().ofType();
+    final Channel<?, FlowData<Object>> outputChannel = routine.invoke().pass(inputChannel).close();
     final Channel<?, Object> intChannel = JRoutineChannels.channelHandler()
                                                           .withChannel()
                                                           .withLogLevel(Level.WARNING)
@@ -2073,13 +2072,13 @@ public class ChannelsTest {
                                                           .outputOfFlow(outputChannel, Sort.STRING,
                                                               Sort.INTEGER)
                                                           .get(Sort.STRING);
-    inputChannel.pass(new Flow<Object>(Sort.STRING, "test21"), new Flow<Object>(Sort.INTEGER, -11));
+    inputChannel.pass(new FlowData<Object>(Sort.STRING, "test21"), new FlowData<Object>(Sort.INTEGER, -11));
     assertThat(intChannel.in(seconds(10)).next()).isEqualTo(-11);
     assertThat(strChannel.in(seconds(10)).next()).isEqualTo("test21");
-    inputChannel.pass(new Flow<Object>(Sort.INTEGER, -11), new Flow<Object>(Sort.STRING, "test21"));
+    inputChannel.pass(new FlowData<Object>(Sort.INTEGER, -11), new FlowData<Object>(Sort.STRING, "test21"));
     assertThat(intChannel.in(seconds(10)).next()).isEqualTo(-11);
     assertThat(strChannel.in(seconds(10)).next()).isEqualTo("test21");
-    inputChannel.pass(new Flow<Object>(Sort.STRING, "test21"), new Flow<Object>(Sort.INTEGER, -11));
+    inputChannel.pass(new FlowData<Object>(Sort.STRING, "test21"), new FlowData<Object>(Sort.INTEGER, -11));
     assertThat(intChannel.in(seconds(10)).next()).isEqualTo(-11);
     assertThat(strChannel.in(seconds(10)).next()).isEqualTo("test21");
   }
@@ -2088,12 +2087,12 @@ public class ChannelsTest {
   @SuppressWarnings("unchecked")
   public void testSelectMapAbort() {
 
-    final Routine<Flow<Object>, Flow<Object>> routine = JRoutineCore.routine().of(new Sort());
-    Channel<Flow<Object>, Flow<Object>> inputChannel = JRoutineCore.channel().ofType();
-    Channel<?, Flow<Object>> outputChannel = routine.invoke().pass(inputChannel).close();
+    final Routine<FlowData<Object>, FlowData<Object>> routine = JRoutineCore.routine().of(new Sort());
+    Channel<FlowData<Object>, FlowData<Object>> inputChannel = JRoutineCore.channel().ofType();
+    Channel<?, FlowData<Object>> outputChannel = routine.invoke().pass(inputChannel).close();
     JRoutineChannels.channelHandler().outputOfFlow(outputChannel, Sort.INTEGER, Sort.STRING);
     inputChannel.after(millis(100))
-                .pass(new Flow<Object>(Sort.STRING, "test21"), new Flow<Object>(Sort.INTEGER, -11))
+                .pass(new FlowData<Object>(Sort.STRING, "test21"), new FlowData<Object>(Sort.INTEGER, -11))
                 .abort();
 
     try {
@@ -2128,7 +2127,7 @@ public class ChannelsTest {
     outputChannel = routine.invoke().pass(inputChannel).close();
     JRoutineChannels.channelHandler().outputOfFlow(outputChannel, Sort.INTEGER, Sort.STRING);
     inputChannel.after(millis(100))
-                .pass(new Flow<Object>(Sort.INTEGER, -11), new Flow<Object>(Sort.STRING, "test21"))
+                .pass(new FlowData<Object>(Sort.INTEGER, -11), new FlowData<Object>(Sort.STRING, "test21"))
                 .abort();
 
     try {
@@ -2163,7 +2162,7 @@ public class ChannelsTest {
     outputChannel = routine.invoke().pass(inputChannel).close();
     JRoutineChannels.channelHandler().outputOfFlow(outputChannel, Sort.STRING, Sort.INTEGER);
     inputChannel.after(millis(100))
-                .pass(new Flow<Object>(Sort.STRING, "test21"), new Flow<Object>(Sort.INTEGER, -11))
+                .pass(new FlowData<Object>(Sort.STRING, "test21"), new FlowData<Object>(Sort.INTEGER, -11))
                 .abort();
 
     try {
@@ -2195,14 +2194,14 @@ public class ChannelsTest {
     }
   }
 
-  private static class Amb<DATA> extends TemplateInvocation<Flow<DATA>, DATA> {
+  private static class Amb<DATA> extends TemplateInvocation<FlowData<DATA>, DATA> {
 
     private static final int NO_INDEX = Integer.MIN_VALUE;
 
     private int mFirstIndex;
 
     @Override
-    public void onInput(final Flow<DATA> input, @NotNull final Channel<DATA, ?> result) {
+    public void onInput(final FlowData<DATA> input, @NotNull final Channel<DATA, ?> result) {
       if (mFirstIndex == NO_INDEX) {
         mFirstIndex = input.id;
         result.pass(input.data);
@@ -2241,7 +2240,7 @@ public class ChannelsTest {
     }
   }
 
-  private static class Sort extends MappingInvocation<Flow<Object>, Flow<Object>> {
+  private static class Sort extends MappingInvocation<FlowData<Object>, FlowData<Object>> {
 
     private static final int INTEGER = 1;
 
@@ -2255,18 +2254,19 @@ public class ChannelsTest {
       super(null);
     }
 
-    public void onInput(final Flow<Object> flow, @NotNull final Channel<Flow<Object>, ?> result) {
+    public void onInput(final FlowData<Object> flowData, @NotNull final Channel<FlowData<Object>,
+        ?> result) {
 
-      switch (flow.id) {
+      switch (flowData.id) {
 
         case INTEGER:
           JRoutineChannels.channelHandler().<Object, Integer>inputOfFlow(result, INTEGER).pass(
-              flow.<Integer>data()).close();
+              flowData.<Integer>data()).close();
           break;
 
         case STRING:
           JRoutineChannels.channelHandler().<Object, String>inputOfFlow(result, STRING).pass(
-              flow.<String>data()).close();
+              flowData.<String>data()).close();
           break;
       }
     }

@@ -24,7 +24,6 @@ import com.github.dm.jrt.core.common.DeadlockException;
 import com.github.dm.jrt.core.common.TimeoutException;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.ChannelConfiguration.TimeoutActionType;
-import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.log.Log;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.NullLog;

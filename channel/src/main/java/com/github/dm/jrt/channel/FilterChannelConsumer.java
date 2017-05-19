@@ -30,7 +30,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <IN> the input data type.
  */
-class FilterChannelConsumer<IN> implements ChannelConsumer<Flow<IN>> {
+class FilterChannelConsumer<IN> implements ChannelConsumer<FlowData<IN>> {
 
   private final Channel<? super IN, ?> mChannel;
 
@@ -55,9 +55,9 @@ class FilterChannelConsumer<IN> implements ChannelConsumer<Flow<IN>> {
     mChannel.abort(error);
   }
 
-  public void onOutput(final Flow<IN> flow) {
-    if (flow.id == mId) {
-      mChannel.pass(flow.data);
+  public void onOutput(final FlowData<IN> flowData) {
+    if (flowData.id == mId) {
+      mChannel.pass(flowData.data);
     }
   }
 }

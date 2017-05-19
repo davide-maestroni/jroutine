@@ -31,7 +31,7 @@ import java.util.ArrayList;
  *
  * @param <IN> the input data type.
  */
-class SortingArrayChannelConsumer<IN> implements ChannelConsumer<Flow<? extends IN>> {
+class SortingArrayChannelConsumer<IN> implements ChannelConsumer<FlowData<? extends IN>> {
 
   private final ArrayList<Channel<? extends IN, ?>> mChannelList;
 
@@ -64,8 +64,8 @@ class SortingArrayChannelConsumer<IN> implements ChannelConsumer<Flow<? extends 
     }
   }
 
-  public void onOutput(final Flow<? extends IN> flow) {
-    final int id = flow.id - mStartId;
+  public void onOutput(final FlowData<? extends IN> flowData) {
+    final int id = flowData.id - mStartId;
     if ((id < 0) || (id >= mSize)) {
       return;
     }
@@ -73,7 +73,7 @@ class SortingArrayChannelConsumer<IN> implements ChannelConsumer<Flow<? extends 
     @SuppressWarnings("unchecked") final Channel<IN, ?> channel =
         (Channel<IN, ?>) mChannelList.get(id);
     if (channel != null) {
-      channel.pass(flow.data);
+      channel.pass(flowData.data);
     }
   }
 }

@@ -23,7 +23,6 @@ import com.github.dm.jrt.core.common.BackoffBuilder;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.executor.ScheduledExecutor;
 import com.github.dm.jrt.core.executor.ScheduledExecutors;
-import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
@@ -53,9 +52,10 @@ import static com.github.dm.jrt.core.util.DurationMeasure.indefiniteTime;
 import static com.github.dm.jrt.core.util.DurationMeasure.millis;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static com.github.dm.jrt.operator.JRoutineOperators.appendOutputsOf;
+import static com.github.dm.jrt.operator.JRoutineOperators.identity;
 import static com.github.dm.jrt.operator.JRoutineOperators.reduce;
 import static com.github.dm.jrt.operator.JRoutineOperators.unary;
-import static com.github.dm.jrt.operator.sequence.JRoutineSequences.range;
+import static com.github.dm.jrt.operator.sequence.Sequence.range;
 import static com.github.dm.jrt.stream.JRoutineStream.streamLifter;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
@@ -298,7 +298,7 @@ public class TransformationsTest {
                              .all()).containsOnly(1L, 4L, 9L);
     assertThat(JRoutineStream.streamOf(JRoutineCore.routine().of(appendOutputsOf(range(1, 3))))
                              .lift(streamLifter().<Integer, Integer, Integer>splitIn(2,
-                                 JRoutineCore.routine().of(IdentityInvocation.<Integer>factory())))
+                                 JRoutineCore.routine().of(JRoutineOperators.<Integer>identity())))
                              .invoke()
                              .close()
                              .in(seconds(3))
@@ -313,7 +313,7 @@ public class TransformationsTest {
     assertThat(JRoutineStream.streamOf(JRoutineCore.routine().of(appendOutputsOf(range(1, 3))))
                              .lift(streamLifter().<Integer, Integer, Integer>splitBy(
                                  FunctionDecorator.<Integer>identity(),
-                                 JRoutineCore.routine().of(IdentityInvocation.<Integer>factory())))
+                                 JRoutineCore.routine().of(JRoutineOperators.<Integer>identity())))
                              .invoke()
                              .close()
                              .in(seconds(3))
@@ -331,7 +331,7 @@ public class TransformationsTest {
     }
 
     try {
-      streamLifter().splitBy(null, JRoutineCore.routine().of(IdentityInvocation.factory()));
+      streamLifter().splitBy(null, JRoutineCore.routine().of(identity()));
       fail();
 
     } catch (final NullPointerException ignored) {
@@ -453,7 +453,7 @@ public class TransformationsTest {
   @Test
   public void testThrottle() throws InterruptedException {
     final Routine<Object, Object> routine = JRoutineStream.streamOf(
-        JRoutineCore.routineOn(ScheduledExecutors.poolExecutor(1)).of(IdentityInvocation.factory()))
+        JRoutineCore.routineOn(ScheduledExecutors.poolExecutor(1)).of(identity()))
                                                           .lift(streamLifter().throttle(1));
     final Channel<Object, Object> channel1 = routine.invoke().pass("test1");
     final Channel<Object, Object> channel2 = routine.invoke().pass("test2");
@@ -465,7 +465,7 @@ public class TransformationsTest {
   @Test
   public void testThrottleAbort() throws InterruptedException {
     final Routine<Object, Object> routine = JRoutineStream.streamOf(
-        JRoutineCore.routineOn(ScheduledExecutors.poolExecutor(1)).of(IdentityInvocation.factory()))
+        JRoutineCore.routineOn(ScheduledExecutors.poolExecutor(1)).of(identity()))
                                                           .lift(streamLifter().throttle(1));
     final Channel<Object, Object> channel1 = routine.invoke().pass("test1");
     final Channel<Object, Object> channel2 = routine.invoke().pass("test2");
@@ -477,7 +477,7 @@ public class TransformationsTest {
   @Test
   public void testTimeThrottle() {
     final Routine<Object, Object> routine =
-        JRoutineStream.streamOf(JRoutineCore.routine().of(IdentityInvocation.factory()))
+        JRoutineStream.streamOf(JRoutineCore.routine().of(identity()))
                       .lift(streamLifter().throttle(1, seconds(1)));
     final Channel<Object, Object> channel1 = routine.invoke().pass("test1").close();
     final Channel<Object, Object> channel2 = routine.invoke().pass("test2").close();
@@ -487,20 +487,20 @@ public class TransformationsTest {
 
   @Test
   public void testTimeout() {
-    assertThat(JRoutineStream.streamOf(JRoutineCore.routine().of(IdentityInvocation.factory()))
+    assertThat(JRoutineStream.streamOf(JRoutineCore.routine().of(identity()))
                              .lift(streamLifter().timeoutAfter(seconds(1)))
                              .invoke()
                              .pass("test")
                              .close()
                              .in(seconds(1))
                              .all()).containsExactly("test");
-    assertThat(JRoutineStream.streamOf(JRoutineCore.routine().of(IdentityInvocation.factory()))
+    assertThat(JRoutineStream.streamOf(JRoutineCore.routine().of(identity()))
                              .lift(streamLifter().timeoutAfter(millis(1)))
                              .invoke()
                              .pass("test")
                              .in(seconds(1))
                              .getError()).isExactlyInstanceOf(ResultTimeoutException.class);
-    assertThat(JRoutineStream.streamOf(JRoutineCore.routine().of(IdentityInvocation.factory()))
+    assertThat(JRoutineStream.streamOf(JRoutineCore.routine().of(identity()))
                              .lift(streamLifter().timeoutAfter(indefiniteTime(), millis(1)))
                              .invoke()
                              .pass("test")

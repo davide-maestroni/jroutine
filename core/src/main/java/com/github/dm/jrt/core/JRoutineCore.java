@@ -80,15 +80,14 @@ import static com.github.dm.jrt.core.executor.ScheduledExecutors.defaultExecutor
  * <p>
  * <b>Example 4:</b> Asynchronously feed a routine from a different thread.
  * <pre><code>
- * final Routine&lt;Result, Result&gt; routine =
- *     JRoutineCore.routine().of(IdentityInvocation.&lt;Result&gt;factory());
- * final Channel&lt;Result, Result&gt; channel = routine.invoke();
+ * final Routine&lt;Data, Result&gt; routine = JRoutineCore.routine().of(factory);
+ * final Channel&lt;Data, Result&gt; channel = routine.invoke();
  *
  * new Thread() {
  *
  *   &#64;Override
  *   public void run() {
- *     channel.pass(new Result()).close();
+ *     channel.pass(new Data()).close();
  *   }
  * }.start();
  *

@@ -18,10 +18,10 @@ package com.github.dm.jrt.function;
 
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
+import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.function.util.Action;
@@ -756,13 +756,23 @@ public class FunctionsTest {
   @Test
   public void testFactoryEquals() {
 
-    final Supplier<Invocation<Object, Object>> supplier =
-        SupplierDecorator.constant(IdentityInvocation.factory().newInvocation());
+    final Supplier<Invocation<Object, Object>> supplier = SupplierDecorator.constant(
+        (Invocation<Object, Object>) new TemplateInvocation<Object, Object>() {
+
+          public void onInput(final Object input, @NotNull final Channel<Object, ?> result) {
+            result.pass(input);
+          }
+        });
     final InvocationFactory<Object, String> factory = createFactory();
     assertThat(factory).isEqualTo(factory);
     assertThat(factory).isNotEqualTo(createFactory());
     assertThat(factory).isNotEqualTo(SupplierDecorator.factoryOf(supplier));
-    assertThat(factory).isNotEqualTo(IdentityInvocation.factory());
+    assertThat(factory).isNotEqualTo(new MappingInvocation<Object, Object>(null) {
+
+      public void onInput(final Object input, @NotNull final Channel<Object, ?> result) {
+        result.pass(input);
+      }
+    });
     assertThat(factory).isNotEqualTo("");
     assertThat(SupplierDecorator.factoryOf(supplier)).isEqualTo(
         SupplierDecorator.factoryOf(supplier));

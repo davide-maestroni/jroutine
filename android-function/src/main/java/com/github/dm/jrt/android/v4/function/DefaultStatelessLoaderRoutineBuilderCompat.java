@@ -28,12 +28,14 @@ import com.github.dm.jrt.android.v4.core.LoaderSourceCompat;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.util.BiConsumerDecorator;
-import com.github.dm.jrt.function.util.ConsumerDecorator;
+import com.github.dm.jrt.function.util.BiConsumer;
+import com.github.dm.jrt.function.util.Consumer;
 
 import org.jetbrains.annotations.NotNull;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
+import static com.github.dm.jrt.function.util.BiConsumerDecorator.wrapBiConsumer;
+import static com.github.dm.jrt.function.util.ConsumerDecorator.wrapConsumer;
 
 /**
  * Default implementation of a stateless Loader routine builder.
@@ -59,13 +61,12 @@ class DefaultStatelessLoaderRoutineBuilderCompat<IN, OUT>
 
   @NotNull
   @Override
-  public LoaderRoutine<IN, OUT> buildRoutine() {
-    return JRoutineLoaderCompat.on(mLoaderSource)
-                               .with(new StatelessContextInvocation<IN, OUT>(getOnNext(),
-                                   getOnError(), getOnComplete()))
+  public LoaderRoutine<IN, OUT> routine() {
+    return JRoutineLoaderCompat.routineOn(mLoaderSource)
                                .withConfiguration(getConfiguration())
                                .withConfiguration(getLoaderConfiguration())
-                               .buildRoutine();
+                               .of(new StatelessContextInvocation<IN, OUT>(getOnNext(),
+                                   getOnError(), getOnComplete()));
   }
 
   /**
@@ -77,11 +78,11 @@ class DefaultStatelessLoaderRoutineBuilderCompat<IN, OUT>
   private static class StatelessContextInvocation<IN, OUT> extends ContextInvocationFactory<IN, OUT>
       implements ContextInvocation<IN, OUT> {
 
-    private final ConsumerDecorator<? super Channel<OUT, ?>> mOnComplete;
+    private final Consumer<? super Channel<OUT, ?>> mOnComplete;
 
-    private final ConsumerDecorator<? super RoutineException> mOnError;
+    private final Consumer<? super RoutineException> mOnError;
 
-    private final BiConsumerDecorator<? super IN, ? super Channel<OUT, ?>> mOnNext;
+    private final BiConsumer<? super IN, ? super Channel<OUT, ?>> mOnNext;
 
     /**
      * Constructor.
@@ -91,10 +92,10 @@ class DefaultStatelessLoaderRoutineBuilderCompat<IN, OUT>
      * @param onComplete the complete consumer.
      */
     private StatelessContextInvocation(
-        @NotNull final BiConsumerDecorator<? super IN, ? super Channel<OUT, ?>> onNext,
-        @NotNull final ConsumerDecorator<? super RoutineException> onError,
-        @NotNull final ConsumerDecorator<? super Channel<OUT, ?>> onComplete) {
-      super(asArgs(onNext, onError, onComplete));
+        @NotNull final BiConsumer<? super IN, ? super Channel<OUT, ?>> onNext,
+        @NotNull final Consumer<? super RoutineException> onError,
+        @NotNull final Consumer<? super Channel<OUT, ?>> onComplete) {
+      super(asArgs(wrapBiConsumer(onNext), wrapConsumer(onError), wrapConsumer(onComplete)));
       mOnNext = onNext;
       mOnError = onError;
       mOnComplete = onComplete;

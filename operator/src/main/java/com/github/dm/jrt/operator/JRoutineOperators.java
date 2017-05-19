@@ -21,7 +21,6 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.Backoff;
 import com.github.dm.jrt.core.common.BackoffBuilder;
 import com.github.dm.jrt.core.common.RoutineException;
-import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -75,6 +74,8 @@ public class JRoutineOperators {
           outs.add(out);
         }
       };
+
+  private static final InvocationFactory<?, ?> sIdentity = unary(FunctionDecorator.identity());
 
   @SuppressWarnings("unchecked")
   private static final InvocationFactory<?, ?> sMax = binary(BiFunctionDecorator.max());
@@ -610,8 +611,9 @@ public class JRoutineOperators {
    * @return the invocation factory instance.
    */
   @NotNull
+  @SuppressWarnings("unchecked")
   public static <DATA> InvocationFactory<DATA, DATA> identity() {
-    return IdentityInvocation.factory();
+    return (InvocationFactory<DATA, DATA>) sIdentity;
   }
 
   /**

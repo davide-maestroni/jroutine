@@ -37,7 +37,6 @@ import com.github.dm.jrt.core.config.InvocationConfiguration.AgingPriority;
 import com.github.dm.jrt.core.executor.SyncExecutor;
 import com.github.dm.jrt.core.invocation.CallInvocation;
 import com.github.dm.jrt.core.invocation.CommandInvocation;
-import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationDeadlockException;

@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.android.v11.channel;
+package com.github.dm.jrt.android.v4.channel;
 
-import android.util.SparseArray;
+import android.support.v4.util.SparseArrayCompat;
 
-import com.github.dm.jrt.channel.Flow;
+import com.github.dm.jrt.channel.FlowData;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.ChannelConsumer;
 import com.github.dm.jrt.core.common.RoutineException;
@@ -26,15 +26,15 @@ import com.github.dm.jrt.core.common.RoutineException;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Channel consumer sorting the output data among a map of channels.
+ * Channel consumer sorting the output data among a sparse array of channels.
  * <p>
  * Created by davide-maestroni on 02/26/2016.
  *
  * @param <OUT> the output data type.
  */
-class SortingMapChannelConsumer<OUT> implements ChannelConsumer<Flow<? extends OUT>> {
+class SortingSparseArrayChannelConsumer<OUT> implements ChannelConsumer<FlowData<? extends OUT>> {
 
-  private final SparseArray<Channel<OUT, ?>> mChannels;
+  private final SparseArrayCompat<Channel<OUT, ?>> mChannels;
 
   /**
    * Constructor.
@@ -42,18 +42,18 @@ class SortingMapChannelConsumer<OUT> implements ChannelConsumer<Flow<? extends O
    * @param channels the map of indexes and channels.
    * @throws java.lang.NullPointerException if the specified map is null or contains a null object.
    */
-  SortingMapChannelConsumer(@NotNull final SparseArray<Channel<OUT, ?>> channels) {
-    final SparseArray<Channel<OUT, ?>> channelMap = channels.clone();
-    if (channelMap.indexOfValue(null) >= 0) {
+  SortingSparseArrayChannelConsumer(@NotNull final SparseArrayCompat<Channel<OUT, ?>> channels) {
+    final SparseArrayCompat<Channel<OUT, ?>> channelArray = channels.clone();
+    if (channelArray.indexOfValue(null) >= 0) {
       throw new NullPointerException("the map of channels must not contain null objects");
     }
 
-    mChannels = channelMap;
+    mChannels = channelArray;
   }
 
   @Override
   public void onComplete() {
-    final SparseArray<Channel<OUT, ?>> channels = mChannels;
+    final SparseArrayCompat<Channel<OUT, ?>> channels = mChannels;
     final int size = channels.size();
     for (int i = 0; i < size; ++i) {
       channels.valueAt(i).close();
@@ -62,7 +62,7 @@ class SortingMapChannelConsumer<OUT> implements ChannelConsumer<Flow<? extends O
 
   @Override
   public void onError(@NotNull final RoutineException error) {
-    final SparseArray<Channel<OUT, ?>> channels = mChannels;
+    final SparseArrayCompat<Channel<OUT, ?>> channels = mChannels;
     final int size = channels.size();
     for (int i = 0; i < size; ++i) {
       channels.valueAt(i).abort(error);
@@ -70,10 +70,10 @@ class SortingMapChannelConsumer<OUT> implements ChannelConsumer<Flow<? extends O
   }
 
   @Override
-  public void onOutput(final Flow<? extends OUT> flow) {
-    final Channel<OUT, ?> channel = mChannels.get(flow.id);
+  public void onOutput(final FlowData<? extends OUT> flowData) {
+    final Channel<OUT, ?> channel = mChannels.get(flowData.id);
     if (channel != null) {
-      channel.pass(flow.data);
+      channel.pass(flowData.data);
     }
   }
 }

@@ -19,32 +19,32 @@ package com.github.dm.jrt.android.channel;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.github.dm.jrt.channel.Flow;
+import com.github.dm.jrt.channel.FlowData;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Data class storing information about the specific flow of data.
+ * Data class storing information about the specific flow.
  * <p>
  * Created by davide-maestroni on 02/26/2016.
  *
  * @param <DATA> the data type.
  */
-public class ParcelableFlow<DATA> extends Flow<DATA> implements Parcelable {
+public class ParcelableFlowData<DATA> extends FlowData<DATA> implements Parcelable {
 
   /**
    * Creator instance needed by the parcelable protocol.
    */
-  public static final Creator<ParcelableFlow> CREATOR = new Creator<ParcelableFlow>() {
+  public static final Creator<ParcelableFlowData> CREATOR = new Creator<ParcelableFlowData>() {
 
     @Override
-    public ParcelableFlow createFromParcel(final Parcel source) {
-      return new ParcelableFlow(source);
+    public ParcelableFlowData createFromParcel(final Parcel source) {
+      return new ParcelableFlowData(source);
     }
 
     @Override
-    public ParcelableFlow[] newArray(final int size) {
-      return new ParcelableFlow[size];
+    public ParcelableFlowData[] newArray(final int size) {
+      return new ParcelableFlowData[size];
     }
   };
 
@@ -54,7 +54,7 @@ public class ParcelableFlow<DATA> extends Flow<DATA> implements Parcelable {
    * @param id   the flow ID.
    * @param data the data object.
    */
-  public ParcelableFlow(final int id, final DATA data) {
+  public ParcelableFlowData(final int id, final DATA data) {
     super(id, data);
   }
 
@@ -64,8 +64,8 @@ public class ParcelableFlow<DATA> extends Flow<DATA> implements Parcelable {
    * @param source the source parcel.
    */
   @SuppressWarnings("unchecked")
-  protected ParcelableFlow(@NotNull final Parcel source) {
-    super(source.readInt(), (DATA) source.readValue(ParcelableFlow.class.getClassLoader()));
+  protected ParcelableFlowData(@NotNull final Parcel source) {
+    super(source.readInt(), (DATA) source.readValue(ParcelableFlowData.class.getClassLoader()));
   }
 
   @Override

@@ -136,14 +136,6 @@ class DefaultStreamRoutine<IN, OUT> implements StreamRoutine<IN, OUT> {
 
   @NotNull
   public <AFTER> StreamRoutine<IN, AFTER> map(
-      @NotNull final Invocation<? super OUT, ? extends AFTER> invocation) {
-    return new DefaultStreamRoutine<IN, AFTER>(
-        wrapSupplier(mChannelSupplier).andThen(new InvocationFunction<IN, OUT, AFTER>(invocation)),
-        mClearAction);
-  }
-
-  @NotNull
-  public <AFTER> StreamRoutine<IN, AFTER> map(
       @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
     return new DefaultStreamRoutine<IN, AFTER>(
         wrapSupplier(mChannelSupplier).andThen(new FactoryFunction<IN, OUT, AFTER>(factory)),
@@ -156,6 +148,14 @@ class DefaultStreamRoutine<IN, OUT> implements StreamRoutine<IN, OUT> {
     return new DefaultStreamRoutine<IN, AFTER>(
         wrapSupplier(mChannelSupplier).andThen(new RoutineFunction<IN, OUT, AFTER>(routine)),
         wrapAction(new RoutineAction(routine)).andThen(mClearAction));
+  }
+
+  @NotNull
+  public <AFTER> StreamRoutine<IN, AFTER> mapSingleton(
+      @NotNull final Invocation<? super OUT, ? extends AFTER> invocation) {
+    return new DefaultStreamRoutine<IN, AFTER>(
+        wrapSupplier(mChannelSupplier).andThen(new InvocationFunction<IN, OUT, AFTER>(invocation)),
+        mClearAction);
   }
 
   @NotNull

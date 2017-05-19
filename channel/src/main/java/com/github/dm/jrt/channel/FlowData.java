@@ -17,13 +17,13 @@
 package com.github.dm.jrt.channel;
 
 /**
- * Data class storing information about the specific flow of data.
+ * Data class storing information about the specific flow.
  * <p>
  * Created by davide-maestroni on 02/26/2016.
  *
  * @param <DATA> the data type.
  */
-public class Flow<DATA> { // TODO: 28/04/2017 rename?
+public class FlowData<DATA> {
 
   /**
    * The data object.
@@ -41,7 +41,7 @@ public class Flow<DATA> { // TODO: 28/04/2017 rename?
    * @param id   the flow ID.
    * @param data the data object.
    */
-  public Flow(final int id, final DATA data) {
+  public FlowData(final int id, final DATA data) {
     this.data = data;
     this.id = id;
   }
@@ -70,16 +70,16 @@ public class Flow<DATA> { // TODO: 28/04/2017 rename?
       return true;
     }
 
-    if (!(o instanceof Flow)) {
+    if (!(o instanceof FlowData)) {
       return false;
     }
 
-    final Flow<?> that = (Flow<?>) o;
+    final FlowData<?> that = (FlowData<?>) o;
     return (id == that.id) && ((data != null) ? data.equals(that.data) : (that.data == null));
   }
 
   @Override
   public String toString() {
-    return "Flow{data=" + data + ", id=" + id + "}";
+    return "FlowData{data=" + data + ", id=" + id + "}";
   }
 }

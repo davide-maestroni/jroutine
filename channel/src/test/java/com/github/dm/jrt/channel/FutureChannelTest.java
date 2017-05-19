@@ -22,7 +22,6 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.OutputTimeoutException;
 import com.github.dm.jrt.core.common.TimeoutException;
 import com.github.dm.jrt.core.config.ChannelConfiguration.TimeoutActionType;
-import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.util.DurationMeasure;
 
 import org.junit.Test;
@@ -266,7 +265,7 @@ public class FutureChannelTest {
     final Channel<?, String> channel = JRoutineChannels.channelHandler()
                                                        .channelOf(future)
                                                        .pipe(
-                                                          JRoutineCore.channel().<String>ofType());
+                                                           JRoutineCore.channel().<String>ofType());
     assertThat(channel.in(seconds(1)).next()).isEqualTo("test");
     assertThat(channel.isOpen()).isFalse();
   }
@@ -543,14 +542,15 @@ public class FutureChannelTest {
         return "test1";
       }
     })).in(seconds(1)).nextOrElse(2)).isEqualTo("test1");
-    assertThat(JRoutineChannels.channelHandler().channelOf(executor.schedule(new Callable<Object>() {
+    assertThat(
+        JRoutineChannels.channelHandler().channelOf(executor.schedule(new Callable<Object>() {
 
-      public Object call() {
-        return "test1";
-      }
-    }, 3, TimeUnit.SECONDS))
+          public Object call() {
+            return "test1";
+          }
+        }, 3, TimeUnit.SECONDS))
 
-                               .eventuallyContinue().in(seconds(1)).nextOrElse(2)).isEqualTo(2);
+                        .eventuallyContinue().in(seconds(1)).nextOrElse(2)).isEqualTo(2);
     try {
       JRoutineChannels.channelHandler().channelOf(executor.schedule(new Callable<Object>() {
 
@@ -567,10 +567,10 @@ public class FutureChannelTest {
       JRoutineChannels.channelHandler()
                       .channelOf(executor.schedule(new Callable<Object>() {
 
-                       public Object call() {
-                         return "test1";
-                       }
-                     }, 3, TimeUnit.SECONDS))
+                        public Object call() {
+                          return "test1";
+                        }
+                      }, 3, TimeUnit.SECONDS))
                       .eventuallyAbort(new IllegalStateException())
                       .in(millis(100))
                       .nextOrElse("test2");
@@ -731,7 +731,7 @@ public class FutureChannelTest {
                                                        .withChannel()
                                                        .withOutputTimeout(millis(10))
                                                        .withOutputTimeoutAction(
-                                                          TimeoutActionType.CONTINUE)
+                                                           TimeoutActionType.CONTINUE)
                                                        .configuration()
                                                        .channelOf(future);
     assertThat(channel.all()).isEmpty();
@@ -750,7 +750,7 @@ public class FutureChannelTest {
                                                        .withChannel()
                                                        .withOutputTimeout(millis(10))
                                                        .withOutputTimeoutAction(
-                                                          TimeoutActionType.ABORT)
+                                                           TimeoutActionType.ABORT)
                                                        .configuration()
                                                        .channelOf(future);
     try {
@@ -774,7 +774,7 @@ public class FutureChannelTest {
                                                        .withChannel()
                                                        .withOutputTimeout(millis(10))
                                                        .withOutputTimeoutAction(
-                                                          TimeoutActionType.FAIL)
+                                                           TimeoutActionType.FAIL)
                                                        .configuration()
                                                        .channelOf(future);
     try {

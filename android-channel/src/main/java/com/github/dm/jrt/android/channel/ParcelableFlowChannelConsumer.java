@@ -16,44 +16,51 @@
 
 package com.github.dm.jrt.android.channel;
 
-import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.builder.AbstractChannelBuilder;
 import com.github.dm.jrt.core.channel.Channel;
+import com.github.dm.jrt.core.channel.ChannelConsumer;
+import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Builder implementation returning a channel making the output data a flow.
+ * Channel consumer transforming data into flow ones.
  * <p>
  * Created by davide-maestroni on 02/26/2016.
  *
+ * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class OutputFlowBuilder<OUT>
-    extends AbstractChannelBuilder<ParcelableFlow<OUT>, ParcelableFlow<OUT>> {
+class ParcelableFlowChannelConsumer<OUT, IN extends OUT> implements ChannelConsumer<IN> {
 
-  private final Channel<?, ? extends OUT> mChannel;
+  private final Channel<? super ParcelableFlowData<OUT>, ?> mChannel;
 
   private final int mId;
 
   /**
    * Constructor.
    *
-   * @param channel the output channel.
+   * @param channel the flow channel.
    * @param id      the flow ID.
    */
-  OutputFlowBuilder(@NotNull final Channel<?, ? extends OUT> channel, final int id) {
+  ParcelableFlowChannelConsumer(@NotNull final Channel<? super ParcelableFlowData<OUT>, ?> channel,
+      final int id) {
     mChannel = ConstantConditions.notNull("channel instance", channel);
     mId = id;
   }
 
-  @NotNull
   @Override
-  public Channel<ParcelableFlow<OUT>, ParcelableFlow<OUT>> buildChannel() {
-    final Channel<ParcelableFlow<OUT>, ParcelableFlow<OUT>> outputChannel =
-        JRoutineCore.<ParcelableFlow<OUT>>ofData().apply(getConfiguration()).buildChannel();
-    mChannel.consume(new FlowChannelConsumer<OUT, OUT>(outputChannel, mId));
-    return outputChannel;
+  public void onComplete() {
+    mChannel.close();
+  }
+
+  @Override
+  public void onError(@NotNull final RoutineException error) {
+    mChannel.abort(error);
+  }
+
+  @Override
+  public void onOutput(final IN input) {
+    mChannel.pass(new ParcelableFlowData<OUT>(mId, input));
   }
 }

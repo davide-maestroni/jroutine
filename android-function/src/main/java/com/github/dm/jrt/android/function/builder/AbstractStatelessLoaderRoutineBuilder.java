@@ -30,7 +30,6 @@ import com.github.dm.jrt.function.util.Function;
 import com.github.dm.jrt.function.util.Supplier;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import static com.github.dm.jrt.function.util.BiConsumerDecorator.wrapBiConsumer;
 import static com.github.dm.jrt.function.util.ConsumerDecorator.wrapConsumer;
@@ -67,32 +66,6 @@ public abstract class AbstractStatelessLoaderRoutineBuilder<IN, OUT, TYPE extend
     }
 
     return decorator;
-  }
-
-  @NotNull
-  @Override
-  @SuppressWarnings("unchecked")
-  public TYPE withConfiguration(@NotNull final LoaderConfiguration configuration) {
-    mConfiguration = ConstantConditions.notNull("loader configuration", configuration);
-    return (TYPE) this;
-  }
-
-  @NotNull
-  @Override
-  public Builder<? extends TYPE> withLoader() {
-    return new Builder<TYPE>(mConfigurable, mConfiguration);
-  }
-
-  @Override
-  public void clear(@Nullable final IN input) {
-  }
-
-  @Override
-  public void clear(@Nullable final IN... inputs) {
-  }
-
-  @Override
-  public void clear(@Nullable final Iterable<? extends IN> inputs) {
   }
 
   @NotNull
@@ -157,6 +130,12 @@ public abstract class AbstractStatelessLoaderRoutineBuilder<IN, OUT, TYPE extend
     return super.onNextOutput(checkStaticScope(wrapFunction(onNext)));
   }
 
+  @NotNull
+  @Override
+  public Builder<? extends TYPE> withLoader() {
+    return new Builder<TYPE>(mConfigurable, mConfiguration);
+  }
+
   /**
    * Returns the current Loader configuration.
    *
@@ -165,5 +144,13 @@ public abstract class AbstractStatelessLoaderRoutineBuilder<IN, OUT, TYPE extend
   @NotNull
   protected LoaderConfiguration getLoaderConfiguration() {
     return mConfiguration;
+  }
+
+  @NotNull
+  @Override
+  @SuppressWarnings("unchecked")
+  public TYPE withConfiguration(@NotNull final LoaderConfiguration configuration) {
+    mConfiguration = ConstantConditions.notNull("loader configuration", configuration);
+    return (TYPE) this;
   }
 }

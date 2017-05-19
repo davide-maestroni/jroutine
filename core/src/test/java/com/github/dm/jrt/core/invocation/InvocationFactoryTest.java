@@ -17,6 +17,7 @@
 package com.github.dm.jrt.core.invocation;
 
 import com.github.dm.jrt.core.JRoutineCore;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.routine.Routine;
 
 import org.jetbrains.annotations.NotNull;
@@ -37,15 +38,25 @@ public class InvocationFactoryTest {
 
   @Test
   public void testDecoratingInvocationFactory() throws Exception {
-    final InvocationFactory<String, String> factory = IdentityInvocation.factory();
-    assertThat(factory.newInvocation()).isExactlyInstanceOf(IdentityInvocation.class);
+    final InvocationFactory<String, String> factory = new MappingInvocation<String, String>(null) {
+
+      public void onInput(final String input, @NotNull final Channel<String, ?> result) {
+        result.pass(input);
+      }
+    };
+    assertThat(factory.newInvocation()).isInstanceOf(MappingInvocation.class);
     final TestInvocationFactory decoratedFactory = new TestInvocationFactory(factory);
     assertThat(decoratedFactory.newInvocation()).isExactlyInstanceOf(TestInvocationDecorator.class);
   }
 
   @Test
   public void testDecoratingInvocationFactoryEquals() {
-    final InvocationFactory<String, String> factory = IdentityInvocation.factory();
+    final InvocationFactory<String, String> factory = new MappingInvocation<String, String>(null) {
+
+      public void onInput(final String input, @NotNull final Channel<String, ?> result) {
+        result.pass(input);
+      }
+    };
     final TestInvocationFactory decoratedFactory = new TestInvocationFactory(factory);
     assertThat(decoratedFactory).isEqualTo(decoratedFactory);
     assertThat(decoratedFactory).isNotEqualTo(null);
@@ -70,7 +81,12 @@ public class InvocationFactoryTest {
 
   @Test
   public void testInvocationDecoratorAbort() {
-    final InvocationFactory<String, String> factory = IdentityInvocation.factory();
+    final InvocationFactory<String, String> factory = new MappingInvocation<String, String>(null) {
+
+      public void onInput(final String input, @NotNull final Channel<String, ?> result) {
+        result.pass(input);
+      }
+    };
     final TestInvocationFactory decoratedFactory = new TestInvocationFactory(factory);
     final Routine<String, String> routine = JRoutineCore.routine().of(decoratedFactory);
     assertThat(routine.invoke().after(millis(100)).pass("test").afterNoDelay().abort()).isTrue();
@@ -78,7 +94,12 @@ public class InvocationFactoryTest {
 
   @Test
   public void testInvocationDecoratorLifecycle() {
-    final InvocationFactory<String, String> factory = IdentityInvocation.factory();
+    final InvocationFactory<String, String> factory = new MappingInvocation<String, String>(null) {
+
+      public void onInput(final String input, @NotNull final Channel<String, ?> result) {
+        result.pass(input);
+      }
+    };
     final TestInvocationFactory decoratedFactory = new TestInvocationFactory(factory);
     final Routine<String, String> routine = JRoutineCore.routine().of(decoratedFactory);
     assertThat(routine.invoke().pass("test").close().in(seconds(1)).all()).containsExactly("test");

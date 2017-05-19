@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.method;
 
-import com.github.dm.jrt.channel.Flow;
+import com.github.dm.jrt.channel.FlowData;
 import com.github.dm.jrt.channel.JRoutineChannels;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.ChannelBuilder;
@@ -620,7 +620,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
     final Object[] safeParams = asArgs(params);
     final Class<? extends RoutineMethod> type = getClass();
     final Method method = findBestMatchingMethod(type, safeParams);
-    final InvocationFactory<Flow<Object>, Flow<Object>> factory;
+    final InvocationFactory<FlowData<Object>, FlowData<Object>> factory;
     final Constructor<? extends RoutineMethod> constructor = mConstructor;
     if (constructor != null) {
       factory = new MultiInvocationFactory(type, constructor, mArgs, method, safeParams);
@@ -691,7 +691,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
   @NotNull
   @SuppressWarnings("unchecked")
   private <OUT> Channel<?, OUT> call(
-      @NotNull final InvocationFactory<Flow<Object>, Flow<Object>> factory,
+      @NotNull final InvocationFactory<FlowData<Object>, FlowData<Object>> factory,
       @NotNull final Method method, @NotNull final Object[] params) {
     final ArrayList<Channel<?, ?>> inputChannels = new ArrayList<Channel<?, ?>>();
     final ArrayList<Channel<?, ?>> outputChannels = new ArrayList<Channel<?, ?>>();
@@ -710,16 +710,16 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
 
     final Channel<OUT, OUT> resultChannel = JRoutineCore.channel().ofType();
     outputChannels.add(resultChannel);
-    final Channel<?, ? extends Flow<Object>> inputChannel =
+    final Channel<?, ? extends FlowData<Object>> inputChannel =
         (!inputChannels.isEmpty()) ? JRoutineChannels.channelHandler().mergeOutputOf(inputChannels)
-            : JRoutineCore.channel().<Flow<Object>>of();
-    final Channel<Flow<Object>, Flow<Object>> outputChannel = JRoutineCore.routineOn(mExecutor)
-                                                                          .withConfiguration(
+            : JRoutineCore.channel().<FlowData<Object>>of();
+    final Channel<FlowData<Object>, FlowData<Object>> outputChannel = JRoutineCore.routineOn(mExecutor)
+                                                                                  .withConfiguration(
                                                                               getConfiguration())
-                                                                          .of(factory)
-                                                                          .invoke()
-                                                                          .pass(inputChannel)
-                                                                          .close();
+                                                                                  .of(factory)
+                                                                                  .invoke()
+                                                                                  .pass(inputChannel)
+                                                                                  .close();
     final Map<Integer, ? extends Channel<?, Object>> channelMap =
         JRoutineChannels.channelHandler().outputOfFlow(0, outputChannels.size(), outputChannel);
     for (final Entry<Integer, ? extends Channel<?, Object>> entry : channelMap.entrySet()) {
@@ -835,7 +835,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
    * Base invocation implementation.
    */
   private static abstract class AbstractInvocation
-      implements Invocation<Flow<Object>, Flow<Object>> {
+      implements Invocation<FlowData<Object>, FlowData<Object>> {
 
     private final boolean mReturnResults;
 
@@ -874,7 +874,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
       }
     }
 
-    public void onComplete(@NotNull final Channel<Flow<Object>, ?> result) throws Exception {
+    public void onComplete(@NotNull final Channel<FlowData<Object>, ?> result) throws Exception {
       bind(result);
       mIsComplete = true;
       if (!mIsAborted) {
@@ -889,7 +889,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
           final Object methodResult =
               internalInvoke((!inputChannels.isEmpty()) ? inputChannels.get(0) : null);
           if (mReturnResults && !isIgnoreReturnValue()) {
-            result.pass(new Flow<Object>(outputChannels.size(), methodResult));
+            result.pass(new FlowData<Object>(outputChannels.size(), methodResult));
           }
 
         } finally {
@@ -905,8 +905,8 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
     public void onDestroy() {
     }
 
-    public void onInput(final Flow<Object> input,
-        @NotNull final Channel<Flow<Object>, ?> result) throws Exception {
+    public void onInput(final FlowData<Object> input,
+        @NotNull final Channel<FlowData<Object>, ?> result) throws Exception {
       bind(result);
       @SuppressWarnings("unchecked") final Channel<Object, Object> inputChannel =
           (Channel<Object, Object>) getInputChannels().get(input.id);
@@ -915,7 +915,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
         resetIgnoreReturnValue();
         final Object methodResult = internalInvoke(inputChannel);
         if (mReturnResults && !isIgnoreReturnValue()) {
-          result.pass(new Flow<Object>(getOutputChannels().size(), methodResult));
+          result.pass(new FlowData<Object>(getOutputChannels().size(), methodResult));
         }
 
       } finally {
@@ -961,7 +961,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
      */
     protected abstract void resetIgnoreReturnValue();
 
-    private void bind(@NotNull final Channel<Flow<Object>, ?> result) {
+    private void bind(@NotNull final Channel<FlowData<Object>, ?> result) {
       if (!mIsBound) {
         mIsBound = true;
         final List<Channel<?, ?>> outputChannels = getOutputChannels();
@@ -1082,7 +1082,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
    * Invocation factory supporting multiple invocation of the routine method.
    */
   private static class MultiInvocationFactory
-      extends InvocationFactory<Flow<Object>, Flow<Object>> {
+      extends InvocationFactory<FlowData<Object>, FlowData<Object>> {
 
     private final Object[] mArgs;
 
@@ -1114,7 +1114,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
 
     @NotNull
     @Override
-    public Invocation<Flow<Object>, Flow<Object>> newInvocation() {
+    public Invocation<FlowData<Object>, FlowData<Object>> newInvocation() {
       return new MultiInvocation(mConstructor, mArgs, mMethod, mParams);
     }
   }
@@ -1199,7 +1199,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
    * Invocation factory supporting single invocation of the routine method.
    */
   private static class SingleInvocationFactory
-      extends InvocationFactory<Flow<Object>, Flow<Object>> {
+      extends InvocationFactory<FlowData<Object>, FlowData<Object>> {
 
     private final ArrayList<Channel<?, ?>> mInputChannels;
 
@@ -1232,7 +1232,7 @@ public class RoutineMethod implements InvocationConfigurable<RoutineMethod> {
 
     @NotNull
     @Override
-    public Invocation<Flow<Object>, Flow<Object>> newInvocation() {
+    public Invocation<FlowData<Object>, FlowData<Object>> newInvocation() {
       return new SingleInvocation(mInputChannels, mOutputChannels, mInstance, mMethod, mParams);
     }
   }

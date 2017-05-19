@@ -16,8 +16,8 @@
 
 package com.github.dm.jrt.android.retrofit;
 
-import com.github.dm.jrt.android.channel.AndroidChannels;
-import com.github.dm.jrt.android.channel.ParcelableFlow;
+import com.github.dm.jrt.android.channel.JRoutineAndroidChannels;
+import com.github.dm.jrt.android.channel.ParcelableFlowData;
 import com.github.dm.jrt.android.channel.io.ParcelableByteChannel;
 import com.github.dm.jrt.android.channel.io.ParcelableByteChannel.ParcelableByteChunk;
 import com.github.dm.jrt.android.core.invocation.AbstractContextInvocation;
@@ -55,7 +55,7 @@ import static com.github.dm.jrt.core.util.DurationMeasure.indefiniteTime;
  */
 @SuppressWarnings("WeakerAccess")
 public class ServiceCallInvocation
-    extends AbstractContextInvocation<ParcelableFlow<Object>, ParcelableFlow<Object>> {
+    extends AbstractContextInvocation<ParcelableFlowData<Object>, ParcelableFlowData<Object>> {
 
   /**
    * The ID of the flow dedicated to the transfer of request and response body bytes.
@@ -83,7 +83,7 @@ public class ServiceCallInvocation
   private RequestData mRequestData;
 
   @Override
-  public void onComplete(@NotNull final Channel<ParcelableFlow<Object>, ?> result) throws
+  public void onComplete(@NotNull final Channel<ParcelableFlowData<Object>, ?> result) throws
       Exception {
     final Channel<ParcelableByteChunk, ParcelableByteChunk> inputChannel = mInputChannel;
     if (inputChannel != null) {
@@ -98,8 +98,8 @@ public class ServiceCallInvocation
   }
 
   @Override
-  public void onInput(final ParcelableFlow<Object> input,
-      @NotNull final Channel<ParcelableFlow<Object>, ?> result) throws Exception {
+  public void onInput(final ParcelableFlowData<Object> input,
+      @NotNull final Channel<ParcelableFlowData<Object>, ?> result) throws Exception {
     switch (input.id) {
       case REQUEST_DATA_ID:
         mRequestData = input.data();
@@ -140,12 +140,12 @@ public class ServiceCallInvocation
     return true;
   }
 
-  private void asyncRequest(@NotNull final Channel<ParcelableFlow<Object>, ?> result) throws
+  private void asyncRequest(@NotNull final Channel<ParcelableFlowData<Object>, ?> result) throws
       Exception {
     final Request request =
         mRequestData.requestWithBody(new AsyncRequestBody(mMediaType, mInputChannel));
-    final Channel<ParcelableFlow<Object>, ParcelableFlow<Object>> outputChannel =
-        JRoutineCore.<ParcelableFlow<Object>>ofData().buildChannel();
+    final Channel<ParcelableFlowData<Object>, ParcelableFlowData<Object>> outputChannel =
+        JRoutineCore.<ParcelableFlowData<Object>>ofData().buildChannel();
     result.pass(outputChannel);
     getClient().newCall(request).enqueue(new Callback() {
 
@@ -179,15 +179,15 @@ public class ServiceCallInvocation
   }
 
   private void publishResult(@NotNull final ResponseBody responseBody,
-      @NotNull final Channel<ParcelableFlow<Object>, ?> result) throws IOException {
+      @NotNull final Channel<ParcelableFlowData<Object>, ?> result) throws IOException {
     final MediaType mediaType = responseBody.contentType();
-    result.pass(new ParcelableFlow<Object>(ConverterChannelConsumer.MEDIA_TYPE_ID,
+    result.pass(new ParcelableFlowData<Object>(ConverterChannelConsumer.MEDIA_TYPE_ID,
         (mediaType != null) ? mediaType.toString() : null));
-    result.pass(new ParcelableFlow<Object>(ConverterChannelConsumer.CONTENT_LENGTH_ID,
+    result.pass(new ParcelableFlowData<Object>(ConverterChannelConsumer.CONTENT_LENGTH_ID,
         responseBody.contentLength()));
     final Channel<Object, ?> channel =
-        AndroidChannels.parcelableFlowInput(result, ConverterChannelConsumer.BYTES_ID)
-                       .buildChannel();
+        JRoutineAndroidChannels.parcelableFlowInput(result, ConverterChannelConsumer.BYTES_ID)
+                               .buildChannel();
     final ByteChunkOutputStream outputStream = ParcelableByteChannel.withOutput(channel)
                                                                     .chunkStreamConfiguration()
                                                                     .withOnClose(
@@ -202,7 +202,7 @@ public class ServiceCallInvocation
     }
   }
 
-  private void syncRequest(@NotNull final Channel<ParcelableFlow<Object>, ?> result) throws
+  private void syncRequest(@NotNull final Channel<ParcelableFlowData<Object>, ?> result) throws
       Exception {
     final Request request = mRequestData.requestWithBody(null);
     final Response response = getClient().newCall(request).execute();
@@ -247,7 +247,7 @@ public class ServiceCallInvocation
       final OutputStream outputStream = sink.outputStream();
       try {
         for (final ParcelableByteChunk chunk : mInputChannel.in(indefiniteTime())) {
-          ParcelableByteChannel.getInputStream(chunk).transferTo(outputStream);
+          ParcelableByteChannel.inputStream(chunk).transferTo(outputStream);
         }
 
       } finally {

@@ -44,7 +44,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.github.dm.jrt.android.core.ServiceSource.serviceFrom;
 import static com.github.dm.jrt.android.core.invocation.InvocationFactoryReference.factoryOf;
 import static com.github.dm.jrt.core.util.DurationMeasure.millis;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
@@ -65,15 +64,16 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
   @SuppressWarnings("unchecked")
   public void testConfiguration() {
-    final Channel<?, String> channel = JRoutineCore.of("test").buildChannel();
+    final Channel<?, String> channel = JRoutineCore.channel().of("test");
     final TestLog testLog = new TestLog();
-    assertThat(AndroidChannels.outputParcelableFlow(channel, 3)
-                              .withChannel()
-                              .withLog(testLog)
-                              .withLogLevel(Level.DEBUG)
-                              .configuration()
-                              .buildChannel()
-                              .all()).containsExactly(new ParcelableFlow<String>(3, "test"));
+    assertThat(JRoutineAndroidChannels.channelHandler()
+                                      .withChannel()
+                                      .withLog(testLog)
+                                      .withLogLevel(Level.DEBUG)
+                                      .configuration()
+                                      .outputParcelableFlowOf(channel, 3)
+                                      .all()).containsExactly(
+        new ParcelableFlowData<String>(3, "test"));
     assertThat(testLog.mLogCount).isGreaterThan(0);
   }
 
@@ -81,7 +81,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     boolean failed = false;
     try {
-      new AndroidChannels();
+      new JRoutineAndroidChannels();
       failed = true;
 
     } catch (final Throwable ignored) {
@@ -94,22 +94,22 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
   @SuppressWarnings("unchecked")
   public void testInputFlow() {
 
-    final Channel<String, String> channel = JRoutineCore.<String>ofData().buildChannel();
-    AndroidChannels.inputFlow(channel, 33)
-                   .buildChannel()
-                   .pass(new ParcelableFlow<String>(33, "test1"),
-                       new ParcelableFlow<String>(-33, "test2"),
-                       new ParcelableFlow<String>(33, "test3"),
-                       new ParcelableFlow<String>(333, "test4"))
-                   .close();
+    final Channel<String, String> channel = JRoutineCore.channel().ofType();
+    JRoutineAndroidChannels.channelHandler()
+                           .inputFlowOf(channel, 33)
+                           .pass(new ParcelableFlowData<String>(33, "test1"),
+                               new ParcelableFlowData<String>(-33, "test2"),
+                               new ParcelableFlowData<String>(33, "test3"),
+                               new ParcelableFlowData<String>(333, "test4"))
+                           .close();
     channel.close();
     assertThat(channel.in(seconds(10)).all()).containsExactly("test1", "test3");
   }
 
   public void testInputFlowAbort() {
 
-    final Channel<String, String> channel = JRoutineCore.<String>ofData().buildChannel();
-    AndroidChannels.inputFlow(channel, 33).buildChannel().abort();
+    final Channel<String, String> channel = JRoutineCore.channel().ofType();
+    JRoutineAndroidChannels.channelHandler().inputFlowOf(channel, 33).abort();
     channel.close();
 
     try {
@@ -126,26 +126,26 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
   @SuppressWarnings("unchecked")
   public void testInputSelect() {
 
-    final Channel<ParcelableFlow<String>, ParcelableFlow<String>> channel =
-        JRoutineCore.<ParcelableFlow<String>>ofData().buildChannel();
-    AndroidChannels.parcelableFlowInput(channel, 33)
-                   .buildChannel()
-                   .pass("test1", "test2", "test3")
-                   .close();
+    final Channel<ParcelableFlowData<String>, ParcelableFlowData<String>> channel =
+        JRoutineCore.channel().ofType();
+    JRoutineAndroidChannels.channelHandler()
+                           .inputOfParcelableFlow(channel, 33)
+                           .pass("test1", "test2", "test3")
+                           .close();
     channel.close();
     assertThat(channel.in(seconds(10)).all()).containsExactly(
-        new ParcelableFlow<String>(33, "test1"), new ParcelableFlow<String>(33, "test2"),
-        new ParcelableFlow<String>(33, "test3"));
+        new ParcelableFlowData<String>(33, "test1"), new ParcelableFlowData<String>(33, "test2"),
+        new ParcelableFlowData<String>(33, "test3"));
   }
 
   public void testInputSelectAbort() {
 
-    final Channel<ParcelableFlow<String>, ParcelableFlow<String>> channel =
-        JRoutineCore.<ParcelableFlow<String>>ofData().buildChannel();
-    AndroidChannels.parcelableFlowInput(channel, 33)
-                   .buildChannel()
-                   .pass("test1", "test2", "test3")
-                   .abort();
+    final Channel<ParcelableFlowData<String>, ParcelableFlowData<String>> channel =
+        JRoutineCore.channel().ofType();
+    JRoutineAndroidChannels.channelHandler()
+                           .inputOfParcelableFlow(channel, 33)
+                           .pass("test1", "test2", "test3")
+                           .abort();
     channel.close();
 
     try {
@@ -160,60 +160,62 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
   }
 
   public void testJoin() {
-
-    final ChannelBuilder<String, String> builder1 = JRoutineCore.ofData();
-    final ChannelBuilder<Integer, Integer> builder2 = JRoutineCore.ofData();
+    final ChannelBuilder builder = JRoutineCore.channel();
     final Routine<List<?>, Character> routine =
-        JRoutineService.on(ServiceSource.serviceOf(getActivity())).with(factoryOf(CharAt.class)).buildRoutine();
+        JRoutineService.routineOn(ServiceSource.serviceOf(getActivity()))
+                       .of(factoryOf(CharAt.class));
     Channel<String, String> channel1;
     Channel<Integer, Integer> channel2;
-    channel1 = builder1.buildChannel();
-    channel2 = builder2.buildChannel();
+    channel1 = builder.ofType();
+    channel2 = builder.ofType();
     channel1.sorted().after(millis(100)).pass("testtest").pass("test2").close();
     channel2.sorted().after(millis(110)).pass(6).pass(4).close();
     assertThat(routine.invoke()
-                      .pass(AndroidChannels.joinOutput(channel1, channel2).buildChannel())
+                      .pass(
+                          JRoutineAndroidChannels.channelHandler().joinOutputOf(channel1, channel2))
                       .close()
                       .in(seconds(10))
                       .all()).containsExactly('s', '2');
-    channel1 = builder1.buildChannel();
-    channel2 = builder2.buildChannel();
+    channel1 = builder.ofType();
+    channel2 = builder.ofType();
     channel1.sorted().after(millis(100)).pass("testtest").pass("test2").close();
     channel2.sorted().after(millis(110)).pass(6).pass(4).close();
     assertThat(routine.invoke()
-                      .pass(AndroidChannels.joinOutput(
-                          Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannel())
+                      .pass(JRoutineAndroidChannels.channelHandler()
+                                                   .joinOutputOf(
+                                                       Arrays.<Channel<?, ?>>asList(channel1,
+                                                           channel2)))
                       .close()
                       .in(seconds(10))
                       .all()).containsExactly('s', '2');
-    channel1 = builder1.buildChannel();
-    channel2 = builder2.buildChannel();
+    channel1 = builder.ofType();
+    channel2 = builder.ofType();
     channel1.sorted().after(millis(100)).pass("testtest").pass("test2").pass("test3").close();
     channel2.sorted().after(millis(110)).pass(6).pass(4).close();
     assertThat(routine.invoke()
-                      .pass(AndroidChannels.joinOutput(channel1, channel2).buildChannel())
+                      .pass(
+                          JRoutineAndroidChannels.channelHandler().joinOutputOf(channel1, channel2))
                       .close()
                       .in(seconds(10))
                       .all()).containsExactly('s', '2');
   }
 
   public void testJoinAbort() {
-
-    final ChannelBuilder<String, String> builder1 = JRoutineCore.ofData();
-    final ChannelBuilder<Integer, Integer> builder2 = JRoutineCore.ofData();
+    final ChannelBuilder builder = JRoutineCore.channel();
     final Routine<List<?>, Character> routine =
-        JRoutineService.on(ServiceSource.serviceOf(getActivity())).with(factoryOf(CharAt.class)).buildRoutine();
+        JRoutineService.routineOn(ServiceSource.serviceOf(getActivity()))
+                       .of(factoryOf(CharAt.class));
     Channel<String, String> channel1;
     Channel<Integer, Integer> channel2;
-    channel1 = builder1.buildChannel();
-    channel2 = builder2.buildChannel();
+    channel1 = builder.ofType();
+    channel2 = builder.ofType();
     channel1.sorted().after(millis(100)).pass("testtest").pass("test2").close();
     channel2.sorted().abort();
 
     try {
 
       routine.invoke()
-             .pass(AndroidChannels.joinOutput(channel1, channel2).buildChannel())
+             .pass(JRoutineAndroidChannels.channelHandler().joinOutputOf(channel1, channel2))
              .close()
              .in(seconds(10))
              .all();
@@ -224,16 +226,17 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     }
 
-    channel1 = builder1.buildChannel();
-    channel2 = builder2.buildChannel();
+    channel1 = builder.ofType();
+    channel2 = builder.ofType();
     channel1.sorted().abort();
     channel2.sorted().after(millis(110)).pass(6).pass(4).close();
 
     try {
 
       routine.invoke()
-             .pass(AndroidChannels.joinOutput(Arrays.<Channel<?, ?>>asList(channel1, channel2))
-                                  .buildChannel())
+             .pass(JRoutineAndroidChannels.channelHandler()
+                                          .joinOutputOf(
+                                              Arrays.<Channel<?, ?>>asList(channel1, channel2)))
              .close()
              .in(seconds(10))
              .all();
@@ -246,50 +249,45 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
   }
 
   public void testJoinError() {
-
     try {
-
-      AndroidChannels.joinOutput();
-
+      JRoutineAndroidChannels.channelHandler().joinOutputOf();
       fail();
 
     } catch (final IllegalArgumentException ignored) {
-
     }
 
     try {
-
-      AndroidChannels.joinOutput(Collections.<Channel<?, ?>>emptyList());
-
+      JRoutineAndroidChannels.channelHandler().joinOutputOf(Collections.<Channel<?, ?>>emptyList());
       fail();
 
     } catch (final IllegalArgumentException ignored) {
-
     }
   }
 
   public void testJoinInput() {
 
-    final Channel<String, String> channel1 = JRoutineService.on(ServiceSource.serviceOf(getActivity()))
-                                                            .with(factoryOf(PassingString.class))
-                                                            .invoke()
-                                                            .sorted();
-    final Channel<String, String> channel2 = JRoutineService.on(ServiceSource.serviceOf(getActivity()))
-                                                            .with(factoryOf(PassingString.class))
-                                                            .invoke()
-                                                            .sorted();
-    AndroidChannels.joinInput(channel1, channel2)
-                   .buildChannel()
-                   .pass(Arrays.asList("test1-1", "test1-2"))
-                   .close();
-    AndroidChannels.joinInput(Arrays.<Channel<?, ?>>asList(channel1, channel2))
-                   .buildChannel()
-                   .pass(Arrays.asList("test2-1", "test2-2"))
-                   .close();
-    AndroidChannels.joinInput(channel1, channel2)
-                   .buildChannel()
-                   .pass(Collections.singletonList("test3-1"))
-                   .close();
+    final Channel<String, String> channel1 =
+        JRoutineService.routineOn(ServiceSource.serviceOf(getActivity()))
+                       .of(factoryOf(PassingString.class))
+                       .invoke()
+                       .sorted();
+    final Channel<String, String> channel2 =
+        JRoutineService.routineOn(ServiceSource.serviceOf(getActivity()))
+                       .of(factoryOf(PassingString.class))
+                       .invoke()
+                       .sorted();
+    JRoutineAndroidChannels.channelHandler()
+                           .joinInputOf(channel1, channel2)
+                           .pass(Arrays.asList("test1-1", "test1-2"))
+                           .close();
+    JRoutineAndroidChannels.channelHandler()
+                           .joinInputOf(Arrays.<Channel<?, ?>>asList(channel1, channel2))
+                           .pass(Arrays.asList("test2-1", "test2-2"))
+                           .close();
+    JRoutineAndroidChannels.channelHandler()
+                           .joinInputOf(channel1, channel2)
+                           .pass(Collections.singletonList("test3-1"))
+                           .close();
     assertThat(channel1.close().in(seconds(10)).all()).containsExactly("test1-1", "test2-1",
         "test3-1");
     assertThat(channel2.close().in(seconds(10)).all()).containsExactly("test1-2", "test2-2");
@@ -299,15 +297,15 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     Channel<String, String> channel1;
     Channel<String, String> channel2;
-    channel1 = JRoutineService.on(ServiceSource.serviceOf(getActivity()))
-                              .with(factoryOf(PassingString.class))
+    channel1 = JRoutineService.routineOn(ServiceSource.serviceOf(getActivity()))
+                              .of(factoryOf(PassingString.class))
                               .invoke()
                               .sorted();
-    channel2 = JRoutineService.on(ServiceSource.serviceOf(getActivity()))
-                              .with(factoryOf(PassingString.class))
+    channel2 = JRoutineService.routineOn(ServiceSource.serviceOf(getActivity()))
+                              .of(factoryOf(PassingString.class))
                               .invoke()
                               .sorted();
-    AndroidChannels.joinInput(channel1, channel2).buildChannel().abort();
+    JRoutineAndroidChannels.channelHandler().joinInputOf(channel1, channel2).abort();
 
     try {
 
@@ -329,17 +327,17 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     }
 
-    channel1 = JRoutineService.on(ServiceSource.serviceOf(getActivity()))
-                              .with(factoryOf(PassingString.class))
+    channel1 = JRoutineService.routineOn(ServiceSource.serviceOf(getActivity()))
+                              .of(factoryOf(PassingString.class))
                               .invoke()
                               .sorted();
-    channel2 = JRoutineService.on(ServiceSource.serviceOf(getActivity()))
-                              .with(factoryOf(PassingString.class))
+    channel2 = JRoutineService.routineOn(ServiceSource.serviceOf(getActivity()))
+                              .of(factoryOf(PassingString.class))
                               .invoke()
                               .sorted();
-    AndroidChannels.joinInput(Arrays.<Channel<?, ?>>asList(channel1, channel2))
-                   .buildChannel()
-                   .abort();
+    JRoutineAndroidChannels.channelHandler()
+                           .joinInputOf(Arrays.<Channel<?, ?>>asList(channel1, channel2))
+                           .abort();
 
     try {
 
@@ -364,14 +362,15 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
   public void testJoinInputError() {
 
-    final Channel<String, String> channel1 = JRoutineService.on(ServiceSource.serviceOf(getActivity()))
-                                                            .with(factoryOf(PassingString.class))
-                                                            .invoke()
-                                                            .sorted();
-    AndroidChannels.joinInput(channel1)
-                   .buildChannel()
-                   .pass(Arrays.asList("test1-1", "test1-2"))
-                   .close();
+    final Channel<String, String> channel1 =
+        JRoutineService.routineOn(ServiceSource.serviceOf(getActivity()))
+                       .of(factoryOf(PassingString.class))
+                       .invoke()
+                       .sorted();
+    JRoutineAndroidChannels.channelHandler()
+                           .joinInputOf(channel1)
+                           .pass(Arrays.asList("test1-1", "test1-2"))
+                           .close();
 
     try {
 
@@ -385,7 +384,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      AndroidChannels.joinInput();
+      JRoutineAndroidChannels.channelHandler().joinInputOf();
 
       fail();
 
@@ -395,7 +394,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      AndroidChannels.joinInput(Collections.<Channel<?, ?>>emptyList());
+      JRoutineAndroidChannels.channelHandler().joinInputOf(Collections.<Channel<?, ?>>emptyList());
 
       fail();
 
@@ -406,28 +405,30 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
   public void testJoinInputPlaceholder() {
 
-    final Channel<String, String> channel1 = JRoutineService.on(ServiceSource.serviceOf(getActivity()))
-                                                            .with(factoryOf(PassingString.class))
-                                                            .invoke()
-                                                            .sorted();
-    final Channel<String, String> channel2 = JRoutineService.on(ServiceSource.serviceOf(getActivity()))
-                                                            .with(factoryOf(PassingString.class))
-                                                            .invoke()
-                                                            .sorted();
-    AndroidChannels.joinInput((Object) null, channel1, channel2)
-                   .buildChannel()
-                   .pass(Arrays.asList("test1-1", "test1-2"))
-                   .close();
+    final Channel<String, String> channel1 =
+        JRoutineService.routineOn(ServiceSource.serviceOf(getActivity()))
+                       .of(factoryOf(PassingString.class))
+                       .invoke()
+                       .sorted();
+    final Channel<String, String> channel2 =
+        JRoutineService.routineOn(ServiceSource.serviceOf(getActivity()))
+                       .of(factoryOf(PassingString.class))
+                       .invoke()
+                       .sorted();
+    JRoutineAndroidChannels.channelHandler()
+                           .joinInputOf((Object) null, channel1, channel2)
+                           .pass(Arrays.asList("test1-1", "test1-2"))
+                           .close();
     final String placeholder = "placeholder";
-    AndroidChannels.joinInput((Object) placeholder,
-        Arrays.<Channel<?, ?>>asList(channel1, channel2))
-                   .buildChannel()
-                   .pass(Arrays.asList("test2-1", "test2-2"))
-                   .close();
-    AndroidChannels.joinInput(placeholder, channel1, channel2)
-                   .buildChannel()
-                   .pass(Collections.singletonList("test3-1"))
-                   .close();
+    JRoutineAndroidChannels.channelHandler()
+                           .joinInputOf((Object) placeholder,
+                               Arrays.<Channel<?, ?>>asList(channel1, channel2))
+                           .pass(Arrays.asList("test2-1", "test2-2"))
+                           .close();
+    JRoutineAndroidChannels.channelHandler()
+                           .joinInputOf(placeholder, channel1, channel2)
+                           .pass(Collections.singletonList("test3-1"))
+                           .close();
     assertThat(channel1.close().in(seconds(10)).all()).containsExactly("test1-1", "test2-1",
         "test3-1");
     assertThat(channel2.close().in(seconds(10)).all()).containsExactly("test1-2", "test2-2",
@@ -438,15 +439,15 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     Channel<String, String> channel1;
     Channel<String, String> channel2;
-    channel1 = JRoutineService.on(ServiceSource.serviceOf(getActivity()))
-                              .with(factoryOf(PassingString.class))
+    channel1 = JRoutineService.routineOn(ServiceSource.serviceOf(getActivity()))
+                              .of(factoryOf(PassingString.class))
                               .invoke()
                               .sorted();
-    channel2 = JRoutineService.on(ServiceSource.serviceOf(getActivity()))
-                              .with(factoryOf(PassingString.class))
+    channel2 = JRoutineService.routineOn(ServiceSource.serviceOf(getActivity()))
+                              .of(factoryOf(PassingString.class))
                               .invoke()
                               .sorted();
-    AndroidChannels.joinInput((Object) null, channel1, channel2).buildChannel().abort();
+    JRoutineAndroidChannels.channelHandler().joinInputOf((Object) null, channel1, channel2).abort();
 
     try {
 
@@ -468,17 +469,17 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     }
 
-    channel1 = JRoutineService.on(ServiceSource.serviceOf(getActivity()))
-                              .with(factoryOf(PassingString.class))
+    channel1 = JRoutineService.routineOn(ServiceSource.serviceOf(getActivity()))
+                              .of(factoryOf(PassingString.class))
                               .invoke()
                               .sorted();
-    channel2 = JRoutineService.on(ServiceSource.serviceOf(getActivity()))
-                              .with(factoryOf(PassingString.class))
+    channel2 = JRoutineService.routineOn(ServiceSource.serviceOf(getActivity()))
+                              .of(factoryOf(PassingString.class))
                               .invoke()
                               .sorted();
-    AndroidChannels.joinInput(null, Arrays.<Channel<?, ?>>asList(channel1, channel2))
-                   .buildChannel()
-                   .abort();
+    JRoutineAndroidChannels.channelHandler()
+                           .joinInputOf(null, Arrays.<Channel<?, ?>>asList(channel1, channel2))
+                           .abort();
 
     try {
 
@@ -503,14 +504,15 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
   public void testJoinInputPlaceholderError() {
 
-    final Channel<String, String> channel1 = JRoutineService.on(ServiceSource.serviceOf(getActivity()))
-                                                            .with(factoryOf(PassingString.class))
-                                                            .invoke()
-                                                            .sorted();
-    AndroidChannels.joinInput((Object) null, channel1)
-                   .buildChannel()
-                   .pass(Arrays.asList("test1-1", "test1-2"))
-                   .close();
+    final Channel<String, String> channel1 =
+        JRoutineService.routineOn(ServiceSource.serviceOf(getActivity()))
+                       .of(factoryOf(PassingString.class))
+                       .invoke()
+                       .sorted();
+    JRoutineAndroidChannels.channelHandler()
+                           .joinInputOf((Object) null, channel1)
+                           .pass(Arrays.asList("test1-1", "test1-2"))
+                           .close();
 
     try {
 
@@ -524,7 +526,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      AndroidChannels.joinInput(new Object());
+      JRoutineAndroidChannels.channelHandler().joinInputOf(new Object());
 
       fail();
 
@@ -534,7 +536,8 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      AndroidChannels.joinInput(null, Collections.<Channel<?, ?>>emptyList());
+      JRoutineAndroidChannels.channelHandler()
+                             .joinInputOf(null, Collections.<Channel<?, ?>>emptyList());
 
       fail();
 
@@ -544,42 +547,44 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
   }
 
   public void testJoinPlaceholder() {
-
-    final ChannelBuilder<String, String> builder1 = JRoutineCore.ofData();
-    final ChannelBuilder<Integer, Integer> builder2 = JRoutineCore.ofData();
+    final ChannelBuilder builder = JRoutineCore.channel();
     final Routine<List<?>, Character> routine =
-        JRoutineService.on(ServiceSource.serviceOf(getActivity())).with(factoryOf(CharAt.class)).buildRoutine();
+        JRoutineService.routineOn(ServiceSource.serviceOf(getActivity()))
+                       .of(factoryOf(CharAt.class));
     Channel<String, String> channel1;
     Channel<Integer, Integer> channel2;
-    channel1 = builder1.buildChannel();
-    channel2 = builder2.buildChannel();
+    channel1 = builder.ofType();
+    channel2 = builder.ofType();
     channel1.sorted().after(millis(100)).pass("testtest").pass("test2").close();
     channel2.sorted().after(millis(110)).pass(6).pass(4).close();
     assertThat(routine.invoke()
-                      .pass(AndroidChannels.joinOutput(new Object(), channel1, channel2)
-                                           .buildChannel())
+                      .pass(JRoutineAndroidChannels.channelHandler()
+                                                   .joinOutputOf(new Object(), channel1, channel2))
                       .close()
                       .in(seconds(10))
                       .all()).containsExactly('s', '2');
-    channel1 = builder1.buildChannel();
-    channel2 = builder2.buildChannel();
+    channel1 = builder.ofType();
+    channel2 = builder.ofType();
     channel1.sorted().after(millis(100)).pass("testtest").pass("test2").close();
     channel2.sorted().after(millis(110)).pass(6).pass(4).close();
     assertThat(routine.invoke()
-                      .pass(AndroidChannels.joinOutput(null,
-                          Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannel())
+                      .pass(JRoutineAndroidChannels.channelHandler()
+                                                   .joinOutputOf(null,
+                                                       Arrays.<Channel<?, ?>>asList(channel1,
+                                                           channel2)))
                       .close()
                       .in(seconds(10))
                       .all()).containsExactly('s', '2');
-    channel1 = builder1.buildChannel();
-    channel2 = builder2.buildChannel();
+    channel1 = builder.ofType();
+    channel2 = builder.ofType();
     channel1.sorted().after(millis(100)).pass("testtest").pass("test2").pass("test3").close();
     channel2.sorted().after(millis(110)).pass(6).pass(4).close();
 
     try {
 
       routine.invoke()
-             .pass(AndroidChannels.joinOutput(new Object(), channel1, channel2).buildChannel())
+             .pass(JRoutineAndroidChannels.channelHandler()
+                                          .joinOutputOf(new Object(), channel1, channel2))
              .close()
              .in(seconds(10))
              .all();
@@ -592,22 +597,22 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
   }
 
   public void testJoinPlaceholderAbort() {
-
-    final ChannelBuilder<String, String> builder1 = JRoutineCore.ofData();
-    final ChannelBuilder<Integer, Integer> builder2 = JRoutineCore.ofData();
+    final ChannelBuilder builder = JRoutineCore.channel();
     final Routine<List<?>, Character> routine =
-        JRoutineService.on(ServiceSource.serviceOf(getActivity())).with(factoryOf(CharAt.class)).buildRoutine();
+        JRoutineService.routineOn(ServiceSource.serviceOf(getActivity()))
+                       .of(factoryOf(CharAt.class));
     Channel<String, String> channel1;
     Channel<Integer, Integer> channel2;
-    channel1 = builder1.buildChannel();
-    channel2 = builder2.buildChannel();
+    channel1 = builder.ofType();
+    channel2 = builder.ofType();
     channel1.sorted().after(millis(100)).pass("testtest").pass("test2").close();
     channel2.sorted().abort();
 
     try {
 
       routine.invoke()
-             .pass(AndroidChannels.joinOutput((Object) null, channel1, channel2).buildChannel())
+             .pass(JRoutineAndroidChannels.channelHandler()
+                                          .joinOutputOf((Object) null, channel1, channel2))
              .close()
              .in(seconds(10))
              .all();
@@ -618,16 +623,17 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     }
 
-    channel1 = builder1.buildChannel();
-    channel2 = builder2.buildChannel();
+    channel1 = builder.ofType();
+    channel2 = builder.ofType();
     channel1.sorted().abort();
     channel2.sorted().after(millis(110)).pass(6).pass(4).close();
 
     try {
 
       routine.invoke()
-             .pass(AndroidChannels.joinOutput(new Object(),
-                 Arrays.<Channel<?, ?>>asList(channel1, channel2)).buildChannel())
+             .pass(JRoutineAndroidChannels.channelHandler()
+                                          .joinOutputOf(new Object(),
+                                              Arrays.<Channel<?, ?>>asList(channel1, channel2)))
              .close()
              .in(seconds(10))
              .all();
@@ -643,7 +649,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      AndroidChannels.joinOutput(new Object());
+      JRoutineAndroidChannels.channelHandler().joinOutputOf(new Object());
 
       fail();
 
@@ -653,7 +659,8 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      AndroidChannels.joinOutput(null, Collections.<Channel<?, ?>>emptyList());
+      JRoutineAndroidChannels.channelHandler()
+                             .joinOutputOf(null, Collections.<Channel<?, ?>>emptyList());
 
       fail();
 
@@ -663,28 +670,26 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
   }
 
   public void testMap() {
+    final ChannelBuilder builder =
+        JRoutineCore.channel().withChannel().withOrder(OrderType.SORTED).configuration();
+    final Channel<String, String> channel1 = builder.ofType();
+    final Channel<Integer, Integer> channel2 = builder.ofType();
 
-    final ChannelBuilder<String, String> builder1 =
-        JRoutineCore.<String>ofData().channelConfiguration().withOrder(OrderType.SORTED).apply();
-    final ChannelBuilder<Integer, Integer> builder2 =
-        JRoutineCore.<Integer>ofData().channelConfiguration().withOrder(OrderType.SORTED).apply();
-    final Channel<String, String> channel1 = builder1.buildChannel();
-    final Channel<Integer, Integer> channel2 = builder2.buildChannel();
-
-    final Channel<?, ? extends ParcelableFlow<Object>> channel =
-        AndroidChannels.mergeParcelableOutput(Arrays.<Channel<?, ?>>asList(channel1, channel2))
-                       .buildChannel();
-    final Channel<?, ParcelableFlow<Object>> output = JRoutineService.on(ServiceSource.serviceOf(getActivity()))
-                                                                     .with(factoryOf(Sort.class))
-                                                                     .withInvocation()
-                                                                     .withInputOrder(
-                                                                         OrderType.SORTED)
-                                                                     .configuration()
-                                                                     .invoke()
-                                                                     .pass(channel)
-                                                                     .close();
+    final Channel<?, ? extends ParcelableFlowData<Object>> channel =
+        JRoutineAndroidChannels.channelHandler()
+                               .mergeParcelableOutputOf(
+                                   Arrays.<Channel<?, ?>>asList(channel1, channel2));
+    final Channel<?, ParcelableFlowData<Object>> output =
+        JRoutineService.routineOn(ServiceSource.serviceOf(getActivity()))
+                       .withInvocation()
+                       .withInputOrder(OrderType.SORTED)
+                       .configuration()
+                       .of(factoryOf(Sort.class))
+                       .invoke()
+                       .pass(channel)
+                       .close();
     final Map<Integer, ? extends Channel<?, Object>> channelMap =
-        AndroidChannels.flowOutput(output, Sort.INTEGER, Sort.STRING).buildChannelMap();
+        JRoutineAndroidChannels.channelHandler().outputOfFlow(output, Sort.INTEGER, Sort.STRING);
 
     for (int i = 0; i < 4; i++) {
 
@@ -703,63 +708,66 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
   @SuppressWarnings("unchecked")
   public void testMerge() {
-
-    final ChannelBuilder<String, String> builder1 =
-        JRoutineCore.<String>ofData().channelConfiguration().withOrder(OrderType.SORTED).apply();
-    final ChannelBuilder<Integer, Integer> builder2 =
-        JRoutineCore.<Integer>ofData().channelConfiguration().withOrder(OrderType.SORTED).apply();
+    final ChannelBuilder builder =
+        JRoutineCore.channel().withChannel().withOrder(OrderType.SORTED).configuration();
     Channel<String, String> channel1;
     Channel<Integer, Integer> channel2;
-    Channel<?, ? extends ParcelableFlow<?>> outputChannel;
-    channel1 = builder1.buildChannel();
-    channel2 = builder2.buildChannel();
-    outputChannel = AndroidChannels.mergeParcelableOutput(-7, channel1, channel2).buildChannel();
+    Channel<?, ? extends ParcelableFlowData<?>> outputChannel;
+    channel1 = builder.ofType();
+    channel2 = builder.ofType();
+    outputChannel =
+        JRoutineAndroidChannels.channelHandler().mergeParcelableOutputOf(-7, channel1, channel2);
     channel1.pass("test1").close();
     channel2.pass(13).close();
     assertThat(outputChannel.in(seconds(10)).all()).containsOnly(
-        new ParcelableFlow<String>(-7, "test1"), new ParcelableFlow<Integer>(-6, 13));
-    channel1 = builder1.buildChannel();
-    channel2 = builder2.buildChannel();
-    outputChannel =
-        AndroidChannels.mergeParcelableOutput(11, Arrays.asList(channel1, channel2)).buildChannel();
+        new ParcelableFlowData<String>(-7, "test1"), new ParcelableFlowData<Integer>(-6, 13));
+    channel1 = builder.ofType();
+    channel2 = builder.ofType();
+    outputChannel = JRoutineAndroidChannels.channelHandler()
+                                           .mergeParcelableOutputOf(11,
+                                               Arrays.asList(channel1, channel2));
     channel2.pass(13).close();
     channel1.pass("test1").close();
     assertThat(outputChannel.in(seconds(10)).all()).containsOnly(
-        new ParcelableFlow<String>(11, "test1"), new ParcelableFlow<Integer>(12, 13));
-    channel1 = builder1.buildChannel();
-    channel2 = builder2.buildChannel();
-    outputChannel = AndroidChannels.mergeParcelableOutput(channel1, channel2).buildChannel();
-    channel1.pass("test2").close();
-    channel2.pass(-17).close();
-    assertThat(outputChannel.in(seconds(10)).all()).containsOnly(
-        new ParcelableFlow<String>(0, "test2"), new ParcelableFlow<Integer>(1, -17));
-    channel1 = builder1.buildChannel();
-    channel2 = builder2.buildChannel();
+        new ParcelableFlowData<String>(11, "test1"), new ParcelableFlowData<Integer>(12, 13));
+    channel1 = builder.ofType();
+    channel2 = builder.ofType();
     outputChannel =
-        AndroidChannels.mergeParcelableOutput(Arrays.asList(channel1, channel2)).buildChannel();
+        JRoutineAndroidChannels.channelHandler().mergeParcelableOutputOf(channel1, channel2);
     channel1.pass("test2").close();
     channel2.pass(-17).close();
     assertThat(outputChannel.in(seconds(10)).all()).containsOnly(
-        new ParcelableFlow<String>(0, "test2"), new ParcelableFlow<Integer>(1, -17));
+        new ParcelableFlowData<String>(0, "test2"), new ParcelableFlowData<Integer>(1, -17));
+    channel1 = builder.ofType();
+    channel2 = builder.ofType();
+    outputChannel = JRoutineAndroidChannels.channelHandler()
+                                           .mergeParcelableOutputOf(
+                                               Arrays.asList(channel1, channel2));
+    channel1.pass("test2").close();
+    channel2.pass(-17).close();
+    assertThat(outputChannel.in(seconds(10)).all()).containsOnly(
+        new ParcelableFlowData<String>(0, "test2"), new ParcelableFlowData<Integer>(1, -17));
   }
 
   @SuppressWarnings("unchecked")
   public void testMerge4() {
+    final ChannelBuilder builder =
+        JRoutineCore.channel().withChannel().withOrder(OrderType.SORTED).configuration();
+    final Channel<String, String> channel1 = builder.ofType();
+    final Channel<String, String> channel2 = builder.ofType();
+    final Channel<String, String> channel3 = builder.ofType();
+    final Channel<String, String> channel4 = builder.ofType();
 
-    final ChannelBuilder<String, String> builder =
-        JRoutineCore.<String>ofData().channelConfiguration().withOrder(OrderType.SORTED).apply();
-    final Channel<String, String> channel1 = builder.buildChannel();
-    final Channel<String, String> channel2 = builder.buildChannel();
-    final Channel<String, String> channel3 = builder.buildChannel();
-    final Channel<String, String> channel4 = builder.buildChannel();
-
-    final Routine<ParcelableFlow<String>, String> routine =
-        JRoutineCore.with(InvocationFactory.factoryOf(new ClassToken<Amb<String>>() {}))
-                    .buildRoutine();
+    final Routine<ParcelableFlowData<String>, String> routine =
+        JRoutineCore.routine().of(InvocationFactory.factoryOf(new ClassToken<Amb<String>>() {}));
     final Channel<?, String> outputChannel = routine.invoke()
-                                                    .pass(AndroidChannels.mergeParcelableOutput(
-                                                        Arrays.asList(channel1, channel2, channel3,
-                                                            channel4)).buildChannel())
+                                                    .pass(JRoutineAndroidChannels.channelHandler()
+                                                                                 .mergeParcelableOutputOf(
+                                                                                     Arrays.asList(
+                                                                                         channel1,
+                                                                                         channel2,
+                                                                                         channel3,
+                                                                                         channel4)))
                                                     .close();
 
     for (int i = 0; i < 4; i++) {
@@ -781,34 +789,33 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
   @SuppressWarnings("unchecked")
   public void testMergeAbort() {
-
-    final ChannelBuilder<String, String> builder1 =
-        JRoutineCore.<String>ofData().channelConfiguration().withOrder(OrderType.SORTED).apply();
-    final ChannelBuilder<Integer, Integer> builder2 =
-        JRoutineCore.<Integer>ofData().channelConfiguration().withOrder(OrderType.SORTED).apply();
+    final ChannelBuilder builder =
+        JRoutineCore.channel().withChannel().withOrder(OrderType.SORTED).configuration();
     Channel<String, String> channel1;
     Channel<Integer, Integer> channel2;
-    Channel<?, ? extends ParcelableFlow<?>> outputChannel;
-    channel1 = builder1.buildChannel();
-    channel2 = builder2.buildChannel();
-    outputChannel = AndroidChannels.mergeParcelableOutput(-7, channel1, channel2).buildChannel();
-    channel1.pass("test1").close();
-    channel2.abort();
-
-    try {
-
-      outputChannel.in(seconds(10)).all();
-
-      fail();
-
-    } catch (final AbortException ignored) {
-
-    }
-
-    channel1 = builder1.buildChannel();
-    channel2 = builder2.buildChannel();
+    Channel<?, ? extends ParcelableFlowData<?>> outputChannel;
+    channel1 = builder.ofType();
+    channel2 = builder.ofType();
     outputChannel =
-        AndroidChannels.mergeParcelableOutput(11, Arrays.asList(channel1, channel2)).buildChannel();
+        JRoutineAndroidChannels.channelHandler().mergeParcelableOutputOf(-7, channel1, channel2);
+    channel1.pass("test1").close();
+    channel2.abort();
+
+    try {
+
+      outputChannel.in(seconds(10)).all();
+
+      fail();
+
+    } catch (final AbortException ignored) {
+
+    }
+
+    channel1 = builder.ofType();
+    channel2 = builder.ofType();
+    outputChannel = JRoutineAndroidChannels.channelHandler()
+                                           .mergeParcelableOutputOf(11,
+                                               Arrays.asList(channel1, channel2));
     channel2.abort();
     channel1.pass("test1").close();
 
@@ -822,9 +829,10 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     }
 
-    channel1 = builder1.buildChannel();
-    channel2 = builder2.buildChannel();
-    outputChannel = AndroidChannels.mergeParcelableOutput(channel1, channel2).buildChannel();
+    channel1 = builder.ofType();
+    channel2 = builder.ofType();
+    outputChannel =
+        JRoutineAndroidChannels.channelHandler().mergeParcelableOutputOf(channel1, channel2);
     channel1.abort();
     channel2.pass(-17).close();
 
@@ -838,10 +846,11 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     }
 
-    channel1 = builder1.buildChannel();
-    channel2 = builder2.buildChannel();
-    outputChannel =
-        AndroidChannels.mergeParcelableOutput(Arrays.asList(channel1, channel2)).buildChannel();
+    channel1 = builder.ofType();
+    channel2 = builder.ofType();
+    outputChannel = JRoutineAndroidChannels.channelHandler()
+                                           .mergeParcelableOutputOf(
+                                               Arrays.asList(channel1, channel2));
     channel1.pass("test2").close();
     channel2.abort();
 
@@ -860,7 +869,9 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      AndroidChannels.mergeParcelableOutput(0, Collections.<Channel<?, Object>>emptyList());
+      JRoutineAndroidChannels.channelHandler()
+                             .mergeParcelableOutputOf(0,
+                                 Collections.<Channel<?, Object>>emptyList());
 
       fail();
 
@@ -870,7 +881,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      AndroidChannels.mergeParcelableOutput(0);
+      JRoutineAndroidChannels.channelHandler().mergeParcelableOutputOf(0);
 
       fail();
 
@@ -880,7 +891,8 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      AndroidChannels.mergeParcelableOutput(Collections.<Channel<?, Object>>emptyList());
+      JRoutineAndroidChannels.channelHandler()
+                             .mergeParcelableOutputOf(Collections.<Channel<?, Object>>emptyList());
 
       fail();
 
@@ -890,7 +902,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      AndroidChannels.mergeParcelableOutput();
+      JRoutineAndroidChannels.channelHandler().mergeParcelableOutputOf();
 
       fail();
 
@@ -901,42 +913,44 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
   public void testMergeInput() {
 
-    final Channel<String, String> channel1 = JRoutineService.on(ServiceSource.serviceOf(getActivity()))
-                                                            .with(factoryOf(PassingString.class))
-                                                            .invoke()
-                                                            .sorted();
-    final Channel<Integer, Integer> channel2 = JRoutineService.on(ServiceSource.serviceOf(getActivity()))
-                                                              .with(factoryOf(PassingInteger.class))
-                                                              .invoke()
-                                                              .sorted();
-    AndroidChannels.mergeInput(channel1, channel2)
-                   .buildChannel()
-                   .pass(new ParcelableFlow<String>(0, "test1"))
-                   .pass(new ParcelableFlow<Integer>(1, 1))
-                   .close();
-    AndroidChannels.mergeInput(3, channel1, channel2)
-                   .buildChannel()
-                   .pass(new ParcelableFlow<String>(3, "test2"))
-                   .pass(new ParcelableFlow<Integer>(4, 2))
-                   .close();
-    AndroidChannels.mergeInput(Arrays.<Channel<?, ?>>asList(channel1, channel2))
-                   .buildChannel()
-                   .pass(new ParcelableFlow<String>(0, "test3"))
-                   .pass(new ParcelableFlow<Integer>(1, 3))
-                   .close();
-    AndroidChannels.mergeInput(-5, Arrays.<Channel<?, ?>>asList(channel1, channel2))
-                   .buildChannel()
-                   .pass(new ParcelableFlow<String>(-5, "test4"))
-                   .pass(new ParcelableFlow<Integer>(-4, 4))
-                   .close();
+    final Channel<String, String> channel1 =
+        JRoutineService.routineOn(ServiceSource.serviceOf(getActivity()))
+                       .of(factoryOf(PassingString.class))
+                       .invoke()
+                       .sorted();
+    final Channel<Integer, Integer> channel2 =
+        JRoutineService.routineOn(ServiceSource.serviceOf(getActivity()))
+                       .of(factoryOf(PassingInteger.class))
+                       .invoke()
+                       .sorted();
+    JRoutineAndroidChannels.channelHandler()
+                           .mergeInputOf(channel1, channel2)
+                           .pass(new ParcelableFlowData<String>(0, "test1"))
+                           .pass(new ParcelableFlowData<Integer>(1, 1))
+                           .close();
+    JRoutineAndroidChannels.channelHandler()
+                           .mergeInputOf(3, channel1, channel2)
+                           .pass(new ParcelableFlowData<String>(3, "test2"))
+                           .pass(new ParcelableFlowData<Integer>(4, 2))
+                           .close();
+    JRoutineAndroidChannels.channelHandler()
+                           .mergeInputOf(Arrays.<Channel<?, ?>>asList(channel1, channel2))
+                           .pass(new ParcelableFlowData<String>(0, "test3"))
+                           .pass(new ParcelableFlowData<Integer>(1, 3))
+                           .close();
+    JRoutineAndroidChannels.channelHandler()
+                           .mergeInputOf(-5, Arrays.<Channel<?, ?>>asList(channel1, channel2))
+                           .pass(new ParcelableFlowData<String>(-5, "test4"))
+                           .pass(new ParcelableFlowData<Integer>(-4, 4))
+                           .close();
     final HashMap<Integer, Channel<?, ?>> map = new HashMap<Integer, Channel<?, ?>>(2);
     map.put(31, channel1);
     map.put(17, channel2);
-    AndroidChannels.mergeInput(map)
-                   .buildChannel()
-                   .pass(new ParcelableFlow<String>(31, "test5"))
-                   .pass(new ParcelableFlow<Integer>(17, 5))
-                   .close();
+    JRoutineAndroidChannels.channelHandler()
+                           .mergeInputOf(map)
+                           .pass(new ParcelableFlowData<String>(31, "test5"))
+                           .pass(new ParcelableFlowData<Integer>(17, 5))
+                           .close();
     assertThat(channel1.close().in(seconds(10)).all()).containsExactly("test1", "test2", "test3",
         "test4", "test5");
     assertThat(channel2.close().in(seconds(10)).all()).containsExactly(1, 2, 3, 4, 5);
@@ -946,15 +960,15 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     Channel<String, String> channel1;
     Channel<Integer, Integer> channel2;
-    channel1 = JRoutineService.on(ServiceSource.serviceOf(getActivity()))
-                              .with(factoryOf(PassingString.class))
+    channel1 = JRoutineService.routineOn(ServiceSource.serviceOf(getActivity()))
+                              .of(factoryOf(PassingString.class))
                               .invoke()
                               .sorted();
-    channel2 = JRoutineService.on(ServiceSource.serviceOf(getActivity()))
-                              .with(factoryOf(PassingInteger.class))
+    channel2 = JRoutineService.routineOn(ServiceSource.serviceOf(getActivity()))
+                              .of(factoryOf(PassingInteger.class))
                               .invoke()
                               .sorted();
-    AndroidChannels.mergeInput(channel1, channel2).buildChannel().abort();
+    JRoutineAndroidChannels.channelHandler().mergeInputOf(channel1, channel2).abort();
 
     try {
 
@@ -976,15 +990,15 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     }
 
-    channel1 = JRoutineService.on(ServiceSource.serviceOf(getActivity()))
-                              .with(factoryOf(PassingString.class))
+    channel1 = JRoutineService.routineOn(ServiceSource.serviceOf(getActivity()))
+                              .of(factoryOf(PassingString.class))
                               .invoke()
                               .sorted();
-    channel2 = JRoutineService.on(ServiceSource.serviceOf(getActivity()))
-                              .with(factoryOf(PassingInteger.class))
+    channel2 = JRoutineService.routineOn(ServiceSource.serviceOf(getActivity()))
+                              .of(factoryOf(PassingInteger.class))
                               .invoke()
                               .sorted();
-    AndroidChannels.mergeInput(3, channel1, channel2).buildChannel().abort();
+    JRoutineAndroidChannels.channelHandler().mergeInputOf(3, channel1, channel2).abort();
 
     try {
 
@@ -1006,17 +1020,17 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     }
 
-    channel1 = JRoutineService.on(ServiceSource.serviceOf(getActivity()))
-                              .with(factoryOf(PassingString.class))
+    channel1 = JRoutineService.routineOn(ServiceSource.serviceOf(getActivity()))
+                              .of(factoryOf(PassingString.class))
                               .invoke()
                               .sorted();
-    channel2 = JRoutineService.on(ServiceSource.serviceOf(getActivity()))
-                              .with(factoryOf(PassingInteger.class))
+    channel2 = JRoutineService.routineOn(ServiceSource.serviceOf(getActivity()))
+                              .of(factoryOf(PassingInteger.class))
                               .invoke()
                               .sorted();
-    AndroidChannels.mergeInput(Arrays.<Channel<?, ?>>asList(channel1, channel2))
-                   .buildChannel()
-                   .abort();
+    JRoutineAndroidChannels.channelHandler()
+                           .mergeInputOf(Arrays.<Channel<?, ?>>asList(channel1, channel2))
+                           .abort();
 
     try {
 
@@ -1038,17 +1052,17 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     }
 
-    channel1 = JRoutineService.on(ServiceSource.serviceOf(getActivity()))
-                              .with(factoryOf(PassingString.class))
+    channel1 = JRoutineService.routineOn(ServiceSource.serviceOf(getActivity()))
+                              .of(factoryOf(PassingString.class))
                               .invoke()
                               .sorted();
-    channel2 = JRoutineService.on(ServiceSource.serviceOf(getActivity()))
-                              .with(factoryOf(PassingInteger.class))
+    channel2 = JRoutineService.routineOn(ServiceSource.serviceOf(getActivity()))
+                              .of(factoryOf(PassingInteger.class))
                               .invoke()
                               .sorted();
-    AndroidChannels.mergeInput(-5, Arrays.<Channel<?, ?>>asList(channel1, channel2))
-                   .buildChannel()
-                   .abort();
+    JRoutineAndroidChannels.channelHandler()
+                           .mergeInputOf(-5, Arrays.<Channel<?, ?>>asList(channel1, channel2))
+                           .abort();
 
     try {
 
@@ -1070,18 +1084,18 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     }
 
-    channel1 = JRoutineService.on(ServiceSource.serviceOf(getActivity()))
-                              .with(factoryOf(PassingString.class))
+    channel1 = JRoutineService.routineOn(ServiceSource.serviceOf(getActivity()))
+                              .of(factoryOf(PassingString.class))
                               .invoke()
                               .sorted();
-    channel2 = JRoutineService.on(ServiceSource.serviceOf(getActivity()))
-                              .with(factoryOf(PassingInteger.class))
+    channel2 = JRoutineService.routineOn(ServiceSource.serviceOf(getActivity()))
+                              .of(factoryOf(PassingInteger.class))
                               .invoke()
                               .sorted();
     final HashMap<Integer, Channel<?, ?>> map = new HashMap<Integer, Channel<?, ?>>(2);
     map.put(31, channel1);
     map.put(17, channel2);
-    AndroidChannels.mergeInput(map).buildChannel().abort();
+    JRoutineAndroidChannels.channelHandler().mergeInputOf(map).abort();
 
     try {
 
@@ -1108,7 +1122,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      AndroidChannels.mergeInput();
+      JRoutineAndroidChannels.channelHandler().mergeInputOf();
 
       fail();
 
@@ -1118,7 +1132,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      AndroidChannels.mergeInput(0);
+      JRoutineAndroidChannels.channelHandler().mergeInputOf(0);
 
       fail();
 
@@ -1128,7 +1142,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      AndroidChannels.mergeInput(Collections.<Channel<?, ?>>emptyList());
+      JRoutineAndroidChannels.channelHandler().mergeInputOf(Collections.<Channel<?, ?>>emptyList());
 
       fail();
 
@@ -1138,7 +1152,8 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      AndroidChannels.mergeInput(0, Collections.<Channel<?, ?>>emptyList());
+      JRoutineAndroidChannels.channelHandler()
+                             .mergeInputOf(0, Collections.<Channel<?, ?>>emptyList());
 
       fail();
 
@@ -1148,7 +1163,8 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     try {
 
-      AndroidChannels.mergeInput(Collections.<Integer, Channel<?, ?>>emptyMap());
+      JRoutineAndroidChannels.channelHandler()
+                             .mergeInputOf(Collections.<Integer, Channel<?, ?>>emptyMap());
 
       fail();
 
@@ -1160,23 +1176,27 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
   @SuppressWarnings("unchecked")
   public void testOutputFlow() {
 
-    final Channel<String, String> channel = JRoutineCore.<String>ofData().buildChannel();
+    final Channel<String, String> channel = JRoutineCore.channel().ofType();
     channel.pass("test1", "test2", "test3").close();
-    assertThat(AndroidChannels.outputParcelableFlow(channel, 33)
-                              .buildChannel()
-                              .in(seconds(10))
-                              .all()).containsExactly(new ParcelableFlow<String>(33, "test1"),
-        new ParcelableFlow<String>(33, "test2"), new ParcelableFlow<String>(33, "test3"));
+    assertThat(JRoutineAndroidChannels.channelHandler()
+                                      .outputParcelableFlowOf(channel, 33)
+                                      .in(seconds(10))
+                                      .all()).containsExactly(
+        new ParcelableFlowData<String>(33, "test1"), new ParcelableFlowData<String>(33, "test2"),
+        new ParcelableFlowData<String>(33, "test3"));
   }
 
   public void testOutputFlowAbort() {
 
-    final Channel<String, String> channel = JRoutineCore.<String>ofData().buildChannel();
+    final Channel<String, String> channel = JRoutineCore.channel().ofType();
     channel.pass("test1", "test2", "test3").abort();
 
     try {
 
-      AndroidChannels.outputParcelableFlow(channel, 33).buildChannel().in(seconds(10)).all();
+      JRoutineAndroidChannels.channelHandler()
+                             .outputParcelableFlowOf(channel, 33)
+                             .in(seconds(10))
+                             .all();
 
       fail();
 
@@ -1188,31 +1208,34 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
   @SuppressWarnings("unchecked")
   public void testOutputMap() {
 
-    final Routine<ParcelableFlow<Object>, ParcelableFlow<Object>> routine =
-        JRoutineService.on(ServiceSource.serviceOf(getActivity())).with(factoryOf(Sort.class)).buildRoutine();
+    final Routine<ParcelableFlowData<Object>, ParcelableFlowData<Object>> routine =
+        JRoutineService.routineOn(ServiceSource.serviceOf(getActivity())).of(factoryOf(Sort.class));
     Map<Integer, ? extends Channel<?, Object>> channelMap;
-    Channel<?, ParcelableFlow<Object>> channel;
+    Channel<?, ParcelableFlowData<Object>> channel;
     channel = routine.invoke()
-                     .pass(new ParcelableFlow<Object>(Sort.STRING, "test21"),
-                         new ParcelableFlow<Object>(Sort.INTEGER, -11))
+                     .pass(new ParcelableFlowData<Object>(Sort.STRING, "test21"),
+                         new ParcelableFlowData<Object>(Sort.INTEGER, -11))
                      .close();
-    channelMap = AndroidChannels.flowOutput(channel, Arrays.asList(Sort.INTEGER, Sort.STRING))
-                                .buildChannelMap();
+    channelMap = JRoutineAndroidChannels.channelHandler()
+                                        .outputOfFlow(channel,
+                                            Arrays.asList(Sort.INTEGER, Sort.STRING));
     assertThat(channelMap.get(Sort.INTEGER).in(seconds(10)).all()).containsOnly(-11);
     assertThat(channelMap.get(Sort.STRING).in(seconds(10)).all()).containsOnly("test21");
     channel = routine.invoke()
-                     .pass(new ParcelableFlow<Object>(Sort.INTEGER, -11),
-                         new ParcelableFlow<Object>(Sort.STRING, "test21"))
+                     .pass(new ParcelableFlowData<Object>(Sort.INTEGER, -11),
+                         new ParcelableFlowData<Object>(Sort.STRING, "test21"))
                      .close();
-    channelMap = AndroidChannels.flowOutput(channel, Sort.INTEGER, Sort.STRING).buildChannelMap();
+    channelMap =
+        JRoutineAndroidChannels.channelHandler().outputOfFlow(channel, Sort.INTEGER, Sort.STRING);
     assertThat(channelMap.get(Sort.INTEGER).in(seconds(10)).all()).containsOnly(-11);
     assertThat(channelMap.get(Sort.STRING).in(seconds(10)).all()).containsOnly("test21");
     channel = routine.invoke()
-                     .pass(new ParcelableFlow<Object>(Sort.STRING, "test21"),
-                         new ParcelableFlow<Object>(Sort.INTEGER, -11))
+                     .pass(new ParcelableFlowData<Object>(Sort.STRING, "test21"),
+                         new ParcelableFlowData<Object>(Sort.INTEGER, -11))
                      .close();
-    channelMap = AndroidChannels.flowOutput(Math.min(Sort.INTEGER, Sort.STRING), 2, channel)
-                                .buildChannelMap();
+    channelMap = JRoutineAndroidChannels.channelHandler()
+                                        .outputOfFlow(Math.min(Sort.INTEGER, Sort.STRING), 2,
+                                            channel);
     assertThat(channelMap.get(Sort.INTEGER).in(seconds(10)).all()).containsOnly(-11);
     assertThat(channelMap.get(Sort.STRING).in(seconds(10)).all()).containsOnly("test21");
   }
@@ -1220,16 +1243,17 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
   @SuppressWarnings("unchecked")
   public void testOutputMapAbort() {
 
-    final Routine<ParcelableFlow<Object>, ParcelableFlow<Object>> routine =
-        JRoutineService.on(ServiceSource.serviceOf(getActivity())).with(factoryOf(Sort.class)).buildRoutine();
+    final Routine<ParcelableFlowData<Object>, ParcelableFlowData<Object>> routine =
+        JRoutineService.routineOn(ServiceSource.serviceOf(getActivity())).of(factoryOf(Sort.class));
     Map<Integer, ? extends Channel<?, Object>> channelMap;
-    Channel<?, ParcelableFlow<Object>> channel;
+    Channel<?, ParcelableFlowData<Object>> channel;
     channel = routine.invoke()
                      .after(millis(100))
-                     .pass(new ParcelableFlow<Object>(Sort.STRING, "test21"),
-                         new ParcelableFlow<Object>(Sort.INTEGER, -11));
-    channelMap = AndroidChannels.flowOutput(channel, Arrays.asList(Sort.INTEGER, Sort.STRING))
-                                .buildChannelMap();
+                     .pass(new ParcelableFlowData<Object>(Sort.STRING, "test21"),
+                         new ParcelableFlowData<Object>(Sort.INTEGER, -11));
+    channelMap = JRoutineAndroidChannels.channelHandler()
+                                        .outputOfFlow(channel,
+                                            Arrays.asList(Sort.INTEGER, Sort.STRING));
     channel.abort();
 
     try {
@@ -1254,9 +1278,10 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     channel = routine.invoke()
                      .after(millis(100))
-                     .pass(new ParcelableFlow<Object>(Sort.INTEGER, -11),
-                         new ParcelableFlow<Object>(Sort.STRING, "test21"));
-    channelMap = AndroidChannels.flowOutput(channel, Sort.INTEGER, Sort.STRING).buildChannelMap();
+                     .pass(new ParcelableFlowData<Object>(Sort.INTEGER, -11),
+                         new ParcelableFlowData<Object>(Sort.STRING, "test21"));
+    channelMap =
+        JRoutineAndroidChannels.channelHandler().outputOfFlow(channel, Sort.INTEGER, Sort.STRING);
     channel.abort();
 
     try {
@@ -1281,10 +1306,11 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
     channel = routine.invoke()
                      .after(millis(100))
-                     .pass(new ParcelableFlow<Object>(Sort.STRING, "test21"),
-                         new ParcelableFlow<Object>(Sort.INTEGER, -11));
-    channelMap = AndroidChannels.flowOutput(Math.min(Sort.INTEGER, Sort.STRING), 2, channel)
-                                .buildChannelMap();
+                     .pass(new ParcelableFlowData<Object>(Sort.STRING, "test21"),
+                         new ParcelableFlowData<Object>(Sort.INTEGER, -11));
+    channelMap = JRoutineAndroidChannels.channelHandler()
+                                        .outputOfFlow(Math.min(Sort.INTEGER, Sort.STRING), 2,
+                                            channel);
     channel.abort();
 
     try {
@@ -1310,22 +1336,25 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
 
   public void testOutputMapCache() {
 
-    final Routine<ParcelableFlow<Object>, ParcelableFlow<Object>> routine =
-        JRoutineService.on(ServiceSource.serviceOf(getActivity())).with(factoryOf(Sort.class)).buildRoutine();
-    final Channel<?, ParcelableFlow<Object>> channel = routine.invoke();
+    final Routine<ParcelableFlowData<Object>, ParcelableFlowData<Object>> routine =
+        JRoutineService.routineOn(ServiceSource.serviceOf(getActivity())).of(factoryOf(Sort.class));
+    final Channel<?, ParcelableFlowData<Object>> channel = routine.invoke();
     final Map<Integer, ? extends Channel<?, Object>> channelMap =
-        AndroidChannels.flowOutput(channel, Arrays.asList(Sort.INTEGER, Sort.STRING))
-                       .buildChannelMap();
+        JRoutineAndroidChannels.channelHandler()
+                               .outputOfFlow(channel, Arrays.asList(Sort.INTEGER, Sort.STRING));
     assertThat(channelMap).isEqualTo(
-        AndroidChannels.flowOutput(channel, Sort.INTEGER, Sort.STRING).buildChannelMap());
+        JRoutineAndroidChannels.channelHandler().outputOfFlow(channel, Sort.INTEGER, Sort.STRING));
   }
 
   public void testOutputMapError() {
 
     try {
 
-      AndroidChannels.flowOutput(0, 0,
-          JRoutineService.on(ServiceSource.serviceOf(getActivity())).with(factoryOf(Sort.class)).invoke());
+      JRoutineAndroidChannels.channelHandler()
+                             .outputOfFlow(0, 0,
+                                 JRoutineService.routineOn(ServiceSource.serviceOf(getActivity()))
+                                                .of(factoryOf(Sort.class))
+                                                .invoke());
 
       fail();
 
@@ -1337,22 +1366,23 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
   @SuppressWarnings("unchecked")
   public void testOutputSelect() {
 
-    final Channel<ParcelableFlow<String>, ParcelableFlow<String>> channel =
-        JRoutineCore.<ParcelableFlow<String>>ofData().buildChannel();
+    final Channel<ParcelableFlowData<String>, ParcelableFlowData<String>> channel =
+        JRoutineCore.channel().ofType();
     final Channel<?, String> outputChannel =
-        AndroidChannels.flowOutput(channel, 33).buildChannelMap().get(33);
-    channel.pass(new ParcelableFlow<String>(33, "test1"), new ParcelableFlow<String>(-33, "test2"),
-        new ParcelableFlow<String>(33, "test3"), new ParcelableFlow<String>(333, "test4"));
+        JRoutineAndroidChannels.channelHandler().outputOfFlow(channel, 33).get(33);
+    channel.pass(new ParcelableFlowData<String>(33, "test1"),
+        new ParcelableFlowData<String>(-33, "test2"), new ParcelableFlowData<String>(33, "test3"),
+        new ParcelableFlowData<String>(333, "test4"));
     channel.close();
     assertThat(outputChannel.in(seconds(10)).all()).containsExactly("test1", "test3");
   }
 
   public void testOutputSelectAbort() {
 
-    final Channel<ParcelableFlow<String>, ParcelableFlow<String>> channel =
-        JRoutineCore.<ParcelableFlow<String>>ofData().buildChannel();
+    final Channel<ParcelableFlowData<String>, ParcelableFlowData<String>> channel =
+        JRoutineCore.channel().ofType();
     final Channel<?, String> outputChannel =
-        AndroidChannels.flowOutput(channel, 33).buildChannelMap().get(33);
+        JRoutineAndroidChannels.channelHandler().outputOfFlow(channel, 33).get(33);
     channel.abort();
 
     try {
@@ -1366,14 +1396,15 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     }
   }
 
-  private static class Amb<DATA> extends TemplateContextInvocation<ParcelableFlow<DATA>, DATA> {
+  private static class Amb<DATA> extends TemplateContextInvocation<ParcelableFlowData<DATA>, DATA> {
 
     private static final int NO_INDEX = Integer.MIN_VALUE;
 
     private int mFirstIndex;
 
     @Override
-    public void onInput(final ParcelableFlow<DATA> input, @NotNull final Channel<DATA, ?> result) {
+    public void onInput(final ParcelableFlowData<DATA> input,
+        @NotNull final Channel<DATA, ?> result) {
       if (mFirstIndex == NO_INDEX) {
         mFirstIndex = input.id;
         result.pass(input.data);
@@ -1436,29 +1467,24 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
   }
 
   private static class Sort
-      extends TemplateContextInvocation<ParcelableFlow<Object>, ParcelableFlow<Object>> {
+      extends TemplateContextInvocation<ParcelableFlowData<Object>, ParcelableFlowData<Object>> {
 
     private static final int INTEGER = 1;
 
     private static final int STRING = 0;
 
     @Override
-    public void onInput(final ParcelableFlow<Object> flow,
-        @NotNull final Channel<ParcelableFlow<Object>, ?> result) {
+    public void onInput(final ParcelableFlowData<Object> flow,
+        @NotNull final Channel<ParcelableFlowData<Object>, ?> result) {
       switch (flow.id) {
         case INTEGER:
-          AndroidChannels.<Object, Integer>parcelableFlowInput(result, INTEGER).buildChannel()
-                                                                               .pass(
-                                                                                   (Integer) flow
-                                                                                       .data)
-                                                                               .close();
+          JRoutineAndroidChannels.channelHandler().<Object, Integer>inputOfParcelableFlow(result,
+              INTEGER).pass((Integer) flow.data).close();
           break;
 
         case STRING:
-          AndroidChannels.<Object, String>parcelableFlowInput(result, STRING).buildChannel()
-                                                                             .pass(
-                                                                                 (String) flow.data)
-                                                                             .close();
+          JRoutineAndroidChannels.channelHandler().<Object, String>inputOfParcelableFlow(result,
+              STRING).pass((String) flow.data).close();
           break;
       }
     }

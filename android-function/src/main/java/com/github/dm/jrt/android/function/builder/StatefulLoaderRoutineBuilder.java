@@ -18,11 +18,12 @@ package com.github.dm.jrt.android.function.builder;
 
 import android.content.Context;
 
-import com.github.dm.jrt.android.core.builder.LoaderRoutineBuilder;
-import com.github.dm.jrt.android.core.config.LoaderConfiguration;
+import com.github.dm.jrt.android.core.config.LoaderConfigurable;
+import com.github.dm.jrt.android.core.routine.LoaderRoutine;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
 import com.github.dm.jrt.function.builder.StatefulRoutineBuilder;
 import com.github.dm.jrt.function.util.BiConsumer;
 import com.github.dm.jrt.function.util.BiFunction;
@@ -34,7 +35,40 @@ import com.github.dm.jrt.function.util.TriFunction;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * TODO: explain Loader invocations lifecycle
+ * Builder of stateful routines based on functions handling the invocation lifecycle.
+ * <br>
+ * The function instances must have a static scope in order to avoid undesired leaks.
+ * <br>
+ * Be also aware that the state instance will not be retained between invocations, since a Loader
+ * routine destroys its invocations as soon as they complete.
+ * <p>
+ * The state object is created when the invocation starts and modified during the execution.
+ * <br>
+ * The last instance returned by the finalization function is retained and re-used during the next
+ * invocation execution, unless null, in which case a new instance is created.
+ * <p>
+ * By default, the same state is retained through the whole invocation lifecycle and automatically
+ * nulled during the finalization step. Hence, it is advisable to customize the finalization
+ * function, in order to be able to re-use the same state instances through successive invocation
+ * executions.
+ * <br>
+ * Note, however, that the state object should be reset on finalization in order to avoid
+ * unpredictable behaviors during different invocations.
+ * <p>
+ * For example, a routine concatenating strings through a {@code StringBuilder} can be implemented
+ * as follows:
+ * <pre><code>
+ * builder.onCreate(StringBuilder::new)
+ *        .onNextState(StringBuilder::append)
+ *        .onCompleteOutput(StringBuilder::toString)
+ *        .routine();
+ * </code></pre>
+ * <p>
+ * Note that the passed instances are expected to behave like a function, that is, they must not
+ * retain a mutable internal state.
+ * <br>
+ * Note also that any external object used inside the function must be synchronized in order to
+ * avoid concurrency issues.
  * <p>
  * Created by davide-maestroni on 03/04/2017.
  *
@@ -43,22 +77,8 @@ import org.jetbrains.annotations.NotNull;
  * @param <STATE> the state data type.
  */
 public interface StatefulLoaderRoutineBuilder<IN, OUT, STATE>
-    extends StatefulRoutineBuilder<IN, OUT, STATE>, LoaderRoutineBuilder<IN, OUT> {
-
-  /**
-   * {@inheritDoc}
-   */
-  @NotNull
-  @Override
-  StatefulLoaderRoutineBuilder<IN, OUT, STATE> withConfiguration(
-      @NotNull InvocationConfiguration configuration);
-
-  /**
-   * {@inheritDoc}
-   */
-  @NotNull
-  @Override
-  InvocationConfiguration.Builder<? extends StatefulLoaderRoutineBuilder<IN, OUT, STATE>> withInvocation();
+    extends StatefulRoutineBuilder<IN, OUT, STATE>,
+    LoaderConfigurable<StatefulLoaderRoutineBuilder<IN, OUT, STATE>> {
 
   /**
    * {@inheritDoc}
@@ -226,14 +246,22 @@ public interface StatefulLoaderRoutineBuilder<IN, OUT, STATE>
    */
   @NotNull
   @Override
-  StatefulLoaderRoutineBuilder<IN, OUT, STATE> withConfiguration(@NotNull LoaderConfiguration configuration);
+  LoaderRoutine<IN, OUT> routine();
 
   /**
    * {@inheritDoc}
    */
   @NotNull
   @Override
-  LoaderConfiguration.Builder<? extends StatefulLoaderRoutineBuilder<IN, OUT, STATE>> withLoader();
+  StatefulLoaderRoutineBuilder<IN, OUT, STATE> withConfiguration(
+      @NotNull InvocationConfiguration configuration);
+
+  /**
+   * {@inheritDoc}
+   */
+  @NotNull
+  @Override
+  Builder<? extends StatefulLoaderRoutineBuilder<IN, OUT, STATE>> withInvocation();
 
   /**
    * Sets the function to call when the Context instance is passed to the invocation.

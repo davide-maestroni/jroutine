@@ -22,7 +22,6 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.TemplateChannelConsumer;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.common.TimeoutException;
-import com.github.dm.jrt.core.invocation.IdentityInvocation;
 
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
@@ -79,8 +78,8 @@ public class ReplayOutputChannelTest {
 
     Iterator<String> iterator = JRoutineChannels.channelHandler()
                                                 .replayOutputOf(JRoutineCore.channel()
-                                                                           .of("test1", "test2",
-                                                                               "test3"))
+                                                                            .of("test1", "test2",
+                                                                                "test3"))
 
                                                 .iterator();
     assertThat(iterator.hasNext()).isTrue();
@@ -111,7 +110,7 @@ public class ReplayOutputChannelTest {
 
     channel = JRoutineChannels.channelHandler()
                               .replayOutputOf(JRoutineCore.channel().<String>ofType().after(days(1))
-                                                                                    .pass("test"));
+                                                                                     .pass("test"));
 
     try {
       channel.eventuallyFail().next();
@@ -147,8 +146,8 @@ public class ReplayOutputChannelTest {
 
     channel = JRoutineChannels.channelHandler()
                               .replayOutputOf(
-                                 JRoutineCore.channel().<String>ofType().after(seconds(1))
-                                                                        .pass("test"));
+                                  JRoutineCore.channel().<String>ofType().after(seconds(1))
+                                                                         .pass("test"));
 
     try {
       channel.eventuallyAbort(new IllegalArgumentException()).next();

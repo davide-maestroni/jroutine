@@ -16,11 +16,12 @@
 
 package com.github.dm.jrt.android.function.builder;
 
-import com.github.dm.jrt.android.core.builder.LoaderRoutineBuilder;
-import com.github.dm.jrt.android.core.config.LoaderConfiguration;
+import com.github.dm.jrt.android.core.config.LoaderConfigurable;
+import com.github.dm.jrt.android.core.routine.LoaderRoutine;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
 import com.github.dm.jrt.function.builder.StatelessRoutineBuilder;
 import com.github.dm.jrt.function.util.BiConsumer;
 import com.github.dm.jrt.function.util.Consumer;
@@ -30,29 +31,29 @@ import com.github.dm.jrt.function.util.Supplier;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * TODO
+ * Builder of stateless routines based on functions handling the invocation lifecycle.
+ * <br>
+ * The function instances must have a static scope in order to avoid undesired leaks.
+ * <p>
+ * For example, a routine switching strings to upper-case can be implemented as follows:
+ * <pre><code>
+ * builder.onNextOutput(String::toUpperCase)
+ *        .routine();
+ * </code></pre>
+ * <p>
+ * Note that the passed instances are expected to behave like a function, that is, they must not
+ * retain a mutable internal state.
+ * <br>
+ * Note also that any external object used inside the function must be synchronized in order to
+ * avoid concurrency issues.
  * <p>
  * Created by davide-maestroni on 03/06/2017.
  *
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-public interface StatelessLoaderRoutineBuilder<IN, OUT>
-    extends StatelessRoutineBuilder<IN, OUT>, LoaderRoutineBuilder<IN, OUT> {
-
-  /**
-   * {@inheritDoc}
-   */
-  @NotNull
-  @Override
-  StatelessLoaderRoutineBuilder<IN, OUT> withConfiguration(@NotNull InvocationConfiguration configuration);
-
-  /**
-   * {@inheritDoc}
-   */
-  @NotNull
-  @Override
-  InvocationConfiguration.Builder<? extends StatelessLoaderRoutineBuilder<IN, OUT>> withInvocation();
+public interface StatelessLoaderRoutineBuilder<IN, OUT> extends StatelessRoutineBuilder<IN, OUT>,
+    LoaderConfigurable<StatelessLoaderRoutineBuilder<IN, OUT>> {
 
   /**
    * {@inheritDoc}
@@ -136,12 +137,20 @@ public interface StatelessLoaderRoutineBuilder<IN, OUT>
    */
   @NotNull
   @Override
-  StatelessLoaderRoutineBuilder<IN, OUT> withConfiguration(@NotNull LoaderConfiguration configuration);
+  LoaderRoutine<IN, OUT> routine();
 
   /**
    * {@inheritDoc}
    */
   @NotNull
   @Override
-  LoaderConfiguration.Builder<? extends StatelessLoaderRoutineBuilder<IN, OUT>> withLoader();
+  StatelessLoaderRoutineBuilder<IN, OUT> withConfiguration(
+      @NotNull InvocationConfiguration configuration);
+
+  /**
+   * {@inheritDoc}
+   */
+  @NotNull
+  @Override
+  Builder<? extends StatelessLoaderRoutineBuilder<IN, OUT>> withInvocation();
 }

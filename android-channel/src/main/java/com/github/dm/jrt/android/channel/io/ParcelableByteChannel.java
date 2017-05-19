@@ -19,6 +19,7 @@ package com.github.dm.jrt.android.channel.io;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.github.dm.jrt.channel.config.ByteChunkStreamConfigurable;
 import com.github.dm.jrt.channel.config.ByteChunkStreamConfiguration;
 import com.github.dm.jrt.channel.config.ByteChunkStreamConfiguration.Builder;
 import com.github.dm.jrt.channel.io.ByteChannel;
@@ -48,8 +49,8 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * <pre><code>
  * public void onInput(final IN in, final Channel&lt;ParcelableByteChunk, ?&gt; result) {
  *   ...
- *   final ByteChunkOutputStream outputStream = ParcelableByteChannel.outputStream(result)
- *                                                                .buildOutputStream();
+ *   final ByteChunkOutputStream outputStream = ParcelableByteChannel.outputStream()
+ *                                                                   .of(result);
  *   ...
  * }
  * </code></pre>
@@ -90,7 +91,7 @@ public class ParcelableByteChannel {
    *                                         of the specified chunks.
    */
   @NotNull
-  public static ByteChunkInputStream getInputStream(@NotNull final ParcelableByteChunk... chunks) {
+  public static ByteChunkInputStream inputStream(@NotNull final ParcelableByteChunk... chunks) {
     final ArrayList<ByteChunk> byteChunks = new ArrayList<ByteChunk>(chunks.length);
     for (final ParcelableByteChunk chunk : chunks) {
       byteChunks.add(chunk.getChunk());
@@ -111,7 +112,7 @@ public class ParcelableByteChannel {
    *                                         of the specified chunks.
    */
   @NotNull
-  public static ByteChunkInputStream getInputStream(
+  public static ByteChunkInputStream inputStream(
       @NotNull final Iterable<? extends ParcelableByteChunk> chunks) {
     final ArrayList<ByteChunk> byteChunks = new ArrayList<ByteChunk>();
     for (final ParcelableByteChunk chunk : chunks) {
@@ -132,7 +133,7 @@ public class ParcelableByteChannel {
    *                                         specified chunk.
    */
   @NotNull
-  public static ByteChunkInputStream getInputStream(@NotNull final ParcelableByteChunk chunk) {
+  public static ByteChunkInputStream inputStream(@NotNull final ParcelableByteChunk chunk) {
     return ByteChannel.inputStream(chunk.getChunk());
   }
 
@@ -145,13 +146,26 @@ public class ParcelableByteChannel {
    * <p>
    * The built streams will not close the underlying channel by default.
    *
-   * @param channel the output channel to feed with data.
    * @return the output stream builder.
    */
   @NotNull
-  public static ChunkOutputStreamBuilder withOutput(
-      @NotNull final Channel<? super ParcelableByteChunk, ?> channel) {
-    return new DefaultChunkOutputStreamBuilder(channel);
+  public static ParcelableByteChunkOutputStreamBuilder outputStream() {
+    return new DefaultChunkOutputStreamBuilder();
+  }
+
+  /**
+   * Interface defining a builder of chunk output streams.
+   */
+  public interface ParcelableByteChunkOutputStreamBuilder
+      extends ByteChunkStreamConfigurable<ParcelableByteChunkOutputStreamBuilder> {
+
+    /**
+     * Builds a new output stream instance.
+     *
+     * @return the output stream instance.
+     */
+    @NotNull
+    ByteChunkOutputStream of(@NotNull Channel<? super ParcelableByteChunk, ?> channel);
   }
 
   /**
@@ -168,9 +182,9 @@ public class ParcelableByteChannel {
    * <br>
    * Used chunks will be released as soon as the corresponding input stream is closed.
    *
-   * @see ParcelableByteChannel#getInputStream(ParcelableByteChunk)
-   * @see ParcelableByteChannel#getInputStream(ParcelableByteChunk...)
-   * @see ParcelableByteChannel#getInputStream(Iterable)
+   * @see ParcelableByteChannel#inputStream(ParcelableByteChunk)
+   * @see ParcelableByteChannel#inputStream(ParcelableByteChunk...)
+   * @see ParcelableByteChannel#inputStream(Iterable)
    */
   public static class ParcelableByteChunk extends DeepEqualObject implements Parcelable {
 
@@ -182,13 +196,13 @@ public class ParcelableByteChannel {
       @Override
       public ParcelableByteChunk createFromParcel(final Parcel in) {
         final byte[] data = in.createByteArray();
-        final Channel<ByteChunk, ByteChunk> channel =
-            JRoutineCore.<ByteChunk>ofData().buildChannel();
-        final ByteChunkOutputStream outputStream = ByteChannel.outputStream(channel)
+        final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.channel().ofType();
+        final ByteChunkOutputStream outputStream = ByteChannel.outputStream()
                                                               .withStream()
-                                                              .withChunkSize(Math.max(data.length, 1))
+                                                              .withChunkSize(
+                                                                  Math.max(data.length, 1))
                                                               .configuration()
-                                                              .buildOutputStream();
+                                                              .of(channel);
         try {
           outputStream.write(data);
           outputStream.close();
@@ -296,40 +310,37 @@ public class ParcelableByteChannel {
   /**
    * Default implementation of an output stream builder.
    */
-  private static class DefaultChunkOutputStreamBuilder implements ChunkOutputStreamBuilder {
-
-    private final Channel<? super ParcelableByteChunk, ?> mChannel;
+  private static class DefaultChunkOutputStreamBuilder
+      implements ParcelableByteChunkOutputStreamBuilder {
 
     private ByteChunkStreamConfiguration mConfiguration =
         ByteChunkStreamConfiguration.defaultConfiguration();
 
     /**
      * Constructor.
-     *
-     * @param channel the output channel to feed with data.
      */
-    private DefaultChunkOutputStreamBuilder(
-        @NotNull final Channel<? super ParcelableByteChunk, ?> channel) {
-      mChannel = ConstantConditions.notNull("channel instance", channel);
+    private DefaultChunkOutputStreamBuilder() {
     }
 
     @NotNull
-    public ChunkOutputStreamBuilder apply(@NotNull final ByteChunkStreamConfiguration configuration) {
+    @Override
+    public ByteChunkOutputStream of(
+        @NotNull final Channel<? super ParcelableByteChunk, ?> channel) {
+      final Channel<ByteChunk, ByteChunk> outputChannel = JRoutineCore.channel().ofType();
+      outputChannel.consume(new ChunkChannelConsumer(channel));
+      return ByteChannel.outputStream().withConfiguration(mConfiguration).of(outputChannel);
+    }
+
+    @NotNull
+    public ParcelableByteChunkOutputStreamBuilder withConfiguration(
+        @NotNull final ByteChunkStreamConfiguration configuration) {
       mConfiguration = ConstantConditions.notNull("output stream configuration", configuration);
       return this;
     }
 
     @NotNull
-    public ByteChunkOutputStream buildOutputStream() {
-      final Channel<ByteChunk, ByteChunk> outputChannel =
-          JRoutineCore.<ByteChunk>ofData().buildChannel();
-      outputChannel.consume(new ChunkChannelConsumer(mChannel));
-      return ByteChannel.outputStream(outputChannel).withConfiguration(mConfiguration).buildOutputStream();
-    }
-
-    @NotNull
-    public Builder<? extends ChunkOutputStreamBuilder> chunkStreamConfiguration() {
-      return new Builder<ChunkOutputStreamBuilder>(this, mConfiguration);
+    public Builder<? extends ParcelableByteChunkOutputStreamBuilder> withStream() {
+      return new Builder<ParcelableByteChunkOutputStreamBuilder>(this, mConfiguration);
     }
   }
 

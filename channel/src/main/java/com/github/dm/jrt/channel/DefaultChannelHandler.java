@@ -203,11 +203,11 @@ class DefaultChannelHandler implements ChannelHandler {
 
   @NotNull
   @SuppressWarnings("unchecked")
-  public <IN> Channel<Flow<IN>, ?> inputFlowOf(@NotNull final Channel<? super IN, ?> channel,
+  public <IN> Channel<FlowData<IN>, ?> inputFlowOf(@NotNull final Channel<? super IN, ?> channel,
       final int id) {
     final Channel<IN, IN> outputChannel = JRoutineCore.channel().ofType();
     ((Channel<IN, ?>) channel).pass(outputChannel);
-    final Channel<Flow<IN>, Flow<IN>> inputChannel =
+    final Channel<FlowData<IN>, FlowData<IN>> inputChannel =
         JRoutineCore.channelOn(mExecutor).withConfiguration(mConfiguration).ofType();
     return inputChannel.consume(new FilterChannelConsumer<IN>(outputChannel, id));
   }
@@ -215,9 +215,9 @@ class DefaultChannelHandler implements ChannelHandler {
   @NotNull
   @SuppressWarnings("unchecked")
   public <DATA, IN extends DATA> Channel<IN, ?> inputOfFlow(
-      @NotNull final Channel<? super Flow<DATA>, ?> channel, final int id) {
-    final Channel<Flow<DATA>, Flow<DATA>> flowChannel = JRoutineCore.channel().ofType();
-    ((Channel<Flow<DATA>, ?>) channel).pass(flowChannel);
+      @NotNull final Channel<? super FlowData<DATA>, ?> channel, final int id) {
+    final Channel<FlowData<DATA>, FlowData<DATA>> flowChannel = JRoutineCore.channel().ofType();
+    ((Channel<FlowData<DATA>, ?>) channel).pass(flowChannel);
     final Channel<IN, IN> inputChannel =
         JRoutineCore.channelOn(mExecutor).withConfiguration(mConfiguration).ofType();
     return inputChannel.consume(new FlowChannelConsumer<DATA, IN>(flowChannel, id));
@@ -225,18 +225,19 @@ class DefaultChannelHandler implements ChannelHandler {
 
   @NotNull
   public <DATA, IN extends DATA> Map<Integer, Channel<IN, ?>> inputOfFlow(
-      @NotNull final Channel<? super Flow<DATA>, ?> channel, @NotNull final int... ids) {
+      @NotNull final Channel<? super FlowData<DATA>, ?> channel, @NotNull final int... ids) {
     final HashSet<Integer> idSet = new HashSet<Integer>();
     for (final int id : ids) {
       idSet.add(id);
     }
 
-    return internalFlowInput(channel, idSet);
+    return internalInputOfFlow(channel, idSet);
   }
 
   @NotNull
   public <DATA, IN extends DATA> Map<Integer, Channel<IN, ?>> inputOfFlow(
-      @NotNull final Channel<? super Flow<DATA>, ?> channel, @NotNull final Iterable<Integer> ids) {
+      @NotNull final Channel<? super FlowData<DATA>, ?> channel,
+      @NotNull final Iterable<Integer> ids) {
     final HashSet<Integer> idSet = new HashSet<Integer>();
     for (final Integer id : ids) {
       if (id == null) {
@@ -246,12 +247,12 @@ class DefaultChannelHandler implements ChannelHandler {
       idSet.add(id);
     }
 
-    return internalFlowInput(channel, idSet);
+    return internalInputOfFlow(channel, idSet);
   }
 
   @NotNull
   public <DATA, IN extends DATA> Map<Integer, Channel<IN, ?>> inputOfFlow(final int startId,
-      final int rangeSize, @NotNull final Channel<? super Flow<DATA>, ?> channel) {
+      final int rangeSize, @NotNull final Channel<? super FlowData<DATA>, ?> channel) {
     ConstantConditions.positive("range size", rangeSize);
     final HashSet<Integer> idSet = new HashSet<Integer>();
     final int endId = startId + rangeSize;
@@ -259,7 +260,7 @@ class DefaultChannelHandler implements ChannelHandler {
       idSet.add(i);
     }
 
-    return internalFlowInput(channel, idSet);
+    return internalInputOfFlow(channel, idSet);
   }
 
   @NotNull
@@ -309,14 +310,14 @@ class DefaultChannelHandler implements ChannelHandler {
   }
 
   @NotNull
-  public <IN> Channel<Flow<? extends IN>, ?> mergeInputOf(
+  public <IN> Channel<FlowData<? extends IN>, ?> mergeInputOf(
       @NotNull final Channel<?, ?>... channels) {
     return mergeInputOf(0, channels);
   }
 
   @NotNull
   @SuppressWarnings("unchecked")
-  public <IN> Channel<Flow<? extends IN>, ?> mergeInputOf(final int startId,
+  public <IN> Channel<FlowData<? extends IN>, ?> mergeInputOf(final int startId,
       @NotNull final Channel<?, ?>... channels) {
     final int length = channels.length;
     if (length == 0) {
@@ -337,13 +338,13 @@ class DefaultChannelHandler implements ChannelHandler {
       channelList.add(outputChannel);
     }
 
-    final Channel<Flow<? extends IN>, ?> inputChannel = channelBuilder.ofType();
+    final Channel<FlowData<? extends IN>, ?> inputChannel = channelBuilder.ofType();
     return inputChannel.consume(new SortingArrayChannelConsumer(startId, channelList));
   }
 
   @NotNull
   @SuppressWarnings("unchecked")
-  public <IN> Channel<Flow<? extends IN>, ?> mergeInputOf(final int startId,
+  public <IN> Channel<FlowData<? extends IN>, ?> mergeInputOf(final int startId,
       @NotNull final Iterable<? extends Channel<? extends IN, ?>> channels) {
     final ChannelBuilder channelBuilder =
         JRoutineCore.channelOn(mExecutor).withConfiguration(mConfiguration);
@@ -363,19 +364,19 @@ class DefaultChannelHandler implements ChannelHandler {
       throw new IllegalArgumentException("the collection of channels must not be empty");
     }
 
-    final Channel<Flow<? extends IN>, ?> inputChannel = channelBuilder.ofType();
+    final Channel<FlowData<? extends IN>, ?> inputChannel = channelBuilder.ofType();
     return inputChannel.consume(new SortingArrayChannelConsumer(startId, channelList));
   }
 
   @NotNull
-  public <IN> Channel<Flow<? extends IN>, ?> mergeInputOf(
+  public <IN> Channel<FlowData<? extends IN>, ?> mergeInputOf(
       @NotNull final Iterable<? extends Channel<? extends IN, ?>> channels) {
     return mergeInputOf(0, channels);
   }
 
   @NotNull
   @SuppressWarnings("unchecked")
-  public <IN> Channel<Flow<? extends IN>, ?> mergeInputOf(
+  public <IN> Channel<FlowData<? extends IN>, ?> mergeInputOf(
       @NotNull final Map<Integer, ? extends Channel<? extends IN, ?>> channels) {
     if (channels.isEmpty()) {
       throw new IllegalArgumentException("the map of channels must not be empty");
@@ -395,24 +396,25 @@ class DefaultChannelHandler implements ChannelHandler {
       inputChannelMap.put(entry.getKey(), outputChannel);
     }
 
-    final Channel<Flow<? extends IN>, Flow<? extends IN>> inputChannel = channelBuilder.ofType();
+    final Channel<FlowData<? extends IN>, FlowData<? extends IN>> inputChannel =
+        channelBuilder.ofType();
     return inputChannel.consume(new SortingMapChannelConsumer<IN>(inputChannelMap));
   }
 
   @NotNull
-  public <OUT> Channel<?, Flow<OUT>> mergeOutputOf(@NotNull final Channel<?, ?>... channels) {
+  public <OUT> Channel<?, FlowData<OUT>> mergeOutputOf(@NotNull final Channel<?, ?>... channels) {
     return mergeOutputOf(0, channels);
   }
 
   @NotNull
   @SuppressWarnings("unchecked")
-  public <OUT> Channel<?, Flow<OUT>> mergeOutputOf(final int startId,
+  public <OUT> Channel<?, FlowData<OUT>> mergeOutputOf(final int startId,
       @NotNull final Channel<?, ?>... channels) {
     if (channels.length == 0) {
       throw new IllegalArgumentException("the array of channels must not be empty");
     }
 
-    final Channel<Flow<OUT>, Flow<OUT>> outputChannel =
+    final Channel<FlowData<OUT>, FlowData<OUT>> outputChannel =
         JRoutineCore.channelOn(mExecutor).withConfiguration(mConfiguration).ofType();
     int i = startId;
     for (final Channel<?, ?> channel : channels) {
@@ -427,9 +429,9 @@ class DefaultChannelHandler implements ChannelHandler {
   }
 
   @NotNull
-  public <OUT> Channel<?, Flow<OUT>> mergeOutputOf(final int startId,
+  public <OUT> Channel<?, FlowData<OUT>> mergeOutputOf(final int startId,
       @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
-    final Channel<Flow<OUT>, Flow<OUT>> outputChannel =
+    final Channel<FlowData<OUT>, FlowData<OUT>> outputChannel =
         JRoutineCore.channelOn(mExecutor).withConfiguration(mConfiguration).ofType();
     int i = startId;
     boolean isEmpty = true;
@@ -450,13 +452,13 @@ class DefaultChannelHandler implements ChannelHandler {
   }
 
   @NotNull
-  public <OUT> Channel<?, Flow<OUT>> mergeOutputOf(
+  public <OUT> Channel<?, FlowData<OUT>> mergeOutputOf(
       @NotNull final Iterable<? extends Channel<?, ? extends OUT>> channels) {
     return mergeOutputOf(0, channels);
   }
 
   @NotNull
-  public <OUT> Channel<?, Flow<OUT>> mergeOutputOf(
+  public <OUT> Channel<?, FlowData<OUT>> mergeOutputOf(
       @NotNull final Map<Integer, ? extends Channel<?, ? extends OUT>> channels) {
     if (channels.isEmpty()) {
       throw new IllegalArgumentException("the map of channels must not be empty");
@@ -466,7 +468,7 @@ class DefaultChannelHandler implements ChannelHandler {
       throw new NullPointerException("the map of channels must not contain null objects");
     }
 
-    final Channel<Flow<OUT>, Flow<OUT>> outputChannel =
+    final Channel<FlowData<OUT>, FlowData<OUT>> outputChannel =
         JRoutineCore.channelOn(mExecutor).withConfiguration(mConfiguration).ofType();
     for (final Entry<Integer, ? extends Channel<?, ? extends OUT>> entry : channels.entrySet()) {
       outputChannel.pass(outputFlowOf(entry.getValue(), entry.getKey()));
@@ -476,9 +478,9 @@ class DefaultChannelHandler implements ChannelHandler {
   }
 
   @NotNull
-  public <OUT> Channel<?, Flow<OUT>> outputFlowOf(@NotNull final Channel<?, ? extends OUT> channel,
-      final int id) {
-    final Channel<Flow<OUT>, Flow<OUT>> outputChannel =
+  public <OUT> Channel<?, FlowData<OUT>> outputFlowOf(
+      @NotNull final Channel<?, ? extends OUT> channel, final int id) {
+    final Channel<FlowData<OUT>, FlowData<OUT>> outputChannel =
         JRoutineCore.channelOn(mExecutor).withConfiguration(mConfiguration).ofType();
     channel.consume(new FlowChannelConsumer<OUT, OUT>(outputChannel, id));
     return readOnly(outputChannel);
@@ -486,18 +488,19 @@ class DefaultChannelHandler implements ChannelHandler {
 
   @NotNull
   public <OUT> Map<Integer, Channel<?, OUT>> outputOfFlow(
-      @NotNull final Channel<?, ? extends Flow<? extends OUT>> channel, @NotNull final int... ids) {
+      @NotNull final Channel<?, ? extends FlowData<? extends OUT>> channel,
+      @NotNull final int... ids) {
     final HashSet<Integer> idSet = new HashSet<Integer>();
     for (final int id : ids) {
       idSet.add(id);
     }
 
-    return internalFlowOutput(channel, idSet);
+    return internalOutputOfFlow(channel, idSet);
   }
 
   @NotNull
   public <OUT> Map<Integer, Channel<?, OUT>> outputOfFlow(
-      @NotNull final Channel<?, ? extends Flow<? extends OUT>> channel,
+      @NotNull final Channel<?, ? extends FlowData<? extends OUT>> channel,
       @NotNull final Iterable<Integer> ids) {
     final HashSet<Integer> idSet = new HashSet<Integer>();
     for (final Integer id : ids) {
@@ -508,12 +511,12 @@ class DefaultChannelHandler implements ChannelHandler {
       idSet.add(id);
     }
 
-    return internalFlowOutput(channel, idSet);
+    return internalOutputOfFlow(channel, idSet);
   }
 
   @NotNull
   public <OUT> Map<Integer, Channel<?, OUT>> outputOfFlow(final int startId, final int rangeSize,
-      @NotNull final Channel<?, ? extends Flow<? extends OUT>> channel) {
+      @NotNull final Channel<?, ? extends FlowData<? extends OUT>> channel) {
     ConstantConditions.positive("range size", rangeSize);
     final HashSet<Integer> idSet = new HashSet<Integer>();
     final int endId = startId + rangeSize;
@@ -521,7 +524,7 @@ class DefaultChannelHandler implements ChannelHandler {
       idSet.add(i);
     }
 
-    return internalFlowOutput(channel, idSet);
+    return internalOutputOfFlow(channel, idSet);
   }
 
   @NotNull
@@ -541,8 +544,9 @@ class DefaultChannelHandler implements ChannelHandler {
   }
 
   @NotNull
-  private <DATA, IN extends DATA> Map<Integer, Channel<IN, ?>> internalFlowInput(
-      @NotNull final Channel<? super Flow<DATA>, ?> channel, @NotNull final HashSet<Integer> ids) {
+  private <DATA, IN extends DATA> Map<Integer, Channel<IN, ?>> internalInputOfFlow(
+      @NotNull final Channel<? super FlowData<DATA>, ?> channel,
+      @NotNull final HashSet<Integer> ids) {
     final HashMap<Integer, Channel<IN, ?>> channelMap =
         new HashMap<Integer, Channel<IN, ?>>(ids.size());
     for (final Integer id : ids) {
@@ -551,53 +555,6 @@ class DefaultChannelHandler implements ChannelHandler {
     }
 
     return channelMap;
-  }
-
-  @NotNull
-  @SuppressWarnings("unchecked")
-  private <OUT> Map<Integer, Channel<?, OUT>> internalFlowOutput(
-      @NotNull final Channel<?, ? extends Flow<? extends OUT>> channel,
-      @NotNull final HashSet<Integer> ids) {
-    synchronized (sOutputChannels) {
-      final WeakIdentityHashMap<Channel<?, ?>, HashMap<FlowInfo, HashMap<Integer, Channel<?, ?>>>>
-          outputChannels = sOutputChannels;
-      HashMap<FlowInfo, HashMap<Integer, Channel<?, ?>>> channelMaps = outputChannels.get(channel);
-      if (channelMaps == null) {
-        channelMaps = new HashMap<FlowInfo, HashMap<Integer, Channel<?, ?>>>();
-        outputChannels.put(channel, channelMaps);
-      }
-
-      final int size = ids.size();
-      final ScheduledExecutor executor = mExecutor;
-      final ChannelConfiguration configuration = mConfiguration;
-      final FlowInfo flowInfo = new FlowInfo(executor, configuration, ids);
-      final HashMap<Integer, Channel<?, OUT>> channelMap =
-          new HashMap<Integer, Channel<?, OUT>>(size);
-      HashMap<Integer, Channel<?, ?>> channels = channelMaps.get(flowInfo);
-      if (channels != null) {
-        for (final Entry<Integer, Channel<?, ?>> entry : channels.entrySet()) {
-          channelMap.put(entry.getKey(), readOnly((Channel<OUT, OUT>) entry.getValue()));
-        }
-
-      } else {
-        final ChannelBuilder channelBuilder =
-            JRoutineCore.channelOn(executor).withConfiguration(configuration);
-        final HashMap<Integer, Channel<OUT, ?>> inputMap =
-            new HashMap<Integer, Channel<OUT, ?>>(size);
-        channels = new HashMap<Integer, Channel<?, ?>>(size);
-        for (final Integer id : ids) {
-          final Channel<OUT, OUT> outputChannel = channelBuilder.ofType();
-          inputMap.put(id, outputChannel);
-          channelMap.put(id, readOnly(outputChannel));
-          channels.put(id, outputChannel);
-        }
-
-        channel.consume(new SortingMapChannelConsumer<OUT>(inputMap));
-        channelMaps.put(flowInfo, channels);
-      }
-
-      return channelMap;
-    }
   }
 
   @NotNull
@@ -727,6 +684,53 @@ class DefaultChannelHandler implements ChannelHandler {
     }
 
     return readOnly(outputChannel);
+  }
+
+  @NotNull
+  @SuppressWarnings("unchecked")
+  private <OUT> Map<Integer, Channel<?, OUT>> internalOutputOfFlow(
+      @NotNull final Channel<?, ? extends FlowData<? extends OUT>> channel,
+      @NotNull final HashSet<Integer> ids) {
+    synchronized (sOutputChannels) {
+      final WeakIdentityHashMap<Channel<?, ?>, HashMap<FlowInfo, HashMap<Integer, Channel<?, ?>>>>
+          outputChannels = sOutputChannels;
+      HashMap<FlowInfo, HashMap<Integer, Channel<?, ?>>> channelMaps = outputChannels.get(channel);
+      if (channelMaps == null) {
+        channelMaps = new HashMap<FlowInfo, HashMap<Integer, Channel<?, ?>>>();
+        outputChannels.put(channel, channelMaps);
+      }
+
+      final int size = ids.size();
+      final ScheduledExecutor executor = mExecutor;
+      final ChannelConfiguration configuration = mConfiguration;
+      final FlowInfo flowInfo = new FlowInfo(executor, configuration, ids);
+      final HashMap<Integer, Channel<?, OUT>> channelMap =
+          new HashMap<Integer, Channel<?, OUT>>(size);
+      HashMap<Integer, Channel<?, ?>> channels = channelMaps.get(flowInfo);
+      if (channels != null) {
+        for (final Entry<Integer, Channel<?, ?>> entry : channels.entrySet()) {
+          channelMap.put(entry.getKey(), readOnly((Channel<OUT, OUT>) entry.getValue()));
+        }
+
+      } else {
+        final ChannelBuilder channelBuilder =
+            JRoutineCore.channelOn(executor).withConfiguration(configuration);
+        final HashMap<Integer, Channel<OUT, ?>> inputMap =
+            new HashMap<Integer, Channel<OUT, ?>>(size);
+        channels = new HashMap<Integer, Channel<?, ?>>(size);
+        for (final Integer id : ids) {
+          final Channel<OUT, OUT> outputChannel = channelBuilder.ofType();
+          inputMap.put(id, outputChannel);
+          channelMap.put(id, readOnly(outputChannel));
+          channels.put(id, outputChannel);
+        }
+
+        channel.consume(new SortingMapChannelConsumer<OUT>(inputMap));
+        channelMaps.put(flowInfo, channels);
+      }
+
+      return channelMap;
+    }
   }
 
   /**

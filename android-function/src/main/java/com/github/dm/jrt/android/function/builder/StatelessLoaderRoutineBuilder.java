@@ -57,6 +57,9 @@ public interface StatelessLoaderRoutineBuilder<IN, OUT> extends StatelessRoutine
 
   /**
    * {@inheritDoc}
+   *
+   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
+   *                                            static scope.
    */
   @NotNull
   @Override
@@ -65,6 +68,9 @@ public interface StatelessLoaderRoutineBuilder<IN, OUT> extends StatelessRoutine
 
   /**
    * {@inheritDoc}
+   *
+   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
+   *                                            static scope.
    */
   @NotNull
   @Override
@@ -72,6 +78,9 @@ public interface StatelessLoaderRoutineBuilder<IN, OUT> extends StatelessRoutine
 
   /**
    * {@inheritDoc}
+   *
+   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
+   *                                            static scope.
    */
   @NotNull
   @Override
@@ -80,6 +89,9 @@ public interface StatelessLoaderRoutineBuilder<IN, OUT> extends StatelessRoutine
 
   /**
    * {@inheritDoc}
+   *
+   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
+   *                                            static scope.
    */
   @NotNull
   @Override
@@ -88,6 +100,9 @@ public interface StatelessLoaderRoutineBuilder<IN, OUT> extends StatelessRoutine
 
   /**
    * {@inheritDoc}
+   *
+   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
+   *                                            static scope.
    */
   @NotNull
   @Override
@@ -96,6 +111,9 @@ public interface StatelessLoaderRoutineBuilder<IN, OUT> extends StatelessRoutine
 
   /**
    * {@inheritDoc}
+   *
+   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
+   *                                            static scope.
    */
   @NotNull
   @Override
@@ -104,6 +122,9 @@ public interface StatelessLoaderRoutineBuilder<IN, OUT> extends StatelessRoutine
 
   /**
    * {@inheritDoc}
+   *
+   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
+   *                                            static scope.
    */
   @NotNull
   @Override
@@ -111,6 +132,9 @@ public interface StatelessLoaderRoutineBuilder<IN, OUT> extends StatelessRoutine
 
   /**
    * {@inheritDoc}
+   *
+   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
+   *                                            static scope.
    */
   @NotNull
   @Override
@@ -118,6 +142,9 @@ public interface StatelessLoaderRoutineBuilder<IN, OUT> extends StatelessRoutine
 
   /**
    * {@inheritDoc}
+   *
+   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
+   *                                            static scope.
    */
   @NotNull
   @Override
@@ -126,6 +153,9 @@ public interface StatelessLoaderRoutineBuilder<IN, OUT> extends StatelessRoutine
 
   /**
    * {@inheritDoc}
+   *
+   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
+   *                                            static scope.
    */
   @NotNull
   @Override

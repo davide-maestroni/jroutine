@@ -17,26 +17,19 @@
 package com.github.dm.jrt.android.reflect.builder;
 
 import com.github.dm.jrt.android.core.config.LoaderConfigurable;
-import com.github.dm.jrt.android.core.routine.LoaderRoutine;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
-import com.github.dm.jrt.core.util.ClassToken;
-import com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilder;
 import com.github.dm.jrt.reflect.config.WrapperConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.Method;
-
 /**
- * Interface defining a builder of routines wrapping an object methods.
- * <p>
- * The single methods can be accessed via reflection or the whole instance can be proxied through
- * an interface.
+ * Interface defining a builder of routines wrapping an object methods, running in a dedicated
+ * Loader instance.
  * <p>
  * Created by davide-maestroni on 04/06/2015.
  */
 public interface LoaderReflectionRoutineBuilder
-    extends ReflectionRoutineBuilder, LoaderConfigurable<LoaderReflectionRoutineBuilder> {
+    extends ReflectionContextRoutineBuilder, LoaderConfigurable<LoaderReflectionRoutineBuilder> {
 
   /**
    * {@inheritDoc}
@@ -51,125 +44,6 @@ public interface LoaderReflectionRoutineBuilder
   @NotNull
   @Override
   LoaderReflectionRoutineBuilder withConfiguration(@NotNull WrapperConfiguration configuration);
-
-  /**
-   * Returns a proxy object enabling asynchronous call of the target instance methods.
-   * <p>
-   * The routines used for calling the methods will honor the attributes specified in any optional
-   * <i>{@code com.github.dm.jrt.reflect.annotation.*}</i> as well as
-   * <i>{@code com.github.dm.jrt.android.reflect.annotation.*}</i> annotations.
-   * <br>
-   * Note that such annotations will override any configuration set through the builder.
-   *
-   * @param itf    the token of the interface implemented by the return object.
-   * @param <TYPE> the interface type.
-   * @return the proxy object.
-   * @throws java.lang.IllegalArgumentException if the specified class does not represent an
-   *                                            interface.
-   * @see <a href='{@docRoot}/com/github/dm/jrt/android/reflect/annotation/package-summary.html'>
-   * Android Annotations</a>
-   * @see com.github.dm.jrt.reflect.annotation Annotations
-   */
-  @NotNull
-  @Override
-  <TYPE> TYPE buildProxy(@NotNull Class<TYPE> itf);
-
-  /**
-   * Returns a proxy object enabling asynchronous call of the target instance methods.
-   * <p>
-   * The routines used for calling the methods will honor the attributes specified in any optional
-   * <i>{@code com.github.dm.jrt.reflect.annotation.*}</i> as well as
-   * <i>{@code com.github.dm.jrt.android.reflect.annotation.*}</i> annotations.
-   * <br>
-   * Note that such annotations will override any configuration set through the builder.
-   *
-   * @param itf    the token of the interface implemented by the return object.
-   * @param <TYPE> the interface type.
-   * @return the proxy object.
-   * @throws java.lang.IllegalArgumentException if the specified class token does not represent an
-   *                                            interface.
-   * @see <a href='{@docRoot}/com/github/dm/jrt/android/reflect/annotation/package-summary.html'>
-   * Android Annotations</a>
-   * @see com.github.dm.jrt.reflect.annotation Annotations
-   */
-  @NotNull
-  @Override
-  <TYPE> TYPE buildProxy(@NotNull ClassToken<TYPE> itf);
-
-  /**
-   * Returns a routine used to call the method whose identifying name is specified in an
-   * {@link com.github.dm.jrt.reflect.annotation.Alias Alias} annotation.
-   * <p>
-   * If no method with the specified alias is found, this method will behave like
-   * {@link #method(String, Class[])} with no parameter.
-   * <br>
-   * Optional <i>{@code com.github.dm.jrt.reflect.annotation.*}</i> as well as
-   * <i>{@code com.github.dm.jrt.android.reflect.annotation.*}</i> method annotations will be
-   * honored.
-   * <br>
-   * Note that such annotations will override any configuration set through the builder.
-   *
-   * @param name  the name specified in the annotation.
-   * @param <IN>  the input data type.
-   * @param <OUT> the output data type.
-   * @return the routine.
-   * @throws java.lang.IllegalArgumentException if the specified method is not found.
-   * @see <a href='{@docRoot}/com/github/dm/jrt/android/reflect/annotation/package-summary.html'>
-   * Android Annotations</a>
-   * @see com.github.dm.jrt.reflect.annotation Annotations
-   */
-  @NotNull
-  @Override
-  <IN, OUT> LoaderRoutine<IN, OUT> method(@NotNull String name);
-
-  /**
-   * Returns a routine used to call the specified method.
-   * <p>
-   * The method is searched via reflection ignoring a name specified in an
-   * {@link com.github.dm.jrt.reflect.annotation.Alias Alias} annotation. Though, optional
-   * <i>{@code com.github.dm.jrt.reflect.annotation.*}</i> as well as
-   * <i>{@code com.github.dm.jrt.android.reflect.annotation.*}</i> method annotations will be
-   * honored.
-   * <br>
-   * Note that such annotations will override any configuration set through the builder.
-   *
-   * @param name           the method name.
-   * @param parameterTypes the method parameter types.
-   * @param <IN>           the input data type.
-   * @param <OUT>          the output data type.
-   * @return the routine.
-   * @throws java.lang.IllegalArgumentException if no matching method is found.
-   * @see <a href='{@docRoot}/com/github/dm/jrt/android/reflect/annotation/package-summary.html'>
-   * Android Annotations</a>
-   * @see com.github.dm.jrt.reflect.annotation Annotations
-   */
-  @NotNull
-  @Override
-  <IN, OUT> LoaderRoutine<IN, OUT> method(@NotNull String name,
-      @NotNull Class<?>... parameterTypes);
-
-  /**
-   * Returns a routine used to call the specified method.
-   * <p>
-   * The method is invoked ignoring a name specified in an
-   * {@link com.github.dm.jrt.reflect.annotation.Alias Alias} annotation. Though, optional
-   * <i>{@code com.github.dm.jrt.reflect.annotation.*}</i> as well as
-   * <i>{@code com.github.dm.jrt.android.reflect.annotation.*}</i> method annotations will be
-   * honored.
-   * <br>
-   * Note that such annotations will override any configuration set through the builder.
-   *
-   * @param method the method instance.
-   * @param <IN>   the input data type.
-   * @param <OUT>  the output data type.
-   * @return the routine.
-   * @see <a href='{@docRoot}/com/github/dm/jrt/android/reflect/annotation/package-summary.html'>
-   * Android Annotations</a>
-   * @see com.github.dm.jrt.reflect.annotation Annotations
-   */
-  @NotNull
-  @Override
-  <IN, OUT> LoaderRoutine<IN, OUT> method(@NotNull Method method);
 
   /**
    * {@inheritDoc}

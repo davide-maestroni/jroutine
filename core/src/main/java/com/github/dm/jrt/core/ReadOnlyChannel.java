@@ -121,6 +121,10 @@ class ReadOnlyChannel<IN, OUT> extends DeepEqualObject implements Channel<IN, OU
     return mChannel.expiringIterator();
   }
 
+  public OUT get() {
+    return mChannel.get();
+  }
+
   public boolean getComplete() {
     return mChannel.getComplete();
   }

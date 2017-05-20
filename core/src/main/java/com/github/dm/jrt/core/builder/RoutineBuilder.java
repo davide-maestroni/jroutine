@@ -51,7 +51,7 @@ public interface RoutineBuilder extends InvocationConfigurable<RoutineBuilder> {
    * <br>
    * In case the instance is destroyed, a successive routine invocation will fail with an exception.
    *
-   * @param invocation the invocation insatnce.
+   * @param invocation the invocation instance.
    * @param <IN>       the input data type.
    * @param <OUT>      the output data type.
    * @return the routine instance.

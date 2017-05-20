@@ -260,6 +260,10 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
         mTimeoutException.get());
   }
 
+  public OUT get() {
+    return next();
+  }
+
   public boolean getComplete() {
     final DurationMeasure timeout = mOutputTimeout.get();
     try {

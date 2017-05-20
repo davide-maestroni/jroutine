@@ -32,6 +32,7 @@ import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.CacheStrategyType;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.ClashResolutionType;
 import com.github.dm.jrt.android.core.invocation.CallContextInvocation;
+import com.github.dm.jrt.android.core.invocation.ContextInvocation;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.core.invocation.IdentityContextInvocation;
 import com.github.dm.jrt.android.core.invocation.InvocationClashException;
@@ -44,6 +45,7 @@ import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.log.Log;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.Logger;
@@ -1561,6 +1563,22 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
     } catch (final NullPointerException ignored) {
 
     }
+  }
+
+  public void testSingleton() throws Exception {
+    final ContextInvocation<Object, Object> invocation =
+        IdentityContextInvocation.factoryOf().newInvocation();
+    final Channel<Object, Object> channel =
+        JRoutineLoaderCompat.routineOn(loaderOf(getActivity())).ofSingleton(invocation).invoke();
+    assertThat(channel.pass("test").close().in(seconds(10)).all()).containsExactly("test");
+  }
+
+  public void testSingletonInvocation() throws Exception {
+    final Invocation<Object, Object> invocation =
+        IdentityContextInvocation.factoryOf().newInvocation();
+    final Channel<Object, Object> channel =
+        JRoutineLoaderCompat.routineOn(loaderOf(getActivity())).ofSingleton(invocation).invoke();
+    assertThat(channel.pass("test").close().in(seconds(10)).all()).containsExactly("test");
   }
 
   public void testSize() {

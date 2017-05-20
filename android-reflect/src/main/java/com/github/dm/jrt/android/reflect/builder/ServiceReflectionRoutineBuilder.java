@@ -18,21 +18,18 @@ package com.github.dm.jrt.android.reflect.builder;
 
 import com.github.dm.jrt.android.core.config.ServiceConfigurable;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
-import com.github.dm.jrt.reflect.builder.ReflectionRoutineBuilder;
 import com.github.dm.jrt.reflect.config.WrapperConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Interface defining a builder of routines wrapping an object methods.
- * <p>
- * The single methods can be accessed via reflection or the whole instance can be proxied through
- * an interface.
+ * Interface defining a builder of routines wrapping an object methods, running in a dedicated
+ * Service instance.
  * <p>
  * Created by davide-maestroni on 03/29/2015.
  */
 public interface ServiceReflectionRoutineBuilder
-    extends ReflectionRoutineBuilder, ServiceConfigurable<ServiceReflectionRoutineBuilder> {
+    extends ReflectionContextRoutineBuilder, ServiceConfigurable<ServiceReflectionRoutineBuilder> {
 
   /**
    * {@inheritDoc}

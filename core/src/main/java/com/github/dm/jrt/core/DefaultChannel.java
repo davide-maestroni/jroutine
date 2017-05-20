@@ -160,6 +160,10 @@ class DefaultChannel<DATA> implements Channel<DATA, DATA> {
     return mChannel.expiringIterator();
   }
 
+  public DATA get() {
+    return mChannel.get();
+  }
+
   public boolean getComplete() {
     return mChannel.getComplete();
   }

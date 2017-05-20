@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Davide Maestroni
+ * Copyright 2017 Davide Maestroni
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.android.reflect.builder;
+package com.github.dm.jrt.android.reflect.util;
 
 import android.test.AndroidTestCase;
 
@@ -35,8 +35,7 @@ import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.core.log.NullLog;
 import com.github.dm.jrt.core.util.DurationMeasure;
 
-import static com.github.dm.jrt.android.reflect.builder.AndroidReflectionRoutineBuilders
-    .withAnnotations;
+import static com.github.dm.jrt.android.reflect.util.ContextInvocationReflection.withAnnotations;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -44,7 +43,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * <p>
  * Created by davide-maestroni on 03/08/2016.
  */
-public class AndroidReflectionRoutineBuildersTest extends AndroidTestCase {
+public class ContextInvocationReflectionTest extends AndroidTestCase {
 
   public void testBuilderConfigurationThroughAnnotations() throws NoSuchMethodException {
 
@@ -58,9 +57,9 @@ public class AndroidReflectionRoutineBuildersTest extends AndroidTestCase {
                            .withLoaderId(-77)
                            .withResultStaleTime(DurationMeasure.millis(333))
                            .configuration());
-    assertThat(
-        withAnnotations(ServiceConfiguration.builder().withExecutorArgs(1).withLogArgs(1).configuration(),
-            AnnotationItf.class.getMethod("toString"))).isEqualTo( //
+    assertThat(withAnnotations(
+        ServiceConfiguration.builder().withExecutorArgs(1).withLogArgs(1).configuration(),
+        AnnotationItf.class.getMethod("toString"))).isEqualTo( //
         ServiceConfiguration.builder()
                             .withLogClass(NullLog.class)
                             .withExecutorClass(MyExecutor.class)
@@ -71,7 +70,7 @@ public class AndroidReflectionRoutineBuildersTest extends AndroidTestCase {
 
     boolean failed = false;
     try {
-      new AndroidReflectionRoutineBuilders();
+      new ContextInvocationReflection();
       failed = true;
 
     } catch (final Throwable ignored) {

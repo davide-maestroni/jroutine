@@ -24,8 +24,8 @@ import com.github.dm.jrt.android.core.config.ServiceConfiguration;
 import com.github.dm.jrt.android.core.invocation.CallContextInvocation;
 import com.github.dm.jrt.android.core.invocation.ContextInvocation;
 import com.github.dm.jrt.android.core.invocation.InvocationFactoryReference;
-import com.github.dm.jrt.android.reflect.builder.AndroidReflectionRoutineBuilders;
 import com.github.dm.jrt.android.reflect.builder.ServiceReflectionRoutineBuilder;
+import com.github.dm.jrt.android.reflect.util.ContextInvocationReflection;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
@@ -88,8 +88,6 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
 
   private final ServiceSource mServiceSource;
 
-  private final ContextInvocationTarget<?> mTarget;
-
   private InvocationConfiguration mInvocationConfiguration =
       InvocationConfiguration.defaultConfiguration();
 
@@ -101,12 +99,9 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
    * Constructor.
    *
    * @param serviceSource the Service source.
-   * @param target        the invocation target.
    */
-  DefaultServiceReflectionRoutineBuilder(@NotNull final ServiceSource serviceSource,
-      @NotNull final ContextInvocationTarget<?> target) {
+  DefaultServiceReflectionRoutineBuilder(@NotNull final ServiceSource serviceSource) {
     mServiceSource = ConstantConditions.notNull("Service source", serviceSource);
-    mTarget = ConstantConditions.notNull("invocation target", target);
   }
 
   @Nullable
@@ -155,31 +150,12 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
 
   @NotNull
   @Override
-  public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
-    if (!itf.isInterface()) {
-      throw new IllegalArgumentException(
-          "the specified class is not an interface: " + itf.getName());
-    }
-
-    final Object proxy = Proxy.newProxyInstance(itf.getClassLoader(), new Class[]{itf},
-        new ProxyInvocationHandler(this));
-    return itf.cast(proxy);
-  }
-
-  @NotNull
-  @Override
-  public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
-    return buildProxy(itf.getRawClass());
-  }
-
-  @NotNull
-  @Override
   @SuppressWarnings("unchecked")
-  public <IN, OUT> Routine<IN, OUT> method(@NotNull final String name) {
-    final ContextInvocationTarget<?> target = mTarget;
+  public <IN, OUT> Routine<IN, OUT> methodOf(@NotNull final ContextInvocationTarget<?> target,
+      @NotNull final String name) {
     final Method targetMethod = getAnnotatedMethod(target.getTargetClass(), name);
     if (targetMethod == null) {
-      return method(name, Reflection.NO_PARAMS);
+      return methodOf(target, name, Reflection.NO_PARAMS);
     }
 
     final Set<String> sharedFields = fieldsWithShareAnnotation(mWrapperConfiguration, targetMethod);
@@ -189,20 +165,18 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
     final InvocationConfiguration invocationConfiguration =
         InvocationReflection.withAnnotations(mInvocationConfiguration, targetMethod);
     final ServiceConfiguration serviceConfiguration =
-        AndroidReflectionRoutineBuilders.withAnnotations(mServiceConfiguration, targetMethod);
-    return (Routine<IN, OUT>) JRoutineService.on(mServiceSource)
-                                             .with(factory)
+        ContextInvocationReflection.withAnnotations(mServiceConfiguration, targetMethod);
+    return (Routine<IN, OUT>) JRoutineService.routineOn(mServiceSource)
                                              .withConfiguration(invocationConfiguration)
-                                             .apply(serviceConfiguration)
-                                             .buildRoutine();
+                                             .withConfiguration(serviceConfiguration)
+                                             .of(factory);
   }
 
   @NotNull
   @Override
   @SuppressWarnings("unchecked")
-  public <IN, OUT> Routine<IN, OUT> method(@NotNull final String name,
-      @NotNull final Class<?>... parameterTypes) {
-    final ContextInvocationTarget<?> target = mTarget;
+  public <IN, OUT> Routine<IN, OUT> methodOf(@NotNull final ContextInvocationTarget<?> target,
+      @NotNull final String name, @NotNull final Class<?>... parameterTypes) {
     final Method targetMethod = findMethod(target.getTargetClass(), name, parameterTypes);
     final Set<String> sharedFields = fieldsWithShareAnnotation(mWrapperConfiguration, targetMethod);
     final Object[] args = asArgs(sharedFields, target, name, toNames(parameterTypes));
@@ -211,18 +185,39 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
     final InvocationConfiguration invocationConfiguration =
         InvocationReflection.withAnnotations(mInvocationConfiguration, targetMethod);
     final ServiceConfiguration serviceConfiguration =
-        AndroidReflectionRoutineBuilders.withAnnotations(mServiceConfiguration, targetMethod);
-    return (Routine<IN, OUT>) JRoutineService.on(mServiceSource)
-                                             .with(factory)
+        ContextInvocationReflection.withAnnotations(mServiceConfiguration, targetMethod);
+    return (Routine<IN, OUT>) JRoutineService.routineOn(mServiceSource)
                                              .withConfiguration(invocationConfiguration)
-                                             .apply(serviceConfiguration)
-                                             .buildRoutine();
+                                             .withConfiguration(serviceConfiguration)
+                                             .of(factory);
   }
 
   @NotNull
   @Override
-  public <IN, OUT> Routine<IN, OUT> method(@NotNull final Method method) {
-    return method(method.getName(), method.getParameterTypes());
+  public <IN, OUT> Routine<IN, OUT> methodOf(@NotNull final ContextInvocationTarget<?> target,
+      @NotNull final Method method) {
+    return methodOf(target, method.getName(), method.getParameterTypes());
+  }
+
+  @NotNull
+  @Override
+  public <TYPE> TYPE proxyOf(@NotNull final ContextInvocationTarget<?> target,
+      @NotNull final ClassToken<TYPE> itf) {
+    return proxyOf(target, itf.getRawClass());
+  }
+
+  @NotNull
+  @Override
+  public <TYPE> TYPE proxyOf(@NotNull final ContextInvocationTarget<?> target,
+      @NotNull final Class<TYPE> itf) {
+    if (!itf.isInterface()) {
+      throw new IllegalArgumentException(
+          "the specified class is not an interface: " + itf.getName());
+    }
+
+    final Object proxy = Proxy.newProxyInstance(itf.getClassLoader(), new Class[]{itf},
+        new ProxyInvocationHandler(target, this));
+    return itf.cast(proxy);
   }
 
   @NotNull
@@ -331,14 +326,11 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
     public void onContext(@NotNull final Context context) throws Exception {
       final InvocationTarget target = mTarget.getInvocationTarget(context);
       mInstance = target.getTarget();
-      mRoutine = JRoutineReflection.with(target)
-                                   .withInvocation()
-                                   .withExecutor(ScheduledExecutors.syncExecutor())
-                                   .configured()
-                                   .wrapperConfiguration()
+      mRoutine = JRoutineReflection.wrapperOn(ScheduledExecutors.syncExecutor())
+                                   .withWrapper()
                                    .withSharedFields(mSharedFields)
-                                   .apply()
-                                   .method(mAliasName);
+                                   .configuration()
+                                   .methodOf(target, mAliasName);
     }
 
     @Override
@@ -443,14 +435,11 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
     public void onContext(@NotNull final Context context) throws Exception {
       final InvocationTarget target = mTarget.getInvocationTarget(context);
       mInstance = target.getTarget();
-      mRoutine = JRoutineReflection.with(target)
-                                   .withInvocation()
-                                   .withExecutor(ScheduledExecutors.syncExecutor())
-                                   .configured()
-                                   .wrapperConfiguration()
+      mRoutine = JRoutineReflection.wrapperOn(ScheduledExecutors.syncExecutor())
+                                   .withWrapper()
                                    .withSharedFields(mSharedFields)
-                                   .apply()
-                                   .method(mMethodName, mParameterTypes);
+                                   .configuration()
+                                   .methodOf(target, mMethodName, mParameterTypes);
     }
   }
 
@@ -522,11 +511,11 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
    */
   private static class ProxyInvocationHandler implements InvocationHandler {
 
-    private final ServiceSource mContext;
-
     private final InvocationConfiguration mInvocationConfiguration;
 
     private final ServiceConfiguration mServiceConfiguration;
+
+    private final ServiceSource mServiceSource;
 
     private final ContextInvocationTarget<?> mTarget;
 
@@ -535,11 +524,13 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
     /**
      * Constructor.
      *
+     * @param target  the invocation target.
      * @param builder the builder instance.
      */
-    private ProxyInvocationHandler(@NotNull final DefaultServiceReflectionRoutineBuilder builder) {
-      mContext = builder.mServiceSource;
-      mTarget = builder.mTarget;
+    private ProxyInvocationHandler(@NotNull final ContextInvocationTarget<?> target,
+        @NotNull final DefaultServiceReflectionRoutineBuilder builder) {
+      mTarget = ConstantConditions.notNull("invocation target", target);
+      mServiceSource = builder.mServiceSource;
       mInvocationConfiguration = builder.mInvocationConfiguration;
       mWrapperConfiguration = builder.mWrapperConfiguration;
       mServiceConfiguration = builder.mServiceConfiguration;
@@ -563,13 +554,13 @@ class DefaultServiceReflectionRoutineBuilder implements ServiceReflectionRoutine
       final InvocationConfiguration invocationConfiguration =
           InvocationReflection.withAnnotations(mInvocationConfiguration, method);
       final ServiceConfiguration serviceConfiguration =
-          AndroidReflectionRoutineBuilders.withAnnotations(mServiceConfiguration, method);
-      final Routine<Object, Object> routine = JRoutineService.on(mContext)
-                                                             .with(factory)
+          ContextInvocationReflection.withAnnotations(mServiceConfiguration, method);
+      final Routine<Object, Object> routine = JRoutineService.routineOn(mServiceSource)
                                                              .withConfiguration(
                                                                  invocationConfiguration)
-                                                             .apply(serviceConfiguration)
-                                                             .buildRoutine();
+                                                             .withConfiguration(
+                                                                 serviceConfiguration)
+                                                             .of(factory);
       return invokeRoutine(routine, method, asArgs(args), inputMode, outputMode);
     }
   }

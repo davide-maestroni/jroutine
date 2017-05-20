@@ -74,51 +74,22 @@ public class JRoutineServiceReflection {
   }
 
   /**
-   * Returns a Context based builder of Service routine builders.
+   * Returns a builder of routines running in a Service based on the specified source.
+   * <br>
+   * In order to customize the object creation, the caller must employ an implementation of a
+   * {@link com.github.dm.jrt.android.reflect.builder.FactoryContext FactoryContext} as the
+   * invocation Service.
+   * <p>
+   * Note that the built routine results will be dispatched into the configured Looper, thus,
+   * waiting for the outputs on the very same Looper thread, immediately after its invocation,
+   * will result in a deadlock. By default output results are dispatched in the main Looper.
    *
    * @param serviceSource the Service source.
-   * @return the Context based builder.
+   * @return the routine builder instance.
    */
   @NotNull
-  public static ServiceReflectionBuilder on(@NotNull final ServiceSource serviceSource) {
-    return new ServiceReflectionBuilder(serviceSource);
-  }
-
-  /**
-   * Context based builder of Service routine builders.
-   */
-  @SuppressWarnings("WeakerAccess")
-  public static class ServiceReflectionBuilder {
-
-    private final ServiceSource mContext;
-
-    /**
-     * Constructor.
-     *
-     * @param context the Service context.
-     */
-    private ServiceReflectionBuilder(@NotNull final ServiceSource context) {
-      mContext = ConstantConditions.notNull("Service context", context);
-    }
-
-    /**
-     * Returns a builder of routines running in a Service based on the builder context, wrapping
-     * the specified target object.
-     * <br>
-     * In order to customize the object creation, the caller must employ an implementation of a
-     * {@link com.github.dm.jrt.android.reflect.builder.FactoryContext FactoryContext} as the
-     * invocation Service.
-     * <p>
-     * Note that the built routine results will be dispatched into the configured Looper, thus,
-     * waiting for the outputs on the very same Looper thread, immediately after its invocation,
-     * will result in a deadlock. By default output results are dispatched in the main Looper.
-     *
-     * @param target the invocation target.
-     * @return the routine builder instance.
-     */
-    @NotNull
-    public ServiceReflectionRoutineBuilder with(@NotNull final ContextInvocationTarget<?> target) {
-      return new DefaultServiceReflectionRoutineBuilder(mContext, target);
-    }
+  public static ServiceReflectionRoutineBuilder wrapperOn(
+      @NotNull final ServiceSource serviceSource) {
+    return new DefaultServiceReflectionRoutineBuilder(serviceSource);
   }
 }

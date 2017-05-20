@@ -82,6 +82,9 @@ public interface StatefulLoaderRoutineBuilder<IN, OUT, STATE>
 
   /**
    * {@inheritDoc}
+   *
+   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
+   *                                            static scope.
    */
   @NotNull
   @Override
@@ -90,6 +93,9 @@ public interface StatefulLoaderRoutineBuilder<IN, OUT, STATE>
 
   /**
    * {@inheritDoc}
+   *
+   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
+   *                                            static scope.
    */
   @NotNull
   @Override
@@ -98,6 +104,9 @@ public interface StatefulLoaderRoutineBuilder<IN, OUT, STATE>
 
   /**
    * {@inheritDoc}
+   *
+   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
+   *                                            static scope.
    */
   @NotNull
   @Override
@@ -106,6 +115,9 @@ public interface StatefulLoaderRoutineBuilder<IN, OUT, STATE>
 
   /**
    * {@inheritDoc}
+   *
+   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
+   *                                            static scope.
    */
   @NotNull
   @Override
@@ -114,6 +126,9 @@ public interface StatefulLoaderRoutineBuilder<IN, OUT, STATE>
 
   /**
    * {@inheritDoc}
+   *
+   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
+   *                                            static scope.
    */
   @NotNull
   @Override
@@ -122,6 +137,9 @@ public interface StatefulLoaderRoutineBuilder<IN, OUT, STATE>
 
   /**
    * {@inheritDoc}
+   *
+   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
+   *                                            static scope.
    */
   @NotNull
   @Override
@@ -130,6 +148,9 @@ public interface StatefulLoaderRoutineBuilder<IN, OUT, STATE>
 
   /**
    * {@inheritDoc}
+   *
+   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
+   *                                            static scope.
    */
   @NotNull
   @Override
@@ -138,6 +159,9 @@ public interface StatefulLoaderRoutineBuilder<IN, OUT, STATE>
 
   /**
    * {@inheritDoc}
+   *
+   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
+   *                                            static scope.
    */
   @NotNull
   @Override
@@ -146,6 +170,9 @@ public interface StatefulLoaderRoutineBuilder<IN, OUT, STATE>
 
   /**
    * {@inheritDoc}
+   *
+   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
+   *                                            static scope.
    */
   @NotNull
   @Override
@@ -154,6 +181,9 @@ public interface StatefulLoaderRoutineBuilder<IN, OUT, STATE>
 
   /**
    * {@inheritDoc}
+   *
+   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
+   *                                            static scope.
    */
   @NotNull
   @Override
@@ -162,6 +192,9 @@ public interface StatefulLoaderRoutineBuilder<IN, OUT, STATE>
 
   /**
    * {@inheritDoc}
+   *
+   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
+   *                                            static scope.
    */
   @NotNull
   @Override
@@ -170,6 +203,9 @@ public interface StatefulLoaderRoutineBuilder<IN, OUT, STATE>
 
   /**
    * {@inheritDoc}
+   *
+   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
+   *                                            static scope.
    */
   @NotNull
   @Override
@@ -178,6 +214,9 @@ public interface StatefulLoaderRoutineBuilder<IN, OUT, STATE>
 
   /**
    * {@inheritDoc}
+   *
+   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
+   *                                            static scope.
    */
   @NotNull
   @Override
@@ -186,6 +225,9 @@ public interface StatefulLoaderRoutineBuilder<IN, OUT, STATE>
 
   /**
    * {@inheritDoc}
+   *
+   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
+   *                                            static scope.
    */
   @NotNull
   @Override
@@ -194,6 +236,9 @@ public interface StatefulLoaderRoutineBuilder<IN, OUT, STATE>
 
   /**
    * {@inheritDoc}
+   *
+   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
+   *                                            static scope.
    */
   @NotNull
   @Override
@@ -203,6 +248,9 @@ public interface StatefulLoaderRoutineBuilder<IN, OUT, STATE>
 
   /**
    * {@inheritDoc}
+   *
+   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
+   *                                            static scope.
    */
   @NotNull
   @Override
@@ -211,6 +259,9 @@ public interface StatefulLoaderRoutineBuilder<IN, OUT, STATE>
 
   /**
    * {@inheritDoc}
+   *
+   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
+   *                                            static scope.
    */
   @NotNull
   @Override
@@ -219,6 +270,9 @@ public interface StatefulLoaderRoutineBuilder<IN, OUT, STATE>
 
   /**
    * {@inheritDoc}
+   *
+   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
+   *                                            static scope.
    */
   @NotNull
   @Override
@@ -227,6 +281,9 @@ public interface StatefulLoaderRoutineBuilder<IN, OUT, STATE>
 
   /**
    * {@inheritDoc}
+   *
+   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
+   *                                            static scope.
    */
   @NotNull
   @Override
@@ -235,6 +292,9 @@ public interface StatefulLoaderRoutineBuilder<IN, OUT, STATE>
 
   /**
    * {@inheritDoc}
+   *
+   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
+   *                                            static scope.
    */
   @NotNull
   @Override
@@ -272,6 +332,8 @@ public interface StatefulLoaderRoutineBuilder<IN, OUT, STATE>
    *
    * @param onContext the function instance.
    * @return this builder.
+   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
+   *                                            static scope.
    * @see com.github.dm.jrt.android.core.invocation.ContextInvocation#onContext(Context)
    * onContext(Context)
    */
@@ -286,6 +348,8 @@ public interface StatefulLoaderRoutineBuilder<IN, OUT, STATE>
    *
    * @param onContext the function instance.
    * @return this builder.
+   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
+   *                                            static scope.
    * @see com.github.dm.jrt.android.core.invocation.ContextInvocation#onContext(Context)
    * onContext(Context)
    */
@@ -301,6 +365,8 @@ public interface StatefulLoaderRoutineBuilder<IN, OUT, STATE>
    *
    * @param onCreate the function instance.
    * @return this builder.
+   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
+   *                                            static scope.
    * @see com.github.dm.jrt.android.core.invocation.ContextInvocation#onStart() onStart()
    */
   @NotNull

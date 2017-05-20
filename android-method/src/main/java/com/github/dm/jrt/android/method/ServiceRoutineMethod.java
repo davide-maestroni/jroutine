@@ -57,6 +57,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import static com.github.dm.jrt.android.core.invocation.InvocationFactoryReference.factoryOf;
+import static com.github.dm.jrt.core.executor.ScheduledExecutors.defaultExecutor;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.core.util.Reflection.boxingClass;
 import static com.github.dm.jrt.core.util.Reflection.boxingDefault;
@@ -132,6 +133,7 @@ public class ServiceRoutineMethod extends RoutineMethod
    */
   public ServiceRoutineMethod(@NotNull final ServiceSource serviceSource,
       @Nullable final Object... args) {
+    super(defaultExecutor());
     mServiceSource = ConstantConditions.notNull("Service context", serviceSource);
     final Class<? extends RoutineMethod> type = getClass();
     if (!Reflection.hasStaticScope(type)) {
@@ -335,22 +337,23 @@ public class ServiceRoutineMethod extends RoutineMethod
       }
     }
 
-    final Channel<OUT, OUT> resultChannel = JRoutineCore.<OUT>ofData().buildChannel();
+    final Channel<OUT, OUT> resultChannel = JRoutineCore.channel().ofType();
     outputChannels.add(resultChannel);
     final Channel<?, ? extends ParcelableFlowData<Object>> inputChannel =
-        (!inputChannels.isEmpty()) ? JRoutineAndroidChannels.mergeParcelableOutput(inputChannels)
-                                                            .buildChannel()
-            : JRoutineCore.<ParcelableFlowData<Object>>of().buildChannel();
+        (!inputChannels.isEmpty()) ? JRoutineAndroidChannels.channelHandler()
+                                                            .mergeParcelableOutputOf(inputChannels)
+            : JRoutineCore.channel().<ParcelableFlowData<Object>>of();
     final Channel<ParcelableFlowData<Object>, ParcelableFlowData<Object>> outputChannel =
-        JRoutineService.on(mServiceSource)
-                       .with(factoryOf(ServiceInvocation.class, getClass(), mArgs, params))
+        JRoutineService.routineOn(mServiceSource)
                        .withConfiguration(getConfiguration())
-                       .apply(getServiceConfiguration())
+                       .withConfiguration(getServiceConfiguration())
+                       .of(factoryOf(ServiceInvocation.class, getClass(), mArgs, params))
                        .invoke()
                        .pass(inputChannel)
                        .close();
     final Map<Integer, ? extends Channel<?, Object>> channelMap =
-        JRoutineAndroidChannels.flowOutput(0, outputChannels.size(), outputChannel).buildChannelMap();
+        JRoutineAndroidChannels.channelHandler()
+                               .outputOfFlow(0, outputChannels.size(), outputChannel);
     for (final Entry<Integer, ? extends Channel<?, Object>> entry : channelMap.entrySet()) {
       ((Channel<Object, Object>) outputChannels.get(entry.getKey())).pass(entry.getValue()).close();
     }
@@ -542,14 +545,14 @@ public class ServiceRoutineMethod extends RoutineMethod
      */
     private ServiceInvocation(@NotNull final Class<? extends ServiceRoutineMethod> type,
         @NotNull final Object[] args, @NotNull final Object[] params) {
-      final ChannelBuilder<?, ?> channelBuilder = JRoutineCore.ofData();
+      final ChannelBuilder channelBuilder = JRoutineCore.channel();
       for (int i = 0; i < params.length; ++i) {
         final Object param = params[i];
         if (param == InputChannelPlaceHolder.class) {
-          params[i] = channelBuilder.buildChannel();
+          params[i] = channelBuilder.ofType();
 
         } else if (param == OutputChannelPlaceHolder.class) {
-          params[i] = channelBuilder.buildChannel();
+          params[i] = channelBuilder.ofType();
         }
       }
 
@@ -674,7 +677,8 @@ public class ServiceRoutineMethod extends RoutineMethod
         mIsBound = true;
         final List<Channel<?, ?>> outputChannels = mOutputChannels;
         if (!outputChannels.isEmpty()) {
-          result.pass(JRoutineAndroidChannels.mergeParcelableOutput(outputChannels).buildChannel());
+          result.pass(
+              JRoutineAndroidChannels.channelHandler().mergeParcelableOutputOf(outputChannels));
         }
       }
     }

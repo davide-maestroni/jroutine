@@ -272,6 +272,10 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
     return mResultChanel.expiringIterator();
   }
 
+  public OUT get() {
+    return mResultChanel.get();
+  }
+
   public boolean getComplete() {
     return mResultChanel.getComplete();
   }

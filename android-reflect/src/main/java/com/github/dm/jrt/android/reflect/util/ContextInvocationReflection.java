@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Davide Maestroni
+ * Copyright 2017 Davide Maestroni
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.android.reflect.builder;
+package com.github.dm.jrt.android.reflect.util;
 
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.core.config.ServiceConfiguration;
@@ -42,13 +42,12 @@ import java.lang.reflect.Method;
  * <p>
  * Created by davide-maestroni on 01/29/2016.
  */
-@SuppressWarnings("WeakerAccess")
-public class AndroidReflectionRoutineBuilders {
+public class ContextInvocationReflection {
 
   /**
    * Avoid explicit instantiation.
    */
-  protected AndroidReflectionRoutineBuilders() {
+  protected ContextInvocationReflection() {
     ConstantConditions.avoid();
   }
 

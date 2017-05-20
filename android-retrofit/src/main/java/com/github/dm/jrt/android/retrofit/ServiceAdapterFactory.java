@@ -21,7 +21,7 @@ import com.github.dm.jrt.android.core.JRoutineService;
 import com.github.dm.jrt.android.core.ServiceSource;
 import com.github.dm.jrt.android.core.config.ServiceConfigurable;
 import com.github.dm.jrt.android.core.config.ServiceConfiguration;
-import com.github.dm.jrt.android.reflect.builder.AndroidReflectionRoutineBuilders;
+import com.github.dm.jrt.android.reflect.util.ContextInvocationReflection;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
@@ -144,7 +144,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
       final InvocationConfiguration invocationConfiguration =
           InvocationReflection.withAnnotations(mInvocationConfiguration, annotations);
       final ServiceConfiguration serviceConfiguration =
-          AndroidReflectionRoutineBuilders.withAnnotations(mServiceConfiguration, annotations);
+          ContextInvocationReflection.withAnnotations(mServiceConfiguration, annotations);
       if (Channel.class == rawType) {
         return new OutputChannelAdapter(invocationConfiguration,
             retrofit.responseBodyConverter(responseType, annotations),
@@ -178,7 +178,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
    * the Retrofit calls, unless they are overwritten by specific annotations.
    *
    * @see InvocationReflection#withAnnotations(InvocationConfiguration, Annotation...)
-   * @see AndroidReflectionRoutineBuilders#withAnnotations(ServiceConfiguration, Annotation...)
+   * @see ContextInvocationReflection#withAnnotations(ServiceConfiguration, Annotation...)
    */
   public static class Builder
       implements ServiceConfigurable<Builder>, InvocationConfigurable<Builder> {

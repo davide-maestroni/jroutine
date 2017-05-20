@@ -16,7 +16,6 @@
 
 package com.github.dm.jrt.android.v11.reflect;
 
-import com.github.dm.jrt.android.reflect.ContextInvocationTarget;
 import com.github.dm.jrt.android.reflect.builder.LoaderReflectionRoutineBuilder;
 import com.github.dm.jrt.android.v11.core.LoaderSource;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -82,55 +81,25 @@ public class JRoutineLoaderReflection {
   }
 
   /**
-   * Returns a Context based builder of Loader routine builders.
+   * Returns a builder of routines bound to the specified Loader source.
+   * <br>
+   * In order to customize the object creation, the caller must employ an implementation of a
+   * {@link com.github.dm.jrt.android.reflect.builder.FactoryContext FactoryContext} as the
+   * application Context.
+   * <p>
+   * Note that the built routine results will be always dispatched on the configured Looper
+   * thread, thus waiting for the outputs immediately after its invocation may result in a
+   * deadlock.
+   * <br>
+   * Note also that the invocation input data will be cached, and the results will be produced
+   * only after the invocation channel is closed, so be sure to avoid streaming inputs in order
+   * to prevent starvation or out of memory errors.
    *
-   * @param context the Loader context.
-   * @return the Context based builder.
+   * @param loaderSource the Loader source.
+   * @return the routine builder instance.
    */
   @NotNull
-  public static LoaderReflectionBuilder on(@NotNull final LoaderSource context) {
-    return new LoaderReflectionBuilder(context);
-  }
-
-  /**
-   * Context based builder of Loader routine builders.
-   */
-  @SuppressWarnings("WeakerAccess")
-  public static class LoaderReflectionBuilder {
-
-    private final LoaderSource mContext;
-
-    /**
-     * Constructor.
-     *
-     * @param context the Loader context.
-     */
-    private LoaderReflectionBuilder(@NotNull final LoaderSource context) {
-      mContext = ConstantConditions.notNull("Loader context", context);
-    }
-
-    /**
-     * Returns a builder of routines bound to the builder context, wrapping the specified target
-     * object.
-     * <br>
-     * In order to customize the object creation, the caller must employ an implementation of a
-     * {@link com.github.dm.jrt.android.reflect.builder.FactoryContext FactoryContext} as the
-     * application Context.
-     * <p>
-     * Note that the built routine results will be always dispatched on the configured Looper
-     * thread, thus waiting for the outputs immediately after its invocation may result in a
-     * deadlock.
-     * <br>
-     * Note also that the invocation input data will be cached, and the results will be produced
-     * only after the invocation channel is closed, so be sure to avoid streaming inputs in order
-     * to prevent starvation or out of memory errors.
-     *
-     * @param target the invocation target.
-     * @return the routine builder instance.
-     */
-    @NotNull
-    public LoaderReflectionRoutineBuilder with(@NotNull final ContextInvocationTarget<?> target) {
-      return new DefaultLoaderReflectionRoutineBuilder(mContext, target);
-    }
+  public static LoaderReflectionRoutineBuilder wrapperOn(@NotNull final LoaderSource loaderSource) {
+    return new DefaultLoaderReflectionRoutineBuilder(loaderSource);
   }
 }

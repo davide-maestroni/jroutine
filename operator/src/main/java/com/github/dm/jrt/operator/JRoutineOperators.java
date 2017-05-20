@@ -183,6 +183,8 @@ public class JRoutineOperators {
     return appendOutputsOf(count, sequence);
   }
 
+  // TODO: 20/05/2017 appendRange()?
+
   /**
    * Returns a factory of invocations appending the outputs returned by the specified sequence to
    * the invocation ones.
@@ -1163,7 +1165,7 @@ public class JRoutineOperators {
   /**
    * Returns a factory of invocations applying the specified projection function to each input.
    *
-   * @param projectionConsumer the consumer insatnce.
+   * @param projectionConsumer the consumer instance.
    * @param <IN>               the input data type.
    * @param <OUT>              the output data type.
    * @return the invocation factory instance.

@@ -138,7 +138,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
   Channel<IN, OUT> afterNoDelay();
 
   /**
-   * Consumes all the results by waiting for the routine to complete at the maximum for the set
+   * Consumes all the results by waiting for the invocation to complete at the maximum for the set
    * delay.
    * <p>
    * Note that this method invocation will block the calling thread until the routine invocation
@@ -165,7 +165,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
   List<OUT> all();
 
   /**
-   * Consumes all the results by waiting for the routine to complete at the maximum for the set
+   * Consumes all the results by waiting for the invocation to complete at the maximum for the set
    * delay, and put them into the specified collection.
    * <p>
    * Note that this method invocation will block the calling thread until the routine invocation
@@ -336,6 +336,37 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
    */
   @NotNull
   Iterator<OUT> expiringIterator();
+
+  /**
+   * Consumes all the results by waiting for the invocation to complete at the maximum for the set
+   * delay, and return the first available output.
+   * <p>
+   * Note that this method invocation will block the calling thread until the routine invocation
+   * completes or is aborted, or the timeout elapses.
+   *
+   * @return the first available result.
+   * @throws com.github.dm.jrt.core.channel.OutputTimeoutException if the channel is set to throw
+   *                                                               an exception when the timeout
+   *                                                               elapses.
+   * @throws com.github.dm.jrt.core.common.RoutineException        if the execution has been
+   *                                                               aborted.
+   * @throws java.lang.IllegalStateException                       if this channel is already
+   *                                                               bound to a consumer or another
+   *                                                               channel.
+   * @throws java.util.NoSuchElementException                      if no output is available (it
+   *                                                               might be thrown also in case
+   *                                                               the read timeout elapses and no
+   *                                                               timeout exception is set to be
+   *                                                               thrown).
+   * @see #eventuallyAbort()
+   * @see #eventuallyAbort(Throwable)
+   * @see #eventuallyContinue()
+   * @see #eventuallyFail()
+   * @see #in(DurationMeasure)
+   * @see #in(long, TimeUnit)
+   * @see #inNoTime()
+   */
+  OUT get(); // TODO: 20/05/2017 test
 
   /**
    * Checks if the invocation has completed, waiting at the maximum for the set delay.

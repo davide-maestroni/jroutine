@@ -19,7 +19,7 @@ package com.github.dm.jrt.android.v11.retrofit;
 import com.github.dm.jrt.android.core.config.LoaderConfigurable;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
-import com.github.dm.jrt.android.reflect.builder.AndroidReflectionRoutineBuilders;
+import com.github.dm.jrt.android.reflect.util.ContextInvocationReflection;
 import com.github.dm.jrt.android.retrofit.ComparableCall;
 import com.github.dm.jrt.android.retrofit.ContextAdapterFactory;
 import com.github.dm.jrt.android.v11.core.JRoutineLoader;
@@ -100,7 +100,7 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
     final InvocationConfiguration invocationConfiguration =
         InvocationReflection.withAnnotations(configuration, annotations);
     final LoaderConfiguration loaderConfiguration =
-        AndroidReflectionRoutineBuilders.withAnnotations(mLoaderConfiguration, annotations);
+        ContextInvocationReflection.withAnnotations(mLoaderConfiguration, annotations);
     final ContextInvocationFactory<Call<Object>, Object> factory =
         getFactory(configuration, responseType, annotations, retrofit);
     return JRoutineLoader.on(mLoaderSource)
@@ -127,7 +127,7 @@ public class LoaderAdapterFactory extends ContextAdapterFactory {
    * the Retrofit calls, unless they are overwritten by specific annotations.
    *
    * @see InvocationReflection#withAnnotations(InvocationConfiguration, Annotation...)
-   * @see AndroidReflectionRoutineBuilders#withAnnotations(LoaderConfiguration, Annotation...)
+   * @see ContextInvocationReflection#withAnnotations(LoaderConfiguration, Annotation...)
    */
   public static class Builder
       implements InvocationConfigurable<Builder>, LoaderConfigurable<Builder> {

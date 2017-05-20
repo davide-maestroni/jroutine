@@ -204,6 +204,10 @@ class ReplayOutputChannel<OUT> implements Channel<OUT, OUT>, ChannelConsumer<OUT
     return mOutputChannel.expiringIterator();
   }
 
+  public OUT get() {
+    return mOutputChannel.get();
+  }
+
   public boolean getComplete() {
     return mOutputChannel.getComplete();
   }

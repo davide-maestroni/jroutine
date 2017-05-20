@@ -370,6 +370,16 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         mTimeoutException.get());
   }
 
+  public OUT get() {
+    final Iterator<OUT> iterator = expiringIterator();
+    final OUT result = iterator.next();
+    while (iterator.hasNext()) {
+      iterator.next();
+    }
+
+    return result;
+  }
+
   public boolean getComplete() {
     synchronized (mMutex) {
       if (mState.isDone()) {

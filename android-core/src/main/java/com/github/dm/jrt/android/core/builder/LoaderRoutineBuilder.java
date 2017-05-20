@@ -70,9 +70,31 @@ public interface LoaderRoutineBuilder
   @Override
   <IN, OUT> LoaderRoutine<IN, OUT> ofSingleton(@NotNull Invocation<IN, OUT> invocation);
 
-  // TODO: 13/05/2017 Javadoc
+  /**
+   * Builds a new routine instance based on the specified invocation factory.
+   * <br>
+   * In order to prevent undesired leaks, the class of the specified factory must have a static
+   * scope.
+   *
+   * @param factory the invocation factory.
+   * @param <IN>    the input data type.
+   * @param <OUT>   the output data type.
+   * @return the routine instance.
+   * @throws java.lang.IllegalArgumentException if the class of the specified factory has not a
+   *                                            static scope.
+   */
   <IN, OUT> LoaderRoutine<IN, OUT> of(@NotNull ContextInvocationFactory<IN, OUT> factory);
 
+  /**
+   * Builds a new routine instance based on the specified invocation.
+   * <br>
+   * Only that specific invocation instance will be employed by the routine.
+   *
+   * @param invocation the invocation instance.
+   * @param <IN>       the input data type.
+   * @param <OUT>      the output data type.
+   * @return the routine instance.
+   */
   <IN, OUT> LoaderRoutine<IN, OUT> ofSingleton(@NotNull ContextInvocation<IN, OUT> invocation);
 
   /**

@@ -158,6 +158,10 @@ class FlatChannel<IN, OUT> implements Channel<IN, OUT> {
     return mOutputChannel.expiringIterator();
   }
 
+  public OUT get() {
+    return mOutputChannel.get();
+  }
+
   public boolean getComplete() {
     return mOutputChannel.getComplete();
   }

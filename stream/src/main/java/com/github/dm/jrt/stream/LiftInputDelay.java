@@ -72,8 +72,8 @@ class LiftInputDelay<IN, OUT> implements LiftingFunction<IN, OUT, IN, OUT> {
 
       public Channel<IN, OUT> apply(final Channel<IN, OUT> channel) {
         return JRoutineCore.channelOn(mExecutor)
-                           .withConfiguration(mConfiguration).<IN>ofType().pipe(
-                channel.after(mDelay, mTimeUnit));
+                           .withConfiguration(mConfiguration).<IN>ofType().after(mDelay, mTimeUnit)
+                                                                          .pipe(channel);
       }
     });
   }

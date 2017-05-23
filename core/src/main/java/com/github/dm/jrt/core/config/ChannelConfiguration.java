@@ -256,7 +256,9 @@ public final class ChannelConfiguration extends DeepEqualObject {
      * Data are passed to the invocation or the channel consumer in the same order as they are
      * passed to the channel, independently from the specific delay.
      */
-    SORTED, /**
+    SORTED,
+
+    /**
      * Unsorted.
      * <br>
      * Data are passed to the invocation or the channel consumer as soon as they are available.
@@ -275,13 +277,17 @@ public final class ChannelConfiguration extends DeepEqualObject {
      * If no result is available after the specified timeout, the called method will throw an
      * {@link com.github.dm.jrt.core.channel.OutputTimeoutException OutputTimeoutException}.
      */
-    FAIL, /**
+    FAIL,
+
+    /**
      * Continue execution.
      * <br>
      * If no result is available after the specified timeout, the called method will continue
      * its execution and eventually exit.
      */
-    CONTINUE, /**
+    CONTINUE,
+
+    /**
      * Abort invocation.
      * <br>
      * If no result is available after the specified timeout, the invocation will be aborted and

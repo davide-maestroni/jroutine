@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -206,6 +207,21 @@ public class ReadOnlyChannelTest {
     assertThat(channel.expiringIterator().hasNext()).isFalse();
     wrapped.after(millis(100)).pass("test");
     assertThat(channel.eventuallyFail().in(seconds(1)).expiringIterator().next()).isEqualTo("test");
+  }
+
+  @Test
+  public void testGet() {
+    final Channel<String, String> inputChannel = JRoutineCore.channel().ofType();
+    final Channel<?, String> channel = JRoutineCore.readOnly(inputChannel.pass("test1", "test2"));
+    try {
+      channel.eventuallyContinue().get();
+      fail();
+
+    } catch (final NoSuchElementException ignored) {
+    }
+
+    inputChannel.close();
+    assertThat(channel.get()).isEqualTo("test2");
   }
 
   @Test

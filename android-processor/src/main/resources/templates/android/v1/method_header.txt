@@ -44,14 +44,13 @@
       @org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.config.InvocationConfiguration invocationConfiguration,
       @org.jetbrains.annotations.NotNull final com.github.dm.jrt.reflect.config.WrapperConfiguration wrapperConfiguration,
       @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.config.LoaderConfiguration loaderConfiguration) {
-    return getBuilder(mContext, new ContextInvocationFactory${methodCount}${genericTypes}(${sharedFields}, target))
-        .invocationConfiguration()
-        .withPatch(invocationConfiguration)
-        ${routineBuilderOptions}
-        .apply()
-        .loaderConfiguration()
-        .withPatch(loaderConfiguration)
-        ${loaderBuilderOptions}
-        .apply()
-        .buildRoutine();
+    return getBuilder().withInvocation()
+                       .withPatch(invocationConfiguration)
+                       ${routineBuilderOptions}
+                       .configuration()
+                       .withLoader()
+                       .withPatch(loaderConfiguration)
+                       ${loaderBuilderOptions}
+                       .configuration()
+                       .of(new ContextInvocationFactory${methodCount}${genericTypes}(${sharedFields}, target));
   }

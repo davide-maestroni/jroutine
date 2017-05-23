@@ -67,7 +67,7 @@ class DefaultStatefulLoaderRoutineBuilderCompat<IN, OUT, STATE> extends
 
   @NotNull
   @Override
-  public LoaderRoutine<IN, OUT> routine() {
+  public LoaderRoutine<IN, OUT> create() {
     return JRoutineLoaderCompat.routineOn(mLoaderSource)
                                .withConfiguration(getConfiguration())
                                .withConfiguration(getLoaderConfiguration())

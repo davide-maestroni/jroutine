@@ -29,6 +29,7 @@ import com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat;
 import com.github.dm.jrt.android.v4.core.LoaderSourceCompat;
 import com.github.dm.jrt.android.v4.reflect.JRoutineLoaderReflectionCompat;
 import com.github.dm.jrt.channel.FlowData;
+import com.github.dm.jrt.channel.JRoutineChannels;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.RoutineException;
@@ -57,6 +58,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static com.github.dm.jrt.core.executor.ScheduledExecutors.defaultExecutor;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.core.util.Reflection.boxingClass;
 import static com.github.dm.jrt.core.util.Reflection.boxingDefault;
@@ -134,6 +136,7 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
    */
   public LoaderRoutineMethodCompat(@NotNull final LoaderSourceCompat loaderSource,
       @Nullable final Object... args) {
+    super(defaultExecutor());
     mLoaderSource = ConstantConditions.notNull("Loader source", loaderSource);
     final Class<? extends LoaderRoutineMethodCompat> type = getClass();
     if (!Reflection.hasStaticScope(type)) {
@@ -368,24 +371,23 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
       }
     }
 
-    final Channel<?, OUT> resultChannel = JRoutineCore.<OUT>ofData().buildChannel();
+    final Channel<?, OUT> resultChannel = JRoutineCore.channel().ofType();
     outputChannels.add(resultChannel);
     final Channel<?, ? extends FlowData<Object>> inputChannel =
-        (!inputChannels.isEmpty()) ? JRoutineAndroidChannels.mergeParcelableOutput(inputChannels)
-                                                            .buildChannel()
-            : JRoutineCore.<FlowData<Object>>of().buildChannel();
-    final Channel<FlowData<Object>, FlowData<Object>> outputChannel = JRoutineLoaderCompat.on(mLoaderSource)
-                                                                                          .with(factory)
-                                                                                          .withConfiguration(
-                                                                                      getConfiguration())
-                                                                                          .withConfiguration(
-                                                                                      getLoaderConfiguration())
-                                                                                          .invoke()
-                                                                                          .pass(
-                                                                                      inputChannel)
-                                                                                          .close();
+        (!inputChannels.isEmpty()) ? JRoutineAndroidChannels.channelHandler()
+                                                            .mergeParcelableOutputOf(inputChannels)
+            : JRoutineCore.channel().<FlowData<Object>>of();
+    final Channel<FlowData<Object>, FlowData<Object>> outputChannel =
+        JRoutineLoaderCompat.routineOn(mLoaderSource)
+                            .withConfiguration(getConfiguration())
+                            .withConfiguration(getLoaderConfiguration())
+                            .of(factory)
+                            .invoke()
+                            .pass(inputChannel)
+                            .close();
     final Map<Integer, ? extends Channel<?, Object>> channelMap =
-        JRoutineAndroidChannels.flowOutput(0, outputChannels.size(), outputChannel).buildChannelMap();
+        JRoutineAndroidChannels.channelHandler()
+                               .outputOfFlow(0, outputChannels.size(), outputChannel);
     for (final Entry<Integer, ? extends Channel<?, Object>> entry : channelMap.entrySet()) {
       ((Channel<Object, Object>) outputChannels.get(entry.getKey())).pass(entry.getValue()).close();
     }
@@ -444,21 +446,6 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
 
     @NotNull
     @Override
-    public ReflectionLoaderRoutineMethodCompat withConfiguration(
-        @NotNull final WrapperConfiguration configuration) {
-      mConfiguration = ConstantConditions.notNull("wrapper configuration", configuration);
-      return this;
-    }
-
-    @NotNull
-    @Override
-    public ReflectionLoaderRoutineMethodCompat withConfiguration(
-        @NotNull final InvocationConfiguration configuration) {
-      return (ReflectionLoaderRoutineMethodCompat) super.withConfiguration(configuration);
-    }
-
-    @NotNull
-    @Override
     @SuppressWarnings("unchecked")
     public <OUT> Channel<?, OUT> call(@Nullable final Object... params) {
       final Object[] safeParams = asArgs(params);
@@ -469,15 +456,15 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
                 + "> but was <" + safeParams.length + ">");
       }
 
-      final Routine<Object, Object> routine = JRoutineLoaderReflectionCompat.on(mContext)
-                                                                            .with(mTarget)
+      final Routine<Object, Object> routine = JRoutineLoaderReflectionCompat.wrapperOn(mContext)
                                                                             .withConfiguration(
                                                                                 getConfiguration())
                                                                             .withConfiguration(
                                                                                 getLoaderConfiguration())
                                                                             .withConfiguration(
                                                                                 mConfiguration)
-                                                                            .method(method);
+                                                                            .methodOf(mTarget,
+                                                                                method);
       final Channel<Object, Object> channel = routine.invoke().sorted();
       for (final Object param : safeParams) {
         if (param instanceof Channel) {
@@ -489,6 +476,13 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
       }
 
       return (Channel<?, OUT>) channel.close();
+    }
+
+    @NotNull
+    @Override
+    public ReflectionLoaderRoutineMethodCompat withConfiguration(
+        @NotNull final InvocationConfiguration configuration) {
+      return (ReflectionLoaderRoutineMethodCompat) super.withConfiguration(configuration);
     }
 
     @NotNull
@@ -512,6 +506,14 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
     @SuppressWarnings("unchecked")
     public Builder<? extends ReflectionLoaderRoutineMethodCompat> withLoader() {
       return (Builder<? extends ReflectionLoaderRoutineMethodCompat>) super.withLoader();
+    }
+
+    @NotNull
+    @Override
+    public ReflectionLoaderRoutineMethodCompat withConfiguration(
+        @NotNull final WrapperConfiguration configuration) {
+      mConfiguration = ConstantConditions.notNull("wrapper configuration", configuration);
+      return this;
     }
 
     @NotNull
@@ -663,7 +665,7 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
         mIsBound = true;
         final List<Channel<?, ?>> outputChannels = getOutputChannels();
         if (!outputChannels.isEmpty()) {
-          result.pass(Channels.mergeOutput(outputChannels).buildChannel());
+          result.pass(JRoutineChannels.channelHandler().mergeOutputOf(outputChannels));
         }
       }
     }

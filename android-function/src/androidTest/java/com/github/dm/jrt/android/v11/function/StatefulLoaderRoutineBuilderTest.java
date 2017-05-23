@@ -87,7 +87,7 @@ public class StatefulLoaderRoutineBuilderTest
         atomicBoolean.set(false);
         return atomicBoolean;
       }
-    }).routine().invoke().close().in(seconds(10)).getComplete()).isTrue();
+    }).create().invoke().close().in(seconds(10)).getComplete()).isTrue();
     assertThat(state.get()).isFalse();
   }
 
@@ -100,7 +100,7 @@ public class StatefulLoaderRoutineBuilderTest
       public void accept(final Context context) {
         state.set(false);
       }
-    }).routine().invoke().close().in(seconds(10)).getComplete()).isTrue();
+    }).create().invoke().close().in(seconds(10)).getComplete()).isTrue();
     assertThat(state.get()).isFalse();
   }
 
@@ -127,7 +127,7 @@ public class StatefulLoaderRoutineBuilderTest
                                                        .withLoader()
                                                        .withCacheStrategy(CacheStrategyType.CACHE)
                                                        .configuration()
-                                                       .routine();
+                                                       .create();
     assertThat(routine.invoke().close().in(seconds(10)).getComplete()).isTrue();
     assertThat(state.get()).isTrue();
     routine.clear();
@@ -148,7 +148,7 @@ public class StatefulLoaderRoutineBuilderTest
                 reference.set(e);
                 return null;
               }
-            }).routine().invoke();
+            }).create().invoke();
     assertThat(reference.get()).isNull();
     channel.abort(new IOException());
     assertThat(channel.in(seconds(10)).getComplete()).isTrue();
@@ -167,7 +167,7 @@ public class StatefulLoaderRoutineBuilderTest
               public void accept(final RoutineException state, final RoutineException e) {
                 reference.set(e);
               }
-            }).routine().invoke();
+            }).create().invoke();
     assertThat(reference.get()).isNull();
     channel.abort(new IOException());
     assertThat(channel.in(seconds(10)).getComplete()).isTrue();
@@ -187,7 +187,7 @@ public class StatefulLoaderRoutineBuilderTest
                 reference.set(e);
                 return null;
               }
-            }).routine().invoke();
+            }).create().invoke();
     assertThat(reference.get()).isNull();
     channel.abort(new IOException());
     assertThat(channel.in(seconds(10)).getComplete()).isTrue();
@@ -210,7 +210,7 @@ public class StatefulLoaderRoutineBuilderTest
             atomicBoolean.set(false);
             return atomicBoolean;
           }
-        }).routine().invoke();
+        }).create().invoke();
     assertThat(state.get()).isTrue();
     channel.abort(new IOException());
     assertThat(channel.in(seconds(10)).getComplete()).isTrue();
@@ -231,7 +231,7 @@ public class StatefulLoaderRoutineBuilderTest
       public void accept(final AtomicBoolean atomicBoolean) {
         atomicBoolean.set(false);
       }
-    }).routine();
+    }).create();
     assertThat(routine.invoke().close().in(seconds(10)).getComplete()).isTrue();
     assertThat(state.get()).isFalse();
   }
@@ -251,7 +251,7 @@ public class StatefulLoaderRoutineBuilderTest
             integers[0] = integer1 + integer2;
             return integers;
           }
-        }).routine();
+        }).create();
     assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(10)).all()).containsExactly(2,
         3, 4, 5);
   }
@@ -269,7 +269,7 @@ public class StatefulLoaderRoutineBuilderTest
           public Iterable<? extends Integer> apply(final Integer integer1, final Integer integer2) {
             return Collections.singleton(integer1 + integer2);
           }
-        }).routine();
+        }).create();
     assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(10)).all()).containsExactly(2,
         3, 4, 5);
   }
@@ -288,7 +288,7 @@ public class StatefulLoaderRoutineBuilderTest
           public void accept(final List<Integer> list, final Integer integer) {
             list.add(integer + 1);
           }
-        }).onCompleteOutput(FunctionDecorator.<List<Integer>>identity()).routine();
+        }).onCompleteOutput(FunctionDecorator.<List<Integer>>identity()).create();
     assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(10)).all()).containsOnly(
         Arrays.asList(2, 3, 4, 5));
   }
@@ -306,7 +306,7 @@ public class StatefulLoaderRoutineBuilderTest
           public Integer apply(final Integer integer1, final Integer integer2) {
             return integer1 + integer2;
           }
-        }).routine();
+        }).create();
     assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(10)).all()).containsExactly(2,
         3, 4, 5);
   }
@@ -358,7 +358,7 @@ public class StatefulLoaderRoutineBuilderTest
           public void accept(final ServiceState serviceState) {
             serviceState.clear();
           }
-        }).routine();
+        }).create();
     assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(10)).all()).containsExactly(2,
         3, 4, 5);
   }
@@ -410,7 +410,7 @@ public class StatefulLoaderRoutineBuilderTest
           public void accept(final ServiceState serviceState) {
             serviceState.clear();
           }
-        }).routine();
+        }).create();
     assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(10)).all()).containsExactly(2,
         3, 4, 5);
   }
@@ -435,7 +435,7 @@ public class StatefulLoaderRoutineBuilderTest
             integers[0] = integer;
             return integers;
           }
-        }).routine();
+        }).create();
     assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(10)).all()).containsOnly(10);
   }
 
@@ -458,7 +458,7 @@ public class StatefulLoaderRoutineBuilderTest
           public void accept(final Integer integer, final Channel<Integer, ?> result) {
             result.pass(integer);
           }
-        }).routine();
+        }).create();
     assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(10)).all()).containsOnly(10);
   }
 
@@ -482,7 +482,7 @@ public class StatefulLoaderRoutineBuilderTest
             result.pass(integer);
             return null;
           }
-        }).routine();
+        }).create();
     assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(10)).all()).containsOnly(10);
   }
 
@@ -504,7 +504,7 @@ public class StatefulLoaderRoutineBuilderTest
           public Iterable<? extends Integer> apply(final Integer integer) {
             return Collections.singleton(integer);
           }
-        }).routine();
+        }).create();
     assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(10)).all()).containsOnly(10);
   }
 
@@ -521,7 +521,7 @@ public class StatefulLoaderRoutineBuilderTest
           public Integer apply(final Integer integer1, final Integer integer2) {
             return integer1 + integer2;
           }
-        }).onCompleteOutput(FunctionDecorator.<Integer>identity()).routine();
+        }).onCompleteOutput(FunctionDecorator.<Integer>identity()).create();
     assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(10)).all()).containsOnly(10);
   }
 
@@ -544,7 +544,7 @@ public class StatefulLoaderRoutineBuilderTest
             result.pass(integer);
             return null;
           }
-        }).routine();
+        }).create();
     assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(10)).all()).containsOnly(10);
   }
 

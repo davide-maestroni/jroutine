@@ -17,8 +17,8 @@
 package com.github.dm.jrt.android.proxy.builder;
 
 import com.github.dm.jrt.android.core.config.ServiceConfigurable;
+import com.github.dm.jrt.android.reflect.ContextInvocationTarget;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
-import com.github.dm.jrt.proxy.builder.ProxyObjectBuilder;
 import com.github.dm.jrt.reflect.config.WrapperConfiguration;
 
 import org.jetbrains.annotations.NotNull;
@@ -32,14 +32,31 @@ import org.jetbrains.annotations.NotNull;
  * @param <TYPE> the interface type.
  */
 public interface ServiceProxyObjectBuilder<TYPE>
-    extends ProxyObjectBuilder<TYPE>, ServiceConfigurable<ServiceProxyObjectBuilder<TYPE>> {
+    extends ProxyContextObjectBuilder<TYPE>, ServiceConfigurable<ServiceProxyObjectBuilder<TYPE>> {
 
   /**
-   * {@inheritDoc}
+   * Returns a proxy object enabling asynchronous call of the target instance methods.
+   * <p>
+   * The routines used for calling the methods will honor the attributes specified in any optional
+   * <i>{@code com.github.dm.jrt.reflect.annotation.*}</i> as well as
+   * <i>{@code com.github.dm.jrt.android.reflect.annotation.*}</i> annotations. Such annotations
+   * will override any configuration set through the builder.
+   * <p>
+   * The proxy object is created through code generation based on the interfaces annotated with
+   * {@link com.github.dm.jrt.android.proxy.annotation.ServiceProxy ServiceProxy}.
+   * <br>
+   * Note that you'll need to enable annotation pre-processing by adding the processor artifact
+   * to the specific project dependencies.
+   *
+   * @param target the invocation target.
+   * @return the proxy object.
+   * @throws java.lang.IllegalArgumentException if the target does not represent a concrete class.
+   * @see com.github.dm.jrt.android.reflect.annotation Android Annotations
+   * @see com.github.dm.jrt.reflect.annotation Annotations
    */
   @NotNull
   @Override
-  ServiceProxyObjectBuilder<TYPE> withConfiguration(@NotNull InvocationConfiguration configuration);
+  TYPE proxyOf(@NotNull ContextInvocationTarget<?> target);
 
   /**
    * {@inheritDoc}
@@ -49,25 +66,11 @@ public interface ServiceProxyObjectBuilder<TYPE>
   ServiceProxyObjectBuilder<TYPE> withConfiguration(@NotNull WrapperConfiguration configuration);
 
   /**
-   * Returns a proxy object enabling asynchronous call of the target instance methods.
-   * <p>
-   * The routines used for calling the methods will honor the attributes specified in any optional
-   * <i>{@code com.github.dm.jrt.reflect.annotation.*}</i> annotations.
-   * <br>
-   * Note that such annotations will override any configuration set through the builder.
-   * <p>
-   * The proxy object is created through code generation based on the interfaces annotated with
-   * {@link com.github.dm.jrt.android.proxy.annotation.ServiceProxy ServiceProxy}.
-   * <br>
-   * Note that, you'll need to enable annotation pre-processing by adding the processor artifact
-   * to the specific project dependencies.
-   *
-   * @return the proxy object.
-   * @see com.github.dm.jrt.reflect.annotation Annotations
+   * {@inheritDoc}
    */
   @NotNull
   @Override
-  TYPE buildProxy();
+  ServiceProxyObjectBuilder<TYPE> withConfiguration(@NotNull InvocationConfiguration configuration);
 
   /**
    * {@inheritDoc}

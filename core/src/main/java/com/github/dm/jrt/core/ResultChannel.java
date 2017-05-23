@@ -371,13 +371,20 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
   }
 
   public OUT get() {
-    final Iterator<OUT> iterator = expiringIterator();
-    final OUT result = iterator.next();
-    while (iterator.hasNext()) {
-      iterator.next();
+    OUT output = null;
+    boolean hasOutputs = false;
+    if (getComplete()) {
+      for (final OUT out : this) {
+        hasOutputs = true;
+        output = out;
+      }
     }
 
-    return result;
+    if (!hasOutputs) {
+      throw new NoSuchElementException("no available output");
+    }
+
+    return output;
   }
 
   public boolean getComplete() {
@@ -849,6 +856,27 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     }
   }
 
+  @NotNull
+  private Runnable getFlushCommand(final boolean forceClose) {
+    final FlushCommand command;
+    if (forceClose) {
+      if (mForcedFlushCommand == null) {
+        mForcedFlushCommand = new FlushCommand(true);
+      }
+
+      command = mForcedFlushCommand;
+
+    } else {
+      if (mFlushCommand == null) {
+        mFlushCommand = new FlushCommand(false);
+      }
+
+      command = mFlushCommand;
+    }
+
+    return command;
+  }
+
   private void internalAbort(@NotNull final RoutineException abortException) {
     if (mAbortException == null) {
       mAbortException = abortException;
@@ -1083,11 +1111,26 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     ChannelConsumer<? super OUT> getConsumer();
 
     /**
+     * Returns the consumer delay.
+     *
+     * @return the consumer delay.
+     */
+    @NotNull
+    DurationMeasure getDelay();
+
+    /**
      * Check if a consumer has been bound to the channel.
      *
      * @return whether the channel is bound.
      */
     boolean isBound();
+
+    /**
+     * Check if the consumer is delayed.
+     *
+     * @return whether the consumer is delayed.
+     */
+    boolean isDelayed();
   }
 
   /**
@@ -1168,27 +1211,15 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     public void run(@NotNull final BindingHandler<OUT> handler, final boolean forceClose) {
       // Need to make sure to pass the outputs to the consumer in the executor thread, so to avoid
       // deadlock issues
-      if (mExecutor.isExecutionThread()) {
+      if (handler.isDelayed()) {
+        final DurationMeasure delay = handler.getDelay();
+        mExecutor.execute(getFlushCommand(forceClose), delay.value, delay.unit);
+
+      } else if (mExecutor.isExecutionThread()) {
         handler.flushOutput(forceClose);
 
       } else {
-        final FlushCommand command;
-        if (forceClose) {
-          if (mForcedFlushCommand == null) {
-            mForcedFlushCommand = new FlushCommand(true);
-          }
-
-          command = mForcedFlushCommand;
-
-        } else {
-          if (mFlushCommand == null) {
-            mFlushCommand = new FlushCommand(false);
-          }
-
-          command = mFlushCommand;
-        }
-
-        mExecutor.execute(command);
+        mExecutor.execute(getFlushCommand(forceClose));
       }
     }
   }
@@ -1202,6 +1233,10 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
     private final Object mConsumerMutex;
 
+    private final DurationMeasure mDelay;
+
+    private final boolean mIsDelayed;
+
     private final SimpleQueue<Object> mQueue = new SimpleQueue<Object>();
 
     /**
@@ -1210,6 +1245,8 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
      * @param consumer the consumer instance.
      */
     private ConsumerHandler(@NotNull final ChannelConsumer<? super OUT> consumer) {
+      final DurationMeasure delay = (mDelay = mResultDelay.get());
+      mIsDelayed = !delay.isZero();
       mConsumer = consumer;
       mConsumerMutex = getMutex(consumer);
     }
@@ -1284,8 +1321,17 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
       return mConsumer;
     }
 
+    @NotNull
+    public DurationMeasure getDelay() {
+      return mDelay;
+    }
+
     public boolean isBound() {
       return true;
+    }
+
+    public boolean isDelayed() {
+      return mIsDelayed;
     }
   }
 
@@ -2322,7 +2368,16 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
       return null;
     }
 
+    @NotNull
+    public DurationMeasure getDelay() {
+      return DurationMeasure.zero(TimeUnit.MILLISECONDS);
+    }
+
     public boolean isBound() {
+      return false;
+    }
+
+    public boolean isDelayed() {
       return false;
     }
   }
@@ -2446,7 +2501,13 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
   private class SyncFlusher implements Flusher<OUT> {
 
     public void run(@NotNull final BindingHandler<OUT> handler, final boolean forceClose) {
-      handler.flushOutput(forceClose);
+      if (handler.isDelayed()) {
+        final DurationMeasure delay = handler.getDelay();
+        mExecutor.execute(getFlushCommand(forceClose), delay.value, delay.unit);
+
+      } else {
+        handler.flushOutput(forceClose);
+      }
     }
   }
 

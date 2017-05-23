@@ -16,17 +16,14 @@
 
 package com.github.dm.jrt.function.builder;
 
-import com.github.dm.jrt.core.config.InvocationConfigurable;
-import com.github.dm.jrt.core.config.InvocationConfiguration;
-import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
-import com.github.dm.jrt.core.routine.Routine;
+import com.github.dm.jrt.core.invocation.InvocationFactory;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Builder of stateless routines based on functions handling the invocation lifecycle.
+ * Builder of stateless invocation factories based on functions handling the invocation lifecycle.
  * <p>
- * For example, a routine switching strings to upper-case can be implemented as follows:
+ * For example, a factory switching strings to upper-case can be implemented as follows:
  * <pre><code>
  * builder.onNextOutput(String::toUpperCase)
  *        .create();
@@ -38,33 +35,19 @@ import org.jetbrains.annotations.NotNull;
  * Note also that any external object used inside the function must be synchronized in order to
  * avoid concurrency issues.
  * <p>
- * Created by davide-maestroni on 02/24/2017.
+ * Created by davide-maestroni on 05/23/2017.
  *
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-public interface StatelessRoutineBuilder<IN, OUT>
-    extends StatelessBuilder<IN, OUT, StatelessRoutineBuilder<IN, OUT>>,
-    InvocationConfigurable<StatelessRoutineBuilder<IN, OUT>> {
+public interface StatelessFactoryBuilder<IN, OUT>
+    extends StatelessBuilder<IN, OUT, StatelessFactoryBuilder<IN, OUT>> {
 
   /**
-   * Builds a new routine instance based on the set functions.
+   * Builds a new factory instance based on the set functions.
    *
-   * @return the routine instance.
+   * @return the invocation factory instance.
    */
   @NotNull
-  Routine<IN, OUT> create();
-
-  /**
-   * {@inheritDoc}
-   */
-  @NotNull
-  StatelessRoutineBuilder<IN, OUT> withConfiguration(
-      @NotNull InvocationConfiguration configuration);
-
-  /**
-   * {@inheritDoc}
-   */
-  @NotNull
-  Builder<? extends StatelessRoutineBuilder<IN, OUT>> withInvocation();
+  InvocationFactory<IN, OUT> create();
 }

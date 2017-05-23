@@ -22,6 +22,7 @@
   @SuppressWarnings("unchecked")
   private com.github.dm.jrt.core.routine.Routine<?, ${resultClassName}> initRoutine${methodCount}(
       @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.reflect.ContextInvocationTarget<?> target,
+      @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.ServiceSource serviceSource,
       @org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.config.InvocationConfiguration invocationConfiguration,
       @org.jetbrains.annotations.NotNull final com.github.dm.jrt.reflect.config.WrapperConfiguration wrapperConfiguration,
       @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.config.ServiceConfiguration serviceConfiguration) {
@@ -29,13 +30,13 @@
     final com.github.dm.jrt.android.core.invocation.InvocationFactoryReference<Object, ${resultClassName}> factory = com.github.dm.jrt.android.core.invocation.InvocationFactoryReference.factoryOf(
         // We need to work around Proguard stripping away generics information, so the use of a ClassToken is not an option
         (Class<? extends com.github.dm.jrt.android.core.invocation.ContextInvocation<Object, ${resultClassName}>>) new ContextInvocation${methodCount}${genericTypes}(sharedFields, target).getClass(), sharedFields, target);
-    return getBuilder(mServiceSource, factory).invocationConfiguration()
-                                              .withPatch(invocationConfiguration)
-                                              ${routineBuilderOptions}
-                                              .apply()
-                                              .serviceConfiguration()
-                                              .withPatch(serviceConfiguration)
-                                              ${serviceBuilderOptions}
-                                              .apply()
-                                              .buildRoutine();
+    return com.github.dm.jrt.android.core.JRoutineService.routineOn(serviceSource).withInvocation()
+                                                                                  .withPatch(invocationConfiguration)
+                                                                                  ${routineBuilderOptions}
+                                                                                  .configuration()
+                                                                                  .withService()
+                                                                                  .withPatch(serviceConfiguration)
+                                                                                  ${serviceBuilderOptions}
+                                                                                  .configuration()
+                                                                                  .of(factory);
   }

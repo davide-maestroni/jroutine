@@ -203,6 +203,67 @@ class DefaultChannelHandler implements ChannelHandler {
 
   @NotNull
   @SuppressWarnings("unchecked")
+  public <IN> Channel<IN, ?> duplicateInputOf(@NotNull final Channel<?, ?>... channels) {
+    final ArrayList<Channel<IN, ?>> outputChannels = new ArrayList<Channel<IN, ?>>();
+    if (channels.length == 0) {
+      throw new IllegalArgumentException("the array of channels must not be empty");
+    }
+
+    for (final Channel<?, ?> channel : channels) {
+      if (channel == null) {
+        throw new NullPointerException("the array of channels must not contain null objects");
+      }
+
+      outputChannels.add((Channel<IN, ?>) channel);
+    }
+
+    final Channel<IN, IN> channel =
+        JRoutineCore.channelOn(mExecutor).withConfiguration(mConfiguration).ofType();
+    return channel.consume(new DuplicateChannelConsumer<IN>(outputChannels));
+  }
+
+  @NotNull
+  @SuppressWarnings("unchecked")
+  public <IN> Channel<IN, ?> duplicateInputOf(
+      @NotNull final Iterable<? extends Channel<? super IN, ?>> channels) {
+    final ArrayList<Channel<IN, ?>> outputChannels = new ArrayList<Channel<IN, ?>>();
+    for (final Channel<?, ?> channel : channels) {
+      if (channel == null) {
+        throw new NullPointerException("the collection of channels must not contain null objects");
+      }
+
+      outputChannels.add((Channel<IN, ?>) channel);
+    }
+
+    if (outputChannels.isEmpty()) {
+      throw new IllegalArgumentException("the collection of channels must not be empty");
+    }
+
+    final Channel<IN, IN> channel =
+        JRoutineCore.channelOn(mExecutor).withConfiguration(mConfiguration).ofType();
+    return channel.consume(new DuplicateChannelConsumer<IN>(outputChannels));
+  }
+
+  @NotNull
+  public <OUT> List<Channel<?, OUT>> duplicateOutputOf(
+      @NotNull final Channel<?, ? extends OUT> channel, final int count) {
+    ConstantConditions.positive("channel count", count);
+    final ArrayList<Channel<OUT, ?>> outputChannels = new ArrayList<Channel<OUT, ?>>();
+    final ArrayList<Channel<?, OUT>> channelList = new ArrayList<Channel<?, OUT>>();
+    final ChannelBuilder builder =
+        JRoutineCore.channelOn(mExecutor).withConfiguration(mConfiguration);
+    for (int i = 0; i < count; ++i) {
+      final Channel<OUT, OUT> outputChannel = builder.ofType();
+      outputChannels.add(outputChannel);
+      channelList.add(readOnly(outputChannel));
+    }
+
+    channel.consume(new DuplicateChannelConsumer<OUT>(outputChannels));
+    return channelList;
+  }
+
+  @NotNull
+  @SuppressWarnings("unchecked")
   public <IN> Channel<FlowData<IN>, ?> inputFlowOf(@NotNull final Channel<? super IN, ?> channel,
       final int id) {
     final Channel<IN, IN> outputChannel = JRoutineCore.channel().ofType();
@@ -240,10 +301,6 @@ class DefaultChannelHandler implements ChannelHandler {
       @NotNull final Iterable<Integer> ids) {
     final HashSet<Integer> idSet = new HashSet<Integer>();
     for (final Integer id : ids) {
-      if (id == null) {
-        throw new NullPointerException("the set of ids must not contain null objects");
-      }
-
       idSet.add(id);
     }
 

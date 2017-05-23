@@ -25,12 +25,14 @@ import com.github.dm.jrt.function.util.BiFunction;
 import com.github.dm.jrt.function.util.BiFunctionDecorator;
 import com.github.dm.jrt.function.util.Consumer;
 import com.github.dm.jrt.function.util.Function;
+import com.github.dm.jrt.operator.sequence.Sequence.EndpointsType;
 
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.MathContext;
 import java.util.Arrays;
 
 import static com.github.dm.jrt.core.executor.ScheduledExecutors.syncExecutor;
@@ -51,7 +53,7 @@ public class SequenceTest {
   @NotNull
   private static <DATA> Routine<DATA, DATA> commandRoutine(
       @NotNull final Consumer<Channel<DATA, ?>> consumer) {
-    return JRoutineFunction.<DATA, DATA>stateless().onComplete(consumer).routine();
+    return JRoutineFunction.<DATA, DATA>statelessRoutine().onComplete(consumer).create();
   }
 
   @Test
@@ -72,23 +74,24 @@ public class SequenceTest {
                                                                .close()
                                                                .in(seconds(3))
                                                                .all()).isEqualTo(
-        Arrays.asList(0, new BigDecimal(0.7), new BigDecimal(0.7).add(new BigDecimal(0.7))));
+        Arrays.asList(BigDecimal.ZERO, new BigDecimal(0.7),
+            new BigDecimal(0.7).add(new BigDecimal(0.7))));
     assertThat(
         commandRoutine(range(0, -10, BigInteger.valueOf(-2))).invoke().close().in(seconds(3)).all())
-        .isEqualTo(
-            Arrays.asList(0, BigInteger.valueOf(-2), BigInteger.valueOf(-4), BigInteger.valueOf(-6),
-                BigInteger.valueOf(-8), -10));
+        .isEqualTo(Arrays.asList(BigInteger.ZERO, BigInteger.valueOf(-2), BigInteger.valueOf(-4),
+            BigInteger.valueOf(-6), BigInteger.valueOf(-8), BigInteger.valueOf(-10)));
     assertThat(commandRoutine(range(0, BigInteger.valueOf(2), 0.7)).invoke()
                                                                    .close()
                                                                    .in(seconds(3))
                                                                    .all()).isEqualTo(
-        Arrays.asList(0, 0.7, 1.4));
+        Arrays.asList(BigDecimal.ZERO, new BigDecimal(0.7),
+            new BigDecimal(0.7).add(new BigDecimal(0.7))));
     assertThat(commandRoutine(range(0, -10, -2)).invoke().close().in(seconds(3)).all()).isEqualTo(
         Arrays.asList(0, -2, -4, -6, -8, -10));
     assertThat(commandRoutine(range(0, 2, 0.7)).invoke().close().in(seconds(3)).all()).isEqualTo(
-        Arrays.asList(0, 0.7d, 1.4d));
+        Arrays.asList(0d, 0.7d, 1.4d));
     assertThat(commandRoutine(range(0, 2, 0.7f)).invoke().close().in(seconds(3)).all()).isEqualTo(
-        Arrays.asList(0, 0.7f, 1.4f));
+        Arrays.asList(0f, 0.7f, 1.4f));
     assertThat(commandRoutine(range(0L, -9, -2)).invoke().close().in(seconds(3)).all()).isEqualTo(
         Arrays.asList(0L, -2L, -4L, -6L, -8L));
     assertThat(
@@ -98,7 +101,7 @@ public class SequenceTest {
                                                                    .close()
                                                                    .in(seconds(3))
                                                                    .all()).isEqualTo(
-        Arrays.asList((byte) 0, (byte) 2, (byte) 4, (byte) 6, (byte) 8));
+        Arrays.asList((short) 0, (short) 2, (short) 4, (short) 6, (short) 8));
     assertThat(commandRoutine(range((byte) 0, (byte) 10, (byte) 2)).invoke()
                                                                    .close()
                                                                    .in(seconds(3))
@@ -108,33 +111,102 @@ public class SequenceTest {
                                                           .close()
                                                           .in(seconds(3))
                                                           .all()).isEqualTo(
-        Arrays.asList(0, 1, new BigDecimal(2)));
+        Arrays.asList(BigDecimal.ZERO, new BigDecimal(1), new BigDecimal(2)));
     assertThat(commandRoutine(range(0, BigInteger.valueOf(-2))).invoke()
                                                                .close()
                                                                .in(seconds(3))
                                                                .all()).isEqualTo(
-        Arrays.asList(0, -1, BigInteger.valueOf(-2)));
+        Arrays.asList(BigInteger.ZERO, BigInteger.valueOf(-1), BigInteger.valueOf(-2)));
     assertThat(commandRoutine(range(0.1, BigInteger.valueOf(2))).invoke()
                                                                 .close()
                                                                 .in(seconds(3))
                                                                 .all()).isEqualTo(
-        Arrays.asList(0.1, 1.1));
+        Arrays.asList(new BigDecimal(0.1, new MathContext(55)),
+            new BigDecimal(0.1).add(BigDecimal.ONE)));
     assertThat(commandRoutine(range(0, -5)).invoke().close().in(seconds(3)).all()).isEqualTo(
         Arrays.asList(0, -1, -2, -3, -4, -5));
     assertThat(commandRoutine(range(0, 2.1)).invoke().close().in(seconds(3)).all()).isEqualTo(
-        Arrays.asList(0, 1, 2));
+        Arrays.asList(0d, 1d, 2d));
     assertThat(commandRoutine(range(0, 1.9f)).invoke().close().in(seconds(3)).all()).isEqualTo(
-        Arrays.asList(0, 1));
+        Arrays.asList(0f, 1f));
     assertThat(commandRoutine(range(0L, -4)).invoke().close().in(seconds(3)).all()).isEqualTo(
-        Arrays.asList(0L, -1L, -2L, -3L, -4));
+        Arrays.asList(0L, -1L, -2L, -3L, -4L));
     assertThat(commandRoutine(range(0, (short) 4)).invoke().close().in(seconds(3)).all()).isEqualTo(
-        Arrays.asList(0, 1, 2, 3, (short) 4));
+        Arrays.asList(0, 1, 2, 3, 4));
     assertThat(
         commandRoutine(range((byte) 0, (short) 4)).invoke().close().in(seconds(3)).all()).isEqualTo(
-        Arrays.asList((byte) 0, (byte) 1, (byte) 2, (byte) 3, (short) 4));
+        Arrays.asList((short) 0, (short) 1, (short) 2, (short) 3, (short) 4));
     assertThat(
         commandRoutine(range((byte) 0, (byte) 5)).invoke().close().in(seconds(3)).all()).isEqualTo(
         Arrays.asList((byte) 0, (byte) 1, (byte) 2, (byte) 3, (byte) 4, (byte) 5));
+  }
+
+  @Test
+  public void testRangeEndpoints() {
+    assertThat(commandRoutine(range(EndpointsType.INCLUSIVE, 0, 10, 2)).invoke()
+                                                                       .close()
+                                                                       .in(seconds(3))
+                                                                       .all()).isEqualTo(
+        Arrays.asList(0, 2, 4, 6, 8, 10));
+    assertThat(commandRoutine(range(EndpointsType.START_EXCLUSIVE, 0, 10, 2)).invoke()
+                                                                             .close()
+                                                                             .in(seconds(3))
+                                                                             .all()).isEqualTo(
+        Arrays.asList(2, 4, 6, 8, 10));
+    assertThat(commandRoutine(range(EndpointsType.END_EXCLUSIVE, 0, 10, 2)).invoke()
+                                                                           .close()
+                                                                           .in(seconds(3))
+                                                                           .all()).isEqualTo(
+        Arrays.asList(0, 2, 4, 6, 8));
+    assertThat(commandRoutine(range(EndpointsType.EXCLUSIVE, 0, 10, 2)).invoke()
+                                                                       .close()
+                                                                       .in(seconds(3))
+                                                                       .all()).isEqualTo(
+        Arrays.asList(2, 4, 6, 8));
+    assertThat(
+        commandRoutine(range(EndpointsType.INCLUSIVE, 0, -5)).invoke().close().in(seconds(3)).all())
+        .isEqualTo(Arrays.asList(0, -1, -2, -3, -4, -5));
+    assertThat(commandRoutine(range(EndpointsType.START_EXCLUSIVE, 0, -5)).invoke()
+                                                                          .close()
+                                                                          .in(seconds(3))
+                                                                          .all()).isEqualTo(
+        Arrays.asList(-1, -2, -3, -4, -5));
+    assertThat(commandRoutine(range(EndpointsType.END_EXCLUSIVE, 0, -5)).invoke()
+                                                                        .close()
+                                                                        .in(seconds(3))
+                                                                        .all()).isEqualTo(
+        Arrays.asList(0, -1, -2, -3, -4));
+    assertThat(
+        commandRoutine(range(EndpointsType.EXCLUSIVE, 0, -5)).invoke().close().in(seconds(3)).all())
+        .isEqualTo(Arrays.asList(-1, -2, -3, -4));
+    assertThat(commandRoutine(
+        range(EndpointsType.INCLUSIVE, 'a', 'e', new Function<Character, Character>() {
+
+          public Character apply(final Character character) {
+            return (char) (character + 1);
+          }
+        })).invoke().close().in(seconds(3)).all()).containsExactly('a', 'b', 'c', 'd', 'e');
+    assertThat(commandRoutine(
+        range(EndpointsType.START_EXCLUSIVE, 'a', 'e', new Function<Character, Character>() {
+
+          public Character apply(final Character character) {
+            return (char) (character + 1);
+          }
+        })).invoke().close().in(seconds(3)).all()).containsExactly('b', 'c', 'd', 'e');
+    assertThat(commandRoutine(
+        range(EndpointsType.END_EXCLUSIVE, 'a', 'e', new Function<Character, Character>() {
+
+          public Character apply(final Character character) {
+            return (char) (character + 1);
+          }
+        })).invoke().close().in(seconds(3)).all()).containsExactly('a', 'b', 'c', 'd');
+    assertThat(commandRoutine(
+        range(EndpointsType.EXCLUSIVE, 'a', 'e', new Function<Character, Character>() {
+
+          public Character apply(final Character character) {
+            return (char) (character + 1);
+          }
+        })).invoke().close().in(seconds(3)).all()).containsExactly('b', 'c', 'd');
   }
 
   @Test
@@ -224,7 +296,7 @@ public class SequenceTest {
     }
 
     try {
-      Sequence.range(null, 1, 1);
+      Sequence.range((Integer) null, 1, 1);
       fail();
 
     } catch (final NullPointerException ignored) {
@@ -305,13 +377,13 @@ public class SequenceTest {
                            .close()
                            .in(seconds(3))
                            .all()).containsExactly('a', 'b', 'c', 'd', 'e');
-    assertThat(JRoutineFunction.<Character, Character>statelessOn(syncExecutor()).onComplete(
+    assertThat(JRoutineFunction.<Character, Character>statelessRoutineOn(syncExecutor()).onComplete(
         sequence('a', 5, new BiFunction<Character, Long, Character>() {
 
           public Character apply(final Character character, final Long n) {
             return (char) (character + 1);
           }
-        })).routine().invoke().close().all()).containsExactly('a', 'b', 'c', 'd', 'e');
+        })).create().invoke().close().all()).containsExactly('a', 'b', 'c', 'd', 'e');
   }
 
   @Test

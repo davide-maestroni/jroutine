@@ -422,15 +422,14 @@ public class ServiceRoutineMethod extends RoutineMethod
                 + "> but was <" + safeParams.length + ">");
       }
 
-      final Routine<Object, Object> routine = JRoutineServiceReflection.on(mContext)
-                                                                       .with(mTarget)
+      final Routine<Object, Object> routine = JRoutineServiceReflection.wrapperOn(mContext)
                                                                        .withConfiguration(
                                                                            getConfiguration())
                                                                        .withConfiguration(
                                                                            getServiceConfiguration())
                                                                        .withConfiguration(
                                                                            mConfiguration)
-                                                                       .method(method);
+                                                                       .methodOf(mTarget, method);
       final Channel<Object, Object> channel = routine.invoke().sorted();
       for (final Object param : safeParams) {
         if (param instanceof Channel) {

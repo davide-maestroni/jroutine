@@ -694,8 +694,9 @@ public class RoutineTest {
     assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(110);
 
     startTime = System.currentTimeMillis();
-    final InvocationConfiguration configuration =
-        builder().withInputOrder(OrderType.SORTED).withOutputOrder(OrderType.SORTED).configuration();
+    final InvocationConfiguration configuration = builder().withInputOrder(OrderType.SORTED)
+                                                           .withOutputOrder(OrderType.SORTED)
+                                                           .configuration();
     final Channel<String, String> channel3 = JRoutineCore.routine()
                                                          .withInvocation()
                                                          .withPatch(configuration)
@@ -1249,6 +1250,20 @@ public class RoutineTest {
 
     } catch (final NullPointerException ignored) {
     }
+  }
+
+  @Test
+  public void testGet() {
+    final Channel<Object, Object> channel =
+        JRoutineCore.routine().of(IdentityInvocation.factory()).invoke();
+    try {
+      channel.pass("test1", "test2").eventuallyContinue().in(seconds(3)).get();
+      fail();
+
+    } catch (final NoSuchElementException ignored) {
+    }
+
+    assertThat(channel.close().get()).isEqualTo("test2");
   }
 
   @Test

@@ -194,6 +194,73 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
       @NotNull Iterable<? extends Channel<?, ? extends OUT>> channels);
 
   /**
+   * Returns a channel duplicating the input data into the specified ones.
+   * <p>
+   * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
+   * <pre><code>
+   * =&gt; [IN, IN, IN, ...]
+   * =&gt; [IN, IN, IN, ...]
+   * =&gt; [IN, IN, IN, ...]
+   * </code></pre>
+   *
+   * @param channels the array of channels.
+   * @param <IN>     the input data type.
+   * @return the channel instance.
+   * @throws java.lang.IllegalArgumentException if the specified array is empty.
+   * @throws java.lang.NullPointerException     if the specified array is null or contains a null
+   *                                            object.
+   */
+  @NotNull
+  <IN> Channel<IN, ?> duplicateInputOf(@NotNull Channel<?, ?>... channels);
+
+  /**
+   * Returns a channel duplicating the input data into the specified ones.
+   * <p>
+   * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
+   * <pre><code>
+   * =&gt; [IN, IN, IN, ...]
+   * =&gt; [IN, IN, IN, ...]
+   * =&gt; [IN, IN, IN, ...]
+   * </code></pre>
+   *
+   * @param channels the iterable of channels.
+   * @param <IN>     the input data type.
+   * @return the channel instance.
+   * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
+   * @throws java.lang.NullPointerException     if the specified iterable is null or contains a null
+   *                                            object.
+   */
+  @NotNull
+  <IN> Channel<IN, ?> duplicateInputOf(
+      @NotNull Iterable<? extends Channel<? super IN, ?>> channels);
+
+  /**
+   * Returns a list of channels duplicating the output data of the specified one.
+   * <p>
+   * Note that the builder will successfully create only one channel instance, and that the passed
+   * ones will be bound as a result of the creation.
+   * <br>
+   * Note also that the returned channel will be read-only.
+   * <p>
+   * Given channel {@code A} the final output will be:
+   * <pre><code>
+   * =&gt; [A, A, A, ...]
+   * =&gt; [A, A, A, ...]
+   * =&gt; [A, A, A, ...]
+   * ...
+   * </code></pre>
+   *
+   * @param channel the channel instance.
+   * @param count   the number of resulting channels.
+   * @param <OUT>   the output data type.
+   * @return the list of duplicated channels.
+   * @throws java.lang.IllegalArgumentException if the specified count is zero or negative.
+   */
+  @NotNull
+  <OUT> List<Channel<?, OUT>> duplicateOutputOf(@NotNull Channel<?, ? extends OUT> channel,
+      int count);
+
+  /**
    * Returns a channel of flows feeding the specified one.
    * <br>
    * Each output will be filtered based on the specified ID.
@@ -202,7 +269,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    * <p>
    * Given channel {@code A}, its final output will be:
    * <pre><code>
-   * A =&gt; [FlowData(id, IN).data, FlowData(id, IN).data, ...]
+   * A =&gt; [FlowData(id, IN).data, FlowData(id, IN).data, FlowData(id, IN).data, ...]
    * </code></pre>
    *
    * @param channel the channel to feed.
@@ -287,8 +354,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    * Given channel {@code A} and channels {@code IN1}, {@code IN2} and {@code IN3} in the returned
    * map, the final output of {@code A} will be:
    * <pre><code>
-   * A =&gt; [FlowData(startId + 1, IN2), FlowData(startId + 0, IN1), FlowData(startId + 2, IN3),
-   * ...]
+   * A =&gt; [FlowData(startId + 1, IN2), FlowData(startId + 0, IN1), ...]
    * </code></pre>
    *
    * @param startId   the flow start ID.
@@ -786,10 +852,10 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    * =&gt; [FlowData(id, A), FlowData(id, A), FlowData(id, A), ...]
    * </code></pre>
    *
-   * @param channel the channel.
+   * @param channel the channel instance.
    * @param id      the flow ID.
    * @param <OUT>   the output data type.
-   * @return the channel instance.
+   * @return the flow channel instance.
    */
   @NotNull
   <OUT> Channel<?, FlowData<OUT>> outputFlowOf(@NotNull Channel<?, ? extends OUT> channel, int id);
@@ -896,7 +962,7 @@ public interface ChannelHandler extends ChannelConfigurable<ChannelHandler> {
    * =&gt; [A, A, A, ...] =&gt; [A, A, A, ...] =&gt; [A, A, A, ...] ...
    * </code></pre>
    *
-   * @param channel the channel.
+   * @param channel the channel instance.
    * @param <OUT>   the output data type.
    * @return the replaying channel instance.
    */

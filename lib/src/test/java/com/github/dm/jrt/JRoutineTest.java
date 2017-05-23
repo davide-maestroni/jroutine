@@ -28,6 +28,7 @@ import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.core.invocation.CallInvocation;
 import com.github.dm.jrt.core.invocation.CommandInvocation;
 import com.github.dm.jrt.core.invocation.InvocationException;
+import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.NullLog;
@@ -39,6 +40,7 @@ import com.github.dm.jrt.function.util.BiConsumer;
 import com.github.dm.jrt.function.util.BiFunction;
 import com.github.dm.jrt.function.util.Consumer;
 import com.github.dm.jrt.function.util.Function;
+import com.github.dm.jrt.function.util.FunctionDecorator;
 import com.github.dm.jrt.function.util.Predicate;
 import com.github.dm.jrt.function.util.Supplier;
 import com.github.dm.jrt.function.util.SupplierDecorator;
@@ -112,12 +114,13 @@ public class JRoutineTest {
   public void testCallFunction() {
 
     final Routine<String, String> routine1 =
-        JRoutine.<String, String, StringBuilder>stateful().onCreate(new Supplier<StringBuilder>() {
+        JRoutine.<String, String, StringBuilder>statefulRoutine().onCreate(
+            new Supplier<StringBuilder>() {
 
-          public StringBuilder get() {
-            return new StringBuilder();
-          }
-        }).onNextState(new BiFunction<StringBuilder, String, StringBuilder>() {
+              public StringBuilder get() {
+                return new StringBuilder();
+              }
+            }).onNextState(new BiFunction<StringBuilder, String, StringBuilder>() {
 
           public StringBuilder apply(final StringBuilder builder, final String s) {
             return builder.append(s);
@@ -127,12 +130,12 @@ public class JRoutineTest {
           public String apply(final StringBuilder builder) {
             return builder.toString();
           }
-        }).routine();
+        }).create();
     assertThat(routine1.invoke().pass("test", "1").close().in(seconds(1)).all()).containsOnly(
         "test1");
 
     final Routine<String, String> routine2 =
-        JRoutine.<String, String, List<String>>statefulOn(syncExecutor()).onCreate(
+        JRoutine.<String, String, List<String>>statefulRoutineOn(syncExecutor()).onCreate(
             new Supplier<List<String>>() {
 
               public List<String> get() {
@@ -153,7 +156,7 @@ public class JRoutineTest {
 
             return builder.toString();
           }
-        }).routine();
+        }).create();
     assertThat(routine2.invoke().pass("test", "1").close().in(seconds(1)).all()).containsOnly(
         "test1");
   }
@@ -305,13 +308,13 @@ public class JRoutineTest {
   public void testConsumerCommand() {
 
     final Routine<Void, String> routine =
-        JRoutine.<Void, String>stateless().onComplete(new Consumer<Channel<String, ?>>() {
+        JRoutine.<Void, String>statelessRoutine().onComplete(new Consumer<Channel<String, ?>>() {
 
           public void accept(final Channel<String, ?> result) {
 
             result.pass("test", "1");
           }
-        }).routine();
+        }).create();
     assertThat(routine.invoke().close().in(seconds(1)).all()).containsOnly("test", "1");
   }
 
@@ -319,14 +322,14 @@ public class JRoutineTest {
   public void testConsumerMapping() {
 
     final Routine<Object, String> routine =
-        JRoutine.<Object, String>statelessOn(syncExecutor()).onNext(
+        JRoutine.<Object, String>statelessRoutineOn(syncExecutor()).onNext(
             new BiConsumer<Object, Channel<String, ?>>() {
 
               public void accept(final Object o, final Channel<String, ?> result) {
 
                 result.pass(o.toString());
               }
-            }).routine();
+            }).create();
     assertThat(routine.invoke().pass("test", 1).close().in(seconds(1)).all()).containsOnly("test",
         "1");
   }
@@ -822,6 +825,42 @@ public class JRoutineTest {
   }
 
   @Test
+  @SuppressWarnings("unchecked")
+  public void testStatefulFactory() {
+    final InvocationFactory<Integer, List<Integer>> factory =
+        JRoutine.<Integer, List<Integer>, List<Integer>>statefulFactory().onCreate(
+            new Supplier<List<Integer>>() {
+
+              public List<Integer> get() {
+                return new ArrayList<Integer>();
+              }
+            }).onNextConsume(new BiConsumer<List<Integer>, Integer>() {
+
+          public void accept(final List<Integer> list, final Integer integer) {
+            list.add(integer + 1);
+          }
+        }).onCompleteOutput(FunctionDecorator.<List<Integer>>identity()).create();
+    final Routine<Integer, List<Integer>> routine = JRoutine.routine().of(factory);
+    assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(1)).all()).containsOnly(
+        Arrays.asList(2, 3, 4, 5));
+  }
+
+  @Test
+  public void testStatelessFactory() {
+    final InvocationFactory<Integer, Integer> factory =
+        JRoutine.<Integer, Integer>statelessFactory().onNextOutput(
+            new Function<Integer, Integer>() {
+
+              public Integer apply(final Integer integer) {
+                return integer + 1;
+              }
+            }).create();
+    final Routine<Integer, Integer> routine = JRoutine.routine().of(factory);
+    assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(1)).all()).containsExactly(2, 3,
+        4, 5);
+  }
+
+  @Test
   public void testStream() {
     assertThat(
         JRoutine.streamOf(JRoutine.routine().of(JRoutineOperators.appendOutputsOf(range(1, 1000))))
@@ -842,12 +881,12 @@ public class JRoutineTest {
   public void testSupplierCommand() {
 
     final Routine<Void, String> routine =
-        JRoutine.<Void, String>stateless().onCompleteOutput(new Supplier<String>() {
+        JRoutine.<Void, String>statelessRoutine().onCompleteOutput(new Supplier<String>() {
 
           public String get() {
             return "test";
           }
-        }).routine();
+        }).create();
     assertThat(routine.invoke().close().in(seconds(1)).all()).containsOnly("test");
   }
 

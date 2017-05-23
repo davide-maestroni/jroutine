@@ -618,14 +618,14 @@ public class StreamRoutineTest {
 
     try {
       JRoutineStream.streamOf(JRoutineCore.routine().of(unary(retryFunction)))
-                    .map(JRoutineFunction.<Channel<Object, String>, Object>stateless().onNext(
+                    .map(JRoutineFunction.<Channel<Object, String>, Object>statelessRoutine().onNext(
                         new BiConsumer<Channel<Object, String>, Channel<Object, ?>>() {
 
                           public void accept(final Channel<Object, String> channel,
                               final Channel<Object, ?> result) throws Exception {
                             result.pass(channel);
                           }
-                        }).routine())
+                        }).create())
                     .invoke()
                     .pass((Object) null)
                     .close()

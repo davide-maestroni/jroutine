@@ -167,7 +167,7 @@ public interface StatelessLoaderRoutineBuilder<IN, OUT> extends StatelessRoutine
    */
   @NotNull
   @Override
-  LoaderRoutine<IN, OUT> routine();
+  LoaderRoutine<IN, OUT> create();
 
   /**
    * {@inheritDoc}

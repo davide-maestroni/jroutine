@@ -58,7 +58,7 @@ import static com.github.dm.jrt.function.util.PredicateDecorator.isNull;
 import static com.github.dm.jrt.function.util.PredicateDecorator.isSameAs;
 import static com.github.dm.jrt.function.util.PredicateDecorator.negative;
 import static com.github.dm.jrt.operator.JRoutineOperators.append;
-import static com.github.dm.jrt.operator.JRoutineOperators.appendElementsOf;
+import static com.github.dm.jrt.operator.JRoutineOperators.appendAllIn;
 import static com.github.dm.jrt.operator.JRoutineOperators.appendOutputOf;
 import static com.github.dm.jrt.operator.JRoutineOperators.appendOutputsOf;
 import static com.github.dm.jrt.operator.JRoutineOperators.collect;
@@ -67,7 +67,7 @@ import static com.github.dm.jrt.operator.JRoutineOperators.failIf;
 import static com.github.dm.jrt.operator.JRoutineOperators.failOnComplete;
 import static com.github.dm.jrt.operator.JRoutineOperators.filter;
 import static com.github.dm.jrt.operator.JRoutineOperators.orElse;
-import static com.github.dm.jrt.operator.JRoutineOperators.orElseElementsOf;
+import static com.github.dm.jrt.operator.JRoutineOperators.orElseAllIn;
 import static com.github.dm.jrt.operator.JRoutineOperators.orElseOutputOf;
 import static com.github.dm.jrt.operator.JRoutineOperators.orElseOutputsOf;
 import static com.github.dm.jrt.operator.JRoutineOperators.orElseThrow;
@@ -75,7 +75,7 @@ import static com.github.dm.jrt.operator.JRoutineOperators.peekComplete;
 import static com.github.dm.jrt.operator.JRoutineOperators.peekError;
 import static com.github.dm.jrt.operator.JRoutineOperators.peekOutput;
 import static com.github.dm.jrt.operator.JRoutineOperators.prepend;
-import static com.github.dm.jrt.operator.JRoutineOperators.prependElementsOf;
+import static com.github.dm.jrt.operator.JRoutineOperators.prependAllIn;
 import static com.github.dm.jrt.operator.JRoutineOperators.prependOutputOf;
 import static com.github.dm.jrt.operator.JRoutineOperators.prependOutputsOf;
 import static com.github.dm.jrt.operator.JRoutineOperators.reduce;
@@ -83,7 +83,7 @@ import static com.github.dm.jrt.operator.JRoutineOperators.replaceIf;
 import static com.github.dm.jrt.operator.JRoutineOperators.replaceWithOutputIf;
 import static com.github.dm.jrt.operator.JRoutineOperators.replaceWithOutputsIf;
 import static com.github.dm.jrt.operator.JRoutineOperators.then;
-import static com.github.dm.jrt.operator.JRoutineOperators.thenElementsOf;
+import static com.github.dm.jrt.operator.JRoutineOperators.thenAllIn;
 import static com.github.dm.jrt.operator.JRoutineOperators.thenOutputOf;
 import static com.github.dm.jrt.operator.JRoutineOperators.thenOutputsOf;
 import static com.github.dm.jrt.operator.JRoutineOperators.unary;
@@ -173,7 +173,7 @@ public class JRoutineOperatorsTest {
                            .in(seconds(3))
                            .all()).containsExactly("test1", "test2", "test3");
     assertThat(JRoutineCore.routine()
-                           .of(appendElementsOf(
+                           .of(appendAllIn(
                                sequence("test2", 2, new BiFunction<String, Long, String>() {
 
                                  public String apply(final String s, final Long step) {
@@ -1818,7 +1818,7 @@ public class JRoutineOperatorsTest {
                            .in(seconds(3))
                            .all()).containsExactly("test");
     assertThat(JRoutineCore.routine()
-                           .of(orElseElementsOf(
+                           .of(orElseAllIn(
                                sequence("est1", 2, new BiFunction<String, Long, String>() {
 
                                  public String apply(final String s, final Long step) {
@@ -1876,7 +1876,7 @@ public class JRoutineOperatorsTest {
                            .in(seconds(3))
                            .all()).containsExactly("test");
     assertThat(JRoutineCore.routineOn(syncExecutor())
-                           .of(orElseElementsOf(
+                           .of(orElseAllIn(
                                sequence("est1", 2, new BiFunction<String, Long, String>() {
 
                                  public String apply(final String s, final Long step) {
@@ -2093,7 +2093,7 @@ public class JRoutineOperatorsTest {
                            .in(seconds(3))
                            .all()).containsExactly("test2", "test3", "test1");
     assertThat(JRoutineCore.routine()
-                           .of(prependElementsOf(
+                           .of(prependAllIn(
                                sequence("test2", 2, new BiFunction<String, Long, String>() {
 
                                  public String apply(final String s, final Long step) {
@@ -2709,7 +2709,7 @@ public class JRoutineOperatorsTest {
                            .in(seconds(3))
                            .all()).containsExactly("test2", "test3");
     assertThat(JRoutineCore.routine()
-                           .of(thenElementsOf(
+                           .of(thenAllIn(
                                sequence("test2", 2, new BiFunction<String, Long, String>() {
 
                                  public String apply(final String s, final Long step) {

@@ -64,7 +64,7 @@ public class StatelessLoaderRoutineBuilderCompatTest
           public void accept(final RoutineException e) throws Exception {
             reference.set(e);
           }
-        }).routine().invoke();
+        }).create().invoke();
     assertThat(reference.get()).isNull();
     channel.abort(new IOException());
     assertThat(channel.in(seconds(10)).getComplete()).isTrue();
@@ -81,7 +81,7 @@ public class StatelessLoaderRoutineBuilderCompatTest
               public void accept(final Integer integer, final Channel<Integer, ?> result) {
                 result.pass(integer + 1);
               }
-            }).routine();
+            }).create();
     assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(10)).all()).containsExactly(2,
         3, 4, 5);
   }
@@ -97,7 +97,7 @@ public class StatelessLoaderRoutineBuilderCompatTest
                 integers[0] = integer + 1;
                 return integers;
               }
-            }).routine();
+            }).create();
     assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(10)).all()).containsExactly(2,
         3, 4, 5);
   }
@@ -111,7 +111,7 @@ public class StatelessLoaderRoutineBuilderCompatTest
               public Iterable<? extends Integer> apply(final Integer integer) {
                 return Collections.singleton(integer + 1);
               }
-            }).routine();
+            }).create();
     assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(10)).all()).containsExactly(2,
         3, 4, 5);
   }
@@ -131,7 +131,7 @@ public class StatelessLoaderRoutineBuilderCompatTest
           public List<Integer> get() {
             return list;
           }
-        }).routine();
+        }).create();
     assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(10)).all()).containsOnly(
         Arrays.asList(2, 3, 4, 5));
   }
@@ -145,7 +145,7 @@ public class StatelessLoaderRoutineBuilderCompatTest
               public Integer apply(final Integer integer) {
                 return integer + 1;
               }
-            }).routine();
+            }).create();
     assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(10)).all()).containsExactly(2,
         3, 4, 5);
   }
@@ -160,7 +160,7 @@ public class StatelessLoaderRoutineBuilderCompatTest
             integers[0] = 17;
             return integers;
           }
-        }).routine();
+        }).create();
     assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(10)).all()).containsExactly(17);
   }
 
@@ -173,7 +173,7 @@ public class StatelessLoaderRoutineBuilderCompatTest
               public Iterable<? extends Integer> get() {
                 return Collections.singleton(17);
               }
-            }).routine();
+            }).create();
     assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(10)).all()).containsExactly(17);
   }
 
@@ -185,7 +185,7 @@ public class StatelessLoaderRoutineBuilderCompatTest
           public Integer get() {
             return 17;
           }
-        }).routine();
+        }).create();
     assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(10)).all()).containsExactly(17);
   }
 

@@ -16,15 +16,12 @@
 
 package com.github.dm.jrt.function.builder;
 
-import com.github.dm.jrt.core.config.InvocationConfigurable;
-import com.github.dm.jrt.core.config.InvocationConfiguration;
-import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
-import com.github.dm.jrt.core.routine.Routine;
+import com.github.dm.jrt.core.invocation.InvocationFactory;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Builder of stateful routines based on functions handling the invocation lifecycle.
+ * Builder of stateful invocation factories based on functions handling the invocation lifecycle.
  * <p>
  * The state object is created when the invocation starts and modified during the execution.
  * <br>
@@ -39,7 +36,7 @@ import org.jetbrains.annotations.NotNull;
  * Note, however, that the state object should be reset on finalization in order to avoid
  * unpredictable behaviors during different executions.
  * <p>
- * For example, a routine concatenating strings through a {@code StringBuilder} can be implemented
+ * For example, a factory concatenating strings through a {@code StringBuilder} can be implemented
  * as follows:
  * <pre><code>
  * builder.onCreate(StringBuilder::new)
@@ -54,34 +51,20 @@ import org.jetbrains.annotations.NotNull;
  * Note also that any external object used inside the function must be synchronized in order to
  * avoid concurrency issues.
  * <p>
- * Created by davide-maestroni on 02/23/2017.
+ * Created by davide-maestroni on 05/23/2017.
  *
  * @param <IN>    the input data type.
  * @param <OUT>   the output data type.
  * @param <STATE> the state data type.
  */
-public interface StatefulRoutineBuilder<IN, OUT, STATE>
-    extends StatefulBuilder<IN, OUT, STATE, StatefulRoutineBuilder<IN, OUT, STATE>>,
-    InvocationConfigurable<StatefulRoutineBuilder<IN, OUT, STATE>> {
+public interface StatefulFactoryBuilder<IN, OUT, STATE>
+    extends StatefulBuilder<IN, OUT, STATE, StatefulFactoryBuilder<IN, OUT, STATE>> {
 
   /**
-   * Builds a new routine instance based on the set functions.
+   * Builds a new factory instance based on the set functions.
    *
-   * @return the routine instance.
+   * @return the invocation factory instance.
    */
   @NotNull
-  Routine<IN, OUT> create();
-
-  /**
-   * {@inheritDoc}
-   */
-  @NotNull
-  StatefulRoutineBuilder<IN, OUT, STATE> withConfiguration(
-      @NotNull InvocationConfiguration configuration);
-
-  /**
-   * {@inheritDoc}
-   */
-  @NotNull
-  Builder<? extends StatefulRoutineBuilder<IN, OUT, STATE>> withInvocation();
+  InvocationFactory<IN, OUT> create();
 }

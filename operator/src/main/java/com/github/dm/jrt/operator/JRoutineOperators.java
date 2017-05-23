@@ -167,36 +167,15 @@ public class JRoutineOperators {
   /**
    * Returns a factory of invocations appending the outputs returned by the specified sequence to
    * the invocation ones.
-   * <br>
-   * The sequence will be called {@code count} number of times only when the routine invocation
-   * completes. The count number must be positive.
-   *
-   * @param count    the number of generated outputs.
-   * @param sequence the sequence instance.
-   * @param <DATA>   the data type.
-   * @return the invocation factory instance.
-   * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
-   */
-  @NotNull
-  public static <DATA> InvocationFactory<DATA, DATA> appendElementsOf(final long count,
-      @NotNull final Sequence<DATA> sequence) {
-    return appendOutputsOf(count, sequence);
-  }
-
-  // TODO: 20/05/2017 appendRange()?
-
-  /**
-   * Returns a factory of invocations appending the outputs returned by the specified sequence to
-   * the invocation ones.
    *
    * @param sequence the sequence instance.
    * @param <DATA>   the data type.
    * @return the invocation factory instance.
    */
   @NotNull
-  public static <DATA> InvocationFactory<DATA, DATA> appendElementsOf(
+  public static <DATA> InvocationFactory<DATA, DATA> appendAllIn(
       @NotNull final Sequence<DATA> sequence) {
-    return appendElementsOf(1, sequence);
+    return appendOutputsOf(sequence);
   }
 
   /**
@@ -827,34 +806,15 @@ public class JRoutineOperators {
   /**
    * Returns a factory of invocations producing the outputs returned by the specified sequence in
    * case the invocation produced none.
-   * <br>
-   * The sequence will be called {@code count} number of times only when the routine invocation
-   * completes. The count number must be positive.
-   *
-   * @param count    the number of generated outputs.
-   * @param sequence the sequence instance.
-   * @param <DATA>   the data type.
-   * @return the invocation factory instance.
-   * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
-   */
-  @NotNull
-  public static <DATA> InvocationFactory<DATA, DATA> orElseElementsOf(final long count,
-      @NotNull final Sequence<DATA> sequence) {
-    return orElseOutputsOf(count, sequence);
-  }
-
-  /**
-   * Returns a factory of invocations producing the outputs returned by the specified sequence in
-   * case the invocation produced none.
    *
    * @param sequence the sequence instance.
    * @param <DATA>   the data type.
    * @return the invocation factory instance.
    */
   @NotNull
-  public static <DATA> InvocationFactory<DATA, DATA> orElseElementsOf(
+  public static <DATA> InvocationFactory<DATA, DATA> orElseAllIn(
       @NotNull final Sequence<DATA> sequence) {
-    return orElseElementsOf(1, sequence);
+    return orElseOutputsOf(sequence);
   }
 
   /**
@@ -1048,36 +1008,15 @@ public class JRoutineOperators {
    * <br>
    * If no input is passed to the invocation, the outputs will be produced only when the invocation
    * completes.
-   * <br>
-   * The sequence will be called {@code count} number of times. The count number must be positive.
-   *
-   * @param count    the number of generated outputs.
-   * @param sequence the sequence instance.
-   * @param <DATA>   the data type.
-   * @return the invocation factory instance.
-   * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
-   */
-  @NotNull
-  public static <DATA> InvocationFactory<DATA, DATA> prependElementsOf(final long count,
-      @NotNull final Sequence<DATA> sequence) {
-    return prependOutputsOf(count, sequence);
-  }
-
-  /**
-   * Returns a factory of invocations prepending the outputs returned by the specified sequence to
-   * the invocation ones.
-   * <br>
-   * If no input is passed to the invocation, the outputs will be produced only when the invocation
-   * completes.
    *
    * @param sequence the sequence instance.
    * @param <DATA>   the data type.
    * @return the invocation factory instance.
    */
   @NotNull
-  public static <DATA> InvocationFactory<DATA, DATA> prependElementsOf(
+  public static <DATA> InvocationFactory<DATA, DATA> prependAllIn(
       @NotNull final Sequence<DATA> sequence) {
-    return prependElementsOf(1, sequence);
+    return prependOutputsOf(sequence);
   }
 
   /**
@@ -1416,26 +1355,6 @@ public class JRoutineOperators {
    * Returns a factory of invocations generating the outputs returned by the specified sequence
    * after the invocation completes.
    * <br>
-   * The sequence will be called {@code count} number of times. The count number must be positive.
-   * <br>
-   * The invocation inputs will be ignored.
-   *
-   * @param count    the number of generated outputs.
-   * @param sequence the sequence instance.
-   * @param <DATA>   the data type.
-   * @return the invocation factory instance.
-   * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
-   */
-  @NotNull
-  public static <DATA> InvocationFactory<DATA, DATA> thenElementsOf(final long count,
-      @NotNull final Sequence<DATA> sequence) {
-    return thenOutputsOf(count, sequence);
-  }
-
-  /**
-   * Returns a factory of invocations generating the outputs returned by the specified sequence
-   * after the invocation completes.
-   * <br>
    * The invocation inputs will be ignored.
    *
    * @param sequence the sequence instance.
@@ -1443,9 +1362,9 @@ public class JRoutineOperators {
    * @return the invocation factory instance.
    */
   @NotNull
-  public static <DATA> InvocationFactory<DATA, DATA> thenElementsOf(
+  public static <DATA> InvocationFactory<DATA, DATA> thenAllIn(
       @NotNull final Sequence<DATA> sequence) {
-    return thenElementsOf(1, sequence);
+    return thenOutputsOf(sequence);
   }
 
   /**

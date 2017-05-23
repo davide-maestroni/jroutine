@@ -339,12 +339,12 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
 
   /**
    * Consumes all the results by waiting for the invocation to complete at the maximum for the set
-   * delay, and return the first available output.
+   * delay, and return the last output.
    * <p>
    * Note that this method invocation will block the calling thread until the routine invocation
    * completes or is aborted, or the timeout elapses.
    *
-   * @return the first available result.
+   * @return the last available result.
    * @throws com.github.dm.jrt.core.channel.OutputTimeoutException if the channel is set to throw
    *                                                               an exception when the timeout
    *                                                               elapses.
@@ -366,7 +366,7 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
    * @see #in(long, TimeUnit)
    * @see #inNoTime()
    */
-  OUT get(); // TODO: 20/05/2017 test
+  OUT get();
 
   /**
    * Checks if the invocation has completed, waiting at the maximum for the set delay.

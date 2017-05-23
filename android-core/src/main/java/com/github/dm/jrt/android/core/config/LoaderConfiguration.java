@@ -221,13 +221,19 @@ public final class LoaderConfiguration extends DeepEqualObject {
     /**
      * On completion the invocation results are cleared.
      */
-    CLEAR, /**
+    CLEAR,
+
+    /**
      * Only in case of error the results are cleared, otherwise they are retained.
      */
-    CACHE_IF_SUCCESS, /**
+    CACHE_IF_SUCCESS,
+
+    /**
      * Only in case of successful completion the results are cleared, otherwise they are retained.
      */
-    CACHE_IF_ERROR, /**
+    CACHE_IF_ERROR,
+
+    /**
      * On completion the invocation results are retained.
      */
     CACHE
@@ -252,15 +258,21 @@ public final class LoaderConfiguration extends DeepEqualObject {
     /**
      * The clash is resolved by joining the two invocations.
      */
-    JOIN, /**
+    JOIN,
+
+    /**
      * The clash is resolved by aborting the running invocation.
      */
-    ABORT_OTHER, /**
+    ABORT_OTHER,
+
+    /**
      * The clash is resolved by aborting the invocation with an
      * {@link com.github.dm.jrt.android.core.invocation.InvocationClashException
      * InvocationClashException}.
      */
-    ABORT_THIS, /**
+    ABORT_THIS,
+
+    /**
      * The clash is resolved by aborting both the invocations.
      */
     ABORT_BOTH

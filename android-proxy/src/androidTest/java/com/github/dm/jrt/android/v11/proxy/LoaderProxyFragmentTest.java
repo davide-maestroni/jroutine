@@ -25,14 +25,12 @@ import com.github.dm.jrt.android.proxy.annotation.LoaderProxy;
 import com.github.dm.jrt.android.proxy.builder.LoaderProxyObjectBuilder;
 import com.github.dm.jrt.android.proxy.builder.LoaderProxyRoutineBuilder;
 import com.github.dm.jrt.android.proxy.test.R;
-import com.github.dm.jrt.android.v11.core.LoaderSource;
+import com.github.dm.jrt.android.reflect.ContextInvocationTarget;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
-import com.github.dm.jrt.core.executor.ScheduledExecutor;
-import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.log.Log;
 import com.github.dm.jrt.core.log.Log.Level;
@@ -58,7 +56,7 @@ import java.util.List;
 
 import static com.github.dm.jrt.android.reflect.ContextInvocationTarget.classOfType;
 import static com.github.dm.jrt.android.reflect.ContextInvocationTarget.instanceOf;
-import static com.github.dm.jrt.android.v11.core.LoaderSource.loaderFrom;
+import static com.github.dm.jrt.android.v11.core.LoaderSource.loaderOf;
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builder;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -85,14 +83,13 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
 
     final TestFragment fragment =
         (TestFragment) getActivity().getFragmentManager().findFragmentById(R.id.test_fragment);
-    final TestStatic testStatic = JRoutineLoaderProxy.on(LoaderSource.loaderOf(fragment))
-                                                     .with(classOfType(TestClass.class))
+    final TestStatic testStatic = JRoutineLoaderProxy.wrapperOn(loaderOf(fragment))
                                                      .withInvocation()
-                                                     .withExecutor(ScheduledExecutors.poolExecutor())
                                                      .withLogLevel(Level.DEBUG)
                                                      .withLog(new NullLog())
-                                                     .configured()
-                                                     .buildProxy(TestStatic.class);
+                                                     .configuration()
+                                                     .proxyOf(classOfType(TestClass.class),
+                                                         TestStatic.class);
 
     try {
 
@@ -116,24 +113,23 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
 
     final TestFragment fragment =
         (TestFragment) getActivity().getFragmentManager().findFragmentById(R.id.test_fragment);
-    final LoaderProxyRoutineBuilder builder = JRoutineLoaderProxy.on(LoaderSource.loaderOf(fragment))
-                                                                 .with(instanceOf(TestList.class))
+    final LoaderProxyRoutineBuilder builder = JRoutineLoaderProxy.wrapperOn(loaderOf(fragment))
                                                                  .withInvocation()
                                                                  .withOutputTimeout(seconds(10))
                                                                  .configuration();
-
+    final ContextInvocationTarget<TestList> target = instanceOf(TestList.class);
     final TestListItf<String> testListItf1 =
-        builder.buildProxy(new ClassToken<TestListItf<String>>() {});
+        builder.proxyOf(target, new ClassToken<TestListItf<String>>() {});
     testListItf1.add("test");
 
     assertThat(testListItf1.get(0)).isEqualTo("test");
-    assertThat(builder.buildProxy(new ClassToken<TestListItf<Integer>>() {})).isSameAs(
+    assertThat(builder.proxyOf(target, new ClassToken<TestListItf<Integer>>() {})).isSameAs(
         testListItf1);
 
     final TestListItf<Integer> testListItf2 =
-        builder.buildProxy(new ClassToken<TestListItf<Integer>>() {});
+        builder.proxyOf(target, new ClassToken<TestListItf<Integer>>() {});
     assertThat(testListItf2).isSameAs(testListItf1);
-    assertThat(builder.buildProxy(new ClassToken<TestListItf<Integer>>() {})).isSameAs(
+    assertThat(builder.proxyOf(target, new ClassToken<TestListItf<Integer>>() {})).isSameAs(
         testListItf2);
 
     testListItf2.add(3);
@@ -151,9 +147,9 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
     final TestFragment fragment =
         (TestFragment) getActivity().getFragmentManager().findFragmentById(R.id.test_fragment);
     final ClassToken<TestInterfaceProxy> token = ClassToken.tokenOf(TestInterfaceProxy.class);
-    final TestInterfaceProxy testProxy = JRoutineLoaderProxy.on(LoaderSource.loaderOf(fragment))
-                                                            .with(instanceOf(TestClass.class))
-                                                            .buildProxy(token);
+    final TestInterfaceProxy testProxy = JRoutineLoaderProxy.wrapperOn(loaderOf(fragment))
+                                                            .proxyOf(instanceOf(TestClass.class),
+                                                                token);
 
     assertThat(testProxy.getOne().next()).isEqualTo(1);
   }
@@ -171,9 +167,8 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
 
     try {
 
-      JRoutineLoaderProxy.on(LoaderSource.loaderOf(fragment))
-                         .with(instanceOf(TestClass.class))
-                         .buildProxy((Class<?>) null);
+      JRoutineLoaderProxy.wrapperOn(loaderOf(fragment))
+                         .proxyOf(instanceOf(TestClass.class), (Class<?>) null);
 
       fail();
 
@@ -183,9 +178,8 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
 
     try {
 
-      JRoutineLoaderProxy.on(LoaderSource.loaderOf(fragment))
-                         .with(instanceOf(TestClass.class))
-                         .buildProxy((ClassToken<?>) null);
+      JRoutineLoaderProxy.wrapperOn(loaderOf(fragment))
+                         .proxyOf(instanceOf(TestClass.class), (ClassToken<?>) null);
 
       fail();
 
@@ -203,14 +197,13 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
 
     final TestFragment fragment =
         (TestFragment) getActivity().getFragmentManager().findFragmentById(R.id.test_fragment);
-    final TestStatic testStatic = JRoutineLoaderProxy.on(LoaderSource.loaderOf(fragment))
-                                                     .with(instanceOf(TestClass.class))
+    final TestStatic testStatic = JRoutineLoaderProxy.wrapperOn(loaderOf(fragment))
                                                      .withInvocation()
-                                                     .withExecutor(ScheduledExecutors.poolExecutor())
                                                      .withLogLevel(Level.DEBUG)
                                                      .withLog(new NullLog())
-                                                     .configured()
-                                                     .buildProxy(TestStatic.class);
+                                                     .configuration()
+                                                     .proxyOf(instanceOf(TestClass.class),
+                                                         TestStatic.class);
 
     assertThat(testStatic.getOne().all()).containsExactly(1);
     assertThat(testStatic.getTwo().all()).containsExactly(2);
@@ -226,24 +219,22 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
     final TestFragment fragment =
         (TestFragment) getActivity().getFragmentManager().findFragmentById(R.id.test_fragment);
     final NullLog log = new NullLog();
-    final ScheduledExecutor executor = ScheduledExecutors.poolExecutor();
-    final TestProxy testProxy = JRoutineLoaderProxy.on(LoaderSource.loaderOf(fragment))
-                                                   .with(instanceOf(TestClass.class))
+    final TestProxy testProxy = JRoutineLoaderProxy.wrapperOn(loaderOf(fragment))
                                                    .withInvocation()
-                                                   .withExecutor(executor)
                                                    .withLogLevel(Level.DEBUG)
                                                    .withLog(log)
-                                                   .configured()
-                                                   .buildProxy(ClassToken.tokenOf(TestProxy.class));
+                                                   .configuration()
+                                                   .proxyOf(instanceOf(TestClass.class),
+                                                       ClassToken.tokenOf(TestProxy.class));
 
     assertThat(testProxy.getOne().next()).isEqualTo(1);
 
     final ArrayList<String> list = new ArrayList<String>();
-    assertThat(testProxy.getList(JRoutineCore.<List<String>>of(list).buildChannel())
+    assertThat(testProxy.getList(JRoutineCore.channel().<List<String>>of(list))
                         .iterator()
                         .next()).isSameAs(list);
 
-    assertThat(testProxy.getString(JRoutineCore.of(3).buildChannel())).isEqualTo("3");
+    assertThat(testProxy.getString(JRoutineCore.channel().of(3))).isEqualTo("3");
   }
 
   public void testProxyBuilder() {
@@ -256,12 +247,10 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
     final TestFragment fragment =
         (TestFragment) getActivity().getFragmentManager().findFragmentById(R.id.test_fragment);
     final NullLog log = new NullLog();
-    final ScheduledExecutor executor = ScheduledExecutors.poolExecutor();
     final InvocationConfiguration configuration =
-        builder().withExecutor(executor).withLogLevel(Level.DEBUG).withLog(log).configured();
+        builder().withLogLevel(Level.DEBUG).withLog(log).configuration();
     final LoaderProxyObjectBuilder<TestProxy> builder =
-        com.github.dm.jrt.android.proxy.LoaderProxy_TestFragment.on(LoaderSource.loaderOf(fragment))
-                                                                .with(instanceOf(TestClass.class));
+        com.github.dm.jrt.android.proxy.LoaderProxy_TestFragment.wrapperOn(loaderOf(fragment));
     final TestProxy testProxy = builder.withInvocation()
                                        .withPatch(configuration)
                                        .configuration()
@@ -271,19 +260,18 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
                                        .withLoader()
                                        .withInvocationId(11)
                                        .configuration()
-                                       .buildProxy();
+                                       .proxyOf(instanceOf(TestClass.class));
 
     assertThat(testProxy.getOne().next()).isEqualTo(1);
 
     final ArrayList<String> list = new ArrayList<String>();
-    assertThat(testProxy.getList(JRoutineCore.<List<String>>of(list).buildChannel())
+    assertThat(testProxy.getList(JRoutineCore.channel().<List<String>>of(list))
                         .iterator()
                         .next()).isSameAs(list);
 
-    assertThat(testProxy.getString(JRoutineCore.of(3).buildChannel())).isEqualTo("3");
+    assertThat(testProxy.getString(JRoutineCore.channel().of(3))).isEqualTo("3");
 
-    assertThat(JRoutineLoaderProxy.on(LoaderSource.loaderOf(fragment))
-                                  .with(instanceOf(TestClass.class))
+    assertThat(JRoutineLoaderProxy.wrapperOn(loaderOf(fragment))
                                   .withInvocation()
                                   .withPatch(configuration)
                                   .configuration()
@@ -293,8 +281,8 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
                                   .withLoader()
                                   .withInvocationId(11)
                                   .configuration()
-                                  .buildProxy(ClassToken.tokenOf(TestProxy.class))).isSameAs(
-        testProxy);
+                                  .proxyOf(instanceOf(TestClass.class),
+                                      ClassToken.tokenOf(TestProxy.class))).isSameAs(testProxy);
   }
 
   public void testProxyCache() {
@@ -307,23 +295,21 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
     final TestFragment fragment =
         (TestFragment) getActivity().getFragmentManager().findFragmentById(R.id.test_fragment);
     final NullLog log = new NullLog();
-    final ScheduledExecutor executor = ScheduledExecutors.poolExecutor();
     final InvocationConfiguration configuration =
-        builder().withExecutor(executor).withLogLevel(Level.DEBUG).withLog(log).configured();
-    final TestProxy testProxy = JRoutineLoaderProxy.on(LoaderSource.loaderOf(fragment))
-                                                   .with(instanceOf(TestClass.class))
+        builder().withLogLevel(Level.DEBUG).withLog(log).configuration();
+    final TestProxy testProxy = JRoutineLoaderProxy.wrapperOn(loaderOf(fragment))
                                                    .withInvocation()
                                                    .withPatch(configuration)
                                                    .configuration()
-                                                   .buildProxy(ClassToken.tokenOf(TestProxy.class));
+                                                   .proxyOf(instanceOf(TestClass.class),
+                                                       ClassToken.tokenOf(TestProxy.class));
 
-    assertThat(JRoutineLoaderProxy.on(LoaderSource.loaderOf(fragment))
-                                  .with(instanceOf(TestClass.class))
+    assertThat(JRoutineLoaderProxy.wrapperOn(loaderOf(fragment))
                                   .withInvocation()
                                   .withPatch(configuration)
                                   .configuration()
-                                  .buildProxy(ClassToken.tokenOf(TestProxy.class))).isSameAs(
-        testProxy);
+                                  .proxyOf(instanceOf(TestClass.class),
+                                      ClassToken.tokenOf(TestProxy.class))).isSameAs(testProxy);
   }
 
   public void testProxyError() {
@@ -338,9 +324,8 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
 
     try {
 
-      JRoutineLoaderProxy.on(LoaderSource.loaderOf(fragment))
-                         .with(instanceOf(TestClass.class))
-                         .buildProxy(TestClass.class);
+      JRoutineLoaderProxy.wrapperOn(loaderOf(fragment))
+                         .proxyOf(instanceOf(TestClass.class), TestClass.class);
 
       fail();
 
@@ -350,9 +335,8 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
 
     try {
 
-      JRoutineLoaderProxy.on(LoaderSource.loaderOf(fragment))
-                         .with(instanceOf(TestClass.class))
-                         .buildProxy(ClassToken.tokenOf(TestClass.class));
+      JRoutineLoaderProxy.wrapperOn(loaderOf(fragment))
+                         .proxyOf(instanceOf(TestClass.class), ClassToken.tokenOf(TestClass.class));
 
       fail();
 
@@ -370,23 +354,22 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
 
     final TestFragment fragment =
         (TestFragment) getActivity().getFragmentManager().findFragmentById(R.id.test_fragment);
-    final LoaderProxyRoutineBuilder builder = JRoutineLoaderProxy.on(LoaderSource.loaderOf(fragment))
-                                                                 .with(instanceOf(TestClass2.class))
+    final LoaderProxyRoutineBuilder builder = JRoutineLoaderProxy.wrapperOn(loaderOf(fragment))
                                                                  .withInvocation()
                                                                  .withOutputTimeout(seconds(10))
                                                                  .configuration();
 
     long startTime = System.currentTimeMillis();
-
+    final ContextInvocationTarget<TestClass2> target = instanceOf(TestClass2.class);
     Channel<?, Integer> getOne = builder.withWrapper()
                                         .withSharedFields("1")
                                         .configuration()
-                                        .buildProxy(TestClassAsync.class)
+                                        .proxyOf(target, TestClassAsync.class)
                                         .getOne();
     Channel<?, Integer> getTwo = builder.withWrapper()
                                         .withSharedFields("2")
                                         .configuration()
-                                        .buildProxy(TestClassAsync.class)
+                                        .proxyOf(target, TestClassAsync.class)
                                         .getTwo();
 
     assertThat(getOne.next()).isEqualTo(1);
@@ -396,8 +379,8 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
 
     startTime = System.currentTimeMillis();
 
-    getOne = builder.buildProxy(TestClassAsync.class).getOne();
-    getTwo = builder.buildProxy(TestClassAsync.class).getTwo();
+    getOne = builder.proxyOf(target, TestClassAsync.class).getOne();
+    getTwo = builder.proxyOf(target, TestClassAsync.class).getTwo();
 
     assertThat(getOne.getComplete()).isTrue();
     assertThat(getTwo.getComplete()).isTrue();
@@ -414,42 +397,41 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
 
     final TestFragment fragment =
         (TestFragment) getActivity().getFragmentManager().findFragmentById(R.id.test_fragment);
-    final Itf itf = JRoutineLoaderProxy.on(LoaderSource.loaderOf(fragment))
-                                       .with(instanceOf(Impl.class))
+    final Itf itf = JRoutineLoaderProxy.wrapperOn(loaderOf(fragment))
                                        .withInvocation()
                                        .withOutputTimeout(seconds(10))
                                        .configuration()
-                                       .buildProxy(Itf.class);
+                                       .proxyOf(instanceOf(Impl.class), Itf.class);
 
     assertThat(itf.add0('c')).isEqualTo((int) 'c');
-    final Channel<Character, Character> channel1 = JRoutineCore.<Character>ofData().buildChannel();
+    final Channel<Character, Character> channel1 = JRoutineCore.channel().ofType();
     channel1.pass('a').close();
     assertThat(itf.add1(channel1)).isEqualTo((int) 'a');
     assertThat(itf.add3('c').all()).containsExactly((int) 'c');
-    final Channel<Character, Character> channel3 = JRoutineCore.<Character>ofData().buildChannel();
+    final Channel<Character, Character> channel3 = JRoutineCore.channel().ofType();
     channel3.pass('a').close();
     assertThat(itf.add4(channel3).all()).containsExactly((int) 'a');
     assertThat(itf.add6().pass('d').close().all()).containsOnly((int) 'd');
     assertThat(itf.add10().invoke().pass('d').close().all()).containsOnly((int) 'd');
     assertThat(itf.addA00(new char[]{'c', 'z'})).isEqualTo(new int[]{'c', 'z'});
-    final Channel<char[], char[]> channel5 = JRoutineCore.<char[]>ofData().buildChannel();
+    final Channel<char[], char[]> channel5 = JRoutineCore.channel().ofType();
     channel5.pass(new char[]{'a', 'z'}).close();
     assertThat(itf.addA01(channel5)).isEqualTo(new int[]{'a', 'z'});
-    final Channel<Character, Character> channel6 = JRoutineCore.<Character>ofData().buildChannel();
+    final Channel<Character, Character> channel6 = JRoutineCore.channel().ofType();
     channel6.pass('d', 'e', 'f').close();
     assertThat(itf.addA02(channel6)).isEqualTo(new int[]{'d', 'e', 'f'});
     assertThat(itf.addA04(new char[]{'c', 'z'}).all()).containsExactly(new int[]{'c', 'z'});
-    final Channel<char[], char[]> channel8 = JRoutineCore.<char[]>ofData().buildChannel();
+    final Channel<char[], char[]> channel8 = JRoutineCore.channel().ofType();
     channel8.pass(new char[]{'a', 'z'}).close();
     assertThat(itf.addA05(channel8).all()).containsExactly(new int[]{'a', 'z'});
-    final Channel<Character, Character> channel9 = JRoutineCore.<Character>ofData().buildChannel();
+    final Channel<Character, Character> channel9 = JRoutineCore.channel().ofType();
     channel9.pass('d', 'e', 'f').close();
     assertThat(itf.addA06(channel9).all()).containsExactly(new int[]{'d', 'e', 'f'});
     assertThat(itf.addA08(new char[]{'c', 'z'}).all()).containsExactly((int) 'c', (int) 'z');
-    final Channel<char[], char[]> channel11 = JRoutineCore.<char[]>ofData().buildChannel();
+    final Channel<char[], char[]> channel11 = JRoutineCore.channel().ofType();
     channel11.pass(new char[]{'a', 'z'}).close();
     assertThat(itf.addA09(channel11).all()).containsExactly((int) 'a', (int) 'z');
-    final Channel<Character, Character> channel12 = JRoutineCore.<Character>ofData().buildChannel();
+    final Channel<Character, Character> channel12 = JRoutineCore.channel().ofType();
     channel12.pass('d', 'e', 'f').close();
     assertThat(itf.addA10(channel12).all()).containsExactly((int) 'd', (int) 'e', (int) 'f');
     assertThat(itf.addA12().pass(new char[]{'c', 'z'}).close().all()).containsOnly(
@@ -461,29 +443,26 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
     assertThat(itf.addA18().invoke().pass(new char[]{'c', 'z'}).close().all()).containsExactly(
         (int) 'c', (int) 'z');
     assertThat(itf.addL00(Arrays.asList('c', 'z'))).isEqualTo(Arrays.asList((int) 'c', (int) 'z'));
-    final Channel<List<Character>, List<Character>> channel20 =
-        JRoutineCore.<List<Character>>ofData().buildChannel();
+    final Channel<List<Character>, List<Character>> channel20 = JRoutineCore.channel().ofType();
     channel20.pass(Arrays.asList('a', 'z')).close();
     assertThat(itf.addL01(channel20)).isEqualTo(Arrays.asList((int) 'a', (int) 'z'));
-    final Channel<Character, Character> channel21 = JRoutineCore.<Character>ofData().buildChannel();
+    final Channel<Character, Character> channel21 = JRoutineCore.channel().ofType();
     channel21.pass('d', 'e', 'f').close();
     assertThat(itf.addL02(channel21)).isEqualTo(Arrays.asList((int) 'd', (int) 'e', (int) 'f'));
     assertThat(itf.addL04(Arrays.asList('c', 'z')).all()).containsExactly(
         Arrays.asList((int) 'c', (int) 'z'));
-    final Channel<List<Character>, List<Character>> channel23 =
-        JRoutineCore.<List<Character>>ofData().buildChannel();
+    final Channel<List<Character>, List<Character>> channel23 = JRoutineCore.channel().ofType();
     channel23.pass(Arrays.asList('a', 'z')).close();
     assertThat(itf.addL05(channel23).all()).containsExactly(Arrays.asList((int) 'a', (int) 'z'));
-    final Channel<Character, Character> channel24 = JRoutineCore.<Character>ofData().buildChannel();
+    final Channel<Character, Character> channel24 = JRoutineCore.channel().ofType();
     channel24.pass('d', 'e', 'f').close();
     assertThat(itf.addL06(channel24).all()).containsExactly(
         Arrays.asList((int) 'd', (int) 'e', (int) 'f'));
     assertThat(itf.addL08(Arrays.asList('c', 'z')).all()).containsExactly((int) 'c', (int) 'z');
-    final Channel<List<Character>, List<Character>> channel26 =
-        JRoutineCore.<List<Character>>ofData().buildChannel();
+    final Channel<List<Character>, List<Character>> channel26 = JRoutineCore.channel().ofType();
     channel26.pass(Arrays.asList('a', 'z')).close();
     assertThat(itf.addL09(channel26).all()).containsExactly((int) 'a', (int) 'z');
-    final Channel<Character, Character> channel27 = JRoutineCore.<Character>ofData().buildChannel();
+    final Channel<Character, Character> channel27 = JRoutineCore.channel().ofType();
     channel27.pass('d', 'e', 'f').close();
     assertThat(itf.addL10(channel27).all()).containsExactly((int) 'd', (int) 'e', (int) 'f');
     assertThat(itf.addL12().pass(Arrays.asList('c', 'z')).close().all()).containsOnly(
@@ -511,26 +490,25 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
     assertThat(itf.getL4().close().all()).containsExactly(1, 2, 3);
     assertThat(itf.getL5().invoke().close().all()).containsExactly(1, 2, 3);
     itf.set0(-17);
-    final Channel<Integer, Integer> channel35 = JRoutineCore.<Integer>ofData().buildChannel();
+    final Channel<Integer, Integer> channel35 = JRoutineCore.channel().ofType();
     channel35.pass(-17).close();
     itf.set1(channel35);
     itf.set3().pass(-17).close().getComplete();
     itf.set5().invoke().pass(-17).close().getComplete();
     itf.setA0(new int[]{1, 2, 3});
-    final Channel<int[], int[]> channel37 = JRoutineCore.<int[]>ofData().buildChannel();
+    final Channel<int[], int[]> channel37 = JRoutineCore.channel().ofType();
     channel37.pass(new int[]{1, 2, 3}).close();
     itf.setA1(channel37);
-    final Channel<Integer, Integer> channel38 = JRoutineCore.<Integer>ofData().buildChannel();
+    final Channel<Integer, Integer> channel38 = JRoutineCore.channel().ofType();
     channel38.pass(1, 2, 3).close();
     itf.setA2(channel38);
     itf.setA4().pass(new int[]{1, 2, 3}).close().getComplete();
     itf.setA6().invoke().pass(new int[]{1, 2, 3}).close().getComplete();
     itf.setL0(Arrays.asList(1, 2, 3));
-    final Channel<List<Integer>, List<Integer>> channel40 =
-        JRoutineCore.<List<Integer>>ofData().buildChannel();
+    final Channel<List<Integer>, List<Integer>> channel40 = JRoutineCore.channel().ofType();
     channel40.pass(Arrays.asList(1, 2, 3)).close();
     itf.setL1(channel40);
-    final Channel<Integer, Integer> channel41 = JRoutineCore.<Integer>ofData().buildChannel();
+    final Channel<Integer, Integer> channel41 = JRoutineCore.channel().ofType();
     channel41.pass(1, 2, 3).close();
     itf.setL2(channel41);
     itf.setL4().pass(Arrays.asList(1, 2, 3)).close().getComplete();
@@ -546,22 +524,20 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
 
     final TestFragment fragment =
         (TestFragment) getActivity().getFragmentManager().findFragmentById(R.id.test_fragment);
-    assertThat(JRoutineLoaderProxy.on(LoaderSource.loaderOf(fragment))
-                                  .with(instanceOf(TestTimeout.class))
+    assertThat(JRoutineLoaderProxy.wrapperOn(loaderOf(fragment))
                                   .withInvocation()
                                   .withOutputTimeout(seconds(10))
                                   .configuration()
-                                  .buildProxy(TestTimeoutItf.class)
+                                  .proxyOf(instanceOf(TestTimeout.class), TestTimeoutItf.class)
                                   .getInt()).isEqualTo(31);
 
     try {
 
-      JRoutineLoaderProxy.on(LoaderSource.loaderOf(fragment))
-                         .with(instanceOf(TestTimeout.class))
+      JRoutineLoaderProxy.wrapperOn(loaderOf(fragment))
                          .withInvocation()
                          .withOutputTimeoutAction(TimeoutActionType.FAIL)
                          .configuration()
-                         .buildProxy(TestTimeoutItf.class)
+                         .proxyOf(instanceOf(TestTimeout.class), TestTimeoutItf.class)
                          .getInt();
 
       fail();

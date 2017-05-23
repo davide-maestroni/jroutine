@@ -18,7 +18,6 @@ package com.github.dm.jrt.android.proxy;
 
 import com.github.dm.jrt.android.core.ServiceSource;
 import com.github.dm.jrt.android.proxy.builder.ServiceProxyRoutineBuilder;
-import com.github.dm.jrt.android.reflect.ContextInvocationTarget;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
@@ -48,51 +47,22 @@ public class JRoutineServiceProxy {
   }
 
   /**
-   * Returns a Context based builder of Service proxy routine builders.
+   * Returns a builder of routines, wrapping an object instance, running in a Service based on the
+   * specified source.
+   * <br>
+   * In order to customize the object creation, the caller must employ an implementation of a
+   * {@link com.github.dm.jrt.android.reflect.builder.FactoryContext FactoryContext} as the
+   * invocation Service.
+   * <p>
+   * Note that the built routine results will be dispatched into the configured Looper, thus,
+   * waiting for the outputs on the very same Looper thread, immediately after its invocation,
+   * will result in a deadlock. By default, output results are dispatched in the main Looper.
    *
    * @param serviceSource the Service source.
-   * @return the Context based builder.
+   * @return the routine builder instance.
    */
   @NotNull
-  public static ServiceProxyBuilder on(@NotNull final ServiceSource serviceSource) {
-    return new ServiceProxyBuilder(serviceSource);
-  }
-
-  /**
-   * Context based builder of Service routine builders.
-   */
-  @SuppressWarnings("WeakerAccess")
-  public static class ServiceProxyBuilder {
-
-    private final ServiceSource mmServiceSource;
-
-    /**
-     * Constructor.
-     *
-     * @param serviceSource the Service source.
-     */
-    private ServiceProxyBuilder(@NotNull final ServiceSource serviceSource) {
-      mmServiceSource = ConstantConditions.notNull("Service source", serviceSource);
-    }
-
-    /**
-     * Returns a builder of routines, wrapping the specified object instance, running in a Service
-     * based on the builder context.
-     * <br>
-     * In order to customize the object creation, the caller must employ an implementation of a
-     * {@link com.github.dm.jrt.android.reflect.builder.FactoryContext FactoryContext} as the
-     * invocation Service.
-     * <p>
-     * Note that the built routine results will be dispatched into the configured Looper, thus,
-     * waiting for the outputs on the very same Looper thread, immediately after its invocation,
-     * will result in a deadlock. By default, output results are dispatched in the main Looper.
-     *
-     * @param target the invocation target.
-     * @return the routine builder instance.
-     */
-    @NotNull
-    public ServiceProxyRoutineBuilder with(@NotNull final ContextInvocationTarget<?> target) {
-      return new DefaultServiceProxyRoutineBuilder(mmServiceSource, target);
-    }
+  public static ServiceProxyRoutineBuilder wrapperOn(@NotNull final ServiceSource serviceSource) {
+    return new DefaultServiceProxyRoutineBuilder(serviceSource);
   }
 }

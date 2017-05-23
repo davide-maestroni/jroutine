@@ -29,6 +29,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -357,6 +358,26 @@ public class FutureChannelTest {
     assertThat(channel.isEmpty()).isTrue();
     assertThat(channel.abort()).isTrue();
     assertThat(channel.isEmpty()).isFalse();
+  }
+
+  @Test
+  public void testGet() {
+    final Future<String> future =
+        Executors.newScheduledThreadPool(1).schedule(new Callable<String>() {
+
+          public String call() {
+            return "test";
+          }
+        }, 100, TimeUnit.MILLISECONDS);
+    final Channel<?, String> channel = JRoutineChannels.channelHandler().channelOf(future);
+    try {
+      channel.eventuallyContinue().get();
+      fail();
+
+    } catch (final NoSuchElementException ignored) {
+    }
+
+    assertThat(channel.in(seconds(3)).get()).isEqualTo("test");
   }
 
   @Test

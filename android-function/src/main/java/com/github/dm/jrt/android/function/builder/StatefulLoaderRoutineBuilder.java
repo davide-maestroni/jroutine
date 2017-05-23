@@ -306,7 +306,7 @@ public interface StatefulLoaderRoutineBuilder<IN, OUT, STATE>
    */
   @NotNull
   @Override
-  LoaderRoutine<IN, OUT> routine();
+  LoaderRoutine<IN, OUT> create();
 
   /**
    * {@inheritDoc}

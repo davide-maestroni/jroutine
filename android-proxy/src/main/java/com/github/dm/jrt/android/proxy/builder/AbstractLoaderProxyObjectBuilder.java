@@ -17,8 +17,8 @@
 package com.github.dm.jrt.android.proxy.builder;
 
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
+import com.github.dm.jrt.android.reflect.ContextInvocationTarget;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
-import com.github.dm.jrt.core.executor.ScheduledExecutor;
 import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DeepEqualObject;
@@ -55,33 +55,16 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
 
   @NotNull
   @Override
-  public LoaderProxyObjectBuilder<TYPE> withConfiguration(@NotNull final LoaderConfiguration configuration) {
-    mLoaderConfiguration = ConstantConditions.notNull("Loader configuration", configuration);
-    return this;
-  }
-
-  @NotNull
-  @Override
-  public LoaderProxyObjectBuilder<TYPE> withConfiguration(
-      @NotNull final InvocationConfiguration configuration) {
-    mInvocationConfiguration =
-        ConstantConditions.notNull("invocation configuration", configuration);
-    return this;
-  }
-
-  @NotNull
-  @Override
-  public LoaderProxyObjectBuilder<TYPE> withConfiguration(@NotNull final WrapperConfiguration configuration) {
-    mWrapperConfiguration = ConstantConditions.notNull("wrapper configuration", configuration);
-    return this;
-  }
-
-  @NotNull
-  @Override
   @SuppressWarnings("unchecked")
-  public TYPE buildProxy() {
+  public TYPE proxyOf(@NotNull final ContextInvocationTarget<?> target) {
+    final Class<?> targetClass = target.getTargetClass();
+    if (targetClass.isInterface()) {
+      throw new IllegalArgumentException(
+          "the target class must not be an interface: " + targetClass.getName());
+    }
+
     synchronized (sContextProxies) {
-      final Object context = getInvocationContext();
+      final Object context = getComponent();
       if (context == null) {
         throw new IllegalStateException("the invocation context has been destroyed");
       }
@@ -94,7 +77,6 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
         contextProxies.put(context, proxyMap);
       }
 
-      final Class<?> targetClass = getTargetClass();
       HashMap<ProxyInfo, Object> proxies = proxyMap.get(targetClass);
       if (proxies == null) {
         proxies = new HashMap<ProxyInfo, Object>();
@@ -112,15 +94,9 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
         return (TYPE) instance;
       }
 
-      final ScheduledExecutor asyncExecutor = invocationConfiguration.getExecutorOrElse(null);
-      if (asyncExecutor != null) {
-        invocationConfiguration.newLogger(this)
-                               .wrn("the specified executor will be ignored: %s", asyncExecutor);
-      }
-
       try {
         final TYPE newInstance =
-            newProxy(invocationConfiguration, wrapperConfiguration, loaderConfiguration);
+            newProxy(target, invocationConfiguration, wrapperConfiguration, loaderConfiguration);
         proxies.put(proxyInfo, newInstance);
         return newInstance;
 
@@ -133,7 +109,25 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
 
   @NotNull
   @Override
-  public InvocationConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>> withInvocation() {
+  public LoaderProxyObjectBuilder<TYPE> withConfiguration(
+      @NotNull final WrapperConfiguration configuration) {
+    mWrapperConfiguration = ConstantConditions.notNull("wrapper configuration", configuration);
+    return this;
+  }
+
+  @NotNull
+  @Override
+  public LoaderProxyObjectBuilder<TYPE> withConfiguration(
+      @NotNull final InvocationConfiguration configuration) {
+    mInvocationConfiguration =
+        ConstantConditions.notNull("invocation configuration", configuration);
+    return this;
+  }
+
+  @NotNull
+  @Override
+  public InvocationConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>> withInvocation
+      () {
     final InvocationConfiguration config = mInvocationConfiguration;
     return new InvocationConfiguration.Builder<LoaderProxyObjectBuilder<TYPE>>(
         new InvocationConfiguration.Configurable<LoaderProxyObjectBuilder<TYPE>>() {
@@ -165,10 +159,28 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
 
   @NotNull
   @Override
+  public LoaderProxyObjectBuilder<TYPE> withConfiguration(
+      @NotNull final LoaderConfiguration configuration) {
+    mLoaderConfiguration = ConstantConditions.notNull("Loader configuration", configuration);
+    return this;
+  }
+
+  @NotNull
+  @Override
   public LoaderConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>> withLoader() {
     final LoaderConfiguration config = mLoaderConfiguration;
     return new LoaderConfiguration.Builder<LoaderProxyObjectBuilder<TYPE>>(this, config);
   }
+
+  /**
+   * Returns the component (Activity, Fragment, etc.) on which the invocation is based.
+   * <br>
+   * Returning null means that the object has been destroyed, so an exception will be thrown.
+   *
+   * @return the invocation context.
+   */
+  @Nullable
+  protected abstract Object getComponent();
 
   /**
    * Returns the builder proxy class.
@@ -179,26 +191,9 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
   protected abstract Class<? super TYPE> getInterfaceClass();
 
   /**
-   * Returns the Context or component (Activity, Fragment, etc.) on which the invocation is based.
-   * <br>
-   * Returning null means that the context has been destroyed, so an exception will be thrown.
-   *
-   * @return the invocation context.
-   */
-  @Nullable
-  protected abstract Object getInvocationContext();
-
-  /**
-   * Returns the builder target class.
-   *
-   * @return the target class.
-   */
-  @NotNull
-  protected abstract Class<?> getTargetClass();
-
-  /**
    * Creates and return a new proxy instance.
    *
+   * @param target                  the invocation target.
    * @param invocationConfiguration the invocation configuration.
    * @param wrapperConfiguration    the wrapper configuration.
    * @param loaderConfiguration     the Loader configuration.
@@ -206,7 +201,8 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
    * @throws java.lang.Exception if an unexpected error occurs.
    */
   @NotNull
-  protected abstract TYPE newProxy(@NotNull InvocationConfiguration invocationConfiguration,
+  protected abstract TYPE newProxy(@NotNull ContextInvocationTarget<?> target,
+      @NotNull InvocationConfiguration invocationConfiguration,
       @NotNull WrapperConfiguration wrapperConfiguration,
       @NotNull LoaderConfiguration loaderConfiguration) throws Exception;
 

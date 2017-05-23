@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.core.common.BackoffBuilder.noDelay;
@@ -272,6 +273,19 @@ public class ChannelTest {
     assertThat(channel.pass("test").isEmpty()).isFalse();
     assertThat(channel.abort()).isTrue();
     assertThat(channel.isEmpty()).isFalse();
+  }
+
+  @Test
+  public void testGet() {
+    final Channel<Object, Object> channel = JRoutineCore.channel().ofType();
+    try {
+      channel.pass("test1", "test2").eventuallyContinue().get();
+      fail();
+
+    } catch (final NoSuchElementException ignored) {
+    }
+
+    assertThat(channel.close().get()).isEqualTo("test2");
   }
 
   @Test

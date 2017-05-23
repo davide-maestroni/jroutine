@@ -35,7 +35,7 @@ import java.util.Locale;
 
 import static com.github.dm.jrt.android.reflect.ContextInvocationTarget.classOfType;
 import static com.github.dm.jrt.android.reflect.ContextInvocationTarget.instanceOf;
-import static com.github.dm.jrt.android.v4.core.LoaderSourceCompat.loaderFrom;
+import static com.github.dm.jrt.android.v4.core.LoaderSourceCompat.loaderOf;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -57,10 +57,10 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
   }
 
   private static void testAbort2(@NotNull final FragmentActivity activity) {
-    final Channel<Integer, Integer> inputChannel1 = JRoutineCore.<Integer>ofData().buildChannel();
-    final Channel<Integer, Integer> inputChannel2 = JRoutineCore.<Integer>ofData().buildChannel();
-    final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
-    new LoaderRoutineMethodCompat(LoaderSourceCompat.loaderOf(activity)) {
+    final Channel<Integer, Integer> inputChannel1 = JRoutineCore.channel().ofType();
+    final Channel<Integer, Integer> inputChannel2 = JRoutineCore.channel().ofType();
+    final Channel<Integer, Integer> outputChannel = JRoutineCore.channel().ofType();
+    new LoaderRoutineMethodCompat(loaderOf(activity)) {
 
       private int mSum;
 
@@ -81,10 +81,10 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
   }
 
   private static void testAbort3(@NotNull final FragmentActivity activity) {
-    final Channel<Integer, Integer> inputChannel1 = JRoutineCore.<Integer>ofData().buildChannel();
-    final Channel<Integer, Integer> inputChannel2 = JRoutineCore.<Integer>ofData().buildChannel();
-    final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
-    new LoaderRoutineMethodCompat(LoaderSourceCompat.loaderOf(activity)) {
+    final Channel<Integer, Integer> inputChannel1 = JRoutineCore.channel().ofType();
+    final Channel<Integer, Integer> inputChannel2 = JRoutineCore.channel().ofType();
+    final Channel<Integer, Integer> outputChannel = JRoutineCore.channel().ofType();
+    new LoaderRoutineMethodCompat(loaderOf(activity)) {
 
       private int mSum;
 
@@ -106,8 +106,8 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
   }
 
   private static void testContext(@NotNull final FragmentActivity activity) {
-    final Channel<Boolean, Boolean> outputChannel = JRoutineCore.<Boolean>ofData().buildChannel();
-    new LoaderRoutineMethodCompat(LoaderSourceCompat.loaderOf(activity)) {
+    final Channel<Boolean, Boolean> outputChannel = JRoutineCore.channel().ofType();
+    new LoaderRoutineMethodCompat(loaderOf(activity)) {
 
       void test(@Output final Channel<Boolean, ?> output) {
         output.pass(getContext() instanceof TestApp);
@@ -117,14 +117,14 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
   }
 
   private static void testNoInputs(@NotNull final FragmentActivity activity) {
-    final LoaderSourceCompat context = LoaderSourceCompat.loaderOf(activity);
+    final LoaderSourceCompat context = loaderOf(activity);
     assertThat(new LoaderRoutineMethodCompat(context) {
 
       String get() {
         return "test";
       }
     }.call().in(seconds(10)).all()).containsExactly("test");
-    final Channel<String, String> outputChannel = JRoutineCore.<String>ofData().buildChannel();
+    final Channel<String, String> outputChannel = JRoutineCore.channel().ofType();
     new LoaderRoutineMethodCompat(context) {
 
       void get(@Output final Channel<String, ?> outputChannel) {
@@ -137,7 +137,7 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
   private static void testParams2(@NotNull final FragmentActivity activity) {
     final Locale locale = Locale.getDefault();
     final LoaderRoutineMethodCompat method =
-        new LoaderRoutineMethodCompat(LoaderSourceCompat.loaderOf(activity), locale) {
+        new LoaderRoutineMethodCompat(loaderOf(activity), locale) {
 
           String switchCase(@Input final Channel<?, String> input, final boolean isUpper) {
             if (input.hasNext()) {
@@ -147,19 +147,17 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
             return null;
           }
         };
-    Channel<Object, Object> inputChannel =
-        JRoutineCore.ofData().buildChannel().pass("test").close();
+    Channel<Object, Object> inputChannel = JRoutineCore.channel().ofType().pass("test").close();
     Channel<?, String> outputChannel = method.call(inputChannel, true);
     assertThat(outputChannel.in(seconds(10)).next()).isEqualTo("TEST");
-    inputChannel = JRoutineCore.ofData().buildChannel().pass("TEST").close();
+    inputChannel = JRoutineCore.channel().ofType().pass("TEST").close();
     outputChannel = method.call(inputChannel, false);
     assertThat(outputChannel.in(seconds(10)).next()).isEqualTo("test");
   }
 
   private static void testParams3(@NotNull final FragmentActivity activity) {
     final Locale locale = Locale.getDefault();
-    final LoaderRoutineMethodCompat method = new LoaderRoutineMethodCompat(
-        LoaderSourceCompat.loaderOf(activity)) {
+    final LoaderRoutineMethodCompat method = new LoaderRoutineMethodCompat(loaderOf(activity)) {
 
       String switchCase(@Input final Channel<?, String> input, final boolean isUpper) {
         if (input.hasNext()) {
@@ -169,10 +167,9 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
         return null;
       }
     };
-    final Channel<?, Object> outputChannel =
-        method.call(JRoutineCore.of("test").buildChannel(), true);
+    final Channel<?, Object> outputChannel = method.call(JRoutineCore.channel().of("test"), true);
     assertThat(outputChannel.in(seconds(10)).next()).isEqualTo("TEST");
-    final Channel<?, String> inputChannel = JRoutineCore.of("test").buildChannel();
+    final Channel<?, String> inputChannel = JRoutineCore.channel().of("test");
     try {
       method.call(inputChannel, false);
       fail();
@@ -182,9 +179,8 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
   }
 
   private static void testReturnValue(@NotNull final FragmentActivity activity) {
-    final Channel<String, String> inputStrings = JRoutineCore.<String>ofData().buildChannel();
-    final Channel<?, Object> outputChannel = new LoaderRoutineMethodCompat(
-        LoaderSourceCompat.loaderOf(activity)) {
+    final Channel<String, String> inputStrings = JRoutineCore.channel().ofType();
+    final Channel<?, Object> outputChannel = new LoaderRoutineMethodCompat(loaderOf(activity)) {
 
       int length(@Input final Channel<?, String> input) {
         if (input.hasNext()) {
@@ -198,10 +194,10 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
   }
 
   private static void testSwitchInput(@NotNull final FragmentActivity activity) {
-    final Channel<Integer, Integer> inputInts = JRoutineCore.<Integer>ofData().buildChannel();
-    final Channel<String, String> inputStrings = JRoutineCore.<String>ofData().buildChannel();
-    final Channel<String, String> outputChannel = JRoutineCore.<String>ofData().buildChannel();
-    new LoaderRoutineMethodCompat(LoaderSourceCompat.loaderOf(activity)) {
+    final Channel<Integer, Integer> inputInts = JRoutineCore.channel().ofType();
+    final Channel<String, String> inputStrings = JRoutineCore.channel().ofType();
+    final Channel<String, String> outputChannel = JRoutineCore.channel().ofType();
+    new LoaderRoutineMethodCompat(loaderOf(activity)) {
 
       void run(@Input final Channel<?, Integer> inputInts,
           @Input final Channel<?, String> inputStrings, @Output final Channel<String, ?> output) {
@@ -217,10 +213,10 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
   }
 
   private static void testSwitchInput2(@NotNull final FragmentActivity activity) {
-    final Channel<Integer, Integer> inputInts = JRoutineCore.<Integer>ofData().buildChannel();
-    final Channel<String, String> inputStrings = JRoutineCore.<String>ofData().buildChannel();
-    final Channel<String, String> outputChannel = JRoutineCore.<String>ofData().buildChannel();
-    new LoaderRoutineMethodCompat(LoaderSourceCompat.loaderOf(activity)) {
+    final Channel<Integer, Integer> inputInts = JRoutineCore.channel().ofType();
+    final Channel<String, String> inputStrings = JRoutineCore.channel().ofType();
+    final Channel<String, String> outputChannel = JRoutineCore.channel().ofType();
+    new LoaderRoutineMethodCompat(loaderOf(activity)) {
 
       void run(@Input final Channel<?, Integer> inputInts,
           @Input final Channel<?, String> inputStrings, @Output final Channel<String, ?> output) {
@@ -236,9 +232,9 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
   }
 
   public void testAbort() {
-    final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofData().buildChannel();
-    final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
-    new SumRoutine(LoaderSourceCompat.loaderOf(getActivity())).call(inputChannel, outputChannel);
+    final Channel<Integer, Integer> inputChannel = JRoutineCore.channel().ofType();
+    final Channel<Integer, Integer> outputChannel = JRoutineCore.channel().ofType();
+    new SumRoutine(loaderOf(getActivity())).call(inputChannel, outputChannel);
     inputChannel.pass(1, 2, 3, 4).abort();
     assertThat(outputChannel.in(seconds(10)).getError()).isExactlyInstanceOf(AbortException.class);
   }
@@ -252,20 +248,20 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
   }
 
   public void testBind() {
-    final LoaderSourceCompat context = LoaderSourceCompat.loaderOf(getActivity());
-    final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofData().buildChannel();
-    final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
+    final LoaderSourceCompat context = loaderOf(getActivity());
+    final Channel<Integer, Integer> inputChannel = JRoutineCore.channel().ofType();
+    final Channel<Integer, Integer> outputChannel = JRoutineCore.channel().ofType();
     new SquareRoutine(context).call(inputChannel, outputChannel);
-    final Channel<Integer, Integer> resultChannel = JRoutineCore.<Integer>ofData().buildChannel();
+    final Channel<Integer, Integer> resultChannel = JRoutineCore.channel().ofType();
     new SumRoutine(context).call(outputChannel, resultChannel);
     inputChannel.pass(1, 2, 3, 4, 5).close();
     assertThat(resultChannel.in(seconds(10)).all()).containsExactly(55);
   }
 
   public void testCall() {
-    final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofData().buildChannel();
-    final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
-    new SumRoutine(LoaderSourceCompat.loaderOf(getActivity())).call(inputChannel, outputChannel);
+    final Channel<Integer, Integer> inputChannel = JRoutineCore.channel().ofType();
+    final Channel<Integer, Integer> outputChannel = JRoutineCore.channel().ofType();
+    new SumRoutine(loaderOf(getActivity())).call(inputChannel, outputChannel);
     inputChannel.pass(1, 2, 3, 4, 5).close();
     assertThat(outputChannel.in(seconds(10)).all()).containsExactly(15);
   }
@@ -275,49 +271,47 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
   }
 
   public void testFromClass() throws NoSuchMethodException {
-    assertThat(LoaderRoutineMethodCompat.from(LoaderSourceCompat.loaderOf(getActivity()),
+    assertThat(LoaderRoutineMethodCompat.from(loaderOf(getActivity()),
         LoaderRoutineMethodCompatTest.class.getMethod("length", String.class))
                                         .call("test")
                                         .in(seconds(10))
                                         .next()).isEqualTo(4);
-    assertThat(LoaderRoutineMethodCompat.from(LoaderSourceCompat.loaderOf(getActivity()),
+    assertThat(LoaderRoutineMethodCompat.from(loaderOf(getActivity()),
         LoaderRoutineMethodCompatTest.class.getMethod("length", String.class))
-                                        .call(JRoutineCore.of("test").buildChannel())
+                                        .call(JRoutineCore.channel().of("test"))
                                         .in(seconds(10))
                                         .next()).isEqualTo(4);
   }
 
   public void testFromClass2() throws NoSuchMethodException {
-    assertThat(LoaderRoutineMethodCompat.from(LoaderSourceCompat.loaderOf(getActivity()),
+    assertThat(LoaderRoutineMethodCompat.from(loaderOf(getActivity()),
         classOfType(LoaderRoutineMethodCompatTest.class), "length", String.class)
                                         .call("test")
                                         .in(seconds(10))
                                         .next()).isEqualTo(4);
-    assertThat(LoaderRoutineMethodCompat.from(LoaderSourceCompat.loaderOf(getActivity()),
+    assertThat(LoaderRoutineMethodCompat.from(loaderOf(getActivity()),
         classOfType(LoaderRoutineMethodCompatTest.class), "length", String.class)
-                                        .call(JRoutineCore.of("test").buildChannel())
+                                        .call(JRoutineCore.channel().of("test"))
                                         .in(seconds(10))
                                         .next()).isEqualTo(4);
-    final Channel<String, String> inputChannel = JRoutineCore.<String>ofData().buildChannel();
-    final Channel<?, Object> outputChannel =
-        LoaderRoutineMethodCompat.from(LoaderSourceCompat.loaderOf(getActivity()),
-            classOfType(LoaderRoutineMethodCompatTest.class), "length", String.class)
-                                 .call(inputChannel);
+    final Channel<String, String> inputChannel = JRoutineCore.channel().ofType();
+    final Channel<?, Object> outputChannel = LoaderRoutineMethodCompat.from(loaderOf(getActivity()),
+        classOfType(LoaderRoutineMethodCompatTest.class), "length", String.class)
+                                                                      .call(inputChannel);
     inputChannel.pass("test").close();
     assertThat(outputChannel.in(seconds(10)).next()).isEqualTo(4);
   }
 
   public void testFromError() throws NoSuchMethodException {
     try {
-      LoaderRoutineMethodCompat.from(LoaderSourceCompat.loaderOf(getActivity()), String.class.getMethod("toString"));
+      LoaderRoutineMethodCompat.from(loaderOf(getActivity()), String.class.getMethod("toString"));
       fail();
 
     } catch (final IllegalArgumentException ignored) {
     }
 
     try {
-      LoaderRoutineMethodCompat.from(
-          LoaderSourceCompat.loaderOf(getActivity()), instanceOf(String.class, "test"),
+      LoaderRoutineMethodCompat.from(loaderOf(getActivity()), instanceOf(String.class, "test"),
           LoaderRoutineMethodCompatTest.class.getMethod("length", String.class));
       fail();
 
@@ -328,12 +322,10 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
   public void testFromInstance() throws NoSuchMethodException {
     final String test = "test";
     assertThat(
-        LoaderRoutineMethodCompat.from(
-            LoaderSourceCompat.loaderOf(getActivity()), instanceOf(String.class, test),
+        LoaderRoutineMethodCompat.from(loaderOf(getActivity()), instanceOf(String.class, test),
             String.class.getMethod("toString")).call().in(seconds(10)).next()).isEqualTo("test");
     assertThat(
-        LoaderRoutineMethodCompat.from(
-            LoaderSourceCompat.loaderOf(getActivity()), instanceOf(String.class, test),
+        LoaderRoutineMethodCompat.from(loaderOf(getActivity()), instanceOf(String.class, test),
             String.class.getMethod("toString"))
                                  .withWrapper()
                                  .withSharedFields()
@@ -346,12 +338,10 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
   public void testFromInstance2() throws NoSuchMethodException {
     final String test = "test";
     assertThat(
-        LoaderRoutineMethodCompat.from(
-            LoaderSourceCompat.loaderOf(getActivity()), instanceOf(String.class, test),
+        LoaderRoutineMethodCompat.from(loaderOf(getActivity()), instanceOf(String.class, test),
             "toString").call().in(seconds(10)).next()).isEqualTo("test");
     assertThat(
-        LoaderRoutineMethodCompat.from(
-            LoaderSourceCompat.loaderOf(getActivity()), instanceOf(String.class, test),
+        LoaderRoutineMethodCompat.from(loaderOf(getActivity()), instanceOf(String.class, test),
             "toString")
                                  .withWrapper()
                                  .withSharedFields()
@@ -366,12 +356,11 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
   }
 
   public void testParams() {
-    final SwitchCase method = new SwitchCase(LoaderSourceCompat.loaderOf(getActivity()));
-    Channel<Object, Object> inputChannel =
-        JRoutineCore.ofData().buildChannel().pass("test").close();
+    final SwitchCase method = new SwitchCase(loaderOf(getActivity()));
+    Channel<Object, Object> inputChannel = JRoutineCore.channel().ofType().pass("test").close();
     Channel<?, String> outputChannel = method.call(inputChannel, true);
     assertThat(outputChannel.in(seconds(10)).next()).isEqualTo("TEST");
-    inputChannel = JRoutineCore.ofData().buildChannel().pass("TEST").close();
+    inputChannel = JRoutineCore.channel().ofType().pass("TEST").close();
     outputChannel = method.call(inputChannel, false);
     assertThat(outputChannel.in(seconds(10)).next()).isEqualTo("test");
   }
@@ -390,7 +379,7 @@ public class LoaderRoutineMethodCompatTest extends ActivityInstrumentationTestCa
 
   public void testStaticScopeError() {
     try {
-      new LoaderRoutineMethodCompat(LoaderSourceCompat.loaderOf(getActivity())) {};
+      new LoaderRoutineMethodCompat(loaderOf(getActivity())) {};
       fail();
 
     } catch (final IllegalStateException ignored) {

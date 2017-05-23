@@ -29,6 +29,7 @@ import com.github.dm.jrt.android.v11.core.JRoutineLoader;
 import com.github.dm.jrt.android.v11.core.LoaderSource;
 import com.github.dm.jrt.android.v11.reflect.JRoutineLoaderReflection;
 import com.github.dm.jrt.channel.FlowData;
+import com.github.dm.jrt.channel.JRoutineChannels;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.RoutineException;
@@ -57,6 +58,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static com.github.dm.jrt.core.executor.ScheduledExecutors.defaultExecutor;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.core.util.Reflection.boxingClass;
 import static com.github.dm.jrt.core.util.Reflection.boxingDefault;
@@ -137,6 +139,7 @@ public class LoaderRoutineMethod extends RoutineMethod
    * @param args    the constructor arguments.
    */
   public LoaderRoutineMethod(@NotNull final LoaderSource context, @Nullable final Object... args) {
+    super(defaultExecutor());
     mContext = ConstantConditions.notNull("Loader context", context);
     final Class<? extends LoaderRoutineMethod> type = getClass();
     if (!Reflection.hasStaticScope(type)) {
@@ -233,12 +236,6 @@ public class LoaderRoutineMethod extends RoutineMethod
     return from(context, target, target.getTargetClass().getMethod(name, parameterTypes));
   }
 
-  @NotNull
-  @Override
-  public LoaderRoutineMethod withConfiguration(@NotNull final InvocationConfiguration configuration) {
-    return (LoaderRoutineMethod) super.withConfiguration(configuration);
-  }
-
   /**
    * Calls the routine.
    * <br>
@@ -279,10 +276,16 @@ public class LoaderRoutineMethod extends RoutineMethod
 
   @NotNull
   @Override
+  public LoaderRoutineMethod withConfiguration(
+      @NotNull final InvocationConfiguration configuration) {
+    return (LoaderRoutineMethod) super.withConfiguration(configuration);
+  }
+
+  @NotNull
+  @Override
   @SuppressWarnings("unchecked")
   public InvocationConfiguration.Builder<? extends LoaderRoutineMethod> withInvocation() {
-    return (InvocationConfiguration.Builder<? extends LoaderRoutineMethod>) super
-        .withInvocation();
+    return (InvocationConfiguration.Builder<? extends LoaderRoutineMethod>) super.withInvocation();
   }
 
   /**
@@ -369,23 +372,23 @@ public class LoaderRoutineMethod extends RoutineMethod
       }
     }
 
-    final Channel<?, OUT> resultChannel = JRoutineCore.<OUT>ofData().buildChannel();
+    final Channel<?, OUT> resultChannel = JRoutineCore.channel().ofType();
     outputChannels.add(resultChannel);
     final Channel<?, ? extends FlowData<Object>> inputChannel =
-        (!inputChannels.isEmpty()) ? JRoutineAndroidChannels.mergeParcelableOutput(inputChannels)
-                                                            .buildChannel()
-            : JRoutineCore.<FlowData<Object>>of().buildChannel();
-    final Channel<FlowData<Object>, FlowData<Object>> outputChannel = JRoutineLoader.on(mContext)
-                                                                                    .with(factory)
-                                                                                    .withConfiguration(
-                                                                                getConfiguration())
-                                                                                    .withConfiguration(
-                                                                                getLoaderConfiguration())
-                                                                                    .invoke()
-                                                                                    .pass(inputChannel)
-                                                                                    .close();
+        (!inputChannels.isEmpty()) ? JRoutineAndroidChannels.channelHandler()
+                                                            .mergeParcelableOutputOf(inputChannels)
+            : JRoutineCore.channel().<FlowData<Object>>of();
+    final Channel<FlowData<Object>, FlowData<Object>> outputChannel =
+        JRoutineLoader.routineOn(mContext)
+                      .withConfiguration(getConfiguration())
+                      .withConfiguration(getLoaderConfiguration())
+                      .of(factory)
+                      .invoke()
+                      .pass(inputChannel)
+                      .close();
     final Map<Integer, ? extends Channel<?, Object>> channelMap =
-        JRoutineAndroidChannels.flowOutput(0, outputChannels.size(), outputChannel).buildChannelMap();
+        JRoutineAndroidChannels.channelHandler()
+                               .outputOfFlow(0, outputChannels.size(), outputChannel);
     for (final Entry<Integer, ? extends Channel<?, Object>> entry : channelMap.entrySet()) {
       ((Channel<Object, Object>) outputChannels.get(entry.getKey())).pass(entry.getValue()).close();
     }
@@ -444,20 +447,6 @@ public class LoaderRoutineMethod extends RoutineMethod
 
     @NotNull
     @Override
-    public ReflectionLoaderRoutineMethod withConfiguration(@NotNull final WrapperConfiguration configuration) {
-      mConfiguration = ConstantConditions.notNull("wrapper configuration", configuration);
-      return this;
-    }
-
-    @NotNull
-    @Override
-    public ReflectionLoaderRoutineMethod withConfiguration(
-        @NotNull final InvocationConfiguration configuration) {
-      return (ReflectionLoaderRoutineMethod) super.withConfiguration(configuration);
-    }
-
-    @NotNull
-    @Override
     @SuppressWarnings("unchecked")
     public <OUT> Channel<?, OUT> call(@Nullable final Object... params) {
       final Object[] safeParams = asArgs(params);
@@ -468,13 +457,14 @@ public class LoaderRoutineMethod extends RoutineMethod
                 + "> but was <" + safeParams.length + ">");
       }
 
-      final Routine<Object, Object> routine = JRoutineLoaderReflection.on(mContext)
-                                                                      .with(mTarget)
-                                                                      .withConfiguration(getConfiguration())
+      final Routine<Object, Object> routine = JRoutineLoaderReflection.wrapperOn(mContext)
+                                                                      .withConfiguration(
+                                                                          getConfiguration())
                                                                       .withConfiguration(
                                                                           getLoaderConfiguration())
-                                                                      .withConfiguration(mConfiguration)
-                                                                      .method(method);
+                                                                      .withConfiguration(
+                                                                          mConfiguration)
+                                                                      .methodOf(mTarget, method);
       final Channel<Object, Object> channel = routine.invoke().sorted();
       for (final Object param : safeParams) {
         if (param instanceof Channel) {
@@ -490,8 +480,16 @@ public class LoaderRoutineMethod extends RoutineMethod
 
     @NotNull
     @Override
+    public ReflectionLoaderRoutineMethod withConfiguration(
+        @NotNull final InvocationConfiguration configuration) {
+      return (ReflectionLoaderRoutineMethod) super.withConfiguration(configuration);
+    }
+
+    @NotNull
+    @Override
     @SuppressWarnings("unchecked")
-    public InvocationConfiguration.Builder<? extends ReflectionLoaderRoutineMethod> withInvocation() {
+    public InvocationConfiguration.Builder<? extends ReflectionLoaderRoutineMethod>
+    withInvocation() {
 
       return (InvocationConfiguration.Builder<? extends ReflectionLoaderRoutineMethod>) super
           .withInvocation();
@@ -499,7 +497,8 @@ public class LoaderRoutineMethod extends RoutineMethod
 
     @NotNull
     @Override
-    public ReflectionLoaderRoutineMethod withConfiguration(@NotNull final LoaderConfiguration configuration) {
+    public ReflectionLoaderRoutineMethod withConfiguration(
+        @NotNull final LoaderConfiguration configuration) {
       return (ReflectionLoaderRoutineMethod) super.withConfiguration(configuration);
     }
 
@@ -508,6 +507,14 @@ public class LoaderRoutineMethod extends RoutineMethod
     @SuppressWarnings("unchecked")
     public Builder<? extends ReflectionLoaderRoutineMethod> withLoader() {
       return (Builder<? extends ReflectionLoaderRoutineMethod>) super.withLoader();
+    }
+
+    @NotNull
+    @Override
+    public ReflectionLoaderRoutineMethod withConfiguration(
+        @NotNull final WrapperConfiguration configuration) {
+      mConfiguration = ConstantConditions.notNull("wrapper configuration", configuration);
+      return this;
     }
 
     @NotNull
@@ -656,7 +663,7 @@ public class LoaderRoutineMethod extends RoutineMethod
         mIsBound = true;
         final List<Channel<?, ?>> outputChannels = getOutputChannels();
         if (!outputChannels.isEmpty()) {
-          result.pass(Channels.mergeOutput(outputChannels).buildChannel());
+          result.pass(JRoutineChannels.channelHandler().mergeOutputOf(outputChannels));
         }
       }
     }

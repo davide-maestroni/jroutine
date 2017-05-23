@@ -16,9 +16,11 @@
 
 package com.github.dm.jrt.function;
 
+import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.RoutineException;
+import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.function.builder.StatefulRoutineBuilder;
 import com.github.dm.jrt.function.util.BiConsumer;
@@ -53,7 +55,7 @@ public class StatefulRoutineBuilderTest {
   @Test
   public void testCompleteState() {
     final AtomicBoolean state = new AtomicBoolean(true);
-    JRoutineFunction.<String, Void, AtomicBoolean>statefulOn(immediateExecutor()).onCreate(
+    JRoutineFunction.<String, Void, AtomicBoolean>statefulRoutineOn(immediateExecutor()).onCreate(
         new Supplier<AtomicBoolean>() {
 
           public AtomicBoolean get() {
@@ -65,7 +67,7 @@ public class StatefulRoutineBuilderTest {
         atomicBoolean.set(false);
         return atomicBoolean;
       }
-    }).routine().invoke().close();
+    }).create().invoke().close();
     assertThat(state.get()).isFalse();
   }
 
@@ -73,7 +75,7 @@ public class StatefulRoutineBuilderTest {
   public void testDestroy() {
     final AtomicBoolean state = new AtomicBoolean(true);
     final StatefulRoutineBuilder<String, Void, AtomicBoolean> builder =
-        JRoutineFunction.statefulOn(immediateExecutor());
+        JRoutineFunction.statefulRoutineOn(immediateExecutor());
     final Routine<String, Void> routine = builder.onCreate(new Supplier<AtomicBoolean>() {
 
       public AtomicBoolean get() {
@@ -89,7 +91,7 @@ public class StatefulRoutineBuilderTest {
                                                      atomicBoolean.set(false);
                                                    }
                                                  })
-                                                 .routine();
+                                                 .create();
     routine.invoke().close();
     assertThat(state.get()).isTrue();
     routine.clear();
@@ -101,7 +103,8 @@ public class StatefulRoutineBuilderTest {
   public void testError() {
     final AtomicReference<RoutineException> reference = new AtomicReference<RoutineException>();
     final Channel<Void, Void> channel =
-        JRoutineFunction.<Void, Void, RoutineException>statefulOn(immediateExecutor()).onError(
+        JRoutineFunction.<Void, Void, RoutineException>statefulRoutineOn(
+            immediateExecutor()).onError(
             new BiFunction<RoutineException, RoutineException, RoutineException>() {
 
               public RoutineException apply(final RoutineException state,
@@ -109,7 +112,7 @@ public class StatefulRoutineBuilderTest {
                 reference.set(e);
                 return null;
               }
-            }).routine().invoke();
+            }).create().invoke();
     assertThat(reference.get()).isNull();
     channel.abort(new IOException());
     assertThat(reference.get()).isExactlyInstanceOf(AbortException.class);
@@ -120,13 +123,15 @@ public class StatefulRoutineBuilderTest {
   @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
   public void testErrorConsume() {
     final AtomicReference<RoutineException> reference = new AtomicReference<RoutineException>();
-    final Channel<Void, Void> channel = JRoutineFunction.<Void, Void, RoutineException>statefulOn(
-        immediateExecutor()).onErrorConsume(new BiConsumer<RoutineException, RoutineException>() {
+    final Channel<Void, Void> channel =
+        JRoutineFunction.<Void, Void, RoutineException>statefulRoutineOn(
+            immediateExecutor()).onErrorConsume(
+            new BiConsumer<RoutineException, RoutineException>() {
 
-      public void accept(final RoutineException state, final RoutineException e) {
-        reference.set(e);
-      }
-    }).routine().invoke();
+              public void accept(final RoutineException state, final RoutineException e) {
+                reference.set(e);
+              }
+            }).create().invoke();
     assertThat(reference.get()).isNull();
     channel.abort(new IOException());
     assertThat(reference.get()).isExactlyInstanceOf(AbortException.class);
@@ -137,14 +142,16 @@ public class StatefulRoutineBuilderTest {
   @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
   public void testErrorException() {
     final AtomicReference<RoutineException> reference = new AtomicReference<RoutineException>();
-    final Channel<Void, Void> channel = JRoutineFunction.<Void, Void, RoutineException>statefulOn(
-        immediateExecutor()).onErrorException(new Function<RoutineException, RoutineException>() {
+    final Channel<Void, Void> channel =
+        JRoutineFunction.<Void, Void, RoutineException>statefulRoutineOn(
+            immediateExecutor()).onErrorException(
+            new Function<RoutineException, RoutineException>() {
 
-      public RoutineException apply(final RoutineException e) {
-        reference.set(e);
-        return null;
-      }
-    }).routine().invoke();
+              public RoutineException apply(final RoutineException e) {
+                reference.set(e);
+                return null;
+              }
+            }).create().invoke();
     assertThat(reference.get()).isNull();
     channel.abort(new IOException());
     assertThat(reference.get()).isExactlyInstanceOf(AbortException.class);
@@ -155,7 +162,7 @@ public class StatefulRoutineBuilderTest {
   public void testErrorState() {
     final AtomicBoolean state = new AtomicBoolean(true);
     final Channel<Void, Void> channel =
-        JRoutineFunction.<Void, Void, AtomicBoolean>statefulOn(immediateExecutor()).onCreate(
+        JRoutineFunction.<Void, Void, AtomicBoolean>statefulRoutineOn(immediateExecutor()).onCreate(
             new Supplier<AtomicBoolean>() {
 
               public AtomicBoolean get() {
@@ -167,75 +174,17 @@ public class StatefulRoutineBuilderTest {
             atomicBoolean.set(false);
             return atomicBoolean;
           }
-        }).routine().invoke();
+        }).create().invoke();
     assertThat(state.get()).isTrue();
     channel.abort(new IOException());
     assertThat(state.get()).isFalse();
   }
 
   @Test
-  public void testFinalizeConsume() {
-    final AtomicBoolean state = new AtomicBoolean(true);
-    final StatefulRoutineBuilder<String, Void, AtomicBoolean> builder =
-        JRoutineFunction.statefulOn(immediateExecutor());
-    final Routine<String, Void> routine = builder.onCreate(new Supplier<AtomicBoolean>() {
-
-      public AtomicBoolean get() {
-        return state;
-      }
-    }).onFinalizeConsume(new Consumer<AtomicBoolean>() {
-
-      public void accept(final AtomicBoolean atomicBoolean) {
-        atomicBoolean.set(false);
-      }
-    }).routine();
-    routine.invoke().close();
-    assertThat(state.get()).isFalse();
-  }
-
-  @Test
-  public void testIncrementArray() {
-    final Routine<Integer, Integer> routine =
-        JRoutineFunction.<Integer, Integer, Integer>stateful().onCreate(new Supplier<Integer>() {
-
-          public Integer get() {
-            return 1;
-          }
-        }).onNextArray(new BiFunction<Integer, Integer, Integer[]>() {
-
-          public Integer[] apply(final Integer integer1, final Integer integer2) {
-            final Integer[] integers = new Integer[1];
-            integers[0] = integer1 + integer2;
-            return integers;
-          }
-        }).routine();
-    assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(1)).all()).containsExactly(2, 3,
-        4, 5);
-  }
-
-  @Test
-  public void testIncrementIterable() {
-    final Routine<Integer, Integer> routine =
-        JRoutineFunction.<Integer, Integer, Integer>stateful().onCreate(new Supplier<Integer>() {
-
-          public Integer get() {
-            return 1;
-          }
-        }).onNextIterable(new BiFunction<Integer, Integer, Iterable<? extends Integer>>() {
-
-          public Iterable<? extends Integer> apply(final Integer integer1, final Integer integer2) {
-            return Collections.singleton(integer1 + integer2);
-          }
-        }).routine();
-    assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(1)).all()).containsExactly(2, 3,
-        4, 5);
-  }
-
-  @Test
   @SuppressWarnings("unchecked")
-  public void testIncrementList() {
-    final Routine<Integer, List<Integer>> routine =
-        JRoutineFunction.<Integer, List<Integer>, List<Integer>>stateful().onCreate(
+  public void testFactory() {
+    final InvocationFactory<Integer, List<Integer>> factory =
+        JRoutineFunction.<Integer, List<Integer>, List<Integer>>statefulFactory().onCreate(
             new Supplier<List<Integer>>() {
 
               public List<Integer> get() {
@@ -246,7 +195,88 @@ public class StatefulRoutineBuilderTest {
           public void accept(final List<Integer> list, final Integer integer) {
             list.add(integer + 1);
           }
-        }).onCompleteOutput(FunctionDecorator.<List<Integer>>identity()).routine();
+        }).onCompleteOutput(FunctionDecorator.<List<Integer>>identity()).create();
+    final Routine<Integer, List<Integer>> routine = JRoutineCore.routine().of(factory);
+    assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(1)).all()).containsOnly(
+        Arrays.asList(2, 3, 4, 5));
+  }
+
+  @Test
+  public void testFinalizeConsume() {
+    final AtomicBoolean state = new AtomicBoolean(true);
+    final StatefulRoutineBuilder<String, Void, AtomicBoolean> builder =
+        JRoutineFunction.statefulRoutineOn(immediateExecutor());
+    final Routine<String, Void> routine = builder.onCreate(new Supplier<AtomicBoolean>() {
+
+      public AtomicBoolean get() {
+        return state;
+      }
+    }).onFinalizeConsume(new Consumer<AtomicBoolean>() {
+
+      public void accept(final AtomicBoolean atomicBoolean) {
+        atomicBoolean.set(false);
+      }
+    }).create();
+    routine.invoke().close();
+    assertThat(state.get()).isFalse();
+  }
+
+  @Test
+  public void testIncrementArray() {
+    final Routine<Integer, Integer> routine =
+        JRoutineFunction.<Integer, Integer, Integer>statefulRoutine().onCreate(
+            new Supplier<Integer>() {
+
+              public Integer get() {
+                return 1;
+              }
+            }).onNextArray(new BiFunction<Integer, Integer, Integer[]>() {
+
+          public Integer[] apply(final Integer integer1, final Integer integer2) {
+            final Integer[] integers = new Integer[1];
+            integers[0] = integer1 + integer2;
+            return integers;
+          }
+        }).create();
+    assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(1)).all()).containsExactly(2, 3,
+        4, 5);
+  }
+
+  @Test
+  public void testIncrementIterable() {
+    final Routine<Integer, Integer> routine =
+        JRoutineFunction.<Integer, Integer, Integer>statefulRoutine().onCreate(
+            new Supplier<Integer>() {
+
+              public Integer get() {
+                return 1;
+              }
+            }).onNextIterable(new BiFunction<Integer, Integer, Iterable<? extends Integer>>() {
+
+          public Iterable<? extends Integer> apply(final Integer integer1, final Integer integer2) {
+            return Collections.singleton(integer1 + integer2);
+          }
+        }).create();
+    assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(1)).all()).containsExactly(2, 3,
+        4, 5);
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void testIncrementList() {
+    final Routine<Integer, List<Integer>> routine =
+        JRoutineFunction.<Integer, List<Integer>, List<Integer>>statefulRoutine().onCreate(
+            new Supplier<List<Integer>>() {
+
+              public List<Integer> get() {
+                return new ArrayList<Integer>();
+              }
+            }).onNextConsume(new BiConsumer<List<Integer>, Integer>() {
+
+          public void accept(final List<Integer> list, final Integer integer) {
+            list.add(integer + 1);
+          }
+        }).onCompleteOutput(FunctionDecorator.<List<Integer>>identity()).create();
     assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(1)).all()).containsOnly(
         Arrays.asList(2, 3, 4, 5));
   }
@@ -254,17 +284,18 @@ public class StatefulRoutineBuilderTest {
   @Test
   public void testIncrementOutput() {
     final Routine<Integer, Integer> routine =
-        JRoutineFunction.<Integer, Integer, Integer>stateful().onCreate(new Supplier<Integer>() {
+        JRoutineFunction.<Integer, Integer, Integer>statefulRoutine().onCreate(
+            new Supplier<Integer>() {
 
-          public Integer get() {
-            return 1;
-          }
-        }).onNextOutput(new BiFunction<Integer, Integer, Integer>() {
+              public Integer get() {
+                return 1;
+              }
+            }).onNextOutput(new BiFunction<Integer, Integer, Integer>() {
 
           public Integer apply(final Integer integer1, final Integer integer2) {
             return integer1 + integer2;
           }
-        }).routine();
+        }).create();
     assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(1)).all()).containsExactly(2, 3,
         4, 5);
   }
@@ -272,12 +303,13 @@ public class StatefulRoutineBuilderTest {
   @Test
   public void testSumArray() {
     final Routine<Integer, Integer> routine =
-        JRoutineFunction.<Integer, Integer, Integer>stateful().onCreate(new Supplier<Integer>() {
+        JRoutineFunction.<Integer, Integer, Integer>statefulRoutine().onCreate(
+            new Supplier<Integer>() {
 
-          public Integer get() {
-            return 0;
-          }
-        }).onNextState(new BiFunction<Integer, Integer, Integer>() {
+              public Integer get() {
+                return 0;
+              }
+            }).onNextState(new BiFunction<Integer, Integer, Integer>() {
 
           public Integer apply(final Integer integer1, final Integer integer2) {
             return integer1 + integer2;
@@ -289,19 +321,20 @@ public class StatefulRoutineBuilderTest {
             integers[0] = integer;
             return integers;
           }
-        }).routine();
+        }).create();
     assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(1)).all()).containsOnly(10);
   }
 
   @Test
   public void testSumConsume() {
     final Routine<Integer, Integer> routine =
-        JRoutineFunction.<Integer, Integer, Integer>stateful().onCreate(new Supplier<Integer>() {
+        JRoutineFunction.<Integer, Integer, Integer>statefulRoutine().onCreate(
+            new Supplier<Integer>() {
 
-          public Integer get() {
-            return 0;
-          }
-        }).onNext(new TriFunction<Integer, Integer, Channel<Integer, ?>, Integer>() {
+              public Integer get() {
+                return 0;
+              }
+            }).onNext(new TriFunction<Integer, Integer, Channel<Integer, ?>, Integer>() {
 
           public Integer apply(final Integer integer1, final Integer integer2,
               final Channel<Integer, ?> result) {
@@ -312,19 +345,20 @@ public class StatefulRoutineBuilderTest {
           public void accept(final Integer integer, final Channel<Integer, ?> result) {
             result.pass(integer);
           }
-        }).routine();
+        }).create();
     assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(1)).all()).containsOnly(10);
   }
 
   @Test
   public void testSumDefault() {
     final Routine<Integer, Integer> routine =
-        JRoutineFunction.<Integer, Integer, Integer>stateful().onCreate(new Supplier<Integer>() {
+        JRoutineFunction.<Integer, Integer, Integer>statefulRoutine().onCreate(
+            new Supplier<Integer>() {
 
-          public Integer get() {
-            return 0;
-          }
-        }).onNext(new TriFunction<Integer, Integer, Channel<Integer, ?>, Integer>() {
+              public Integer get() {
+                return 0;
+              }
+            }).onNext(new TriFunction<Integer, Integer, Channel<Integer, ?>, Integer>() {
 
           public Integer apply(final Integer integer1, final Integer integer2,
               final Channel<Integer, ?> result) {
@@ -336,19 +370,20 @@ public class StatefulRoutineBuilderTest {
             result.pass(integer);
             return null;
           }
-        }).routine();
+        }).create();
     assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(1)).all()).containsOnly(10);
   }
 
   @Test
   public void testSumIterable() {
     final Routine<Integer, Integer> routine =
-        JRoutineFunction.<Integer, Integer, Integer>stateful().onCreate(new Supplier<Integer>() {
+        JRoutineFunction.<Integer, Integer, Integer>statefulRoutine().onCreate(
+            new Supplier<Integer>() {
 
-          public Integer get() {
-            return 0;
-          }
-        }).onNextState(new BiFunction<Integer, Integer, Integer>() {
+              public Integer get() {
+                return 0;
+              }
+            }).onNextState(new BiFunction<Integer, Integer, Integer>() {
 
           public Integer apply(final Integer integer1, final Integer integer2) {
             return integer1 + integer2;
@@ -358,36 +393,38 @@ public class StatefulRoutineBuilderTest {
           public Iterable<? extends Integer> apply(final Integer integer) {
             return Collections.singleton(integer);
           }
-        }).routine();
+        }).create();
     assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(1)).all()).containsOnly(10);
   }
 
   @Test
   public void testSumOutput() {
     final Routine<Integer, Integer> routine =
-        JRoutineFunction.<Integer, Integer, Integer>stateful().onCreate(new Supplier<Integer>() {
+        JRoutineFunction.<Integer, Integer, Integer>statefulRoutine().onCreate(
+            new Supplier<Integer>() {
 
-          public Integer get() {
-            return 0;
-          }
-        }).onNextState(new BiFunction<Integer, Integer, Integer>() {
+              public Integer get() {
+                return 0;
+              }
+            }).onNextState(new BiFunction<Integer, Integer, Integer>() {
 
           public Integer apply(final Integer integer1, final Integer integer2) {
             return integer1 + integer2;
           }
-        }).onCompleteOutput(FunctionDecorator.<Integer>identity()).routine();
+        }).onCompleteOutput(FunctionDecorator.<Integer>identity()).create();
     assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(1)).all()).containsOnly(10);
   }
 
   @Test
   public void testSumState() {
     final Routine<Integer, Integer> routine =
-        JRoutineFunction.<Integer, Integer, Integer>stateful().onCreate(new Supplier<Integer>() {
+        JRoutineFunction.<Integer, Integer, Integer>statefulRoutine().onCreate(
+            new Supplier<Integer>() {
 
-          public Integer get() {
-            return 0;
-          }
-        }).onNextState(new BiFunction<Integer, Integer, Integer>() {
+              public Integer get() {
+                return 0;
+              }
+            }).onNextState(new BiFunction<Integer, Integer, Integer>() {
 
           public Integer apply(final Integer integer1, final Integer integer2) {
             return integer1 + integer2;
@@ -398,7 +435,7 @@ public class StatefulRoutineBuilderTest {
             result.pass(integer);
             return null;
           }
-        }).routine();
+        }).create();
     assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(1)).all()).containsOnly(10);
   }
 }

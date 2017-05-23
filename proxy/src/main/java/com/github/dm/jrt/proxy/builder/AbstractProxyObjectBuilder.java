@@ -77,10 +77,12 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
         proxies.put(proxyTarget, proxyMap);
       }
 
+      final ScheduledExecutor executor = mExecutor;
       final InvocationConfiguration invocationConfiguration = mInvocationConfiguration;
       final WrapperConfiguration wrapperConfiguration = mWrapperConfiguration;
       final ClassInfo classInfo =
-          new ClassInfo(getInterfaceClass(), invocationConfiguration, wrapperConfiguration);
+          new ClassInfo(getInterfaceClass(), executor, invocationConfiguration,
+              wrapperConfiguration);
       final Object instance = proxyMap.get(classInfo);
       if (instance != null) {
         return (TYPE) instance;
@@ -88,7 +90,7 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
 
       try {
         final TYPE newInstance =
-            newProxy(target, mExecutor, invocationConfiguration, wrapperConfiguration);
+            newProxy(target, executor, invocationConfiguration, wrapperConfiguration);
         proxyMap.put(classInfo, newInstance);
         return newInstance;
 
@@ -158,13 +160,14 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
      * Constructor.
      *
      * @param itf                     the proxy interface class.
+     * @param executor                the executor instance.
      * @param invocationConfiguration the invocation configuration.
      * @param wrapperConfiguration    the wrapper configuration.
      */
-    private ClassInfo(@NotNull final Class<?> itf,
+    private ClassInfo(@NotNull final Class<?> itf, @NotNull final ScheduledExecutor executor,
         @NotNull final InvocationConfiguration invocationConfiguration,
         @NotNull final WrapperConfiguration wrapperConfiguration) {
-      super(asArgs(itf, invocationConfiguration, wrapperConfiguration));
+      super(asArgs(itf, executor, invocationConfiguration, wrapperConfiguration));
     }
   }
 }

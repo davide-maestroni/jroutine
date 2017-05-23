@@ -140,6 +140,26 @@ class DefaultSparseChannelHandler implements SparseChannelHandler {
 
   @NotNull
   @Override
+  public <IN> Channel<IN, ?> duplicateInputOf(@NotNull final Channel<?, ?>... channels) {
+    return mChannelHandler.duplicateInputOf(channels);
+  }
+
+  @NotNull
+  @Override
+  public <IN> Channel<IN, ?> duplicateInputOf(
+      @NotNull final Iterable<? extends Channel<? super IN, ?>> channels) {
+    return mChannelHandler.duplicateInputOf(channels);
+  }
+
+  @NotNull
+  @Override
+  public <OUT> List<Channel<?, OUT>> duplicateOutputOf(
+      @NotNull final Channel<?, ? extends OUT> channel, final int count) {
+    return mChannelHandler.duplicateOutputOf(channel, count);
+  }
+
+  @NotNull
+  @Override
   public <IN> Channel<FlowData<IN>, ?> inputFlowOf(@NotNull final Channel<? super IN, ?> channel,
       final int id) {
     return mChannelHandler.withConfiguration(mConfiguration).inputFlowOf(channel, id);

@@ -159,18 +159,24 @@ public class ByteChunkStreamConfiguration extends DeepEqualObject {
      * <br>
      * As soon as the output stream is closed, the fed channel is closed as well.
      */
-    CLOSE_CHANNEL, /**
+    CLOSE_CHANNEL,
+
+    /**
      * Close output stream.
      * <br>
      * When the output stream is closed, the fed channel is left open.
      */
-    CLOSE_STREAM, /**
+    CLOSE_STREAM,
+
+    /**
      * Flush output stream.
      * <br>
      * The output stream is just flushed but not closed, so that it can be used to transfer
      * additional data.
      */
-    FLUSH_STREAM, /**
+    FLUSH_STREAM,
+
+    /**
      * Ignore the command.
      * <br>
      * The close method just do nothing.

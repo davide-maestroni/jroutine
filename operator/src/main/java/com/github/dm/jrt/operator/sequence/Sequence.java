@@ -54,8 +54,31 @@ public abstract class Sequence<DATA> extends DeepEqualObject implements Consumer
   /**
    * Returns a consumer generating the specified range of data.
    * <br>
-   * The generated data will start from the specified first one up to and including the specified
-   * last one, by computing each next element through the specified function.
+   * The generated data will start from the specified first one up to the specified last one, by
+   * computing each next element through the specified function.
+   * <br>
+   * The endpoint values will be included or not in the range based on the specified type.
+   *
+   * @param endpoints         the type of endpoints inclusion.
+   * @param start             the first element in the range.
+   * @param end               the last element in the range.
+   * @param incrementFunction the function incrementing the current element.
+   * @param <DATA>            the data type.
+   * @return the consumer instance.
+   */
+  @NotNull
+  public static <DATA extends Comparable<? super DATA>> Sequence<DATA> range(
+      @NotNull final EndpointsType endpoints, @NotNull final DATA start, @NotNull final DATA end,
+      @NotNull final Function<DATA, DATA> incrementFunction) {
+    return new RangeConsumer<DATA>(endpoints, start, end, incrementFunction);
+  }
+
+  /**
+   * Returns a consumer generating the specified range of data.
+   * <br>
+   * The method returns the same sequence as the one returned by
+   * {@link #range(EndpointsType, Comparable, Comparable, Function)} called with
+   * {@link EndpointsType#INCLUSIVE} as first parameter.
    *
    * @param start             the first element in the range.
    * @param end               the last element in the range.
@@ -67,7 +90,7 @@ public abstract class Sequence<DATA> extends DeepEqualObject implements Consumer
   public static <DATA extends Comparable<? super DATA>> Sequence<DATA> range(
       @NotNull final DATA start, @NotNull final DATA end,
       @NotNull final Function<DATA, DATA> incrementFunction) {
-    return new RangeConsumer<DATA>(start, end, incrementFunction);
+    return range(EndpointsType.INCLUSIVE, start, end, incrementFunction);
   }
 
   /**
@@ -79,8 +102,56 @@ public abstract class Sequence<DATA> extends DeepEqualObject implements Consumer
    * increment will be {@code +1}. On the contrary, if the former is greater than the latter, the
    * increment will be {@code -1}.
    * <br>
+   * The endpoint values will be included or not in the range based on the specified type.
+   * <br>
    * Note that the {@code end} number will be returned only if the incremented value will exactly
    * match it.
+   *
+   * @param endpoints the type of endpoints inclusion.
+   * @param start     the first number in the range.
+   * @param end       the last number in the range.
+   * @param <N>       the number type.
+   * @return the consumer instance.
+   */
+  @NotNull
+  @SuppressWarnings("unchecked")
+  public static <N extends Number> Sequence<N> range(@NotNull final EndpointsType endpoints,
+      @NotNull final N start, @NotNull final N end) {
+    final Operation<?> operation = getHigherPrecisionOperation(start.getClass(), end.getClass());
+    return range(endpoints, start, end,
+        (N) getOperation(start.getClass()).convert((operation.compare(start, end) <= 0) ? 1 : -1));
+  }
+
+  /**
+   * Returns a consumer generating the specified range of numbers.
+   * <br>
+   * The stream will generate a range of numbers by applying the specified increment up to the
+   * {@code end} number.
+   * <br>
+   * The endpoint values will be included or not in the range based on the specified type.
+   * <br>
+   * Note that the {@code end} number will be returned only if the incremented value will exactly
+   * match it.
+   *
+   * @param endpoints the type of endpoints inclusion.
+   * @param start     the first number in the range.
+   * @param end       the last number in the range.
+   * @param increment the increment to apply to the current number.
+   * @param <N>       the number type.
+   * @return the consumer instance.
+   */
+  @NotNull
+  public static <N extends Number> Sequence<N> range(@NotNull final EndpointsType endpoints,
+      @NotNull final N start, @NotNull final N end, @NotNull final N increment) {
+    return new NumberRangeConsumer<N>(endpoints, start, end, increment);
+  }
+
+  /**
+   * Returns a consumer generating the specified range of numbers.
+   * <br>
+   * The method returns the same sequence as the one returned by
+   * {@link #range(EndpointsType, Number, Number)} called with {@link EndpointsType#INCLUSIVE} as
+   * first parameter.
    *
    * @param start the first number in the range.
    * @param end   the last number in the range.
@@ -90,19 +161,15 @@ public abstract class Sequence<DATA> extends DeepEqualObject implements Consumer
   @NotNull
   @SuppressWarnings("unchecked")
   public static <N extends Number> Sequence<N> range(@NotNull final N start, @NotNull final N end) {
-    final Operation<?> operation = getHigherPrecisionOperation(start.getClass(), end.getClass());
-    return range(start, end,
-        (N) getOperation(start.getClass()).convert((operation.compare(start, end) <= 0) ? 1 : -1));
+    return range(EndpointsType.INCLUSIVE, start, end);
   }
 
   /**
    * Returns a consumer generating the specified range of numbers.
    * <br>
-   * The stream will generate a range of numbers by applying the specified increment up to and
-   * including the {@code end} number.
-   * <br>
-   * Note that the {@code end} number will be returned only if the incremented value will exactly
-   * match it.
+   * The method returns the same sequence as the one returned by
+   * {@link #range(EndpointsType, Number, Number, Number)} called with
+   * {@link EndpointsType#INCLUSIVE} as first parameter.
    *
    * @param start     the first number in the range.
    * @param end       the last number in the range.
@@ -111,10 +178,9 @@ public abstract class Sequence<DATA> extends DeepEqualObject implements Consumer
    * @return the consumer instance.
    */
   @NotNull
-  @SuppressWarnings("unchecked")
   public static <N extends Number> Sequence<N> range(@NotNull final N start, @NotNull final N end,
       @NotNull final N increment) {
-    return new NumberRangeConsumer<N>(start, end, increment);
+    return range(EndpointsType.INCLUSIVE, start, end, increment);
   }
 
   /**
@@ -137,41 +203,110 @@ public abstract class Sequence<DATA> extends DeepEqualObject implements Consumer
   }
 
   /**
+   * Enumeration defining whether the endpoints are included or not in the range.
+   */
+  public enum EndpointsType {
+
+    /**
+     * Inclusive endpoints.
+     * <br>
+     * Both starting and ending endpoints are included in the range.
+     */
+    INCLUSIVE(true, true),
+
+    /**
+     * Exclusive starting endpoint.
+     * <br>
+     * Only the ending endpoint is included in the range.
+     */
+    START_EXCLUSIVE(false, true),
+
+    /**
+     * Exclusive ending endpoint.
+     * <br>
+     * Only the starting endpoint is included in the range.
+     */
+    END_EXCLUSIVE(true, false),
+
+    /**
+     * Exclusive endpoints.
+     * <br>
+     * Both starting and ending endpoints are excluded from the range.
+     */
+    EXCLUSIVE(false, false);
+
+    private final boolean mIsEndInclusive;
+
+    private final boolean mIsStartInclusive;
+
+    /**
+     * Constructor.
+     *
+     * @param isStartInclusive if the starting endpoint is included in the range.
+     * @param isEndInclusive   if the ending endpoint is included in the range.
+     */
+    EndpointsType(final boolean isStartInclusive, final boolean isEndInclusive) {
+      mIsStartInclusive = isStartInclusive;
+      mIsEndInclusive = isEndInclusive;
+    }
+
+    /**
+     * Returns whether the ending endpoint is included in the range.
+     *
+     * @return if the ending endpoint is included in the range.
+     */
+    public boolean isEndInclusive() {
+      return mIsEndInclusive;
+    }
+
+    /**
+     * Returns whether the starting endpoint is included in the range.
+     *
+     * @return if the starting endpoint is included in the range.
+     */
+    public boolean isStartInclusive() {
+      return mIsStartInclusive;
+    }
+  }
+
+  /**
    * Consumer implementation generating a range of numbers.
    *
    * @param <N> the number type.
    */
   private static class NumberRangeConsumer<N extends Number> extends Sequence<N> {
 
-    private final Operation<? extends Number> mAddOperation;
-
-    private final Operation<? extends Number> mCompareOperation;
-
     private final N mEnd;
 
+    private final EndpointsType mEndpoints;
+
     private final N mIncrement;
+
+    private final Operation<? extends Number> mOperation;
 
     private final N mStart;
 
     /**
      * Constructor.
      *
+     * @param endpoints the endpoints type.
      * @param start     the first number in the range.
      * @param end       the last number in the range.
      * @param increment the increment.
      */
-    private NumberRangeConsumer(@NotNull final N start, @NotNull final N end,
-        @NotNull final N increment) {
-      super(asArgs(ConstantConditions.notNull("start element", start),
+    private NumberRangeConsumer(@NotNull final EndpointsType endpoints, @NotNull final N start,
+        @NotNull final N end, @NotNull final N increment) {
+      super(asArgs(ConstantConditions.notNull("endpoints type", endpoints),
+          ConstantConditions.notNull("start element", start),
           ConstantConditions.notNull("end element", end),
           ConstantConditions.notNull("increment", increment)));
+      mEndpoints = endpoints;
       mStart = start;
       mEnd = end;
       mIncrement = increment;
-      final Operation<?> addOperation =
-          (mAddOperation = getHigherPrecisionOperation(start.getClass(), increment.getClass()));
-      mCompareOperation =
-          getHigherPrecisionOperation(addOperation.convert(0).getClass(), end.getClass());
+      mOperation = getHigherPrecisionOperation(
+          getHigherPrecisionOperation(start.getClass(), increment.getClass()).convert(0).getClass(),
+          end.getClass());
     }
 
     @SuppressWarnings("unchecked")
@@ -179,28 +314,25 @@ public abstract class Sequence<DATA> extends DeepEqualObject implements Consumer
       final N start = mStart;
       final N end = mEnd;
       final N increment = mIncrement;
-      final Operation<? extends Number> addOperation = mAddOperation;
-      final Operation<? extends Number> compareOperation = mCompareOperation;
-      N current = start;
-      if (compareOperation.compare(start, end) <= 0) {
-        while (compareOperation.compare(current, end) < 0) {
+      final EndpointsType endpoints = mEndpoints;
+      final Operation<? extends Number> operation = mOperation;
+      N current = (N) (endpoints.isStartInclusive() ? operation.convert(start)
+          : operation.add(start, increment));
+      if (operation.compare(start, end) <= 0) {
+        while (operation.compare(current, end) < 0) {
           result.pass(current);
-          current = (N) addOperation.add(current, increment);
-        }
-
-        if (compareOperation.compare(current, end) == 0) {
-          result.pass(end);
+          current = (N) operation.add(current, increment);
         }
 
       } else {
-        while (compareOperation.compare(current, end) > 0) {
+        while (operation.compare(current, end) > 0) {
           result.pass(current);
-          current = (N) addOperation.add(current, increment);
+          current = (N) operation.add(current, increment);
         }
+      }
 
-        if (compareOperation.compare(current, end) == 0) {
-          result.pass(end);
-        }
+      if (endpoints.isEndInclusive() && (operation.compare(current, end) == 0)) {
+        result.pass((N) operation.convert(end));
       }
     }
   }
@@ -214,6 +346,8 @@ public abstract class Sequence<DATA> extends DeepEqualObject implements Consumer
 
     private final OUT mEnd;
 
+    private final EndpointsType mEndpoints;
+
     private final Function<OUT, OUT> mIncrementFunction;
 
     private final OUT mStart;
@@ -221,14 +355,17 @@ public abstract class Sequence<DATA> extends DeepEqualObject implements Consumer
     /**
      * Constructor.
      *
+     * @param endpoints         the endpoints type.
      * @param start             the first element in the range.
      * @param end               the last element in the range.
      * @param incrementFunction the function incrementing the current element.
      */
-    private RangeConsumer(@NotNull final OUT start, @NotNull final OUT end,
-        @NotNull final Function<OUT, OUT> incrementFunction) {
-      super(asArgs(ConstantConditions.notNull("start element", start),
+    private RangeConsumer(@NotNull final EndpointsType endpoints, @NotNull final OUT start,
+        @NotNull final OUT end, @NotNull final Function<OUT, OUT> incrementFunction) {
+      super(asArgs(ConstantConditions.notNull("endpoints type", endpoints),
+          ConstantConditions.notNull("start element", start),
           ConstantConditions.notNull("end element", end), wrapFunction(incrementFunction)));
+      mEndpoints = endpoints;
       mStart = start;
       mEnd = end;
       mIncrementFunction = incrementFunction;
@@ -238,18 +375,23 @@ public abstract class Sequence<DATA> extends DeepEqualObject implements Consumer
       final OUT start = mStart;
       final OUT end = mEnd;
       final Function<OUT, OUT> increment = mIncrementFunction;
-      OUT current = start;
+      final EndpointsType endpoints = mEndpoints;
+      OUT current = endpoints.isStartInclusive() ? start : increment.apply(start);
       if (start.compareTo(end) <= 0) {
-        while (current.compareTo(end) <= 0) {
+        while (current.compareTo(end) < 0) {
           result.pass(current);
           current = increment.apply(current);
         }
 
       } else {
-        while (current.compareTo(end) >= 0) {
+        while (current.compareTo(end) > 0) {
           result.pass(current);
           current = increment.apply(current);
         }
+      }
+
+      if (endpoints.isEndInclusive() && (current.compareTo(end) == 0)) {
+        result.pass(current);
       }
     }
   }

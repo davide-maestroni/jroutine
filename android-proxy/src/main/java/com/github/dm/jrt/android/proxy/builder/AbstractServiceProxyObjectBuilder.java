@@ -18,7 +18,9 @@ package com.github.dm.jrt.android.proxy.builder;
 
 import android.content.Context;
 
+import com.github.dm.jrt.android.core.ServiceSource;
 import com.github.dm.jrt.android.core.config.ServiceConfiguration;
+import com.github.dm.jrt.android.reflect.ContextInvocationTarget;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -27,7 +29,6 @@ import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 import com.github.dm.jrt.reflect.config.WrapperConfiguration;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 
@@ -48,6 +49,8 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
       sContextProxies =
       new WeakIdentityHashMap<Context, HashMap<Class<?>, HashMap<ProxyInfo, Object>>>();
 
+  private final ServiceSource mServiceSource;
+
   private InvocationConfiguration mInvocationConfiguration =
       InvocationConfiguration.defaultConfiguration();
 
@@ -55,35 +58,28 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
 
   private WrapperConfiguration mWrapperConfiguration = WrapperConfiguration.defaultConfiguration();
 
-  @NotNull
-  @Override
-  public ServiceProxyObjectBuilder<TYPE> withConfiguration(@NotNull final ServiceConfiguration configuration) {
-    mServiceConfiguration = ConstantConditions.notNull("Service configuration", configuration);
-    return this;
-  }
-
-  @NotNull
-  @Override
-  public ServiceProxyObjectBuilder<TYPE> withConfiguration(
-      @NotNull final InvocationConfiguration configuration) {
-    mInvocationConfiguration =
-        ConstantConditions.notNull("invocation configuration", configuration);
-    return this;
-  }
-
-  @NotNull
-  @Override
-  public ServiceProxyObjectBuilder<TYPE> withConfiguration(@NotNull final WrapperConfiguration configuration) {
-    mWrapperConfiguration = ConstantConditions.notNull("wrapper configuration", configuration);
-    return this;
+  /**
+   * Constructor.
+   *
+   * @param serviceSource the Service source.
+   */
+  protected AbstractServiceProxyObjectBuilder(@NotNull final ServiceSource serviceSource) {
+    mServiceSource = ConstantConditions.notNull("Service source", serviceSource);
   }
 
   @NotNull
   @Override
   @SuppressWarnings("unchecked")
-  public TYPE buildProxy() {
+  public TYPE proxyOf(@NotNull final ContextInvocationTarget<?> target) {
+    final Class<?> targetClass = target.getTargetClass();
+    if (targetClass.isInterface()) {
+      throw new IllegalArgumentException(
+          "the target class must not be an interface: " + targetClass.getName());
+    }
+
     synchronized (sContextProxies) {
-      final Context context = getInvocationContext();
+      final ServiceSource serviceSource = mServiceSource;
+      final Context context = serviceSource.getContext();
       if (context == null) {
         throw new IllegalStateException("the invocation context has been destroyed");
       }
@@ -96,7 +92,6 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
         contextProxies.put(context, proxyMap);
       }
 
-      final Class<?> targetClass = getTargetClass();
       HashMap<ProxyInfo, Object> proxies = proxyMap.get(targetClass);
       if (proxies == null) {
         proxies = new HashMap<ProxyInfo, Object>();
@@ -116,7 +111,8 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
 
       try {
         final TYPE newInstance =
-            newProxy(invocationConfiguration, wrapperConfiguration, serviceConfiguration);
+            newProxy(target, serviceSource, invocationConfiguration, wrapperConfiguration,
+                serviceConfiguration);
         proxies.put(proxyInfo, newInstance);
         return newInstance;
 
@@ -129,7 +125,25 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
 
   @NotNull
   @Override
-  public InvocationConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>> withInvocation() {
+  public ServiceProxyObjectBuilder<TYPE> withConfiguration(
+      @NotNull final WrapperConfiguration configuration) {
+    mWrapperConfiguration = ConstantConditions.notNull("wrapper configuration", configuration);
+    return this;
+  }
+
+  @NotNull
+  @Override
+  public ServiceProxyObjectBuilder<TYPE> withConfiguration(
+      @NotNull final InvocationConfiguration configuration) {
+    mInvocationConfiguration =
+        ConstantConditions.notNull("invocation configuration", configuration);
+    return this;
+  }
+
+  @NotNull
+  @Override
+  public InvocationConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>>
+  withInvocation() {
     final InvocationConfiguration config = mInvocationConfiguration;
     return new InvocationConfiguration.Builder<ServiceProxyObjectBuilder<TYPE>>(
         new InvocationConfiguration.Configurable<ServiceProxyObjectBuilder<TYPE>>() {
@@ -161,6 +175,14 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
 
   @NotNull
   @Override
+  public ServiceProxyObjectBuilder<TYPE> withConfiguration(
+      @NotNull final ServiceConfiguration configuration) {
+    mServiceConfiguration = ConstantConditions.notNull("Service configuration", configuration);
+    return this;
+  }
+
+  @NotNull
+  @Override
   public ServiceConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>> withService() {
     final ServiceConfiguration config = mServiceConfiguration;
     return new ServiceConfiguration.Builder<ServiceProxyObjectBuilder<TYPE>>(this, config);
@@ -175,26 +197,10 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
   protected abstract Class<? super TYPE> getInterfaceClass();
 
   /**
-   * Returns the Context on which the invocation is based.
-   * <br>
-   * Returning null means that the Context has been destroyed, so an exception will be thrown.
-   *
-   * @return the invocation Context.
-   */
-  @Nullable
-  protected abstract Context getInvocationContext();
-
-  /**
-   * Returns the builder target class.
-   *
-   * @return the target class.
-   */
-  @NotNull
-  protected abstract Class<?> getTargetClass();
-
-  /**
    * Creates and return a new proxy instance.
    *
+   * @param target                  the invocation target.
+   * @param serviceSource           the service source.
    * @param invocationConfiguration the invocation configuration.
    * @param wrapperConfiguration    the wrapper configuration.
    * @param serviceConfiguration    the Service configuration.
@@ -202,7 +208,9 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
    * @throws java.lang.Exception if an unexpected error occurs.
    */
   @NotNull
-  protected abstract TYPE newProxy(@NotNull InvocationConfiguration invocationConfiguration,
+  protected abstract TYPE newProxy(@NotNull ContextInvocationTarget<?> target,
+      @NotNull ServiceSource serviceSource,
+      @NotNull InvocationConfiguration invocationConfiguration,
       @NotNull WrapperConfiguration wrapperConfiguration,
       @NotNull ServiceConfiguration serviceConfiguration) throws Exception;
 

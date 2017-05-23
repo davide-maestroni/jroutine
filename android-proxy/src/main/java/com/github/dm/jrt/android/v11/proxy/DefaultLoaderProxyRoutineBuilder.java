@@ -42,9 +42,7 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingConstructor
  */
 class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder {
 
-  private final LoaderSource mContext;
-
-  private final ContextInvocationTarget<?> mTarget;
+  private final LoaderSource mLoaderSource;
 
   private InvocationConfiguration mInvocationConfiguration =
       InvocationConfiguration.defaultConfiguration();
@@ -56,40 +54,16 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder {
   /**
    * Constructor.
    *
-   * @param context the routine context.
-   * @param target  the invocation target.
+   * @param loaderSource the Loader source.
    */
-  DefaultLoaderProxyRoutineBuilder(@NotNull final LoaderSource context,
-      @NotNull final ContextInvocationTarget<?> target) {
-    mContext = ConstantConditions.notNull("Loader context", context);
-    mTarget = ConstantConditions.notNull("Context invocation target", target);
+  DefaultLoaderProxyRoutineBuilder(@NotNull final LoaderSource loaderSource) {
+    mLoaderSource = ConstantConditions.notNull("Loader context", loaderSource);
   }
 
   @NotNull
   @Override
-  public LoaderProxyRoutineBuilder withConfiguration(@NotNull final LoaderConfiguration configuration) {
-    mLoaderConfiguration = ConstantConditions.notNull("Loader configuration", configuration);
-    return this;
-  }
-
-  @NotNull
-  @Override
-  public LoaderProxyRoutineBuilder withConfiguration(@NotNull final InvocationConfiguration configuration) {
-    mInvocationConfiguration =
-        ConstantConditions.notNull("invocation configuration", configuration);
-    return this;
-  }
-
-  @NotNull
-  @Override
-  public LoaderProxyRoutineBuilder withConfiguration(@NotNull final WrapperConfiguration configuration) {
-    mWrapperConfiguration = ConstantConditions.notNull("wrapper configuration", configuration);
-    return this;
-  }
-
-  @NotNull
-  @Override
-  public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
+  public <TYPE> TYPE proxyOf(@NotNull final ContextInvocationTarget<?> target,
+      @NotNull final Class<TYPE> itf) {
     if (!itf.isInterface()) {
       throw new IllegalArgumentException(
           "the specified class is not an interface: " + itf.getName());
@@ -102,17 +76,35 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder {
     }
 
     final TargetLoaderProxyObjectBuilder<TYPE> builder =
-        new TargetLoaderProxyObjectBuilder<TYPE>(mContext, mTarget, itf);
+        new TargetLoaderProxyObjectBuilder<TYPE>(mLoaderSource, itf);
     return builder.withConfiguration(mInvocationConfiguration)
                   .withConfiguration(mWrapperConfiguration)
                   .withConfiguration(mLoaderConfiguration)
-                  .buildProxy();
+                  .proxyOf(target);
   }
 
   @NotNull
   @Override
-  public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
-    return buildProxy(itf.getRawClass());
+  public <TYPE> TYPE proxyOf(@NotNull final ContextInvocationTarget<?> target,
+      @NotNull final ClassToken<TYPE> itf) {
+    return proxyOf(target, itf.getRawClass());
+  }
+
+  @NotNull
+  @Override
+  public LoaderProxyRoutineBuilder withConfiguration(
+      @NotNull final WrapperConfiguration configuration) {
+    mWrapperConfiguration = ConstantConditions.notNull("wrapper configuration", configuration);
+    return this;
+  }
+
+  @NotNull
+  @Override
+  public LoaderProxyRoutineBuilder withConfiguration(
+      @NotNull final InvocationConfiguration configuration) {
+    mInvocationConfiguration =
+        ConstantConditions.notNull("invocation configuration", configuration);
+    return this;
   }
 
   @NotNull
@@ -149,6 +141,14 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder {
 
   @NotNull
   @Override
+  public LoaderProxyRoutineBuilder withConfiguration(
+      @NotNull final LoaderConfiguration configuration) {
+    mLoaderConfiguration = ConstantConditions.notNull("Loader configuration", configuration);
+    return this;
+  }
+
+  @NotNull
+  @Override
   public LoaderConfiguration.Builder<? extends LoaderProxyRoutineBuilder> withLoader() {
     final LoaderConfiguration config = mLoaderConfiguration;
     return new LoaderConfiguration.Builder<LoaderProxyRoutineBuilder>(this, config);
@@ -162,25 +162,26 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder {
   private static class TargetLoaderProxyObjectBuilder<TYPE>
       extends AbstractLoaderProxyObjectBuilder<TYPE> {
 
-    private final LoaderSource mContext;
-
     private final Class<? super TYPE> mInterfaceClass;
 
-    private final ContextInvocationTarget<?> mTarget;
+    private final LoaderSource mLoaderSource;
 
     /**
      * Constructor.
      *
-     * @param context        the routine context.
-     * @param target         the invocation target.
+     * @param loaderSource   the Loader source.
      * @param interfaceClass the proxy interface class.
      */
-    private TargetLoaderProxyObjectBuilder(@NotNull final LoaderSource context,
-        @NotNull final ContextInvocationTarget<?> target,
+    private TargetLoaderProxyObjectBuilder(@NotNull final LoaderSource loaderSource,
         @NotNull final Class<? super TYPE> interfaceClass) {
-      mContext = context;
-      mTarget = target;
+      mLoaderSource = loaderSource;
       mInterfaceClass = interfaceClass;
+    }
+
+    @Nullable
+    @Override
+    protected Object getComponent() {
+      return mLoaderSource.getComponent();
     }
 
     @NotNull
@@ -189,26 +190,13 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder {
       return mInterfaceClass;
     }
 
-    @Nullable
-    @Override
-    protected Object getInvocationContext() {
-      return mContext.getComponent();
-    }
-
-    @NotNull
-    @Override
-    protected Class<?> getTargetClass() {
-      return mTarget.getTargetClass();
-    }
-
     @NotNull
     @Override
     @SuppressWarnings("unchecked")
-    protected TYPE newProxy(@NotNull final InvocationConfiguration invocationConfiguration,
+    protected TYPE newProxy(@NotNull final ContextInvocationTarget<?> target,
+        @NotNull final InvocationConfiguration invocationConfiguration,
         @NotNull final WrapperConfiguration wrapperConfiguration,
         @NotNull final LoaderConfiguration loaderConfiguration) throws Exception {
-      final LoaderSource context = mContext;
-      final ContextInvocationTarget<?> target = mTarget;
       final Class<? super TYPE> interfaceClass = mInterfaceClass;
       final LoaderProxy annotation = interfaceClass.getAnnotation(LoaderProxy.class);
       String packageName = annotation.classPackage();
@@ -232,10 +220,11 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder {
 
       final String fullClassName =
           packageName + annotation.classPrefix() + className + annotation.classSuffix();
+      final LoaderSource loaderSource = mLoaderSource;
       final Constructor<?> constructor =
-          findBestMatchingConstructor(Class.forName(fullClassName), context, target,
+          findBestMatchingConstructor(Class.forName(fullClassName), target, loaderSource,
               invocationConfiguration, wrapperConfiguration, loaderConfiguration);
-      return (TYPE) constructor.newInstance(context, target, invocationConfiguration,
+      return (TYPE) constructor.newInstance(target, loaderSource, invocationConfiguration,
           wrapperConfiguration, loaderConfiguration);
     }
   }

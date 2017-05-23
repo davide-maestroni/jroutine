@@ -159,6 +159,13 @@ public class ReplayOutputChannelTest {
   }
 
   @Test
+  public void testGet() {
+    final Channel<?, String> channel =
+        JRoutineChannels.channelHandler().replayOutputOf(JRoutineCore.channel().of("test"));
+    assertThat(channel.get()).isEqualTo("test");
+  }
+
+  @Test
   @SuppressWarnings("unchecked")
   public void testInvalidCalls() {
     final Channel<String, String> inputChannel = JRoutineCore.channel().ofType();

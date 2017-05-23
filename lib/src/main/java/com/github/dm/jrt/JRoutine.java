@@ -32,7 +32,9 @@ import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.JRoutineFunction;
 import com.github.dm.jrt.function.builder.FunctionalChannelConsumer;
+import com.github.dm.jrt.function.builder.StatefulFactoryBuilder;
 import com.github.dm.jrt.function.builder.StatefulRoutineBuilder;
+import com.github.dm.jrt.function.builder.StatelessFactoryBuilder;
 import com.github.dm.jrt.function.builder.StatelessRoutineBuilder;
 import com.github.dm.jrt.function.util.Action;
 import com.github.dm.jrt.function.util.Consumer;
@@ -292,13 +294,12 @@ public class JRoutine {
   }
 
   /**
-   * Returns a builder of stateful routines running on the default executor.
+   * Returns a builder of stateful invocation factories.
    * <p>
-   * This type of routines are based on invocations retaining a mutable state during their
-   * lifecycle.
+   * This invocations retain a mutable state during their lifecycle.
    * <br>
-   * A typical example of stateful routine is the one computing a final result by accumulating the
-   * input data (for instance, computing the sum of input numbers).
+   * A typical example of stateful invocation is the one computing a final result by accumulating
+   * the input data (for instance, computing the sum of input numbers).
    *
    * @param <IN>    the input data type.
    * @param <OUT>   the output data type.
@@ -306,8 +307,27 @@ public class JRoutine {
    * @return the routine builder.
    */
   @NotNull
-  public static <IN, OUT, STATE> StatefulRoutineBuilder<IN, OUT, STATE> stateful() {
-    return JRoutineFunction.stateful();
+  public static <IN, OUT, STATE> StatefulFactoryBuilder<IN, OUT, STATE> statefulFactory() {
+    return JRoutineFunction.statefulFactory();
+  }
+
+  /**
+   * Returns a builder of stateful routines running on the default executor.
+   * <p>
+   * This type of routines are based on invocations retaining a mutable state during their
+   * lifecycle.
+   * <br>
+   * A typical example of stateful invocation is the one computing a final result by accumulating
+   * the input data (for instance, computing the sum of input numbers).
+   *
+   * @param <IN>    the input data type.
+   * @param <OUT>   the output data type.
+   * @param <STATE> the state data type.
+   * @return the routine builder.
+   */
+  @NotNull
+  public static <IN, OUT, STATE> StatefulRoutineBuilder<IN, OUT, STATE> statefulRoutine() {
+    return JRoutineFunction.statefulRoutine();
   }
 
   /**
@@ -316,8 +336,8 @@ public class JRoutine {
    * This type of routines are based on invocations retaining a mutable state during their
    * lifecycle.
    * <br>
-   * A typical example of stateful routine is the one computing a final result by accumulating the
-   * input data (for instance, computing the sum of input numbers).
+   * A typical example of stateful invocation is the one computing a final result by accumulating
+   * the input data (for instance, computing the sum of input numbers).
    *
    * @param executor the executor instance.
    * @param <IN>     the input data type.
@@ -326,17 +346,17 @@ public class JRoutine {
    * @return the routine builder.
    */
   @NotNull
-  public static <IN, OUT, STATE> StatefulRoutineBuilder<IN, OUT, STATE> statefulOn(
+  public static <IN, OUT, STATE> StatefulRoutineBuilder<IN, OUT, STATE> statefulRoutineOn(
       @NotNull final ScheduledExecutor executor) {
-    return JRoutineFunction.statefulOn(executor);
+    return JRoutineFunction.statefulRoutineOn(executor);
   }
 
   /**
-   * Returns a builder of stateless routines running on the default executor.
+   * Returns a builder of stateless invocation factories.
    * <p>
-   * This type of routines are based on invocations not retaining a mutable internal state.
+   * This invocations do not retain a mutable internal state.
    * <br>
-   * A typical example of stateless routine is the one processing each input separately (for
+   * A typical example of stateless invocation is the one processing each input separately (for
    * instance, computing the square of input numbers).
    *
    * @param <IN>  the input data type.
@@ -344,8 +364,25 @@ public class JRoutine {
    * @return the routine builder.
    */
   @NotNull
-  public static <IN, OUT> StatelessRoutineBuilder<IN, OUT> stateless() {
-    return JRoutineFunction.stateless();
+  public static <IN, OUT> StatelessFactoryBuilder<IN, OUT> statelessFactory() {
+    return JRoutineFunction.statelessFactory();
+  }
+
+  /**
+   * Returns a builder of stateless routines running on the default executor.
+   * <p>
+   * This type of routines are based on invocations not retaining a mutable internal state.
+   * <br>
+   * A typical example of stateless invocation is the one processing each input separately (for
+   * instance, computing the square of input numbers).
+   *
+   * @param <IN>  the input data type.
+   * @param <OUT> the output data type.
+   * @return the routine builder.
+   */
+  @NotNull
+  public static <IN, OUT> StatelessRoutineBuilder<IN, OUT> statelessRoutine() {
+    return JRoutineFunction.statelessRoutine();
   }
 
   /**
@@ -353,7 +390,7 @@ public class JRoutine {
    * <p>
    * This type of routines are based on invocations not retaining a mutable internal state.
    * <br>
-   * A typical example of stateless routine is the one processing each input separately (for
+   * A typical example of stateless invocation is the one processing each input separately (for
    * instance, computing the square of input numbers).
    *
    * @param executor the executor instance.
@@ -362,9 +399,9 @@ public class JRoutine {
    * @return the routine builder.
    */
   @NotNull
-  public static <IN, OUT> StatelessRoutineBuilder<IN, OUT> statelessOn(
+  public static <IN, OUT> StatelessRoutineBuilder<IN, OUT> statelessRoutineOn(
       @NotNull final ScheduledExecutor executor) {
-    return JRoutineFunction.statelessOn(executor);
+    return JRoutineFunction.statelessRoutineOn(executor);
   }
 
   /**

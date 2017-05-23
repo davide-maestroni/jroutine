@@ -33,7 +33,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
 
-import static com.github.dm.jrt.android.core.ServiceSource.serviceFrom;
+import static com.github.dm.jrt.android.core.ServiceSource.serviceOf;
 import static com.github.dm.jrt.android.reflect.ContextInvocationTarget.classOfType;
 import static com.github.dm.jrt.android.reflect.ContextInvocationTarget.instanceOf;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
@@ -57,10 +57,10 @@ public class ServiceRoutineMethodTest extends ActivityInstrumentationTestCase2<T
   }
 
   private static void testAbort2(@NotNull final Activity activity) {
-    final Channel<Integer, Integer> inputChannel1 = JRoutineCore.<Integer>ofData().buildChannel();
-    final Channel<Integer, Integer> inputChannel2 = JRoutineCore.<Integer>ofData().buildChannel();
-    final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
-    new ServiceRoutineMethod(ServiceSource.serviceOf(activity)) {
+    final Channel<Integer, Integer> inputChannel1 = JRoutineCore.channel().ofType();
+    final Channel<Integer, Integer> inputChannel2 = JRoutineCore.channel().ofType();
+    final Channel<Integer, Integer> outputChannel = JRoutineCore.channel().ofType();
+    new ServiceRoutineMethod(serviceOf(activity)) {
 
       private int mSum;
 
@@ -81,10 +81,10 @@ public class ServiceRoutineMethodTest extends ActivityInstrumentationTestCase2<T
   }
 
   private static void testAbort3(@NotNull final Activity activity) {
-    final Channel<Integer, Integer> inputChannel1 = JRoutineCore.<Integer>ofData().buildChannel();
-    final Channel<Integer, Integer> inputChannel2 = JRoutineCore.<Integer>ofData().buildChannel();
-    final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
-    new ServiceRoutineMethod(ServiceSource.serviceOf(activity)) {
+    final Channel<Integer, Integer> inputChannel1 = JRoutineCore.channel().ofType();
+    final Channel<Integer, Integer> inputChannel2 = JRoutineCore.channel().ofType();
+    final Channel<Integer, Integer> outputChannel = JRoutineCore.channel().ofType();
+    new ServiceRoutineMethod(serviceOf(activity)) {
 
       private int mSum;
 
@@ -106,8 +106,8 @@ public class ServiceRoutineMethodTest extends ActivityInstrumentationTestCase2<T
   }
 
   private static void testContext(@NotNull final Activity activity) {
-    final Channel<Boolean, Boolean> outputChannel = JRoutineCore.<Boolean>ofData().buildChannel();
-    new ServiceRoutineMethod(ServiceSource.serviceOf(activity)) {
+    final Channel<Boolean, Boolean> outputChannel = JRoutineCore.channel().ofType();
+    new ServiceRoutineMethod(serviceOf(activity)) {
 
       void test(@Output final Channel<Boolean, ?> output) {
         output.pass(getContext() instanceof InvocationService);
@@ -117,14 +117,14 @@ public class ServiceRoutineMethodTest extends ActivityInstrumentationTestCase2<T
   }
 
   private static void testNoInputs(@NotNull final Activity activity) {
-    final ServiceSource context = ServiceSource.serviceOf(activity);
+    final ServiceSource context = serviceOf(activity);
     assertThat(new ServiceRoutineMethod(context) {
 
       String get() {
         return "test";
       }
     }.call().in(seconds(10)).all()).containsExactly("test");
-    final Channel<String, String> outputChannel = JRoutineCore.<String>ofData().buildChannel();
+    final Channel<String, String> outputChannel = JRoutineCore.channel().ofType();
     new ServiceRoutineMethod(context) {
 
       void get(@Output final Channel<String, ?> outputChannel) {
@@ -136,19 +136,19 @@ public class ServiceRoutineMethodTest extends ActivityInstrumentationTestCase2<T
 
   private static void testParams2(@NotNull final Activity activity) {
     final Locale locale = Locale.getDefault();
-    final ServiceRoutineMethod method = new ServiceRoutineMethod(ServiceSource.serviceOf(activity), locale) {
+    final ServiceRoutineMethod method = new ServiceRoutineMethod(serviceOf(activity), locale) {
 
       String switchCase(@Input final Channel<?, String> input, final boolean isUpper) {
         final String str = input.next();
         return (isUpper) ? str.toUpperCase(locale) : str.toLowerCase(locale);
       }
     };
-    Channel<Object, Object> inputChannel = JRoutineCore.ofData().buildChannel().pass("test");
+    Channel<Object, Object> inputChannel = JRoutineCore.channel().ofType().pass("test");
     Channel<?, String> outputChannel = method.call(inputChannel, true);
     assertThat(outputChannel.in(seconds(10)).next()).isEqualTo("TEST");
     inputChannel.close();
     outputChannel.in(seconds(10)).getComplete();
-    inputChannel = JRoutineCore.ofData().buildChannel().pass("TEST");
+    inputChannel = JRoutineCore.channel().ofType().pass("TEST");
     outputChannel = method.call(inputChannel, false);
     assertThat(outputChannel.in(seconds(10)).next()).isEqualTo("test");
     inputChannel.close();
@@ -156,8 +156,8 @@ public class ServiceRoutineMethodTest extends ActivityInstrumentationTestCase2<T
   }
 
   private static void testReturnValue(@NotNull final Activity activity) {
-    final Channel<String, String> inputStrings = JRoutineCore.<String>ofData().buildChannel();
-    final Channel<?, Object> outputChannel = new ServiceRoutineMethod(ServiceSource.serviceOf(activity)) {
+    final Channel<String, String> inputStrings = JRoutineCore.channel().ofType();
+    final Channel<?, Object> outputChannel = new ServiceRoutineMethod(serviceOf(activity)) {
 
       int length(@Input final Channel<?, String> input) {
         if (input.hasNext()) {
@@ -171,10 +171,10 @@ public class ServiceRoutineMethodTest extends ActivityInstrumentationTestCase2<T
   }
 
   private static void testSwitchInput(@NotNull final Activity activity) {
-    final Channel<Integer, Integer> inputInts = JRoutineCore.<Integer>ofData().buildChannel();
-    final Channel<String, String> inputStrings = JRoutineCore.<String>ofData().buildChannel();
-    final Channel<String, String> outputChannel = JRoutineCore.<String>ofData().buildChannel();
-    new ServiceRoutineMethod(ServiceSource.serviceOf(activity)) {
+    final Channel<Integer, Integer> inputInts = JRoutineCore.channel().ofType();
+    final Channel<String, String> inputStrings = JRoutineCore.channel().ofType();
+    final Channel<String, String> outputChannel = JRoutineCore.channel().ofType();
+    new ServiceRoutineMethod(serviceOf(activity)) {
 
       void run(@Input final Channel<?, Integer> inputInts,
           @Input final Channel<?, String> inputStrings, @Output final Channel<String, ?> output) {
@@ -189,10 +189,10 @@ public class ServiceRoutineMethodTest extends ActivityInstrumentationTestCase2<T
   }
 
   private static void testSwitchInput2(@NotNull final Activity activity) {
-    final Channel<Integer, Integer> inputInts = JRoutineCore.<Integer>ofData().buildChannel();
-    final Channel<String, String> inputStrings = JRoutineCore.<String>ofData().buildChannel();
-    final Channel<String, String> outputChannel = JRoutineCore.<String>ofData().buildChannel();
-    new ServiceRoutineMethod(ServiceSource.serviceOf(activity)) {
+    final Channel<Integer, Integer> inputInts = JRoutineCore.channel().ofType();
+    final Channel<String, String> inputStrings = JRoutineCore.channel().ofType();
+    final Channel<String, String> outputChannel = JRoutineCore.channel().ofType();
+    new ServiceRoutineMethod(serviceOf(activity)) {
 
       void run(@Input final Channel<?, Integer> inputInts,
           @Input final Channel<?, String> inputStrings, @Output final Channel<String, ?> output) {
@@ -210,9 +210,9 @@ public class ServiceRoutineMethodTest extends ActivityInstrumentationTestCase2<T
   }
 
   public void testAbort() {
-    final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofData().buildChannel();
-    final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
-    new SumRoutine(ServiceSource.serviceOf(getActivity())).call(inputChannel, outputChannel);
+    final Channel<Integer, Integer> inputChannel = JRoutineCore.channel().ofType();
+    final Channel<Integer, Integer> outputChannel = JRoutineCore.channel().ofType();
+    new SumRoutine(serviceOf(getActivity())).call(inputChannel, outputChannel);
     inputChannel.pass(1, 2, 3, 4).abort();
     assertThat(outputChannel.in(seconds(10)).getError()).isExactlyInstanceOf(AbortException.class);
   }
@@ -226,20 +226,20 @@ public class ServiceRoutineMethodTest extends ActivityInstrumentationTestCase2<T
   }
 
   public void testBind() {
-    final ServiceSource context = ServiceSource.serviceOf(getActivity());
-    final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofData().buildChannel();
-    final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
+    final ServiceSource context = serviceOf(getActivity());
+    final Channel<Integer, Integer> inputChannel = JRoutineCore.channel().ofType();
+    final Channel<Integer, Integer> outputChannel = JRoutineCore.channel().ofType();
     new SquareRoutine(context).call(inputChannel, outputChannel);
-    final Channel<Integer, Integer> resultChannel = JRoutineCore.<Integer>ofData().buildChannel();
+    final Channel<Integer, Integer> resultChannel = JRoutineCore.channel().ofType();
     new SumRoutine(context).call(outputChannel, resultChannel);
     inputChannel.pass(1, 2, 3, 4, 5).close();
     assertThat(resultChannel.in(seconds(10)).all()).containsExactly(55);
   }
 
   public void testCall() {
-    final Channel<Integer, Integer> inputChannel = JRoutineCore.<Integer>ofData().buildChannel();
-    final Channel<Integer, Integer> outputChannel = JRoutineCore.<Integer>ofData().buildChannel();
-    new SumRoutine(ServiceSource.serviceOf(getActivity())).call(inputChannel, outputChannel);
+    final Channel<Integer, Integer> inputChannel = JRoutineCore.channel().ofType();
+    final Channel<Integer, Integer> outputChannel = JRoutineCore.channel().ofType();
+    new SumRoutine(serviceOf(getActivity())).call(inputChannel, outputChannel);
     inputChannel.pass(1, 2, 3, 4, 5).close();
     assertThat(outputChannel.in(seconds(10)).all()).containsExactly(15);
   }
@@ -249,31 +249,31 @@ public class ServiceRoutineMethodTest extends ActivityInstrumentationTestCase2<T
   }
 
   public void testFromClass() throws NoSuchMethodException {
-    assertThat(ServiceRoutineMethod.from(ServiceSource.serviceOf(getActivity()),
+    assertThat(ServiceRoutineMethod.from(serviceOf(getActivity()),
         ServiceRoutineMethodTest.class.getMethod("length", String.class))
                                    .call("test")
                                    .in(seconds(10))
                                    .next()).isEqualTo(4);
-    assertThat(ServiceRoutineMethod.from(ServiceSource.serviceOf(getActivity()),
+    assertThat(ServiceRoutineMethod.from(serviceOf(getActivity()),
         ServiceRoutineMethodTest.class.getMethod("length", String.class))
-                                   .call(JRoutineCore.of("test").buildChannel())
+                                   .call(JRoutineCore.channel().of("test"))
                                    .in(seconds(10))
                                    .next()).isEqualTo(4);
   }
 
   public void testFromClass2() throws NoSuchMethodException {
-    assertThat(ServiceRoutineMethod.from(ServiceSource.serviceOf(getActivity()),
+    assertThat(ServiceRoutineMethod.from(serviceOf(getActivity()),
         classOfType(ServiceRoutineMethodTest.class), "length", String.class)
                                    .call("test")
                                    .in(seconds(10))
                                    .next()).isEqualTo(4);
-    assertThat(ServiceRoutineMethod.from(ServiceSource.serviceOf(getActivity()),
+    assertThat(ServiceRoutineMethod.from(serviceOf(getActivity()),
         classOfType(ServiceRoutineMethodTest.class), "length", String.class)
-                                   .call(JRoutineCore.of("test").buildChannel())
+                                   .call(JRoutineCore.channel().of("test"))
                                    .in(seconds(10))
                                    .next()).isEqualTo(4);
-    final Channel<String, String> inputChannel = JRoutineCore.<String>ofData().buildChannel();
-    final Channel<?, Object> outputChannel = ServiceRoutineMethod.from(ServiceSource.serviceOf(getActivity()),
+    final Channel<String, String> inputChannel = JRoutineCore.channel().ofType();
+    final Channel<?, Object> outputChannel = ServiceRoutineMethod.from(serviceOf(getActivity()),
         classOfType(ServiceRoutineMethodTest.class), "length", String.class).call(inputChannel);
     inputChannel.pass("test").close();
     assertThat(outputChannel.in(seconds(10)).next()).isEqualTo(4);
@@ -281,15 +281,14 @@ public class ServiceRoutineMethodTest extends ActivityInstrumentationTestCase2<T
 
   public void testFromError() throws NoSuchMethodException {
     try {
-      ServiceRoutineMethod.from(ServiceSource.serviceOf(getActivity()), String.class.getMethod("toString"));
+      ServiceRoutineMethod.from(serviceOf(getActivity()), String.class.getMethod("toString"));
       fail();
 
     } catch (final IllegalArgumentException ignored) {
     }
 
     try {
-      ServiceRoutineMethod.from(
-          ServiceSource.serviceOf(getActivity()), instanceOf(String.class, "test"),
+      ServiceRoutineMethod.from(serviceOf(getActivity()), instanceOf(String.class, "test"),
           ServiceRoutineMethodTest.class.getMethod("length", String.class));
       fail();
 
@@ -299,11 +298,9 @@ public class ServiceRoutineMethodTest extends ActivityInstrumentationTestCase2<T
 
   public void testFromInstance() throws NoSuchMethodException {
     final String test = "test";
-    assertThat(ServiceRoutineMethod.from(
-        ServiceSource.serviceOf(getActivity()), instanceOf(String.class, test),
+    assertThat(ServiceRoutineMethod.from(serviceOf(getActivity()), instanceOf(String.class, test),
         String.class.getMethod("toString")).call().in(seconds(10)).next()).isEqualTo("test");
-    assertThat(ServiceRoutineMethod.from(
-        ServiceSource.serviceOf(getActivity()), instanceOf(String.class, test),
+    assertThat(ServiceRoutineMethod.from(serviceOf(getActivity()), instanceOf(String.class, test),
         String.class.getMethod("toString"))
                                    .withWrapper()
                                    .withSharedFields()
@@ -315,13 +312,16 @@ public class ServiceRoutineMethodTest extends ActivityInstrumentationTestCase2<T
 
   public void testFromInstance2() throws NoSuchMethodException {
     final String test = "test";
-    assertThat(ServiceRoutineMethod.from(
-        ServiceSource.serviceOf(getActivity()), instanceOf(String.class, test),
+    assertThat(ServiceRoutineMethod.from(serviceOf(getActivity()), instanceOf(String.class, test),
         "toString").call().in(seconds(10)).next()).isEqualTo("test");
-    assertThat(ServiceRoutineMethod.from(
-        ServiceSource.serviceOf(getActivity()), instanceOf(String.class, test),
-        "toString").withWrapper().withSharedFields().configuration().call().in(seconds(10)).next())
-        .isEqualTo("test");
+    assertThat(ServiceRoutineMethod.from(serviceOf(getActivity()), instanceOf(String.class, test),
+        "toString")
+                                   .withWrapper()
+                                   .withSharedFields()
+                                   .configuration()
+                                   .call()
+                                   .in(seconds(10))
+                                   .next()).isEqualTo("test");
   }
 
   public void testNoInputs() {
@@ -329,13 +329,13 @@ public class ServiceRoutineMethodTest extends ActivityInstrumentationTestCase2<T
   }
 
   public void testParams() {
-    final SwitchCase method = new SwitchCase(ServiceSource.serviceOf(getActivity()));
-    Channel<Object, Object> inputChannel = JRoutineCore.ofData().buildChannel().pass("test");
+    final SwitchCase method = new SwitchCase(serviceOf(getActivity()));
+    Channel<Object, Object> inputChannel = JRoutineCore.channel().ofType().pass("test");
     Channel<?, String> outputChannel = method.call(inputChannel, true);
     assertThat(outputChannel.in(seconds(10)).next()).isEqualTo("TEST");
     inputChannel.close();
     outputChannel.in(seconds(10)).getComplete();
-    inputChannel = JRoutineCore.ofData().buildChannel().pass("TEST");
+    inputChannel = JRoutineCore.channel().ofType().pass("TEST");
     outputChannel = method.call(inputChannel, false);
     assertThat(outputChannel.in(seconds(10)).next()).isEqualTo("test");
     inputChannel.close();
@@ -352,7 +352,7 @@ public class ServiceRoutineMethodTest extends ActivityInstrumentationTestCase2<T
 
   public void testStaticScopeError() {
     try {
-      new ServiceRoutineMethod(ServiceSource.serviceOf(getActivity())) {};
+      new ServiceRoutineMethod(serviceOf(getActivity())) {};
       fail();
 
     } catch (final IllegalStateException ignored) {

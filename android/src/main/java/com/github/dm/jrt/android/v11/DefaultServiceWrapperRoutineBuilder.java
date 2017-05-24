@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Davide Maestroni
+ * Copyright 2017 Davide Maestroni
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.android;
+package com.github.dm.jrt.android.v11;
 
+import com.github.dm.jrt.WrapperRoutineBuilder.ProxyStrategyType;
+import com.github.dm.jrt.android.ServiceWrapperRoutineBuilder;
 import com.github.dm.jrt.android.core.ServiceSource;
 import com.github.dm.jrt.android.core.config.ServiceConfiguration;
 import com.github.dm.jrt.android.proxy.JRoutineServiceProxy;
@@ -44,8 +46,6 @@ class DefaultServiceWrapperRoutineBuilder implements ServiceWrapperRoutineBuilde
 
   private final ServiceSource mServiceSource;
 
-  private final ContextInvocationTarget<?> mTarget;
-
   private InvocationConfiguration mInvocationConfiguration =
       InvocationConfiguration.defaultConfiguration();
 
@@ -59,56 +59,57 @@ class DefaultServiceWrapperRoutineBuilder implements ServiceWrapperRoutineBuilde
    * Constructor.
    *
    * @param serviceSource the Service source.
-   * @param target        the invocation target.
    */
-  DefaultServiceWrapperRoutineBuilder(@NotNull final ServiceSource serviceSource,
-      @NotNull final ContextInvocationTarget<?> target) {
+  DefaultServiceWrapperRoutineBuilder(@NotNull final ServiceSource serviceSource) {
     mServiceSource = ConstantConditions.notNull("Service source", serviceSource);
-    mTarget = ConstantConditions.notNull("invocation target", target);
   }
 
   @NotNull
   @Override
-  public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
+  public <IN, OUT> Routine<IN, OUT> methodOf(@NotNull final ContextInvocationTarget<?> target,
+      @NotNull final String name) {
+    return newReflectionBuilder().methodOf(target, name);
+  }
+
+  @NotNull
+  @Override
+  public <IN, OUT> Routine<IN, OUT> methodOf(@NotNull final ContextInvocationTarget<?> target,
+      @NotNull final String name, @NotNull final Class<?>... parameterTypes) {
+    return newReflectionBuilder().methodOf(target, name, parameterTypes);
+  }
+
+  @NotNull
+  @Override
+  public <IN, OUT> Routine<IN, OUT> methodOf(@NotNull final ContextInvocationTarget<?> target,
+      @NotNull final Method method) {
+    return newReflectionBuilder().methodOf(target, method);
+  }
+
+  @NotNull
+  @Override
+  public <TYPE> TYPE proxyOf(@NotNull final ContextInvocationTarget<?> target,
+      @NotNull final ClassToken<TYPE> itf) {
+    return proxyOf(target, itf.getRawClass());
+  }
+
+  @NotNull
+  @Override
+  public <TYPE> TYPE proxyOf(@NotNull final ContextInvocationTarget<?> target,
+      @NotNull final Class<TYPE> itf) {
     final ProxyStrategyType proxyStrategyType = mProxyStrategyType;
     if (proxyStrategyType == null) {
       final ServiceProxy proxyAnnotation = itf.getAnnotation(ServiceProxy.class);
-      if ((proxyAnnotation != null) && mTarget.isAssignableTo(proxyAnnotation.value())) {
-        return newProxyBuilder().buildProxy(itf);
+      if ((proxyAnnotation != null) && target.isAssignableTo(proxyAnnotation.value())) {
+        return newProxyBuilder().proxyOf(target, itf);
       }
 
-      return newReflectionBuilder().buildProxy(itf);
+      return newReflectionBuilder().proxyOf(target, itf);
 
     } else if (proxyStrategyType == ProxyStrategyType.CODE_GENERATION) {
-      return newProxyBuilder().buildProxy(itf);
+      return newProxyBuilder().proxyOf(target, itf);
     }
 
-    return newReflectionBuilder().buildProxy(itf);
-  }
-
-  @NotNull
-  @Override
-  public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
-    return buildProxy(itf.getRawClass());
-  }
-
-  @NotNull
-  @Override
-  public <IN, OUT> Routine<IN, OUT> method(@NotNull final String name) {
-    return newReflectionBuilder().method(name);
-  }
-
-  @NotNull
-  @Override
-  public <IN, OUT> Routine<IN, OUT> method(@NotNull final String name,
-      @NotNull final Class<?>... parameterTypes) {
-    return newReflectionBuilder().method(name, parameterTypes);
-  }
-
-  @NotNull
-  @Override
-  public <IN, OUT> Routine<IN, OUT> method(@NotNull final Method method) {
-    return newReflectionBuilder().method(method);
+    return newReflectionBuilder().proxyOf(target, itf);
   }
 
   @NotNull
@@ -141,13 +142,6 @@ class DefaultServiceWrapperRoutineBuilder implements ServiceWrapperRoutineBuilde
             return DefaultServiceWrapperRoutineBuilder.this.withConfiguration(configuration);
           }
         }, mInvocationConfiguration);
-  }
-
-  @NotNull
-  @Override
-  public ServiceWrapperRoutineBuilder withStrategy(@Nullable final ProxyStrategyType strategyType) {
-    mProxyStrategyType = strategyType;
-    return this;
   }
 
   @NotNull
@@ -189,9 +183,15 @@ class DefaultServiceWrapperRoutineBuilder implements ServiceWrapperRoutineBuilde
   }
 
   @NotNull
+  @Override
+  public ServiceWrapperRoutineBuilder withStrategy(@Nullable final ProxyStrategyType strategyType) {
+    mProxyStrategyType = strategyType;
+    return this;
+  }
+
+  @NotNull
   private ServiceProxyRoutineBuilder newProxyBuilder() {
-    return JRoutineServiceProxy.on(mServiceSource)
-                               .with(mTarget)
+    return JRoutineServiceProxy.wrapperOn(mServiceSource)
                                .withConfiguration(mInvocationConfiguration)
                                .withConfiguration(mWrapperConfiguration)
                                .withConfiguration(mServiceConfiguration);
@@ -199,8 +199,7 @@ class DefaultServiceWrapperRoutineBuilder implements ServiceWrapperRoutineBuilde
 
   @NotNull
   private ServiceReflectionRoutineBuilder newReflectionBuilder() {
-    return JRoutineServiceReflection.on(mServiceSource)
-                                    .with(mTarget)
+    return JRoutineServiceReflection.wrapperOn(mServiceSource)
                                     .withConfiguration(mInvocationConfiguration)
                                     .withConfiguration(mWrapperConfiguration)
                                     .withConfiguration(mServiceConfiguration);

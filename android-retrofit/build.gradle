@@ -92,7 +92,6 @@ conditionalDependencies {
   compile name: 'android-channel', version: androidChannelVersion
   compile name: 'android-core', version: androidCoreVersion
   compile name: 'android-reflect', version: androidReflectVersion
-  compile name: 'android-stream', version: androidStreamVersion
   compile name: 'channel', version: channelVersion
   compile name: 'core', version: coreVersion
   compile name: 'function', version: functionVersion
@@ -121,7 +120,6 @@ tasks.withType(Javadoc) {
       "${prefix}/${androidChannelVersion}/android-channel/",
       "${prefix}/${androidCoreVersion}/android-core/",
       "${prefix}/${androidReflectVersion}/android-reflect/",
-      "${prefix}/${androidStreamVersion}/android-stream/",
       "${prefix}/${channelVersion}/channel/",
       "${prefix}/${coreVersion}/core/",
       "${prefix}/${functionVersion}/function/",

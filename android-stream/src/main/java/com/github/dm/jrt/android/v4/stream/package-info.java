@@ -15,8 +15,8 @@
  */
 
 /**
- * Stream transformations utility classes specific to the Android platform.
+ * Stream transformations utility classes with support for the Android compatibility library.
  * <p>
  * Created by davide-maestroni on 01/04/2016.
  */
-package com.github.dm.jrt.android.v11.stream.transform;
+package com.github.dm.jrt.android.v4.stream;

@@ -28,6 +28,8 @@ import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.executor.ScheduledExecutor;
+import com.github.dm.jrt.core.invocation.Invocation;
+import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.JRoutineFunction;
@@ -123,6 +125,21 @@ public class JRoutine {
   }
 
   /**
+   * Gets an input stream returning the data contained in the specified buffer.
+   * <p>
+   * Note that only one input stream can be created for each buffer.
+   *
+   * @param buffer the byte buffer.
+   * @return the input stream.
+   * @throws java.lang.IllegalStateException if an input stream has been already created for the
+   *                                         specified buffer.
+   */
+  @NotNull
+  public static ByteChunkInputStream inputStream(@NotNull final ByteChunk buffer) {
+    return ByteChannel.inputStream(buffer);
+  }
+
+  /**
    * Gets an input stream returning the concatenation of the data contained in the specified
    * buffers.
    * <p>
@@ -156,21 +173,6 @@ public class JRoutine {
   }
 
   /**
-   * Gets an input stream returning the data contained in the specified buffer.
-   * <p>
-   * Note that only one input stream can be created for each buffer.
-   *
-   * @param buffer the byte buffer.
-   * @return the input stream.
-   * @throws java.lang.IllegalStateException if an input stream has been already created for the
-   *                                         specified buffer.
-   */
-  @NotNull
-  public static ByteChunkInputStream inputStream(@NotNull final ByteChunk buffer) {
-    return ByteChannel.inputStream(buffer);
-  }
-
-  /**
    * Returns a channel consumer builder employing the specified action to handle the invocation
    * completion.
    *
@@ -193,6 +195,20 @@ public class JRoutine {
   public static FunctionalChannelConsumer<Object> onError(
       @NotNull final Consumer<? super RoutineException> onError) {
     return JRoutineFunction.onError(onError);
+  }
+
+  /**
+   * Returns a channel consumer builder employing the specified consumer function to handle the
+   * invocation outputs.
+   *
+   * @param onOutput the consumer function.
+   * @param <OUT>    the output data type.
+   * @return the channel consumer builder.
+   */
+  @NotNull
+  public static <OUT> FunctionalChannelConsumer<OUT> onOutput(
+      @NotNull final Consumer<? super OUT> onOutput) {
+    return JRoutineFunction.onOutput(onOutput);
   }
 
   /**
@@ -226,20 +242,6 @@ public class JRoutine {
       @NotNull final Consumer<? super OUT> onOutput,
       @NotNull final Consumer<? super RoutineException> onError, @NotNull final Action onComplete) {
     return JRoutineFunction.onOutput(onOutput, onError, onComplete);
-  }
-
-  /**
-   * Returns a channel consumer builder employing the specified consumer function to handle the
-   * invocation outputs.
-   *
-   * @param onOutput the consumer function.
-   * @param <OUT>    the output data type.
-   * @return the channel consumer builder.
-   */
-  @NotNull
-  public static <OUT> FunctionalChannelConsumer<OUT> onOutput(
-      @NotNull final Consumer<? super OUT> onOutput) {
-    return JRoutineFunction.onOutput(onOutput);
   }
 
   /**
@@ -426,6 +428,22 @@ public class JRoutine {
   }
 
   /**
+   * Returns a stream routine wrapping the specified factory of invocations.
+   * <br>
+   * The invocations will be executed synchronously on the same thread as the routine invocation.
+   *
+   * @param factory the invocation factory instance.
+   * @param <IN>    the input data type.
+   * @param <OUT>   the output data type.
+   * @return the stream routine.
+   */
+  @NotNull
+  public static <IN, OUT> StreamRoutine<IN, OUT> streamOf(
+      @NotNull final InvocationFactory<IN, OUT> factory) {
+    return JRoutineStream.streamOf(factory);
+  }
+
+  /**
    * Returns a stream routine wrapping the specified one.
    *
    * @param routine the routine instance.
@@ -436,6 +454,24 @@ public class JRoutine {
   @NotNull
   public static <IN, OUT> StreamRoutine<IN, OUT> streamOf(@NotNull final Routine<IN, OUT> routine) {
     return JRoutineStream.streamOf(routine);
+  }
+
+  /**
+   * Returns a stream routine wrapping the specified invocation.
+   * <br>
+   * The invocations will be executed synchronously on the same thread as the routine invocation.
+   * <br>
+   * Note that the returned routine can be called only once.
+   *
+   * @param invocation the invocation instance.
+   * @param <IN>       the input data type.
+   * @param <OUT>      the output data type.
+   * @return the stream routine.
+   */
+  @NotNull
+  public static <IN, OUT> StreamRoutine<IN, OUT> streamOfSingleton(
+      @NotNull final Invocation<IN, OUT> invocation) {
+    return JRoutineStream.streamOfSingleton(invocation);
   }
 
   /**

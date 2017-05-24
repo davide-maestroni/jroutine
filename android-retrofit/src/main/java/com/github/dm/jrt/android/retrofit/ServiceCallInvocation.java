@@ -113,7 +113,7 @@ public class ServiceCallInvocation
 
       case BYTES_ID:
         if (mInputChannel == null) {
-          mInputChannel = JRoutineCore.<ParcelableByteChunk>ofData().buildChannel();
+          mInputChannel = JRoutineCore.channel().ofType();
         }
 
         final ParcelableByteChunk chunk = input.data();
@@ -145,7 +145,7 @@ public class ServiceCallInvocation
     final Request request =
         mRequestData.requestWithBody(new AsyncRequestBody(mMediaType, mInputChannel));
     final Channel<ParcelableFlowData<Object>, ParcelableFlowData<Object>> outputChannel =
-        JRoutineCore.<ParcelableFlowData<Object>>ofData().buildChannel();
+        JRoutineCore.channel().ofType();
     result.pass(outputChannel);
     getClient().newCall(request).enqueue(new Callback() {
 
@@ -185,15 +185,17 @@ public class ServiceCallInvocation
         (mediaType != null) ? mediaType.toString() : null));
     result.pass(new ParcelableFlowData<Object>(ConverterChannelConsumer.CONTENT_LENGTH_ID,
         responseBody.contentLength()));
-    final Channel<Object, ?> channel =
-        JRoutineAndroidChannels.parcelableFlowInput(result, ConverterChannelConsumer.BYTES_ID)
-                               .buildChannel();
-    final ByteChunkOutputStream outputStream = ParcelableByteChannel.withOutput(channel)
-                                                                    .chunkStreamConfiguration()
+    final Channel<Object, ?> channel = JRoutineAndroidChannels.channelHandler()
+                                                              .inputOfParcelableFlow(result,
+                                                                  ConverterChannelConsumer
+                                                                      .BYTES_ID);
+    final ByteChunkOutputStream outputStream = ParcelableByteChannel.outputStream()
+                                                                    .withStream()
                                                                     .withOnClose(
-                                                                    CloseActionType.CLOSE_CHANNEL)
-                                                                    .apply()
-                                                                    .buildOutputStream();
+                                                                        CloseActionType
+                                                                            .CLOSE_CHANNEL)
+                                                                    .configuration()
+                                                                    .of(channel);
     try {
       outputStream.transferFrom(responseBody.byteStream());
 

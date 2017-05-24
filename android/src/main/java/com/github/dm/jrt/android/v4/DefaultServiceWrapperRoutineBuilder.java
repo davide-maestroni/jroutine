@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Davide Maestroni
+ * Copyright 2017 Davide Maestroni
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,17 +17,16 @@
 package com.github.dm.jrt.android.v4;
 
 import com.github.dm.jrt.WrapperRoutineBuilder.ProxyStrategyType;
-import com.github.dm.jrt.android.LoaderWrapperRoutineBuilder;
-import com.github.dm.jrt.android.core.config.LoaderConfiguration;
-import com.github.dm.jrt.android.proxy.annotation.LoaderProxyCompat;
-import com.github.dm.jrt.android.proxy.builder.LoaderProxyRoutineBuilder;
+import com.github.dm.jrt.android.ServiceWrapperRoutineBuilder;
+import com.github.dm.jrt.android.core.ServiceSource;
+import com.github.dm.jrt.android.core.config.ServiceConfiguration;
+import com.github.dm.jrt.android.proxy.JRoutineServiceProxy;
+import com.github.dm.jrt.android.proxy.annotation.ServiceProxy;
+import com.github.dm.jrt.android.proxy.builder.ServiceProxyRoutineBuilder;
 import com.github.dm.jrt.android.reflect.ContextInvocationTarget;
-import com.github.dm.jrt.android.reflect.builder.LoaderReflectionRoutineBuilder;
-import com.github.dm.jrt.android.v4.core.LoaderSourceCompat;
-import com.github.dm.jrt.android.v4.proxy.JRoutineLoaderProxyCompat;
-import com.github.dm.jrt.android.v4.reflect.JRoutineLoaderReflectionCompat;
+import com.github.dm.jrt.android.reflect.JRoutineServiceReflection;
+import com.github.dm.jrt.android.reflect.builder.ServiceReflectionRoutineBuilder;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
-import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -39,30 +38,30 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Method;
 
 /**
- * Default implementation of a Loader reflection/proxy routine builder.
+ * Default implementation of a Service reflection/proxy routine builder.
  * <p>
- * Created by davide-maestroni on 03/07/2016.
+ * Created by davide-maestroni on 03/06/2016.
  */
-class DefaultLoaderWrapperRoutineBuilderCompat implements LoaderWrapperRoutineBuilder {
+class DefaultServiceWrapperRoutineBuilder implements ServiceWrapperRoutineBuilder {
 
-  private final LoaderSourceCompat mLoaderSource;
+  private final ServiceSource mServiceSource;
 
   private InvocationConfiguration mInvocationConfiguration =
       InvocationConfiguration.defaultConfiguration();
 
-  private LoaderConfiguration mLoaderConfiguration = LoaderConfiguration.defaultConfiguration();
-
   private ProxyStrategyType mProxyStrategyType;
+
+  private ServiceConfiguration mServiceConfiguration = ServiceConfiguration.defaultConfiguration();
 
   private WrapperConfiguration mWrapperConfiguration = WrapperConfiguration.defaultConfiguration();
 
   /**
    * Constructor.
    *
-   * @param loaderSource the Loader source.
+   * @param serviceSource the Service source.
    */
-  DefaultLoaderWrapperRoutineBuilderCompat(@NotNull final LoaderSourceCompat loaderSource) {
-    mLoaderSource = ConstantConditions.notNull("Loader source", loaderSource);
+  DefaultServiceWrapperRoutineBuilder(@NotNull final ServiceSource serviceSource) {
+    mServiceSource = ConstantConditions.notNull("Service source", serviceSource);
   }
 
   @NotNull
@@ -99,7 +98,7 @@ class DefaultLoaderWrapperRoutineBuilderCompat implements LoaderWrapperRoutineBu
       @NotNull final Class<TYPE> itf) {
     final ProxyStrategyType proxyStrategyType = mProxyStrategyType;
     if (proxyStrategyType == null) {
-      final LoaderProxyCompat proxyAnnotation = itf.getAnnotation(LoaderProxyCompat.class);
+      final ServiceProxy proxyAnnotation = itf.getAnnotation(ServiceProxy.class);
       if ((proxyAnnotation != null) && target.isAssignableTo(proxyAnnotation.value())) {
         return newProxyBuilder().proxyOf(target, itf);
       }
@@ -115,7 +114,7 @@ class DefaultLoaderWrapperRoutineBuilderCompat implements LoaderWrapperRoutineBu
 
   @NotNull
   @Override
-  public LoaderWrapperRoutineBuilder withConfiguration(
+  public ServiceWrapperRoutineBuilder withConfiguration(
       @NotNull final InvocationConfiguration configuration) {
     mInvocationConfiguration =
         ConstantConditions.notNull("invocation configuration", configuration);
@@ -124,7 +123,7 @@ class DefaultLoaderWrapperRoutineBuilderCompat implements LoaderWrapperRoutineBu
 
   @NotNull
   @Override
-  public LoaderWrapperRoutineBuilder withConfiguration(
+  public ServiceWrapperRoutineBuilder withConfiguration(
       @NotNull final WrapperConfiguration configuration) {
     mWrapperConfiguration = ConstantConditions.notNull("wrapper configuration", configuration);
     return this;
@@ -132,77 +131,77 @@ class DefaultLoaderWrapperRoutineBuilderCompat implements LoaderWrapperRoutineBu
 
   @NotNull
   @Override
-  public Builder<? extends LoaderWrapperRoutineBuilder> withInvocation() {
-    return new InvocationConfiguration.Builder<LoaderWrapperRoutineBuilder>(
-        new InvocationConfiguration.Configurable<LoaderWrapperRoutineBuilder>() {
+  public InvocationConfiguration.Builder<? extends ServiceWrapperRoutineBuilder> withInvocation() {
+    return new InvocationConfiguration.Builder<ServiceWrapperRoutineBuilder>(
+        new InvocationConfiguration.Configurable<ServiceWrapperRoutineBuilder>() {
 
           @NotNull
           @Override
-          public LoaderWrapperRoutineBuilder withConfiguration(
+          public ServiceWrapperRoutineBuilder withConfiguration(
               @NotNull final InvocationConfiguration configuration) {
-            return DefaultLoaderWrapperRoutineBuilderCompat.this.withConfiguration(configuration);
+            return DefaultServiceWrapperRoutineBuilder.this.withConfiguration(configuration);
           }
         }, mInvocationConfiguration);
   }
 
   @NotNull
   @Override
-  public WrapperConfiguration.Builder<? extends LoaderWrapperRoutineBuilder> withWrapper() {
-    return new WrapperConfiguration.Builder<LoaderWrapperRoutineBuilder>(
-        new WrapperConfiguration.Configurable<LoaderWrapperRoutineBuilder>() {
+  public WrapperConfiguration.Builder<? extends ServiceWrapperRoutineBuilder> withWrapper() {
+    return new WrapperConfiguration.Builder<ServiceWrapperRoutineBuilder>(
+        new WrapperConfiguration.Configurable<ServiceWrapperRoutineBuilder>() {
 
           @NotNull
           @Override
-          public LoaderWrapperRoutineBuilder withConfiguration(
+          public ServiceWrapperRoutineBuilder withConfiguration(
               @NotNull final WrapperConfiguration configuration) {
-            return DefaultLoaderWrapperRoutineBuilderCompat.this.withConfiguration(configuration);
+            return DefaultServiceWrapperRoutineBuilder.this.withConfiguration(configuration);
           }
         }, mWrapperConfiguration);
   }
 
   @NotNull
   @Override
-  public LoaderWrapperRoutineBuilder withConfiguration(
-      @NotNull final LoaderConfiguration configuration) {
-    mLoaderConfiguration = ConstantConditions.notNull("Loader configuration", configuration);
+  public ServiceWrapperRoutineBuilder withConfiguration(
+      @NotNull final ServiceConfiguration configuration) {
+    mServiceConfiguration = ConstantConditions.notNull("Service configuration", configuration);
     return this;
   }
 
   @NotNull
   @Override
-  public LoaderConfiguration.Builder<? extends LoaderWrapperRoutineBuilder> withLoader() {
-    return new LoaderConfiguration.Builder<LoaderWrapperRoutineBuilder>(
-        new LoaderConfiguration.Configurable<LoaderWrapperRoutineBuilder>() {
+  public ServiceConfiguration.Builder<? extends ServiceWrapperRoutineBuilder> withService() {
+    return new ServiceConfiguration.Builder<ServiceWrapperRoutineBuilder>(
+        new ServiceConfiguration.Configurable<ServiceWrapperRoutineBuilder>() {
 
           @NotNull
           @Override
-          public LoaderWrapperRoutineBuilder withConfiguration(
-              @NotNull final LoaderConfiguration configuration) {
-            return DefaultLoaderWrapperRoutineBuilderCompat.this.withConfiguration(configuration);
+          public ServiceWrapperRoutineBuilder withConfiguration(
+              @NotNull final ServiceConfiguration configuration) {
+            return DefaultServiceWrapperRoutineBuilder.this.withConfiguration(configuration);
           }
-        }, mLoaderConfiguration);
+        }, mServiceConfiguration);
   }
 
   @NotNull
   @Override
-  public LoaderWrapperRoutineBuilder withStrategy(@Nullable final ProxyStrategyType strategyType) {
+  public ServiceWrapperRoutineBuilder withStrategy(@Nullable final ProxyStrategyType strategyType) {
     mProxyStrategyType = strategyType;
     return this;
   }
 
   @NotNull
-  private LoaderProxyRoutineBuilder newProxyBuilder() {
-    return JRoutineLoaderProxyCompat.wrapperOn(mLoaderSource)
-                                    .withConfiguration(mInvocationConfiguration)
-                                    .withConfiguration(mWrapperConfiguration)
-                                    .withConfiguration(mLoaderConfiguration);
+  private ServiceProxyRoutineBuilder newProxyBuilder() {
+    return JRoutineServiceProxy.wrapperOn(mServiceSource)
+                               .withConfiguration(mInvocationConfiguration)
+                               .withConfiguration(mWrapperConfiguration)
+                               .withConfiguration(mServiceConfiguration);
   }
 
   @NotNull
-  private LoaderReflectionRoutineBuilder newReflectionBuilder() {
-    return JRoutineLoaderReflectionCompat.wrapperOn(mLoaderSource)
-                                         .withConfiguration(mInvocationConfiguration)
-                                         .withConfiguration(mWrapperConfiguration)
-                                         .withConfiguration(mLoaderConfiguration);
+  private ServiceReflectionRoutineBuilder newReflectionBuilder() {
+    return JRoutineServiceReflection.wrapperOn(mServiceSource)
+                                    .withConfiguration(mInvocationConfiguration)
+                                    .withConfiguration(mWrapperConfiguration)
+                                    .withConfiguration(mServiceConfiguration);
   }
 }

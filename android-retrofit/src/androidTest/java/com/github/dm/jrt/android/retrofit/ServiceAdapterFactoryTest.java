@@ -38,7 +38,7 @@ import retrofit2.Retrofit;
 import retrofit2.Retrofit.Builder;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-import static com.github.dm.jrt.android.core.ServiceSource.serviceFrom;
+import static com.github.dm.jrt.android.core.ServiceSource.serviceOf;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static com.github.dm.jrt.function.JRoutineFunction.onOutput;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -59,7 +59,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
     super(TestActivity.class);
   }
 
-  private static void testOutputChannelAdapter(@NotNull final ServiceSource context) throws
+  private static void testOutputChannelAdapter(@NotNull final ServiceSource serviceSource) throws
       IOException {
 
     final MockWebServer server = new MockWebServer();
@@ -67,7 +67,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
     server.start();
     try {
       final ServiceAdapterFactory adapterFactory = //
-          ServiceAdapterFactory.on(context)
+          ServiceAdapterFactory.factoryOn(serviceSource)
                                .withInvocation()
                                .withOutputTimeout(seconds(10))
                                .configuration()
@@ -78,7 +78,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
                                              .addConverterFactory(converterFactory)
                                              .build();
       final GitHubService service = retrofit.create(GitHubService.class);
-      final List<Repo> repos = service.listRepos("octocat").next();
+      final List<Repo> repos = service.listRepos("octocat").invoke().close().get();
       assertThat(repos).hasSize(3);
       assertThat(repos.get(0).getId()).isEqualTo("1");
       assertThat(repos.get(0).getName()).isEqualTo("Repo1");
@@ -95,7 +95,8 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
     }
   }
 
-  private static void testPostAdapter(@NotNull final ServiceSource context) throws IOException {
+  private static void testPostAdapter(@NotNull final ServiceSource serviceSource) throws
+      IOException {
 
     final Repo repo = new Repo();
     repo.setName("Test Repo");
@@ -110,7 +111,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
     server.start();
     try {
       final ServiceAdapterFactory adapterFactory = //
-          ServiceAdapterFactory.on(context)
+          ServiceAdapterFactory.factoryOn(serviceSource)
                                .withInvocation()
                                .withOutputTimeout(seconds(10))
                                .configuration()
@@ -121,7 +122,7 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
                                              .addConverterFactory(converterFactory)
                                              .build();
       final GitHubService2 service = retrofit.create(GitHubService2.class);
-      final Repo newRepo = service.createRepo("octocat", repo).next();
+      final Repo newRepo = service.createRepo("octocat", repo).invoke().close().get();
       assertThat(newRepo.getId()).isEqualTo(response.getId());
       assertThat(newRepo.getName()).isEqualTo(response.getName());
       assertThat(newRepo.isPrivate()).isEqualTo(response.isPrivate());
@@ -131,14 +132,15 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
     }
   }
 
-  private static void testStreamBuilderAdapter(@NotNull final ServiceSource context) throws
+  private static void testStreamBuilderAdapter(@NotNull final ServiceSource serviceSource) throws
       IOException {
 
     final MockWebServer server = new MockWebServer();
     server.enqueue(new MockResponse().setBody(BODY));
     server.start();
     try {
-      final ServiceAdapterFactory adapterFactory = ServiceAdapterFactory.on(context).buildFactory();
+      final ServiceAdapterFactory adapterFactory =
+          ServiceAdapterFactory.factoryOn(serviceSource).buildFactory();
       final GsonConverterFactory converterFactory = GsonConverterFactory.create();
       final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + server.getPort())
                                              .addCallAdapterFactory(adapterFactory)
@@ -169,31 +171,31 @@ public class ServiceAdapterFactoryTest extends ActivityInstrumentationTestCase2<
 
   public void testOutputChannelAdapter() throws IOException {
 
-    testOutputChannelAdapter(ServiceSource.serviceOf(getActivity(), TestService.class));
+    testOutputChannelAdapter(serviceOf(getActivity(), TestService.class));
   }
 
   public void testOutputChannelAdapterRemote() throws IOException {
 
-    testOutputChannelAdapter(ServiceSource.serviceOf(getActivity(), RemoteTestService.class));
+    testOutputChannelAdapter(serviceOf(getActivity(), RemoteTestService.class));
   }
 
   public void testPostAdapter() throws IOException {
 
-    testPostAdapter(ServiceSource.serviceOf(getActivity(), TestService.class));
+    testPostAdapter(serviceOf(getActivity(), TestService.class));
   }
 
   public void testPostAdapterRemote() throws IOException {
 
-    testPostAdapter(ServiceSource.serviceOf(getActivity(), RemoteTestService.class));
+    testPostAdapter(serviceOf(getActivity(), RemoteTestService.class));
   }
 
   public void testStreamBuilderAdapter() throws IOException {
 
-    testStreamBuilderAdapter(ServiceSource.serviceOf(getActivity(), TestService.class));
+    testStreamBuilderAdapter(serviceOf(getActivity(), TestService.class));
   }
 
   public void testStreamBuilderAdapterRemote() throws IOException {
 
-    testStreamBuilderAdapter(ServiceSource.serviceOf(getActivity(), RemoteTestService.class));
+    testStreamBuilderAdapter(serviceOf(getActivity(), RemoteTestService.class));
   }
 }

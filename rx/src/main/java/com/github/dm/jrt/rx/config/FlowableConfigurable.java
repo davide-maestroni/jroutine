@@ -40,5 +40,5 @@ public interface FlowableConfigurable<TYPE> extends Configurable<TYPE> {
    * @return the Flowable configuration builder.
    */
   @NotNull
-  Builder<TYPE> flowableConfiguration();
+  Builder<TYPE> withFlowable();
 }

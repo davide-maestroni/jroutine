@@ -44,23 +44,23 @@ import io.reactivex.FlowableOperator;
  */
 class LoaderFlowableOperator<DATA> implements FlowableOperator<DATA, DATA> {
 
-  private final LoaderSourceCompat mContext;
-
   private final InvocationConfiguration mInvocationConfiguration;
 
   private final LoaderConfiguration mLoaderConfiguration;
 
+  private final LoaderSourceCompat mLoaderSource;
+
   /**
    * Constructor.
    *
-   * @param context                 the Loader context.
+   * @param loaderSource            the Loader source.
    * @param invocationConfiguration the invocation configuration.
    * @param loaderConfiguration     the Loader configuration.
    */
-  LoaderFlowableOperator(@NotNull final LoaderSourceCompat context,
+  LoaderFlowableOperator(@NotNull final LoaderSourceCompat loaderSource,
       @NotNull final InvocationConfiguration invocationConfiguration,
       @NotNull final LoaderConfiguration loaderConfiguration) {
-    mContext = ConstantConditions.notNull("Loader context", context);
+    mLoaderSource = ConstantConditions.notNull("Loader source", loaderSource);
     mInvocationConfiguration =
         ConstantConditions.notNull("invocation configuration", invocationConfiguration);
     mLoaderConfiguration = ConstantConditions.notNull("loader configuration", loaderConfiguration);
@@ -70,12 +70,12 @@ class LoaderFlowableOperator<DATA> implements FlowableOperator<DATA, DATA> {
   public Subscriber<? super DATA> apply(final Subscriber<? super DATA> subscriber) {
     final SubscriberInvocationFactory<DATA> factory =
         new SubscriberInvocationFactory<DATA>(subscriber);
-    return new LoaderSubscriber<DATA>(subscriber, JRoutineLoaderCompat.on(mContext)
-                                                                      .with(factory)
+    return new LoaderSubscriber<DATA>(subscriber, JRoutineLoaderCompat.routineOn(mLoaderSource)
                                                                       .withConfiguration(
                                                                           mInvocationConfiguration)
-                                                                      .withConfiguration(mLoaderConfiguration)
-                                                                      .buildRoutine());
+                                                                      .withConfiguration(
+                                                                          mLoaderConfiguration)
+                                                                      .of(factory));
   }
 
   /**

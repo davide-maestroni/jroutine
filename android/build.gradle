@@ -27,6 +27,7 @@ archivesBaseName = "${project.parent.name}-${project.name}"
 ext {
   androidChannelVersion = '7.0.0'
   androidCoreVersion = '7.0.0'
+  androidFunctionVersion = '7.0.0'
   androidMethodVersion = '7.0.0'
   androidProxyVersion = '7.0.0'
   androidReflectVersion = '7.0.0'
@@ -88,6 +89,7 @@ dependencies {
 conditionalDependencies {
   compile name: 'android-channel', version: androidChannelVersion
   compile name: 'android-core', version: androidCoreVersion
+  compile name: 'android-function', version: androidFunctionVersion
   compile name: 'android-method', version: androidMethodVersion
   compile name: 'android-proxy', version: androidProxyVersion
   compile name: 'android-reflect', version: androidReflectVersion
@@ -113,6 +115,7 @@ tasks.withType(Javadoc) {
   options.overview("${project.projectDir}/docs/overview.html")
   options.links("${prefix}/${androidChannelVersion}/android-channel/",
       "${prefix}/${androidCoreVersion}/android-core/",
+      "${prefix}/${androidCoreVersion}/android-function/",
       "${prefix}/${androidMethodVersion}/android-method/",
       "${prefix}/${androidProxyVersion}/android-proxy/",
       "${prefix}/${androidReflectVersion}/android-reflect/",

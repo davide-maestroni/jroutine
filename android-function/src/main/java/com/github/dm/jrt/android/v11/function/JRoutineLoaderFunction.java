@@ -71,7 +71,7 @@ public class JRoutineLoaderFunction {
    * A typical example of stateful routine is the one computing a final result by accumulating the
    * input data (for instance, computing the sum of input numbers).
    *
-   * @param context      the Loader context.
+   * @param loaderSource the Loader source.
    * @param invocationId the invocation ID.
    * @param <IN>         the input data type.
    * @param <OUT>        the output data type.
@@ -80,11 +80,11 @@ public class JRoutineLoaderFunction {
    */
   @NotNull
   public static <IN, OUT, STATE> StatefulLoaderRoutineBuilder<IN, OUT, STATE> statefulOn(
-      @NotNull final LoaderSource context, final int invocationId) {
-    return new DefaultStatefulLoaderRoutineBuilder<IN, OUT, STATE>(context).withLoader()
-                                                                           .withInvocationId(
-                                                                               invocationId)
-                                                                           .configuration();
+      @NotNull final LoaderSource loaderSource, final int invocationId) {
+    return new DefaultStatefulLoaderRoutineBuilder<IN, OUT, STATE>(loaderSource).withLoader()
+                                                                                .withInvocationId(
+                                                                                    invocationId)
+                                                                                .configuration();
   }
 
   /**
@@ -98,7 +98,7 @@ public class JRoutineLoaderFunction {
    * A typical example of stateless routine is the one processing each input separately (for
    * instance, computing the square of input numbers).
    *
-   * @param context      the Loader context.
+   * @param loaderSource the Loader source.
    * @param invocationId the invocation ID.
    * @param <IN>         the input data type.
    * @param <OUT>        the output data type.
@@ -106,9 +106,10 @@ public class JRoutineLoaderFunction {
    */
   @NotNull
   public static <IN, OUT> StatelessLoaderRoutineBuilder<IN, OUT> statelessOn(
-      @NotNull final LoaderSource context, final int invocationId) {
-    return new DefaultStatelessLoaderRoutineBuilder<IN, OUT>(context).withLoader()
-                                                                     .withInvocationId(invocationId)
-                                                                     .configuration();
+      @NotNull final LoaderSource loaderSource, final int invocationId) {
+    return new DefaultStatelessLoaderRoutineBuilder<IN, OUT>(loaderSource).withLoader()
+                                                                          .withInvocationId(
+                                                                              invocationId)
+                                                                          .configuration();
   }
 }

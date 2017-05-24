@@ -21,7 +21,6 @@ import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
-import com.github.dm.jrt.android.core.ServiceSource;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.CacheStrategyType;
 import com.github.dm.jrt.android.retrofit.GitHubService;
 import com.github.dm.jrt.android.retrofit.Repo;
@@ -51,8 +50,8 @@ import retrofit2.Retrofit;
 import retrofit2.Retrofit.Builder;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-import static com.github.dm.jrt.android.core.ServiceSource.serviceFrom;
-import static com.github.dm.jrt.android.v11.core.LoaderSource.loaderFrom;
+import static com.github.dm.jrt.android.core.ServiceSource.serviceOf;
+import static com.github.dm.jrt.android.v11.core.LoaderSource.loaderOf;
 import static com.github.dm.jrt.core.util.DurationMeasure.seconds;
 import static com.github.dm.jrt.function.JRoutineFunction.onOutput;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -72,7 +71,8 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
     super(TestActivity.class);
   }
 
-  private static void testBodyDelegate(@NotNull final LoaderSource context) throws IOException {
+  private static void testBodyDelegate(@NotNull final LoaderSource loaderSource) throws
+      IOException {
     final MockWebServer server = new MockWebServer();
     server.enqueue(new MockResponse().setBody(BODY));
     server.enqueue(new MockResponse().setBody(BODY));
@@ -80,7 +80,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
     try {
       final BodyAdapterFactory factory = new BodyAdapterFactory();
       final LoaderAdapterFactory adapterFactory = //
-          LoaderAdapterFactory.on(context)
+          LoaderAdapterFactory.factoryOn(loaderSource)
                               .delegateFactory(factory)
                               .withInvocation()
                               .withOutputTimeout(seconds(10))
@@ -96,7 +96,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                              .build();
       {
         final GitHubService service = retrofit.create(GitHubService.class);
-        final List<Repo> repos = service.listRepos("octocat").next();
+        final List<Repo> repos = service.listRepos("octocat").invoke().close().get();
         assertThat(repos).hasSize(3);
         assertThat(repos.get(0).getId()).isEqualTo("1");
         assertThat(repos.get(0).getName()).isEqualTo("Repo1");
@@ -134,13 +134,13 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
     }
   }
 
-  private static void testOutputChannelAdapter(@NotNull final LoaderSource context) throws
+  private static void testOutputChannelAdapter(@NotNull final LoaderSource loaderSource) throws
       IOException {
     final MockWebServer server = new MockWebServer();
     server.enqueue(new MockResponse().setBody(BODY));
     server.start();
     try {
-      final LoaderAdapterFactory adapterFactory = LoaderAdapterFactory.on(context)
+      final LoaderAdapterFactory adapterFactory = LoaderAdapterFactory.factoryOn(loaderSource)
                                                                       .withInvocation()
                                                                       .withOutputTimeout(
                                                                           seconds(10))
@@ -152,7 +152,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                              .addConverterFactory(converterFactory)
                                              .build();
       final GitHubService service = retrofit.create(GitHubService.class);
-      final List<Repo> repos = service.listRepos("octocat").next();
+      final List<Repo> repos = service.listRepos("octocat").invoke().close().get();
       assertThat(repos).hasSize(3);
       assertThat(repos.get(0).getId()).isEqualTo("1");
       assertThat(repos.get(0).getName()).isEqualTo("Repo1");
@@ -169,17 +169,18 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
     }
   }
 
-  private static void testServiceDelegate(@NotNull final LoaderSource context) throws IOException {
+  private static void testServiceDelegate(@NotNull final LoaderSource loaderSource) throws
+      IOException {
     final MockWebServer server = new MockWebServer();
     server.enqueue(new MockResponse().setBody(BODY));
     server.enqueue(new MockResponse().setBody(BODY));
     server.start();
     try {
-      final ServiceAdapterFactory factory = ServiceAdapterFactory.on(
-          ServiceSource.serviceOf(ConstantConditions.notNull(context.getLoaderContext()), TestService.class))
+      final ServiceAdapterFactory factory = ServiceAdapterFactory.factoryOn(
+          serviceOf(ConstantConditions.notNull(loaderSource.getLoaderContext()), TestService.class))
                                                                  .buildFactory();
       final LoaderAdapterFactory adapterFactory = //
-          LoaderAdapterFactory.on(context)
+          LoaderAdapterFactory.factoryOn(loaderSource)
                               .delegateFactory(factory)
                               .withInvocation()
                               .withOutputTimeout(seconds(10))
@@ -195,7 +196,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
                                              .build();
       {
         final GitHubService service = retrofit.create(GitHubService.class);
-        final List<Repo> repos = service.listRepos("octocat").next();
+        final List<Repo> repos = service.listRepos("octocat").invoke().close().get();
         assertThat(repos).hasSize(3);
         assertThat(repos.get(0).getId()).isEqualTo("1");
         assertThat(repos.get(0).getName()).isEqualTo("Repo1");
@@ -233,13 +234,14 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
     }
   }
 
-  private static void testStreamBuilderAdapter(@NotNull final LoaderSource context) throws
+  private static void testStreamBuilderAdapter(@NotNull final LoaderSource loaderSource) throws
       IOException {
     final MockWebServer server = new MockWebServer();
     server.enqueue(new MockResponse().setBody(BODY));
     server.start();
     try {
-      final LoaderAdapterFactory adapterFactory = LoaderAdapterFactory.on(context).buildFactory();
+      final LoaderAdapterFactory adapterFactory =
+          LoaderAdapterFactory.factoryOn(loaderSource).buildFactory();
       final GsonConverterFactory converterFactory = GsonConverterFactory.create();
       final Retrofit retrofit = new Builder().baseUrl("http://localhost:" + server.getPort())
                                              .addCallAdapterFactory(adapterFactory)
@@ -273,7 +275,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
       return;
     }
 
-    testBodyDelegate(LoaderSource.loaderOf(getActivity()));
+    testBodyDelegate(loaderOf(getActivity()));
   }
 
   public void testBodyDelegateFragment() throws IOException {
@@ -283,7 +285,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
 
     final TestFragment fragment =
         (TestFragment) getActivity().getFragmentManager().findFragmentById(R.id.test_fragment);
-    testBodyDelegate(LoaderSource.loaderOf(fragment));
+    testBodyDelegate(loaderOf(fragment));
   }
 
   public void testOutputChannelAdapter() throws IOException {
@@ -291,7 +293,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
       return;
     }
 
-    testOutputChannelAdapter(LoaderSource.loaderOf(getActivity()));
+    testOutputChannelAdapter(loaderOf(getActivity()));
   }
 
   public void testOutputChannelAdapterFragment() throws IOException {
@@ -301,7 +303,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
 
     final TestFragment fragment =
         (TestFragment) getActivity().getFragmentManager().findFragmentById(R.id.test_fragment);
-    testOutputChannelAdapter(LoaderSource.loaderOf(fragment));
+    testOutputChannelAdapter(loaderOf(fragment));
   }
 
   public void testServiceDelegate() throws IOException {
@@ -309,7 +311,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
       return;
     }
 
-    testServiceDelegate(LoaderSource.loaderOf(getActivity()));
+    testServiceDelegate(loaderOf(getActivity()));
   }
 
   public void testServiceDelegateFragment() throws IOException {
@@ -319,7 +321,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
 
     final TestFragment fragment =
         (TestFragment) getActivity().getFragmentManager().findFragmentById(R.id.test_fragment);
-    testServiceDelegate(LoaderSource.loaderOf(fragment));
+    testServiceDelegate(loaderOf(fragment));
   }
 
   public void testStreamBuilderAdapter() throws IOException {
@@ -327,7 +329,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
       return;
     }
 
-    testStreamBuilderAdapter(LoaderSource.loaderOf(getActivity()));
+    testStreamBuilderAdapter(loaderOf(getActivity()));
   }
 
   public void testStreamBuilderAdapterFragment() throws IOException {
@@ -337,7 +339,7 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
 
     final TestFragment fragment =
         (TestFragment) getActivity().getFragmentManager().findFragmentById(R.id.test_fragment);
-    testStreamBuilderAdapter(LoaderSource.loaderOf(fragment));
+    testStreamBuilderAdapter(loaderOf(fragment));
   }
 
   private static class BodyAdapterFactory extends CallAdapter.Factory {

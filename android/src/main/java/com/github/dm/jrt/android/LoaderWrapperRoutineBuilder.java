@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.android;
 
-import com.github.dm.jrt.WrapperRoutineBuilder;
+import com.github.dm.jrt.WrapperRoutineBuilder.ProxyStrategyType;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.reflect.builder.LoaderReflectionRoutineBuilder;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
@@ -37,8 +37,7 @@ import org.jetbrains.annotations.Nullable;
  * <p>
  * Created by davide-maestroni on 03/06/2016.
  */
-public interface LoaderWrapperRoutineBuilder
-    extends WrapperRoutineBuilder, LoaderReflectionRoutineBuilder {
+public interface LoaderWrapperRoutineBuilder extends LoaderReflectionRoutineBuilder {
 
   /**
    * {@inheritDoc}
@@ -63,16 +62,6 @@ public interface LoaderWrapperRoutineBuilder
 
   /**
    * {@inheritDoc}
-   *
-   * @see com.github.dm.jrt.android.v11.proxy.JRoutineLoaderProxy JRoutineLoaderProxy
-   * @see com.github.dm.jrt.android.v4.proxy.JRoutineLoaderProxyCompat JRoutineLoaderProxyCompat
-   */
-  @NotNull
-  @Override
-  LoaderWrapperRoutineBuilder withStrategy(@Nullable ProxyStrategyType strategyType);
-
-  /**
-   * {@inheritDoc}
    */
   @NotNull
   @Override
@@ -91,4 +80,18 @@ public interface LoaderWrapperRoutineBuilder
   @NotNull
   @Override
   LoaderConfiguration.Builder<? extends LoaderWrapperRoutineBuilder> withLoader();
+
+  /**
+   * Force the type of strategy to be employed to create the proxy instance.
+   * <br>
+   * A null value means default algorithm will be applied, that is, the type will be automatically
+   * chosen based on the presence of the specific annotation.
+   *
+   * @param strategyType the strategy type.
+   * @return this builder.
+   * @see com.github.dm.jrt.android.v11.proxy.JRoutineLoaderProxy JRoutineLoaderProxy
+   * @see com.github.dm.jrt.android.v4.proxy.JRoutineLoaderProxyCompat JRoutineLoaderProxyCompat
+   */
+  @NotNull
+  LoaderWrapperRoutineBuilder withStrategy(@Nullable ProxyStrategyType strategyType);
 }

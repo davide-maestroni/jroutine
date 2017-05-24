@@ -17,27 +17,26 @@
 package com.github.dm.jrt.android.stream.builder;
 
 import com.github.dm.jrt.android.core.config.LoaderConfigurable;
+import com.github.dm.jrt.core.config.InvocationConfigurable;
+import com.github.dm.jrt.stream.transform.LiftingFunction;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Interface defining a builder of lifting function based on Loader instances.
+ * Interface defining a builder of lifting functions based on Loader instances.
  * <p>
  * Created by davide-maestroni on 01/30/2017.
- *
- * @param <IN>     the input data type.
- * @param <OUT>    the output data type.
- * @param <BEFORE> the input type after the lifting.
- * @param <AFTER>  the output type after the lifting.
  */
-public interface LoaderTransformationBuilder<IN, OUT, BEFORE, AFTER>
-    extends LoaderConfigurable<LoaderTransformationBuilder<IN, OUT, BEFORE, AFTER>> {
+public interface LoaderStreamLifter
+    extends InvocationConfigurable<LoaderStreamLifter>, LoaderConfigurable<LoaderStreamLifter> {
 
   /**
-   * Returns the newly created lifting function.
+   * Returns a lifting function making the stream run on the lifter Loader.
    *
-   * @return the function.
+   * @param <IN>  the input data type.
+   * @param <OUT> the output data type.
+   * @return the lifting function.
    */
   @NotNull
-  LiftFunction<IN, OUT, BEFORE, AFTER> buildFunction();
+  <IN, OUT> LiftingFunction<IN, OUT, IN, OUT> runOnLoader();
 }

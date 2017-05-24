@@ -35,7 +35,7 @@ class DefaultFlowableBuilder implements FlowableBuilder {
   }
 
   @NotNull
-  public Builder<FlowableBuilder> flowableConfiguration() {
+  public Builder<FlowableBuilder> withFlowable() {
     return new Builder<FlowableBuilder>(this, mConfiguration);
   }
 

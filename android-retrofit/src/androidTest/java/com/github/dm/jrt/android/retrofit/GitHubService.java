@@ -18,8 +18,8 @@ package com.github.dm.jrt.android.retrofit;
 
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.CacheStrategyType;
 import com.github.dm.jrt.android.reflect.annotation.CacheStrategy;
-import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.stream.builder.StreamBuilder;
+import com.github.dm.jrt.core.routine.Routine;
+import com.github.dm.jrt.stream.routine.StreamRoutine;
 
 import java.util.List;
 
@@ -37,10 +37,10 @@ public interface GitHubService {
   @GET("users/{user}/repos")
   @Headers("Accept: application/json")
   @CacheStrategy(CacheStrategyType.CACHE)
-  Channel<Object, List<Repo>> listRepos(@Path("user") String user);
+  Routine<Object, List<Repo>> listRepos(@Path("user") String user);
 
   @GET("users/{user}/repos")
   @Headers("Accept: application/json")
   @CacheStrategy(CacheStrategyType.CACHE)
-  StreamBuilder<Object, List<Repo>> streamRepos(@Path("user") String user);
+  StreamRoutine<Object, List<Repo>> streamRepos(@Path("user") String user);
 }

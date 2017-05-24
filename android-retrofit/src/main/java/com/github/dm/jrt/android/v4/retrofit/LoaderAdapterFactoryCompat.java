@@ -26,6 +26,7 @@ import com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat;
 import com.github.dm.jrt.android.v4.core.LoaderSourceCompat;
 import com.github.dm.jrt.core.config.InvocationConfigurable;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.executor.ScheduledExecutor;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.reflect.util.InvocationReflection;
@@ -56,39 +57,39 @@ public class LoaderAdapterFactoryCompat extends ContextAdapterFactory {
 
   private final LoaderConfiguration mLoaderConfiguration;
 
-  private final LoaderSourceCompat mLoaderContext;
+  private final LoaderSourceCompat mLoaderSource;
 
   /**
    * Constructor.
    *
-   * @param context                 the Loader context.
+   * @param loaderSource            the Loader source.
    * @param delegateFactory         the delegate factory.
    * @param invocationConfiguration the invocation configuration.
    * @param loaderConfiguration     the Loader configuration.
    */
-  private LoaderAdapterFactoryCompat(@NotNull final LoaderSourceCompat context,
+  private LoaderAdapterFactoryCompat(@NotNull final LoaderSourceCompat loaderSource,
       @Nullable final CallAdapter.Factory delegateFactory,
       @NotNull final InvocationConfiguration invocationConfiguration,
       @NotNull final LoaderConfiguration loaderConfiguration) {
     super(delegateFactory, invocationConfiguration);
-    mLoaderContext = context;
+    mLoaderSource = loaderSource;
     mLoaderConfiguration = loaderConfiguration;
   }
 
   /**
    * Returns an adapter factory builder.
    *
-   * @param context the Loader context.
+   * @param loaderSource the Loader source.
    * @return the builder instance.
    */
   @NotNull
-  public static Builder on(@NotNull final LoaderSourceCompat context) {
-    return new Builder(context);
+  public static Builder factoryOn(@NotNull final LoaderSourceCompat loaderSource) {
+    return new Builder(loaderSource);
   }
 
   @NotNull
   @Override
-  protected Routine<? extends Call<?>, ?> buildRoutine(
+  protected Routine<? extends Call<?>, ?> buildRoutine(@NotNull final ScheduledExecutor executor,
       @NotNull final InvocationConfiguration configuration, @NotNull final Type returnRawType,
       @NotNull final Type responseType, @NotNull final Annotation[] annotations,
       @NotNull final Retrofit retrofit) {
@@ -99,20 +100,20 @@ public class LoaderAdapterFactoryCompat extends ContextAdapterFactory {
         ContextInvocationReflection.withAnnotations(mLoaderConfiguration, annotations);
     final ContextInvocationFactory<Call<Object>, Object> factory =
         getFactory(configuration, responseType, annotations, retrofit);
-    return JRoutineLoaderCompat.on(mLoaderContext)
-                               .with(factory)
+    return JRoutineLoaderCompat.routineOn(mLoaderSource)
                                .withConfiguration(invocationConfiguration)
                                .withConfiguration(loaderConfiguration)
-                               .buildRoutine();
+                               .of(factory);
   }
 
   @Nullable
   @Override
-  protected CallAdapter<?> get(@NotNull final InvocationConfiguration configuration,
-      @NotNull final Type returnRawType, @NotNull final Type responseType,
-      @NotNull final Annotation[] annotations, @NotNull final Retrofit retrofit) {
+  protected CallAdapter<?> get(@NotNull final ScheduledExecutor executor,
+      @NotNull final InvocationConfiguration configuration, @NotNull final Type returnRawType,
+      @NotNull final Type responseType, @NotNull final Annotation[] annotations,
+      @NotNull final Retrofit retrofit) {
     final CallAdapter<?> callAdapter =
-        super.get(configuration, returnRawType, responseType, annotations, retrofit);
+        super.get(executor, configuration, returnRawType, responseType, annotations, retrofit);
     return (callAdapter != null) ? ComparableCall.wrap(callAdapter) : null;
   }
 
@@ -128,7 +129,7 @@ public class LoaderAdapterFactoryCompat extends ContextAdapterFactory {
   public static class Builder
       implements InvocationConfigurable<Builder>, LoaderConfigurable<Builder> {
 
-    private final LoaderSourceCompat mLoaderContext;
+    private final LoaderSourceCompat mLoaderSource;
 
     private CallAdapter.Factory mDelegateFactory;
 
@@ -140,10 +141,33 @@ public class LoaderAdapterFactoryCompat extends ContextAdapterFactory {
     /**
      * Constructor.
      *
-     * @param context the Loader context.
+     * @param loaderSource the Loader source.
      */
-    private Builder(@NotNull final LoaderSourceCompat context) {
-      mLoaderContext = ConstantConditions.notNull("Loader context", context);
+    private Builder(@NotNull final LoaderSourceCompat loaderSource) {
+      mLoaderSource = ConstantConditions.notNull("Loader source", loaderSource);
+    }
+
+    /**
+     * Builds and return a new factory instance.
+     *
+     * @return the factory instance.
+     */
+    @NotNull
+    public LoaderAdapterFactoryCompat buildFactory() {
+      return new LoaderAdapterFactoryCompat(mLoaderSource, mDelegateFactory,
+          mInvocationConfiguration, mLoaderConfiguration);
+    }
+
+    /**
+     * Sets the delegate factory to be used to execute the calls.
+     *
+     * @param factory the factory instance.
+     * @return this builder.
+     */
+    @NotNull
+    public Builder delegateFactory(@Nullable final CallAdapter.Factory factory) {
+      mDelegateFactory = factory;
+      return this;
     }
 
     @NotNull
@@ -158,29 +182,6 @@ public class LoaderAdapterFactoryCompat extends ContextAdapterFactory {
     @Override
     public Builder withConfiguration(@NotNull final LoaderConfiguration configuration) {
       mLoaderConfiguration = ConstantConditions.notNull("Loader configuration", configuration);
-      return this;
-    }
-
-    /**
-     * Builds and return a new factory instance.
-     *
-     * @return the factory instance.
-     */
-    @NotNull
-    public LoaderAdapterFactoryCompat buildFactory() {
-      return new LoaderAdapterFactoryCompat(mLoaderContext, mDelegateFactory,
-          mInvocationConfiguration, mLoaderConfiguration);
-    }
-
-    /**
-     * Sets the delegate factory to be used to execute the calls.
-     *
-     * @param factory the factory instance.
-     * @return this builder.
-     */
-    @NotNull
-    public Builder delegateFactory(@Nullable final CallAdapter.Factory factory) {
-      mDelegateFactory = factory;
       return this;
     }
 

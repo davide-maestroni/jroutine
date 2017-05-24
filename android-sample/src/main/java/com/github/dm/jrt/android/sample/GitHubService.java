@@ -20,7 +20,7 @@ import com.github.dm.jrt.android.core.config.LoaderConfiguration.CacheStrategyTy
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.ClashResolutionType;
 import com.github.dm.jrt.android.reflect.annotation.CacheStrategy;
 import com.github.dm.jrt.android.reflect.annotation.MatchResolution;
-import com.github.dm.jrt.core.channel.Channel;
+import com.github.dm.jrt.core.routine.Routine;
 
 import java.util.List;
 
@@ -37,9 +37,9 @@ public interface GitHubService {
 
   @CacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
   @GET("users/{user}/repos")
-  Channel<Object, List<Repo>> listRepos(@Path("user") String user);
+  Routine<Object, List<Repo>> listRepos(@Path("user") String user);
 
   @MatchResolution(ClashResolutionType.ABORT_OTHER)
   @GET("users/{user}/repos")
-  Channel<Object, List<Repo>> refreshRepos(@Path("user") String user);
+  Routine<Object, List<Repo>> refreshRepos(@Path("user") String user);
 }

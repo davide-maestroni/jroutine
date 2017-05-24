@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.android;
 
-import com.github.dm.jrt.WrapperRoutineBuilder;
+import com.github.dm.jrt.WrapperRoutineBuilder.ProxyStrategyType;
 import com.github.dm.jrt.android.core.config.ServiceConfiguration;
 import com.github.dm.jrt.android.reflect.builder.ServiceReflectionRoutineBuilder;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
@@ -38,8 +38,7 @@ import org.jetbrains.annotations.Nullable;
  * Created by davide-maestroni on 03/06/2016.
  */
 @SuppressWarnings("WeakerAccess")
-public interface ServiceWrapperRoutineBuilder
-    extends WrapperRoutineBuilder, ServiceReflectionRoutineBuilder {
+public interface ServiceWrapperRoutineBuilder extends ServiceReflectionRoutineBuilder {
 
   /**
    * {@inheritDoc}
@@ -64,15 +63,6 @@ public interface ServiceWrapperRoutineBuilder
 
   /**
    * {@inheritDoc}
-   *
-   * @see com.github.dm.jrt.android.proxy.JRoutineServiceProxy JRoutineServiceProxy
-   */
-  @NotNull
-  @Override
-  ServiceWrapperRoutineBuilder withStrategy(@Nullable ProxyStrategyType strategyType);
-
-  /**
-   * {@inheritDoc}
    */
   @NotNull
   @Override
@@ -91,4 +81,17 @@ public interface ServiceWrapperRoutineBuilder
   @NotNull
   @Override
   ServiceConfiguration.Builder<? extends ServiceWrapperRoutineBuilder> withService();
+
+  /**
+   * Force the type of strategy to be employed to create the proxy instance.
+   * <br>
+   * A null value means default algorithm will be applied, that is, the type will be automatically
+   * chosen based on the presence of the specific annotation.
+   *
+   * @param strategyType the strategy type.
+   * @return this builder.
+   * @see com.github.dm.jrt.android.proxy.JRoutineServiceProxy JRoutineServiceProxy
+   */
+  @NotNull
+  ServiceWrapperRoutineBuilder withStrategy(@Nullable ProxyStrategyType strategyType);
 }

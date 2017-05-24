@@ -36,6 +36,7 @@ import retrofit2.CallAdapter;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
+import static com.github.dm.jrt.core.executor.ScheduledExecutors.defaultExecutor;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
@@ -87,7 +88,7 @@ public abstract class ContextAdapterFactory extends AbstractAdapterFactory {
    */
   protected ContextAdapterFactory(@Nullable final CallAdapter.Factory delegateFactory,
       @NotNull final InvocationConfiguration configuration) {
-    super(configuration, delegateFactory);
+    super(defaultExecutor(), configuration, delegateFactory);
     mDelegateFactory = delegateFactory;
   }
 

@@ -65,13 +65,14 @@ class CallMappingInvocation extends MappingInvocation<Call<?>, ParcelableFlowDat
       result.pass(new ParcelableFlowData<Object>(MEDIA_TYPE_ID,
           (mediaType != null) ? mediaType.toString() : null));
       final Channel<Object, ?> channel =
-          JRoutineAndroidChannels.parcelableFlowInput(result, BYTES_ID).buildChannel();
-      final ByteChunkOutputStream outputStream = ParcelableByteChannel.withOutput(channel)
-                                                                      .chunkStreamConfiguration()
+          JRoutineAndroidChannels.channelHandler().inputOfParcelableFlow(result, BYTES_ID);
+      final ByteChunkOutputStream outputStream = ParcelableByteChannel.outputStream()
+                                                                      .withStream()
                                                                       .withOnClose(
-                                                                      CloseActionType.CLOSE_CHANNEL)
-                                                                      .apply()
-                                                                      .buildOutputStream();
+                                                                          CloseActionType
+                                                                              .CLOSE_CHANNEL)
+                                                                      .configuration()
+                                                                      .of(channel);
       final BufferedSink buffer = Okio.buffer(Okio.sink(outputStream));
       body.writeTo(buffer);
       buffer.close();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Davide Maestroni
+ * Copyright 2017 Davide Maestroni
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,9 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.android.retrofit;
-
-import com.github.dm.jrt.core.routine.Routine;
-
-import retrofit2.http.Body;
-import retrofit2.http.Headers;
-import retrofit2.http.POST;
-import retrofit2.http.Path;
-
 /**
- * GitHub service interface.
+ * Stream transformations utility classes specific to the Android platform.
  * <p>
- * Created by davide-maestroni on 03/25/2016.
+ * Created by davide-maestroni on 01/04/2016.
  */
-public interface GitHubService2 {
-
-  @POST("users/{user}/repos")
-  @Headers({"Accept: application/json", "Content-type: application/json"})
-  Routine<Object, Repo> createRepo(@Path("user") String user, @Body Repo repo);
-}
+package com.github.dm.jrt.android.v11.stream;

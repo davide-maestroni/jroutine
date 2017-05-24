@@ -94,7 +94,7 @@ public class JRoutineLoaderFunctionCompat {
    * A typical example of stateless routine is the one processing each input separately (for
    * instance, computing the square of input numbers).
    *
-   * @param context      the Loader context.
+   * @param loaderSource the Loader source.
    * @param invocationId the invocation ID.
    * @param <IN>         the input data type.
    * @param <OUT>        the output data type.
@@ -102,10 +102,10 @@ public class JRoutineLoaderFunctionCompat {
    */
   @NotNull
   public static <IN, OUT> StatelessLoaderRoutineBuilder<IN, OUT> statelessOn(
-      @NotNull final LoaderSourceCompat context, final int invocationId) {
-    return new DefaultStatelessLoaderRoutineBuilderCompat<IN, OUT>(context).withLoader()
-                                                                           .withInvocationId(
-                                                                               invocationId)
-                                                                           .configuration();
+      @NotNull final LoaderSourceCompat loaderSource, final int invocationId) {
+    return new DefaultStatelessLoaderRoutineBuilderCompat<IN, OUT>(loaderSource).withLoader()
+                                                                                .withInvocationId(
+                                                                                    invocationId)
+                                                                                .configuration();
   }
 }

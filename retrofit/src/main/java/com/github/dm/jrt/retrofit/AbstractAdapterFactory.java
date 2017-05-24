@@ -42,7 +42,6 @@ import retrofit2.CallAdapter.Factory;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
-import static com.github.dm.jrt.core.executor.ScheduledExecutors.immediateExecutor;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
@@ -179,7 +178,7 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
       @NotNull final Type responseType, @NotNull final Annotation[] annotations,
       @NotNull final Retrofit retrofit) {
     if ((Routine.class == returnRawType) || (StreamRoutine.class == returnRawType)) {
-      return new RoutineAdapter(
+      return new StreamRoutineAdapter(
           buildRoutine(executor, configuration, returnRawType, responseType, annotations, retrofit),
           responseType);
     }
@@ -315,29 +314,6 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
   }
 
   /**
-   * Routine adapter implementation.
-   */
-  private static class RoutineAdapter extends BaseAdapter<Routine> {
-
-    /**
-     * Constructor.
-     *
-     * @param routine      the routine instance.
-     * @param responseType the response type.
-     */
-    private RoutineAdapter(@NotNull final Routine<? extends Call<?>, ?> routine,
-        @NotNull final Type responseType) {
-      super(routine, responseType);
-    }
-
-    public <OUT> Routine adapt(final Call<OUT> call) {
-      return JRoutineStream.streamOf(
-          JRoutineCore.routineOn(immediateExecutor()).ofSingleton(new InputCallInvocation(call)))
-                           .map(getRoutine());
-    }
-  }
-
-  /**
    * Mapping invocation employing a call adapter.
    */
   private static class RoutineAdapterInvocation extends MappingInvocation<Call<Object>, Object> {
@@ -389,6 +365,27 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
 
     public Type getOwnerType() {
       return null;
+    }
+  }
+
+  /**
+   * Stream routine adapter implementation.
+   */
+  private static class StreamRoutineAdapter extends BaseAdapter<Routine> {
+
+    /**
+     * Constructor.
+     *
+     * @param routine      the routine instance.
+     * @param responseType the response type.
+     */
+    private StreamRoutineAdapter(@NotNull final Routine<? extends Call<?>, ?> routine,
+        @NotNull final Type responseType) {
+      super(routine, responseType);
+    }
+
+    public <OUT> Routine adapt(final Call<OUT> call) {
+      return JRoutineStream.streamOfSingleton(new InputCallInvocation(call)).map(getRoutine());
     }
   }
 

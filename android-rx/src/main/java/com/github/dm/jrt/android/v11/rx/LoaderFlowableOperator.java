@@ -44,23 +44,23 @@ import io.reactivex.FlowableOperator;
  */
 class LoaderFlowableOperator<DATA> implements FlowableOperator<DATA, DATA> {
 
-  private final LoaderSource mContext;
-
   private final InvocationConfiguration mInvocationConfiguration;
 
   private final LoaderConfiguration mLoaderConfiguration;
 
+  private final LoaderSource mLoaderSource;
+
   /**
    * Constructor.
    *
-   * @param context                 the Loader context.
+   * @param loaderSource            the Loader source.
    * @param invocationConfiguration the invocation configuration.
    * @param loaderConfiguration     the Loader configuration.
    */
-  LoaderFlowableOperator(@NotNull final LoaderSource context,
+  LoaderFlowableOperator(@NotNull final LoaderSource loaderSource,
       @NotNull final InvocationConfiguration invocationConfiguration,
       @NotNull final LoaderConfiguration loaderConfiguration) {
-    mContext = ConstantConditions.notNull("Loader context", context);
+    mLoaderSource = ConstantConditions.notNull("Loader source", loaderSource);
     mInvocationConfiguration =
         ConstantConditions.notNull("invocation configuration", invocationConfiguration);
     mLoaderConfiguration = ConstantConditions.notNull("loader configuration", loaderConfiguration);
@@ -70,11 +70,12 @@ class LoaderFlowableOperator<DATA> implements FlowableOperator<DATA, DATA> {
   public Subscriber<? super DATA> apply(final Subscriber<? super DATA> subscriber) {
     final SubscriberInvocationFactory<DATA> factory =
         new SubscriberInvocationFactory<DATA>(subscriber);
-    return new LoaderSubscriber<DATA>(subscriber, JRoutineLoader.on(mContext)
-                                                                .with(factory)
-                                                                .withConfiguration(mInvocationConfiguration)
-                                                                .withConfiguration(mLoaderConfiguration)
-                                                                .buildRoutine());
+    return new LoaderSubscriber<DATA>(subscriber, JRoutineLoader.routineOn(mLoaderSource)
+                                                                .withConfiguration(
+                                                                    mInvocationConfiguration)
+                                                                .withConfiguration(
+                                                                    mLoaderConfiguration)
+                                                                .of(factory));
   }
 
   /**

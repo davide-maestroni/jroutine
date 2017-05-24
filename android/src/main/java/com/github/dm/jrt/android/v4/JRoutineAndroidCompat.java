@@ -16,30 +16,32 @@
 
 package com.github.dm.jrt.android.v4;
 
-import android.content.Context;
-import android.content.Intent;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-
 import com.github.dm.jrt.JRoutine;
-import com.github.dm.jrt.android.ServiceBuilder;
+import com.github.dm.jrt.android.LoaderWrapperRoutineBuilder;
+import com.github.dm.jrt.android.ServiceWrapperRoutineBuilder;
 import com.github.dm.jrt.android.channel.io.ParcelableByteChannel;
 import com.github.dm.jrt.android.channel.io.ParcelableByteChannel.ParcelableByteChunk;
+import com.github.dm.jrt.android.channel.io.ParcelableByteChannel
+    .ParcelableByteChunkOutputStreamBuilder;
+import com.github.dm.jrt.android.core.JRoutineService;
 import com.github.dm.jrt.android.core.ServiceSource;
-import com.github.dm.jrt.android.core.service.InvocationService;
+import com.github.dm.jrt.android.core.builder.LoaderChannelBuilder;
+import com.github.dm.jrt.android.core.builder.LoaderRoutineBuilder;
+import com.github.dm.jrt.android.core.builder.ServiceRoutineBuilder;
+import com.github.dm.jrt.android.function.builder.StatefulLoaderRoutineBuilder;
+import com.github.dm.jrt.android.function.builder.StatelessLoaderRoutineBuilder;
+import com.github.dm.jrt.android.stream.builder.LoaderStreamLifter;
 import com.github.dm.jrt.android.v4.channel.JRoutineSparseChannelsCompat;
+import com.github.dm.jrt.android.v4.channel.builder.SparseChannelHandlerCompat;
+import com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat;
 import com.github.dm.jrt.android.v4.core.LoaderSourceCompat;
+import com.github.dm.jrt.android.v4.function.JRoutineLoaderFunctionCompat;
+import com.github.dm.jrt.android.v4.stream.JRoutineLoaderStreamCompat;
 import com.github.dm.jrt.channel.io.ByteChannel.ByteChunkInputStream;
-import com.github.dm.jrt.core.builder.ChannelBuilder;
-import com.github.dm.jrt.core.channel.Channel;
+import com.github.dm.jrt.core.executor.ScheduledExecutor;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.util.Consumer;
-import com.github.dm.jrt.function.util.Supplier;
-import com.github.dm.jrt.stream.JRoutineStream;
-import com.github.dm.jrt.stream.builder.StreamBuilder;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Class acting as a fa&ccedil;ade of all the JRoutine library features, with support for the
@@ -48,7 +50,7 @@ import org.jetbrains.annotations.Nullable;
  * Created by davide-maestroni on 03/06/2016.
  */
 @SuppressWarnings("WeakerAccess")
-public class JRoutineAndroidCompat extends JRoutineSparseChannelsCompat {
+public class JRoutineAndroidCompat extends JRoutine {
 
   /**
    * Avoid explicit instantiation.
@@ -58,23 +60,51 @@ public class JRoutineAndroidCompat extends JRoutineSparseChannelsCompat {
   }
 
   /**
-   * Creates an input stream returning the concatenation of the data contained in the specified
-   * buffers.
-   * <p>
-   * Note that only one input stream can be created for each buffer.
+   * Returns a channel handler employing the default executor.
    *
-   * @param buffers the byte buffers whose data have to be concatenated.
-   * @return the input stream.
-   * @throws java.lang.IllegalStateException if an input stream has been already created for one
-   *                                         of the specified buffers.
+   * @return the handler instance.
    */
   @NotNull
-  public static ByteChunkInputStream getInputStream(@NotNull final ParcelableByteChunk... buffers) {
-    return ParcelableByteChannel.inputStream(buffers);
+  public static SparseChannelHandlerCompat channelHandler() {
+    return JRoutineSparseChannelsCompat.channelHandler();
   }
 
   /**
-   * Creates an input stream returning the concatenation of the data contained in the specified
+   * Returns a channel handler employing the specified executor.
+   *
+   * @param executor the executor instance.
+   * @return the handler instance.
+   */
+  @NotNull
+  public static SparseChannelHandlerCompat channelHandlerOn(
+      @NotNull final ScheduledExecutor executor) {
+    return JRoutineSparseChannelsCompat.channelHandlerOn(executor);
+  }
+
+  /**
+   * Returns a builder of channels bound to the Loader identified by the specified ID.
+   * <br>
+   * If no Loader with the specified ID is running at the time of the channel creation, the
+   * output will be aborted with a
+   * {@link com.github.dm.jrt.android.core.invocation.MissingLoaderException
+   * MissingLoaderException}.
+   * <p>
+   * Note that the built routine results will be always dispatched on the configured Looper
+   * thread, thus waiting for the outputs immediately after its invocation may result in a
+   * deadlock.
+   *
+   * @param loaderSource the Loader source.
+   * @param loaderId     the Loader ID.
+   * @return the channel builder instance.
+   */
+  @NotNull
+  public static LoaderChannelBuilder channelOn(@NotNull final LoaderSourceCompat loaderSource,
+      final int loaderId) {
+    return JRoutineLoaderCompat.channelOn(loaderSource, loaderId);
+  }
+
+  /**
+   * Gets an input stream returning the concatenation of the data contained in the specified
    * buffers.
    * <p>
    * Note that only one input stream can be created for each buffer.
@@ -85,13 +115,13 @@ public class JRoutineAndroidCompat extends JRoutineSparseChannelsCompat {
    *                                         of the specified buffers.
    */
   @NotNull
-  public static ByteChunkInputStream getInputStream(
+  public static ByteChunkInputStream parcelableInputStream(
       @NotNull final Iterable<? extends ParcelableByteChunk> buffers) {
     return ParcelableByteChannel.inputStream(buffers);
   }
 
   /**
-   * Creates an input stream returning the data contained in the specified buffer.
+   * Gets an input stream returning the data contained in the specified buffer.
    * <p>
    * Note that only one input stream can be created for each buffer.
    *
@@ -101,367 +131,166 @@ public class JRoutineAndroidCompat extends JRoutineSparseChannelsCompat {
    *                                         specified buffer.
    */
   @NotNull
-  public static ByteChunkInputStream getInputStream(@NotNull final ParcelableByteChunk buffer) {
+  public static ByteChunkInputStream parcelableInputStream(
+      @NotNull final ParcelableByteChunk buffer) {
     return ParcelableByteChannel.inputStream(buffer);
   }
 
   /**
-   * Returns a builder of channels producing no data.
+   * Gets an input stream returning the concatenation of the data contained in the specified
+   * buffers.
    * <p>
-   * Note that the returned channels will be already closed.
+   * Note that only one input stream can be created for each buffer.
    *
-   * @param <OUT> the output data type.
-   * @return the channel builder instance.
+   * @param buffers the byte buffers whose data have to be concatenated.
+   * @return the input stream.
+   * @throws java.lang.IllegalStateException if an input stream has been already created for one
+   *                                         of the specified buffers.
    */
   @NotNull
-  public static <OUT> ChannelBuilder<?, OUT> of() {
-    return JRoutine.of();
+  public static ByteChunkInputStream parcelableInputStream(
+      @NotNull final ParcelableByteChunk... buffers) {
+    return ParcelableByteChannel.inputStream(buffers);
   }
 
   /**
-   * Returns a builder of channels producing the specified output.
-   * <p>
-   * Note that the returned channels will be already closed.
-   *
-   * @param output the output.
-   * @param <OUT>  the output data type.
-   * @return the channel builder instance.
-   */
-  @NotNull
-  public static <OUT> ChannelBuilder<?, OUT> of(@Nullable OUT output) {
-    return JRoutine.of(output);
-  }
-
-  /**
-   * Returns a builder of channels producing the specified outputs.
-   * <p>
-   * Note that the returned channels will be already closed.
-   *
-   * @param outputs the output data.
-   * @param <OUT>   the output data type.
-   * @return the channel builder instance.
-   */
-  @NotNull
-  public static <OUT> ChannelBuilder<?, OUT> of(@Nullable OUT... outputs) {
-    return JRoutine.of(outputs);
-  }
-
-  /**
-   * Returns a builder of channels producing the specified outputs.
-   * <p>
-   * Note that the returned channels will be already closed.
-   *
-   * @param outputs the iterable returning the output data.
-   * @param <OUT>   the output data type.
-   * @return the channel builder instance.
-   */
-  @NotNull
-  public static <OUT> ChannelBuilder<?, OUT> of(@Nullable Iterable<OUT> outputs) {
-    return JRoutine.of(outputs);
-  }
-
-  /**
-   * Returns a channel builder.
-   *
-   * @param <DATA> the data type.
-   * @return the channel builder instance.
-   */
-  @NotNull
-  public static <DATA> ChannelBuilder<DATA, DATA> ofData() {
-    return JRoutine.ofData();
-  }
-
-  /**
-   * Returns a Context based builder of Service routine builders.
-   *
-   * @param context the Service Context.
-   * @return the Context based builder.
-   */
-  @NotNull
-  public static ServiceBuilder on(@NotNull final Context context) {
-    return on(ServiceSource.serviceOf(context));
-  }
-
-  /**
-   * Returns a Context based builder of Service routine builders.
-   *
-   * @param context      the Service Context.
-   * @param serviceClass the Service class.
-   * @return the Context based builder.
-   */
-  @NotNull
-  public static ServiceBuilder on(@NotNull final Context context,
-      @NotNull final Class<? extends InvocationService> serviceClass) {
-    return on(ServiceSource.serviceOf(context, serviceClass));
-  }
-
-  /**
-   * Returns a Context based builder of Service routine builders.
-   *
-   * @param context the Service Context.
-   * @param service the Service Intent.
-   * @return the Context based builder.
-   */
-  @NotNull
-  public static ServiceBuilder on(@NotNull final Context context, @NotNull final Intent service) {
-    return on(serviceOf(context, service));
-  }
-
-  /**
-   * Returns a Context based builder of Loader routine builders.
-   *
-   * @param fragment the Loader Fragment.
-   * @return the Context based builder.
-   */
-  @NotNull
-  public static LoaderBuilderCompat on(@NotNull final Fragment fragment) {
-    return on(LoaderSourceCompat.loaderOf(fragment));
-  }
-
-  /**
-   * Returns a Context based builder of Loader routine builders.
-   *
-   * @param fragment the Loader Fragment.
-   * @param context  the Context used to get the application one.
-   * @return the Context based builder.
-   */
-  @NotNull
-  public static LoaderBuilderCompat on(@NotNull final Fragment fragment,
-      @NotNull final Context context) {
-    return on(LoaderSourceCompat.loaderOf(fragment, context));
-  }
-
-  /**
-   * Returns a Context based builder of Loader routine builders.
-   *
-   * @param activity the Loader Activity.
-   * @return the Context based builder.
-   */
-  @NotNull
-  public static LoaderBuilderCompat on(@NotNull final FragmentActivity activity) {
-    return on(LoaderSourceCompat.loaderOf(activity));
-  }
-
-  /**
-   * Returns a Context based builder of Loader routine builders.
-   *
-   * @param activity the Loader Activity.
-   * @param context  the Context used to get the application one.
-   * @return the Context based builder.
-   */
-  @NotNull
-  public static LoaderBuilderCompat on(@NotNull final FragmentActivity activity,
-      @NotNull final Context context) {
-    return on(loaderOf(activity, context));
-  }
-
-  /**
-   * Returns a Context based builder of Loader routine builders.
-   *
-   * @param context the Loader context.
-   * @return the Context based builder.
-   */
-  @NotNull
-  public static LoaderBuilderCompat on(@NotNull final LoaderSourceCompat context) {
-    return new LoaderBuilderCompat(context);
-  }
-
-  /**
-   * Returns a Context based builder of Service routine builders.
-   *
-   * @param context the Service context.
-   * @return the Context based builder.
-   */
-  @NotNull
-  public static ServiceBuilder on(@NotNull final ServiceSource context) {
-    return new ServiceBuilder(context) {};
-  }
-
-  /**
-   * Returns a builder of buffer output streams.
-   * <br>
-   * Since the byte buffers generated by the channel are likely to be part of a remote procedure
-   * call, be aware of the limits imposed by the Android OS architecture when choosing a specific
-   * buffer size (see {@link android.os.TransactionTooLargeException}).
+   * Returns a builder of chunk output streams.
    * <p>
    * The built streams will not close the underlying channel by default.
    *
-   * @param channel the output channel to feed with data.
    * @return the output stream builder.
    */
   @NotNull
-  public static ChunkOutputStreamBuilder withOutput(
-      @NotNull final Channel<? super ParcelableByteChunk, ?> channel) {
-    return ParcelableByteChannel.withOutput(channel);
+  public static ParcelableByteChunkOutputStreamBuilder parcelableOutputStream() {
+    return ParcelableByteChannel.outputStream();
   }
 
   /**
-   * Returns a stream routine builder.
-   *
-   * @param <IN> the input data type.
-   * @return the routine builder instance.
-   */
-  @NotNull
-  public static <IN> StreamBuilder<IN, IN> withStream() {
-    return JRoutineStream.withStream();
-  }
-
-  /**
-   * Returns a stream routine builder producing only the inputs passed by the specified consumer.
-   * <br>
-   * The data will be produced only when the invocation completes.
-   * <br>
-   * If any other input is passed to the built routine, the invocation will be aborted with an
-   * {@link java.lang.IllegalStateException}.
-   *
-   * @param consumer the consumer instance.
-   * @param <IN>     the input data type.
-   * @return the routine builder instance.
-   * @throws java.lang.IllegalArgumentException if the class of the specified consumer has not a
-   *                                            static scope.
-   */
-  @NotNull
-  public static <IN> StreamBuilder<IN, IN> withStreamAccept(
-      @NotNull final Consumer<Channel<IN, ?>> consumer) {
-    return JRoutineStream.withStreamAccept(consumer);
-  }
-
-  /**
-   * Returns a stream routine builder producing only the inputs passed by the specified consumer.
-   * <br>
-   * The data will be produced by calling the consumer {@code count} number of times only when the
-   * invocation completes.
-   * <br>
-   * If any other input is passed to the built routine, the invocation will be aborted with an
-   * {@link java.lang.IllegalStateException}.
-   *
-   * @param count    the number of times the consumer is called.
-   * @param consumer the consumer instance.
-   * @param <IN>     the input data type.
-   * @return the routine builder instance.
-   * @throws java.lang.IllegalArgumentException if the class of the specified consumer has not a
-   *                                            static scope or the specified count number is 0 or
-   *                                            negative.
-   */
-  @NotNull
-  public static <IN> StreamBuilder<IN, IN> withStreamAccept(final int count,
-      @NotNull final Consumer<Channel<IN, ?>> consumer) {
-    return JRoutineStream.withStreamAccept(count, consumer);
-  }
-
-  /**
-   * Returns a stream routine builder producing only the inputs returned by the specified supplier.
-   * <br>
-   * The data will be produced only when the invocation completes.
-   * <br>
-   * If any other input is passed to the built routine, the invocation will be aborted with an
-   * {@link java.lang.IllegalStateException}.
-   *
-   * @param supplier the supplier instance.
-   * @param <IN>     the input data type.
-   * @return the routine builder instance.
-   * @throws java.lang.IllegalArgumentException if the class of the specified supplier has not a
-   *                                            static scope.
-   */
-  @NotNull
-  public static <IN> StreamBuilder<IN, IN> withStreamGet(@NotNull final Supplier<IN> supplier) {
-    return JRoutineStream.withStreamGet(supplier);
-  }
-
-  /**
-   * Returns a stream routine builder producing only the inputs returned by the specified supplier.
-   * <br>
-   * The data will be produced by calling the supplier {@code count} number of times only when the
-   * invocation completes.
-   * <br>
-   * If any other input is passed to the built routine, the invocation will be aborted with an
-   * {@link java.lang.IllegalStateException}.
-   *
-   * @param count    the number of times the supplier is called.
-   * @param supplier the supplier instance.
-   * @param <IN>     the input data type.
-   * @return the routine builder instance.
-   * @throws java.lang.IllegalArgumentException if the class of the specified supplier has not a
-   *                                            static scope or the specified count number is 0 or
-   *                                            negative.
-   */
-  @NotNull
-  public static <IN> StreamBuilder<IN, IN> withStreamGet(final int count,
-      @NotNull final Supplier<IN> supplier) {
-    return JRoutineStream.withStreamGet(count, supplier);
-  }
-
-  /**
-   * Returns a stream routine builder producing only the specified input.
-   * <br>
-   * The data will be produced only when the invocation completes.
-   * <br>
-   * If any other input is passed to the built routine, the invocation will be aborted with an
-   * {@link java.lang.IllegalStateException}.
-   *
-   * @param input the input.
-   * @param <IN>  the input data type.
-   * @return the routine builder instance.
-   */
-  @NotNull
-  public static <IN> StreamBuilder<IN, IN> withStreamOf(@Nullable final IN input) {
-    return JRoutineStream.withStreamOf(input);
-  }
-
-  /**
-   * Returns a stream routine builder producing only the specified inputs.
-   * <br>
-   * The data will be produced only when the invocation completes.
-   * <br>
-   * If any other input is passed to the built routine, the invocation will be aborted with an
-   * {@link java.lang.IllegalStateException}.
-   *
-   * @param inputs the input data.
-   * @param <IN>   the input data type.
-   * @return the routine builder instance.
-   */
-  @NotNull
-  public static <IN> StreamBuilder<IN, IN> withStreamOf(@Nullable final IN... inputs) {
-    return JRoutineStream.withStreamOf(inputs);
-  }
-
-  /**
-   * Returns a stream routine builder producing only the inputs returned by the specified iterable.
-   * <br>
-   * The data will be produced only when the invocation completes.
-   * <br>
-   * If any other input is passed to the built routine, the invocation will be aborted with an
-   * {@link java.lang.IllegalStateException}.
-   *
-   * @param inputs the inputs iterable.
-   * @param <IN>   the input data type.
-   * @return the routine builder instance.
-   */
-  @NotNull
-  public static <IN> StreamBuilder<IN, IN> withStreamOf(
-      @Nullable final Iterable<? extends IN> inputs) {
-    return JRoutineStream.withStreamOf(inputs);
-  }
-
-  /**
-   * Returns a stream routine builder producing only the inputs returned by the specified channel.
-   * <br>
-   * The data will be produced only when the invocation completes.
-   * <br>
-   * If any other input is passed to the built routine, the invocation will be aborted with an
-   * {@link java.lang.IllegalStateException}.
+   * Returns a Context based builder of Loader routines.
    * <p>
-   * Note that the passed channel will be bound as a result of the call, so, in order to support
-   * multiple invocations, consider wrapping the channel in a replayable one, by calling the
-   * {@link Channels#replayOutput(Channel)} utility method.
+   * Note that the built routine results will be always dispatched on the configured Looper
+   * thread, thus waiting for the outputs immediately after its invocation may result in a
+   * deadlock.
+   * <br>
+   * Note also that the input data passed to the invocation channel will be cached, and the
+   * results will be produced only after the invocation channel is closed, so be sure to avoid
+   * streaming inputs in order to prevent starvation or out of memory errors.
    *
-   * @param channel the input channel.
-   * @param <IN>    the input data type.
+   * @param loaderSource the Loader source.
    * @return the routine builder instance.
    */
   @NotNull
-  public static <IN> StreamBuilder<IN, IN> withStreamOf(
-      @Nullable final Channel<?, ? extends IN> channel) {
-    return JRoutineStream.withStreamOf(channel);
+  public static LoaderRoutineBuilder routineOn(@NotNull final LoaderSourceCompat loaderSource) {
+    return JRoutineLoaderCompat.routineOn(loaderSource);
+  }
+
+  /**
+   * Returns a Context based builder of Service routines.
+   *
+   * @param serviceSource the Service source.
+   * @return the routine builder.
+   */
+  @NotNull
+  public static ServiceRoutineBuilder routineOn(@NotNull final ServiceSource serviceSource) {
+    return JRoutineService.routineOn(serviceSource);
+  }
+
+  /**
+   * Returns a builder of stateful Loader routines.
+   * <br>
+   * The specified invocation ID will be used to uniquely identify the built routine, so to make an
+   * invocation survive configuration changes.
+   * <p>
+   * This type of routines are based on invocations retaining a mutable state during their
+   * lifecycle.
+   * <br>
+   * A typical example of stateful routine is the one computing a final result by accumulating the
+   * input data (for instance, computing the sum of input numbers).
+   *
+   * @param loaderSource the Loader source.
+   * @param invocationId the invocation ID.
+   * @param <IN>         the input data type.
+   * @param <OUT>        the output data type.
+   * @param <STATE>      the state data type.
+   * @return the routine builder.
+   */
+  @NotNull
+  public static <IN, OUT, STATE> StatefulLoaderRoutineBuilder<IN, OUT, STATE> statefulOn(
+      @NotNull final LoaderSourceCompat loaderSource, final int invocationId) {
+    // TODO: 24/05/2017 fix
+    return JRoutineLoaderFunctionCompat.statefulOn(loaderSource, invocationId);
+  }
+
+  /**
+   * Returns a builder of stateless Loader routines.
+   * <br>
+   * The specified invocation ID will be used to uniquely identify the built routine, so to make an
+   * invocation survive configuration changes.
+   * <p>
+   * This type of routines are based on invocations not retaining a mutable internal state.
+   * <br>
+   * A typical example of stateless routine is the one processing each input separately (for
+   * instance, computing the square of input numbers).
+   *
+   * @param loaderSource the Loader source.
+   * @param invocationId the invocation ID.
+   * @param <IN>         the input data type.
+   * @param <OUT>        the output data type.
+   * @return the routine builder.
+   */
+  @NotNull
+  public static <IN, OUT> StatelessLoaderRoutineBuilder<IN, OUT> statelessOn(
+      @NotNull final LoaderSourceCompat loaderSource, final int invocationId) {
+    // TODO: 24/05/2017 fix
+    return JRoutineLoaderFunctionCompat.statelessOn(loaderSource, invocationId);
+  }
+
+  /**
+   * Returns a builder of functions making the stream routine run on the specified Loader.
+   * <p>
+   * The example below shows how it's possible to make the computation happen in a dedicated Loader:
+   * <pre><code>
+   * JRoutineStream.withStreamOf(routine)
+   *               .lift(JRoutineLoaderStreamCompat.streamLifterOn(loaderOf(activity))
+   *                                               .withLoader()
+   *                                               .withInvocationId(INVOCATION_ID)
+   *                                               .configuration()
+   *                                               .runOnLoader())
+   *               .invoke()
+   *               .consume(getConsumer())
+   *               .close();
+   * </code></pre>
+   * Note that the Loader ID, by default, will only depend on the inputs, so that, in order to avoid
+   * clashing, it is advisable to explicitly set the invocation ID like shown in the example.
+   *
+   * @param loaderSource the Loader source.
+   * @return the lifting function builder.
+   */
+  @NotNull
+  public static LoaderStreamLifter streamLifterOn(@NotNull final LoaderSourceCompat loaderSource) {
+    return JRoutineLoaderStreamCompat.streamLifterOn(loaderSource);
+  }
+
+  /**
+   * Returns a builder of routines wrapping a target object.
+   *
+   * @param loaderSource the Loader source.
+   * @return the routine builder instance.
+   */
+  @NotNull
+  public static LoaderWrapperRoutineBuilder wrapperOn(
+      @NotNull final LoaderSourceCompat loaderSource) {
+    return new DefaultLoaderWrapperRoutineBuilderCompat(loaderSource);
+  }
+
+  /**
+   * Returns a builder of routines wrapping a target object.
+   *
+   * @param serviceSource the Service source.
+   * @return the routine builder instance.
+   */
+  @NotNull
+  public static ServiceWrapperRoutineBuilder wrapperOn(@NotNull final ServiceSource serviceSource) {
+    return new DefaultServiceWrapperRoutineBuilder(serviceSource);
   }
 }

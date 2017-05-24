@@ -27,16 +27,17 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfigurable;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.util.BiFunction;
 import com.github.dm.jrt.function.util.Function;
+import com.github.dm.jrt.function.util.Supplier;
 import com.github.dm.jrt.reflect.util.InvocationReflection;
 import com.github.dm.jrt.stream.JRoutineStream;
-import com.github.dm.jrt.stream.builder.StreamBuilder;
-import com.github.dm.jrt.stream.config.StreamConfiguration;
+import com.github.dm.jrt.stream.routine.StreamRoutine;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
@@ -49,10 +50,10 @@ import retrofit2.Converter;
 import retrofit2.Retrofit;
 
 import static com.github.dm.jrt.android.core.invocation.InvocationFactoryReference.factoryOf;
-import static com.github.dm.jrt.function.Functions.decorate;
+import static com.github.dm.jrt.function.util.SupplierDecorator.wrapSupplier;
 
 /**
- * Implementation of a call adapter factory supporting {@code Channel} and {@code StreamBuilder}
+ * Implementation of a Call adapter factory supporting {@code Routine} and {@code StreamRoutine}
  * return types.
  * <br>
  * Note that the routines generated through stream builders must be invoked and the returned channel
@@ -115,12 +116,12 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
   /**
    * Returns an adapter factory builder.
    *
-   * @param context the Service context.
+   * @param serviceSource the Service source.
    * @return the builder instance.
    */
   @NotNull
-  public static Builder on(@NotNull final ServiceSource context) {
-    return new Builder(context);
+  public static Builder factoryOn(@NotNull final ServiceSource serviceSource) {
+    return new Builder(serviceSource);
   }
 
   @Override
@@ -131,7 +132,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
     if (returnType instanceof ParameterizedType) {
       final ParameterizedType parameterizedType = (ParameterizedType) returnType;
       rawType = parameterizedType.getRawType();
-      if ((Channel.class == rawType) || (StreamBuilder.class == rawType)) {
+      if ((Routine.class == rawType) || (StreamRoutine.class == rawType)) {
         responseType = parameterizedType.getActualTypeArguments()[1];
       }
 
@@ -145,13 +146,8 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
           InvocationReflection.withAnnotations(mInvocationConfiguration, annotations);
       final ServiceConfiguration serviceConfiguration =
           ContextInvocationReflection.withAnnotations(mServiceConfiguration, annotations);
-      if (Channel.class == rawType) {
-        return new OutputChannelAdapter(invocationConfiguration,
-            retrofit.responseBodyConverter(responseType, annotations),
-            buildRoutine(invocationConfiguration, serviceConfiguration), responseType);
-
-      } else if (StreamBuilder.class == rawType) {
-        return new StreamBuilderAdapter(invocationConfiguration,
+      if ((Routine.class == rawType) || (StreamRoutine.class == rawType)) {
+        return new StreamRoutineAdapter(invocationConfiguration,
             retrofit.responseBodyConverter(responseType, annotations),
             buildRoutine(invocationConfiguration, serviceConfiguration), responseType);
       }
@@ -164,11 +160,10 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
   private Routine<ParcelableFlowData<Object>, ParcelableFlowData<Object>> buildRoutine(
       @NotNull final InvocationConfiguration invocationConfiguration,
       @NotNull final ServiceConfiguration serviceConfiguration) {
-    return JRoutineService.on(mServiceSource)
-                          .with(factoryOf(ServiceCallInvocation.class))
+    return JRoutineService.routineOn(mServiceSource)
                           .withConfiguration(invocationConfiguration)
-                          .apply(serviceConfiguration)
-                          .buildRoutine();
+                          .withConfiguration(serviceConfiguration)
+                          .of(factoryOf(ServiceCallInvocation.class));
   }
 
   /**
@@ -194,10 +189,10 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
     /**
      * Constructor.
      *
-     * @param context the Service context.
+     * @param serviceSource the Service source.
      */
-    private Builder(@NotNull final ServiceSource context) {
-      mServiceSource = ConstantConditions.notNull("Service context", context);
+    private Builder(@NotNull final ServiceSource serviceSource) {
+      mServiceSource = ConstantConditions.notNull("Service source", serviceSource);
     }
 
     /**
@@ -240,48 +235,37 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
   }
 
   /**
-   * Base adapter implementation.
+   * Invocation allowing a single Call object as input.
    */
-  private static abstract class BaseAdapter<T> implements CallAdapter<T> {
+  private static class InputCallInvocation extends TemplateInvocation<Call<?>, Call<?>> {
 
-    private final Type mResponseType;
-
-    private final Routine<ParcelableFlowData<Object>, ParcelableFlowData<Object>> mRoutine;
+    private final Call<?> mCall;
 
     /**
      * Constructor.
      *
-     * @param routine      the routine instance.
-     * @param responseType the response type.
+     * @param call the input Call.
      */
-    private BaseAdapter(
-        @NotNull final Routine<ParcelableFlowData<Object>, ParcelableFlowData<Object>> routine,
-        @NotNull final Type responseType) {
-      mResponseType = responseType;
-      mRoutine = routine;
+    private InputCallInvocation(@Nullable final Call<?> call) {
+      mCall = call;
     }
 
     @Override
-    public Type responseType() {
-      return mResponseType;
+    public void onComplete(@NotNull final Channel<Call<?>, ?> result) {
+      result.pass(mCall);
     }
 
-    /**
-     * Gets the adapter routine.
-     *
-     * @return the routine instance.
-     */
-    @NotNull
-    Routine<ParcelableFlowData<Object>, ParcelableFlowData<Object>> getRoutine() {
-      return mRoutine;
+    @Override
+    public void onInput(final Call<?> input, @NotNull final Channel<Call<?>, ?> result) {
+      result.abort(new IllegalArgumentException("no input is allowed"));
     }
   }
 
   /**
-   * Bind function used to create the stream channel instances.
+   * Lift function used to create the stream channel instances.
    */
-  private static class BindService
-      implements Function<Channel<?, ParcelableFlowData<Object>>, Channel<?, Object>> {
+  private static class LiftService
+      implements Function<Channel<Call<?>, ParcelableFlowData<Object>>, Channel<Object, Object>> {
 
     private final ChannelConfiguration mConfiguration;
 
@@ -296,7 +280,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
      * @param converter     the body converter.
      * @param routine       the routine instance.
      */
-    private BindService(@NotNull final ChannelConfiguration configuration,
+    private LiftService(@NotNull final ChannelConfiguration configuration,
         @NotNull final Converter<ResponseBody, ?> converter,
         @NotNull final Routine<ParcelableFlowData<Object>, ParcelableFlowData<Object>> routine) {
       mConfiguration = configuration;
@@ -305,27 +289,32 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
     }
 
     @Override
-    public Channel<?, Object> apply(final Channel<?, ParcelableFlowData<Object>> channel) {
+    public Channel<Object, Object> apply(
+        final Channel<Call<?>, ParcelableFlowData<Object>> channel) {
       final Channel<Object, Object> outputChannel =
-          JRoutineCore.ofData().apply(mConfiguration).buildChannel();
+          JRoutineCore.channel().withConfiguration(mConfiguration).ofType();
       mRoutine.invoke()
               .consume(new ConverterChannelConsumer(mConverter, outputChannel))
               .pass(channel)
               .close();
-      return outputChannel;
+      return JRoutineCore.readOnly(outputChannel);
     }
   }
 
   /**
-   * Output channel adapter implementation.
+   * Stream routine adapter implementation.
    */
-  private static class OutputChannelAdapter extends BaseAdapter<Channel> {
+  private static class StreamRoutineAdapter implements CallAdapter<StreamRoutine>,
+      Function<Supplier<? extends Channel<Call<?>, ParcelableFlowData<Object>>>,
+          Supplier<Channel<Object, Object>>> {
 
-    private final ChannelConfiguration mChannelConfiguration;
+    private final ChannelConfiguration mConfiguration;
 
     private final Converter<ResponseBody, ?> mConverter;
 
-    private final InvocationConfiguration mInvocationConfiguration;
+    private final Type mResponseType;
+
+    private final Routine<ParcelableFlowData<Object>, ParcelableFlowData<Object>> mRoutine;
 
     /**
      * Constructor.
@@ -335,77 +324,32 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
      * @param routine       the routine instance.
      * @param responseType  the response type.
      */
-    private OutputChannelAdapter(@NotNull final InvocationConfiguration configuration,
+    private StreamRoutineAdapter(@NotNull final InvocationConfiguration configuration,
         @NotNull final Converter<ResponseBody, ?> converter,
         @NotNull final Routine<ParcelableFlowData<Object>, ParcelableFlowData<Object>> routine,
         @NotNull final Type responseType) {
-      super(routine, responseType);
-      mInvocationConfiguration = configuration;
-      mChannelConfiguration = configuration.outputConfigurationBuilder().configuration();
-      mConverter = converter;
-    }
-
-    @NotNull
-    private Channel<?, ParcelableFlowData<Object>> invokeCall(final Call<?> call) {
-      return JRoutineCore.with(sInvocation)
-                         .apply(mInvocationConfiguration)
-                         .invoke()
-                         .pass(call)
-                         .close();
-    }
-
-    @Override
-    public <OUT> Channel adapt(final Call<OUT> call) {
-      final Channel<Object, Object> outputChannel =
-          JRoutineCore.ofData().apply(mChannelConfiguration).buildChannel();
-      getRoutine().invoke()
-                  .consume(new ConverterChannelConsumer(mConverter, outputChannel))
-                  .pass(invokeCall(call))
-                  .close();
-      return outputChannel;
-    }
-  }
-
-  /**
-   * Stream routine builder adapter implementation.
-   */
-  private static class StreamBuilderAdapter extends BaseAdapter<StreamBuilder> implements
-      BiFunction<StreamConfiguration, Function<Channel<?, Call<?>>, Channel<?, ParcelableFlowData<Object>>>, Function<Channel<?, Call<?>>, Channel<?, Object>>> {
-
-    private final Converter<ResponseBody, ?> mConverter;
-
-    private final InvocationConfiguration mInvocationConfiguration;
-
-    /**
-     * Constructor.
-     *
-     * @param configuration the invocation configuration.
-     * @param converter     the body converter.
-     * @param routine       the routine instance.
-     * @param responseType  the response type.
-     */
-    private StreamBuilderAdapter(@NotNull final InvocationConfiguration configuration,
-        @NotNull final Converter<ResponseBody, ?> converter,
-        @NotNull final Routine<ParcelableFlowData<Object>, ParcelableFlowData<Object>> routine,
-        @NotNull final Type responseType) {
-      super(routine, responseType);
-      mInvocationConfiguration = configuration;
+      mRoutine = routine;
+      mResponseType = responseType;
+      mConfiguration = configuration.outputConfigurationBuilder().configuration();
       mConverter = converter;
     }
 
     @Override
-    public Function<Channel<?, Call<?>>, Channel<?, Object>> apply(
-        final StreamConfiguration streamConfiguration,
-        final Function<Channel<?, Call<?>>, Channel<?, ParcelableFlowData<Object>>> function) {
-      return decorate(function).andThen(
-          new BindService(streamConfiguration.toChannelConfiguration(), mConverter, getRoutine()));
+    public Type responseType() {
+      return mResponseType;
     }
 
     @Override
-    public <OUT> StreamBuilder adapt(final Call<OUT> call) {
-      return JRoutineStream.<Call<?>>withStreamOf(call).withConfiguration(mInvocationConfiguration)
-                                                       .map(sInvocation)
-                                                       .lift(this);
+    public <OUT> StreamRoutine adapt(final Call<OUT> call) {
+      return JRoutineStream.streamOfSingleton(new InputCallInvocation(call))
+                           .map(JRoutineCore.routine().of(sInvocation))
+                           .lift(this);
+    }
+
+    @Override
+    public Supplier<Channel<Object, Object>> apply(
+        final Supplier<? extends Channel<Call<?>, ParcelableFlowData<Object>>> supplier) {
+      return wrapSupplier(supplier).andThen(new LiftService(mConfiguration, mConverter, mRoutine));
     }
   }
 }

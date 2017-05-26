@@ -41,6 +41,8 @@ import java.util.concurrent.TimeUnit;
 @SuppressWarnings("WeakerAccess")
 public interface StreamLifter extends ChannelConfigurable<StreamLifter> {
 
+  // TODO: 25/05/2017 runOn(ScheduledExecutor), consumeOn(ScheduledExecutor)
+
   /**
    * Returns a function adding a delay at the beginning of the stream, so that any data, exception
    * or completion notification coming from the source will be dispatched to the stream after the

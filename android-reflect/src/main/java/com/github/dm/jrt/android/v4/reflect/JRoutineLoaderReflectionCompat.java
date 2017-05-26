@@ -98,6 +98,6 @@ public class JRoutineLoaderReflectionCompat {
   @NotNull
   public static LoaderReflectionRoutineBuilder wrapperOn(
       @NotNull final LoaderSourceCompat loaderSource) {
-    return new DefaultLoaderReflectionRoutineBuilder(loaderSource);
+    return new DefaultLoaderReflectionRoutineBuilderCompat(loaderSource);
   }
 }

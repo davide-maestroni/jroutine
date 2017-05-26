@@ -27,11 +27,12 @@ import com.github.dm.jrt.android.retrofit.ServiceAdapterFactory;
 import com.github.dm.jrt.android.retrofit.service.TestService;
 import com.github.dm.jrt.android.retrofit.test.R;
 import com.github.dm.jrt.android.v4.core.LoaderSourceCompat;
-import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.invocation.InvocationException;
+import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.util.Consumer;
 import com.github.dm.jrt.operator.JRoutineOperators;
+import com.github.dm.jrt.stream.routine.StreamRoutine;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -316,11 +317,12 @@ public class LoaderAdapterFactoryCompatTest extends ActivityInstrumentationTestC
     public CallAdapter<?> get(final Type returnType, final Annotation[] annotations,
         final Retrofit retrofit) {
       if (returnType instanceof ParameterizedType) {
-        if (((ParameterizedType) returnType).getRawType() == Channel.class) {
+        final Type rawType = ((ParameterizedType) returnType).getRawType();
+        if ((rawType == Routine.class) || (rawType == StreamRoutine.class)) {
           return null;
         }
 
-      } else if (returnType == Channel.class) {
+      } else if ((returnType == Routine.class) || (returnType == StreamRoutine.class)) {
         return null;
       }
 

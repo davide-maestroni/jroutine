@@ -63,7 +63,7 @@ import static com.github.dm.jrt.core.util.DurationMeasure.indefiniteTime;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
+class LoaderInvocationCompat<IN, OUT> extends CallInvocation<IN, OUT> {
 
   private static final WeakIdentityHashMap<Object,
       SparseArrayCompat<WeakReference<RoutineLoaderCallbacks<?>>>>
@@ -101,7 +101,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
    * @param order         the input data order.
    * @param logger        the logger instance.
    */
-  LoaderInvocation(@NotNull final LoaderSourceCompat loaderSource,
+  LoaderInvocationCompat(@NotNull final LoaderSourceCompat loaderSource,
       @NotNull final ContextInvocationFactory<IN, OUT> factory,
       @NotNull final LoaderConfiguration configuration, @Nullable final OrderType order,
       @NotNull final Logger logger) {
@@ -191,7 +191,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
         continue;
       }
 
-      final InvocationLoader<?, ?> loader = callbacks.mLoader;
+      final InvocationLoaderCompat<?, ?> loader = callbacks.mLoader;
       if ((loaderId == callbackArray.keyAt(i)) && (loader.getInvocationCount() == 0)) {
         loaderManager.destroyLoader(loaderId);
         callbackArray.removeAt(i);
@@ -230,8 +230,8 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
         continue;
       }
 
-      @SuppressWarnings("unchecked") final InvocationLoader<Object, Object> loader =
-          (InvocationLoader<Object, Object>) callbacks.mLoader;
+      @SuppressWarnings("unchecked") final InvocationLoaderCompat<Object, Object> loader =
+          (InvocationLoaderCompat<Object, Object>) callbacks.mLoader;
       if ((loader.getInvocationCount() == 0) && (loaderId == callbackArray.keyAt(i))
           && loader.areSameInputs(inputs)) {
         loaderManager.destroyLoader(loaderId);
@@ -271,7 +271,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
         continue;
       }
 
-      final InvocationLoader<?, ?> loader = callbacks.mLoader;
+      final InvocationLoaderCompat<?, ?> loader = callbacks.mLoader;
       if (loader.getInvocationFactory().equals(factory) && (loader.getInvocationCount() == 0)) {
         final int id = callbackArray.keyAt(i);
         if ((loaderId == LoaderConfiguration.AUTO) || (loaderId == id)) {
@@ -314,8 +314,8 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
         continue;
       }
 
-      @SuppressWarnings("unchecked") final InvocationLoader<Object, Object> loader =
-          (InvocationLoader<Object, Object>) callbacks.mLoader;
+      @SuppressWarnings("unchecked") final InvocationLoaderCompat<Object, Object> loader =
+          (InvocationLoaderCompat<Object, Object>) callbacks.mLoader;
       if (loader.getInvocationFactory().equals(factory) && (loader.getInvocationCount() == 0)) {
         final int id = callbackArray.keyAt(i);
         if (((loaderId == LoaderConfiguration.AUTO) || (loaderId == id)) && loader.areSameInputs(
@@ -369,7 +369,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
       logger.dbg("generating Loader ID: %d", loaderId);
     }
 
-    final Loader<InvocationResult<OUT>> loader = loaderManager.getLoader(loaderId);
+    final Loader<InvocationResultCompat<OUT>> loader = loaderManager.getLoader(loaderId);
     final ClashType clashType = getClashType(loader, loaderId, inputs);
     final WeakIdentityHashMap<Object, SparseArrayCompat<WeakReference<RoutineLoaderCallbacks<?>>>>
         callbackMap = sCallbacks;
@@ -393,15 +393,15 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
       throw clashException;
     }
 
-    final boolean isRoutineLoader = InvocationLoader.class.isInstance(loader);
+    final boolean isRoutineLoader = InvocationLoaderCompat.class.isInstance(loader);
     final boolean isStaleResult =
-        isRoutineLoader && ((InvocationLoader<?, OUT>) loader).isStaleResult(
+        isRoutineLoader && ((InvocationLoaderCompat<?, OUT>) loader).isStaleResult(
             mResultStaleTimeMillis);
     final boolean isRestart = (clashType == ClashType.ABORT_OTHER) || isStaleResult;
     if ((callbacks == null) || (loader == null) || isRestart) {
-      final InvocationLoader<IN, OUT> invocationLoader;
+      final InvocationLoaderCompat<IN, OUT> invocationLoader;
       if ((clashType == ClashType.NONE) && isRoutineLoader && !isStaleResult) {
-        invocationLoader = (InvocationLoader<IN, OUT>) loader;
+        invocationLoader = (InvocationLoaderCompat<IN, OUT>) loader;
 
       } else {
         invocationLoader = null;
@@ -436,12 +436,13 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
 
   @NotNull
   private RoutineLoaderCallbacks<OUT> createCallbacks(@NotNull final Context loaderContext,
-      @NotNull final LoaderManager loaderManager, @Nullable final InvocationLoader<IN, OUT> loader,
+      @NotNull final LoaderManager loaderManager,
+      @Nullable final InvocationLoaderCompat<IN, OUT> loader,
       @NotNull final List<? extends IN> inputs, final int loaderId) throws Exception {
     final Logger logger = mLogger;
-    final InvocationLoader<IN, OUT> callbacksLoader = (loader != null) ? loader
-        : new InvocationLoader<IN, OUT>(loaderContext, inputs, createInvocation(loaderId), mFactory,
-            mOrderType, logger);
+    final InvocationLoaderCompat<IN, OUT> callbacksLoader = (loader != null) ? loader
+        : new InvocationLoaderCompat<IN, OUT>(loaderContext, inputs, createInvocation(loaderId),
+            mFactory, mOrderType, logger);
     return new RoutineLoaderCallbacks<OUT>(loaderManager, callbacksLoader, logger);
   }
 
@@ -459,22 +460,22 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
   }
 
   @NotNull
-  private ClashType getClashType(@Nullable final Loader<InvocationResult<OUT>> loader,
+  private ClashType getClashType(@Nullable final Loader<InvocationResultCompat<OUT>> loader,
       final int loaderId, @NotNull final List<? extends IN> inputs) {
     if (loader == null) {
       return ClashType.NONE;
     }
 
     final Logger logger = mLogger;
-    if (loader.getClass() != InvocationLoader.class) {
+    if (loader.getClass() != InvocationLoaderCompat.class) {
       logger.err("clashing Loader ID [%d]: %s", loaderId, loader.getClass().getName());
       throw new TypeClashException(loaderId);
     }
 
     final ContextInvocationFactory<IN, OUT> factory = mFactory;
-    @SuppressWarnings("unchecked") final InvocationLoader<IN, OUT> invocationLoader =
-        (InvocationLoader<IN, OUT>) loader;
-    final ClashResolutionType resolution = (factory instanceof MissingLoaderInvocationFactory) || ((
+    @SuppressWarnings("unchecked") final InvocationLoaderCompat<IN, OUT> invocationLoader =
+        (InvocationLoaderCompat<IN, OUT>) loader;
+    final ClashResolutionType resolution = (factory instanceof MissingLoaderInvocationFactoryCompat) || ((
         invocationLoader.getInvocationFactory().equals(factory) && invocationLoader.areSameInputs(
             inputs))) ? mMatchResolutionType : mClashResolutionType;
     if (resolution == ClashResolutionType.JOIN) {
@@ -640,13 +641,13 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
    * @param <OUT> the output data type.
    */
   private static class RoutineLoaderCallbacks<OUT>
-      implements LoaderCallbacks<InvocationResult<OUT>> {
+      implements LoaderCallbacks<InvocationResultCompat<OUT>> {
 
     private final ArrayList<Channel<OUT, ?>> mAbortedChannels = new ArrayList<Channel<OUT, ?>>();
 
     private final ArrayList<Channel<OUT, ?>> mChannels = new ArrayList<Channel<OUT, ?>>();
 
-    private final InvocationLoader<?, OUT> mLoader;
+    private final InvocationLoaderCompat<?, OUT> mLoader;
 
     private final LoaderManager mLoaderManager;
 
@@ -666,23 +667,23 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
      * @param logger        the logger instance.
      */
     private RoutineLoaderCallbacks(@NotNull final LoaderManager loaderManager,
-        @NotNull final InvocationLoader<?, OUT> loader, @NotNull final Logger logger) {
+        @NotNull final InvocationLoaderCompat<?, OUT> loader, @NotNull final Logger logger) {
       mLoaderManager = loaderManager;
       mLoader = loader;
       mLogger = logger.subContextLogger(this);
     }
 
     @Override
-    public Loader<InvocationResult<OUT>> onCreateLoader(final int id, final Bundle args) {
+    public Loader<InvocationResultCompat<OUT>> onCreateLoader(final int id, final Bundle args) {
       mLogger.dbg("creating Android Loader: %d", id);
       return mLoader;
     }
 
     @Override
-    public void onLoadFinished(final Loader<InvocationResult<OUT>> loader,
-        final InvocationResult<OUT> data) {
+    public void onLoadFinished(final Loader<InvocationResultCompat<OUT>> loader,
+        final InvocationResultCompat<OUT> data) {
       final Logger logger = mLogger;
-      final InvocationLoader<?, OUT> internalLoader = mLoader;
+      final InvocationLoaderCompat<?, OUT> internalLoader = mLoader;
       final ArrayList<Channel<OUT, ?>> channels = mChannels;
       final ArrayList<Channel<OUT, ?>> newChannels = mNewChannels;
       final ArrayList<Channel<OUT, ?>> abortedChannels = mAbortedChannels;
@@ -731,7 +732,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
     }
 
     @Override
-    public void onLoaderReset(final Loader<InvocationResult<OUT>> loader) {
+    public void onLoaderReset(final Loader<InvocationResultCompat<OUT>> loader) {
       mLogger.dbg("resetting Android Loader: %d", mLoader.getId());
       reset(new InvocationClashException(mLoader.getId()));
     }
@@ -740,7 +741,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
     private Channel<?, OUT> newChannel() {
       final Logger logger = mLogger;
       logger.dbg("creating new result channel");
-      final InvocationLoader<?, OUT> internalLoader = mLoader;
+      final InvocationLoaderCompat<?, OUT> internalLoader = mLoader;
       final ArrayList<Channel<OUT, ?>> channels = mNewChannels;
       final Channel<OUT, OUT> channel = JRoutineCore.channel()
                                                     .withChannel()

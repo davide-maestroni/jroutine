@@ -15,7 +15,7 @@
  */
 
 /**
- * RxJava utility classes with support for the Android compatibility library.
+ * RxJava integration utility classes with support for the Android compatibility library.
  * <p>
  * Created by davide-maestroni on 02/10/2017.
  */

@@ -15,7 +15,7 @@
  */
 
 /**
- * RxJava utility classes employing Android Loaders to execute mapping functions.
+ * RxJava integration utility classes employing Android Loaders to execute mapping functions.
  * <p>
  * Created by davide-maestroni on 02/10/2017.
  */

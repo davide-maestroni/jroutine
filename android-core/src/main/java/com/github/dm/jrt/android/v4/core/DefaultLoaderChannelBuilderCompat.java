@@ -32,7 +32,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static com.github.dm.jrt.android.v4.core.LoaderInvocation.clearLoader;
+import static com.github.dm.jrt.android.v4.core.LoaderInvocationCompat.clearLoader;
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builderFromOutput;
 
 /**
@@ -40,7 +40,7 @@ import static com.github.dm.jrt.core.config.InvocationConfiguration.builderFromO
  * <p>
  * Created by davide-maestroni on 01/14/2015.
  */
-class DefaultLoaderChannelBuilder implements LoaderChannelBuilder {
+class DefaultLoaderChannelBuilderCompat implements LoaderChannelBuilder {
 
   private final LoaderSourceCompat mLoaderSource;
 
@@ -53,7 +53,7 @@ class DefaultLoaderChannelBuilder implements LoaderChannelBuilder {
    *
    * @param loaderSource the Loader source.
    */
-  DefaultLoaderChannelBuilder(@NotNull final LoaderSourceCompat loaderSource) {
+  DefaultLoaderChannelBuilderCompat(@NotNull final LoaderSourceCompat loaderSource) {
     mLoaderSource = ConstantConditions.notNull("Loader source", loaderSource);
   }
 
@@ -128,9 +128,9 @@ class DefaultLoaderChannelBuilder implements LoaderChannelBuilder {
       return channel.close();
     }
 
-    final MissingLoaderInvocationFactory<OUT> factory =
-        new MissingLoaderInvocationFactory<OUT>(loaderId);
-    final DefaultLoaderRoutineBuilder builder = new DefaultLoaderRoutineBuilder(context);
+    final MissingLoaderInvocationFactoryCompat<OUT> factory =
+        new MissingLoaderInvocationFactoryCompat<OUT>(loaderId);
+    final DefaultLoaderRoutineBuilderCompat builder = new DefaultLoaderRoutineBuilderCompat(context);
     return builder.withConfiguration(builderFromOutput(mChannelConfiguration).configuration())
                   .withConfiguration(loaderConfiguration)
                   .of(factory)

@@ -378,6 +378,16 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
         hasOutputs = true;
         output = out;
       }
+
+    } else {
+      final TimeoutActionType actionType = mTimeoutActionType.get();
+      if (actionType == TimeoutActionType.ABORT) {
+        abort(mTimeoutException.get());
+
+      } else if (actionType == TimeoutActionType.FAIL) {
+        throw new OutputTimeoutException(
+            "timeout while waiting for outputs [" + mOutputTimeout.get() + "]");
+      }
     }
 
     if (!hasOutputs) {

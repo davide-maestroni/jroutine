@@ -15,7 +15,7 @@
  */
 
 /**
- * Classes and interfaces related to Flowable builders.
+ * RxJava integration classes and interfaces related to builders.
  * <p>
  * Created by davide-maestroni on 02/09/2017.
  */

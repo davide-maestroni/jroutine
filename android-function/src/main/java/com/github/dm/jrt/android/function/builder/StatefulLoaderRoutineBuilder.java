@@ -16,21 +16,9 @@
 
 package com.github.dm.jrt.android.function.builder;
 
-import android.content.Context;
-
 import com.github.dm.jrt.android.core.config.LoaderConfigurable;
 import com.github.dm.jrt.android.core.routine.LoaderRoutine;
-import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.common.RoutineException;
-import com.github.dm.jrt.core.config.InvocationConfiguration;
-import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
-import com.github.dm.jrt.function.builder.StatefulRoutineBuilder;
-import com.github.dm.jrt.function.util.BiConsumer;
-import com.github.dm.jrt.function.util.BiFunction;
-import com.github.dm.jrt.function.util.Consumer;
-import com.github.dm.jrt.function.util.Function;
-import com.github.dm.jrt.function.util.Supplier;
-import com.github.dm.jrt.function.util.TriFunction;
+import com.github.dm.jrt.core.config.InvocationConfigurable;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -61,7 +49,7 @@ import org.jetbrains.annotations.NotNull;
  * builder.onCreate(StringBuilder::new)
  *        .onNextState(StringBuilder::append)
  *        .onCompleteOutput(StringBuilder::toString)
- *        .routine();
+ *        .create();
  * </code></pre>
  * <p>
  * Note that the passed instances are expected to behave like a function, that is, they must not
@@ -77,299 +65,15 @@ import org.jetbrains.annotations.NotNull;
  * @param <STATE> the state data type.
  */
 public interface StatefulLoaderRoutineBuilder<IN, OUT, STATE>
-    extends StatefulRoutineBuilder<IN, OUT, STATE>,
+    extends StatefulContextBuilder<IN, OUT, STATE, StatefulLoaderRoutineBuilder<IN, OUT, STATE>>,
+    InvocationConfigurable<StatefulLoaderRoutineBuilder<IN, OUT, STATE>>,
     LoaderConfigurable<StatefulLoaderRoutineBuilder<IN, OUT, STATE>> {
 
   /**
-   * {@inheritDoc}
+   * Builds a new Loader routine instance based on the set functions.
    *
-   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
-   *                                            static scope.
+   * @return the Loader routine instance.
    */
   @NotNull
-  @Override
-  StatefulLoaderRoutineBuilder<IN, OUT, STATE> onComplete(
-      @NotNull BiFunction<? super STATE, ? super Channel<OUT, ?>, ? extends STATE> onComplete);
-
-  /**
-   * {@inheritDoc}
-   *
-   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
-   *                                            static scope.
-   */
-  @NotNull
-  @Override
-  StatefulLoaderRoutineBuilder<IN, OUT, STATE> onCompleteArray(
-      @NotNull Function<? super STATE, OUT[]> onComplete);
-
-  /**
-   * {@inheritDoc}
-   *
-   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
-   *                                            static scope.
-   */
-  @NotNull
-  @Override
-  StatefulLoaderRoutineBuilder<IN, OUT, STATE> onCompleteConsume(
-      @NotNull BiConsumer<? super STATE, ? super Channel<OUT, ?>> onComplete);
-
-  /**
-   * {@inheritDoc}
-   *
-   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
-   *                                            static scope.
-   */
-  @NotNull
-  @Override
-  StatefulLoaderRoutineBuilder<IN, OUT, STATE> onCompleteIterable(
-      @NotNull Function<? super STATE, ? extends Iterable<? extends OUT>> onComplete);
-
-  /**
-   * {@inheritDoc}
-   *
-   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
-   *                                            static scope.
-   */
-  @NotNull
-  @Override
-  StatefulLoaderRoutineBuilder<IN, OUT, STATE> onCompleteOutput(
-      @NotNull Function<? super STATE, ? extends OUT> onComplete);
-
-  /**
-   * {@inheritDoc}
-   *
-   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
-   *                                            static scope.
-   */
-  @NotNull
-  @Override
-  StatefulLoaderRoutineBuilder<IN, OUT, STATE> onCompleteState(
-      @NotNull Function<? super STATE, ? extends STATE> onComplete);
-
-  /**
-   * {@inheritDoc}
-   *
-   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
-   *                                            static scope.
-   */
-  @NotNull
-  @Override
-  StatefulLoaderRoutineBuilder<IN, OUT, STATE> onCreate(
-      @NotNull Supplier<? extends STATE> onCreate);
-
-  /**
-   * {@inheritDoc}
-   *
-   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
-   *                                            static scope.
-   */
-  @NotNull
-  @Override
-  StatefulLoaderRoutineBuilder<IN, OUT, STATE> onDestroy(
-      @NotNull Consumer<? super STATE> onDestroy);
-
-  /**
-   * {@inheritDoc}
-   *
-   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
-   *                                            static scope.
-   */
-  @NotNull
-  @Override
-  StatefulLoaderRoutineBuilder<IN, OUT, STATE> onError(
-      @NotNull BiFunction<? super STATE, ? super RoutineException, ? extends STATE> onError);
-
-  /**
-   * {@inheritDoc}
-   *
-   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
-   *                                            static scope.
-   */
-  @NotNull
-  @Override
-  StatefulLoaderRoutineBuilder<IN, OUT, STATE> onErrorConsume(
-      @NotNull BiConsumer<? super STATE, ? super RoutineException> onError);
-
-  /**
-   * {@inheritDoc}
-   *
-   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
-   *                                            static scope.
-   */
-  @NotNull
-  @Override
-  StatefulLoaderRoutineBuilder<IN, OUT, STATE> onErrorException(
-      @NotNull Function<? super RoutineException, ? extends STATE> onError);
-
-  /**
-   * {@inheritDoc}
-   *
-   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
-   *                                            static scope.
-   */
-  @NotNull
-  @Override
-  StatefulLoaderRoutineBuilder<IN, OUT, STATE> onErrorState(
-      @NotNull Function<? super STATE, ? extends STATE> onError);
-
-  /**
-   * {@inheritDoc}
-   *
-   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
-   *                                            static scope.
-   */
-  @NotNull
-  @Override
-  StatefulLoaderRoutineBuilder<IN, OUT, STATE> onFinalize(
-      @NotNull Function<? super STATE, ? extends STATE> onFinalize);
-
-  /**
-   * {@inheritDoc}
-   *
-   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
-   *                                            static scope.
-   */
-  @NotNull
-  @Override
-  StatefulLoaderRoutineBuilder<IN, OUT, STATE> onFinalizeConsume(
-      @NotNull Consumer<? super STATE> onFinalize);
-
-  /**
-   * {@inheritDoc}
-   *
-   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
-   *                                            static scope.
-   */
-  @NotNull
-  @Override
-  StatefulLoaderRoutineBuilder<IN, OUT, STATE> onNext(
-      @NotNull TriFunction<? super STATE, ? super IN, ? super Channel<OUT, ?>, ? extends STATE>
-          onNext);
-
-  /**
-   * {@inheritDoc}
-   *
-   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
-   *                                            static scope.
-   */
-  @NotNull
-  @Override
-  StatefulLoaderRoutineBuilder<IN, OUT, STATE> onNextArray(
-      @NotNull BiFunction<? super STATE, ? super IN, OUT[]> onNext);
-
-  /**
-   * {@inheritDoc}
-   *
-   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
-   *                                            static scope.
-   */
-  @NotNull
-  @Override
-  StatefulLoaderRoutineBuilder<IN, OUT, STATE> onNextConsume(
-      @NotNull BiConsumer<? super STATE, ? super IN> onNext);
-
-  /**
-   * {@inheritDoc}
-   *
-   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
-   *                                            static scope.
-   */
-  @NotNull
-  @Override
-  StatefulLoaderRoutineBuilder<IN, OUT, STATE> onNextIterable(
-      @NotNull BiFunction<? super STATE, ? super IN, ? extends Iterable<? extends OUT>> onNext);
-
-  /**
-   * {@inheritDoc}
-   *
-   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
-   *                                            static scope.
-   */
-  @NotNull
-  @Override
-  StatefulLoaderRoutineBuilder<IN, OUT, STATE> onNextOutput(
-      @NotNull BiFunction<? super STATE, ? super IN, ? extends OUT> onNext);
-
-  /**
-   * {@inheritDoc}
-   *
-   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
-   *                                            static scope.
-   */
-  @NotNull
-  @Override
-  StatefulLoaderRoutineBuilder<IN, OUT, STATE> onNextState(
-      @NotNull BiFunction<? super STATE, ? super IN, ? extends STATE> onNext);
-
-  /**
-   * {@inheritDoc}
-   */
-  @NotNull
-  @Override
   LoaderRoutine<IN, OUT> create();
-
-  /**
-   * {@inheritDoc}
-   */
-  @NotNull
-  @Override
-  StatefulLoaderRoutineBuilder<IN, OUT, STATE> withConfiguration(
-      @NotNull InvocationConfiguration configuration);
-
-  /**
-   * {@inheritDoc}
-   */
-  @NotNull
-  @Override
-  Builder<? extends StatefulLoaderRoutineBuilder<IN, OUT, STATE>> withInvocation();
-
-  /**
-   * Sets the function to call when the Context instance is passed to the invocation.
-   * <p>
-   * The Context is passed only once after the invocation has been instantiated.
-   * <br>
-   * The returned state object is retained and passed to any successive calls to the set functions.
-   *
-   * @param onContext the function instance.
-   * @return this builder.
-   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
-   *                                            static scope.
-   * @see com.github.dm.jrt.android.core.invocation.ContextInvocation#onContext(Context)
-   * onContext(Context)
-   */
-  @NotNull
-  StatefulLoaderRoutineBuilder<IN, OUT, STATE> onContext(
-      @NotNull Function<? super Context, ? extends STATE> onContext);
-
-  /**
-   * Sets the consumer to call when the Context instance is passed to the invocation.
-   * <p>
-   * The Context is passed only once after the invocation has been instantiated.
-   *
-   * @param onContext the function instance.
-   * @return this builder.
-   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
-   *                                            static scope.
-   * @see com.github.dm.jrt.android.core.invocation.ContextInvocation#onContext(Context)
-   * onContext(Context)
-   */
-  @NotNull
-  StatefulLoaderRoutineBuilder<IN, OUT, STATE> onContextConsume(
-      @NotNull Consumer<? super Context> onContext);
-
-  /**
-   * Sets the function to call when the invocation starts.
-   * <br>
-   * If a state object has been retained from the previous invocation or from the Context
-   * notification, the same instance will be passed to the function.
-   *
-   * @param onCreate the function instance.
-   * @return this builder.
-   * @throws java.lang.IllegalArgumentException if the class of the specified function has not a
-   *                                            static scope.
-   * @see com.github.dm.jrt.android.core.invocation.ContextInvocation#onStart() onStart()
-   */
-  @NotNull
-  StatefulLoaderRoutineBuilder<IN, OUT, STATE> onCreateState(
-      @NotNull Function<? super STATE, ? extends STATE> onCreate);
 }

@@ -22,12 +22,12 @@
         <Bug pattern="PZLA_PREFER_ZERO_LENGTH_ARRAYS"/>
     </Match>
     <Match>
-        <Class name="com.github.dm.jrt.android.v4.core.LoaderInvocation"/>
+        <Class name="com.github.dm.jrt.android.v4.core.LoaderInvocationCompat"/>
         <Method name="onCall"/>
         <Bug pattern="BC_UNCONFIRMED_CAST_OF_RETURN_VALUE"/>
     </Match>
     <Match>
-        <Class name="com.github.dm.jrt.android.v4.core.LoaderInvocation"/>
+        <Class name="com.github.dm.jrt.android.v4.core.LoaderInvocationCompat"/>
         <Method name="getClashType"/>
         <Bug pattern="BC_UNCONFIRMED_CAST"/>
     </Match>

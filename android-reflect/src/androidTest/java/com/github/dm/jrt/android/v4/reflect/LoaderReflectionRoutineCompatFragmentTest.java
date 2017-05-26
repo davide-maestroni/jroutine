@@ -168,7 +168,7 @@ public class LoaderReflectionRoutineCompatFragmentTest
 
     try {
 
-      new DefaultLoaderReflectionRoutineBuilder(
+      new DefaultLoaderReflectionRoutineBuilderCompat(
           LoaderSourceCompat.loaderOf(fragment)).withConfiguration((InvocationConfiguration) null);
 
       fail();
@@ -179,7 +179,7 @@ public class LoaderReflectionRoutineCompatFragmentTest
 
     try {
 
-      new DefaultLoaderReflectionRoutineBuilder(
+      new DefaultLoaderReflectionRoutineBuilderCompat(
           LoaderSourceCompat.loaderOf(fragment)).withConfiguration((WrapperConfiguration) null);
 
       fail();
@@ -190,7 +190,7 @@ public class LoaderReflectionRoutineCompatFragmentTest
 
     try {
 
-      new DefaultLoaderReflectionRoutineBuilder(
+      new DefaultLoaderReflectionRoutineBuilderCompat(
           LoaderSourceCompat.loaderOf(fragment)).withConfiguration((LoaderConfiguration) null);
 
       fail();

@@ -33,7 +33,7 @@ import com.github.dm.jrt.core.util.Reflection;
 
 import org.jetbrains.annotations.NotNull;
 
-import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.factoryFrom;
+import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.convertFactory;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
@@ -41,7 +41,8 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * <p>
  * Created by davide-maestroni on 12/09/2014.
  */
-class DefaultLoaderRoutineBuilder extends AbstractRoutineBuilder implements LoaderRoutineBuilder {
+class DefaultLoaderRoutineBuilderCompat extends AbstractRoutineBuilder
+    implements LoaderRoutineBuilder {
 
   private final LoaderSourceCompat mLoaderSource;
 
@@ -52,7 +53,7 @@ class DefaultLoaderRoutineBuilder extends AbstractRoutineBuilder implements Load
    *
    * @param loaderSource the Loader source.
    */
-  DefaultLoaderRoutineBuilder(@NotNull final LoaderSourceCompat loaderSource) {
+  DefaultLoaderRoutineBuilderCompat(@NotNull final LoaderSourceCompat loaderSource) {
     mLoaderSource = ConstantConditions.notNull("Loader source", loaderSource);
   }
 
@@ -65,7 +66,7 @@ class DefaultLoaderRoutineBuilder extends AbstractRoutineBuilder implements Load
           "the factory class must have a static scope: " + factoryClass.getName());
     }
 
-    return new DefaultLoaderRoutine<IN, OUT>(mLoaderSource, factoryFrom(factory),
+    return new DefaultLoaderRoutine<IN, OUT>(mLoaderSource, convertFactory(factory),
         getConfiguration(), mLoaderConfiguration);
   }
 

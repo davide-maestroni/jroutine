@@ -822,7 +822,7 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
 
     try {
 
-      new DefaultLoaderRoutineBuilder(loaderOf(getActivity())).withConfiguration(
+      new DefaultLoaderRoutineBuilderCompat(loaderOf(getActivity())).withConfiguration(
           (InvocationConfiguration) null);
 
       fail();
@@ -833,7 +833,7 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
 
     try {
 
-      new DefaultLoaderRoutineBuilder(loaderOf(getActivity())).withConfiguration(
+      new DefaultLoaderRoutineBuilderCompat(loaderOf(getActivity())).withConfiguration(
           (LoaderConfiguration) null);
 
       fail();
@@ -1472,7 +1472,7 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
 
     try {
 
-      new LoaderInvocation<String, String>(null, factoryOf(ToUpperCase.class), configuration, null,
+      new LoaderInvocationCompat<String, String>(null, factoryOf(ToUpperCase.class), configuration, null,
           logger);
 
       fail();
@@ -1483,7 +1483,7 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
 
     try {
 
-      new LoaderInvocation<String, String>(context, null, configuration, null, logger);
+      new LoaderInvocationCompat<String, String>(context, null, configuration, null, logger);
 
       fail();
 
@@ -1493,7 +1493,7 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
 
     try {
 
-      new LoaderInvocation<String, String>(context, factoryOf(ToUpperCase.class), null, null,
+      new LoaderInvocationCompat<String, String>(context, factoryOf(ToUpperCase.class), null, null,
           logger);
 
       fail();
@@ -1504,7 +1504,7 @@ public class LoaderRoutineCompatTest extends ActivityInstrumentationTestCase2<Te
 
     try {
 
-      new LoaderInvocation<String, String>(context, factoryOf(ToUpperCase.class), configuration,
+      new LoaderInvocationCompat<String, String>(context, factoryOf(ToUpperCase.class), configuration,
           null, null);
 
       fail();

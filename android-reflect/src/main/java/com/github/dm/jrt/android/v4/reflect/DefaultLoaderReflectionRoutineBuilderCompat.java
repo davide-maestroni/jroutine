@@ -64,7 +64,7 @@ import static com.github.dm.jrt.reflect.util.InvocationReflection.getAnnotatedMe
  * <p>
  * Created by davide-maestroni on 04/06/2015.
  */
-class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBuilder {
+class DefaultLoaderReflectionRoutineBuilderCompat implements LoaderReflectionRoutineBuilder {
 
   private final LoaderSourceCompat mLoaderSource;
 
@@ -80,7 +80,7 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
    *
    * @param loaderSource the Loader source.
    */
-  DefaultLoaderReflectionRoutineBuilder(@NotNull final LoaderSourceCompat loaderSource) {
+  DefaultLoaderReflectionRoutineBuilderCompat(@NotNull final LoaderSourceCompat loaderSource) {
     mLoaderSource = ConstantConditions.notNull("Loader source", loaderSource);
   }
 
@@ -153,14 +153,6 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
     return itf.cast(proxy);
   }
 
-  @Override
-  @NotNull
-  public LoaderReflectionRoutineBuilder withConfiguration(
-      @NotNull final WrapperConfiguration configuration) {
-    mWrapperConfiguration = ConstantConditions.notNull("wrapper configuration", configuration);
-    return this;
-  }
-
   @NotNull
   @Override
   public LoaderReflectionRoutineBuilder withConfiguration(
@@ -170,11 +162,11 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
     return this;
   }
 
-  @NotNull
   @Override
+  @NotNull
   public LoaderReflectionRoutineBuilder withConfiguration(
-      @NotNull final LoaderConfiguration configuration) {
-    mLoaderConfiguration = ConstantConditions.notNull("Loader configuration", configuration);
+      @NotNull final WrapperConfiguration configuration) {
+    mWrapperConfiguration = ConstantConditions.notNull("wrapper configuration", configuration);
     return this;
   }
 
@@ -190,16 +182,10 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
           @Override
           public LoaderReflectionRoutineBuilder withConfiguration(
               @NotNull final InvocationConfiguration configuration) {
-            return DefaultLoaderReflectionRoutineBuilder.this.withConfiguration(configuration);
+            return DefaultLoaderReflectionRoutineBuilderCompat.this.withConfiguration(
+                configuration);
           }
         }, config);
-  }
-
-  @NotNull
-  @Override
-  public LoaderConfiguration.Builder<? extends LoaderReflectionRoutineBuilder> withLoader() {
-    final LoaderConfiguration config = mLoaderConfiguration;
-    return new LoaderConfiguration.Builder<LoaderReflectionRoutineBuilder>(this, config);
   }
 
   @NotNull
@@ -213,9 +199,25 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
           @Override
           public LoaderReflectionRoutineBuilder withConfiguration(
               @NotNull final WrapperConfiguration configuration) {
-            return DefaultLoaderReflectionRoutineBuilder.this.withConfiguration(configuration);
+            return DefaultLoaderReflectionRoutineBuilderCompat.this.withConfiguration(
+                configuration);
           }
         }, config);
+  }
+
+  @NotNull
+  @Override
+  public LoaderReflectionRoutineBuilder withConfiguration(
+      @NotNull final LoaderConfiguration configuration) {
+    mLoaderConfiguration = ConstantConditions.notNull("Loader configuration", configuration);
+    return this;
+  }
+
+  @NotNull
+  @Override
+  public LoaderConfiguration.Builder<? extends LoaderReflectionRoutineBuilder> withLoader() {
+    final LoaderConfiguration config = mLoaderConfiguration;
+    return new LoaderConfiguration.Builder<LoaderReflectionRoutineBuilder>(this, config);
   }
 
   /**
@@ -597,7 +599,7 @@ class DefaultLoaderReflectionRoutineBuilder implements LoaderReflectionRoutineBu
      * @param builder the builder instance.
      */
     private ProxyInvocationHandler(@NotNull final ContextInvocationTarget<?> target,
-        @NotNull final DefaultLoaderReflectionRoutineBuilder builder) {
+        @NotNull final DefaultLoaderReflectionRoutineBuilderCompat builder) {
       mTarget = ConstantConditions.notNull("invocation target", target);
       mLoaderSource = builder.mLoaderSource;
       mInvocationConfiguration = builder.mInvocationConfiguration;

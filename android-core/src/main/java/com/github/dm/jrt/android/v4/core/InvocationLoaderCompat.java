@@ -32,7 +32,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.fromFactory;
+import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.convertFactory;
 import static com.github.dm.jrt.core.executor.ScheduledExecutors.syncExecutor;
 
 /**
@@ -43,7 +43,7 @@ import static com.github.dm.jrt.core.executor.ScheduledExecutors.syncExecutor;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
+class InvocationLoaderCompat<IN, OUT> extends AsyncTaskLoader<InvocationResultCompat<OUT>> {
 
   private final ContextInvocationFactory<IN, OUT> mFactory;
 
@@ -57,7 +57,7 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
 
   private int mInvocationCount;
 
-  private InvocationResult<OUT> mResult;
+  private InvocationResultCompat<OUT> mResult;
 
   /**
    * Constructor.
@@ -69,7 +69,7 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
    * @param order      the data order.
    * @param logger     the logger instance.
    */
-  InvocationLoader(@NotNull final Context context, @NotNull final List<? extends IN> inputs,
+  InvocationLoaderCompat(@NotNull final Context context, @NotNull final List<? extends IN> inputs,
       @NotNull final ContextInvocation<IN, OUT> invocation,
       @NotNull final ContextInvocationFactory<IN, OUT> factory, @Nullable final OrderType order,
       @NotNull final Logger logger) {
@@ -82,7 +82,7 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
   }
 
   @Override
-  public void deliverResult(final InvocationResult<OUT> data) {
+  public void deliverResult(final InvocationResultCompat<OUT> data) {
     mLogger.dbg("delivering result: %s", data);
     mResult = data;
     super.deliverResult(data);
@@ -93,7 +93,7 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
     super.onStartLoading();
     final Logger logger = mLogger;
     logger.dbg("start background invocation");
-    final InvocationResult<OUT> result = mResult;
+    final InvocationResultCompat<OUT> result = mResult;
     if (takeContentChanged() || (result == null)) {
       forceLoad();
 
@@ -119,7 +119,7 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
   }
 
   @Override
-  public InvocationResult<OUT> loadInBackground() {
+  public InvocationResultCompat<OUT> loadInBackground() {
     final Logger logger = mLogger;
     final InvocationChannelConsumer<OUT> consumer =
         new InvocationChannelConsumer<OUT>(this, logger);
@@ -131,7 +131,7 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
                 .withLog(logger.getLog())
                 .withLogLevel(logger.getLogLevel())
                 .configuration()
-                .of(fromFactory(getContext(), factory))
+                .of(convertFactory(getContext(), factory))
                 .invoke()
                 .consume(consumer)
                 .pass(mInputs)
@@ -184,7 +184,7 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
    * @return whether the result is stale.
    */
   boolean isStaleResult(final long staleTimeMillis) {
-    final InvocationResult<OUT> result = mResult;
+    final InvocationResultCompat<OUT> result = mResult;
     return (result != null) && ((System.currentTimeMillis() - result.getResultTimestamp())
         > staleTimeMillis);
   }

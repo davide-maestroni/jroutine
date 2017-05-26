@@ -31,7 +31,7 @@ import io.reactivex.Flowable;
  * <p>
  * Created by davide-maestroni on 05/24/2017.
  */
-class DefaultLoaderFlowable extends AbstractLoaderFlowable {
+class DefaultLoaderFlowableCompat extends AbstractLoaderFlowable {
 
   private final LoaderSourceCompat mLoaderSource;
 
@@ -40,14 +40,14 @@ class DefaultLoaderFlowable extends AbstractLoaderFlowable {
    *
    * @param loaderSource the Loader source.
    */
-  DefaultLoaderFlowable(@NotNull final LoaderSourceCompat loaderSource) {
+  DefaultLoaderFlowableCompat(@NotNull final LoaderSourceCompat loaderSource) {
     mLoaderSource = ConstantConditions.notNull("Loader source", loaderSource);
   }
 
   @NotNull
   @Override
   public <DATA> Flowable<DATA> observeOnLoader(@NotNull final Flowable<DATA> flowable) {
-    final FlowableInvocationFactory<DATA> factory = new FlowableInvocationFactory<DATA>(flowable);
+    final FlowableInvocationFactoryCompat<DATA> factory = new FlowableInvocationFactoryCompat<DATA>(flowable);
     return JRoutineFlowable.flowable()
                            .withConfiguration(getFlowableConfiguration())
                            .of(JRoutineLoaderCompat.routineOn(mLoaderSource)
@@ -62,7 +62,7 @@ class DefaultLoaderFlowable extends AbstractLoaderFlowable {
   @Override
   public <DATA> Flowable<DATA> subscribeOnLoader(@NotNull final Flowable<DATA> flowable) {
     return flowable.lift(
-        new LoaderFlowableOperator<DATA>(mLoaderSource, getInvocationConfiguration(),
+        new LoaderFlowableOperatorCompat<DATA>(mLoaderSource, getInvocationConfiguration(),
             getLoaderConfiguration()));
   }
 }

@@ -148,9 +148,9 @@ public class JRoutineLoaderCompat {
   @NotNull
   public static LoaderChannelBuilder channelOn(@NotNull final LoaderSourceCompat loaderSource,
       final int loaderId) {
-    return new DefaultLoaderChannelBuilder(loaderSource).withLoader()
-                                                        .withLoaderId(loaderId)
-                                                        .configuration();
+    return new DefaultLoaderChannelBuilderCompat(loaderSource).withLoader()
+                                                              .withLoaderId(loaderId)
+                                                              .configuration();
   }
 
   /**
@@ -169,6 +169,6 @@ public class JRoutineLoaderCompat {
    */
   @NotNull
   public static LoaderRoutineBuilder routineOn(@NotNull final LoaderSourceCompat loaderSource) {
-    return new DefaultLoaderRoutineBuilder(loaderSource);
+    return new DefaultLoaderRoutineBuilderCompat(loaderSource);
   }
 }

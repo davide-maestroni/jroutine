@@ -14,15 +14,19 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.function.builder;
+package com.github.dm.jrt.android.function.builder;
 
-import com.github.dm.jrt.core.config.InvocationConfigurable;
-import com.github.dm.jrt.core.routine.Routine;
+import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Builder of stateful routines based on functions handling the invocation lifecycle.
+ * Builder of stateful invocation factories based on functions handling the invocation lifecycle.
+ * <br>
+ * The function instances must have a static scope in order to avoid undesired leaks.
+ * <br>
+ * Be also aware that the state instance will not be retained between invocations, since a Loader
+ * routine destroys its invocations as soon as they complete.
  * <p>
  * The state object is created when the invocation starts and modified during the execution.
  * <br>
@@ -35,9 +39,9 @@ import org.jetbrains.annotations.NotNull;
  * executions.
  * <br>
  * Note, however, that the state object should be reset on finalization in order to avoid
- * unpredictable behaviors during different executions.
+ * unpredictable behaviors during different invocations.
  * <p>
- * For example, a routine concatenating strings through a {@code StringBuilder} can be implemented
+ * For example, a factory concatenating strings through a {@code StringBuilder} can be implemented
  * as follows:
  * <pre><code>
  * builder.onCreate(StringBuilder::new)
@@ -52,21 +56,20 @@ import org.jetbrains.annotations.NotNull;
  * Note also that any external object used inside the function must be synchronized in order to
  * avoid concurrency issues.
  * <p>
- * Created by davide-maestroni on 02/23/2017.
+ * Created by davide-maestroni on 05/25/2017.
  *
  * @param <IN>    the input data type.
  * @param <OUT>   the output data type.
  * @param <STATE> the state data type.
  */
-public interface StatefulRoutineBuilder<IN, OUT, STATE>
-    extends StatefulBuilder<IN, OUT, STATE, StatefulRoutineBuilder<IN, OUT, STATE>>,
-    InvocationConfigurable<StatefulRoutineBuilder<IN, OUT, STATE>> {
+public interface StatefulContextFactoryBuilder<IN, OUT, STATE>
+    extends StatefulContextBuilder<IN, OUT, STATE, StatefulContextFactoryBuilder<IN, OUT, STATE>> {
 
   /**
-   * Builds a new routine instance based on the set functions.
+   * Builds a new factory instance based on the set functions.
    *
-   * @return the routine instance.
+   * @return the Context invocation factory instance.
    */
   @NotNull
-  Routine<IN, OUT> create();
+  ContextInvocationFactory<IN, OUT> create();
 }

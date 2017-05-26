@@ -15,7 +15,7 @@
  */
 
 /**
- * TODO
+ * RxJava integration common interfaces and classes.
  * <p>
  * Created by davide-maestroni on 05/24/2017.
  */

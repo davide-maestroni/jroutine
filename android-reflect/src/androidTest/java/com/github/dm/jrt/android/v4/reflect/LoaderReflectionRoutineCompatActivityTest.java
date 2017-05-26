@@ -194,7 +194,7 @@ public class LoaderReflectionRoutineCompatActivityTest
 
     try {
 
-      new DefaultLoaderReflectionRoutineBuilder(loaderOf(getActivity())).withConfiguration(
+      new DefaultLoaderReflectionRoutineBuilderCompat(loaderOf(getActivity())).withConfiguration(
           (InvocationConfiguration) null);
 
       fail();
@@ -205,7 +205,7 @@ public class LoaderReflectionRoutineCompatActivityTest
 
     try {
 
-      new DefaultLoaderReflectionRoutineBuilder(loaderOf(getActivity())).withConfiguration(
+      new DefaultLoaderReflectionRoutineBuilderCompat(loaderOf(getActivity())).withConfiguration(
           (WrapperConfiguration) null);
 
       fail();
@@ -216,7 +216,7 @@ public class LoaderReflectionRoutineCompatActivityTest
 
     try {
 
-      new DefaultLoaderReflectionRoutineBuilder(loaderOf(getActivity())).withConfiguration(
+      new DefaultLoaderReflectionRoutineBuilderCompat(loaderOf(getActivity())).withConfiguration(
           (LoaderConfiguration) null);
 
       fail();

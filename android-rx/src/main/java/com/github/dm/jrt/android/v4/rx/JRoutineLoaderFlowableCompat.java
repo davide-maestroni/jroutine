@@ -49,6 +49,6 @@ public class JRoutineLoaderFlowableCompat {
    */
   @NotNull
   public static LoaderFlowable flowableOn(@NotNull final LoaderSourceCompat loaderSource) {
-    return new DefaultLoaderFlowable(loaderSource);
+    return new DefaultLoaderFlowableCompat(loaderSource);
   }
 }

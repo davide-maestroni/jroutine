@@ -265,7 +265,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
    * Lift function used to create the stream channel instances.
    */
   private static class LiftService
-      implements Function<Channel<Call<?>, ParcelableFlowData<Object>>, Channel<Object, Object>> {
+      implements Function<Channel<Call<?>, ParcelableFlowData<Object>>, Channel<Call<?>, Object>> {
 
     private final ChannelConfiguration mConfiguration;
 
@@ -289,7 +289,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
     }
 
     @Override
-    public Channel<Object, Object> apply(
+    public Channel<Call<?>, Object> apply(
         final Channel<Call<?>, ParcelableFlowData<Object>> channel) {
       final Channel<Object, Object> outputChannel =
           JRoutineCore.channel().withConfiguration(mConfiguration).ofType();
@@ -297,7 +297,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
               .consume(new ConverterChannelConsumer(mConverter, outputChannel))
               .pass(channel)
               .close();
-      return JRoutineCore.readOnly(outputChannel);
+      return JRoutineCore.flatten(channel, JRoutineCore.readOnly(outputChannel));
     }
   }
 
@@ -306,7 +306,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
    */
   private static class StreamRoutineAdapter implements CallAdapter<StreamRoutine>,
       Function<Supplier<? extends Channel<Call<?>, ParcelableFlowData<Object>>>,
-          Supplier<Channel<Object, Object>>> {
+          Supplier<Channel<Call<?>, Object>>> {
 
     private final ChannelConfiguration mConfiguration;
 
@@ -347,7 +347,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
     }
 
     @Override
-    public Supplier<Channel<Object, Object>> apply(
+    public Supplier<Channel<Call<?>, Object>> apply(
         final Supplier<? extends Channel<Call<?>, ParcelableFlowData<Object>>> supplier) {
       return wrapSupplier(supplier).andThen(new LiftService(mConfiguration, mConverter, mRoutine));
     }

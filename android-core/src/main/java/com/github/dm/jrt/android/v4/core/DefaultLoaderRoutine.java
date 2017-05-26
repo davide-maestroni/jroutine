@@ -35,7 +35,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.github.dm.jrt.android.core.executor.AndroidExecutors.mainExecutor;
-import static com.github.dm.jrt.android.v4.core.LoaderInvocation.clearLoaders;
+import static com.github.dm.jrt.android.v4.core.LoaderInvocationCompat.clearLoaders;
 import static com.github.dm.jrt.core.executor.ScheduledExecutors.zeroDelayExecutor;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
@@ -96,7 +96,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
   @NotNull
   @Override
   protected Invocation<IN, OUT> newInvocation() {
-    return new LoaderInvocation<IN, OUT>(mLoaderSource, mFactory, mConfiguration, mOrderType,
+    return new LoaderInvocationCompat<IN, OUT>(mLoaderSource, mFactory, mConfiguration, mOrderType,
         getLogger());
   }
 

@@ -17,8 +17,6 @@
 package com.github.dm.jrt.function.builder;
 
 import com.github.dm.jrt.core.config.InvocationConfigurable;
-import com.github.dm.jrt.core.config.InvocationConfiguration;
-import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
 import com.github.dm.jrt.core.routine.Routine;
 
 import org.jetbrains.annotations.NotNull;
@@ -54,17 +52,4 @@ public interface StatelessRoutineBuilder<IN, OUT>
    */
   @NotNull
   Routine<IN, OUT> create();
-
-  /**
-   * {@inheritDoc}
-   */
-  @NotNull
-  StatelessRoutineBuilder<IN, OUT> withConfiguration(
-      @NotNull InvocationConfiguration configuration);
-
-  /**
-   * {@inheritDoc}
-   */
-  @NotNull
-  Builder<? extends StatelessRoutineBuilder<IN, OUT>> withInvocation();
 }

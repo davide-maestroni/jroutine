@@ -31,7 +31,7 @@ import java.util.Collection;
  *
  * @param <OUT> the output data type.
  */
-interface InvocationResult<OUT> {
+interface InvocationResultCompat<OUT> {
 
   /**
    * Aborts the Loader invocation.

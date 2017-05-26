@@ -425,7 +425,7 @@ class DefaultSparseChannelHandlerCompat implements SparseChannelHandlerCompat {
 
     final Channel<FlowData<? extends IN>, FlowData<? extends IN>> inputChannel =
         channelBuilder.ofType();
-    return inputChannel.consume(new SortingSparseArrayChannelConsumer<IN>(channelArray));
+    return inputChannel.consume(new SortingSparseArrayChannelConsumerCompat<IN>(channelArray));
   }
 
   @NotNull
@@ -608,7 +608,7 @@ class DefaultSparseChannelHandlerCompat implements SparseChannelHandlerCompat {
           channels.put(id, outputChannel);
         }
 
-        channel.consume(new SortingSparseArrayChannelConsumer<OUT>(inputArray));
+        channel.consume(new SortingSparseArrayChannelConsumerCompat<OUT>(inputArray));
         channelArrays.put(flowInfo, channels);
       }
 

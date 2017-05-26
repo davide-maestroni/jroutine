@@ -33,7 +33,7 @@ import com.github.dm.jrt.core.util.Reflection;
 
 import org.jetbrains.annotations.NotNull;
 
-import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.factoryFrom;
+import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.convertFactory;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
@@ -65,7 +65,7 @@ class DefaultLoaderRoutineBuilder extends AbstractRoutineBuilder implements Load
           "the factory class must have a static scope: " + factoryClass.getName());
     }
 
-    return new DefaultLoaderRoutine<IN, OUT>(mContext, factoryFrom(factory), getConfiguration(),
+    return new DefaultLoaderRoutine<IN, OUT>(mContext, convertFactory(factory), getConfiguration(),
         mLoaderConfiguration);
   }
 

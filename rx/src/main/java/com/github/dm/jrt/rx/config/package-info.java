@@ -15,7 +15,7 @@
  */
 
 /**
- * Classes storing Flowable configurations.
+ * RxJava integration classes storing configurations.
  * <p>
  * Created by davide-maestroni on 02/09/2017.
  */

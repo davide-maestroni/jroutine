@@ -66,7 +66,7 @@ class InvocationChannelConsumer<OUT> implements ChannelConsumer<OUT> {
    * @param loader the Loader instance.
    * @param logger the logger instance.
    */
-  InvocationChannelConsumer(@NotNull final Loader<InvocationResult<OUT>> loader,
+  InvocationChannelConsumer(@NotNull final Loader<InvocationResultCompat<OUT>> loader,
       @NotNull final Logger logger) {
     ConstantConditions.notNull("Loader instance", loader);
     mDeliverResult = new Runnable() {
@@ -138,7 +138,7 @@ class InvocationChannelConsumer<OUT> implements ChannelConsumer<OUT> {
    * @return the result object.
    */
   @NotNull
-  InvocationResult<OUT> createResult() {
+  InvocationResultCompat<OUT> createResult() {
     // Need to create a new instance each time to trick the Loader manager into thinking that a
     // brand new result is available
     return new Result();
@@ -151,7 +151,7 @@ class InvocationChannelConsumer<OUT> implements ChannelConsumer<OUT> {
   /**
    * Implementation of an invocation result.
    */
-  private class Result implements InvocationResult<OUT> {
+  private class Result implements InvocationResultCompat<OUT> {
 
     @Override
     public void abort() {

@@ -21,8 +21,10 @@ import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.core.invocation.TemplateContextInvocation;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.retrofit.AbstractAdapterFactory;
 import com.github.dm.jrt.retrofit.ErrorResponseException;
+import com.github.dm.jrt.stream.routine.StreamRoutine;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -111,12 +113,21 @@ public abstract class ContextAdapterFactory extends AbstractAdapterFactory {
       return sCallInvocationFactory;
     }
 
-    @SuppressWarnings("unchecked") final CallAdapter<Channel<?, ?>> channelAdapter =
-        (CallAdapter<Channel<?, ?>>) delegateFactory.get(getChannelType(responseType), annotations,
+    @SuppressWarnings("unchecked") final CallAdapter<Routine<?, ?>> routineAdapter =
+        (CallAdapter<Routine<?, ?>>) delegateFactory.get(getRoutineType(responseType), annotations,
             retrofit);
-    if (channelAdapter != null) {
-      return new ChannelAdapterInvocationFactory(
-          asArgs(delegateFactory, responseType, annotations, retrofit), channelAdapter);
+    if (routineAdapter != null) {
+      return new RoutineAdapterInvocationFactory(
+          asArgs(delegateFactory, responseType, annotations, retrofit), routineAdapter);
+    }
+
+    @SuppressWarnings("unchecked") final CallAdapter<StreamRoutine<?, ?>> streamRoutineAdapter =
+        (CallAdapter<StreamRoutine<?, ?>>) delegateFactory.get(getStreamRoutineType(responseType),
+            annotations, retrofit);
+    if (streamRoutineAdapter != null) {
+      return new RoutineAdapterInvocationFactory(
+          asArgs(delegateFactory, configuration, responseType, annotations, retrofit),
+          streamRoutineAdapter);
     }
 
     final CallAdapter<?> bodyAdapter = delegateFactory.get(responseType, annotations, retrofit);
@@ -189,23 +200,26 @@ public abstract class ContextAdapterFactory extends AbstractAdapterFactory {
   /**
    * Context invocation employing a call adapter.
    */
-  private static class ChannelAdapterInvocation
+  private static class RoutineAdapterInvocation
       extends TemplateContextInvocation<Call<Object>, Object> {
 
-    private final CallAdapter<Channel<?, ?>> mCallAdapter;
+    private final CallAdapter<? extends Routine<?, ?>> mCallAdapter;
 
     /**
      * Constructor.
      *
      * @param callAdapter the call adapter instance.
      */
-    private ChannelAdapterInvocation(@NotNull final CallAdapter<Channel<?, ?>> callAdapter) {
+    private RoutineAdapterInvocation(
+        @NotNull final CallAdapter<? extends Routine<?, ?>> callAdapter) {
       mCallAdapter = callAdapter;
     }
 
     @Override
     public void onInput(final Call<Object> input, @NotNull final Channel<Object, ?> result) {
-      result.pass(mCallAdapter.adapt(input));
+      final Channel<?, ?> channel = mCallAdapter.adapt(input).invoke();
+      result.pass(channel);
+      channel.close();
     }
 
     @Override
@@ -217,10 +231,10 @@ public abstract class ContextAdapterFactory extends AbstractAdapterFactory {
   /**
    * Context invocation factory employing a call adapter.
    */
-  private static class ChannelAdapterInvocationFactory
+  private static class RoutineAdapterInvocationFactory
       extends ContextInvocationFactory<Call<Object>, Object> {
 
-    private final ChannelAdapterInvocation mInvocation;
+    private final RoutineAdapterInvocation mInvocation;
 
     /**
      * Constructor.
@@ -228,10 +242,10 @@ public abstract class ContextAdapterFactory extends AbstractAdapterFactory {
      * @param args        the factory arguments.
      * @param callAdapter the call adapter instance.
      */
-    private ChannelAdapterInvocationFactory(@Nullable final Object[] args,
-        @NotNull final CallAdapter<Channel<?, ?>> callAdapter) {
+    private RoutineAdapterInvocationFactory(@Nullable final Object[] args,
+        @NotNull final CallAdapter<? extends Routine<?, ?>> callAdapter) {
       super(args);
-      mInvocation = new ChannelAdapterInvocation(callAdapter);
+      mInvocation = new RoutineAdapterInvocation(callAdapter);
     }
 
     @NotNull

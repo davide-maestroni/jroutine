@@ -66,31 +66,24 @@ public abstract class ContextInvocationFactory<IN, OUT> extends DeepEqualObject 
    *                                            static scope.
    */
   @NotNull
-  public static <IN, OUT> ContextInvocationFactory<IN, OUT> factoryFrom(
+  public static <IN, OUT> ContextInvocationFactory<IN, OUT> convertFactory(
       @NotNull final InvocationFactory<IN, OUT> factory) {
     return new WrappingContextInvocationFactory<IN, OUT>(factory, null);
   }
 
   /**
-   * Builds and returns a new Context invocation factory creating instances of the specified class.
-   * <br>
-   * The method accepts also classes implementing {@link ContextInvocation}.
-   * <p>
-   * Note that inner and anonymous classes can be passed as well. Remember however that Java
-   * creates synthetic constructors for such classes, so be sure to specify the correct arguments
-   * to guarantee proper instantiation.
+   * Converts the specified Context invocation factory into a factory of invocations.
    *
-   * @param invocationClass the invocation class.
-   * @param <IN>            the input data type.
-   * @param <OUT>           the output data type.
+   * @param context the routine Context.
+   * @param factory the Context invocation factory.
+   * @param <IN>    the input data type.
+   * @param <OUT>   the output data type.
    * @return the invocation factory.
-   * @throws java.lang.IllegalArgumentException if the class of the specified invocation has not a
-   *                                            static scope or no default construct is found.
    */
   @NotNull
-  public static <IN, OUT> ContextInvocationFactory<IN, OUT> factoryOf(
-      @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass) {
-    return factoryOf(invocationClass, (Object[]) null);
+  public static <IN, OUT> InvocationFactory<IN, OUT> convertFactory(@NotNull final Context context,
+      @NotNull final ContextInvocationFactory<IN, OUT> factory) {
+    return new AdaptingContextInvocationFactory<IN, OUT>(context, factory);
   }
 
   /**
@@ -122,7 +115,7 @@ public abstract class ContextInvocationFactory<IN, OUT> extends DeepEqualObject 
           (Class<? extends ContextInvocation<IN, OUT>>) invocationClass, args);
     }
 
-    return factoryFrom(InvocationFactory.factoryOf(invocationClass, args));
+    return convertFactory(InvocationFactory.factoryOf(invocationClass, args));
   }
 
   /**
@@ -174,6 +167,8 @@ public abstract class ContextInvocationFactory<IN, OUT> extends DeepEqualObject 
     return factoryOf(invocationToken.getRawClass(), args);
   }
 
+  // TODO: 25/05/2017 factoryOf(ContextInvocation)?
+
   /**
    * Builds and returns a new Context invocation factory creating instances delegating the execution
    * to another routine.
@@ -196,6 +191,28 @@ public abstract class ContextInvocationFactory<IN, OUT> extends DeepEqualObject 
   }
 
   /**
+   * Builds and returns a new Context invocation factory creating instances of the specified class.
+   * <br>
+   * The method accepts also classes implementing {@link ContextInvocation}.
+   * <p>
+   * Note that inner and anonymous classes can be passed as well. Remember however that Java
+   * creates synthetic constructors for such classes, so be sure to specify the correct arguments
+   * to guarantee proper instantiation.
+   *
+   * @param invocationClass the invocation class.
+   * @param <IN>            the input data type.
+   * @param <OUT>           the output data type.
+   * @return the invocation factory.
+   * @throws java.lang.IllegalArgumentException if the class of the specified invocation has not a
+   *                                            static scope or no default construct is found.
+   */
+  @NotNull
+  public static <IN, OUT> ContextInvocationFactory<IN, OUT> factoryOf(
+      @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass) {
+    return factoryOf(invocationClass, (Object[]) null);
+  }
+
+  /**
    * Builds and returns a new Context invocation factory creating instances delegating the
    * processing of each input separately to another routine invocation.
    * <p>
@@ -214,21 +231,6 @@ public abstract class ContextInvocationFactory<IN, OUT> extends DeepEqualObject 
       @NotNull final Routine<IN, OUT> routine, final int routineId) {
     return new WrappingContextInvocationFactory<IN, OUT>(
         InvocationFactory.factoryOfParallel(routine), routineId);
-  }
-
-  /**
-   * Converts the specified Context invocation factory into a factory of invocations.
-   *
-   * @param context the routine Context.
-   * @param factory the Context invocation factory.
-   * @param <IN>    the input data type.
-   * @param <OUT>   the output data type.
-   * @return the invocation factory.
-   */
-  @NotNull
-  public static <IN, OUT> InvocationFactory<IN, OUT> fromFactory(@NotNull final Context context,
-      @NotNull final ContextInvocationFactory<IN, OUT> factory) {
-    return new AdaptingContextInvocationFactory<IN, OUT>(context, factory);
   }
 
   /**

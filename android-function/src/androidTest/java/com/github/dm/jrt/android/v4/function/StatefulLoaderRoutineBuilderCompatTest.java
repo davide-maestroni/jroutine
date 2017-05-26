@@ -73,7 +73,7 @@ public class StatefulLoaderRoutineBuilderCompatTest
 
   private static void testCompleteState(final FragmentActivity activity) {
     final AtomicBoolean state = new AtomicBoolean(true);
-    assertThat(JRoutineLoaderFunctionCompat.<String, Void, AtomicBoolean>statefulOn(
+    assertThat(JRoutineLoaderFunctionCompat.<String, Void, AtomicBoolean>statefulRoutineOn(
         LoaderSourceCompat.loaderOf(activity), 0).onCreate(new Supplier<AtomicBoolean>() {
 
       public AtomicBoolean get() {
@@ -91,7 +91,7 @@ public class StatefulLoaderRoutineBuilderCompatTest
 
   private static void testContextConsume(final FragmentActivity activity) {
     final AtomicBoolean state = new AtomicBoolean(true);
-    assertThat(JRoutineLoaderFunctionCompat.<String, Void, AtomicBoolean>statefulOn(
+    assertThat(JRoutineLoaderFunctionCompat.<String, Void, AtomicBoolean>statefulRoutineOn(
         LoaderSourceCompat.loaderOf(activity), 0).onContextConsume(new Consumer<Context>() {
 
       @Override
@@ -105,7 +105,7 @@ public class StatefulLoaderRoutineBuilderCompatTest
   private static void testDestroy(final FragmentActivity activity) throws InterruptedException {
     final AtomicBoolean state = new AtomicBoolean(true);
     final StatefulLoaderRoutineBuilder<String, Void, AtomicBoolean> builder =
-        JRoutineLoaderFunctionCompat.statefulOn(LoaderSourceCompat.loaderOf(activity), 0);
+        JRoutineLoaderFunctionCompat.statefulRoutineOn(LoaderSourceCompat.loaderOf(activity), 0);
     final LoaderRoutine<String, Void> routine = builder.onCreate(new Supplier<AtomicBoolean>() {
 
       public AtomicBoolean get() {
@@ -137,7 +137,7 @@ public class StatefulLoaderRoutineBuilderCompatTest
   private static void testError(final FragmentActivity activity) {
     final AtomicReference<RoutineException> reference = new AtomicReference<RoutineException>();
     final Channel<Void, Void> channel =
-        JRoutineLoaderFunctionCompat.<Void, Void, RoutineException>statefulOn(
+        JRoutineLoaderFunctionCompat.<Void, Void, RoutineException>statefulRoutineOn(
             LoaderSourceCompat.loaderOf(activity), 0).onError(
             new BiFunction<RoutineException, RoutineException, RoutineException>() {
 
@@ -158,7 +158,7 @@ public class StatefulLoaderRoutineBuilderCompatTest
   private static void testErrorConsume(final FragmentActivity activity) {
     final AtomicReference<RoutineException> reference = new AtomicReference<RoutineException>();
     final Channel<Void, Void> channel =
-        JRoutineLoaderFunctionCompat.<Void, Void, RoutineException>statefulOn(
+        JRoutineLoaderFunctionCompat.<Void, Void, RoutineException>statefulRoutineOn(
             LoaderSourceCompat.loaderOf(activity), 0).onErrorConsume(
             new BiConsumer<RoutineException, RoutineException>() {
 
@@ -177,7 +177,7 @@ public class StatefulLoaderRoutineBuilderCompatTest
   private static void testErrorException(final FragmentActivity activity) {
     final AtomicReference<RoutineException> reference = new AtomicReference<RoutineException>();
     final Channel<Void, Void> channel =
-        JRoutineLoaderFunctionCompat.<Void, Void, RoutineException>statefulOn(
+        JRoutineLoaderFunctionCompat.<Void, Void, RoutineException>statefulRoutineOn(
             LoaderSourceCompat.loaderOf(activity), 0).onErrorException(
             new Function<RoutineException, RoutineException>() {
 
@@ -196,7 +196,7 @@ public class StatefulLoaderRoutineBuilderCompatTest
   private static void testErrorState(final FragmentActivity activity) {
     final AtomicBoolean state = new AtomicBoolean(true);
     final Channel<Void, Void> channel =
-        JRoutineLoaderFunctionCompat.<Void, Void, AtomicBoolean>statefulOn(
+        JRoutineLoaderFunctionCompat.<Void, Void, AtomicBoolean>statefulRoutineOn(
             LoaderSourceCompat.loaderOf(activity), 0).onCreate(new Supplier<AtomicBoolean>() {
 
           public AtomicBoolean get() {
@@ -218,7 +218,7 @@ public class StatefulLoaderRoutineBuilderCompatTest
   private static void testFinalizeConsume(final FragmentActivity activity) {
     final AtomicBoolean state = new AtomicBoolean(true);
     final StatefulLoaderRoutineBuilder<String, Void, AtomicBoolean> builder =
-        JRoutineLoaderFunctionCompat.statefulOn(LoaderSourceCompat.loaderOf(activity), 0);
+        JRoutineLoaderFunctionCompat.statefulRoutineOn(LoaderSourceCompat.loaderOf(activity), 0);
     final LoaderRoutine<String, Void> routine = builder.onCreate(new Supplier<AtomicBoolean>() {
 
       public AtomicBoolean get() {
@@ -236,7 +236,7 @@ public class StatefulLoaderRoutineBuilderCompatTest
 
   private static void testIncrementArray(final FragmentActivity activity) {
     final LoaderRoutine<Integer, Integer> routine =
-        JRoutineLoaderFunctionCompat.<Integer, Integer, Integer>statefulOn(
+        JRoutineLoaderFunctionCompat.<Integer, Integer, Integer>statefulRoutineOn(
             LoaderSourceCompat.loaderOf(activity), 0).onCreate(new Supplier<Integer>() {
 
           public Integer get() {
@@ -256,7 +256,7 @@ public class StatefulLoaderRoutineBuilderCompatTest
 
   private static void testIncrementIterable(final FragmentActivity activity) {
     final LoaderRoutine<Integer, Integer> routine =
-        JRoutineLoaderFunctionCompat.<Integer, Integer, Integer>statefulOn(
+        JRoutineLoaderFunctionCompat.<Integer, Integer, Integer>statefulRoutineOn(
             LoaderSourceCompat.loaderOf(activity), 0).onCreate(new Supplier<Integer>() {
 
           public Integer get() {
@@ -275,7 +275,7 @@ public class StatefulLoaderRoutineBuilderCompatTest
   @SuppressWarnings("unchecked")
   private static void testIncrementList(final FragmentActivity activity) {
     final LoaderRoutine<Integer, List<Integer>> routine =
-        JRoutineLoaderFunctionCompat.<Integer, List<Integer>, List<Integer>>statefulOn(
+        JRoutineLoaderFunctionCompat.<Integer, List<Integer>, List<Integer>>statefulRoutineOn(
             LoaderSourceCompat.loaderOf(activity), 0).onCreate(new Supplier<List<Integer>>() {
 
           public List<Integer> get() {
@@ -293,7 +293,7 @@ public class StatefulLoaderRoutineBuilderCompatTest
 
   private static void testIncrementOutput(final FragmentActivity activity) {
     final LoaderRoutine<Integer, Integer> routine =
-        JRoutineLoaderFunctionCompat.<Integer, Integer, Integer>statefulOn(
+        JRoutineLoaderFunctionCompat.<Integer, Integer, Integer>statefulRoutineOn(
             LoaderSourceCompat.loaderOf(activity), 0).onCreate(new Supplier<Integer>() {
 
           public Integer get() {
@@ -311,7 +311,7 @@ public class StatefulLoaderRoutineBuilderCompatTest
 
   private static void testIncrementRemoteService(final FragmentActivity activity) {
     final LoaderRoutine<Integer, Integer> routine =
-        JRoutineLoaderFunctionCompat.<Integer, Integer, ServiceState>statefulOn(
+        JRoutineLoaderFunctionCompat.<Integer, Integer, ServiceState>statefulRoutineOn(
             LoaderSourceCompat.loaderOf(activity), 0).onContext(
             new Function<Context, ServiceState>() {
 
@@ -364,7 +364,7 @@ public class StatefulLoaderRoutineBuilderCompatTest
 
   private static void testIncrementService(final FragmentActivity activity) {
     final LoaderRoutine<Integer, Integer> routine =
-        JRoutineLoaderFunctionCompat.<Integer, Integer, ServiceState>statefulOn(
+        JRoutineLoaderFunctionCompat.<Integer, Integer, ServiceState>statefulRoutineOn(
             LoaderSourceCompat.loaderOf(activity), 0).onContext(
             new Function<Context, ServiceState>() {
 
@@ -417,7 +417,7 @@ public class StatefulLoaderRoutineBuilderCompatTest
 
   private static void testSumArray(final FragmentActivity activity) {
     final LoaderRoutine<Integer, Integer> routine =
-        JRoutineLoaderFunctionCompat.<Integer, Integer, Integer>statefulOn(
+        JRoutineLoaderFunctionCompat.<Integer, Integer, Integer>statefulRoutineOn(
             LoaderSourceCompat.loaderOf(activity), 0).onCreate(new Supplier<Integer>() {
 
           public Integer get() {
@@ -441,7 +441,7 @@ public class StatefulLoaderRoutineBuilderCompatTest
 
   private static void testSumConsume(final FragmentActivity activity) {
     final LoaderRoutine<Integer, Integer> routine =
-        JRoutineLoaderFunctionCompat.<Integer, Integer, Integer>statefulOn(
+        JRoutineLoaderFunctionCompat.<Integer, Integer, Integer>statefulRoutineOn(
             LoaderSourceCompat.loaderOf(activity), 0).onCreate(new Supplier<Integer>() {
 
           public Integer get() {
@@ -464,7 +464,7 @@ public class StatefulLoaderRoutineBuilderCompatTest
 
   private static void testSumDefault(final FragmentActivity activity) {
     final LoaderRoutine<Integer, Integer> routine =
-        JRoutineLoaderFunctionCompat.<Integer, Integer, Integer>statefulOn(
+        JRoutineLoaderFunctionCompat.<Integer, Integer, Integer>statefulRoutineOn(
             LoaderSourceCompat.loaderOf(activity), 0).onCreate(new Supplier<Integer>() {
 
           public Integer get() {
@@ -488,7 +488,7 @@ public class StatefulLoaderRoutineBuilderCompatTest
 
   private static void testSumIterable(final FragmentActivity activity) {
     final LoaderRoutine<Integer, Integer> routine =
-        JRoutineLoaderFunctionCompat.<Integer, Integer, Integer>statefulOn(
+        JRoutineLoaderFunctionCompat.<Integer, Integer, Integer>statefulRoutineOn(
             LoaderSourceCompat.loaderOf(activity), 0).onCreate(new Supplier<Integer>() {
 
           public Integer get() {
@@ -510,7 +510,7 @@ public class StatefulLoaderRoutineBuilderCompatTest
 
   private static void testSumOutput(final FragmentActivity activity) {
     final LoaderRoutine<Integer, Integer> routine =
-        JRoutineLoaderFunctionCompat.<Integer, Integer, Integer>statefulOn(
+        JRoutineLoaderFunctionCompat.<Integer, Integer, Integer>statefulRoutineOn(
             LoaderSourceCompat.loaderOf(activity), 0).onCreate(new Supplier<Integer>() {
 
           public Integer get() {
@@ -527,7 +527,7 @@ public class StatefulLoaderRoutineBuilderCompatTest
 
   private static void testSumState(final FragmentActivity activity) {
     final LoaderRoutine<Integer, Integer> routine =
-        JRoutineLoaderFunctionCompat.<Integer, Integer, Integer>statefulOn(
+        JRoutineLoaderFunctionCompat.<Integer, Integer, Integer>statefulRoutineOn(
             LoaderSourceCompat.loaderOf(activity), 0).onCreate(new Supplier<Integer>() {
 
           public Integer get() {

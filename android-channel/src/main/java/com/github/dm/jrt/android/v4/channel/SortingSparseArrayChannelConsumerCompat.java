@@ -32,7 +32,8 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <OUT> the output data type.
  */
-class SortingSparseArrayChannelConsumer<OUT> implements ChannelConsumer<FlowData<? extends OUT>> {
+class SortingSparseArrayChannelConsumerCompat<OUT>
+    implements ChannelConsumer<FlowData<? extends OUT>> {
 
   private final SparseArrayCompat<Channel<OUT, ?>> mChannels;
 
@@ -42,7 +43,8 @@ class SortingSparseArrayChannelConsumer<OUT> implements ChannelConsumer<FlowData
    * @param channels the map of indexes and channels.
    * @throws java.lang.NullPointerException if the specified map is null or contains a null object.
    */
-  SortingSparseArrayChannelConsumer(@NotNull final SparseArrayCompat<Channel<OUT, ?>> channels) {
+  SortingSparseArrayChannelConsumerCompat(
+      @NotNull final SparseArrayCompat<Channel<OUT, ?>> channels) {
     final SparseArrayCompat<Channel<OUT, ?>> channelArray = channels.clone();
     if (channelArray.indexOfValue(null) >= 0) {
       throw new NullPointerException("the map of channels must not contain null objects");

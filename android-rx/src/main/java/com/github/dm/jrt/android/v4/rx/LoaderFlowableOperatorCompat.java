@@ -42,7 +42,7 @@ import io.reactivex.FlowableOperator;
  *
  * @param <DATA> the data type.
  */
-class LoaderFlowableOperator<DATA> implements FlowableOperator<DATA, DATA> {
+class LoaderFlowableOperatorCompat<DATA> implements FlowableOperator<DATA, DATA> {
 
   private final InvocationConfiguration mInvocationConfiguration;
 
@@ -57,7 +57,7 @@ class LoaderFlowableOperator<DATA> implements FlowableOperator<DATA, DATA> {
    * @param invocationConfiguration the invocation configuration.
    * @param loaderConfiguration     the Loader configuration.
    */
-  LoaderFlowableOperator(@NotNull final LoaderSourceCompat loaderSource,
+  LoaderFlowableOperatorCompat(@NotNull final LoaderSourceCompat loaderSource,
       @NotNull final InvocationConfiguration invocationConfiguration,
       @NotNull final LoaderConfiguration loaderConfiguration) {
     mLoaderSource = ConstantConditions.notNull("Loader source", loaderSource);

@@ -92,14 +92,25 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
   }
 
   /**
-   * Returns a type representing a channel with the specified output data type.
+   * Returns a type representing a routine with the specified output data type.
    *
    * @param outputType the output data type.
    * @return the parameterized type.
    */
   @NotNull
-  protected static ParameterizedType getChannelType(@NotNull final Type outputType) {
+  protected static ParameterizedType getRoutineType(@NotNull final Type outputType) {
     return new RoutineType(ConstantConditions.notNull("outputs type", outputType));
+  }
+
+  /**
+   * Returns a type representing a stream routine with the specified output data type.
+   *
+   * @param outputType the output data type.
+   * @return the parameterized type.
+   */
+  @NotNull
+  protected static ParameterizedType getStreamRoutineType(@NotNull final Type outputType) {
+    return new StreamRoutineType(ConstantConditions.notNull("outputs type", outputType));
   }
 
   @Override

@@ -16,18 +16,16 @@
 
 package com.github.dm.jrt.android.function.builder;
 
-import com.github.dm.jrt.android.core.config.LoaderConfigurable;
-import com.github.dm.jrt.android.core.routine.LoaderRoutine;
-import com.github.dm.jrt.core.config.InvocationConfigurable;
+import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Builder of stateless routines based on functions handling the invocation lifecycle.
+ * Builder of stateless invocation factories based on functions handling the invocation lifecycle.
  * <br>
  * The function instances must have a static scope in order to avoid undesired leaks.
  * <p>
- * For example, a routine switching strings to upper-case can be implemented as follows:
+ * For example, a factory switching strings to upper-case can be implemented as follows:
  * <pre><code>
  * builder.onNextOutput(String::toUpperCase)
  *        .create();
@@ -39,21 +37,19 @@ import org.jetbrains.annotations.NotNull;
  * Note also that any external object used inside the function must be synchronized in order to
  * avoid concurrency issues.
  * <p>
- * Created by davide-maestroni on 03/06/2017.
+ * Created by davide-maestroni on 05/25/2017.
  *
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-public interface StatelessLoaderRoutineBuilder<IN, OUT>
-    extends StatelessContextBuilder<IN, OUT, StatelessLoaderRoutineBuilder<IN, OUT>>,
-    InvocationConfigurable<StatelessLoaderRoutineBuilder<IN, OUT>>,
-    LoaderConfigurable<StatelessLoaderRoutineBuilder<IN, OUT>> {
+public interface StatelessContextFactoryBuilder<IN, OUT>
+    extends StatelessContextBuilder<IN, OUT, StatelessContextFactoryBuilder<IN, OUT>> {
 
   /**
-   * Builds a new Loader routine instance based on the set functions.
+   * Builds a new factory instance based on the set functions.
    *
-   * @return the Loader routine instance.
+   * @return the Context invocation factory instance.
    */
   @NotNull
-  LoaderRoutine<IN, OUT> create();
+  ContextInvocationFactory<IN, OUT> create();
 }

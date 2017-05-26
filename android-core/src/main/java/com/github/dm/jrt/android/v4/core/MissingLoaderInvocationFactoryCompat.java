@@ -33,7 +33,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  *
  * @param <OUT> the output data type.
  */
-final class MissingLoaderInvocationFactory<OUT> extends ContextInvocationFactory<Void, OUT> {
+final class MissingLoaderInvocationFactoryCompat<OUT> extends ContextInvocationFactory<Void, OUT> {
 
   private final int mId;
 
@@ -42,7 +42,7 @@ final class MissingLoaderInvocationFactory<OUT> extends ContextInvocationFactory
    *
    * @param id the Loader ID.
    */
-  MissingLoaderInvocationFactory(final int id) {
+  MissingLoaderInvocationFactoryCompat(final int id) {
     super(asArgs(id));
     mId = id;
   }

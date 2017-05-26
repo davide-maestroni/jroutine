@@ -59,7 +59,7 @@ public class StatelessLoaderRoutineBuilderTest
   private static void testError(final Activity activity) {
     final AtomicReference<RoutineException> reference = new AtomicReference<RoutineException>();
     final Channel<Void, Void> channel =
-        JRoutineLoaderFunction.<Void, Void>statelessOn(LoaderSource.loaderOf(activity), 0).onError(
+        JRoutineLoaderFunction.<Void, Void>statelessRoutineOn(LoaderSource.loaderOf(activity), 0).onError(
             new Consumer<RoutineException>() {
 
               public void accept(final RoutineException e) throws Exception {
@@ -75,7 +75,7 @@ public class StatelessLoaderRoutineBuilderTest
 
   private static void testIncrement(final Activity activity) {
     final LoaderRoutine<Integer, Integer> routine =
-        JRoutineLoaderFunction.<Integer, Integer>statelessOn(LoaderSource.loaderOf(activity),
+        JRoutineLoaderFunction.<Integer, Integer>statelessRoutineOn(LoaderSource.loaderOf(activity),
             0).onNext(new BiConsumer<Integer, Channel<Integer, ?>>() {
 
           public void accept(final Integer integer, final Channel<Integer, ?> result) {
@@ -88,7 +88,7 @@ public class StatelessLoaderRoutineBuilderTest
 
   private static void testIncrementArray(final Activity activity) {
     final LoaderRoutine<Integer, Integer> routine =
-        JRoutineLoaderFunction.<Integer, Integer>statelessOn(LoaderSource.loaderOf(activity),
+        JRoutineLoaderFunction.<Integer, Integer>statelessRoutineOn(LoaderSource.loaderOf(activity),
             0).onNextArray(new Function<Integer, Integer[]>() {
 
           public Integer[] apply(final Integer integer) {
@@ -103,7 +103,7 @@ public class StatelessLoaderRoutineBuilderTest
 
   private static void testIncrementIterable(final Activity activity) {
     final LoaderRoutine<Integer, Integer> routine =
-        JRoutineLoaderFunction.<Integer, Integer>statelessOn(LoaderSource.loaderOf(activity),
+        JRoutineLoaderFunction.<Integer, Integer>statelessRoutineOn(LoaderSource.loaderOf(activity),
             0).onNextIterable(new Function<Integer, Iterable<? extends Integer>>() {
 
           public Iterable<? extends Integer> apply(final Integer integer) {
@@ -118,7 +118,7 @@ public class StatelessLoaderRoutineBuilderTest
   private static void testIncrementList(final Activity activity) {
     final ArrayList<Integer> list = new ArrayList<Integer>();
     final LoaderRoutine<Integer, List<Integer>> routine =
-        JRoutineLoaderFunction.<Integer, List<Integer>>statelessOn(LoaderSource.loaderOf(activity),
+        JRoutineLoaderFunction.<Integer, List<Integer>>statelessRoutineOn(LoaderSource.loaderOf(activity),
             0).onNextConsume(new Consumer<Integer>() {
 
           public void accept(final Integer integer) {
@@ -136,7 +136,7 @@ public class StatelessLoaderRoutineBuilderTest
 
   private static void testIncrementOutput(final Activity activity) {
     final LoaderRoutine<Integer, Integer> routine =
-        JRoutineLoaderFunction.<Integer, Integer>statelessOn(LoaderSource.loaderOf(activity),
+        JRoutineLoaderFunction.<Integer, Integer>statelessRoutineOn(LoaderSource.loaderOf(activity),
             0).onNextOutput(new Function<Integer, Integer>() {
 
           public Integer apply(final Integer integer) {
@@ -149,7 +149,7 @@ public class StatelessLoaderRoutineBuilderTest
 
   private static void testProduceArray(final Activity activity) {
     final LoaderRoutine<Integer, Integer> routine =
-        JRoutineLoaderFunction.<Integer, Integer>statelessOn(LoaderSource.loaderOf(activity),
+        JRoutineLoaderFunction.<Integer, Integer>statelessRoutineOn(LoaderSource.loaderOf(activity),
             0).onCompleteArray(new Supplier<Integer[]>() {
 
           public Integer[] get() {
@@ -163,7 +163,7 @@ public class StatelessLoaderRoutineBuilderTest
 
   private static void testProduceIterable(final Activity activity) {
     final LoaderRoutine<Integer, Integer> routine =
-        JRoutineLoaderFunction.<Integer, Integer>statelessOn(LoaderSource.loaderOf(activity),
+        JRoutineLoaderFunction.<Integer, Integer>statelessRoutineOn(LoaderSource.loaderOf(activity),
             0).onCompleteIterable(new Supplier<Iterable<? extends Integer>>() {
 
           public Iterable<? extends Integer> get() {
@@ -175,7 +175,7 @@ public class StatelessLoaderRoutineBuilderTest
 
   private static void testProduceOutput(final Activity activity) {
     final LoaderRoutine<Integer, Integer> routine =
-        JRoutineLoaderFunction.<Integer, Integer>statelessOn(LoaderSource.loaderOf(activity),
+        JRoutineLoaderFunction.<Integer, Integer>statelessRoutineOn(LoaderSource.loaderOf(activity),
             0).onCompleteOutput(new Supplier<Integer>() {
 
           public Integer get() {

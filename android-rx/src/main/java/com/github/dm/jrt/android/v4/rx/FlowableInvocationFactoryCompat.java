@@ -36,7 +36,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  *
  * @param <DATA> the data type.
  */
-class FlowableInvocationFactory<DATA> extends ContextInvocationFactory<Void, DATA> {
+class FlowableInvocationFactoryCompat<DATA> extends ContextInvocationFactory<Void, DATA> {
 
   private final Flowable<DATA> mFlowable;
 
@@ -45,7 +45,7 @@ class FlowableInvocationFactory<DATA> extends ContextInvocationFactory<Void, DAT
    *
    * @param flowable the Flowable instance.
    */
-  FlowableInvocationFactory(@NotNull final Flowable<DATA> flowable) {
+  FlowableInvocationFactoryCompat(@NotNull final Flowable<DATA> flowable) {
     super(asArgs(ConstantConditions.notNull("flowable instance", flowable)));
     mFlowable = flowable;
   }

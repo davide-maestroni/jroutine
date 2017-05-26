@@ -17,24 +17,11 @@
 package com.github.dm.jrt.android.function.builder;
 
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
-import com.github.dm.jrt.android.core.config.LoaderConfiguration.Builder;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.Configurable;
-import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.common.RoutineException;
+import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.builder.AbstractStatelessRoutineBuilder;
-import com.github.dm.jrt.function.util.BiConsumer;
-import com.github.dm.jrt.function.util.Consumer;
-import com.github.dm.jrt.function.util.Decorator;
-import com.github.dm.jrt.function.util.Function;
-import com.github.dm.jrt.function.util.Supplier;
 
 import org.jetbrains.annotations.NotNull;
-
-import static com.github.dm.jrt.function.util.BiConsumerDecorator.wrapBiConsumer;
-import static com.github.dm.jrt.function.util.ConsumerDecorator.wrapConsumer;
-import static com.github.dm.jrt.function.util.FunctionDecorator.wrapFunction;
-import static com.github.dm.jrt.function.util.SupplierDecorator.wrapSupplier;
 
 /**
  * Abstract implementation of a stateless Loader routine builder.
@@ -46,12 +33,24 @@ import static com.github.dm.jrt.function.util.SupplierDecorator.wrapSupplier;
  */
 public abstract class AbstractStatelessLoaderRoutineBuilder<IN, OUT, TYPE extends
     StatelessLoaderRoutineBuilder<IN, OUT>>
-    extends AbstractStatelessRoutineBuilder<IN, OUT, TYPE>
+    extends AbstractStatelessContextBuilder<IN, OUT, StatelessLoaderRoutineBuilder<IN, OUT>>
     implements StatelessLoaderRoutineBuilder<IN, OUT> {
 
-  private LoaderConfiguration mConfiguration = LoaderConfiguration.defaultConfiguration();
+  private InvocationConfiguration mInvocationConfiguration =
+      InvocationConfiguration.defaultConfiguration();
 
-  private final Configurable<TYPE> mConfigurable = new Configurable<TYPE>() {
+  private final InvocationConfiguration.Configurable<TYPE> mInvocationConfigurable =
+      new InvocationConfiguration.Configurable<TYPE>() {
+
+        @NotNull
+        public TYPE withConfiguration(@NotNull final InvocationConfiguration configuration) {
+          return AbstractStatelessLoaderRoutineBuilder.this.withConfiguration(configuration);
+        }
+      };
+
+  private LoaderConfiguration mLoaderConfiguration = LoaderConfiguration.defaultConfiguration();
+
+  private final Configurable<TYPE> mLoaderConfigurable = new Configurable<TYPE>() {
 
     @NotNull
     public TYPE withConfiguration(@NotNull final LoaderConfiguration configuration) {
@@ -60,80 +59,26 @@ public abstract class AbstractStatelessLoaderRoutineBuilder<IN, OUT, TYPE extend
   };
 
   @NotNull
-  private static <TYPE extends Decorator> TYPE checkStaticScope(@NotNull final TYPE decorator) {
-    if (!decorator.hasStaticScope()) {
-      throw new IllegalArgumentException("the specified function must have a static scope");
-    }
-
-    return decorator;
+  @SuppressWarnings("unchecked")
+  public InvocationConfiguration.Builder<? extends TYPE> withInvocation() {
+    return new InvocationConfiguration.Builder<TYPE>(mInvocationConfigurable,
+        mInvocationConfiguration);
   }
 
   @NotNull
   @Override
-  public TYPE onComplete(@NotNull final Consumer<? super Channel<OUT, ?>> onComplete) {
-    return super.onComplete(checkStaticScope(wrapConsumer(onComplete)));
+  public LoaderConfiguration.Builder<? extends TYPE> withLoader() {
+    return new LoaderConfiguration.Builder<TYPE>(mLoaderConfigurable, mLoaderConfiguration);
   }
 
+  /**
+   * Returns the current invocation configuration.
+   *
+   * @return the invocation configuration.
+   */
   @NotNull
-  @Override
-  public TYPE onCompleteArray(@NotNull final Supplier<OUT[]> onComplete) {
-    return super.onCompleteArray(checkStaticScope(wrapSupplier(onComplete)));
-  }
-
-  @NotNull
-  @Override
-  public TYPE onCompleteIterable(
-      @NotNull final Supplier<? extends Iterable<? extends OUT>> onComplete) {
-    return super.onCompleteIterable(checkStaticScope(wrapSupplier(onComplete)));
-  }
-
-  @NotNull
-  @Override
-  public TYPE onCompleteOutput(@NotNull final Supplier<? extends OUT> onComplete) {
-    return super.onCompleteOutput(checkStaticScope(wrapSupplier(onComplete)));
-  }
-
-  @NotNull
-  @Override
-  public TYPE onError(@NotNull final Consumer<? super RoutineException> onError) {
-    return super.onError(checkStaticScope(wrapConsumer(onError)));
-  }
-
-  @NotNull
-  @Override
-  public TYPE onNext(@NotNull final BiConsumer<? super IN, ? super Channel<OUT, ?>> onNext) {
-    return super.onNext(checkStaticScope(wrapBiConsumer(onNext)));
-  }
-
-  @NotNull
-  @Override
-  public TYPE onNextArray(@NotNull final Function<? super IN, OUT[]> onNext) {
-    return super.onNextArray(checkStaticScope(wrapFunction(onNext)));
-  }
-
-  @NotNull
-  @Override
-  public TYPE onNextConsume(@NotNull final Consumer<? super IN> onNext) {
-    return super.onNextConsume(checkStaticScope(wrapConsumer(onNext)));
-  }
-
-  @NotNull
-  @Override
-  public TYPE onNextIterable(
-      @NotNull final Function<? super IN, ? extends Iterable<? extends OUT>> onNext) {
-    return super.onNextIterable(checkStaticScope(wrapFunction(onNext)));
-  }
-
-  @NotNull
-  @Override
-  public TYPE onNextOutput(@NotNull final Function<? super IN, ? extends OUT> onNext) {
-    return super.onNextOutput(checkStaticScope(wrapFunction(onNext)));
-  }
-
-  @NotNull
-  @Override
-  public Builder<? extends TYPE> withLoader() {
-    return new Builder<TYPE>(mConfigurable, mConfiguration);
+  protected InvocationConfiguration getInvocationConfiguration() {
+    return mInvocationConfiguration;
   }
 
   /**
@@ -143,14 +88,22 @@ public abstract class AbstractStatelessLoaderRoutineBuilder<IN, OUT, TYPE extend
    */
   @NotNull
   protected LoaderConfiguration getLoaderConfiguration() {
-    return mConfiguration;
+    return mLoaderConfiguration;
+  }
+
+  @NotNull
+  @SuppressWarnings("unchecked")
+  public TYPE withConfiguration(@NotNull final InvocationConfiguration configuration) {
+    mInvocationConfiguration =
+        ConstantConditions.notNull("invocation configuration", configuration);
+    return (TYPE) this;
   }
 
   @NotNull
   @Override
   @SuppressWarnings("unchecked")
   public TYPE withConfiguration(@NotNull final LoaderConfiguration configuration) {
-    mConfiguration = ConstantConditions.notNull("loader configuration", configuration);
+    mLoaderConfiguration = ConstantConditions.notNull("loader configuration", configuration);
     return (TYPE) this;
   }
 }

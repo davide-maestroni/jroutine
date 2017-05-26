@@ -68,6 +68,6 @@ public class JRoutineLoaderProxyCompat {
   @NotNull
   public static LoaderProxyRoutineBuilder wrapperOn(
       @NotNull final LoaderSourceCompat loaderSource) {
-    return new DefaultLoaderProxyRoutineBuilder(loaderSource);
+    return new DefaultLoaderProxyRoutineBuilderCompat(loaderSource);
   }
 }

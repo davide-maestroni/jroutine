@@ -34,7 +34,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.fromFactory;
+import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.convertFactory;
 import static com.github.dm.jrt.core.executor.ScheduledExecutors.syncExecutor;
 
 /**
@@ -135,7 +135,7 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
                 .withLog(logger.getLog())
                 .withLogLevel(logger.getLogLevel())
                 .configuration()
-                .of(fromFactory(getContext(), factory))
+                .of(convertFactory(getContext(), factory))
                 .invoke()
                 .consume(consumer)
                 .pass(mInputs)

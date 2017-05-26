@@ -40,7 +40,7 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingConstructor
  * <p>
  * Created by davide-maestroni on 05/06/2015.
  */
-class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder {
+class DefaultLoaderProxyRoutineBuilderCompat implements LoaderProxyRoutineBuilder {
 
   private final LoaderSourceCompat mLoaderSource;
 
@@ -56,7 +56,7 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder {
    *
    * @param loaderSource the Loader source.
    */
-  DefaultLoaderProxyRoutineBuilder(@NotNull final LoaderSourceCompat loaderSource) {
+  DefaultLoaderProxyRoutineBuilderCompat(@NotNull final LoaderSourceCompat loaderSource) {
     mLoaderSource = ConstantConditions.notNull("Loader context", loaderSource);
   }
 
@@ -118,7 +118,7 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder {
           @Override
           public LoaderProxyRoutineBuilder withConfiguration(
               @NotNull final InvocationConfiguration configuration) {
-            return DefaultLoaderProxyRoutineBuilder.this.withConfiguration(configuration);
+            return DefaultLoaderProxyRoutineBuilderCompat.this.withConfiguration(configuration);
           }
         }, config);
   }
@@ -134,7 +134,7 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder {
           @Override
           public LoaderProxyRoutineBuilder withConfiguration(
               @NotNull final WrapperConfiguration configuration) {
-            return DefaultLoaderProxyRoutineBuilder.this.withConfiguration(configuration);
+            return DefaultLoaderProxyRoutineBuilderCompat.this.withConfiguration(configuration);
           }
         }, config);
   }

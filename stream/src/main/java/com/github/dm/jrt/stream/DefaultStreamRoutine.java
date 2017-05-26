@@ -121,6 +121,7 @@ class DefaultStreamRoutine<IN, OUT> implements StreamRoutine<IN, OUT> {
   }
 
   @NotNull
+  @SuppressWarnings("unchecked")
   public <BEFORE, AFTER> StreamRoutine<BEFORE, AFTER> lift(
       @NotNull final Function<? super Supplier<? extends Channel<IN, OUT>>, ? extends Supplier<?
           extends Channel<BEFORE, AFTER>>> liftingFunction) {
@@ -245,13 +246,13 @@ class DefaultStreamRoutine<IN, OUT> implements StreamRoutine<IN, OUT> {
      * @param outputChannel the output channel.
      */
     InvocationConsumer(@NotNull final Invocation<? super IN, ? extends OUT> invocation,
-        @NotNull final Channel<OUT, ?> outputChannel) {
+        @NotNull final Channel<OUT, ?> outputChannel) throws Exception {
       try {
         invocation.onStart();
 
       } catch (final Exception e) {
         destroy(invocation, outputChannel);
-        throw new IllegalStateException(e);
+        throw e;
       }
 
       mInvocation = invocation;
@@ -259,7 +260,7 @@ class DefaultStreamRoutine<IN, OUT> implements StreamRoutine<IN, OUT> {
     }
 
     private static void destroy(@NotNull final Invocation<?, ?> invocation,
-        @NotNull final Channel<?, ?> outputChannel) {
+        @NotNull final Channel<?, ?> outputChannel) throws Exception {
       try {
         invocation.onRecycle();
 
@@ -269,10 +270,9 @@ class DefaultStreamRoutine<IN, OUT> implements StreamRoutine<IN, OUT> {
         try {
           invocation.onDestroy();
 
-        } catch (final Exception ignored) {
+        } finally {
+          outputChannel.close();
         }
-
-        outputChannel.close();
       }
     }
 
@@ -284,12 +284,7 @@ class DefaultStreamRoutine<IN, OUT> implements StreamRoutine<IN, OUT> {
         ((Invocation<IN, OUT>) invocation).onComplete(outputChannel);
 
       } catch (final Exception e) {
-        try {
-          invocation.onAbort(InvocationException.wrapIfNeeded(e));
-
-        } catch (final Exception ignored) {
-        }
-
+        invocation.onAbort(InvocationException.wrapIfNeeded(e));
         throw e;
 
       } finally {

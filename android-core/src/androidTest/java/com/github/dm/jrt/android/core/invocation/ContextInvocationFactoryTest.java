@@ -108,6 +108,21 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
     }
   }
 
+  public void testInstance() {
+    assertThat(JRoutineCore.routineOn(syncExecutor())
+                           .of(convertFactory(getActivity(), factoryOf(new Case())))
+                           .invoke()
+                           .pass("TEST")
+                           .close()
+                           .all()).containsExactly("test");
+    assertThat(JRoutineCore.routineOn(syncExecutor())
+                           .of(convertFactory(getActivity(), factoryOf(new Case(), true)))
+                           .invoke()
+                           .pass("test")
+                           .close()
+                           .all()).containsExactly("TEST");
+  }
+
   public void testScopeError() {
     try {
       convertFactory(new InvocationFactory<Object, Object>(null) {
@@ -132,6 +147,13 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
 
     try {
       factoryOf(new TemplateContextInvocation<Object, Object>() {}.getClass());
+      fail();
+
+    } catch (final IllegalArgumentException ignored) {
+    }
+
+    try {
+      factoryOf(new TemplateInvocation<Object, Object>() {});
       fail();
 
     } catch (final IllegalArgumentException ignored) {

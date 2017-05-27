@@ -19,6 +19,7 @@ package com.github.dm.jrt.stream;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
+import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.executor.ScheduledExecutor;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -56,17 +57,17 @@ class LiftSplitIn<IN, OUT, AFTER> implements LiftingFunction<IN, OUT, IN, AFTER>
    * Constructor.
    *
    * @param executor      the executor instance.
-   * @param configuration the channel configuration.
+   * @param configuration the invocation configuration.
    * @param count         the invocation count.
    * @param routine       the routine instance.
    */
   LiftSplitIn(@NotNull final ScheduledExecutor executor,
-      @NotNull final ChannelConfiguration configuration, final int count,
+      @NotNull final InvocationConfiguration configuration, final int count,
       @NotNull final Routine<? super OUT, ? extends AFTER> routine) {
     mExecutor = ConstantConditions.notNull("executor instance", executor);
-    mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
     mCount = ConstantConditions.positive("invocation count", count);
     mRoutine = ConstantConditions.notNull("routine instance", routine);
+    mConfiguration = configuration.outputConfigurationBuilder().configuration();
   }
 
   public Supplier<? extends Channel<IN, AFTER>> apply(

@@ -29,6 +29,7 @@ import com.github.dm.jrt.core.util.Reflection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.core.util.Reflection.cloneArgs;
 
@@ -167,7 +168,54 @@ public abstract class ContextInvocationFactory<IN, OUT> extends DeepEqualObject 
     return factoryOf(invocationToken.getRawClass(), args);
   }
 
-  // TODO: 25/05/2017 factoryOf(ContextInvocation)?
+  /**
+   * Builds and returns a new invocation factory creating instances of the specified object.
+   * <br>
+   * The method accepts also instances of {@link ContextInvocation}.
+   * <p>
+   * Note that inner and anonymous objects can be passed as well. Remember however that Java
+   * creates synthetic constructors for such classes, so be sure to specify the correct arguments
+   * to guarantee proper instantiation. In fact, inner classes always have the outer instance as
+   * first constructor parameter, and anonymous classes have both the outer instance and all the
+   * variables captured in the closure.
+   *
+   * @param invocation the invocation instance.
+   * @param <IN>       the input data type.
+   * @param <OUT>      the output data type.
+   * @return the invocation factory.
+   * @throws java.lang.IllegalArgumentException if no default constructor was found.
+   */
+  @NotNull
+  public static <IN, OUT> ContextInvocationFactory<IN, OUT> factoryOf(
+      @NotNull final Invocation<IN, OUT> invocation) {
+    return factoryOf(tokenOf(invocation));
+  }
+
+  /**
+   * Builds and returns a new invocation factory creating instances of the specified object by
+   * passing the specified arguments to the class constructor.
+   * <br>
+   * The method accepts also instances of {@link ContextInvocation}.
+   * <p>
+   * Note that inner and anonymous objects can be passed as well. Remember however that Java
+   * creates synthetic constructors for such classes, so be sure to specify the correct arguments
+   * to guarantee proper instantiation. In fact, inner classes always have the outer instance as
+   * first constructor parameter, and anonymous classes have both the outer instance and all the
+   * variables captured in the closure.
+   *
+   * @param invocation the invocation instance.
+   * @param args       the invocation constructor arguments.
+   * @param <IN>       the input data type.
+   * @param <OUT>      the output data type.
+   * @return the invocation factory.
+   * @throws java.lang.IllegalArgumentException if no constructor taking the specified objects as
+   *                                            parameters was found.
+   */
+  @NotNull
+  public static <IN, OUT> ContextInvocationFactory<IN, OUT> factoryOf(
+      @NotNull final Invocation<IN, OUT> invocation, @Nullable final Object... args) {
+    return factoryOf(tokenOf(invocation), args);
+  }
 
   /**
    * Builds and returns a new Context invocation factory creating instances delegating the execution

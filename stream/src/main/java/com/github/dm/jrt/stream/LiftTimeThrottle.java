@@ -18,7 +18,7 @@ package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.config.ChannelConfiguration;
+import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.executor.ScheduledExecutor;
 import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -40,7 +40,7 @@ import java.util.concurrent.TimeUnit;
  */
 class LiftTimeThrottle<IN, OUT> implements LiftingFunction<IN, OUT, IN, OUT> {
 
-  private final ChannelConfiguration mConfiguration;
+  private final InvocationConfiguration mConfiguration;
 
   private final ScheduledExecutor mExecutor;
 
@@ -60,16 +60,16 @@ class LiftTimeThrottle<IN, OUT> implements LiftingFunction<IN, OUT, IN, OUT> {
    * Constructor.
    *
    * @param executor      the executor instance.
-   * @param configuration the channel configuration.
+   * @param configuration the invocation configuration.
    * @param count         the maximum invocation count.
    * @param range         the time range value.
    * @param timeUnit      the time range unit.
    */
   LiftTimeThrottle(@NotNull final ScheduledExecutor executor,
-      @NotNull final ChannelConfiguration configuration, final int count, final long range,
+      @NotNull final InvocationConfiguration configuration, final int count, final long range,
       @NotNull final TimeUnit timeUnit) {
     mExecutor = ConstantConditions.notNull("executor instance", executor);
-    mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
+    mConfiguration = ConstantConditions.notNull("invocation configuration", configuration);
     mMaxCount = ConstantConditions.positive("max count", count);
     mRangeMillis = timeUnit.toMillis(range);
   }
@@ -97,9 +97,18 @@ class LiftTimeThrottle<IN, OUT> implements LiftingFunction<IN, OUT, IN, OUT> {
 
     public Channel<IN, OUT> get() throws Exception {
       final ScheduledExecutor executor = mExecutor;
-      final Channel<IN, IN> inputChannel = JRoutineCore.channelOn(executor).ofType();
-      final Channel<OUT, OUT> outputChannel =
-          JRoutineCore.channelOn(executor).withConfiguration(mConfiguration).ofType();
+      final InvocationConfiguration configuration = mConfiguration;
+      final Channel<IN, IN> inputChannel = JRoutineCore.channelOn(executor)
+                                                       .withConfiguration(
+                                                           configuration.inputConfigurationBuilder()
+                                                                        .configuration())
+                                                       .ofType();
+      final Channel<OUT, OUT> outputChannel = JRoutineCore.channelOn(executor)
+                                                          .withConfiguration(
+                                                              configuration
+                                                                  .outputConfigurationBuilder()
+                                                                           .configuration())
+                                                          .ofType();
       final long delay;
       final boolean isBind;
       synchronized (mMutex) {

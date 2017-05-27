@@ -20,6 +20,7 @@ import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
+import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.executor.ScheduledExecutor;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.util.BiConsumer;
@@ -51,15 +52,15 @@ class LiftTryCatch<IN, OUT> implements LiftingFunction<IN, OUT, IN, OUT> {
    * Constructor.
    *
    * @param executor      the executor instance.
-   * @param configuration the channel configuration.
+   * @param configuration the invocation configuration.
    * @param catchConsumer the error consumer instance.
    */
   LiftTryCatch(@NotNull final ScheduledExecutor executor,
-      @NotNull final ChannelConfiguration configuration,
+      @NotNull final InvocationConfiguration configuration,
       @NotNull final BiConsumer<? super RoutineException, ? super Channel<OUT, ?>> catchConsumer) {
     mExecutor = ConstantConditions.notNull("executor instance", executor);
-    mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
     mCatchConsumer = ConstantConditions.notNull("consumer instance", catchConsumer);
+    mConfiguration = configuration.outputConfigurationBuilder().configuration();
   }
 
   public Supplier<? extends Channel<IN, OUT>> apply(

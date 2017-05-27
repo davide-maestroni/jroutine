@@ -19,6 +19,7 @@ package com.github.dm.jrt.stream;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
+import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.executor.ScheduledExecutor;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.util.Function;
@@ -53,16 +54,16 @@ class LiftOutputDelay<IN, OUT> implements LiftingFunction<IN, OUT, IN, OUT> {
    * Constructor.
    *
    * @param executor      the executor instance.
-   * @param configuration the channel configuration.
+   * @param configuration the invocation configuration.
    * @param delay         the delay value.
    * @param timeUnit      the delay time unit.
    */
   LiftOutputDelay(@NotNull final ScheduledExecutor executor,
-      @NotNull final ChannelConfiguration configuration, final long delay,
+      @NotNull final InvocationConfiguration configuration, final long delay,
       @NotNull final TimeUnit timeUnit) {
     mExecutor = ConstantConditions.notNull("executor instance", executor);
-    mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
     mTimeUnit = ConstantConditions.notNull("delay time unit", timeUnit);
+    mConfiguration = configuration.outputConfigurationBuilder().configuration();
     mDelay = delay;
   }
 

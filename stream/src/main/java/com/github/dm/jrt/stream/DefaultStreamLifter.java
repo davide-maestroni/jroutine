@@ -20,8 +20,8 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.Backoff;
 import com.github.dm.jrt.core.common.BackoffBuilder;
 import com.github.dm.jrt.core.common.RoutineException;
-import com.github.dm.jrt.core.config.ChannelConfiguration;
-import com.github.dm.jrt.core.config.ChannelConfiguration.Builder;
+import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
 import com.github.dm.jrt.core.executor.ScheduledExecutor;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -48,7 +48,7 @@ class DefaultStreamLifter implements StreamLifter {
 
   private final ScheduledExecutor mExecutor;
 
-  private ChannelConfiguration mConfiguration = ChannelConfiguration.defaultConfiguration();
+  private InvocationConfiguration mConfiguration = InvocationConfiguration.defaultConfiguration();
 
   /**
    * Constructor.
@@ -84,6 +84,11 @@ class DefaultStreamLifter implements StreamLifter {
   }
 
   @NotNull
+  public <IN, OUT> LiftingFunction<IN, OUT, IN, OUT> publishOnExecutor() {
+    return new LiftPublishOnExecutor<IN, OUT>(mExecutor, mConfiguration);
+  }
+
+  @NotNull
   public <IN, OUT> LiftingFunction<IN, OUT, IN, OUT> retry(
       @NotNull final BiFunction<? super Integer, ? super RoutineException, ? extends Long>
           backoffFunction) {
@@ -99,6 +104,11 @@ class DefaultStreamLifter implements StreamLifter {
   public <IN, OUT> LiftingFunction<IN, OUT, IN, OUT> retry(final int maxCount,
       @NotNull final Backoff backoff) {
     return retry(new RetryBackoff(maxCount, backoff));
+  }
+
+  @NotNull
+  public <IN, OUT> LiftingFunction<IN, OUT, IN, OUT> runOnExecutor() {
+    return new LiftRunOnExecutor<IN, OUT>(mExecutor, mConfiguration);
   }
 
   @NotNull
@@ -179,13 +189,13 @@ class DefaultStreamLifter implements StreamLifter {
   }
 
   @NotNull
-  public Builder<? extends StreamLifter> withChannel() {
-    return new Builder<StreamLifter>(this, mConfiguration);
+  public StreamLifter withConfiguration(@NotNull final InvocationConfiguration configuration) {
+    mConfiguration = ConstantConditions.notNull("invocation configuration", configuration);
+    return this;
   }
 
   @NotNull
-  public StreamLifter withConfiguration(@NotNull final ChannelConfiguration configuration) {
-    mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
-    return this;
+  public Builder<? extends StreamLifter> withInvocation() {
+    return new Builder<StreamLifter>(this, mConfiguration);
   }
 }

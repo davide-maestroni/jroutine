@@ -19,7 +19,7 @@ package com.github.dm.jrt.stream;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.RoutineException;
-import com.github.dm.jrt.core.config.ChannelConfiguration;
+import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.executor.ScheduledExecutor;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.util.BiFunction;
@@ -41,7 +41,7 @@ class LiftRetry<IN, OUT> implements LiftingFunction<IN, OUT, IN, OUT> {
   private final BiFunction<? super Integer, ? super RoutineException, ? extends Long>
       mBackoffFunction;
 
-  private final ChannelConfiguration mConfiguration;
+  private final InvocationConfiguration mConfiguration;
 
   private final ScheduledExecutor mExecutor;
 
@@ -49,15 +49,15 @@ class LiftRetry<IN, OUT> implements LiftingFunction<IN, OUT, IN, OUT> {
    * Constructor.
    *
    * @param executor        the executor instance.
-   * @param configuration   the channel configuration.
+   * @param configuration   the invocation configuration.
    * @param backoffFunction the backoff function.
    */
   LiftRetry(@NotNull final ScheduledExecutor executor,
-      @NotNull final ChannelConfiguration configuration,
+      @NotNull final InvocationConfiguration configuration,
       @NotNull final BiFunction<? super Integer, ? super RoutineException, ? extends Long>
           backoffFunction) {
     mExecutor = ConstantConditions.notNull("executor instance", executor);
-    mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
+    mConfiguration = ConstantConditions.notNull("invocation configuration", configuration);
     mBackoffFunction = ConstantConditions.notNull("backoff function", backoffFunction);
   }
 
@@ -67,9 +67,19 @@ class LiftRetry<IN, OUT> implements LiftingFunction<IN, OUT, IN, OUT> {
 
       public Channel<IN, OUT> get() {
         final ScheduledExecutor executor = mExecutor;
-        final Channel<IN, IN> inputChannel = JRoutineCore.channelOn(executor).ofType();
-        final Channel<OUT, OUT> outputChannel =
-            JRoutineCore.channelOn(executor).withConfiguration(mConfiguration).ofType();
+        final InvocationConfiguration configuration = mConfiguration;
+        final Channel<IN, IN> inputChannel = JRoutineCore.channelOn(executor)
+                                                         .withConfiguration(
+                                                             configuration
+                                                                 .inputConfigurationBuilder()
+                                                                          .configuration())
+                                                         .ofType();
+        final Channel<OUT, OUT> outputChannel = JRoutineCore.channelOn(executor)
+                                                            .withConfiguration(
+                                                                configuration
+                                                                    .outputConfigurationBuilder()
+                                                                             .configuration())
+                                                            .ofType();
         new RetryChannelConsumer<IN, OUT>(executor, supplier, mBackoffFunction, inputChannel,
             outputChannel).run();
         return JRoutineCore.flatten(inputChannel, JRoutineCore.readOnly(outputChannel));

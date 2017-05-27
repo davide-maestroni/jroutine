@@ -18,11 +18,10 @@ package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel;
-import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.executor.ScheduledExecutor;
+import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.util.Action;
 import com.github.dm.jrt.function.util.Function;
 import com.github.dm.jrt.function.util.Supplier;
 import com.github.dm.jrt.stream.transform.LiftingFunction;
@@ -32,45 +31,59 @@ import org.jetbrains.annotations.NotNull;
 import static com.github.dm.jrt.function.util.SupplierDecorator.wrapSupplier;
 
 /**
- * Lifting function concatenating to the stream an action always performed when the invocation
- * completes, even if an error occurred.
+ * Lifting function publishing the output of the stream on the specified executor.
  * <p>
- * Created by davide-maestroni on 05/02/2017.
+ * Created by davide-maestroni on 05/26/2017.
  *
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class LiftTryFinally<IN, OUT> implements LiftingFunction<IN, OUT, IN, OUT> {
+class LiftPublishOnExecutor<IN, OUT> implements LiftingFunction<IN, OUT, IN, OUT> {
 
-  private final ChannelConfiguration mConfiguration;
+  private final InvocationConfiguration mConfiguration;
 
   private final ScheduledExecutor mExecutor;
-
-  private final Action mFinallyAction;
 
   /**
    * Constructor.
    *
    * @param executor      the executor instance.
    * @param configuration the invocation configuration.
-   * @param finallyAction the finally action.
    */
-  LiftTryFinally(@NotNull final ScheduledExecutor executor,
-      @NotNull final InvocationConfiguration configuration, @NotNull final Action finallyAction) {
+  LiftPublishOnExecutor(@NotNull final ScheduledExecutor executor,
+      @NotNull final InvocationConfiguration configuration) {
     mExecutor = ConstantConditions.notNull("executor instance", executor);
-    mFinallyAction = ConstantConditions.notNull("action instance", finallyAction);
-    mConfiguration = configuration.outputConfigurationBuilder().configuration();
+    mConfiguration = ConstantConditions.notNull("invocation configuration", configuration);
+  }
+
+  /**
+   * Mapping invocation passing on the input data.
+   *
+   * @param <DATA> the data type.
+   */
+  private static class PassInvocation<DATA> extends MappingInvocation<DATA, DATA> {
+
+    /**
+     * Constructor.
+     */
+    private PassInvocation() {
+      super(null);
+    }
+
+    public void onInput(final DATA input, @NotNull final Channel<DATA, ?> result) throws Exception {
+      result.pass(input);
+    }
   }
 
   public Supplier<? extends Channel<IN, OUT>> apply(
       final Supplier<? extends Channel<IN, OUT>> supplier) {
     return wrapSupplier(supplier).andThen(new Function<Channel<IN, OUT>, Channel<IN, OUT>>() {
 
-      public Channel<IN, OUT> apply(final Channel<IN, OUT> channel) throws Exception {
-        final Channel<OUT, OUT> outputChannel =
-            JRoutineCore.channelOn(mExecutor).withConfiguration(mConfiguration).ofType();
-        channel.consume(new TryFinallyChannelConsumer<OUT>(mFinallyAction, outputChannel));
-        return JRoutineCore.flatten(channel, JRoutineCore.readOnly(outputChannel));
+      public Channel<IN, OUT> apply(final Channel<IN, OUT> channel) {
+        return channel.pipe(JRoutineCore.routineOn(mExecutor)
+                                        .withConfiguration(mConfiguration)
+                                        .of(new PassInvocation<OUT>())
+                                        .invoke());
       }
     });
   }

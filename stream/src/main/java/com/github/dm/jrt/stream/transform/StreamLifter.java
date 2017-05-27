@@ -19,7 +19,7 @@ package com.github.dm.jrt.stream.transform;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.Backoff;
 import com.github.dm.jrt.core.common.RoutineException;
-import com.github.dm.jrt.core.config.ChannelConfigurable;
+import com.github.dm.jrt.core.config.InvocationConfigurable;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.DurationMeasure;
 import com.github.dm.jrt.function.util.Action;
@@ -39,9 +39,7 @@ import java.util.concurrent.TimeUnit;
  * @see com.github.dm.jrt.stream.routine.StreamRoutine#lift(Function)
  */
 @SuppressWarnings("WeakerAccess")
-public interface StreamLifter extends ChannelConfigurable<StreamLifter> {
-
-  // TODO: 25/05/2017 runOn(ScheduledExecutor), consumeOn(ScheduledExecutor)
+public interface StreamLifter extends InvocationConfigurable<StreamLifter> {
 
   /**
    * Returns a function adding a delay at the beginning of the stream, so that any data, exception
@@ -100,6 +98,10 @@ public interface StreamLifter extends ChannelConfigurable<StreamLifter> {
   <IN, OUT> LiftingFunction<IN, OUT, IN, OUT> delayOutputsOf(long delay,
       @NotNull TimeUnit timeUnit);
 
+  // TODO: 27/05/2017 javadoc
+  @NotNull
+  <IN, OUT> LiftingFunction<IN, OUT, IN, OUT> publishOnExecutor();
+
   /**
    * Returns a function making the stream retry the whole flow of data until the specified function
    * does not return a null value.
@@ -150,6 +152,10 @@ public interface StreamLifter extends ChannelConfigurable<StreamLifter> {
    */
   @NotNull
   <IN, OUT> LiftingFunction<IN, OUT, IN, OUT> retry(int maxCount, @NotNull Backoff backoff);
+
+  // TODO: 27/05/2017 javadoc
+  @NotNull
+  <IN, OUT> LiftingFunction<IN, OUT, IN, OUT> runOnExecutor();
 
   /**
    * Returns a function splitting the outputs produced by the stream, so that each subset will be

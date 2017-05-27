@@ -163,6 +163,12 @@ public abstract class InvocationFactory<IN, OUT> extends DeepEqualObject {
 
   /**
    * Builds and returns a new invocation factory creating instances of the specified object.
+   * <p>
+   * Note that inner and anonymous objects can be passed as well. Remember however that Java
+   * creates synthetic constructors for such classes, so be sure to specify the correct arguments
+   * to guarantee proper instantiation. In fact, inner classes always have the outer instance as
+   * first constructor parameter, and anonymous classes have both the outer instance and all the
+   * variables captured in the closure.
    *
    * @param invocation the invocation instance.
    * @param <IN>       the input data type.

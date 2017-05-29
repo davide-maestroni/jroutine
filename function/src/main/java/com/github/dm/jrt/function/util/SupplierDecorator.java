@@ -95,6 +95,7 @@ public class SupplierDecorator<OUT> extends DeepEqualObject implements Supplier<
   @NotNull
   public static <IN, OUT> InvocationFactory<IN, OUT> factoryOf(
       @NotNull final Supplier<? extends Invocation<? super IN, ? extends OUT>> supplier) {
+    // TODO: 29/05/2017 move...
     return new SupplierInvocationFactory<IN, OUT>(supplier);
   }
 

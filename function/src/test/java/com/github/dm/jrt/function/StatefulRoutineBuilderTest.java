@@ -435,7 +435,7 @@ public class StatefulRoutineBuilderTest {
             result.pass(integer);
             return null;
           }
-        }).create();
+        }).withInvocation().withMaxInvocations(1).configuration().create();
     assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(1)).all()).containsOnly(10);
   }
 }

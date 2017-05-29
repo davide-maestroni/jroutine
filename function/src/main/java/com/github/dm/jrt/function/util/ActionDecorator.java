@@ -33,7 +33,6 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * <p>
  * Created by davide-maestroni on 06/29/2016.
  */
-@SuppressWarnings("WeakerAccess")
 public class ActionDecorator extends DeepEqualObject implements Action, Decorator {
 
   private static final ActionDecorator sNoOp = new ActionDecorator(new Action() {

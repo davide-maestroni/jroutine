@@ -46,6 +46,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * <p>
  * Created by davide-maestroni on 04/20/2015.
  */
+@SuppressWarnings("WeakerAccess")
 public final class ServiceConfiguration extends DeepEqualObject {
 
   private static final DefaultConfigurable sDefaultConfigurable = new DefaultConfigurable();

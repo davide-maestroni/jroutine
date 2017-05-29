@@ -202,7 +202,7 @@ class ConverterChannelConsumer implements ChannelConsumer<ParcelableFlowData<Obj
         if (mInputStream == null) {
           final Channel<ParcelableByteChunk, ParcelableByteChunk> channel = mChannel;
           if (channel.in(indefiniteTime()).hasNext()) {
-            mInputStream = ParcelableByteChannel.inputStream(channel.next());
+            mInputStream = ParcelableByteChannel.parcelableInputStream(channel.next());
 
           } else {
             return -1;

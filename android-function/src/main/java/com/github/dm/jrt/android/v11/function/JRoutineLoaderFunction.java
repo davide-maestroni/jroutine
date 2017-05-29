@@ -21,12 +21,7 @@ import com.github.dm.jrt.android.function.builder.StatefulLoaderRoutineBuilder;
 import com.github.dm.jrt.android.function.builder.StatelessContextFactoryBuilder;
 import com.github.dm.jrt.android.function.builder.StatelessLoaderRoutineBuilder;
 import com.github.dm.jrt.android.v11.core.LoaderSource;
-import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.JRoutineFunction;
-import com.github.dm.jrt.function.builder.FunctionalChannelConsumer;
-import com.github.dm.jrt.function.util.Action;
-import com.github.dm.jrt.function.util.Consumer;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -64,78 +59,6 @@ public class JRoutineLoaderFunction {
    */
   private JRoutineLoaderFunction() {
     ConstantConditions.avoid();
-  }
-
-  /**
-   * Returns a channel consumer builder employing the specified action to handle the invocation
-   * completion.
-   *
-   * @param onComplete the action instance.
-   * @return the channel consumer builder.
-   */
-  @NotNull
-  public static FunctionalChannelConsumer<Object> onComplete(@NotNull final Action onComplete) {
-    return JRoutineFunction.onComplete(onComplete);
-  }
-
-  /**
-   * Returns a channel consumer builder employing the specified consumer function to handle the
-   * invocation errors.
-   *
-   * @param onError the consumer function.
-   * @return the channel consumer builder.
-   */
-  @NotNull
-  public static FunctionalChannelConsumer<Object> onError(
-      @NotNull final Consumer<? super RoutineException> onError) {
-    return JRoutineFunction.onError(onError);
-  }
-
-  /**
-   * Returns a channel consumer builder employing the specified consumer function to handle the
-   * invocation outputs.
-   *
-   * @param onOutput the consumer function.
-   * @param onError  the consumer function.
-   * @param <OUT>    the output data type.
-   * @return the channel consumer builder.
-   */
-  @NotNull
-  public static <OUT> FunctionalChannelConsumer<OUT> onOutput(
-      @NotNull final Consumer<? super OUT> onOutput,
-      @NotNull final Consumer<? super RoutineException> onError) {
-    return JRoutineFunction.onOutput(onOutput, onError);
-  }
-
-  /**
-   * Returns a channel consumer builder employing the specified functions to handle the invocation
-   * outputs, errors adn completion.
-   *
-   * @param onOutput   the consumer function.
-   * @param onError    the consumer function.
-   * @param onComplete the action instance.
-   * @param <OUT>      the output data type.
-   * @return the channel consumer builder.
-   */
-  @NotNull
-  public static <OUT> FunctionalChannelConsumer<OUT> onOutput(
-      @NotNull final Consumer<? super OUT> onOutput,
-      @NotNull final Consumer<? super RoutineException> onError, @NotNull final Action onComplete) {
-    return JRoutineFunction.onOutput(onOutput, onError, onComplete);
-  }
-
-  /**
-   * Returns a channel consumer builder employing the specified consumer function to handle the
-   * invocation outputs.
-   *
-   * @param onOutput the consumer function.
-   * @param <OUT>    the output data type.
-   * @return the channel consumer builder.
-   */
-  @NotNull
-  public static <OUT> FunctionalChannelConsumer<OUT> onOutput(
-      @NotNull final Consumer<? super OUT> onOutput) {
-    return JRoutineFunction.onOutput(onOutput);
   }
 
   /**

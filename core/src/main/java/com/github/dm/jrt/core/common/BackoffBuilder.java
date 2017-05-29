@@ -36,7 +36,6 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * <p>
  * Created by davide-maestroni on 05/10/2016.
  */
-@SuppressWarnings("WeakerAccess")
 public class BackoffBuilder {
 
   private static final DefaultBackoff sNoDelay = new DefaultBackoff(null) {

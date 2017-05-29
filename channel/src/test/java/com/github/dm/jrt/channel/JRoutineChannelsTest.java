@@ -16,6 +16,10 @@
 
 package com.github.dm.jrt.channel;
 
+import com.github.dm.jrt.channel.config.ByteChunkStreamConfiguration.CloseActionType;
+import com.github.dm.jrt.channel.io.ByteChannel.ByteChunk;
+import com.github.dm.jrt.channel.io.ByteChannel.ByteChunkInputStream;
+import com.github.dm.jrt.channel.io.ByteChannel.ByteChunkOutputStream;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.ChannelBuilder;
 import com.github.dm.jrt.core.channel.AbortException;
@@ -34,6 +38,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -56,7 +62,7 @@ import static org.junit.Assert.fail;
  * <p>
  * Created by davide-maestroni on 03/18/2015.
  */
-public class ChannelHandlerTest {
+public class JRoutineChannelsTest {
 
   @Test
   public void testBlendOutput() {
@@ -188,6 +194,33 @@ public class ChannelHandlerTest {
     } catch (final NullPointerException ignored) {
 
     }
+  }
+
+  @Test
+  public void testByteChannel() throws IOException {
+    final Channel<ByteChunk, ByteChunk> channel = JRoutineCore.channel().ofType();
+    final ByteChunkOutputStream stream = JRoutineChannels.outputStream()
+                                                         .withStream()
+                                                         .withChunkSize(4)
+                                                         .withOnClose(CloseActionType.CLOSE_CHANNEL)
+                                                         .configuration()
+                                                         .of(channel);
+    final byte[] b = new byte[16];
+    stream.write(b);
+    stream.close();
+    ByteChunkInputStream inputStream = JRoutineChannels.inputStream(channel.next());
+    assertThat(inputStream.available()).isEqualTo(4);
+    assertThat(inputStream.skip(4)).isEqualTo(4);
+    assertThat(inputStream.available()).isEqualTo(0);
+    inputStream.close();
+    inputStream = JRoutineChannels.inputStream(channel.next(), channel.next());
+    assertThat(inputStream.available()).isEqualTo(8);
+    assertThat(inputStream.readAll(new ByteArrayOutputStream())).isEqualTo(8);
+    assertThat(inputStream.available()).isEqualTo(0);
+    inputStream.close();
+    inputStream = JRoutineChannels.inputStream(Collections.singleton(channel.next()));
+    assertThat(inputStream.available()).isEqualTo(4);
+    inputStream.close();
   }
 
   @Test

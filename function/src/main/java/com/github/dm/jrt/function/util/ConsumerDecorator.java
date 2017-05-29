@@ -35,7 +35,6 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  *
  * @param <IN> the input data type.
  */
-@SuppressWarnings("WeakerAccess")
 public class ConsumerDecorator<IN> extends DeepEqualObject implements Consumer<IN>, Decorator {
 
   private static final ConsumerDecorator<Object> sSink =

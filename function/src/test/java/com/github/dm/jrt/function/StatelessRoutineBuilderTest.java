@@ -196,7 +196,7 @@ public class StatelessRoutineBuilderTest {
               public Integer get() {
                 return 17;
               }
-            }).create();
+            }).withInvocation().withMaxInvocations(1).configuration().create();
     assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(1)).all()).containsExactly(17);
   }
 }

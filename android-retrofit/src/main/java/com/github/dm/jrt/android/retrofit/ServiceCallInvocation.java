@@ -189,7 +189,7 @@ public class ServiceCallInvocation
                                                               .inputOfParcelableFlow(result,
                                                                   ConverterChannelConsumer
                                                                       .BYTES_ID);
-    final ByteChunkOutputStream outputStream = ParcelableByteChannel.outputStream()
+    final ByteChunkOutputStream outputStream = ParcelableByteChannel.parcelableOutputStream()
                                                                     .withStream()
                                                                     .withOnClose(
                                                                         CloseActionType
@@ -249,7 +249,7 @@ public class ServiceCallInvocation
       final OutputStream outputStream = sink.outputStream();
       try {
         for (final ParcelableByteChunk chunk : mInputChannel.in(indefiniteTime())) {
-          ParcelableByteChannel.inputStream(chunk).transferTo(outputStream);
+          ParcelableByteChannel.parcelableInputStream(chunk).transferTo(outputStream);
         }
 
       } finally {

@@ -49,8 +49,8 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * <pre><code>
  * public void onInput(final IN in, final Channel&lt;ParcelableByteChunk, ?&gt; result) {
  *   ...
- *   final ByteChunkOutputStream outputStream = ParcelableByteChannel.outputStream()
- *                                                                   .of(result);
+ *   final ByteChunkOutputStream parcelableOutputStream =
+ *           ParcelableByteChannel.parcelableOutputStream().of(result);
  *   ...
  * }
  * </code></pre>
@@ -59,7 +59,8 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * <pre><code>
  * public void onInput(final ParcelableByteChunk chunk, final Channel&lt;OUT, ?&gt; result) {
  *   ...
- *   final ByteChunkInputStream inputStream = ParcelableByteChannel.inputStream(chunk);
+ *   final ByteChunkInputStream parcelableInputStream =
+ *           ParcelableByteChannel.parcelableInputStream(chunk);
  *   ...
  * }
  * </code></pre>
@@ -70,7 +71,6 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * <p>
  * Created by davide-maestroni on 09/03/2015.
  */
-@SuppressWarnings("WeakerAccess")
 public class ParcelableByteChannel {
 
   /**
@@ -91,28 +91,7 @@ public class ParcelableByteChannel {
    *                                         of the specified chunks.
    */
   @NotNull
-  public static ByteChunkInputStream inputStream(@NotNull final ParcelableByteChunk... chunks) {
-    final ArrayList<ByteChunk> byteChunks = new ArrayList<ByteChunk>(chunks.length);
-    for (final ParcelableByteChunk chunk : chunks) {
-      byteChunks.add(chunk.getChunk());
-    }
-
-    return ByteChannel.inputStream(byteChunks);
-  }
-
-  /**
-   * Creates an input stream returning the concatenation of the data contained in the specified
-   * chunks.
-   * <p>
-   * Note that only one input stream can be created for each chunk.
-   *
-   * @param chunks the byte chunks whose data have to be concatenated.
-   * @return the input stream.
-   * @throws java.lang.IllegalStateException if an input stream has been already created for one
-   *                                         of the specified chunks.
-   */
-  @NotNull
-  public static ByteChunkInputStream inputStream(
+  public static ByteChunkInputStream parcelableInputStream(
       @NotNull final Iterable<? extends ParcelableByteChunk> chunks) {
     final ArrayList<ByteChunk> byteChunks = new ArrayList<ByteChunk>();
     for (final ParcelableByteChunk chunk : chunks) {
@@ -133,8 +112,31 @@ public class ParcelableByteChannel {
    *                                         specified chunk.
    */
   @NotNull
-  public static ByteChunkInputStream inputStream(@NotNull final ParcelableByteChunk chunk) {
+  public static ByteChunkInputStream parcelableInputStream(
+      @NotNull final ParcelableByteChunk chunk) {
     return ByteChannel.inputStream(chunk.getChunk());
+  }
+
+  /**
+   * Creates an input stream returning the concatenation of the data contained in the specified
+   * chunks.
+   * <p>
+   * Note that only one input stream can be created for each chunk.
+   *
+   * @param chunks the byte chunks whose data have to be concatenated.
+   * @return the input stream.
+   * @throws java.lang.IllegalStateException if an input stream has been already created for one
+   *                                         of the specified chunks.
+   */
+  @NotNull
+  public static ByteChunkInputStream parcelableInputStream(
+      @NotNull final ParcelableByteChunk... chunks) {
+    final ArrayList<ByteChunk> byteChunks = new ArrayList<ByteChunk>(chunks.length);
+    for (final ParcelableByteChunk chunk : chunks) {
+      byteChunks.add(chunk.getChunk());
+    }
+
+    return ByteChannel.inputStream(byteChunks);
   }
 
   /**
@@ -149,7 +151,7 @@ public class ParcelableByteChannel {
    * @return the output stream builder.
    */
   @NotNull
-  public static ParcelableByteChunkOutputStreamBuilder outputStream() {
+  public static ParcelableByteChunkOutputStreamBuilder parcelableOutputStream() {
     return new DefaultChunkOutputStreamBuilder();
   }
 
@@ -176,15 +178,15 @@ public class ParcelableByteChannel {
    * {@code ByteChunkOutputStream}s and passed to the underlying channel.
    * <br>
    * The data contained in a chunk can be read through the dedicated {@code ByteChunkInputStream}
-   * returned by one of the {@code ParcelableByteChannel.inputStream()} methods. Note that
+   * returned by one of the {@code ParcelableByteChannel.parcelableInputStream()} methods. Note that
    * only one
    * input stream can be created for each chunk, any further attempt will generate an exception.
    * <br>
    * Used chunks will be released as soon as the corresponding input stream is closed.
    *
-   * @see ParcelableByteChannel#inputStream(ParcelableByteChunk)
-   * @see ParcelableByteChannel#inputStream(ParcelableByteChunk...)
-   * @see ParcelableByteChannel#inputStream(Iterable)
+   * @see ParcelableByteChannel#parcelableInputStream(ParcelableByteChunk)
+   * @see ParcelableByteChannel#parcelableInputStream(ParcelableByteChunk...)
+   * @see ParcelableByteChannel#parcelableInputStream(Iterable)
    */
   public static class ParcelableByteChunk extends DeepEqualObject implements Parcelable {
 

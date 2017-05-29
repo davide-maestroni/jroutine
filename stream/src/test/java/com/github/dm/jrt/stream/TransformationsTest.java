@@ -22,7 +22,6 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.common.BackoffBuilder;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.executor.ScheduledExecutor;
-import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.MappingInvocation;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
@@ -46,6 +45,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static com.github.dm.jrt.core.executor.ScheduledExecutors.poolExecutor;
 import static com.github.dm.jrt.core.executor.ScheduledExecutors.syncExecutor;
 import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
 import static com.github.dm.jrt.core.util.DurationMeasure.indefiniteTime;
@@ -72,7 +72,7 @@ public class TransformationsTest {
   @NotNull
   private static ScheduledExecutor getSingleThreadExecutor() {
     if (sSingleThreadExecutor == null) {
-      sSingleThreadExecutor = ScheduledExecutors.poolExecutor(1);
+      sSingleThreadExecutor = poolExecutor(1);
     }
 
     return sSingleThreadExecutor;
@@ -346,6 +346,26 @@ public class TransformationsTest {
   }
 
   @Test
+  public void testPublishOn() {
+    final StreamRoutine<String, String> routine =
+        JRoutineStream.streamOf(new MappingInvocation<String, String>(null) {
+
+          public void onInput(final String input, @NotNull final Channel<String, ?> result) {
+            result.pass(input.toUpperCase());
+          }
+        })
+                      .lift(JRoutineStream.streamLifterOn(poolExecutor(1))
+                                          .withInvocation()
+                                          .withMaxInvocations(1)
+                                          .configuration().<String, String>publishOnExecutor());
+    assertThat(routine.invoke()
+                      .pass("test1", "test2", "test3")
+                      .close()
+                      .in(seconds(2))
+                      .all()).containsExactly("TEST1", "TEST2", "TEST3");
+  }
+
+  @Test
   public void testRetry() {
     final AtomicInteger count1 = new AtomicInteger();
     try {
@@ -451,10 +471,30 @@ public class TransformationsTest {
   }
 
   @Test
+  public void testRunOn() {
+    final StreamRoutine<String, String> routine =
+        JRoutineStream.streamOf(new MappingInvocation<String, String>(null) {
+
+          public void onInput(final String input, @NotNull final Channel<String, ?> result) {
+            result.pass(input.toUpperCase());
+          }
+        })
+                      .lift(JRoutineStream.streamLifterOn(poolExecutor(1))
+                                          .withInvocation()
+                                          .withMaxInvocations(1)
+                                          .configuration().<String, String>runOnExecutor());
+    assertThat(routine.invoke()
+                      .pass("test1", "test2", "test3")
+                      .close()
+                      .in(seconds(2))
+                      .all()).containsExactly("TEST1", "TEST2", "TEST3");
+  }
+
+  @Test
   public void testThrottle() throws InterruptedException {
-    final Routine<Object, Object> routine = JRoutineStream.streamOf(
-        JRoutineCore.routineOn(ScheduledExecutors.poolExecutor(1)).of(identity()))
-                                                          .lift(streamLifter().throttle(1));
+    final Routine<Object, Object> routine =
+        JRoutineStream.streamOf(JRoutineCore.routineOn(poolExecutor(1)).of(identity()))
+                      .lift(streamLifter().throttle(1));
     final Channel<Object, Object> channel1 = routine.invoke().pass("test1");
     final Channel<Object, Object> channel2 = routine.invoke().pass("test2");
     seconds(0.5).sleepAtLeast();
@@ -464,9 +504,9 @@ public class TransformationsTest {
 
   @Test
   public void testThrottleAbort() throws InterruptedException {
-    final Routine<Object, Object> routine = JRoutineStream.streamOf(
-        JRoutineCore.routineOn(ScheduledExecutors.poolExecutor(1)).of(identity()))
-                                                          .lift(streamLifter().throttle(1));
+    final Routine<Object, Object> routine =
+        JRoutineStream.streamOf(JRoutineCore.routineOn(poolExecutor(1)).of(identity()))
+                      .lift(streamLifter().throttle(1));
     final Channel<Object, Object> channel1 = routine.invoke().pass("test1");
     final Channel<Object, Object> channel2 = routine.invoke().pass("test2");
     seconds(0.5).sleepAtLeast();

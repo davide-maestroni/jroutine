@@ -36,7 +36,6 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * @param <IN1> the first input data type.
  * @param <IN2> the second input data type.
  */
-@SuppressWarnings("WeakerAccess")
 public class BiConsumerDecorator<IN1, IN2> extends DeepEqualObject
     implements BiConsumer<IN1, IN2>, Decorator {
 

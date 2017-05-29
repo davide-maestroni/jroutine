@@ -20,9 +20,13 @@ import android.annotation.TargetApi;
 import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
+import com.github.dm.jrt.android.channel.io.ParcelableByteChannel.ParcelableByteChunk;
 import com.github.dm.jrt.android.core.JRoutineService;
 import com.github.dm.jrt.android.core.ServiceSource;
 import com.github.dm.jrt.android.core.invocation.TemplateContextInvocation;
+import com.github.dm.jrt.channel.config.ByteChunkStreamConfiguration.CloseActionType;
+import com.github.dm.jrt.channel.io.ByteChannel.ByteChunkInputStream;
+import com.github.dm.jrt.channel.io.ByteChannel.ByteChunkOutputStream;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.ChannelBuilder;
 import com.github.dm.jrt.core.channel.AbortException;
@@ -37,7 +41,10 @@ import com.github.dm.jrt.core.util.ClassToken;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.junit.Test;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -55,11 +62,42 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Created by davide-maestroni on 06/18/2015.
  */
 @TargetApi(VERSION_CODES.FROYO)
-public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestActivity> {
+public class JRoutineAndroidChannelsTest extends ActivityInstrumentationTestCase2<TestActivity> {
 
-  public AndroidChannelsTest() {
+  public JRoutineAndroidChannelsTest() {
 
     super(TestActivity.class);
+  }
+
+  @Test
+  public void testByteChannel() throws IOException {
+    final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
+        JRoutineCore.channel().ofType();
+    final ByteChunkOutputStream stream = JRoutineAndroidChannels.parcelableOutputStream()
+                                                                .withStream()
+                                                                .withChunkSize(4)
+                                                                .withOnClose(
+                                                                    CloseActionType.CLOSE_CHANNEL)
+                                                                .configuration()
+                                                                .of(channel);
+    final byte[] b = new byte[16];
+    stream.write(b);
+    stream.close();
+    ByteChunkInputStream inputStream =
+        JRoutineAndroidChannels.parcelableInputStream(channel.next());
+    assertThat(inputStream.available()).isEqualTo(4);
+    assertThat(inputStream.skip(4)).isEqualTo(4);
+    assertThat(inputStream.available()).isEqualTo(0);
+    inputStream.close();
+    inputStream = JRoutineAndroidChannels.parcelableInputStream(channel.next(), channel.next());
+    assertThat(inputStream.available()).isEqualTo(8);
+    assertThat(inputStream.readAll(new ByteArrayOutputStream())).isEqualTo(8);
+    assertThat(inputStream.available()).isEqualTo(0);
+    inputStream.close();
+    inputStream =
+        JRoutineAndroidChannels.parcelableInputStream(Collections.singleton(channel.next()));
+    assertThat(inputStream.available()).isEqualTo(4);
+    inputStream.close();
   }
 
   @SuppressWarnings("unchecked")

@@ -17,6 +17,10 @@
 package com.github.dm.jrt.channel;
 
 import com.github.dm.jrt.channel.builder.ChannelHandler;
+import com.github.dm.jrt.channel.io.ByteChannel;
+import com.github.dm.jrt.channel.io.ByteChannel.ByteChunk;
+import com.github.dm.jrt.channel.io.ByteChannel.ByteChunkInputStream;
+import com.github.dm.jrt.channel.io.ByteChannel.ByteChunkOutputStreamBuilder;
 import com.github.dm.jrt.core.executor.ScheduledExecutor;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
@@ -58,5 +62,67 @@ public class JRoutineChannels {
   @NotNull
   public static ChannelHandler channelHandlerOn(@NotNull final ScheduledExecutor executor) {
     return new DefaultChannelHandler(executor);
+  }
+
+  /**
+   * Gets an input stream returning the data contained in the specified chunk.
+   * <p>
+   * Note that only one input stream can be created for each chunk.
+   *
+   * @param chunk the byte chunk.
+   * @return the input stream.
+   * @throws java.lang.IllegalStateException if an input stream has been already created for the
+   *                                         specified chunk.
+   * @see com.github.dm.jrt.channel.io.ByteChannel ByteChannel
+   */
+  @NotNull
+  public static ByteChunkInputStream inputStream(@NotNull final ByteChunk chunk) {
+    return ByteChannel.inputStream(chunk);
+  }
+
+  /**
+   * Gets an input stream returning the concatenation of the data contained in the specified chunks.
+   * <p>
+   * Note that only one input stream can be created for each chunk.
+   *
+   * @param chunks the byte chunks whose data have to be concatenated.
+   * @return the input stream.
+   * @throws java.lang.IllegalStateException if an input stream has been already created for one
+   *                                         of the specified chunks.
+   * @see com.github.dm.jrt.channel.io.ByteChannel ByteChannel
+   */
+  @NotNull
+  public static ByteChunkInputStream inputStream(@NotNull final ByteChunk... chunks) {
+    return ByteChannel.inputStream(chunks);
+  }
+
+  /**
+   * Gets an input stream returning the concatenation of the data contained in the specified chunks.
+   * <p>
+   * Note that only one input stream can be created for each chunk.
+   *
+   * @param chunks the byte chunks whose data have to be concatenated.
+   * @return the input stream.
+   * @throws java.lang.IllegalStateException if an input stream has been already created for one
+   *                                         of the specified chunks.
+   * @see com.github.dm.jrt.channel.io.ByteChannel ByteChannel
+   */
+  @NotNull
+  public static ByteChunkInputStream inputStream(
+      @NotNull final Iterable<? extends ByteChunk> chunks) {
+    return ByteChannel.inputStream(chunks);
+  }
+
+  /**
+   * Returns a builder of chunk output streams.
+   * <p>
+   * The built streams will not close the underlying channel by default.
+   *
+   * @return the output stream builder.
+   * @see com.github.dm.jrt.channel.io.ByteChannel ByteChannel
+   */
+  @NotNull
+  public static ByteChunkOutputStreamBuilder outputStream() {
+    return ByteChannel.outputStream();
   }
 }

@@ -44,7 +44,6 @@ import static com.github.dm.jrt.core.executor.ScheduledExecutors.defaultExecutor
  * <p>
  * Created by davide-maestroni on 07/01/2016.
  */
-@SuppressWarnings("WeakerAccess")
 public class JRoutineStream {
 
   /**

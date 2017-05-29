@@ -121,7 +121,7 @@ public class JRoutineAndroid extends JRoutine {
   @NotNull
   public static ByteChunkInputStream parcelableInputStream(
       @NotNull final Iterable<? extends ParcelableByteChunk> buffers) {
-    return ParcelableByteChannel.inputStream(buffers);
+    return ParcelableByteChannel.parcelableInputStream(buffers);
   }
 
   /**
@@ -137,7 +137,7 @@ public class JRoutineAndroid extends JRoutine {
   @NotNull
   public static ByteChunkInputStream parcelableInputStream(
       @NotNull final ParcelableByteChunk buffer) {
-    return ParcelableByteChannel.inputStream(buffer);
+    return ParcelableByteChannel.parcelableInputStream(buffer);
   }
 
   /**
@@ -154,7 +154,7 @@ public class JRoutineAndroid extends JRoutine {
   @NotNull
   public static ByteChunkInputStream parcelableInputStream(
       @NotNull final ParcelableByteChunk... buffers) {
-    return ParcelableByteChannel.inputStream(buffers);
+    return ParcelableByteChannel.parcelableInputStream(buffers);
   }
 
   /**
@@ -166,7 +166,7 @@ public class JRoutineAndroid extends JRoutine {
    */
   @NotNull
   public static ParcelableByteChunkOutputStreamBuilder parcelableOutputStream() {
-    return ParcelableByteChannel.outputStream();
+    return ParcelableByteChannel.parcelableOutputStream();
   }
 
   /**

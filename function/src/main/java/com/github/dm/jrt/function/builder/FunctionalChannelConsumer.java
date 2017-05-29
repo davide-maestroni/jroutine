@@ -30,7 +30,6 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <OUT> the output data type.
  */
-@SuppressWarnings("WeakerAccess")
 public interface FunctionalChannelConsumer<OUT> extends ChannelConsumer<OUT> {
 
   /**

@@ -34,7 +34,6 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * @param <IN3> the third input data type.
  * @param <OUT> the output data type.
  */
-@SuppressWarnings("WeakerAccess")
 public class TriFunctionDecorator<IN1, IN2, IN3, OUT> extends DeepEqualObject
     implements TriFunction<IN1, IN2, IN3, OUT>, Decorator {
 

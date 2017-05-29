@@ -18,6 +18,7 @@ package com.github.dm.jrt.android.v11.rx;
 
 import com.github.dm.jrt.android.rx.LoaderFlowable;
 import com.github.dm.jrt.android.v11.core.LoaderSource;
+import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -44,6 +45,13 @@ import org.jetbrains.annotations.NotNull;
  */
 @SuppressWarnings("WeakerAccess")
 public class JRoutineLoaderFlowable {
+
+  /**
+   * Avoid explicit instantiation.
+   */
+  protected JRoutineLoaderFlowable() {
+    ConstantConditions.avoid();
+  }
 
   /**
    * Returns a Loader Flowable instance based on the specified source.

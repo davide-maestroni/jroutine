@@ -38,7 +38,6 @@ import java.util.concurrent.TimeUnit;
  *
  * @see com.github.dm.jrt.stream.routine.StreamRoutine#lift(Function)
  */
-@SuppressWarnings("WeakerAccess")
 public interface StreamLifter extends InvocationConfigurable<StreamLifter> {
 
   /**
@@ -98,7 +97,13 @@ public interface StreamLifter extends InvocationConfigurable<StreamLifter> {
   <IN, OUT> LiftingFunction<IN, OUT, IN, OUT> delayOutputsOf(long delay,
       @NotNull TimeUnit timeUnit);
 
-  // TODO: 27/05/2017 javadoc
+  /**
+   * Returns a function making the stream publish its output on the specified executor.
+   *
+   * @param <IN>  the input data type.
+   * @param <OUT> the output data type.
+   * @return the lifting function.
+   */
   @NotNull
   <IN, OUT> LiftingFunction<IN, OUT, IN, OUT> publishOnExecutor();
 
@@ -153,7 +158,13 @@ public interface StreamLifter extends InvocationConfigurable<StreamLifter> {
   @NotNull
   <IN, OUT> LiftingFunction<IN, OUT, IN, OUT> retry(int maxCount, @NotNull Backoff backoff);
 
-  // TODO: 27/05/2017 javadoc
+  /**
+   * Returns a function making the stream run on the specified executor.
+   *
+   * @param <IN>  the input data type.
+   * @param <OUT> the output data type.
+   * @return the lifting function.
+   */
   @NotNull
   <IN, OUT> LiftingFunction<IN, OUT, IN, OUT> runOnExecutor();
 

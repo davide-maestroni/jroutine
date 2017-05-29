@@ -66,7 +66,7 @@ class CallMappingInvocation extends MappingInvocation<Call<?>, ParcelableFlowDat
           (mediaType != null) ? mediaType.toString() : null));
       final Channel<Object, ?> channel =
           JRoutineAndroidChannels.channelHandler().inputOfParcelableFlow(result, BYTES_ID);
-      final ByteChunkOutputStream outputStream = ParcelableByteChannel.outputStream()
+      final ByteChunkOutputStream outputStream = ParcelableByteChannel.parcelableOutputStream()
                                                                       .withStream()
                                                                       .withOnClose(
                                                                           CloseActionType

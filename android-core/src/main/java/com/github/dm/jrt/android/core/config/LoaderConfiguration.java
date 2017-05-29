@@ -51,6 +51,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * <p>
  * Created by davide-maestroni on 04/19/2015.
  */
+@SuppressWarnings("WeakerAccess")
 public final class LoaderConfiguration extends DeepEqualObject {
 
   /**

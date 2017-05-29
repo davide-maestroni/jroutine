@@ -26,10 +26,12 @@ import com.github.dm.jrt.WrapperRoutineBuilder.ProxyStrategyType;
 import com.github.dm.jrt.android.channel.io.ParcelableByteChannel.ParcelableByteChunk;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.CacheStrategyType;
 import com.github.dm.jrt.android.core.invocation.CallContextInvocation;
+import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.core.invocation.InvocationFactoryReference;
 import com.github.dm.jrt.android.core.invocation.TemplateContextInvocation;
 import com.github.dm.jrt.android.core.log.AndroidLog;
 import com.github.dm.jrt.android.core.log.AndroidLogs;
+import com.github.dm.jrt.android.core.routine.LoaderRoutine;
 import com.github.dm.jrt.android.proxy.annotation.LoaderProxy;
 import com.github.dm.jrt.android.proxy.annotation.ServiceProxy;
 import com.github.dm.jrt.android.test.R;
@@ -37,8 +39,12 @@ import com.github.dm.jrt.channel.io.ByteChannel.ByteChunkInputStream;
 import com.github.dm.jrt.channel.io.ByteChannel.ByteChunkOutputStream;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel;
+import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.core.util.ClassToken;
+import com.github.dm.jrt.function.util.BiConsumer;
+import com.github.dm.jrt.function.util.BiFunction;
 import com.github.dm.jrt.function.util.Function;
+import com.github.dm.jrt.function.util.Supplier;
 import com.github.dm.jrt.operator.JRoutineOperators;
 import com.github.dm.jrt.reflect.annotation.Alias;
 import com.github.dm.jrt.reflect.annotation.AsyncOutput;
@@ -75,6 +81,67 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
     super(TestActivity.class);
   }
 
+  private static void testIncrement(final Activity activity) {
+    final LoaderRoutine<Integer, Integer> routine =
+        JRoutineAndroid.<Integer, Integer>statelessRoutineOn(loaderOf(activity), 0).onNext(
+            new BiConsumer<Integer, Channel<Integer, ?>>() {
+
+              public void accept(final Integer integer, final Channel<Integer, ?> result) {
+                result.pass(integer + 1);
+              }
+            }).create();
+    assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(10)).all()).containsExactly(2,
+        3, 4, 5);
+  }
+
+  private static void testStatefulFactory(final Activity activity) {
+    final ContextInvocationFactory<Integer, Integer> factory =
+        JRoutineAndroid.<Integer, Integer, Integer>statefulContextFactory().onCreate(
+            new Supplier<Integer>() {
+
+              public Integer get() {
+                return 0;
+              }
+            }).onNextState(new BiFunction<Integer, Integer, Integer>() {
+
+          public Integer apply(final Integer integer1, final Integer integer2) {
+            return integer1 + integer2;
+          }
+        }).onCompleteArray(new Function<Integer, Integer[]>() {
+
+          public Integer[] apply(final Integer integer) {
+            final Integer[] integers = new Integer[1];
+            integers[0] = integer;
+            return integers;
+          }
+        }).create();
+    assertThat(JRoutineAndroid.routineOn(loaderOf(activity))
+                              .of(factory)
+                              .invoke()
+                              .pass(1, 2, 3, 4)
+                              .close()
+                              .in(seconds(10))
+                              .all()).containsOnly(10);
+  }
+
+  private static void testStatelessFactory(final Activity activity) {
+    final ContextInvocationFactory<Integer, Integer> factory =
+        JRoutineAndroid.<Integer, Integer>statelessContextFactory().onNext(
+            new BiConsumer<Integer, Channel<Integer, ?>>() {
+
+              public void accept(final Integer integer, final Channel<Integer, ?> result) {
+                result.pass(integer + 1);
+              }
+            }).create();
+    assertThat(JRoutineAndroid.routineOn(loaderOf(activity))
+                              .of(factory)
+                              .invoke()
+                              .pass(1, 2, 3, 4)
+                              .close()
+                              .in(seconds(10))
+                              .all()).containsExactly(2, 3, 4, 5);
+  }
+
   private static void testStream(@NotNull final Activity activity) {
     assertThat(JRoutineAndroid.streamOf(JRoutineOperators.appendAllIn(range(1, 1000)))
                               .map(JRoutineOperators.unary(new Function<Number, Double>() {
@@ -91,6 +158,41 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
                               .close()
                               .in(seconds(10))
                               .next()).isCloseTo(21, Offset.offset(0.1));
+  }
+
+  private static void testSumArray(final Activity activity) {
+    final LoaderRoutine<Integer, Integer> routine =
+        JRoutineAndroid.<Integer, Integer, Integer>statefulRoutineOn(loaderOf(activity),
+            0).onCreate(new Supplier<Integer>() {
+
+          public Integer get() {
+            return 0;
+          }
+        }).onNextState(new BiFunction<Integer, Integer, Integer>() {
+
+          public Integer apply(final Integer integer1, final Integer integer2) {
+            return integer1 + integer2;
+          }
+        }).onCompleteArray(new Function<Integer, Integer[]>() {
+
+          public Integer[] apply(final Integer integer) {
+            final Integer[] integers = new Integer[1];
+            integers[0] = integer;
+            return integers;
+          }
+        }).create();
+    assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(10)).all()).containsOnly(10);
+  }
+
+  public void testConcat() {
+    assertThat(JRoutineAndroid.channelHandler()
+                              .concatOutputOf(JRoutineAndroid.channel().of("test1"),
+                                  JRoutineAndroid.channel().of("test2"))
+                              .all()).containsExactly("test1", "test2");
+    assertThat(JRoutineAndroid.channelHandlerOn(ScheduledExecutors.syncExecutor())
+                              .concatOutputOf(JRoutineAndroid.channel().of("test1"),
+                                  JRoutineAndroid.channel().of("test2"))
+                              .all()).containsExactly("test1", "test2");
   }
 
   public void testConcatReadOutput() throws IOException {
@@ -177,6 +279,14 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
     }
 
     assertThat(JRoutineAndroid.channel().of("test").next()).isEqualTo("test");
+  }
+
+  public void testIncrement() {
+    if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+      return;
+    }
+
+    testIncrement(getActivity());
   }
 
   public void testLoader() {
@@ -576,6 +686,22 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
                               .all()).containsExactly("test");
   }
 
+  public void testStatefulFactory() {
+    if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+      return;
+    }
+
+    testStatefulFactory(getActivity());
+  }
+
+  public void testStatelessFactory() {
+    if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+      return;
+    }
+
+    testStatelessFactory(getActivity());
+  }
+
   public void testStream() {
     if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
       return;
@@ -638,6 +764,14 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
                        .invoke();
     assertThat(channel.abort()).isTrue();
     assertThat(channel.in(seconds(10)).getError()).isInstanceOf(AbortException.class);
+  }
+
+  public void testSumArray() {
+    if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+      return;
+    }
+
+    testSumArray(getActivity());
   }
 
   @ServiceProxy(TestClass.class)

@@ -41,7 +41,6 @@ import com.github.dm.jrt.core.util.ClassToken;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -69,7 +68,6 @@ public class JRoutineAndroidChannelsTest extends ActivityInstrumentationTestCase
     super(TestActivity.class);
   }
 
-  @Test
   public void testByteChannel() throws IOException {
     final Channel<ParcelableByteChunk, ParcelableByteChunk> channel =
         JRoutineCore.channel().ofType();

@@ -28,6 +28,9 @@ import com.github.dm.jrt.android.core.ServiceSource;
 import com.github.dm.jrt.android.core.builder.LoaderChannelBuilder;
 import com.github.dm.jrt.android.core.builder.LoaderRoutineBuilder;
 import com.github.dm.jrt.android.core.builder.ServiceRoutineBuilder;
+import com.github.dm.jrt.android.core.invocation.ContextInvocation;
+import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
+import com.github.dm.jrt.android.function.JRoutineAndroidFunction;
 import com.github.dm.jrt.android.function.builder.StatefulContextFactoryBuilder;
 import com.github.dm.jrt.android.function.builder.StatefulLoaderRoutineBuilder;
 import com.github.dm.jrt.android.function.builder.StatelessContextFactoryBuilder;
@@ -42,6 +45,7 @@ import com.github.dm.jrt.android.v4.stream.JRoutineLoaderStreamCompat;
 import com.github.dm.jrt.channel.io.ByteChannel.ByteChunkInputStream;
 import com.github.dm.jrt.core.executor.ScheduledExecutor;
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.function.util.Supplier;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -103,6 +107,30 @@ public class JRoutineAndroidCompat extends JRoutine {
   public static LoaderChannelBuilder channelOn(@NotNull final LoaderSourceCompat loaderSource,
       final int loaderId) {
     return JRoutineLoaderCompat.channelOn(loaderSource, loaderId);
+  }
+
+  /**
+   * Returns a new Context invocation factory based on the specified supplier instance.
+   * <br>
+   * It's up to the caller to prevent undesired leaks.
+   * <p>
+   * Note that the passed object is expected to behave like a function, that is, it must not retain
+   * a mutable internal state.
+   * <br>
+   * Note also that any external object used inside the function must be synchronized in order to
+   * avoid concurrency issues.
+   *
+   * @param supplier the supplier instance.
+   * @param <IN>     the input data type.
+   * @param <OUT>    the output data type.
+   * @return the Context invocation factory.
+   * @throws java.lang.IllegalArgumentException if the class of the specified supplier has not a
+   *                                            static scope.
+   */
+  @NotNull
+  public static <IN, OUT> ContextInvocationFactory<IN, OUT> contextFactoryOf(
+      @NotNull final Supplier<? extends ContextInvocation<? super IN, ? extends OUT>> supplier) {
+    return JRoutineAndroidFunction.contextFactoryOf(supplier);
   }
 
   /**

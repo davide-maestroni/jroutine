@@ -184,6 +184,19 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
     assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(10)).all()).containsOnly(10);
   }
 
+  private static void testSupplierFactory(final Activity activity) {
+    final LoaderRoutine<String, String> routine = JRoutineAndroid.routineOn(loaderOf(activity))
+                                                                 .of(JRoutineAndroid
+                                                                     .contextFactoryOf(
+                                                                     new Supplier<ToCase>() {
+
+                                                                       public ToCase get() {
+                                                                         return new ToCase();
+                                                                       }
+                                                                     }));
+    assertThat(routine.invoke().pass("TEST").close().in(seconds(1)).all()).containsOnly("test");
+  }
+
   public void testConcat() {
     assertThat(JRoutineAndroid.channelHandler()
                               .concatOutputOf(JRoutineAndroid.channel().of("test1"),
@@ -774,6 +787,14 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
     testSumArray(getActivity());
   }
 
+  public void testSupplierFactory() {
+    if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+      return;
+    }
+
+    testSupplierFactory(getActivity());
+  }
+
   @ServiceProxy(TestClass.class)
   @LoaderProxy(TestClass.class)
   public interface TestAnnotatedProxy extends TestProxy {}
@@ -883,6 +904,23 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
     @Alias("test")
     public String getStringLow() {
       return sText.toLowerCase();
+    }
+  }
+
+  public static class ToCase extends TemplateContextInvocation<String, String> {
+
+    private final boolean mIsUpper;
+
+    public ToCase() {
+      this(false);
+    }
+
+    public ToCase(final boolean isUpper) {
+      mIsUpper = isUpper;
+    }
+
+    public void onInput(final String input, @NotNull final Channel<String, ?> result) {
+      result.pass(mIsUpper ? input.toUpperCase() : input.toLowerCase());
     }
   }
 }

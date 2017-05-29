@@ -183,6 +183,18 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
     assertThat(routine.invoke().pass(1, 2, 3, 4).close().in(seconds(10)).all()).containsOnly(10);
   }
 
+  private static void testSupplierFactory(final FragmentActivity activity) {
+    final LoaderRoutine<String, String> routine =
+        JRoutineAndroidCompat.routineOn(loaderOf(activity))
+                             .of(JRoutineAndroidCompat.contextFactoryOf(new Supplier<ToCase>() {
+
+                               public ToCase get() {
+                                 return new ToCase();
+                               }
+                             }));
+    assertThat(routine.invoke().pass("TEST").close().in(seconds(1)).all()).containsOnly("test");
+  }
+
   public void testConcat() {
     assertThat(JRoutineAndroidCompat.channelHandler()
                                     .concatOutputOf(JRoutineAndroidCompat.channel().of("test1"),
@@ -670,6 +682,10 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
     testSumArray(getActivity());
   }
 
+  public void testSupplierFactory() {
+    testSupplierFactory(getActivity());
+  }
+
   @ServiceProxy(TestClass.class)
   @LoaderProxyCompat(TestClass.class)
   public interface TestAnnotatedProxy extends TestProxy {}
@@ -779,6 +795,23 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
     @Alias("test")
     public String getStringLow() {
       return sText.toLowerCase();
+    }
+  }
+
+  public static class ToCase extends TemplateContextInvocation<String, String> {
+
+    private final boolean mIsUpper;
+
+    public ToCase() {
+      this(false);
+    }
+
+    public ToCase(final boolean isUpper) {
+      mIsUpper = isUpper;
+    }
+
+    public void onInput(final String input, @NotNull final Channel<String, ?> result) {
+      result.pass(mIsUpper ? input.toUpperCase() : input.toLowerCase());
     }
   }
 }

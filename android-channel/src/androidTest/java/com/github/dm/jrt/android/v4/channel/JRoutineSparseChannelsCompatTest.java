@@ -1357,7 +1357,12 @@ public class JRoutineSparseChannelsCompatTest
   }
 
   public void testListError() {
-    JRoutineSparseChannelsCompat.channelHandler().channels(-1);
+    try {
+      JRoutineSparseChannelsCompat.channelHandler().channels(-1);
+      fail();
+
+    } catch (final IllegalArgumentException ignored) {
+    }
   }
 
   public void testMap() {

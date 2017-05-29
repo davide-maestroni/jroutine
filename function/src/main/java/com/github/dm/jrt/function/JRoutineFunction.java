@@ -18,6 +18,8 @@ package com.github.dm.jrt.function;
 
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.executor.ScheduledExecutor;
+import com.github.dm.jrt.core.invocation.Invocation;
+import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.builder.FunctionalChannelConsumer;
 import com.github.dm.jrt.function.builder.StatefulFactoryBuilder;
@@ -26,10 +28,13 @@ import com.github.dm.jrt.function.builder.StatelessFactoryBuilder;
 import com.github.dm.jrt.function.builder.StatelessRoutineBuilder;
 import com.github.dm.jrt.function.util.Action;
 import com.github.dm.jrt.function.util.Consumer;
+import com.github.dm.jrt.function.util.Supplier;
 
 import org.jetbrains.annotations.NotNull;
 
 import static com.github.dm.jrt.core.executor.ScheduledExecutors.defaultExecutor;
+import static com.github.dm.jrt.core.util.Reflection.asArgs;
+import static com.github.dm.jrt.function.util.SupplierDecorator.wrapSupplier;
 
 /**
  * This utility class provides a few ways to easily implement routines and channel consumer through
@@ -61,6 +66,28 @@ public class JRoutineFunction {
    */
   private JRoutineFunction() {
     ConstantConditions.avoid();
+  }
+
+  /**
+   * Returns a new invocation factory based on the specified supplier instance.
+   * <br>
+   * It's up to the caller to prevent undesired leaks.
+   * <p>
+   * Note that the passed object is expected to behave like a function, that is, it must not retain
+   * a mutable internal state.
+   * <br>
+   * Note also that any external object used inside the function must be synchronized in order to
+   * avoid concurrency issues.
+   *
+   * @param supplier the supplier instance.
+   * @param <IN>     the input data type.
+   * @param <OUT>    the output data type.
+   * @return the invocation factory.
+   */
+  @NotNull
+  public static <IN, OUT> InvocationFactory<IN, OUT> factoryOf(
+      @NotNull final Supplier<? extends Invocation<? super IN, ? extends OUT>> supplier) {
+    return new SupplierInvocationFactory<IN, OUT>(supplier);
   }
 
   /**
@@ -244,5 +271,34 @@ public class JRoutineFunction {
   public static <IN, OUT> StatelessRoutineBuilder<IN, OUT> statelessRoutineOn(
       @NotNull final ScheduledExecutor executor) {
     return new DefaultStatelessRoutineBuilder<IN, OUT>(executor);
+  }
+
+  /**
+   * Implementation of an invocation factory based on a supplier function.
+   *
+   * @param <IN>  the input data type.
+   * @param <OUT> the output data type.
+   */
+  private static class SupplierInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
+
+    private final Supplier<? extends Invocation<? super IN, ? extends OUT>> mSupplier;
+
+    /**
+     * Constructor.
+     *
+     * @param supplier the supplier function.
+     */
+    private SupplierInvocationFactory(
+        @NotNull final Supplier<? extends Invocation<? super IN, ? extends OUT>> supplier) {
+      super(asArgs(wrapSupplier(supplier)));
+      mSupplier = supplier;
+    }
+
+    @NotNull
+    @Override
+    @SuppressWarnings("unchecked")
+    public Invocation<IN, OUT> newInvocation() throws Exception {
+      return (Invocation<IN, OUT>) mSupplier.get();
+    }
   }
 }

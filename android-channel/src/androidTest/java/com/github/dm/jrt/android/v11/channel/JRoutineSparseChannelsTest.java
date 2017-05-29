@@ -1469,7 +1469,12 @@ public class JRoutineSparseChannelsTest extends ActivityInstrumentationTestCase2
       return;
     }
 
-    JRoutineSparseChannels.channelHandler().channels(-1);
+    try {
+      JRoutineSparseChannels.channelHandler().channels(-1);
+      fail();
+
+    } catch (final IllegalArgumentException ignored) {
+    }
   }
 
   public void testMap() {

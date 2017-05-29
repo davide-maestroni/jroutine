@@ -43,7 +43,6 @@ import com.github.dm.jrt.function.util.Function;
 import com.github.dm.jrt.function.util.FunctionDecorator;
 import com.github.dm.jrt.function.util.Predicate;
 import com.github.dm.jrt.function.util.Supplier;
-import com.github.dm.jrt.function.util.SupplierDecorator;
 import com.github.dm.jrt.operator.JRoutineOperators;
 import com.github.dm.jrt.proxy.annotation.Proxy;
 import com.github.dm.jrt.reflect.annotation.Alias;
@@ -894,7 +893,7 @@ public class JRoutineTest {
   public void testSupplierFactory() {
 
     final Routine<String, String> routine =
-        JRoutine.routine().of(SupplierDecorator.factoryOf(new Supplier<ToCase>() {
+        JRoutine.routine().of(JRoutine.factoryOf(new Supplier<ToCase>() {
 
           public ToCase get() {
             return new ToCase();

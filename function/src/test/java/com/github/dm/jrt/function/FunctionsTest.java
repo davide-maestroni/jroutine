@@ -88,7 +88,7 @@ public class FunctionsTest {
   @NotNull
   private static InvocationFactory<Object, String> createFactory() {
 
-    return SupplierDecorator.factoryOf(new Supplier<Invocation<Object, String>>() {
+    return JRoutineFunction.factoryOf(new Supplier<Invocation<Object, String>>() {
 
       public Invocation<Object, String> get() {
 
@@ -766,7 +766,7 @@ public class FunctionsTest {
     final InvocationFactory<Object, String> factory = createFactory();
     assertThat(factory).isEqualTo(factory);
     assertThat(factory).isNotEqualTo(createFactory());
-    assertThat(factory).isNotEqualTo(SupplierDecorator.factoryOf(supplier));
+    assertThat(factory).isNotEqualTo(JRoutineFunction.factoryOf(supplier));
     assertThat(factory).isNotEqualTo(new MappingInvocation<Object, Object>(null) {
 
       public void onInput(final Object input, @NotNull final Channel<Object, ?> result) {
@@ -774,10 +774,10 @@ public class FunctionsTest {
       }
     });
     assertThat(factory).isNotEqualTo("");
-    assertThat(SupplierDecorator.factoryOf(supplier)).isEqualTo(
-        SupplierDecorator.factoryOf(supplier));
-    assertThat(SupplierDecorator.factoryOf(supplier).hashCode()).isEqualTo(
-        SupplierDecorator.factoryOf(supplier).hashCode());
+    assertThat(JRoutineFunction.factoryOf(supplier)).isEqualTo(
+        JRoutineFunction.factoryOf(supplier));
+    assertThat(JRoutineFunction.factoryOf(supplier).hashCode()).isEqualTo(
+        JRoutineFunction.factoryOf(supplier).hashCode());
   }
 
   @Test
@@ -786,7 +786,7 @@ public class FunctionsTest {
 
     try {
 
-      SupplierDecorator.factoryOf(null);
+      JRoutineFunction.factoryOf(null);
 
       fail();
 

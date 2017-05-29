@@ -16,8 +16,6 @@
 
 package com.github.dm.jrt.function.util;
 
-import com.github.dm.jrt.core.invocation.Invocation;
-import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.core.util.Reflection;
@@ -74,29 +72,6 @@ public class SupplierDecorator<OUT> extends DeepEqualObject implements Supplier<
   @NotNull
   public static <OUT> SupplierDecorator<OUT> constant(final OUT result) {
     return new SupplierDecorator<OUT>(new ConstantSupplier<OUT>(result));
-  }
-
-  /**
-   * Returns a new invocation factory based on the specified supplier instance.
-   * <br>
-   * It's up to the caller to prevent undesired leaks.
-   * <p>
-   * Note that the passed object is expected to behave like a function, that is, it must not retain
-   * a mutable internal state.
-   * <br>
-   * Note also that any external object used inside the function must be synchronized in order to
-   * avoid concurrency issues.
-   *
-   * @param supplier the supplier instance.
-   * @param <IN>     the input data type.
-   * @param <OUT>    the output data type.
-   * @return the invocation factory.
-   */
-  @NotNull
-  public static <IN, OUT> InvocationFactory<IN, OUT> factoryOf(
-      @NotNull final Supplier<? extends Invocation<? super IN, ? extends OUT>> supplier) {
-    // TODO: 29/05/2017 move...
-    return new SupplierInvocationFactory<IN, OUT>(supplier);
   }
 
   /**
@@ -167,35 +142,6 @@ public class SupplierDecorator<OUT> extends DeepEqualObject implements Supplier<
 
     public OUT get() {
       return mResult;
-    }
-  }
-
-  /**
-   * Implementation of an invocation factory based on a supplier function.
-   *
-   * @param <IN>  the input data type.
-   * @param <OUT> the output data type.
-   */
-  private static class SupplierInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
-
-    private final Supplier<? extends Invocation<? super IN, ? extends OUT>> mSupplier;
-
-    /**
-     * Constructor.
-     *
-     * @param supplier the supplier function.
-     */
-    private SupplierInvocationFactory(
-        @NotNull final Supplier<? extends Invocation<? super IN, ? extends OUT>> supplier) {
-      super(asArgs(wrapSupplier(supplier)));
-      mSupplier = supplier;
-    }
-
-    @NotNull
-    @Override
-    @SuppressWarnings("unchecked")
-    public Invocation<IN, OUT> newInvocation() throws Exception {
-      return (Invocation<IN, OUT>) mSupplier.get();
     }
   }
 }

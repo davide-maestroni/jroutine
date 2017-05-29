@@ -15,8 +15,9 @@
  */
 
 /**
- * Functional consumer and routine builder definitions.
+ * Classes implementing functional Loader routine and Context invocation factory builders, with
+ * support for the Android compatibility library.
  * <p>
- * Created by davide-maestroni on 02/25/2017.
+ * Created by davide-maestroni on 05/29/2017.
  */
-package com.github.dm.jrt.function.builder;
+package com.github.dm.jrt.android.v4.function;

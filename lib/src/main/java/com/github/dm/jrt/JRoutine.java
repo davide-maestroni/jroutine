@@ -40,6 +40,7 @@ import com.github.dm.jrt.function.builder.StatelessFactoryBuilder;
 import com.github.dm.jrt.function.builder.StatelessRoutineBuilder;
 import com.github.dm.jrt.function.util.Action;
 import com.github.dm.jrt.function.util.Consumer;
+import com.github.dm.jrt.function.util.Supplier;
 import com.github.dm.jrt.stream.JRoutineStream;
 import com.github.dm.jrt.stream.routine.StreamRoutine;
 import com.github.dm.jrt.stream.transform.StreamLifter;
@@ -103,6 +104,28 @@ public class JRoutine {
   @NotNull
   public static ChannelBuilder channelOn(@NotNull final ScheduledExecutor executor) {
     return JRoutineCore.channelOn(executor);
+  }
+
+  /**
+   * Returns a new invocation factory based on the specified supplier instance.
+   * <br>
+   * It's up to the caller to prevent undesired leaks.
+   * <p>
+   * Note that the passed object is expected to behave like a function, that is, it must not retain
+   * a mutable internal state.
+   * <br>
+   * Note also that any external object used inside the function must be synchronized in order to
+   * avoid concurrency issues.
+   *
+   * @param supplier the supplier instance.
+   * @param <IN>     the input data type.
+   * @param <OUT>    the output data type.
+   * @return the invocation factory.
+   */
+  @NotNull
+  public static <IN, OUT> InvocationFactory<IN, OUT> factoryOf(
+      @NotNull final Supplier<? extends Invocation<? super IN, ? extends OUT>> supplier) {
+    return JRoutineFunction.factoryOf(supplier);
   }
 
   /**

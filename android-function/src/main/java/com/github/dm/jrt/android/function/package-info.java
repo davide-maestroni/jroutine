@@ -15,8 +15,8 @@
  */
 
 /**
- * Functional consumer and routine builder definitions.
+ * Functional Context invocation factory builders.
  * <p>
- * Created by davide-maestroni on 02/25/2017.
+ * Created by davide-maestroni on 05/29/2017.
  */
-package com.github.dm.jrt.function.builder;
+package com.github.dm.jrt.android.function;

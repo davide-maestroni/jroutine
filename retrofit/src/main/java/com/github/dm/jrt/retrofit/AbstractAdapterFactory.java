@@ -114,8 +114,8 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
   }
 
   @Override
-  public CallAdapter<?> get(final Type returnType, final Annotation[] annotations,
-      final Retrofit retrofit) {
+  public CallAdapter<?, ?> get(@NotNull final Type returnType,
+      @NotNull final Annotation[] annotations, @NotNull final Retrofit retrofit) {
     if (returnType instanceof ParameterizedType) {
       final ParameterizedType parameterizedType = (ParameterizedType) returnType;
       final Type responseType = extractResponseType(parameterizedType);
@@ -184,7 +184,7 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
    * @return the call adapter or null.
    */
   @Nullable
-  protected CallAdapter<?> get(@NotNull final ScheduledExecutor executor,
+  protected CallAdapter<?, ?> get(@NotNull final ScheduledExecutor executor,
       @NotNull final InvocationConfiguration configuration, @NotNull final Type returnRawType,
       @NotNull final Type responseType, @NotNull final Annotation[] annotations,
       @NotNull final Retrofit retrofit) {
@@ -206,25 +206,26 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
       return sCallInvocation;
     }
 
-    @SuppressWarnings("unchecked") final CallAdapter<Routine<?, ?>> routineAdapter =
-        (CallAdapter<Routine<?, ?>>) delegateFactory.get(new RoutineType(responseType), annotations,
-            retrofit);
+    @SuppressWarnings("unchecked") final CallAdapter<Object, Routine<?, ?>> routineAdapter =
+        (CallAdapter<Object, Routine<?, ?>>) delegateFactory.get(new RoutineType(responseType),
+            annotations, retrofit);
     if (routineAdapter != null) {
       return new RoutineAdapterInvocation(
           asArgs(delegateFactory, configuration, responseType, annotations, retrofit),
           routineAdapter);
     }
 
-    @SuppressWarnings("unchecked") final CallAdapter<StreamRoutine<?, ?>> streamRoutineAdapter =
-        (CallAdapter<StreamRoutine<?, ?>>) delegateFactory.get(new StreamRoutineType(responseType),
-            annotations, retrofit);
+    @SuppressWarnings("unchecked") final CallAdapter<Object, StreamRoutine<?, ?>>
+        streamRoutineAdapter = (CallAdapter<Object, StreamRoutine<?, ?>>) delegateFactory.get(
+        new StreamRoutineType(responseType), annotations, retrofit);
     if (streamRoutineAdapter != null) {
       return new RoutineAdapterInvocation(
           asArgs(delegateFactory, configuration, responseType, annotations, retrofit),
           streamRoutineAdapter);
     }
 
-    final CallAdapter<?> bodyAdapter = delegateFactory.get(responseType, annotations, retrofit);
+    @SuppressWarnings("unchecked") final CallAdapter<Object, ?> bodyAdapter =
+        (CallAdapter<Object, ?>) delegateFactory.get(responseType, annotations, retrofit);
     if (bodyAdapter != null) {
       return new BodyAdapterInvocation(
           asArgs(delegateFactory, configuration, responseType, annotations, retrofit), bodyAdapter);
@@ -238,8 +239,12 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
 
   /**
    * Base adapter implementation.
+   *
+   * @param <R> the response type.
+   * @param <T> the adapted type.
    */
-  protected static abstract class BaseAdapter<T> implements CallAdapter<T> {
+  @SuppressWarnings("WeakerAccess")
+  protected static abstract class BaseAdapter<R, T> implements CallAdapter<R, T> {
 
     private final Type mResponseType;
 
@@ -278,7 +283,7 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
    */
   private static class BodyAdapterInvocation extends MappingInvocation<Call<Object>, Object> {
 
-    private final CallAdapter<?> mCallAdapter;
+    private final CallAdapter<Object, ?> mCallAdapter;
 
     /**
      * Constructor.
@@ -287,7 +292,7 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
      * @param callAdapter the call adapter instance.
      */
     private BodyAdapterInvocation(@Nullable final Object[] args,
-        @NotNull final CallAdapter<?> callAdapter) {
+        @NotNull final CallAdapter<Object, ?> callAdapter) {
       super(args);
       mCallAdapter = callAdapter;
     }
@@ -329,7 +334,7 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
    */
   private static class RoutineAdapterInvocation extends MappingInvocation<Call<Object>, Object> {
 
-    private final CallAdapter<? extends Routine<?, ?>> mCallAdapter;
+    private final CallAdapter<Object, ? extends Routine<?, ?>> mCallAdapter;
 
     /**
      * Constructor.
@@ -338,7 +343,7 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
      * @param callAdapter the Call adapter instance.
      */
     private RoutineAdapterInvocation(@Nullable final Object[] args,
-        @NotNull final CallAdapter<? extends Routine<?, ?>> callAdapter) {
+        @NotNull final CallAdapter<Object, ? extends Routine<?, ?>> callAdapter) {
       super(args);
       mCallAdapter = callAdapter;
     }
@@ -382,7 +387,7 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
   /**
    * Stream routine adapter implementation.
    */
-  private static class StreamRoutineAdapter extends BaseAdapter<Routine> {
+  private static class StreamRoutineAdapter extends BaseAdapter<Object, Routine> {
 
     /**
      * Constructor.
@@ -395,7 +400,7 @@ public abstract class AbstractAdapterFactory extends CallAdapter.Factory {
       super(routine, responseType);
     }
 
-    public <OUT> Routine adapt(final Call<OUT> call) {
+    public Routine adapt(@NotNull final Call<Object> call) {
       return JRoutineStream.streamOfSingleton(new InputCallInvocation(call)).map(getRoutine());
     }
   }

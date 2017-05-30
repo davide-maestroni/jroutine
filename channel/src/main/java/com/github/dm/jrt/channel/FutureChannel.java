@@ -324,16 +324,12 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
     return in(noTime());
   }
 
-  public int inputSize() {
-    return outputSize();
-  }
-
   public boolean isBound() {
     return mIsBound.get();
   }
 
   public boolean isEmpty() {
-    return (outputSize() == 0);
+    return (size() == 0);
   }
 
   public boolean isOpen() {
@@ -357,14 +353,6 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
     }
 
     return output;
-  }
-
-  public int outputSize() {
-    if (mFuture.isDone()) {
-      return mIsRead.get() ? 0 : 1;
-    }
-
-    return 0;
   }
 
   @NotNull
@@ -395,7 +383,11 @@ class FutureChannel<OUT> implements Channel<OUT, OUT> {
   }
 
   public int size() {
-    return outputSize();
+    if (mFuture.isDone()) {
+      return mIsRead.get() ? 0 : 1;
+    }
+
+    return 0;
   }
 
   @NotNull

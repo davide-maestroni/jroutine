@@ -311,18 +311,12 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
     return this;
   }
 
-  public int inputSize() {
-    synchronized (mMutex) {
-      return mState.inputCount();
-    }
-  }
-
   public boolean isBound() {
     return mResultChanel.isBound();
   }
 
   public boolean isEmpty() {
-    return (inputSize() == 0) && (outputSize() == 0);
+    return (size() == 0);
   }
 
   public boolean isOpen() {
@@ -338,10 +332,6 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
 
   public OUT nextOrElse(final OUT output) {
     return mResultChanel.nextOrElse(output);
-  }
-
-  public int outputSize() {
-    return mResultChanel.outputSize();
   }
 
   @NotNull
@@ -438,7 +428,12 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
   }
 
   public int size() {
-    return inputSize() + outputSize();
+    final int inputSize;
+    synchronized (mMutex) {
+      inputSize = mState.inputCount();
+    }
+
+    return inputSize + mResultChanel.size();
   }
 
   @NotNull

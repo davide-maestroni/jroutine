@@ -248,18 +248,17 @@ public class JRoutineAndroid extends JRoutine {
 
   /**
    * Returns a builder of stateful Loader routines.
-   * <br>
-   * The specified invocation ID will be used to uniquely identify the built routine, so to make an
-   * invocation survive configuration changes.
    * <p>
    * This type of routines are based on invocations retaining a mutable state during their
    * lifecycle.
    * <br>
    * A typical example of stateful routine is the one computing a final result by accumulating the
    * input data (for instance, computing the sum of input numbers).
+   * <p>
+   * Note that, it is advisable to set a specific invocation ID to uniquely identify the built
+   * routine, so to make the invocations survive configuration changes.
    *
    * @param loaderSource the Loader source.
-   * @param invocationId the invocation ID.
    * @param <IN>         the input data type.
    * @param <OUT>        the output data type.
    * @param <STATE>      the state data type.
@@ -267,8 +266,8 @@ public class JRoutineAndroid extends JRoutine {
    */
   @NotNull
   public static <IN, OUT, STATE> StatefulLoaderRoutineBuilder<IN, OUT, STATE> statefulRoutineOn(
-      @NotNull final LoaderSource loaderSource, final int invocationId) {
-    return JRoutineLoaderFunction.statefulRoutineOn(loaderSource, invocationId);
+      @NotNull final LoaderSource loaderSource) {
+    return JRoutineLoaderFunction.statefulRoutineOn(loaderSource);
   }
 
   /**
@@ -290,25 +289,24 @@ public class JRoutineAndroid extends JRoutine {
 
   /**
    * Returns a builder of stateless Loader routines.
-   * <br>
-   * The specified invocation ID will be used to uniquely identify the built routine, so to make an
-   * invocation survive configuration changes.
    * <p>
    * This type of routines are based on invocations not retaining a mutable internal state.
    * <br>
    * A typical example of stateless routine is the one processing each input separately (for
    * instance, computing the square of input numbers).
+   * <p>
+   * Note that, it is advisable to set a specific invocation ID to uniquely identify the built
+   * routine, so to make the invocations survive configuration changes.
    *
    * @param loaderSource the Loader source.
-   * @param invocationId the invocation ID.
    * @param <IN>         the input data type.
    * @param <OUT>        the output data type.
    * @return the routine builder.
    */
   @NotNull
   public static <IN, OUT> StatelessLoaderRoutineBuilder<IN, OUT> statelessRoutineOn(
-      @NotNull final LoaderSource loaderSource, final int invocationId) {
-    return JRoutineLoaderFunction.statelessRoutineOn(loaderSource, invocationId);
+      @NotNull final LoaderSource loaderSource) {
+    return JRoutineLoaderFunction.statelessRoutineOn(loaderSource);
   }
 
   /**

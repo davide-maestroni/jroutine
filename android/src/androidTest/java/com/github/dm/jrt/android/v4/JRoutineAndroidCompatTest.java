@@ -82,7 +82,7 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
 
   private static void testIncrement(final FragmentActivity activity) {
     final LoaderRoutine<Integer, Integer> routine =
-        JRoutineAndroidCompat.<Integer, Integer>statelessRoutineOn(loaderOf(activity), 0).onNext(
+        JRoutineAndroidCompat.<Integer, Integer>statelessRoutineOn(loaderOf(activity)).onNext(
             new BiConsumer<Integer, Channel<Integer, ?>>() {
 
               public void accept(final Integer integer, final Channel<Integer, ?> result) {
@@ -161,8 +161,8 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
 
   private static void testSumArray(final FragmentActivity activity) {
     final LoaderRoutine<Integer, Integer> routine =
-        JRoutineAndroidCompat.<Integer, Integer, Integer>statefulRoutineOn(loaderOf(activity),
-            0).onCreate(new Supplier<Integer>() {
+        JRoutineAndroidCompat.<Integer, Integer, Integer>statefulRoutineOn(
+            loaderOf(activity)).onCreate(new Supplier<Integer>() {
 
           public Integer get() {
             return 0;

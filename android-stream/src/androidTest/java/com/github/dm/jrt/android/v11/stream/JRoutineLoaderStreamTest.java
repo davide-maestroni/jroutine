@@ -63,6 +63,9 @@ public class JRoutineLoaderStreamTest extends ActivityInstrumentationTestCase2<T
                              }))
                              .map(JRoutineOperators.<Integer, Integer>sum(Integer.class))
                              .lift(JRoutineLoaderStream.streamLifterOn(loaderOf(getActivity()))
+                                                       .withInvocation()
+                                                       .withMaxInvocations(1)
+                                                       .configuration()
                                                        .withLoader()
                                                        .withInvocationId(12)
                                                        .configuration().<String,

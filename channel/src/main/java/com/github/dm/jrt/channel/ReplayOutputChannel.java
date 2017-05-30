@@ -243,10 +243,6 @@ class ReplayOutputChannel<OUT> implements Channel<OUT, OUT>, ChannelConsumer<OUT
     return this;
   }
 
-  public int inputSize() {
-    return mChannel.inputSize();
-  }
-
   public boolean isBound() {
     return false;
   }
@@ -272,10 +268,6 @@ class ReplayOutputChannel<OUT> implements Channel<OUT, OUT>, ChannelConsumer<OUT
 
   public OUT nextOrElse(final OUT output) {
     return mOutputChannel.nextOrElse(output);
-  }
-
-  public int outputSize() {
-    return mOutputChannel.outputSize();
   }
 
   @NotNull

@@ -202,6 +202,19 @@ public class JRoutineFlowableTest {
   }
 
   @Test
+  public void testConstructor() {
+    boolean failed = false;
+    try {
+      new JRoutineFlowable();
+      failed = true;
+
+    } catch (final Throwable ignored) {
+    }
+
+    assertThat(failed).isFalse();
+  }
+
+  @Test
   public void testFlowable() {
     final AtomicReference<String> reference = new AtomicReference<String>();
     JRoutineFlowable.flowable()

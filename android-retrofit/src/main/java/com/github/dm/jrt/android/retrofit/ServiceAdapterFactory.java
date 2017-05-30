@@ -125,8 +125,8 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
   }
 
   @Override
-  public CallAdapter<?> get(final Type returnType, final Annotation[] annotations,
-      final Retrofit retrofit) {
+  public CallAdapter<?, ?> get(@NotNull final Type returnType,
+      @NotNull final Annotation[] annotations, @NotNull final Retrofit retrofit) {
     Type rawType = null;
     Type responseType = Object.class;
     if (returnType instanceof ParameterizedType) {
@@ -304,7 +304,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
   /**
    * Stream routine adapter implementation.
    */
-  private static class StreamRoutineAdapter implements CallAdapter<StreamRoutine>,
+  private static class StreamRoutineAdapter implements CallAdapter<Object, StreamRoutine>,
       Function<Supplier<? extends Channel<Call<?>, ParcelableFlowData<Object>>>,
           Supplier<Channel<Call<?>, Object>>> {
 
@@ -340,7 +340,7 @@ public class ServiceAdapterFactory extends CallAdapter.Factory {
     }
 
     @Override
-    public <OUT> StreamRoutine adapt(final Call<OUT> call) {
+    public StreamRoutine adapt(@NotNull final Call<Object> call) {
       return JRoutineStream.streamOfSingleton(new InputCallInvocation(call))
                            .map(JRoutineCore.routine().of(sInvocation))
                            .lift(this);

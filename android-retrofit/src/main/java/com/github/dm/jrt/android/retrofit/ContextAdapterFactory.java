@@ -113,24 +113,25 @@ public abstract class ContextAdapterFactory extends AbstractAdapterFactory {
       return sCallInvocationFactory;
     }
 
-    @SuppressWarnings("unchecked") final CallAdapter<Routine<?, ?>> routineAdapter =
-        (CallAdapter<Routine<?, ?>>) delegateFactory.get(getRoutineType(responseType), annotations,
-            retrofit);
+    @SuppressWarnings("unchecked") final CallAdapter<Object, Routine<?, ?>> routineAdapter =
+        (CallAdapter<Object, Routine<?, ?>>) delegateFactory.get(getRoutineType(responseType),
+            annotations, retrofit);
     if (routineAdapter != null) {
       return new RoutineAdapterInvocationFactory(
           asArgs(delegateFactory, responseType, annotations, retrofit), routineAdapter);
     }
 
-    @SuppressWarnings("unchecked") final CallAdapter<StreamRoutine<?, ?>> streamRoutineAdapter =
-        (CallAdapter<StreamRoutine<?, ?>>) delegateFactory.get(getStreamRoutineType(responseType),
-            annotations, retrofit);
+    @SuppressWarnings("unchecked") final CallAdapter<Object, StreamRoutine<?, ?>>
+        streamRoutineAdapter = (CallAdapter<Object, StreamRoutine<?, ?>>) delegateFactory.get(
+        getStreamRoutineType(responseType), annotations, retrofit);
     if (streamRoutineAdapter != null) {
       return new RoutineAdapterInvocationFactory(
           asArgs(delegateFactory, configuration, responseType, annotations, retrofit),
           streamRoutineAdapter);
     }
 
-    final CallAdapter<?> bodyAdapter = delegateFactory.get(responseType, annotations, retrofit);
+    @SuppressWarnings("unchecked") final CallAdapter<Object, ?> bodyAdapter =
+        (CallAdapter<Object, ?>) delegateFactory.get(responseType, annotations, retrofit);
     if (bodyAdapter != null) {
       return new BodyAdapterInvocationFactory(
           asArgs(delegateFactory, responseType, annotations, retrofit), bodyAdapter);
@@ -148,14 +149,14 @@ public abstract class ContextAdapterFactory extends AbstractAdapterFactory {
   private static class BodyAdapterInvocation
       extends TemplateContextInvocation<Call<Object>, Object> {
 
-    private final CallAdapter<?> mCallAdapter;
+    private final CallAdapter<Object, ?> mCallAdapter;
 
     /**
      * Constructor.
      *
      * @param callAdapter the call adapter instance.
      */
-    private BodyAdapterInvocation(@NotNull final CallAdapter<?> callAdapter) {
+    private BodyAdapterInvocation(@NotNull final CallAdapter<Object, ?> callAdapter) {
       mCallAdapter = callAdapter;
     }
 
@@ -185,7 +186,7 @@ public abstract class ContextAdapterFactory extends AbstractAdapterFactory {
      * @param callAdapter the call adapter instance.
      */
     private BodyAdapterInvocationFactory(@Nullable final Object[] args,
-        @NotNull final CallAdapter<?> callAdapter) {
+        @NotNull final CallAdapter<Object, ?> callAdapter) {
       super(args);
       mInvocation = new BodyAdapterInvocation(callAdapter);
     }
@@ -203,7 +204,7 @@ public abstract class ContextAdapterFactory extends AbstractAdapterFactory {
   private static class RoutineAdapterInvocation
       extends TemplateContextInvocation<Call<Object>, Object> {
 
-    private final CallAdapter<? extends Routine<?, ?>> mCallAdapter;
+    private final CallAdapter<Object, ? extends Routine<?, ?>> mCallAdapter;
 
     /**
      * Constructor.
@@ -211,7 +212,7 @@ public abstract class ContextAdapterFactory extends AbstractAdapterFactory {
      * @param callAdapter the call adapter instance.
      */
     private RoutineAdapterInvocation(
-        @NotNull final CallAdapter<? extends Routine<?, ?>> callAdapter) {
+        @NotNull final CallAdapter<Object, ? extends Routine<?, ?>> callAdapter) {
       mCallAdapter = callAdapter;
     }
 
@@ -243,7 +244,7 @@ public abstract class ContextAdapterFactory extends AbstractAdapterFactory {
      * @param callAdapter the call adapter instance.
      */
     private RoutineAdapterInvocationFactory(@Nullable final Object[] args,
-        @NotNull final CallAdapter<? extends Routine<?, ?>> callAdapter) {
+        @NotNull final CallAdapter<Object, ? extends Routine<?, ?>> callAdapter) {
       super(args);
       mInvocation = new RoutineAdapterInvocation(callAdapter);
     }

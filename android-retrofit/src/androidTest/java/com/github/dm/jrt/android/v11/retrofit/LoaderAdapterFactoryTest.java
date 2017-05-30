@@ -346,8 +346,8 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
   private static class BodyAdapterFactory extends CallAdapter.Factory {
 
     @Override
-    public CallAdapter<?> get(final Type returnType, final Annotation[] annotations,
-        final Retrofit retrofit) {
+    public CallAdapter<?, ?> get(@NotNull final Type returnType,
+        @NotNull final Annotation[] annotations, @NotNull final Retrofit retrofit) {
       if (returnType instanceof ParameterizedType) {
         final Type rawType = ((ParameterizedType) returnType).getRawType();
         if ((rawType == Routine.class) || (rawType == StreamRoutine.class)) {
@@ -358,13 +358,13 @@ public class LoaderAdapterFactoryTest extends ActivityInstrumentationTestCase2<T
         return null;
       }
 
-      return new CallAdapter<Object>() {
+      return new CallAdapter<Object, Object>() {
 
         public Type responseType() {
           return returnType;
         }
 
-        public <T> Object adapt(final Call<T> call) {
+        public Object adapt(@NotNull final Call<Object> call) {
           try {
             return call.execute().body();
 

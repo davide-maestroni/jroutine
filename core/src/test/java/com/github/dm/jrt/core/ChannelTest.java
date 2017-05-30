@@ -652,30 +652,22 @@ public class ChannelTest {
   public void testSize() {
     final Channel<Object, Object> channel =
         JRoutineCore.routine().of(IdentityInvocation.factory()).invoke();
-    assertThat(channel.inputSize()).isEqualTo(0);
-    assertThat(channel.outputSize()).isEqualTo(0);
+    assertThat(channel.size()).isEqualTo(0);
     channel.after(millis(500)).pass("test");
-    assertThat(channel.inputSize()).isEqualTo(1);
-    assertThat(channel.outputSize()).isEqualTo(0);
+    assertThat(channel.size()).isEqualTo(1);
     channel.afterNoDelay().close();
     assertThat(channel.in(seconds(1)).getComplete()).isTrue();
-    assertThat(channel.inputSize()).isEqualTo(0);
-    assertThat(channel.outputSize()).isEqualTo(1);
     assertThat(channel.size()).isEqualTo(1);
-    assertThat(channel.skipNext(1).outputSize()).isEqualTo(0);
+    assertThat(channel.skipNext(1).size()).isEqualTo(0);
 
     final Channel<Object, Object> channel1 = JRoutineCore.channel().ofType();
-    assertThat(channel1.inputSize()).isEqualTo(0);
-    assertThat(channel1.outputSize()).isEqualTo(0);
+    assertThat(channel1.size()).isEqualTo(0);
     channel1.after(millis(500)).pass("test");
-    assertThat(channel1.inputSize()).isEqualTo(1);
-    assertThat(channel1.outputSize()).isEqualTo(1);
+    assertThat(channel1.size()).isEqualTo(1);
     channel1.afterNoDelay().close();
     assertThat(channel1.in(seconds(1)).getComplete()).isTrue();
-    assertThat(channel1.inputSize()).isEqualTo(1);
-    assertThat(channel1.outputSize()).isEqualTo(1);
     assertThat(channel1.size()).isEqualTo(1);
-    assertThat(channel1.skipNext(1).outputSize()).isEqualTo(0);
+    assertThat(channel1.skipNext(1).size()).isEqualTo(0);
   }
 
   @Test

@@ -64,7 +64,7 @@ public class JRoutineFunction {
   /**
    * Avoid explicit instantiation.
    */
-  private JRoutineFunction() {
+  protected JRoutineFunction() {
     ConstantConditions.avoid();
   }
 

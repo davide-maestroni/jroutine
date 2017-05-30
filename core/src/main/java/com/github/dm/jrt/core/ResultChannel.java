@@ -512,16 +512,12 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     return in(noTime());
   }
 
-  public int inputSize() {
-    return outputSize();
-  }
-
   public boolean isBound() {
     return getBindingHandler().isBound();
   }
 
   public boolean isEmpty() {
-    return (outputSize() == 0);
+    return (size() == 0);
   }
 
   public boolean isOpen() {
@@ -553,12 +549,6 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     }
 
     return output;
-  }
-
-  public int outputSize() {
-    synchronized (mMutex) {
-      return mOutputCount;
-    }
   }
 
   @NotNull
@@ -661,7 +651,9 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
   }
 
   public int size() {
-    return outputSize();
+    synchronized (mMutex) {
+      return mOutputCount;
+    }
   }
 
   @NotNull

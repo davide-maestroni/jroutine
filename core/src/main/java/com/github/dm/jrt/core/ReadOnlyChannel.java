@@ -160,10 +160,6 @@ class ReadOnlyChannel<IN, OUT> extends DeepEqualObject implements Channel<IN, OU
     return this;
   }
 
-  public int inputSize() {
-    return mChannel.inputSize();
-  }
-
   public boolean isBound() {
     return mChannel.isBound();
   }
@@ -183,10 +179,6 @@ class ReadOnlyChannel<IN, OUT> extends DeepEqualObject implements Channel<IN, OU
 
   public OUT nextOrElse(final OUT output) {
     return mChannel.nextOrElse(output);
-  }
-
-  public int outputSize() {
-    return mChannel.outputSize();
   }
 
   @NotNull

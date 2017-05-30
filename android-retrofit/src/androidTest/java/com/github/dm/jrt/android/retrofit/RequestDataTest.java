@@ -19,6 +19,8 @@ package com.github.dm.jrt.android.retrofit;
 import android.os.Parcel;
 import android.test.AndroidTestCase;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 
 import okhttp3.Request;
@@ -67,7 +69,7 @@ public class RequestDataTest extends AndroidTestCase {
       throw new IOException();
     }
 
-    public void enqueue(final Callback<Object> callback) {
+    public void enqueue(@NotNull final Callback<Object> callback) {
 
     }
 

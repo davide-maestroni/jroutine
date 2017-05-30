@@ -18,6 +18,7 @@ package com.github.dm.jrt.android.function;
 
 import com.github.dm.jrt.android.core.invocation.ContextInvocation;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
+import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.util.Supplier;
 
 import org.jetbrains.annotations.NotNull;
@@ -32,6 +33,13 @@ import static com.github.dm.jrt.function.util.SupplierDecorator.wrapSupplier;
  * Created by davide-maestroni on 05/29/2017.
  */
 public class JRoutineAndroidFunction {
+
+  /**
+   * Avoid explicit instantiation.
+   */
+  protected JRoutineAndroidFunction() {
+    ConstantConditions.avoid();
+  }
 
   /**
    * Returns a new Context invocation factory based on the specified supplier instance.

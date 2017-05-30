@@ -22,6 +22,7 @@ import com.github.dm.jrt.function.util.Consumer;
 import com.github.dm.jrt.operator.JRoutineOperators;
 import com.github.dm.jrt.stream.routine.StreamRoutine;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -247,8 +248,8 @@ public class RoutineAdapterFactoryTest {
   private static class BodyAdapterFactory extends CallAdapter.Factory {
 
     @Override
-    public CallAdapter<?> get(final Type returnType, final Annotation[] annotations,
-        final Retrofit retrofit) {
+    public CallAdapter<?, ?> get(@NotNull final Type returnType,
+        @NotNull final Annotation[] annotations, @NotNull final Retrofit retrofit) {
       if (returnType instanceof ParameterizedType) {
         final Type rawType = ((ParameterizedType) returnType).getRawType();
         if ((rawType == Routine.class) || (rawType == StreamRoutine.class)) {
@@ -259,13 +260,13 @@ public class RoutineAdapterFactoryTest {
         return null;
       }
 
-      return new CallAdapter<Object>() {
+      return new CallAdapter<Object, Object>() {
 
         public Type responseType() {
           return returnType;
         }
 
-        public <R> Object adapt(final Call<R> call) {
+        public Object adapt(@NotNull final Call<Object> call) {
           try {
             return call.execute().body();
 

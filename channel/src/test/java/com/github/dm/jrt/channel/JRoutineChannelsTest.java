@@ -412,6 +412,32 @@ public class JRoutineChannelsTest {
   }
 
   @Test
+  public void testConstructor() {
+    boolean failed = false;
+    try {
+      new JRoutineChannels();
+      failed = true;
+
+    } catch (final Throwable ignored) {
+    }
+
+    assertThat(failed).isFalse();
+  }
+
+  @Test
+  @SuppressWarnings({"ConstantConditions", "ThrowableResultOfMethodCallIgnored"})
+  public void testDuplicateAbort() {
+    final Channel<String, String> channel = JRoutineCore.channel().ofType();
+    final List<Channel<?, String>> outputChannels =
+        JRoutineChannels.channelHandler().duplicateOutputOf(channel, 3);
+    channel.abort(new IllegalArgumentException());
+    for (final Channel<?, String> outputChannel : outputChannels) {
+      assertThat(outputChannel.in(seconds(3)).getError().getCause()).isExactlyInstanceOf(
+          IllegalArgumentException.class);
+    }
+  }
+
+  @Test
   public void testDuplicateInput() {
     final List<Channel<String, String>> outputChannels =
         JRoutineChannels.channelHandler().channels(3);
@@ -422,9 +448,9 @@ public class JRoutineChannelsTest {
 
     final Channel<String, String> channel1 = JRoutineCore.channel().ofType();
     final Channel<String, String> channel2 = JRoutineCore.channel().ofType();
-    JRoutineChannels.channelHandler().duplicateInputOf(channel1, channel2).pass("test");
-    assertThat(channel1.in(seconds(3)).next()).isEqualTo("test");
-    assertThat(channel2.in(seconds(3)).next()).isEqualTo("test");
+    JRoutineChannels.channelHandler().duplicateInputOf(channel1, channel2).pass("test").close();
+    assertThat(channel1.in(seconds(3)).all()).containsExactly("test");
+    assertThat(channel2.in(seconds(3)).all()).containsExactly("test");
   }
 
   @Test

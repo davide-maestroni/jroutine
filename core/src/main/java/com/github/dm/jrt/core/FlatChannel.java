@@ -197,10 +197,6 @@ class FlatChannel<IN, OUT> implements Channel<IN, OUT> {
     return this;
   }
 
-  public int inputSize() {
-    return mInputChannel.size();
-  }
-
   public boolean isBound() {
     return mOutputChannel.isBound();
   }
@@ -220,10 +216,6 @@ class FlatChannel<IN, OUT> implements Channel<IN, OUT> {
 
   public OUT nextOrElse(final OUT output) {
     return mOutputChannel.nextOrElse(output);
-  }
-
-  public int outputSize() {
-    return mOutputChannel.size();
   }
 
   @NotNull

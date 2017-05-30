@@ -108,11 +108,11 @@ public class LoaderAdapterFactoryCompat extends ContextAdapterFactory {
 
   @Nullable
   @Override
-  protected CallAdapter<?> get(@NotNull final ScheduledExecutor executor,
+  protected CallAdapter<?, ?> get(@NotNull final ScheduledExecutor executor,
       @NotNull final InvocationConfiguration configuration, @NotNull final Type returnRawType,
       @NotNull final Type responseType, @NotNull final Annotation[] annotations,
       @NotNull final Retrofit retrofit) {
-    final CallAdapter<?> callAdapter =
+    final CallAdapter<?, ?> callAdapter =
         super.get(executor, configuration, returnRawType, responseType, annotations, retrofit);
     return (callAdapter != null) ? ComparableCall.wrap(callAdapter) : null;
   }

@@ -59,6 +59,9 @@ public class JRoutineLoaderStreamCompatTest extends ActivityInstrumentationTestC
                              .map(JRoutineOperators.<Integer, Integer>sum(Integer.class))
                              .lift(
                                  JRoutineLoaderStreamCompat.streamLifterOn(loaderOf(getActivity()))
+                                                           .withInvocation()
+                                                           .withMaxInvocations(1)
+                                                           .configuration()
                                                            .withLoader()
                                                            .withInvocationId(12)
                                                            .configuration().<String,

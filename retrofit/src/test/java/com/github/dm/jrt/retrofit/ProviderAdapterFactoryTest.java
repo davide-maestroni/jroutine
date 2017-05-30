@@ -19,6 +19,7 @@ package com.github.dm.jrt.retrofit;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.stream.JRoutineStream;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.lang.annotation.Annotation;
@@ -205,18 +206,18 @@ public class ProviderAdapterFactoryTest {
     private boolean mCalled;
 
     @Override
-    public CallAdapter<?> get(final Type returnType, final Annotation[] annotations,
-        final Retrofit retrofit) {
+    public CallAdapter<?, ?> get(@NotNull final Type returnType,
+        @NotNull final Annotation[] annotations, @NotNull final Retrofit retrofit) {
       mCalled = true;
       final RoutineAdapterFactory factory = RoutineAdapterFactory.defaultFactory();
       final Type responseType = factory.get(returnType, annotations, retrofit).responseType();
-      return new CallAdapter<Object>() {
+      return new CallAdapter<Object, Object>() {
 
         public Type responseType() {
           return responseType;
         }
 
-        public <R> Object adapt(final Call<R> call) {
+        public Object adapt(@NotNull final Call<Object> call) {
           return JRoutineStream.streamOf(JRoutineCore.routineOn(immediateExecutor())
                                                      .of(append((Object) Collections.emptyList())));
         }

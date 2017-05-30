@@ -152,6 +152,22 @@ public class JRoutineLoaderFlowableTest extends ActivityInstrumentationTestCase2
     assertThat(isSuccess.get()).isTrue();
   }
 
+  public void testConstructor() {
+    if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+      return;
+    }
+
+    boolean failed = false;
+    try {
+      new JRoutineLoaderFlowable();
+      failed = true;
+
+    } catch (final Throwable ignored) {
+    }
+
+    assertThat(failed).isFalse();
+  }
+
   public void testFragmentObserveOn() throws InterruptedException {
     if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
       return;

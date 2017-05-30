@@ -50,7 +50,7 @@ public class JRoutineLoaderStream {
   /**
    * Avoid explicit instantiation.
    */
-  private JRoutineLoaderStream() {
+  protected JRoutineLoaderStream() {
     ConstantConditions.avoid();
   }
 
@@ -69,8 +69,8 @@ public class JRoutineLoaderStream {
    *               .consume(getConsumer())
    *               .close();
    * </code></pre>
-   * Note that the Loader ID, by default, will only depend on the inputs, so that, in order to avoid
-   * clashing, it is advisable to explicitly set the invocation ID like shown in the example.
+   * Note that, it is advisable to set a specific invocation ID to uniquely identify the built
+   * routine, so to make the invocations survive configuration changes.
    *
    * @param loaderSource the Loader source.
    * @return the lifting function builder.

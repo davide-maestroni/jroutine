@@ -83,7 +83,7 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
 
   private static void testIncrement(final Activity activity) {
     final LoaderRoutine<Integer, Integer> routine =
-        JRoutineAndroid.<Integer, Integer>statelessRoutineOn(loaderOf(activity), 0).onNext(
+        JRoutineAndroid.<Integer, Integer>statelessRoutineOn(loaderOf(activity)).onNext(
             new BiConsumer<Integer, Channel<Integer, ?>>() {
 
               public void accept(final Integer integer, final Channel<Integer, ?> result) {
@@ -162,13 +162,13 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
 
   private static void testSumArray(final Activity activity) {
     final LoaderRoutine<Integer, Integer> routine =
-        JRoutineAndroid.<Integer, Integer, Integer>statefulRoutineOn(loaderOf(activity),
-            0).onCreate(new Supplier<Integer>() {
+        JRoutineAndroid.<Integer, Integer, Integer>statefulRoutineOn(loaderOf(activity)).onCreate(
+            new Supplier<Integer>() {
 
-          public Integer get() {
-            return 0;
-          }
-        }).onNextState(new BiFunction<Integer, Integer, Integer>() {
+              public Integer get() {
+                return 0;
+              }
+            }).onNextState(new BiFunction<Integer, Integer, Integer>() {
 
           public Integer apply(final Integer integer1, final Integer integer2) {
             return integer1 + integer2;

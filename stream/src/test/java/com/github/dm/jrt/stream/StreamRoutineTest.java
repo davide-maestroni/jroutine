@@ -63,6 +63,7 @@ import static com.github.dm.jrt.operator.JRoutineOperators.reduce;
 import static com.github.dm.jrt.operator.JRoutineOperators.unary;
 import static com.github.dm.jrt.operator.sequence.Sequence.range;
 import static com.github.dm.jrt.stream.JRoutineStream.streamLifter;
+import static com.github.dm.jrt.stream.JRoutineStream.streamOf;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -286,12 +287,6 @@ public class StreamRoutineTest {
                              .afterNoDelay()
                              .close()
                              .next()).isEqualTo("test");
-    assertThat(JRoutineStream.streamOf(JRoutineCore.routineOn(syncExecutor()).of(identity()))
-                             .invoke()
-                             .inputSize()).isZero();
-    assertThat(JRoutineStream.streamOf(JRoutineCore.routineOn(syncExecutor()).of(identity()))
-                             .invoke()
-                             .outputSize()).isZero();
     assertThat(JRoutineStream.streamOf(JRoutineCore.routineOn(syncExecutor()).of(identity()))
                              .invoke()
                              .size()).isZero();
@@ -618,14 +613,15 @@ public class StreamRoutineTest {
 
     try {
       JRoutineStream.streamOf(JRoutineCore.routine().of(unary(retryFunction)))
-                    .map(JRoutineFunction.<Channel<Object, String>, Object>statelessRoutine().onNext(
-                        new BiConsumer<Channel<Object, String>, Channel<Object, ?>>() {
+                    .map(
+                        JRoutineFunction.<Channel<Object, String>, Object>statelessRoutine().onNext(
+                            new BiConsumer<Channel<Object, String>, Channel<Object, ?>>() {
 
-                          public void accept(final Channel<Object, String> channel,
-                              final Channel<Object, ?> result) throws Exception {
-                            result.pass(channel);
-                          }
-                        }).create())
+                              public void accept(final Channel<Object, String> channel,
+                                  final Channel<Object, ?> result) throws Exception {
+                                result.pass(channel);
+                              }
+                            }).create())
                     .invoke()
                     .pass((Object) null)
                     .close()
@@ -884,6 +880,12 @@ public class StreamRoutineTest {
     } catch (final IllegalArgumentException e) {
       assertThat(e.getCause()).isExactlyInstanceOf(NullPointerException.class);
     }
+  }
+
+  @Test
+  public void testWrap() {
+    final StreamRoutine<Object, Object> routine = streamOf(JRoutineCore.routine().of(identity()));
+    assertThat(streamOf(routine)).isSameAs(routine);
   }
 
   private static class SumData {

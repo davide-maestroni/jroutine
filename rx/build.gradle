@@ -27,7 +27,7 @@ compileJavaCompatibility = JavaVersion.VERSION_1_5
 compileTestJavaCompatibility = JavaVersion.VERSION_1_7
 
 ext {
-  rxJavaVersion = '2.0.5'
+  rxJavaVersion = '2.1.0'
   coreVersion = '7.0.0'
 }
 

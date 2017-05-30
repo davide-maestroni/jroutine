@@ -43,6 +43,7 @@ import retrofit2.Retrofit;
  * <p>
  * Created by davide-maestroni on 05/20/2016.
  */
+@SuppressWarnings("WeakerAccess")
 public class ProviderAdapterFactory extends CallAdapter.Factory {
 
   private final Map<String, CallAdapter.Factory> mFactories;
@@ -92,8 +93,8 @@ public class ProviderAdapterFactory extends CallAdapter.Factory {
   }
 
   @Override
-  public CallAdapter<?> get(final Type returnType, final Annotation[] annotations,
-      final Retrofit retrofit) {
+  public CallAdapter<?, ?> get(@NotNull final Type returnType,
+      @NotNull final Annotation[] annotations, @NotNull final Retrofit retrofit) {
     String factoryName = null;
     for (final Annotation annotation : annotations) {
       if (annotation.annotationType() == CallAdapterFactory.class) {
@@ -107,7 +108,7 @@ public class ProviderAdapterFactory extends CallAdapter.Factory {
   }
 
   @Nullable
-  private CallAdapter<?> getDefault(final boolean hasAnnotation, final Type returnType,
+  private CallAdapter<?, ?> getDefault(final boolean hasAnnotation, final Type returnType,
       final Annotation[] annotations, final Retrofit retrofit) {
     final CallAdapter.Factory factory =
         (hasAnnotation) ? mMissingNameFactory : mMissingAnnotationFactory;

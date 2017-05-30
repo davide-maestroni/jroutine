@@ -44,10 +44,10 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Created by davide-maestroni on 12/02/2016.
  */
 @TargetApi(VERSION_CODES.FROYO)
-public class JRoutineLoaderObservableCompatTest
+public class JRoutineLoaderFlowableCompatTest
     extends ActivityInstrumentationTestCase2<TestActivity> {
 
-  public JRoutineLoaderObservableCompatTest() {
+  public JRoutineLoaderFlowableCompatTest() {
     super(TestActivity.class);
   }
 
@@ -142,6 +142,18 @@ public class JRoutineLoaderObservableCompatTest
                                 });
     latch.await(10, TimeUnit.SECONDS);
     assertThat(isSuccess.get()).isTrue();
+  }
+
+  public void testConstructor() {
+    boolean failed = false;
+    try {
+      new JRoutineLoaderFlowableCompat();
+      failed = true;
+
+    } catch (final Throwable ignored) {
+    }
+
+    assertThat(failed).isFalse();
   }
 
   public void testFragmentObserveOn() throws InterruptedException {

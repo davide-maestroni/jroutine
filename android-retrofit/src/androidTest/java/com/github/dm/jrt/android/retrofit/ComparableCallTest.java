@@ -18,6 +18,8 @@ package com.github.dm.jrt.android.retrofit;
 
 import android.test.AndroidTestCase;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.Semaphore;
@@ -63,12 +65,13 @@ public class ComparableCallTest extends AndroidTestCase {
     call.enqueue(new Callback<List<Repo>>() {
 
       @Override
-      public void onResponse(final Call<List<Repo>> call, final Response<List<Repo>> response) {
+      public void onResponse(@NotNull final Call<List<Repo>> call,
+          @NotNull final Response<List<Repo>> response) {
         semaphore.release();
       }
 
       @Override
-      public void onFailure(final Call<List<Repo>> call, final Throwable t) {
+      public void onFailure(@NotNull final Call<List<Repo>> call, @NotNull final Throwable t) {
         semaphore.release();
       }
     });

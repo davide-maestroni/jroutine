@@ -38,11 +38,11 @@ dependencies {
   swaggerCompile project
   testCompile project(':operator')
   testCompile project(':retrofit')
-  testCompile 'com.squareup.okhttp3:mockwebserver:3.6.0'
-  testCompile 'com.squareup.retrofit2:converter-gson:2.1.0'
-  testCompile 'com.squareup.retrofit2:converter-scalars:2.1.0'
-  testCompile 'com.squareup.retrofit2:converter-jackson:2.1.0'
-  testCompile 'com.squareup.retrofit2:retrofit:2.1.0'
+  testCompile 'com.squareup.okhttp3:mockwebserver:3.8.0'
+  testCompile 'com.squareup.retrofit2:converter-gson:2.3.0'
+  testCompile 'com.squareup.retrofit2:converter-scalars:2.3.0'
+  testCompile 'com.squareup.retrofit2:converter-jackson:2.3.0'
+  testCompile 'com.squareup.retrofit2:retrofit:2.3.0'
   testCompile 'junit:junit:4.12'
   testCompile 'org.apache.oltu.oauth2:org.apache.oltu.oauth2.client:1.0.2'
   testCompile 'org.assertj:assertj-core:2.4.1'

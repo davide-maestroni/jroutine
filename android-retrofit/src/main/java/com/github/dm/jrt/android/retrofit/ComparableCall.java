@@ -45,11 +45,11 @@ import retrofit2.Response;
  * <p>
  * Created by davide-maestroni on 03/25/2016.
  *
- * @param <T> the response type.
+ * @param <R> the response type.
  */
-public class ComparableCall<T> implements Call<T> {
+public class ComparableCall<R> implements Call<R> {
 
-  private final Call<T> mCall;
+  private final Call<R> mCall;
 
   /**
    * Constructor.
@@ -57,32 +57,33 @@ public class ComparableCall<T> implements Call<T> {
    * @param wrapped the wrapped instance.
    */
   @SuppressWarnings("unchecked")
-  private ComparableCall(@NotNull final Call<?> wrapped) {
-    mCall = (Call<T>) ConstantConditions.notNull("call instance", wrapped);
+  private ComparableCall(@NotNull final Call<R> wrapped) {
+    mCall = ConstantConditions.notNull("call instance", wrapped);
   }
 
   /**
    * Returns a call instance wrapping the specified one.
    *
    * @param wrapped the wrapped instance.
-   * @param <T>     the response type.
+   * @param <R>     the response type.
    * @return the comparable call.
    */
   @NotNull
-  public static <T> ComparableCall<T> of(@NotNull final Call<?> wrapped) {
-    return new ComparableCall<T>(wrapped);
+  public static <R> ComparableCall<R> of(@NotNull final Call<R> wrapped) {
+    return new ComparableCall<R>(wrapped);
   }
 
   /**
    * Wraps the specified adapter so to make the passed call comparable.
    *
    * @param callAdapter the adapter to wrap.
-   * @param <T>         the response type.
+   * @param <R>         the response type.
+   * @param <T>         the adapted type.
    * @return the wrapped adapter.
    */
   @NotNull
-  public static <T> CallAdapter<T> wrap(@NotNull final CallAdapter<T> callAdapter) {
-    return new CallAdapterDecorator<T>(callAdapter);
+  public static <R, T> CallAdapter<R, T> wrap(@NotNull final CallAdapter<R, T> callAdapter) {
+    return new CallAdapterDecorator<R, T>(callAdapter);
   }
 
   private static boolean equals(@Nullable final RequestBody b1, @Nullable final RequestBody b2) {
@@ -147,8 +148,8 @@ public class ComparableCall<T> implements Call<T> {
 
   @Override
   @SuppressWarnings("CloneDoesntCallSuperClone")
-  public Call<T> clone() {
-    return new ComparableCall<T>(mCall.clone());
+  public Call<R> clone() {
+    return new ComparableCall<R>(mCall.clone());
   }
 
   @Override
@@ -210,7 +211,7 @@ public class ComparableCall<T> implements Call<T> {
 
       for (final String name : names) {
         result += result * 31 + ((name != null) ? name.hashCode() : 0);
-        final List<String> values = headers.values(name);
+        final List<String> values = (name != null) ? headers.values(name) : null;
         result += result * 31 + ((values != null) ? values.hashCode() : 0);
       }
     }
@@ -219,12 +220,12 @@ public class ComparableCall<T> implements Call<T> {
   }
 
   @Override
-  public Response<T> execute() throws IOException {
+  public Response<R> execute() throws IOException {
     return mCall.execute();
   }
 
   @Override
-  public void enqueue(final Callback<T> callback) {
+  public void enqueue(@NotNull final Callback<R> callback) {
     mCall.enqueue(callback);
   }
 
@@ -253,16 +254,16 @@ public class ComparableCall<T> implements Call<T> {
    *
    * @param <T> the adapted type.
    */
-  private static class CallAdapterDecorator<T> implements CallAdapter<T> {
+  private static class CallAdapterDecorator<R, T> implements CallAdapter<R, T> {
 
-    private final CallAdapter<T> mAdapter;
+    private final CallAdapter<R, T> mAdapter;
 
     /**
      * Constructor.
      *
      * @param wrapped the wrapped adapter instance.
      */
-    private CallAdapterDecorator(@NotNull final CallAdapter<T> wrapped) {
+    private CallAdapterDecorator(@NotNull final CallAdapter<R, T> wrapped) {
       mAdapter = ConstantConditions.notNull("call adapter instance", wrapped);
     }
 
@@ -272,7 +273,7 @@ public class ComparableCall<T> implements Call<T> {
     }
 
     @Override
-    public <OUT> T adapt(final Call<OUT> call) {
+    public T adapt(@NotNull final Call<R> call) {
       return mAdapter.adapt(ComparableCall.of(call));
     }
   }

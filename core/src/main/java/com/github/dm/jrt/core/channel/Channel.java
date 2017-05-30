@@ -499,14 +499,6 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
   Channel<IN, OUT> inNoTime();
 
   /**
-   * Returns the number of input data stored in the channel.
-   *
-   * @return the input data size.
-   */
-  int inputSize();
-  // TODO: 24/04/2017 remove?
-
-  /**
    * Checks if this channel is bound to a consumer or another channel.
    *
    * @return whether the channel is bound.
@@ -589,14 +581,6 @@ public interface Channel<IN, OUT> extends Iterator<OUT>, Iterable<OUT> {
    * @see #inNoTime()
    */
   OUT nextOrElse(OUT output);
-
-  /**
-   * Returns the number of output data stored in the channel.
-   *
-   * @return the output data size.
-   */
-  int outputSize();
-  // TODO: 24/04/2017 remove?
 
   /**
    * Passes the data returned by the specified channel to this one.

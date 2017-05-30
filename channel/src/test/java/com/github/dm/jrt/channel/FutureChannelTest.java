@@ -816,17 +816,13 @@ public class FutureChannelTest {
           }
         }, 100, TimeUnit.MILLISECONDS);
     final Channel<?, String> channel = JRoutineChannels.channelHandler().channelOf(future);
-    assertThat(channel.inputSize()).isEqualTo(0);
-    assertThat(channel.outputSize()).isEqualTo(0);
+    assertThat(channel.size()).isEqualTo(0);
     millis(500).sleepAtLeast();
-    assertThat(channel.inputSize()).isEqualTo(1);
-    assertThat(channel.outputSize()).isEqualTo(1);
+    assertThat(channel.size()).isEqualTo(1);
     channel.close();
     assertThat(channel.in(seconds(1)).getComplete()).isTrue();
-    assertThat(channel.inputSize()).isEqualTo(1);
-    assertThat(channel.outputSize()).isEqualTo(1);
     assertThat(channel.size()).isEqualTo(1);
-    assertThat(channel.skipNext(1).outputSize()).isEqualTo(0);
+    assertThat(channel.skipNext(1).size()).isEqualTo(0);
   }
 
   @Test

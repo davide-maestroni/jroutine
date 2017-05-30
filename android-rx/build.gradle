@@ -25,7 +25,7 @@ version = project.getProperty('releaseVersion')
 archivesBaseName = "${project.parent.name}-${project.name}"
 
 ext {
-  rxJavaVersion = '2.0.5'
+  rxJavaVersion = '2.1.0'
   androidCoreVersion = '7.0.0'
   coreVersion = '7.0.0'
   rxVersion = '7.0.0'

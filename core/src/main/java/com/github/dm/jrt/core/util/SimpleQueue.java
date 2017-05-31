@@ -71,13 +71,6 @@ public class SimpleQueue<E> implements Iterable<E> {
     mMask = initialCapacity - 1;
   }
 
-  private static void resizeArray(@NotNull final Object[] src, @NotNull final Object[] dst,
-      final int first) {
-    final int remainder = src.length - first;
-    System.arraycopy(src, 0, dst, 0, first);
-    System.arraycopy(src, first, dst, dst.length - remainder, remainder);
-  }
-
   /**
    * Adds the specified element to end of the queue.
    * <p>
@@ -87,13 +80,11 @@ public class SimpleQueue<E> implements Iterable<E> {
    */
   public void add(@Nullable final E element) {
     final int last = mLast;
-    final int newLast = (last + 1) & mMask;
     mData[last] = element;
-    if (mFirst == newLast) {
+    if (mFirst == (mLast = (last + 1) & mMask)) {
       doubleCapacity();
     }
 
-    mLast = newLast;
     ++mSize;
   }
 
@@ -119,15 +110,12 @@ public class SimpleQueue<E> implements Iterable<E> {
    */
   public void addFirst(@Nullable final E element) {
     int mask = mMask;
-    int newFirst = (mFirst + mask) & mask;
+    int newFirst = (mFirst = (mFirst + mask) & mask);
+    mData[newFirst] = element;
     if (newFirst == mLast) {
       doubleCapacity();
-      mask = mMask;
-      newFirst = (mFirst + mask) & mask;
     }
 
-    mData[newFirst] = element;
-    mFirst = newFirst;
     ++mSize;
   }
 
@@ -274,15 +262,13 @@ public class SimpleQueue<E> implements Iterable<E> {
     }
 
     final int first = mFirst;
+    final int remainder = size - first;
     final Object[] newData = new Object[newSize];
-    resizeArray(data, newData, first);
+    System.arraycopy(data, first, newData, 0, remainder);
+    System.arraycopy(data, 0, newData, remainder, first);
     mData = newData;
-    final int shift = newSize - size;
-    mFirst = first + shift;
-    if (mLast >= first) {
-      mLast += shift;
-    }
-
+    mFirst = 0;
+    mLast = size;
     mMask = newSize - 1;
   }
 

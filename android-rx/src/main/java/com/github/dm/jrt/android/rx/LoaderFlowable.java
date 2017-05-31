@@ -39,6 +39,7 @@ public interface LoaderFlowable
    * The returned Flowable will asynchronously subscribe Observers on the main thread.
    *
    * @param flowable the Flowable to lift.
+   * @param <DATA>   the data type.
    * @return the lifted Flowable.
    */
   @NotNull
@@ -48,6 +49,7 @@ public interface LoaderFlowable
    * Returns a Flowable asynchronously subscribing Observers in a dedicated Loader.
    *
    * @param flowable the Flowable to lift.
+   * @param <DATA>   the data type.
    * @return the lifted Flowable.
    */
   @NotNull

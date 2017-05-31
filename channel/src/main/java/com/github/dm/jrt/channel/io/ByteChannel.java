@@ -203,6 +203,7 @@ public class ByteChannel {
     /**
      * Builds a new output stream instance.
      *
+     * @param channel the channel to feed.
      * @return the output stream instance.
      */
     @NotNull

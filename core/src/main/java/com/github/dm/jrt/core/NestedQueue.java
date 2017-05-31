@@ -33,9 +33,9 @@ import java.util.Collection;
  */
 class NestedQueue<E> {
 
-  private final SimpleQueue<Object> mQueue = new SimpleQueue<Object>();
-
   private boolean mClosed;
+
+  private SimpleQueue<Object> mQueue = new SimpleQueue<Object>();
 
   private QueueManager<E> mQueueManager;
 
@@ -65,7 +65,6 @@ class NestedQueue<E> {
    * @throws java.lang.IllegalStateException if the queue has been already closed.
    */
   void add(@Nullable final E element) {
-    checkOpen();
     mQueue.add(element);
   }
 
@@ -78,7 +77,6 @@ class NestedQueue<E> {
    * @throws java.lang.IllegalStateException if the queue has been already closed.
    */
   void addAll(@NotNull final Iterable<? extends E> elements) {
-    checkOpen();
     mQueue.addAll(elements);
   }
 
@@ -90,7 +88,6 @@ class NestedQueue<E> {
    */
   @NotNull
   NestedQueue<E> addNested() {
-    checkOpen();
     final InnerNestedQueue<E> queue = new InnerNestedQueue<E>();
     mQueue.add(queue);
     mQueueManager = new NestedQueueManager();
@@ -112,6 +109,7 @@ class NestedQueue<E> {
    */
   void close() {
     mClosed = true;
+    mQueue = new ReadOnlyQueue<Object>(mQueue);
   }
 
   /**
@@ -149,12 +147,6 @@ class NestedQueue<E> {
    */
   void transferTo(@NotNull final SimpleQueue<? super E> other) {
     mQueueManager.transferTo(other);
-  }
-
-  private void checkOpen() {
-    if (mClosed) {
-      throw new IllegalStateException("the queue is closed");
-    }
   }
 
   /**
@@ -200,6 +192,90 @@ class NestedQueue<E> {
    * @param <E> the element data type.
    */
   private static class InnerNestedQueue<E> extends NestedQueue<E> {}
+
+  /**
+   * Read only queue implementation.
+   *
+   * @param <E> the element type.
+   */
+  private static class ReadOnlyQueue<E> extends SimpleQueue<E> {
+
+    private final SimpleQueue<E> mQueue;
+
+    /**
+     * Constructor.
+     *
+     * @param wrapped the wrapped queue.
+     */
+    private ReadOnlyQueue(@NotNull final SimpleQueue<E> wrapped) {
+      mQueue = wrapped;
+    }
+
+    @Override
+    public void add(@Nullable final E element) {
+      throw exception();
+    }
+
+    @Override
+    public void addAll(@NotNull final Iterable<? extends E> elements) {
+      throw exception();
+    }
+
+    @Override
+    public void addFirst(@Nullable final E element) {
+      throw exception();
+    }
+
+    @Override
+    public void clear() {
+      mQueue.clear();
+    }
+
+    @Override
+    public boolean isEmpty() {
+      return mQueue.isEmpty();
+    }
+
+    @Override
+    public SimpleQueueIterator<E> iterator() {
+      return mQueue.iterator();
+    }
+
+    @Override
+    public E peekFirst() {
+      return mQueue.peekFirst();
+    }
+
+    @Override
+    public E removeFirst() {
+      return mQueue.removeFirst();
+    }
+
+    @Override
+    public E removeLast() {
+      return mQueue.removeLast();
+    }
+
+    @Override
+    public int size() {
+      return mQueue.size();
+    }
+
+    @Override
+    public void transferTo(@NotNull final Collection<? super E> collection) {
+      mQueue.transferTo(collection);
+    }
+
+    @Override
+    public void transferTo(@NotNull final SimpleQueue<? super E> other) {
+      mQueue.transferTo(other);
+    }
+
+    @NotNull
+    private IllegalStateException exception() {
+      return new IllegalStateException("the queue is closed");
+    }
+  }
 
   /**
    * Nested queue manager implementation.
@@ -311,14 +387,12 @@ class NestedQueue<E> {
 
     @SuppressWarnings("unchecked")
     public void transferTo(@NotNull final Collection<? super E> collection) {
-      final SimpleQueue<E> queue = (SimpleQueue<E>) mQueue;
-      queue.transferTo(collection);
+      ((SimpleQueue<E>) mQueue).transferTo(collection);
     }
 
     @SuppressWarnings("unchecked")
     public void transferTo(@NotNull final SimpleQueue<? super E> other) {
-      final SimpleQueue<E> queue = (SimpleQueue<E>) mQueue;
-      queue.transferTo(other);
+      ((SimpleQueue<E>) mQueue).transferTo(other);
     }
   }
 }

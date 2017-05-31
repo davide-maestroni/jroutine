@@ -188,7 +188,8 @@ class DefaultStreamRoutine<IN, OUT> implements StreamRoutine<IN, OUT> {
      *
      * @param factory the factory instance.
      */
-    FactoryFunction(@NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
+    private FactoryFunction(
+        @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
       mFactory = ConstantConditions.notNull("factory instance", factory);
     }
 
@@ -214,7 +215,7 @@ class DefaultStreamRoutine<IN, OUT> implements StreamRoutine<IN, OUT> {
      *
      * @param factory the factory instance.
      */
-    FactorySupplier(@NotNull final InvocationFactory<? super IN, ? extends OUT> factory) {
+    private FactorySupplier(@NotNull final InvocationFactory<? super IN, ? extends OUT> factory) {
       mFactory = ConstantConditions.notNull("factory instance", factory);
     }
 
@@ -245,7 +246,7 @@ class DefaultStreamRoutine<IN, OUT> implements StreamRoutine<IN, OUT> {
      * @param invocation    the invocation instance.
      * @param outputChannel the output channel.
      */
-    InvocationConsumer(@NotNull final Invocation<? super IN, ? extends OUT> invocation,
+    private InvocationConsumer(@NotNull final Invocation<? super IN, ? extends OUT> invocation,
         @NotNull final Channel<OUT, ?> outputChannel) throws Exception {
       try {
         invocation.onStart();
@@ -327,7 +328,7 @@ class DefaultStreamRoutine<IN, OUT> implements StreamRoutine<IN, OUT> {
      *
      * @param invocation the invocation instance.
      */
-    InvocationFunction(@NotNull final Invocation<? super OUT, ? extends AFTER> invocation) {
+    private InvocationFunction(@NotNull final Invocation<? super OUT, ? extends AFTER> invocation) {
       mInvocation = ConstantConditions.notNull("invocation instance", invocation);
     }
 
@@ -359,7 +360,7 @@ class DefaultStreamRoutine<IN, OUT> implements StreamRoutine<IN, OUT> {
      *
      * @param invocation the invocation instance.
      */
-    InvocationSupplier(@NotNull final Invocation<? super IN, ? extends OUT> invocation) {
+    private InvocationSupplier(@NotNull final Invocation<? super IN, ? extends OUT> invocation) {
       mInvocation = ConstantConditions.notNull("invocation instance", invocation);
     }
 

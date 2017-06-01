@@ -28,7 +28,7 @@
     private com.github.dm.jrt.reflect.common.Mutex mMutex = com.github.dm.jrt.reflect.common.Mutex.NONE;
 
     @SuppressWarnings("unused")
-    private com.github.dm.jrt.reflect.InvocationTarget mTarget;
+    private com.github.dm.jrt.reflect.InvocationTarget<?> mTarget;
 
     private ContextInvocation${methodCount}(@org.jetbrains.annotations.Nullable final java.util.Set<String> sharedFields,
         @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.reflect.ContextInvocationTarget<?> target) {

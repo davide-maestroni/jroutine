@@ -88,7 +88,7 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
    * @throws java.lang.IllegalArgumentException if no constructor taking the specified objects as
    *                                            parameters was found for the configured log or the
    *                                            configured executor.
-   * @throws java.lang.IllegalStateException    if the specified context is no more valid.
+   * @throws java.lang.IllegalStateException    if the specified Context is no more valid.
    */
   ServiceRoutine(@NotNull final ServiceSource serviceSource,
       @NotNull final InvocationFactoryReference<IN, OUT> target,
@@ -187,11 +187,11 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
    */
   private static class IncomingHandler<OUT> extends Handler {
 
-    private final ServiceSource mContext;
-
     private final Logger mLogger;
 
     private final Channel<OUT, OUT> mOutputChannel;
+
+    private final ServiceSource mServiceSource;
 
     private ServiceConnection mConnection;
 
@@ -201,14 +201,15 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
      * Constructor.
      *
      * @param looper        the message Looper.
-     * @param context       the Service context.
+     * @param serviceSource the Service source.
      * @param outputChannel the output channel.
      * @param logger        the logger instance.
      */
-    private IncomingHandler(@NotNull final Looper looper, @NotNull final ServiceSource context,
-        @NotNull final Channel<OUT, OUT> outputChannel, @NotNull final Logger logger) {
+    private IncomingHandler(@NotNull final Looper looper,
+        @NotNull final ServiceSource serviceSource, @NotNull final Channel<OUT, OUT> outputChannel,
+        @NotNull final Logger logger) {
       super(looper);
-      mContext = context;
+      mServiceSource = serviceSource;
       mOutputChannel = outputChannel;
       mLogger = logger;
     }
@@ -256,8 +257,8 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
       }
 
       mIsUnbound = true;
-      final Context serviceContext = mContext.getContext();
-      if (serviceContext != null) {
+      final Context context = mServiceSource.getContext();
+      if (context != null) {
         // Unbind on main thread to avoid crashing the IPC
         ScheduledExecutors.zeroDelayExecutor(mainExecutor()).execute(new Runnable() {
 
@@ -265,7 +266,7 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
           public void run() {
             // Unfortunately there is no way to know if the context is still valid
             try {
-              serviceContext.unbindService(mConnection);
+              context.unbindService(mConnection);
 
             } catch (final Throwable t) {
               InterruptedInvocationException.throwIfInterrupt(t);
@@ -375,8 +376,6 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
    */
   private static class ServiceInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> {
 
-    private final ServiceSource mContext;
-
     private final InvocationConfiguration mInvocationConfiguration;
 
     private final Logger mLogger;
@@ -385,6 +384,8 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
 
     private final InvocationFactoryReference<IN, OUT> mTargetFactory;
 
+    private final ServiceSource mmServiceSource;
+
     private Channel<IN, IN> mInputChannel;
 
     private Channel<OUT, OUT> mOutputChannel;
@@ -392,17 +393,17 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
     /**
      * Constructor.
      *
-     * @param context                 the Service context.
+     * @param serviceSource           the Service source.
      * @param target                  the invocation factory target.
      * @param invocationConfiguration the invocation configuration.
      * @param serviceConfiguration    the Service configuration.
      * @param logger                  the logger instance.
      */
-    private ServiceInvocation(@NotNull final ServiceSource context,
+    private ServiceInvocation(@NotNull final ServiceSource serviceSource,
         @NotNull final InvocationFactoryReference<IN, OUT> target,
         @NotNull final InvocationConfiguration invocationConfiguration,
         @NotNull final ServiceConfiguration serviceConfiguration, @NotNull final Logger logger) {
-      mContext = context;
+      mmServiceSource = serviceSource;
       mTargetFactory = target;
       mInvocationConfiguration = invocationConfiguration;
       mServiceConfiguration = serviceConfiguration;
@@ -450,7 +451,7 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
                                    .ofType();
       final Looper looper = mServiceConfiguration.getMessageLooperOrElse(Looper.getMainLooper());
       final IncomingHandler<OUT> handler =
-          new IncomingHandler<OUT>(looper, mContext, mOutputChannel, logger);
+          new IncomingHandler<OUT>(looper, mmServiceSource, mOutputChannel, logger);
       handler.setConnection(bindService(handler));
     }
 
@@ -463,18 +464,18 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
 
     @NotNull
     private ServiceConnection bindService(@NotNull final IncomingHandler<OUT> handler) {
-      final ServiceSource context = mContext;
-      final Context serviceContext = context.getContext();
-      if (serviceContext == null) {
+      final ServiceSource serviceSource = mmServiceSource;
+      final Context context = serviceSource.getContext();
+      if (context == null) {
         throw new IllegalStateException("the Service Context has been destroyed");
       }
 
-      final Intent intent = context.getIntent();
+      final Intent intent = serviceSource.getIntent();
       final RoutineServiceConnection<IN, OUT> connection =
           new RoutineServiceConnection<IN, OUT>(randomUUID().toString(), mTargetFactory,
               mInvocationConfiguration, mServiceConfiguration, handler, mInputChannel,
               mOutputChannel, mLogger);
-      if (!serviceContext.bindService(intent, connection, Context.BIND_AUTO_CREATE)) {
+      if (!context.bindService(intent, connection, Context.BIND_AUTO_CREATE)) {
         throw new RoutineException("failed to bind to Service: " + intent
             + ", remember to add the Service declaration to the Android manifest file!");
       }

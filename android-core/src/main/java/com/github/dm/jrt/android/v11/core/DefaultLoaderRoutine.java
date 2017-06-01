@@ -52,29 +52,29 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
 
   private final LoaderConfiguration mConfiguration;
 
-  private final LoaderSource mContext;
-
   private final ContextInvocationFactory<IN, OUT> mFactory;
 
   private final int mLoaderId;
+
+  private final LoaderSource mLoaderSource;
 
   private final OrderType mOrderType;
 
   /**
    * Constructor.
    *
-   * @param context                 the routine context.
+   * @param loaderSource            the Loader source.
    * @param factory                 the invocation factory.
    * @param invocationConfiguration the invocation configuration.
    * @param loaderConfiguration     the Loader configuration.
    */
-  DefaultLoaderRoutine(@NotNull final LoaderSource context,
+  DefaultLoaderRoutine(@NotNull final LoaderSource loaderSource,
       @NotNull final ContextInvocationFactory<IN, OUT> factory,
       @NotNull final InvocationConfiguration invocationConfiguration,
       @NotNull final LoaderConfiguration loaderConfiguration) {
     super(invocationConfiguration, zeroDelayExecutor(mainExecutor()));
     final int invocationId = loaderConfiguration.getInvocationIdOrElse(LoaderConfiguration.AUTO);
-    mContext = ConstantConditions.notNull("Loader context", context);
+    mLoaderSource = ConstantConditions.notNull("Loader source", loaderSource);
     ConstantConditions.notNull("Context invocation factory", factory);
     mFactory = (invocationId == LoaderConfiguration.AUTO) ? factory
         : new FactoryWrapper<IN, OUT>(factory, invocationId);
@@ -87,30 +87,30 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
   @Override
   public void clear() {
     super.clear();
-    final LoaderSource context = mContext;
-    if (context.getComponent() != null) {
-      clearLoaders(context, mLoaderId, mFactory);
+    final LoaderSource loaderSource = mLoaderSource;
+    if (loaderSource.getComponent() != null) {
+      clearLoaders(loaderSource, mLoaderId, mFactory);
     }
   }
 
   @NotNull
   @Override
   protected Invocation<IN, OUT> newInvocation() {
-    return new LoaderInvocation<IN, OUT>(mContext, mFactory, mConfiguration, mOrderType,
+    return new LoaderInvocation<IN, OUT>(mLoaderSource, mFactory, mConfiguration, mOrderType,
         getLogger());
   }
 
   @Override
   public void clear(@Nullable final IN input) {
-    final LoaderSource context = mContext;
-    if (context.getComponent() != null) {
-      clearLoaders(context, mLoaderId, mFactory, Collections.singletonList(input));
+    final LoaderSource loaderSource = mLoaderSource;
+    if (loaderSource.getComponent() != null) {
+      clearLoaders(loaderSource, mLoaderId, mFactory, Collections.singletonList(input));
     }
   }
 
   public void clear(@Nullable final IN... inputs) {
-    final LoaderSource context = mContext;
-    if (context.getComponent() != null) {
+    final LoaderSource loaderSource = mLoaderSource;
+    if (loaderSource.getComponent() != null) {
       final List<IN> inputList;
       if (inputs == null) {
         inputList = Collections.emptyList();
@@ -119,14 +119,14 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
         inputList = Arrays.asList(inputs);
       }
 
-      clearLoaders(context, mLoaderId, mFactory, inputList);
+      clearLoaders(loaderSource, mLoaderId, mFactory, inputList);
     }
   }
 
   @Override
   public void clear(@Nullable final Iterable<? extends IN> inputs) {
-    final LoaderSource context = mContext;
-    if (context.getComponent() != null) {
+    final LoaderSource loaderSource = mLoaderSource;
+    if (loaderSource.getComponent() != null) {
       final List<IN> inputList;
       if (inputs == null) {
         inputList = Collections.emptyList();
@@ -138,7 +138,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
         }
       }
 
-      clearLoaders(context, mLoaderId, mFactory, inputList);
+      clearLoaders(loaderSource, mLoaderId, mFactory, inputList);
     }
   }
 

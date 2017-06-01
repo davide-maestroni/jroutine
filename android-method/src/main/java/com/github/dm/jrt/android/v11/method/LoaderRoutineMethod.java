@@ -71,7 +71,7 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * <h2>How to implement a routine</h2>
  * The class behaves like a {@link RoutineMethod} with a few differences. In order to avoid
  * undesired leaks, the implementing class must be static. Moreover, each constructor must have the
- * Loader context as first argument.
+ * Loader source as first argument.
  * <br>
  * Note that, for the method to be executed inside the Loader, all the input channels must be
  * closed.
@@ -83,8 +83,8 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * <pre><code>
  * public static class MyMethod extends LoaderRoutineMethod {
  *
- *   public MyMethod(final LoaderContext context) {
- *     super(context);
+ *   public MyMethod(final LoaderSource source) {
+ *     super(source);
  *   }
  *
  *   void run(&#64;Input final Channel&lt;?, String&gt; input,
@@ -109,9 +109,9 @@ public class LoaderRoutineMethod extends RoutineMethod
 
   private final Constructor<? extends LoaderRoutineMethod> mConstructor;
 
-  private final LoaderSource mContext;
-
   private final AtomicBoolean mIsFirstCall = new AtomicBoolean(true);
+
+  private final LoaderSource mLoaderSource;
 
   private final ThreadLocal<Channel<?, ?>> mLocalChannel = new ThreadLocal<Channel<?, ?>>();
 
@@ -126,21 +126,22 @@ public class LoaderRoutineMethod extends RoutineMethod
   /**
    * Constructor.
    *
-   * @param context the Loader context.
+   * @param loaderSource the Loader source.
    */
-  public LoaderRoutineMethod(@NotNull final LoaderSource context) {
-    this(context, (Object[]) null);
+  public LoaderRoutineMethod(@NotNull final LoaderSource loaderSource) {
+    this(loaderSource, (Object[]) null);
   }
 
   /**
    * Constructor.
    *
-   * @param context the Loader context.
-   * @param args    the constructor arguments.
+   * @param loaderSource the Loader source.
+   * @param args         the constructor arguments.
    */
-  public LoaderRoutineMethod(@NotNull final LoaderSource context, @Nullable final Object... args) {
+  public LoaderRoutineMethod(@NotNull final LoaderSource loaderSource,
+      @Nullable final Object... args) {
     super(defaultExecutor());
-    mContext = ConstantConditions.notNull("Loader context", context);
+    mLoaderSource = ConstantConditions.notNull("Loader source", loaderSource);
     final Class<? extends LoaderRoutineMethod> type = getClass();
     if (!Reflection.hasStaticScope(type)) {
       throw new IllegalStateException(
@@ -153,20 +154,20 @@ public class LoaderRoutineMethod extends RoutineMethod
       if (safeArgs.length > 0) {
         constructorArgs = new Object[safeArgs.length + 2];
         System.arraycopy(safeArgs, 0, constructorArgs, 2, safeArgs.length);
-        constructorArgs[0] = context;
+        constructorArgs[0] = loaderSource;
         constructorArgs[1] = safeArgs;
 
       } else {
-        constructorArgs = new Object[]{context};
+        constructorArgs = new Object[]{loaderSource};
       }
 
     } else if (safeArgs.length > 0) {
       constructorArgs = new Object[safeArgs.length + 1];
       System.arraycopy(safeArgs, 0, constructorArgs, 1, safeArgs.length);
-      constructorArgs[0] = context;
+      constructorArgs[0] = loaderSource;
 
     } else {
-      constructorArgs = new Object[]{context};
+      constructorArgs = new Object[]{loaderSource};
     }
 
     Constructor<? extends LoaderRoutineMethod> constructor = null;
@@ -183,46 +184,47 @@ public class LoaderRoutineMethod extends RoutineMethod
   /**
    * Builds a Loader reflection routine method by wrapping the specified static method.
    *
-   * @param context the Loader context.
-   * @param method  the method.
+   * @param loaderSource the Loader source.
+   * @param method       the method.
    * @return the routine method instance.
    * @throws java.lang.IllegalArgumentException if the specified method is not static.
    */
   @NotNull
-  public static ReflectionLoaderRoutineMethod from(@NotNull final LoaderSource context,
+  public static ReflectionLoaderRoutineMethod from(@NotNull final LoaderSource loaderSource,
       @NotNull final Method method) {
     if (!Modifier.isStatic(method.getModifiers())) {
       throw new IllegalArgumentException("the method is not static: " + method);
     }
 
-    return from(context, ContextInvocationTarget.classOfType(method.getDeclaringClass()), method);
+    return from(loaderSource, ContextInvocationTarget.classOfType(method.getDeclaringClass()),
+        method);
   }
 
   /**
    * Builds a Loader reflection routine method by wrapping a method of the specified target.
    *
-   * @param context the Loader context.
-   * @param target  the invocation target.
-   * @param method  the method.
+   * @param loaderSource the Loader source.
+   * @param target       the invocation target.
+   * @param method       the method.
    * @return the routine method instance.
    * @throws java.lang.IllegalArgumentException if the specified method is not implemented by the
    *                                            target instance.
    */
   @NotNull
-  public static ReflectionLoaderRoutineMethod from(@NotNull final LoaderSource context,
+  public static ReflectionLoaderRoutineMethod from(@NotNull final LoaderSource loaderSource,
       @NotNull final ContextInvocationTarget<?> target, @NotNull final Method method) {
     if (!method.getDeclaringClass().isAssignableFrom(target.getTargetClass())) {
       throw new IllegalArgumentException(
           "the method is not applicable to the specified target class: " + target.getTargetClass());
     }
 
-    return new ReflectionLoaderRoutineMethod(context, target, method);
+    return new ReflectionLoaderRoutineMethod(loaderSource, target, method);
   }
 
   /**
    * Builds a Loader reflection routine method by wrapping a method of the specified target.
    *
-   * @param context        the Loader context.
+   * @param loaderSource   the Loader source.
    * @param target         the invocation target.
    * @param name           the method name.
    * @param parameterTypes the method parameter types.
@@ -230,10 +232,10 @@ public class LoaderRoutineMethod extends RoutineMethod
    * @throws java.lang.NoSuchMethodException if no method with the specified signature is found.
    */
   @NotNull
-  public static ReflectionLoaderRoutineMethod from(@NotNull final LoaderSource context,
+  public static ReflectionLoaderRoutineMethod from(@NotNull final LoaderSource loaderSource,
       @NotNull final ContextInvocationTarget<?> target, @NotNull final String name,
       @Nullable final Class<?>... parameterTypes) throws NoSuchMethodException {
-    return from(context, target, target.getTargetClass().getMethod(name, parameterTypes));
+    return from(loaderSource, target, target.getTargetClass().getMethod(name, parameterTypes));
   }
 
   /**
@@ -379,7 +381,7 @@ public class LoaderRoutineMethod extends RoutineMethod
                                                             .mergeParcelableOutputOf(inputChannels)
             : JRoutineCore.channel().<FlowData<Object>>of();
     final Channel<FlowData<Object>, FlowData<Object>> outputChannel =
-        JRoutineLoader.routineOn(mContext)
+        JRoutineLoader.routineOn(mLoaderSource)
                       .withConfiguration(getConfiguration())
                       .withConfiguration(getLoaderConfiguration())
                       .of(factory)
@@ -422,7 +424,7 @@ public class LoaderRoutineMethod extends RoutineMethod
   public static class ReflectionLoaderRoutineMethod extends LoaderRoutineMethod
       implements WrapperConfigurable<ReflectionLoaderRoutineMethod> {
 
-    private final LoaderSource mContext;
+    private final LoaderSource mLoaderSource;
 
     private final Method mMethod;
 
@@ -433,14 +435,14 @@ public class LoaderRoutineMethod extends RoutineMethod
     /**
      * Constructor.
      *
-     * @param context the loader context.
-     * @param target  the invocation target.
-     * @param method  the method instance.
+     * @param loaderSource the loader source.
+     * @param target       the invocation target.
+     * @param method       the method instance.
      */
-    private ReflectionLoaderRoutineMethod(@NotNull final LoaderSource context,
+    private ReflectionLoaderRoutineMethod(@NotNull final LoaderSource loaderSource,
         @NotNull final ContextInvocationTarget<?> target, @NotNull final Method method) {
-      super(context);
-      mContext = context;
+      super(loaderSource);
+      mLoaderSource = loaderSource;
       mTarget = target;
       mMethod = method;
     }
@@ -457,7 +459,7 @@ public class LoaderRoutineMethod extends RoutineMethod
                 + "> but was <" + safeParams.length + ">");
       }
 
-      final Routine<Object, Object> routine = JRoutineLoaderReflection.wrapperOn(mContext)
+      final Routine<Object, Object> routine = JRoutineLoaderReflection.wrapperOn(mLoaderSource)
                                                                       .withConfiguration(
                                                                           getConfiguration())
                                                                       .withConfiguration(

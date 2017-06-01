@@ -130,9 +130,6 @@ public class StatefulLoaderRoutineBuilderCompatTest
                                                        .configuration()
                                                        .create();
     assertThat(routine.invoke().close().in(seconds(10)).getComplete()).isTrue();
-    assertThat(state.get()).isTrue();
-    routine.clear();
-    seconds(2).sleepAtLeast();
     assertThat(state.get()).isFalse();
   }
 

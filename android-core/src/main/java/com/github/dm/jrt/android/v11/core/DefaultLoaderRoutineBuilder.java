@@ -43,17 +43,17 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class DefaultLoaderRoutineBuilder extends AbstractRoutineBuilder implements LoaderRoutineBuilder {
 
-  private final LoaderSource mContext;
+  private final LoaderSource mLoaderSource;
 
   private LoaderConfiguration mLoaderConfiguration = LoaderConfiguration.defaultConfiguration();
 
   /**
    * Constructor.
    *
-   * @param context the routine context.
+   * @param loaderSource the Loader source.
    */
-  DefaultLoaderRoutineBuilder(@NotNull final LoaderSource context) {
-    mContext = ConstantConditions.notNull("Loader context", context);
+  DefaultLoaderRoutineBuilder(@NotNull final LoaderSource loaderSource) {
+    mLoaderSource = ConstantConditions.notNull("Loader source", loaderSource);
   }
 
   @NotNull
@@ -65,8 +65,8 @@ class DefaultLoaderRoutineBuilder extends AbstractRoutineBuilder implements Load
           "the factory class must have a static scope: " + factoryClass.getName());
     }
 
-    return new DefaultLoaderRoutine<IN, OUT>(mContext, convertFactory(factory), getConfiguration(),
-        mLoaderConfiguration);
+    return new DefaultLoaderRoutine<IN, OUT>(mLoaderSource, convertFactory(factory),
+        getConfiguration(), mLoaderConfiguration);
   }
 
   @NotNull
@@ -85,7 +85,7 @@ class DefaultLoaderRoutineBuilder extends AbstractRoutineBuilder implements Load
           "the factory class must have a static scope: " + factoryClass.getName());
     }
 
-    return new DefaultLoaderRoutine<IN, OUT>(mContext, factory, getConfiguration(),
+    return new DefaultLoaderRoutine<IN, OUT>(mLoaderSource, factory, getConfiguration(),
         mLoaderConfiguration);
   }
 

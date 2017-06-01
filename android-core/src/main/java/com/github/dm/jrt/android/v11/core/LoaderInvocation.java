@@ -41,7 +41,6 @@ import com.github.dm.jrt.core.executor.ScheduledExecutor;
 import com.github.dm.jrt.core.executor.ScheduledExecutors;
 import com.github.dm.jrt.core.invocation.CallInvocation;
 import com.github.dm.jrt.core.log.Logger;
-import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 
@@ -80,11 +79,11 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
 
   private final ClashResolutionType mClashResolutionType;
 
-  private final LoaderSource mContext;
-
   private final ContextInvocationFactory<IN, OUT> mFactory;
 
   private final int mLoaderId;
+
+  private final LoaderSource mLoaderSource;
 
   private final Logger mLogger;
 
@@ -97,17 +96,17 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
   /**
    * Constructor.
    *
-   * @param context       the context instance.
+   * @param loaderSource  the Loader source.
    * @param factory       the invocation factory.
    * @param configuration the Loader configuration.
    * @param order         the input data order.
    * @param logger        the logger instance.
    */
-  LoaderInvocation(@NotNull final LoaderSource context,
+  LoaderInvocation(@NotNull final LoaderSource loaderSource,
       @NotNull final ContextInvocationFactory<IN, OUT> factory,
       @NotNull final LoaderConfiguration configuration, @Nullable final OrderType order,
       @NotNull final Logger logger) {
-    mContext = ConstantConditions.notNull("Loader context", context);
+    mLoaderSource = ConstantConditions.notNull("Loader source", loaderSource);
     mFactory = ConstantConditions.notNull("Context invocation factory", factory);
     mLoaderId = configuration.getLoaderIdOrElse(LoaderConfiguration.AUTO);
     mClashResolutionType =
@@ -122,56 +121,56 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
   /**
    * Destroys the Loader with the specified ID.
    *
-   * @param context  the context instance.
-   * @param loaderId the Loader ID.
+   * @param loaderSource the Loader source.
+   * @param loaderId     the Loader ID.
    */
-  static void clearLoader(@NotNull final LoaderSource context, final int loaderId) {
-    sMainExecutor.execute(new ClearCommand(context, loaderId));
+  static void clearLoader(@NotNull final LoaderSource loaderSource, final int loaderId) {
+    sMainExecutor.execute(new ClearCommand(loaderSource, loaderId));
   }
 
   /**
    * Destroys the Loader with the specified ID and the specified inputs.
    *
-   * @param context  the context instance.
-   * @param loaderId the Loader ID.
-   * @param inputs   the invocation inputs.
+   * @param loaderSource the Loader source.
+   * @param loaderId     the Loader ID.
+   * @param inputs       the invocation inputs.
    */
-  static void clearLoader(@NotNull final LoaderSource context, final int loaderId,
+  static void clearLoader(@NotNull final LoaderSource loaderSource, final int loaderId,
       @NotNull final List<?> inputs) {
-    sMainExecutor.execute(new ClearInputsCommand(context, loaderId, inputs), 0,
+    sMainExecutor.execute(new ClearInputsCommand(loaderSource, loaderId, inputs), 0,
         TimeUnit.MILLISECONDS);
   }
 
   /**
    * Destroys all the Loaders with the specified invocation factory.
    *
-   * @param context  the context instance.
-   * @param loaderId the Loader ID.
-   * @param factory  the invocation factory.
+   * @param loaderSource the Loader source.
+   * @param loaderId     the Loader ID.
+   * @param factory      the invocation factory.
    */
-  static void clearLoaders(@NotNull final LoaderSource context, final int loaderId,
+  static void clearLoaders(@NotNull final LoaderSource loaderSource, final int loaderId,
       @NotNull final ContextInvocationFactory<?, ?> factory) {
-    sMainExecutor.execute(new ClearFactoryCommand(context, factory, loaderId), 0,
+    sMainExecutor.execute(new ClearFactoryCommand(loaderSource, factory, loaderId), 0,
         TimeUnit.MILLISECONDS);
   }
 
   /**
    * Destroys all the Loaders with the specified invocation factory and inputs.
    *
-   * @param context  the context instance.
-   * @param loaderId the Loader ID.
-   * @param factory  the invocation factory.
-   * @param inputs   the invocation inputs.
+   * @param loaderSource the Loader source.
+   * @param loaderId     the Loader ID.
+   * @param factory      the invocation factory.
+   * @param inputs       the invocation inputs.
    */
-  static void clearLoaders(@NotNull final LoaderSource context, final int loaderId,
+  static void clearLoaders(@NotNull final LoaderSource loaderSource, final int loaderId,
       @NotNull final ContextInvocationFactory<?, ?> factory, @NotNull final List<?> inputs) {
-    sMainExecutor.execute(new ClearFactoryInputsCommand(context, factory, loaderId, inputs), 0,
+    sMainExecutor.execute(new ClearFactoryInputsCommand(loaderSource, factory, loaderId, inputs), 0,
         TimeUnit.MILLISECONDS);
   }
 
-  private static void clearLoaderInternal(@NotNull final LoaderSource context,
+  private static void clearLoaderInternal(@NotNull final LoaderSource loaderSource,
       final int loaderId) {
-    final Object component = context.getComponent();
+    final Object component = loaderSource.getComponent();
     final WeakIdentityHashMap<Object, SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>>
         callbackMap = sCallbacks;
     final SparseArray<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
@@ -180,7 +179,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
       return;
     }
 
-    final LoaderManager loaderManager = context.getLoaderManager();
+    final LoaderManager loaderManager = loaderSource.getLoaderManager();
     if (loaderManager == null) {
       return;
     }
@@ -208,9 +207,9 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
     }
   }
 
-  private static void clearLoaderInternal(@NotNull final LoaderSource context, final int loaderId,
-      @NotNull final List<?> inputs) {
-    final Object component = context.getComponent();
+  private static void clearLoaderInternal(@NotNull final LoaderSource loaderSource,
+      final int loaderId, @NotNull final List<?> inputs) {
+    final Object component = loaderSource.getComponent();
     final WeakIdentityHashMap<Object, SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>>
         callbackMap = sCallbacks;
     final SparseArray<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
@@ -219,7 +218,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
       return;
     }
 
-    final LoaderManager loaderManager = context.getLoaderManager();
+    final LoaderManager loaderManager = loaderSource.getLoaderManager();
     if (loaderManager == null) {
       return;
     }
@@ -249,9 +248,9 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
     }
   }
 
-  private static void clearLoadersInternal(@NotNull final LoaderSource context, final int loaderId,
-      @NotNull final ContextInvocationFactory<?, ?> factory) {
-    final Object component = context.getComponent();
+  private static void clearLoadersInternal(@NotNull final LoaderSource loaderSource,
+      final int loaderId, @NotNull final ContextInvocationFactory<?, ?> factory) {
+    final Object component = loaderSource.getComponent();
     final WeakIdentityHashMap<Object, SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>>
         callbackMap = sCallbacks;
     final SparseArray<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
@@ -260,7 +259,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
       return;
     }
 
-    final LoaderManager loaderManager = context.getLoaderManager();
+    final LoaderManager loaderManager = loaderSource.getLoaderManager();
     if (loaderManager == null) {
       return;
     }
@@ -291,9 +290,10 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
     }
   }
 
-  private static void clearLoadersInternal(@NotNull final LoaderSource context, final int loaderId,
-      @NotNull final ContextInvocationFactory<?, ?> factory, @NotNull final List<?> inputs) {
-    final Object component = context.getComponent();
+  private static void clearLoadersInternal(@NotNull final LoaderSource loaderSource,
+      final int loaderId, @NotNull final ContextInvocationFactory<?, ?> factory,
+      @NotNull final List<?> inputs) {
+    final Object component = loaderSource.getComponent();
     final WeakIdentityHashMap<Object, SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>>
         callbackMap = sCallbacks;
     final SparseArray<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
@@ -302,7 +302,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
       return;
     }
 
-    final LoaderManager loaderManager = context.getLoaderManager();
+    final LoaderManager loaderManager = loaderSource.getLoaderManager();
     if (loaderManager == null) {
       return;
     }
@@ -338,29 +338,35 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
   @Override
   public void onAbort(@NotNull final RoutineException reason) throws Exception {
     super.onAbort(reason);
-    final Context loaderContext = mContext.getLoaderContext();
-    if (loaderContext == null) {
-      mLogger.dbg("avoiding aborting invocation since Context is null");
+    final Logger logger = mLogger;
+    final Context context = mLoaderSource.getLoaderContext();
+    if (context == null) {
+      logger.dbg("avoiding aborting invocation since Context is null");
       return;
     }
 
-    // TODO: 06/05/2017 mimick invocation lifecycle
     final ContextInvocation<IN, OUT> invocation = createInvocation(mLoaderId);
-    invocation.onContext(loaderContext.getApplicationContext());
-    final Routine<IN, OUT> routine = JRoutineCore.routineOn(syncExecutor()).ofSingleton(invocation);
-    routine.invoke().abort(reason);
-    routine.clear();
+    invocation.onContext(context.getApplicationContext());
+    JRoutineCore.routineOn(syncExecutor())
+                .withInvocation()
+                .withCoreInvocations(0)
+                .withLog(logger.getLog())
+                .withLogLevel(logger.getLogLevel())
+                .configuration()
+                .ofSingleton(invocation)
+                .invoke()
+                .abort(reason);
   }
 
   @Override
   @SuppressWarnings("unchecked")
   protected void onCall(@NotNull final List<? extends IN> inputs,
       @NotNull final Channel<OUT, ?> result) throws Exception {
-    final LoaderSource context = mContext;
-    final Object component = context.getComponent();
-    final Context loaderContext = context.getLoaderContext();
-    final LoaderManager loaderManager = context.getLoaderManager();
-    if ((component == null) || (loaderContext == null) || (loaderManager == null)) {
+    final LoaderSource loaderSource = mLoaderSource;
+    final Object component = loaderSource.getComponent();
+    final Context context = loaderSource.getLoaderContext();
+    final LoaderManager loaderManager = loaderSource.getLoaderManager();
+    if ((component == null) || (context == null) || (loaderManager == null)) {
       throw new IllegalArgumentException("the routine Context has been destroyed");
     }
 
@@ -410,7 +416,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
       }
 
       final RoutineLoaderCallbacks<OUT> newCallbacks =
-          createCallbacks(loaderContext, loaderManager, invocationLoader, inputs, loaderId);
+          createCallbacks(context, loaderManager, invocationLoader, inputs, loaderId);
       if (callbacks != null) {
         logger.dbg("resetting existing callbacks [%d]", loaderId);
         callbacks.reset(
@@ -437,12 +443,12 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
   }
 
   @NotNull
-  private RoutineLoaderCallbacks<OUT> createCallbacks(@NotNull final Context loaderContext,
+  private RoutineLoaderCallbacks<OUT> createCallbacks(@NotNull final Context context,
       @NotNull final LoaderManager loaderManager, @Nullable final InvocationLoader<IN, OUT> loader,
       @NotNull final List<? extends IN> inputs, final int loaderId) throws Exception {
     final Logger logger = mLogger;
     final InvocationLoader<IN, OUT> callbacksLoader = (loader != null) ? loader
-        : new InvocationLoader<IN, OUT>(loaderContext, inputs, createInvocation(loaderId), mFactory,
+        : new InvocationLoader<IN, OUT>(context, inputs, createInvocation(loaderId), mFactory,
             mOrderType, logger);
     return new RoutineLoaderCallbacks<OUT>(loaderManager, callbacksLoader, logger);
   }
@@ -514,24 +520,24 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
    */
   private static class ClearCommand implements Runnable {
 
-    private final LoaderSource mContext;
-
     private final int mLoaderId;
+
+    private final LoaderSource mLoaderSource;
 
     /**
      * Constructor.
      *
-     * @param context  the context instance.
-     * @param loaderId the Loader ID.
+     * @param loaderSource the Loader source.
+     * @param loaderId     the Loader ID.
      */
-    private ClearCommand(@NotNull final LoaderSource context, final int loaderId) {
-      mContext = context;
+    private ClearCommand(@NotNull final LoaderSource loaderSource, final int loaderId) {
+      mLoaderSource = loaderSource;
       mLoaderId = loaderId;
     }
 
     @Override
     public void run() {
-      clearLoaderInternal(mContext, mLoaderId);
+      clearLoaderInternal(mLoaderSource, mLoaderId);
     }
   }
 
@@ -540,29 +546,29 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
    */
   private static class ClearFactoryCommand implements Runnable {
 
-    private final LoaderSource mContext;
-
     private final ContextInvocationFactory<?, ?> mFactory;
 
     private final int mLoaderId;
 
+    private final LoaderSource mLoaderSource;
+
     /**
      * Constructor.
      *
-     * @param context  the context instance.
-     * @param factory  the invocation factory.
-     * @param loaderId the Loader ID.
+     * @param loaderSource the Loader source.
+     * @param factory      the invocation factory.
+     * @param loaderId     the Loader ID.
      */
-    private ClearFactoryCommand(@NotNull final LoaderSource context,
+    private ClearFactoryCommand(@NotNull final LoaderSource loaderSource,
         @NotNull final ContextInvocationFactory<?, ?> factory, final int loaderId) {
-      mContext = context;
+      mLoaderSource = loaderSource;
       mFactory = factory;
       mLoaderId = loaderId;
     }
 
     @Override
     public void run() {
-      clearLoadersInternal(mContext, mLoaderId, mFactory);
+      clearLoadersInternal(mLoaderSource, mLoaderId, mFactory);
     }
   }
 
@@ -571,26 +577,26 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
    */
   private static class ClearFactoryInputsCommand implements Runnable {
 
-    private final LoaderSource mContext;
-
     private final ContextInvocationFactory<?, ?> mFactory;
 
     private final List<?> mInputs;
 
     private final int mLoaderId;
 
+    private final LoaderSource mLoaderSource;
+
     /**
      * Constructor.
      *
-     * @param context  the context instance.
-     * @param factory  the invocation factory.
-     * @param loaderId the Loader ID.
-     * @param inputs   the list of inputs.
+     * @param loaderSource the Loader source.
+     * @param factory      the invocation factory.
+     * @param loaderId     the Loader ID.
+     * @param inputs       the list of inputs.
      */
-    private ClearFactoryInputsCommand(@NotNull final LoaderSource context,
+    private ClearFactoryInputsCommand(@NotNull final LoaderSource loaderSource,
         @NotNull final ContextInvocationFactory<?, ?> factory, final int loaderId,
         @NotNull final List<?> inputs) {
-      mContext = context;
+      mLoaderSource = loaderSource;
       mFactory = factory;
       mLoaderId = loaderId;
       mInputs = new ArrayList<Object>(inputs);
@@ -598,7 +604,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
 
     @Override
     public void run() {
-      clearLoadersInternal(mContext, mLoaderId, mFactory, mInputs);
+      clearLoadersInternal(mLoaderSource, mLoaderId, mFactory, mInputs);
     }
   }
 
@@ -607,29 +613,29 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
    */
   private static class ClearInputsCommand implements Runnable {
 
-    private final LoaderSource mContext;
-
     private final List<?> mInputs;
 
     private final int mLoaderId;
 
+    private final LoaderSource mLoaderSource;
+
     /**
      * Constructor.
      *
-     * @param context  the context instance.
-     * @param loaderId the Loader ID.
-     * @param inputs   the list of inputs.
+     * @param loaderSource the Loader source.
+     * @param loaderId     the Loader ID.
+     * @param inputs       the list of inputs.
      */
-    private ClearInputsCommand(@NotNull final LoaderSource context, final int loaderId,
+    private ClearInputsCommand(@NotNull final LoaderSource loaderSource, final int loaderId,
         @NotNull final List<?> inputs) {
-      mContext = context;
+      mLoaderSource = loaderSource;
       mLoaderId = loaderId;
       mInputs = new ArrayList<Object>(inputs);
     }
 
     @Override
     public void run() {
-      clearLoaderInternal(mContext, mLoaderId, mInputs);
+      clearLoaderInternal(mLoaderSource, mLoaderId, mInputs);
     }
   }
 

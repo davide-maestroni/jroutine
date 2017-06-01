@@ -25,7 +25,7 @@ import com.github.dm.jrt.android.core.invocation.ContextInvocation;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.config.ChannelConfiguration.OrderType;
-import com.github.dm.jrt.core.invocation.InterruptedInvocationException;
+import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
@@ -34,7 +34,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.convertFactory;
 import static com.github.dm.jrt.core.executor.ScheduledExecutors.syncExecutor;
 
 /**
@@ -108,14 +107,6 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
 
   @Override
   protected void onReset() {
-    try {
-      mInvocation.onDestroy();
-
-    } catch (final Throwable t) {
-      InterruptedInvocationException.throwIfInterrupt(t);
-      mLogger.wrn(t, "ignoring exception while discarding invocation instance");
-    }
-
     mLogger.dbg("resetting result");
     mResult = null;
     super.onReset();
@@ -126,20 +117,27 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
     final Logger logger = mLogger;
     final InvocationChannelConsumer<OUT> consumer =
         new InvocationChannelConsumer<OUT>(this, logger);
-    final LoaderContextInvocationFactory<IN, OUT> factory =
-        new LoaderContextInvocationFactory<IN, OUT>(mInvocation);
-    // TODO: 06/05/2017 mimick invocation lifecycle
-    JRoutineCore.routineOn(syncExecutor())
-                .withInvocation()
-                .withOutputOrder(mOrderType)
-                .withLog(logger.getLog())
-                .withLogLevel(logger.getLogLevel())
-                .configuration()
-                .of(convertFactory(getContext(), factory))
-                .invoke()
-                .consume(consumer)
-                .pass(mInputs)
-                .close();
+    final ContextInvocation<IN, OUT> invocation = mInvocation;
+    try {
+      invocation.onContext(getContext());
+      JRoutineCore.routineOn(syncExecutor())
+                  .withInvocation()
+                  .withCoreInvocations(0)
+                  .withOutputOrder(mOrderType)
+                  .withLog(logger.getLog())
+                  .withLogLevel(logger.getLogLevel())
+                  .configuration()
+                  .ofSingleton(invocation)
+                  .invoke()
+                  .consume(consumer)
+                  .pass(mInputs)
+                  .close();
+
+    } catch (final Exception e) {
+      logger.err("failed to initialize invocation Context", e);
+      consumer.onError(InvocationException.wrapIfNeeded(e));
+    }
+
     return consumer.createResult();
   }
 
@@ -191,33 +189,5 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
     final InvocationResult<OUT> result = mResult;
     return (result != null) && ((System.currentTimeMillis() - result.getResultTimestamp())
         > staleTimeMillis);
-  }
-
-  /**
-   * Context invocation factory implementation.
-   *
-   * @param <IN>  the input data type.
-   * @param <OUT> the output data type.
-   */
-  private static class LoaderContextInvocationFactory<IN, OUT>
-      extends ContextInvocationFactory<IN, OUT> {
-
-    private final ContextInvocation<IN, OUT> mInvocation;
-
-    /**
-     * Constructor.
-     *
-     * @param invocation the Loader invocation instance.
-     */
-    private LoaderContextInvocationFactory(@NotNull final ContextInvocation<IN, OUT> invocation) {
-      super(null);
-      mInvocation = invocation;
-    }
-
-    @NotNull
-    @Override
-    public ContextInvocation<IN, OUT> newInvocation() {
-      return mInvocation;
-    }
   }
 }

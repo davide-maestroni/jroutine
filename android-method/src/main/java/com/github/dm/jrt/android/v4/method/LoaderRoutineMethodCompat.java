@@ -71,7 +71,7 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * <h2>How to implement a routine</h2>
  * The class behaves like a {@link RoutineMethod} with a few differences. In order to avoid
  * undesired leaks, the implementing class must be static. Moreover, each constructor must have the
- * Loader context as first argument.
+ * Loader source as first argument.
  * <br>
  * Note that, for the method to be executed inside the Loader, all the input channels must be
  * closed.
@@ -180,46 +180,48 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
   /**
    * Builds a Loader reflection routine method by wrapping the specified static method.
    *
-   * @param context the Loader context.
-   * @param method  the method.
+   * @param loaderSource the Loader source.
+   * @param method       the method.
    * @return the routine method instance.
    * @throws java.lang.IllegalArgumentException if the specified method is not static.
    */
   @NotNull
-  public static ReflectionLoaderRoutineMethodCompat from(@NotNull final LoaderSourceCompat context,
-      @NotNull final Method method) {
+  public static ReflectionLoaderRoutineMethodCompat from(
+      @NotNull final LoaderSourceCompat loaderSource, @NotNull final Method method) {
     if (!Modifier.isStatic(method.getModifiers())) {
       throw new IllegalArgumentException("the method is not static: " + method);
     }
 
-    return from(context, ContextInvocationTarget.classOfType(method.getDeclaringClass()), method);
+    return from(loaderSource, ContextInvocationTarget.classOfType(method.getDeclaringClass()),
+        method);
   }
 
   /**
    * Builds a Loader reflection routine method by wrapping a method of the specified target.
    *
-   * @param context the Loader context.
-   * @param target  the invocation target.
-   * @param method  the method.
+   * @param loaderSource the Loader source.
+   * @param target       the invocation target.
+   * @param method       the method.
    * @return the routine method instance.
    * @throws java.lang.IllegalArgumentException if the specified method is not implemented by the
    *                                            target instance.
    */
   @NotNull
-  public static ReflectionLoaderRoutineMethodCompat from(@NotNull final LoaderSourceCompat context,
+  public static ReflectionLoaderRoutineMethodCompat from(
+      @NotNull final LoaderSourceCompat loaderSource,
       @NotNull final ContextInvocationTarget<?> target, @NotNull final Method method) {
     if (!method.getDeclaringClass().isAssignableFrom(target.getTargetClass())) {
       throw new IllegalArgumentException(
           "the method is not applicable to the specified target class: " + target.getTargetClass());
     }
 
-    return new ReflectionLoaderRoutineMethodCompat(context, target, method);
+    return new ReflectionLoaderRoutineMethodCompat(loaderSource, target, method);
   }
 
   /**
    * Builds a Loader reflection routine method by wrapping a method of the specified target.
    *
-   * @param context        the Loader context.
+   * @param loaderSource   the Loader source.
    * @param target         the invocation target.
    * @param name           the method name.
    * @param parameterTypes the method parameter types.
@@ -227,10 +229,11 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
    * @throws java.lang.NoSuchMethodException if no method with the specified signature is found.
    */
   @NotNull
-  public static ReflectionLoaderRoutineMethodCompat from(@NotNull final LoaderSourceCompat context,
+  public static ReflectionLoaderRoutineMethodCompat from(
+      @NotNull final LoaderSourceCompat loaderSource,
       @NotNull final ContextInvocationTarget<?> target, @NotNull final String name,
       @Nullable final Class<?>... parameterTypes) throws NoSuchMethodException {
-    return from(context, target, target.getTargetClass().getMethod(name, parameterTypes));
+    return from(loaderSource, target, target.getTargetClass().getMethod(name, parameterTypes));
   }
 
   /**
@@ -421,7 +424,7 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
   public static class ReflectionLoaderRoutineMethodCompat extends LoaderRoutineMethodCompat
       implements WrapperConfigurable<ReflectionLoaderRoutineMethodCompat> {
 
-    private final LoaderSourceCompat mContext;
+    private final LoaderSourceCompat mLoaderSource;
 
     private final Method mMethod;
 
@@ -432,14 +435,14 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
     /**
      * Constructor.
      *
-     * @param context the loader context.
-     * @param target  the invocation target.
-     * @param method  the method instance.
+     * @param loaderSource the Loader source.
+     * @param target       the invocation target.
+     * @param method       the method instance.
      */
-    private ReflectionLoaderRoutineMethodCompat(@NotNull final LoaderSourceCompat context,
+    private ReflectionLoaderRoutineMethodCompat(@NotNull final LoaderSourceCompat loaderSource,
         @NotNull final ContextInvocationTarget<?> target, @NotNull final Method method) {
-      super(context);
-      mContext = context;
+      super(loaderSource);
+      mLoaderSource = loaderSource;
       mTarget = target;
       mMethod = method;
     }
@@ -456,15 +459,12 @@ public class LoaderRoutineMethodCompat extends RoutineMethod
                 + "> but was <" + safeParams.length + ">");
       }
 
-      final Routine<Object, Object> routine = JRoutineLoaderReflectionCompat.wrapperOn(mContext)
-                                                                            .withConfiguration(
-                                                                                getConfiguration())
-                                                                            .withConfiguration(
-                                                                                getLoaderConfiguration())
-                                                                            .withConfiguration(
-                                                                                mConfiguration)
-                                                                            .methodOf(mTarget,
-                                                                                method);
+      final Routine<Object, Object> routine =
+          JRoutineLoaderReflectionCompat.wrapperOn(mLoaderSource)
+                                        .withConfiguration(getConfiguration())
+                                        .withConfiguration(getLoaderConfiguration())
+                                        .withConfiguration(mConfiguration)
+                                        .methodOf(mTarget, method);
       final Channel<Object, Object> channel = routine.invoke().sorted();
       for (final Object param : safeParams) {
         if (param instanceof Channel) {

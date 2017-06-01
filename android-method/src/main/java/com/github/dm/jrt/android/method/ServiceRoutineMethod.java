@@ -70,7 +70,7 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * <h2>How to implement a routine</h2>
  * The class behaves like a {@link RoutineMethod} with a few differences. In order to run in a
  * Service, the implementing class must be static. Moreover, each constructor must have the Service
- * context as first argument and all the other arguments must be among the ones supported by the
+ * source as first argument and all the other arguments must be among the ones supported by the
  * {@link android.os.Parcel#writeValue(Object)} method.
  * <br>
  * In case a remote Service is employed (that is, a Service running in a different process), the
@@ -84,8 +84,8 @@ import static com.github.dm.jrt.core.util.Reflection.findBestMatchingMethod;
  * <pre><code>
  * public static class MyMethod extends ServiceRoutineMethod {
  *
- *   public MyMethod(final ServiceSource context) {
- *     super(context);
+ *   public MyMethod(final ServiceSource source) {
+ *     super(source);
  *   }
  *
  *   void run(&#64;Input final Channel&lt;?, String&gt; input,
@@ -128,13 +128,13 @@ public class ServiceRoutineMethod extends RoutineMethod
   /**
    * Constructor.
    *
-   * @param serviceSource the Service context.
+   * @param serviceSource the Service source.
    * @param args          the constructor arguments.
    */
   public ServiceRoutineMethod(@NotNull final ServiceSource serviceSource,
       @Nullable final Object... args) {
     super(defaultExecutor());
-    mServiceSource = ConstantConditions.notNull("Service context", serviceSource);
+    mServiceSource = ConstantConditions.notNull("Service source", serviceSource);
     final Class<? extends RoutineMethod> type = getClass();
     if (!Reflection.hasStaticScope(type)) {
       throw new IllegalStateException(
@@ -167,46 +167,47 @@ public class ServiceRoutineMethod extends RoutineMethod
   /**
    * Builds a Service reflection routine method by wrapping the specified static method.
    *
-   * @param context the Service context.
-   * @param method  the method.
+   * @param serviceSource the Service source.
+   * @param method        the method.
    * @return the routine method instance.
    * @throws java.lang.IllegalArgumentException if the specified method is not static.
    */
   @NotNull
-  public static ReflectionServiceRoutineMethod from(@NotNull final ServiceSource context,
+  public static ReflectionServiceRoutineMethod from(@NotNull final ServiceSource serviceSource,
       @NotNull final Method method) {
     if (!Modifier.isStatic(method.getModifiers())) {
       throw new IllegalArgumentException("the method is not static: " + method);
     }
 
-    return from(context, ContextInvocationTarget.classOfType(method.getDeclaringClass()), method);
+    return from(serviceSource, ContextInvocationTarget.classOfType(method.getDeclaringClass()),
+        method);
   }
 
   /**
    * Builds a Service reflection routine method by wrapping a method of the specified target.
    *
-   * @param context the Service context.
-   * @param target  the invocation target.
-   * @param method  the method.
+   * @param serviceSource the Service source.
+   * @param target        the invocation target.
+   * @param method        the method.
    * @return the routine method instance.
    * @throws java.lang.IllegalArgumentException if the specified method is not implemented by the
    *                                            target instance.
    */
   @NotNull
-  public static ReflectionServiceRoutineMethod from(@NotNull final ServiceSource context,
+  public static ReflectionServiceRoutineMethod from(@NotNull final ServiceSource serviceSource,
       @NotNull final ContextInvocationTarget<?> target, @NotNull final Method method) {
     if (!method.getDeclaringClass().isAssignableFrom(target.getTargetClass())) {
       throw new IllegalArgumentException(
           "the method is not applicable to the specified target class: " + target.getTargetClass());
     }
 
-    return new ReflectionServiceRoutineMethod(context, target, method);
+    return new ReflectionServiceRoutineMethod(serviceSource, target, method);
   }
 
   /**
    * Builds a Service reflection routine method by wrapping a method of the specified target.
    *
-   * @param context        the Service context.
+   * @param serviceSource  the Service source.
    * @param target         the invocation target.
    * @param name           the method name.
    * @param parameterTypes the method parameter types.
@@ -214,10 +215,10 @@ public class ServiceRoutineMethod extends RoutineMethod
    * @throws java.lang.NoSuchMethodException if no method with the specified signature is found.
    */
   @NotNull
-  public static ReflectionServiceRoutineMethod from(@NotNull final ServiceSource context,
+  public static ReflectionServiceRoutineMethod from(@NotNull final ServiceSource serviceSource,
       @NotNull final ContextInvocationTarget<?> target, @NotNull final String name,
       @Nullable final Class<?>... parameterTypes) throws NoSuchMethodException {
-    return from(context, target, target.getTargetClass().getMethod(name, parameterTypes));
+    return from(serviceSource, target, target.getTargetClass().getMethod(name, parameterTypes));
   }
 
   /**
@@ -387,25 +388,25 @@ public class ServiceRoutineMethod extends RoutineMethod
   public static class ReflectionServiceRoutineMethod extends ServiceRoutineMethod
       implements WrapperConfigurable<ReflectionServiceRoutineMethod> {
 
-    private final ServiceSource mContext;
-
     private final Method mMethod;
 
     private final ContextInvocationTarget<?> mTarget;
+
+    private final ServiceSource mmServiceSource;
 
     private WrapperConfiguration mConfiguration = WrapperConfiguration.defaultConfiguration();
 
     /**
      * Constructor.
      *
-     * @param context the Service context.
-     * @param target  the invocation target.
-     * @param method  the method instance.
+     * @param serviceSource the Service source.
+     * @param target        the invocation target.
+     * @param method        the method instance.
      */
-    private ReflectionServiceRoutineMethod(@NotNull final ServiceSource context,
+    private ReflectionServiceRoutineMethod(@NotNull final ServiceSource serviceSource,
         @NotNull final ContextInvocationTarget<?> target, @NotNull final Method method) {
-      super(context, target, method);
-      mContext = context;
+      super(serviceSource, target, method);
+      mmServiceSource = serviceSource;
       mTarget = target;
       mMethod = method;
     }
@@ -422,7 +423,7 @@ public class ServiceRoutineMethod extends RoutineMethod
                 + "> but was <" + safeParams.length + ">");
       }
 
-      final Routine<Object, Object> routine = JRoutineServiceReflection.wrapperOn(mContext)
+      final Routine<Object, Object> routine = JRoutineServiceReflection.wrapperOn(mmServiceSource)
                                                                        .withConfiguration(
                                                                            getConfiguration())
                                                                        .withConfiguration(

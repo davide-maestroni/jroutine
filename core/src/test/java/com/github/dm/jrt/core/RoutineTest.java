@@ -1089,7 +1089,7 @@ public class RoutineTest {
     final Logger logger = Logger.newLogger(null, null, this);
     try {
       final ResultChannel<Object> channel =
-          new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(), syncExecutor(),
+          new ResultChannel<Object>(syncExecutor(), InvocationConfiguration.defaultConfiguration(),
               new TestAbortHandler(), logger);
       new InvocationExecution<Object, Object>(null, new TestExecutionObserver(), channel, logger);
       fail();
@@ -1099,8 +1099,8 @@ public class RoutineTest {
 
     try {
       final ResultChannel<Object> channel =
-          new ResultChannel<Object>(ChannelConfiguration.defaultConfiguration(),
-              new ConcurrentExecutor(syncExecutor()), new TestAbortHandler(), logger);
+          new ResultChannel<Object>(new ConcurrentExecutor(syncExecutor()), ChannelConfiguration.defaultConfiguration(),
+              new TestAbortHandler(), logger);
       new InvocationExecution<Object, Object>(new TestInvocationManager(), null, channel, logger);
       fail();
 
@@ -1117,7 +1117,7 @@ public class RoutineTest {
 
     try {
       final ResultChannel<Object> channel =
-          new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(), syncExecutor(),
+          new ResultChannel<Object>(syncExecutor(), InvocationConfiguration.defaultConfiguration(),
               new TestAbortHandler(), logger);
       new InvocationExecution<Object, Object>(new TestInvocationManager(),
           new TestExecutionObserver(), channel, null);
@@ -1874,7 +1874,7 @@ public class RoutineTest {
   public void testResultChannelError() {
     final Logger logger = Logger.newLogger(new NullLog(), Level.DEBUG, this);
     try {
-      new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(), defaultExecutor(),
+      new ResultChannel<Object>(defaultExecutor(), InvocationConfiguration.defaultConfiguration(),
           null, logger);
       fail();
 
@@ -1882,15 +1882,14 @@ public class RoutineTest {
     }
 
     try {
-      new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(), null,
-          new TestAbortHandler(), logger);
+      new ResultChannel<Object>(null, InvocationConfiguration.defaultConfiguration(), new TestAbortHandler(), logger);
       fail();
 
     } catch (final NullPointerException ignored) {
     }
 
     try {
-      new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(), defaultExecutor(),
+      new ResultChannel<Object>(defaultExecutor(), InvocationConfiguration.defaultConfiguration(),
           new TestAbortHandler(), null);
       fail();
 
@@ -1898,7 +1897,7 @@ public class RoutineTest {
     }
 
     try {
-      new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(), defaultExecutor(),
+      new ResultChannel<Object>(defaultExecutor(), InvocationConfiguration.defaultConfiguration(),
           new TestAbortHandler(), logger).after(null);
       fail();
 
@@ -1906,7 +1905,7 @@ public class RoutineTest {
     }
 
     try {
-      new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(), defaultExecutor(),
+      new ResultChannel<Object>(defaultExecutor(), InvocationConfiguration.defaultConfiguration(),
           new TestAbortHandler(), logger).after(0, null);
       fail();
 
@@ -1915,8 +1914,8 @@ public class RoutineTest {
 
     try {
       final ResultChannel<Object> channel =
-          new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(),
-              defaultExecutor(), new TestAbortHandler(), logger);
+          new ResultChannel<Object>(defaultExecutor(), InvocationConfiguration.defaultConfiguration(),
+              new TestAbortHandler(), logger);
       channel.after(-1, TimeUnit.MILLISECONDS);
       fail();
 
@@ -1924,7 +1923,7 @@ public class RoutineTest {
     }
 
     try {
-      new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(), defaultExecutor(),
+      new ResultChannel<Object>(defaultExecutor(), InvocationConfiguration.defaultConfiguration(),
           new TestAbortHandler(), logger).in(null);
       fail();
 
@@ -1932,7 +1931,7 @@ public class RoutineTest {
     }
 
     try {
-      new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(), defaultExecutor(),
+      new ResultChannel<Object>(defaultExecutor(), InvocationConfiguration.defaultConfiguration(),
           new TestAbortHandler(), logger).in(0, null);
       fail();
 
@@ -1941,8 +1940,9 @@ public class RoutineTest {
 
     try {
       final ResultChannel<Object> channel =
-          new ResultChannel<Object>(InvocationConfiguration.defaultConfiguration(),
-              defaultExecutor(), new TestAbortHandler(), logger);
+          new ResultChannel<Object>(defaultExecutor(), InvocationConfiguration.defaultConfiguration(),
+
+              new TestAbortHandler(), logger);
       channel.in(-1, TimeUnit.MILLISECONDS);
       fail();
 

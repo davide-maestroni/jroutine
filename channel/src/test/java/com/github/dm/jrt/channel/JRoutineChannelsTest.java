@@ -208,17 +208,17 @@ public class JRoutineChannelsTest {
     final byte[] b = new byte[16];
     stream.write(b);
     stream.close();
-    ByteChunkInputStream inputStream = JRoutineChannels.inputStream(channel.next());
+    ByteChunkInputStream inputStream = JRoutineChannels.inputStreamOf(channel.next());
     assertThat(inputStream.available()).isEqualTo(4);
     assertThat(inputStream.skip(4)).isEqualTo(4);
     assertThat(inputStream.available()).isEqualTo(0);
     inputStream.close();
-    inputStream = JRoutineChannels.inputStream(channel.next(), channel.next());
+    inputStream = JRoutineChannels.inputStreamOf(channel.next(), channel.next());
     assertThat(inputStream.available()).isEqualTo(8);
     assertThat(inputStream.readAll(new ByteArrayOutputStream())).isEqualTo(8);
     assertThat(inputStream.available()).isEqualTo(0);
     inputStream.close();
-    inputStream = JRoutineChannels.inputStream(Collections.singleton(channel.next()));
+    inputStream = JRoutineChannels.inputStreamOf(Collections.singleton(channel.next()));
     assertThat(inputStream.available()).isEqualTo(4);
     inputStream.close();
   }

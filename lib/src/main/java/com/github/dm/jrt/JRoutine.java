@@ -158,8 +158,8 @@ public class JRoutine {
    *                                         specified buffer.
    */
   @NotNull
-  public static ByteChunkInputStream inputStream(@NotNull final ByteChunk buffer) {
-    return ByteChannel.inputStream(buffer);
+  public static ByteChunkInputStream inputStreamOf(@NotNull final ByteChunk buffer) {
+    return ByteChannel.inputStreamOf(buffer);
   }
 
   /**
@@ -174,8 +174,8 @@ public class JRoutine {
    *                                         of the specified buffers.
    */
   @NotNull
-  public static ByteChunkInputStream inputStream(@NotNull final ByteChunk... buffers) {
-    return ByteChannel.inputStream(buffers);
+  public static ByteChunkInputStream inputStreamOf(@NotNull final ByteChunk... buffers) {
+    return ByteChannel.inputStreamOf(buffers);
   }
 
   /**
@@ -190,9 +190,9 @@ public class JRoutine {
    *                                         of the specified buffers.
    */
   @NotNull
-  public static ByteChunkInputStream inputStream(
+  public static ByteChunkInputStream inputStreamOf(
       @NotNull final Iterable<? extends ByteChunk> buffers) {
-    return ByteChannel.inputStream(buffers);
+    return ByteChannel.inputStreamOf(buffers);
   }
 
   /**

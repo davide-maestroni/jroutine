@@ -247,7 +247,7 @@ public class JRoutineTest {
         JRoutine.outputStream().withStream().withChunkSize(3).configuration().of(channel);
     stream.write(new byte[]{31, 17, (byte) 155, 13});
     stream.flush();
-    final ByteChunkInputStream inputStream = JRoutine.inputStream(channel.next(), channel.next());
+    final ByteChunkInputStream inputStream = JRoutine.inputStreamOf(channel.next(), channel.next());
     final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     assertThat(inputStream.read(outputStream)).isEqualTo(3);
     assertThat(outputStream.size()).isEqualTo(3);
@@ -272,7 +272,7 @@ public class JRoutineTest {
     stream.write(new byte[]{31, 17, (byte) 155, 13});
     stream.flush();
     final ByteChunkInputStream inputStream =
-        JRoutine.inputStream(channel.eventuallyContinue().all());
+        JRoutine.inputStreamOf(channel.eventuallyContinue().all());
     final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     assertThat(inputStream.read(outputStream)).isEqualTo(3);
     assertThat(outputStream.size()).isEqualTo(3);
@@ -799,7 +799,7 @@ public class JRoutineTest {
     final ByteChunkOutputStream stream = JRoutine.outputStream().of(channel);
     stream.write(new byte[]{31, 17, (byte) 155, 13});
     stream.flush();
-    final ByteChunkInputStream inputStream = JRoutine.inputStream(channel.next());
+    final ByteChunkInputStream inputStream = JRoutine.inputStreamOf(channel.next());
     final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     assertThat(inputStream.readAll(outputStream)).isEqualTo(4);
     assertThat(outputStream.size()).isEqualTo(4);

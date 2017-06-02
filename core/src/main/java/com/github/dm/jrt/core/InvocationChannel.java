@@ -139,7 +139,7 @@ class InvocationChannel<IN, OUT> implements Channel<IN, OUT> {
         return true;
       }
     };
-    mResultChanel = new ResultChannel<OUT>(configuration, executor.decorated(), new AbortHandler() {
+    mResultChanel = new ResultChannel<OUT>(executor.decorated(), configuration, new AbortHandler() {
 
       public void onAbort(@NotNull final RoutineException reason, final long delay,
           @NotNull final TimeUnit timeUnit) {

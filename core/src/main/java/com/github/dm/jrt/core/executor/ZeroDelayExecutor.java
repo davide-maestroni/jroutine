@@ -103,8 +103,8 @@ class ZeroDelayExecutor extends ScheduledExecutorDecorator {
   @Override
   public void execute(@NotNull final Runnable command, final long delay,
       @NotNull final TimeUnit timeUnit) {
-    if ((delay == 0) && getThreadManager().isManagedThread()) {
-      sSyncExecutor.execute(getRunnableDecorator(command));
+    if (delay == 0) {
+      execute(command);
 
     } else {
       super.execute(command, delay, timeUnit);

@@ -76,8 +76,8 @@ public class JRoutineChannels {
    * @see com.github.dm.jrt.channel.io.ByteChannel ByteChannel
    */
   @NotNull
-  public static ByteChunkInputStream inputStream(@NotNull final ByteChunk chunk) {
-    return ByteChannel.inputStream(chunk);
+  public static ByteChunkInputStream inputStreamOf(@NotNull final ByteChunk chunk) {
+    return ByteChannel.inputStreamOf(chunk);
   }
 
   /**
@@ -92,8 +92,8 @@ public class JRoutineChannels {
    * @see com.github.dm.jrt.channel.io.ByteChannel ByteChannel
    */
   @NotNull
-  public static ByteChunkInputStream inputStream(@NotNull final ByteChunk... chunks) {
-    return ByteChannel.inputStream(chunks);
+  public static ByteChunkInputStream inputStreamOf(@NotNull final ByteChunk... chunks) {
+    return ByteChannel.inputStreamOf(chunks);
   }
 
   /**
@@ -108,9 +108,9 @@ public class JRoutineChannels {
    * @see com.github.dm.jrt.channel.io.ByteChannel ByteChannel
    */
   @NotNull
-  public static ByteChunkInputStream inputStream(
+  public static ByteChunkInputStream inputStreamOf(
       @NotNull final Iterable<? extends ByteChunk> chunks) {
-    return ByteChannel.inputStream(chunks);
+    return ByteChannel.inputStreamOf(chunks);
   }
 
   /**

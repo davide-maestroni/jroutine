@@ -50,7 +50,7 @@ import static com.github.dm.jrt.core.executor.ScheduledExecutors.defaultExecutor
  * <p>
  * <b>Example 2:</b> Asynchronously merge the output of two routines.
  * <pre><code>
- * final Channel&lt;Result, Result&gt; channel = JRoutineCore.channel().&lt;Result&gt;ofType();
+ * final Channel&lt;Result, Result&gt; channel = JRoutineCore.channel().ofType();
  * channel.pass(routine1.invoke().close())
  *        .pass(routine2.invoke().close())
  *        .close();

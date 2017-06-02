@@ -48,7 +48,7 @@ import java.util.ArrayList;
  * <pre><code>
  * public void onInput(final ByteChunk chunk, final Channel&lt;OUT, ?&gt; result) {
  *   ...
- *   final ByteChunkInputStream inputStream = ByteChannel.inputStream(chunk);
+ *   final ByteChunkInputStream inputStream = ByteChannel.inputStreamOf(chunk);
  *   ...
  * }
  * </code></pre>
@@ -101,7 +101,7 @@ public class ByteChannel {
    *                                         of the specified chunks.
    */
   @NotNull
-  public static ByteChunkInputStream inputStream(@NotNull final ByteChunk... chunks) {
+  public static ByteChunkInputStream inputStreamOf(@NotNull final ByteChunk... chunks) {
     return new MultiByteChunkInputStream(chunks);
   }
 
@@ -116,7 +116,7 @@ public class ByteChannel {
    *                                         of the specified chunks.
    */
   @NotNull
-  public static ByteChunkInputStream inputStream(
+  public static ByteChunkInputStream inputStreamOf(
       @NotNull final Iterable<? extends ByteChunk> chunks) {
     return new MultiByteChunkInputStream(chunks);
   }
@@ -132,7 +132,7 @@ public class ByteChannel {
    *                                         specified chunk.
    */
   @NotNull
-  public static ByteChunkInputStream inputStream(@NotNull final ByteChunk chunk) {
+  public static ByteChunkInputStream inputStreamOf(@NotNull final ByteChunk chunk) {
     return chunk.getStream();
   }
 
@@ -722,14 +722,14 @@ public class ByteChannel {
    * {@code ByteChunkOutputStream}s and passed to the underlying channel.
    * <br>
    * The data contained in a chunk can be read through the dedicated {@code ByteChunkInputStream}
-   * returned by one of the {@code ByteChannel.inputStream()} methods. Note that only one input
+   * returned by one of the {@code ByteChannel.inputStreamOf()} methods. Note that only one input
    * stream can be created for each chunk, any further attempt will generate an exception.
    * <br>
    * Used chunks will be released as soon as the corresponding input stream is closed.
    *
-   * @see ByteChannel#inputStream(ByteChunk)
-   * @see ByteChannel#inputStream(ByteChunk...)
-   * @see ByteChannel#inputStream(Iterable)
+   * @see ByteChannel#inputStreamOf(ByteChunk)
+   * @see ByteChannel#inputStreamOf(ByteChunk...)
+   * @see ByteChannel#inputStreamOf(Iterable)
    */
   public class ByteChunk {
 

@@ -141,58 +141,57 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
   /**
    * Constructor.
    *
-   * @param configuration the channel configuration.
    * @param executor      the executor instance.
+   * @param configuration the channel configuration.
    * @param handler       the abort handler.
    * @param logger        the logger instance.
    */
-  ResultChannel(@NotNull final ChannelConfiguration configuration,
-      @NotNull final ScheduledExecutor executor, @NotNull final AbortHandler handler,
+  ResultChannel(@NotNull final ScheduledExecutor executor,
+      @NotNull final ChannelConfiguration configuration, @NotNull final AbortHandler handler,
       @NotNull final Logger logger) {
-    this(configuration.getOrderTypeOrElse(OrderType.UNSORTED),
+    this(executor, configuration.getOrderTypeOrElse(OrderType.UNSORTED),
         configuration.getMaxSizeOrElse(Integer.MAX_VALUE), configuration.getBackoffOrElse(null),
         configuration.getOutputTimeoutOrElse(noTime()),
-        configuration.getOutputTimeoutActionOrElse(TimeoutActionType.FAIL), executor, handler,
-        logger);
+        configuration.getOutputTimeoutActionOrElse(TimeoutActionType.FAIL), handler, logger);
   }
 
   /**
    * Constructor.
    *
-   * @param configuration the invocation configuration.
    * @param executor      the executor instance.
+   * @param configuration the invocation configuration.
    * @param handler       the abort handler.
    * @param logger        the logger instance.
    */
-  ResultChannel(@NotNull final InvocationConfiguration configuration,
-      @NotNull final ScheduledExecutor executor, @NotNull final AbortHandler handler,
+  ResultChannel(@NotNull final ScheduledExecutor executor,
+      @NotNull final InvocationConfiguration configuration, @NotNull final AbortHandler handler,
       @NotNull final Logger logger) {
-    this(configuration.getOutputOrderTypeOrElse(OrderType.UNSORTED),
+    this(executor, configuration.getOutputOrderTypeOrElse(OrderType.UNSORTED),
         configuration.getOutputMaxSizeOrElse(Integer.MAX_VALUE),
         configuration.getOutputBackoffOrElse(null), configuration.getOutputTimeoutOrElse(noTime()),
-        configuration.getOutputTimeoutActionOrElse(TimeoutActionType.FAIL), executor, handler,
-        logger);
+        configuration.getOutputTimeoutActionOrElse(TimeoutActionType.FAIL), handler, logger);
   }
 
   /**
    * Contructor.
    *
+   * @param executor          the executor instance.
    * @param orderType         the channel order type.
    * @param maxOutput         the maximum output size.
    * @param backoff           the channel backoff or null.
    * @param outputTimeout     the output timeout.
    * @param timeoutActionType the timeout action type.
-   * @param executor          the executor instance.
    * @param handler           the abort handler.
    * @param logger            the logger instance.
    */
-  private ResultChannel(@NotNull final OrderType orderType, final int maxOutput,
-      @Nullable final Backoff backoff, @NotNull final DurationMeasure outputTimeout,
-      @NotNull final TimeoutActionType timeoutActionType, @NotNull final ScheduledExecutor executor,
-      @NotNull final AbortHandler handler, @NotNull final Logger logger) {
-    mLogger = logger.subContextLogger(this);
+  private ResultChannel(@NotNull final ScheduledExecutor executor,
+      @NotNull final OrderType orderType, final int maxOutput, @Nullable final Backoff backoff,
+      @NotNull final DurationMeasure outputTimeout,
+      @NotNull final TimeoutActionType timeoutActionType, @NotNull final AbortHandler handler,
+      @NotNull final Logger logger) {
+    mExecutor = ConstantConditions.notNull("executor instance", executor);
     mHandler = ConstantConditions.notNull("abort handler", handler);
-    mExecutor = executor;
+    mLogger = logger.subContextLogger(this);
     mFlusher = executor.isSynchronous() ? new SyncFlusher() : new AsyncFlusher();
     mResultOrder = new LocalField<OrderType>(orderType);
     mResultDelay = new LocalField<DurationMeasure>(noTime());

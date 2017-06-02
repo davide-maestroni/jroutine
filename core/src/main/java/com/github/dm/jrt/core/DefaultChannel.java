@@ -76,7 +76,7 @@ class DefaultChannel<DATA> implements Channel<DATA, DATA> {
 
     final ChannelAbortHandler abortHandler = new ChannelAbortHandler();
     final ResultChannel<DATA> channel =
-        new ResultChannel<DATA>(configuration, channelExecutor, abortHandler, logger);
+        new ResultChannel<DATA>(channelExecutor, configuration, abortHandler, logger);
     abortHandler.setChannel(channel);
     mChannel = channel;
     logger.dbg("building channel with configuration: %s", configuration);

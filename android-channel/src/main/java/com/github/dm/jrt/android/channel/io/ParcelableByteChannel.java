@@ -98,7 +98,7 @@ public class ParcelableByteChannel {
       byteChunks.add(chunk.getChunk());
     }
 
-    return ByteChannel.inputStream(byteChunks);
+    return ByteChannel.inputStreamOf(byteChunks);
   }
 
   /**
@@ -114,7 +114,7 @@ public class ParcelableByteChannel {
   @NotNull
   public static ByteChunkInputStream parcelableInputStream(
       @NotNull final ParcelableByteChunk chunk) {
-    return ByteChannel.inputStream(chunk.getChunk());
+    return ByteChannel.inputStreamOf(chunk.getChunk());
   }
 
   /**
@@ -136,7 +136,7 @@ public class ParcelableByteChannel {
       byteChunks.add(chunk.getChunk());
     }
 
-    return ByteChannel.inputStream(byteChunks);
+    return ByteChannel.inputStreamOf(byteChunks);
   }
 
   /**
@@ -246,7 +246,7 @@ public class ParcelableByteChannel {
     public void writeToParcel(final Parcel dest, final int flags) {
       final ByteChunk chunk = mChunk;
       if (chunk != null) {
-        final ByteChunkInputStream inputStream = ByteChannel.inputStream(chunk);
+        final ByteChunkInputStream inputStream = ByteChannel.inputStreamOf(chunk);
         final ParcelOutputStream outputStream = new ParcelOutputStream(inputStream.available());
         try {
           inputStream.transferTo(outputStream);

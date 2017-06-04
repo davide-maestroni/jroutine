@@ -94,7 +94,7 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
       @NotNull final InvocationFactoryReference<IN, OUT> target,
       @NotNull final InvocationConfiguration invocationConfiguration,
       @NotNull final ServiceConfiguration serviceConfiguration) {
-    super(invocationConfiguration, mainExecutor());
+    super(mainExecutor(), invocationConfiguration);
     final Context serviceContext = serviceSource.getContext();
     if (serviceContext == null) {
       throw new IllegalStateException("the Service Context has been destroyed");

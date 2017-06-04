@@ -436,7 +436,7 @@ public class InvocationService extends Service {
         @NotNull final ScheduledExecutor executor,
         @NotNull final InvocationConfiguration configuration,
         @NotNull final ContextInvocationFactory<?, ?> factory) {
-      super(configuration, executor);
+      super(executor, configuration);
       mContext = context;
       mFactory = factory;
       mExecutor = executor;

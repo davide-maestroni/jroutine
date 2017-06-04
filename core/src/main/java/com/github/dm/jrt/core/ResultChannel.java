@@ -173,7 +173,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
   }
 
   /**
-   * Contructor.
+   * Constructor.
    *
    * @param executor          the executor instance.
    * @param orderType         the channel order type.

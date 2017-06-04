@@ -56,11 +56,11 @@ class DefaultChannel<DATA> implements Channel<DATA, DATA> {
   /**
    * Constructor.
    *
-   * @param configuration the channel configuration.
    * @param executor      the executor instance.
+   * @param configuration the channel configuration.
    */
-  DefaultChannel(@NotNull final ChannelConfiguration configuration,
-      @NotNull final ScheduledExecutor executor) {
+  DefaultChannel(@NotNull final ScheduledExecutor executor,
+      @NotNull final ChannelConfiguration configuration) {
     final Logger logger = configuration.newLogger(this);
     ChannelExecutor channelExecutor;
     synchronized (sExecutors) {

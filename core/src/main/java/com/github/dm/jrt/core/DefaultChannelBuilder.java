@@ -64,6 +64,6 @@ class DefaultChannelBuilder extends AbstractChannelBuilder {
 
   @NotNull
   public <DATA> Channel<DATA, DATA> ofType() {
-    return new DefaultChannel<DATA>(getConfiguration(), mExecutor);
+    return new DefaultChannel<DATA>(mExecutor, getConfiguration());
   }
 }

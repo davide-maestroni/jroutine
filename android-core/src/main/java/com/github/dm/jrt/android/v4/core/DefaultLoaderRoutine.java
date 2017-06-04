@@ -72,7 +72,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
       @NotNull final ContextInvocationFactory<IN, OUT> factory,
       @NotNull final InvocationConfiguration invocationConfiguration,
       @NotNull final LoaderConfiguration loaderConfiguration) {
-    super(invocationConfiguration, zeroDelayExecutor(mainExecutor()));
+    super(zeroDelayExecutor(mainExecutor()), invocationConfiguration);
     final int invocationId = loaderConfiguration.getInvocationIdOrElse(LoaderConfiguration.AUTO);
     mLoaderSource = ConstantConditions.notNull("Loader source", loaderSource);
     ConstantConditions.notNull("Context invocation factory", factory);

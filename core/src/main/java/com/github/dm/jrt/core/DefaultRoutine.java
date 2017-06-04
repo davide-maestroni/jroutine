@@ -47,7 +47,7 @@ class DefaultRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
   DefaultRoutine(@NotNull final InvocationConfiguration configuration,
       @NotNull final ScheduledExecutor executor,
       @NotNull final InvocationFactory<IN, OUT> factory) {
-    super(configuration, executor);
+    super(executor, configuration);
     mFactory = ConstantConditions.notNull("invocation factory", factory);
   }
 

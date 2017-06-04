@@ -100,5 +100,5 @@ tasks.withType(Javadoc) {
   options.links("http://reactivex.io/RxJava/2.x/javadoc/${rxJavaVersion}/",
       "${prefix}/${androidCoreVersion}/android-core/",
       "${prefix}/${coreVersion}/core/",
-      "${prefix}/${rxVersion}/rxs/")
+      "${prefix}/${rxVersion}/rx/")
 }

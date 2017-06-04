@@ -2931,7 +2931,7 @@ public class RoutineTest {
   private static class ExceptionRoutine extends AbstractRoutine<Object, Object> {
 
     protected ExceptionRoutine(@NotNull final InvocationConfiguration configuration) {
-      super(configuration, defaultExecutor());
+      super(defaultExecutor(), configuration);
     }
 
     @NotNull
@@ -3074,7 +3074,7 @@ public class RoutineTest {
   private static class NullRoutine extends AbstractRoutine<Object, Object> {
 
     protected NullRoutine(@NotNull final InvocationConfiguration configuration) {
-      super(configuration, defaultExecutor());
+      super(defaultExecutor(), configuration);
     }
 
     @NotNull

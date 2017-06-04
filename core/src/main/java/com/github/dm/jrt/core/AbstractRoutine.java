@@ -72,12 +72,11 @@ public abstract class AbstractRoutine<IN, OUT> implements Routine<IN, OUT> {
   /**
    * Constructor.
    *
-   * @param configuration the invocation configuration.
    * @param executor      the executor instance.
+   * @param configuration the invocation configuration.
    */
-  protected AbstractRoutine(@NotNull final InvocationConfiguration configuration,
-      @NotNull final ScheduledExecutor executor) {
-    mConfiguration = configuration;
+  protected AbstractRoutine(@NotNull final ScheduledExecutor executor,
+      @NotNull final InvocationConfiguration configuration) {
     final int priority = configuration.getPriorityOrElse(InvocationConfiguration.DEFAULT);
     if (priority != InvocationConfiguration.DEFAULT) {
       mExecutor = ScheduledExecutors.priorityExecutor(executor).ofPriority(priority);
@@ -86,6 +85,7 @@ public abstract class AbstractRoutine<IN, OUT> implements Routine<IN, OUT> {
       mExecutor = executor;
     }
 
+    mConfiguration = configuration;
     mMaxInvocations = configuration.getMaxInvocationsOrElse(DEFAULT_MAX_INVOCATIONS);
     mCoreInvocations = configuration.getCoreInvocationsOrElse(DEFAULT_CORE_INVOCATIONS);
     mLogger = configuration.newLogger(this);

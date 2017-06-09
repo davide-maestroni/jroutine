@@ -19,11 +19,13 @@ package com.github.dm.jrt.core.util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
+import java.lang.reflect.Array;
+import java.util.AbstractCollection;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Queue;
 
 /**
  * Minimal implementation of a light-weight queue, storing elements into a dynamically increasing
@@ -33,7 +35,7 @@ import java.util.NoSuchElementException;
  *
  * @param <E> the element type.
  */
-public class SimpleQueue<E> implements Iterable<E> {
+public class SimpleQueue<E> extends AbstractCollection<E> implements Queue<E> {
 
   private static final int DEFAULT_SIZE = 1 << 3; // 8
 
@@ -72,23 +74,6 @@ public class SimpleQueue<E> implements Iterable<E> {
   }
 
   /**
-   * Adds the specified element to end of the queue.
-   * <p>
-   * Note that the element can be null.
-   *
-   * @param element the element to add.
-   */
-  public void add(@Nullable final E element) {
-    final int last = mLast;
-    mData[last] = element;
-    if (mFirst == (mLast = (last + 1) & mMask)) {
-      doubleCapacity();
-    }
-
-    ++mSize;
-  }
-
-  /**
    * Adds all the elements returned by the specified iterable to end of the queue.
    * <p>
    * Note that any of the returned element can be null.
@@ -96,6 +81,7 @@ public class SimpleQueue<E> implements Iterable<E> {
    * @param elements the element iterable.
    */
   public void addAll(@NotNull final Iterable<? extends E> elements) {
+    // TODO: 09/06/2017 remove?
     for (final E element : elements) {
       add(element);
     }
@@ -120,26 +106,112 @@ public class SimpleQueue<E> implements Iterable<E> {
   }
 
   /**
-   * Clears the queue.
+   * Adds the specified element to end of the queue.
+   * <p>
+   * Note that the element can be null.
+   *
+   * @param element the element to add.
    */
-  public void clear() {
-    mFirst = 0;
-    mLast = 0;
-    mSize = 0;
-    Arrays.fill(mData, null);
+  public void addLast(@Nullable final E element) {
+    final int last = mLast;
+    mData[last] = element;
+    if (mFirst == (mLast = (last + 1) & mMask)) {
+      doubleCapacity();
+    }
+
+    ++mSize;
   }
 
-  /**
-   * Check if the queue does not contain any element.
-   *
-   * @return whether the queue is empty.
-   */
+  @NotNull
+  @Override
+  public SimpleQueueIterator<E> iterator() {
+    return new SimpleQueueIterator<E>(this);
+  }
+
+  @Override
+  public int size() {
+    return mSize;
+  }
+
+  @Override
   public boolean isEmpty() {
     return mSize == 0;
   }
 
-  public SimpleQueueIterator<E> iterator() {
-    return new SimpleQueueIterator<E>(this);
+  @NotNull
+  @Override
+  public Object[] toArray() {
+    return copyElements(new Object[size()]);
+  }
+
+  @NotNull
+  @Override
+  @SuppressWarnings("unchecked")
+  public <T> T[] toArray(@NotNull T[] array) {
+    int size = size();
+    if (array.length < size) {
+      array = (T[]) Array.newInstance(array.getClass().getComponentType(), size);
+      copyElements(array);
+
+    } else {
+      copyElements(array);
+      if (array.length > size) {
+        array[size] = null;
+      }
+    }
+
+    return array;
+  }
+
+  @Override
+  public boolean add(@Nullable final E element) {
+    addLast(element);
+    return true;
+  }
+
+  @Override
+  public void clear() {
+    final int mask = mMask;
+    final int last = mLast;
+    final Object[] data = mData;
+    int index = mFirst;
+    while (index != last) {
+      data[index] = null;
+      index = (index + 1) & mask;
+    }
+
+    mFirst = 0;
+    mLast = 0;
+    mSize = 0;
+  }
+
+  public boolean offer(final E e) {
+    addLast(e);
+    return true;
+  }
+
+  public E remove() {
+    return removeFirst();
+  }
+
+  public E poll() {
+    if (isEmpty()) {
+      return null;
+    }
+
+    return removeFirst();
+  }
+
+  public E element() {
+    return peekFirst();
+  }
+
+  public E peek() {
+    if (isEmpty()) {
+      return null;
+    }
+
+    return peekFirst();
   }
 
   /**
@@ -155,6 +227,22 @@ public class SimpleQueue<E> implements Iterable<E> {
     }
 
     return (E) mData[mFirst];
+  }
+
+  /**
+   * Peeks the last element of the queue.
+   *
+   * @return the element.
+   * @throws java.util.NoSuchElementException if the queue is empty.
+   */
+  @SuppressWarnings("unchecked")
+  public E peekLast() {
+    if (isEmpty()) {
+      throw new NoSuchElementException();
+    }
+
+    final int mask = mMask;
+    return (E) mData[(mLast + mask) & mask];
   }
 
   /**
@@ -201,12 +289,36 @@ public class SimpleQueue<E> implements Iterable<E> {
   }
 
   /**
-   * Returns the size of the queue (that is, the number of elements).
+   * TODO
    *
-   * @return the size.
+   * @param dst
+   * @param destPos
+   * @param <T>
+   * @return
    */
-  public int size() {
-    return mSize;
+  @SuppressWarnings("unchecked")
+  public <T> int transferTo(@NotNull final T[] dst, final int destPos) {
+    final Object[] data = mData;
+    final int mask = mMask;
+    final int last = mLast;
+    final int length = dst.length - destPos;
+    int i = mFirst;
+    int n = destPos;
+    while (i != last) {
+      if (n == length) {
+        mFirst = i;
+        return -(mSize -= (n - destPos));
+      }
+
+      dst[n++] = (T) data[i];
+      data[i] = null;
+      i = (i + 1) & mask;
+    }
+
+    mFirst = 0;
+    mLast = 0;
+    mSize = 0;
+    return (n - destPos);
   }
 
   /**
@@ -231,26 +343,22 @@ public class SimpleQueue<E> implements Iterable<E> {
     mSize = 0;
   }
 
-  /**
-   * Removes all the elements from this queue and add them to the specified one.
-   *
-   * @param other the queue to fill.
-   */
-  @SuppressWarnings("unchecked")
-  public void transferTo(@NotNull final SimpleQueue<? super E> other) {
+  @NotNull
+  @SuppressWarnings("SuspiciousSystemArraycopy")
+  private <T> T[] copyElements(@NotNull final T[] dst) {
     final Object[] data = mData;
-    final int mask = mMask;
+    final int first = mFirst;
     final int last = mLast;
-    int i = mFirst;
-    while (i != last) {
-      other.add((E) data[i]);
-      data[i] = null;
-      i = (i + 1) & mask;
+    if (first <= last) {
+      System.arraycopy(data, first, dst, 0, mSize);
+
+    } else {
+      final int length = data.length - first;
+      System.arraycopy(data, first, dst, 0, length);
+      System.arraycopy(data, 0, dst, length, last);
     }
 
-    mFirst = 0;
-    mLast = 0;
-    mSize = 0;
+    return dst;
   }
 
   private void doubleCapacity() {
@@ -277,11 +385,13 @@ public class SimpleQueue<E> implements Iterable<E> {
    */
   public static class SimpleQueueIterator<E> implements Iterator<E> {
 
-    private final int mOriginalFirst;
-
-    private final int mOriginalLast;
-
     private final SimpleQueue<E> mQueue;
+
+    private boolean mIsRemoved;
+
+    private int mOriginalFirst;
+
+    private int mOriginalLast;
 
     private int mPointer;
 
@@ -314,12 +424,67 @@ public class SimpleQueue<E> implements Iterable<E> {
         throw new NoSuchElementException();
       }
 
+      mIsRemoved = false;
       mPointer = (pointer + 1) & queue.mMask;
       return (E) queue.mData[pointer];
     }
 
     public void remove() {
-      throw new UnsupportedOperationException();
+      if (mIsRemoved) {
+        throw new IllegalStateException("element already removed");
+      }
+
+      final SimpleQueue<E> queue = mQueue;
+      final int last = queue.mLast;
+      final int originalLast = mOriginalLast;
+      if (last != originalLast) {
+        throw new ConcurrentModificationException();
+      }
+
+      final int pointer = mPointer;
+      if (pointer == originalLast) {
+        throw new NoSuchElementException();
+      }
+
+      final Object[] data = queue.mData;
+      final int mask = queue.mMask;
+      final int first = queue.mFirst;
+      final int front = (pointer - first) & mask;
+      final int back = (last - pointer) & mask;
+      if (front <= back) {
+        if (first <= pointer) {
+          System.arraycopy(data, first, data, first + 1, front);
+          shiftForward();
+
+        } else if (back <= (mask - first + pointer)) {
+          System.arraycopy(data, pointer + 1, data, pointer, back);
+          shiftBackward();
+
+        } else {
+          System.arraycopy(data, 0, data, 1, pointer);
+          data[0] = data[mask];
+          System.arraycopy(data, first, data, first + 1, mask - first);
+          shiftForward();
+        }
+
+      } else {
+        if (pointer < last) {
+          System.arraycopy(data, pointer + 1, data, pointer, back);
+          shiftBackward();
+
+        } else if (front <= (mask - pointer + last)) {
+          System.arraycopy(data, first, data, first + 1, front);
+          shiftForward();
+
+        } else {
+          System.arraycopy(data, pointer + 1, data, pointer, mask - pointer);
+          data[mask] = data[0];
+          System.arraycopy(data, 1, data, 0, last);
+          shiftBackward();
+        }
+      }
+
+      mIsRemoved = true;
     }
 
     /**
@@ -343,6 +508,21 @@ public class SimpleQueue<E> implements Iterable<E> {
 
       final int mask = queue.mMask;
       queue.mData[(pointer + mask) & mask] = element;
+    }
+
+    private void shiftBackward() {
+      final SimpleQueue<E> queue = mQueue;
+      final int mask = queue.mMask;
+      final int last = queue.mLast;
+      queue.mLast = mOriginalLast = (last + mask) & mask;
+      mPointer = (mPointer + mask) & mask;
+    }
+
+    private void shiftForward() {
+      final SimpleQueue<E> queue = mQueue;
+      final int first = queue.mFirst;
+      queue.mData[first] = null;
+      queue.mFirst = mOriginalFirst = (first + 1) & queue.mMask;
     }
   }
 }

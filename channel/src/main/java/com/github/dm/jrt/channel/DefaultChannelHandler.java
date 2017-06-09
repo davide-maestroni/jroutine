@@ -266,10 +266,12 @@ class DefaultChannelHandler implements ChannelHandler {
   @SuppressWarnings("unchecked")
   public <IN> Channel<FlowData<IN>, ?> inputFlowOf(@NotNull final Channel<? super IN, ?> channel,
       final int id) {
-    final Channel<IN, IN> outputChannel = JRoutineCore.channel().ofType();
+    // TODO: 09/06/2017 same config for input and output channels...
+    final ChannelBuilder channelBuilder =
+        JRoutineCore.channelOn(mExecutor).withConfiguration(mConfiguration);
+    final Channel<IN, IN> outputChannel = channelBuilder.ofType();
     ((Channel<IN, ?>) channel).pass(outputChannel);
-    final Channel<FlowData<IN>, FlowData<IN>> inputChannel =
-        JRoutineCore.channelOn(mExecutor).withConfiguration(mConfiguration).ofType();
+    final Channel<FlowData<IN>, FlowData<IN>> inputChannel = channelBuilder.ofType();
     return inputChannel.consume(new FilterChannelConsumer<IN>(outputChannel, id));
   }
 
@@ -277,10 +279,11 @@ class DefaultChannelHandler implements ChannelHandler {
   @SuppressWarnings("unchecked")
   public <DATA, IN extends DATA> Channel<IN, ?> inputOfFlow(
       @NotNull final Channel<? super FlowData<DATA>, ?> channel, final int id) {
-    final Channel<FlowData<DATA>, FlowData<DATA>> flowChannel = JRoutineCore.channel().ofType();
+    final ChannelBuilder channelBuilder =
+        JRoutineCore.channelOn(mExecutor).withConfiguration(mConfiguration);
+    final Channel<FlowData<DATA>, FlowData<DATA>> flowChannel = channelBuilder.ofType();
     ((Channel<FlowData<DATA>, ?>) channel).pass(flowChannel);
-    final Channel<IN, IN> inputChannel =
-        JRoutineCore.channelOn(mExecutor).withConfiguration(mConfiguration).ofType();
+    final Channel<IN, IN> inputChannel = channelBuilder.ofType();
     return inputChannel.consume(new FlowChannelConsumer<DATA, IN>(flowChannel, id));
   }
 

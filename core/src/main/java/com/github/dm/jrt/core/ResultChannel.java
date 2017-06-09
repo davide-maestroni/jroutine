@@ -40,7 +40,6 @@ import com.github.dm.jrt.core.util.DurationMeasure.Condition;
 import com.github.dm.jrt.core.util.LocalFence;
 import com.github.dm.jrt.core.util.LocalField;
 import com.github.dm.jrt.core.util.SimpleQueue;
-import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -76,8 +75,8 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
       "cannot wait while no invocation instance is available"
           + "\nTry increasing the max number of instances";
 
-  private static final WeakIdentityHashMap<ChannelConsumer<?>, Object> sConsumerMutexes =
-      new WeakIdentityHashMap<ChannelConsumer<?>, Object>();
+  //  private static final WeakIdentityHashMap<ChannelConsumer<?>, Object> sConsumerMutexes =
+  //      new WeakIdentityHashMap<ChannelConsumer<?>, Object>();
 
   private static final LocalFence sInvocationFence = new LocalFence();
 
@@ -223,19 +222,19 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     mState = new OutputChannelState();
   }
 
-  @NotNull
-  private static Object getMutex(@NotNull final ChannelConsumer<?> consumer) {
-    synchronized (sConsumerMutexes) {
-      final WeakIdentityHashMap<ChannelConsumer<?>, Object> consumerMutexes = sConsumerMutexes;
-      Object mutex = consumerMutexes.get(consumer);
-      if (mutex == null) {
-        mutex = new Object();
-        consumerMutexes.put(consumer, mutex);
-      }
-
-      return mutex;
-    }
-  }
+  //  @NotNull
+  //  private static Object getMutex(@NotNull final ChannelConsumer<?> consumer) {
+  //    synchronized (sConsumerMutexes) {
+  //      final WeakIdentityHashMap<ChannelConsumer<?>, Object> consumerMutexes = sConsumerMutexes;
+  //      Object mutex = consumerMutexes.get(consumer);
+  //      if (mutex == null) {
+  //        mutex = new Object();
+  //        consumerMutexes.put(consumer, mutex);
+  //      }
+  //
+  //      return mutex;
+  //    }
+  //  }
 
   public boolean abort() {
     return abort(null);
@@ -1212,15 +1211,16 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     public void run(@NotNull final BindingHandler<OUT> handler, final boolean forceClose) {
       // Need to make sure to pass the outputs to the consumer in the executor thread, so to avoid
       // deadlock issues
+      final ScheduledExecutor executor = mExecutor;
       if (handler.isDelayed()) {
         final DurationMeasure delay = handler.getDelay();
-        mExecutor.execute(getFlushCommand(forceClose), delay.value, delay.unit);
+        executor.execute(getFlushCommand(forceClose), delay.value, delay.unit);
 
-      } else if (mExecutor.isExecutionThread()) {
+      } else if (executor.isExecutionThread()) {
         handler.flushOutput(forceClose);
 
       } else {
-        mExecutor.execute(getFlushCommand(forceClose));
+        executor.execute(getFlushCommand(forceClose));
       }
     }
   }
@@ -1232,13 +1232,17 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
     private final ChannelConsumer<? super OUT> mConsumer;
 
-    private final Object mConsumerMutex;
+    //    private final Object mConsumerMutex;
 
     private final DurationMeasure mDelay;
 
     private final boolean mIsDelayed;
 
     private final SimpleQueue<Object> mQueue = new SimpleQueue<Object>();
+
+    private boolean mIsForced;
+
+    private boolean mIsRunning;
 
     /**
      * Constructor.
@@ -1249,28 +1253,33 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
       final DurationMeasure delay = (mDelay = mResultDelay.get());
       mIsDelayed = !delay.isZero();
       mConsumer = consumer;
-      mConsumerMutex = getMutex(consumer);
+      //      mConsumerMutex = getMutex(consumer);
     }
 
     @SuppressWarnings("unchecked")
     public void flushOutput(final boolean forceClose) {
-      final Logger logger = mLogger;
-      RoutineException abortException = null;
-      synchronized (mConsumerMutex) {
-        final NestedQueue<Object> outputQueue = mOutputQueue;
-        final SimpleQueue<Object> queue = mQueue;
-        final OutputChannelState currentState;
-        final boolean isFinal;
-        synchronized (mMutex) {
-          currentState = mState;
-          isFinal = currentState.isReadyToComplete();
-          outputQueue.transferTo(queue);
-          mOutputCount = 0;
-          mMutex.notifyAll();
+      //      synchronized (mConsumerMutex) {
+      final SimpleQueue<Object> queue = mQueue;
+      final boolean isFinal;
+      synchronized (mMutex) {
+        if (mIsRunning) {
+          if (forceClose || mState.isReadyToComplete()) {
+            mIsForced = true;
+          }
+
+          return;
         }
 
-        final ChannelConsumer<? super OUT> consumer = mConsumer;
-        try {
+        isFinal = forceClose || mState.isReadyToComplete();
+        transferTo(queue);
+        mIsRunning = !queue.isEmpty();
+      }
+
+      final Logger logger = mLogger;
+      final ChannelConsumer<? super OUT> consumer = mConsumer;
+      RoutineException abortException = null;
+      try {
+        while (!queue.isEmpty()) {
           while (!queue.isEmpty()) {
             final Object output = queue.removeFirst();
             if (output instanceof RoutineExceptionWrapper) {
@@ -1296,25 +1305,58 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
             }
           }
 
-          if (forceClose || isFinal) {
-            closeConsumer(currentState, consumer);
-          }
-
-        } catch (final Throwable t) {
-          synchronized (mMutex) {
-            logger.wrn(t, "consumer exception (%s)", consumer);
-            outputQueue.clear();
-            queue.clear();
-            abortException = mState.abortConsumer(t);
-          }
-
-          InterruptedInvocationException.throwIfInterrupt(t);
+          getOutputs(queue);
         }
+
+        if (isFinal || isForced()) {
+          closeConsumer(getState(), consumer);
+        }
+
+      } catch (final Throwable t) {
+        synchronized (mMutex) {
+          logger.wrn(t, "consumer exception (%s)", consumer);
+          mIsRunning = false;
+          mOutputQueue.clear();
+          queue.clear();
+          abortException = mState.abortConsumer(t);
+        }
+
+        InterruptedInvocationException.throwIfInterrupt(t);
       }
+      //    }
 
       if (abortException != null) {
         mHandler.onAbort(abortException, 0, TimeUnit.MILLISECONDS);
       }
+    }
+
+    private void getOutputs(@NotNull final SimpleQueue<Object> queue) {
+      synchronized (mMutex) {
+        transferTo(queue);
+      }
+    }
+
+    private OutputChannelState getState() {
+      synchronized (mMutex) {
+        return mState;
+      }
+    }
+
+    private boolean isForced() {
+      synchronized (mMutex) {
+        return mIsForced;
+      }
+    }
+
+    private void transferTo(@NotNull final SimpleQueue<Object> queue) {
+      // TODO: 08/06/2017 optimize using arrays?
+      mOutputQueue.transferTo(queue);
+      mOutputCount = 0;
+      if (queue.isEmpty()) {
+        mIsRunning = false;
+      }
+
+      mMutex.notifyAll();
     }
 
     @Nullable
@@ -1514,7 +1556,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
       }
 
       if (needsFlush) {
-        mFlusher.run(handler, false);
+        handler.flushOutput(false);
       }
     }
   }
@@ -1544,7 +1586,7 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
       }
 
       if (needsFlush) {
-        mFlusher.run(handler, false);
+        handler.flushOutput(false);
       }
     }
   }

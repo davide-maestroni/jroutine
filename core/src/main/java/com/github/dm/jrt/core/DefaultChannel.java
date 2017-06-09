@@ -44,7 +44,10 @@ import java.util.concurrent.TimeUnit;
  *
  * @param <DATA> the data type.
  */
+@SuppressWarnings("unused")
 class DefaultChannel<DATA> implements Channel<DATA, DATA> {
+
+  // TODO: 09/06/2017 remove class
 
   private static final WeakIdentityHashMap<ScheduledExecutor, WeakReference<ChannelExecutor>>
       sExecutors = new WeakIdentityHashMap<ScheduledExecutor, WeakReference<ChannelExecutor>>();

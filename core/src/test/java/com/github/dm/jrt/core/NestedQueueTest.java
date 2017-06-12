@@ -190,114 +190,6 @@ public class NestedQueueTest {
   }
 
   @Test
-  public void testDrain() {
-    final NestedQueue<Integer> queue = new NestedQueue<Integer>();
-    queue.add(13);
-    final NestedQueue<Integer> nested0 = queue.addNested();
-    queue.add(7);
-    final NestedQueue<Integer> nested1 = queue.addNested();
-    nested1.addAll(Arrays.asList(11, 5));
-    final NestedQueue<Integer> nested2 = nested1.addNested();
-    nested2.add(-77);
-    final NestedQueue<Integer> nested3 = nested2.addNested();
-    nested3.add(-33);
-    queue.add(1);
-    final ArrayList<Integer> list = new ArrayList<Integer>();
-    queue.transferTo(list);
-    assertThat(list).containsExactly(13);
-    list.clear();
-    nested0.close();
-    queue.transferTo(list);
-    assertThat(list).containsExactly(7, 11, 5, -77, -33);
-    list.clear();
-    nested3.close();
-    queue.transferTo(list);
-    assertThat(list).isEmpty();
-    nested1.close();
-    queue.transferTo(list);
-    assertThat(list).isEmpty();
-    nested2.close();
-    queue.transferTo(list);
-    assertThat(list).containsExactly(1);
-  }
-
-  @Test
-  public void testDrain2() {
-    final NestedQueue<Integer> queue = new NestedQueue<Integer>();
-    queue.add(13);
-    final NestedQueue<Integer> nested0 = queue.addNested();
-    queue.add(7);
-    final NestedQueue<Integer> nested1 = queue.addNested();
-    nested1.addAll(Arrays.asList(11, 5));
-    final NestedQueue<Integer> nested2 = nested1.addNested();
-    nested2.add(-77);
-    final NestedQueue<Integer> nested3 = nested2.addNested();
-    nested3.add(-33);
-    queue.add(1);
-    nested0.close();
-    nested1.close();
-    nested2.close();
-    nested3.close();
-    final ArrayList<Integer> list = new ArrayList<Integer>();
-    queue.transferTo(list);
-    assertThat(list).containsExactly(13, 7, 11, 5, -77, -33, 1);
-  }
-
-  @Test
-  public void testDrain3() {
-    final NestedQueue<Integer> queue = new NestedQueue<Integer>();
-    queue.add(13);
-    final NestedQueue<Integer> nested0 = queue.addNested();
-    queue.add(7);
-    final NestedQueue<Integer> nested1 = queue.addNested();
-    nested1.addAll(Arrays.asList(11, 5));
-    final NestedQueue<Integer> nested2 = nested1.addNested();
-    nested2.add(-77);
-    final NestedQueue<Integer> nested3 = nested2.addNested();
-    nested3.add(-33);
-    queue.add(1);
-    final SimpleQueue<Integer> other = new SimpleQueue<Integer>();
-    queue.transferTo(other);
-    assertThat(other).containsExactly(13);
-    other.clear();
-    nested0.close();
-    queue.transferTo(other);
-    assertThat(other).containsExactly(7, 11, 5, -77, -33);
-    other.clear();
-    nested3.close();
-    queue.transferTo(other);
-    assertThat(other).isEmpty();
-    nested1.close();
-    queue.transferTo(other);
-    assertThat(other).isEmpty();
-    nested2.close();
-    queue.transferTo(other);
-    assertThat(other).containsExactly(1);
-  }
-
-  @Test
-  public void testDrain4() {
-    final NestedQueue<Integer> queue = new NestedQueue<Integer>();
-    queue.add(13);
-    final NestedQueue<Integer> nested0 = queue.addNested();
-    queue.add(7);
-    final NestedQueue<Integer> nested1 = queue.addNested();
-    nested1.addAll(Arrays.asList(11, 5));
-    final NestedQueue<Integer> nested2 = nested1.addNested();
-    nested2.add(-77);
-    final NestedQueue<Integer> nested3 = nested2.addNested();
-    nested3.add(-33);
-    queue.add(1);
-    nested0.close();
-    nested1.close();
-    nested2.close();
-    nested3.close();
-    final SimpleQueue<Integer> other = new SimpleQueue<Integer>();
-    queue.transferTo(other);
-    assertThat(other).containsExactly(13, 7, 11, 5, -77, -33, 1);
-  }
-
-  @Test
   public void testRemoveAllError() {
     final NestedQueue<Integer> queue = new NestedQueue<Integer>();
     for (int i = 0; i < 7; i++) {
@@ -354,5 +246,145 @@ public class NestedQueueTest {
 
     } catch (final NoSuchElementException ignored) {
     }
+  }
+
+  @Test
+  public void testTransferToArray() {
+    final NestedQueue<Integer> queue = new NestedQueue<Integer>();
+    queue.add(13);
+    final NestedQueue<Integer> nested0 = queue.addNested();
+    queue.add(7);
+    final NestedQueue<Integer> nested1 = queue.addNested();
+    nested1.addAll(Arrays.asList(11, 5));
+    final NestedQueue<Integer> nested2 = nested1.addNested();
+    nested2.add(-77);
+    final NestedQueue<Integer> nested3 = nested2.addNested();
+    nested3.add(-33);
+    queue.add(1);
+    Integer[] array = new Integer[2];
+    assertThat(queue.transferTo(array, 1)).isEqualTo(1);
+    assertThat(array).containsExactly(null, 13);
+    nested0.close();
+    assertThat(queue.transferTo(array, 0)).isEqualTo(-1);
+    assertThat(array).containsExactly(7, 11);
+    array = new Integer[4];
+    array[3] = 333;
+    assertThat(queue.transferTo(array, 0)).isEqualTo(3);
+    assertThat(array).containsExactly(5, -77, -33, 333);
+    nested3.close();
+    assertThat(queue.transferTo(array, 3)).isZero();
+    nested1.close();
+    assertThat(queue.transferTo(array, 4)).isZero();
+    nested2.close();
+    assertThat(queue.transferTo(array, 0)).isEqualTo(1);
+    assertThat(array).containsExactly(1, -77, -33, 333);
+  }
+
+  @Test
+  public void testTransferToCollection() {
+    final NestedQueue<Integer> queue = new NestedQueue<Integer>();
+    queue.add(13);
+    final NestedQueue<Integer> nested0 = queue.addNested();
+    queue.add(7);
+    final NestedQueue<Integer> nested1 = queue.addNested();
+    nested1.addAll(Arrays.asList(11, 5));
+    final NestedQueue<Integer> nested2 = nested1.addNested();
+    nested2.add(-77);
+    final NestedQueue<Integer> nested3 = nested2.addNested();
+    nested3.add(-33);
+    queue.add(1);
+    final ArrayList<Integer> list = new ArrayList<Integer>();
+    queue.transferTo(list);
+    assertThat(list).containsExactly(13);
+    list.clear();
+    nested0.close();
+    queue.transferTo(list);
+    assertThat(list).containsExactly(7, 11, 5, -77, -33);
+    list.clear();
+    nested3.close();
+    queue.transferTo(list);
+    assertThat(list).isEmpty();
+    nested1.close();
+    queue.transferTo(list);
+    assertThat(list).isEmpty();
+    nested2.close();
+    queue.transferTo(list);
+    assertThat(list).containsExactly(1);
+  }
+
+  @Test
+  public void testTransferToCollection2() {
+    final NestedQueue<Integer> queue = new NestedQueue<Integer>();
+    queue.add(13);
+    final NestedQueue<Integer> nested0 = queue.addNested();
+    queue.add(7);
+    final NestedQueue<Integer> nested1 = queue.addNested();
+    nested1.addAll(Arrays.asList(11, 5));
+    final NestedQueue<Integer> nested2 = nested1.addNested();
+    nested2.add(-77);
+    final NestedQueue<Integer> nested3 = nested2.addNested();
+    nested3.add(-33);
+    queue.add(1);
+    nested0.close();
+    nested1.close();
+    nested2.close();
+    nested3.close();
+    final ArrayList<Integer> list = new ArrayList<Integer>();
+    queue.transferTo(list);
+    assertThat(list).containsExactly(13, 7, 11, 5, -77, -33, 1);
+  }
+
+  @Test
+  public void testTransferToCollection3() {
+    final NestedQueue<Integer> queue = new NestedQueue<Integer>();
+    queue.add(13);
+    final NestedQueue<Integer> nested0 = queue.addNested();
+    queue.add(7);
+    final NestedQueue<Integer> nested1 = queue.addNested();
+    nested1.addAll(Arrays.asList(11, 5));
+    final NestedQueue<Integer> nested2 = nested1.addNested();
+    nested2.add(-77);
+    final NestedQueue<Integer> nested3 = nested2.addNested();
+    nested3.add(-33);
+    queue.add(1);
+    final SimpleQueue<Integer> other = new SimpleQueue<Integer>();
+    queue.transferTo(other);
+    assertThat(other).containsExactly(13);
+    other.clear();
+    nested0.close();
+    queue.transferTo(other);
+    assertThat(other).containsExactly(7, 11, 5, -77, -33);
+    other.clear();
+    nested3.close();
+    queue.transferTo(other);
+    assertThat(other).isEmpty();
+    nested1.close();
+    queue.transferTo(other);
+    assertThat(other).isEmpty();
+    nested2.close();
+    queue.transferTo(other);
+    assertThat(other).containsExactly(1);
+  }
+
+  @Test
+  public void testTransferToCollection4() {
+    final NestedQueue<Integer> queue = new NestedQueue<Integer>();
+    queue.add(13);
+    final NestedQueue<Integer> nested0 = queue.addNested();
+    queue.add(7);
+    final NestedQueue<Integer> nested1 = queue.addNested();
+    nested1.addAll(Arrays.asList(11, 5));
+    final NestedQueue<Integer> nested2 = nested1.addNested();
+    nested2.add(-77);
+    final NestedQueue<Integer> nested3 = nested2.addNested();
+    nested3.add(-33);
+    queue.add(1);
+    nested0.close();
+    nested1.close();
+    nested2.close();
+    nested3.close();
+    final SimpleQueue<Integer> other = new SimpleQueue<Integer>();
+    queue.transferTo(other);
+    assertThat(other).containsExactly(13, 7, 11, 5, -77, -33, 1);
   }
 }

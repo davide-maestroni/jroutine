@@ -75,14 +75,8 @@ class DefaultChannelBuilder extends AbstractChannelBuilder {
     final Logger logger = configuration.newLogger(this);
     final ChannelAbortHandler abortHandler = new ChannelAbortHandler();
     final ResultChannel<DATA> channel =
-        new ResultChannel<DATA>(new ScheduledExecutorDecorator(mExecutor) {
-
-          @Override
-          public boolean isExecutionThread() {
-            // always flush output synchronously
-            return true;
-          }
-        }, configuration, abortHandler, logger);
+        new ResultChannel<DATA>(new ChannelExecutor(mExecutor), configuration, abortHandler,
+            logger);
     abortHandler.setChannel(channel);
     logger.dbg("building channel with configuration: %s", configuration);
     return channel;
@@ -102,6 +96,27 @@ class DefaultChannelBuilder extends AbstractChannelBuilder {
 
     private void setChannel(@NotNull final ResultChannel<?> channel) {
       mChannel = channel;
+    }
+  }
+
+  /**
+   * Executor decorator making the flush of outputs happen always in the calling thread.
+   */
+  private static class ChannelExecutor extends ScheduledExecutorDecorator {
+
+    /**
+     * Constructor.
+     *
+     * @param wrapped the wrapped instance.
+     */
+    public ChannelExecutor(@NotNull final ScheduledExecutor wrapped) {
+      super(wrapped);
+    }
+
+    @Override
+    public boolean isExecutionThread() {
+      // always flush output synchronously
+      return true;
     }
   }
 }

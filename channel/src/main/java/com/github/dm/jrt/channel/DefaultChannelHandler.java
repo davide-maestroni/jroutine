@@ -250,10 +250,10 @@ class DefaultChannelHandler implements ChannelHandler {
     ConstantConditions.positive("channel count", count);
     final ArrayList<Channel<OUT, ?>> outputChannels = new ArrayList<Channel<OUT, ?>>();
     final ArrayList<Channel<?, OUT>> channelList = new ArrayList<Channel<?, OUT>>();
-    final ChannelBuilder builder =
+    final ChannelBuilder channelBuilder =
         JRoutineCore.channelOn(mExecutor).withConfiguration(mConfiguration);
     for (int i = 0; i < count; ++i) {
-      final Channel<OUT, OUT> outputChannel = builder.ofType();
+      final Channel<OUT, OUT> outputChannel = channelBuilder.ofType();
       outputChannels.add(outputChannel);
       channelList.add(readOnly(outputChannel));
     }
@@ -266,12 +266,10 @@ class DefaultChannelHandler implements ChannelHandler {
   @SuppressWarnings("unchecked")
   public <IN> Channel<FlowData<IN>, ?> inputFlowOf(@NotNull final Channel<? super IN, ?> channel,
       final int id) {
-    // TODO: 09/06/2017 same config for input and output channels...
-    final ChannelBuilder channelBuilder =
-        JRoutineCore.channelOn(mExecutor).withConfiguration(mConfiguration);
-    final Channel<IN, IN> outputChannel = channelBuilder.ofType();
+    final Channel<IN, IN> outputChannel = JRoutineCore.channel().ofType();
     ((Channel<IN, ?>) channel).pass(outputChannel);
-    final Channel<FlowData<IN>, FlowData<IN>> inputChannel = channelBuilder.ofType();
+    final Channel<FlowData<IN>, FlowData<IN>> inputChannel =
+        JRoutineCore.channelOn(mExecutor).withConfiguration(mConfiguration).ofType();
     return inputChannel.consume(new FilterChannelConsumer<IN>(outputChannel, id));
   }
 
@@ -279,11 +277,10 @@ class DefaultChannelHandler implements ChannelHandler {
   @SuppressWarnings("unchecked")
   public <DATA, IN extends DATA> Channel<IN, ?> inputOfFlow(
       @NotNull final Channel<? super FlowData<DATA>, ?> channel, final int id) {
-    final ChannelBuilder channelBuilder =
-        JRoutineCore.channelOn(mExecutor).withConfiguration(mConfiguration);
-    final Channel<FlowData<DATA>, FlowData<DATA>> flowChannel = channelBuilder.ofType();
+    final Channel<FlowData<DATA>, FlowData<DATA>> flowChannel = JRoutineCore.channel().ofType();
     ((Channel<FlowData<DATA>, ?>) channel).pass(flowChannel);
-    final Channel<IN, IN> inputChannel = channelBuilder.ofType();
+    final Channel<IN, IN> inputChannel =
+        JRoutineCore.channelOn(mExecutor).withConfiguration(mConfiguration).ofType();
     return inputChannel.consume(new FlowChannelConsumer<DATA, IN>(flowChannel, id));
   }
 
@@ -384,8 +381,7 @@ class DefaultChannelHandler implements ChannelHandler {
       throw new IllegalArgumentException("the array of channels must not be empty");
     }
 
-    final ChannelBuilder channelBuilder =
-        JRoutineCore.channelOn(mExecutor).withConfiguration(mConfiguration);
+    final ChannelBuilder channelBuilder = JRoutineCore.channel();
     final ArrayList<Channel<? extends IN, ?>> channelList =
         new ArrayList<Channel<? extends IN, ?>>(length);
     for (final Channel<?, ?> channel : channels) {
@@ -398,7 +394,8 @@ class DefaultChannelHandler implements ChannelHandler {
       channelList.add(outputChannel);
     }
 
-    final Channel<FlowData<? extends IN>, ?> inputChannel = channelBuilder.ofType();
+    final Channel<FlowData<? extends IN>, ?> inputChannel =
+        JRoutineCore.channelOn(mExecutor).withConfiguration(mConfiguration).ofType();
     return inputChannel.consume(new SortingArrayChannelConsumer(startId, channelList));
   }
 
@@ -406,8 +403,7 @@ class DefaultChannelHandler implements ChannelHandler {
   @SuppressWarnings("unchecked")
   public <IN> Channel<FlowData<? extends IN>, ?> mergeInputOf(final int startId,
       @NotNull final Iterable<? extends Channel<? extends IN, ?>> channels) {
-    final ChannelBuilder channelBuilder =
-        JRoutineCore.channelOn(mExecutor).withConfiguration(mConfiguration);
+    final ChannelBuilder channelBuilder = JRoutineCore.channel();
     final ArrayList<Channel<? extends IN, ?>> channelList =
         new ArrayList<Channel<? extends IN, ?>>();
     for (final Channel<? extends IN, ?> channel : channels) {
@@ -424,7 +420,8 @@ class DefaultChannelHandler implements ChannelHandler {
       throw new IllegalArgumentException("the collection of channels must not be empty");
     }
 
-    final Channel<FlowData<? extends IN>, ?> inputChannel = channelBuilder.ofType();
+    final Channel<FlowData<? extends IN>, ?> inputChannel =
+        JRoutineCore.channelOn(mExecutor).withConfiguration(mConfiguration).ofType();
     return inputChannel.consume(new SortingArrayChannelConsumer(startId, channelList));
   }
 
@@ -446,8 +443,7 @@ class DefaultChannelHandler implements ChannelHandler {
       throw new NullPointerException("the map of channels must not contain null objects");
     }
 
-    final ChannelBuilder channelBuilder =
-        JRoutineCore.channelOn(mExecutor).withConfiguration(mConfiguration);
+    final ChannelBuilder channelBuilder = JRoutineCore.channel();
     final HashMap<Integer, Channel<IN, ?>> inputChannelMap =
         new HashMap<Integer, Channel<IN, ?>>(channels.size());
     for (final Entry<Integer, ? extends Channel<? extends IN, ?>> entry : channels.entrySet()) {
@@ -457,7 +453,7 @@ class DefaultChannelHandler implements ChannelHandler {
     }
 
     final Channel<FlowData<? extends IN>, FlowData<? extends IN>> inputChannel =
-        channelBuilder.ofType();
+        JRoutineCore.channelOn(mExecutor).withConfiguration(mConfiguration).ofType();
     return inputChannel.consume(new SortingMapChannelConsumer<IN>(inputChannelMap));
   }
 
@@ -626,8 +622,7 @@ class DefaultChannelHandler implements ChannelHandler {
       throw new IllegalArgumentException("the array of channels must not be empty");
     }
 
-    final ChannelBuilder channelBuilder =
-        JRoutineCore.channelOn(mExecutor).withConfiguration(mConfiguration);
+    final ChannelBuilder channelBuilder = JRoutineCore.channel();
     final ArrayList<Channel<?, ?>> channelList = new ArrayList<Channel<?, ?>>(length);
     for (final Channel<?, ?> channel : channels) {
       if (channel == null) {
@@ -639,7 +634,8 @@ class DefaultChannelHandler implements ChannelHandler {
       channelList.add(outputChannel);
     }
 
-    final Channel<List<? extends IN>, ?> inputChannel = channelBuilder.ofType();
+    final Channel<List<? extends IN>, ?> inputChannel =
+        JRoutineCore.channelOn(mExecutor).withConfiguration(mConfiguration).ofType();
     return inputChannel.consume(new DistributeChannelConsumer(channelList, isFlush, placeholder));
   }
 
@@ -648,8 +644,7 @@ class DefaultChannelHandler implements ChannelHandler {
   private <IN> Channel<List<? extends IN>, ?> internalJoinInput(final boolean isFlush,
       @Nullable final IN placeholder,
       @NotNull final Iterable<? extends Channel<? extends IN, ?>> channels) {
-    final ChannelBuilder channelBuilder =
-        JRoutineCore.channelOn(mExecutor).withConfiguration(mConfiguration);
+    final ChannelBuilder channelBuilder = JRoutineCore.channel();
     final ArrayList<Channel<?, ?>> channelList = new ArrayList<Channel<?, ?>>();
     for (final Channel<?, ?> channel : channels) {
       if (channel == null) {
@@ -665,7 +660,8 @@ class DefaultChannelHandler implements ChannelHandler {
       throw new IllegalArgumentException("the collection of channels must not be empty");
     }
 
-    final Channel<List<? extends IN>, ?> inputChannel = channelBuilder.ofType();
+    final Channel<List<? extends IN>, ?> inputChannel =
+        JRoutineCore.channelOn(mExecutor).withConfiguration(mConfiguration).ofType();
     return inputChannel.consume(new DistributeChannelConsumer(channelList, isFlush, placeholder));
   }
 

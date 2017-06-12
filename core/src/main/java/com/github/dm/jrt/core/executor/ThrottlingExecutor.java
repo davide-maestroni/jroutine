@@ -18,12 +18,12 @@ package com.github.dm.jrt.core.executor;
 
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.SimpleQueue;
-import com.github.dm.jrt.core.util.SimpleQueue.SimpleQueueIterator;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.ref.WeakReference;
+import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -46,8 +46,6 @@ class ThrottlingExecutor extends ScheduledExecutorDecorator {
   private final Object mMutex = new Object();
 
   private final SimpleQueue<PendingCommand> mQueue = new SimpleQueue<PendingCommand>();
-
-  private final VoidPendingCommand mVoidCommand = new VoidPendingCommand();
 
   private int mRunningCount;
 
@@ -81,11 +79,11 @@ class ThrottlingExecutor extends ScheduledExecutorDecorator {
   public void cancel(@NotNull final Runnable command) {
     ThrottlingCommand throttlingCommand = null;
     synchronized (mMutex) {
-      final SimpleQueueIterator<PendingCommand> iterator = mQueue.iterator();
+      final Iterator<PendingCommand> iterator = mQueue.iterator();
       while (iterator.hasNext()) {
         final PendingCommand pendingCommand = iterator.next();
         if (pendingCommand.mCommand == command) {
-          iterator.replace(mVoidCommand);
+          iterator.remove();
         }
       }
 
@@ -145,15 +143,6 @@ class ThrottlingExecutor extends ScheduledExecutorDecorator {
     }
 
     return throttlingCommand;
-  }
-
-  /**
-   * Void command implementation.
-   */
-  private static class VoidCommand implements Runnable {
-
-    public void run() {
-    }
   }
 
   /**
@@ -242,34 +231,6 @@ class ThrottlingExecutor extends ScheduledExecutorDecorator {
         if (pendingCommand != null) {
           pendingCommand.run();
         }
-      }
-    }
-  }
-
-  /**
-   * Void pending command implementation.
-   */
-  private class VoidPendingCommand extends PendingCommand {
-
-    /**
-     * Constructor.
-     */
-    private VoidPendingCommand() {
-      super(new VoidCommand(), 0, TimeUnit.MILLISECONDS);
-    }
-
-    @Override
-    public void run() {
-      final SimpleQueue<PendingCommand> queue = mQueue;
-      PendingCommand pendingCommand = null;
-      synchronized (mMutex) {
-        if (!queue.isEmpty()) {
-          pendingCommand = queue.removeFirst();
-        }
-      }
-
-      if (pendingCommand != null) {
-        pendingCommand.run();
       }
     }
   }

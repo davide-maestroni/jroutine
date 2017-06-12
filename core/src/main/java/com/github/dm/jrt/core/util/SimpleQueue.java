@@ -30,6 +30,10 @@ import java.util.Queue;
 /**
  * Minimal implementation of a light-weight queue, storing elements into a dynamically increasing
  * circular buffer.
+ * <br>
+ * Note that, even if the class implements a {@code Queue}, null elements are supported, so the
+ * values returned by {@link #peek()} and {@link #poll()} methods could not be used to detect
+ * whether the queue is empty or not.
  * <p>
  * Created by davide-maestroni on 09/27/2014.
  *
@@ -37,7 +41,7 @@ import java.util.Queue;
  */
 public class SimpleQueue<E> extends AbstractCollection<E> implements Queue<E> {
 
-  private static final int DEFAULT_SIZE = 1 << 3; // 8
+  private static final int DEFAULT_SIZE = 1 << 3;
 
   private Object[] mData;
 
@@ -46,8 +50,6 @@ public class SimpleQueue<E> extends AbstractCollection<E> implements Queue<E> {
   private int mLast;
 
   private int mMask;
-
-  private volatile long mReplaceCount = Long.MIN_VALUE;
 
   private int mSize;
 
@@ -74,20 +76,6 @@ public class SimpleQueue<E> extends AbstractCollection<E> implements Queue<E> {
   }
 
   /**
-   * Adds all the elements returned by the specified iterable to end of the queue.
-   * <p>
-   * Note that any of the returned element can be null.
-   *
-   * @param elements the element iterable.
-   */
-  public void addAll(@NotNull final Iterable<? extends E> elements) {
-    // TODO: 09/06/2017 remove?
-    for (final E element : elements) {
-      add(element);
-    }
-  }
-
-  /**
    * Adds the specified element as the first element of the queue.
    * <p>
    * Note that the element can be null.
@@ -96,7 +84,7 @@ public class SimpleQueue<E> extends AbstractCollection<E> implements Queue<E> {
    */
   public void addFirst(@Nullable final E element) {
     int mask = mMask;
-    int newFirst = (mFirst = (mFirst + mask) & mask);
+    int newFirst = (mFirst = (mFirst - 1) & mask);
     mData[newFirst] = element;
     if (newFirst == mLast) {
       doubleCapacity();
@@ -124,7 +112,7 @@ public class SimpleQueue<E> extends AbstractCollection<E> implements Queue<E> {
 
   @NotNull
   @Override
-  public SimpleQueueIterator<E> iterator() {
+  public Iterator<E> iterator() {
     return new SimpleQueueIterator<E>(this);
   }
 
@@ -242,7 +230,7 @@ public class SimpleQueue<E> extends AbstractCollection<E> implements Queue<E> {
     }
 
     final int mask = mMask;
-    return (E) mData[(mLast + mask) & mask];
+    return (E) mData[(mLast - 1) & mask];
   }
 
   /**
@@ -280,7 +268,7 @@ public class SimpleQueue<E> extends AbstractCollection<E> implements Queue<E> {
 
     final Object[] data = mData;
     final int mask = mMask;
-    final int newLast = (mLast + mask) & mask;
+    final int newLast = (mLast - 1) & mask;
     mLast = newLast;
     final Object output = data[newLast];
     data[newLast] = null;
@@ -289,19 +277,30 @@ public class SimpleQueue<E> extends AbstractCollection<E> implements Queue<E> {
   }
 
   /**
-   * TODO
+   * Removes all the elements from this queue and put them into the specified array, starting from
+   * {@code dstPos} position.
+   * <br>
+   * If the array is bigger than the required length, the remaining elements will stay untouched,
+   * and the number of transferred data will be returned.
+   * <br>
+   * On the contrary, if the array is not big enough to contain all the data, only the fitting
+   * number of elements will be transferred, and a negative number, whose absolute value represents
+   * the number of data still remaining in the queue, will be returned.
+   * <br>
+   * If the queue is empty, {@code 0} will be returned.
    *
-   * @param dst
-   * @param destPos
-   * @param <T>
-   * @return
+   * @param dst     the destination array.
+   * @param destPos the destination position in the array.
+   * @param <T>     the array component type.
+   * @return the number of transferred elements or the negated number of elements still remaining
+   * in the queue.
    */
   @SuppressWarnings("unchecked")
   public <T> int transferTo(@NotNull final T[] dst, final int destPos) {
     final Object[] data = mData;
     final int mask = mMask;
     final int last = mLast;
-    final int length = dst.length - destPos;
+    final int length = dst.length;
     int i = mFirst;
     int n = destPos;
     while (i != last) {
@@ -383,7 +382,7 @@ public class SimpleQueue<E> extends AbstractCollection<E> implements Queue<E> {
   /**
    * Queue iterator implementation.
    */
-  public static class SimpleQueueIterator<E> implements Iterator<E> {
+  private static class SimpleQueueIterator<E> implements Iterator<E> {
 
     private final SimpleQueue<E> mQueue;
 
@@ -395,8 +394,6 @@ public class SimpleQueue<E> extends AbstractCollection<E> implements Queue<E> {
 
     private int mPointer;
 
-    private long mReplaceCount;
-
     /**
      * Constructor.
      */
@@ -404,7 +401,6 @@ public class SimpleQueue<E> extends AbstractCollection<E> implements Queue<E> {
       mQueue = queue;
       mPointer = (mOriginalFirst = queue.mFirst);
       mOriginalLast = queue.mLast;
-      mReplaceCount = queue.mReplaceCount;
     }
 
     public boolean hasNext() {
@@ -413,15 +409,15 @@ public class SimpleQueue<E> extends AbstractCollection<E> implements Queue<E> {
 
     @SuppressWarnings("unchecked")
     public E next() {
-      final SimpleQueue<E> queue = mQueue;
-      final int originalLast = mOriginalLast;
-      if (queue.mLast != originalLast) {
-        throw new ConcurrentModificationException();
-      }
-
       final int pointer = mPointer;
+      final int originalLast = mOriginalLast;
       if (pointer == originalLast) {
         throw new NoSuchElementException();
+      }
+
+      final SimpleQueue<E> queue = mQueue;
+      if ((queue.mFirst != mOriginalFirst) || (queue.mLast != originalLast)) {
+        throw new ConcurrentModificationException();
       }
 
       mIsRemoved = false;
@@ -434,95 +430,53 @@ public class SimpleQueue<E> extends AbstractCollection<E> implements Queue<E> {
         throw new IllegalStateException("element already removed");
       }
 
-      final SimpleQueue<E> queue = mQueue;
-      final int last = queue.mLast;
-      final int originalLast = mOriginalLast;
-      if (last != originalLast) {
-        throw new ConcurrentModificationException();
-      }
-
       final int pointer = mPointer;
-      if (pointer == originalLast) {
-        throw new NoSuchElementException();
-      }
-
-      final Object[] data = queue.mData;
-      final int mask = queue.mMask;
-      final int first = queue.mFirst;
-      final int front = (pointer - first) & mask;
-      final int back = (last - pointer) & mask;
-      if (front <= back) {
-        if (first <= pointer) {
-          System.arraycopy(data, first, data, first + 1, front);
-          shiftForward();
-
-        } else if (back <= (mask - first + pointer)) {
-          System.arraycopy(data, pointer + 1, data, pointer, back);
-          shiftBackward();
-
-        } else {
-          System.arraycopy(data, 0, data, 1, pointer);
-          data[0] = data[mask];
-          System.arraycopy(data, first, data, first + 1, mask - first);
-          shiftForward();
-        }
-
-      } else {
-        if (pointer < last) {
-          System.arraycopy(data, pointer + 1, data, pointer, back);
-          shiftBackward();
-
-        } else if (front <= (mask - pointer + last)) {
-          System.arraycopy(data, first, data, first + 1, front);
-          shiftForward();
-
-        } else {
-          System.arraycopy(data, pointer + 1, data, pointer, mask - pointer);
-          data[mask] = data[0];
-          System.arraycopy(data, 1, data, 0, last);
-          shiftBackward();
-        }
-      }
-
-      mIsRemoved = true;
-    }
-
-    /**
-     * Replaces the last element returned by {@code next()} with the specified one.
-     * <br>
-     * This method can be called several times to replace the same element.
-     *
-     * @param element the replacement element.
-     * @throws java.lang.IllegalStateException if the {@code next()} method has not yet been called.
-     */
-    public void replace(final E element) {
-      final int pointer = mPointer;
-      if (pointer == mOriginalFirst) {
+      final int originalFirst = mOriginalFirst;
+      if (pointer == originalFirst) {
         throw new IllegalStateException();
       }
 
       final SimpleQueue<E> queue = mQueue;
-      if ((queue.mLast != mOriginalLast) || (++mReplaceCount != ++queue.mReplaceCount)) {
+      final int first = queue.mFirst;
+      final int last = queue.mLast;
+      if ((first != originalFirst) || (last != mOriginalLast)) {
         throw new ConcurrentModificationException();
       }
 
+      final Object[] data = queue.mData;
       final int mask = queue.mMask;
-      queue.mData[(pointer + mask) & mask] = element;
-    }
+      final int index = (pointer - 1) & mask;
+      final int front = (index - first) & mask;
+      final int back = (last - index) & mask;
+      if (front <= back) {
+        if (first <= index) {
+          System.arraycopy(data, first, data, first + 1, front);
 
-    private void shiftBackward() {
-      final SimpleQueue<E> queue = mQueue;
-      final int mask = queue.mMask;
-      final int last = queue.mLast;
-      queue.mLast = mOriginalLast = (last + mask) & mask;
-      mPointer = (mPointer + mask) & mask;
-    }
+        } else {
+          System.arraycopy(data, 0, data, 1, index);
+          data[0] = data[mask];
+          System.arraycopy(data, first, data, first + 1, mask - first);
+        }
 
-    private void shiftForward() {
-      final SimpleQueue<E> queue = mQueue;
-      final int first = queue.mFirst;
-      queue.mData[first] = null;
-      queue.mFirst = mOriginalFirst = (first + 1) & queue.mMask;
+        queue.mData[first] = null;
+        queue.mFirst = mOriginalFirst = (first + 1) & queue.mMask;
+
+      } else {
+        if (index < last) {
+          System.arraycopy(data, index + 1, data, index, back);
+
+        } else {
+          System.arraycopy(data, index + 1, data, index, mask - index);
+          data[mask] = data[0];
+          System.arraycopy(data, 1, data, 0, last);
+        }
+
+        queue.mLast = mOriginalLast = (last - 1) & mask;
+        mPointer = (mPointer - 1) & mask;
+      }
+
+      --queue.mSize;
+      mIsRemoved = true;
     }
   }
 }

@@ -39,7 +39,6 @@ import com.github.dm.jrt.core.util.DurationMeasure;
 import com.github.dm.jrt.core.util.DurationMeasure.Condition;
 import com.github.dm.jrt.core.util.LocalFence;
 import com.github.dm.jrt.core.util.LocalField;
-import com.github.dm.jrt.core.util.SimpleQueue;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -74,9 +73,6 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
   private static final String INVOCATION_DEADLOCK_MESSAGE =
       "cannot wait while no invocation instance is available"
           + "\nTry increasing the max number of instances";
-
-  //  private static final WeakIdentityHashMap<ChannelConsumer<?>, Object> sConsumerMutexes =
-  //      new WeakIdentityHashMap<ChannelConsumer<?>, Object>();
 
   private static final LocalFence sInvocationFence = new LocalFence();
 
@@ -221,20 +217,6 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
     mBindingHandler = new OutputHandler();
     mState = new OutputChannelState();
   }
-
-  //  @NotNull
-  //  private static Object getMutex(@NotNull final ChannelConsumer<?> consumer) {
-  //    synchronized (sConsumerMutexes) {
-  //      final WeakIdentityHashMap<ChannelConsumer<?>, Object> consumerMutexes = sConsumerMutexes;
-  //      Object mutex = consumerMutexes.get(consumer);
-  //      if (mutex == null) {
-  //        mutex = new Object();
-  //        consumerMutexes.put(consumer, mutex);
-  //      }
-  //
-  //      return mutex;
-  //    }
-  //  }
 
   public boolean abort() {
     return abort(null);
@@ -1232,17 +1214,15 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
 
     private final ChannelConsumer<? super OUT> mConsumer;
 
-    //    private final Object mConsumerMutex;
-
     private final DurationMeasure mDelay;
 
     private final boolean mIsDelayed;
 
-    private final SimpleQueue<Object> mQueue = new SimpleQueue<Object>();
-
     private boolean mIsForced;
 
     private boolean mIsRunning;
+
+    private Object[] mOutputs = new Object[8];
 
     /**
      * Constructor.
@@ -1253,13 +1233,12 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
       final DurationMeasure delay = (mDelay = mResultDelay.get());
       mIsDelayed = !delay.isZero();
       mConsumer = consumer;
-      //      mConsumerMutex = getMutex(consumer);
     }
 
     @SuppressWarnings("unchecked")
     public void flushOutput(final boolean forceClose) {
-      //      synchronized (mConsumerMutex) {
-      final SimpleQueue<Object> queue = mQueue;
+      int n;
+      Object[] outputs = mOutputs;
       final boolean isFinal;
       synchronized (mMutex) {
         if (mIsRunning) {
@@ -1270,18 +1249,19 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
           return;
         }
 
+        mIsRunning = true;
         isFinal = forceClose || mState.isReadyToComplete();
-        transferTo(queue);
-        mIsRunning = !queue.isEmpty();
+        n = transferTo(outputs);
       }
 
       final Logger logger = mLogger;
       final ChannelConsumer<? super OUT> consumer = mConsumer;
       RoutineException abortException = null;
       try {
-        while (!queue.isEmpty()) {
-          while (!queue.isEmpty()) {
-            final Object output = queue.removeFirst();
+        while (n != 0) {
+          final int length = (n < 0) ? outputs.length : n;
+          for (int i = 0; i < length; ++i) {
+            final Object output = outputs[i];
             if (output instanceof RoutineExceptionWrapper) {
               try {
                 logger.dbg("aborting consumer (%s): %s", consumer, output);
@@ -1296,7 +1276,6 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
                 logger.err(t, "ignoring consumer exception (%s)", consumer);
               }
 
-              queue.clear();
               break;
 
             } else {
@@ -1305,7 +1284,11 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
             }
           }
 
-          getOutputs(queue);
+          if (n < -outputs.length) {
+            outputs = new Object[outputs.length << 1];
+          }
+
+          n = getOutputs(outputs);
         }
 
         if (isFinal || isForced()) {
@@ -1317,22 +1300,23 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
           logger.wrn(t, "consumer exception (%s)", consumer);
           mIsRunning = false;
           mOutputQueue.clear();
-          queue.clear();
           abortException = mState.abortConsumer(t);
         }
 
         InterruptedInvocationException.throwIfInterrupt(t);
+
+      } finally {
+        Arrays.fill(outputs, null);
       }
-      //    }
 
       if (abortException != null) {
         mHandler.onAbort(abortException, 0, TimeUnit.MILLISECONDS);
       }
     }
 
-    private void getOutputs(@NotNull final SimpleQueue<Object> queue) {
+    private int getOutputs(@NotNull final Object[] dst) {
       synchronized (mMutex) {
-        transferTo(queue);
+        return transferTo(dst);
       }
     }
 
@@ -1348,15 +1332,15 @@ class ResultChannel<OUT> implements Channel<OUT, OUT> {
       }
     }
 
-    private void transferTo(@NotNull final SimpleQueue<Object> queue) {
-      // TODO: 08/06/2017 optimize using arrays?
-      mOutputQueue.transferTo(queue);
+    private int transferTo(@NotNull final Object[] dst) {
+      final int result = mOutputQueue.transferTo(dst, 0);
       mOutputCount = 0;
-      if (queue.isEmpty()) {
+      if (result == 0) {
         mIsRunning = false;
       }
 
       mMutex.notifyAll();
+      return result;
     }
 
     @Nullable

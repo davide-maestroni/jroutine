@@ -69,14 +69,14 @@ class NestedQueue<E> {
   }
 
   /**
-   * Adds all the elements returned by the specified iterable.
+   * Adds all the elements in the specified collection.
    * <p>
-   * Note that the any of the returned element can be null.
+   * Note that null elements are supported as well.
    *
-   * @param elements the element iterable.
+   * @param elements the collection of elements to add.
    * @throws java.lang.IllegalStateException if the queue has been already closed.
    */
-  void addAll(@NotNull final Iterable<? extends E> elements) {
+  void addAll(@NotNull final Collection<? extends E> elements) {
     mQueue.addAll(elements);
   }
 
@@ -99,6 +99,7 @@ class NestedQueue<E> {
    */
   void clear() {
     mQueue.clear();
+    mQueueManager = new SimpleQueueManager();
   }
 
   /**
@@ -141,6 +142,30 @@ class NestedQueue<E> {
   }
 
   /**
+   * Removes all the elements from this queue and put them into the specified array, starting from
+   * {@code dstPos} position.
+   * <br>
+   * If the array is bigger than the required length, the remaining elements will stay untouched,
+   * and the number of transferred data will be returned.
+   * <br>
+   * On the contrary, if the array is not big enough to contain all the data, only the fitting
+   * number of elements will be transferred, and a negative number, whose absolute value
+   * represents
+   * the number of data still remaining in the queue, will be returned.
+   * <br>
+   * If the queue is empty, {@code 0} will be returned.
+   *
+   * @param dst     the destination array.
+   * @param destPos the destination position in the array.
+   * @param <T>     the array component type.
+   * @return the number of transferred elements or the negated number of elements still remaining
+   * in the queue.
+   */
+  <T> int transferTo(@NotNull final T[] dst, final int destPos) {
+    return mQueueManager.transferTo(dst, destPos);
+  }
+
+  /**
    * Interface describing a manager of the internal queue.
    *
    * @param <E> the element data type.
@@ -168,6 +193,28 @@ class NestedQueue<E> {
      * @param collection the collection to fill.
      */
     void transferTo(@NotNull Collection<? super E> collection);
+
+    /**
+     * Removes all the elements from this queue and put them into the specified array, starting from
+     * {@code dstPos} position.
+     * <br>
+     * If the array is bigger than the required length, the remaining elements will stay untouched,
+     * and the number of transferred data will be returned.
+     * <br>
+     * On the contrary, if the array is not big enough to contain all the data, only the fitting
+     * number of elements will be transferred, and a negative number, whose absolute value
+     * represents
+     * the number of data still remaining in the queue, will be returned.
+     * <br>
+     * If the queue is empty, {@code 0} will be returned.
+     *
+     * @param dst     the destination array.
+     * @param destPos the destination position in the array.
+     * @param <T>     the array component type.
+     * @return the number of transferred elements or the negated number of elements still remaining
+     * in the queue.
+     */
+    <T> int transferTo(@NotNull T[] dst, int destPos);
   }
 
   /**
@@ -184,8 +231,6 @@ class NestedQueue<E> {
    */
   private static class ReadOnlyQueue<E> extends SimpleQueue<E> {
 
-    // TODO: 09/06/2017 fix
-
     private final SimpleQueue<E> mQueue;
 
     /**
@@ -198,47 +243,13 @@ class NestedQueue<E> {
     }
 
     @Override
-    public void addAll(@NotNull final Iterable<? extends E> elements) {
+    public boolean addAll(final Collection<? extends E> collection) {
       throw exception();
-    }
-
-    @Override
-    public void addFirst(@Nullable final E element) {
-      throw exception();
-    }
-
-    @Override
-    public void addLast(@Nullable final E element) {
-      throw exception();
-    }
-
-    @NotNull
-    @Override
-    public SimpleQueueIterator<E> iterator() {
-      return mQueue.iterator();
-    }
-
-    @Override
-    public int size() {
-      return mQueue.size();
     }
 
     @Override
     public boolean isEmpty() {
       return mQueue.isEmpty();
-    }
-
-    @NotNull
-    @Override
-    public Object[] toArray() {
-      return mQueue.toArray();
-    }
-
-    @NotNull
-    @Override
-    @SuppressWarnings("SuspiciousToArrayCall")
-    public <T> T[] toArray(@NotNull final T[] array) {
-      return mQueue.toArray(array);
     }
 
     @Override
@@ -252,48 +263,13 @@ class NestedQueue<E> {
     }
 
     @Override
-    public boolean offer(final E e) {
-      throw exception();
-    }
-
-    @Override
-    public E remove() {
-      return mQueue.remove();
-    }
-
-    @Override
-    public E poll() {
-      return mQueue.poll();
-    }
-
-    @Override
-    public E element() {
-      return mQueue.element();
-    }
-
-    @Override
-    public E peek() {
-      return mQueue.peek();
-    }
-
-    @Override
     public E peekFirst() {
       return mQueue.peekFirst();
     }
 
     @Override
-    public E peekLast() {
-      return mQueue.peekLast();
-    }
-
-    @Override
     public E removeFirst() {
       return mQueue.removeFirst();
-    }
-
-    @Override
-    public E removeLast() {
-      return mQueue.removeLast();
     }
 
     @Override
@@ -304,11 +280,6 @@ class NestedQueue<E> {
     @Override
     public void transferTo(@NotNull final Collection<? super E> collection) {
       mQueue.transferTo(collection);
-    }
-
-    @Override
-    public boolean addAll(final Collection<? extends E> collection) {
-      throw exception();
     }
 
     @NotNull
@@ -388,6 +359,42 @@ class NestedQueue<E> {
         }
       }
     }
+
+    @SuppressWarnings("unchecked")
+    public <T> int transferTo(@NotNull final T[] dst, final int destPos) {
+      int i = destPos;
+      int result = 0;
+      final int length = dst.length;
+      final SimpleQueue<Object> queue = mQueue;
+      while (!queue.isEmpty()) {
+        final Object element = queue.peekFirst();
+        if (element instanceof InnerNestedQueue) {
+          final NestedQueue<E> nested = (NestedQueue<E>) element;
+          final int n = nested.transferTo(dst, i);
+          if (n < 0) {
+            return n;
+          }
+
+          i += n;
+          result += n;
+          if (canPrune(nested)) {
+            queue.removeFirst();
+            continue;
+          }
+
+          return result;
+
+        } else if (i < length) {
+          dst[i++] = (T) queue.removeFirst();
+          ++result;
+
+        } else {
+          return -1;
+        }
+      }
+
+      return result;
+    }
   }
 
   /**
@@ -407,6 +414,10 @@ class NestedQueue<E> {
     @SuppressWarnings("unchecked")
     public void transferTo(@NotNull final Collection<? super E> collection) {
       ((SimpleQueue<E>) mQueue).transferTo(collection);
+    }
+
+    public <T> int transferTo(@NotNull final T[] dst, final int destPos) {
+      return mQueue.transferTo(dst, destPos);
     }
   }
 }

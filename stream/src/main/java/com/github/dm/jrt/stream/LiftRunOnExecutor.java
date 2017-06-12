@@ -24,7 +24,6 @@ import com.github.dm.jrt.core.executor.ScheduledExecutor;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.util.Function;
 import com.github.dm.jrt.function.util.Supplier;
 import com.github.dm.jrt.stream.transform.LiftingFunction;
 
@@ -57,6 +56,19 @@ class LiftRunOnExecutor<IN, OUT> implements LiftingFunction<IN, OUT, IN, OUT> {
       @NotNull final InvocationConfiguration configuration) {
     mExecutor = ConstantConditions.notNull("executor instance", executor);
     mConfiguration = ConstantConditions.notNull("invocation configuration", configuration);
+  }
+
+  public Supplier<? extends Channel<IN, OUT>> apply(
+      final Supplier<? extends Channel<IN, OUT>> supplier) {
+    return new Supplier<Channel<IN, OUT>>() {
+
+      public Channel<IN, OUT> get() {
+        return JRoutineCore.routineOn(mExecutor)
+                           .withConfiguration(mConfiguration)
+                           .of(new RunOnInvocationFactory<IN, OUT>(supplier))
+                           .invoke();
+      }
+    };
   }
 
   /**
@@ -140,18 +152,5 @@ class LiftRunOnExecutor<IN, OUT> implements LiftingFunction<IN, OUT, IN, OUT> {
     public Invocation<IN, OUT> newInvocation() {
       return new RunOnInvocation<IN, OUT>(mChannelSupplier);
     }
-  }
-
-  public Supplier<? extends Channel<IN, OUT>> apply(
-      final Supplier<? extends Channel<IN, OUT>> supplier) {
-    return wrapSupplier(supplier).andThen(new Function<Channel<IN, OUT>, Channel<IN, OUT>>() {
-
-      public Channel<IN, OUT> apply(final Channel<IN, OUT> channel) {
-        return JRoutineCore.routineOn(mExecutor)
-                           .withConfiguration(mConfiguration)
-                           .of(new RunOnInvocationFactory<IN, OUT>(supplier))
-                           .invoke();
-      }
-    });
   }
 }

@@ -194,7 +194,7 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
                                                                          return new ToCase();
                                                                        }
                                                                      }));
-    assertThat(routine.invoke().pass("TEST").close().in(seconds(1)).all()).containsOnly("test");
+    assertThat(routine.invoke().pass("TEST").close().in(seconds(10)).all()).containsOnly("test");
   }
 
   public void testConcat() {
@@ -490,12 +490,12 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
 
     final Channel<?, Integer> channel = JRoutineAndroid.channel().of(2);
     assertThat(channel.isOpen()).isFalse();
-    assertThat(channel.in(seconds(1)).all()).containsExactly(2);
-    assertThat(JRoutineAndroid.channel().of().in(seconds(1)).all()).isEmpty();
-    assertThat(JRoutineAndroid.channel().of(-11, 73).in(seconds(1)).all()).containsExactly(-11, 73);
+    assertThat(channel.in(seconds(10)).all()).containsExactly(2);
+    assertThat(JRoutineAndroid.channel().of().in(seconds(10)).all()).isEmpty();
+    assertThat(JRoutineAndroid.channel().of(-11, 73).in(seconds(10)).all()).containsExactly(-11, 73);
     assertThat(JRoutineAndroid.channel().of(Arrays.asList(3, 12, -7))
 
-                              .in(seconds(1)).all()).containsExactly(3, 12, -7);
+                              .in(seconds(10)).all()).containsExactly(3, 12, -7);
     assertThat(JRoutineAndroid.channel().of((Object[]) null).all()).isEmpty();
     assertThat(JRoutineAndroid.channel().of((List<Object>) null).all()).isEmpty();
   }

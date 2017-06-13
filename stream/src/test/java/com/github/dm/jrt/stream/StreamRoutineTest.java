@@ -636,18 +636,18 @@ public class StreamRoutineTest {
 
   @Test
   public void testMapRoutine() {
-    final Routine<String, String> routine = JRoutineCore.routine()
-                                                        .withInvocation()
-                                                        .withOutputOrder(OrderType.SORTED)
-                                                        .configuration()
-                                                        .of(new UpperCase());
+    final Routine<String, String> routine = JRoutineCore.routine().of(new UpperCase());
     assertThat(JRoutineStream.streamOf(routine)
                              .invoke()
                              .pass("test1", "test2")
                              .close()
                              .in(seconds(3))
                              .all()).containsExactly("TEST1", "TEST2");
-    assertThat(JRoutineStream.streamOf(JRoutineCore.routine().of(factoryOfParallel(routine)))
+    assertThat(JRoutineStream.streamOf(JRoutineCore.routine()
+                                                   .withInvocation()
+                                                   .withOutputOrder(OrderType.SORTED)
+                                                   .configuration()
+                                                   .of(factoryOfParallel(routine)))
                              .invoke()
                              .pass("test1", "test2")
                              .close()

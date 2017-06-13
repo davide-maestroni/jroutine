@@ -68,7 +68,7 @@ public class JRoutineAndroidFunctionTest extends ActivityInstrumentationTestCase
                                                         .of(convertFactory(
                                                             getActivity().getApplicationContext(),
                                                             createFactory()));
-    assertThat(routine.invoke().pass("test", 1).close().in(seconds(1)).all()).containsOnly("test",
+    assertThat(routine.invoke().pass("test", 1).close().in(seconds(10)).all()).containsOnly("test",
         "1");
   }
 

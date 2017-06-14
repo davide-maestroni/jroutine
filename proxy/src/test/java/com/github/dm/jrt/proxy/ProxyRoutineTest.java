@@ -117,8 +117,8 @@ public class ProxyRoutineTest {
 
   @Test
   public void testClassStaticMethod() {
-
-    final TestStatic testStatic = JRoutineProxy.wrapperOn(poolExecutor())
+    final ScheduledExecutor executor = poolExecutor();
+    final TestStatic testStatic = JRoutineProxy.wrapperOn(executor)
                                                .withInvocation()
                                                .withLogLevel(Level.DEBUG)
                                                .withLog(new NullLog())
@@ -137,6 +137,7 @@ public class ProxyRoutineTest {
     }
 
     assertThat(testStatic.getTwo().all()).containsExactly(2);
+    executor.stop();
   }
 
   @Test
@@ -220,9 +221,9 @@ public class ProxyRoutineTest {
 
   @Test
   public void testObjectStaticMethod() {
-
+    final ScheduledExecutor executor = poolExecutor();
     final TestClass test = new TestClass();
-    final TestStatic testStatic = JRoutineProxy.wrapperOn(poolExecutor())
+    final TestStatic testStatic = JRoutineProxy.wrapperOn(executor)
                                                .withInvocation()
                                                .withLogLevel(Level.DEBUG)
                                                .withLog(new NullLog())
@@ -231,6 +232,7 @@ public class ProxyRoutineTest {
 
     assertThat(testStatic.getOne().all()).containsExactly(1);
     assertThat(testStatic.getTwo().all()).containsExactly(2);
+    executor.stop();
   }
 
   @Test
@@ -254,6 +256,7 @@ public class ProxyRoutineTest {
                                       .next()).isSameAs(list);
 
     assertThat(testProxy.getString(JRoutineCore.channel().of(3))).isEqualTo("3");
+    executor.stop();
   }
 
   @Test
@@ -291,6 +294,7 @@ public class ProxyRoutineTest {
                             .withSharedFields()
                             .configuration()
                             .proxyOf(instance(test), tokenOf(TestProxy.class))).isSameAs(testProxy);
+    executor.stop();
   }
 
   @Test
@@ -312,6 +316,7 @@ public class ProxyRoutineTest {
                             .withPatch(configuration)
                             .configuration()
                             .proxyOf(instance(test), tokenOf(TestProxy.class))).isSameAs(testProxy);
+    executor.stop();
   }
 
   @Test
